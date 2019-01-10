@@ -1442,7 +1442,7 @@
 		$obj
 			.on('mousedown', function(event) {
 				if (event.which != 1 || data['pos-action'] !== ''
-						|| ($(event.target).not(data.new_widget_placeholder.container)
+						|| (!$(event.target).is(data.new_widget_placeholder.container)
 						&& data.new_widget_placeholder.container.has(event.target).length == 0)) {
 					return;
 				}
