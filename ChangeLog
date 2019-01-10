@@ -1,6 +1,8 @@
 Changes for 4.2.0alpha3
 
 New features:
+A......... [ZBXNEXT-4933] dropped support of "elementid" in map.create() and map.update() methods (Sasha)
+A......... [ZBXNEXT-4933] dropped support of string format for "headers" and "variables" in httptest.create() and httptest.update() methods (Sasha)
 ..F....... [ZBXNEXT-4873] implemented single dot datasets to be drawn as points in line vector graphs (miks)
 
 Bug fixes:
