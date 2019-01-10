@@ -23,7 +23,8 @@
 
 struct zbx_regexp
 {
-	pcre	*pcre_regexp;
+	pcre			*pcre_regexp;
+	struct pcre_extra	*extra;
 };
 
 /* maps to ovector of pcre_exec() */
@@ -37,6 +38,10 @@ zbx_regmatch_t;
 #define ZBX_REGEXP_GROUPS_MAX	10	/* Max number of supported capture groups in regular expressions. */
 					/* Group \0 contains the matching part of string, groups \1 ...\9 */
 					/* contain captured groups (substrings).                          */
+
+#ifndef PCRE_STUDY_JIT_COMPILE
+	#define PCRE_STUDY_JIT_COMPILE 0
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -59,8 +64,9 @@ zbx_regmatch_t;
  ******************************************************************************/
 static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp, const char **err_msg_static)
 {
-	int	error_offset = -1;
-	pcre	*pcre_regexp;
+	int			error_offset = -1;
+	pcre			*pcre_regexp;
+	struct pcre_extra	*extra;
 
 #ifdef PCRE_NO_AUTO_CAPTURE
 	/* If PCRE_NO_AUTO_CAPTURE bit is set in 'flags' but regular expression contains references to numbered */
@@ -92,8 +98,25 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 
 	if (NULL != regexp)
 	{
+		if (NULL == (extra = pcre_study(pcre_regexp, PCRE_STUDY_JIT_COMPILE, err_msg_static)))
+		{
+			if (NULL != *err_msg_static)
+			{
+				pcre_free(pcre_regexp);
+				return FAIL;
+			}
+
+			extra = (pcre_extra *)zbx_malloc(NULL, sizeof(pcre_extra));
+			extra->flags = 0;
+		}
+#if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION)
+		extra->flags |= PCRE_EXTRA_MATCH_LIMIT | PCRE_EXTRA_MATCH_LIMIT_RECURSION;
+		extra->match_limit = 1000000;
+		extra->match_limit_recursion = 1000000;
+#endif
 		*regexp = (zbx_regexp_t *)zbx_malloc(NULL, sizeof(zbx_regexp_t));
 		(*regexp)->pcre_regexp = pcre_regexp;
+		(*regexp)->extra = extra;
 	}
 	else
 		pcre_free(pcre_regexp);
@@ -198,24 +221,13 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	ZBX_THREAD_LOCAL static int	matches_buff[MATCHES_BUFF_SIZE];
 	int				*ovector = NULL;
 	int				ovecsize = 3 * count;		/* see pcre_exec() in "man pcreapi" why 3 */
-#if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION)
-	struct pcre_extra		pextra;
-#endif
 
 	if (ZBX_REGEXP_GROUPS_MAX < count)
 		ovector = (int *)zbx_malloc(NULL, (size_t)ovecsize * sizeof(int));
 	else
 		ovector = matches_buff;
 
-#if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION)
-	pextra.flags = PCRE_EXTRA_MATCH_LIMIT | PCRE_EXTRA_MATCH_LIMIT_RECURSION;
-	pextra.match_limit = 1000000;
-	pextra.match_limit_recursion = 1000000;
-
-	r = pcre_exec(regexp->pcre_regexp, &pextra, string, strlen(string), flags, 0, ovector, ovecsize);
-#else
-	r = pcre_exec(regexp->pcre_regexp, NULL, string, strlen(string), flags, 0, ovector, ovecsize);
-#endif
+	r = pcre_exec(regexp->pcre_regexp, regexp->extra, string, strlen(string), flags, 0, ovector, ovecsize);
 
 	if (0 <= r)	/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
 	{
@@ -252,6 +264,11 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
  ******************************************************************************/
 void	zbx_regexp_free(zbx_regexp_t *regexp)
 {
+#ifdef PCRE_CONFIG_JIT
+		pcre_free_study(regexp->extra);
+#else
+		pcre_free(regexp->extra);
+#endif
 	pcre_free(regexp->pcre_regexp);
 	zbx_free(regexp);
 }
