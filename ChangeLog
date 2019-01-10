@@ -6,6 +6,7 @@ A......... [ZBXNEXT-4933] dropped support of string format for "headers" and "va
 ..F....... [ZBXNEXT-4873] implemented single dot datasets to be drawn as points in line vector graphs (miks)
 
 Bug fixes:
+..F....... [ZBX-15377] fixed error messages for arrays in GET parameters (Sasha)
 A......... [ZBX-15369] fixed "Undefined index: label" in map.update() method (Sasha)
 ..F....... [ZBX-15376] fixed "Undefined index: refresh" on several pages with disabled guest user (Sasha)
 ..F....... [ZBX-15375] fixed web scenario step name can consist only of whitespaces (agriscenko)
