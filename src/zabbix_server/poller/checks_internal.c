@@ -882,7 +882,11 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
+			zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
+
 			zbx_get_zabbix_stats(&json);
+
+			zbx_json_close(&json);
 
 			set_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
 
