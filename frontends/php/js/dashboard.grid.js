@@ -889,6 +889,8 @@
 				data['pos-action'] = '';
 				setResizableState('enable', data.widgets, widget.uniqueid);
 				stopWidgetPositioning($obj, $(event.target), data);
+				// Hide resize handles for situation when mouse button was released outside dashboard container area.
+				widget['div'].find('.ui-resizable-handle').hide();
 
 				// Hack for Safari to manually accept parent container height in pixels when done widget snapping to grid.
 				if (SF) {
