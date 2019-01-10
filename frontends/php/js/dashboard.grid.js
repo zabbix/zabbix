@@ -386,7 +386,7 @@
 			.error(`\t\t\t\t\tcollapsing widgets`);
 		console
 			.log(`affected widgets after compact step (${axis_key}, ${opposite_axis_key}, ${size_key}):`,
-				JSON.parse(JSON.stringify((function(d){ return $.map(d, function(b){return `"${b.header}: ${b.current_pos[axis_key]}, ${b.current_pos[opposite_axis_key]}, ${b.current_pos[size_key]}"`}).join(', ')})(affected))))
+				(function(d){ return $.map(d, function(b){return `"${b.header}: ${b.current_pos[axis_key]}, ${b.current_pos[opposite_axis_key]}, ${b.current_pos[size_key]}"`}).join(', ')})(affected));
 
 		// Compact widget by resizing.
 		if (overlap > 0) {
@@ -529,7 +529,7 @@
 					console
 						.log(`\tcollapsed_pos:`, JSON.parse(JSON.stringify(collapsed_pos)));
 					affected.each(function(box) {
-						if (box.current_pos[axis_key] > slot) {
+						if (box.current_pos[axis_key] > slot && box.current_pos[opposite_axis_key] in collapsed_pos) {
 							var old_value = box.current_pos[axis_key];
 
 							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - scanline[size_key],
@@ -537,6 +537,10 @@
 							);
 							console
 								.log(`${box.header} moved from ${old_value} to ${box.current_pos[axis_key]}, pos.${axis_key}=${box.pos[axis_key]}`);
+						}
+						else {
+							console
+								.log(`${box.header} keep same position ${axis_key}, slot=${slot}`, $.extend({}, box.current_pos));
 						}
 					});
 
