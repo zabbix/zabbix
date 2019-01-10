@@ -48,20 +48,20 @@ class testItem extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['itemids'] as $id) {
-				$dbResult = 'SELECT * FROM items WHERE itemid='.$id;
+				$dbResult = 'SELECT * FROM items WHERE itemid='.zbx_dbstr($id);
 				$this->assertEquals(0, CDBHelper::getCount($dbResult));
 			}
 
 			// Check that related discovered trigerid is removed with all related data.
 			if (array_key_exists('discovered_triggerids', $data)) {
 				foreach ($data['discovered_triggerids'] as $id) {
-					$dbResult = 'SELECT * FROM triggers WHERE triggerid='.$id;
+					$dbResult = 'SELECT * FROM triggers WHERE triggerid='.zbx_dbstr($id);
 					$this->assertEquals(0, CDBHelper::getCount($dbResult));
 
-					$dbResult = 'SELECT * FROM functions WHERE triggerid='.$id;
+					$dbResult = 'SELECT * FROM functions WHERE triggerid='.zbx_dbstr($id);
 					$this->assertEquals(0, CDBHelper::getCount($dbResult));
 
-					$dbResult = 'SELECT * FROM trigger_discovery WHERE triggerid='.$id;
+					$dbResult = 'SELECT * FROM trigger_discovery WHERE triggerid='.zbx_dbstr($id);
 					$this->assertEquals(0, CDBHelper::getCount($dbResult));
 				}
 			}
@@ -69,7 +69,7 @@ class testItem extends CAPITest {
 			// Check that dependent item is removed.
 			if (array_key_exists('dependent_item', $data)) {
 				foreach ($data['dependent_item'] as $id) {
-					$dbResult = 'SELECT * FROM items WHERE itemid='.$id;
+					$dbResult = 'SELECT * FROM items WHERE itemid='.zbx_dbstr($id);
 					$this->assertEquals(0, CDBHelper::getCount($dbResult));
 				}
 			}
@@ -77,13 +77,13 @@ class testItem extends CAPITest {
 			// Check that discovered trigger of dependent item is removed with all related data.
 			if (array_key_exists('dependent_item_disc_triggerids', $data)) {
 				foreach ($data['dependent_item_disc_triggerids'] as $id) {
-					$dbResult = 'SELECT * FROM triggers WHERE triggerid='.$id;
+					$dbResult = 'SELECT * FROM triggers WHERE triggerid='.zbx_dbstr($id);
 					$this->assertEquals(0, CDBHelper::getCount($dbResult));
 
-					$dbResult = 'SELECT * FROM functions WHERE triggerid='.$id;
+					$dbResult = 'SELECT * FROM functions WHERE triggerid='.zbx_dbstr($id);
 					$this->assertEquals(0, CDBHelper::getCount($dbResult));
 
-					$dbResult = 'SELECT * FROM trigger_discovery WHERE triggerid='.$id;
+					$dbResult = 'SELECT * FROM trigger_discovery WHERE triggerid='.zbx_dbstr($id);
 					$this->assertEquals(0, CDBHelper::getCount($dbResult));
 				}
 			}
