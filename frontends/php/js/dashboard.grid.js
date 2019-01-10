@@ -268,30 +268,49 @@
 	 * @param {number} max_rows  Dashboard rows count.
 	 */
 	function dragPrepare(widgets, widget, max_rows) {
-		var pos = $.extend({}, widget.pos);
+		var pos = {
+			x: widget.pos.x,
+			y: widget.pos.y + widget.pos.height,
+			width: widget.pos.width,
+			height: 1
+		};
 
-		pos.height = max_rows - pos.y;
-
-		widgets
+		var markAffected = function(pos) {
+			$.map(widgets, function(box) {
+				return (!('affected' in box) && rectOverlap(pos, box.current_pos)) ? box : null;
+			})
 			.each(function(box) {
-				if (widget.uniqueid == box.uniqueid || !rectOverlap(pos, box.pos)) {
+				if (box.uniqueid == widget.uniqueid) {
 					return;
 				}
 
-				box.current_pos.y = box.pos.y - widget.pos.height;
+				var pos = $.extend({}, box.pos);
 
-				widgets.each(function(b) {
-					if (b.uniqueid == box.uniqueid || b.uniqueid == widget.uniqueid
-							|| !rectOverlap(b.current_pos, box.current_pos)) {
-						return;
-					}
+				pos.height += 1;
 
-					box.current_pos.y = Math.max(box.current_pos.y, b.current_pos.y + b.current_pos.height);
-				});
-
-				console
-					.log(`${box.pos.y - widget.pos.height != box.current_pos.y ? '! ' : ''}${box.header} desired position ${box.pos.y - widget.pos.height} actual ${box.current_pos.y}`);
+				box.affected = 1;
+				markAffected(pos);
 			});
+		};
+
+		markAffected(pos);
+		widgets.each(function(box) {
+			if (!('affected' in box)) {
+				return;
+			}
+
+			delete box.affected;
+			box.current_pos.y = box.pos.y - widget.pos.height;
+
+			widgets.each(function(b) {
+				if (b.uniqueid == box.uniqueid || b.uniqueid == widget.uniqueid
+						|| !rectOverlap(b.current_pos, box.current_pos)) {
+					return;
+				}
+
+				box.current_pos.y = Math.max(box.current_pos.y, b.current_pos.y + b.current_pos.height);
+			});
+		});
 	}
 
 	/**
@@ -347,7 +366,7 @@
 				: null;
 		});
 
-		widgets.each(function(b) {b.div.css('background-color', 'affected_axis' in b ? (b.affected_axis == 'x' ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 255, 0, 0.5)') : '' )});
+		widgets.each(function(b) {b.div.css('background-color', 'affected_axis' in b ? (b.affected_axis == 'x' ? 'rgba(255, 0, 0, 0.1)' : 'rgba(0, 255, 0, 0.1)') : '' )});
 
 		var margins = {},
 			overlap = 0,
@@ -579,7 +598,7 @@
 						console
 							.log(`\tnew_pos`, JSON.parse(JSON.stringify(box.new_pos)));
 						box.current_pos = box.new_pos;
-						box.div.css('background-color', axis_key == 'x' ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 255, 0, 1)');
+						box.div.css('background-color', axis_key == 'x' ? 'rgba(255, 0, 0, 0.3)' : 'rgba(0, 255, 0, 0.3)');
 					}
 
 					delete box.new_pos;
