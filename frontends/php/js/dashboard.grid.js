@@ -304,14 +304,14 @@
 			},
 			markAffectedWidgets = function(pos) {
 				$.map(widgets, function(box) {
-					return (!('affected_axis' in box) && rectOverlap(pos, box.pos)) ? box : null;
+					return (!('affected_axis' in box) && rectOverlap(pos, box.current_pos)) ? box : null;
 				})
 				.each(function(box) {
-					var boundary = $.extend({}, box.pos);
+					var boundary = $.extend({}, box.current_pos);
 
 					if (axis_key in axis) {
 						boundary[axis_key] = Math.max(0, boundary[axis_key] - axis[size_key]);
-						boundary[size_key] += box.pos[axis_key] - boundary[axis_key];
+						boundary[size_key] += box.current_pos[axis_key] - boundary[axis_key];
 					}
 					else {
 						boundary[size_key] += axis[size_key];
@@ -330,11 +330,7 @@
 				: null;
 		});
 
-		if (axis_key == 'x') {
-			widgets.each(function(b) {b.div.css('background-color', '')});
-		}
-		//widgets.each(function(b) { (b.header == 'F1') && (b.div.css('background-color', 'rgba(255, 0, 0, 0.5)'))});
-		affected.each(function(b) {b.div.css('background-color', axis_key == 'x' ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 255, 0, 0.5)')});
+		widgets.each(function(b) {b.div.css('background-color', 'affected_axis' in b ? (b.affected_axis == 'x' ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 255, 0, 0.5)') : '' )});
 
 		var margins = {},
 			overlap = 0,
@@ -638,12 +634,7 @@
 				size_min: 1,
 				size_max: data.options['max-columns'],
 				width: changes.width,
-				boundary: {
-					x: widget.current_pos.x,
-					y: widget['height' in changes ? 'pos' : 'current_pos'].y,
-					width: widget.current_pos.width,
-					height: widget['height' in changes ? 'pos' : 'current_pos'].height // it always gives same result. why?
-				},
+				boundary: $.extend({}, widget.current_pos),
 				scanline: {
 					width: data.options['max-columns'],
 					height: data.options['max-rows']
