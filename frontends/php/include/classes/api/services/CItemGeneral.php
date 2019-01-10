@@ -721,23 +721,47 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Updates the children of the item on the given hosts and propagates the inheritance to the child hosts.
 	 *
-	 * @param array $items          an array of items to inherit
-	 * @param array|null $hostids   an array of hosts to inherit to; if set to null, the children will be updated on all
-	 *                              child hosts
+	 * @param array      $tpl_items              an array of items to inherit
+	 * @param string     $tpl_items[]['itemid']
+	 * @param int        $tpl_items[]['type']
+	 * @param array|null $hostids                an array of hosts to inherit to; if set to null, the items will be
+	 *                                           inherited to all linked hosts or templates
 	 */
-	protected function inherit(array $items, array $hostids = null) {
-		if (!$items) {
-			return;
-		}
+	protected function inherit(array $tpl_items, array $hostids = null) {
+		$tpl_items = zbx_toHash($tpl_items, 'itemid');
 
+		// Inherit starting from common items and finishing up dependent.
+		while ($tpl_items) {
+			$_tpl_items = [];
+
+			foreach ($tpl_items as $tpl_item) {
+				if ($tpl_item['type'] != ITEM_TYPE_DEPENDENT//* || TODO: !array_key_exists('master_itemid', $tpl_item)*/
+						|| !array_key_exists($tpl_item['master_itemid'], $tpl_items)) {
+					$_tpl_items[$tpl_item['itemid']] = $tpl_item;
+				}
+			}
+
+			foreach ($_tpl_items as $itemid => $_tpl_item) {
+				unset($tpl_items[$itemid]);
+			}
+
+			$this->_inherit($_tpl_items, $hostids);
+		}
+	}
+
+	/**
+	 * Auxiliary method for item inheritance. See full description in inherit() method.
+	 */
+	private function _inherit(array $tpl_items, array $hostids = null) {
 		// Prepare the child items.
-		$new_items = $this->prepareInheritedItems($items, $hostids);
+		$new_items = $this->prepareInheritedItems($tpl_items, $hostids);
 		if (!$new_items) {
 			return;
 		}
 
 		$ins_items = [];
 		$upd_items = [];
+
 		foreach ($new_items as $new_item) {
 			if (array_key_exists('itemid', $new_item)) {
 				if ($this instanceof CItemPrototype) {
@@ -753,34 +777,30 @@ abstract class CItemGeneral extends CApiService {
 		// Save the new items.
 		if ($ins_items) {
 			if ($this instanceof CItem) {
-				static::validateInventoryLinks($ins_items, false); // false means 'create'
+				static::validateInventoryLinks($ins_items, false);
+			}
+			if ($this instanceof CItem || $this instanceof CItemPrototype) {
+				$this->validateDependentItems($ins_items, get_class($this).'::create');
 			}
 
 			$this->createReal($ins_items);
-
-			if ($this instanceof CItem || $this instanceof CItemPrototype) {
-				$ins_items = $this->inheritDependentItems($ins_items);
-				$this->validateDependentItems($ins_items, get_class($this).'::create');
-			}
 		}
 
 		if ($upd_items) {
 			if ($this instanceof CItem) {
-				static::validateInventoryLinks($upd_items, true); // true means 'update'
+				static::validateInventoryLinks($upd_items, true);
+			}
+			if ($this instanceof CItem || $this instanceof CItemPrototype) {
+				$this->validateDependentItems($upd_items, get_class($this).'::update');
 			}
 
 			$this->updateReal($upd_items);
-
-			if ($this instanceof CItem || $this instanceof CItemPrototype) {
-				$upd_items = $this->inheritDependentItems($upd_items);
-				$this->validateDependentItems($upd_items, get_class($this).'::update');
-			}
 		}
 
 		$new_items = array_merge($upd_items, $ins_items);
 
 		// Inheriting items from the templates.
-		$tpl_items = DBselect(
+		$db_items = DBselect(
 			'SELECT i.itemid'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
@@ -789,8 +809,8 @@ abstract class CItemGeneral extends CApiService {
 		);
 
 		$tpl_itemids = [];
-		while ($tpl_item = DBfetch($tpl_items)) {
-			$tpl_itemids[$tpl_item['itemid']] = true;
+		while ($db_item = DBfetch($db_items)) {
+			$tpl_itemids[$db_item['itemid']] = true;
 		}
 
 		foreach ($new_items as $index => $new_item) {
@@ -806,27 +826,27 @@ abstract class CItemGeneral extends CApiService {
 	 * Prepares and returns an array of child items, inherited from items $tpl_items on the given hosts.
 	 *
 	 * @param array      $tpl_items
-	 * @param string     $tpl_items[]['itemid']
-	 * @param string     $tpl_items[]['hostid']
-	 * @param string     $tpl_items[]['key_']
-	 * @param int        $tpl_items[]['type']
-	 * @param array      $tpl_items[]['applicationPrototypes']            (optional) Suitable for item prototypes.
-	 * @param string     $tpl_items[]['applicationPrototypes'][]['name']
-	 * @param array      $tpl_items[]['applications']                     (optional) Array of applicationids.
-	 * @param array      $tpl_items[]['preprocessing']                    (optional) Suitable for items and item
-	 *                                                                               prototypes.
-	 * @param int        $tpl_items[]['preprocessing'][]['type']
-	 * @param string     $tpl_items[]['preprocessing'][]['params']
-	 * @param int        $tpl_items[]['flags']
-	 * @param mixed      $tpl_items[][<field_name>]                       (optional)
+	 * @param string     $tpl_items[<itemid>]['itemid']
+	 * @param string     $tpl_items[<itemid>]['hostid']
+	 * @param string     $tpl_items[<itemid>]['key_']
+	 * @param int        $tpl_items[<itemid>]['type']
+	 * @param array      $tpl_items[<itemid>]['applicationPrototypes']            (optional) Suitable for item
+	 *                                                                            prototypes.
+	 * @param string     $tpl_items[<itemid>]['applicationPrototypes'][]['name']
+	 * @param array      $tpl_items[<itemid>]['applications']                     (optional) Array of applicationids.
+	 * @param array      $tpl_items[<itemid>]['preprocessing']                    (optional) Suitable for items and item
+	 *                                                                            prototypes.
+	 * @param int        $tpl_items[<itemid>]['preprocessing'][]['type']
+	 * @param string     $tpl_items[<itemid>]['preprocessing'][]['params']
+	 * @param int        $tpl_items[<itemid>]['flags']
+	 * @param string     $tpl_items[<itemid>]['master_itemid']                    (optional)
+	 * @param mixed      $tpl_items[<itemid>][<field_name>]                       (optional)
 	 * @param array|null $hostids
 	 *
 	 * @return array an array of unsaved child items
 	 */
-	protected function prepareInheritedItems(array $tpl_items, array $hostids = null) {
+	private function prepareInheritedItems(array $tpl_items, array $hostids = null) {
 		$class = get_class($this);
-
-		$tpl_items = zbx_toHash($tpl_items, 'itemid');
 
 		$itemids_by_templateid = [];
 		foreach ($tpl_items as $tpl_item) {
@@ -1140,6 +1160,63 @@ abstract class CItemGeneral extends CApiService {
 				}
 				unset($new_item);
 			}
+		}
+
+		if ($class === 'CItem' || $class === 'CItemPrototype') {
+			$new_items = $this->prepareDependentItems($tpl_items, $new_items, $hostids);
+		}
+
+		return $new_items;
+	}
+
+	/**
+	 * Update relations for inherited dependent items to master items.
+	 *
+	 * @param array      $tpl_items
+	 * @param int        $tpl_items[<itemid>]['type']
+	 * @param string     $tpl_items[<itemid>]['master_itemid']  (optional)
+	 * @param array      $new_items
+	 * @param string     $new_items[<itemid>]['hostid']
+	 * @param int        $new_items[<itemid>]['type']
+	 * @param string     $new_items[<itemid>]['templateid']
+	 * @param array|null $hostids
+	 *
+	 * @return array an array of synchronized inherited items.
+	 */
+	private function prepareDependentItems(array $tpl_items, array $new_items, array $hostids = null) {
+		$tpl_master_itemids = [];
+
+		foreach ($tpl_items as $tpl_item) {
+			if ($tpl_item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists('master_itemid', $tpl_item)) {
+				$tpl_master_itemids[$tpl_item['master_itemid']] = true;
+			}
+		}
+
+		if ($tpl_master_itemids) {
+			$sql = 'SELECT i.itemid,i.hostid,i.templateid'.
+				' FROM items i'.
+				' WHERE '.dbConditionId('i.templateid', array_keys($tpl_master_itemids));
+			if ($hostids !== null) {
+				$sql .= ' AND '.dbConditionId('i.hostid', $hostids);
+			}
+			$db_items = DBselect($sql);
+
+			$master_links = [];
+
+			while ($db_item = DBfetch($db_items)) {
+				$master_links[$db_item['templateid']][$db_item['hostid']] = $db_item['itemid'];
+			}
+
+			foreach ($new_items as &$new_item) {
+				if ($new_item['type'] == ITEM_TYPE_DEPENDENT) {
+					$tpl_item = $tpl_items[$new_item['templateid']];
+
+					if (array_key_exists('master_itemid', $tpl_item)) {
+						$new_item['master_itemid'] = $master_links[$tpl_item['master_itemid']][$new_item['hostid']];
+					}
+				}
+			}
+			unset($new_item);
 		}
 
 		return $new_items;
@@ -1740,70 +1817,6 @@ abstract class CItemGeneral extends CApiService {
 				));
 			}
 		}
-	}
-
-	/**
-	 * Synchronize dependent item to master item relation for inherited items.
-	 *
-	 * @param array $items  Array of inherited items.
-	 *
-	 * @return array an array of synchronized inherited items.
-	 */
-	protected function inheritDependentItems(array $items) {
-		$master_itemids = [];
-
-		foreach ($items as $item) {
-			if ($item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists('master_itemid', $item)) {
-				$master_itemids[$item['master_itemid']] = true;
-			}
-		}
-
-		if ($master_itemids) {
-			$master_items = DB::select('items', [
-				'output' => ['key_', 'hostid'],
-				'filter' => ['itemid' => array_keys($master_itemids)],
-				'preservekeys' => true
-			]);
-
-			$data = [];
-			$host_master_items = [];
-
-			foreach ($items as &$item) {
-				if ($item['type'] != ITEM_TYPE_DEPENDENT || !array_key_exists('master_itemid', $item)) {
-					continue;
-				}
-				$master_item = $master_items[$item['master_itemid']];
-
-				if (!array_key_exists($item['hostid'], $host_master_items)) {
-					$host_master_items[$item['hostid']] = [];
-				}
-
-				if (bccomp($master_item['hostid'], $item['hostid']) != 0) {
-					if (!array_key_exists($master_item['key_'], $host_master_items[$item['hostid']])) {
-						$inherited_master_items = DB::select('items', [
-							'output' => ['itemid'],
-							'filter' => ['hostid' => $item['hostid'], 'key_' => $master_item['key_']]
-						]);
-
-						$host_master_items[$item['hostid']][$master_item['key_']] = reset($inherited_master_items);
-					}
-
-					$inherited_master_item = $host_master_items[$item['hostid']][$master_item['key_']];
-					$data[] = [
-						'values' => ['master_itemid' => $inherited_master_item['itemid']],
-						'where' => ['itemid' => $item['itemid']]
-					];
-					$item['master_itemid'] = $inherited_master_item['itemid'];
-				}
-			}
-			unset($item);
-
-			if ($data) {
-				DB::update('items', $data);
-			}
-		}
-
-		return $items;
 	}
 
 	/**
