@@ -927,7 +927,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($discovery_rule);
 		$this->zbxTestClickLinkTextWait('Host prototypes');
-		$this->zbxTestContentControlButtonClickText('Create host prototype');
+		$this->zbxTestContentControlButtonClickTextWait('Create host prototype');
 
 		$this->zbxTestInputType('host', $name);
 		$this->zbxTestTabSwitch('Groups');
