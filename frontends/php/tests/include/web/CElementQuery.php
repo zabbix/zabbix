@@ -34,6 +34,7 @@ require_once dirname(__FILE__).'/elements/CMessageElement.php';
 require_once dirname(__FILE__).'/elements/CMultiselectElement.php';
 require_once dirname(__FILE__).'/elements/CSegmentedRadioElement.php';
 require_once dirname(__FILE__).'/elements/CRangeControlElement.php';
+require_once dirname(__FILE__).'/elements/CCheckboxListElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -138,7 +139,12 @@ class CElementQuery implements IWaitable {
 		}
 
 		if ($locator === null) {
-			list($type, $locator) = explode(':', $type, 2);
+			$parts = explode(':', $type, 2);
+			if (count($parts) !== 2) {
+				throw new Exception('Element selector "'.$type.'" is not well formatted.');
+			}
+
+			list($type, $locator) = $parts;
 		}
 
 		$mapping = [
@@ -147,7 +153,7 @@ class CElementQuery implements IWaitable {
 			'tag' => 'tagName',
 			'link' => 'linkText',
 			'button' => function () use ($locator) {
-				return WebDriverBy::xpath('//button[contains(text(),'.CXPathHelper::escapeQuotes($locator).')]');
+				return WebDriverBy::xpath('.//button[contains(text(),'.CXPathHelper::escapeQuotes($locator).')]');
 			}
 		];
 

@@ -48,7 +48,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 	// Test case annotations.
 	protected $annotations = null;
 	// Test case warnings.
-	protected $warnings = [];
+	protected static $warnings = [];
 
 	/**
 	 * Overriden constructor for collecting data on data sets from dataProvider annotations.
@@ -109,6 +109,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 		$class_name = get_class($this);
 		$case_name = $this->getName(false);
 		$this->backup = [];
+		self::$warnings = [];
 
 		if (!isset($DB['DB'])) {
 			DBconnect($error);
@@ -184,8 +185,8 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 		DBclose();
 
-		if ($this->warnings) {
-			throw new PHPUnit_Framework_Warning(implode("\n", $this->warnings));
+		if (self::$warnings) {
+			throw new PHPUnit_Framework_Warning(implode("\n", self::$warnings));
 		}
 	}
 
@@ -221,9 +222,9 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param string $warning    warning text
 	 */
-	public function addWarning($warning) {
-		if (defined('PHPUNIT_REPORT_WARNINGS') && PHPUNIT_REPORT_WARNINGS && !in_array($warning, $this->warnings)) {
-			$this->warnings[] = $warning;
+	public static function addWarning($warning) {
+		if (defined('PHPUNIT_REPORT_WARNINGS') && PHPUNIT_REPORT_WARNINGS && !in_array($warning, self::$warnings)) {
+			self::$warnings[] = $warning;
 		}
 	}
 }

@@ -78,13 +78,23 @@ class CFormElement extends CElement {
 	 */
 	public function getLabel($name) {
 		$prefix = 'xpath:.//ul[@class="table-forms"]/li/div[@class="table-forms-td-left"]';
-		$label = $this->query($prefix.'/label[text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
+		$labels = $this->query($prefix.'/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
 
-		if ($label === null) {
+		if ($labels->isEmpty()) {
 			throw new Exception('Failed to find form label by name: "'.$name.'".');
 		}
 
-		return $label;
+		if ($labels->count() > 1) {
+			CTest::addWarning('Form label "'.$name.'" is not unique.');
+		}
+
+		foreach ($labels as $label) {
+			if ($label->isVisible()) {
+				return $label;
+			}
+		}
+
+		throw new Exception('Form label with name: "'.$name.'" is not visible.');
 	}
 
 	/**
@@ -95,18 +105,49 @@ class CFormElement extends CElement {
 	 * @return CElement|null
 	 */
 	public function getFieldByLabelElement($label) {
-		$prefix = 'xpath:./../../div[@class="table-forms-td-right"]';
-		$selectors = [
-			'/*[@name][not(@type="hidden")]'		=> 'CElement',
-			'/div[@class="multiselect-wrapper"]'	=> 'CMultiselectElement',
-			'/ul[@class="radio-segmented"]'			=> 'CSegmentedRadioElement',
-			'/div[@class="range-control"]'			=> 'CRangeControlElement'
+		$prefix = './../../div[@class="table-forms-td-right"]';
+		$classes = [
+			'CElement'					=> [
+				'/input[@name][not(@type) or @type="text" or @type="password"]',
+				'/textarea[@name]'
+			],
+			'CDropdownElement'			=> '/select[@name]',
+			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
+			'CMultiselectElement'		=> '/div[@class="multiselect-wrapper"]',
+			'CSegmentedRadioElement'	=> [
+				'/ul[@class="radio-segmented"]',
+				'/div/ul[@class="radio-segmented"]',
+			],
+			'CCheckboxListElement'		=> '/ul[@class="list-check-radio"]',
+			'CTableElement'				=> [
+				'/table',
+				'/*[@class="table-forms-separator"]/table'
+			],
+			'CRangeControlElement'		=> '/div[@class="range-control"]'
 		];
 
-		foreach ($selectors as $selector => $class) {
-			if (($element = $label->query($prefix.$selector)->cast($class)->one(false)) !== null) {
+		foreach ($classes as $class => $selectors) {
+			if (!is_array($selectors)) {
+				$selectors = [$selectors];
+			}
+
+			$xpaths = [];
+			foreach ($selectors as $selector) {
+				$xpaths[] = $prefix.$selector;
+			}
+
+			if (($element = $label->query('xpath', implode('|', $xpaths))->cast($class)->one(false)) !== null) {
 				return $element;
 			}
+		}
+
+		// Nested table forms.
+		$element = $label->query('xpath', $prefix.'//ul[@class="table-forms"]/..')
+				->cast('CFormElement', ['normalized' => true])
+				->one(false);
+
+		if ($element !== null) {
+			return $element;
 		}
 
 		return null;
@@ -136,14 +177,15 @@ class CFormElement extends CElement {
 	/**
 	 * Get field by label name.
 	 *
-	 * @param string $name    field label text
+	 * @param string  $name          field label text
+	 * @param boolean $invalidate    cache usage flag
 	 *
 	 * @return CElement
 	 *
 	 * @throws Exception
 	 */
-	public function getField($name) {
-		if (!$this->fields->exists($name)) {
+	public function getField($name, $invalidate = false) {
+		if ($invalidate || !$this->fields->exists($name)) {
 			$label = $this->getLabel($name);
 
 			if (($element = $this->getFieldByLabelElement($label)) === null) {
@@ -154,6 +196,36 @@ class CFormElement extends CElement {
 		}
 
 		return $this->fields->get($name);
+	}
+
+	/**
+	 * Get field by field id.
+	 *
+	 * @param string $id    field id
+	 *
+	 * @return CElement
+	 *
+	 * @throws Exception
+	 */
+	public function getFieldById($id) {
+		$prefix = 'xpath:.//ul[@class="table-forms"]/li/div[@class="table-forms-td-left"]';
+		$label = $this->query($prefix.'/label[@for='.CXPathHelper::escapeQuotes($id).']')->one(false);
+
+		if (!$label) {
+			$label = $this->query('xpath:.//ul[@class="table-forms"]/li/div[@class="table-forms-td-right"]//*[@id='.
+					CXPathHelper::escapeQuotes($id).']/ancestor::div[@class="table-forms-td-right"]/../'.
+					'div[@class="table-forms-td-left"]/label')->one(false);
+
+			if (!$label) {
+				throw new Exception('Failed to find form label by field id: "'.$id.'".');
+			}
+		}
+
+		if (($element = $this->getFieldByLabelElement($label)) === null) {
+			throw new Exception('Failed to find form field by label id: "'.$id.'".');
+		}
+
+		return $element;
 	}
 
 	/**
@@ -226,6 +298,27 @@ class CFormElement extends CElement {
 		}
 		else {
 			parent::submit();
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Fill form with specified data.
+	 *
+	 * @param array $data    data array where keys are label text and values are values to be put in fields
+	 *
+	 * @return $this
+	 */
+	public function fill($data) {
+		if ($data) {
+			if (!is_array($data)) {
+				$data = [$data];
+			}
+
+			foreach ($data as $field => $value) {
+				$this->getField($field)->fill($value);
+			}
 		}
 
 		return $this;
