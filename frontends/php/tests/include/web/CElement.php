@@ -203,6 +203,17 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getText() {
+		if (!$this->isVisible()) {
+			return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+		}
+
+		return parent::getText();
+	}
+
+	/**
 	 * Check if element is clickable.
 	 *
 	 * @return boolean

@@ -170,6 +170,16 @@ class CElementCollection implements Iterator {
 	}
 
 	/**
+	 * Set element by key.
+	 *
+	 * @param mixed $key        array key
+	 * @param mixed $element    element to be set
+	 */
+	public function set($key, $element) {
+		$this->elements[$key] = $element;
+	}
+
+	/**
 	 * Perform action on all array elements.
 	 *
 	 * @param string $method    method name

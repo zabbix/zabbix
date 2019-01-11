@@ -156,6 +156,17 @@ trait CastableTrait {
 	}
 
 	/**
+	 * Cast object to Range Control element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CRangeControlElement
+	 */
+	public function asRangeControl($options = []) {
+		return $this->cast('CRangeControlElement', $options);
+	}
+
+	/**
 	 * Cast object to base RemoteWebElement.
 	 *
 	 * @param array $options    additional casting options
