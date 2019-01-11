@@ -132,6 +132,18 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
+			'application_prototypes' => [
+				'title' => _('Application prototypes'),
+				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
+				'allowed_src_fields' => 'application_prototypeid,name',
+				'form' => [
+					'name' => 'application_prototype_form',
+					'id' => 'application_prototypes'
+				],
+				'table_columns' => [
+					_('Name')
+				]
+			],
 			'triggers' => [
 				'title' => _('Triggers'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
@@ -861,6 +873,33 @@ class CControllerPopupGeneric extends CController {
 				$records = API::Application()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['applicationid' => 'id']);
+				break;
+
+			case 'application_prototypes':
+				$parent_discoveryid = $this->getInput('parent_discoveryid');
+
+				$discovery_rules = API::DiscoveryRule()->get([
+					'output' => [],
+					'selectApplicationPrototypes' => ['application_prototypeid', 'name'],
+					'itemids' => [$parent_discoveryid]
+				]);
+
+				if ($discovery_rules) {
+					$discovery_rule = $discovery_rules[0];
+
+					if ($discovery_rule['applicationPrototypes']) {
+						CArrayHelper::sort($discovery_rule['applicationPrototypes'], [
+							['field' => 'name', 'order' => ZBX_SORT_UP]
+						]);
+
+						foreach ($discovery_rule['applicationPrototypes'] as $application_prototype) {
+							$records[$application_prototype['application_prototypeid']] = [
+								'id' => $application_prototype['application_prototypeid'],
+								'name' => $application_prototype['name']
+							];
+						}
+					}
+				}
 				break;
 
 			case 'graphs':

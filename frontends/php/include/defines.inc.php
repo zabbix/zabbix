@@ -193,6 +193,11 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
 
+// Multiselect helper buttons that allow selected objects to be added, replaced or removed.
+define('ZBX_MULTISELECT_ADD',		0);
+define('ZBX_MULTISELECT_REPLACE',	1);
+define('ZBX_MULTISELECT_REMOVE',	2);
+
 // Maximum number of tags to display.
 define('ZBX_TAG_COUNT_DEFAULT', 3);
 

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/include/func.inc.php';
 require_once dirname(__FILE__).'/include/defines.inc.php';
 require_once dirname(__FILE__).'/include/classes/json/CJson.php';
@@ -240,7 +241,7 @@ switch ($data['method']) {
 
 	/**
 	 * Create multi select data.
-	 * Supported objects: "applications", "hosts", "hostGroup", "templates", "triggers"
+	 * Supported objects: "applications", "hosts", "hostGroup", "templates", "triggers", "application_prototypes"
 	 *
 	 * @param string $data['objectName']
 	 * @param string $data['search']
@@ -378,8 +379,8 @@ switch ($data['method']) {
 
 			case 'applications':
 				$applications = API::Application()->get([
-					'hostids' => zbx_toArray($data['hostid']),
 					'output' => ['applicationid', 'name'],
+					'hostids' => zbx_toArray($data['hostid']),
 					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
 					'limit' => $config['search_limit']
 				]);
@@ -394,6 +395,37 @@ switch ($data['method']) {
 					}
 
 					$result = CArrayHelper::renameObjectsKeys($applications, ['applicationid' => 'id']);
+				}
+				break;
+
+			case 'application_prototypes':
+				$discovery_rules = API::DiscoveryRule()->get([
+					'output' => [],
+					'selectApplicationPrototypes' => ['application_prototypeid', 'name'],
+					'itemids' => [$data['parent_discoveryid']],
+					'limitSelects' => $config['search_limit']
+				]);
+
+				if ($discovery_rules) {
+					$discovery_rule = $discovery_rules[0];
+
+					if ($discovery_rule['applicationPrototypes']) {
+						foreach ($discovery_rule['applicationPrototypes'] as $application_prototype) {
+							if (array_key_exists('search', $data)
+									&& stripos($application_prototype['name'], $data['search']) !== false) {
+								$result[] = [
+									'id' => $application_prototype['application_prototypeid'],
+									'name' => $application_prototype['name']
+								];
+							}
+						}
+
+						CArrayHelper::sort($result, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
+
+						if (array_key_exists('limit', $data)) {
+							$result = array_slice($result, 0, $data['limit']);
+						}
+					}
 				}
 				break;
 

@@ -494,11 +494,13 @@ class CApplication extends CApiService {
 	}
 
 	/**
-	 * Add Items to applications.
+	 * Add items to applications.
 	 *
-	 * @param array $data
-	 * @param array $data['applications']
-	 * @param array $data['items']
+	 * @param array  $data
+	 * @param array  $data['applications']
+	 * @param string $data['applications'][]['applicationid']
+	 * @param array  $data['items']
+	 * @param string $data['items'][]['itemid']
 	 *
 	 * @return array
 	 */

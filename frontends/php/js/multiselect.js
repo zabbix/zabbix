@@ -117,8 +117,8 @@ jQuery(function($) {
 		 */
 		addData: function(item) {
 			return this.each(function() {
-				var obj = $(this);
-				var ms = $(this).data('multiSelect');
+				var obj = $(this),
+					ms = $(this).data('multiSelect');
 
 				// clean input if selectedLimit == 1
 				if (ms.options.selectedLimit == 1) {
@@ -200,6 +200,44 @@ jQuery(function($) {
 
 					ms.values.isAvailableOpened = true;
 					ms.options.disabled = false;
+				}
+			});
+		},
+
+		/**
+		 * Modify one or more multiselect options after multiselect object has been created.
+		 *
+		 * @return jQuery
+		 */
+		modify: function(options) {
+			return this.each(function() {
+				var $obj = $(this),
+					ms = $(this).data('multiSelect');
+
+				for (var ms_key in ms.options) {
+					if (ms_key in options) {
+						ms.options[ms_key] = options[ms_key];
+					}
+
+					/*
+					 * When changing the option "addNew" few things need to happen:
+					 *   1) previous search results must be cleared, in case same search string is requested. So
+					 *      a new request is sent and new results are received. With or without "(new)".
+					 *   2) Already selected "(new)" items must be hidden and disabled, so that they are not sent
+					 *      when form is submitted.
+					 *   3) Already visible block with results must be hidden. It will reappear on new search.
+					 */
+					if (ms_key === 'addNew') {
+						cleanLastSearch($obj);
+
+						$('input[name*="[new]"]', $obj)
+							.prop('disabled', !ms.options[ms_key])
+							.each(function() {
+								$('.selected li[data-id="' + this.value + '"]', $obj).toggle(ms.options[ms_key]);
+							});
+
+						hideAvailable($obj);
+					}
 				}
 			});
 		}
