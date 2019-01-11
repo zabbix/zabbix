@@ -275,9 +275,13 @@
 			height: 1
 		};
 
+		widgets.sort(function(box1, box2) {
+			return box1.pos.y - box2.pos.y;
+		});
+
 		var markAffected = function(pos) {
 			$.map(widgets, function(box) {
-				return (!('affected' in box) && rectOverlap(pos, box.current_pos)) ? box : null;
+				return (!('affected' in box) && rectOverlap(pos, box.pos)) ? box : null;
 			})
 			.each(function(box) {
 				if (box.uniqueid == widget.uniqueid) {
@@ -294,21 +298,25 @@
 		};
 
 		markAffected(pos);
+
 		widgets.each(function(box) {
+			box.div.css('background-color', '');
 			if (!('affected' in box)) {
 				return;
 			}
 
 			delete box.affected;
-			box.current_pos.y = box.pos.y - widget.pos.height;
+
+			box.pos.y = box.pos.y - widget.pos.height;
+			box.div.css('background-color', 'rgba(255, 0, 0, 0.1)');
 
 			widgets.each(function(b) {
-				if (b.uniqueid == box.uniqueid || b.uniqueid == widget.uniqueid
-						|| !rectOverlap(b.current_pos, box.current_pos)) {
+				if (b.uniqueid == box.uniqueid || b.uniqueid == widget.uniqueid || !rectOverlap(b.pos, box.pos)) {
 					return;
 				}
 
-				box.current_pos.y = Math.max(box.current_pos.y, b.current_pos.y + b.current_pos.height);
+				box.pos.y = Math.max(box.pos.y, b.pos.y + b.pos.height);
+				box.div.css('background-color', 'rgba(255, 0, 0, 0.6)');
 			});
 		});
 	}
@@ -823,7 +831,6 @@
 			resetCurrentPositions(data['widgets']);
 			widget['current_pos'] = pos;
 
-			dragPrepare(data.widgets, widget, data['options']['max-rows']);
 			realignWidget(data, widget);
 
 			data.widgets.each(function(box) {
@@ -890,7 +897,17 @@
 				};
 
 				setResizableState('disable', data.widgets, widget.uniqueid);
+
+				console.groupCollapsed(`start drag ${widget.header} is dragged`);
+				console
+					.log('initial position of widgets:', $.map(data.widgets, function(b) {return $.extend({header: b.header}, b.pos)}));
+				dragPrepare(data.widgets, widget, data['options']['max-rows']);
+				console
+					.log('modified position of widgets:', $.map(data.widgets, function(b) {return $.extend({header: b.header}, b.pos)}));
+				console.groupEnd();
+
 				startWidgetPositioning(ui.helper, data);
+				realignWidget(data, widget);
 			},
 			drag: function(event, ui) {
 				// Limit element draggable area for X and Y axis.
