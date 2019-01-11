@@ -102,14 +102,14 @@ function insert_javascript_for_visibilitybox() {
 	$js = '
 		function visibility_status_changeds(value, obj_name, replace_to) {
 			var obj = document.getElementsByName(obj_name);
-			if (obj.length <= 0) {
+			if (obj.length == 0) {
 				obj = [document.getElementById(obj_name)];
 			}
-			if (obj.length <= 0 || is_null(obj[0])) {
+			if (obj.length == 0 || is_null(obj[0])) {
 				throw "'._('Cannot find objects with name').' [" + obj_name +"]";
 			}
 
-			for (i = obj.length - 1; i >= 0; i--) {
+			for (var i = obj.length - 1; i >= 0; i--) {
 				if (replace_to && replace_to != "") {
 					if (obj[i].originalObject) {
 						var old_obj = obj[i].originalObject;
@@ -118,14 +118,13 @@ function insert_javascript_for_visibilitybox() {
 					}
 					else if (!value) {
 						try {
-							var new_obj = document.createElement("a");
+							var new_obj = document.createElement("span");
 							new_obj.setAttribute("name", obj[i].name);
 							new_obj.setAttribute("id", obj[i].id);
 						}
 						catch(e) {
 							throw "'._('Cannot create new element').'";
 						}
-						new_obj.style.textDecoration = "none";
 						new_obj.innerHTML = replace_to;
 						new_obj.originalObject = obj[i];
 						obj[i].parentNode.replaceChild(new_obj, obj[i]);
@@ -135,8 +134,7 @@ function insert_javascript_for_visibilitybox() {
 					}
 				}
 				else {
-					value = value ? "visible" : "hidden";
-					obj[i].style.visibility = value;
+					obj[i].style.visibility = value ? "visible" : "hidden";
 				}
 			}
 		}';
