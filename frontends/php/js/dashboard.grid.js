@@ -274,8 +274,7 @@
 
 			$.map(widgets, function(box) {
 				return (!('affected' in box) && rectOverlap(box_pos, box.pos)) ? box : null;
-			})
-			.each(function(box) {
+			}).each(function(box) {
 				if (box.uniqueid != widget.uniqueid) {
 					box.affected = 1;
 					markAffected(box.pos);
