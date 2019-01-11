@@ -268,11 +268,19 @@
 	 * @param {number} max_rows  Dashboard rows count.
 	 */
 	function dragPrepare(widgets, widget, max_rows) {
-		var pos = {
-			x: widget.pos.x,
-			y: widget.pos.y + widget.pos.height,
-			width: widget.pos.width,
-			height: 1
+		var markAffected = function(pos) {
+			var box_pos = $.extend({}, pos);
+			box_pos.height++;
+
+			$.map(widgets, function(box) {
+				return (!('affected' in box) && rectOverlap(box_pos, box.pos)) ? box : null;
+			})
+			.each(function(box) {
+				if (box.uniqueid != widget.uniqueid) {
+					box.affected = 1;
+					markAffected(box.pos);
+				}
+			});
 		};
 
 		widgets.sort(function(box1, box2) {
@@ -281,24 +289,7 @@
 			box.div.data('widget-index', index);
 		});
 
-		var markAffected = function(pos) {
-			$.map(widgets, function(box) {
-				return (!('affected' in box) && rectOverlap(pos, box.pos)) ? box : null;
-			})
-			.each(function(box) {
-				if (box.uniqueid == widget.uniqueid) {
-					return;
-				}
-
-				var pos = $.extend({}, box.pos);
-
-				pos.height += 1;
-				box.affected = 1;
-				markAffected(pos);
-			});
-		};
-
-		markAffected(pos);
+		markAffected(widget.pos);
 
 		widgets.each(function(box) {
 			box.div.css('background-color', '');
