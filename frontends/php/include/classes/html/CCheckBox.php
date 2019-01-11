@@ -115,6 +115,11 @@ class CCheckBox extends CInput {
 			? [$this->label, new CSpan()]
 			: [new CSpan(), $this->label];
 
-		return parent::toString($destroy).((new CLabel($elements, $this->getId()))->toString(true));
+		$label = new CLabel($elements, $this->getId());
+		if ($this->label_position == self::LABEL_POSITION_LEFT) {
+			$label->addClass('label-pos-left');
+		}
+
+		return parent::toString($destroy).($label->toString(true));
 	}
 }
