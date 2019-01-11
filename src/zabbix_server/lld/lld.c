@@ -611,9 +611,8 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	lld_filter_t		filter;
 	time_t			now;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
-	zabbix_log(LOG_LEVEL_INFORMATION, "sleeping kill -SIGALRM %ld", zbx_get_thread_id());
-	sleep(3600);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
+
 	zbx_vector_ptr_create(&lld_rows);
 
 	lld_filter_init(&filter);

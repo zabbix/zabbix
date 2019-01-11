@@ -150,7 +150,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 				goto out;
 			}
 		}
-		else if (0 == strcmp(param2, "cache"))
+		else if (0 == strcmp(param1, "cache"))
 		{
 			if (0 == strcmp(param3, "hits"))
 				SET_UI64_RESULT(result, stats.hits);

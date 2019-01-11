@@ -468,10 +468,7 @@ static void	lld_process_result(zbx_lld_manager_t *manager, zbx_ipc_client_t *cli
 	lld_data_free(data);
 
 	if (SUCCEED != zbx_binary_heap_empty(&manager->rule_queue))
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "next");
 		lld_process_next_request(manager, worker);
-	}
 	else
 		zbx_queue_ptr_push(&manager->free_workers, worker);
 

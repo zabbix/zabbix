@@ -23,8 +23,7 @@
 
 struct zbx_regexp
 {
-	pcre			*pcre_regexp;
-	struct pcre_extra	*extra;
+	pcre	*pcre_regexp;
 };
 
 /* maps to ovector of pcre_exec() */
@@ -93,12 +92,8 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 
 	if (NULL != regexp)
 	{
-		const char	*errptr = NULL;
 		*regexp = (zbx_regexp_t *)zbx_malloc(NULL, sizeof(zbx_regexp_t));
 		(*regexp)->pcre_regexp = pcre_regexp;
-
-		if (NULL == ((*regexp)->extra = pcre_study(pcre_regexp, PCRE_STUDY_JIT_COMPILE, &errptr)))
-			exit(0);
 	}
 	else
 		pcre_free(pcre_regexp);
@@ -217,7 +212,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	pextra.match_limit = 1000000;
 	pextra.match_limit_recursion = 1000000;
 
-	r = pcre_exec(regexp->pcre_regexp, regexp->extra, string, strlen(string), flags, 0, ovector, ovecsize);
+	r = pcre_exec(regexp->pcre_regexp, &pextra, string, strlen(string), flags, 0, ovector, ovecsize);
 #else
 	r = pcre_exec(regexp->pcre_regexp, NULL, string, strlen(string), flags, 0, ovector, ovecsize);
 #endif
@@ -257,7 +252,6 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
  ******************************************************************************/
 void	zbx_regexp_free(zbx_regexp_t *regexp)
 {
-	pcre_free_study(regexp->extra);
 	pcre_free(regexp->pcre_regexp);
 	zbx_free(regexp);
 }
