@@ -36,7 +36,7 @@ class CSvgGraphXAxis extends CSvgTag {
 	 *
 	 * @var int
 	 */
-	const GRID_PIXELS = 32;
+	const GRID_PIXELS = 35;
 
 	/**
 	 * Label degrees to rotate.
