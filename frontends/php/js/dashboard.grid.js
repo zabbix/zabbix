@@ -277,6 +277,8 @@
 
 		widgets.sort(function(box1, box2) {
 			return box1.pos.y - box2.pos.y;
+		}).each(function(box, index) {
+			box.div.data('widget-index', index);
 		});
 
 		var markAffected = function(pos) {
@@ -291,7 +293,6 @@
 				var pos = $.extend({}, box.pos);
 
 				pos.height += 1;
-
 				box.affected = 1;
 				markAffected(pos);
 			});
@@ -896,8 +897,9 @@
 					'top-max': data.options['max-rows'] * data.options['widget-height'] - ui.helper.height()
 				};
 
-				setResizableState('disable', data.widgets, widget.uniqueid);
+				setResizableState('disable', data.widgets, '');
 
+				var	widget = getWidgetByTarget(data.widgets, ui.helper);
 				console.groupCollapsed(`start drag ${widget.header} is dragged`);
 				console
 					.log('initial position of widgets:', $.map(data.widgets, function(b) {return $.extend({header: b.header}, b.pos)}));
@@ -907,6 +909,7 @@
 				console.groupEnd();
 
 				startWidgetPositioning(ui.helper, data);
+				widget.current_pos = $.extend({}, widget.pos);
 				realignWidget(data, widget);
 			},
 			drag: function(event, ui) {
@@ -922,7 +925,7 @@
 				data['pos-action'] = '';
 				delete data.calculated;
 
-				setResizableState('enable', data.widgets, widget.uniqueid);
+				setResizableState('enable', data.widgets, '');
 				stopWidgetPositioning($obj, ui.helper, data);
 			}
 		});
