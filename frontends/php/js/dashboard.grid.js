@@ -640,7 +640,8 @@
 	 */
 	function realignResize(data, widget) {
 		var changes = {},
-			axis;
+			axis,
+			process_order = ['x', 'y'];
 
 		// Fill changes object with difference between current_pos and pos. Do not set not changed values.
 		$.each(widget.current_pos, function(k, v) {
@@ -649,12 +650,23 @@
 			}
 		});
 
+		if (!('prev_pos' in widget)) {
+			widget.prev_pos = $.extend({}, widget.pos);
+
+			if ('y' in changes) {
+				process_order = ['y', 'x'];
+			}
+		}
+		else if (widget.prev_pos.y != widget.current_pos.y || widget.prev_pos.height != widget.current_pos.height) {
+			process_order = ['y', 'x'];
+		}
+
+		widget.prev_pos = $.extend({}, widget.current_pos);
+
 		data.widgets.each(function(box) {
 			if (box.uniqueid != widget.uniqueid) {
 				box.current_pos = $.extend({}, box.pos);
 			}
-
-			delete box.affected_axis;
 		});
 
 		// Exit if there are no affected widgets.
@@ -662,58 +674,84 @@
 			return;
 		}
 
-		// Horizontal resize.
-		if ('width' in changes) {
-			axis = {
-				axis_key: 'x',
-				size_key: 'width',
-				size_min: 1,
-				size_max: data.options['max-columns'],
-				width: changes.width,
-				boundary: $.extend({}, widget.current_pos),
-				scanline: {
-					width: data.options['max-columns'],
-					height: data.options['max-rows']
-				},
-			};
+		console.groupCollapsed(`resize step. process order: "${process_order.join('", ')}"`);
+		var dbg_affected = {y:[], x:[]};
 
-			if ('x' in changes) {
-				axis.x = changes.x;
+		var backup_axis = process_order[0],
+			backup_indexes = [];
+
+		// Diagonal resize.
+		process_order.each(function(axis_key) {
+			data.widgets.each(function(box, index) {
+				if ('affected_axis' in box) {
+					dbg_affected[box.affected_axis].push(box.header);
+				}
+
+				if ('affected_axis' in box && box.affected_axis === axis_key) {
+					if (backup_axis === axis_key) {
+						backup_indexes.push(index);
+					}
+
+					delete box.affected_axis;
+				}
+			});
+
+			if (axis_key === 'x') {
+				axis = {
+					axis_key: 'x',
+					size_key: 'width',
+					size_min: 1,
+					size_max: data.options['max-columns'],
+					width: changes.width,
+					boundary: $.extend({}, widget.current_pos),
+					scanline: {
+						width: data.options['max-columns'],
+						height: data.options['max-rows']
+					}
+				};
+			}
+			else {
+				axis = {
+					axis_key: 'y',
+					size_key: 'height',
+					size_min: data.options['widget-min-rows'],
+					size_max: data.options['max-rows'],
+					height: changes.height,
+					boundary: $.extend({}, widget.current_pos),
+					scanline: {
+						width: data.options['max-columns'],
+						height: data.options['max-rows']
+					}
+				};
 			}
 
-			fitWigetsIntoBox(data.widgets, widget, axis);
-		}
-
-		// Vertical resize.
-		if ('height' in changes) {
-			axis = {
-				axis_key: 'y',
-				size_key: 'height',
-				size_min: data.options['widget-min-rows'],
-				size_max: data.options['max-rows'],
-				height: changes.height,
-				boundary: $.extend({}, widget.current_pos),
-				scanline: {
-					width: data.options['max-columns'],
-					height: data.options['max-rows']
-				},
-			};
-
-			if ('y' in changes) {
-				axis.y = changes.y;
+			if (axis_key in changes) {
+				axis[axis_key] = changes[axis_key];
 			}
 
-			fitWigetsIntoBox(data.widgets, widget, axis);
-		}
+			console
+				.log('backup indexes', backup_indexes);
+			console
+				.log(`${axis_key} start processing. affected x="${dbg_affected.x.join('", "')}", y="${dbg_affected.y.join('", "')}"`)
 
-		// Force to repaint non changed widgets too.
+			fitWigetsIntoBox(data.widgets, widget, axis);
+		});
+
+		// Restore affected on first axis in list.
+		backup_indexes.each(function(index) {
+			data.widgets[index].affected_axis = backup_axis;
+		});
+
+		var dbg = {x:[], y:[]}
 		data.widgets.each(function(box) {
-			if (('current_pos' in box) === false) {
-				box.current_pos = $.extend({}, box.pos);
+			if ('affected_axis' in box) {
+				dbg[box.affected_axis].push(box.header);
 			}
 		});
 
-		return;
+		console
+			.log('final result for affected by changes on axes:', dbg);
+		console.groupEnd();
 	}
 
 	function checkWidgetOverlap(data, widget) {
