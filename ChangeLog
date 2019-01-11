@@ -5,6 +5,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+...G...... [ZBX-15301] fixed monotonous lag behind in Windows "system.localtime" (MVekslers)
 ..F....... [ZBX-15377] fixed error messages for arrays in GET parameters (Sasha)
 A......... [ZBX-15369] fixed "Undefined index: label" in map.update() method (Sasha)
 ..F....... [ZBX-15376] fixed "Undefined index: refresh" on several pages with disabled guest user (Sasha)
