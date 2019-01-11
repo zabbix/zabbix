@@ -2792,7 +2792,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of item prototypes');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added');
-				$this->zbxTestCheckFatalErrors();
 
 				$dbResultItem = DBselect("SELECT name,key_,itemid FROM items where key_ = '".$data['key']."'");
 				$rowItem = DBfetch($dbResultItem);

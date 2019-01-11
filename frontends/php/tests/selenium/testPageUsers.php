@@ -86,7 +86,6 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Users');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User updated');
 		$this->zbxTestTextPresent($alias);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($oldHashUser, CDBHelper::getHash($sqlHashUser));
 		$this->assertEquals($oldHashGroup, CDBHelper::getHash($sqlHashGroup));
@@ -123,7 +122,6 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $this->userAlias);
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function testPageUsers_FilterReset() {

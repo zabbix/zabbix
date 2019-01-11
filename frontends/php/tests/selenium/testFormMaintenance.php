@@ -104,7 +104,6 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//button[@id=\'add\'][@type=\'submit\']');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance added');
 		$this->zbxTestTextPresent($this->name);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
 		$this->assertEquals(3, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value='.zbx_dbstr($value)));
@@ -132,7 +131,6 @@ class testFormMaintenance extends CLegacyWebTest {
 		// Close the form.
 		$this->zbxTestClickWait('cancel');
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the result in DB.
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
@@ -199,7 +197,6 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance updated');
 		$this->zbxTestAssertElementText('//a[text()=\''.$this->name.'\']/../../td[3]', 'No data collection');
 		$this->zbxTestTextPresent($this->name);
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
@@ -255,7 +252,6 @@ class testFormMaintenance extends CLegacyWebTest {
 		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance added');
 		$this->zbxTestTextPresent([$this->name.$suffix, $this->name]);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name.$suffix)));
@@ -276,7 +272,6 @@ class testFormMaintenance extends CLegacyWebTest {
 		// Delete a maintenance and check the result in frontend.
 		$this->zbxTestClickAndAcceptAlert('delete');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance deleted');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
 	}

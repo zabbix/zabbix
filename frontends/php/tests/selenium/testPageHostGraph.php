@@ -501,8 +501,6 @@ class testPageHostGraph extends CLegacyWebTest {
 				}
 			}
 		}
-
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	/**
@@ -603,7 +601,6 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graphs deleted');
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
 

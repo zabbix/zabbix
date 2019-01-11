@@ -763,7 +763,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				$this->zbxTestAssertElementText("//ul/li[2]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
 			}
 
-			$this->zbxTestCheckFatalErrors();
 			$this->webDriver->manage()->deleteAllCookies();
 		}
 	}

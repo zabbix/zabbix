@@ -212,7 +212,6 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestClickXpath("//label[@for='filter_users_status_1']");
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function testPageUserGroups_FilterReset() {

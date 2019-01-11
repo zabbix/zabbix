@@ -99,7 +99,6 @@ class testPageHostPrototypes extends CLegacyWebTest {
 		}
 
 		$this->zbxTestIsElementPresent('//*[@class="msg-good"]');
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		$this->zbxTestCheckHeader('Host prototypes');
 

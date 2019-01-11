@@ -199,7 +199,6 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 				$this->zbxTestTextPresent($data['error_msg']);
 				break;
 		}
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public static function blink_period() {
@@ -288,7 +287,6 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 				$this->zbxTestTextPresent($data['error_msg']);
 				break;
 		}
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function testFormAdministrationGeneralTrigDisplOptions_ResetTrigDisplOptions() {

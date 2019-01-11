@@ -100,7 +100,6 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 			case TEST_GOOD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added');
 				$this->zbxTestTextPresent($data['name']);
-				$this->zbxTestCheckFatalErrors();
 
 				$itemId = 0;
 
@@ -137,7 +136,6 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
 				$this->zbxTestTextPresent($data['errors']);
-				$this->zbxTestCheckFatalErrors();
 				break;
 		}
 	}

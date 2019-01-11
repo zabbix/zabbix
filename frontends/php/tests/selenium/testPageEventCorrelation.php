@@ -184,7 +184,6 @@ class testPageEventCorrelation extends CLegacyWebTest {
 				? 'Correlation enabled' : 'Correlation disabled'
 		);
 
-		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']
 				.' AND status ='.$data['make_status'])
 		);
@@ -206,8 +205,6 @@ class testPageEventCorrelation extends CLegacyWebTest {
 				? 'Correlation enabled' : 'Correlation disabled'
 		);
 
-		$this->zbxTestCheckFatalErrors();
-
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']
 				.' AND status ='.$data['make_status'])
 		);
@@ -219,7 +216,6 @@ class testPageEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClickButton('correlation.massenable');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlations enabled');
-		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation WHERE status ='.ZBX_CORRELATION_DISABLED));
 	}
 
@@ -229,7 +225,6 @@ class testPageEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClickButton('correlation.massdisable');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlations disabled');
-		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation WHERE status ='.ZBX_CORRELATION_ENABLED));
 	}
 
@@ -242,7 +237,6 @@ class testPageEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClickButton('correlation.massdelete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Selected correlations deleted');
-		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']));
 	}
 
@@ -252,7 +246,6 @@ class testPageEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClickButton('correlation.massdelete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Selected correlations deleted');
-		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation'));
 	}
 }
