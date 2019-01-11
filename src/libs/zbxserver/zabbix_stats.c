@@ -103,7 +103,7 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 			ZBX_QUEUE_TO_INFINITY));
 
 	/* zabbix[rcache,<cache>,<mode>] */
-	zbx_json_addobject(json, "rcache.buffer");
+	zbx_json_addobject(json, "rcache");
 	zbx_json_adduint64(json, "total", *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_TOTAL));
 	zbx_json_adduint64(json, "free", *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_FREE));
 	zbx_json_addfloat(json, "pfree", *(double *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_PFREE));
