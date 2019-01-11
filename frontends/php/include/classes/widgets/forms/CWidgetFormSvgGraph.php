@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,10 +27,11 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->data = self::convertDottedKeys($this->data);
 
 		// API doesn't guarantee fields to be retrieved in same order as stored.
-		foreach (['or', 'ds'] as $field) {
-			if (array_key_exists($field, $this->data)) {
-				ksort($this->data[$field]);
-			}
+		if (array_key_exists('or', $this->data)) {
+			ksort($this->data['or']);
+		}
+		if (array_key_exists('ds', $this->data)) {
+			ksort($this->data['ds']);
 		}
 
 		/**
@@ -157,8 +158,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		]))
 			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
 			->setAction('jQuery("#lefty_static_units")'.
-							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))'
-			);
+							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))');
 
 		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_lefty_units->setFlags(CWidgetField::FLAG_DISABLED);
@@ -230,8 +230,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		]))
 			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
 			->setAction('jQuery("#righty_static_units")'.
-							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))'
-			);
+							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))');
 
 		if ($field_righty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_righty_units->setFlags(CWidgetField::FLAG_DISABLED);

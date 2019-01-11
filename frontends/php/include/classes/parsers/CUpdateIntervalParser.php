@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,9 +89,7 @@ class CUpdateIntervalParser extends CParser {
 
 				$this->intervals[] = [
 					'type' => ITEM_DELAY_FLEXIBLE,
-					'interval' => $this->flexible_interval_parser->getMatch(),
-					'update_interval' => $this->flexible_interval_parser->getUpdateInterval(),
-					'time_period' => $this->flexible_interval_parser->getTimePeriod()
+					'interval' => $this->flexible_interval_parser->getMatch()
 				];
 			}
 			elseif ($this->scheduling_interval_parser->parse($source, $p) != self::PARSE_FAIL) {

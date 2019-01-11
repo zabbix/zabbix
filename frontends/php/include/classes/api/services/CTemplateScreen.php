@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -331,7 +331,6 @@ class CTemplateScreen extends CScreen {
 				$tplItems = API::Item()->get([
 					'output' => ['itemid', 'key_', 'hostid'],
 					'itemids' => $itemids,
-					'webitems' => true,
 					'nopermissions' => true,
 					'preservekeys' => true
 				]);
@@ -340,7 +339,6 @@ class CTemplateScreen extends CScreen {
 					'output' => ['itemid', 'key_', 'hostid'],
 					'hostids' => $options['hostids'],
 					'filter' => ['key_' => zbx_objectValues($tplItems, 'key_')],
-					'webitems' => true,
 					'nopermissions' => true,
 					'preservekeys' => true
 				]);

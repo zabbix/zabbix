@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -332,7 +332,7 @@ $widget = (new CWidget())
 
 if (in_array($page['web_layout_mode'], [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	// Filter
-	$widget->addItem((new CFilter(new CUrl('latest.php')))
+	$widget->addItem((new CFilter())
 		->setProfile('web.latest.filter')
 		->setActiveTab(CProfile::get('web.latest.filter.active', 1))
 		->addFilterTab(_('Filter'), [
@@ -347,8 +347,7 @@ if (in_array($page['web_layout_mode'], [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN
 								'srctbl' => 'host_groups',
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'groupids_',
-								'real_hosts' => true
+								'dstfld1' => 'groupids_'
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -543,6 +542,7 @@ foreach ($items as $key => $item) {
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		]);
+		$change = nbsp($change);
 	}
 	else {
 		$change = UNKNOWN_VALUE;
@@ -697,6 +697,7 @@ foreach ($items as $item) {
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		]);
+		$change = nbsp($change);
 	}
 	else {
 		$change = UNKNOWN_VALUE;

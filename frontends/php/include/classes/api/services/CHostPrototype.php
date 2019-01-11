@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -262,9 +262,7 @@ class CHostPrototype extends CHostBase {
 			];
 
 			// inventory
-			if (isset($hostPrototype['inventory']['inventory_mode'])
-					&& ($hostPrototype['inventory']['inventory_mode'] == HOST_INVENTORY_MANUAL
-						|| $hostPrototype['inventory']['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)) {
+			if (isset($hostPrototype['inventory']) && $hostPrototype['inventory']) {
 				$hostPrototypeInventory[] = [
 					'hostid' => $hostPrototype['hostid'],
 					'inventory_mode' => $hostPrototype['inventory']['inventory_mode']
@@ -542,20 +540,21 @@ class CHostPrototype extends CHostBase {
 			// inventory
 			if (isset($hostPrototype['inventory']) ) {
 				$inventory = zbx_array_mintersect(['inventory_mode'], $hostPrototype['inventory']);
+				$inventory['hostid'] = $hostPrototype['hostid'];
 
-				if (array_key_exists('inventory_mode', $inventory)
-					&& ($inventory['inventory_mode'] == HOST_INVENTORY_MANUAL
-						|| $inventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)) {
+				if ($hostPrototype['inventory']
+					&& (!isset($hostPrototype['inventory']['inventory_mode']) || $hostPrototype['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED)) {
 
-					if ($exHostPrototype['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED) {
+					if ($exHostPrototype['inventory']) {
 						DB::update('host_inventory', [
 							'values' => $inventory,
-							'where' => ['hostid' => $hostPrototype['hostid']]
+							'where' => ['hostid' => $inventory['hostid']]
 						]);
 					}
 					else {
-						$inventoryCreate[] = $inventory + ['hostid' => $hostPrototype['hostid']];
+						$inventoryCreate[] = $inventory;
 					}
+
 				}
 				else {
 					$inventoryDeleteIds[] = $hostPrototype['hostid'];
@@ -1120,14 +1119,6 @@ class CHostPrototype extends CHostBase {
 		return $sqlParts;
 	}
 
-	/**
-	 * Retrieves and adds additional requested data to the result set.
-	 *
-	 * @param array  $options
-	 * @param array  $result
-	 *
-	 * @return array
-	 */
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -1140,7 +1131,7 @@ class CHostPrototype extends CHostBase {
 				'output' => $options['selectDiscoveryRule'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
-				'preservekeys' => true
+				'preservekeys' => true,
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
@@ -1205,7 +1196,7 @@ class CHostPrototype extends CHostBase {
 				'hostids' => $relationMap->getRelatedIds(),
 				'templated_hosts' => true,
 				'nopermissions' => true,
-				'preservekeys' => true
+				'preservekeys' => true,
 			]);
 			$result = $relationMap->mapOne($result, $hosts, 'parentHost');
 		}
@@ -1236,25 +1227,21 @@ class CHostPrototype extends CHostBase {
 
 		// adding inventory
 		if ($options['selectInventory'] !== null) {
-			$inventory = API::getApiService()->select('host_inventory', [
-				'output' => ['hostid', 'inventory_mode'],
-				'filter' => ['hostid' => $hostPrototypeIds],
-				'preservekeys' => true
-			]);
+			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
 
-			foreach ($hostPrototypeIds as $host_prototypeid) {
-				// There is no DB record if inventory mode is HOST_INVENTORY_DISABLED.
-				if (!array_key_exists($host_prototypeid, $inventory)) {
-					$inventory[$host_prototypeid] = [
-						'hostid' => (string) $host_prototypeid,
-						'inventory_mode' => (string) HOST_INVENTORY_DISABLED
-					];
-				}
+			// only allow to retrieve the hostid and inventory_mode fields
+			$output = [];
+			if ($this->outputIsRequested('hostid', $options['selectInventory'])) {
+				$output[] = 'hostid';
 			}
-
-			$relation_map = $this->createRelationMap($result, 'hostid', 'hostid');
-			$inventory = $this->unsetExtraFields($inventory, ['hostid', 'inventory_mode'], $options['selectInventory']);
-			$result = $relation_map->mapOne($result, $inventory, 'inventory');
+			if ($this->outputIsRequested('inventory_mode', $options['selectInventory'])) {
+				$output[] = 'inventory_mode';
+			}
+			$inventory = API::getApiService()->select('host_inventory', [
+				'output' => $output,
+				'filter' => ['hostid' => $hostPrototypeIds]
+			]);
+			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
 		}
 
 		return $result;

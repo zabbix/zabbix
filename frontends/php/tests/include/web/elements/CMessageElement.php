@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class CMessageElement extends CElement {
 	 * @return string
 	 */
 	public function getTitle() {
-		return $this->query('xpath:./span')->one()->getText();
+		return $this->getText();
 	}
 
 	/**
@@ -63,7 +63,7 @@ class CMessageElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getLines() {
-		return $this->query('xpath:./div[@class="msg-details"]/ul/li')->all();
+		$this->query('xpath:./div[@class="msg-details"]/ul[@class="msg-details-border"]/li')->all();
 	}
 
 	/**
@@ -81,14 +81,5 @@ class CMessageElement extends CElement {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Get text of lines in message details.
-	 *
-	 * @return array
-	 */
-	public function getLinesText() {
-		return $this->getLines()->asText();
 	}
 }

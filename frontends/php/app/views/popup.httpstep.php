@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -136,13 +136,9 @@ $http_popup_form_list
 		(new CCheckBox('follow_redirects'))
 			->setChecked($options['follow_redirects'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON)
 	)
-	->addRow(
-		new CLabel(_('Retrieve mode'), 'retrieve_mode'),
-		(new CRadioButtonList('retrieve_mode', (int) $options['retrieve_mode']))
-			->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
-			->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
-			->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
-			->setModern(true)
+	->addRow(_('Retrieve only headers'),
+		(new CCheckBox('retrieve_mode'))
+			->setChecked($options['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 	)
 	->addRow((new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
 		(new CTextBox('timeout', $options['timeout']))

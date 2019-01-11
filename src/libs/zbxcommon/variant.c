@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -152,7 +152,6 @@ static int	variant_to_str(zbx_variant_t *value)
 			return SUCCEED;
 		case ZBX_VARIANT_DBL:
 			value_str = zbx_dsprintf(NULL, ZBX_FS_DBL, value->data.dbl);
-			del_zeros(value_str);
 			break;
 		case ZBX_VARIANT_UI64:
 			value_str = zbx_dsprintf(NULL, ZBX_FS_UI64, value->data.ui64);
@@ -219,7 +218,6 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 	{
 		case ZBX_VARIANT_DBL:
 			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, value->data.dbl);
-			del_zeros(buffer);
 			return buffer;
 		case ZBX_VARIANT_UI64:
 			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, value->data.ui64);
@@ -263,140 +261,3 @@ int	zbx_validate_value_dbl(double value)
 
 	return SUCCEED;
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: variant_compare_empty                                            *
- *                                                                            *
- * Purpose: compares two variant values when at least one is empty            *
- *                                                                            *
- ******************************************************************************/
-static int	variant_compare_empty(const zbx_variant_t *value1, const zbx_variant_t *value2)
-{
-	if (ZBX_VARIANT_NONE == value1->type)
-	{
-		if (ZBX_VARIANT_NONE == value2->type)
-			return 0;
-
-		return -1;
-	}
-
-	return 1;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: variant_compare_str                                              *
- *                                                                            *
- * Purpose: compares two variant values when at least one is string           *
- *                                                                            *
- ******************************************************************************/
-static int	variant_compare_str(const zbx_variant_t *value1, const zbx_variant_t *value2)
-{
-	if (ZBX_VARIANT_STR == value1->type)
-		return strcmp(value1->data.str, zbx_variant_value_desc(value2));
-
-	return strcmp(zbx_variant_value_desc(value1), value2->data.str);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: variant_compare_dbl                                              *
- *                                                                            *
- * Purpose: compares two variant values when at least one is double and the   *
- *          other is double or uint64                                         *
- *                                                                            *
- ******************************************************************************/
-static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t *value2)
-{
-	double	value1_dbl, value2_dbl;
-
-	switch (value1->type)
-	{
-		case ZBX_VARIANT_DBL:
-			value1_dbl = value1->data.dbl;
-			break;
-		case ZBX_VARIANT_UI64:
-			value1_dbl = value1->data.ui64;
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
-	}
-
-	switch (value2->type)
-	{
-		case ZBX_VARIANT_DBL:
-			value2_dbl = value2->data.dbl;
-			break;
-		case ZBX_VARIANT_UI64:
-			value2_dbl = value2->data.ui64;
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
-	}
-
-	if (SUCCEED == zbx_double_compare(value1_dbl, value2_dbl))
-		return 0;
-
-	ZBX_RETURN_IF_NOT_EQUAL(value1_dbl, value2_dbl);
-	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: variant_compare_ui64                                             *
- *                                                                            *
- * Purpose: compares two variant values when both are uint64                  *
- *                                                                            *
- ******************************************************************************/
-static int	variant_compare_ui64(const zbx_variant_t *value1, const zbx_variant_t *value2)
-{
-	ZBX_RETURN_IF_NOT_EQUAL(value1->data.ui64, value2->data.ui64);
-	return 0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_variant_compare                                              *
- *                                                                            *
- * Purpose: compares two variant values                                       *
- *                                                                            *
- * Parameters: value1 - [IN] the first value                                  *
- *             value2 - [IN] the second value                                 *
- *                                                                            *
- * Return value: <0 - the first value is less than second                     *
- *               >0 - the first value is greater than second                  *
- *               0  - the values are equal                                    *
- *                                                                            *
- * Comments: The following priority is applied:                               *
- *           1) value of none type is always less than other types, two       *
- *              none types are equal                                          *
- *           2) if any of value is of string type, the other is converted to  *
- *              string and both are compared                                  *
- *           3) if any of value is of floating type, the other is converted   *
- *              to floating value and both are compared                       *
- *           4) only uin64 types are left, compare as uin64                   *
- *                                                                            *
- ******************************************************************************/
-int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2)
-{
-	if (ZBX_VARIANT_NONE == value1->type || ZBX_VARIANT_NONE == value2->type)
-		return variant_compare_empty(value1, value2);
-
-	if (ZBX_VARIANT_STR == value1->type || ZBX_VARIANT_STR == value2->type)
-		return variant_compare_str(value1, value2);
-
-	if (ZBX_VARIANT_DBL == value1->type || ZBX_VARIANT_DBL == value2->type)
-		return variant_compare_dbl(value1, value2);
-
-	if (ZBX_VARIANT_UI64 == value1->type && ZBX_VARIANT_UI64 == value2->type)
-		return variant_compare_ui64(value1, value2);
-
-	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
-}
-
-

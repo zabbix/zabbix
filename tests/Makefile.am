@@ -1,7 +1,6 @@
 SUBDIRS = \
 	. \
-	libs \
-	zabbix_server
+	libs
 
 noinst_LIBRARIES = \
 	libzbxmocktest.a \

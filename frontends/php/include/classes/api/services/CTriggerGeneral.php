@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1114,7 +1114,7 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		if ($class === 'CTrigger' && $changed_priority_triggerids
-				&& CTriggerManager::usedInItServices($changed_priority_triggerids)) {
+				&& $this->usedInItServices($changed_priority_triggerids)) {
 			updateItServices();
 		}
 

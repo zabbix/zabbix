@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -581,7 +581,7 @@ class CService extends CApiService {
 						' FROM service_alarms sa'.
 						' WHERE '.dbConditionInt('sa.serviceid', $usedSeviceIds).
 							' AND ('.implode(' OR ', $intervalConditions).')'.
-						' ORDER BY sa.servicealarmid'
+						' ORDER BY sa.clock,sa.servicealarmid'
 					);
 					while ($data = DBfetch($query)) {
 						$services[$data['serviceid']]['alarms'][] = $data;
@@ -748,14 +748,18 @@ class CService extends CApiService {
 	 * @return array
 	 */
 	protected function fetchLatestValues(array $serviceIds, $beforeTime) {
-		// The query will return the alarms with the latest servicealarmid for each service, before $beforeTime.
+		// the query will return the alarms with the maximum timestamp for each service
+		// since multiple alarms can have the same timestamp, we only need to save the last one
 		$query = DBSelect(
 			'SELECT sa.serviceid,sa.value'.
-			' FROM (SELECT sa2.serviceid,MAX(sa2.servicealarmid) AS servicealarmid'.
-					' FROM service_alarms sa2'.
-					' WHERE sa2.clock<'.zbx_dbstr($beforeTime).
-						' AND '.dbConditionInt('sa2.serviceid', $serviceIds).
-					'GROUP BY sa2.serviceid) ss2 '.
+			' FROM (SELECT MAX(sa3.servicealarmid) AS servicealarmid'.
+					' FROM (SELECT sa2.serviceid,MAX(sa2.clock) AS clock'.
+							' FROM service_alarms sa2'.
+							' WHERE sa2.clock<'.zbx_dbstr($beforeTime).
+								' AND '.dbConditionInt('sa2.serviceid', $serviceIds).
+							' GROUP BY sa2.serviceid) ss'.
+					' JOIN service_alarms sa3 ON sa3.serviceid = ss.serviceid and sa3.clock = ss.clock'.
+					' GROUP BY sa3.serviceid) ss2'.
 			' JOIN service_alarms sa ON sa.servicealarmid = ss2.servicealarmid'
 		);
 		$rs = [];

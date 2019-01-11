@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,14 +88,17 @@ abstract class CBaseElement extends RemoteWebElement {
 
 	/**
 	 * Alias for isDisplayed.
-	 * @see isDisplayed
+	 * @see RemoteWebElement::isDisplayed
 	 *
-	 * @param boolean $displayed if element should be visible
-	 *
-	 * @return boolean
+	 * @return $this
 	 */
-	public function isVisible($displayed = true) {
-		return $this->isDisplayed($displayed);
+	public function isVisible() {
+		try {
+			return $this->isDisplayed();
+		}
+		catch (StaleElementReferenceException $exception) {
+			return false;
+		}
 	}
 
 	/**
@@ -194,53 +197,5 @@ abstract class CBaseElement extends RemoteWebElement {
 	 */
 	public function findElements(WebDriverBy $by) {
 		return $this->executeStaleSafe(__FUNCTION__, [$by]);
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function isDisplayed($displayed = true) {
-		try {
-			return (parent::isDisplayed() === $displayed);
-		}
-		catch (StaleElementReferenceException $exception) {
-			return ($displayed === false);
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function isEnabled($enabled = true) {
-		return (parent::isEnabled() === $enabled);
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function isSelected($selected = true) {
-		return (parent::isSelected() === $selected);
-	}
-
-	/**
-	 * Highlight the value in the field.
-	 *
-	 * @return $this
-	 */
-	public function selectValue() {
-		$this->click()->sendKeys([WebDriverKeys::CONTROL, 'a', WebDriverKeys::CONTROL]);
-
-		return $this;
-	}
-
-	/**
-	 * Ovewrvrite value in field.
-	 *
-	 * @param $text text to be written into the field.
-	 *
-	 * @return $this
-	 */
-	public function overwrite($text) {
-		return $this->selectValue()->type($text);
 	}
 }

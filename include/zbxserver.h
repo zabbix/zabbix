@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,6 @@
 #define MACRO_TYPE_HTTP_RAW		0x00100000
 #define MACRO_TYPE_HTTP_JSON		0x00200000
 #define MACRO_TYPE_HTTP_XML		0x00400000
-#define MACRO_TYPE_ALLOWED_HOSTS	0x00800000
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 

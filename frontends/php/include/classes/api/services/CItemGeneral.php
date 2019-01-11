@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2017 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,14 +236,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		$item_key_parser = new CItemKey();
-		$ip_range_parser = new CIPRangeParser([
-			'v6' => ZBX_HAVE_IPV6,
-			'ranges' => false,
-			'usermacros' => true,
-			'macros' => [
-				'{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'
-			]
-		]);
+		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false, 'usermacros' => true]);
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,
 			'lldmacros' => (get_class($this) === 'CItemPrototype')
@@ -772,6 +765,71 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Checks whether the given items are referenced by any graphs and tries to
+	 * unset these references, if they are no longer used.
+	 *
+	 * @throws APIException if at least one of the item can't be deleted
+	 *
+	 * @param array $itemids   An array of item IDs
+	 */
+	protected function checkGraphReference(array $itemids) {
+		$this->checkUseInGraphAxis($itemids, true);
+		$this->checkUseInGraphAxis($itemids);
+	}
+
+	/**
+	 * Checks if any of the given items are used as min/max Y values in a graph.
+	 *
+	 * if there are graphs, that have an y*_itemid column set, but the
+	 * y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, the y*_itemid
+	 * column will be set to NULL.
+	 *
+	 * If the $checkMax parameter is set to true, the items will be checked against
+	 * max Y values, otherwise, they will be checked against min Y values.
+	 *
+	 * @throws APIException if any of the given items are used as min/max Y values in a graph.
+	 *
+	 * @param array $itemids   An array of items IDs
+	 * @param bool  $check_max
+	 */
+	protected function checkUseInGraphAxis(array $itemids, $check_max = false) {
+		$field_name_itemid = $check_max ? 'ymax_itemid' : 'ymin_itemid';
+		$field_name_type = $check_max ? 'ymax_type' : 'ymin_type';
+		$error = $check_max
+			? 'Could not delete these items because some of them are used as MAX values for graphs.'
+			: 'Could not delete these items because some of them are used as MIN values for graphs.';
+
+		$result = DBselect(
+			'SELECT g.graphid,g.'.$field_name_type.
+			' FROM graphs g'.
+			' WHERE '.dbConditionInt('g.'.$field_name_itemid, $itemids)
+		);
+
+		$update_graphs = [];
+
+		while ($row = DBfetch($result)) {
+			// check if Y type is actually set to GRAPH_YAXIS_TYPE_ITEM_VALUE
+			if ($row[$field_name_type] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+			else {
+				$update_graphs[] = [
+					'values' => [$field_name_itemid => 0],
+					'where' => ['graphid' => $row['graphid']]
+				];
+			}
+		}
+		unset($graph);
+
+		// if there are graphs, that have an y*_itemid column set, but the
+		// y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, set y*_itemid to NULL.
+		// Otherwise we won't be able to delete them.
+		if ($update_graphs) {
+			DB::update('graphs', $update_graphs);
+		}
+	}
+
+	/**
 	 * Updates the children of the item on the given hosts and propagates the inheritance to the child hosts.
 	 *
 	 * @abstract
@@ -1130,40 +1188,25 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Validate item pre-processing.
 	 *
-	 * @param array  $item                                             An array of single item data.
-	 * @param array  $item['preprocessing']                            An array of item pre-processing data.
-	 * @param string $item['preprocessing'][]['type']                  The preprocessing option type. Possible values:
-	 *                                                                  1 - ZBX_PREPROC_MULTIPLIER;
-	 *                                                                  2 - ZBX_PREPROC_RTRIM;
-	 *                                                                  3 - ZBX_PREPROC_LTRIM;
-	 *                                                                  4 - ZBX_PREPROC_TRIM;
-	 *                                                                  5 - ZBX_PREPROC_REGSUB;
-	 *                                                                  6 - ZBX_PREPROC_BOOL2DEC;
-	 *                                                                  7 - ZBX_PREPROC_OCT2DEC;
-	 *                                                                  8 - ZBX_PREPROC_HEX2DEC;
-	 *                                                                  9 - ZBX_PREPROC_DELTA_VALUE;
-	 *                                                                  10 - ZBX_PREPROC_DELTA_SPEED;
-	 *                                                                  11 - ZBX_PREPROC_XPATH;
-	 *                                                                  12 - ZBX_PREPROC_JSONPATH;
-	 *                                                                  13 - ZBX_PREPROC_VALIDATE_RANGE;
-	 *                                                                  14 - ZBX_PREPROC_VALIDATE_REGEX;
-	 *                                                                  15 - ZBX_PREPROC_VALIDATE_NOT_REGEX;
-	 *                                                                  16 - ZBX_PREPROC_ERROR_FIELD_JSON;
-	 *                                                                  17 - ZBX_PREPROC_ERROR_FIELD_XML;
-	 *                                                                  18 - ZBX_PREPROC_ERROR_FIELD_REGEX;
-	 *                                                                  19 - ZBX_PREPROC_THROTTLE_VALUE;
-	 *                                                                  20 - ZBX_PREPROC_THROTTLE_TIMED_VALUE.
-	 * @param string $item['preprocessing'][]['params']                Additional parameters used by preprocessing
-	 *                                                                 option. Multiple parameters are separated by LF
-	 *                                                                 (\n) character.
-	 * @param string $item['preprocessing'][]['error_handler']         Action type used in case of preprocessing step
-	 *                                                                 failure. Possible values:
-	 *                                                                  0 - ZBX_PREPROC_FAIL_DEFAULT;
-	 *                                                                  1 - ZBX_PREPROC_FAIL_DISCARD_VALUE;
-	 *                                                                  2 - ZBX_PREPROC_FAIL_SET_VALUE;
-	 *                                                                  3 - ZBX_PREPROC_FAIL_SET_ERROR.
-	 * @param string $item['preprocessing'][]['error_handler_params']  Error handler parameters.
-	 * @param string $method                                           A string of "create" or "update" method.
+	 * @param array  $item									An array of single item data.
+	 * @param array  $item['preprocessing']					An array of item pre-processing data.
+	 * @param string $item['preprocessing'][]['type']		The preprocessing option type. Possible values:
+	 *															1 - ZBX_PREPROC_MULTIPLIER;
+	 *															2 - ZBX_PREPROC_RTRIM;
+	 *															3 - ZBX_PREPROC_LTRIM;
+	 *															4 - ZBX_PREPROC_TRIM;
+	 *															5 - ZBX_PREPROC_REGSUB;
+	 *															6 - ZBX_PREPROC_BOOL2DEC;
+	 *															7 - ZBX_PREPROC_OCT2DEC;
+	 *															8 - ZBX_PREPROC_HEX2DEC;
+	 *															9 - ZBX_PREPROC_DELTA_VALUE;
+	 *															10 - ZBX_PREPROC_DELTA_SPEED;
+	 *															11 - ZBX_PREPROC_XPATH;
+	 *															12 - ZBX_PREPROC_JSONPATH.
+	 * @param string $item['preprocessing'][]['params']		Additional parameters used by preprocessing option. In case
+	 *														of regular expression (ZBX_PREPROC_REGSUB), multiple
+	 *														parameters are separated by LF (\n)character.
+	 * @param string $method								A string of "create" or "update" method.
 	 */
 	protected function validateItemPreprocessing(array $item, $method) {
 		if (array_key_exists('preprocessing', $item)) {
@@ -1173,15 +1216,8 @@ abstract class CItemGeneral extends CApiService {
 
 			$type_validator = new CLimitedSetValidator(['values' => array_keys(get_preprocessing_types(null, false))]);
 
-			$error_handler_validator = new CLimitedSetValidator([
-				'values' => [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE,
-					ZBX_PREPROC_FAIL_SET_ERROR
-				]
-			]);
-
-			$required_fields = ['type', 'params', 'error_handler', 'error_handler_params'];
+			$required_fields = ['type', 'params'];
 			$delta = false;
-			$throttling = false;
 
 			foreach ($item['preprocessing'] as $preprocessing) {
 				$missing_keys = array_diff($required_fields, array_keys($preprocessing));
@@ -1209,7 +1245,6 @@ abstract class CItemGeneral extends CApiService {
 						)
 					);
 				}
-
 				switch ($preprocessing['type']) {
 					case ZBX_PREPROC_MULTIPLIER:
 						// Check if custom multiplier is a valid number.
@@ -1240,10 +1275,6 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_TRIM:
 					case ZBX_PREPROC_XPATH:
 					case ZBX_PREPROC_JSONPATH:
-					case ZBX_PREPROC_VALIDATE_REGEX:
-					case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-					case ZBX_PREPROC_ERROR_FIELD_JSON:
-					case ZBX_PREPROC_ERROR_FIELD_XML:
 						// Check 'params' if not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1257,7 +1288,6 @@ abstract class CItemGeneral extends CApiService {
 						break;
 
 					case ZBX_PREPROC_REGSUB:
-					case ZBX_PREPROC_ERROR_FIELD_REGEX:
 						// Check if 'params' are not empty and if second parameter contains (after \n) is not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1284,52 +1314,9 @@ abstract class CItemGeneral extends CApiService {
 						}
 						break;
 
-					case ZBX_PREPROC_VALIDATE_RANGE:
-						if (is_array($preprocessing['params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif (trim($preprocessing['params']) === '' || $preprocessing['params'] === null
-								|| $preprocessing['params'] === false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
-							);
-						}
-
-						$params = explode("\n", $preprocessing['params']);
-
-						if ($params[0] !== '' && !is_numeric($params[0])
-								&& (new CUserMacroParser())->parse($params[0]) != CParser::PARSE_SUCCESS
-								&& (!($this instanceof CItemPrototype)
-									|| ((new CLLDMacroFunctionParser())->parse($params[0]) != CParser::PARSE_SUCCESS
-										&& (new CLLDMacroParser())->parse($params[0]) != CParser::PARSE_SUCCESS))) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('a numeric value is expected')
-							));
-						}
-
-						if ($params[1] !== '' && !is_numeric($params[1])
-								&& (new CUserMacroParser())->parse($params[1]) != CParser::PARSE_SUCCESS
-								&& (!($this instanceof CItemPrototype)
-									|| ((new CLLDMacroFunctionParser())->parse($params[1]) != CParser::PARSE_SUCCESS
-										&& (new CLLDMacroParser())->parse($params[1]) != CParser::PARSE_SUCCESS))) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('a numeric value is expected')
-							));
-						}
-
-						if (is_numeric($params[0]) && is_numeric($params[1]) && $params[0] > $params[1]) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value for field "%1$s": %2$s.',
-								'params',
-								_s('"%1$s" value must be less than or equal to "%2$s" value', _('min'), _('max'))
-							));
-						}
-						break;
-
 					case ZBX_PREPROC_BOOL2DEC:
 					case ZBX_PREPROC_OCT2DEC:
 					case ZBX_PREPROC_HEX2DEC:
-					case ZBX_PREPROC_THROTTLE_VALUE:
 						// Check if 'params' is empty, because it must be empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1339,15 +1326,6 @@ abstract class CItemGeneral extends CApiService {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('should be empty'))
 							);
-						}
-
-						if ($preprocessing['type'] == ZBX_PREPROC_THROTTLE_VALUE) {
-							if ($throttling) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one throttling step is allowed.'));
-							}
-							else {
-								$throttling = true;
-							}
 						}
 						break;
 
@@ -1372,100 +1350,6 @@ abstract class CItemGeneral extends CApiService {
 							$delta = true;
 						}
 						break;
-
-					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-						$api_input_rules = [
-							'type' => API_TIME_UNIT,
-							'flags' => ($this instanceof CItemPrototype)
-								? API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
-								: API_NOT_EMPTY | API_ALLOW_USER_MACRO,
-							'in' => '1:'.ZBX_MAX_TIMESHIFT
-						];
-
-						if (!CApiInputValidator::validate($api_input_rules, $preprocessing['params'], 'params',
-								$error)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-						}
-
-						if ($throttling) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one throttling step is allowed.'));
-						}
-						else {
-							$throttling = true;
-						}
-						break;
-				}
-
-				switch ($preprocessing['type']) {
-					case ZBX_PREPROC_RTRIM:
-					case ZBX_PREPROC_LTRIM:
-					case ZBX_PREPROC_TRIM:
-					case ZBX_PREPROC_ERROR_FIELD_JSON:
-					case ZBX_PREPROC_ERROR_FIELD_XML:
-					case ZBX_PREPROC_ERROR_FIELD_REGEX:
-					case ZBX_PREPROC_THROTTLE_VALUE:
-					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-						if (is_array($preprocessing['error_handler'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($preprocessing['error_handler'] != ZBX_PREPROC_FAIL_DEFAULT) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler',
-									_s('unexpected value "%1$s"', $preprocessing['error_handler'])
-								)
-							);
-						}
-
-						if (is_array($preprocessing['error_handler_params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($preprocessing['error_handler_params'] !== ''
-								&& $preprocessing['error_handler_params'] !== null
-								&& $preprocessing['error_handler_params'] !== false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
-									_('should be empty')
-								)
-							);
-						}
-						break;
-
-					default:
-						if (is_array($preprocessing['error_handler'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif (!$error_handler_validator->validate($preprocessing['error_handler'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler',
-									_s('unexpected value "%1$s"', $preprocessing['error_handler'])
-								)
-							);
-						}
-
-						if (is_array($preprocessing['error_handler_params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif (($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT
-									|| $preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DISCARD_VALUE)
-								&& $preprocessing['error_handler_params'] !== ''
-								&& $preprocessing['error_handler_params'] !== null
-								&& $preprocessing['error_handler_params'] !== false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
-									_('should be empty')
-								)
-							);
-						}
-						elseif ($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR
-								&& ($preprocessing['error_handler_params'] === ''
-									|| $preprocessing['error_handler_params'] === null
-									|| $preprocessing['error_handler_params'] === false)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
-									_('cannot be empty')
-								)
-							);
-						}
 				}
 			}
 		}
@@ -1474,24 +1358,21 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Insert item pre-processing data into DB.
 	 *
-	 * @param array $items                     An array of items.
-	 * @param array $items[]['preprocessing']  An array of item pre-processing data.
+	 * @param array $items							An array of items.
+	 * @param array $items[]['preprocessing']		An array of item pre-processing data.
 	 */
 	protected function createItemPreprocessing(array $items) {
 		$item_preproc = [];
+		$step = 1;
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
-				$step = 1;
-
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
 						'itemid' => $item['itemid'],
 						'step' => $step++,
 						'type' => $preprocessing['type'],
-						'params' => $preprocessing['params'],
-						'error_handler' => $preprocessing['error_handler'],
-						'error_handler_params' => $preprocessing['error_handler_params']
+						'params' => $preprocessing['params']
 					];
 				}
 			}
@@ -1505,26 +1386,24 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Update item pre-processing data in DB. Delete old records and create new ones.
 	 *
-	 * @param array $items                     An array of items.
-	 * @param array $items[]['preprocessing']  An array of item pre-processing data.
+	 * @param array $items							An array of items.
+	 * @param array $items[]['preprocessing']		An array of item pre-processing data.
 	 */
 	protected function updateItemPreprocessing(array $items) {
 		$item_preproc = [];
 		$item_preprocids = [];
+		$step = 1;
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
 				$item_preprocids[] = $item['itemid'];
-				$step = 1;
 
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
 						'itemid' => $item['itemid'],
 						'step' => $step++,
 						'type' => $preprocessing['type'],
-						'params' => $preprocessing['params'],
-						'error_handler' => $preprocessing['error_handler'],
-						'error_handler_params' => $preprocessing['error_handler_params']
+						'params' => $preprocessing['params']
 					];
 				}
 			}

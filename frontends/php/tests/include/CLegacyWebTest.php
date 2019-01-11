@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -303,43 +303,17 @@ class CLegacyWebTest extends CWebTest {
 		);
 	}
 
-	/**
-	 * Removes one element from the multiselect
-	 *
-	 * @param string $id		ID of the multiselect
-	 * @param string $string	Element name to be removed
-	 */
 	public function zbxTestMultiselectRemove($id, $string) {
 		$this->zbxTestClickXpathWait(
 			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
 			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']/..".
 			"/span[@class='subfilter-disable-btn']"
 		);
+
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath(
 			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
 			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']"
 		));
-	}
-
-	/**
-	 * Clears all elements from the multiselect
-	 *
-	 * @param string $id	ID of the multiselect
-	 */
-	public function zbxTestMultiselectClear($id) {
-		$xpath = '//div[contains(@class, "multiselect") and @id="'.$id.'"]'.
-				'/div[@class="selected"]/ul[@class="multiselect-list"]/li'.
-				'//span[@class="subfilter-disable-btn"]';
-		$locator = WebDriverBy::xpath($xpath);
-		$elements = $this->webDriver->findElements($locator);
-
-		if ($elements) {
-			foreach ($elements as $element) {
-				$element->click();
-			}
-
-			$this->zbxTestWaitUntilElementNotVisible($locator);
-		}
 	}
 
 	/**
@@ -661,7 +635,7 @@ class CLegacyWebTest extends CWebTest {
 				"//nav[@aria-label='Content controls']".
 					"//button[text()='{$text}']";
 
-		$this->zbxTestClickXpathWait($xpath);
+		$this->zbxTestClickXpath($xpath);
 	}
 
 	/**

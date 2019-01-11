@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -131,8 +131,7 @@ class CRouter {
 		'popup.testtriggerexpr'			=> ['CControllerPopupTestTriggerExpr',		'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerwizard'			=> ['CControllerPopupTriggerWizard',		'layout.json',			'popup.triggerwizard'],
 		'popup.trigdesc.view'			=> ['CControllerPopupTrigDescView',			'layout.json',			'popup.trigdesc.view'],
-		'trigdesc.update'				=> ['CControllerTrigDescUpdate',			'layout.json',			null],
-		'search'						=> ['CControllerSearch',					'layout.htmlpage',		'search']
+		'trigdesc.update'				=> ['CControllerTrigDescUpdate',			'layout.json',			null]
 	];
 
 	public function __construct($action) {

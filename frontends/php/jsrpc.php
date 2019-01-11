@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
 
 require_once dirname(__FILE__).'/include/func.inc.php';
 require_once dirname(__FILE__).'/include/defines.inc.php';
@@ -241,7 +240,7 @@ switch ($data['method']) {
 
 	/**
 	 * Create multi select data.
-	 * Supported objects: "applications", "hosts", "hostGroup", "templates", "triggers", "application_prototypes"
+	 * Supported objects: "applications", "hosts", "hostGroup", "templates", "triggers"
 	 *
 	 * @param string $data['objectName']
 	 * @param string $data['search']
@@ -254,23 +253,15 @@ switch ($data['method']) {
 
 		switch ($data['objectName']) {
 			case 'hostGroup':
-				$options = [
+				$hostGroups = API::HostGroup()->get([
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['groupid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
-					'real_hosts' => array_key_exists('real_hosts', $data) ? $data['real_hosts'] : null
-				];
-				$hostGroups = API::HostGroup()->get($options);
+					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
+				]);
 
 				if ($hostGroups) {
-					if (array_key_exists('enrich_parent_groups', $data)) {
-						$hostGroups = CPageFilter::enrichParentGroups($hostGroups, [
-							'real_hosts' => null
-						] + $options);
-					}
-
 					CArrayHelper::sort($hostGroups, [
 						['field' => 'name', 'order' => ZBX_SORT_UP]
 					]);
@@ -379,8 +370,8 @@ switch ($data['method']) {
 
 			case 'applications':
 				$applications = API::Application()->get([
-					'output' => ['applicationid', 'name'],
 					'hostids' => zbx_toArray($data['hostid']),
+					'output' => ['applicationid', 'name'],
 					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
 					'limit' => $config['search_limit']
 				]);
@@ -395,37 +386,6 @@ switch ($data['method']) {
 					}
 
 					$result = CArrayHelper::renameObjectsKeys($applications, ['applicationid' => 'id']);
-				}
-				break;
-
-			case 'application_prototypes':
-				$discovery_rules = API::DiscoveryRule()->get([
-					'output' => [],
-					'selectApplicationPrototypes' => ['application_prototypeid', 'name'],
-					'itemids' => [$data['parent_discoveryid']],
-					'limitSelects' => $config['search_limit']
-				]);
-
-				if ($discovery_rules) {
-					$discovery_rule = $discovery_rules[0];
-
-					if ($discovery_rule['applicationPrototypes']) {
-						foreach ($discovery_rule['applicationPrototypes'] as $application_prototype) {
-							if (array_key_exists('search', $data)
-									&& stripos($application_prototype['name'], $data['search']) !== false) {
-								$result[] = [
-									'id' => $application_prototype['application_prototypeid'],
-									'name' => $application_prototype['name']
-								];
-							}
-						}
-
-						CArrayHelper::sort($result, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
-
-						if (array_key_exists('limit', $data)) {
-							$result = array_slice($result, 0, $data['limit']);
-						}
-					}
 				}
 				break;
 

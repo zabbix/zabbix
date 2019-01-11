@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -478,6 +478,9 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 	zbx_snprintf(addr, sizeof(addr), "%s:%hu", item->interface.addr, item->interface.port);
 #endif
 	session.peername = addr;
+
+	/* remote_port is no longer used in latest versions of Net-SNMP */
+	session.remote_port = item->interface.port;
 
 	if (SNMP_VERSION_1 == session.version || SNMP_VERSION_2c == session.version)
 	{

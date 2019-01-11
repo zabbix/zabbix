@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,8 +95,9 @@ abstract class CValidator {
 	 * Adds a validation error with custom parameter support. The value of $objectName will be passed as the
 	 * first parameter.
 	 *
-	 * @param string    $message   Message optionally containing placeholders to substitute.
-	 * @param mixed     $param     Unlimited number of optional parameters to replace sequential placeholders.
+	 * @param string 	$message
+	 * @param mixed 	$param 		parameter to be replace the first placeholder
+	 * @param mixed 	$param,... 	unlimited number of optional parameters
 	 *
 	 * @return string
 	 */
@@ -112,7 +113,7 @@ abstract class CValidator {
 
 
 	/**
-	 * Returns string representation of a variable.
+	 * Returns string represenation of a variable
 	 *
 	 * @param mixed $value
 	 * @return string

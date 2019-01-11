@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,13 +34,11 @@ class CServicesSlaCalculatorTest extends PHPUnit_Framework_TestCase {
 				[
 					[
 						'clock' => strtotime('30 March 2014 3:00'),
-						'value' => 3,
-						'servicealarmid' => 1
+						'value' => 3
 					],
 					[
 						'clock' => strtotime('30 March 2014 6:00'),
-						'value' => 0,
-						'servicealarmid' => 2
+						'value' => 0
 					],
 				],
 				[
@@ -74,13 +72,11 @@ class CServicesSlaCalculatorTest extends PHPUnit_Framework_TestCase {
 				[
 					[
 						'clock' => strtotime('30 March 2014 3:00'),
-						'value' => 3,
-						'servicealarmid' => 1
+						'value' => 3
 					],
 					[
 						'clock' => strtotime('30 March 2014 6:00'),
-						'value' => 0,
-						'servicealarmid' => 2
+						'value' => 0
 					],
 				],
 				[

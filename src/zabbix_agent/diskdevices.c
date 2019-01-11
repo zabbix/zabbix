@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,8 +106,6 @@ static void	process_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device)
 		return;
 
 	apply_diskstat(device, now, dstat);
-
-	device->ticks_since_polled++;
 }
 
 void	collect_stats_diskdevices(void)
@@ -118,22 +116,7 @@ void	collect_stats_diskdevices(void)
 	diskstat_shm_reattach();
 
 	for (i = 0; i < diskdevices->count; i++)
-	{
 		process_diskstat(&diskdevices->device[i]);
-
-		/* remove device from collector if not being polled for long time */
-		if (DISKDEVICE_TTL <= diskdevices->device[i].ticks_since_polled)
-		{
-			if ((diskdevices->count - 1) > i)
-			{
-				memcpy(diskdevices->device + i, diskdevices->device + i + 1,
-					sizeof(ZBX_SINGLE_DISKDEVICE_DATA) * (diskdevices->count - i));
-			}
-
-			diskdevices->count--;
-			i--;
-		}
-	}
 
 	UNLOCK_DISKSTATS;
 }
@@ -159,7 +142,6 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname)
 		if (0 == strcmp(devname, diskdevices->device[i].name))
 		{
 			device = &diskdevices->device[i];
-			device->ticks_since_polled = 0;
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() device '%s' found", __function_name, devname);
 			break;
 		}
@@ -196,10 +178,8 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
 		diskstat_shm_extend();
 
 	device = &(diskdevices->device[diskdevices->count]);
-	memset(device, 0, sizeof(ZBX_SINGLE_DISKDEVICE_DATA));
 	zbx_strlcpy(device->name, devname, sizeof(device->name));
 	device->index = -1;
-	device->ticks_since_polled = 0;
 	(diskdevices->count)++;
 
 	process_diskstat(device);

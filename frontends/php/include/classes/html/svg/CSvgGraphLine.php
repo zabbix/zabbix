@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,12 +40,13 @@ class CSvgGraphLine extends CSvgPath {
 		$this->item_name = $metric['name'];
 		$this->units = $metric['units'];
 		$this->host = $metric['host'];
+		$this->line_values = '';
 
 		$this->options = $metric['options'] + [
-			'transparency' => CSvgGraph::SVG_GRAPH_DEFAULT_TRANSPARENCY,
-			'width' => CSvgGraph::SVG_GRAPH_DEFAULT_LINE_WIDTH,
-			'color' => CSvgGraph::SVG_GRAPH_DEFAULT_COLOR,
+			'transparency' => 5,
 			'type' => SVG_GRAPH_TYPE_LINE,
+			'width' => 1,
+			'color' => '#b0af07',
 			'order' => 1
 		];
 	}
@@ -70,22 +71,19 @@ class CSvgGraphLine extends CSvgPath {
 	}
 
 	protected function draw() {
-		// drawMetricArea can be called with single data point.
-		if (count($this->path) > 1) {
-			$last_point = [0, 0];
+		$last_point = [0, 0];
 
-			foreach ($this->path as $i => $point) {
-				if ($i == 0) {
-					$this->moveTo($point[0], $point[1]);
-				}
-				else {
-					if ($this->options['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
-						$this->lineTo($point[0], $last_point[1]);
-					}
-					$this->lineTo($point[0], $point[1]);
-				}
-				$last_point = $point;
+		foreach ($this->path as $i => $point) {
+			if ($i == 0) {
+				$this->moveTo($point[0], $point[1]);
 			}
+			else {
+				if ($this->options['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
+					$this->lineTo($point[0], $last_point[1]);
+				}
+				$this->lineTo($point[0], $point[1]);
+			}
+			$last_point = $point;
 		}
 	}
 

@@ -59,7 +59,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (configuration\ syncer, data\ sender, discoverer, heartbeat\ sender, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector)
+All processes of specified type (e.g., poller)
 .RE
 .RS 4
 .TP 4
@@ -69,7 +69,7 @@ Process type and number (e.g., poller,3)
 .RS 4
 .TP 4
 .I pid
-Process identifier, up to 65535. For larger values specify target as "process\-type,N"
+Process identifier, up to 65535. For larger values specify target as "process\-type,N" 
 .RE
 .RE
 .IP "\fB\-h\fR, \fB\-\-help\fR"

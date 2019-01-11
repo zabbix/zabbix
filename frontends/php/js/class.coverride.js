@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2019 Zabbix SIA
+ ** Copyright (C) 2001-2018 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ jQuery(function ($) {
 		if (option === 'color') {
 			var id = field_name.replace(/\]/g, '_').replace(/\[/g, '_'),
 				input = $('<input>')
-					.attr({'name': field_name, 'type': 'text', 'maxlength': 6, 'id': id, 'placeholder': t('S_COLOR')})
+					.attr({'name': field_name, 'type': 'text', 'maxlength': 6, 'id': id, 'placeholder': t('S_COLOUR')})
 					.val(value);
 
 			return $('<div></div>')

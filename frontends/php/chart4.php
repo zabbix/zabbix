@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,7 +114,7 @@ for ($i = 0; $i < $weeks; $i++) {
 	$periodStart = $start + SEC_PER_WEEK * $i;
 	$periodEnd = $start + SEC_PER_WEEK * ($i + 1);
 
-	$stat = calculateAvailability(getRequest('triggerid'), $periodStart, $periodEnd - 1);
+	$stat = calculateAvailability(getRequest('triggerid'), $periodStart, $periodEnd);
 	$true[$i] = $stat['true'];
 	$false[$i] = $stat['false'];
 	$count_now[$i] = 1;

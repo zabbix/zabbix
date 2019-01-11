@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,96 +17,76 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 var cookie = {
 	cookies: [],
 	prefix:	null,
-	/*
-	 * Encoding values separated by a comma (%2C), makes the cookie very large in size. A dot, however, remains a dot.
-	 * Must be synced with class.ctree.js for consistency.
-	 */
-	delimiter: '.',
 
 	init: function() {
 		var allCookies = document.cookie.split('; ');
 
 		for (var i = 0; i < allCookies.length; i++) {
 			var cookiePair = allCookies[i].split('=');
-			this.cookies[decodeURIComponent(cookiePair[0])] = decodeURIComponent(cookiePair[1]);
+			this.cookies[cookiePair[0]] = cookiePair[1];
 		}
 	},
 
 	create: function(name, value, days) {
 		var expires = '';
 
-		if (typeof(days) !== 'undefined') {
+		if (typeof(days) != 'undefined') {
 			var date = new Date();
 			date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
 			expires = '; expires=' + date.toGMTString();
 		}
 
-		document.cookie = encodeURIComponent(name) + '=' + encodeURIComponent(value) + expires +
-			(location.protocol === 'https:' ? '; secure' : '');
+		document.cookie = name + '=' + value + expires + (location.protocol == 'https:' ? '; secure' : '');
 
-		// Apache header size limit.
+		// apache header size limit
 		if (document.cookie.length > 8000) {
-			document.cookie = encodeURIComponent(name) + '=;';
-			alert(t('S_MAX_COOKIE_SIZE_REACHED'));
+			document.cookie = name + '=;';
+			alert(locale['S_MAX_COOKIE_SIZE_REACHED']);
 			return false;
 		}
 		else {
 			this.cookies[name] = value;
 		}
-
 		return true;
 	},
 
 	createArray: function(name, value, days) {
-		var part_string = '',
-			part_length = 0,
-			part = 0,
-			prev_part_count = parseInt(this.read(name + '_parts'), 10);
+		var list = value.join(',');
+		var list_part = '';
+		var part = 1;
+		var part_count = parseInt(this.read(name + '_parts'), 10);
 
-		if (is_null(prev_part_count)) {
-			prev_part_count = 1;
+		if (is_null(part_count)) {
+			part_count = 1;
 		}
 
-		for (var i = 0; i < value.length; i++) {
-			var is_last = (i === value.length - 1),
-				curr_value = value[i];
-
-			if (!is_last) {
-				curr_value += this.delimiter;
-			}
-
-			var curr_length = encodeURIComponent(curr_value).length;
-
-			if (part_length + curr_length <= 4000) {
-				part_string += curr_value;
-				part_length += curr_length;
-			}
-			else {
-				part++;
-
-				if (!this.create(name + '_' + part, part_string, days)) {
-					break;
+		var tmp_index = 0
+		var result = true;
+		while (list.length > 0) {
+			list_part = list.substr(0, 4000);
+			list = list.substr(4000);
+			if (list.length > 0) {
+				tmp_index = list_part.lastIndexOf(',');
+				if (tmp_index > -1) {
+					list = list_part.substring(tmp_index+1) + list;
+					list_part = list_part.substring(0, tmp_index + 1);
 				}
-
-				part_string = curr_value;
-				part_length = curr_length;
 			}
+			result = this.create(name + '_' + part, list_part, days);
+			part++;
 
-			if (is_last) {
-				part++;
-				this.create(name + '_' + part, part_string, days);
+			if (!result) {
+				break;
 			}
 		}
+		this.create(name + '_parts', part - 1, days);
 
-		this.create(name + '_parts', part, days);
-
-		while (part < prev_part_count) {
-			part++;
+		while (part <= part_count) {
 			this.erase(name + '_' + part);
+			part++;
 		}
 	},
 
@@ -124,21 +104,19 @@ var cookie = {
 		if (typeof(this.cookies[name]) !== 'undefined') {
 			return this.cookies[name];
 		}
-		else if (document.cookie.indexOf(encodeURIComponent(name)) != -1) {
-			var nameEQ = encodeURIComponent(name) + '=';
+		else if (document.cookie.indexOf(name) != -1) {
+			var nameEQ = name + '=';
 			var ca = document.cookie.split(';');
-
 			for (var i = 0; i < ca.length; i++) {
 				var c = ca[i];
 				while (c.charAt(0) == ' ') {
 					c = c.substring(1, c.length);
 				}
 				if (c.indexOf(nameEQ) == 0) {
-					return this.cookies[name] = decodeURIComponent(c.substring(nameEQ.length, c.length));
+					return this.cookies[name] = c.substring(nameEQ.length, c.length);
 				}
 			}
 		}
-
 		return null;
 	},
 
@@ -159,7 +137,7 @@ var cookie = {
 			list_part = this.read(name + '_' + part);
 			part++;
 		}
-		var range = (list != '') ? list.split(this.delimiter) : [];
+		var range = (list != '') ? list.split(',') : [];
 		return range;
 	},
 

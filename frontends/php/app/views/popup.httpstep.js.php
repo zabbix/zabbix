@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ function validateHttpStep(formname, dialogueid) {
 		url = new Curl(jQuery(form).attr('action')),
 		dialogueid = dialogueid || null;
 
-	jQuery(form).trimValues(['#step_name', '#url', '#timeout', '#required', '#status_codes']);
+	jQuery(form).trimValues(['#name', '#url', '#timeout', '#required', '#status_codes']);
 
 	url.setArgument('validate', 1);
 

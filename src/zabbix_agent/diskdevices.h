@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,19 +28,10 @@
 
 #define	MAX_DISKDEVICES	1024
 
-/* Disk device time to live: if disk statistics is being collected but not polled (using passive  */
-/* or active check) DISKDEVICE_TTL or more seconds then delete this disk from collector.          */
-/* Update interval for vfs.dev.read[] and vfs.dev.write[] items must be less than DISKDEVICE_TTL. */
-#define	DISKDEVICE_TTL	(3 * SEC_PER_HOUR)
-
 typedef struct c_single_diskdevice_data
 {
 	char		name[32];
 	int		index;
-	/* Counter used to detect devices no longer polled and to delete them from collector. It is set */
-	/* to 0 when disk statistics is polled and incremented when disk statistics is updated. For     */
-	/* example, value 3600 means that approximately 1 hour statistics was not polled for this disk. */
-	int 		ticks_since_polled;
 	time_t		clock[MAX_COLLECTOR_HISTORY];
 	zbx_uint64_t	r_sect[MAX_COLLECTOR_HISTORY];
 	zbx_uint64_t	r_oper[MAX_COLLECTOR_HISTORY];

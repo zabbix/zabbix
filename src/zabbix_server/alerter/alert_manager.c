@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 #include "zbxserver.h"
 #include "alerter_protocol.h"
 #include "alert_manager.h"
-#include "zbxmedia.h"
 
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
@@ -158,7 +157,6 @@ typedef struct
 	int			maxsessions;
 	int			maxattempts;
 	int			attempt_interval;
-	unsigned char		content_type;
 }
 zbx_am_mediatype_t;
 
@@ -344,7 +342,7 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, int
 		const char *exec_path, const char *gsm_modem, const char *username, const char *passwd,
 		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
 		unsigned char smtp_verify_host, unsigned char smtp_authentication, const char *exec_params,
-		int maxsessions, int maxattempts, int attempt_interval, unsigned char content_type)
+		int maxsessions, int maxattempts, int attempt_interval)
 {
 	zbx_am_mediatype_t	*mediatype;
 
@@ -383,7 +381,6 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, int
 	mediatype->maxsessions = maxsessions;
 	mediatype->maxattempts = maxattempts;
 	mediatype->attempt_interval = attempt_interval;
-	mediatype->content_type = content_type;
 }
 
 /******************************************************************************
@@ -987,15 +984,6 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 
 		alert_message = am_create_db_alert_message();
 
-		if (ZBX_MEDIA_CONTENT_TYPE_HTML == mediatype->content_type)
-		{
-			char	*am_esc;
-
-			am_esc = xml_escape_dyn(alert_message);
-			alert_message = zbx_dsprintf(alert_message, "<html><pre>%s</pre></html>", am_esc);
-			zbx_free(am_esc);
-		}
-
 		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, alert_subject, alert_message, 0,
 				0, 0);
 
@@ -1271,7 +1259,7 @@ static int	am_db_update_mediatypes(zbx_am_t *manager, const zbx_uint64_t *mediat
 	int		type, maxsessions, maxattempts, attempt_interval, ret = SUCCEED;
 	zbx_uint64_t	mediatypeid;
 	unsigned short	smtp_port;
-	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, content_type;
+	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1281,7 +1269,7 @@ static int	am_db_update_mediatypes(zbx_am_t *manager, const zbx_uint64_t *mediat
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,"
 				"username,passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,"
-				"smtp_authentication,exec_params,maxsessions,maxattempts,attempt_interval,content_type"
+				"smtp_authentication,exec_params,maxsessions,maxattempts,attempt_interval"
 			" from media_type"
 			" where");
 
@@ -1312,7 +1300,6 @@ static int	am_db_update_mediatypes(zbx_am_t *manager, const zbx_uint64_t *mediat
 		ZBX_STR2UCHAR(smtp_authentication, row[14]);
 		maxsessions = atoi(row[16]);
 		maxattempts = atoi(row[17]);
-		ZBX_STR2UCHAR(content_type, row[19]);
 
 		if (FAIL == is_time_suffix(row[18], &attempt_interval, ZBX_LENGTH_UNLIMITED))
 		{
@@ -1334,7 +1321,7 @@ static int	am_db_update_mediatypes(zbx_am_t *manager, const zbx_uint64_t *mediat
 
 		am_update_mediatype(manager, mediatypeid, type, row[2], row[3], row[4], row[5], row[6], row[7], row[8],
 				row[9], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
-				smtp_authentication, row[15], maxsessions, maxattempts, attempt_interval, content_type);
+				smtp_authentication, row[15], maxsessions, maxattempts, attempt_interval);
 	}
 	DBfree_result(result);
 out:
@@ -1757,8 +1744,7 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 					alert->message, mediatype->smtp_server, mediatype->smtp_port,
 					mediatype->smtp_helo, mediatype->smtp_email, mediatype->smtp_security,
 					mediatype->smtp_verify_peer, mediatype->smtp_verify_host,
-					mediatype->smtp_authentication, mediatype->username, mediatype->passwd,
-					mediatype->content_type);
+					mediatype->smtp_authentication, mediatype->username, mediatype->passwd);
 			break;
 		case MEDIA_TYPE_JABBER:
 			command = ZBX_IPC_ALERTER_JABBER;

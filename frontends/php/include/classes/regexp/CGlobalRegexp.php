@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ class CGlobalRegexp {
 			}
 		}
 		else {
-			$result = (bool) @preg_match('/'.str_replace('/', '\/', $this->expression).'/', $string);
+			$result = (bool) preg_match('/'.$this->expression.'/', $string);
 		}
 
 		return $result;
@@ -187,7 +187,7 @@ class CGlobalRegexp {
 		$result = true;
 
 		if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED) {
-			$patterns = array_filter(explode($expression['exp_delimiter'], $expression['expression']), 'strlen');
+			$patterns = explode($expression['exp_delimiter'], $expression['expression']);
 		}
 		else {
 			$patterns = [$expression['expression']];

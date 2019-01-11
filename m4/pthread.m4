@@ -105,8 +105,7 @@ AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base 
 
 	LIBPTHREAD_LIBS="-lpthread"
 
-	AC_CHECK_HEADER([pthread.h],[found_libpthread=yes])
-	if test -n "$_libpthread_dir_set" -o "x$found_libpthread" = xyes; then
+	if test -n "$_libpthread_dir_set" -o -f /usr/include/pthread.h; then
 		found_libpthread="yes"
 	elif test -f /usr/local/include/pthread.h; then
 		LIBPTHREAD_CFLAGS="-I/usr/local/include"

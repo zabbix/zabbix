@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class CColorValidator extends CStringValidator {
 
 	public function __construct(array $options = []) {
 		$this->messageRegex = _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).');
-		$this->messageEmpty = _('Empty colour.');
+		$this->messageEmpty = _('Empty color.');
 
 		parent::__construct($options);
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,27 +92,12 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->assertEquals($oldHashTriggers, CDBHelper::getHash($sqlTriggers));
 	}
 
-	public function testPageTemplates_FilterTemplateByName() {
+	public function testPageTemplates_FilterTemplate() {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestInputTypeOverwrite('filter_name', $this->templateName);
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='$this->templateName']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
-	}
-
-	public function testPageTemplates_FilterByLinkedTemplate() {
-		$this->zbxTestLogin('templates.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestClickButtonMultiselect('filter_templates_');
-		$this->zbxTestLaunchOverlayDialog('Templates');
-		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//select/option[text()="Templates"]');
-		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//a[text()="Template Module ICMP Ping"]');
-		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template Module Generic SNMPv1']");
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template Module Generic SNMPv2']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
 	}
 

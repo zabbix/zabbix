@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -704,7 +704,7 @@ class CItemPrototype extends CItemGeneral {
 
 		// Find and delete application prototypes from database that are no longer linked to any item prototypes.
 		if ($application_prototypes_to_remove) {
-			CItemPrototypeManager::deleteUnusedApplicationPrototypes(array_keys($application_prototypes_to_remove));
+			$this->deleteApplicationPrototypes(array_keys($application_prototypes_to_remove));
 		}
 
 		$this->updateItemPreprocessing($items);
@@ -828,52 +828,207 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * Delete Item prototypes.
 	 *
-	 * @param array $itemids
+	 * @param array $prototypeids
+	 * @param bool 	$nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $itemids) {
-		$this->validateDelete($itemids, $db_items);
-
-		CItemPrototypeManager::delete($itemids);
-
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM_PROTOTYPE, $db_items);
-
-		return ['prototypeids' => $itemids];
-	}
-
-	/**
-	 * Validates the input parameters for the delete() method.
-	 *
-	 * @param array $itemids   [IN/OUT]
-	 * @param array $db_items  [OUT]
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	private function validateDelete(array &$itemids, array &$db_items = null) {
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-		if (!CApiInputValidator::validate($api_input_rules, $itemids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+	public function delete(array $prototypeids, $nopermissions = false) {
+		if (empty($prototypeids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$db_items = $this->get([
-			'output' => ['itemid', 'name', 'templateid', 'flags'],
-			'itemids' => $itemids,
+		$prototypeids = array_keys(array_flip($prototypeids));
+
+		$options = [
+			'itemids' => $prototypeids,
 			'editable' => true,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'output' => API_OUTPUT_EXTEND
+		];
+		$delItemPrototypes = $this->get($options);
+
+		// TODO: remove $nopermissions hack
+		if (!$nopermissions) {
+			foreach ($prototypeids as $prototypeid) {
+				if (!isset($delItemPrototypes[$prototypeid])) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				}
+				if ($delItemPrototypes[$prototypeid]['templateid'] != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items'));
+				}
+			}
+		}
+
+		// first delete child items
+		$parentItemids = $prototypeids;
+		$childPrototypeids = [];
+		do {
+			$dbItems = DBselect('SELECT itemid FROM items WHERE '.dbConditionInt('templateid', $parentItemids));
+			$parentItemids = [];
+			while ($dbItem = DBfetch($dbItems)) {
+				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
+				$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
+			}
+		} while ($parentItemids);
+
+		$db_dependent_items = $delItemPrototypes + $childPrototypeids;
+		$dependent_itemprototypes = [];
+		// Master item deletion will remove dependent items on database level.
+		while ($db_dependent_items) {
+			$db_dependent_items = $this->get([
+				'output' => ['itemid', 'name'],
+				'filter' => ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
+				'preservekeys' => true
+			]);
+			$db_dependent_items = array_diff_key($db_dependent_items, $dependent_itemprototypes);
+			$dependent_itemprototypes += $db_dependent_items;
+		};
+		$dependent_itemprototypeids = array_keys($dependent_itemprototypes);
+		$childPrototypeids += array_combine($dependent_itemprototypeids, $dependent_itemprototypeids);
+
+		$prototypeids = array_merge($prototypeids, $childPrototypeids);
+
+		// Delete graphs or leave them if graphs still have at least one item prototype.
+		$del_graph_prototypes = [];
+		$db_graph_prototypes = DBselect(
+			'SELECT gi.graphid'.
+			' FROM graphs_items gi'.
+			' WHERE '.dbConditionInt('gi.itemid', $prototypeids).
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM graphs_items gii,items i'.
+					' WHERE gi.graphid=gii.graphid'.
+						' AND gii.itemid=i.itemid'.
+						' AND '.dbConditionInt('i.itemid', $prototypeids, true).
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
+				')'
+		);
+		while ($db_graph_prototype = DBfetch($db_graph_prototypes)) {
+			$del_graph_prototypes[] = $db_graph_prototype['graphid'];
+		}
+
+		if ($del_graph_prototypes) {
+			API::GraphPrototype()->delete($del_graph_prototypes, true);
+		}
+
+		// check if any graphs are referencing this item
+		$this->checkGraphReference($prototypeids);
+
+// CREATED ITEMS
+		$createdItems = [];
+		$sql = 'SELECT itemid FROM item_discovery WHERE '.dbConditionInt('parent_itemid', $prototypeids);
+		$dbItems = DBselect($sql);
+		while ($item = DBfetch($dbItems)) {
+			$createdItems[$item['itemid']] = $item['itemid'];
+		}
+		if ($createdItems) {
+			// This API call will also make sure that discovered applications are no longer linked to other items.
+			API::Item()->delete($createdItems, true);
+		}
+
+
+// TRIGGER PROTOTYPES
+		$delTriggerPrototypes = API::TriggerPrototype()->get([
+			'output' => [],
+			'itemids' => $prototypeids,
+			'nopermissions' => true,
+			'preservekeys' => true,
+		]);
+		if ($delTriggerPrototypes) {
+			API::TriggerPrototype()->delete(array_keys($delTriggerPrototypes), true);
+		}
+
+		// screen items
+		DB::delete('screens_items', [
+			'resourceid' => $prototypeids,
+			'resourcetype' => [SCREEN_RESOURCE_LLD_SIMPLE_GRAPH]
 		]);
 
-		foreach ($itemids as $itemid) {
-			if (!array_key_exists($itemid, $db_items)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
+		// Unlink application prototypes and delete those who are no longer linked to any other item prototypes.
+		$db_item_application_prototypes = DBfetchArray(DBselect(
+			'SELECT iap.item_application_prototypeid,iap.application_prototypeid'.
+			' FROM item_application_prototype iap'.
+			' WHERE '.dbConditionInt('iap.itemid', $prototypeids)
+		));
+
+		if ($db_item_application_prototypes) {
+			DB::delete('item_application_prototype', [
+				'item_application_prototypeid' => zbx_objectValues($db_item_application_prototypes,
+					'item_application_prototypeid'
+				)
+			]);
+
+			$this->deleteApplicationPrototypes(zbx_objectValues($db_item_application_prototypes,
+				'application_prototypeid'
+			));
+		}
+
+// ITEM PROTOTYPES
+		DB::delete('items', ['itemid' => $prototypeids]);
+
+		$prototypeids = array_map('strval', $prototypeids);
+
+		return ['prototypeids' => $prototypeids];
+	}
+
+	/*
+	 * Finds and deletes application prototypes by given IDs. Looks for discovered applications that were created from
+	 * prototypes and deletes them if they are not discovered by other rules.
+	 *
+	 * @param array $application_prototypeids
+	 */
+	protected function deleteApplicationPrototypes(array $application_prototypeids) {
+		$db_application_prototypes = DBfetchArray(DBselect(
+			'SELECT ap.application_prototypeid'.
+			' FROM application_prototype ap'.
+			' WHERE NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM item_application_prototype iap'.
+				' WHERE ap.application_prototypeid=iap.application_prototypeid'.
+			')'.
+			' AND '.dbConditionInt('ap.application_prototypeid', $application_prototypeids)
+		));
+
+		if ($db_application_prototypes) {
+			// Find discovered applications for deletable application prototypes.
+			$discovered_applications = DBfetchArray(DBselect(
+				'SELECT DISTINCT ad.applicationid'.
+				' FROM application_discovery ad'.
+				' WHERE '.dbConditionInt('ad.application_prototypeid', $application_prototypeids)
+			));
+
+			$db_application_prototypeids = zbx_objectValues($db_application_prototypes, 'application_prototypeid');
+
+			// unlink templated application prototype
+			DB::update('application_prototype', [
+				'values' => ['templateid' => null],
+				'where' => ['templateid' => $db_application_prototypeids]
+			]);
+
+			DB::delete('application_prototype', ['application_prototypeid' => $db_application_prototypeids]);
+
+			/*
+			 * Deleting an application prototype will automatically delete the link in 'item_application_prototype',
+			 * but it will not delete the actual discovered application. When the link is gone,
+			 * delete the discoveted application. Link between a regular item does not matter any more.
+			 */
+			if ($discovered_applications) {
+				$discovered_applicationids = zbx_objectValues($discovered_applications, 'applicationid');
+
+				$discovered_applications_to_delete = DBfetchArray(DBselect(
+					'SELECT DISTINCT ad.applicationid'.
+					' FROM application_discovery ad'.
+					' WHERE '.dbConditionInt('ad.applicationid', $discovered_applicationids)
+				));
+
+				$applications_to_delete = array_diff($discovered_applicationids,
+					zbx_objectValues($discovered_applications_to_delete, 'applicationid')
 				);
-			}
 
-			$db_item = $db_items[$itemid];
-
-			if ($db_item['templateid'] != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated item prototype.'));
+				if ($applications_to_delete) {
+					API::Application()->delete($applications_to_delete, true);
+				}
 			}
 		}
 	}
@@ -893,7 +1048,7 @@ class CItemPrototype extends CItemGeneral {
 			'output' => $output,
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
-			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectPreprocessing' => ['type', 'params'],
 			'hostids' => $data['templateids'],
 			'preservekeys' => true
 		]);

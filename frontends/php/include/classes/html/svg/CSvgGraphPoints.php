@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,10 +33,10 @@ class CSvgGraphPoints extends CSvgGroup {
 		$this->itemid = $metric['itemid'];
 		$this->item_name = $metric['name'];
 		$this->options = $metric['options'] + [
-			'color' => CSvgGraph::SVG_GRAPH_DEFAULT_COLOR,
-			'pointsize' => CSvgGraph::SVG_GRAPH_DEFAULT_POINTSIZE,
-			'transparency' => CSvgGraph::SVG_GRAPH_DEFAULT_TRANSPARENCY,
-			'order' => 1
+			'color' => '#b0af07',
+			'order' => 1,
+			'pointsize' => 1,
+			'transparency' => 5
 		];
 	}
 

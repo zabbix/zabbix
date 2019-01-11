@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,21 +35,20 @@ function getMenuPopupHistory(options) {
 	// latest graphs
 	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
 		url.setArgument('action', 'showgraph');
-		url.setArgument('to', 'now');
 
-		url.setArgument('from', 'now-1h');
+		url.setArgument('period', '3600');
 		items.push({
 			label: t('Last hour graph'),
 			url: url.getUrl()
 		});
 
-		url.setArgument('from', 'now-7d');
+		url.setArgument('period', '604800');
 		items.push({
 			label: t('Last week graph'),
 			url: url.getUrl()
 		});
 
-		url.setArgument('from', 'now-1M');
+		url.setArgument('period', '2678400');
 		items.push({
 			label: t('Last month graph'),
 			url: url.getUrl()
@@ -58,7 +57,7 @@ function getMenuPopupHistory(options) {
 
 	// latest values
 	url.setArgument('action', 'showvalues');
-	url.setArgument('from', 'now-1h');
+	url.setArgument('period', '3600');
 	items.push({
 		label: t('Latest values'),
 		url: url.getUrl()
@@ -471,7 +470,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 						if (link.data('value') == currentRate) {
 							link
 								.addClass('selected')
-								.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
+								.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
 						}
 						else {
 							link
@@ -502,7 +501,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 								if (link.data('value') == currentRate) {
 									link
 										.addClass('selected')
-										.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
+										.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
 								}
 								else {
 									link
@@ -671,7 +670,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	}
 
 	sections[sections.length] = {
-		label: t('S_TRIGGER'),
+		label: t('Trigger'),
 		items: items
 	};
 
@@ -938,10 +937,10 @@ jQuery(function($) {
 
 			opener.attr('data-expanded', 'true');
 
-			// Close other action menus.
-			$('.action-menu-top').not('#' + id).menuPopup('close');
-
 			if (menuPopup.length > 0) {
+				// Close other action menus.
+				$('.action-menu-top').not('#' + id).menuPopup('close');
+
 				var display = menuPopup.css('display');
 
 				// Hide current action menu sub-levels.
@@ -1263,7 +1262,7 @@ jQuery(function($) {
 			link = $('<a>', {
 				role: 'menuitem',
 				tabindex: '-1',
-				'aria-label': options.selected ? sprintf(t('S_SELECTED_SR'), options.ariaLabel) : options.ariaLabel
+				'aria-label': options.selected ? sprintf(t('%1$s, selected'), options.ariaLabel) : options.ariaLabel
 			}).data('aria-label', options.ariaLabel);
 
 		if (typeof options.label !== 'undefined') {

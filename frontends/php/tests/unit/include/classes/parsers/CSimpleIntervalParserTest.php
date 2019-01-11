@@ -1,7 +1,7 @@
 ﻿<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,27 +88,6 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M}'
-				]
-			],
-			[
-				'{$M: "context"}', 0, ['usermacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$M: "context"}'
-				]
-			],
-			[
-				'{$M: ";"}', 0, ['usermacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$M: ";"}'
-				]
-			],
-			[
-				'{$M: "/"}', 0, ['usermacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$M: "/"}'
 				]
 			],
 			[
@@ -270,27 +249,6 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 			// User macros are not enabled.
 			[
 				'{$M}', 0, ['lldmacros' => true],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'{$M: "context"}', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'{$M: ";"}', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'{$M: "/"}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''

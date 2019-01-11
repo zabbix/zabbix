@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@ extern int	CONFIG_ESCALATOR_FORKS;
 #define ZBX_ESCALATION_DELETE		1
 #define ZBX_ESCALATION_SKIP		2
 #define ZBX_ESCALATION_PROCESS		3
-#define ZBX_ESCALATION_SUPPRESS		4
 
 #define ZBX_ESCALATIONS_PER_STEP	1000
 
@@ -1903,11 +1902,11 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 			goto out;
 		}
 
-		/* suppress paused escalations created before maintenance period */
+		/* skip paused escalations created before maintenance period */
 		/* until maintenance ends or the escalations are recovered   */
 		if (0 == escalation->r_eventid)
 		{
-			ret = ZBX_ESCALATION_SUPPRESS;
+			ret = ZBX_ESCALATION_SKIP;
 			goto out;
 		}
 	}
@@ -2280,12 +2279,6 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 				/* break; is not missing here */
 			case ZBX_ESCALATION_SKIP:
 				goto cancel_warning;	/* error is NULL on skip */
-			case ZBX_ESCALATION_SUPPRESS:
-				diff = escalation_create_diff(escalation);
-				escalation->nextcheck = now + SEC_PER_MIN;
-				escalation_update_diff(escalation, diff);
-				zbx_vector_ptr_append(&diffs, diff);
-				continue;
 			case ZBX_ESCALATION_PROCESS:
 				break;
 			default:
@@ -2334,7 +2327,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 			}
 			else if (ESCALATION_STATUS_SLEEP == escalation->status)
 			{
-				escalation->nextcheck = now + (0 == action->esc_period ? SEC_PER_HOUR :
+				escalation->nextcheck = time(NULL) + (0 == action->esc_period ? SEC_PER_HOUR :
 						action->esc_period);
 			}
 			else

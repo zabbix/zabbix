@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 /**
  * @backup items
  */
-class testFormLowLevelDiscovery extends CLegacyWebTest {
+class testFormDiscoveryRule extends CLegacyWebTest {
 
 	/**
 	 * The name of the test host created in the test data set.
@@ -220,7 +220,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	/**
 	 * @dataProvider layout
 	 */
-	public function testFormLowLevelDiscovery_CheckLayout($data) {
+	public function testFormDiscoveryRule_CheckLayout($data) {
 
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
@@ -461,7 +461,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
-			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
+			$this->zbxTestAssertElementValue('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
 
 			$this->zbxTestTextPresent('Port');
 			$this->zbxTestAssertVisibleId('port');
@@ -665,7 +665,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormLowLevelDiscovery_SimpleUpdate($data) {
+	public function testFormDiscoveryRule_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlDiscovery = 'select itemid, hostid, name, key_, delay from items order by itemid';
@@ -997,7 +997,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Invalid interval "".'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1012,7 +1012,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Invalid interval "1-11,00:00-24:00".'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1027,7 +1027,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Invalid interval "1-7,00:00-25:00".'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1042,7 +1042,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Invalid interval "1-7,24:00-00:00".'
+						'Incorrect value for field "delay": invalid delay'
 					]
 				]
 			],
@@ -1381,7 +1381,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'discovery-snmpv1-agent',
-					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1392,7 +1391,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'type' => 'SNMPv2 agent',
 					'name' => 'SNMPv2 agent',
 					'key' => 'discovery-snmpv2-agent',
-					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1403,7 +1401,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'discovery-snmpv3-agent',
-					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1413,20 +1410,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
-					'key' => 'test-item-snmp_oid',
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Incorrect value for field "SNMP OID": cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'type' => 'SNMPv1 agent',
-					'name' => 'SNMPv1 agent',
 					'key' => 'test-item-reuse',
-					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
 						'Item with key "test-item-reuse" already exists on "Simple form test host".'
@@ -1439,7 +1423,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'test-item-form1',
-					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
 						'Item with key "test-item-form1" already exists on "Simple form test host".'
@@ -1621,7 +1604,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testFormLowLevelDiscovery_SimpleCreate($data) {
+	public function testFormDiscoveryRule_SimpleCreate($data) {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
@@ -1688,10 +1671,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		if (isset($data['delay']))	{
 			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
-		}
-
-		if (array_key_exists('snmp_oid', $data))	{
-			$this->zbxTestInputTypeOverwrite('snmp_oid', $data['snmp_oid']);
 		}
 
 		$itemFlexFlag = true;
@@ -1889,7 +1868,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	/**
 	 * @dataProvider getCreateFiltersData
 	 */
-	public function testFormLowLevelDiscovery_CreateFiltersMacros($data) {
+	public function testFormDiscoveryRule_CreateFiltersMacros($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
@@ -2030,7 +2009,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	/**
 	 * @dataProvider getCreateFiltersMacrosValidationData
 	 */
-	public function testFormLowLevelDiscovery_FiltersMacrosValidation($data) {
+	public function testFormDiscoveryRule_FiltersMacrosValidation($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);

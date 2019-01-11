@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2019 Zabbix SIA
+ ** Copyright (C) 2001-2018 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@
 
 
 /**
- * JQuery class that initializes interactivity for SVG graph.
- *
- * Supported options:
+ * JQuery class that initializes interactivity for SVG graph. Currently following features are supported:
  *  - SBox - time range selector;
  *  - show_problems - show problems in hintbox when mouse is moved over the problem zone;
  *  - min_period - min period in seconds that must be s-boxed to change the data in dashboard timeselector.
@@ -46,43 +44,16 @@ jQuery(function ($) {
 		var graph = graph || e.data.graph,
 			data = graph.data('options');
 
-		dropDocumentListeners(e, graph);
+		$(document)
+			.off('selectstart', disableSelect)
+			.off('keydown', sBoxKeyboardInteraction)
+			.off('mousemove', moveSBoxMouse)
+			.off('mouseup', destroySBox);
 
 		if (data) {
-			if (!data.isHintBoxFrozen) {
-				$('.dashbrd-grid-widget-container')
-					.dashboardGrid('unpauseWidgetRefresh', graph.data('widget')['uniqueid']);
-			}
-
 			$('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
 			$('.svg-graph-selection-text', graph).text('');
 			graph.data('options').boxing = false;
-		}
-	}
-
-	/**
-	 * Function removes SBox related $(document) event listeners:
-	 * - if no other widget have active SBox;
-	 * - to avoid another call of destroySBox on 'mouseup' (in case if user has pressed ESC).
-	 */
-	function dropDocumentListeners(e, graph) {
-		var widgets_boxing = 0; // Number of widgets with active SBox.
-		$('.dashbrd-grid-widget-container').data('dashboardGrid')['widgets'].forEach(function(w) {
-			if (w !== graph.data('widget') && w['type'] === 'svggraph') {
-				var svg_graph = $('svg', w['content_body']);
-				if (svg_graph.length && svg_graph.data('options')['boxing']) {
-					widgets_boxing++;
-				}
-			}
-		});
-
-		if (widgets_boxing == 0 || (e && 'keyCode' in e && e.keyCode == 27)) {
-			$(document)
-				.off('selectstart', disableSelect)
-				.off('keydown', sBoxKeyboardInteraction)
-				.off('mousemove', moveSBoxMouse)
-				.off('mouseup', destroySBox)
-				.off('mouseup', endSBoxDrag);
 		}
 	}
 
@@ -118,11 +89,8 @@ jQuery(function ($) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
 			data.isHintBoxFrozen = true;
-			$('.dashbrd-grid-widget-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
 
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
-				$('.dashbrd-grid-widget-container')
-					.dashboardGrid('unpauseWidgetRefresh', graph.data('widget')['uniqueid']);
 				data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
 				graph.off('mouseup', hintboxSilentMode);
 				destroyHintbox(graph);
@@ -183,9 +151,8 @@ jQuery(function ($) {
 
 		data.end = offsetX - data.dimX;
 
-		// If mouse movement detected (SBox has dragged), destroy opened hintbox and pause widget refresh.
+		// Check if movement has started and destroy hintbox if it is still visible.
 		if (data.start != data.end && !data.boxing) {
-			$('.dashbrd-grid-widget-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
 			data.isHintBoxFrozen = false;
 			data.boxing = true;
 			destroyHintbox(graph);
@@ -205,7 +172,7 @@ jQuery(function ($) {
 
 			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
 				label = formatTimestamp(seconds, false, true)
-					+ (seconds < data.minPeriod ? ' [min 1' + t('S_MINUTE_SHORT') + ']'  : '');
+					+ (seconds < data.minPeriod ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
 
 			stxt
 				.text(label)
@@ -279,25 +246,11 @@ jQuery(function ($) {
 					var direction_string = '',
 						label = [],
 						data_set = nodes[i].getAttribute('data-set'),
-						data_nodes = nodes[i].childNodes,
-						elmnt_label,
-						cx,
-						cy;
+						paths = nodes[i].querySelectorAll('.svg-graph-line');
 
-					for (var index = 0, len = data_nodes.length; index < len; index++) {
-						elmnt_label = data_nodes[index].getAttribute('label');
-						if (elmnt_label) {
-							label.push(elmnt_label);
-
-							if (data_nodes[index].tagName.toLowerCase() === 'circle') {
-								cx = data_nodes[index].getAttribute('cx');
-								cy = data_nodes[index].getAttribute('cy');
-								direction_string += ' _' + cx + ',' + cy;
-							}
-							else {
-								direction_string += ' ' + data_nodes[index].getAttribute('d');
-							}
-						}
+					for (var index = 0, len = paths.length; index < len; index++) {
+						direction_string += ' ' + paths[index].getAttribute('d');
+						label.push(paths[index].getAttribute('label'));
 					}
 
 					label = label.join(',').split(',');
@@ -363,13 +316,12 @@ jQuery(function ($) {
 	 * this function. Tolerance is used to find exacly matched point only.
 	 */
 	function getDataPointTolerance(ds) {
-		var data_tag = ds.querySelector(':not(.svg-point-highlight)');
-
-		if (data_tag.tagName.toLowerCase() === 'circle') {
+		if (ds.getAttribute('data-set') === 'points') {
+			// Take radius of first real data set point (the 0th is .svg-point-highlight).
 			return +ds.childNodes[1].getAttribute('r');
 		}
 		else {
-			return +window.getComputedStyle(data_tag)['strokeWidth'];
+			return +window.getComputedStyle(ds.querySelectorAll('path')[0])['strokeWidth'];
 		}
 	}
 
@@ -549,14 +501,14 @@ jQuery(function ($) {
 					.addClass('paging-btn-container')
 					.append(
 						$('<div></div>')
-							.text(sprintf(t('S_DISPLAYING_FOUND'), num_displayed, num_total))
+							.text(sprintf(t('Displaying %1$s of %2$s found'), num_displayed, num_total))
 							.addClass('table-stats')
 					)
 		);
 	}
 
 	var methods = {
-		init: function(options, widget) {
+		init: function(options) {
 			options = $.extend({}, {
 				sbox: false,
 				show_problems: true,
@@ -580,24 +532,21 @@ jQuery(function ($) {
 					};
 
 				graph
-					.data('options', data)
-					.data('widget', widget)
-					.attr('unselectable', 'on')
-					.css('user-select', 'none')
-					.on('mousemove', {graph: graph}, showHintbox)
 					.on('mouseleave', function(e) {
 						var graph = $(this);
 						destroyHintbox(graph);
 						hideHelper(graph);
 					})
+					.data('options', data)
+					.on('mousemove', {graph: graph}, showHintbox)
+					.attr('unselectable', 'on')
+					.css('user-select', 'none')
 					.on('selectstart', false);
 
 				if (options.sbox) {
-					dropDocumentListeners(null, graph);
-
+					destroySBox(null, graph);
 					graph
 						.on('dblclick', function() {
-							hintBox.hideHint(graph, true);
 							$.publish('timeselector.zoomout');
 							return false;
 						})

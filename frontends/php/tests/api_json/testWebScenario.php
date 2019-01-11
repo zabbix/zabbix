@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -276,63 +276,8 @@ class testWebScenario extends CAPITest {
 							'no' => 0,
 						]
 					]
-				]],
-				'expected_error' => null
-			],
-			[
-				'httptest' => [
-				[
-					'name' => 'API Create two web scenarios 3',
-					'hostid' => '50009',
-					'steps' => [
-						[
-							'name' => 'API create step',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-							'retrieve_mode' => 2
-						]
-					]
+				]
 				],
-				[
-					'name' => 'API Create two web scenarios 4',
-					'hostid' => '50009',
-					'steps' => [
-						[
-							'name' => 'API create step',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-							'retrieve_mode' => 3
-						]
-					]
-				]],
-				'expected_error' => 'Invalid parameter "/2/steps/1/retrieve_mode": value must be one of 0, 1, 2.'
-			],
-			[
-				'httptest' => [
-				[
-					'name' => 'API Create two web scenarios 5',
-					'hostid' => '50009',
-					'steps' => [
-						[
-							'name' => 'API create step 1',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-							'retrieve_mode' => 0
-						],
-						[
-							'name' => 'API create step 2',
-							'url' => 'http://zabbix.com',
-							'no' => 1,
-							'retrieve_mode' => 1
-						],
-						[
-							'name' => 'API create step 3',
-							'url' => 'http://zabbix.com',
-							'no' => 2,
-							'retrieve_mode' => 2
-						]
-					]
-				]],
 				'expected_error' => null
 			]
 		];
@@ -346,28 +291,11 @@ class testWebScenario extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['httptestids'] as $key => $id) {
-				$db_result_web = DBSelect('SELECT * FROM httptest WHERE httptestid='.zbx_dbstr($id));
-				$db_row_web = DBFetch($db_result_web);
-				$this->assertEquals($db_row_web['name'], $httptests[$key]['name']);
-				$this->assertEquals($db_row_web['hostid'], $httptests[$key]['hostid']);
-
-				$db_result_steps = DBSelect('SELECT * FROM httpstep WHERE httptestid='.zbx_dbstr($id).' order by no;');
-				$db_rows_steps = DBFetchArray($db_result_steps);
-				$this->assertCount(count($httptests[$key]['steps']), $db_rows_steps);
-
-				// It is assumed dataset steps array is sorted by 'no' field.
-				foreach($db_rows_steps as $no => $db_step) {
-					$dataset_step = $httptests[$key]['steps'][$no];
-					// Defaults are to be tested.
-					if (!array_key_exists('retrieve_mode', $dataset_step)) {
-						$dataset_step['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
-					}
-
-					foreach ($dataset_step as $property_name => $expected) {
-						$debug_msg = 'Case, httptest['.$key.']->step['.$no.']->property['.$property_name.']';
-						$this->assertEquals($expected, $db_step[$property_name], $debug_msg);
-					}
-				}
+				$dbResultWeb = DBSelect('select * from httptest where httptestid='.zbx_dbstr($id));
+				$dbRowWeb = DBFetch($dbResultWeb);
+				$this->assertEquals($dbRowWeb['name'], $httptests[$key]['name']);
+				$this->assertEquals($dbRowWeb['hostid'], $httptests[$key]['hostid']);
+				$this->assertEquals(1, CDBHelper::getCount('select * from httpstep where httptestid='.zbx_dbstr($id)));
 			}
 		}
 		else {
@@ -486,19 +414,6 @@ class testWebScenario extends CAPITest {
 					]
 				],
 				'expected_error' => null
-			],
-			// Check successfully web scenario update. Including steps.
-			// 15012 has one step.
-			// 15013 has two steps.
-			[
-				'httptest' => [
-					[
-						'httptestid' => '15012',
-						'name' => 'Api updated into scenario without steps.',
-						'steps' => []
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/steps": cannot be empty.'
 			]
 		];
 	}
@@ -736,9 +651,7 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong headers',
-					'headers' => [
-						['name' => '☺', 'value' => '']
-					]
+					'headers' => '☺'
 				],
 				'expected_error' => 'Invalid parameter "/1/headers/1/value": cannot be empty.'
 			],
@@ -1102,9 +1015,7 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong variable',
-					'variables' => [
-						['name' => '☺']
-					]
+					'variables' => '☺'
 				],
 				'expected_error' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 			],

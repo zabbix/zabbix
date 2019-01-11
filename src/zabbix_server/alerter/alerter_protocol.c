@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t aler
 		const char *subject, const char *message, const char *smtp_server, unsigned short smtp_port,
 		const char *smtp_helo, const char *smtp_email, unsigned char smtp_security,
 		unsigned char smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
-		const char *username, const char *password, unsigned char content_type)
+		const char *username, const char *password)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0, sendto_len, subject_len, message_len, smtp_server_len, smtp_helo_len,
@@ -73,7 +73,6 @@ zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t aler
 	zbx_serialize_prepare_value(data_len, smtp_authentication);
 	zbx_serialize_prepare_str(data_len, username);
 	zbx_serialize_prepare_str(data_len, password);
-	zbx_serialize_prepare_value(data_len, content_type);
 
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
@@ -91,8 +90,7 @@ zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t aler
 	ptr += zbx_serialize_value(ptr, smtp_verify_host);
 	ptr += zbx_serialize_value(ptr, smtp_authentication);
 	ptr += zbx_serialize_str(ptr, username, username_len);
-	ptr += zbx_serialize_str(ptr, password, password_len);
-	(void)zbx_serialize_value(ptr, content_type);
+	(void)zbx_serialize_str(ptr, password, password_len);
 
 	return data_len;
 }
@@ -100,7 +98,7 @@ zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t aler
 void	zbx_alerter_deserialize_email(const unsigned char *data, zbx_uint64_t *alertid, char **sendto, char **subject,
 		char **message, char **smtp_server, unsigned short *smtp_port, char **smtp_helo, char **smtp_email,
 		unsigned char *smtp_security, unsigned char *smtp_verify_peer, unsigned char *smtp_verify_host,
-		unsigned char *smtp_authentication, char **username, char **password, unsigned char *content_type)
+		unsigned char *smtp_authentication, char **username, char **password)
 {
 	zbx_uint32_t	len;
 
@@ -117,8 +115,7 @@ void	zbx_alerter_deserialize_email(const unsigned char *data, zbx_uint64_t *aler
 	data += zbx_deserialize_value(data, smtp_verify_host);
 	data += zbx_deserialize_value(data, smtp_authentication);
 	data += zbx_deserialize_str(data, username, len);
-	data += zbx_deserialize_str(data, password, len);
-	(void)zbx_deserialize_value(data, content_type);
+	(void)zbx_deserialize_str(data, password, len);
 }
 
 zbx_uint32_t	zbx_alerter_serialize_jabber(unsigned char **data, zbx_uint64_t alertid,  const char *sendto,

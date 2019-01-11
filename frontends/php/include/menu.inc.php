@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,9 +111,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'imgstore.php'
 				],
 				[
-					'url' => 'zabbix.php',
-					'action' => 'search',
-					'active_if' => ['search']
+					'url' => 'search.php'
 				],
 				[
 					'url' => 'jsrpc.php'

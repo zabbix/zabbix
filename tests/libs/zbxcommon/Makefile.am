@@ -6,11 +6,8 @@ SERVER_tests = \
 	calculate_item_nextcheck \
 	zbx_function_get_param_dyn \
 	zbx_token_find \
-	zbx_interval_preproc \
-	zbx_validate_interval \
 	is_double_suffix \
-	is_double \
-	zbx_variant_compare
+	is_double
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -170,33 +167,6 @@ zbx_token_find_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_token_find_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-zbx_interval_preproc_SOURCES = \
-	zbx_interval_preproc.c \
-	$(COMMON_SRC_FILES)
-
-zbx_interval_preproc_LDADD = \
-	$(COMMON_LIB_FILES)
-
-zbx_interval_preproc_LDADD += @SERVER_LIBS@
-
-zbx_interval_preproc_LDFLAGS = @SERVER_LDFLAGS@
-
-zbx_interval_preproc_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
-
-zbx_validate_interval_SOURCES = \
-	zbx_validate_interval.c \
-	$(COMMON_SRC_FILES)
-
-zbx_validate_interval_LDADD = \
-	$(COMMON_LIB_FILES)
-
-zbx_validate_interval_LDADD += @SERVER_LIBS@
-
-zbx_validate_interval_LDFLAGS = @SERVER_LDFLAGS@
-
-zbx_validate_interval_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
 
 is_double_suffix_SOURCES = \
 	is_double_suffix.c \
@@ -224,18 +194,5 @@ is_double_LDADD += @SERVER_LIBS@
 is_double_LDFLAGS = @SERVER_LDFLAGS@
 
 is_double_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
-zbx_variant_compare_SOURCES = \
-	zbx_variant_compare.c \
-	$(COMMON_SRC_FILES)
-
-zbx_variant_compare_LDADD = \
-	$(COMMON_LIB_FILES)
-
-zbx_variant_compare_LDADD += @SERVER_LIBS@
-
-zbx_variant_compare_LDFLAGS = @SERVER_LDFLAGS@
-
-zbx_variant_compare_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

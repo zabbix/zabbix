@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,8 +52,7 @@ class CControllerMediatypeEdit extends CController {
 			'maxsessions' =>			'db media_type.maxsessions',
 			'maxattempts' =>			'db media_type.maxattempts',
 			'attempt_interval' =>		'db media_type.attempt_interval',
-			'form_refresh' =>			'int32',
-			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML
+			'form_refresh' =>			'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -85,7 +84,7 @@ class CControllerMediatypeEdit extends CController {
 				'output' => ['mediatypeid', 'type', 'description', 'smtp_server', 'smtp_port', 'smtp_helo',
 					'smtp_email', 'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security',
 					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions',
-					'maxattempts', 'attempt_interval', 'content_type'
+					'maxattempts', 'attempt_interval'
 				],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
@@ -109,10 +108,10 @@ class CControllerMediatypeEdit extends CController {
 			'mediatypeid' => 0,
 			'type' => MEDIA_TYPE_EMAIL,
 			'description' => '',
-			'smtp_server' => 'mail.example.com',
+			'smtp_server' => 'localhost',
 			'smtp_port' => $db_defaults['smtp_port'],
-			'smtp_helo' => 'example.com',
-			'smtp_email' => 'zabbix@example.com',
+			'smtp_helo' => 'localhost',
+			'smtp_email' => 'zabbix@localhost',
 			'smtp_security' => $db_defaults['smtp_security'],
 			'smtp_verify_peer' => $db_defaults['smtp_verify_peer'],
 			'smtp_verify_host' => $db_defaults['smtp_verify_host'],
@@ -129,8 +128,7 @@ class CControllerMediatypeEdit extends CController {
 			'maxsessions' => $db_defaults['maxsessions'],
 			'maxattempts' => $db_defaults['maxattempts'],
 			'attempt_interval' => $db_defaults['attempt_interval'],
-			'form_refresh' => 0,
-			'content_type' => $db_defaults['content_type']
+			'form_refresh' => 0
 		];
 
 		// get values from the dabatase
@@ -147,7 +145,6 @@ class CControllerMediatypeEdit extends CController {
 			$data['smtp_verify_host'] = $this->mediatype['smtp_verify_host'];
 			$data['smtp_authentication'] = $this->mediatype['smtp_authentication'];
 			$data['exec_path'] = $this->mediatype['exec_path'];
-			$data['content_type'] = $this->mediatype['content_type'];
 
 			$this->mediatype['exec_params'] = explode("\n", $this->mediatype['exec_params']);
 			foreach ($this->mediatype['exec_params'] as $exec_param) {
@@ -208,8 +205,7 @@ class CControllerMediatypeEdit extends CController {
 			'maxattempts',
 			'attempt_interval',
 			'maxsessionsType',
-			'form_refresh',
-			'content_type'
+			'form_refresh'
 		]);
 
 		$response = new CControllerResponseData($data);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -697,7 +697,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			// Misc
 			[[
-				'url' => 'zabbix.php?action=search&search=server',
+				'url' => 'search.php?search=server',
 				'title' =>	'Search',
 				'header' => 'Search: server',
 				'users' => [
@@ -764,7 +764,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			}
 
 			$this->zbxTestCheckFatalErrors();
-			$this->webDriver->manage()->deleteAllCookies();
 		}
 	}
 

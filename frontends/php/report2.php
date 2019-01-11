@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -416,12 +416,11 @@ elseif (hasRequest('filter_hostid')) {
 	}
 
 	$reportWidget->addItem(
-		(new CFilter(new CUrl('report2.php')))
+		(new CFilter())
 			->setProfile($data['filter']['timeline']['profileIdx'])
 			->setActiveTab($data['filter']['active_tab'])
 			->addFormItem((new CVar('config', $availabilityReportMode))->removeId())
-			->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'], true,
-				ZBX_DATE_TIME)
+			->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'], ZBX_DATE_TIME)
 			->addFilterTab(_('Filter'), [$filter_column])
 	);
 
@@ -454,10 +453,10 @@ elseif (hasRequest('filter_hostid')) {
 					->setArgument('filter_triggerids[]', $trigger['triggerid'])
 					->setArgument('filter_set', '1')
 			),
-			($availability['true'] < 0.00005)
+			($availability['true'] == 0)
 				? ''
 				: (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),
-			($availability['false'] < 0.00005)
+			($availability['false'] == 0)
 				? ''
 				: (new CSpan(sprintf('%.4f%%', $availability['false'])))->addClass(ZBX_STYLE_GREEN),
 			new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['filter_groupid'].

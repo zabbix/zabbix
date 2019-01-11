@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -962,14 +962,20 @@ function DBfetchArrayAssoc($cursor, $field) {
  *
  * @param resource $cursor
  * @param string   $column
+ * @param bool     $asHash
  *
  * @return array
  */
-function DBfetchColumn($cursor, $column) {
+function DBfetchColumn($cursor, $column, $asHash = false) {
 	$result = [];
 
 	while ($dbResult = DBfetch($cursor)) {
-		$result[] = $dbResult[$column];
+		if ($asHash) {
+			$result[$dbResult[$column]] = $dbResult[$column];
+		}
+		else {
+			$result[] = $dbResult[$column];
+		}
 	}
 
 	return $result;

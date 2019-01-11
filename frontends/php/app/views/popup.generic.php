@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ else {
 	}
 }
 
-if (in_array($data['popup_type'], ['applications', 'application_prototypes', 'triggers'])) {
+if (in_array($data['popup_type'], ['applications', 'triggers'])) {
 	if (!array_key_exists('noempty', $options)) {
 		$value1 = strpos($options['dstfld1'], 'id') !== false ? 0 : '';
 		$value2 = strpos($options['dstfld2'], 'id') !== false ? 0 : '';
@@ -159,7 +159,6 @@ switch ($data['popup_type']) {
 	case 'host_templates':
 	case 'templates':
 	case 'applications':
-	case 'application_prototypes':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
@@ -642,7 +641,6 @@ if ($data['multiselect'] && $form !== null) {
 		[
 			'title' => _('Select'),
 			'class' => '',
-			'isSubmit' => true,
 			'action' => 'return addSelectedValues('.zbx_jsvalue($form->getId()).', '.
 						zbx_jsvalue($options['reference']).', '.$options['parentid'].'); '.
 						'overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));'
@@ -650,9 +648,7 @@ if ($data['multiselect'] && $form !== null) {
 	];
 }
 
-$types = ['users', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
-	'proxies', 'items'
-];
+$types = ['users', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'proxies', 'items'];
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {
 	$output['script_inline'] .= 'var popup_reference = '.zbx_jsvalue($data['table_records'], true).';';
 }
@@ -664,10 +660,7 @@ jQuery(document).ready(function() {
 });';
 
 if ($form) {
-	$form->addItem([
-		$table,
-		(new CInput('submit', 'submit'))->addStyle('display: none;')
-	]);
+	$form->addItem($table);
 	$output['body'] = (new CDiv([$data['messages'], $form]))->toString();
 }
 else {

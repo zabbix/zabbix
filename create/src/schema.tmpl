@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2001-2019 Zabbix SIA
+-- Copyright (C) 2001-2018 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -400,7 +400,6 @@ FIELD		|exec_params	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|maxsessions	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|maxattempts	|t_integer	|'3'	|NOT NULL	|0
 FIELD		|attempt_interval|t_varchar(32)	|'10s'	|NOT NULL	|0
-FIELD		|content_type	|t_integer	|'1'	|NOT NULL	|0
 UNIQUE		|1		|description
 
 TABLE|usrgrp|usrgrpid|ZBX_DATA
@@ -1508,8 +1507,6 @@ FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
 FIELD		|step		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|params		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|error_handler	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|error_handler_params|t_varchar(255)|''	|NOT NULL	|0
 INDEX		|1		|itemid,step
 
 TABLE|task_remote_command|taskid|0
@@ -1654,4 +1651,4 @@ INDEX|1|maintenanceid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4010004	|4010004
+ROW		|4000000	|4000000

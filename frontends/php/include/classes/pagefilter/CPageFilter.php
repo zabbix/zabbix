@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -378,11 +378,10 @@ class CPageFilter {
 	 * @param array  $groups
 	 * @param string $groups[<groupid>]['groupid']
 	 * @param string $groups[<groupid>]['name']
-	 * @param array  $options                        HostGroup API call parameters.
 	 *
 	 * @return array
 	 */
-	public static function enrichParentGroups(array $groups, array $options = []) {
+	public static function enrichParentGroups(array $groups) {
 		$parents = [];
 		foreach ($groups as $group) {
 			$parent = explode('/', $group['name']);
@@ -400,18 +399,11 @@ class CPageFilter {
 		}
 
 		if ($parents) {
-			if (!array_key_exists('output', $options)) {
-				$options['output'] = ['groupid', 'name'];
-			}
-
-			if (!array_key_exists('filter', $options)) {
-				$options['filter'] = [];
-			}
-
-			$options['filter']['name'] = array_keys($parents);
-
-			$options['preservekeys'] = true;
-			$groups += API::HostGroup()->get($options);
+			$groups += API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'filter' => ['name' => array_keys($parents)],
+				'preservekeys' => true
+			]);
 		}
 
 		return $groups;

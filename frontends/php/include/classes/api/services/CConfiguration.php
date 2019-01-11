@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,68 +66,68 @@ class CConfiguration extends CApiService {
 			'source' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'rules' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 				'applications' =>		['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
 				]],
 				'discoveryRules' =>		['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
 				]],
 				'graphs' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
 				]],
 				'groups' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN]
 				]],
 				'hosts' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN]
 				]],
 				'httptests' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
 				]],
 				'images' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN]
 				]],
 				'items' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
 				]],
 				'maps' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN]
 				]],
 				'screens' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN]
 				]],
 				'templateLinkage' =>	['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN]
 				]],
 				'templates' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN]
 				]],
 				'templateScreens' =>	['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
 				]],
 				'triggers' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN],
+					'deleteMissing' =>		['type' => API_BOOLEAN]
 				]],
 				'valueMaps' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN],
+					'updateExisting' =>		['type' => API_BOOLEAN]
 				]]
 			]]
 		]];

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -610,69 +610,50 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Retrieve mode
+			// Retrieve only headers
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Retrieve mode',
-					'step_name' => 'Step retrieve mode headers',
+					'name' => 'Retrieve only headers',
+					'step_name' => 'Step retrieve only headers',
 					'url' => 'http://www.zabbix.com',
-					'retrieve' => 'Headers'
+					'retrieve' => true
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Retrieve mode with required string',
-					'step_name' => 'Step retrieve mode headers and required string',
-					'url' => 'http://www.zabbix.com',
-					'retrieve' => 'Headers',
-					'string' => 'Zabbix'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Retrieve mode as headers and with post value',
+					'name' => 'Retrieve only headers with post value',
 					'step_name' => 'Step retrieve only headers with post value',
 					'url' => 'http://www.zabbix.com',
 					'post' => [
 						['value' => 'test'],
 					],
-					'retrieve' => 'Headers'
+					'retrieve' => true
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Retrieve mode as headers and with post name',
-					'step_name' => 'Step retrieve mode headers with post name',
+					'name' => 'Retrieve only headers with post name',
+					'step_name' => 'Step retrieve only headers with post name',
 					'url' => 'http://www.zabbix.com',
 					'post' => [
-						['name' => 'test'],
+						['value' => 'test'],
 					],
-					'retrieve' => 'Headers'
+					'retrieve' => true
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Retrieve mode as headers and with post value and name',
-					'step_name' => 'Step retrieve mode headers with post value and name',
+					'name' => 'Retrieve only headers with post value and name',
+					'step_name' => 'Step retrieve only headers with post value and name',
 					'url' => 'http://www.zabbix.com',
 					'post' => [
-						['name' => 'xxx' , 'value' => 'yyy'],
+						['value' => 'test'],
 					],
-					'retrieve' => 'Headers'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Retrieve mode as Body and headers',
-					'step_name' => 'Step retrieve mode body and headers',
-					'url' => 'http://www.zabbix.com',
-					'retrieve' => 'Body and headers'
+					'retrieve' => true
 				]
 			],
 			// Timeout
@@ -774,7 +755,6 @@ class testFormWebStep extends CLegacyWebTest {
 					'headers' => [
 						['name' => 'header', 'value' => 'test_header'],
 					],
-					'retrieve' => 'Body and headers',
 					'timeout' => 0,
 					'string' => 'Zabbix',
 					'code' => 404,
@@ -912,22 +892,12 @@ class testFormWebStep extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('retrieve', $data)) {
-			$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-body"]//ul[@id="retrieve_mode"]'
-					. '//label[text()="'.$data['retrieve'].'"]');
-
-			// Check disabled fields for Headers mode.
-			$ids = ['post_type_0', 'post_type_1', 'pairs_4_name', 'pairs_4_value'];
-			if ($data['retrieve'] === 'Headers') {
-				foreach ($ids as $id) {
-					$this->zbxTestAssertElementPresentXpath('//div[@class="overlay-dialogue-body"]//input[@id="'.$id.'"][@disabled]');
-				}
-				$this->zbxTestAssertElementNotPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='required'][@disabled]");
-			}
-			else {
-				foreach ($ids as $id) {
-					$this->zbxTestAssertElementNotPresentXpath('//div[@class="overlay-dialogue-body"]//input[@id="'.$id.'"][@disabled]');
-				}
-			}
+			$this->zbxTestCheckboxSelect('retrieve_mode');
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='post_type_0'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='post_type_1'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='pairs_4_name'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='pairs_4_value'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='required'][@disabled]");
 		}
 
 		if (array_key_exists('timeout', $data)) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -881,7 +881,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 									'items.php?form=update&itemid='.$function['itemid']
 								))
 									->addClass(ZBX_STYLE_LINK_ALT)
-									->setAttribute('data-itemid', $function['itemid'])
 									->addClass($style);
 							}
 

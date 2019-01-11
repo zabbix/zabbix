@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.0</version>
-    <date>2018-11-29T09:14:29Z</date>
+    <date>2018-09-27T15:14:27Z</date>
     <groups>
         <group>
             <name>Templates/Modules</name>
@@ -24,7 +24,7 @@
             </applications>
             <items>
                 <item>
-                    <name>Host name of Zabbix agent running</name>
+                    <name>Host name of zabbix_agentd running</name>
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -83,7 +83,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix agent ping</name>
+                    <name>Agent ping</name>
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -144,7 +144,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Version of Zabbix agent running</name>
+                    <name>Version of zabbix_agent(d) running</name>
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -215,7 +215,7 @@
             <expression>{Template App Zabbix Agent:agent.hostname.diff(0)}&gt;0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
-            <name>Host name of Zabbix agent was changed on {HOST.NAME}</name>
+            <name>Host name of zabbix_agentd was changed on {HOST.NAME}</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
             <url/>
@@ -231,7 +231,7 @@
             <expression>{Template App Zabbix Agent:agent.version.diff(0)}&gt;0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
-            <name>Version of Zabbix agent was changed on {HOST.NAME}</name>
+            <name>Version of zabbix_agent(d) was changed on {HOST.NAME}</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
             <url/>

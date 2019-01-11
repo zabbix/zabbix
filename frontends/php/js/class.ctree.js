@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,20 +21,16 @@
 var CTree = Class.create();
 
 CTree.prototype = {
+
 	name: null,
 	nodes: [],
-	/*
-	 * Encoding values separated by a comma (%2C), makes the cookie very large in size. A dot, however, remains a dot.
-	 * Must be synced with class.cookie.js for consistency.
-	 */
-	cookie_delimiter: '.',
 
 	initialize: function(name, nodes) {
 		this.name = name;
 		this.nodes = nodes;
 
 		if ((tree_init = cookie.read(name)) != null) {
-			var nodes = tree_init.split(this.cookie_delimiter);
+			var nodes = tree_init.split(',');
 
 			for (var i = 0, size = nodes.length; i < size; i++) {
 				this.onStartSetStatus(nodes[i]);
@@ -58,7 +54,7 @@ CTree.prototype = {
 				var node = this.nodes[id];
 
 				if (!empty(node.status) && node.status == 'open') {
-					cookieData += id + this.cookie_delimiter;
+					cookieData += id + ',';
 				}
 			}
 

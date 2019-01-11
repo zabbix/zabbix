@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1279,11 +1279,10 @@ static void	copy_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 		sql_offset = 0;
 	}
 
-	zbx_db_insert_prepare(&db_insert, "item_preproc", "item_preprocid", "itemid", "step", "type", "params",
-			"error_handler", "error_handler_params", NULL);
+	zbx_db_insert_prepare(&db_insert, "item_preproc", "item_preprocid", "itemid", "step", "type", "params", NULL);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ip.itemid,ip.step,ip.type,ip.params,ip.error_handler,ip.error_handler_params"
+			"select ip.itemid,ip.step,ip.type,ip.params"
 				" from item_preproc ip,items ti"
 				" where ip.itemid=ti.itemid"
 				" and");
@@ -1303,7 +1302,7 @@ static void	copy_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 		}
 
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), (*pitem)->itemid, atoi(row[1]), atoi(row[2]),
-				row[3], atoi(row[4]), row[5]);
+				row[3]);
 
 	}
 	DBfree_result(result);

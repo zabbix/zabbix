@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1089,7 +1089,7 @@ class CUser extends CApiService {
 			return true;
 		}
 		else {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $ldapValidator->getError());
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
 		}
 	}
 
@@ -1150,7 +1150,7 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_SYSTEM => $config['authentication_type'],
 			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
 			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
-			GROUP_GUI_ACCESS_DISABLED => $config['authentication_type']
+			GROUP_GUI_ACCESS_DISABLED => null
 		];
 
 		$db_user = $this->findByAlias($user['user'], ($config['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE),
@@ -1184,6 +1184,10 @@ class CUser extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
 					}
 					break;
+
+				default:
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
+					break;
 			}
 		}
 		catch (APIException $e) {
@@ -1191,7 +1195,7 @@ class CUser extends CApiService {
 				'values' => [
 					'attempt_failed' => ++$db_user['attempt_failed'],
 					'attempt_clock' => time(),
-					'attempt_ip' => substr($db_user['userip'], 0, 39)
+					'attempt_ip' => $db_user['userip']
 				],
 				'where' => ['userid' => $db_user['userid']]
 			]);
@@ -1479,7 +1483,7 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_SYSTEM => $default_auth,
 			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
 			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
-			GROUP_GUI_ACCESS_DISABLED => $default_auth
+			GROUP_GUI_ACCESS_DISABLED => null
 		];
 		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
 			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'

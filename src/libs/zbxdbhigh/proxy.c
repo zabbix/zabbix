@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2413,7 +2413,6 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 
 				log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
 				log->value = zbx_strdup(NULL, value->value);
-				zbx_replace_invalid_utf8(log->value);
 
 				if (0 == value->timestamp)
 				{
@@ -2437,7 +2436,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 				SET_LOG_RESULT(&result, log);
 			}
 			else
-				set_result_type(&result, ITEM_VALUE_TYPE_TEXT, value->value);
+				SET_TEXT_RESULT(&result, zbx_strdup(NULL, value->value));
 		}
 
 		if (0 != value->meta)
@@ -3017,7 +3016,7 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 
 		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL,
-				&allowed_peers, MACRO_TYPE_ALLOWED_HOSTS, NULL, 0);
+				&allowed_peers, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 		ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
 		zbx_free(allowed_peers);
 

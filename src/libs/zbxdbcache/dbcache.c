@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2978,8 +2978,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 			if (0 != history_num || 0 != timers_num)
 			{
-				/* timer triggers do not intersect with item triggers because item triggers */
-				/* where already locked and skipped when retrieving timer triggers          */
 				zbx_vector_uint64_append_array(&triggerids, timer_triggerids.values,
 						timer_triggerids.values_num);
 				do

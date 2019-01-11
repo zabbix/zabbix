@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -418,7 +418,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 					zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period '%s' for itemid '%s'",
 							tmp, row[0]);
 				}
-				else if (0 != history && (ZBX_HK_HISTORY_MIN > history || ZBX_HK_PERIOD_MAX < history))
+				else if (0 != history && ZBX_HK_HISTORY_MIN > history)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for itemid '%s'",
 							row[0]);
@@ -446,7 +446,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 					zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period '%s' for itemid '%s'",
 							tmp, row[0]);
 				}
-				else if (0 != trends && (ZBX_HK_TRENDS_MIN > trends || ZBX_HK_PERIOD_MAX < trends))
+				else if (0 != trends && ZBX_HK_TRENDS_MIN > trends)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period for itemid '%s'",
 							row[0]);

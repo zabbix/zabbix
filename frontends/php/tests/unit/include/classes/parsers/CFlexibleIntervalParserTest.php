@@ -1,7 +1,7 @@
 ﻿<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,90 +31,56 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				'10s/7-7,23:59-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '10s/7-7,23:59-24:00',
-					'update_interval' => '10s',
-					'time_period' => '7-7,23:59-24:00'
+					'match' => '10s/7-7,23:59-24:00'
 				]
 			],
 			[
 				'10/7,0:00-0:01', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '10/7,0:00-0:01',
-					'update_interval' => '10',
-					'time_period' => '7,0:00-0:01'
+					'match' => '10/7,0:00-0:01'
 				]
 			],
 			[
 				'52w/7,00:00-0:01', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '52w/7,00:00-0:01',
-					'update_interval' => '52w',
-					'time_period' => '7,00:00-0:01'
+					'match' => '52w/7,00:00-0:01'
 				]
 			],
 			[
-				'{$M}/{$M}', 0, ['usermacros' => true],
+				'{$A}/{$B}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$M}/{$M}',
-					'update_interval' => '{$M}',
-					'time_period' => '{$M}'
+					'match' => '{$A}/{$B}'
 				]
 			],
 			[
-				'{$M:"context"}/{$M:"context"}', 0, ['usermacros' => true],
+				'{$C:"d"}/{$E:"f"}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$M:"context"}/{$M:"context"}',
-					'update_interval' => '{$M:"context"}',
-					'time_period' => '{$M:"context"}'
-				]
-			],
-			[
-				'{$M:";"}/{$M:";"}', 0, ['usermacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$M:";"}/{$M:";"}',
-					'update_interval' => '{$M:";"}',
-					'time_period' => '{$M:";"}'
-				]
-			],
-			[
-				'{$M:"/"}/{$M:"/"}', 0, ['usermacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$M:"/"}/{$M:"/"}',
-					'update_interval' => '{$M:"/"}',
-					'time_period' => '{$M:"/"}'
+					'match' => '{$C:"d"}/{$E:"f"}'
 				]
 			],
 			[
 				'{#A}/{#B}', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{#A}/{#B}',
-					'update_interval' => '{#A}',
-					'time_period' => '{#B}'
+					'match' => '{#A}/{#B}'
 				]
 			],
 			[
 				'{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{#B}', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{#B}',
-					'update_interval' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}',
-					'time_period' => '{#B}'
+					'match' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{#B}'
 				]
 			],
 			[
 				'{#A}/{{#B}.regsub("^([0-9]+)", "{#B}: \1")}', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{#A}/{{#B}.regsub("^([0-9]+)", "{#B}: \1")}',
-					'update_interval' => '{#A}',
-					'time_period' => '{{#B}.regsub("^([0-9]+)", "{#B}: \1")}'
+					'match' => '{#A}/{{#B}.regsub("^([0-9]+)", "{#B}: \1")}'
 				]
 			],
 			[
@@ -122,9 +88,7 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 					['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{{#B}.regsub("^([0-9]+)", "{#B}: \1")}',
-					'update_interval' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}',
-					'time_period' => '{{#B}.regsub("^([0-9]+)", "{#B}: \1")}'
+					'match' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{{#B}.regsub("^([0-9]+)", "{#B}: \1")}'
 				]
 			],
 			[
@@ -132,9 +96,7 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 					['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{#B}',
-					'update_interval' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}',
-					'time_period' => '{#B}'
+					'match' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{#B}'
 				]
 			],
 			// partial success
@@ -142,81 +104,49 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				'random text.....52w/7,00:00-0:01....text', 16, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '52w/7,00:00-0:01',
-					'update_interval' => '52w',
-					'time_period' => '7,00:00-0:01'
+					'match' => '52w/7,00:00-0:01'
 				]
 			],
 			[
 				'0/2,0:00-9:000', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '0/2,0:00-9:00',
-					'update_interval' => '0',
-					'time_period' => '2,0:00-9:00'
+					'match' => '0/2,0:00-9:00'
 				]
 			],
 			[
 				'5/2,1:00-9:20;', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '5/2,1:00-9:20',
-					'update_interval' => '5',
-					'time_period' => '2,1:00-9:20'
+					'match' => '5/2,1:00-9:20'
 				]
 			],
 			[
 				'0/2,1:00-9:20a', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '0/2,1:00-9:20',
-					'update_interval' => '0',
-					'time_period' => '2,1:00-9:20'
+					'match' => '0/2,1:00-9:20'
 				]
 			],
 			[
 				'52w/7,00:00-0:010', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '52w/7,00:00-0:01',
-					'update_interval' => '52w',
-					'time_period' => '7,00:00-0:01'
+					'match' => '52w/7,00:00-0:01'
 				]
 			],
 			[
 				'{$M}/{$M}}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{$M}/{$M}',
-					'update_interval' => '{$M}',
-					'time_period' => '{$M}'
+					'match' => '{$M}/{$M}'
 				]
 			],
 			[
-				'{$M:"context"}/{$M:"context"}}', 0, ['usermacros' => true],
+				'{$M:"a"}/{$M:"b"}}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{$M:"context"}/{$M:"context"}',
-					'update_interval' => '{$M:"context"}',
-					'time_period' => '{$M:"context"}'
-				]
-			],
-			[
-				'{$M:";"}/{$M:";"}}', 0, ['usermacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{$M:";"}/{$M:";"}',
-					'update_interval' => '{$M:";"}',
-					'time_period' => '{$M:";"}'
-				]
-			],
-			[
-				'{$M:"/"}/{$M:"/"}}', 0, ['usermacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{$M:"/"}/{$M:"/"}',
-					'update_interval' => '{$M:"/"}',
-					'time_period' => '{$M:"/"}'
+					'match' => '{$M:"a"}/{$M:"b"}'
 				]
 			],
 			// fail
@@ -224,1080 +154,840 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				'', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'10s/', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'10ss/7-7,23:59-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'52w,7,00:00-0:01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'69s', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'69s/', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'20m,7,00:00-001', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'1,23:59-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'7-7,23:59-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				';5/1,1:00-9:20', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5a/7,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5 7,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5/ 7,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5 /7,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5/z7,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5\/7,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5/77,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'1/1-000,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'1/1-1 ,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'1/1 ,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'1/01,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'1/1-07,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'1/1-7,,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'1 1-7,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'1/00-7,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'1/1-3-7,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'1/001-7,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'1/1--7,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5/7+6,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5/7/6,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5/6a,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5/1-6a,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5/1-60,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5/1-6, 0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5/1-6,,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5/1-6,:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,000:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,00:0-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,0:0-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,0::00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,00::00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,00:000-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,00:0024:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,00:00--24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,00:00 -24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,00:00- 24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,23:59-2400', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,0:00-9:2', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,0:00-111:2', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,1:00-9::20', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,1:00-09::20', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'0/2,00:00-024:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'50/1-?,00:00-23:59', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/11', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-11', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/12-34', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-3', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-,', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1 -3', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1- 3', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-3 ', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/ 1-3', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1,3', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/d-d', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/9-9', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/6-1', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-77', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,a', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7 ,a', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7 , a', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1--7,00:01-0:02', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/10-7,23:59-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/77,0:00-0:01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/7-99,00:00-0:01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1 -7,00:00-00:01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1- 7,00:00-00:01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1.7,00:00-00:01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/7,000:00-00:01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,00::00-00:01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,00:,00-00:01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,0:001-0:02', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,0:01 -0:02', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,0:01- 0:02', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/7,0:01-000:02', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/7,0:01-00::02', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/9-7,0:01-00:02', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,00:00-00:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,00:00-24:13', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,25:00-20:13', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,11:60-20:13', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,9:00-7:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,09:00-07:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-7,09:00-07:99', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/7,23:59-23:59', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/7-7,23:59-23:59', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/8-9,23:59-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/8-9,23:59-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/8-9,23:59-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/7-9,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/7-6,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/0,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/1-0,0:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/2,00:00-00:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/2,00:01-00:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/2,5:00-29:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/2,24:00-24:01', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/2,24:00-23:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/2,99:00-24:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'5d/7-7,99:99-99:99', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'{/1-7,10:00-11:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'{$/1-7,10:00-11:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'{#/1-7,10:00-11:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'{$M/1-7,10:00-11:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'{$M./1-7,10:00-11:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'{$M}/{', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'{$M}/{$', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'{$M}/{$M', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			],
 			[
 				'{$M}}/{$M}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'update_interval' => '',
-					'time_period' => ''
+					'match' => ''
 				]
 			]
 		];
@@ -1316,9 +1006,7 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
-			'match' => $parser->getMatch(),
-			'update_interval' => $parser->getUpdateInterval(),
-			'time_period' => $parser->getTimePeriod()
+			'match' => $parser->getMatch()
 		]);
 		$this->assertSame(strlen($expected['match']), $parser->getLength());
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -190,7 +190,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		$this->zbxTestClickButton('graph.massdelete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete graph prototypes');
-		$this->zbxTestTextPresentInMessageDetails('Cannot delete templated graph prototype.');
+		$this->zbxTestTextPresentInMessageDetails('Cannot delete templated graphs.');
 		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));

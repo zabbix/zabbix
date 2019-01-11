@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -565,25 +565,25 @@ class CTemplate extends CHostGeneral {
 		API::Template()->unlink($templateids, null, true);
 
 		// delete the discovery rules first
-		$del_rules = API::DiscoveryRule()->get([
-			'output' => [],
+		$delRules = API::DiscoveryRule()->get([
+			'output' => ['itemid'],
 			'hostids' => $templateids,
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
-		if ($del_rules) {
-			API::DiscoveryRule()->delete(array_keys($del_rules), true);
+		if ($delRules) {
+			API::DiscoveryRule()->delete(array_keys($delRules), true);
 		}
 
 		// delete the items
-		$del_items = API::Item()->get([
-			'output' => [],
+		$delItems = API::Item()->get([
 			'templateids' => $templateids,
+			'output' => ['itemid'],
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
-		if ($del_items) {
-			CItemManager::delete(array_keys($del_items));
+		if ($delItems) {
+			API::Item()->delete(array_keys($delItems), true);
 		}
 
 		// delete host from maps

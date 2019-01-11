@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -592,58 +592,151 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Delete triggers.
 	 *
-	 * @param array $triggerids
+	 * @param array $triggerIds
+	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $triggerids) {
-		$this->validateDelete($triggerids, $db_triggers);
+	public function delete(array $triggerIds, $nopermissions = false) {
+		$this->validateDelete($triggerIds, $nopermissions);
 
-		CTriggerManager::delete($triggerids);
+		// get child triggers
+		$parentTriggerIds = $triggerIds;
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $db_triggers);
+		do {
+			$dbItems = DBselect('SELECT triggerid FROM triggers WHERE '.dbConditionInt('templateid', $parentTriggerIds));
+			$parentTriggerIds = [];
 
-		return ['triggerids' => $triggerids];
+			while ($dbTrigger = DBfetch($dbItems)) {
+				$parentTriggerIds[] = $dbTrigger['triggerid'];
+				$triggerIds[] = $dbTrigger['triggerid'];
+			}
+		} while ($parentTriggerIds);
+
+		// select all triggers which are deleted (including children)
+		$delTriggers = $this->get([
+			'output' => ['triggerid', 'description'],
+			'triggerids' => $triggerIds,
+			'nopermissions' => true,
+			'selectHosts' => ['name']
+		]);
+
+		// TODO: REMOVE info
+		foreach ($delTriggers as $trigger) {
+			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
+				implode(', ', zbx_objectValues($trigger['hosts'], 'name'))
+			));
+
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'],
+				null, null, null
+			);
+		}
+
+		// execute delete
+		$this->deleteByIds($triggerIds);
+
+		return ['triggerids' => $triggerIds];
 	}
 
 	/**
 	 * Validates the input parameters for the delete() method.
 	 *
-	 * @param array $triggerids   [IN/OUT]
-	 * @param array $db_triggers  [OUT]
+	 * @param array		$triggerids			Trigger IDs.
+	 * @param bool		$nopermissions		If set to true permissions will not be checked.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array &$triggerids, array &$db_triggers = null) {
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-		if (!CApiInputValidator::validate($api_input_rules, $triggerids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+	protected function validateDelete(array $triggerids, $nopermissions) {
+		if (!$triggerids) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$db_triggers = $this->get([
-			'output' => ['triggerid', 'description', 'expression', 'templateid'],
-			'triggerids' => $triggerids,
-			'editable' => true,
-			'preservekeys' => true
+		if (!$nopermissions) {
+			$this->checkPermissions($triggerids);
+			$this->checkNotInherited($triggerids);
+		}
+	}
+
+	/**
+	 * Delete trigger by ids.
+	 *
+	 * @param array $triggerIds
+	 */
+	protected function deleteByIds(array $triggerIds) {
+		// disable actions
+		$actionIds = [];
+
+		$dbActions = DBselect(
+			'SELECT DISTINCT actionid'.
+			' FROM conditions'.
+			' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
+				' AND '.dbConditionString('value', $triggerIds)
+		);
+		while ($dbAction = DBfetch($dbActions)) {
+			$actionIds[$dbAction['actionid']] = $dbAction['actionid'];
+		}
+
+		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.dbConditionInt('actionid', $actionIds));
+
+		// delete action conditions
+		DB::delete('conditions', [
+			'conditiontype' => CONDITION_TYPE_TRIGGER,
+			'value' => $triggerIds
 		]);
 
-		foreach ($triggerids as $triggerid) {
-			if (!array_key_exists($triggerid, $db_triggers)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if ($this->usedInItServices($triggerIds)) {
+			DB::update('services', [
+				'values' => [
+					'triggerid' => null,
+					'showsla' => SERVICE_SHOW_SLA_OFF
+				],
+				'where' => [
+					'triggerid' => $triggerIds
+				]
+			]);
 
-			$db_trigger = $db_triggers[$triggerid];
-
-			if ($db_trigger['templateid'] != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot delete templated trigger "%1$s:%2$s".', $db_trigger['description'],
-						CMacrosResolverHelper::resolveTriggerExpression($db_trigger['expression'])
-					)
-				);
-			}
+			updateItServices();
 		}
+
+		// Remove trigger sysmap elements.
+		$selementids = [];
+
+		$db_trigger_elements = DBselect(
+			'SELECT st.selementid'.
+			' FROM sysmap_element_trigger st'.
+			' WHERE '.dbConditionInt('st.triggerid', $triggerIds)
+		);
+
+		while ($db_trigger_element = DBfetch($db_trigger_elements)) {
+			$selementids[$db_trigger_element['selementid']] = true;
+		}
+
+		if ($selementids) {
+			DB::delete('sysmap_element_trigger', ['triggerid' => $triggerIds]);
+
+			$db_not_empty_elements = DBselect(
+				'SELECT st.selementid'.
+				' FROM sysmap_element_trigger st'.
+				' WHERE '.dbConditionInt('st.selementid', array_keys($selementids))
+			);
+			while ($db_not_empty_element = DBfetch($db_not_empty_elements)) {
+				unset($selementids[$db_not_empty_element['selementid']]);
+			}
+
+			DB::delete('sysmaps_elements', ['selementid' => array_keys($selementids)]);
+		}
+
+		$insert = [];
+		foreach ($triggerIds as $triggerId) {
+			$insert[] = [
+				'tablename' => 'events',
+				'field' => 'triggerid',
+				'value' => $triggerId
+			];
+		}
+		DB::insertBatch('housekeeper', $insert);
+
+		parent::deleteByIds($triggerIds);
 	}
 
 	/**
@@ -1304,6 +1397,55 @@ class CTrigger extends CTriggerGeneral {
 		return $sqlParts;
 	}
 
+	/**
+	 * Checks if all of the given triggers are available for writing.
+	 *
+	 * @throws APIException     if a trigger is not writable or does not exist or is not normal
+	 *
+	 * @param array $triggerids
+	 */
+	protected function checkPermissions(array $triggerids) {
+		if ($triggerids) {
+			$triggerids = array_unique($triggerids);
+
+			$count = $this->get([
+				'countOutput' => true,
+				'triggerids' => $triggerids,
+				'editable' => true
+			]);
+
+			if ($count != count($triggerids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+	}
+
+	/**
+	 * Checks that none of the given triggers is inherited from a template.
+	 *
+	 * @throws APIException     if one of the triggers is inherited
+	 *
+	 * @param array $triggerIds
+	 */
+	protected function checkNotInherited(array $triggerIds) {
+		$trigger = DBfetch(DBselect(
+			'SELECT t.triggerid,t.description,t.expression'.
+				' FROM triggers t'.
+				' WHERE '.dbConditionInt('t.triggerid', $triggerIds).
+				' AND t.templateid IS NOT NULL',
+			1
+		));
+		if ($trigger) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot delete templated trigger "%1$s:%2$s".', $trigger['description'],
+					CMacrosResolverHelper::resolveTriggerExpression($trigger['expression'])
+				)
+			);
+		}
+	}
+
 	protected function requiresPostSqlFiltering(array $options) {
 		return $options['skipDependent'] !== null || $options['withLastEventUnacknowledged'] !== null;
 	}
@@ -1469,5 +1611,18 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		return $triggers;
+	}
+
+	/**
+	 * Returns true if at least one of the given triggers is used in services.
+	 *
+	 * @param array $triggerIds
+	 *
+	 * @return bool
+	 */
+	protected function usedInItServices(array $triggerIds) {
+		$query = DBselect('SELECT serviceid FROM services WHERE '.dbConditionInt('triggerid', $triggerIds), 1);
+
+		return (DBfetch($query) != false);
 	}
 }

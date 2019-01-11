@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -547,7 +547,9 @@ class CFrontendSetup {
 	 * @return array
 	 */
 	public function checkPhpLdapModule() {
-		$current = (new CLdap())->error !== CLdap::ERR_PHP_EXTENSION;
+		$current = function_exists('ldap_connect') && function_exists('ldap_set_option') && function_exists('ldap_bind')
+				&& function_exists('ldap_search') && function_exists('ldap_get_entries')
+				&& function_exists('ldap_free_result') && function_exists('ldap_start_tls');
 
 		return [
 			'name' => _('PHP LDAP'),

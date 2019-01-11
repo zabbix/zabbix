@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -116,17 +116,17 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 	zbx_uint64_t	alertid;
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *username, *password;
 	unsigned short	smtp_port;
-	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, content_type;
+	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication;
 	int		ret;
 	char		error[MAX_STRING_LEN];
 
 
 	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &sendto, &subject, &message, &smtp_server,
 			&smtp_port, &smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer, &smtp_verify_host,
-			&smtp_authentication, &username, &password, &content_type);
+			&smtp_authentication, &username, &password);
 
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, subject, message, smtp_security,
-			smtp_verify_peer, smtp_verify_host, smtp_authentication, username, password, content_type,
+			smtp_verify_peer, smtp_verify_host, smtp_authentication, username, password,
 			ALARM_ACTION_TIMEOUT, error, sizeof(error));
 
 	alerter_send_result(socket, ret, (SUCCEED == ret ? NULL : error));

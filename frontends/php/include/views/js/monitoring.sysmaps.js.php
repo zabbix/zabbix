@@ -8,7 +8,7 @@ $shape_border_types = [
 
 $horizontal_align_types = [
 	SYSMAP_SHAPE_LABEL_HALIGN_LEFT		=> _('Left'),
-	SYSMAP_SHAPE_LABEL_HALIGN_CENTER	=> _('Centre'),
+	SYSMAP_SHAPE_LABEL_HALIGN_CENTER	=> _('Center'),
 	SYSMAP_SHAPE_LABEL_HALIGN_RIGHT		=> _('Right')
 ];
 

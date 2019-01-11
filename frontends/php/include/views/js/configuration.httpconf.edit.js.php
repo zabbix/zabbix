@@ -210,23 +210,17 @@
 					pairManager.addNew(formid, {type:jQuery(this).data('type')});
 				});
 
-				var post_fields = jQuery('#post_fields', $form);
-				var post_field_inputs = jQuery('#posts,#post_fields input[type="text"],' +
-					'#post_fields .btn-link,#post_type input', $form)
+				jQuery('#retrieve_mode', $form)
+					.on('change', function() {
+						jQuery('#post_fields', $form).toggleClass('disabled',this.checked);
+						jQuery('#required, #posts, #post_fields input[type="text"], #post_fields .btn-link,' +
+								'#post_type input', $form)
+							.attr('disabled', this.checked);
 
-				jQuery('#retrieve_mode [name="retrieve_mode"]', $form)
-					.on('change', function(e) {
-						if (e.target.value == <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>) {
-							post_fields.addClass('disabled');
-							post_field_inputs.attr('disabled', 'disabled');
-						}
-						else {
-							post_fields.removeClass('disabled');
-							post_field_inputs.removeAttr('disabled');
+						if (this.checked === false) {
 							pairManager.refresh();
 						}
 					})
-					.filter(':checked')
 					.trigger('change');
 			},
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -349,7 +349,7 @@ static int    proc_read_tcp_listen(const char *filename, char **buffer, int *buf
 				count++;
 			}
 
-			if (3 == count && 0 != strncmp(start, "0A", 2) && 0 != strncmp(start, "03", 2))
+			if (3 == count && 0 != strncmp(start, "0A", 2))
 				break;
 		}
 	}

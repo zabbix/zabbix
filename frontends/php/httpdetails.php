@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -199,14 +199,19 @@ $graph_time->insertFlickerfreeJs();
 CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 
 // Create graphs widget.
-$widget = (new CWidget())
-	->setWebLayoutMode($page['web_layout_mode'])
-	->addItem(
-		(new CFilter(new CUrl()))
-			->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
-			->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
-			->addTimeSelector($timeline['from'], $timeline['to'], $page['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE)
-	)
+$widget = (new CWidget())->setWebLayoutMode($page['web_layout_mode']);
+
+$filter = (new CFilter())
+	->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
+	->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
+	->addTimeSelector($timeline['from'], $timeline['to']);
+
+if ($page['web_layout_mode'] === ZBX_LAYOUT_KIOSKMODE) {
+	$filter->addClass(ZBX_STYLE_HIDDEN);
+}
+$widget->addItem($filter);
+
+$widget
 	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
 	->show();
 

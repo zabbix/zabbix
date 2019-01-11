@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@ class testPageDashboardWidgets extends CWebTest {
 	 * Check "Problem Hosts" widget.
 	 */
 	public function testPageDashboardWidgets_checkProblemHostsWidget() {
-		// Authorize user and open the page 'zabbix.php?action=dashboard.view&dashboardid=100'.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=100');
+		// Authorize user and open the page 'zabbix.php?action=dashboard.view&dashboardid=1'.
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
 
 		// Find dashboard element.
 		$dashboard = CDashboardElement::find()->one();
@@ -48,7 +48,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Expected table values.
 		$expected = [
 			'Host group for tag permissions'	=> 1,
-			'Zabbix servers'					=> 15,
+			'Zabbix servers'					=> 11,
 			'ZBX6648 All Triggers'				=> 1,
 			'ZBX6648 Disabled Triggers'			=> 1,
 			'ZBX6648 Enabled Triggers'			=> 1
@@ -91,7 +91,7 @@ class testPageDashboardWidgets extends CWebTest {
 			],
 			'Zabbix servers' => [
 				'Average' => 1,
-				'Warning' => 5
+				'Warning' => 1
 			]
 		];
 
@@ -127,9 +127,9 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->assertTrue($dashboard->isEmpty());
 
 		// Open a new widget form.
-		$overlay = $dashboard->edit()->addWidget();
+		$form = $dashboard->edit()->addWidget();
 		// Wait until add widget dialog is shown and close it.
-		$overlay->close();
+		$form->parents('id:overlay_dialogue')->asOverlayDialog()->one()->close();
 
 		// Check if dashboard is still empty.
 		$this->assertTrue($dashboard->isEmpty());
@@ -147,9 +147,9 @@ class testPageDashboardWidgets extends CWebTest {
 		$dialog = $this->query('id:overlay_dialogue')->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
 
 		$this->assertEquals('Dashboard properties', $dialog->getTitle());
-		$configuration = $dialog->asForm();
+		$configuration = $dialog->getContent()->asForm();
 		// Change dashboard owner.
-		$owner = $configuration->getField('Owner');
+		$owner = $configuration->getField('Owner')->asMultiselect();
 		$owner->clear();
 		$owner->select('test-user');
 		// Change dashboard name.
@@ -158,12 +158,10 @@ class testPageDashboardWidgets extends CWebTest {
 
 		$dashboard = CDashboardElement::find()->one();
 		// Check the name of dashboard.
-		$this->query('id:page-title-general')->waitUntilTextPresent('Dashboard create test');
 		$this->assertEquals('Dashboard create test', $dashboard->getTitle());
 
 		// Add widget.
-		$overlay = $dashboard->addWidget();
-		$form = $overlay->asForm();
+		$form = $dashboard->addWidget();
 		// Set type to "Clock".
 		$form->getField('Type')->asDropdown()->select('Clock');
 		// Wait until form is reloaded.
@@ -195,7 +193,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
 
 		$dashboard = CDashboardElement::find()->one()->edit();
-		$widget = $dashboard->getWidget('Problems by severity');
+		$widget = $dashboard->getWidget('Problem hosts');
 
 		// Check if widget is editable.
 		$this->assertEquals(true, $widget->isEditable());
@@ -204,7 +202,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$form = $widget->edit();
 
 		// Get "Host groups" multiselect.
-		$groups = $form->getField('Host groups');
+		$groups = $form->getField('Host groups')->asMultiselect();
 
 		// Select a single group.
 		$groups->select('Zabbix servers');

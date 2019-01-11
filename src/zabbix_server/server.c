@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,16 +107,7 @@ const char	*help_message[] = {
 	"                                 target is not specified",
 	"",
 	"      Log level control targets:",
-	"        process-type             All processes of specified type",
-	"                                 (alerter, alert manager, configuration syncer,",
-	"                                 discoverer, escalator, history syncer,",
-	"                                 housekeeper, http poller, icmp pinger,",
-	"                                 ipmi manager, ipmi poller, java poller,",
-	"                                 poller, preprocessing manager,",
-	"                                 preprocessing worker, proxy poller,",
-	"                                 self-monitoring, snmp trapper, task manager,",
-	"                                 timer, trapper, unreachable poller,",
-	"                                 vmware collector)",
+	"        process-type             All processes of specified type (e.g., poller)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier, up to 65535. For larger",
 	"                                 values specify target as \"process-type,N\"",
@@ -1113,12 +1104,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
-				poller_type = ZBX_POLLER_TYPE_NORMAL;
+				poller_type = ZBX_PROCESS_TYPE_POLLER;
 				thread_args.args = &poller_type;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_UNREACHABLE:
-				poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+				poller_type = ZBX_PROCESS_TYPE_UNREACHABLE;
 				thread_args.args = &poller_type;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
@@ -1151,7 +1142,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(escalator_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
-				poller_type = ZBX_POLLER_TYPE_JAVA;
+				poller_type = ZBX_PROCESS_TYPE_JAVAPOLLER;
 				thread_args.args = &poller_type;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;

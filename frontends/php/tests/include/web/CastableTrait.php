@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -142,28 +142,6 @@ trait CastableTrait {
 	 */
 	public function asWidget($options = []) {
 		return $this->cast('CWidgetElement', $options);
-	}
-
-	/**
-	 * Cast object to SegmentedRadio element.
-	 *
-	 * @param array $options    additional casting options
-	 *
-	 * @return CSegmentedRadioElement
-	 */
-	public function asSegmentedRadio($options = []) {
-		return $this->cast('CSegmentedRadioElement', $options);
-	}
-
-	/**
-	 * Cast object to Range Control element.
-	 *
-	 * @param array $options    additional casting options
-	 *
-	 * @return CRangeControlElement
-	 */
-	public function asRangeControl($options = []) {
-		return $this->cast('CRangeControlElement', $options);
 	}
 
 	/**

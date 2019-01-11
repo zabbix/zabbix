@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ function audit_resource2str($resource_type = null) {
 		AUDIT_RESOURCE_HOST_PROTOTYPE => _('Host prototype'),
 		AUDIT_RESOURCE_ACTION => _('Action'),
 		AUDIT_RESOURCE_GRAPH => _('Graph'),
-		AUDIT_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
 		AUDIT_RESOURCE_GRAPH_ELEMENT => _('Graph element'),
 		AUDIT_RESOURCE_USER_GROUP => _('User group'),
 		AUDIT_RESOURCE_APPLICATION => _('Application'),
@@ -36,7 +35,6 @@ function audit_resource2str($resource_type = null) {
 		AUDIT_RESOURCE_TRIGGER_PROTOTYPE => _('Trigger prototype'),
 		AUDIT_RESOURCE_HOST_GROUP => _('Host group'),
 		AUDIT_RESOURCE_ITEM => _('Item'),
-		AUDIT_RESOURCE_ITEM_PROTOTYPE => _('Item prototype'),
 		AUDIT_RESOURCE_IMAGE => _('Image'),
 		AUDIT_RESOURCE_VALUE_MAP => _('Value map'),
 		AUDIT_RESOURCE_IT_SERVICE => _('Service'),

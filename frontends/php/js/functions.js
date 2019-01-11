@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -390,13 +390,13 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		}
 	}
 
-	var str = (years == 0) ? '' : years + t('S_YEAR_SHORT') + ' ';
-	str += (months == 0) ? '' : months + t('S_MONTH_SHORT') + ' ';
+	var str = (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
+	str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
 	str += (isExtend && isTsDouble)
-		? days + t('S_DAY_SHORT') + ' '
-		: ((days == 0) ? '' : days + t('S_DAY_SHORT') + ' ');
-	str += (hours == 0) ? '' : hours + t('S_HOUR_SHORT') + ' ';
-	str += (minutes == 0) ? '' : minutes + t('S_MINUTE_SHORT') + ' ';
+		? days + locale['S_DAY_SHORT'] + ' '
+		: ((days == 0) ? '' : days + locale['S_DAY_SHORT'] + ' ');
+	str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
+	str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
 
 	return str;
 }
@@ -643,7 +643,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		.append(
 			jQuery('<button>', {
 				class: 'overlay-close-btn',
-				title: t('S_CLOSE')
+				title: t('Close')
 			})
 				.click(function(e) {
 					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');

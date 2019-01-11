@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,18 +127,6 @@ class CControllerPopupGeneric extends CController {
 				'form' => [
 					'name' => 'applicationform',
 					'id' => 'applications'
-				],
-				'table_columns' => [
-					_('Name')
-				]
-			],
-			'application_prototypes' => [
-				'title' => _('Application prototypes'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
-				'allowed_src_fields' => 'application_prototypeid,name',
-				'form' => [
-					'name' => 'application_prototype_form',
-					'id' => 'application_prototypes'
 				],
 				'table_columns' => [
 					_('Name')
@@ -376,8 +364,7 @@ class CControllerPopupGeneric extends CController {
 			'orig_names' =>					'in 1',
 			'writeonly' =>					'in 1',
 			'noempty' =>					'in 1',
-			'submit_parent' =>				'in 1',
-			'enrich_parent_groups' =>		'in 1'
+			'submit_parent' =>				'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -617,9 +604,9 @@ class CControllerPopupGeneric extends CController {
 			$page_options['hostid'] = $hostid;
 		}
 
-		$option_fields_binary = ['enrich_parent_groups', 'monitored_hosts', 'noempty', 'normal_only', 'numeric',
-			'real_hosts', 'submit_parent', 'templated_hosts', 'with_applications', 'with_graphs', 'with_items',
-			'with_monitored_triggers', 'with_simple_graph_items', 'with_triggers', 'with_webitems', 'writeonly'];
+		$option_fields_binary = ['monitored_hosts', 'noempty', 'normal_only', 'numeric', 'real_hosts', 'submit_parent',
+			'templated_hosts', 'with_applications', 'with_graphs', 'with_items', 'with_monitored_triggers',
+			'with_simple_graph_items', 'with_triggers', 'with_webitems', 'writeonly'];
 		foreach ($option_fields_binary as $field) {
 			if ($this->hasInput($field)) {
 				$page_options[$field] = true;
@@ -719,10 +706,6 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if (array_key_exists('real_hosts', $page_options)) {
-					$options['real_hosts'] = $page_options['real_hosts'];
-				}
-
 				if (array_key_exists('normal_only', $page_options)) {
 					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 				}
@@ -732,12 +715,6 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				$records = API::HostGroup()->get($options);
-				if (array_key_exists('enrich_parent_groups', $page_options)) {
-					$records = CPageFilter::enrichParentGroups($records, [
-						'real_hosts' => null
-					] + $options);
-				}
-
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['groupid' => 'id']);
 				break;
@@ -873,33 +850,6 @@ class CControllerPopupGeneric extends CController {
 				$records = API::Application()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['applicationid' => 'id']);
-				break;
-
-			case 'application_prototypes':
-				$parent_discoveryid = $this->getInput('parent_discoveryid');
-
-				$discovery_rules = API::DiscoveryRule()->get([
-					'output' => [],
-					'selectApplicationPrototypes' => ['application_prototypeid', 'name'],
-					'itemids' => [$parent_discoveryid]
-				]);
-
-				if ($discovery_rules) {
-					$discovery_rule = $discovery_rules[0];
-
-					if ($discovery_rule['applicationPrototypes']) {
-						CArrayHelper::sort($discovery_rule['applicationPrototypes'], [
-							['field' => 'name', 'order' => ZBX_SORT_UP]
-						]);
-
-						foreach ($discovery_rule['applicationPrototypes'] as $application_prototype) {
-							$records[$application_prototype['application_prototypeid']] = [
-								'id' => $application_prototype['application_prototypeid'],
-								'name' => $application_prototype['name']
-							];
-						}
-					}
-				}
 				break;
 
 			case 'graphs':

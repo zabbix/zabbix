@@ -56,7 +56,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (active\ checks, collector, listener)
+All processes of specified type (e.g., listener)
 .RE
 .RS 4
 .TP 4

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/js/common.filter.trigger.js.php';
 $filter = $this->data['filter'];
 $config = $this->data['config'];
 
-$filterForm = (new CFilter((new CUrl('overview.php'))->setArgument('type', 0)))
+$filterForm = (new CFilter())
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addVar('groupid', $filter['groupId'])

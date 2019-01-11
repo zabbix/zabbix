@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,9 +112,8 @@ class CNewValidator {
 					if (array_key_exists($field, $this->input)) {
 						if (!is_string($this->input[$field]) || !in_array($this->input[$field], $params)) {
 							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
 							);
 							return false;
 						}
@@ -125,9 +124,8 @@ class CNewValidator {
 					if (array_key_exists($field, $this->input)) {
 						if (!is_string($this->input[$field]) || !$this->is_int32($this->input[$field])) {
 							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
 							);
 							return false;
 						}
@@ -138,9 +136,8 @@ class CNewValidator {
 					if (array_key_exists($field, $this->input)) {
 						if (!is_string($this->input[$field]) || !$this->is_id($this->input[$field])) {
 							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
 							);
 							return false;
 						}
@@ -154,9 +151,8 @@ class CNewValidator {
 					if (array_key_exists($field, $this->input)) {
 						if (!is_array($this->input[$field]) || !$this->is_array_id($this->input[$field])) {
 							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
 							);
 							return false;
 						}
@@ -187,9 +183,8 @@ class CNewValidator {
 						if (!$this->is_array_db($this->input[$field], $params['table'], $params['field'], $flags)
 								|| !is_array($this->input[$field])) {
 							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
 							);
 							return false;
 						}
@@ -238,9 +233,8 @@ class CNewValidator {
 					if (array_key_exists($field, $this->input)) {
 						if (!$this->is_db($this->input[$field], $params['table'], $params['field'], $flags)) {
 							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
 							);
 							return false;
 						}

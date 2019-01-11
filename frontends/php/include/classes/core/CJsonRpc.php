@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,9 +84,7 @@ class CJsonRpc {
 			}
 
 			list($api, $method) = array_merge(explode('.', $call['method']), [null, null]);
-			$result = $this->apiClient->callMethod($api, $method, $call['params'],
-				array_key_exists('auth', $call) ? $call['auth'] : null
-			);
+			$result = $this->apiClient->callMethod($api, $method, $call['params'], $call['auth']);
 
 			$this->processResult($call, $result);
 		}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,13 +19,13 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.2.0alpha3');
+define('ZABBIX_VERSION',		'4.2.0alpha1');
 define('ZABBIX_API_VERSION',	'4.2.0');
-define('ZABBIX_EXPORT_VERSION',	'4.2');
-define('ZABBIX_DB_VERSION',	4010004);
+define('ZABBIX_EXPORT_VERSION',	'4.0');
+define('ZABBIX_DB_VERSION',		4000000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2019');
+define('ZABBIX_COPYRIGHT_TO',	'2018');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -193,11 +193,6 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
 
-// Multiselect helper buttons that allow selected objects to be added, replaced or removed.
-define('ZBX_MULTISELECT_ADD',		0);
-define('ZBX_MULTISELECT_REPLACE',	1);
-define('ZBX_MULTISELECT_REMOVE',	2);
-
 // Maximum number of tags to display.
 define('ZBX_TAG_COUNT_DEFAULT', 3);
 
@@ -215,39 +210,37 @@ define('AUDIT_ACTION_LOGOUT',	4);
 define('AUDIT_ACTION_ENABLE',	5);
 define('AUDIT_ACTION_DISABLE',	6);
 
-define('AUDIT_RESOURCE_USER',				0);
-define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2);
-define('AUDIT_RESOURCE_MEDIA_TYPE',			3);
-define('AUDIT_RESOURCE_HOST',				4);
-define('AUDIT_RESOURCE_ACTION',				5);
-define('AUDIT_RESOURCE_GRAPH',				6);
-define('AUDIT_RESOURCE_GRAPH_ELEMENT',		7);
-define('AUDIT_RESOURCE_USER_GROUP',			11);
-define('AUDIT_RESOURCE_APPLICATION',		12);
-define('AUDIT_RESOURCE_TRIGGER',			13);
-define('AUDIT_RESOURCE_HOST_GROUP',			14);
-define('AUDIT_RESOURCE_ITEM',				15);
-define('AUDIT_RESOURCE_IMAGE',				16);
-define('AUDIT_RESOURCE_VALUE_MAP',			17);
-define('AUDIT_RESOURCE_IT_SERVICE',			18);
-define('AUDIT_RESOURCE_MAP',				19);
-define('AUDIT_RESOURCE_SCREEN',				20);
-define('AUDIT_RESOURCE_SCENARIO',			22);
-define('AUDIT_RESOURCE_DISCOVERY_RULE',		23);
-define('AUDIT_RESOURCE_SLIDESHOW',			24);
-define('AUDIT_RESOURCE_SCRIPT',				25);
-define('AUDIT_RESOURCE_PROXY',				26);
-define('AUDIT_RESOURCE_MAINTENANCE',		27);
-define('AUDIT_RESOURCE_REGEXP',				28);
-define('AUDIT_RESOURCE_MACRO',				29);
-define('AUDIT_RESOURCE_TEMPLATE',			30);
-define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE',	31);
-define('AUDIT_RESOURCE_ICON_MAP',			32);
-define('AUDIT_RESOURCE_DASHBOARD',			33);
-define('AUDIT_RESOURCE_CORRELATION',		34);
-define('AUDIT_RESOURCE_GRAPH_PROTOTYPE',	35);
-define('AUDIT_RESOURCE_ITEM_PROTOTYPE',		36);
-define('AUDIT_RESOURCE_HOST_PROTOTYPE',		37);
+define('AUDIT_RESOURCE_USER',			0);
+define('AUDIT_RESOURCE_ZABBIX_CONFIG',	2);
+define('AUDIT_RESOURCE_MEDIA_TYPE',		3);
+define('AUDIT_RESOURCE_HOST',			4);
+define('AUDIT_RESOURCE_ACTION',			5);
+define('AUDIT_RESOURCE_GRAPH',			6);
+define('AUDIT_RESOURCE_GRAPH_ELEMENT',	7);
+define('AUDIT_RESOURCE_USER_GROUP',		11);
+define('AUDIT_RESOURCE_APPLICATION',	12);
+define('AUDIT_RESOURCE_TRIGGER',		13);
+define('AUDIT_RESOURCE_HOST_GROUP',		14);
+define('AUDIT_RESOURCE_ITEM',			15);
+define('AUDIT_RESOURCE_IMAGE',			16);
+define('AUDIT_RESOURCE_VALUE_MAP',		17);
+define('AUDIT_RESOURCE_IT_SERVICE',		18);
+define('AUDIT_RESOURCE_MAP',			19);
+define('AUDIT_RESOURCE_SCREEN',			20);
+define('AUDIT_RESOURCE_SCENARIO',		22);
+define('AUDIT_RESOURCE_DISCOVERY_RULE',	23);
+define('AUDIT_RESOURCE_SLIDESHOW',		24);
+define('AUDIT_RESOURCE_SCRIPT',			25);
+define('AUDIT_RESOURCE_PROXY',			26);
+define('AUDIT_RESOURCE_MAINTENANCE',	27);
+define('AUDIT_RESOURCE_REGEXP',			28);
+define('AUDIT_RESOURCE_MACRO',			29);
+define('AUDIT_RESOURCE_TEMPLATE',		30);
+define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE', 31);
+define('AUDIT_RESOURCE_ICON_MAP',		32);
+define('AUDIT_RESOURCE_DASHBOARD',		33);
+define('AUDIT_RESOURCE_CORRELATION',	34);
+define('AUDIT_RESOURCE_HOST_PROTOTYPE', 35);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -534,33 +527,19 @@ define('ITEM_LOGTYPE_VERBOSE',			10);
 define('ITEM_DELAY_FLEXIBLE',	0);
 define('ITEM_DELAY_SCHEDULING',	1);
 
-// Item pre-processing types.
-define('ZBX_PREPROC_MULTIPLIER',			1);
-define('ZBX_PREPROC_RTRIM',					2);
-define('ZBX_PREPROC_LTRIM',					3);
-define('ZBX_PREPROC_TRIM',					4);
-define('ZBX_PREPROC_REGSUB',				5);
-define('ZBX_PREPROC_BOOL2DEC',				6);
-define('ZBX_PREPROC_OCT2DEC',				7);
-define('ZBX_PREPROC_HEX2DEC',				8);
-define('ZBX_PREPROC_DELTA_VALUE',			9);
-define('ZBX_PREPROC_DELTA_SPEED',			10);
-define('ZBX_PREPROC_XPATH',					11);
-define('ZBX_PREPROC_JSONPATH',				12);
-define('ZBX_PREPROC_VALIDATE_RANGE',		13);
-define('ZBX_PREPROC_VALIDATE_REGEX',		14);
-define('ZBX_PREPROC_VALIDATE_NOT_REGEX',	15);
-define('ZBX_PREPROC_ERROR_FIELD_JSON',		16);
-define('ZBX_PREPROC_ERROR_FIELD_XML',		17);
-define('ZBX_PREPROC_ERROR_FIELD_REGEX',		18);
-define('ZBX_PREPROC_THROTTLE_VALUE',		19);
-define('ZBX_PREPROC_THROTTLE_TIMED_VALUE',	20);
-
-// Item pre-processing error handlers.
-define('ZBX_PREPROC_FAIL_DEFAULT',			0);
-define('ZBX_PREPROC_FAIL_DISCARD_VALUE',	1);
-define('ZBX_PREPROC_FAIL_SET_VALUE',		2);
-define('ZBX_PREPROC_FAIL_SET_ERROR',		3);
+// item pre-processing
+define('ZBX_PREPROC_MULTIPLIER',	1);
+define('ZBX_PREPROC_RTRIM',			2);
+define('ZBX_PREPROC_LTRIM',			3);
+define('ZBX_PREPROC_TRIM',			4);
+define('ZBX_PREPROC_REGSUB',		5);
+define('ZBX_PREPROC_BOOL2DEC',		6);
+define('ZBX_PREPROC_OCT2DEC',		7);
+define('ZBX_PREPROC_HEX2DEC',		8);
+define('ZBX_PREPROC_DELTA_VALUE',	9);
+define('ZBX_PREPROC_DELTA_SPEED',	10);
+define('ZBX_PREPROC_XPATH',			11);
+define('ZBX_PREPROC_JSONPATH',		12);
 
 define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
@@ -645,9 +624,6 @@ define('SMTP_CONNECTION_SECURITY_SSL_TLS',	2);
 
 define('SMTP_AUTHENTICATION_NONE',		0);
 define('SMTP_AUTHENTICATION_NORMAL',	1);
-
-define('SMTP_MESSAGE_FORMAT_PLAIN_TEXT',	0);
-define('SMTP_MESSAGE_FORMAT_HTML',			1);
 
 define('EZ_TEXTING_LIMIT_USA',		0);
 define('EZ_TEXTING_LIMIT_CANADA',	1);
@@ -1543,6 +1519,7 @@ define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_TEAL', 'teal');
 define('ZBX_STYLE_HEADER_LOGO', 'header-logo');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
+define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
@@ -1699,21 +1676,14 @@ define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
-// HTML column layout.
+// html layout columns
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
-// column occupies x% width of column wrapper
-define('ZBX_STYLE_COLUMN_5', 'column-5');
-define('ZBX_STYLE_COLUMN_10', 'column-10');
-define('ZBX_STYLE_COLUMN_20', 'column-20');
+define('ZBX_STYLE_COLUMN_5', 'column-5');	// column occupies 5% width of column wrapper.
+define('ZBX_STYLE_COLUMN_10', 'column-10');	// column occupies 10% width of column wrapper.
 define('ZBX_STYLE_COLUMN_33', 'column-33'); // column occupies 1/3 width of column wrapper.
-define('ZBX_STYLE_COLUMN_40', 'column-40');
-define('ZBX_STYLE_COLUMN_50', 'column-50');
-define('ZBX_STYLE_COLUMN_80', 'column-80');
-define('ZBX_STYLE_COLUMN_90', 'column-90');
-define('ZBX_STYLE_COLUMN_95', 'column-95');
-// column visual options
-define('ZBX_STYLE_COLUMN_CENTER', 'column-center');
-define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');
+define('ZBX_STYLE_COLUMN_50', 'column-50'); // column occupies 50% width of column wrapper.
+define('ZBX_STYLE_COLUMN_90', 'column-90'); // column occupies 90% width of column wrapper.
+define('ZBX_STYLE_COLUMN_95', 'column-95'); // column occupies 95% width of column wrapper.
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');

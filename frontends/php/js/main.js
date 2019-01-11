@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -437,23 +437,17 @@ var hintBox = {
 	 */
 	bindEvents: function () {
 		jQuery(document).on('keydown click mouseenter mouseleave', '[data-hintbox=1]', function (e) {
-
-			if (jQuery(this).hasClass('hint-item')) {
-				var target = jQuery(this).siblings('.main-hint');
-			}
-			else {
-				var target = jQuery(this);
-			}
+			var target = jQuery(this);
 
 			switch (e.type) {
 				case 'mouseenter':
-					hintBox.showHint(e, target[0], target.next('.hint-box').html(), target.data('hintbox-class'), false,
+					hintBox.showHint(e, this, target.next('.hint-box').html(), target.data('hintbox-class'), false,
 						target.data('hintbox-style')
 					);
 					break;
 
 				case 'mouseleave':
-					hintBox.hideHint(target[0], false);
+					hintBox.hideHint(this, false);
 					break;
 
 				case 'keydown':
@@ -465,7 +459,7 @@ var hintBox = {
 						e.clientY = offset.top - w.scrollTop() + (target.height() / 2);
 						e.preventDefault();
 
-						hintBox.showStaticHint(e, target[0], target.data('hintbox-class'), false,
+						hintBox.showStaticHint(e, this, target.data('hintbox-class'), false,
 							target.data('hintbox-style')
 						);
 					}
@@ -473,7 +467,7 @@ var hintBox = {
 
 				case 'click':
 					if (target.data('hintbox-static') == 1) {
-						hintBox.showStaticHint(e, target[0], target.data('hintbox-class'), false,
+						hintBox.showStaticHint(e, this, target.data('hintbox-class'), false,
 							target.data('hintbox-style')
 						);
 					}
@@ -519,7 +513,7 @@ var hintBox = {
 
 			var close_link = jQuery('<button>', {
 					'class': 'overlay-close-btn',
-					'title': t('S_CLOSE')
+					'title': t('Close')
 				}
 			)
 				.click(function() {
@@ -552,7 +546,6 @@ var hintBox = {
 
 			target.isStatic = true;
 			hintBox.showHint(e, target, hintText, className, true, styles);
-			jQuery(target).data('return-control', jQuery(e.target));
 
 			if (resizeAfterLoad) {
 				hintText.one('load', function(e) {
@@ -667,9 +660,6 @@ var hintBox = {
 			delete target.hintBoxItem;
 
 			if (target.isStatic) {
-				if (jQuery(target).data('return-control') !== 'undefined') {
-					jQuery(target).data('return-control').focus();
-				}
 				delete target.isStatic;
 			}
 		}
@@ -726,7 +716,7 @@ function updateUserProfile(idx, value_int, idx2) {
 	});
 }
 
-function changeWidgetState(obj, widgetId, idx) {
+function changeWidgetState(obj, widgetId, url) {
 	var widgetObj = jQuery('#' + widgetId + '_widget'),
 		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
 		state = 0;
@@ -742,10 +732,14 @@ function changeWidgetState(obj, widgetId, idx) {
 		state = 1;
 	}
 
-	obj.title = (state == 1) ? t('S_COLLAPSE') : t('S_EXPAND');
-	if (idx !== '' && typeof idx !== 'undefined') {
-		updateUserProfile(idx, state, []);
-	}
+	obj.title = (state == 1) ? locale['S_COLLAPSE'] : locale['S_EXPAND'];
+
+	sendAjaxData(url, {
+		data: {
+			widget: widgetId,
+			state: state
+		}
+	});
 }
 
 /**

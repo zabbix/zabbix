@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -699,12 +699,14 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static int	process_discovery(void)
+static int	process_discovery(int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		rule_count = 0;
+	DB_DRULE	drule;
+	int		rule_count = 0, delay;
 	char		*delay_str = NULL;
+	zbx_uint64_t	druleid;
 
 	result = DBselect(
 			"select distinct r.druleid,r.iprange,r.name,c.dcheckid,r.proxy_hostid,r.delay"
@@ -716,15 +718,12 @@ static int	process_discovery(void)
 				" and r.nextcheck<=%d"
 				" and " ZBX_SQL_MOD(r.druleid,%d) "=%d",
 			DRULE_STATUS_MONITORED,
-			(int)time(NULL),
+			now,
 			CONFIG_DISCOVERER_FORKS,
 			process_num - 1);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		int		now, delay;
-		zbx_uint64_t	druleid;
-
 		rule_count++;
 
 		ZBX_STR2UINT64(druleid, row[0]);
@@ -739,23 +738,16 @@ static int	process_discovery(void)
 
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid update interval \"%s\"",
 					row[2], delay_str);
-
 			zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
-
-			now = (int)time(NULL);
-
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64,
 					(0 == cfg.refresh_unsupported || 0 > now + cfg.refresh_unsupported ?
 					ZBX_JAN_2038 : now + cfg.refresh_unsupported), druleid);
-
 			zbx_config_clean(&cfg);
 			continue;
 		}
 
 		if (SUCCEED == DBis_null(row[4]))
 		{
-			DB_DRULE	drule;
-
 			memset(&drule, 0, sizeof(drule));
 
 			drule.druleid = druleid;
@@ -769,11 +761,9 @@ static int	process_discovery(void)
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			discovery_clean_services(druleid);
 
-		now = (int)time(NULL);
 		if (0 > now + delay)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": nextcheck update causes overflow",
-					row[2]);
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": nextcheck update causes overflow", row[2]);
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64, ZBX_JAN_2038, druleid);
 		}
 		else
@@ -817,10 +807,12 @@ static int	get_minnextcheck(void)
  *                                                                            *
  * Purpose: periodically try to find new hosts and services                   *
  *                                                                            *
+ * Comments: executes once per 30 seconds (hardcoded)                         *
+ *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
-	int	nextcheck, sleeptime = -1, rule_count = 0, old_rule_count = 0;
+	int	now, nextcheck, sleeptime = -1, rule_count = 0, old_rule_count = 0;
 	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
 
@@ -858,7 +850,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 					old_total_sec);
 		}
 
-		rule_count += process_discovery();
+		now = time(NULL);
+		rule_count += process_discovery(now);
 		total_sec += zbx_time() - sec;
 
 		nextcheck = get_minnextcheck();

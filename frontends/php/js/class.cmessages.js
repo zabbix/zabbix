@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@
 var ZBX_MESSAGES = [];
 
 // use this function to initialize Messaging system
-function initMessages() {
+function initMessages(args) {
 	var messagesListId = ZBX_MESSAGES.length;
-	ZBX_MESSAGES[messagesListId] = new CMessageList(messagesListId);
+	ZBX_MESSAGES[messagesListId] = new CMessageList(messagesListId, args);
 	return messagesListId;
 }
 
@@ -52,7 +52,7 @@ var CMessageList = Class.create({
 		'time': 0				// Message timestamp.
 	},
 
-	initialize: function(messagesListId) {
+	initialize: function(messagesListId, args) {
 		this.messageListId = messagesListId;
 		this.dom = {};
 		this.messageList = {};
@@ -388,7 +388,7 @@ var CMessageList = Class.create({
 
 		// close all
 		this.dom.container.close = document.createElement('button');
-		this.dom.container.close.setAttribute('title', t('S_CLEAR'));
+		this.dom.container.close.setAttribute('title', locale['S_CLEAR']);
 		this.dom.container.close.className = 'overlay-close-btn';
 		this.dom.container.appendChild(this.dom.container.close);
 
@@ -406,7 +406,7 @@ var CMessageList = Class.create({
 		this.dom.controls.appendChild(this.dom.snooze);
 
 		this.dom.snooze.button = document.createElement('button');
-		this.dom.snooze.button.setAttribute('title', t('S_SNOOZE'));
+		this.dom.snooze.button.setAttribute('title', locale['S_SNOOZE']);
 		this.dom.snooze.button.className = 'btn-alarm-on';
 		this.dom.snooze.appendChild(this.dom.snooze.button);
 
@@ -415,7 +415,7 @@ var CMessageList = Class.create({
 		this.dom.controls.appendChild(this.dom.mute);
 
 		this.dom.mute.button = document.createElement('button');
-		this.dom.mute.button.setAttribute('title', t('S_MUTE') + '/' + t('S_UNMUTE'));
+		this.dom.mute.button.setAttribute('title', locale['S_MUTE'] + '/' + locale['S_UNMUTE']);
 		this.dom.mute.button.className = 'btn-sound-on';
 		this.dom.mute.appendChild(this.dom.mute.button);
 

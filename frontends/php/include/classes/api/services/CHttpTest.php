@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,6 +254,7 @@ class CHttpTest extends CApiService {
 	 * @return array
 	 */
 	public function create($httptests) {
+		$httptests = $this->convertHttpPairs($httptests);
 		$this->validateCreate($httptests);
 
 		$httptests = Manager::HttpTest()->persist($httptests);
@@ -312,7 +313,7 @@ class CHttpTest extends CApiService {
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'value')]
 				]],
 				'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
-				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH])],
+				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS])],
 				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0:'.SEC_PER_HOUR],
 				'required' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'required')],
 				'status_codes' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'status_codes')]
@@ -342,6 +343,7 @@ class CHttpTest extends CApiService {
 	 * @return array
 	 */
 	public function update($httptests) {
+		$httptests = $this->convertHttpPairs($httptests);
 		$this->validateUpdate($httptests, $db_httptests);
 
 		Manager::HttpTest()->persist($httptests);
@@ -407,7 +409,7 @@ class CHttpTest extends CApiService {
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'value')]
 				]],
 				'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
-				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH])],
+				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS])],
 				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0:'.SEC_PER_HOUR],
 				'required' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'required')],
 				'status_codes' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'status_codes')]
@@ -594,7 +596,7 @@ class CHttpTest extends CApiService {
 		}
 
 		if ($del_itemids) {
-			CItemManager::delete($del_itemids);
+			API::Item()->delete($del_itemids, true);
 		}
 
 		DB::delete('httptest', ['httptestid' => $del_httptestids]);
@@ -1061,19 +1063,21 @@ class CHttpTest extends CApiService {
 					else {
 						$db_httptest = $db_httptests[$httptest['httptestid']];
 						$db_httpstep = $db_httptest['steps'][$httpstep['httpstepid']];
+						$httpstep += ['retrieve_mode' => $db_httpstep['retrieve_mode']];
 						$httpstep += [
-							'retrieve_mode' => $db_httpstep['retrieve_mode'],
-							'required' => $db_httpstep['required'],
-							'posts' => ($db_httpstep['retrieve_mode'] != HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
+							'posts' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 								? $db_httpstep['posts']
+								: '',
+							'required' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
+								? $db_httpstep['required']
 								: ''
 						];
 					}
 
 					if ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
-						if ($httpstep['posts'] !== '' && $httpstep['posts'] !== []) {
+						if (($httpstep['posts'] !== '' && $httpstep['posts'] !== []) || $httpstep['required'] !== '') {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'posts', _('should be empty'))
+								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
 							);
 						}
 					}
@@ -1082,5 +1086,73 @@ class CHttpTest extends CApiService {
 			unset($httpstep);
 		}
 		unset($httptest);
+	}
+
+	/**
+	 * Convert string to HTTP pair array.
+	 *
+	 * @param string $data
+	 * @param string $delimiter
+	 *
+	 * @return mixed
+	 */
+	private function convertHTTPPairString($data, $delimiter) {
+		/* converts to pair array */
+		$pairs = array_values(array_filter(explode("\n", str_replace("\r", "\n", $data))));
+		foreach ($pairs as &$pair) {
+			$pair = explode($delimiter, $pair, 2);
+			$pair = [
+				'name' => $pair[0],
+				'value' => array_key_exists(1, $pair) ? $pair[1] : ''
+			];
+		}
+		unset($pair);
+
+		return $pairs;
+	}
+
+	/**
+	 * Convert headers and variables from string to HTTP pair array.
+	 * @deprecated conversion will be removed in future
+	 *
+	 * @param array  $httptests
+	 *
+	 * @return array
+	 */
+	private function convertHttpPairs($httptests) {
+		reset($httptests);
+
+		if (!is_int(key($httptests))) {
+			$httptests = [$httptests];
+		}
+
+		$fields = [
+			'headers' => ':',
+			'variables' => '='
+		];
+
+		foreach ($httptests as &$httptest) {
+			foreach ($fields as $field => $delimiter) {
+				if (is_array($httptest) && array_key_exists($field, $httptest) && is_string($httptest[$field])) {
+					$this->deprecated('using string format for field "'.$field.'" is deprecated.');
+					$httptest[$field] = $this->convertHTTPPairString($httptest[$field], $delimiter);
+				}
+			}
+
+			if (array_key_exists('steps', $httptest) && is_array($httptest['steps'])) {
+				foreach ($httptest['steps'] as &$step) {
+					foreach ($fields as $field => $delimiter) {
+						if (is_array($step) && array_key_exists($field, $step) && is_string($step[$field])) {
+							$this->deprecated('using string format for field "'.$field.'" is deprecated.');
+							$step[$field] = $this->convertHTTPPairString($step[$field], $delimiter);
+						}
+					}
+				}
+				unset($step);
+			}
+		}
+		unset($httptest);
+
+		return $httptests;
 	}
 }

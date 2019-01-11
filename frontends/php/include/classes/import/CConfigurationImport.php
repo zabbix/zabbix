@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1635,7 +1635,8 @@ class CConfigurationImport {
 	 * @return null
 	 */
 	protected function processImages() {
-		if (!$this->options['images']['updateExisting'] && !$this->options['images']['createMissing']) {
+		if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN
+				|| (!$this->options['images']['updateExisting'] && !$this->options['images']['createMissing'])) {
 			return;
 		}
 

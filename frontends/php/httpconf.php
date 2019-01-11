@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -225,6 +225,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$step['follow_redirects'] = $step['follow_redirects']
 				? HTTPTEST_STEP_FOLLOW_REDIRECTS_ON
 				: HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF;
+			$step['retrieve_mode'] = $step['retrieve_mode']
+				? HTTPTEST_STEP_RETRIEVE_MODE_HEADERS
+				: HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
 
 			foreach ($field_names as $field_name) {
 				$step[$field_name] = [];

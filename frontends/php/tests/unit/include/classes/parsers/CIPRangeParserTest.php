@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2018 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -422,42 +422,6 @@ class CIPRangeValidatorTest extends PHPUnit_Framework_TestCase {
 				'fe80:0:0:0:0:0:c0a8:0/129', [], [
 					'rc' => false,
 					'error' => 'invalid address range "fe80:0:0:0:0:0:c0a8:0/129"',
-					'max_ip_count' => '0',
-					'max_ip_range' => ''
-				]
-			],
-			[
-				'{HOST.HOST}', ['macros' => ['{HOST.HOST}']], [
-					'rc' => true,
-					'error' => '',
-					'max_ip_count' => '0',
-					'max_ip_range' => ''
-				]
-			],
-			[
-				'{HOST.HOST1}', ['macros' => ['{HOST.HOST}']], [
-					'rc' => false,
-					'error' => 'invalid address range "{HOST.HOST1}"',
-					'max_ip_count' => '0',
-					'max_ip_range' => ''
-				]
-			],
-			[
-				'0.0.0.0,{HOST.IP},{HOST.DNS},1.1.1.1-2.2.2.2,{HOST.CONN},fe80::c0a8:100,{HOST.HOST},{HOST.NAME},{$MACRO}', [
-					'usermacros' => true,
-					'macros' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.HOST}', '{HOST.NAME}']
-				],
-				[
-					'rc' => true,
-					'error' => '',
-					'max_ip_count' => '1',
-					'max_ip_range' => '0.0.0.0'
-				]
-			],
-			[
-				'{HOST.IP}', ['macros' => ['{HOST.DNS}']], [
-					'rc' => false,
-					'error' => 'invalid address range "{HOST.IP}"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
 				]
