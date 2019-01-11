@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,7 +117,6 @@ class CTask extends CApiService {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'type', 'hostid', 'status'],
 			'itemids' => $task['itemids'],
-			'templated' => false,
 			'editable' => true
 		]);
 
@@ -129,7 +128,6 @@ class CTask extends CApiService {
 			$discovery_rules = API::DiscoveryRule()->get([
 				'output' => ['itemid', 'type', 'hostid', 'status'],
 				'itemids' => $task['itemids'],
-				'templated' => false,
 				'editable' => true
 			]);
 
@@ -176,6 +174,7 @@ class CTask extends CApiService {
 		$hosts = API::Host()->get([
 			'output' => ['status'],
 			'hostids' => array_keys($hostids),
+			'templated_hosts' => true,
 			'nopermissions' => true
 		]);
 

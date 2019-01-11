@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,8 @@ class CControllerMediatypeCreate extends CController {
 			'maxsessions' =>			'db media_type.maxsessions',
 			'maxattempts' =>			'db media_type.maxattempts',
 			'attempt_interval' =>		'db media_type.attempt_interval',
-			'form_refresh' =>			'int32'
+			'form_refresh' =>			'int32',
+			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML
 		];
 
 		$ret = $this->validateInput($fields);
@@ -91,7 +92,7 @@ class CControllerMediatypeCreate extends CController {
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
 				$this->getInputs($mediatype, ['smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
-					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'passwd'
+					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'passwd', 'content_type'
 				]);
 
 				if ($this->hasInput('smtp_username')) {

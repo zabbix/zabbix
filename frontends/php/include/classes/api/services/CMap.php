@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1484,8 +1484,7 @@ class CMap extends CMapElement {
 			foreach ($map['selements'] as $selement) {
 				if (!$this->validateCircularReferenceRecursive($selement, $cref_mapids)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot add "%1$s" element of the map "%2$s" due to circular reference.',
-							$selement['label'], $map['name'])
+						_s('Cannot add map element of the map "%1$s" due to circular reference.', $map['name'])
 					);
 				}
 			}
@@ -2303,6 +2302,53 @@ class CMap extends CMapElement {
 			]);
 			$relation_map = $this->createRelationMap($selements, 'sysmapid', 'selementid');
 
+			if ($this->outputIsRequested('elements', $options['selectSelements']) && $selements) {
+				foreach ($selements as &$selement) {
+					$selement['elements'] = [];
+				}
+				unset($selement);
+
+				$selement_triggers = DBselect(
+					'SELECT st.selementid,st.triggerid,st.selement_triggerid'.
+					' FROM sysmap_element_trigger st,triggers tr'.
+					' WHERE '.dbConditionInt('st.selementid', array_keys($selements)).
+						' AND st.triggerid=tr.triggerid'.
+					' ORDER BY tr.priority DESC,st.selement_triggerid'
+				);
+				while ($selement_trigger = DBfetch($selement_triggers)) {
+					$selements[$selement_trigger['selementid']]['elements'][] = [
+						'triggerid' => $selement_trigger['triggerid']
+					];
+					if ($selements[$selement_trigger['selementid']]['elementid'] == 0) {
+						$selements[$selement_trigger['selementid']]['elementid'] = $selement_trigger['triggerid'];
+					}
+				}
+
+				$single_element_types = [SYSMAP_ELEMENT_TYPE_HOST, SYSMAP_ELEMENT_TYPE_MAP,
+					SYSMAP_ELEMENT_TYPE_HOST_GROUP
+				];
+
+				foreach ($selements as &$selement) {
+					if (in_array($selement['elementtype'], $single_element_types)) {
+						switch ($selement['elementtype']) {
+							case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+								$field = 'groupid';
+								break;
+
+							case SYSMAP_ELEMENT_TYPE_HOST:
+								$field = 'hostid';
+								break;
+
+							case SYSMAP_ELEMENT_TYPE_MAP:
+								$field = 'sysmapid';
+								break;
+						}
+						$selement['elements'][] = [$field => $selement['elementid']];
+					}
+				}
+				unset($selement);
+			}
+
 			// add selement URLs
 			if ($this->outputIsRequested('urls', $options['selectSelements'])) {
 				foreach ($selements as &$selement) {
@@ -2341,49 +2387,6 @@ class CMap extends CMapElement {
 						? $selementUrl
 						: $this->expandUrlMacro($selementUrl, $selements[$selementUrl['selementid']]);
 				}
-			}
-
-			if ($this->outputIsRequested('elements', $options['selectSelements']) && $selements) {
-				foreach ($selements as &$selement) {
-					$selement['elements'] = [];
-				}
-				unset($selement);
-
-				$selement_triggers = DBselect(
-					'SELECT st.selementid,st.triggerid'.
-					' FROM sysmap_element_trigger st'.
-					' WHERE '.dbConditionInt('st.selementid', array_keys($selements)).
-					' ORDER BY st.selement_triggerid'
-				);
-				while ($selement_trigger = DBfetch($selement_triggers)) {
-					$selements[$selement_trigger['selementid']]['elements'][] = [
-						'triggerid' => $selement_trigger['triggerid']
-					];
-				}
-
-				$single_element_types = [SYSMAP_ELEMENT_TYPE_HOST, SYSMAP_ELEMENT_TYPE_MAP,
-					SYSMAP_ELEMENT_TYPE_HOST_GROUP
-				];
-
-				foreach ($selements as &$selement) {
-					if (in_array($selement['elementtype'], $single_element_types)) {
-						switch ($selement['elementtype']) {
-							case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-								$field = 'groupid';
-								break;
-
-							case SYSMAP_ELEMENT_TYPE_HOST:
-								$field = 'hostid';
-								break;
-
-							case SYSMAP_ELEMENT_TYPE_MAP:
-								$field = 'sysmapid';
-								break;
-						}
-						$selement['elements'][] = [$field => $selement['elementid']];
-					}
-				}
-				unset($selement);
 			}
 
 			if ($this->outputIsRequested('permission', $options['selectSelements']) && $selements) {

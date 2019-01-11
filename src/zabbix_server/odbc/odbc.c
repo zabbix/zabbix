@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -611,8 +611,12 @@ int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, cha
 		{
 			char	*value = NULL;
 
-			value = zbx_strdup(value, row[i]);
-			zbx_replace_invalid_utf8(value);
+			if (NULL != row[i])
+			{
+				value = zbx_strdup(value, row[i]);
+				zbx_replace_invalid_utf8(value);
+			}
+
 			zbx_json_addstring(&json, macros.values[i], value, ZBX_JSON_TYPE_STRING);
 			zbx_free(value);
 		}
@@ -628,6 +632,7 @@ int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, cha
 
 	ret = SUCCEED;
 out:
+	zbx_vector_str_clear_ext(&macros, zbx_str_free);
 	zbx_vector_str_destroy(&macros);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

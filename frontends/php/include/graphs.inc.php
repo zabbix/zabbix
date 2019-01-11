@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ function getGraphDims($graphid = null) {
 		return $graphDims;
 	}
 
-	// zoom featers
+	// Select graph's type and height as well as which Y axes are used by graph items.
 	$dbGraphs = DBselect(
 		'SELECT MAX(g.graphtype) AS graphtype,MIN(gi.yaxisside) AS yaxissidel,MAX(gi.yaxisside) AS yaxissider,MAX(g.height) AS height'.
 		' FROM graphs g,graphs_items gi'.

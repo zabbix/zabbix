@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ $action_list->addItem([(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), get_
 $header['right']->addItem($action_list);
 
 // create filter
-$filter_form = new CFilter();
+$filter_form = new CFilter(new CUrl());
 $filter_tab = [];
 
 if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
@@ -208,9 +208,9 @@ else {
 		->setTitle($header['left'])
 		->setControls((new CTag('nav', true, $header['right']))->setAttribute('aria-label', _('Content controls')));
 
-	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST
-		&& in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-			$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
+	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST) {
+		$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to'],
+			$web_layout_mode != ZBX_LAYOUT_KIOSKMODE);
 	}
 
 	if ($data['action'] == HISTORY_BATCH_GRAPH) {
@@ -239,9 +239,8 @@ else {
 
 
 	if ($data['itemids']) {
-		if ($data['action'] !== HISTORY_LATEST
-			&& in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-				$historyWidget->addItem($filter_form);
+		if ($data['action'] !== HISTORY_LATEST) {
+			$historyWidget->addItem($filter_form);
 		}
 
 		$historyWidget->addItem($screen->get());
@@ -251,7 +250,7 @@ else {
 		}
 	}
 	else {
-		if ($filter_tab && in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+		if ($filter_tab) {
 			$historyWidget->addItem($filter_form);
 		}
 

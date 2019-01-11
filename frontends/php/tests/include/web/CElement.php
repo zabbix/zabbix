@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -200,6 +200,17 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function cast($class, $options = []) {
 		return new $class($this, array_merge($options, ['parent' => $this->parent, 'by' => $this->by]));
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getText() {
+		if (!$this->isVisible()) {
+			return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+		}
+
+		return parent::getText();
 	}
 
 	/**

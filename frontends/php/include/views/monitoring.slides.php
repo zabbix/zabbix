@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,16 +60,9 @@ $favourite_icon = get_icon('favourite', [
 
 $refresh_icon = get_icon('screenconf');
 
-if ($this->data['screen']) {
-	$refresh_icon->setMenuPopup(CMenuPopupHelper::getRefresh(
-		WIDGET_SLIDESHOW,
-		'x'.$this->data['refreshMultiplier'],
-		true,
-		[
-			'elementid' => $this->data['elementId']
-		]
-	));
-}
+$refresh_icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SLIDESHOW, 'x'.$this->data['refreshMultiplier'], true,
+	['elementid' => $this->data['elementId']]
+));
 
 if (isset($this->data['isDynamicItems'])) {
 	$controls->addItem([
@@ -102,18 +95,18 @@ $widget->setControls((new CList([
 		->setAttribute('aria-label', _('Content controls'))
 ])));
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-	$widget->addItem((new CFilter())
-		->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
-		->setActiveTab($data['active_tab'])
-		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
+$widget
+	->addItem(
+		(new CFilter(new CUrl()))
+			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+			->setActiveTab($data['active_tab'])
+			->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
+				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
+	)
+	->addItem(
+		(new CDiv((new CDiv())->addClass('preloader')))
+			->setId(WIDGET_SLIDESHOW)
 	);
-}
-
-$widget->addItem(
-	(new CDiv((new CDiv())->addClass('preloader')))
-		->setId(WIDGET_SLIDESHOW)
-);
 
 require_once dirname(__FILE__).'/js/monitoring.slides.js.php';
 

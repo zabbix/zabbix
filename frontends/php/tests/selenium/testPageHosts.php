@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class testPageHosts extends CLegacyWebTest {
 				' LEFT JOIN hstgrp g'.
 					' ON g.groupid=hg.groupid'.
 			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-			" AND h.name NOT LIKE '%{#%'"
+			" AND NOT h.flags = 2"
 		);
 	}
 
@@ -48,6 +48,10 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextPresent('Simple form test host');
 		$this->zbxTestTextNotPresent('ZBX6648 All Triggers Host');
+
+		// Check that proxy field is disabled.
+		$this->zbxTestAssertElementNotPresentId('filter_proxyids__ms');
+		$this->zbxTestAssertElementPresentXpath('//div[@id="filter_proxyids_"]/..//button[@disabled]');
 
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Name']");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Applications')]");
@@ -145,7 +149,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Hosts disabled');
 
 		$sql = "select * from hosts where status=".HOST_STATUS_MONITORED.
-			" and name NOT LIKE '%{#%'";
+			" and NOT flags = 2";
 		$this->assertEquals(0, CDBHelper::getCount($sql), "Chuck Norris: all hosts disabled but DB does not match");
 	}
 
@@ -210,7 +214,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Hosts enabled');
 
 		$sql = "select host from hosts where status=".HOST_STATUS_NOT_MONITORED.
-			" and name NOT LIKE '%{#%'";
+			" and NOT flags = 2";
 		$this->assertEquals(0, CDBHelper::getCount($sql), "Chuck Norris: all hosts activated but DB does not match");
 	}
 
@@ -221,6 +225,38 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+	}
+
+	public function testPageHosts_FilterByTemplates() {
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestClickButtonMultiselect('filter_templates_');
+		$this->zbxTestLaunchOverlayDialog('Templates');
+		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//select/option[text()="Templates"]');
+		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//a[text()="Form test template"]');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Simple form test host']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+	}
+
+	public function testPageHosts_FilterByProxy() {
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestClickXpathWait('//label[text()="Proxy"]');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_2 with proxy']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
+		$this->zbxTestClickButtonMultiselect('filter_proxyids_');
+		$this->zbxTestLaunchOverlayDialog('Proxies');
+		$this->zbxTestClickLinkTextWait('Proxy_1 for filter');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}
 
 	public function testPageHosts_FilterNone() {
@@ -236,6 +272,7 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByAllFields() {
 		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestDropdownSelectWait('groupid', $this->HostGroup);
 		$this->zbxTestInputTypeOverwrite('filter_host', $this->HostName);
 		$this->zbxTestInputTypeOverwrite('filter_ip', $this->HostIp);

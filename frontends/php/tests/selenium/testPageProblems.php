@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -390,13 +390,13 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Host for suppression');
 		$this->zbxTestClickButtonText('Apply');
 
-		$this->zbxTestTextNotPresent('Trigger for suppression');
+		$this->zbxTestTextNotPresent('Trigger_for_suppression');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 0 of 0 found');
 
 		$this->zbxTestCheckboxSelect('filter_show_suppressed');
 		$this->zbxTestClickButtonText('Apply');
 
-		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Trigger for suppression');
+		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Trigger_for_suppression');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'SupTag: A');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 

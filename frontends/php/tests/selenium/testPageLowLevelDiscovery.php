@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageDiscoveryRules extends CLegacyWebTest {
+class testPageLowLevelDiscovery extends CLegacyWebTest {
 
 	// Returns all Discovery Rules
 	public static function data() {
@@ -36,7 +36,7 @@ class testPageDiscoveryRules extends CLegacyWebTest {
 	/**
 	* @dataProvider data
 	*/
-	public function testPageDiscoveryRules_CheckLayout($data) {
+	public function testPageLowLevelDiscovery_CheckLayout($data) {
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckHeader('Discovery rules');
@@ -85,13 +85,19 @@ class testPageDiscoveryRules extends CLegacyWebTest {
 	/**
 	 * @dataProvider data
 	 */
-	public function testPageDiscoveryRules_CheckNowAll($data) {
+	public function testPageLowLevelDiscovery_CheckNowAll($data) {
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
 		$this->zbxTestCheckHeader('Discovery rules');
 
 		$this->zbxTestClick('all_items');
 		$this->zbxTestClickButtonText('Check now');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+		if ($data['status'] == HOST_STATUS_TEMPLATE) {
+			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot send request');
+			$this->zbxTestTextPresentInMessageDetails('Cannot send request: host is not monitored.');
+		}
+		else {
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+		}
 		$this->zbxTestCheckFatalErrors();
 	}
 
@@ -99,7 +105,7 @@ class testPageDiscoveryRules extends CLegacyWebTest {
 	 * @dataProvider data
 	 * @backup-once triggers
 	 */
-	public function testPageDiscoveryRules_SimpleDelete($data) {
+	public function testPageLowLevelDiscovery_SimpleDelete($data) {
 		$itemid = $data['itemid'];
 
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
@@ -132,7 +138,7 @@ class testPageDiscoveryRules extends CLegacyWebTest {
 	 * @dataProvider rule
 	 * @backup-once triggers
 	 */
-	public function testPageDiscoveryRules_MassDelete($rule) {
+	public function testPageLowLevelDiscovery_MassDelete($rule) {
 		$hostids = CDBHelper::getAll(
 			'SELECT hostid'.
 			' FROM items'.

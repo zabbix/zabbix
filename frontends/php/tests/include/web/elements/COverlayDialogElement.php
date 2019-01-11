@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ class COverlayDialogElement extends CElement {
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('class:overlay-dialogue-body')->one();
+		return $this->query('class:overlay-dialogue-body')->waitUntilPresent()->one();
 	}
 
 	/**

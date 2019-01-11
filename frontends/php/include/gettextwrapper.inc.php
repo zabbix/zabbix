@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,9 +92,8 @@ function npgettext($context, $msgId, $msgIdPlural, $num) {
  * Translates the string and substitutes the placeholders with the given parameters.
  * Placeholders must be defined as %1$s, %2$s etc.
  *
- * @param string $string
- * @param string $param			parameter to be replace the first placeholder
- * @param string $param,...		unlimited number of optional parameters
+ * @param string $string         String optionally containing placeholders to substitute.
+ * @param string $param,...      Unlimited number of optional parameters to replace sequential placeholders.
  *
  * @return string
  */
@@ -152,10 +151,9 @@ function _x($message, $context) {
  * Example: _xs('Message for arg1 "%1$s" and arg2 "%2$s"', 'context', 'arg1Value', 'arg2Value');
  * returns: 'Message for arg1 "arg1Value" and arg2 "arg2Value"'
  *
- * @param string $message		string to translate
- * @param string $context		context of the string
- * @param string $param			parameter to be replace the first placeholder
- * @param string $param,... 	unlimited number of optional parameters
+ * @param string $message       String to translate.
+ * @param string $context       Context of the string.
+ * @param string $param,...     Unlimited number of optional parameters to replace sequential placeholders.
  *
  * @return string
  */
@@ -175,12 +173,11 @@ function _xs($message, $context) {
  * Example: _xn('%1$s message for arg1 "%2$s"', '%1$s messages for arg1 "%2$s"', 3, 'context', 'arg1Value');
  * returns: '3 messages for arg1 "arg1Value"'
  *
- * @param string $message			string to translate
- * @param string $messagePlural		string to translate for plural form
- * @param int    $num				number to determine usage of plural form, also is used as first replace argument
- * @param string $context			context of the string
- * @param string $param				parameter to be replace the first placeholder
- * @param string $param,...			unlimited number of optional parameters
+ * @param string $message           String to translate.
+ * @param string $messagePlural     String to translate for plural form.
+ * @param int    $num               Number to determine usage of plural form, also is used as first replace argument.
+ * @param string $context           Context of the string.
+ * @param string $param,...         Unlimited number of optional parameters to replace sequential placeholders.
  *
  * @return string
  */

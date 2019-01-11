@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,38 +54,39 @@ class CDiscoveryRule extends CItemGeneral {
 		];
 
 		$defOptions = [
-			'groupids'					=> null,
-			'templateids'				=> null,
-			'hostids'					=> null,
-			'itemids'					=> null,
-			'interfaceids'				=> null,
-			'inherited'					=> null,
-			'templated'					=> null,
-			'monitored'					=> null,
-			'editable'					=> false,
-			'nopermissions'				=> null,
+			'groupids'						=> null,
+			'templateids'					=> null,
+			'hostids'						=> null,
+			'itemids'						=> null,
+			'interfaceids'					=> null,
+			'inherited'						=> null,
+			'templated'						=> null,
+			'monitored'						=> null,
+			'editable'						=> false,
+			'nopermissions'					=> null,
 			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> false,
-			'excludeSearch'				=> false,
-			'searchWildcardsEnabled'	=> null,
+			'filter'						=> null,
+			'search'						=> null,
+			'searchByAny'					=> null,
+			'startSearch'					=> false,
+			'excludeSearch'					=> false,
+			'searchWildcardsEnabled'		=> null,
 			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'selectHosts'				=> null,
-			'selectItems'				=> null,
-			'selectTriggers'			=> null,
-			'selectGraphs'				=> null,
-			'selectHostPrototypes'		=> null,
-			'selectFilter'				=> null,
-			'countOutput'				=> false,
-			'groupCount'				=> false,
-			'preservekeys'				=> false,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null,
-			'limitSelects'				=> null
+			'output'						=> API_OUTPUT_EXTEND,
+			'selectHosts'					=> null,
+			'selectItems'					=> null,
+			'selectTriggers'				=> null,
+			'selectGraphs'					=> null,
+			'selectHostPrototypes'			=> null,
+			'selectApplicationPrototypes'	=> null,
+			'selectFilter'					=> null,
+			'countOutput'					=> false,
+			'groupCount'					=> false,
+			'preservekeys'					=> false,
+			'sortfield'						=> '',
+			'sortorder'						=> '',
+			'limit'							=> null,
+			'limitSelects'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
@@ -517,10 +518,8 @@ class CDiscoveryRule extends CItemGeneral {
 		while ($item = DBfetch($dbItems)) {
 			$iprototypeids[$item['itemid']] = $item['itemid'];
 		}
-		if (!empty($iprototypeids)) {
-			if (!API::ItemPrototype()->delete($iprototypeids, true)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete discovery rule'));
-			}
+		if ($iprototypeids) {
+			CItemPrototypeManager::delete($iprototypeids);
 		}
 
 		// delete host prototypes
@@ -679,13 +678,12 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @throws APIException if trigger saving fails
 	 *
 	 * @param array $srcDiscovery    The source discovery rule to copy from
-	 * @param array $dstDiscovery    The target discovery rule to copy to
 	 * @param array $srcHost         The host the source discovery belongs to
 	 * @param array $dstHost         The host the target discovery belongs to
 	 *
 	 * @return array
 	 */
-	protected function copyTriggerPrototypes(array $srcDiscovery, array $dstDiscovery, array $srcHost, array $dstHost) {
+	protected function copyTriggerPrototypes(array $srcDiscovery, array $srcHost, array $dstHost) {
 		$srcTriggers = API::TriggerPrototype()->get([
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
@@ -700,15 +698,15 @@ class CDiscoveryRule extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		if (!$srcTriggers) {
-			return [];
-		}
-
 		foreach ($srcTriggers as $id => $trigger) {
 			// Skip trigger prototypes with web items and remove them from source.
 			if (httpItemExists($trigger['items'])) {
 				unset($srcTriggers[$id]);
 			}
+		}
+
+		if (!$srcTriggers) {
+			return [];
 		}
 
 		/*
@@ -743,7 +741,7 @@ class CDiscoveryRule extends CItemGeneral {
 			['sources' => ['expression', 'recovery_expression']]
 		);
 		foreach ($dstTriggers as $id => &$trigger) {
-			unset($dstTriggers[$id]['triggerid'], $dstTriggers[$id]['templateid']);
+			unset($trigger['triggerid'], $trigger['templateid']);
 
 			// Update the destination expressions.
 			$trigger['expression'] = triggerExpressionReplaceHost($trigger['expression'], $srcHost['host'],
@@ -845,15 +843,13 @@ class CDiscoveryRule extends CItemGeneral {
 									$new_trigger_prototype['src_host'],
 									$new_trigger_prototype['new_host']
 								);
-								error(_s(
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 									'Cannot add dependency from trigger "%1$s:%2$s" to non existing trigger "%3$s:%4$s".',
 									$trigger_prototype['description'],
 									$trigger_prototype['expression'],
 									$dep_triggers[$dep_triggerid]['description'],
 									$expr2
 								));
-
-								return false;
 							}
 						}
 					}
@@ -1269,39 +1265,33 @@ class CDiscoveryRule extends CItemGeneral {
 		$dstDiscovery['itemid'] = $newDiscovery['itemids'][0];
 
 		// copy prototypes
-		$newPrototypes = $this->copyItemPrototypes($srcDiscovery, $dstDiscovery, $dstHost);
+		$new_prototypeids = $this->copyItemPrototypes($srcDiscovery, $dstDiscovery, $dstHost);
 
 		// if there were prototypes defined, clone everything else
-		if ($newPrototypes) {
+		if ($new_prototypeids) {
 			// fetch new prototypes
-			$newPrototypes = API::ItemPrototype()->get([
-				'itemids' => $newPrototypes['itemids'],
-				'output' => API_OUTPUT_EXTEND,
+			$dstDiscovery['items'] = API::ItemPrototype()->get([
+				'output' => ['itemid', 'key_'],
+				'itemids' => $new_prototypeids,
 				'preservekeys' => true
 			]);
-
-			foreach ($newPrototypes as $i => $newPrototype) {
-				unset($newPrototypes[$i]['templateid']);
-			}
-
-			$dstDiscovery['items'] = $newPrototypes;
 
 			// copy graphs
 			$this->copyGraphPrototypes($srcDiscovery, $dstDiscovery);
 
 			// copy triggers
-			$this->copyTriggerPrototypes($srcDiscovery, $dstDiscovery, $srcHost, $dstHost);
+			$this->copyTriggerPrototypes($srcDiscovery, $srcHost, $dstHost);
 		}
 
 		// copy host prototypes
-		$this->copyHostPrototypes($srcDiscovery, $dstDiscovery);
+		$this->copyHostPrototypes($discoveryid, $dstDiscovery);
 
 		return true;
 	}
 
 	/**
 	 * Copies all of the item prototypes from the source discovery to the target
-	 * discovery rule.
+	 * discovery rule. Return array of created item prototype ids.
 	 *
 	 * @throws APIException if prototype saving fails
 	 *
@@ -1324,10 +1314,13 @@ class CDiscoveryRule extends CItemGeneral {
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
-			'selectPreprocessing' => ['type', 'params'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'discoveryids' => $srcDiscovery['itemid'],
 			'preservekeys' => true
 		]);
+		$new_itemids = [];
+		$itemkey_to_id = [];
+		$create_items = [];
 
 		if ($item_prototypes) {
 			$create_order = [];
@@ -1389,8 +1382,6 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 			asort($create_order);
 
-			$itemkey_to_id = [];
-			$create_items = [];
 			$current_dependency = reset($create_order);
 
 			foreach ($create_order as $key => $dependency_level) {
@@ -1401,7 +1392,9 @@ class CDiscoveryRule extends CItemGeneral {
 					if (!$created_itemids) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone item prototypes.'));
 					}
+
 					$created_itemids = $created_itemids['itemids'];
+					$new_itemids = array_merge($new_itemids, $created_itemids);
 
 					foreach ($create_items as $index => $created_item) {
 						$itemkey_to_id[$created_item['key_']] = $created_itemids[$index];
@@ -1467,12 +1460,18 @@ class CDiscoveryRule extends CItemGeneral {
 				$create_items[] = $item_prototype;
 			}
 
-			if ($create_items && !API::ItemPrototype()->create($create_items)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone item prototypes.'));
+			if ($create_items) {
+				$created_itemids = API::ItemPrototype()->create($create_items);
+
+				if (!$created_itemids) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone item prototypes.'));
+				}
+
+				$new_itemids = array_merge($new_itemids, $created_itemids['itemids']);
 			}
 		}
 
-		return true;
+		return $new_itemids;
 	}
 
 	/**
@@ -1596,16 +1595,16 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Copies all of the host prototypes from the source discovery to the target
 	 * discovery rule.
 	 *
-	 * @throws APIException if prototype saving fails
+	 * @throws APIException if prototype saving fails.
 	 *
-	 * @param array $srcDiscovery   The source discovery rule to copy from
-	 * @param array $dstDiscovery   The target discovery rule to copy to
+	 * @param int   $srcid          The source discovery rule id to copy from.
+	 * @param array $dstDiscovery   The target discovery rule to copy to.
 	 *
 	 * @return array
 	 */
-	protected function copyHostPrototypes(array $srcDiscovery, array $dstDiscovery) {
+	protected function copyHostPrototypes($srcid, array $dstDiscovery) {
 		$prototypes = API::HostPrototype()->get([
-			'discoveryids' => $srcDiscovery['itemid'],
+			'discoveryids' => $srcid,
 			'output' => ['host', 'name', 'status'],
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
@@ -1793,6 +1792,24 @@ class CDiscoveryRule extends CItemGeneral {
 					$result[$itemid]['hostPrototypes'] = isset($hostPrototypes[$itemid]) ? $hostPrototypes[$itemid]['rowscount'] : 0;
 				}
 			}
+		}
+
+		if ($options['selectApplicationPrototypes'] !== null
+				&& $options['selectApplicationPrototypes'] != API_OUTPUT_COUNT) {
+			$relation_map = $this->createRelationMap($result, 'itemid', 'application_prototypeid',
+				'application_prototype'
+			);
+
+			$application_prototypes = API::getApiService()->select('application_prototype', [
+				'output' => $options['selectApplicationPrototypes'],
+				'filter' => ['application_prototypeid' => $relation_map->getRelatedIds()],
+				'limit' => $options['limitSelects'],
+				'preservekeys' => true
+			]);
+
+			$result = $relation_map->mapMany($result, $application_prototypes, 'applicationPrototypes',
+				$options['limitSelects']
+			);
 		}
 
 		if ($options['selectFilter'] !== null) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,19 +34,19 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 			[
 				[
 					'type' => 'Email',
-					'smtp_server' => 'localhost',
+					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'localhost',
-					'smtp_email' => 'zabbix@localhost'
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com'
 				]
 			],
 			[
 				[
 					'type' => 'Email',
-					'smtp_server' => 'localhost',
+					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'localhost',
-					'smtp_email' => 'zabbix@localhost',
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com',
 					'smtp_security' => 'STARTTLS',
 					'smtp_authentication' => 'Username and password'
 				]
@@ -54,11 +54,21 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 			[
 				[
 					'type' => 'Email',
-					'smtp_server' => 'localhost',
+					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'localhost',
-					'smtp_email' => 'zabbix@localhost',
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com',
 					'smtp_security' => 'SSL/TLS'
+				]
+			],
+			[
+				[
+					'type' => 'Email',
+					'smtp_server' => 'mail.example.com',
+					'smtp_port' => 25,
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com',
+					'message_format' => 'Plain text'
 				]
 			],
 			[
@@ -83,7 +93,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'type' => 'Ez Texting',
 					'eztext_limit' => 'USA (160 characters)',
 				]
-			],
+			]
 		];
 	}
 
@@ -99,7 +109,8 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$this->zbxTestCheckHeader('Media types');
-		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email', 'Connection security', 'Authentication']);
+		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email',
+			'Connection security', 'Authentication', 'Message format']);
 
 		$this->zbxTestAssertElementPresentId('description');
 		$this->zbxTestAssertAttribute("//input[@id='description']", "maxlength", 100);
@@ -170,6 +181,14 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					$this->assertTrue($this->zbxTestCheckboxSelected('smtp_authentication_0'));
 					$this->zbxTestAssertNotVisibleId('smtp_username');
 					$this->zbxTestAssertNotVisibleId('passwd');
+				}
+
+				if (array_key_exists('message_format', $data)) {
+					$this->zbxTestClickXpath("//label[text()='".$data['message_format']."']");
+					$this->assertTrue($this->zbxTestCheckboxSelected('content_type_1'));
+				}
+				else {
+					$this->assertTrue($this->zbxTestCheckboxSelected('content_type_0'));
 				}
 				break;
 			case 'Script':
@@ -242,10 +261,11 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 	}
 
 	public static function newMediaTypes() {
-		$data=[
+		$data = [
 			[
 				'Email', ['Description' => 'Email2', 'SMTP server' => 'mail.zabbix.com',
-						'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix@zabbix.com']
+						'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix@zabbix.com',
+						'message_format' => 'Plain text']
 			],
 			[
 				'Email', ['Description' => 'Email3', 'SMTP server' => 'mail2.zabbix.com',
@@ -287,6 +307,9 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 				$this->zbxTestInputType('smtp_server', $data['SMTP server']);
 				$this->zbxTestInputType('smtp_helo', $data['SMTP helo']);
 				$this->zbxTestInputType('smtp_email', $data['SMTP email']);
+				if (array_key_exists('message_format', $data)) {
+					$this->zbxTestClickXpath("//label[text()='".$data['message_format']."']");
+				}
 				break;
 			case 'Script':
 				$this->zbxTestDropdownSelectWait('type', $type);
@@ -562,6 +585,8 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 	}
 
 	/**
+	 * Test media type creation with properties from tab "Options".
+	 *
 	 * @dataProvider create_options
 	 */
 	public function testFormAdministrationMediaTypes_CreateWithOptions($data) {
