@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ $options = [
 	'page' => $data['page'],
 	'data' => [
 		'action' => $data['action'],
-		'fullscreen' => $data['fullscreen'],
 		'sort' => $data['sort'],
 		'sortorder' => $data['sortorder'],
 		'page' => $data['page'],
@@ -49,7 +48,8 @@ $options = [
 			'compact_view' => $data['filter']['compact_view'],
 			'show_timeline' => $data['filter']['show_timeline'],
 			'details' => $data['filter']['details'],
-			'highlight_row' => $data['filter']['highlight_row']
+			'highlight_row' => $data['filter']['highlight_row'],
+			'show_latest_values' => $data['filter']['show_latest_values']
 		]
 	]
 ];
@@ -78,6 +78,7 @@ if ($data['action'] == 'problem.view') {
 	$this->addJsFile('gtlc.js');
 	$this->addJsFile('flickerfreescreen.js');
 	$this->addJsFile('multiselect.js');
+	$this->addJsFile('layout.mode.js');
 	require_once dirname(__FILE__).'/monitoring.problem.view.js.php';
 
 	if ($data['uncheck']) {
@@ -102,7 +103,9 @@ if ($data['action'] == 'problem.view') {
 						'srctbl' => 'host_groups',
 						'srcfld1' => 'groupid',
 						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'filter_groupids_'
+						'dstfld1' => 'filter_groupids_',
+						'real_hosts' => true,
+						'enrich_parent_groups' => true
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -234,8 +237,8 @@ if ($data['action'] == 'problem.view') {
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
-				->addValue(_('Like'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
 				->setModern(true),
 			(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))
@@ -316,13 +319,17 @@ if ($data['action'] == 'problem.view') {
 			]))
 				->addClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
 				->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+		])
+		->addRow(_('Show latest values'), [
+			(new CCheckBox('filter_show_latest_values'))
+				->setChecked($data['filter']['show_latest_values'] == 1)
+				->setEnabled($data['filter']['compact_view'] == 0)
 		]);
 
-	$filter = (new CFilter())
+	$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'problem.view')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'problem.view'))->removeId())
-		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())
 		->addFormItem((new CVar('page', $data['page']))->removeId());
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
@@ -331,13 +338,15 @@ if ($data['action'] == 'problem.view') {
 
 	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
-	(new CWidget())
+	$web_layout_mode = CView::getLayoutMode();
+
+	$widget = (new CWidget())
 		->setTitle(_('Problems'))
+		->setWebLayoutMode($web_layout_mode)
 		->setControls((new CTag('nav', true,
 			(new CForm('get'))
 				->cleanItems()
 				->addVar('action', 'problem.view')
-				->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 				->addVar('page', $data['page'])
 				->addItem((new CList())
 					->addItem(new CRedirectButton(_('Export to CSV'),
@@ -345,12 +354,17 @@ if ($data['action'] == 'problem.view') {
 							->setArgument('action', 'problem.view.csv')
 							->setArgument('page',  $data['page'])
 					))
-					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+					->addItem(get_icon('fullscreen'))
 				)
 			))
 				->setAttribute('aria-label', _('Content controls'))
-		)
-		->addItem($filter)
+		);
+
+	if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+		$widget->addItem($filter);
+	}
+
+	$widget
 		->addItem($screen->get())
 		->show();
 

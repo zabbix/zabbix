@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1085,7 +1085,7 @@ static int	DBpatch_3010026(void)
 		}
 
 		zbx_free(formula);
-		zbx_vector_str_clear_ext(&filter, zbx_ptr_free);
+		zbx_vector_str_clear_ext(&filter, zbx_str_free);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			goto out;

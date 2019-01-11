@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@
 
 class CControllerDiscoveryView extends CController {
 
-	private $sysmapid;
-
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -31,8 +29,7 @@ class CControllerDiscoveryView extends CController {
 		$fields = [
 			'druleid' =>	'db drules.druleid',
 			'sort' =>		'in ip',
-			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'fullscreen' =>	'in 0,1'
+			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
 		];
 
 		$ret = $this->validateInput($fields);
@@ -74,7 +71,6 @@ class CControllerDiscoveryView extends CController {
 		 * Display
 		 */
 		$data = [
-			'fullscreen' => $this->getInput('fullscreen', 0),
 			'druleid' => $this->getInput('druleid', 0),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder
@@ -84,6 +80,8 @@ class CControllerDiscoveryView extends CController {
 			'drules' => ['filter' => ['status' => DRULE_STATUS_ACTIVE]],
 			'druleid' => $data['druleid']
 		]);
+
+		CView::$has_web_layout_mode = true;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Status of discovery'));

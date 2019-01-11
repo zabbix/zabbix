@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 $hostInventoryWidget = (new CWidget())
 	->setTitle(_('Host inventory'))
@@ -41,7 +42,7 @@ foreach ($inventoryFields as $inventoryField) {
 
 // filter
 $hostInventoryWidget->addItem(
-	(new CFilter())
+	(new CFilter(new CUrl('hostinventories.php')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
@@ -49,8 +50,8 @@ $hostInventoryWidget->addItem(
 				$inventoryFieldsComboBox,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				new CComboBox('filter_exact', $this->data['filterExact'], null, [
-					0 => _('like'),
-					1 => _('exactly')
+					0 => _('contains'),
+					1 => _('equals')
 				]),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CTextBox('filter_field_value', $this->data['filterFieldValue']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)

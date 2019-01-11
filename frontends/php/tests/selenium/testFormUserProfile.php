@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,38 +18,38 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testFormUserProfile extends CWebTest {
+class testFormUserProfile extends CLegacyWebTest {
 
 	public function testFormProfile_SimpleUpdate() {
 		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,type,theme,attempt_failed,attempt_clock,rows_per_page'
 				. ' from users order by userid';
-		$oldHashUsers = DBhash($sqlHashUsers);
+		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 
 		$this->zbxTestCheckTitle('User profile');
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 
-		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
+		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 	}
 
 	public function testFormProfile_Cancel() {
 		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,type,theme,attempt_failed,attempt_clock,rows_per_page'
 				. ' from users order by userid';
-		$oldHashUsers = DBhash($sqlHashUsers);
+		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
 		$this->zbxTestInputTypeOverwrite('refresh', '60');
 
 		$this->zbxTestClickWait('cancel');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 
-		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
+		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 	}
 
 	public static function passwords() {
@@ -90,7 +90,7 @@ class testFormUserProfile extends CWebTest {
 	 */
 	public function testFormProfile_PasswordChange($data) {
 		$sqlHashUsers = 'select * from users order by userid';
-		$oldHashUsers = DBhash($sqlHashUsers);
+		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 
@@ -102,32 +102,32 @@ class testFormUserProfile extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestCheckHeader('Dashboard');
+				$this->zbxTestCheckHeader('Global view');
 				$row = DBfetch(DBselect("select passwd from users where alias='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals(md5($data['password1']), $row['passwd']);
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , $data['error_msg']);
 				$this->zbxTestCheckTitle('User profile');
-				$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
+				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 				break;
 		}
 	}
 
 	public function testFormProfile_ThemeChange() {
 		$sqlHashUsers = "select * from users where alias<>'".PHPUNIT_LOGIN_NAME."' order by userid";
-		$oldHashUsers = DBhash($sqlHashUsers);
+		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 
 		$this->zbxTestDropdownSelect('theme', 'Blue');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 
 		$row = DBfetch(DBselect("select theme from users where alias='".PHPUNIT_LOGIN_NAME."'"));
 		$this->assertEquals('blue-theme', $row['theme']);
 
-		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
+		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 	}
 
 	public static function refresh() {
@@ -203,7 +203,7 @@ class testFormUserProfile extends CWebTest {
 	 */
 	public function testFormProfile_RefreshTime($data) {
 		$sqlHashUsers = 'select * from users order by userid';
-		$oldHashUsers = DBhash($sqlHashUsers);
+		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 
@@ -212,7 +212,7 @@ class testFormUserProfile extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestCheckHeader('Dashboard');
+				$this->zbxTestCheckHeader('Global view');
 				$row = DBfetch(DBselect("select refresh from users where alias='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals($data['refresh'] , $row['refresh']);
 				$this->zbxTestCheckFatalErrors();
@@ -222,7 +222,7 @@ class testFormUserProfile extends CWebTest {
 				$this->zbxTestTextPresent($data['error_msg']);
 				$this->zbxTestCheckFatalErrors();
 				$this->zbxTestCheckTitle('User profile');
-				$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
+				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 				break;
 		}
 	}
@@ -312,7 +312,7 @@ class testFormUserProfile extends CWebTest {
 	 */
 	public function testFormProfile_AutologoutTime($data) {
 		$sqlHashUsers = 'select * from users order by userid';
-		$oldHashUsers = DBhash($sqlHashUsers);
+		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 
@@ -322,7 +322,7 @@ class testFormUserProfile extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestCheckHeader('Dashboard');
+				$this->zbxTestCheckHeader('Global view');
 				$this->zbxTestCheckFatalErrors();
 				$row = DBfetch(DBselect("select autologout from users where alias='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals($data['autologout'] , $row['autologout']);
@@ -332,7 +332,7 @@ class testFormUserProfile extends CWebTest {
 				$this->zbxTestTextPresent($data['error_msg']);
 				$this->zbxTestCheckFatalErrors();
 				$this->zbxTestCheckTitle('User profile');
-				$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
+				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 				break;
 		}
 	}
@@ -412,11 +412,13 @@ class testFormUserProfile extends CWebTest {
 			]],
 			[[
 				'expected' => TEST_GOOD,
-				'timeout' => '1m'
+				'timeout' => '1m',
+				'suppressed' => true
 			]],
 			[[
 				'expected' => TEST_GOOD,
-				'timeout' => '1d'
+				'timeout' => '1d',
+				'suppressed' => false
 			]],
 			[[
 				'expected' => TEST_GOOD
@@ -439,6 +441,7 @@ class testFormUserProfile extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='start'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='stop'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_show_suppressed'][@disabled]");
 		}
 
 		if (array_key_exists('timeout', $data)) {
@@ -449,6 +452,7 @@ class testFormUserProfile extends CWebTest {
 			$this->zbxTestAssertElementNotPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
 			$this->zbxTestAssertElementNotPresentXpath("//button[@name='start'][@disabled]");
 			$this->zbxTestAssertElementNotPresentXpath("//button[@name='stop'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//input[@id='messages_show_suppressed'][@disabled]");
 		}
 		else {
 			$this->zbxTestCheckboxSelect('messages_enabled', false);
@@ -458,13 +462,18 @@ class testFormUserProfile extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='start'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='stop'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_show_suppressed'][@disabled]");
+		}
+
+		if (array_key_exists('suppressed', $data)) {
+			$this->zbxTestCheckboxSelect('messages_show_suppressed', $data['suppressed']);
 		}
 
 		$this->zbxTestClickWait('update');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestCheckHeader('Dashboard');
+				$this->zbxTestCheckHeader('Global view');
 				$this->zbxTestCheckFatalErrors();
 				break;
 			case TEST_BAD:
@@ -555,8 +564,7 @@ class testFormUserProfile extends CWebTest {
 		}
 
 		if (array_key_exists('period', $data)) {
-			$this->webDriver->findElement(WebDriverBy::xpath('//div[@class="overlay-dialogue-body"]//input[@id="period"]'))->clear();
-			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="period"]', $data['period']);
+			$this->zbxTestInputClearAndTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="period"]', $data['period']);
 		}
 
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
@@ -566,10 +574,10 @@ class testFormUserProfile extends CWebTest {
 				$this->zbxTestWaitForPageToLoad();
 				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_bg']"));
 				$this->zbxTestClickWait('update');
-				$this->zbxTestCheckHeader('Dashboard');
+				$this->zbxTestCheckHeader('Global view');
 				$this->zbxTestCheckFatalErrors();
 				$sql = "SELECT * FROM media WHERE sendto = '".$data['send_to']."'";
-				$this->assertEquals(1, DBcount($sql));
+				$this->assertEquals(1, CDBHelper::getCount($sql));
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='overlay-dialogue-body']//div[@class='msg-details']"));

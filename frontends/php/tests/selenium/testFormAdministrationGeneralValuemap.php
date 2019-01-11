@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testFormAdministrationGeneralValuemap extends CWebTest {
+class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 		private $valuemapWithMultipleMappings = '1valuemapWithMultipleMappings1';
 
 	public function testFormAdministrationGeneralValuemap_Layout() {
@@ -94,15 +94,15 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 
 		// checking that valuemap with such name has been created in the DB
 		$sqlValuemap = 'SELECT * FROM valuemaps WHERE name ='.zbx_dbstr($mapname);
-		$this->assertEquals(1, DBcount($sqlValuemap), 'Chuck Norris: Value map with such name has not been created in the DB');
+		$this->assertEquals(1, CDBHelper::getCount($sqlValuemap), 'Chuck Norris: Value map with such name has not been created in the DB');
 		$valuemap = DBfetch(DBselect($sqlValuemap));
 
 		// checking that mappings for this valuemap has been created in the DB
 		$sqlMappingid = 'SELECT mappingid FROM mappings WHERE valuemapid=\''.$valuemap['valuemapid'].'\'';
-		$result2 = DBcount($sqlMappingid);
+		$result2 = CDBHelper::getCount($sqlMappingid);
 
 		$sqlMappings = 'SELECT count(mappingid) FROM mappings WHERE valuemapid=\''.$valuemap['valuemapid'].'\'';
-		$mappings_amount = DBcount($sqlMappings);
+		$mappings_amount = CDBHelper::getCount($sqlMappings);
 		$this->assertEquals($result2, $mappings_amount, 'Chuck Norris: Incorrect amount of mappings for this value map"');
 
 	}
@@ -153,7 +153,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestClickWait('update');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$newVmName.'\'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Value map name has not been updated in the DB');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Value map name has not been updated in the DB');
 	}
 
 	public function testFormAdministrationGeneralValuemap_IncorrectValueMap() {
@@ -187,7 +187,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Value map deleted');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$newVmName.'\'';
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Value map with such name has not been deleted from the DB');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Value map with such name has not been deleted from the DB');
 
 	}
 
@@ -199,7 +199,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 
 		// checking that valuemap was not deleted after clicking on the "Cancel" button in the confirm dialog box
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$this->valuemapWithMultipleMappings.'\'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Value map with such name has been deleted from the DB');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Value map with such name has been deleted from the DB');
 	}
 
 	public function testFormAdministrationGeneralValuemap_DeleteRemainingValueMaps() {
@@ -214,7 +214,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Value map deleted');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$this->valuemapWithMultipleMappings.'\'';
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Value map with such name has not been deleted from the DB');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Value map with such name has not been deleted from the DB');
 
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -504,7 +504,7 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expression_constructor' => getRequest('recovery_expression_constructor', IM_ESTABLISHED),
 		'limited' => false,
 		'templates' => [],
-		'hostid' => getRequest('hostid', $discoveryRule['hostid']),
+		'hostid' => $discoveryRule['hostid'],
 		'expression_action' => $expression_action,
 		'recovery_expression_action' => $recovery_expression_action,
 		'tags' => getRequest('tags', []),
@@ -559,9 +559,12 @@ else {
 		],
 		'selectHosts' => ['hostid', 'host'],
 		'selectDependencies' => ['triggerid', 'description'],
+		'selectTags' => ['tag', 'value'],
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	]);
 	order_result($data['triggers'], $sortField, $sortOrder);
+
+	$data['tags'] = makeTags($data['triggers'], true, 'triggerid');
 
 	$depTriggerIds = [];
 	foreach ($data['triggers'] as $trigger) {
@@ -606,8 +609,7 @@ else {
 		unset($dependencyTrigger);
 	}
 
-	// get real hosts
-	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
+	$data['parent_templates'] = getTriggerParentTemplates($data['triggers'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	// render view
 	$triggersView = new CView('configuration.trigger.prototype.list', $data);

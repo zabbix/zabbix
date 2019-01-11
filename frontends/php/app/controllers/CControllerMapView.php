@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,7 @@ class CControllerMapView extends CController {
 		$fields = [
 			'sysmapid' =>		'db sysmaps.sysmapid',
 			'mapname' =>		'not_empty',
-			'severity_min' =>	'in 0,1,2,3,4,5',
-			'fullscreen' =>		'in 0,1'
+			'severity_min' =>	'in 0,1,2,3,4,5'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -112,11 +111,12 @@ class CControllerMapView extends CController {
 			'severityMin' => $this->hasInput('severity_min') ? $this->getInput('severity_min') : null
 		]);
 
+		CView::$has_web_layout_mode = true;
+
 		$response = new CControllerResponseData([
 			'map' => $map,
 			'pageFilter' => $page_filter,
-			'severity_min' => $page_filter->severityMin,
-			'fullscreen' => (bool) $this->getInput('fullscreen', false)
+			'severity_min' => $page_filter->severityMin
 		]);
 		$response->setTitle(_('Network maps'));
 		$this->setResponse($response);

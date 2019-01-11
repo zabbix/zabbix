@@ -4,7 +4,7 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates/Network Devices</name>
+         <name>Templates/Network devices</name>
       </group>
    </groups>
    <templates>
@@ -17,7 +17,7 @@ QTECH-MIB&#13;
 ENTITY-MIB</description>
          <groups>
             <group>
-               <name>Templates/Network Devices</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications>

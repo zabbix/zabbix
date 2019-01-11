@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageSearch extends CWebTest {
+class testPageSearch extends CLegacyWebTest {
 	public function testPageSearch_FindZabbixServer() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestInputTypeWait('search', 'ЗАББИКС Сервер');
@@ -57,12 +57,12 @@ class testPageSearch extends CWebTest {
 		$this->zbxTestInputTypeWait('search', '');
 		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
 		$this->zbxTestCheckTitle('Dashboard');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 
 		// Do not search if search string consists only of whitespace characters.
 		$this->zbxTestInputTypeWait('search', '   ');
 		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
 		$this->zbxTestCheckTitle('Dashboard');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 	}
 }

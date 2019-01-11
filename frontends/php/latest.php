@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,10 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['multiselect.js'];
+$page['scripts'] = ['multiselect.js', 'layout.mode.js'];
+
+CView::$has_web_layout_mode = true;
+$page['web_layout_mode'] = CView::getLayoutMode();
 
 if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
@@ -39,7 +42,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'groupids' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'hostids' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'fullscreen' =>			[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	'select' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'show_without_data' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'show_details' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
@@ -320,77 +322,77 @@ if ($filter['hostids']) {
  */
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))
-	->setControls((new CTag('nav', true, (new CList())
-		->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
-	))
-		->setAttribute('aria-label', _('Content controls'))
+	->setWebLayoutMode($page['web_layout_mode'])
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(get_icon('fullscreen'))
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
-// Filter
-$filterForm = (new CFilter())
-	->setProfile('web.latest.filter')
-	->setActiveTab(CProfile::get('web.latest.filter.active', 1))
-	->addVar('fullscreen', getRequest('fullscreen'));
-
-$filterColumn1 = (new CFormList())
-	->addRow((new CLabel(_('Host groups'), 'groupids__ms')),
-		(new CMultiSelect([
-			'name' => 'groupids[]',
-			'object_name' => 'hostGroup',
-			'data' => $multiselect_hostgroup_data,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'groupids_'
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	)
-	->addRow((new CLabel(_('Hosts'), 'hostids__ms')),
-		(new CMultiSelect([
-			'name' => 'hostids[]',
-			'object_name' => 'hosts',
-			'data' => $multiselect_host_data,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'hosts',
-					'srcfld1' => 'hostid',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'hostids_'
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	)
-	->addRow(_('Application'), [
-		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('application_name', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
-					'srctbl' => 'applications',
-					'srcfld1' => 'name',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'application',
-					'real_hosts' => '1',
-					'with_applications' => '1'
-				]).', null, this);'
-			)
-	]);
-
-$filterColumn2 = (new CFormList())
-	->addRow(_('Name'), (new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
-	->addRow(_('Show items without data'),
-		(new CCheckBox('show_without_data'))->setChecked($filter['showWithoutData'] == 1)
-	)
-	->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1));
-
-$filterForm->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2]);
-
-$widget->addItem($filterForm);
-// End of Filter
+if (in_array($page['web_layout_mode'], [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+	// Filter
+	$widget->addItem((new CFilter(new CUrl('latest.php')))
+		->setProfile('web.latest.filter')
+		->setActiveTab(CProfile::get('web.latest.filter.active', 1))
+		->addFilterTab(_('Filter'), [
+			(new CFormList())
+				->addRow((new CLabel(_('Host groups'), 'groupids__ms')),
+					(new CMultiSelect([
+						'name' => 'groupids[]',
+						'object_name' => 'hostGroup',
+						'data' => $multiselect_hostgroup_data,
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'host_groups',
+								'srcfld1' => 'groupid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'groupids_',
+								'real_hosts' => true
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+				->addRow((new CLabel(_('Hosts'), 'hostids__ms')),
+					(new CMultiSelect([
+						'name' => 'hostids[]',
+						'object_name' => 'hosts',
+						'data' => $multiselect_host_data,
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'hosts',
+								'srcfld1' => 'hostid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'hostids_'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+				->addRow(_('Application'), [
+					(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton('application_name', _('Select')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->onClick('return PopUp("popup.generic",'.
+							CJs::encodeJson([
+								'srctbl' => 'applications',
+								'srcfld1' => 'name',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'application',
+								'real_hosts' => '1',
+								'with_applications' => '1'
+							]).', null, this);'
+						)
+				]),
+			(new CFormList())
+				->addRow(_('Name'), (new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
+				->addRow(_('Show items without data'),
+					(new CCheckBox('show_without_data'))->setChecked($filter['showWithoutData'] == 1)
+				)
+				->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1))
+		])
+	);
+}
 
 $form = (new CForm('GET', 'history.php'))
 	->setName('items')
@@ -541,7 +543,6 @@ foreach ($items as $key => $item) {
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		]);
-		$change = nbsp($change);
 	}
 	else {
 		$change = UNKNOWN_VALUE;
@@ -696,7 +697,6 @@ foreach ($items as $item) {
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		]);
-		$change = nbsp($change);
 	}
 	else {
 		$change = UNKNOWN_VALUE;

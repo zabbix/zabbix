@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,24 +19,29 @@
 **/
 
 
-$widget = (new CWidget())
-	->setTitle(_('Screens'))
-	->addItem((new CList())
-		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-		->addClass(ZBX_STYLE_OBJECT_GROUP)
-		->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
-		->addItem([
-			(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
-			'/',
-			(new CSpan())
-				->addClass(ZBX_STYLE_SELECTED)
-				->addItem(
-					new CLink($data['screen']['name'], (new CUrl('screens.php'))
-						->setArgument('elementid', $data['screen']['screenid'])
-						->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-				))
-	]));
+$web_layout_mode = CView::getLayoutMode();
+
+$widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
+
+if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+	$widget
+		->setTitle(_('Screens'))
+		->addItem((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
+			->addClass(ZBX_STYLE_OBJECT_GROUP)
+			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+			->addItem([
+				(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
+				'/',
+				(new CSpan())
+					->addClass(ZBX_STYLE_SELECTED)
+					->addItem(
+						new CLink($data['screen']['name'], (new CUrl('screens.php'))
+							->setArgument('elementid', $data['screen']['screenid'])
+					))
+		]));
+}
 
 $controls = (new CList())
 	->addItem(
@@ -88,12 +93,11 @@ $controls
 			'elid' => $data['screen']['screenid']
 		]
 	))
-	->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
+	->addItem(get_icon('fullscreen'));
 
 $widget->setControls((new CTag('nav', true, (new CList())
 	->addItem((new CForm('get'))
 		->setName('headerForm')
-		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 		->addItem($controls)
 	)))
 		->setAttribute('aria-label', _('Content controls'))
@@ -111,15 +115,15 @@ $screenBuilder = new CScreenBuilder([
 	'to' => $data['to']
 ]);
 
-$widget
-	->addItem((new CFilter())
+$widget->addItem(
+	(new CFilter(new CUrl()))
 		->setProfile($data['profileIdx'], $data['profileIdx2'])
 		->setActiveTab($data['active_tab'])
-		->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'])
-	)
-	->addItem(
-		(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
-	);
+		->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'],
+			$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
+);
+
+$widget->addItem((new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
 
 CScreenBuilder::insertScreenStandardJs($screenBuilder->timeline);
 

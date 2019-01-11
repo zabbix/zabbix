@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -148,6 +148,7 @@ void	zbx_hashset_create_ext(zbx_hashset_t *hs, size_t init_size,
 				zbx_mem_free_func_t mem_free_func);
 void	zbx_hashset_destroy(zbx_hashset_t *hs);
 
+int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req);
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size);
 void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset);
 void	*zbx_hashset_search(zbx_hashset_t *hs, const void *data);
@@ -318,7 +319,9 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
 														\
 ZBX_VECTOR_DECL(__id, __type)											\
 														\
-void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_clean_func_t clean_func);
+typedef void (*zbx_ ## __id ## _free_func_t)(__type data);							\
+														\
+void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ ## __id ## _free_func_t free_func);
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t)
 ZBX_PTR_VECTOR_DECL(str, char *)
@@ -329,6 +332,7 @@ ZBX_VECTOR_DECL(uint64_pair, zbx_uint64_pair_t)
 /* this function is only for use with zbx_vector_XXX_clear_ext() */
 /* and only if the vector does not contain nested allocations */
 void	zbx_ptr_free(void *data);
+void	zbx_str_free(char *data);
 
 /* 128 bit unsigned integer handling */
 #define uset128(base, hi64, lo64)	(base)->hi = hi64; (base)->lo = lo64

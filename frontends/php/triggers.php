@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,6 +87,10 @@ $fields = [
 	'filter_value' =>							[T_ZBX_INT, O_OPT, null,
 													IN([-1, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE]), null
 												],
+	'filter_evaltype' =>						[T_ZBX_INT, O_OPT, null,
+													IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), null
+												],
+	'filter_tags' =>							[T_ZBX_STR, O_OPT, null,	null,			null],
 	// actions
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
@@ -371,10 +375,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
-	DBstart();
-
 	$result = API::Trigger()->delete([getRequest('triggerid')]);
-	$result = DBend($result);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
@@ -655,6 +656,24 @@ else {
 		if ($data['show_value_column']) {
 			CProfile::update('web.triggers.filter_value', getRequest('filter_value', -1), PROFILE_TYPE_INT);
 		}
+
+		CProfile::update('web.triggers.filter.evaltype', getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
+			PROFILE_TYPE_INT
+		);
+
+		$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
+		foreach (getRequest('filter_tags', []) as $filter_tag) {
+			if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
+				continue;
+			}
+
+			$filter_tags['tags'][] = $filter_tag['tag'];
+			$filter_tags['values'][] = $filter_tag['value'];
+			$filter_tags['operators'][] = $filter_tag['operator'];
+		}
+		CProfile::updateArray('web.triggers.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
+		CProfile::updateArray('web.triggers.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
+		CProfile::updateArray('web.triggers.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.triggers.filter_priority');
@@ -664,6 +683,11 @@ else {
 		if ($data['show_value_column']) {
 			CProfile::delete('web.triggers.filter_value');
 		}
+
+		CProfile::delete('web.triggers.filter.evaltype');
+		CProfile::deleteIdx('web.triggers.filter.tags.tag');
+		CProfile::deleteIdx('web.triggers.filter.tags.value');
+		CProfile::deleteIdx('web.triggers.filter.tags.operator');
 	}
 
 	$data += [
@@ -674,6 +698,17 @@ else {
 
 	if ($data['show_value_column']) {
 		$data['filter_value'] = CProfile::get('web.triggers.filter_value', -1);
+	}
+
+	$data['filter_evaltype'] = CProfile::get('web.triggers.filter.evaltype', TAG_EVAL_TYPE_AND_OR);
+
+	$data['filter_tags'] = [];
+	foreach (CProfile::getArray('web.triggers.filter.tags.tag', []) as $i => $tag) {
+		$data['filter_tags'][] = [
+			'tag' => $tag,
+			'value' => CProfile::get('web.triggers.filter.tags.value', null, $i),
+			'operator' => CProfile::get('web.triggers.filter.tags.operator', null, $i)
+		];
 	}
 
 	// get triggers
@@ -710,6 +745,11 @@ else {
 				if ($data['filter_status'] != -1) {
 					$options['filter']['status'] = $data['filter_status'];
 				}
+		}
+
+		if ($data['filter_tags']) {
+			$options['evaltype'] = $data['filter_evaltype'];
+			$options['tags'] = $data['filter_tags'];
 		}
 
 		if ($data['pageFilter']->hostid > 0) {
@@ -759,6 +799,7 @@ else {
 		'selectHosts' => ['hostid', 'host', 'name', 'status'],
 		'selectDependencies' => ['triggerid', 'description'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectTags' => ['tag', 'value'],
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	]);
 
@@ -769,6 +810,8 @@ else {
 	else {
 		order_result($data['triggers'], $data['sort'], $data['sortorder']);
 	}
+
+	$data['tags'] = makeTags($data['triggers'], true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $data['filter_tags']);
 
 	$depTriggerIds = [];
 	foreach ($data['triggers'] as $trigger) {
@@ -799,28 +842,9 @@ else {
 
 	$data['dependencyTriggers'] = $dependencyTriggers;
 
-	// get real hosts
-	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
+	$data['parent_templates'] = getTriggerParentTemplates($data['triggers'], ZBX_FLAG_DISCOVERY_NORMAL);
 
-	// Select writable template IDs.
-	$hostids = [];
-
-	foreach ($data['realHosts'] as $realHost) {
-		$hostids = array_merge($hostids, zbx_objectValues($realHost, 'hostid'));
-	}
-
-	$data['writable_templates'] = [];
-
-	if ($hostids) {
-		$data['writable_templates'] = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => $hostids,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-	}
-
-	// do not show 'Info' column, if it is a template
+	// Do not show 'Info' column, if it is a template.
 	if ($data['hostid']) {
 		$data['showInfoColumn'] = (bool) API::Host()->get([
 			'output' => [],

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,14 +28,7 @@ class CSvgGraphLine extends CSvgPath {
 	protected $units;
 	protected $host;
 	protected $options;
-	protected $line_values;
 	protected $add_label;
-
-	protected $position_x = 0;
-	protected $position_y = 0;
-
-	protected $width = 0;
-	protected $height = 0;
 
 	public function __construct($path, $metric) {
 		parent::__construct();
@@ -47,77 +40,67 @@ class CSvgGraphLine extends CSvgPath {
 		$this->item_name = $metric['name'];
 		$this->units = $metric['units'];
 		$this->host = $metric['host'];
-		$this->line_values = '';
 
 		$this->options = $metric['options'] + [
-			'transparency' => 5,
+			'transparency' => CSvgGraph::SVG_GRAPH_DEFAULT_TRANSPARENCY,
+			'width' => CSvgGraph::SVG_GRAPH_DEFAULT_LINE_WIDTH,
+			'color' => CSvgGraph::SVG_GRAPH_DEFAULT_COLOR,
 			'type' => SVG_GRAPH_TYPE_LINE,
-			'width' => 1,
-			'color' => '#b0af07',
 			'order' => 1
 		];
 	}
 
-	public function getStyles() {
+	public function makeStyles() {
 		$this
-			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_LINE)
-			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order']);
+			->addClass(CSvgTag::ZBX_STYLE_GRAPH_LINE)
+			->addClass(CSvgTag::ZBX_STYLE_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order']);
+
+		$line_style = ($this->options['type'] == SVG_GRAPH_TYPE_LINE) ? ['stroke-linejoin' => 'round'] : [];
 
 		return [
-			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_LINE => [
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_LINE => [
 				'fill' => 'none'
 			],
-			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order'] => [
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order'] => [
 				'opacity' => $this->options['transparency'] * 0.1,
 				'stroke' => $this->options['color'],
 				'stroke-width' => $this->options['width']
-			]
+			] + $line_style
 		];
 	}
 
-	public function setPosition($x, $y) {
-		$this->position_x = $x;
-		$this->position_y = $y;
-
-		return $this;
-	}
-
-	public function addLineValue($value) {
-		$this->line_values .= ($this->line_values === '') ? $value : ','.$value;
-	}
-
-	public function setSize($width, $height) {
-		$this->width = $width;
-		$this->height = $height;
-
-		return $this;
-	}
-
 	protected function draw() {
-		$last_point = [0, 0];
-		foreach ($this->path as $i => $point) {
-			if ($i == 0) {
-				$this->moveTo($point[0], $point[1]);
-				if ($this->add_label) {
-					$this->addLineValue($point[2]);
+		// drawMetricArea can be called with single data point.
+		if (count($this->path) > 1) {
+			$last_point = [0, 0];
+
+			foreach ($this->path as $i => $point) {
+				if ($i == 0) {
+					$this->moveTo($point[0], $point[1]);
 				}
+				else {
+					if ($this->options['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
+						$this->lineTo($point[0], $last_point[1]);
+					}
+					$this->lineTo($point[0], $point[1]);
+				}
+				$last_point = $point;
 			}
-			else {
-				if ($this->options['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
-					$this->lineTo($point[0], $last_point[1]);
-				}
-				$this->lineTo($point[0], $point[1]);
-				if ($this->add_label) {
-					$this->addLineValue($point[2]);
-				}
-			}
-			$last_point = $point;
 		}
 	}
 
 	public function toString($destroy = true) {
 		$this->draw();
-		$this->setAttribute('data-label', $this->line_values !== '' ? $this->line_values : null);
+
+		if ($this->add_label && $this->path) {
+			$line_values = '';
+
+			foreach ($this->path as $point) {
+				$line_values .= ($line_values === '') ? $point[2] : ','.$point[2];
+			}
+
+			$this->setAttribute('label', $line_values);
+		}
 
 		return parent::toString($destroy);
 	}

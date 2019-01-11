@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,22 +21,12 @@
 
 class CSvgLine extends CSvgTag {
 
-	public function __construct($x1, $y1, $x2, $y2, $color = null) {
+	public function __construct($x1, $y1, $x2, $y2) {
 		parent::__construct('line', true);
 
 		$this->setAttribute('x1', $x1);
 		$this->setAttribute('y1', $y1);
 		$this->setAttribute('x2', $x2);
 		$this->setAttribute('y2', $y2);
-
-		if ($color) {
-			$this->setAttribute('stroke', $color);
-		}
-	}
-
-	public function setDashed() {
-		$this->setAttribute('stroke-dasharray', '2, 2');
-
-		return $this;
 	}
 }

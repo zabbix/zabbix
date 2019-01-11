@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,6 +103,11 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['unacknowledged']),
 	CWidgetHelper::getCheckBox($fields['unacknowledged'])
 );
 
+// Show latest values.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_latest_values']),
+	CWidgetHelper::getCheckBox($fields['show_latest_values'])
+);
+
 // Sort entries by.
 $form_list->addRow(CWidgetHelper::getLabel($fields['sort_triggers']),
 	CWidgetHelper::getComboBox($fields['sort_triggers'])
@@ -114,7 +119,7 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['show_timeline']),
 );
 
 // Show lines.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getNumericBox($fields['show_lines']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getIntegerBox($fields['show_lines']));
 
 $form->addItem($form_list);
 

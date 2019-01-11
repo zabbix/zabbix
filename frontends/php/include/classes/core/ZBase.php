@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,6 +127,7 @@ class ZBase {
 				$this->initDB();
 				$this->authenticateUser();
 				$this->initLocales();
+				$this->setLayoutModeByUrl();
 				break;
 
 			case self::EXEC_MODE_API:
@@ -358,13 +359,7 @@ class ZBase {
 	 * Authenticate user.
 	 */
 	protected function authenticateUser() {
-		$sessionid = CWebUser::getSessionCookie();
-
-		if ($sessionid === null) {
-			$sessionid = CWebUser::authenticateHttpUser();
-		}
-
-		$sessionid = CWebUser::checkAuthentication($sessionid);
+		$sessionid = CWebUser::checkAuthentication(CWebUser::getSessionCookie());
 
 		if (!$sessionid) {
 			CWebUser::setDefault();
@@ -403,7 +398,6 @@ class ZBase {
 				$data['page']['file'] = $response->getFileName();
 				$data['controller']['action'] = $router->getAction();
 				$data['main_block'] = $view->getOutput();
-				$data['fullscreen'] = isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'] == 1 ? 1 : 0;
 				$data['javascript']['files'] = $view->getAddedJS();
 				$data['javascript']['pre'] = $view->getIncludedJS();
 				$data['javascript']['post'] = $view->getPostJS();
@@ -445,12 +439,27 @@ class ZBase {
 			foreach ($_REQUEST as $key => $value) {
 				// do not output SID
 				if ($key != 'sid') {
-					$response->addMessage($key.': '.$value);
+					$response->addMessage(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
 			}
 			CSession::setValue('messages', $response->getMessages());
 
 			redirect('zabbix.php?action=system.warning');
 		}
+	}
+
+	/**
+	 * Set layout to fullscreen or kiosk mode if URL contains 'fullscreen' and/or 'kiosk' arguments.
+	 */
+	private function setLayoutModeByUrl() {
+		if (array_key_exists('kiosk', $_GET) && $_GET['kiosk'] === '1') {
+			CView::setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
+		}
+		elseif (array_key_exists('fullscreen', $_GET)) {
+			CView::setLayoutMode($_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL);
+		}
+
+		// Remove $_GET arguments to prevent CUrl from generating URL with 'fullscreen'/'kiosk' arguments.
+		unset($_GET['fullscreen'], $_GET['kiosk']);
 	}
 }

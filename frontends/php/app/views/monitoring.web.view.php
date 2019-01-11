@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,15 +21,16 @@
 
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
+$this->addJsFile('layout.mode.js');
 
 (new CWidget())
 	->setTitle(_('Web monitoring'))
+	->setWebLayoutMode(CView::getLayoutMode())
 	->setControls((new CList([
 		(new CForm('get'))
 			->cleanItems()
 			->setAttribute('aria-label', _('Main filter'))
 			->addVar('action', 'web.view')
-			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 			->addItem((new CList())
 				->addItem([
 					new CLabel(_('Group'), 'groupid'),
@@ -42,9 +43,9 @@ $this->addJsFile('flickerfreescreen.js');
 					$data['pageFilter']->getHostsCB()
 				])
 			),
-		(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])))
+		(new CTag('nav', true, get_icon('fullscreen')))
 			->setAttribute('aria-label', _('Content controls'))
-	])))
+		])))
 	->addItem(
 		CScreenBuilder::getScreen([
 			'resourcetype' => SCREEN_RESOURCE_HTTPTEST,
@@ -55,7 +56,6 @@ $this->addJsFile('flickerfreescreen.js');
 			'page' => $data['page'],
 			'data' => [
 				'hosts_selected' => $data['pageFilter']->hostsSelected,
-				'fullscreen' => $data['fullscreen'],
 				'sort' => $data['sort'],
 				'sortorder' => $data['sortorder'],
 				'groupid' => $data['pageFilter']->groupid

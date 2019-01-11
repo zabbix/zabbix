@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -523,7 +523,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 
 	ret = SUCCEED;
 out:
-	zbx_vector_str_clear_ext(&received_metrics, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&received_metrics, zbx_str_free);
 	zbx_vector_str_destroy(&received_metrics);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -2018,6 +2018,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
 	time_t	nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0;
+	double	time_now;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -2043,9 +2044,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_handle_log();
-
-		now = time(NULL);
+		time_now = zbx_time();
+		zbx_update_env(time_now);
+		now = (int)time_now;
 
 		if (now >= nextsend)
 		{
@@ -2074,7 +2075,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			process_active_checks(activechk_args.host, activechk_args.port);
 
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)	/* failed to complete processing active checks */
-				goto next;
+				continue;
 
 			nextcheck = get_min_nextcheck();
 			if (FAIL == nextcheck)
@@ -2097,12 +2098,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 
 		lastcheck = now;
-next:
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#else
-		;
-#endif
 	}
 
 	zbx_free(session_token);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ $widget = (new CWidget())
 			))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem((new CFilter())
+	->addItem((new CFilter(new CUrl('usergrps.php')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
@@ -56,7 +56,7 @@ $userGroupTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_groups'))->onClick("checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], 'usergrps.php'),
 		'#',
 		_('Members'),
 		_('Frontend access'),

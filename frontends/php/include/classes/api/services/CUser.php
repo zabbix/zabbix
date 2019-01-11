@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -266,14 +266,14 @@ class CUser extends CApiService {
 			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'alias')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
-			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'passwd')],
+			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
-			'autologout' =>		['type' => API_TIME_UNIT, 'in' => '0,90:'.SEC_PER_DAY],
+			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'lang')],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $valid_themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
-			'refresh' =>		['type' => API_TIME_UNIT, 'in' => '0:'.SEC_PER_HOUR],
+			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
 			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
 			'usrgrps' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
@@ -371,14 +371,14 @@ class CUser extends CApiService {
 			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'alias')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
-			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'passwd')],
+			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
-			'autologout' =>		['type' => API_TIME_UNIT, 'in' => '0,90:'.SEC_PER_DAY],
+			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'lang')],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $valid_themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
-			'refresh' =>		['type' => API_TIME_UNIT, 'in' => '0:'.SEC_PER_HOUR],
+			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
 			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
 			'usrgrps' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
@@ -547,32 +547,24 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	private static function getGroupGuiAccess($user, $db_usrgrps) {
-		$config = select_config();
 		$gui_access_arr = [];
 		$usrgrps = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 
+		$config = select_config();
+		$system_gui_access = array_search($config['authentication_type'], [
+			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
+			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP
+		]);
+
 		foreach($usrgrps as $usergrp) {
 			if (array_key_exists($usergrp, $db_usrgrps)) {
-				$gui_access = $db_usrgrps[$usergrp]['gui_access'];
-
-				if ($db_usrgrps[$usergrp]['gui_access'] == GROUP_GUI_ACCESS_SYSTEM) {
-					switch ($config['authentication_type']) {
-						case ZBX_AUTH_INTERNAL:
-							$gui_access = GROUP_GUI_ACCESS_INTERNAL;
-							break;
-						case ZBX_AUTH_LDAP:
-							$gui_access = GROUP_GUI_ACCESS_LDAP;
-							break;
-					}
-				}
-
-				if (!in_array($gui_access, $gui_access_arr)) {
-					$gui_access_arr[] = $gui_access;
-				}
+				$gui_access = (int) $db_usrgrps[$usergrp]['gui_access'];
+				$index = ($gui_access == GROUP_GUI_ACCESS_SYSTEM) ? $system_gui_access : $gui_access;
+				$gui_access_arr[$index] = '';
 			}
 		}
 
-		return $gui_access_arr;
+		return array_keys($gui_access_arr);
 	}
 
 	/**
@@ -1097,7 +1089,7 @@ class CUser extends CApiService {
 			return true;
 		}
 		else {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, $ldapValidator->getError());
 		}
 	}
 
@@ -1153,111 +1145,17 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$http_alias = '';
 		$config = select_config();
 		$group_to_auth_map = [
 			GROUP_GUI_ACCESS_SYSTEM => $config['authentication_type'],
 			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
 			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
-			GROUP_GUI_ACCESS_DISABLED => null
+			GROUP_GUI_ACCESS_DISABLED => $config['authentication_type']
 		];
 
-		if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $user['password'] === '') {
-			// HTTP authentication.
-			foreach (['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
-				if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
-					$http_alias = $_SERVER[$key];
-					break;
-				}
-			}
-
-			if ($http_alias !== '') {
-				$parser = new CADNameAttributeParser(['strict' => true]);
-
-				if ($parser->parse($http_alias) === CParser::PARSE_SUCCESS) {
-					$strip_domain = explode(',', $config['http_strip_domains']);
-					$strip_domain = array_map('trim', $strip_domain);
-
-					if ($strip_domain && in_array($parser->getDomainName(), $strip_domain)) {
-						$http_alias = $parser->getUserName();
-					}
-				}
-
-				$is_requested_user = ($config['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
-					? ($user['user'] === $http_alias)
-					: (strtolower($user['user']) === strtolower($http_alias));
-
-				if (!$is_requested_user) {
-					$http_alias = '';
-				}
-			}
-		}
-
-		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
-		];
-		$db_users = [];
-
-		// Try to login user with HTTP authentication module passed user alias.
-		if ($http_alias !== '') {
-			$http_authenticated = true;
-
-			if ($config['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE) {
-				$db_users = DB::select('users', [
-					'output' => $fields,
-					'filter' => ['alias' => $http_alias]
-				]);
-			}
-			else {
-				$db_users = DBfetchArray(DBselect(
-					'SELECT '.implode(',', $fields).
-					' FROM users'.
-					' WHERE LOWER(alias)='.zbx_dbstr(strtolower($http_alias))
-				));
-			}
-		}
-
-		// Try to login user with passed credentials.
-		if (!$db_users) {
-			$http_authenticated = false;
-
-			if ($config['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE) {
-				$db_users = DB::select('users', [
-					'output' => $fields,
-					'filter' => ['alias' => $user['user']]
-				]);
-			}
-			else {
-				$db_users_rows = DBfetchArray(DBselect(
-					'SELECT '.implode(',', $fields).
-					' FROM users'.
-						' WHERE LOWER(alias)='.zbx_dbstr(strtolower($user['user']))
-				));
-
-				// Users with ZBX_AUTH_INTERNAL access attribute 'alias' is always case sensitive.
-				$db_users = [];
-
-				foreach($db_users_rows as $db_user_row) {
-					$permissions = $this->getUserGroupsData($db_user_row['userid']);
-
-					if ($group_to_auth_map[$permissions['gui_access']] != ZBX_AUTH_INTERNAL
-							|| $db_user_row['alias'] === $user['user']) {
-						$db_users[] = $db_user_row;
-					}
-				}
-			}
-		}
-
-		if (!$db_users) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
-		}
-		elseif (count($db_users) > 1) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Authentication failed: %1$s.', _('supplied credentials are not unique'))
-			);
-		}
-
-		$db_user = reset($db_users);
+		$db_user = $this->findByAlias($user['user'], ($config['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE),
+			$config['authentication_type'], true
+		);
 
 		// Check if user is blocked.
 		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
@@ -1275,72 +1173,74 @@ class CUser extends CApiService {
 			]);
 		}
 
-		$usrgrps = $this->getUserGroupsData($db_user['userid']);
+		try {
+			switch ($group_to_auth_map[$db_user['gui_access']]) {
+				case ZBX_AUTH_LDAP:
+					$this->ldapLogin($user);
+					break;
 
-		$db_user['debug_mode'] = $usrgrps['debug_mode'];
-		$db_user['userip'] = $usrgrps['userip'];
-		$db_user['gui_access'] = $usrgrps['gui_access'];
-
-		// Check system permissions.
-		if ($usrgrps['users_status'] == GROUP_STATUS_DISABLED) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
+				case ZBX_AUTH_INTERNAL:
+					if (md5($user['password']) !== $db_user['passwd']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+					}
+					break;
+			}
 		}
+		catch (APIException $e) {
+			DB::update('users', [
+				'values' => [
+					'attempt_failed' => ++$db_user['attempt_failed'],
+					'attempt_clock' => time(),
+					'attempt_ip' => substr($db_user['userip'], 0, 39)
+				],
+				'where' => ['userid' => $db_user['userid']]
+			]);
 
-		if (!$http_authenticated) {
-			try {
-				switch ($group_to_auth_map[$db_user['gui_access']]) {
-					case ZBX_AUTH_LDAP:
-						$this->ldapLogin($user);
-						break;
+			$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
+				$db_user['userip']
+			);
 
-					case ZBX_AUTH_INTERNAL:
-						if (md5($user['password']) !== $db_user['passwd']) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
-						}
-						break;
-				}
-			}
-			catch (APIException $e) {
-				DB::update('users', [
-					'values' => [
-						'attempt_failed' => ++$db_user['attempt_failed'],
-						'attempt_clock' => time(),
-						'attempt_ip' => $db_user['userip']
-					],
-					'where' => ['userid' => $db_user['userid']]
-				]);
-
-				$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
-					$db_user['userip']
-				);
-
-				self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
-			}
+			self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
 		}
 
 		// Start session.
 		unset($db_user['passwd']);
-		$db_user['sessionid'] = md5(microtime().md5($user['password']).$user['user'].mt_rand());
-
-		DB::insert('sessions', [[
-			'sessionid' => $db_user['sessionid'],
-			'userid' => $db_user['userid'],
-			'lastaccess' => time(),
-			'status' => ZBX_SESSION_ACTIVE
-		]], false);
-
-		if ($db_user['attempt_failed'] != 0) {
-			DB::update('users', [
-				'values' => ['attempt_failed' => 0],
-				'where' => ['userid' => $db_user['userid']]
-			]);
-		}
-
+		$db_user = $this->createSession($user, $db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
 
 		return array_key_exists('userData', $user) && $user['userData'] ? $db_user : $db_user['sessionid'];
+	}
+
+	/**
+	 * Method is ONLY for internal use!
+	 * Login user by alias. Return array with user data.
+	 *
+	 * @param string $alias      Authenticated user alias value.
+	 * @param bool   $api_call   Check is method called via API call or from local php file.
+	 *
+	 * @return array
+	 */
+	public function loginHttp($alias, $api_call = true) {
+		if ($api_call) {
+			return self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect method "%1$s.%2$s".', 'user', 'loginHttp'));
+		}
+
+		$config = select_config();
+		$db_user = $this->findByAlias($alias, ($config['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE),
+			$config['authentication_type'], false
+		);
+
+		unset($db_user['passwd']);
+		$db_user = $this->createSession([
+			'user' => $alias,
+			'password' => mt_rand()
+		], $db_user);
+		self::$userData = $db_user;
+
+		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
+		return $db_user;
 	}
 
 	/**
@@ -1529,5 +1429,111 @@ class CUser extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Initialize session for user. Returns user data array with valid sessionid.
+	 *
+	 * @param array  $user              Authentication credentials.
+	 * @param string $user['user']      User alias value.
+	 * @param string $user['password']  User password, is used in sessionid generation.
+	 * @param array  $db_user           User data from database.
+	 *
+	 * @return array
+	 */
+	private function createSession($user, $db_user) {
+		$db_user['sessionid'] = md5(microtime().md5($user['password']).$user['user'].mt_rand());
+
+		DB::insert('sessions', [[
+			'sessionid' => $db_user['sessionid'],
+			'userid' => $db_user['userid'],
+			'lastaccess' => time(),
+			'status' => ZBX_SESSION_ACTIVE
+		]], false);
+
+		if ($db_user['attempt_failed'] != 0) {
+			DB::update('users', [
+				'values' => ['attempt_failed' => 0],
+				'where' => ['userid' => $db_user['userid']]
+			]);
+		}
+
+		return $db_user;
+	}
+
+	/**
+	 * Find user by alias. Return user data from database.
+	 *
+	 * @param string $alias             User alias to search for.
+	 * @param bool   $case_sensitive    Perform case sensitive search.
+	 * @param int    $default_auth      System default authentication type.
+	 * @param bool   $do_group_check    Is actual only when $case_sensitive equals false. In HTTP authentication case
+	 *                                  user alias string is case insensitive string even for groups with frontend
+	 *                                  access GROUP_GUI_ACCESS_INTERNAL.
+	 *
+	 * @return array
+	 */
+	private function findByAlias($alias, $case_sensitive, $default_auth, $do_group_check) {
+		$db_users = [];
+		$group_to_auth_map = [
+			GROUP_GUI_ACCESS_SYSTEM => $default_auth,
+			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
+			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
+			GROUP_GUI_ACCESS_DISABLED => $default_auth
+		];
+		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
+		];
+
+		if ($case_sensitive) {
+			$db_users = DB::select('users', [
+				'output' => $fields,
+				'filter' => ['alias' => $alias]
+			]);
+		}
+		else {
+			$db_users_rows = DBfetchArray(DBselect(
+				'SELECT '.implode(',', $fields).
+				' FROM users'.
+					' WHERE LOWER(alias)='.zbx_dbstr(strtolower($alias))
+			));
+
+			if ($do_group_check) {
+				// Users with ZBX_AUTH_INTERNAL access attribute 'alias' is always case sensitive.
+				foreach($db_users_rows as $db_user_row) {
+					$permissions = $this->getUserGroupsData($db_user_row['userid']);
+
+					if ($group_to_auth_map[$permissions['gui_access']] != ZBX_AUTH_INTERNAL
+							|| $db_user_row['alias'] === $alias) {
+						$db_users[] = $db_user_row;
+					}
+				}
+			}
+			else {
+				$db_users = $db_users_rows;
+			}
+		}
+
+		if (!$db_users) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+		}
+		elseif (count($db_users) > 1) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Authentication failed: %1$s.', _('supplied credentials are not unique'))
+			);
+		}
+
+		$db_user = reset($db_users);
+		$usrgrps = $this->getUserGroupsData($db_user['userid']);
+
+		if ($usrgrps['users_status'] == GROUP_STATUS_DISABLED) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
+		}
+
+		$db_user['debug_mode'] = $usrgrps['debug_mode'];
+		$db_user['userip'] = $usrgrps['userip'];
+		$db_user['gui_access'] = $usrgrps['gui_access'];
+
+		return $db_user;
 	}
 }

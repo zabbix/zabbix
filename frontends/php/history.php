@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,14 @@ require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['file'] = 'history.php';
 $page['title'] = _('History');
-$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'multiselect.js'];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'multiselect.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
+CView::$has_web_layout_mode = true;
+$page['web_layout_mode'] = CView::getLayoutMode();
+
 if (hasRequest('plaintext')) {
-	define('ZBX_PAGE_NO_MENU', 1);
+	define('ZBX_PAGE_NO_MENU', true);
 }
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
@@ -52,8 +55,7 @@ $fields = [
 	'cancel' =>			[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
 	'form' =>			[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
 	'form_copy_to' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
-	'form_refresh' =>	[T_ZBX_INT,			O_OPT, null,	null,	null],
-	'fullscreen' =>		[T_ZBX_INT,			O_OPT, P_SYS,	IN('0,1'),	null]
+	'form_refresh' =>	[T_ZBX_INT,			O_OPT, null,	null,	null]
 ];
 check_fields($fields);
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
@@ -105,7 +107,6 @@ $data = [
 	'to' => getRequest('to'),
 	'plaintext' => hasRequest('plaintext'),
 	'graphtype' => getRequest('graphtype', GRAPH_TYPE_NORMAL),
-	'fullscreen' => (bool) getRequest('fullscreen', false),
 	'iv_string' => [ITEM_VALUE_TYPE_LOG => true, ITEM_VALUE_TYPE_TEXT => true],
 	'iv_numeric' => [ITEM_VALUE_TYPE_FLOAT => true, ITEM_VALUE_TYPE_UINT64 => true],
 	'profileIdx' => 'web.item.graph.filter',

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,14 @@ require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['title'] = _('Services');
 $page['file'] = 'srv_status.php';
+$page['scripts'] = ['layout.mode.js'];
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
+if (!getRequest('serviceid') || !getRequest('showgraph')) {
+	CView::$has_web_layout_mode = true;
+	$page['web_layout_mode'] = CView::getLayoutMode();
+}
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $periods = [
@@ -41,13 +46,11 @@ $periods = [
 	24 * DAY_IN_YEAR => _('Last 365 days')
 ];
 
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'serviceid' =>	[T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID,	null],
 	'showgraph' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('1'),		'isset({serviceid})'],
-	'period' =>		[T_ZBX_STR, O_OPT, P_SYS,	IN('"'.implode('","', array_keys($periods)).'"'),	null],
-	'fullscreen' => [T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),		null]
+	'period' =>		[T_ZBX_STR, O_OPT, P_SYS,	IN('"'.implode('","', array_keys($periods)).'"'),	null]
 ];
 check_fields($fields);
 
@@ -144,7 +147,7 @@ else {
 			'reason' => _('Reason'),
 			'sla' => (new CColHeader(_('Problem time')))->setColSpan(2),
 			'sla2' => null,
-			'sla3' => nbsp(_('SLA').' / '._('Acceptable SLA'))
+			'sla3' => _('SLA').' / '._('Acceptable SLA')
 		]
 	);
 
@@ -155,12 +158,12 @@ else {
 			$period_combo->addItem($key, $val);
 		}
 
-		$srv_wdgt = (new CWidget())
+		(new CWidget())
 			->setTitle(_('Services'))
+			->setWebLayoutMode($page['web_layout_mode'])
 			->setControls(new CList([
 				(new CForm('get'))
 					->cleanItems()
-					->addVar('fullscreen', getRequest('fullscreen'))
 					->setAttribute('aria-label', _('Main filter'))
 					->addItem((new CList())
 						->addItem([
@@ -169,10 +172,8 @@ else {
 							$period_combo
 						])
 					),
-				(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])))
-					->setAttribute('aria-label', _('Content controls'))
+				(new CTag('nav', true, get_icon('fullscreen')))->setAttribute('aria-label', _('Content controls'))
 			]))
-			->addItem(BR())
 			->addItem($tree->getHTML())
 			->show();
 	}

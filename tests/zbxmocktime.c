@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@
  *                                                                            *
  * Return value: text after the time component                                *
  *                                                                            *
- * Comments: If the first character is not a digit the the source text is     *
+ * Comments: If the first character is not a digit the source text is         *
  *           returned.                                                        *
  *                                                                            *
  ******************************************************************************/

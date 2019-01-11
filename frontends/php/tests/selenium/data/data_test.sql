@@ -294,14 +294,16 @@ INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200010,
 INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200011, 200003, 200020, 4, 60);
 
 -- Add maintenance periods
-INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till) VALUES (1,'Maintenance period 1 (data collection)',0,'Test description 1',1294760280,1294846680);
-INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till) VALUES (2,'Maintenance period 2 (no data collection)',1,'Test description 1',1294760280,1294846680);
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (1,'Maintenance period 1 (data collection)',0,'Test description 1',1294760280,1294846680,0);
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (2,'Maintenance period 2 (no data collection)',1,'Test description 1',1294760280,1294846680,0);
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (3,'Maintenance for update (data collection)',0,'Test description',1534885200,1534971600,2);
 
 INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (1,1,20000);
 INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (2,2,20000);
 
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (1,1,4);
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (2,2,4);
+INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (3,3,4);
 
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (1,0,1,0,0,1,43200,184200,1294760340);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (2,2,2,0,0,1,43200,93780,1294760400);
@@ -313,6 +315,7 @@ INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek,
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (8,3,2,0,85,1,85800,300,1294760400);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (9,4,0,1365,0,15,37500,183840,1294760460);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (10,4,1,2730,85,0,84600,1800,1294760520);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (11,0,1,0,0,1,43200,90000,1534950000);
 
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (1,1,1);
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (2,1,2);
@@ -324,6 +327,10 @@ INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timep
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (8,2,8);
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (9,2,9);
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (10,2,10);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (11,3,11);
+
+INSERT INTO maintenance_tag (maintenancetagid, maintenanceid, tag, operator,value) VALUES (1,3,'Tag1',2,'A');
+INSERT INTO maintenance_tag (maintenancetagid, maintenanceid, tag, operator,value) VALUES (2,3,'Tag2',0,'B');
 
 -- Add maps
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (3, 'Test map 1', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
@@ -363,8 +370,8 @@ INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, description, 
 
 -- add some test items
 -- first, one that references a non-existent user macro in the key and then references that key parameter in the item name using a positional reference
-INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, error, lastlogsize, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, mtime, flags, interfaceid, port, posts, headers) VALUES (23100, 0, '', '', 10053, 'a. i am referencing a non-existent user macro $1', 'key[{$I_DONT_EXIST}]', '30s', '90d', '365d', 0, 0, '', '', '', 0, '', '', '', 0, '', NULL, NULL, '', '', 0, '', '', '', '', 0, 0, 10021, '', '', '');
-INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, error, lastlogsize, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, mtime, flags, interfaceid, port, inventory_link, posts, headers) VALUES (23101, 0, '', '', 10053, 'i am populating filed Type', 'key.test.pop.type', '30s', '90d', '365d', 0, 0, '', '', '', 0, '', '', '', 0, '', NULL, NULL, '', '', 0, '', '', '', '', 0, 0, 10021, '', 1, '', '');
+INSERT INTO items (itemid, name, type, snmp_community, snmp_oid, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, error, lastlogsize, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, mtime, flags, interfaceid, port, posts, headers) VALUES (23100, 'Item_referencing_a_non-existent_user_macro', 0, '', '', 10053, 'a. i am referencing a non-existent user macro $1', 'key[{$I_DONT_EXIST}]', '30s', '90d', '365d', 0, 0, '', '', '', 0, '', '', '', 0, '', NULL, NULL, '', '', 0, '', '', '', '', 0, 0, 10021, '', '', '');
+INSERT INTO items (itemid, name, type, snmp_community, snmp_oid, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, error, lastlogsize, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, mtime, flags, interfaceid, port, inventory_link, posts, headers) VALUES (23101, 'Item_populating_filed_Type', 0, '', '', 10053, 'i am populating filed Type', 'key.test.pop.type', '30s', '90d', '365d', 0, 0, '', '', '', 0, '', '', '', 0, '', NULL, NULL, '', '', 0, '', '', '', '', 0, 0, 10021, '', 1, '', '');
 
 -- test discovery rule
 INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (3, NULL, 'External network', '192.168.3.1-255', 600, 0, 0);
@@ -386,6 +393,13 @@ INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (20, 3, 8, '', '', '10000-20000', '', 0, '', '', 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (21, 3, 15, '', '', '23', '', 0, '', '', 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (22, 3, 9, 'agent.uname', '', '10050', '', 0, '', '', 0);
+
+INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (4, 20003, 'Discovery rule for update', '192.14.3.1-255', 600, 0, 0);
+INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (23, 4, 12, '', '', '0', '', 0, '', '', 0);
+INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (5, 20003, 'Disabled discovery rule for update', '192.15.3.1-255', 600, 0, 1);
+INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (24, 5, 12, '', '', '0', '', 0, '', '', 0);
+INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (6, 20003, 'Discovery rule to check delete', '192.16.3.1-255', 600, 0, 1);
+INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (25, 6, 12, '', '', '0', '', 0, '', '', 0);
 
 -- Global macros
 INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (6,'{$DEFAULT_DELAY}','30');
@@ -1536,9 +1550,11 @@ INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90008
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90009, 'Host prototype {#8}', 'Host prototype {#8}', 0, '', 2);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90010, 'Host prototype {#9}', 'Host prototype {#9}', 0, '', 2);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90011, 'Host prototype {#10}', 'Host prototype {#10}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90012, 'Host prototype {#33}', 'Host prototype visible name', 0, '', 2);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90002, 90001);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90003, 90001);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90004, 90001);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90012, 90001);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90005, 90002);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90006, 90002);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90007, 90002);
@@ -1548,6 +1564,8 @@ INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90010, 90003);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90011, 90003);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1000, 90002, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1001, 90003, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1019, 90003, '{#FSNAME}', NULL, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1020, 90012, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1002, 90004, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1003, 90005, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1004, 90006, '', 5, NULL);
@@ -1556,6 +1574,8 @@ INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templatei
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1007, 90009, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1008, 90010, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1009, 90011, '', 5, NULL);
+
+INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 90003, 10001);
 
 -- adding test data to the 'alerts' table for testing Reports-> Notifications
 INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype) VALUES (8, 12, 1, 1, 1483275171, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.01.01 12:52:51', 1, 0, '', 1, 0);
@@ -1708,6 +1728,16 @@ INSERT INTO hosts (hostid, host, name, status, description, templateid, flags) V
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1015, 99010, '', 15, 1004);
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99010, NULL, 99084, '', 0, 0);
 
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99060, 'Host prototype for Clone {#TEST}', 'Host prototype for Clone {#TEST}', 1, '', 2);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1023, 99060, '', 15, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1024, 99060, '{#GROUP_PROTO}',NULL, NULL);
+INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99060, NULL, 99083, '', 0, 0);
+
+INSERT INTO hosts (hostid, host, name, status, description, templateid, flags) VALUES (99055, 'Host prototype for Clone {#TEST}', 'Host prototype for Clone {#TEST}', 1, '', 99060, 2);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1025, 99055, '', 15, 1024);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1026, 99055, '{#GROUP_PROTO}',NULL, 1023);
+INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99055, NULL, 99084, '', 0, 0);
+
 -- testFormItemHttpAgent
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'Host for different item types', 'Host for different items types', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90281, 50010, 4);
@@ -1801,3 +1831,253 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (112,99,'Eta','e
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (113,99,'Gamma','g');
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (114,99,'Theta','t');
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (115,99,'Delta','t');
+
+-- Problem suppression test: host, item, trigger, maintenance, event, problem, tags
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50013, 'Host group for suppression', 0);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99011, 'Host for suppression', 'Host for suppression', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99007, 99011, 50013);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50025,99011,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99087, 2, 99011, 'Trapper_for_suppression', '', 'trapper_sup', 30, NULL, '', '', '', '', '','');
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100031, 'Trigger_for_suppression', '{100031}>0', 1, 3, 0, '1535012391', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100031, 99087, 100031, 'last', '0');
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (104, 'SupTag','A', 100031);
+
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (4,'Maintenance for suppression test',0,'',1534971600,2147378400,2);
+INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (3,4,99011);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (12,0,1,0,0,1,43200,86399940,1535021880);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (12,4,12);
+INSERT INTO maintenance_tag (maintenancetagid, maintenanceid, tag, operator,value) VALUES (3,4,'SupTag',2,'A');
+
+INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (175,0,0,100031,1535012391,445429746,1,'Trigger_for_suppression',3);
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (200,175,'SupTag','A');
+INSERT INTO event_suppress (event_suppressid,eventid,maintenanceid,suppress_until) VALUES (1,175,4,1621329420);
+INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALUES (175,0,0,100031,1535012391,445429746,'Trigger_for_suppression',3);
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (200,175,'SupTag','A');
+
+-- testPageHostGraph
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50005,'Group for host graph check',0);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99012, 'Host to check graph 1', 'Host to check graph 1', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99008, 99012, 50005);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50026,99012,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99007, 2, 99012, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700018,'Check graph 1',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700019,'Check graph 2',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700026, 700018, 99007, 0, 0, '1A7C11', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700027, 700019, 99007, 0, 0, '1A7C11', 0, 2, 0);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99013, 'Host to delete graphs', 'Host to delete graphs', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99009, 99013, 50005);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50027,99013,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99008, 2, 99013, 'Item to delete graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700020,'Delete graph 1',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700021,'Delete graph 2',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700022,'Delete graph 3',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700023,'Delete graph 4',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700024,'Delete graph 5',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700028, 700020, 99008, 0, 0, '1A7C11', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700029, 700021, 99008, 0, 0, '1A7C11', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700030, 700022, 99008, 0, 0, '1A7C11', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700031, 700023, 99008, 0, 0, '1A7C11', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700032, 700024, 99008, 0, 0, '1A7C11', 0, 2, 0);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99014, 'Empty template', 'Empty template', 3, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99010, 99014, 1);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50006,'Empty group',0);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99015, 'Empty host', 'Empty host', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99011, 99015, 50006);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50028,99015,1,1,1,'127.0.0.1','','10050');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99016, 'Template to test graphs', 'Template to test graphs', 3, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99012, 99016, 1);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99009, 2, 99016, 'Item to check graph', '', 'graph[2]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700025,'Graph to check copy',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700033, 700025, 99009, 0, 0, '1A7C11', 0, 2, 0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50007,'Group to copy graph',0);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99017, 'Host with item and without graph 1', 'Host with item and without graph 1', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99013, 99017, 50007);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50029,99017,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99010, 2, 99017, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99018, 'Host with item and without graph 2', 'Host with item and without graph 2', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99014, 99018, 50007);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50030,99018,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99011, 2, 99018, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50008,'Group to copy all graph',0);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99019, 'Host with item to copy all graphs 1', 'Host with item to copy all graphs 1', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99015, 99019, 50008);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50031,99019,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99012, 2, 99019, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99020, 'Host with item to copy all graphs 2', 'Host with item to copy all graphs 2', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99016, 99020, 50008);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50032,99020,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99013, 2, 99020, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99021, 'Host to check graph 2', 'Host to check graph 2', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99017, 99021, 50005);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50033,99021,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99014, 2, 99021, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99022, 'Template with item graph', 'Template with item graph', 3, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99018, 99022, 1);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99015, 2, 99022, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99023, 'Template with item graph for copy all graph', 'Template with item graph for copy all graph', 3, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99019, 99023, 1);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99016, 2, 99023, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99029, 'Template to copy graph to several templates 1', 'Template to copy graph to several templates 1', 3, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99020, 99029, 1);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99022, 2, 99029, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99030, 'Template to copy graph to several templates 2', 'Template to copy graph to several templates 2', 3, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99021, 99030, 1);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99023, 2, 99030, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99024, 'Host to check graph 3', 'Host to check graph 3', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99022, 99024, 50005);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50034,99024,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99017, 2, 99024, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99025, 'Host to check graph 4', 'Host to check graph 4', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99023, 99025, 50005);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50035,99025,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99018, 2, 99025, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99026, 'Host to check graph 5', 'Host to check graph 5', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99024, 99026, 50005);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50036,99026,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99019, 2, 99026, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50009,'Copy graph to several groups 1',0);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99027, 'Host 1 from first group', 'Host 1 from first group', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99025, 99027, 50009);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50037,99027,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99020, 2, 99027, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50010,'Copy graph to several groups 2',0);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99028, 'Host 1 from second group', 'Host 1 from second group', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99026, 99028, 50010);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50038,99028,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99021, 2, 99028, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+
+-- testPageTriggers tags filtering test
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99050, 'Host for trigger tags filtering', 'Host for trigger tags filtering', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99910, 99050, 4);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (55030,99050,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99090, 2, 99050, 'Trapper', '', 'trap', 30, NULL, '', '', '', '', '','');
+
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100060, 'First trigger for tag filtering', '{100060}>0', 0, 3, 0, '0', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100060, 99090, 100060, 'last', '');
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (130, 'TagA','A', 100060);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (131, 'TagB','b', 100060);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (132, 'TagD','d', 100060);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (133, 'TagG','g', 100060);
+
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100061, 'Second trigger for tag filtering', '{100061}>0', 0, 3, 0, '0', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100061, 99090, 100061, 'last', '');
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (134, 'TagB','b', 100061);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (135, 'TagE','e', 100061);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (136, 'TagE1','e', 100061);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (137, 'TagZ','z', 100061);
+
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100062, 'Third trigger for tag filtering', '{100062}>0', 0, 3, 0, '0', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100062, 99090, 100062, 'last', '');
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (138, 'TagA','a', 100062);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (139, 'TagI','i', 100062);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (140, 'TagK','k', 100062);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (141, 'TagT','t', 100062);
+
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100063, 'Fourth trigger for tag filtering', '{100063}>0', 0, 3, 0, '0', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100063, 99090, 100063, 'last', '');
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (142, 'TagD','d', 100063);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (143, 'TagE1','e', 100063);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (144, 'TagG','g', 100063);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (145, 'TagT','t', 100063);
+
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100064, 'Fifth trigger for tag filtering (no tags)', '{100064}>0', 0, 3, 0, '0', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100064, 99090, 100064, 'last', '');
+
+-- testPageMonitoringOverview
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50011, 'Group to check Overview', 0);
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50012, 'Another group to check Overview', 0);
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50011, '1_Host_to_check_Monitoring_Overview', '1_Host_to_check_Monitoring_Overview', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50012, '3_Host_to_check_Monitoring_Overview', '3_Host_to_check_Monitoring_Overview', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50013, '4_Host_to_check_Monitoring_Overview', '4_Host_to_check_Monitoring_Overview', 0, '');
+INSERT INTO host_inventory (type, type_full, name, alias, os, os_full, os_short, serialno_a, serialno_b, tag, asset_tag, macaddress_a, macaddress_b, hardware, hardware_full, software, software_full, software_app_a, software_app_b, software_app_c, software_app_d, software_app_e, contact, location, location_lat, location_lon, notes, chassis, model, hw_arch, vendor, contract_number, installer_name, deployment_status, url_a, url_b, url_c, host_networks, host_netmask, host_router, oob_ip, oob_netmask, oob_router, date_hw_purchase, date_hw_install, date_hw_expiry, date_hw_decomm, site_address_a, site_address_b, site_address_c, site_city, site_state, site_country, site_zip, site_rack, site_notes, poc_1_name, poc_1_email, poc_1_phone_a, poc_1_phone_b, poc_1_cell, poc_1_screen, poc_1_notes, poc_2_name, poc_2_email, poc_2_phone_a, poc_2_phone_b, poc_2_cell, poc_2_screen, poc_2_notes, hostid) VALUES ('Type', 'Type (Full details)', 'Name', 'Alias', 'OS', 'OS (Full details)', 'OS (Short)', 'Serial number A', 'Serial number B', 'Tag','Asset tag', 'MAC address A', 'MAC address B', 'Hardware', 'Hardware (Full details)', 'Software', 'Software (Full details)', 'Software application A', 'Software application B', 'Software application C', 'Software application D', 'Software application E', 'Contact', 'Location', 'Location latitud', 'Location longitu', 'Notes', 'Chassis', 'Model', 'HW architecture', 'Vendor', 'Contract number', 'Installer name', 'Deployment status', 'URL A', 'URL B', 'URL C', 'Host networks', 'Host subnet mask', 'Host router', 'OOB IP address', 'OOB subnet mask', 'OOB router', 'Date HW purchased', 'Date HW installed', 'Date HW maintenance expires', 'Date hw decommissioned', 'Site address A', 'Site address B', 'Site address C', 'Site city', 'Site state / province', 'Site country', 'Site ZIP / postal', 'Site rack location', 'Site notes', 'Primary POC name', 'Primary POC email', 'Primary POC phone A', 'Primary POC phone B', 'Primary POC cell', 'Primary POC screen name', 'Primary POC notes', 'Secondary POC name', 'Secondary POC email', 'Secondary POC phone A', 'Secondary POC phone B', 'Secondary POC cell', 'Secondary POC screen name', 'Secondary POC notes', 50012);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90282, 50011, 50011);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90283, 50012, 50011);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90284, 50013, 50012);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50039,50011,1,1,1,'127.0.0.1','','10050');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50040,50012,1,1,1,'127.0.0.1','','10050');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50041,50013,1,1,1,'127.0.0.1','','10050');
+INSERT INTO applications (applicationid, hostid, name) VALUES (99010, 50011, '1 application');
+INSERT INTO applications (applicationid, hostid, name) VALUES (99011, 50011, '2 application');
+INSERT INTO applications (applicationid, hostid, name) VALUES (99012, 50012, '3 application');
+INSERT INTO applications (applicationid, hostid, name) VALUES (99013, 50013, '4 application');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99086, 50011, 50039, 2, 3, '1_item','trap[1]', '30s', '90d', 0, '', '', 0, '', '');
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99002, 99010, 99086);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99091, 50011, 50039, 2, 3, '2_item','trap[2]', '30s', '90d', 0, '', '', 0, '', '');
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99003, 99011, 99091);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99088, 50012, 50040, 2, 3, '3_item','trap[3]', '30s', '90d', 0, '', '', 0, '', '');
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99004, 99012, 99088);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99089, 50013, 50041, 2, 3, '4_item','trap[4]', '30s', '90d', 0, '', '', 0, '', '');
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99005, 99013, 99089);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100032, '1_trigger_Not_classified', '{100032}>0', 1, 0, '1533555726', '', 0);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100033, '1_trigger_Warning', '{100033}>0', 1, 0, '1533555726', '', 2);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100034, '1_trigger_Average', '{100034}>0', 1, 0, '1533555726', '', 3);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100035, '1_trigger_High', '{100035}>0', 1, 0, '1533555726', '', 4);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100036, '1_trigger_Disaster', '{100036}>0', 1, 0, '1533555726', '', 5);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100037, '2_trigger_Information', '{100037}>0', 1, 0, '1533555726', '', 1);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100038, '3_trigger_Average', '{100038}>0', 1, 0, '1533555726', '', 3);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100039, '3_trigger_Disaster', '{100039}>0', 0, 0, '1533555726', '', 5);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100040, '4_trigger_Average', '{100040}>0', 1, 0, '1533555726', '', 3);
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100032, 99086, 100032, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100033, 99086, 100033, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100034, 99086, 100034, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100035, 99086, 100035, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100036, 99086, 100036, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100037, 99091, 100037, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100038, 99088, 100038, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100039, 99088, 100039, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100040, 99089, 100040, 'last', '0');
+INSERT INTO history_uint (itemid, clock, value, ns) VALUES (99086, 1533555726, 1, 726692808);
+INSERT INTO history_uint (itemid, clock, value, ns) VALUES (99091, 1533555726, 2, 726692808);
+INSERT INTO history_uint (itemid, clock, value, ns) VALUES (99088, 1533555726, 3, 726692808);
+INSERT INTO history_uint (itemid, clock, value, ns) VALUES (99089, 1533555726, 4, 726692808);
+INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (9000, 0, 0, 100032, 1533555726, 726692808, 1, '1_trigger_Not_classified', 0);
+INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (9001, 0, 0, 100033, 1533555726, 726692808, 1, '1_trigger_Warning', 2);
+INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (9002, 0, 0, 100034, 1533555726, 726692808, 1, '1_trigger_Average', 3);
+INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (9003, 0, 0, 100035, 1533555726, 726692808, 1, '1_trigger_High', 4);
+INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (9004, 0, 0, 100036, 1533555726, 726692808, 1, '1_trigger_Disaster', 5);
+INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity, acknowledged) VALUES (9005, 0, 0, 100037, 1533555726, 726692808, 1, '2_trigger_Information', 1, 1);
+INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity, acknowledged) VALUES (9006, 0, 0, 100038, 1533555726, 726692808, 1, '3_trigger_Average', 3, 1);
+INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (9007, 0, 0, 100040, 1533555726, 726692808, 1, '4_trigger_Average', 3);
+INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ( 9000, 0, 0, 100032, 1533555726, 726692808, '1_trigger_Not_classified', 0);
+INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ( 9001, 0, 0, 100033, 1533555726, 726692808, '1_trigger_Warning', 2);
+INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ( 9002, 0, 0, 100034, 1533555726, 726692808, '1_trigger_Average', 3);
+INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ( 9003, 0, 0, 100035, 1533555726, 726692808, '1_trigger_High', 4);
+INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ( 9004, 0, 0, 100036, 1533555726, 726692808, '1_trigger_Disaster', 5);
+INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity, acknowledged) VALUES ( 9005, 0, 0, 100037, 1533555726, 726692808, '2_trigger_Information', 1, 1);
+INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity, acknowledged) VALUES ( 9006, 0, 0, 100038, 1533555726, 726692808, '3_trigger_Average', 3, 1);
+INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity, acknowledged) VALUES ( 9007, 0, 0, 100040, 1533555726, 726692808, '4_trigger_Average', 3, 1);
+INSERT INTO acknowledges (acknowledgeid, userid, eventid, clock, message, action, old_severity, new_severity) VALUES (1, 1, 9005, 1533629135, '1 acknowledged', 2, 0, 0);
+INSERT INTO acknowledges (acknowledgeid, userid, eventid, clock, message, action, old_severity, new_severity) VALUES (2, 1, 9006, 1533629135, '2 acknowledged', 2, 0, 0);
+INSERT INTO task (taskid, type, status, clock, ttl, proxy_hostid) VALUES (1, 4, 1, 1533631968, 0, NULL);
+INSERT INTO task (taskid, type, status, clock, ttl, proxy_hostid) VALUES (2, 4, 1, 1533631968, 0, NULL);
+INSERT INTO task_acknowledge (taskid, acknowledgeid) VALUES (1, 1);
+INSERT INTO task_acknowledge (taskid, acknowledgeid) VALUES (2, 2);
+
+-- Hosts with proxies for Hosts filtering test
+INSERT INTO hosts (hostid, host, status, description) VALUES (99051, 'Proxy_1 for filter', 5, '');
+INSERT INTO hosts (hostid, host, status, description) VALUES (99052, 'Proxy_2 for filter', 5, '');
+INSERT INTO hosts (hostid, proxy_hostid, host, name, status, description) VALUES (99053, 99051, 'Host_1 with proxy', 'Host_1 with proxy', 0, '');
+INSERT INTO hosts (hostid, proxy_hostid, host, name, status, description) VALUES (99054, 99052, 'Host_2 with proxy', 'Host_2 with proxy', 0, '');
+INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (55031, 99053, 1, '127.0.0.1', 1, '10050', 1);
+INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (55032, 99054, 1, '127.0.0.1', 1, '10050', 1);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99911, 99053, 4);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99912, 99054, 4);
+
+-- Dashboard for problem hosts widget
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (100, 'Dashboard for Problem hosts widget', 1, 1);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (100, 100, 'problemhosts', '', 0, 0, 8, 8);
+INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (4, 1, 'web.dashbrd.dashboardid', 1, '', 1);
+
+-- testPageAvailabilityReport SLA reports
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50014, 'SLA reports host', 'SLA reports host', 0, '');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50042, 50014, 1, 1, 1, '127.0.0.1', '10051');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50013, 50014, 4);
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40067, 2, 50014, 'Item A', 'A', '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40068, 2, 50014, 'Item B', 'B', '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40069, 2, 50014, 'Item C', 'C', '', '', '', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (16027, '{16027}=0', 'A trigger', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (16028, '{16028}=0', 'B trigger', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (16029, '{16029}=0', 'C trigger', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16028, 40067, 16027,'last','0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16029, 40068, 16028,'last','0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16030, 40069, 16029,'last','0');

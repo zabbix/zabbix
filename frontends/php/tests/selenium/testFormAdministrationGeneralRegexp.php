@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup regexps
  */
-class testFormAdministrationGeneralRegexp extends CWebTest {
+class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 
 	private $regexp = 'test_regexp1';
 	private $regexp2 = 'test_regexp2';
@@ -100,7 +100,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestTextPresent('Regular expression added');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($name).' AND r.regexpid=e.regexpid';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Regular expression with such name has not been added');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Regular expression with such name has not been added');
 	}
 
 	public function testFormAdministrationGeneralRegexp_AddExisting() {
@@ -160,7 +160,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestTextPresent('Regular expression added');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->cloned_regexp).' AND r.regexpid=e.regexpid';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Cloned regular expression does not exist in the DB');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Cloned regular expression does not exist in the DB');
 	}
 
 	public function testFormAdministrationGeneralRegexp_Update() {
@@ -172,7 +172,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestTextPresent('Regular expression updated');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->regexp.'2').' AND r.regexpid=e.regexpid';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Regexp name has not been changed in the DB');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Regexp name has not been changed in the DB');
 	}
 
 	public function testFormAdministrationGeneralRegexp_Delete() {
@@ -186,12 +186,12 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);
 
 		$sql = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($this->regexp2);
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.regexpid=e.regexpid and r.name='.zbx_dbstr($this->regexp2);
 
 		// this check will fail as at this moment expressions are not deleted when deleting related regexp
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
 	}
 
 	public function testFormAdministrationGeneralRegexp_DeleteAll() {
@@ -205,9 +205,9 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestTextPresent('Regular expressions deleted');
 
 		$sql = 'SELECT * FROM regexps';
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
 
 		$sql = 'SELECT * FROM expressions';
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
 	}
 }

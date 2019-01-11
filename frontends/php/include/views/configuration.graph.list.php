@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,30 +107,32 @@ foreach ($data['graphs'] as $graph) {
 	}
 
 	$name = [];
-	if (!empty($graph['templateid'])) {
-		$realHosts = get_realhosts_by_graphid($graph['templateid']);
-		$realHosts = DBfetch($realHosts);
-		$name[] = (new CLink($realHosts['name'], 'graphs.php?hostid='.$realHosts['hostid']))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREY);
-		$name[] = NAME_DELIMITER;
-	}
-	elseif (!empty($graph['discoveryRule']) && empty($this->data['parent_discoveryid'])) {
-		$name[] = (new CLink($graph['discoveryRule']['name'],
-			'host_discovery.php?form=update&itemid='.$graph['discoveryRule']['itemid'])
-		)
+	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], ($data['parent_discoveryid'] === null)
+		? ZBX_FLAG_DISCOVERY_NORMAL
+		: ZBX_FLAG_DISCOVERY_PROTOTYPE
+	);
+
+	if ($graph['discoveryRule'] && $data['parent_discoveryid'] === null) {
+		$name[] = (new CLink(CHtml::encode($graph['discoveryRule']['name']),
+			(new CUrl('host_discovery.php'))
+				->setArgument('form', 'update')
+				->setArgument('itemid', $graph['discoveryRule']['itemid'])
+		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
 		$name[] = NAME_DELIMITER;
 	}
 
-	$name[] = new CLink(
-		$graph['name'],
-		'graphs.php?'.
-			'form=update'.
-			'&graphid='.$graphid.url_param('parent_discoveryid').
-			'&hostid='.$this->data['hostid']
-	);
+	$url = (new CUrl('graphs.php'))
+		->setArgument('form', 'update')
+		->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+		->setArgument('graphid', $graphid);
+
+	if ($data['parent_discoveryid'] === null) {
+		$url->setArgument('hostid', $this->data['hostid']);
+	}
+
+	$name[] = new CLink(CHtml::encode($graph['name']), $url);
 
 	$graphTable->addRow([
 		new CCheckBox('group_graphid['.$graphid.']', $graphid),

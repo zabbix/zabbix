@@ -500,23 +500,34 @@ ul.top-nav-icons {
 	@include transform(scale(.9999));
 }
 
-.header-title {
+.header-title,
+.object-group {
+	min-height: 24px;
+	line-height: 24px;
+	padding: 10px 0 6px;
 	position: relative;
-	width: 100%;
-	padding: 0 0 6px 0;
-	margin: 0 0 10px 0;
-	text-align: right;
-	border-bottom: 1px solid $ui-border-color;
+	vertical-align: top;
+}
 
-	.cell:first-child {
-		max-width: calc(100vw - 370px);
+.header-title {
+	border-bottom: 1px solid $ui-border-color;
+	margin-top: -10px;
+	padding: 10px 0 6px;
+	width: 100%;
+
+	.cell {
+
+		&:first-child {
+			max-width: calc(100vw - 370px);
+		}
 	}
 
 	h1 {
-		text-align: left;
-		white-space: nowrap;
-		text-overflow: ellipsis;
+		line-height: 24px;
 		overflow: hidden;
+		padding-top: 1px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	form {
@@ -525,6 +536,8 @@ ul.top-nav-icons {
 	}
 
 	ul {
+		text-align: right;
+
 		li {
 			display: inline-block;
 			vertical-align: top;
@@ -535,12 +548,17 @@ ul.top-nav-icons {
 		ul li:first-child {
 			padding-left: 0;
 		}
+
+		button {
+			line-height: 22px;
+		}
 	}
 
 	.dashbrd-edit {
 		position: relative;
 		display: inline-block;
 		background-color: $ui-bg-color;
+		margin-right: 5px;
 		@include box-shadow(0 0 0 4px $ui-bg-color);
 
 		&::after {
@@ -578,9 +596,7 @@ article {
 
 // Object Group Navigation
 .object-group {
-	min-height: 24px;
-	line-height: 24px;
-	margin-bottom: 5px;
+	margin-bottom: -1px;
 
 	li {
 		float: left;
@@ -613,6 +629,14 @@ article {
 	.arrow-right {
 		border-left-color: $font-color;
 	}
+
+	button {
+		line-height: 22px;
+	}
+
+	.btn-link {
+		line-height: 14px;
+	}
 }
 
 .hor-list {
@@ -634,22 +658,22 @@ article {
 // Breadcrumbs inline with filter block
 .filter-breadcrumb {
 	display: inline-block;
-	position: relative;
-	top: 0;
 	z-index: 3;
-	margin-bottom: 0;
 
-	& > li:first-child {
-		float: left;
-		white-space: nowrap;
+	li {
+		line-height: 14px;
+		vertical-align: top;
 
-		& > span {
+		.status-container {
+			padding-top: 3px;
+		}
+
+		> span {
 			display: inline-block;
-			line-height: 1;
-			padding: 4px 7px;
+			height: 18px;
+			padding: 4px 7px 0;
 
 			a {
-				display: inline-block;
 				max-width: 200px;
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -658,8 +682,17 @@ article {
 		}
 	}
 
-	& + .filter-space {
-		margin-top: -28px;
+	> li {
+		padding: 1px 0;
+	}
+
+	> li:first-child {
+		float: left;
+		white-space: nowrap;
+	}
+
+	+ .filter-space {
+		margin-top: -29px;
 	}
 }
 
@@ -822,6 +855,13 @@ output {
 
 				&:last-of-type {
 					margin-right: 0;
+				}
+			}
+
+			[class*='icon-depend-'] {
+				&,
+				&:last-of-type {
+					margin-right: 12px;
 				}
 			}
 
@@ -1018,7 +1058,7 @@ output {
 			@extend %nothing-to-show;
 		}
 
-		&:last-child td {
+		&:last-child th, &:last-child td {
 			border-bottom: none;
 		}
 
@@ -1034,15 +1074,22 @@ output {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
+		max-width: 300px;
 	}
 
 	tbody th {
-		text-align: inherit;
+		text-align: left;
 	}
 
 	.vertical_rotation_inner {
 		white-space: nowrap;
 		@include rotate(270);
+	}
+
+	.list-table-footer {
+		border-bottom: none;
+		color: $font-alt-color;
+		text-align: right;
 	}
 }
 
@@ -1476,6 +1523,10 @@ output {
 		border-color: $form-border-focus-color;
 	}
 
+	&[aria-disabled] {
+		@extend %form-disabled;
+	}
+
 	input[type="text"] {
 		border: none;
 		background: none;
@@ -1591,6 +1642,14 @@ output {
 .suggest-found {
 	font-weight: bold;
 	color: $dark-yellow;
+}
+
+.suggest-new {
+	border-top: 1px solid $form-border-color;
+
+	span:first-child {
+		font-weight: bold;
+	}
 }
 
 // Forms
@@ -1863,7 +1922,7 @@ output {
 		}
 
 		&:checked:focus + label {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			@include box-shadow(0 0 0 2px rgba($blue, .35));
 			position: relative;
 			z-index: 2;
 		}
@@ -1978,6 +2037,10 @@ textarea {
 	&[readonly] {
 		color: $font-color!important;
 		@extend %form-disabled;
+
+		&:focus {
+			border-color: $form-border-focus-color;
+		}
 	}
 }
 
@@ -2443,14 +2506,15 @@ $icon-widget-btn: (
 			background-color: $ui-bg-color;
 			border: 1px solid $ui-border-color;
 			border-bottom: none;
-			margin: 0 0 0 6px;
-			padding: 0 34px 7px 10px;
+			margin: -1px 0 0 6px;
+			padding: 1px 34px 7px 10px;
 			@include border-radius(2px 2px 0 0);
 		}
 
 		.btn-time {
 			&:after {
 				background-position: -246px -583px;
+				top: 1px;
 			}
 		}
 
@@ -2482,6 +2546,7 @@ $icon-widget-btn: (
 
 .filter-space {
 	box-sizing: border-box;
+	margin-top: 10px;
 
 	li a.ui-tabs-anchor {
 		vertical-align: top;
@@ -2562,6 +2627,7 @@ $icon-widget-btn: (
 	border: 1px solid transparent;
 	color: $font-color;
 	height: 24px;
+	line-height: 22px;
 	margin: 0 5px;
 	vertical-align: top;
 
@@ -2731,10 +2797,15 @@ $icon-widget-btn: (
 }
 
 %btn-disabled {
-	color: $btn-disabled-font-color;
+	color: $btn-disabled-font-color !important;
 	background-color: $btn-disabled-bg-color;
 	border-color: $btn-disabled-border-color;
 	cursor: default;
+
+	&.icon-cal {
+		opacity: 0.3;
+		background-color: transparent;
+	}
 }
 
 %form-disabled {
@@ -3138,7 +3209,7 @@ $form-icon-btn: (
 // Dashboard
 .dashbrd-grid-widget-container {
 	position: relative;
-	margin: -.25rem;
+	margin: -4px;
 }
 
 .dashbrd-grid-widget-placeholder {
@@ -3201,8 +3272,12 @@ $form-icon-btn: (
 
 		tbody tr {
 
-			&:last-child td {
+			&:last-child th, &:last-child td {
 				border-bottom: 1px solid $table-border-color;
+
+				&.list-table-footer {
+					border-bottom: none;
+				}
 			}
 		}
 	}
@@ -3231,6 +3306,7 @@ $form-icon-btn: (
 	margin: .25rem;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
+	padding-bottom: 8px;
 }
 
 .dashbrd-grid-widget-head {
@@ -3257,22 +3333,6 @@ $form-icon-btn: (
 			select {
 				margin: 4px 0;
 			}
-		}
-	}
-}
-
-.dashbrd-grid-widget-foot {
-	text-align: right;
-	color: $font-alt-color;
-	padding: 8px 8px 6px 8px;
-
-	ul {
-		display: flex;
-		justify-content: flex-end;
-
-		li {
-			padding: 0 0 0 13px;
-			@extend %overflow-ellipsis;
 		}
 	}
 }
@@ -3776,6 +3836,13 @@ $form-icon-btn: (
 		min-width: 650px;
 	}
 
+	.msg-bad,
+	.msg-good {
+		position: sticky;
+		top: 0;
+		z-index: 1000;
+	}
+
 	.list-table {
 		white-space: normal;
 		border: none;
@@ -4174,10 +4241,12 @@ $form-icon-btn: (
 	border-bottom: none;
 }
 .svg-graph-selection {
-	fill: $yellow;
-	fill-opacity: 0.35;
-	stroke-color: rgba($dark-yellow,0.6);
+	fill: rgba($yellow,0.35);
+	stroke: rgba($dark-yellow,0.6);
 	stroke-width: 1px;
+}
+.svg-graph-selection-text {
+	fill: $font-color;
 }
 .svg-helper {
 	stroke-opacity: 0.35;
@@ -4185,15 +4254,8 @@ $form-icon-btn: (
 	stroke-width: 2px;
 }
 .svg-point-highlight {
-	fill: $font-color;
-	fill-opacity: 0.5;
-}
-.svg-graph-hintbox-item-color {
-	margin: 3px 10px 3px 3px;
-	width: 10px;
-	height: 10px;
-	float: left;
-	display: block;
+	fill: $font-color !important;
+	fill-opacity: 0.5 !important;
 }
 
 .svg-graph-preview {
@@ -4213,6 +4275,8 @@ $form-icon-btn: (
 	}
 }
 
+.svg-single-item-graph-legend,
+.svg-single-two-items-graph-legend,
 .svg-graph-legend {
 	// Legend single line height is 18. Value should be synchronized with $legend_height in 'CSvgGraphHelper.php'.
 	$svg-legend-line-height: 18px;
@@ -4228,7 +4292,6 @@ $form-icon-btn: (
 		font-size: 12px;
 		line-height: $svg-legend-line-height;
 		vertical-align: middle;
-		max-width: 30%;
 		min-width: 120px;
 		overflow: hidden;
 		white-space: nowrap;
@@ -4249,12 +4312,18 @@ $form-icon-btn: (
 		border-top-color: inherit;
 	}
 }
+.svg-graph-legend div {
+	max-width: 30%;
+}
+.svg-single-two-items-graph-legend div {
+	max-width: 50%;
+}
 
 .svg-graph-hintbox {
-	padding-top: 5px;
-	display: block;
 	font-size: 12px;
 	line-height: 18px;
+	white-space: nowrap;
+	min-width: 145px;
 
 	.table-paging {
 		min-height: 18px;
@@ -4270,6 +4339,18 @@ $form-icon-btn: (
 	.list-table tbody tr:last-child td {
 		border-bottom-style: none;
 		box-shadow: none;
+	}
+
+	li {
+		padding-left: 23px;
+
+		.svg-graph-hintbox-item-color {
+			margin: 3px 10px 3px -20px;
+			width: 10px;
+			height: 10px;
+			float: left;
+			display: block;
+		}
 	}
 }
 
@@ -4294,6 +4375,7 @@ $form-icon-btn: (
 
 // Debug, Overlay Description
 .debug-output {
+	display: none;
 	max-height: 600px;
 	overflow-y: auto;
 	padding: 11px;
@@ -4599,7 +4681,6 @@ a.link-action {
 	background-color: $ui-bg-selected-color;
 	margin: 1px 3px 1px 0;
 	padding: 2px 3px;
-	text-align: center;
 	line-height: 1em;
 	max-width: 133px;
 	vertical-align: middle;
@@ -5207,21 +5288,22 @@ a.overlay-close-btn {
 		cursor: pointer;
 	}
 
-	input[readonly] + div, input:disabled + div {
-		cursor: default;
+	input[readonly],
+	input:disabled {
+		color: $form-disabled-font-color !important;
+
+		+ div {
+			cursor: default;
+		}
+	}
+
+	input:disabled + div {
+		background: $form-disabled-font-color !important;
+		border: 1px solid $form-disabled-font-color;
 	}
 
 	input[type="text"] {
 		padding-left: 25px;
-	}
-
-	&.disabled {
-		opacity: 1;
-
-		div {
-			background: $form-disabled-font-color !important;
-			border: 1px solid $form-disabled-font-color;
-		}
 	}
 }
 
@@ -5460,6 +5542,10 @@ tr.cursor-move {
 	position: relative;
 }
 
+.graph-wrapper {
+	display: inline;
+}
+
 // Analog Clock
 .clock {
 	padding: 0 10px;
@@ -5519,6 +5605,7 @@ svg {
 	border: 10px solid $ui-bg-color;
 	background: $ui-bg-color;
 	display: block;
+	margin: 4px 0;
 
 	.map-container {
 		display: table;
@@ -5550,10 +5637,17 @@ svg {
 .overrides-list {
 	display: table;
 	width: 90%;
+	max-width: 738px;
 	padding-left: 15px;
 
 	.overrides-list-item {
 		display: table-row;
+
+		& .remove-btn {
+			position: relative;
+			right: -73px;
+			top: 3px;
+		}
 	}
 }
 
@@ -5570,8 +5664,8 @@ svg {
 
 		> div {
 			position: relative;
-			padding: 1px 22px 1px 1px;
-			background-color: lighten($ui-bg-selected-color, 10%);
+			padding: 1px 18px 1px 1px;
+			background-color: $ui-bg-selected-color;
 			border-radius: 2px;
 
 			> span {
@@ -5587,16 +5681,24 @@ svg {
 				width: 85px;
 			}
 
-			> .remove-btn {
-				color: #ffffff;
-				right: 2px;
-				top: 3px;
+			> .subfilter-disable-btn {
+				border: none !important;
+				right: 0px;
+				top: 0px;
 
-				&:active {
-					background-color: lighten($ui-bg-selected-color, 100%);
+				&:focus,
+				&:hover {
+					background: none;
 				}
 			}
 		}
+	}
+}
+
+.list-accordion-foot {
+	& > div {
+		display: table-cell;
+		padding-top: 10px;
 	}
 }
 
@@ -5605,21 +5707,24 @@ svg {
 	width: 24px;
 	float: left;
 	margin-right: 10px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: #ffffff;
-	font-weight: bold;
 	cursor: pointer;
+	border: none;
+	border-radius: 0px;
 }
 
 .list-vertical-accordion {
 	display: table;
 	padding-left: 15px;
-	width: 100%;
+	width: calc(100% - 15px);
 
 	.list-accordion-item {
 		display: table-row;
+
+		& .remove-btn {
+			position: relative;
+			right: -10px;
+			top: 3px;
+		}
 	}
 
 	.list-accordion-item-closed {
@@ -5636,6 +5741,10 @@ svg {
 			height: 24px;
 		}
 	}
+}
+
+.patternselect {
+	line-height: 14px;
 }
 
 .columns-wrapper {
@@ -6096,49 +6205,70 @@ $range-thumb-color-focus: $link-active-color;
 $range-progress-color-focus: $link-active-color;
 $range-thumb-size: 10px;
 $range-track-height: 2px;
-
-[type=range] {
-	cursor: pointer;
-	-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
-	width: 100%; /* Specific width is required for Firefox. */
-	opacity: 0;
-	vertical-align: middle;
-	padding: 0px;
-	height: 24px;
-}
-
-[type=range]:focus {
-	outline: none;
-}
-
-/* Special styling for WebKit/Blink */
-input[type=range]::-webkit-slider-thumb {
-	cursor: pointer;
-	margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
-	height: $range-thumb-size;
-	width: $range-thumb-size;
-	opacity: 0;
-}
-
-input[type=range]::-webkit-slider-runnable-track {
-	height: $range-thumb-size;
-	opacity: 0;
-}
-
+$range-input-width: 31px;
 
 .range-control {
 	position: relative;
 	display: inline-block;
 	vertical-align: middle;
-	margin: 0 $range-thumb-size 0 0;
 
-	.range-control-track, .range-control-progress {
+	input[type=range] {
+		cursor: pointer;
+		-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+		width: calc(100% + 10px);
+		opacity: 0;
+		vertical-align: middle;
+		margin: 0 -5px;
+		padding: 0px;
+		height: 20px;
+
+		&:focus {
+			outline: none;
+		}
+
+		/* Special styling for WebKit/Blink */
+		&::-webkit-slider-thumb {
+			margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+			height: $range-thumb-size;
+			width: $range-thumb-size;
+			opacity: 0;
+		}
+
+		&::-webkit-slider-runnable-track {
+			height: $range-thumb-size;
+			opacity: 0;
+		}
+	}
+
+	input[type=text] {
+		width: $range-input-width;
+		float: right;
+	}
+
+	> div {
+		position: relative;
+		width: calc(100% - 10px - #{$range-input-width});
+		margin: 2px $range-thumb-size 0 0;
+		float: left;
+	}
+
+	.range-control-track,
+	.range-control-progress {
 		position: absolute;
 		top: 50%;
 		margin-top: -$range-track-height/2;
 		left: 0;
 		height: $range-track-height;
 		cursor: pointer;
+	}
+
+	.range-control-track {
+		width: 100%;
+		background: $range-track-color;
+	}
+
+	.range-control-progress {
+		background: $range-progress-color;
 	}
 
 	.range-control-thumb {
@@ -6153,19 +6283,21 @@ input[type=range]::-webkit-slider-runnable-track {
 		background: $range-thumb-color;
 	}
 
-	.range-control-track {
-		width: 100%;
-		background: $range-track-color;
-	}
+	&.range-control-focus {
+		.range-control-thumb {
+			background: $range-thumb-color-focus;
+			box-shadow: 0 0 0 2px lighten($btn-bg-color, 10%);
+		}
 
-	.range-control-progress {
-		background: $range-progress-color;
+		.range-control-progress {
+			background: $range-progress-color-focus;
+		}
 	}
 
 	&.disabled {
 		opacity: 1;
 
-		[type=range] {
+		input[type=range] {
 			cursor: default;
 		}
 		.range-control-progress,
@@ -6191,24 +6323,6 @@ input[type=range]::-webkit-slider-runnable-track {
 	}
 }
 
-div.range-control {
-	width: 240px;
-}
-input[type=text].range-control {
-	width: 31px;
-}
-
-.range-control-focus {
-	.range-control-thumb {
-		background: $range-thumb-color-focus;
-		box-shadow: 0 0 1px black;
-	}
-
-	.range-control-progress {
-		background: $range-progress-color-focus;
-	}
-}
-
 .graph-legend {
 	text-align: left;
 	white-space: nowrap;
@@ -6220,7 +6334,9 @@ input[type=text].range-control {
 	padding: 10px 0px;
 
 	> .tabs-nav {
-		padding-left: calc(15% + 20px);
+		padding-left: calc(15% + 10px);
+		margin-right: 0;
+		margin-left: 0;
 	}
 }
 

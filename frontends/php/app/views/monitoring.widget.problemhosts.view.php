@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,8 +41,7 @@ $url_group = (new CUrl('zabbix.php'))
 	->setArgument('filter_show_suppressed', ($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 		? ZBX_PROBLEM_SUPPRESSED_TRUE
 		: null
-	)
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	);
 $url_host = (new CUrl('zabbix.php'))
 	->setArgument('action', 'problem.view')
 	->setArgument('filter_set', 1)
@@ -53,8 +52,7 @@ $url_host = (new CUrl('zabbix.php'))
 	->setArgument('filter_show_suppressed', ($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 		? ZBX_PROBLEM_SUPPRESSED_TRUE
 		: null
-	)
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	);
 
 foreach ($data['groups'] as $group) {
 	$problematic_count_key = ($data['filter']['ext_ack'] == EXTACK_OPTION_UNACK)
@@ -142,8 +140,7 @@ foreach ($data['groups'] as $group) {
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString(),
-	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'body' => $table->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

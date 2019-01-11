@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -391,9 +391,8 @@ $pageFilter = new CPageFilter([
 ]);
 
 if (empty($_REQUEST['parent_discoveryid'])) {
-	if ($pageFilter->hostid > 0) {
-		$hostId = $pageFilter->hostid;
-	}
+	$groupId = $pageFilter->groupid;
+	$hostId = $pageFilter->hostid;
 }
 
 if (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasRequest('group_graphid')) {
@@ -464,46 +463,10 @@ elseif (isset($_REQUEST['form'])) {
 		}
 
 		// templates
-		if (!empty($data['templateid'])) {
-			$parentGraphid = $data['templateid'];
-			do {
-				$parentGraph = getGraphByGraphId($parentGraphid);
-
-				// parent graph prototype link
-				if (getRequest('parent_discoveryid')) {
-					$parentGraphPrototype = API::GraphPrototype()->get([
-						'output' => ['graphid'],
-						'graphids' => $parentGraph['graphid'],
-						'selectTemplates' => API_OUTPUT_EXTEND,
-						'selectDiscoveryRule' => ['itemid']
-					]);
-					if ($parentGraphPrototype) {
-						$parentGraphPrototype = reset($parentGraphPrototype);
-						$parentTemplate = reset($parentGraphPrototype['templates']);
-
-						$link = new CLink($parentTemplate['name'],
-							'graphs.php?form=update&graphid='.$parentGraphPrototype['graphid'].'&hostid='.$parentTemplate['templateid'].'&parent_discoveryid='.$parentGraphPrototype['discoveryRule']['itemid']
-						);
-					}
-				}
-				// parent graph link
-				else {
-					$parentTemplate = get_hosts_by_graphid($parentGraph['graphid']);
-					$parentTemplate = DBfetch($parentTemplate);
-
-					$link = new CLink($parentTemplate['name'],
-						'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid']
-					);
-				}
-				if (isset($link)) {
-					$data['templates'][] = $link;
-					$data['templates'][] = ' &rArr; ';
-				}
-				$parentGraphid = $parentGraph['templateid'];
-			} while ($parentGraphid != 0);
-			$data['templates'] = array_reverse($data['templates']);
-			array_shift($data['templates']);
-		}
+		$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		$data['templates'] = makeGraphTemplatesHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
+			$flag
+		);
 
 		// items
 		$data['items'] = API::GraphItem()->get([
@@ -641,33 +604,34 @@ else {
 	$data = [
 		'pageFilter' => $pageFilter,
 		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : $hostId,
-		'parent_discoveryid' => isset($discoveryRule) ? $discoveryRule['itemid'] : null,
+		'parent_discoveryid' => hasRequest('parent_discoveryid') ? $discoveryRule['itemid'] : null,
 		'graphs' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
 	];
 
-	// get graphs
-	$options = [
-		'hostids' => ($data['hostid'] == 0) ? null : $data['hostid'],
-		'groupids' => ($data['hostid'] == 0 && $pageFilter->groupid > 0) ? $pageFilter->groupids : null,
-		'discoveryids' => isset($discoveryRule) ? $discoveryRule['itemid'] : null,
-		'editable' => true,
-		'output' => ['graphid', 'name', 'graphtype'],
-		'limit' => $config['search_limit'] + 1
-	];
+	if ($data['pageFilter']->hostsSelected) {
+		$options = [
+			'output' => ['graphid', 'name', 'graphtype'],
+			'hostids' => ($data['hostid'] == 0) ? null : $data['hostid'],
+			'groupids' => ($data['hostid'] == 0 && $pageFilter->groupid > 0) ? $pageFilter->groupids : null,
+			'discoveryids' => hasRequest('parent_discoveryid') ? $discoveryRule['itemid'] : null,
+			'editable' => true,
+			'limit' => $config['search_limit'] + 1
+		];
 
-	$data['graphs'] = isset($discoveryRule)
-		? API::GraphPrototype()->get($options)
-		: API::Graph()->get($options);
+		$data['graphs'] = hasRequest('parent_discoveryid')
+			? API::GraphPrototype()->get($options)
+			: API::Graph()->get($options);
 
-	if ($sortField == 'graphtype') {
-		foreach ($data['graphs'] as $gnum => $graph) {
-			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
+		if ($sortField === 'graphtype') {
+			foreach ($data['graphs'] as $gnum => $graph) {
+				$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
+			}
 		}
-	}
 
-	order_result($data['graphs'], $sortField, $sortOrder);
+		order_result($data['graphs'], $sortField, $sortOrder);
+	}
 
 	$url = (new CUrl('graphs.php'))
 		->setArgument('groupid', $pageFilter->groupid)
@@ -675,24 +639,31 @@ else {
 
 	$data['paging'] = getPagingLine($data['graphs'], $sortOrder, $url);
 
-	// get graphs after paging
-	$options = [
-		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
-		'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
-		'selectDiscoveryRule' => ['itemid', 'name'],
-		'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
-		'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null
-	];
+	if ($data['pageFilter']->hostsSelected) {
+		// Get graphs after paging.
+		$options = [
+			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
+			'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null,
+			'graphids' => zbx_objectValues($data['graphs'], 'graphid')
+		];
 
-	$data['graphs'] = empty($_REQUEST['parent_discoveryid'])
-		? API::Graph()->get($options)
-		: API::GraphPrototype()->get($options);
+		$data['graphs'] = hasRequest('parent_discoveryid')
+			? API::GraphPrototype()->get($options)
+			: API::Graph()->get($options);
 
-	foreach ($data['graphs'] as $gnum => $graph) {
-		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
+		foreach ($data['graphs'] as $gnum => $graph) {
+			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
+		}
+
+		order_result($data['graphs'], $sortField, $sortOrder);
 	}
 
-	order_result($data['graphs'], $sortField, $sortOrder);
+	$data['parent_templates'] = getGraphParentTemplates($data['graphs'], ($data['parent_discoveryid'] === null)
+		? ZBX_FLAG_DISCOVERY_NORMAL
+		: ZBX_FLAG_DISCOVERY_PROTOTYPE
+	);
 
 	// render view
 	$graphView = new CView('configuration.graph.list', $data);

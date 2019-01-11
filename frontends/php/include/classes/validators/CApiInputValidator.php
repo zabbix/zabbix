@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,6 +70,9 @@ class CApiInputValidator {
 	 */
 	private static function validateData($rule, &$data, $path, &$error, array $parent_data = null) {
 		switch ($rule['type']) {
+			case API_COLOR:
+				return self::validateColor($rule, $data, $path, $error);
+
 			case API_MULTIPLE:
 				if ($parent_data !== null) {
 					return self::validateMultiple($rule, $data, $path, $error, $parent_data);
@@ -114,6 +117,9 @@ class CApiInputValidator {
 
 			case API_H_NAME:
 				return self::validateHostName($rule, $data, $path, $error);
+
+			case API_NUMERIC:
+				return self::validateNumeric($rule, $data, $path, $error);
 
 			case API_SCRIPT_NAME:
 				return self::validateScriptName($rule, $data, $path, $error);
@@ -161,6 +167,7 @@ class CApiInputValidator {
 	 */
 	private static function validateDataUniqueness($rule, &$data, $path, &$error) {
 		switch ($rule['type']) {
+			case API_COLOR:
 			case API_MULTIPLE:
 			case API_STRING_UTF8:
 			case API_INT32:
@@ -170,6 +177,7 @@ class CApiInputValidator {
 			case API_OUTPUT:
 			case API_HG_NAME:
 			case API_H_NAME:
+			case API_NUMERIC:
 			case API_SCRIPT_NAME:
 			case API_USER_MACRO:
 			case API_RANGE_TIME:
@@ -230,6 +238,38 @@ class CApiInputValidator {
 
 		if (($flags & API_NOT_EMPTY) && $data === '') {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Color validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateColor($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (preg_match('/^[0-9a-f]{6}$/i', $data) !== 1) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('a hexadecimal colour code (6 symbols) is expected')
+			);
 			return false;
 		}
 
@@ -496,7 +536,7 @@ class CApiInputValidator {
 	 * Identifier validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
+	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL, API_NOT_EMPTY
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -512,6 +552,11 @@ class CApiInputValidator {
 
 		if (!is_scalar($data) || is_bool($data) || is_double($data) || !ctype_digit(strval($data))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) && $data == 0) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
 			return false;
 		}
 
@@ -868,6 +913,60 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Validator for numeric data with optional suffix.
+	 * Supported time suffixes: s, m, h, d, w
+	 * Supported metric suffixes: K, M, G, T
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateNumeric($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (is_int($data)) {
+			$data = (string) $data;
+		}
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		$pattern = '/^(-?)0*(0|[1-9][0-9]*)(\.?[0-9]+)?(['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.'])?$/';
+
+		if (1 != preg_match($pattern, strval($data))) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+			return false;
+		}
+
+		$value = convertFunctionValue($data, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+
+		if (bccomp($value, ZBX_MIN_INT64) < 0 || bccomp($value, ZBX_MAX_INT64) > 0) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+			return false;
+		}
+
+		// Trim leading zeroes.
+		$data = preg_replace($pattern, '${1}${2}${3}${4}', (string) $data);
+
+		return true;
+	}
+
+	/**
 	 * Global script name validator.
 	 *
 	 * @param array  $rule
@@ -1026,7 +1125,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (false === @preg_match('/'.$data.'/', '')) {
+		if (@preg_match('/'.str_replace('/', '\/', $data).'/', '') === false) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid regular expression'));
 			return false;
 		}
@@ -1038,7 +1137,7 @@ class CApiInputValidator {
 	 * Time unit validator like "10", "20s", "30m", "4h", "{$TIME}" etc.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
 	 * @param int    $rule['in']      (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -1057,13 +1156,18 @@ class CApiInputValidator {
 			$data = (string) $data;
 		}
 
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
 		}
 
 		$simple_interval_parser = new CSimpleIntervalParser([
 			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
-			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'negative' => true
 		]);
 
 		if ($simple_interval_parser->parse($data) != CParser::PARSE_SUCCESS) {
@@ -1077,7 +1181,7 @@ class CApiInputValidator {
 
 		$seconds = timeUnitToSeconds($data);
 
-		if (bccomp($seconds, ZBX_MAX_INT32) > 0) {
+		if (bccomp(ZBX_MIN_INT32, $seconds) > 0 || bccomp($seconds, ZBX_MAX_INT32) > 0) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}
@@ -1270,7 +1374,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['length']  (optional)
-	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO
+	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_NOT_EMPTY
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1280,7 +1384,7 @@ class CApiInputValidator {
 	private static function validateUrl($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (self::checkStringUtf8(0x00, $data, $path, $error) === false) {
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 

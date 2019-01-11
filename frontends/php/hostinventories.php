@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,14 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
+$page['scripts'] = ['layout.mode.js'];
+
+$hostId = getRequest('hostid', 0);
+
+if ($hostId > 0) {
+	CView::$has_web_layout_mode = true;
+	$page['web_layout_mode'] = CView::getLayoutMode();
+}
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -44,8 +52,7 @@ $fields = [
 								IN('"name","pr_macaddress_a","pr_name","pr_os","pr_serialno_a","pr_tag","pr_type"'),
 								null
 							],
-	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null],
-	'fullscreen' =>		    [T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null]
+	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
 
@@ -65,16 +72,10 @@ $sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortor
 CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-$hostId = getRequest('hostid', 0);
-
 /*
  * Display
  */
 if ($hostId > 0) {
-	$data = [
-		'fullscreen' => getRequest('fullscreen', 0)
-	];
-
 	// host scripts
 	$data['hostScripts'] = API::Script()->getScriptsByHosts([$hostId]);
 

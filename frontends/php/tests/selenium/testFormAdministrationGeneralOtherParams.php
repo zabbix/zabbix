@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,26 +18,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup config
  */
-class testFormAdministrationGeneralOtherParams extends CWebTest {
+class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 
 	public static function allValues() {
-
-		return DBdata('SELECT refresh_unsupported, snmptrap_logging FROM config ORDER BY configid');
+		return CDBHelper::getDataProvider('SELECT refresh_unsupported, snmptrap_logging FROM config ORDER BY configid');
 	}
 
 	public static function allGroups() {
-
-		return DBdata('SELECT name FROM hstgrp ORDER BY groupid');
+		return CDBHelper::getDataProvider('SELECT name FROM hstgrp ORDER BY groupid');
 	}
 
 	public static function AlertUsrgrpid() {
-
-		return DBdata('SELECT * FROM usrgrp ORDER BY usrgrpid');
+		return CDBHelper::getDataProvider('SELECT * FROM usrgrp ORDER BY usrgrpid');
 	}
 
 	/**
@@ -115,9 +112,9 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestTextPresent('Configuration updated');
 
 		$sql = "SELECT refresh_unsupported FROM config WHERE refresh_unsupported='700'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 		$sql = 'SELECT snmptrap_logging FROM config WHERE snmptrap_logging=1';
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
@@ -131,9 +128,9 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestTextPresent('Configuration updated');
 
 		$sql = "SELECT refresh_unsupported FROM config WHERE refresh_unsupported='86400'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 		$sql = 'SELECT snmptrap_logging FROM config WHERE snmptrap_logging=0';
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
 		// trying to enter value > max_value
 		$this->zbxTestCheckTitle('Other configuration parameters');

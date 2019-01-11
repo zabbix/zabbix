@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -524,7 +524,7 @@ function closeDialogHandler(event) {
 
 				// Close overlay hintbox.
 				case 'hintbox':
-					hintBox.hideHint(null, dialog.element, true);
+					hintBox.hideHint(dialog.element, true);
 					break;
 
 				// Close context menu overlays.
@@ -534,7 +534,7 @@ function closeDialogHandler(event) {
 
 				// Close overlay time picker.
 				case 'clndr':
-					getCalendarByID(dialog.dialogueid.toString()).clndr.clndrhide();
+					CLNDR.clndrhide();
 					break;
 
 				// Close overlay message.
@@ -556,7 +556,7 @@ function closeDialogHandler(event) {
 /*
  * Removed overlay from overlays stack and sets focus to source element.
  *
- * @param {string} dialogueid		Id of dialogue, that is beeing closed.
+ * @param {string} dialogueid		Id of dialogue, that is being closed.
  * @param {boolean} return_focus	If not FALSE, the element stored in overlay.element will be focused.
  */
 function removeFromOverlaysStack(dialogueid, return_focus) {

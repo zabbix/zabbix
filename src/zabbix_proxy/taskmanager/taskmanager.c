@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -298,11 +298,10 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	{
 		zbx_sleep_loop(sleeptime);
 
-		zbx_handle_log();
+		sec1 = zbx_time();
+		zbx_update_env(sec1);
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
-
-		sec1 = zbx_time();
 
 		tasks_num = tm_process_tasks((int)sec1);
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
@@ -320,9 +319,5 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 }

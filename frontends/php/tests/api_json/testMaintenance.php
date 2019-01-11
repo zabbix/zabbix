@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup maintenances
  */
-class testMaintenance extends CZabbixTest {
+class testMaintenance extends CAPITest {
 	public static function getMaintenanceCreateData() {
 		$n = 0;
 		$def_options = [
@@ -304,7 +304,7 @@ class testMaintenance extends CZabbixTest {
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/tags/1/operator": a number is expected.'
 			],
-			// Fail. Possible values for "operator" are 0 (Equal) and 2 (Like).
+			// Fail. Possible values for "operator" are 0 (Equals) and 2 (Contains).
 			[
 				'request_data' => [
 					'name' => 'M'.++$n,

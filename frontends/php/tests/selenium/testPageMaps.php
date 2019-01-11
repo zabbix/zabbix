@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,15 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageMaps extends CWebTest {
+class testPageMaps extends CLegacyWebTest {
 	public $mapName = 'Local network';
 	public $mapWidth = 680;
 	public $mapHeight = 200;
 
 	public static function allMaps() {
-		return DBdata('select * from sysmaps');
+		return CDBHelper::getDataProvider('select * from sysmaps');
 	}
 
 	public function testPageMaps_CheckLayout() {
@@ -59,13 +59,13 @@ class testPageMaps extends CWebTest {
 		$sysmapid = $map['sysmapid'];
 
 		$sqlMap = "select * from sysmaps where name='$name' order by sysmapid";
-		$oldHashMap = DBhash($sqlMap);
+		$oldHashMap = CDBHelper::getHash($sqlMap);
 		$sqlElements = "select * from sysmaps_elements where sysmapid=$sysmapid order by selementid";
-		$oldHashElements = DBhash($sqlElements);
+		$oldHashElements = CDBHelper::getHash($sqlElements);
 		$sqlLinks = "select * from sysmaps_links where sysmapid=$sysmapid order by linkid";
-		$oldHashLinks = DBhash($sqlLinks);
+		$oldHashLinks = CDBHelper::getHash($sqlLinks);
 		$sqlLinkTriggers = "SELECT slt.* FROM sysmaps_link_triggers slt, sysmaps_links sl WHERE slt.linkid = sl.linkid AND sl.sysmapid=$sysmapid ORDER BY slt.linktriggerid";
-		$oldHashLinkTriggers = DBhash($sqlLinkTriggers);
+		$oldHashLinkTriggers = CDBHelper::getHash($sqlLinkTriggers);
 
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
@@ -81,10 +81,10 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestCheckHeader('Maps');
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals($oldHashMap, DBhash($sqlMap));
-		$this->assertEquals($oldHashElements, DBhash($sqlElements));
-		$this->assertEquals($oldHashLinks, DBhash($sqlLinks));
-		$this->assertEquals($oldHashLinkTriggers, DBhash($sqlLinkTriggers));
+		$this->assertEquals($oldHashMap, CDBHelper::getHash($sqlMap));
+		$this->assertEquals($oldHashElements, CDBHelper::getHash($sqlElements));
+		$this->assertEquals($oldHashLinks, CDBHelper::getHash($sqlLinks));
+		$this->assertEquals($oldHashLinkTriggers, CDBHelper::getHash($sqlLinkTriggers));
 	}
 
 	/**
@@ -95,13 +95,13 @@ class testPageMaps extends CWebTest {
 		$sysmapid = $map['sysmapid'];
 
 		$sqlMap = "select * from sysmaps where name='$name' order by sysmapid";
-		$oldHashMap = DBhash($sqlMap);
+		$oldHashMap = CDBHelper::getHash($sqlMap);
 		$sqlElements = "select * from sysmaps_elements where sysmapid=$sysmapid order by selementid";
-		$oldHashElements = DBhash($sqlElements);
+		$oldHashElements = CDBHelper::getHash($sqlElements);
 		$sqlLinks = "select * from sysmaps_links where sysmapid=$sysmapid order by linkid";
-		$oldHashLinks = DBhash($sqlLinks);
+		$oldHashLinks = CDBHelper::getHash($sqlLinks);
 		$sqlLinkTriggers = "select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
-		$oldHashLinkTriggers = DBhash($sqlLinkTriggers);
+		$oldHashLinkTriggers = CDBHelper::getHash($sqlLinkTriggers);
 
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
@@ -114,10 +114,10 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestTextPresent('Configuration of network maps');
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals($oldHashMap, DBhash($sqlMap));
-		$this->assertEquals($oldHashElements, DBhash($sqlElements));
-		$this->assertEquals($oldHashLinks, DBhash($sqlLinks));
-		$this->assertEquals($oldHashLinkTriggers, DBhash($sqlLinkTriggers));
+		$this->assertEquals($oldHashMap, CDBHelper::getHash($sqlMap));
+		$this->assertEquals($oldHashElements, CDBHelper::getHash($sqlElements));
+		$this->assertEquals($oldHashLinks, CDBHelper::getHash($sqlLinks));
+		$this->assertEquals($oldHashLinkTriggers, CDBHelper::getHash($sqlLinkTriggers));
 	}
 
 	/**
@@ -138,15 +138,15 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$sql = "select * from sysmaps where sysmapid=$sysmapid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = "select * from sysmaps_elements where sysmapid=$sysmapid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = "select * from sysmaps_links where sysmapid=$sysmapid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = "select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = "select * from screens_items where resourcetype=".SCREEN_RESOURCE_MAP." and resourceid=$sysmapid;";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	public function testPageMaps_CreateCancel() {

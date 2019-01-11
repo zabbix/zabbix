@@ -106,7 +106,7 @@ out:
     - 2017-10-29 06:00:00 +02:00
 
 ---
-test case: Sheduled every 15m check when changing from winter time to summer
+test case: Scheduled every 15m check when changing from winter time to summer
 in:
   item type: ZABBIX
   delay: 0;m/15

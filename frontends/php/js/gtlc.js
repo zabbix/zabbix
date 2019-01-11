@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,8 +48,8 @@ jQuery(function ($){
 		xhr = null,
 		endpoint = new Curl('zabbix.php'),
 		element = {
-			from: container.find('#from'),
-			to: container.find('#to'),
+			from: container.find('[name=from]'),
+			to: container.find('[name=to]'),
 			from_clndr: container.find('[name=from_calendar]'),
 			to_clndr: container.find('[name=to_calendar]'),
 			apply: container.find('[name=apply]'),
@@ -60,11 +60,12 @@ jQuery(function ($){
 			label: container.find('.btn-time')
 		},
 		request_data = {
-			idx: container.length ? container.data()['profileIdx'] : '',
-			idx2: container.length ? container.data()['profileIdx2'] : 0,
+			idx: container.data('profileIdx'),
+			idx2: container.data('profileIdx2'),
 			from: element.from.val(),
 			to: element.to.val()
 		},
+		ui_accessible = (container.data('accessible') == 1),
 		ui_disabled = false;
 
 	endpoint.setArgument('action', 'timeselector.update');
@@ -136,6 +137,10 @@ jQuery(function ($){
 	 * @param {object} data Server response on 'timeselector.rangechange' request.
 	 */
 	function updateTimeSelectorUI(data) {
+		if (!ui_accessible) {
+			return;
+		}
+
 		if ('error' in data === false) {
 			element.from.val(data.from);
 			element.to.val(data.to);
@@ -170,6 +175,10 @@ jQuery(function ($){
 	 * Disable time selector UI.
 	 */
 	function disableTimeSelectorUI() {
+		if (!ui_accessible) {
+			return;
+		}
+
 		element.apply.closest('.ui-tabs-panel').addClass('in-progress');
 		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', true);
 		$([element.decrement[0], element.zoomout[0], element.increment[0]]).addClass('disabled');
@@ -306,7 +315,6 @@ jQuery(function ($){
 
 	// Time selection box for graphs.
 	var selection = null,
-		anchor = null,
 		noclick_area = null,
 		was_dragged = false,
 		prevent_click = false;
@@ -411,9 +419,9 @@ jQuery(function ($){
 	 * @param {object} e    jQuery event object.
 	 */
 	function selectionHandlerDragEnd(e) {
-		var left = Math.floor(selection.dom.position().left),
+		var left = Math.floor(Math.max(selection.dom.position().left, selection.min)),
 			from_offset = (left - selection.min) * selection.seconds_per_px,
-			to_offset = (selection.max - selection.dom.width() - left) * selection.seconds_per_px,
+			to_offset = (selection.max - Math.floor(selection.dom.width()) - left) * selection.seconds_per_px,
 			zbx_sbox = e.data.zbx_sbox;
 
 		zbx_sbox.prevent_refresh = false;
@@ -448,7 +456,7 @@ jQuery(function ($){
 			width = Math.abs(x - selection.base_x),
 			seconds = Math.round(width * selection.seconds_per_px),
 			label = formatTimestamp(seconds, false, true)
-				+ (seconds < 60 ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
+				+ (seconds < 60 ? ' [min 1' + t('S_MINUTE_SHORT') + ']'  : '');
 
 		if (!was_dragged) {
 			was_dragged = true;
@@ -615,11 +623,6 @@ var timeControl = {
 			.on('load', function() {
 				img.replaceWith(clone);
 				window.flickerfreeScreen.setElementProgressState(obj.id, false);
-
-				// Update dashboard widget footer.
-				if (obj.onDashboard) {
-					timeControl.updateDashboardFooter(id);
-				}
 			});
 
 		var async = (obj.loadSBox == 0)
@@ -654,44 +657,6 @@ var timeControl = {
 		container.attr('href', graphUrl.getUrl());
 	},
 
-	/**
-	 * Updates dashboard widget footer for specified graph
-	 *
-	 * @param {string} id  Id of img tag with graph.
-	 */
-	updateDashboardFooter: function (id) {
-		var widgets = jQuery(".dashbrd-grid-widget-container")
-				.dashboardGrid("getWidgetsBy", "uniqueid", id.replace('graph_', ''));
-
-		if (widgets.length !== 1) {
-			return;
-		}
-
-		var widget = widgets[0],
-			obj = this.objectList[id],
-			url = new Curl('zabbix.php'),
-			post_args = {
-				uniqueid: widget['uniqueid'],
-				only_footer: 1
-			};
-
-		if (widget.type === 'graph') {
-			post_args.from = obj.timeline.from;
-			post_args.to = obj.timeline.to;
-		}
-
-		url.setArgument('action', 'widget.graph.view');
-		jQuery.ajax({
-			url: url.getUrl(),
-			method: 'POST',
-			data: post_args,
-			dataType: 'json',
-			success: function(resp) {
-				widget['content_footer'].html(resp.footer);
-			}
-		});
-	},
-
 	refreshObject: function(id) {
 		this.objectList[id].processed = 0;
 		this.objectList[id].refresh = true;
@@ -719,7 +684,7 @@ var timeControl = {
 		jQuery.each(this.objectList, function(i, obj) {
 			if (obj.loadSBox == 1) {
 				obj.loadSBox = 0;
-				jQuery('#'+obj.id).data('zbx_sbox', null);
+				jQuery('#'+obj.id).removeData('zbx_sbox');
 			}
 		});
 	},

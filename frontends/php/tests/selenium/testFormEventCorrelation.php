@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup correlation
  */
 
-class testFormEventCorrelation extends CWebTest {
+class testFormEventCorrelation extends CLegacyWebTest {
 
 	public static function create() {
 		return [
@@ -58,7 +58,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckHeader('Event correlation rules');
 		$this->zbxTestCheckTitle('Event correlation rules');
 
-		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
 		$this->zbxTestInputType('new_condition_tag', $data['tag']);
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
@@ -80,7 +80,7 @@ class testFormEventCorrelation extends CWebTest {
 
 		$this->zbxTestCheckFatalErrors();
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public static function validation() {
@@ -145,12 +145,12 @@ class testFormEventCorrelation extends CWebTest {
 
 		if 	(array_key_exists('name', $data) && $data['name'] === 'Event correlation for update') {
 			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-			$this->assertEquals(1, DBcount($sql));
+			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 
 		if (array_key_exists('name', $data) && $data['name'] != 'Event correlation for update') {
 			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-			$this->assertEquals(0, DBcount($sql));
+			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
 	}
 
@@ -179,23 +179,23 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 		// Name longer than 255 symbols is truncated on frontend, check the shortened name in DB
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($db_name);
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public static function tags() {
 		return [
 			[
 				[
-					'name' => 'Test create with New event host group =',
+					'name' => 'Test create with New event host group equals',
 					'select_tag' => 'New event host group',
-					'operator' => '='
+					'operator' => 'equals'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with New event host group !=',
+					'name' => 'Test create with New event host group does not equa',
 					'select_tag' => 'New event host group',
-					'operator' => '<>'
+					'operator' => 'does not equal'
 				]
 			],
 			[
@@ -208,91 +208,91 @@ class testFormEventCorrelation extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Test create with Old event tag value = tag',
+					'name' => 'Test create with Old event tag value equals tag',
 					'select_tag' => 'Old event tag value',
 					'tag' => 'TagTag',
-					'operator' => '=',
+					'operator' => 'equals',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with Old event tag value = Empty',
+					'name' => 'Test create with Old event tag value equals Empty',
 					'select_tag' => 'Old event tag value',
 					'tag' => 'TagTag',
-					'operator' => '=',
+					'operator' => 'equals',
 					'value' => ''
 				]
 			],
 			[
 				[
-					'name' => 'Test create with Old event tag value != tag',
+					'name' => 'Test create with Old event tag value does not equal tag',
 					'select_tag' => 'Old event tag value',
 					'tag' => 'TagTag',
-					'operator' => '<>',
+					'operator' => 'does not equal',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with Old event tag value like tag',
+					'name' => 'Test create with Old event tag value contains tag',
 					'select_tag' => 'Old event tag value',
 					'tag' => 'TagTag',
-					'operator' => 'like',
+					'operator' => 'contains',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with Old event tag value not like tag',
+					'name' => 'Test create with Old event tag value does not contain tag',
 					'select_tag' => 'Old event tag value',
 					'tag' => 'TagTag',
-					'operator' => 'not like',
+					'operator' => 'does not contain',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with New event tag value = tag',
+					'name' => 'Test create with New event tag value equals tag',
 					'select_tag' => 'New event tag value',
 					'tag' => 'TagTag',
-					'operator' => '=',
+					'operator' => 'equals',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with New event tag value = Empty',
+					'name' => 'Test create with New event tag value equals Empty',
 					'select_tag' => 'New event tag value',
 					'tag' => 'TagTag',
-					'operator' => '=',
+					'operator' => 'equals',
 					'value' => ''
 				]
 			],
 			[
 				[
-					'name' => 'Test create with New event tag value != tag',
+					'name' => 'Test create with New event tag value does not equal tag',
 					'select_tag' => 'New event tag value',
 					'tag' => 'TagTag',
-					'operator' => '<>',
+					'operator' => 'does not equal',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with New event tag value like tag',
+					'name' => 'Test create with New event tag value contains tag',
 					'select_tag' => 'New event tag value',
 					'tag' => 'TagTag',
-					'operator' => 'like',
+					'operator' => 'contains',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with New event tag value not like tag',
+					'name' => 'Test create with New event tag value does not contain tag',
 					'select_tag' => 'New event tag value',
 					'tag' => 'TagTag',
-					'operator' => 'not like',
+					'operator' => 'does not contain',
 					'value' => 'TagValue'
 				]
 			]
@@ -348,7 +348,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextPresent($data['name']);
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public static function tagsValidation() {
@@ -430,7 +430,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	public static function calculation() {
@@ -514,7 +514,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextPresent($data['name']);
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public static function formulaValidation() {
@@ -536,7 +536,7 @@ class testFormEventCorrelation extends CWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value']
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
 					],
 					'formula'=> 'A or B',
 					'error_message' => 'Condition "C" is not used in formula "A or B" for correlation "Test create with missing argument".'
@@ -548,7 +548,7 @@ class testFormEventCorrelation extends CWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value']
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
 					],
 					'formula'=> '(A or B) and (C or D)',
 					'error_message' => 'Condition "D" used in formula "(A or B) and (C or D)" for correlation "Test create with extra argument" is not defined.'
@@ -560,7 +560,7 @@ class testFormEventCorrelation extends CWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value']
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
 					],
 					'formula'=> 'Wrong formula',
 					'error_message' => 'Incorrect custom expression "Wrong formula" for correlation "Test create with wrong formula": check expression starting from "Wrong formula".'
@@ -637,7 +637,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	public function testFormEventCorrelation_Clone() {
@@ -655,13 +655,13 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Cloned correlation' AND description='Test description clone'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for clone' AND description='Test description clone'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
 		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='clone tag'";
-		$this->assertEquals(2, DBcount($sql));
+		$this->assertEquals(2, CDBHelper::getCount($sql));
 	}
 
 	/**
@@ -669,7 +669,7 @@ class testFormEventCorrelation extends CWebTest {
 	 */
 	public function testFormEventCorrelation_UpdateNone() {
 		$sql_hash = 'SELECT * FROM correlation ORDER BY correlationid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickLinkTextWait('Event correlation for update');
@@ -682,7 +682,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestTextPresent('Event correlation for update');
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	public function testFormEventCorrelation_UpdateAllFields() {
@@ -711,16 +711,16 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$sql = "SELECT NULL FROM correlation WHERE name='New event correlation for update' AND description='New test description update'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for update'";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 
 		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='New update tag'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
 		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='update tag'";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	public function testFormEventCorrelation_Delete() {
@@ -736,12 +736,12 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for delete'";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	public function testFormEventCorrelation_Cancel() {
 		$sql_hash = 'SELECT * FROM correlation ORDER BY correlationid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickLinkTextWait('Event correlation for cancel');
@@ -753,6 +753,6 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestTextPresent('Event correlation for cancel');
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 define('ZBX_PAGE_NO_HEADER', 1);
 define('ZBX_PAGE_NO_FOOTER', 1);
+define('ZBX_PAGE_NO_MENU', true);
 
 require_once dirname(__FILE__).'/../page_header.php';
 $error = null;

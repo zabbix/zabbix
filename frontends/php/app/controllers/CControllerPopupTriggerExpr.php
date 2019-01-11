@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,38 +46,46 @@ class CControllerPopupTriggerExpr extends CController {
 			PARAM_TYPE_COUNTS => _('Count')
 		];
 
+		/*
+		 * C - caption
+		 * T - type
+		 * M - metrics
+		 * A - asterisk
+		 */
 		$this->param1SecCount = [
-			[
-				'C' => _('Last of').' (T)',	// caption
-				'T' => T_ZBX_INT,			// type
-				'M' => $this->metrics		// metrics
+			'last' => [
+				'C' => _('Last of').' (T)',
+				'T' => T_ZBX_INT,
+				'M' => $this->metrics,
+				'A' => true
 			],
-			[
+			'shift' => [
 				'C' => _('Time shift'),
 				'T' => T_ZBX_INT
 			]
 		];
 
 		$this->param1Sec = [
-			[
+			'last' => [
 				'C' => _('Last of').' (T)',
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => true
 			]
 		];
 
 		$this->param1Str = [
-			[
+			'pattern' => [
 				'C' => 'T',
 				'T' => T_ZBX_STR
 			]
 		];
 
 		$this->param2SecCount = [
-			[
+			'pattern' => [
 				'C' => 'V',
 				'T' => T_ZBX_STR
 			],
-			[
+			'last' => [
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
 				'M' => $this->metrics
@@ -85,96 +93,105 @@ class CControllerPopupTriggerExpr extends CController {
 		];
 
 		$this->param3SecVal = [
-			[
+			'last' => [
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
-				'M' => $this->metrics
+				'M' => $this->metrics,
+				'A' => true
 			],
-			[
+			'v' => [
 				'C' => 'V',
 				'T' => T_ZBX_STR
 			],
-			[
+			'o' => [
 				'C' => 'O',
 				'T' => T_ZBX_STR
 			],
-			[
+			'shift' => [
 				'C' => _('Time shift'),
 				'T' => T_ZBX_INT
 			]
 		];
 
 		$this->param3SecPercent = [
-			[
+			'last' => [
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
-				'M' => $this->metrics
+				'M' => $this->metrics,
+				'A' => true
 			],
-			[
+			'shift' => [
 				'C' => _('Time shift'),
 				'T' => T_ZBX_INT
 			],
-			[
+			'p' => [
 				'C' => _('Percentage').' (P)',
-				'T' => T_ZBX_DBL
+				'T' => T_ZBX_DBL,
+				'A' => true
 			]
 		];
 
 		$this->paramSecIntCount = [
-			[
+			'last' => [
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
-				'M' => $this->metrics
+				'M' => $this->metrics,
+				'A' => true
 			],
-			[
+			'mask' => [
 				'C' => _('Mask'),
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => true
 			],
-			[
+			'shift' => [
 				'C' => _('Time shift'),
 				'T' => T_ZBX_INT
 			]
 		];
 
 		$this->paramForecast = [
-			[
+			'last' => [
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
-				'M' => $this->metrics
+				'M' => $this->metrics,
+				'A' => true
 			],
-			[
+			'shift' => [
 				'C' => _('Time shift'),
 				'T' => T_ZBX_INT
 			],
-			[
+			'time' => [
 				'C' => _('Time').' (t)',
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => true
 			],
-			[
+			'fit' => [
 				'C' => _('Fit'),
 				'T' => T_ZBX_STR
 			],
-			[
+			'mode' => [
 				'C' => _('Mode'),
 				'T' => T_ZBX_STR
 			]
 		];
 
 		$this->paramTimeleft = [
-			[
+			'last' => [
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
-				'M' => $this->metrics
+				'M' => $this->metrics,
+				'A' => true
 			],
-			[
+			'shift' => [
 				'C' => _('Time shift'),
 				'T' => T_ZBX_INT
 			],
-			[
+			't' => [
 				'C' => _('Threshold'),
-				'T' => T_ZBX_DBL
+				'T' => T_ZBX_DBL,
+				'A' => true
 			],
-			[
+			'fit' => [
 				'C' => _('Fit'),
 				'T' => T_ZBX_STR
 			]
@@ -304,7 +321,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'fuzzytime' => [
-				'description' => _('fuzzytime() - Difference between item timestamp value and Zabbix server timestamp is over T seconds (1 - true, 0 - false)'),
+				'description' => _('fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)'),
 				'params' => $this->param1Sec,
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>']
@@ -408,9 +425,14 @@ class CControllerPopupTriggerExpr extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
-			);
+			if ($this->hasInput('add')) {
+				$this->setResponse(
+					(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+				);
+			}
+			else {
+				$ret = true;
+			}
 		}
 
 		return $ret;
@@ -448,7 +470,8 @@ class CControllerPopupTriggerExpr extends CController {
 					$params = $function_macro_token['data']['functionParams'];
 					$param_number = in_array($function, ['regexp', 'iregexp', 'str']) ? 1 : 0;
 					if (array_key_exists($param_number, $params) && is_string($params[$param_number])
-							&& $params[$param_number] !== '' && $params[$param_number][0] === '#') {
+							&& $params[$param_number] !== '' && $params[$param_number][0] === '#'
+							&& !in_array($function, ['fuzzytime', 'nodata'])) {
 						$param_type = PARAM_TYPE_COUNTS;
 						$params[$param_number] = substr($params[$param_number], 1);
 					}
@@ -566,11 +589,9 @@ class CControllerPopupTriggerExpr extends CController {
 			}
 		}
 
-		if (!$this->getInput('add', false) && $data['selectedFunction'] === null) {
-			error(_s('Function "%1$s" cannot be used with selected item "%2$s"',
-				$data['functions'][$function]['description'],
-				$data['description']
-			));
+		if ($data['selectedFunction'] === null) {
+			$data['selectedFunction'] = 'last';
+			$data['function'] = 'last';
 		}
 
 		// Remove functions that not correspond to chosen item.
@@ -590,13 +611,13 @@ class CControllerPopupTriggerExpr extends CController {
 		if ($this->getInput('add', false)) {
 			try {
 				if ($data['description']) {
-					if ($data['paramtype'] == PARAM_TYPE_COUNTS) {
-						$param_number = in_array($function, ['regexp', 'iregexp', 'str']) ? 1 : 0;
-						$data['params'][$param_number] = '#'.$data['params'][$param_number];
+					if ($data['paramtype'] == PARAM_TYPE_COUNTS
+							&& array_key_exists('last', $data['params'])
+							&& $data['params']['last'] !== '') {
+						$data['params']['last'] = '#'.$data['params']['last'];
 					}
-
-					if ($data['paramtype'] == PARAM_TYPE_TIME && in_array($function, ['last', 'band', 'strlen'])) {
-						$data['params'][0] = '';
+					elseif ($data['paramtype'] == PARAM_TYPE_TIME && in_array($function, ['last', 'band', 'strlen'])) {
+						$data['params']['last'] = '';
 					}
 
 					// Quote function param.

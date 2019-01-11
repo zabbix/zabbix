@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -270,7 +270,6 @@ typedef enum
 	ITEM_DATA_TYPE_BOOLEAN
 }
 zbx_item_data_type_t;
-const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type);
 
 /* service supported by discoverer */
 typedef enum
@@ -847,9 +846,14 @@ do				\
 }				\
 while (0)
 
-#define THIS_SHOULD_NEVER_HAPPEN	zbx_error("ERROR [file:%s,line:%d] "				\
-							"Something impossible has just happened.",	\
-							__FILE__, __LINE__)
+#define THIS_SHOULD_NEVER_HAPPEN										\
+														\
+do														\
+{														\
+	zbx_error("ERROR [file:%s,line:%d] Something impossible has just happened.", __FILE__, __LINE__);	\
+	zbx_backtrace();											\
+}														\
+while (0)
 
 #define MIN_ZABBIX_PORT 1024u
 #define MAX_ZABBIX_PORT 65535u
@@ -974,7 +978,7 @@ void	zbx_lrtrim(char *str, const char *charlist);
 void	zbx_remove_chars(char *str, const char *charlist);
 #define ZBX_WHITESPACE			" \t\r\n"
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
-void	del_zeroes(char *s);
+void	del_zeros(char *s);
 int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
@@ -994,9 +998,9 @@ char	*get_param_dyn(const char *param, int num);
  *      cb_data   - [IN] callback function custom data                        *
  *      param     - [OUT] replaced item key string                            *
  *                                                                            *
- * Return value: SUCEED - if parameter doesn't change or has been changed     *
- *                        successfully                                        *
- *               FAIL   - otherwise                                           *
+ * Return value: SUCCEED - if parameter doesn't change or has been changed    *
+ *                         successfully                                       *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: The new string should be quoted if it contains special           *
  *           characters                                                       *
@@ -1016,8 +1020,9 @@ size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
 
 typedef struct zbx_custom_interval	zbx_custom_interval_t;
-int	zbx_interval_preproc(const char *interval_str, int *simple_interval,
-		zbx_custom_interval_t **custom_intervals, char **error);
+int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
+		char **error);
+int	zbx_validate_interval(const char *str, char **error);
 void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals);
 int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
 		const zbx_custom_interval_t *custom_intervals, time_t now);
@@ -1083,7 +1088,7 @@ int	zbx_day_in_month(int year, int mon);
 
 void	__zbx_zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
-size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
+size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_format_printf(3, 4);
 
 void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
@@ -1094,6 +1099,8 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
+
+void	zbx_strsplit(const char *src, char delimiter, char **left, char **right);
 
 /* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
@@ -1134,6 +1141,7 @@ int	is_ip(const char *ip);
 int	zbx_validate_hostname(const char *hostname);
 
 void	zbx_on_exit(void); /* calls exit() at the end! */
+void	zbx_backtrace(void);
 
 int	int_in_list(char *list, int value);
 int	ip_in_list(const char *list, const char *ip);
@@ -1208,6 +1216,7 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
+#define ZBX_MAX_BYTES_IN_UTF8_CHAR	4
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
 size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen);
@@ -1265,6 +1274,7 @@ int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
 
 int	zbx_number_parse(const char *number, int *len);
+int	zbx_suffixed_number_parse(const char *number, int *len);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 
@@ -1340,11 +1350,12 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
 
 /* additional token flags */
-#define ZBX_TOKEN_NUMERIC	0x08000
-#define ZBX_TOKEN_JSON		0x10000
-#define ZBX_TOKEN_XML		0x20000
-#define ZBX_TOKEN_REGEXP	0x40000
-#define ZBX_TOKEN_XPATH		0x80000
+#define ZBX_TOKEN_NUMERIC	0x008000
+#define ZBX_TOKEN_JSON		0x010000
+#define ZBX_TOKEN_XML		0x020000
+#define ZBX_TOKEN_REGEXP	0x040000
+#define ZBX_TOKEN_XPATH		0x080000
+#define ZBX_TOKEN_REGEXP_OUTPUT	0x100000
 
 /* location of a substring */
 typedef struct
@@ -1427,7 +1438,7 @@ typedef struct
 	/* token type, see ZBX_TOKEN_ defines */
 	int			type;
 	/* the token location in expression including opening and closing brackets {} */
-	zbx_strloc_t		token;
+	zbx_strloc_t		loc;
 	/* the token type specific data */
 	zbx_token_data_t	data;
 }
@@ -1506,6 +1517,7 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value);
 const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 
 int	zbx_validate_value_dbl(double value);
+void	zbx_update_env(double time_now);
 
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);

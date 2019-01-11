@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,16 +37,21 @@ $triggersForm = (new CForm())
 	->setName('triggersForm')
 	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
+$url = (new CUrl('trigger_prototypes.php'))
+	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+	->getUrl();
+
 // create table
 $triggersTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_triggers'))->onClick("checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
 		_('Expression'),
-		make_sorting_header(_('Create enabled'), 'status', $this->data['sort'], $this->data['sortorder'])
+		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url),
+		_('Tags')
 	]);
 
 $this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], [
@@ -60,28 +65,9 @@ foreach ($this->data['triggers'] as $trigger) {
 
 	// description
 	$description = [];
-
-	if ($trigger['templateid'] > 0) {
-		if (!isset($this->data['realHosts'][$triggerid])) {
-			$description[] = (new CSpan(_('Template')))->addClass(ZBX_STYLE_GREY);
-			$description[] = NAME_DELIMITER;
-		}
-		else {
-			$real_hosts = $this->data['realHosts'][$triggerid];
-			$real_host = reset($real_hosts);
-
-			$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'],
-				$real_host['hostid']
-			);
-			$description[] = (new CLink(
-				CHtml::encode($real_host['name']),
-				'trigger_prototypes.php?parent_discoveryid='.$tpl_disc_ruleid))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY);
-
-			$description[] = NAME_DELIMITER;
-		}
-	}
+	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
+		ZBX_FLAG_DISCOVERY_PROTOTYPE
+	);
 
 	$description[] = new CLink(
 		CHtml::encode($trigger['description']),
@@ -156,7 +142,8 @@ foreach ($this->data['triggers'] as $trigger) {
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$description,
 		$expression,
-		$status
+		$status,
+		$data['tags'][$triggerid]
 	]);
 }
 

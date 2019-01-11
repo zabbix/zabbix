@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,7 @@ class CControllerDashboardDelete extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardids' =>	'required|array_db dashboard.dashboardid',
-			'fullscreen' =>		'in 0,1'
+			'dashboardids' =>	'required|array_db dashboard.dashboardid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -53,9 +52,6 @@ class CControllerDashboardDelete extends CController {
 		$url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'dashboard.list')
 			->setArgument('uncheck', '1');
-		if ($this->getInput('fullscreen', 0)) {
-			$url->setArgument('fullscreen', '1');
-		}
 
 		$response = new CControllerResponseRedirect($url->getUrl());
 

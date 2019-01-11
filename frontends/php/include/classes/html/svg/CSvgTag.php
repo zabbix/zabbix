@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,12 +33,14 @@ class CSvgTag extends CTag {
 	const ZBX_STYLE_GRAPH_AXIS_RIGHT = 'svg-graph-axis-right';
 	const ZBX_STYLE_GRAPH_AXIS_BOTTOM = 'svg-graph-axis-bottom';
 
-	const ZBX_STYLE_SVG_GRAPH_AREA = 'svg-graph-area';
-	const ZBX_STYLE_SVG_GRAPH_GRID = 'svg-graph-grid';
-	const ZBX_STYLE_SVG_GRAPH_LINE = 'svg-graph-line';
-	const ZBX_STYLE_SVG_GRAPH_POINTS = 'svg-graph-points';
+	const ZBX_STYLE_GRAPH_AREA = 'svg-graph-area';
+	const ZBX_STYLE_GRAPH_GRID = 'svg-graph-grid';
+	const ZBX_STYLE_GRAPH_LINE = 'svg-graph-line';
+	const ZBX_STYLE_GRAPH_POINTS = 'svg-graph-points';
 
 	const ZBX_STYLE_GRAPH_LEGEND = 'svg-graph-legend';
+	const ZBX_STYLE_GRAPH_LEGEND_SINGLE_ITEM = 'svg-single-item-graph-legend';
+	const ZBX_STYLE_GRAPH_LEGEND_TWO_ITEMS = 'svg-single-two-items-graph-legend';
 
 	const ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE = 'svg-point-highlight';
 	const ZBX_STYLE_GRAPH_HELPER = 'svg-helper';
@@ -57,7 +59,7 @@ class CSvgTag extends CTag {
 		parent::__construct($tag, true);
 	}
 
-	public function getStyles() {
+	public function makeStyles() {
 		return $this->styles;
 	}
 
@@ -70,12 +72,11 @@ class CSvgTag extends CTag {
 	 */
 	public function addItem($value) {
 		if ($value instanceof CSvgTag) {
-			$this->styles = $value->getStyles() + $this->styles;
+			$this->styles = $value->makeStyles() + $this->styles;
 		}
 
 		return parent::addItem($value);
 	}
-
 
 	/**
 	 * Set axis container size.

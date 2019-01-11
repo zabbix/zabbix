@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
 CWebUser::disableSessionCookie();
-CWebUser::disableGuestAutoLogin();
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -31,30 +30,16 @@ $page['file'] = 'index.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'name' =>		[T_ZBX_STR, O_NO,	null,	null,	'isset({enter})', _('Username')],
-	'password' =>	[T_ZBX_STR, O_OPT, null,	null,	'isset({enter})'],
+	'name' =>		[T_ZBX_STR, O_NO,	null,	null,	'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"', _('Username')],
+	'password' =>	[T_ZBX_STR, O_OPT, null,	null,	'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"'],
 	'sessionid' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
 	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS,	null,	null],
 	'enter' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
 	'autologin' =>	[T_ZBX_INT, O_OPT, null,	null,	null],
 	'request' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
-	'guest_login' => [T_ZBX_INT, O_OPT, null,	null,	null],
 	'form' =>		[T_ZBX_STR, O_OPT, null,	null,	null]
 ];
 check_fields($fields);
-
-/**
- * When HTTP authentication is enabled attempt to silently login as guest by opening any URL except this one
- * will fail to HTTP authentication therefore we have to login guest user explicitly.
- */
-if (hasRequest('guest_login')) {
-	// Remove HTTP authentication step messages if any exists.
-	clear_messages();
-	CWebUser::login(ZBX_GUEST_USER, '');
-	redirect(ZBX_DEFAULT_URL);
-
-	exit;
-}
 
 if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 	CWebUser::logout();
@@ -74,14 +59,14 @@ if ($request) {
 }
 
 if (!hasRequest('form') && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
-		&& $config['http_login_form'] == ZBX_AUTH_FORM_HTTP) {
+		&& $config['http_login_form'] == ZBX_AUTH_FORM_HTTP && !hasRequest('enter')) {
 	redirect('index_http.php');
 
 	exit;
 }
 
 // login via form
-if (hasRequest('enter') && CWebUser::login(getRequest('name', ''), getRequest('password', ''))) {
+if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), getRequest('password', ''))) {
 	if (CWebUser::$data['autologin'] != $autologin) {
 		API::User()->update([
 			'userid' => CWebUser::$data['userid'],
@@ -89,7 +74,7 @@ if (hasRequest('enter') && CWebUser::login(getRequest('name', ''), getRequest('p
 		]);
 	}
 
-	$redirect = array_filter([$request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
+	$redirect = array_filter([CWebUser::isGuest() ? '' : $request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
 	redirect(reset($redirect));
 
 	exit;
@@ -103,11 +88,9 @@ $messages = clear_messages();
 
 (new CView('general.login', [
 	'http_login_url' => $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
-		? (new CUrl('index_http.php'))->removeArgument('sid')
+		? (new CUrl('index_http.php'))->setArgument('request', getRequest('request'))
 		: '',
-	'guest_login_url' => CWebUser::isGuestAllowed()
-		? (new CUrl())->setArgument('guest_login', 1)
-		: '',
+	'guest_login_url' => CWebUser::isGuestAllowed() ? (new CUrl())->setArgument('enter', ZBX_GUEST_USER) : '',
 	'autologin' => $autologin == 1,
 	'error' => hasRequest('enter') && $messages ? array_pop($messages) : null
 ]))->render();

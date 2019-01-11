@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ class CWidgetField {
 	protected	$save_type;
 	protected	$action;
 	private		$validation_rules = [];
+	private		$strict_validation_rules = null;
 	private		$ex_validation_rules = [];
 	private		$flags;
 
@@ -108,6 +109,19 @@ class CWidgetField {
 		$this->validation_rules = $validation_rules;
 	}
 
+	protected function getValidationRules() {
+		return $this->validation_rules;
+	}
+
+	/**
+	 * Set validation rules for "strict" mode.
+	 *
+	 * @param array|null $strict_validation_rules
+	 */
+	protected function setStrictValidationRules(array $strict_validation_rules = null) {
+		$this->strict_validation_rules = $strict_validation_rules;
+	}
+
 	protected function setExValidationRules(array $ex_validation_rules) {
 		$this->ex_validation_rules = $ex_validation_rules;
 	}
@@ -135,6 +149,22 @@ class CWidgetField {
 
 	public function getSaveType() {
 		return $this->save_type;
+	}
+
+	/**
+	 * Set additional flags for validation rule array.
+	 *
+	 * @param array $validation_rule
+	 * @param int   $flag
+	 *
+	 */
+	protected static function setValidationRuleFlag(array &$validation_rule, $flag) {
+		if (array_key_exists('flags', $validation_rule)) {
+			$validation_rule['flags'] |= $flag;
+		}
+		else {
+			$validation_rule['flags'] = $flag;
+		}
 	}
 
 	/**
@@ -169,7 +199,10 @@ class CWidgetField {
 	public function validate($strict = false) {
 		$errors = [];
 
-		$validation_rules = $this->validation_rules + $this->ex_validation_rules;
+		$validation_rules = ($strict && $this->strict_validation_rules !== null)
+			? $this->strict_validation_rules
+			: $this->validation_rules;
+		$validation_rules += $this->ex_validation_rules;
 		$value = $this->getValue();
 		$label = ($this->label === null) ? $this->name : $this->label;
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
  */
 class CBrandHelper {
 
+	const BRAND_CONFIG_FILE_PATH = '/../../../local/conf/brand.conf.php';
+
 	/**
 	 * Brand configuration array.
 	 *
@@ -36,7 +38,7 @@ class CBrandHelper {
 	 */
 	private static function loadConfig() {
 		if (!self::$config) {
-			$config_file_path = realpath(dirname(__FILE__).'/../../../local/conf/brand.conf.php');
+			$config_file_path = realpath(dirname(__FILE__).self::BRAND_CONFIG_FILE_PATH);
 
 			if (file_exists($config_file_path)) {
 				self::$config = include $config_file_path;

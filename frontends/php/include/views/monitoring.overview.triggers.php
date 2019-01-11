@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,8 +71,11 @@ if ($blink_period > 0) {
 }
 
 // header right
+$web_layout_mode = CView::getLayoutMode();
+
 $widget = (new CWidget())
 	->setTitle(_('Overview'))
+	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
@@ -101,44 +104,43 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, (new CList())
-			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+			->addItem(get_icon('fullscreen'))
 			->addItem(get_icon('overviewhelp')->setHint($help_hint))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]));
 
-// filter
-$filter = $data['filter'];
-$filterFormView = new CView('common.filter.trigger', [
-	'filter' => [
-		'showTriggers' => $filter['showTriggers'],
-		'ackStatus' => $filter['ackStatus'],
-		'showSeverity' => $filter['showSeverity'],
-		'statusChange' => $filter['statusChange'],
-		'statusChangeDays' => $filter['statusChangeDays'],
-		'txtSelect' => $filter['txtSelect'],
-		'application' => $filter['application'],
-		'inventory' => $filter['inventory'],
-		'show_suppressed' => $filter['show_suppressed'],
-		'hostId' => $data['hostid'],
-		'groupId' => $data['groupid'],
-		'fullScreen' => $data['fullscreen']
-	],
-	'config' => $data['config'],
-	'profileIdx' => $data['profileIdx'],
-	'active_tab' => $data['active_tab']
-]);
-$filterForm = $filterFormView->render();
+if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+	// filter
+	$filter = $data['filter'];
+	$filterFormView = new CView('common.filter.trigger', [
+		'filter' => [
+			'showTriggers' => $filter['showTriggers'],
+			'ackStatus' => $filter['ackStatus'],
+			'showSeverity' => $filter['showSeverity'],
+			'statusChange' => $filter['statusChange'],
+			'statusChangeDays' => $filter['statusChangeDays'],
+			'txtSelect' => $filter['txtSelect'],
+			'application' => $filter['application'],
+			'inventory' => $filter['inventory'],
+			'show_suppressed' => $filter['show_suppressed'],
+			'hostId' => $data['hostid'],
+			'groupId' => $data['groupid']
+		],
+		'config' => $data['config'],
+		'profileIdx' => $data['profileIdx'],
+		'active_tab' => $data['active_tab']
+	]);
+	$filterForm = $filterFormView->render();
 
-$widget->addItem($filterForm);
+	$widget->addItem($filterForm);
+}
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
 	global $page;
 
-	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $page['file'], $data['view_style'], null,
-		$data['fullscreen']
-	);
+	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $page['file'], $data['view_style']);
 }
 else {
 	$dataTable = new CTableInfo();

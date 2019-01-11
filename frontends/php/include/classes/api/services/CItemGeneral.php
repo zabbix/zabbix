@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,7 +236,14 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		$item_key_parser = new CItemKey();
-		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false, 'usermacros' => true]);
+		$ip_range_parser = new CIPRangeParser([
+			'v6' => ZBX_HAVE_IPV6,
+			'ranges' => false,
+			'usermacros' => true,
+			'macros' => [
+				'{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'
+			]
+		]);
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,
 			'lldmacros' => (get_class($this) === 'CItemPrototype')
@@ -765,71 +772,6 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Checks whether the given items are referenced by any graphs and tries to
-	 * unset these references, if they are no longer used.
-	 *
-	 * @throws APIException if at least one of the item can't be deleted
-	 *
-	 * @param array $itemids   An array of item IDs
-	 */
-	protected function checkGraphReference(array $itemids) {
-		$this->checkUseInGraphAxis($itemids, true);
-		$this->checkUseInGraphAxis($itemids);
-	}
-
-	/**
-	 * Checks if any of the given items are used as min/max Y values in a graph.
-	 *
-	 * if there are graphs, that have an y*_itemid column set, but the
-	 * y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, the y*_itemid
-	 * column will be set to NULL.
-	 *
-	 * If the $checkMax parameter is set to true, the items will be checked against
-	 * max Y values, otherwise, they will be checked against min Y values.
-	 *
-	 * @throws APIException if any of the given items are used as min/max Y values in a graph.
-	 *
-	 * @param array $itemids   An array of items IDs
-	 * @param bool  $check_max
-	 */
-	protected function checkUseInGraphAxis(array $itemids, $check_max = false) {
-		$field_name_itemid = $check_max ? 'ymax_itemid' : 'ymin_itemid';
-		$field_name_type = $check_max ? 'ymax_type' : 'ymin_type';
-		$error = $check_max
-			? 'Could not delete these items because some of them are used as MAX values for graphs.'
-			: 'Could not delete these items because some of them are used as MIN values for graphs.';
-
-		$result = DBselect(
-			'SELECT g.graphid,g.'.$field_name_type.
-			' FROM graphs g'.
-			' WHERE '.dbConditionInt('g.'.$field_name_itemid, $itemids)
-		);
-
-		$update_graphs = [];
-
-		while ($row = DBfetch($result)) {
-			// check if Y type is actually set to GRAPH_YAXIS_TYPE_ITEM_VALUE
-			if ($row[$field_name_type] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-			else {
-				$update_graphs[] = [
-					'values' => [$field_name_itemid => 0],
-					'where' => ['graphid' => $row['graphid']]
-				];
-			}
-		}
-		unset($graph);
-
-		// if there are graphs, that have an y*_itemid column set, but the
-		// y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, set y*_itemid to NULL.
-		// Otherwise we won't be able to delete them.
-		if ($update_graphs) {
-			DB::update('graphs', $update_graphs);
-		}
-	}
-
-	/**
 	 * Updates the children of the item on the given hosts and propagates the inheritance to the child hosts.
 	 *
 	 * @abstract
@@ -927,13 +869,13 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		foreach ($hostids_by_key as $key_ => $hostids) {
+		foreach ($hostids_by_key as $key_ => $key_hostids) {
 			$sql_select = ($class === 'CItemPrototype') ? ',id.parent_itemid AS ruleid' : '';
 			$sql_join = ($class === 'CItemPrototype') ? ' JOIN item_discovery id ON i.itemid=id.itemid' : '';
 			$db_items = DBselect(
 				'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid,i.master_itemid'.$sql_select.
 					' FROM items i'.$sql_join.
-					' WHERE '.dbConditionInt('i.hostid', $hostids).
+					' WHERE '.dbConditionInt('i.hostid', $key_hostids).
 						' AND '.dbConditionString('i.key_', [$key_])
 			);
 
@@ -1913,8 +1855,8 @@ abstract class CItemGeneral extends CApiService {
 		$rules = [
 			'timeout' => [
 				'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
-					? API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
-					: API_ALLOW_USER_MACRO,
+					? API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
+					: API_NOT_EMPTY | API_ALLOW_USER_MACRO,
 				'in' => '1:'.SEC_PER_MIN
 			],
 			'url' => [

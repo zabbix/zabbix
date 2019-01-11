@@ -31,7 +31,7 @@
 			</triggers>
 			<items>
 				<item type="0" key="vfs.fs.size[/,pfree]" value_type="0">
-					<description>Free disk space on $1 in %</description>
+					<description>Free disk space on / in %</description>
 					<ipmi_sensor></ipmi_sensor>
 					<delay>30</delay>
 					<history>7</history>

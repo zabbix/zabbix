@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,10 +55,10 @@ class CSvgGraphAnnotation extends CSvgTag {
 		$this->type = $type;
 	}
 
-	public function getStyles() {
+	public function makeStyles() {
 		return [
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_DASHED => [
-				'stroke-dasharray' => '2, 2'
+				'stroke-dasharray' => '2,2'
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_HANDLE => [
 				'fill' => $this->color,
@@ -68,7 +68,7 @@ class CSvgGraphAnnotation extends CSvgTag {
 				'fill' => $this->color,
 				'opacity' => '0.1'
 			],
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_PROBLEMS . ' line' => [
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_PROBLEMS.' line' => [
 				'stroke' => $this->color
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_ARROW => [
@@ -117,11 +117,11 @@ class CSvgGraphAnnotation extends CSvgTag {
 			(new CSvgPolygon([
 				[$this->x, $y + 1],
 				[$this->x - $offset, $y + 5],
-				[$this->x + $offset, $y + 5],
+				[$this->x + $offset, $y + 5]
 			]))
+				->addClass(CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_ARROW)
 				->setAttribute('x', $this->x - $offset)
 				->setAttribute('width', $arrow_width)
-				->addClass(CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_ARROW)
 				->setAttribute('data-info', $this->data_info)
 		];
 	}
@@ -148,7 +148,7 @@ class CSvgGraphAnnotation extends CSvgTag {
 			(new CSvgRect($this->x, $this->y, $this->width, $this->height))
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_BOX),
 			$end_line,
-			(new CSvgRect($this->x, $this->y + $this->height + 1, $this->width , 4))
+			(new CSvgRect($this->x, $this->y + $this->height + 1, $this->width, 4))
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_HANDLE)
 				->setAttribute('data-info', $this->data_info)
 		];

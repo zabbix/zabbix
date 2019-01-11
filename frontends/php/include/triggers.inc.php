@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,10 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * Get trigger severity full line height css style name.
  *
- * @param  int         $severity Trigger severity.
+ * @param int $severity  Trigger severity.
  *
  * @return string|null
  */
@@ -47,7 +48,7 @@ function getSeverityFlhStyle($severity) {
 /**
  * Get trigger severity status css style name.
  *
- * @param  int         $severity Trigger severity.
+ * @param int $severity  Trigger severity.
  *
  * @return string|null
  */
@@ -96,8 +97,8 @@ function getSeverityStyle($severity, $type = true) {
 /**
  * Get trigger severity name by given state and configuration.
  *
- * @param int   $severity Trigger severity.
- * @param array $config   Array with configuration parameters containing severity names.
+ * @param int   $severity  Trigger severity.
+ * @param array $config    Array with configuration parameters containing severity names.
  *
  * @return string
  */
@@ -239,50 +240,6 @@ function trigger_value2str($value = null) {
 	}
 
 	return _('Unknown');
-}
-
-function getParentHostsByTriggers($triggers) {
-	$hosts = [];
-	$triggerParent = [];
-
-	while (!empty($triggers)) {
-		foreach ($triggers as $tnum => $trigger) {
-			if ($trigger['templateid'] == 0) {
-				if (isset($triggerParent[$trigger['triggerid']])) {
-					foreach ($triggerParent[$trigger['triggerid']] as $triggerid => $state) {
-						$hosts[$triggerid] = $trigger['hosts'];
-					}
-				}
-				else {
-					$hosts[$trigger['triggerid']] = $trigger['hosts'];
-				}
-				unset($triggers[$tnum]);
-			}
-			else {
-				if (isset($triggerParent[$trigger['triggerid']])) {
-					if (!isset($triggerParent[$trigger['templateid']])) {
-						$triggerParent[$trigger['templateid']] = [];
-					}
-					$triggerParent[$trigger['templateid']][$trigger['triggerid']] = 1;
-					$triggerParent[$trigger['templateid']] += $triggerParent[$trigger['triggerid']];
-				}
-				else {
-					if (!isset($triggerParent[$trigger['templateid']])) {
-						$triggerParent[$trigger['templateid']] = [];
-					}
-					$triggerParent[$trigger['templateid']][$trigger['triggerid']] = 1;
-				}
-			}
-		}
-		$triggers = API::Trigger()->get([
-			'triggerids' => zbx_objectValues($triggers, 'templateid'),
-			'selectHosts' => ['hostid', 'host', 'name', 'status'],
-			'output' => ['triggerid', 'templateid'],
-			'filter' => ['flags' => null]
-		]);
-	}
-
-	return $hosts;
 }
 
 function get_trigger_by_triggerid($triggerid) {
@@ -697,8 +654,29 @@ function replace_template_dependencies($deps, $hostid) {
 	return $deps;
 }
 
+/**
+ * Creates and returns item data overview table for the given host groups.
+ *
+ * @param array  $groupids
+ * @param string $application
+ * @param int    $style                               Table display style: either hosts on top or on the left.
+ * @param array  $host_options
+ * @param array  $trigger_options
+ * @param array  $problem_options
+ * @param int    $problem_options['min_severity']     (optional) Minimal problem severity.
+ * @param int    $problem_options['show_suppressed']  (optional) Whether to show triggers with suppressed problems.
+ * @param int    $problem_options['time_from']        (optional) The time starting from which the problems were created.
+ *
+ * @return array
+ */
 function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
-		array $trigger_options = [], $show_suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE) {
+		array $trigger_options = [], array $problem_options = []) {
+	$problem_options += [
+		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
+		'time_from' => null
+	];
+
 	// fetch hosts
 	$hosts = API::Host()->get([
 		'output' => ['hostid', 'status'],
@@ -710,7 +688,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 
 	$hostids = array_keys($hosts);
 
-	$options = [
+	$trigger_options = [
 		'output' => ['triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags',
 			'comments'],
 		'selectHosts' => ['hostid', 'name', 'status'],
@@ -731,10 +709,10 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 			'search' => ['name' => $application],
 			'preservekeys' => true
 		]);
-		$options['applicationids'] = array_keys($applications);
+		$trigger_options['applicationids'] = array_keys($applications);
 	}
 
-	$triggers = getTriggersWithActualSeverity($options, $show_suppressed);
+	$triggers = getTriggersWithActualSeverity($trigger_options, $problem_options);
 
 	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
@@ -754,24 +732,34 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 }
 
 /**
- * Get triggers data with priority set to highest priority of not resolved problems generated by this trigger.
+ * Get triggers data with priority set to highest priority of problems generated by this trigger.
  *
- * @param array $options          API options. Array 'output' should contain 'value', option 'preservekeys' should be
- *                                set to true.
- * @param int   $show_suppressed  Whether to show suppressed problems.
+ * @param array $trigger_options                     API options. Array 'output' should contain 'value', option
+ *                                                   'preservekeys' should be set to true.
+ * @param array		$problem_options
+ * @param int		$problem_options['show_suppressed']  Whether to show triggers with suppressed problems.
+ * @param int		$problem_options['min_severity']     (optional) Minimal problem severity.
+ * @param int		$problem_options['time_from']        (optional) The time starting from which the problems were created.
+ * @param boolean	$problem_options['recent']			 (optional) show recent problems.
+ * @param boolean	$problem_options['any']				 (optional) show resolved and not resolved problems.
  *
  * @return array
  */
-function getTriggersWithActualSeverity($options, $show_suppressed) {
-	$triggers = API::Trigger()->get($options);
+function getTriggersWithActualSeverity(array $trigger_options, array $problem_options) {
+	$problem_options += [
+		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+		'time_from' => null,
+		'recent' => null,
+		'any' => null
+	];
+
+	$triggers = API::Trigger()->get($trigger_options);
 
 	$problem_triggerids = [];
 
 	foreach ($triggers as $triggerid => &$trigger) {
-		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-			$problem_triggerids[] = $triggerid;
-			$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-		}
+		$problem_triggerids[] = $triggerid;
+		$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	}
 	unset($trigger);
 
@@ -779,7 +767,10 @@ function getTriggersWithActualSeverity($options, $show_suppressed) {
 		$problems = API::Problem()->get([
 			'output' => ['objectid', 'severity'],
 			'objectids' => $problem_triggerids,
-			'suppressed' => ($show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
+			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
+			'time_from' => $problem_options['time_from'],
+			'recent' => $problem_options['recent'],
+			'any' => $problem_options['any']
 		]);
 
 		$triggerids = zbx_objectValues($problems, 'objectid');
@@ -788,6 +779,12 @@ function getTriggersWithActualSeverity($options, $show_suppressed) {
 		foreach ($problems as $problem) {
 			if ($triggers[$problem['objectid']]['priority'] < $problem['severity']) {
 				$triggers[$problem['objectid']]['priority'] = $problem['severity'];
+			}
+		}
+
+		foreach ($triggers as $triggerid => $trigger) {
+			if ($trigger['priority'] < $problem_options['min_severity']) {
+				unset($triggers[$triggerid]);
 			}
 		}
 	}
@@ -818,12 +815,10 @@ function getTriggersWithActualSeverity($options, $show_suppressed) {
  * @param string $pageFile                     The page where the element is displayed.
  * @param int    $viewMode                     Table display style: either hosts on top, or host on the left side.
  * @param string $screenId                     The ID of the screen, that contains the trigger overview table.
- * @param bool   $fullscreen                   Display mode.
  *
  * @return CTableInfo
  */
-function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null,
-		$fullscreen = false) {
+function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null) {
 	$data = [];
 	$host_names = [];
 	$trcounter = [];
@@ -894,12 +889,12 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		// data
 		foreach ($data as $trigger_name => $trigger_data) {
 			foreach ($trigger_data as $trigger_hosts) {
-				$columns = [nbsp($trigger_name)];
+				$columns = [(new CColHeader($trigger_name))->addClass(ZBX_STYLE_NOWRAP)];
 
 				foreach ($host_names as $host_name) {
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
-						$dependencies, $pageFile, $screenId, $fullscreen
+						$dependencies, $pageFile, $screenId
 					);
 				}
 				$triggerTable->addRow($columns);
@@ -908,7 +903,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 	}
 	else {
 		// header
-		$header = [_('Host')];
+		$header = [_('Hosts')];
 
 		foreach ($data as $trigger_name => $trigger_data) {
 			foreach ($trigger_data as $trigger_hosts) {
@@ -925,14 +920,14 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 		foreach ($host_names as $hostId => $host_name) {
 			$name = (new CLinkAction($host_name))
-				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true, $fullscreen));
+				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true));
 
 			$columns = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
 				foreach ($trigger_data as $trigger_hosts) {
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
-						$dependencies, $pageFile, $screenId, $fullscreen
+						$dependencies, $pageFile, $screenId
 					);
 				}
 			}
@@ -953,11 +948,10 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
  * @param string $pageFile      The page where the element is displayed.
  * @param string $screenid
- * @param bool   $fullscreen    Display mode.
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid = null, $fullscreen = false) {
+function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid = null) {
 	$ack = null;
 	$css = null;
 	$desc = null;
@@ -1019,7 +1013,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$options = ['description_enabled' => $trigger['description_enabled'], 'fullscreen' => $fullscreen];
+		$options = ['description_enabled' => $trigger['description_enabled']];
 		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge, $options));
 	}
 
@@ -1048,8 +1042,9 @@ function calculateAvailability($triggerId, $startTime, $endTime) {
 				' ORDER BY e.eventid DESC';
 		if ($row = DBfetch(DBselect($sql, 1))) {
 			$startValue = $row['value'];
-			$min = $startTime;
 		}
+
+		$min = $startTime;
 	}
 
 	$sql = 'SELECT COUNT(e.eventid) AS cnt,MIN(e.clock) AS min_clock,MAX(e.clock) AS max_clock'.
@@ -1110,7 +1105,7 @@ function calculateAvailability($triggerId, $startTime, $endTime) {
 		$clock = $row['clock'];
 		$value = $row['value'];
 
-		$diff = $clock - $time;
+		$diff = max($clock - $time, 0);
 		$time = $clock;
 
 		if ($state == 0) {
@@ -1200,7 +1195,7 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 /**
  * Make trigger info block.
  *
- * @param array $trigger			Trigger described in info block.
+ * @param array $trigger  Trigger described in info block.
  *
  * @return object
  */
@@ -1284,8 +1279,8 @@ function make_trigger_details($trigger) {
 /**
  * Analyze an expression and returns expression html tree.
  *
- * @param string $expression		Trigger expression or recovery expression string.
- * @param int $type					Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
+ * @param string $expression  Trigger expression or recovery expression string.
+ * @param int $type           Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
  *
  * @return array
  */
@@ -1310,15 +1305,15 @@ function analyzeExpression($expression, $type) {
 /**
  * Builds expression HTML tree.
  *
- * @param array 	$expressionTree 	Output of getExpressionTree() function.
- * @param array 	$next           	Parameter only for recursive call; should be empty array.
- * @param int 		$letterNum      	Parameter only for recursive call; should be 0.
- * @param int 		$level          	Parameter only for recursive call.
- * @param string 	$operator       	Parameter only for recursive call.
- * @param int		$type				Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
+ * @param array  $expressionTree  Output of getExpressionTree() function.
+ * @param array  $next            Parameter only for recursive call; should be empty array.
+ * @param int    $letterNum       Parameter only for recursive call; should be 0.
+ * @param int    $level           Parameter only for recursive call.
+ * @param string $operator        Parameter only for recursive call.
+ * @param int    $type            Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
  *
- * @return array	Array containing the trigger expression formula as the first element and an array describing the
- *					expression tree as the second.
+ * @return array  Array containing the trigger expression formula as the first element and an array describing the
+ *                expression tree as the second.
  */
 function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operator = null,
 		$type) {
@@ -1457,10 +1452,10 @@ function expressionHighLevelErrors($expression) {
 }
 
 /**
- * Draw level for trigger expression builder tree
+ * Draw level for trigger expression builder tree.
  *
  * @param array $next
- * @param int $level
+ * @param int   $level
  *
  * @return array
  */
@@ -2301,11 +2296,10 @@ function getTriggersHostsList(array $triggers) {
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_type']
  * @param int    $triggers_hosts[<triggerid>][]['graphs']              The number of graphs.
  * @param int    $triggers_hosts[<triggerid>][]['screens']             The number of screens.
- * @param bool   $fullscreen				                           Fullscreen mode.
  *
  * @return array
  */
-function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
+function makeTriggersHostsList(array $triggers_hosts) {
 	$db_maintenances = [];
 	$scripts_by_hosts = [];
 
@@ -2341,7 +2335,7 @@ function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
 				? $scripts_by_hosts[$host['hostid']]
 				: [];
 			$host_name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host, true, $fullscreen));
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host, true));
 
 			// Add maintenance icon with hint if host is in maintenance.
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
@@ -2364,6 +2358,259 @@ function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
 	unset($hosts);
 
 	return $triggers_hosts;
+}
+
+/**
+ * Get parent templates for each given trigger.
+ *
+ * @param $array $triggers                  An array of triggers.
+ * @param string $triggers[]['triggerid']   ID of a trigger.
+ * @param string $triggers[]['templateid']  ID of parent template trigger.
+ * @param int    $flag                      Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or
+ *                                          ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ *
+ * @return array
+ */
+function getTriggerParentTemplates(array $triggers, $flag) {
+	$parent_triggerids = [];
+	$data = [
+		'links' => [],
+		'templates' => []
+	];
+
+	foreach ($triggers as $trigger) {
+		if ($trigger['templateid'] != 0) {
+			$parent_triggerids[$trigger['templateid']] = true;
+			$data['links'][$trigger['triggerid']] = ['triggerid' => $trigger['templateid']];
+		}
+	}
+
+	if (!$parent_triggerids) {
+		return $data;
+	}
+
+	$all_parent_triggerids = [];
+	$hostids = [];
+	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		$lld_ruleids = [];
+	}
+
+	do {
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$db_triggers = API::TriggerPrototype()->get([
+				'output' => ['triggerid', 'templateid'],
+				'selectHosts' => ['hostid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'triggerids' => array_keys($parent_triggerids)
+			]);
+		}
+		// ZBX_FLAG_DISCOVERY_NORMAL
+		else {
+			$db_triggers = API::Trigger()->get([
+				'output' => ['triggerid', 'templateid'],
+				'selectHosts' => ['hostid'],
+				'triggerids' => array_keys($parent_triggerids)
+			]);
+		}
+
+		$all_parent_triggerids += $parent_triggerids;
+		$parent_triggerids = [];
+
+		foreach ($db_triggers as $db_trigger) {
+			foreach ($db_trigger['hosts'] as $host) {
+				$data['templates'][$host['hostid']] = [];
+				$hostids[$db_trigger['triggerid']][] = $host['hostid'];
+			}
+
+			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$lld_ruleids[$db_trigger['triggerid']] = $db_trigger['discoveryRule']['itemid'];
+			}
+
+			if ($db_trigger['templateid'] != 0) {
+				if (!array_key_exists($db_trigger['templateid'], $all_parent_triggerids)) {
+					$parent_triggerids[$db_trigger['templateid']] = true;
+				}
+
+				$data['links'][$db_trigger['triggerid']] = ['triggerid' => $db_trigger['templateid']];
+			}
+		}
+	}
+	while ($parent_triggerids);
+
+	foreach ($data['links'] as &$parent_trigger) {
+		$parent_trigger['hostids'] = array_key_exists($parent_trigger['triggerid'], $hostids)
+			? $hostids[$parent_trigger['triggerid']]
+			: [0];
+
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$parent_trigger['lld_ruleid'] = array_key_exists($parent_trigger['triggerid'], $lld_ruleids)
+				? $lld_ruleids[$parent_trigger['triggerid']]
+				: 0;
+		}
+	}
+	unset($parent_trigger);
+
+	$db_templates = $data['templates']
+		? API::Template()->get([
+			'output' => ['name'],
+			'templateids' => array_keys($data['templates']),
+			'preservekeys' => true
+		])
+		: [];
+
+	$rw_templates = $db_templates
+		? API::Template()->get([
+			'output' => [],
+			'templateids' => array_keys($db_templates),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	$data['templates'][0] = [];
+
+	foreach ($data['templates'] as $hostid => &$template) {
+		$template = array_key_exists($hostid, $db_templates)
+			? [
+				'hostid' => $hostid,
+				'name' => $db_templates[$hostid]['name'],
+				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
+			]
+			: [
+				'hostid' => $hostid,
+				'name' => _('Inaccessible template'),
+				'permission' => PERM_DENY
+			];
+	}
+	unset($template);
+
+	return $data;
+}
+
+/**
+ * Returns a template prefix for selected trigger.
+ *
+ * @param string $triggerid
+ * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
+ * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ *
+ * @return array|null
+ */
+function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
+	if (!array_key_exists($triggerid, $parent_templates['links'])) {
+		return null;
+	}
+
+	while (array_key_exists($parent_templates['links'][$triggerid]['triggerid'], $parent_templates['links'])) {
+		$triggerid = $parent_templates['links'][$triggerid]['triggerid'];
+	}
+
+	$templates = [];
+	foreach ($parent_templates['links'][$triggerid]['hostids'] as $hostid) {
+		$templates[] = $parent_templates['templates'][$hostid];
+	}
+
+	CArrayHelper::sort($templates, ['name']);
+
+	$list = [];
+
+	foreach ($templates as $template) {
+		if ($template['permission'] == PERM_READ_WRITE) {
+			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$url = (new CUrl('trigger_prototypes.php'))
+					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid']);
+			}
+			// ZBX_FLAG_DISCOVERY_NORMAL
+			else {
+				$url = (new CUrl('triggers.php'))
+					->setArgument('hostid', $template['hostid'])
+					->setArgument('filter_set', 1);
+			}
+
+			$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
+		}
+		else {
+			$name = new CSpan(CHtml::encode($template['name']));
+		}
+
+		$list[] = $name->addClass(ZBX_STYLE_GREY);
+		$list[] = ', ';
+	}
+
+	array_pop($list);
+	$list[] = NAME_DELIMITER;
+
+	return $list;
+}
+
+/**
+ * Returns a list of trigger templates.
+ *
+ * @param string $triggerid
+ * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
+ * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ *
+ * @return array
+ */
+function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag) {
+	$list = [];
+
+	while (array_key_exists($triggerid, $parent_templates['links'])) {
+		$list_item = [];
+		$templates = [];
+
+		foreach ($parent_templates['links'][$triggerid]['hostids'] as $hostid) {
+			$templates[] = $parent_templates['templates'][$hostid];
+		}
+
+		$show_parentheses = (count($templates) > 1 && $list);
+
+		if ($show_parentheses) {
+			CArrayHelper::sort($templates, ['name']);
+			$list_item[] = '(';
+		}
+
+		foreach ($templates as $template) {
+			if ($template['permission'] == PERM_READ_WRITE) {
+				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					$url = (new CUrl('trigger_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
+						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid']);
+				}
+				// ZBX_FLAG_DISCOVERY_NORMAL
+				else {
+					$url = (new CUrl('triggers.php'))
+						->setArgument('form', 'update')
+						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
+						->setArgument('hostid', $template['hostid']);
+				}
+
+				$name = new CLink(CHtml::encode($template['name']), $url);
+			}
+			else {
+				$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+			}
+
+			$list_item[] = $name;
+			$list_item[] = ', ';
+		}
+		array_pop($list_item);
+
+		if ($show_parentheses) {
+			$list_item[] = ')';
+		}
+
+		array_unshift($list, $list_item, '&nbsp;&rArr;&nbsp;');
+
+		$triggerid = $parent_templates['links'][$triggerid]['triggerid'];
+	}
+
+	if ($list) {
+		array_pop($list);
+	}
+
+	return $list;
 }
 
 /**

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,26 +21,29 @@
 
 class CSvgGraphArea extends CSvgGraphLine {
 
-	public function __construct($path, $metric) {
+	protected $y_zero;
+
+	public function __construct($path, $metric, $y_zero = 0) {
 		parent::__construct($path, $metric);
 
+		$this->y_zero = $y_zero;
 		$this->add_label = false;
 		$this->options = $metric['options'] + [
 			'fill' => 5
 		];
 	}
 
-	public function getStyles() {
+	public function makeStyles() {
 		$this
-			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_AREA)
-			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order']);
+			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AREA)
+			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order']);
 
 		return [
-			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_AREA => [
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_AREA => [
 				'stroke-width' => 0
 			],
-			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order'] => [
-				'fill-opacity' => $this->options['fill']  * 0.1,
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order'] => [
+				'fill-opacity' => $this->options['fill'] * 0.1,
 				'fill' => $this->options['color']
 			]
 		];
@@ -53,8 +56,8 @@ class CSvgGraphArea extends CSvgGraphLine {
 			$first_point = reset($this->path);
 			$last_point = end($this->path);
 			$this
-				->lineTo($last_point[0], $this->position_y + $this->height)
-				->lineTo($first_point[0], $this->position_y + $this->height)
+				->lineTo($last_point[0], $this->y_zero)
+				->lineTo($first_point[0], $this->y_zero)
 				->closePath();
 		}
 

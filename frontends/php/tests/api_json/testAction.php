@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup actions
  */
-class testAction extends CZabbixTest {
+class testAction extends CAPITest {
 
 	public static function getActionDeleteData() {
 		return [
@@ -89,7 +90,7 @@ class testAction extends CZabbixTest {
 		if ($expected_error === null) {
 			foreach ($result['result']['actionids'] as $id) {
 				$dbResult = 'SELECT * FROM actions WHERE actionid='.$id;
-				$this->assertEquals(0, DBcount($dbResult));
+				$this->assertEquals(0, CDBHelper::getCount($dbResult));
 			}
 		}
 	}
@@ -134,7 +135,7 @@ class testAction extends CZabbixTest {
 	 */
 	public function testAction_Permissions($login, $action, $expected_error) {
 		$actions = 'SELECT * FROM actions ORDER BY actionid';
-		$old_actions=DBhash($actions);
+		$old_actions=CDBHelper::getHash($actions);
 
 		$this->authorize($login['user'], $login['password']);
 		$result = $this->call('action.delete', $action, $expected_error);
@@ -142,11 +143,11 @@ class testAction extends CZabbixTest {
 		if ($expected_error === null) {
 			foreach ($result['result']['actionids'] as $id) {
 				$dbResult = 'SELECT * FROM actions WHERE actionid='.$id;
-				$this->assertEquals(0, DBcount($dbResult));
+				$this->assertEquals(0, CDBHelper::getCount($dbResult));
 			}
 		}
 		else {
-			$this->assertEquals($old_actions, DBhash($actions));
+			$this->assertEquals($old_actions, CDBHelper::getHash($actions));
 		}
 	}
 }

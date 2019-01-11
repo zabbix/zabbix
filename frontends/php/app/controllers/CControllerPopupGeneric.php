@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -361,9 +361,11 @@ class CControllerPopupGeneric extends CController {
 			'value_types' =>				'array',
 			'numeric' =>					'in 1',
 			'reference' =>					'string',
+			'orig_names' =>					'in 1',
 			'writeonly' =>					'in 1',
 			'noempty' =>					'in 1',
-			'submit_parent' =>				'in 1'
+			'submit_parent' =>				'in 1',
+			'enrich_parent_groups' =>		'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -603,16 +605,16 @@ class CControllerPopupGeneric extends CController {
 			$page_options['hostid'] = $hostid;
 		}
 
-		$option_fields_binary = ['monitored_hosts', 'noempty', 'normal_only', 'numeric', 'real_hosts', 'submit_parent',
-			'templated_hosts', 'with_applications', 'with_graphs', 'with_items', 'with_monitored_triggers',
-			'with_simple_graph_items', 'with_triggers', 'with_webitems', 'writeonly'];
+		$option_fields_binary = ['enrich_parent_groups', 'monitored_hosts', 'noempty', 'normal_only', 'numeric',
+			'real_hosts', 'submit_parent', 'templated_hosts', 'with_applications', 'with_graphs', 'with_items',
+			'with_monitored_triggers', 'with_simple_graph_items', 'with_triggers', 'with_webitems', 'writeonly'];
 		foreach ($option_fields_binary as $field) {
 			if ($this->hasInput($field)) {
 				$page_options[$field] = true;
 			}
 		}
 
-		$option_fields_value = ['host_templates', 'itemtype', 'screenid', 'value_types'];
+		$option_fields_value = ['host_templates', 'itemtype', 'screenid', 'orig_names', 'value_types'];
 		foreach ($option_fields_value as $field) {
 			if ($this->hasInput($field)) {
 				$page_options[$field] = $this->getInput($field);
@@ -705,6 +707,10 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
+				if (array_key_exists('real_hosts', $page_options)) {
+					$options['real_hosts'] = $page_options['real_hosts'];
+				}
+
 				if (array_key_exists('normal_only', $page_options)) {
 					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 				}
@@ -714,6 +720,12 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				$records = API::HostGroup()->get($options);
+				if (array_key_exists('enrich_parent_groups', $page_options)) {
+					$records = CPageFilter::enrichParentGroups($records, [
+						'real_hosts' => null
+					] + $options);
+				}
+
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['groupid' => 'id']);
 				break;
@@ -822,7 +834,11 @@ class CControllerPopupGeneric extends CController {
 					$records = API::Item()->get($options);
 				}
 
-				$records = CMacrosResolverHelper::resolveItemNames($records);
+				// Resolve item names by default.
+				$records = array_key_exists('orig_names', $page_options)
+					? CArrayHelper::renameObjectsKeys($records, ['name' => 'name_expanded'])
+					: CMacrosResolverHelper::resolveItemNames($records);
+
 				CArrayHelper::sort($records, ['name_expanded']);
 				break;
 

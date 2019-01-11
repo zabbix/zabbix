@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2018 Zabbix SIA
+ ** Copyright (C) 2001-2019 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -53,21 +53,13 @@ jQuery(function ($) {
 				accordion
 					.data('options', options)
 					.on('click', options['handler'], function() {
-						var section = $(this).closest(options['section']),
-							button = $(options['handler'], section);
+						var section = $(this).closest(options['section']);
 
 						if (section.hasClass(options['active_class'])) {
-							button.attr('title', t('S_EXPAND'));
-							section
-								.removeClass(options['active_class'])
-								.addClass(options['closed_class']);
+							methods['collapseAll'].apply(accordion);
 						}
 						else {
-							methods['collapseAll'].apply(accordion);
-							button.attr('title', t('S_COLLAPSE'));
-							section
-								.removeClass(options['closed_class'])
-								.addClass(options['active_class']);
+							methods['expandNth'].apply(accordion, [$(section).index()]);
 						}
 					});
 			});
@@ -75,29 +67,27 @@ jQuery(function ($) {
 		// Collapse all accordion rows.
 		collapseAll: function() {
 			var accordion = $(this),
-				options = accordion.data('options'),
-				active_class = accordion.data('options')['active_class'],
-				closed_class = accordion.data('options')['closed_class'];
-			$('.'+active_class, accordion)
-				.removeClass(active_class)
-				.addClass(closed_class);
+				options = accordion.data('options');
+
+			$('.' + options['active_class'], accordion)
+				.removeClass(options['active_class'])
+				.addClass(options['closed_class']);
 
 			$(options['handler'], accordion).attr('title', t('S_EXPAND'));
 		},
 		// Expand N-th row in accordion. Collapse others.
 		expandNth: function(n) {
 			var accordion = $(this),
-				options = accordion.data('options');
+				options = accordion.data('options'),
+				section = $(options['section'] + ':nth(' + n + ')', accordion),
+				handler = $(options['handler'], section);
 
-			$(options['handler'], $('.'+options['active_class'], accordion)).attr('title', t('S_EXPAND'));
-			$(options['handler'], $(options['section']+':nth('+n+')', accordion)).attr('title', t('S_COLLAPSE'));
+			methods['collapseAll'].apply(accordion);
 
-			$('.'+options['active_class'], accordion)
-				.removeClass(options['active_class'])
-				.addClass(options['closed_class']);
-			$(options['section']+':nth('+n+')', accordion)
+			section
 				.removeClass(options['closed_class'])
 				.addClass(options['active_class']);
+			handler.attr('title', t('S_COLLAPSE'));
 		}
 	};
 
@@ -105,8 +95,7 @@ jQuery(function ($) {
 		if (methods[method]) {
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		}
-		else {
-			return methods.init.apply(this, arguments);
-		}
+
+		return methods.init.apply(this, arguments);
 	};
 });

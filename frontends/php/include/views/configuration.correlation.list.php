@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ $widget = (new CWidget())
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem((new CFilter())
+	->addItem((new CFilter(new CUrl('correlation.php')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
@@ -57,10 +57,10 @@ $table = (new CTableInfo())
 			(new CCheckBox('all_items'))
 				->onClick("checkAll('".$form->getName()."', 'all_items', 'g_correlationid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], 'correlation.php'),
 		_('Conditions'),
 		_('Operations'),
-		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'])
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], 'correlation.php')
 	]);
 
 if ($data['correlations']) {

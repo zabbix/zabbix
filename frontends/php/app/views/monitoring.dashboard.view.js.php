@@ -203,18 +203,6 @@
 		// Turn on edit dashboard.
 		$('#dashbrd-edit').click(showEditMode);
 
-		var $norm_mode_btn = $('.btn-dashbrd-normal');
-		if ($norm_mode_btn.length) {
-			$(window).on('mousemove keyup scroll', function() {
-				clearTimeout($norm_mode_btn.data('timer'));
-				$norm_mode_btn
-					.removeClass('hidden')
-					.data('timer', setTimeout(function() {
-						$norm_mode_btn.addClass('hidden');
-					}, 2000));
-			}).trigger('mousemove');
-		}
-
 		<?php if ($this->data['dashboard']['dashboardid'] == 0) { ?>
 		// When creating new dashboard, open it in edit mode, with opened properties popup.
 		showEditMode();

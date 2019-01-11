@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup icon_map
  */
-class testFormAdministrationGeneralIconMapping extends CWebTest {
+class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 	public function getCreateValidationData() {
 		return [
@@ -53,27 +53,9 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Icon mapping create with slash',
-					'mappings' => [
-						['expression' => '/']
-					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-				]
-			],
-			[
-				[
 					'name' => 'Icon mapping create with backslash',
 					'mappings' => [
 						['expression' => '\\']
-					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-				]
-			],
-			[
-				[
-					'name' => 'Icon mapping create with double slash',
-					'mappings' => [
-						['expression' => '//']
 					],
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
 				]
@@ -160,7 +142,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 
 		// Check the results in DB
 		if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
-			$this->assertEquals(0, DBcount('SELECT NULL FROM icon_map WHERE name='.zbx_dbstr($data['name'])));
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM icon_map WHERE name='.zbx_dbstr($data['name'])));
 		}
 	}
 
@@ -170,7 +152,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 				[
 					'name' => 'Icon mapping testForm create default inventory and icons',
 					'mappings' => [
-						['expression' => '!@#$%^&*()123abc']
+						['expression' => '/!@#$%^&*()123abc']
 					],
 					'check_db' => true,
 					'check_form' => true
@@ -290,7 +272,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 					.' ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '.zbx_dbstr($data['name'])
 					.' AND '.dbConditionString('icon_mapping.expression', $expressions);
 
-			$this->assertEquals(count($expressions), DBcount($sql));
+			$this->assertEquals(count($expressions), CDBHelper::getCount($sql));
 		}
 
 		// Check the results in form
@@ -316,7 +298,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	 */
 	public function testFormAdministrationGeneralIconMapping_CancelCreation() {
 		$sql_hash = 'SELECT * FROM icon_map ORDER BY iconmapid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php?form=create');
 		$this->zbxTestInputTypeWait('iconmap_name', 'CancelCreation');
@@ -329,7 +311,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextNotPresent('CancelCreation');
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	/**
@@ -337,23 +319,22 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	 */
 	public function testFormAdministrationGeneralIconMapping_SimpleUpdate() {
 		$sql_icon_map = 'SELECT * FROM icon_map ORDER BY iconmapid';
-		$old_icon_map = DBhash($sql_icon_map);
+		$old_icon_map = CDBHelper::getHash($sql_icon_map);
 
 		$sql_expression_hash = 'SELECT * FROM icon_mapping ORDER BY iconmappingid';
-		$old_expression = DBhash($sql_expression_hash);
+		$old_expression = CDBHelper::getHash($sql_expression_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 
-		foreach (DBdata("SELECT name FROM icon_map", false) as $iconmap) {
-			$iconmap = $iconmap[0];
+		foreach (CDBHelper::getAll('SELECT name FROM icon_map') as $iconmap) {
 			$this->zbxTestClickLinkText($iconmap['name']);
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickWait('update');
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map updated');
 		}
 
-		$this->assertEquals($old_icon_map, DBhash($sql_icon_map));
-		$this->assertEquals($old_expression, DBhash($sql_expression_hash));
+		$this->assertEquals($old_icon_map, CDBHelper::getHash($sql_icon_map));
+		$this->assertEquals($old_expression, CDBHelper::getHash($sql_expression_hash));
 	}
 
 	public function getUpdateValidationData() {
@@ -372,29 +353,11 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 					'error' => 'Icon map "Icon mapping one" already exists.'
 				]
 			],
-			// Expression with slash
-			[
-				[
-					'mappings' => [
-						['expression' => '/', 'action' => 'update']
-					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-				]
-			],
 			// Expression with backslash
 			[
 				[
 					'mappings' => [
 						['expression' => '\\', 'action' => 'update']
-					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-				]
-			],
-			// Expression with double slash
-			[
-				[
-					'mappings' => [
-						['expression' => '//', 'action' => 'update']
 					],
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
 				]
@@ -448,7 +411,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$update_icon = 'Icon mapping for update';
 		$sql_hash = 'SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping'
 				.' ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '.zbx_dbstr($update_icon);
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($update_icon);
@@ -475,7 +438,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	public function getUpdateData() {
@@ -484,7 +447,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 				[
 					'old_name' => 'Icon mapping testForm update expression',
 					'mappings' => [
-						['expression' => '!@#$%^&*()123updated', 'action' => 'update']
+						['expression' => '/!@#$%^&*()123updated', 'action' => 'update']
 					],
 					'check_db' => true,
 				]
@@ -618,12 +581,11 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	 */
 	public function testFormAdministrationGeneralIconMapping_CancelUpdating() {
 		$sql_hash = 'SELECT * FROM icon_map ORDER BY iconmapid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 
-		foreach (DBdata("SELECT name FROM icon_map LIMIT 1", false) as $iconmap) {
-			$iconmap = $iconmap[0];
+		foreach (CDBHelper::getAll('SELECT name FROM icon_map LIMIT 1') as $iconmap) {
 			$this->zbxTestClickLinkText($iconmap['name']);
 			$this->zbxTestInputTypeOverwrite('iconmap_name', $iconmap['name'].' (updated)');
 			$this->zbxTestClick('cancel');
@@ -633,7 +595,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 			$this->zbxTestTextNotPresent($iconmap['name'].' (updated)');
 		}
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	public function getCloneValidationData() {
@@ -650,31 +612,12 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 					'error' => 'Invalid parameter "/1/name": cannot be empty.'
 				]
 			],
-			[
-				[
-					'new_name' => 'CLONE: Icon mapping update expression with slash',
-					'mappings' => [
-						['expression' => '/', 'action' => 'update']
-					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-				]
-			],
 			// Icon mapping clone with backslash.
 			[
 				[
 					'new_name' => 'CLONE: Icon mapping update expression with two backslash',
 					'mappings' => [
 						['expression' => '\\', 'action' => 'update']
-					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-				]
-			],
-			// Icon mapping clone with double slash.
-			[
-				[
-					'new_name' => 'CLONE: Icon mapping update expression with two slash',
-					'mappings' => [
-						['expression' => '//', 'action' => 'update']
 					],
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
 				]
@@ -724,7 +667,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$name = 'Icon mapping to check clone functionality';
 		$sql_hash = 'SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping'
 				.' ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '.zbx_dbstr($name);
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name);
@@ -743,7 +686,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$this->zbxTestTextPresent($data['error']);
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	public function getCloneData() {
@@ -760,7 +703,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 					'old_name' => 'Icon mapping to check clone functionality',
 					'name' => 'Clone Icon mapping with expression update',
 					'mappings' => [
-						['expression' => '!@#$%^&*()123updated', 'action' => 'update']
+						['expression' => '/!@#$%^&*()123updated', 'action' => 'update']
 					],
 					'check_db' => '4'
 				]
@@ -860,7 +803,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 
 		// Check the results in DB.
 		if (array_key_exists('check_db', $data)) {
-			$this->assertEquals($data['check_db'], DBcount('SELECT icon_map.name, icon_mapping.expression FROM icon_map'
+			$this->assertEquals($data['check_db'], CDBHelper::getCount('SELECT icon_map.name, icon_mapping.expression FROM icon_map'
 					.' LEFT JOIN icon_mapping ON icon_map.iconmapid = icon_mapping.iconmapid'
 					.' WHERE icon_map.name = '.zbx_dbstr($data['name'])));
 		}
@@ -876,12 +819,11 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	 */
 	public function testFormAdministrationGeneralIconMapping_CancelCloning() {
 		$sql_hash = 'SELECT * FROM icon_map ORDER BY iconmapid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 
-		foreach (DBdata('SELECT name FROM icon_map LIMIT 2', false) as $iconmap) {
-			$iconmap = $iconmap[0];
+		foreach (CDBHelper::getAll('SELECT name FROM icon_map LIMIT 2') as $iconmap) {
 			$this->zbxTestClickLinkText($iconmap['name']);
 			$this->zbxTestInputTypeOverwrite('iconmap_name', $iconmap['name'].' (cloned)');
 			$this->zbxTestClickWait('clone');
@@ -895,7 +837,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		}
 
 		// Check the results in DB
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	/**
@@ -914,7 +856,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 
 		// Check the results in DB.
 		$sql = 'SELECT * FROM icon_map WHERE name='.zbx_dbstr($name);
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	/**
@@ -924,19 +866,19 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$name = 'Icon mapping one';
 
 		$sql_hash = 'SELECT * FROM icon_map ORDER BY iconmapid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('delete');
-		$this->webDriver->switchTo()->alert()->dismiss();
+		$this->zbxTestDismissAlert();
 
 		// Check the results in frontend.
 		$this->zbxTestCheckTitle('Configuration of icon mapping');
 		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	/**
@@ -946,7 +888,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$name = 'used_by_map';
 
 		$sql_hash = 'SELECT * FROM icon_map WHERE name='.zbx_dbstr($name).' ORDER BY iconmapid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name);
@@ -958,7 +900,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 
 		// Check the results in DB.
 		$sql = 'SELECT * FROM icon_map WHERE name='.zbx_dbstr($name);
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	private function checkFormFields($data) {

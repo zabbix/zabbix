@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -227,6 +227,9 @@ ZBX_THREAD_LOCAL static size_t			psk_identity_len_for_cb	= 0;
 ZBX_THREAD_LOCAL static char			*psk_for_cb		= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_len_for_cb		= 0;
 static int					init_done 		= 0;
+/* variables for capturing PSK identity from server callback function */
+ZBX_THREAD_LOCAL static int			incoming_connection_has_psk = 0;
+ZBX_THREAD_LOCAL static char			incoming_connection_psk_id[PSK_MAX_IDENTITY_LEN + 1];
 /* buffer for messages produced by zbx_openssl_info_cb() */
 ZBX_THREAD_LOCAL char				info_buf[256];
 #endif
@@ -482,6 +485,27 @@ static void	zbx_tls_cert_error_msg(unsigned int flags, char **error)
 	}
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_version                                                  *
+ *                                                                            *
+ * Purpose: print tls library version on stdout by application request with   *
+ *          parameter '-V'                                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tls_version(void)
+{
+#if defined(HAVE_POLARSSL)
+	printf("Compiled with %s\n", POLARSSL_VERSION_STRING_FULL);
+#elif defined(HAVE_GNUTLS)
+	printf("Compiled with GnuTLS %s\nRunning with GnuTLS %s\n", GNUTLS_VERSION, gnutls_check_version(NULL));
+#elif defined(HAVE_OPENSSL)
+	printf("This product includes software developed by the OpenSSL Project\n"
+			"for use in the OpenSSL Toolkit (http://www.openssl.org/).\n\n");
+	printf("Compiled with %s\nRunning with %s\n", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
+#endif
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1430,6 +1454,8 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __function_name, identity);
 
+	incoming_connection_has_psk = 1;
+
 	/* try PSK from configuration file first (it is already in binary form) */
 
 	if (0 < my_psk_identity_len && 0 == strcmp(my_psk_identity, identity))
@@ -1450,7 +1476,7 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 				/* this should have been prevented by validation in frontend or API */
 				zabbix_log(LOG_LEVEL_WARNING, "cannot convert PSK to binary form for PSK identity"
 						" \"%s\"", identity);
-				return 0;	/* fail */
+				goto fail;
 			}
 
 			psk_loc = (char *)psk_buf;
@@ -1464,7 +1490,7 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 						__function_name, identity);
 			}
 
-			return 0;	/* PSK not found */
+			goto fail;
 		}
 	}
 
@@ -1474,14 +1500,16 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "PSK associated with PSK identity \"%s\" does not fit into"
 					" %u-byte buffer", identity, max_psk_len);
-			return 0;	/* fail */
+			goto fail;
 		}
 
 		memcpy(psk, psk_loc, psk_len);
+		zbx_strlcpy(incoming_connection_psk_id, identity, sizeof(incoming_connection_psk_id));
 
 		return (unsigned int)psk_len;	/* success */
 	}
-
+fail:
+	incoming_connection_psk_id[0] = '\0';
 	return 0;	/* PSK not found */
 }
 #endif
@@ -3110,6 +3138,12 @@ void	zbx_tls_init_child(void)
 #define ZBX_CIPHERS_CERT_ECDHE		"EECDH+aRSA+AES128:"
 #define ZBX_CIPHERS_CERT		"RSA+aRSA+AES128"
 
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
+	/* TLS_AES_256_GCM_SHA384 is excluded from client ciphersuite list for PSK based connections. */
+	/* By default, in TLS 1.3 only *-SHA256 ciphersuites work with PSK. */
+#	define ZBX_CIPHERS_PSK_TLS13	"TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256"
+#endif
+
 #if OPENSSL_VERSION_NUMBER >= 0x1010000fL	/* OpenSSL 1.1.0 or newer */
 #	define ZBX_CIPHERS_PSK_ECDHE	"kECDHEPSK+AES128:"
 #	define ZBX_CIPHERS_PSK		"kPSK+AES128"
@@ -3410,6 +3444,14 @@ void	zbx_tls_init_child(void)
 		else
 			ciphers = ZBX_CIPHERS_PSK;
 
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
+		if (1 != SSL_CTX_set_ciphersuites(ctx_psk, ZBX_CIPHERS_PSK_TLS13))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of PSK TLS 1.3"
+					"  ciphersuites:");
+			goto out;
+		}
+#endif
 		if (1 != SSL_CTX_set_cipher_list(ctx_psk, ciphers))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of PSK ciphersuites:");
@@ -3468,6 +3510,9 @@ out1:
 #undef ZBX_CIPHERS_CERT
 #undef ZBX_CIPHERS_PSK_ECDHE
 #undef ZBX_CIPHERS_PSK
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
+#	undef ZBX_CIPHERS_PSK_TLS13
+#endif
 }
 #endif
 
@@ -4860,10 +4905,15 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 #if defined(_WINDOWS)
 	double		sec;
 #endif
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
+	const unsigned char	session_id_context[] = {'Z', 'b', 'x'};
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 	s->tls_ctx->ctx = NULL;
+
+	incoming_connection_has_psk = 0;	/* assume certificate-based connection by default */
 
 	if ((ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK) == (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
 	{
@@ -4950,6 +5000,13 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		}
 	}
 
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
+	if (1 != SSL_set_session_id_context(s->tls_ctx->ctx, session_id_context, sizeof(session_id_context)))
+	{
+		*error = zbx_strdup(*error, "cannot set session_id_context");
+		goto out;
+	}
+#endif
 	if (1 != SSL_set_fd(s->tls_ctx->ctx, s->socket))
 	{
 		*error = zbx_strdup(*error, "cannot set socket for TLS context");
@@ -5009,12 +5066,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 
 	cipher_name = SSL_get_cipher(s->tls_ctx->ctx);
 
-#if OPENSSL_VERSION_NUMBER >= 0x1010000fL	/* OpenSSL 1.1.0 or newer */
-	if (0 == strncmp("ECDHE-PSK-", cipher_name, ZBX_CONST_STRLEN("ECDHE-PSK-")) ||
-			0 == strncmp("PSK-", cipher_name, ZBX_CONST_STRLEN("PSK-")))
-#else
-	if (0 == strncmp("PSK-", cipher_name, ZBX_CONST_STRLEN("PSK-")))
-#endif
+	if (1 == incoming_connection_has_psk)
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
 	}
@@ -5485,6 +5537,7 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
  *     GnuTLS makes it asymmetric - see documentation for                     *
  *     gnutls_psk_server_get_username() and gnutls_psk_client_get_hint()      *
  *     (the latter function is not used in Zabbix).                           *
+ *     Implementation for OpenSSL is server-side only, too.                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
@@ -5498,8 +5551,15 @@ int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 	else
 		return FAIL;
 #elif defined(HAVE_OPENSSL)
-	if (NULL != (attr->psk_identity = SSL_get_psk_identity(s->tls_ctx->ctx)))
+	ZBX_UNUSED(s);
+
+	/* SSL_get_psk_identity() is not used here. It works with TLS 1.2, */
+	/* but returns NULL with TLS 1.3 in OpenSSL 1.1.1 */
+	if ('\0' != incoming_connection_psk_id[0])
+	{
+		attr->psk_identity = incoming_connection_psk_id;
 		attr->psk_identity_len = strlen(attr->psk_identity);
+	}
 	else
 		return FAIL;
 #endif

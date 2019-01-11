@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -267,7 +267,7 @@ int	zbx_mock_data_free(void **state)
 {
 	ZBX_UNUSED(state);
 
-	zbx_vector_str_clear_ext(&string_pool, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&string_pool, zbx_str_free);
 	zbx_vector_ptr_clear_ext(&handle_pool, zbx_ptr_free);
 	zbx_vector_str_destroy(&string_pool);
 	zbx_vector_ptr_destroy(&handle_pool);

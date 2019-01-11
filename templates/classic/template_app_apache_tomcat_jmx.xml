@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>3.4</version>
-    <date>2017-08-11T08:46:42Z</date>
+    <version>4.0</version>
+    <date>2018-11-26T09:05:40Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -36,471 +36,11 @@
             </applications>
             <items>
                 <item>
-                    <name>http-8080 bytes received per second</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=http-8080&quot;,bytesReceived]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units>B</units>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8080</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing>
-                        <step>
-                            <type>10</type>
-                            <params/>
-                        </step>
-                    </preprocessing>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8080 bytes sent per second</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=http-8080&quot;,bytesSent]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units>B</units>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8080</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing>
-                        <step>
-                            <type>10</type>
-                            <params/>
-                        </step>
-                    </preprocessing>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8080 errors per second</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=http-8080&quot;,errorCount]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units/>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8080</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing>
-                        <step>
-                            <type>10</type>
-                            <params/>
-                        </step>
-                    </preprocessing>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8080 request processing time</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=http-8080&quot;,processingTime]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units>s</units>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8080</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing>
-                        <step>
-                            <type>1</type>
-                            <params>0.001</params>
-                        </step>
-                    </preprocessing>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8080 requests per second</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=http-8080&quot;,requestCount]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units/>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8080</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing>
-                        <step>
-                            <type>10</type>
-                            <params/>
-                        </step>
-                    </preprocessing>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8443 bytes received per second</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=http-8443&quot;,bytesReceived]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units>B</units>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8443</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing>
-                        <step>
-                            <type>10</type>
-                            <params/>
-                        </step>
-                    </preprocessing>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8443 bytes sent per second</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=http-8443&quot;, bytesSent]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units>B</units>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8443</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing>
-                        <step>
-                            <type>10</type>
-                            <params/>
-                        </step>
-                    </preprocessing>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8443 errors per second</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=http-8443&quot;,errorCount]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units/>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8443</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing>
-                        <step>
-                            <type>10</type>
-                            <params/>
-                        </step>
-                    </preprocessing>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8443 request processing time</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=http-8443&quot;,processingTime]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units>s</units>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8443</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing>
-                        <step>
-                            <type>1</type>
-                            <params>0.001</params>
-                        </step>
-                    </preprocessing>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8443 requests per second</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=http-8443&quot;,requestCount]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units/>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8443</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing>
-                        <step>
-                            <type>10</type>
-                            <params/>
-                        </step>
-                    </preprocessing>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
                     <name>jk-8009 bytes received per second</name>
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=jk-8009&quot;, bytesReceived]</key>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;, bytesReceived]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -539,6 +79,24 @@
                         </step>
                     </preprocessing>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -546,7 +104,7 @@
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=jk-8009&quot;,bytesSent]</key>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,bytesSent]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -585,6 +143,24 @@
                         </step>
                     </preprocessing>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -592,7 +168,7 @@
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=jk-8009&quot;,errorCount]</key>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,errorCount]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -631,6 +207,24 @@
                         </step>
                     </preprocessing>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -638,7 +232,7 @@
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=jk-8009&quot;,processingTime]</key>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,processingTime]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -677,6 +271,24 @@
                         </step>
                     </preprocessing>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -684,7 +296,7 @@
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=jk-8009&quot;,requestCount]</key>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,requestCount]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -723,6 +335,664 @@
                         </step>
                     </preprocessing>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8443 bytes received per second</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,bytesReceived]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>B</units>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8443</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8443 bytes sent per second</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;, bytesSent]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>B</units>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8443</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8443 errors per second</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,errorCount]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8443</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8443 request processing time</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,processingTime]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>s</units>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8443</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing>
+                        <step>
+                            <type>1</type>
+                            <params>0.001</params>
+                        </step>
+                    </preprocessing>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8443 requests per second</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,requestCount]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8443</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8080 bytes received per second</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,bytesReceived]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>B</units>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8080</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8080 bytes sent per second</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,bytesSent]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>B</units>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8080</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8080 errors per second</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,errorCount]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8080</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8080 request processing time</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,processingTime]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>s</units>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8080</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing>
+                        <step>
+                            <type>1</type>
+                            <params>0.001</params>
+                        </step>
+                    </preprocessing>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8080 requests per second</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=GlobalRequestProcessor,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,requestCount]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8080</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -730,7 +1000,7 @@
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=Manager,path=/,host=localhost&quot;,activeSessions]</key>
+                    <key>jmx[&quot;Catalina:type=Manager,context=/,host=localhost&quot;,activeSessions]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -764,6 +1034,24 @@
                     <logtimefmt/>
                     <preprocessing/>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -771,7 +1059,7 @@
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=Manager,path=/,host=localhost&quot;,maxActiveSessions]</key>
+                    <key>jmx[&quot;Catalina:type=Manager,context=/,host=localhost&quot;,maxActiveSessions]</key>
                     <delay>1h</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -805,6 +1093,24 @@
                     <logtimefmt/>
                     <preprocessing/>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -812,7 +1118,7 @@
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=Manager,path=/,host=localhost&quot;,maxActive]</key>
+                    <key>jmx[&quot;Catalina:type=Manager,context=/,host=localhost&quot;,maxActive]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -846,6 +1152,24 @@
                     <logtimefmt/>
                     <preprocessing/>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -853,7 +1177,7 @@
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=Manager,path=/,host=localhost&quot;,rejectedSessions]</key>
+                    <key>jmx[&quot;Catalina:type=Manager,context=/,host=localhost&quot;,rejectedSessions]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -887,6 +1211,24 @@
                     <logtimefmt/>
                     <preprocessing/>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -894,7 +1236,7 @@
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=Manager,path=/,host=localhost&quot;,sessionCounter]</key>
+                    <key>jmx[&quot;Catalina:type=Manager,context=/,host=localhost&quot;,sessionCounter]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -933,6 +1275,24 @@
                         </step>
                     </preprocessing>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -974,6 +1334,24 @@
                     <logtimefmt/>
                     <preprocessing/>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -1015,6 +1393,24 @@
                     <logtimefmt/>
                     <preprocessing/>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -1056,252 +1452,24 @@
                     <logtimefmt/>
                     <preprocessing/>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8080 threads allocated</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=ThreadPool,name=http-8080&quot;,currentThreadCount]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>3</value_type>
-                    <allowed_hosts/>
-                    <units/>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8080</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing/>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8080 threads busy</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=ThreadPool,name=http-8080&quot;,currentThreadsBusy]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>3</value_type>
-                    <allowed_hosts/>
-                    <units/>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8080</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing/>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8080 threads max</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=ThreadPool,name=http-8080&quot;,maxThreads]</key>
-                    <delay>1h</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>3</value_type>
-                    <allowed_hosts/>
-                    <units/>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8080</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing/>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8443 threads allocated</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=ThreadPool,name=http-8443&quot;,currentThreadCount]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>3</value_type>
-                    <allowed_hosts/>
-                    <units/>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8443</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing/>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8443 threads busy</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=ThreadPool,name=http-8443&quot;,currentThreadsBusy]</key>
-                    <delay>1m</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>3</value_type>
-                    <allowed_hosts/>
-                    <units/>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8443</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing/>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
-                    <master_item/>
-                </item>
-                <item>
-                    <name>http-8443 threads max</name>
-                    <type>16</type>
-                    <snmp_community/>
-                    <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=ThreadPool,name=http-8443&quot;,maxThreads]</key>
-                    <delay>1h</delay>
-                    <history>1w</history>
-                    <trends>365d</trends>
-                    <status>0</status>
-                    <value_type>3</value_type>
-                    <allowed_hosts/>
-                    <units/>
-                    <snmpv3_contextname/>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                    <snmpv3_privpassphrase/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>http-8443</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                    <logtimefmt/>
-                    <preprocessing/>
-                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -1309,7 +1477,7 @@
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=ThreadPool,name=jk-8009&quot;,currentThreadCount]</key>
+                    <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,currentThreadCount]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -1343,6 +1511,24 @@
                     <logtimefmt/>
                     <preprocessing/>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -1350,7 +1536,7 @@
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=ThreadPool,name=jk-8009&quot;,currentThreadsBusy]</key>
+                    <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,currentThreadsBusy]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -1384,6 +1570,24 @@
                     <logtimefmt/>
                     <preprocessing/>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
                 <item>
@@ -1391,7 +1595,7 @@
                     <type>16</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jmx[&quot;Catalina:type=ThreadPool,name=jk-8009&quot;,maxThreads]</key>
+                    <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,maxThreads]</key>
                     <delay>1h</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -1425,19 +1629,404 @@
                     <logtimefmt/>
                     <preprocessing/>
                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8443 threads allocated</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,currentThreadCount]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>3</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8443</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing/>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8443 threads busy</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,currentThreadsBusy]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>3</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8443</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing/>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8443 threads max</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,maxThreads]</key>
+                    <delay>1h</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>3</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8443</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing/>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8080 threads allocated</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,currentThreadCount]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>3</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8080</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing/>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8080 threads busy</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,currentThreadsBusy]</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>3</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8080</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing/>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item/>
+                </item>
+                <item>
+                    <name>http-8080 threads max</name>
+                    <type>16</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,maxThreads]</key>
+                    <delay>1h</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>3</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>http-8080</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing/>
+                    <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
                     <master_item/>
                 </item>
             </items>
             <discovery_rules/>
             <httptests/>
-            <macros/>
+            <macros>
+                <macro>
+                    <macro>{$PROTOCOL_HANDLER_AJP}</macro>
+                    <value>ajp-nio-8009</value>
+                </macro>
+                <macro>
+                    <macro>{$PROTOCOL_HANDLER_HTTP}</macro>
+                    <value>http-nio-8080</value>
+                </macro>
+                <macro>
+                    <macro>{$PROTOCOL_HANDLER_HTTPS}</macro>
+                    <value>https-openssl-nio-8443</value>
+                </macro>
+            </macros>
             <templates/>
             <screens/>
         </template>
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=http-8080&quot;,currentThreadsBusy].last(0)} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=http-8080&quot;,maxThreads].last(0)} * 0.7)</expression>
+            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,currentThreadsBusy].last(0)} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,maxThreads].last(0)} * 0.7)</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>70% http-8080 worker threads busy on {HOST.NAME}</name>
@@ -1453,7 +2042,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=http-8443&quot;,currentThreadsBusy].last(0)} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=http-8443&quot;,maxThreads].last(0)} * 0.7)</expression>
+            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,currentThreadsBusy].last(0)} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,maxThreads].last(0)} * 0.7)</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>70% http-8443 worker threads busy on {HOST.NAME}</name>
@@ -1469,7 +2058,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=jk-8009&quot;,currentThreadsBusy].last(0)} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=jk-8009&quot;,maxThreads].last(0)}  *0.7)</expression>
+            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,currentThreadsBusy].last(0)} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,maxThreads].last(0)}  *0.7)</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>70% jk-8009 worker threads busy on {HOST.NAME}</name>
@@ -1545,7 +2134,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Apache Tomcat JMX</host>
-                        <key>jmx[&quot;Catalina:type=ThreadPool,name=http-8080&quot;,maxThreads]</key>
+                        <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,maxThreads]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -1557,7 +2146,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Apache Tomcat JMX</host>
-                        <key>jmx[&quot;Catalina:type=ThreadPool,name=http-8080&quot;,currentThreadsBusy]</key>
+                        <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,currentThreadsBusy]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -1569,7 +2158,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Apache Tomcat JMX</host>
-                        <key>jmx[&quot;Catalina:type=ThreadPool,name=http-8080&quot;,currentThreadCount]</key>
+                        <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,currentThreadCount]</key>
                     </item>
                 </graph_item>
             </graph_items>
@@ -1601,7 +2190,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Apache Tomcat JMX</host>
-                        <key>jmx[&quot;Catalina:type=ThreadPool,name=http-8443&quot;,maxThreads]</key>
+                        <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,maxThreads]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -1613,7 +2202,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Apache Tomcat JMX</host>
-                        <key>jmx[&quot;Catalina:type=ThreadPool,name=http-8443&quot;,currentThreadsBusy]</key>
+                        <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,currentThreadsBusy]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -1625,7 +2214,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Apache Tomcat JMX</host>
-                        <key>jmx[&quot;Catalina:type=ThreadPool,name=http-8443&quot;,currentThreadCount]</key>
+                        <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,currentThreadCount]</key>
                     </item>
                 </graph_item>
             </graph_items>
@@ -1657,7 +2246,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Apache Tomcat JMX</host>
-                        <key>jmx[&quot;Catalina:type=ThreadPool,name=jk-8009&quot;,maxThreads]</key>
+                        <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,maxThreads]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -1669,7 +2258,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Apache Tomcat JMX</host>
-                        <key>jmx[&quot;Catalina:type=ThreadPool,name=jk-8009&quot;,currentThreadsBusy]</key>
+                        <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,currentThreadsBusy]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -1681,7 +2270,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Apache Tomcat JMX</host>
-                        <key>jmx[&quot;Catalina:type=ThreadPool,name=jk-8009&quot;,currentThreadCount]</key>
+                        <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,currentThreadCount]</key>
                     </item>
                 </graph_item>
             </graph_items>
@@ -1713,7 +2302,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Apache Tomcat JMX</host>
-                        <key>jmx[&quot;Catalina:type=Manager,path=/,host=localhost&quot;,rejectedSessions]</key>
+                        <key>jmx[&quot;Catalina:type=Manager,context=/,host=localhost&quot;,rejectedSessions]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -1725,7 +2314,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Apache Tomcat JMX</host>
-                        <key>jmx[&quot;Catalina:type=Manager,path=/,host=localhost&quot;,activeSessions]</key>
+                        <key>jmx[&quot;Catalina:type=Manager,context=/,host=localhost&quot;,activeSessions]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -1737,7 +2326,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Apache Tomcat JMX</host>
-                        <key>jmx[&quot;Catalina:type=Manager,path=/,host=localhost&quot;,maxActiveSessions]</key>
+                        <key>jmx[&quot;Catalina:type=Manager,context=/,host=localhost&quot;,maxActiveSessions]</key>
                     </item>
                 </graph_item>
             </graph_items>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,46 +20,49 @@
 
 
 /**
- * Widget Field for numeric box
+ * Widget Field for numeric data.
  */
 class CWidgetFieldNumericBox extends CWidgetField {
 
-	/**
-	 * Allowed min value
-	 *
-	 * @var int
-	 */
-	private $min;
-
-	/**
-	 * Allowed max value
-	 *
-	 * @var int
-	 */
-	private $max;
+	private $placeholder;
+	private $width;
 
 	/**
 	 * A numeric box widget field.
+	 * Supported signed decimal values with suffix (KMGTsmhdw).
 	 *
 	 * @param string $name   field name in form
 	 * @param string $label  label for the field in form
-	 * @param int    $min    minimal allowed value (this included)
-	 * @param int    $max    maximal allowed value (this included)
 	 */
-	public function __construct($name, $label, $min = 0, $max = ZBX_MAX_INT32) {
+	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
-		$this->min = $min;
-		$this->max = $max;
-		$this->setExValidationRules(['in' => $this->min.':'.$this->max]);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this->setValidationRules(['type' => API_NUMERIC, 'length' => 255]);
+		$this->setDefault('');
 	}
 
 	public function getMaxLength() {
 		return strlen((string) $this->max);
 	}
 
-	public function setValue($value) {
-		return parent::setValue((int) $value);
+	public function setPlaceholder($placeholder) {
+		$this->placeholder = $placeholder;
+
+		return $this;
+	}
+
+	public function getPlaceholder() {
+		return $this->placeholder;
+	}
+
+	public function setWidth($width) {
+		$this->width = $width;
+
+		return $this;
+	}
+
+	public function getWidth() {
+		return $this->width;
 	}
 }

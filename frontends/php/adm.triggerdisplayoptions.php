@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ $page['scripts'] = ['colorpicker.js'];
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $fields = [
-	'custom_color' =>			[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Use custom event status colors')],
+	'custom_color' =>			[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Use custom event status colours')],
 	'problem_unack_color' =>	[T_ZBX_CLR, O_OPT, null, null, 'isset({update}) && isset({custom_color})',
 		_('Unacknowledged PROBLEM events')
 	],

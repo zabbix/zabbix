@@ -1,7 +1,7 @@
 ﻿<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,10 +77,38 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'3550w', 0, ['negative' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '3550w'
+				]
+			],
+			[
 				'{$M}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M}'
+				]
+			],
+			[
+				'{$M: "context"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: "context"}'
+				]
+			],
+			[
+				'{$M: ";"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: ";"}'
+				]
+			],
+			[
+				'{$M: "/"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: "/"}'
 				]
 			],
 			[
@@ -95,6 +123,20 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
+				]
+			],
+			[
+				'-2w', 0, ['negative' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '-2w'
+				]
+			],
+			[
+				'-3600', 0, ['negative' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '-3600'
 				]
 			],
 			// partial success
@@ -218,9 +260,37 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => ''
 				]
 			],
+			[
+				'-10s', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
 			// User macros are not enabled.
 			[
 				'{$M}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: "context"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: ";"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: "/"}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''

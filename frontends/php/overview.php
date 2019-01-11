@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,10 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Overview');
 $page['file'] = 'overview.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['scripts'] = ['layout.mode.js'];
+
+CView::$has_web_layout_mode = true;
+$page['web_layout_mode'] = CView::getLayoutMode();
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 define('SHOW_TRIGGERS', 0);
@@ -40,7 +44,6 @@ $fields = [
 	'groupid'     => [T_ZBX_INT, O_OPT, P_SYS, DB_ID,     null],
 	'view_style'  => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
 	'type'        => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
-	'fullscreen'  => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
 	// filter
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -141,7 +144,6 @@ $page_filter = new CPageFilter([
 ]);
 
 $data = [
-	'fullscreen' => (bool) getRequest('fullscreen', false),
 	'type' => $type,
 	'view_style' => $viewStyle,
 	'config' => $config,
@@ -173,30 +175,45 @@ if ($type == SHOW_TRIGGERS) {
 		];
 	}
 
-	$host_options = [];
+	if ($data['pageFilter']->groupsSelected) {
+		$host_options = [];
 
-	// fetch hosts
-	if ($filter['inventory']) {
-		$host_options['searchInventory'] = [];
-		foreach ($filter['inventory'] as $field) {
-			$host_options['searchInventory'][$field['field']][] = $field['value'];
+		if ($filter['inventory']) {
+			$host_options['searchInventory'] = [];
+
+			foreach ($filter['inventory'] as $field) {
+				$host_options['searchInventory'][$field['field']][] = $field['value'];
+			}
 		}
+
+		$trigger_options = [
+			'search' => ($filter['txtSelect'] !== '') ? ['description' => $filter['txtSelect']] : null,
+			'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
+			'filter' => [
+				'value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
+			],
+			'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
+			'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null
+		];
+
+		$problem_options = [
+			'show_suppressed' => $filter['show_suppressed'],
+			'min_severity' => $filter['showSeverity'],
+			'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null,
+			'recent' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
+			'any' => ($filter['showTriggers'] == TRIGGERS_OPTION_ALL) ? true : null
+		];
+
+		$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
+
+		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
+			$host_options, $trigger_options, $problem_options
+		);
 	}
-
-	$trigger_options = [
-		'search' => ($filter['txtSelect'] !== '') ? ['description' => $filter['txtSelect']] : null,
-		'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
-		'filter' => ['value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null],
-		'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
-		'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null,
-		'min_severity' => ($filter['showSeverity'] > TRIGGER_SEVERITY_NOT_CLASSIFIED) ? $filter['showSeverity'] : null,
-		'lastChangeSince' => $filter['statusChange'] ? time() - $filter['statusChangeDays'] * SEC_PER_DAY : null
-	];
-
-	$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
-	list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
-		$host_options, $trigger_options, $filter['show_suppressed']
-	);
+	else {
+		$hosts = [];
+		$triggers = [];
+	}
 
 	$data['filter'] = $filter;
 	$data['hosts'] = $hosts;
@@ -207,7 +224,8 @@ if ($type == SHOW_TRIGGERS) {
 // fetch item data
 else {
 	$data['filter'] = [
-		'application' => CProfile::get('web.overview.filter.application', '')
+		'application' => CProfile::get('web.overview.filter.application', ''),
+		'show_suppressed' => CProfile::get('web.overview.filter.show_suppressed', 0)
 	];
 
 	$overviewView = new CView('monitoring.overview.items', $data);

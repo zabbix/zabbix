@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ else {
 	$create_button = new CSubmit('form', _('Create trigger'));
 }
 
-$filter_form = (new CFormList())
+$filter_column1 = (new CFormList())
 	->addRow(_('Severity'),
 		new CSeverity([
 			'name' => 'filter_priority',
@@ -52,7 +52,7 @@ $filter_form = (new CFormList())
 	);
 
 if ($data['show_value_column']) {
-	$filter_form->addRow(_('Value'),
+	$filter_column1->addRow(_('Value'),
 		(new CRadioButtonList('filter_value', (int) $data['filter_value']))
 			->addValue(_('all'), -1)
 			->addValue(_('Ok'), TRIGGER_VALUE_FALSE)
@@ -61,10 +61,57 @@ if ($data['show_value_column']) {
 	);
 }
 
-$filter = (new CFilter())
+$filter_tags = $data['filter_tags'];
+if (!$filter_tags) {
+	$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+}
+
+$filter_tags_table = (new CTable())
+	->setId('filter-tags')
+	->addRow((new CCol(
+		(new CRadioButtonList('filter_evaltype', (int) $data['filter_evaltype']))
+			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
+			->addValue(_('Or'), TAG_EVAL_TYPE_OR)
+			->setModern(true)
+		))->setColSpan(4)
+	);
+
+$i = 0;
+foreach ($filter_tags as $tag) {
+	$filter_tags_table->addRow([
+		(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
+			->setAttribute('placeholder', _('tag'))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
+			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
+			->setModern(true),
+		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
+			->setAttribute('placeholder', _('value'))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		(new CCol(
+			(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	], 'form_row');
+
+	$i++;
+}
+$filter_tags_table->addRow(
+	(new CCol(
+		(new CButton('filter_tags_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+	))->setColSpan(3)
+);
+
+$filter_column2 = (new CFormList())->addRow(_('Tags'), $filter_tags_table);
+
+$filter = (new CFilter(new CUrl('triggers.php')))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
-	->addFilterTab(_('Filter'), [$filter_form]);
+	->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
@@ -106,19 +153,24 @@ $triggers_form = (new CForm())
 	->setName('triggersForm')
 	->addVar('hostid', $data['hostid']);
 
+$url = (new CUrl('triggers.php'))
+	->setArgument('hostid', $data['hostid'])
+	->getUrl();
+
 // create table
 $triggers_table = (new CTableInfo())->setHeader([
 	(new CColHeader(
 		(new CCheckBox('all_triggers'))
 			->onClick("checkAll('".$triggers_form->getName()."', 'all_triggers', 'g_triggerid');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder']),
+	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
 	$data['show_value_column'] ? _('Value') : null,
 	($data['hostid'] == 0) ? _('Host') : null,
-	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder']),
+	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
 	_('Expression'),
-	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder']),
-	$data['showInfoColumn'] ? _('Info') : null
+	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
+	$data['showInfoColumn'] ? _('Info') : null,
+	_('Tags')
 ]);
 
 $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
@@ -131,32 +183,11 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	// description
 	$description = [];
+	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
+		ZBX_FLAG_DISCOVERY_NORMAL
+	);
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
-
-	if ($trigger['templateid'] > 0) {
-		if (!isset($data['realHosts'][$triggerid])) {
-			$description[] = (new CSpan(_('Host')))->addClass(ZBX_STYLE_GREY);
-			$description[] = NAME_DELIMITER;
-		}
-		else {
-			$real_hosts = $data['realHosts'][$triggerid];
-			$real_host = reset($real_hosts);
-
-			if (array_key_exists($real_host['hostid'], $data['writable_templates'])) {
-				$description[] = (new CLink(CHtml::encode($real_host['name']),
-					'triggers.php?hostid='.$real_host['hostid']
-				))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY);
-			}
-			else {
-				$description[] = (new CSpan(CHtml::encode($real_host['name'])))->addClass(ZBX_STYLE_GREY);
-			}
-
-			$description[] = NAME_DELIMITER;
-		}
-	}
 
 	if ($trigger['discoveryRule']) {
 		$description[] = (new CLink(
@@ -254,7 +285,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$description,
 		$expression,
 		$status,
-		$data['showInfoColumn'] ? makeInformationList($info_icons) : null
+		$data['showInfoColumn'] ? makeInformationList($info_icons) : null,
+		$data['tags'][$triggerid]
 	]);
 }
 

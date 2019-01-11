@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -434,7 +434,6 @@ class CApiService {
 		$sqlFrom = implode(',', array_unique($sqlParts['from']));
 		$sqlWhere = empty($sqlParts['where']) ? '' : ' WHERE '.implode(' AND ', array_unique($sqlParts['where']));
 		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
-		$sqlHaving = empty($sqlParts['having']) ? '' : ' HAVING '.implode(' AND ', array_unique($sqlParts['having']));
 		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
 
 		return 'SELECT'.zbx_db_distinct($sqlParts).' '.$sqlSelect.
@@ -442,7 +441,6 @@ class CApiService {
 				$sql_left_join.
 				$sqlWhere.
 				$sqlGroup.
-				$sqlHaving.
 				$sqlOrder;
 	}
 
@@ -940,7 +938,7 @@ class CApiService {
 	}
 
 	/**
-	 * Check if a set of parameters contains a deprecated parameter or a a parameter with a deprecated value.
+	 * Check if a set of parameters contains a deprecated parameter or a parameter with a deprecated value.
 	 * If $value is not set, the method will trigger a deprecated notice if $params contains the $paramName key.
 	 * If $value is set, the method will trigger a notice if the value of the parameter is equal to the deprecated value
 	 * or the parameter is an array and contains a deprecated value.

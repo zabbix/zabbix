@@ -4,8 +4,8 @@
 			->setAttribute('placeholder', _('tag'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		(new CRadioButtonList('tags[#{rowNum}][operator]', MAINTENANCE_TAG_OPERATOR_LIKE))
-			->addValue(_('Like'), MAINTENANCE_TAG_OPERATOR_LIKE)
-			->addValue(_('Equal'), MAINTENANCE_TAG_OPERATOR_EQUAL)
+			->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
+			->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 			->setModern(true),
 		(new CTextBox('tags[#{rowNum}][value]'))
 			->setAttribute('placeholder', _('value'))

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_test_user' => 'string',
 			'ldap_test_password' => 'string',
 			'change_bind_password' => 'in 0,1',
+			'db_authentication_type' => 'string',
 			'authentication_type' => 'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'http_case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
@@ -71,60 +72,59 @@ class CControllerAuthenticationEdit extends CController {
 
 	protected function doAction() {
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
-		$config = select_config();
 
 		$data = [
 			'action_submit' => 'authentication.update',
 			'action_passw_change' => 'authentication.edit',
-			'ldap_configured' => $config['ldap_configured'],
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'ldap_test_password' => '',
+			'ldap_test_user' => CWebUser::$data['alias'],
 			'change_bind_password' => 0,
-			'authentication_type' => $config['authentication_type'],
-			'db_authentication_type' => $config['authentication_type'],
-			'http_case_sensitive' => $config['http_case_sensitive'],
-			'ldap_case_sensitive' => $config['ldap_case_sensitive'],
-			'ldap_host' => $config['ldap_host'],
-			'ldap_port' => $config['ldap_port'],
-			'ldap_base_dn' => $config['ldap_base_dn'],
-			'ldap_bind_dn' => $config['ldap_bind_dn'],
-			'ldap_search_attribute' => $config['ldap_search_attribute'],
-			'ldap_bind_password' => $this->getInput('change_bind_password', 0) ? '' : $config['ldap_bind_password'],
-			'ldap_test_user' => '',
-			'http_auth_enabled' => $config['http_auth_enabled'],
-			'http_login_form' => $config['http_login_form'],
-			'http_strip_domains' => $config['http_strip_domains'],
 			'form_refresh' => 0
 		];
 
-		$this->getInputs($data, [
-			'form_refresh',
-			'change_bind_password',
-			'authentication_type',
-			'http_case_sensitive',
-			'ldap_case_sensitive',
-			'ldap_configured',
-			'ldap_host',
-			'ldap_port',
-			'ldap_base_dn',
-			'ldap_bind_dn',
-			'ldap_search_attribute',
-			'ldap_bind_password',
-			'ldap_test_user',
-			'http_auth_enabled',
-			'http_login_form',
-			'http_strip_domains'
-		]);
+		if ($this->hasInput('form_refresh')) {
+			// Fill value for unchecked state to prevent defaults values from database to be set.
+			$data += array_fill_keys(['http_case_sensitive', 'ldap_case_sensitive'], 0);
+
+			$this->getInputs($data, [
+				'form_refresh',
+				'change_bind_password',
+				'db_authentication_type',
+				'authentication_type',
+				'http_case_sensitive',
+				'ldap_case_sensitive',
+				'ldap_configured',
+				'ldap_host',
+				'ldap_port',
+				'ldap_base_dn',
+				'ldap_bind_dn',
+				'ldap_search_attribute',
+				'ldap_bind_password',
+				'ldap_test_user',
+				'ldap_test_password',
+				'http_auth_enabled',
+				'http_login_form',
+				'http_strip_domains'
+			]);
+
+			$data += DB::getDefaults('config');
+
+			if ($data['ldap_configured'] != ZBX_AUTH_LDAP_ENABLED) {
+				$data['change_bind_password'] = 1;
+			}
+		}
+		else {
+			$data += select_config();
+			$data['db_authentication_type'] = $data['authentication_type'];
+			$data['change_bind_password'] = ($data['ldap_bind_password'] === '') ? 1 : 0;
+		}
 
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
 
-		if ($data['ldap_test_user'] === '') {
-			$data['ldap_test_user'] = CWebUser::$data['alias'];
-		}
-
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Authentication'));
+		$response->setTitle(_('Configuration of authentication'));
 		$this->setResponse($response);
 	}
 }

@@ -4,7 +4,7 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates/Servers Hardware</name>
+         <name>Templates/Server hardware</name>
       </group>
    </groups>
    <templates>
@@ -30,7 +30,7 @@ version : IMM1&#13;
 device : IMM1 servers (M2,M3 generations)</description>
          <groups>
             <group>
-               <name>Templates/Servers Hardware</name>
+               <name>Templates/Server hardware</name>
             </group>
          </groups>
          <applications>
@@ -41,10 +41,10 @@ device : IMM1 servers (M2,M3 generations)</description>
                <name>Inventory</name>
             </application>
             <application>
-               <name>Physical Disks</name>
+               <name>Physical disks</name>
             </application>
             <application>
-               <name>Power Supply</name>
+               <name>Power supply</name>
             </application>
             <application>
                <name>Status</name>
@@ -683,7 +683,7 @@ A description of the power module status.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Power Supply</name>
+                           <name>Power supply</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -931,7 +931,7 @@ Please check the fan unit</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -974,7 +974,7 @@ disk module FRU name.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap/>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2016 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup httptest
  */
-class testWebScenario extends CZabbixTest {
+class testWebScenario extends CAPITest {
 
 	public static function httptest_create() {
 		return [
@@ -294,13 +295,13 @@ class testWebScenario extends CZabbixTest {
 				$dbRowWeb = DBFetch($dbResultWeb);
 				$this->assertEquals($dbRowWeb['name'], $httptests[$key]['name']);
 				$this->assertEquals($dbRowWeb['hostid'], $httptests[$key]['hostid']);
-				$this->assertEquals(1, DBcount('select * from httpstep where httptestid='.zbx_dbstr($id)));
+				$this->assertEquals(1, CDBHelper::getCount('select * from httpstep where httptestid='.zbx_dbstr($id)));
 			}
 		}
 		else {
 			foreach ([$httptests] as $httptest) {
 				if (array_key_exists('name', $httptest) && $httptest['name'] !== 'Api web scenario'){
-					$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
+					$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
 				}
 			}
 		}
@@ -451,7 +452,7 @@ class testWebScenario extends CZabbixTest {
 		else {
 			foreach ($httptests as $httptest) {
 				if (array_key_exists('name', $httptest) && $httptest['name'] !== 'Api web scenario'){
-					$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
+					$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
 				}
 			}
 		}
@@ -462,7 +463,7 @@ class testWebScenario extends CZabbixTest {
 			// Check  unexpected parameter.
 			[
 				'httptest' => [
-					'name' => 'Api web scenario with readonly parametr',
+					'name' => 'Api web scenario with readonly parameter',
 					'templateid' => '1'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "templateid".'
@@ -616,7 +617,7 @@ class testWebScenario extends CZabbixTest {
 					'name' => 'Api web with wrong delay',
 					'delay' => '-1'
 				],
-				'expected_error' => 'Invalid parameter "/1/delay": a time unit is expected.'
+				'expected_error' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
 			],
 			[
 				'httptest' => [
@@ -650,7 +651,9 @@ class testWebScenario extends CZabbixTest {
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong headers',
-					'headers' => '☺'
+					'headers' => [
+						['name' => '☺', 'value' => '']
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/headers/1/value": cannot be empty.'
 			],
@@ -1014,7 +1017,9 @@ class testWebScenario extends CZabbixTest {
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong variable',
-					'variables' => '☺'
+					'variables' => [
+						['name' => '☺']
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 			],
@@ -1201,7 +1206,7 @@ class testWebScenario extends CZabbixTest {
 				$this->assertEquals($dbRow['name'], $httptests['name']);
 			}
 			else {
-				$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptests['name'])));
+				$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptests['name'])));
 			}
 		}
 	}
@@ -1258,7 +1263,7 @@ class testWebScenario extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['httptestids'] as $id) {
-				$this->assertEquals(0, DBcount('select * from httptest where httptestid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount('select * from httptest where httptestid='.zbx_dbstr($id)));
 			}
 		}
 	}

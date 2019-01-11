@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,11 +123,10 @@ static const char	*sysfs_read_attr(const char *device, char **attribute)
 
 static int	get_device_info(const char *dev_path, const char *dev_name, char *device_info, const char **name_subfolder)
 {
-	char		bus_path[MAX_STRING_LEN], linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
-	char		*subsys, *prefix = NULL, *bus_attr = NULL;
-	const char	*bus_subfolder;
-	int		domain, bus, slot, fn, addr, vendor, product, sub_len, ret = FAIL;
-	short int	bus_spi, bus_i2c;
+	int		ret = FAIL;
+	unsigned int	addr;
+	ssize_t		sub_len;
+	char		*subsys, *prefix = NULL, linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
 
 	/* ignore any device without name attribute */
 	if (NULL == (*name_subfolder = sysfs_read_attr(dev_path, &prefix)))
@@ -137,8 +136,7 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 	{
 		/* Virtual device */
 		/* Assuming that virtual devices are unique */
-		addr = 0;
-		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-virtual-%x", prefix, addr);
+		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-virtual-0", prefix);
 		ret = SUCCEED;
 
 		goto out;
@@ -172,6 +170,8 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 
 	if ((NULL == subsys || 0 == strcmp(subsys, "i2c")))
 	{
+		short int	bus_i2c;
+
 		if (2 != sscanf(dev_name, "%hd-%x", &bus_i2c, &addr))
 			goto out;
 
@@ -182,34 +182,47 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 		}
 		else
 		{
+			const char	*bus_subfolder;
+			char		*bus_attr = NULL, bus_path[MAX_STRING_LEN];
+
 			zbx_snprintf(bus_path, sizeof(bus_path), "/sys/class/i2c-adapter/i2c-%d", bus_i2c);
 			bus_subfolder = sysfs_read_attr(bus_path, &bus_attr);
 
 			if (NULL != bus_subfolder && '\0' != *bus_subfolder)
 			{
 				if (0 != strncmp(bus_attr, "ISA ", 4))
+				{
+					zbx_free(bus_attr);
 					goto out;
+				}
 
 				zbx_snprintf(device_info, MAX_STRING_LEN, "%s-isa-%04x", prefix, addr);
 			}
 			else
 				zbx_snprintf(device_info, MAX_STRING_LEN, "%s-i2c-%hd-%02x", prefix, bus_i2c, addr);
+
+			zbx_free(bus_attr);
 		}
 
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(subsys, "spi"))
 	{
+		int		address;
+		short int	bus_spi;
+
 		/* SPI */
-		if (2 != sscanf(dev_name, "spi%hd.%d", &bus_spi, &addr))
+		if (2 != sscanf(dev_name, "spi%hd.%d", &bus_spi, &address))
 			goto out;
 
-		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-spi-%hd-%x", prefix, bus_spi, addr);
+		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-spi-%hd-%x", prefix, bus_spi, (unsigned int)address);
 
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(subsys, "pci"))
 	{
+		unsigned int	domain, bus, slot, fn;
+
 		/* PCI */
 		if (4 != sscanf(dev_name, "%x:%x:%x.%x", &domain, &bus, &slot, &fn))
 			goto out;
@@ -221,34 +234,36 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 	}
 	else if (0 == strcmp(subsys, "platform") || 0 == strcmp(subsys, "of_platform"))
 	{
-		/* must be new ISA (platform driver) */
-		if (1 != sscanf(dev_name, "%*[a-z0-9_].%d", &addr))
-			addr = 0;
+		int	address;
 
-		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-isa-%04x", prefix, addr);
+		/* must be new ISA (platform driver) */
+		if (1 != sscanf(dev_name, "%*[a-z0-9_].%d", &address))
+			address = 0;
+
+		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-isa-%04x", prefix, (unsigned int)address);
 
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(subsys, "acpi"))
 	{
 		/* Assuming that acpi devices are unique */
-		addr = 0;
-		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-acpi-%x", prefix, addr);
+		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-acpi-0", prefix);
 
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(subsys, "hid"))
 	{
+		unsigned int	bus, vendor, product;
+
 		/* As of kernel 2.6.32, the hid device names do not look good */
 		if (4 != sscanf(dev_name, "%x:%x:%x.%x", &bus, &vendor, &product, &addr))
 			goto out;
 
-		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-hid-%hd-%x", prefix, bus, addr);
+		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-hid-%hd-%x", prefix, (short int)bus, addr);
 
 		ret = SUCCEED;
 	}
 out:
-	zbx_free(bus_attr);
 	zbx_free(prefix);
 
 	return ret;
@@ -308,7 +323,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 	char		hwmon_dir[MAX_STRING_LEN], devicepath[MAX_STRING_LEN], deviced[MAX_STRING_LEN],
 			device_info[MAX_STRING_LEN], regex[MAX_STRING_LEN], *device_p;
 	const char	*subfolder;
-	int		err, dev_len;
+	int		err;
 
 	zbx_snprintf(hwmon_dir, sizeof(hwmon_dir), "%s", DEVICE_DIR);
 
@@ -317,6 +332,8 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 
 	while (NULL != (deviceent = readdir(devicedir)))
 	{
+		ssize_t	dev_len;
+
 		if (0 == strcmp(deviceent->d_name, ".") || 0 == strcmp(deviceent->d_name, ".."))
 			continue;
 

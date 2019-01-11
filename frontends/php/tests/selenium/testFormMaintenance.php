@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Tests for "Configuration -> Maintenance".
@@ -30,7 +30,7 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
  *
  * @backup maintenances
  */
-class testFormMaintenance extends CWebTest {
+class testFormMaintenance extends CLegacyWebTest {
 	public $name = 'Test maintenance';
 
 	/**
@@ -89,13 +89,25 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkTextWait('Zabbix servers');
 
+		// Add problem tags.
+		$this->zbxTestClickXpath('//label[text()="Or"]');
+		$tags = ['Tag1', 'Tag2', 'Tag3'];
+		$value = 'Value';
+		foreach ($tags as $i => $tag) {
+			$this->zbxTestInputTypeWait('tags_'.$i.'_tag', $tag);
+			$this->zbxTestClickXpath('//label[@for="tags_'.$i.'_operator_1"]');
+			$this->zbxTestInputType('tags_'.$i.'_value', $value );
+			$this->zbxTestClick('tags_add');
+		}
+
 		// Create maintenance and check the results in frontend.
 		$this->zbxTestClickXpath('//button[@id=\'add\'][@type=\'submit\']');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance added');
 		$this->zbxTestTextPresent($this->name);
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(3, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value='.zbx_dbstr($value)));
 	}
 
 	/**
@@ -105,7 +117,7 @@ class testFormMaintenance extends CWebTest {
 	 */
 	public function testFromMaintenance_Cancel() {
 		$sql_hash = 'SELECT * FROM maintenances ORDER BY maintenanceid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		// Open form and change maintenance name.
 		$this->zbxTestLogin('maintenance.php?ddreset=1');
@@ -123,7 +135,7 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		// Check the result in DB.
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 
 		// Open form to check changes was not saved.
 		$this->zbxTestClickLinkTextWait($this->name);
@@ -190,7 +202,34 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB.
-		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+	}
+
+	public function testFormMaintenance_UpdateTags() {
+		$maintenance = 'Maintenance for update (data collection)';
+		$this->zbxTestLogin('maintenance.php?ddreset=1');
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
+		$this->zbxTestCheckHeader('Maintenance periods');
+		$this->zbxTestClickLinkTextWait($maintenance);
+
+		// Update tags.
+		$this->zbxTestTabSwitch('Hosts and groups');
+		$this->zbxTestClickXpathWait('//label[text()="And/Or"]');
+		$tag = 'Tag';
+		$values = ['A1','B1'];
+		foreach ($values as $i => $value) {
+			$this->zbxTestInputTypeOverwrite('tags_'.$i.'_tag', $tag);
+			$this->zbxTestInputTypeOverwrite('tags_'.$i.'_value', $value);
+		}
+		$this->zbxTestClickXpath('//label[@for="tags_0_operator_1"]');
+		$this->zbxTestClickXpath('//label[@for="tags_1_operator_0"]');
+
+		$this->zbxTestClick('update');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance updated');
+
+		$this->assertEquals(2, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE tag='.zbx_dbstr($tag)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value=\'A1\' AND operator=0'));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value=\'B1\' AND operator=2'));
 	}
 
 	/**
@@ -218,8 +257,8 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestTextPresent([$this->name.$suffix, $this->name]);
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
-		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name.$suffix)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name.$suffix)));
 	}
 
 	/**
@@ -239,6 +278,6 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance deleted');
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals(0, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
 	}
 }

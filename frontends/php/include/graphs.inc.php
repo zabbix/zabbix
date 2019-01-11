@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ function getGraphDims($graphid = null) {
 		return $graphDims;
 	}
 
-	// zoom featers
+	// Select graph's type and height as well as which Y axes are used by graph items.
 	$dbGraphs = DBselect(
 		'SELECT MAX(g.graphtype) AS graphtype,MIN(gi.yaxisside) AS yaxissidel,MAX(gi.yaxisside) AS yaxissider,MAX(g.height) AS height'.
 		' FROM graphs g,graphs_items gi'.
@@ -140,24 +140,6 @@ function getGraphDims($graphid = null) {
 	return $graphDims;
 }
 
-function get_realhosts_by_graphid($graphid) {
-	$graph = getGraphByGraphId($graphid);
-	if (!empty($graph['templateid'])) {
-		return get_realhosts_by_graphid($graph['templateid']);
-	}
-	return get_hosts_by_graphid($graphid);
-}
-
-function get_hosts_by_graphid($graphid) {
-	return DBselect(
-		'SELECT DISTINCT h.*'.
-		' FROM graphs_items gi,items i,hosts h'.
-		' WHERE h.hostid=i.hostid'.
-			' AND gi.itemid=i.itemid'.
-			' AND gi.graphid='.zbx_dbstr($graphid)
-	);
-}
-
 function getGraphByGraphId($graphId) {
 	$dbGraph = DBfetch(DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphId)));
 
@@ -168,6 +150,217 @@ function getGraphByGraphId($graphId) {
 	error(_s('No graph item with graphid "%s".', $graphId));
 
 	return false;
+}
+
+/**
+ * Get parent templates for each given graph.
+ *
+ * @param $array $graphs                  An array of graphs.
+ * @param string $graphs[]['graphid']     ID of a graph.
+ * @param string $graphs[]['templateid']  ID of parent template graph.
+ * @param int    $flag                    Origin of the graph (ZBX_FLAG_DISCOVERY_NORMAL or
+ *                                        ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ *
+ * @return array
+ */
+function getGraphParentTemplates(array $graphs, $flag) {
+	$parent_graphids = [];
+	$data = [
+		'links' => [],
+		'templates' => []
+	];
+
+	foreach ($graphs as $graph) {
+		if ($graph['templateid'] != 0) {
+			$parent_graphids[$graph['templateid']] = true;
+			$data['links'][$graph['graphid']] = ['graphid' => $graph['templateid']];
+		}
+	}
+
+	if (!$parent_graphids) {
+		return $data;
+	}
+
+	$all_parent_graphids = [];
+	$hostids = [];
+	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		$lld_ruleids = [];
+	}
+
+	do {
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$db_graphs = API::GraphPrototype()->get([
+				'output' => ['graphid', 'templateid'],
+				'selectHosts' => ['hostid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'graphids' => array_keys($parent_graphids)
+			]);
+		}
+		// ZBX_FLAG_DISCOVERY_NORMAL
+		else {
+			$db_graphs = API::Graph()->get([
+				'output' => ['graphid', 'templateid'],
+				'selectHosts' => ['hostid'],
+				'graphids' => array_keys($parent_graphids)
+			]);
+		}
+
+		$all_parent_graphids += $parent_graphids;
+		$parent_graphids = [];
+
+		foreach ($db_graphs as $db_graph) {
+			$data['templates'][$db_graph['hosts'][0]['hostid']] = [];
+			$hostids[$db_graph['graphid']] = $db_graph['hosts'][0]['hostid'];
+
+			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$lld_ruleids[$db_graph['graphid']] = $db_graph['discoveryRule']['itemid'];
+			}
+
+			if ($db_graph['templateid'] != 0) {
+				if (!array_key_exists($db_graph['templateid'], $all_parent_graphids)) {
+					$parent_graphids[$db_graph['templateid']] = true;
+				}
+
+				$data['links'][$db_graph['graphid']] = ['graphid' => $db_graph['templateid']];
+			}
+		}
+	}
+	while ($parent_graphids);
+
+	foreach ($data['links'] as &$parent_graph) {
+		$parent_graph['hostid'] = array_key_exists($parent_graph['graphid'], $hostids)
+			? $hostids[$parent_graph['graphid']]
+			: 0;
+
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$parent_graph['lld_ruleid'] = array_key_exists($parent_graph['graphid'], $lld_ruleids)
+				? $lld_ruleids[$parent_graph['graphid']]
+				: 0;
+		}
+	}
+	unset($parent_graph);
+
+	$db_templates = $data['templates']
+		? API::Template()->get([
+			'output' => ['name'],
+			'templateids' => array_keys($data['templates']),
+			'preservekeys' => true
+		])
+		: [];
+
+	$rw_templates = $db_templates
+		? API::Template()->get([
+			'output' => [],
+			'templateids' => array_keys($db_templates),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	$data['templates'][0] = [];
+
+	foreach ($data['templates'] as $hostid => &$template) {
+		$template = array_key_exists($hostid, $db_templates)
+			? [
+				'hostid' => $hostid,
+				'name' => $db_templates[$hostid]['name'],
+				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
+			]
+			: [
+				'hostid' => $hostid,
+				'name' => _('Inaccessible template'),
+				'permission' => PERM_DENY
+			];
+	}
+	unset($template);
+
+	return $data;
+}
+
+/**
+ * Returns a template prefix for selected graph.
+ *
+ * @param string $graphid
+ * @param array  $parent_templates  The list of the templates, prepared by getGraphParentTemplates() function.
+ * @param int    $flag              Origin of the graph (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ *
+ * @return array|null
+ */
+function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag) {
+	if (!array_key_exists($graphid, $parent_templates['links'])) {
+		return null;
+	}
+
+	while (array_key_exists($parent_templates['links'][$graphid]['graphid'], $parent_templates['links'])) {
+		$graphid = $parent_templates['links'][$graphid]['graphid'];
+	}
+
+	$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
+
+	if ($template['permission'] == PERM_READ_WRITE) {
+		$url = (new CUrl('graphs.php'));
+
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
+		}
+		// ZBX_FLAG_DISCOVERY_NORMAL
+		else {
+			$url->setArgument('hostid', $template['hostid']);
+		}
+
+		$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
+	}
+	else {
+		$name = new CSpan(CHtml::encode($template['name']));
+	}
+
+	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
+}
+
+/**
+ * Returns a list of graph templates.
+ *
+ * @param string $graphid
+ * @param array  $parent_templates  The list of the templates, prepared by getGraphParentTemplates() function.
+ * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ *
+ * @return array
+ */
+function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag) {
+	$list = [];
+
+	while (array_key_exists($graphid, $parent_templates['links'])) {
+		$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
+
+		if ($template['permission'] == PERM_READ_WRITE) {
+			$url = (new CUrl('graphs.php'))->setArgument('form', 'update');
+
+			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
+			}
+
+			$url->setArgument('graphid', $parent_templates['links'][$graphid]['graphid']);
+
+			if ($flag == ZBX_FLAG_DISCOVERY_NORMAL) {
+				$url->setArgument('hostid', $template['hostid']);
+			}
+
+			$name = new CLink(CHtml::encode($template['name']), $url);
+		}
+		else {
+			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+		}
+
+		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
+
+		$graphid = $parent_templates['links'][$graphid]['graphid'];
+	}
+
+	if ($list) {
+		array_pop($list);
+	}
+
+	return $list;
 }
 
 /**
@@ -510,16 +703,15 @@ function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
  * @param int 		$fontsize
  * @param int 		$angle
  * @param string 	$string
- * @param string 	$fontname
  *
  * @return array
  */
-function imageTextSize($fontsize, $angle, $string, $fontname = null) {
+function imageTextSize($fontsize, $angle, $string) {
 	if (preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) {
-		$ttf = ZBX_FONTPATH.'/'.($fontname ? : ZBX_FONT_NAME).'.ttf';
+		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 	}
 	else {
-		$ttf = ZBX_FONTPATH.'/'.($fontname ? : ZBX_FONT_NAME).'.ttf';
+		$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
 	}
 
 	$ar = imagettfbbox($fontsize, $angle, $ttf, $string);

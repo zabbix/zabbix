@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,23 +29,16 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 		$this->setType(WIDGET_TRIG_OVER);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fullscreen' => 'in 0,1',
-			'kioskmode' => 'in 0,1',
 			'fields' => 'json'
 		]);
 	}
 
 	protected function doAction() {
-		$fullscreen = (bool) $this->getInput('fullscreen', false);
-		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
-
 		$fields = $this->getForm()->getFieldsData();
 
 		$data = [
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'style' => $fields['style'],
-			'fullscreen' => $fullscreen,
-			'kioskmode' => $kioskmode,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -56,8 +49,14 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 			'filter' => ['value' => ($fields['show'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null]
 		];
 
+		$problem_options = [
+			'show_suppressed' => $fields['show_suppressed'],
+			'recent' => ($fields['show'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
+			'any' => ($fields['show'] == TRIGGERS_OPTION_ALL) ? true : null
+		];
+
 		list($data['hosts'], $data['triggers']) = getTriggersOverviewData(getSubGroups($fields['groupids']),
-			$fields['application'], $fields['style'], [], $trigger_options, $fields['show_suppressed']
+			$fields['application'], $fields['style'], [], $trigger_options, $problem_options
 		);
 
 		$this->setResponse(new CControllerResponseData($data));

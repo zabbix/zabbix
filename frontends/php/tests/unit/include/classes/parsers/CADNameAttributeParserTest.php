@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,6 +125,15 @@ class CADNameAttributeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL
 				] + $should_be_unknown
+			],
+			[
+				'anna@comp', 0, $only_upn,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'anna@comp',
+					'user' => 'anna',
+					'domain' => 'comp',
+				] + $should_be_upn
 			],
 			[
 				'user@example.com', 0, $only_upn,

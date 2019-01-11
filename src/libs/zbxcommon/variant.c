@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ static int	variant_to_ui64(zbx_variant_t *value)
 
 	zbx_ltrim(buffer, " \"+");
 	zbx_rtrim(buffer, " \"\n\r");
-	del_zeroes(buffer);
+	del_zeros(buffer);
 
 	if (SUCCEED != is_uint64(buffer, &value_ui64))
 		return FAIL;
@@ -193,7 +193,7 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 
 	zbx_ltrim(buffer, " \"+");
 	zbx_rtrim(buffer, " \"\n\r");
-	del_zeroes(buffer);
+	del_zeros(buffer);
 
 	if (SUCCEED == is_uint64(buffer, &value_ui64))
 	{

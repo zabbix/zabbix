@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,16 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageHosts extends CWebTest {
+class testPageHosts extends CLegacyWebTest {
 	public $HostName = 'ЗАББИКС Сервер';
 	public $HostGroup = 'Zabbix servers';
 	public $HostIp = '127.0.0.1';
 	public $HostPort = '10050';
 
 	public static function allHosts() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 			'SELECT h.name,h.hostid,g.name AS group_name'.
 			' FROM hosts h'.
 				' LEFT JOIN hosts_groups hg'.
@@ -35,7 +35,7 @@ class testPageHosts extends CWebTest {
 				' LEFT JOIN hstgrp g'.
 					' ON g.groupid=hg.groupid'.
 			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-			" AND h.name NOT LIKE '%{#%'"
+			" AND NOT h.flags = 2"
 		);
 	}
 
@@ -48,6 +48,10 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextPresent('Simple form test host');
 		$this->zbxTestTextNotPresent('ZBX6648 All Triggers Host');
+
+		// Check that proxy field is disabled.
+		$this->zbxTestAssertElementNotPresentId('filter_proxyids__ms');
+		$this->zbxTestAssertElementPresentXpath('//div[@id="filter_proxyids_"]/..//button[@disabled]');
 
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Name']");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Applications')]");
@@ -88,23 +92,23 @@ class testPageHosts extends CWebTest {
 			'name,flags,templateid,description,tls_connect,tls_accept'.
 			' FROM hosts'.
 			' WHERE hostid='.$hostid;
-		$oldHashHosts = DBhash($sqlHosts);
+		$oldHashHosts = CDBHelper::getHash($sqlHosts);
 		$sqlItems = "select * from items where hostid=$hostid order by itemid";
-		$oldHashItems = DBhash($sqlItems);
+		$oldHashItems = CDBHelper::getHash($sqlItems);
 		$sqlApplications = "select * from applications where hostid=$hostid order by applicationid";
-		$oldHashApplications = DBhash($sqlApplications);
-		$sqlInteraface = "select * from interface where hostid=$hostid order by interfaceid";
-		$oldHashInterface = DBhash($sqlInteraface);
+		$oldHashApplications = CDBHelper::getHash($sqlApplications);
+		$sqlInterface = "select * from interface where hostid=$hostid order by interfaceid";
+		$oldHashInterface = CDBHelper::getHash($sqlInterface);
 		$sqlHostMacro = "select * from hostmacro where hostid=$hostid order by hostmacroid";
-		$oldHashHostMacro = DBhash($sqlHostMacro);
+		$oldHashHostMacro = CDBHelper::getHash($sqlHostMacro);
 		$sqlHostsGroups = "select * from hosts_groups where hostid=$hostid order by hostgroupid";
-		$oldHashHostsGroups = DBhash($sqlHostsGroups);
+		$oldHashHostsGroups = CDBHelper::getHash($sqlHostsGroups);
 		$sqlHostsTemplates = "select * from hosts_templates where hostid=$hostid order by hosttemplateid";
-		$oldHashHostsTemplates = DBhash($sqlHostsTemplates);
+		$oldHashHostsTemplates = CDBHelper::getHash($sqlHostsTemplates);
 		$sqlMaintenancesHosts = "select * from maintenances_hosts where hostid=$hostid order by maintenance_hostid";
-		$oldHashMaintenancesHosts = DBhash($sqlMaintenancesHosts);
+		$oldHashMaintenancesHosts = CDBHelper::getHash($sqlMaintenancesHosts);
 		$sqlHostInventory = "select * from host_inventory where hostid=$hostid";
-		$oldHashHostInventory = DBhash($sqlHostInventory);
+		$oldHashHostInventory = CDBHelper::getHash($sqlHostInventory);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
@@ -118,15 +122,15 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 		$this->zbxTestTextPresent($name);
 
-		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
-		$this->assertEquals($oldHashItems, DBhash($sqlItems));
-		$this->assertEquals($oldHashApplications, DBhash($sqlApplications));
-		$this->assertEquals($oldHashInterface, DBhash($sqlInteraface));
-		$this->assertEquals($oldHashHostMacro, DBhash($sqlHostMacro));
-		$this->assertEquals($oldHashHostsGroups, DBhash($sqlHostsGroups));
-		$this->assertEquals($oldHashHostsTemplates, DBhash($sqlHostsTemplates));
-		$this->assertEquals($oldHashMaintenancesHosts, DBhash($sqlMaintenancesHosts));
-		$this->assertEquals($oldHashHostInventory, DBhash($sqlHostInventory));
+		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts));
+		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
+		$this->assertEquals($oldHashApplications, CDBHelper::getHash($sqlApplications));
+		$this->assertEquals($oldHashInterface, CDBHelper::getHash($sqlInterface));
+		$this->assertEquals($oldHashHostMacro, CDBHelper::getHash($sqlHostMacro));
+		$this->assertEquals($oldHashHostsGroups, CDBHelper::getHash($sqlHostsGroups));
+		$this->assertEquals($oldHashHostsTemplates, CDBHelper::getHash($sqlHostsTemplates));
+		$this->assertEquals($oldHashMaintenancesHosts, CDBHelper::getHash($sqlMaintenancesHosts));
+		$this->assertEquals($oldHashHostInventory, CDBHelper::getHash($sqlHostInventory));
 	}
 
 
@@ -145,8 +149,8 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Hosts disabled');
 
 		$sql = "select * from hosts where status=".HOST_STATUS_MONITORED.
-			" and name NOT LIKE '%{#%'";
-		$this->assertEquals(0, DBcount($sql), "Chuck Norris: all hosts disabled but DB does not match");
+			" and NOT flags = 2";
+		$this->assertEquals(0, CDBHelper::getCount($sql), "Chuck Norris: all hosts disabled but DB does not match");
 	}
 
 	/**
@@ -169,7 +173,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host disabled');
 
 		$sql = "select * from hosts where hostid=$hostid and status=".HOST_STATUS_NOT_MONITORED;
-		$this->assertEquals(1, DBcount($sql), "Chuck Norris: host $hostid disabled but status is wrong in the DB");
+		$this->assertEquals(1, CDBHelper::getCount($sql), "Chuck Norris: host $hostid disabled but status is wrong in the DB");
 	}
 
 	/**
@@ -192,7 +196,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host enabled');
 
 		$sql = "select * from hosts where hostid=$hostid and status=".HOST_STATUS_MONITORED;
-		$this->assertEquals(1, DBcount($sql), "Chuck Norris: host $hostid activated but status is wrong in the DB");
+		$this->assertEquals(1, CDBHelper::getCount($sql), "Chuck Norris: host $hostid activated but status is wrong in the DB");
 	}
 
 	public function testPageHosts_MassActivateAll() {
@@ -210,8 +214,8 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Hosts enabled');
 
 		$sql = "select host from hosts where status=".HOST_STATUS_NOT_MONITORED.
-			" and name NOT LIKE '%{#%'";
-		$this->assertEquals(0, DBcount($sql), "Chuck Norris: all hosts activated but DB does not match");
+			" and NOT flags = 2";
+		$this->assertEquals(0, CDBHelper::getCount($sql), "Chuck Norris: all hosts activated but DB does not match");
 	}
 
 	public function testPageHosts_FilterByName() {
@@ -221,6 +225,38 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+	}
+
+	public function testPageHosts_FilterByTemplates() {
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestClickButtonMultiselect('filter_templates_');
+		$this->zbxTestLaunchOverlayDialog('Templates');
+		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//select/option[text()="Templates"]');
+		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//a[text()="Form test template"]');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Simple form test host']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+	}
+
+	public function testPageHosts_FilterByProxy() {
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestClickXpathWait('//label[text()="Proxy"]');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_2 with proxy']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
+		$this->zbxTestClickButtonMultiselect('filter_proxyids_');
+		$this->zbxTestLaunchOverlayDialog('Proxies');
+		$this->zbxTestClickLinkTextWait('Proxy_1 for filter');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}
 
 	public function testPageHosts_FilterNone() {
@@ -236,6 +272,7 @@ class testPageHosts extends CWebTest {
 
 	public function testPageHosts_FilterByAllFields() {
 		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestDropdownSelectWait('groupid', $this->HostGroup);
 		$this->zbxTestInputTypeOverwrite('filter_host', $this->HostName);
 		$this->zbxTestInputTypeOverwrite('filter_ip', $this->HostIp);

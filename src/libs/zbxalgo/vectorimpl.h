@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -272,14 +272,14 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 														\
 ZBX_VECTOR_IMPL(__id, __type)											\
 														\
-void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_clean_func_t clean_func)	\
+void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ ## __id ## _free_func_t free_func)	\
 {														\
 	if (0 != vector->values_num)										\
 	{													\
 		int	index;											\
 														\
 		for (index = 0; index < vector->values_num; index++)						\
-			clean_func(vector->values[index]);							\
+			free_func(vector->values[index]);							\
 														\
 		vector->values_num = 0;										\
 	}													\

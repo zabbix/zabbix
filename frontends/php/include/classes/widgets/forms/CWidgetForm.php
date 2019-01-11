@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,47 +63,44 @@ class CWidgetForm {
 	/**
 	 * Convert all dot-delimited keys to arrays of objects.
 	 * Example:
-	 *   source: [
-	 *               'tags.tag.1' => 'tag1',
-	 *               'tags.value.1' => 'value1',
-	 *               'tags.tag.2' => 'tag2',
-	 *               'tags.value.2' => 'value2'
-	 *           ]
-	 *   result: [
-	 *               'tags' => [
-	 *                   ['tag' => 'tag1', 'value' => 'value1'],
-	 *                   ['tag' => 'tag2', 'value' => 'value2']
-	 *               ]
-	 *           ]
+	 *   source:                             result:
+	 *   [                                   [
+	 *       'tags.tag.0' => 'tag1',             'tags' => [
+	 *       'tags.value.0' => 'value1',             ['tag' => 'tag1', 'value' => 'value1'],
+	 *       'tags.tag.1' => 'tag2',                 ['tag' => 'tag2', 'value' => 'value2']
+	 *       'tags.value.1' => 'value2',         ],
+	 *       'ds.hosts.0.0' => 'host1',          'ds' => [
+	 *       'ds.hosts.1.0' => 'host2',              [
+	 *       'ds.hosts.1.1' => 'host3',                  'hosts' => ['host1'],
+	 *       'ds.color.0' => 'AB43C5',                   'color' => 'AB43C5'
+	 *       'ds.color.1' => 'CCCCCC',               ],
+	 *       'ds.hosts.1.1' => 'host3',              [
+	 *       'problemhosts.0' => 'ph1',                  'hosts => ['host2', 'host3'],
+	 *       'problemhosts.1' => 'ph2'                   'color' => 'CCCCCC'
+	 *   ]                                           ],
+	 *                                           ],
+	 *                                           'problemhosts' => ['ph1', 'ph2']
+	 *                                       ]
 	 *
 	 * @static
 	 *
-	 * @param array $data             An array of key => value pairs.
-	 * @param bool  $supports_arrays  If true, parses values with keys formated as 'tags.tag.1.0' as one level arrays.
+	 * @param array $data  An array of key => value pairs.
 	 *
 	 * @return array
 	 */
-	protected static function convertDottedKeys(array $data, $supports_arrays = false) {
+	protected static function convertDottedKeys(array $data) {
 		foreach ($data as $key => $value) {
-			if ($supports_arrays) {
-				if (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)\.(\d+)$/', $key, $matches) === 1) {
-					$data[$matches[1]][$matches[3]][$matches[2]][$matches[4]] = $value;
-					unset($data[$key]);
-				}
-				elseif (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
-					$data[$matches[1]][$matches[3]][$matches[2]] = $value;
-					unset($data[$key]);
-				}
-				elseif (preg_match('/^([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
-					$data[$matches[1]][$matches[2]] = $value;
-					unset($data[$key]);
-				}
+			if (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)\.(\d+)$/', $key, $matches) === 1) {
+				$data[$matches[1]][$matches[3]][$matches[2]][$matches[4]] = $value;
+				unset($data[$key]);
 			}
-			else {
-				if (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
-					$data[$matches[1]][$matches[3]][$matches[2]] = $value;
-					unset($data[$key]);
-				}
+			elseif (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
+				$data[$matches[1]][$matches[3]][$matches[2]] = $value;
+				unset($data[$key]);
+			}
+			elseif (preg_match('/^([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
+				$data[$matches[1]][$matches[2]] = $value;
+				unset($data[$key]);
 			}
 		}
 

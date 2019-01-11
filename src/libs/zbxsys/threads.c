@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,9 +53,8 @@ int	zbx_fork(void)
  * Comments: use this function only for forks from the main process           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_child_fork(void)
+void	zbx_child_fork(pid_t *pid)
 {
-	pid_t		pid;
 	sigset_t	mask, orig_mask;
 
 	/* block SIGTERM, SIGINT and SIGCHLD during fork to avoid deadlock (we've seen one in __unregister_atfork()) */
@@ -65,15 +64,14 @@ int	zbx_child_fork(void)
 	sigaddset(&mask, SIGCHLD);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
-	pid = zbx_fork();
+	/* set process id instead of returning, this is to avoid race condition when signal arrives before return */
+	*pid = zbx_fork();
 
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 
 	/* ignore SIGCHLD to avoid problems with exiting scripts in zbx_execute() and other cases */
-	if (0 == pid)
+	if (0 == *pid)
 		signal(SIGCHLD, SIG_DFL);
-
-	return pid;
 }
 #else
 int	zbx_win_exception_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep);
@@ -104,46 +102,46 @@ void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
  *                                                                            *
  * Purpose: Start the handled function as "thread"                            *
  *                                                                            *
- * Parameters: "thread" handle                                                *
- *                                                                            *
- * Return value: returns a handle to the newly created "thread",              *
- *               ZBX_THREAD_ERROR on an error                                 *
+ * Parameters: handler     - [IN] new thread starts execution from this       *
+ *                                handler function                            *
+ *             thread_args - [IN] arguments for thread function               *
+ *             thread      - [OUT] handle to a newly created thread           *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: The zbx_thread_exit must be called from the handler!             *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args)
+void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args, ZBX_THREAD_HANDLE *thread)
 {
-	ZBX_THREAD_HANDLE	thread = ZBX_THREAD_HANDLE_NULL;
 #ifdef _WINDOWS
 	unsigned		thrdaddr;
 
 	thread_args->entry = handler;
 	/* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
-	if (0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, zbx_win_thread_entry, thread_args, 0, &thrdaddr)))
+	if (0 == (*thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, zbx_win_thread_entry, thread_args, 0, &thrdaddr)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "failed to create a thread: %s", strerror_from_system(GetLastError()));
-		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
+		*thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
 #else
-	if (0 == (thread = zbx_child_fork()))	/* child process */
+	zbx_child_fork(thread);
+
+	if (0 == *thread)	/* child process */
 	{
 		(*handler)(thread_args);
 
 		/* The zbx_thread_exit must be called from the handler. */
 		/* And in normal case the program will never reach this point. */
-		zbx_thread_exit(EXIT_SUCCESS);
+		THIS_SHOULD_NEVER_HAPPEN;
 		/* program will never reach this point */
 	}
-	else if (-1 == thread)
+	else if (-1 == *thread)
 	{
 		zbx_error("failed to fork: %s", zbx_strerror(errno));
-		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
+		*thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
 #endif
-	return thread;
 }
 
 /******************************************************************************

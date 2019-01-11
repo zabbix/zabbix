@@ -4,7 +4,7 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates/Network Devices</name>
+         <name>Templates/Network devices</name>
       </group>
    </groups>
    <templates>
@@ -21,7 +21,7 @@ ENTITY-MIB&#13;
 STATISTICS-MIB</description>
          <groups>
             <group>
-               <name>Templates/Network Devices</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications>
@@ -38,7 +38,7 @@ STATISTICS-MIB</description>
                <name>Memory</name>
             </application>
             <application>
-               <name>Power Supply</name>
+               <name>Power supply</name>
             </application>
             <application>
                <name>Temperature</name>
@@ -761,7 +761,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Power Supply</name>
+                           <name>Power supply</name>
                         </application>
                      </applications>
                      <valuemap>

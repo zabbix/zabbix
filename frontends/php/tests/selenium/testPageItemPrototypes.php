@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageItemPrototypes extends CWebTest {
+class testPageItemPrototypes extends CLegacyWebTest {
 
 	// Returns all item protos
 	public static function data() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 			'SELECT h.status,i.name,i.itemid,d.parent_itemid,h.hostid,di.name AS d_name'.
 			' FROM items i,item_discovery d,items di,hosts h'.
 			' WHERE i.itemid=d.itemid'.
@@ -83,12 +83,12 @@ class testPageItemPrototypes extends CWebTest {
 		$this->zbxTestTextPresent('Item prototypes deleted');
 
 		$sql = 'SELECT null FROM items WHERE itemid='.$itemid;
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	// Returns all discovery rules
 	public static function rule() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 			'SELECT h.status,i.name,i.itemid,d.parent_itemid,h.hostid,di.name AS d_name'.
 			' FROM items i,item_discovery d,items di,hosts h'.
 			' WHERE i.itemid=d.itemid'.
@@ -108,7 +108,7 @@ class testPageItemPrototypes extends CWebTest {
 		$drule = $rule['d_name'];
 		$hostid = $rule['hostid'];
 
-		$itemids = DBdata('select itemid from item_discovery where parent_itemid='.$druleid, false);
+		$itemids = CDBHelper::getAll('select itemid from item_discovery where parent_itemid='.$druleid);
 		$itemids = zbx_objectValues($itemids, 'itemid');
 
 		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
@@ -123,6 +123,6 @@ class testPageItemPrototypes extends CWebTest {
 		$this->zbxTestTextPresent('Item prototypes deleted');
 
 		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('itemid', $itemids);
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,11 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Details of web scenario');
 $page['file'] = 'httpdetails.php';
-$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js'];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
+
+CView::$has_web_layout_mode = true;
+$page['web_layout_mode'] = CView::getLayoutMode();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -36,8 +39,7 @@ $fields = [
 	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
 	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
 	'reset' =>		[T_ZBX_STR,			O_OPT, P_SYS|P_ACT, null,	null],
-	'httptestid' =>	[T_ZBX_INT,			O_MAND, P_SYS,	DB_ID,		null],
-	'fullscreen' =>	[T_ZBX_INT,			O_OPT, P_SYS,	IN('0,1'),	null]
+	'httptestid' =>	[T_ZBX_INT,			O_MAND, P_SYS,	DB_ID,		null]
 ];
 check_fields($fields);
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
@@ -81,12 +83,11 @@ $details_screen = CScreenBuilder::getScreen([
 
 (new CWidget())
 	->setTitle(_('Details of web scenario').': '.$http_test_name)
+	->setWebLayoutMode($page['web_layout_mode'])
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
-			->addItem((new CList())
-				->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
-			)
+			->addItem((new CList())->addItem(get_icon('fullscreen')))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)
@@ -198,11 +199,13 @@ $graph_time->insertFlickerfreeJs();
 CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 
 // Create graphs widget.
-(new CWidget())
-	->addItem((new CFilter())
-		->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
-		->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
-		->addTimeSelector($timeline['from'], $timeline['to'])
+$widget = (new CWidget())
+	->setWebLayoutMode($page['web_layout_mode'])
+	->addItem(
+		(new CFilter(new CUrl()))
+			->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
+			->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
+			->addTimeSelector($timeline['from'], $timeline['to'], $page['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE)
 	)
 	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
 	->show();

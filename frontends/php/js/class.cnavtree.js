@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1150,7 +1150,7 @@ jQuery(function($) {
 			};
 
 			/*
-			 * Grouping a seperate widget fields into objects of items. Each items consists of its name, parent, id etc.
+			 * Grouping a separate widget fields into objects of items. Each items consists of its name, parent, id etc.
 			 *
 			 * @returns {Array} - an array of item objects.
 			 */

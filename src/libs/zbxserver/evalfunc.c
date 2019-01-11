@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2805,7 +2805,7 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	}
 
 	if (SUCCEED == ret)
-		del_zeroes(value);
+		del_zeros(value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name, zbx_result_string(ret), value);
 
@@ -3006,7 +3006,7 @@ static void	add_value_units_no_kmgt(char *value, size_t max_len, const char *uni
 	if (SUCCEED != zbx_double_compare(round(value_double), value_double))
 	{
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(2), value_double);
-		del_zeroes(tmp);
+		del_zeros(tmp);
 	}
 	else
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(0), value_double);
@@ -3075,7 +3075,7 @@ static void	add_value_units_with_kmgt(char *value, size_t max_len, const char *u
 	if (SUCCEED != zbx_double_compare(round(value_double), value_double))
 	{
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(2), value_double);
-		del_zeroes(tmp);
+		del_zeros(tmp);
 	}
 	else
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(0), value_double);
@@ -3175,7 +3175,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 	{
-		del_zeroes(row[0]);
+		del_zeros(row[0]);
 
 		value_tmp = zbx_dsprintf(NULL, "%s (%s)", row[0], value);
 		zbx_strlcpy_utf8(value, value_tmp, max_len);
@@ -3215,7 +3215,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 			replace_value_by_map(value, max_len, valuemapid);
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
-			del_zeroes(value);
+			del_zeros(value);
 			/* break; is not missing here */
 		case ITEM_VALUE_TYPE_UINT64:
 			if (SUCCEED != replace_value_by_map(value, max_len, valuemapid))

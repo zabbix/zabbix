@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,8 +34,11 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 // header right
+$web_layout_mode = CView::getLayoutMode();
+
 $widget = (new CWidget())
 	->setTitle(_('Overview'))
+	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CList([
 		(new CForm('get'))
 			->cleanItems()
@@ -64,44 +67,52 @@ $widget = (new CWidget())
 				])
 		),
 		(new CTag('nav', true, (new CList())
-			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+			->addItem(get_icon('fullscreen'))
 			->addItem(get_icon('overviewhelp')->setHint($help_hint))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	])));
 
-// filter
-$filter = (new CFilter())
-	->setProfile($data['profileIdx'])
-	->setActiveTab($data['active_tab'])
-	->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-	->addFilterTab(_('Filter'), [
-		(new CFormList())->addRow(_('Application'), [
-			(new CTextBox('application', $data['filter']['application']))
-				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				->setAttribute('autofocus', 'autofocus'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('application_name', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
-						'srctbl' => 'applications',
-						'srcfld1' => 'name',
-						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'application',
-						'real_hosts' => '1',
-						'with_applications' => '1'
-					]).', null, this);'
+if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+	// filter
+	$widget->addItem((new CFilter((new CUrl('overview.php'))->setArgument('type', 1)))
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())
+				->addRow(_('Application'), [
+					(new CTextBox('application', $data['filter']['application']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+						->setAttribute('autofocus', 'autofocus'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton('application_name', _('Select')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->onClick('return PopUp("popup.generic",'.
+							CJs::encodeJson([
+								'srctbl' => 'applications',
+								'srcfld1' => 'name',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'application',
+								'real_hosts' => '1',
+								'with_applications' => '1'
+							]).', null, this);'
+						)
+				])
+				->addRow(_('Show suppressed problems'),
+					(new CCheckBox('show_suppressed'))->setChecked(
+						$data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE
+					)
 				)
 		])
-	]);
-
-$widget->addItem($filter);
+	);
+}
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
 	$groupids = ($data['pageFilter']->groupids !== null) ? $data['pageFilter']->groupids : [];
-	$table = getItemsDataOverview($groupids, $data['filter']['application'], $data['view_style'], $data['fullscreen']);
+	$table = getItemsDataOverview($groupids, $data['filter']['application'], $data['view_style'],
+		$data['filter']['show_suppressed']
+	);
 }
 else {
 	$table = new CTableInfo();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,28 @@ class CWidgetFieldItem extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
 		$this->setDefault([]);
+	}
+
+	/**
+	 * Set additional flags, which can be used in configuration form.
+	 *
+	 * @param int $flags
+	 *
+	 * @return $this
+	 */
+	public function setFlags($flags) {
+		parent::setFlags($flags);
+
+		if ($flags & self::FLAG_NOT_EMPTY) {
+			$strict_validation_rules = $this->getValidationRules();
+			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
+			$this->setStrictValidationRules($strict_validation_rules);
+		}
+		else {
+			$this->setStrictValidationRules(null);
+		}
+
+		return $this;
 	}
 
 	public function setValue($value) {
@@ -86,15 +108,5 @@ class CWidgetFieldItem extends CWidgetField {
 		$this->filter_parameters[$name] = $value;
 
 		return $this;
-	}
-
-	public function validate($strict = false) {
-		$errors = parent::validate($strict);
-
-		if (!$errors && $strict && ($this->getFlags() & CWidgetField::FLAG_NOT_EMPTY) && !$this->getValue()) {
-			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(), _('cannot be empty'));
-		}
-
-		return $errors;
 	}
 }

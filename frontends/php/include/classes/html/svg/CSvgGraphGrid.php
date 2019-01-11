@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,23 +27,24 @@ class CSvgGraphGrid extends CSvgTag {
 	protected $position_x = 0;
 	protected $position_y = 0;
 
-	protected $width = 0;
-	protected $height = 0;
+	protected $color;
 
-	public function __construct(array $points_value = [], array $points_time = []) {
+	public function __construct(array $points_value, array $points_time) {
 		parent::__construct('g', true);
 
-		$this->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_GRID);
+		$this
+			->setAttribute('shape-rendering', 'crispEdges')
+			->addClass(CSvgTag::ZBX_STYLE_GRAPH_GRID);
 
 		$this->points_value = $points_value;
 		$this->points_time = $points_time;
 	}
 
-	public function getStyles() {
+	public function makeStyles() {
 		return [
-			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_GRID.' path' => [
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_GRID.' path' => [
 				'stroke-dasharray' => '2,2',
-				'stroke' => 'rgba(120,120,120,.5)'
+				'stroke' => $this->color
 			]
 		];
 	}
@@ -55,9 +56,15 @@ class CSvgGraphGrid extends CSvgTag {
 		return $this;
 	}
 
-	public function setSize($width, $height) {
-		$this->width = $width;
-		$this->height = $height;
+	/**
+	 * Set color.
+	 *
+	 * @param string $color  Color value.
+	 *
+	 * @return CSvgGraphGrid
+	 */
+	public function setColor($color) {
+		$this->color = $color;
 
 		return $this;
 	}
@@ -72,12 +79,12 @@ class CSvgGraphGrid extends CSvgTag {
 		$path = (new CSvgPath());
 
 		foreach ($this->points_time as $pos => $time) {
-			if (($pos + $this->position_x) <= ($this->position_x + $this->width)) {
+			if (($this->position_x + $pos) <= ($this->position_x + $this->width)) {
 				$path
-					->moveTo($pos + $this->position_x, $this->position_y)
-					->lineTo($pos + $this->position_x, $this->position_y + $this->height);
+					->moveTo($this->position_x + $pos, $this->position_y)
+					->lineTo($this->position_x + $pos, $this->position_y + $this->height);
 			}
-		};
+		}
 
 		foreach ($this->points_value as $pos => $value) {
 			if (($this->position_y + $this->height - $pos) <= ($this->position_y + $this->height)) {
@@ -85,7 +92,7 @@ class CSvgGraphGrid extends CSvgTag {
 					->moveTo($this->position_x, $this->position_y + $this->height - $pos)
 					->lineTo($this->position_x + $this->width, $this->position_y + $this->height - $pos);
 			}
-		};
+		}
 
 		return $path;
 	}

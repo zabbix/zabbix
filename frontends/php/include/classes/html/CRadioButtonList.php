@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ class CRadioButtonList extends CList {
 	private $value;
 	private $orientation;
 	private $enabled;
+	private $readonly;
 	private $values;
 	private $modern;
 	private $autofocused;
@@ -41,6 +42,7 @@ class CRadioButtonList extends CList {
 		$this->enabled = true;
 		$this->values = [];
 		$this->modern = false;
+		$this->readonly = false;
 		$this->setId(zbx_formatDomId($name));
 	}
 
@@ -67,6 +69,12 @@ class CRadioButtonList extends CList {
 		return $this;
 	}
 
+	public function setReadonly($readonly) {
+		$this->readonly = $readonly;
+
+		return $this;
+	}
+
 	public function setModern($modern) {
 		$this->modern = $modern;
 
@@ -84,13 +92,18 @@ class CRadioButtonList extends CList {
 			);
 		}
 
+		if ($this->readonly) {
+			parent::addItem(new CVar($this->name, $this->value, zbx_formatDomId($this->name)));
+		}
+
 		foreach ($this->values as $key => $value) {
 			if ($value['id'] === null) {
 				$value['id'] = zbx_formatDomId($this->name).'_'.$key;
 			}
 
 			$radio = (new CInput('radio', $this->name, $value['value']))
-				->setEnabled($this->enabled)
+				// Read-only for radioboxes is simulated by disabling control and adding CVar with value.
+				->setEnabled($this->enabled && !$this->readonly)
 				->onChange($value['on_change'])
 				->setId($value['id']);
 

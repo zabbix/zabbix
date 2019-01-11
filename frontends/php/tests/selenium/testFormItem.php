@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
  *       dropdown field when "on change" event is fired before "on focus" event is fired.
  * @ignore-browser-errors
  */
-class testFormItem extends CWebTest {
+class testFormItem extends CLegacyWebTest {
 
 	/**
 	 * The name of the test host created in the test data set.
@@ -742,7 +742,7 @@ class testFormItem extends CWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
 			if (!isset($itemid)) {
-				$this->zbxTestAssertElementValue('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
+				$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
 			}
 
 			$this->zbxTestTextPresent('Port');
@@ -1176,7 +1176,7 @@ class testFormItem extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("SELECT * FROM items WHERE hostid = 40001 AND key_ LIKE 'test-item-form%'");
+		return CDBHelper::getDataProvider("SELECT * FROM items WHERE hostid = 40001 AND key_ LIKE 'test-item-form%'");
 	}
 
 	/**
@@ -1186,7 +1186,7 @@ class testFormItem extends CWebTest {
 		$name = $data['name'];
 
 		$sqlItems = "SELECT * FROM items ORDER BY itemid";
-		$oldHashItems = DBhash($sqlItems);
+		$oldHashItems = CDBHelper::getHash($sqlItems);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
@@ -1198,7 +1198,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestCheckHeader('Items');
 
-		$this->assertEquals($oldHashItems, DBhash($sqlItems));
+		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
 	}
 
 	// Returns create data
@@ -1298,7 +1298,7 @@ class testFormItem extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "".'
 					]
 				]
 			],
@@ -1313,7 +1313,7 @@ class testFormItem extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-11,00:00-24:00".'
 					]
 				]
 			],
@@ -1328,7 +1328,7 @@ class testFormItem extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,00:00-25:00".'
 					]
 				]
 			],
@@ -1343,7 +1343,7 @@ class testFormItem extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,24:00-00:00".'
 					]
 				]
 			],
@@ -1806,6 +1806,7 @@ class testFormItem extends CWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'item-snmpv1-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1816,6 +1817,7 @@ class testFormItem extends CWebTest {
 					'type' => 'SNMPv2 agent',
 					'name' => 'SNMPv2 agent',
 					'key' => 'item-snmpv2-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1826,6 +1828,7 @@ class testFormItem extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'item-snmpv3-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -2175,6 +2178,10 @@ class testFormItem extends CWebTest {
 			$this->zbxTestClickButtonMultiselect('master_itemid');
 			$this->zbxTestLaunchOverlayDialog('Items');
 			$this->zbxTestClickLinkTextWait($data['master_item']);
+		}
+
+		if (array_key_exists('snmp_oid', $data))	{
+			$this->zbxTestInputTypeOverwrite('snmp_oid', $data['snmp_oid']);
 		}
 
 		$itemFlexFlag = true;
@@ -2717,7 +2724,7 @@ class testFormItem extends CWebTest {
 				$this->zbxTestTextPresent($data['error']);
 
 				$sqlItem = "SELECT * FROM items where key_ = '".$data['key']."'";
-				$this->assertEquals(0, DBcount($sqlItem));
+				$this->assertEquals(0, CDBHelper::getCount($sqlItem));
 				break;
 		}
 	}

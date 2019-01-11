@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2018 Zabbix SIA
+ ** Copyright (C) 2001-2019 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -32,14 +32,14 @@ jQuery(function ($) {
 					e.stopPropagation();
 					e.preventDefault();
 				})
-				.addClass('remove-btn'),
+				.addClass('subfilter-disable-btn'),
 			opt = $override.data('options'),
-			field_name = opt.makeName(option);
+			field_name = opt.makeName(option, opt.getId($override));
 
 		if (option === 'color') {
 			var id = field_name.replace(/\]/g, '_').replace(/\[/g, '_'),
 				input = $('<input>')
-					.attr({'name': field_name, 'type': 'text', 'maxlength': 6, 'id': id, 'placeholder': t('color')})
+					.attr({'name': field_name, 'type': 'text', 'maxlength': 6, 'id': id, 'placeholder': t('S_COLOR')})
 					.val(value);
 
 			return $('<div></div>')
@@ -53,7 +53,7 @@ jQuery(function ($) {
 						'name': field_name,
 						'maxlength': 10,
 						'type': 'text',
-						'placeholder': t('time shift')
+						'placeholder': t('S_TIME_SHIFT')
 					})
 					.val(value)
 				)
@@ -176,8 +176,11 @@ jQuery(function ($) {
 		 *
 		 * Supported options:
 		 * - add		- UI element to click on to open override options menu.
+		 * - override   - selector for single override set. Mandatory if getId() uses it.
+		 * - overridesList - selector for overrides list. Mandatory if getId() uses it.
 		 * - options	- selector of UI elements for already specified overrides.
 		 * - menu		- JSon for override options that appears in context menu.
+		 * - getId	    - Function returns unique identifier of override used for override option name.
 		 * - makeName	- Function creates pattern matching name for input field that stores value of override option.
 		 * - makeOption	- Function extracts given string and returns override option from it.
 		 * - onUpdate	- Function called when override values changes.
@@ -189,7 +192,8 @@ jQuery(function ($) {
 				options: 'input[type=hidden]',
 				add: null,
 				menu: {},
-				makeName: function(option) {
+				// Argument row_id is needed even if it is not used. Function is assumed to be overwritten.
+				makeName: function(option, row_id) {
 					return option;
 				},
 				makeOption: function(name) {
@@ -197,21 +201,25 @@ jQuery(function ($) {
 				},
 				onUpdate: function() {
 					return true;
+				},
+				getId: function($override) {
+					var opt = $override.data('options');
+					return $(opt.overridesList + ' ' + opt.override).index($override.closest(opt.override));
 				}
 			}, options);
 
 			this.each(function() {
-				var override = $(this);
-				if (typeof override.data('options') !== 'undefined') {
+				var $override = $(this);
+				if (typeof $override.data('options') !== 'undefined') {
 					return;
 				}
 
-				var row_id = $(options['add'], override).data('row');
-				override.data('options', $.extend({}, {rowId: row_id}, options));
+				$override.data('options', $.extend({}, options));
 
-				$(options.options, override).each(function() {
+				$(options.options, $override).each(function() {
 					var opt = options.makeOption($(this).attr('name')),
-						elmnt = createOverrideElement(override, opt, $(this).val());
+						elmnt = createOverrideElement($override, opt, $(this).val());
+
 					$(elmnt).insertBefore($(this));
 					$(this).remove();
 
@@ -220,14 +228,13 @@ jQuery(function ($) {
 					}
 				});
 
-				$(override).on('click', '[data-option]', function(e) {
+				$override.on('click', '[data-option]', function(e) {
 					var obj = $(this);
-
-					obj.menuPopup(getMenu(override, options['menu'], obj.data('option'), obj), e);
+					obj.menuPopup(getMenu($override, options['menu'], obj.data('option'), obj), e);
 					return false;
 				});
 
-				$(options['add'], override).on('click keydown', function(e) {
+				$(options['add'], $override).on('click keydown', function(e) {
 					var obj = $(this);
 
 					if (e.type === 'keydown') {
@@ -239,7 +246,7 @@ jQuery(function ($) {
 						e.target = this;
 					}
 
-					obj.menuPopup(getMenu(override, options['menu'], null, obj), e);
+					obj.menuPopup(getMenu($override, options['menu'], null, obj), e);
 					return false;
 				});
 			});
@@ -255,7 +262,8 @@ jQuery(function ($) {
 		 * @param string value           Value of option. Can be NULL for options 'color' and 'timeshift'.
 		 */
 		addOverride: function($override, option, value) {
-			if ($('[name="'+$override.data('options')['makeName'](option)+'"]', $override).length > 0) {
+			var opt = $override.data('options');
+			if ($('[name="' + opt['makeName'](option, opt.getId($override)) + '"]', $override).length > 0) {
 				methods.updateOverride($override, option, value);
 			}
 			else {
@@ -270,7 +278,7 @@ jQuery(function ($) {
 			}
 
 			// Call on-select callback.
-			$override.data('options')['onUpdate']();
+			opt['onUpdate']();
 		},
 
 		/**
@@ -279,8 +287,9 @@ jQuery(function ($) {
 		 * See methods.addOverride for argument description.
 		 */
 		updateOverride: function($override, option, value) {
-			var field_name = $override.data('options')['makeName'](option);
-			$('[name="'+field_name+'"]', $override).val(value);
+			var opt = $override.data('options'),
+				field_name = opt['makeName'](option, opt.getId($override));
+			$('[name="' + field_name + '"]', $override).val(value);
 
 			switch (option) {
 				case 'timeshift':
@@ -288,10 +297,12 @@ jQuery(function ($) {
 					break;
 
 				default:
-					var o = $override.data('options');
-					var visible_name = (typeof o.captions[option] !== 'undefined') ? o.captions[option] : option;
-					var visible_value = (typeof o.captions[option+value] !== 'undefined') ? o.captions[option+value] : value;
-					$('span', $('[name="'+field_name+'"]', $override).parent()).text(visible_name+': '+visible_value);
+					var visible_name = (typeof opt.captions[option] !== 'undefined') ? opt.captions[option] : option,
+						visible_value = (typeof opt.captions[option + value] !== 'undefined')
+							? opt.captions[option + value]
+							: value;
+					$('span', $('[name="' + field_name + '"]', $override).parent())
+						.text(visible_name + ': ' + visible_value);
 					break;
 			}
 		},
@@ -303,8 +314,9 @@ jQuery(function ($) {
 		 * @param string option          Override option that need to be removed.
 		 */
 		removeOverride: function($override, option) {
-			$('[name="'+$override.data('options')['makeName'](option)+'"]', $(this)).closest('li').remove();
-			$override.data('options')['onUpdate']();
+			var opt = $override.data('options');
+			$('[name="'+opt['makeName'](option, opt.getId($override))+'"]', $(this)).closest('li').remove();
+			opt['onUpdate']();
 		}
 	};
 
@@ -312,8 +324,7 @@ jQuery(function ($) {
 		if (methods[method]) {
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		}
-		else {
-			return methods.init.apply(this, arguments);
-		}
+
+		return methods.init.apply(this, arguments);
 	};
 });

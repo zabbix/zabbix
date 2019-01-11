@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,15 +69,15 @@ class CWidgetFieldRangeControl extends CWidgetField {
 		return $this;
 	}
 
-	public function getMinValue() {
+	public function getMin() {
 		return $this->min;
 	}
 
-	public function getMaxValue() {
+	public function getMax() {
 		return $this->max;
 	}
 
-	public function getStepValue() {
+	public function getStep() {
 		return $this->step;
 	}
 }

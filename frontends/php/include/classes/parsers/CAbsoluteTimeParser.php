@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,11 +81,7 @@ class CAbsoluteTimeParser extends CParser {
 			return false;
 		}
 
-		$this->tokens['Y'] = $matches['Y'];
-
-		$matches = array_filter($matches);
-
-		foreach (['m', 'd', 'H', 'i', 's'] as $key) {
+		foreach (['Y', 'm', 'd', 'H', 'i', 's'] as $key) {
 			if (array_key_exists($key, $matches)) {
 				$this->tokens[$key] = $matches[$key];
 			}

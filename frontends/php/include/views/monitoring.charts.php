@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $controls = (new CForm('get'))
 	->cleanItems()
 	->setAttribute('aria-label', _('Main filter'))
-	->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 	->addVar('page', 1)
 	->addItem((new CList())
 		->addItem([
@@ -54,19 +54,22 @@ if ($this->data['graphid']) {
 	);
 }
 
-$content_control->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
-$content_control = (new CTag('nav', true, $content_control))
-	->setAttribute('aria-label', _('Content controls'));
+$content_control->addItem(get_icon('fullscreen'));
+$content_control = (new CTag('nav', true, $content_control))->setAttribute('aria-label', _('Content controls'));
+
+$web_layout_mode = CView::getLayoutMode();
 
 $chartsWidget = (new CWidget())
 	->setTitle(_('Graphs'))
-	->setControls(new CList([$controls, $content_control]));
-
-$filterForm = (new CFilter())
-	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
-	->setActiveTab($data['active_tab'])
-	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
-$chartsWidget->addItem($filterForm);
+	->setWebLayoutMode($web_layout_mode)
+	->setControls(new CList([$controls, $content_control]))
+	->addItem(
+		(new CFilter(new CUrl('charts.php')))
+			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+			->setActiveTab($data['active_tab'])
+			->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
+				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
+	);
 
 if (!empty($this->data['graphid'])) {
 	// append chart to widget

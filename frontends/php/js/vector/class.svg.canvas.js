@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -641,7 +641,7 @@ ImageCache.prototype.handleCallback = function () {
 };
 
 /**
- * Callback for sucessful image load.
+ * Callback for successful image load.
  *
  * @param {string}     id       Image id.
  * @param {object}     image    Loaded image.

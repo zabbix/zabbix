@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,8 +25,7 @@ $item = ($data['url']['error'] !== null)
 
 $output = [
 	'header' => $data['name'],
-	'body' => $item->toString(),
-	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'body' => $item->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

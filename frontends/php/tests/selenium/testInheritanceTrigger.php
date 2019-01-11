@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup triggers
  */
-class testInheritanceTrigger extends CWebTest {
+class testInheritanceTrigger extends CLegacyWebTest {
 
 	private $templateid = 15000;	// 'Inheritance test template'
 	private $template = 'Inheritance test template';
@@ -35,7 +35,7 @@ class testInheritanceTrigger extends CWebTest {
 
 	// return list of triggers from a template
 	public static function update() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 			'SELECT t.triggerid'.
 			' FROM triggers t'.
 			' WHERE EXISTS ('.
@@ -56,14 +56,14 @@ class testInheritanceTrigger extends CWebTest {
 
 	public function testInheritanceTrigger_SimpleUpdate($data) {
 		$sqlTriggers = 'SELECT * FROM triggers ORDER BY triggerid';
-		$oldHashTriggers = DBhash($sqlTriggers);
+		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
 		$this->zbxTestLogin('triggers.php?form=update&triggerid='.$data['triggerid']);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger updated');
 
-		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
+		$this->assertEquals($oldHashTriggers, CDBHelper::getHash($sqlTriggers));
 	}
 
 	public static function create() {

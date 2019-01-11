@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1925,6 +1925,68 @@ static int	DBpatch_3050155(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050156(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"delete from widget_field"
+		" where (name like 'ds.order.%%' or name like 'or.order.%%')"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='svggraph'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050157(void)
+{
+	const ZBX_FIELD	field = {"passwd", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
+static int	DBpatch_3050158(void)
+{
+	int res;
+
+	res = DBexecute("update users set passwd=rtrim(passwd)");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050159(void)
+{
+	return DBcreate_index("escalations", "escalations_2", "eventid", 0);
+}
+
+static int	DBpatch_3050160(void)
+{
+	return DBdrop_index("escalations", "escalations_1");
+}
+
+static int	DBpatch_3050161(void)
+{
+	return DBcreate_index("escalations", "escalations_1", "triggerid,itemid,escalationid", 1);
+}
+
+static int	DBpatch_3050162(void)
+{
+	return DBcreate_index("escalations", "escalations_3", "nextcheck", 0);
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -2083,6 +2145,13 @@ DBPATCH_ADD(3050152, 0, 1)
 DBPATCH_ADD(3050153, 0, 1)
 DBPATCH_ADD(3050154, 0, 1)
 DBPATCH_ADD(3050155, 0, 1)
+DBPATCH_ADD(3050156, 0, 1)
+DBPATCH_ADD(3050157, 0, 1)
+DBPATCH_ADD(3050158, 0, 1)
+DBPATCH_ADD(3050159, 0, 1)
+DBPATCH_ADD(3050160, 0, 1)
+DBPATCH_ADD(3050161, 0, 1)
+DBPATCH_ADD(3050162, 0, 1)
 
 DBPATCH_END()
 

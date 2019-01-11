@@ -130,8 +130,8 @@ $ok-ack-fg-color: #009900;
 // ICONS
 $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -203px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -203px -730px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -203px -766px,
+	depend-up: url(../img/icon-sprite.svg) no-repeat -208px -730px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -208px -766px,
 	ackn: url(../img/icon-sprite.svg) no-repeat -203px -693px
 );
 
@@ -334,22 +334,22 @@ button {
 
 		input[type="radio"] {
 
-			&:checked:not([disabled]) + label,
-			&:focus + label {
-				border-color: $form-border-focus-color;
+			&:checked:not([disabled]) + label {
 				color: $white;
 			}
 
 			&:checked + label {
-				background-color: $ui-bg-selected-color;
+				background-color: $ui-bg-selected-color !important;
+			}
+
+			&:focus + label {
+				@include box-shadow(0 0 0 2px rgba($blue, 1) !important);
+				background-color: lighten($btn-bg-color, 10%) !important;
+				color: $white;
 			}
 
 			&:checked[disabled] + label {
 				background-color: #d3d3d3 !important;
-			}
-
-			&:focus + label {
-				background-color: #777 !important;
 			}
 		}
 	}
@@ -1049,6 +1049,11 @@ td.inactive-bg {
 	border: none;
 	outline: 2px solid rgba($font-color,0.6);
 }
+.svg-graph-selection {
+	fill: rgba($font-color,0.1);
+	stroke: rgba($font-color,0.6);
+	stroke-width: 2px;
+}
 
 .ui-selectable-helper {
 	background-color: rgba($font-color,0.1);
@@ -1195,5 +1200,17 @@ td.inactive-bg {
 .icon-actions-number-red {
 	&::before {
 		background-position: -524px -285px;
+	}
+}
+
+// OVERRIDES
+.overrides-options-list {
+	> li > div {
+		background-color: $ui-bg-selected-color !important;
+
+		> .subfilter-disable-btn {
+			border: none !important;
+			top: 0;
+		}
 	}
 }

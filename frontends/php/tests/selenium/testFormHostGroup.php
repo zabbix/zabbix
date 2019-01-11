@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup hstgrp
  */
-class testFormHostGroup extends CWebTest {
+class testFormHostGroup extends CLegacyWebTest {
 	private $hostGroup = 'Test Group';
 
 	public function testFormHostGroup_CheckLayout() {
@@ -60,7 +60,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group added');
 
 		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public function testFormHostGroup_CreateDuplicate() {
@@ -107,7 +107,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
 
 		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup ". 2 ."'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public function testFormHostGroup_Delete() {
@@ -119,6 +119,6 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group deleted');
 
 		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup ". 2 ."'";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 }

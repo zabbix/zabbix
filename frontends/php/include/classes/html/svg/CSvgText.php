@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,23 +24,8 @@ class CSvgText extends CSvgTag {
 	public function __construct($x, $y, $text) {
 		parent::__construct('text', true);
 
-		$this->x = $x;
-		$this->y = $y;
-
-		$this->setAttribute('x', $this->x);
-		$this->setAttribute('y', $this->y);
+		$this->setAttribute('x', $x);
+		$this->setAttribute('y', $y);
 		$this->addItem($text);
-	}
-
-	public function setAngle($angle) {
-		$this->setAttribute('transform', 'rotate('.$angle.','.$this->x.','.$this->y.')');
-
-		return $this;
-	}
-
-	public function setFontSize($font_size) {
-		$this->setAttribute('font-size', $font_size);
-
-		return $this;
 	}
 }

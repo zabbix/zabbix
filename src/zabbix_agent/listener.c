@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,11 +126,11 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #endif
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_handle_log();
-
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
+		ret = zbx_tcp_accept(&s, configured_tls_accept_modes);
+		zbx_update_env(zbx_time());
 
-		if (SUCCEED == (ret = zbx_tcp_accept(&s, configured_tls_accept_modes)))
+		if (SUCCEED == ret)
 		{
 			zbx_setproctitle("listener #%d [processing request]", process_num);
 
@@ -150,7 +150,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		}
 
 		if (SUCCEED == ret || EINTR == zbx_socket_last_error())
-			goto next;
+			continue;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		if (NULL != msg)
@@ -167,12 +167,6 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 		if (ZBX_IS_RUNNING())
 			zbx_sleep(1);
-next:
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#else
-		;
-#endif
 	}
 
 #ifdef _WINDOWS

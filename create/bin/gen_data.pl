@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 # Zabbix
-# Copyright (C) 2001-2018 Zabbix SIA
+# Copyright (C) 2001-2019 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -209,6 +209,10 @@ sub main
 	close(INFO);
 
 	open(INFO, dirname($0)."/../src/templates.tmpl");
+	push(@lines, <INFO>);
+	close(INFO);
+
+	open(INFO, dirname($0)."/../src/dashboards.tmpl");
 	push(@lines, <INFO>);
 	close(INFO);
 

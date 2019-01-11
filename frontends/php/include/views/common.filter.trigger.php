@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,10 +24,9 @@ require_once dirname(__FILE__).'/js/common.filter.trigger.js.php';
 $filter = $this->data['filter'];
 $config = $this->data['config'];
 
-$filterForm = (new CFilter())
+$filterForm = (new CFilter((new CUrl('overview.php'))->setArgument('type', 0)))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
-	->addVar('fullscreen', $filter['fullScreen'] ? '1' : null)
 	->addVar('groupid', $filter['groupId'])
 	->addVar('hostid', $filter['hostId']);
 
@@ -55,7 +54,7 @@ $severityNames = [];
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$severityNames[] = getSeverityName($severity, $config);
 }
-$column1->addRow(_('Minimum trigger severity'),
+$column1->addRow(_('Minimum severity'),
 	new CComboBox('show_severity', $filter['showSeverity'], null, $severityNames)
 );
 

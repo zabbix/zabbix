@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,19 +21,22 @@
 
 /**
  * Class for range control creation.
- * Initialize it using:
- * 
- * jQuery("#'.$this->getId().'").rangeControl();
  */
 class CRangeControl extends CTextBox {
 
-	protected $options;
+	private $options;
 
 	public function __construct($name, $value = '') {
 		parent::__construct($name);
 
-		$this->options = [];
+		$this->options = [
+			'min' => 0,
+			'max' => ZBX_MAX_INT32,
+			'step' => 1,
+			'width' => ZBX_TEXTAREA_SMALL_WIDTH
+		];
 		$this->setValue($value);
+		$this->addClass(ZBX_STYLE_RANGE_CONTROL);
 		return $this;
 	}
 
@@ -57,12 +60,20 @@ class CRangeControl extends CTextBox {
 		return $this;
 	}
 
+	public function setWidth($value) {
+		$this->options['width'] = $value;
+		return $this;
+	}
+
+	public function getPostJS() {
+		return 'jQuery("[name=\''.$this->getName().'\']").rangeControl();';
+	}
+
 	public function toString($destroy = true) {
 		// Set options for jQuery rangeControl class.
 		$this->setAttribute('data-options', CJs::encodeJson($this->options));
+		$this->setAttribute('maxlength', max(strlen($this->options['min']), strlen($this->options['max'])));
 
-		$input = parent::toString($destroy);
-
-		return $input;
+		return parent::toString($destroy);
 	}
 }

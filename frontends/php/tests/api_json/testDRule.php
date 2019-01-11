@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup drules
  */
-class testDRule extends CZabbixTest {
+class testDRule extends CAPITest {
 
 	public static function getDRuleDeleteData() {
 		return [
@@ -91,7 +91,7 @@ class testDRule extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['druleids'] as $id) {
-				$this->assertEquals(0, DBcount('SELECT NULL FROM drules WHERE druleid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM drules WHERE druleid='.zbx_dbstr($id)));
 			}
 		}
 	}
@@ -126,18 +126,18 @@ class testDRule extends CZabbixTest {
 	 */
 	public function testDRule_Permissions($login, $drule, $expected_error) {
 		$sql = 'SELECT * FROM drules ORDER BY druleid';
-		$old_drule=DBhash($sql);
+		$old_drule=CDBHelper::getHash($sql);
 
 		$this->authorize($login['user'], $login['password']);
 		$result = $this->call('drule.delete', $drule, $expected_error);
 
 		if ($expected_error === null) {
 			foreach ($result['result']['druleids'] as $id) {
-				$this->assertEquals(0, DBcount('SELECT * FROM drules WHERE druleid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE druleid='.zbx_dbstr($id)));
 			}
 		}
 		else {
-			$this->assertEquals($old_drule, DBhash($sql));
+			$this->assertEquals($old_drule, CDBHelper::getHash($sql));
 		}
 	}
 }

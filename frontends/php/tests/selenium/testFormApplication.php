@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Test checks Configuration -> Hosts or Templates -> Applications form.
  *
  * @backup applications
  */
-class testFormApplication extends CWebTest {
+class testFormApplication extends CLegacyWebTest {
 
 	/**
 	 * The name of the test application used in the test data set.
@@ -72,11 +72,11 @@ class testFormApplication extends CWebTest {
 		$this->zbxTestTextPresent($new_name);
 
 		// Check the results in DB.
-		$this->assertEquals(1, DBcount("SELECT NULL FROM applications WHERE name='".$new_name."'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT NULL FROM applications WHERE name='".$new_name."'"));
 
 		if ($new_name !== $name) {
 			// There should be no application with previous name if name was changed.
-			$this->assertEquals(0, DBcount("SELECT NULL FROM applications WHERE name='".$name."'"));
+			$this->assertEquals(0, CDBHelper::getCount("SELECT NULL FROM applications WHERE name='".$name."'"));
 		}
 	}
 
@@ -102,7 +102,7 @@ class testFormApplication extends CWebTest {
 		$this->zbxTestTextPresent($name);
 
 		// Check the results in DB.
-		$this->assertEquals(1, DBcount("SELECT NULL FROM applications WHERE name='".$name."'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT NULL FROM applications WHERE name='".$name."'"));
 	}
 
 	/**
@@ -130,11 +130,11 @@ class testFormApplication extends CWebTest {
 	 */
 	public function testFormApplication_SimpleUpdate() {
 		$sql_hash = 'SELECT * FROM applications ORDER BY applicationid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->updateApplication(self::$application);
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	/**
@@ -157,7 +157,7 @@ class testFormApplication extends CWebTest {
 	 */
 	public function testFormApplication_Cancel() {
 		$sql_hash = 'SELECT * FROM applications ORDER BY applicationid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		// Select hostgroup and host, open a form.
 		$this->zbxTestLogin('applications.php');
@@ -174,7 +174,7 @@ class testFormApplication extends CWebTest {
 		// Check the result in frontend.
 		$this->zbxTestCheckTitle('Configuration of applications');
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	/**
@@ -221,6 +221,6 @@ class testFormApplication extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Application deleted');
 
 		// Check the result in DB.
-		$this->assertEquals(0, DBcount("SELECT NULL FROM applications WHERE name='".$name."'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT NULL FROM applications WHERE name='".$name."'"));
 	}
 }

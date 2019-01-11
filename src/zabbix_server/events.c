@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -704,8 +704,8 @@ static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_
 		else
 			value = "0";
 
-		zbx_replace_string(&expression, token.token.l, &token.token.r, value);
-		pos = token.token.r;
+		zbx_replace_string(&expression, token.loc.l, &token.loc.r, value);
+		pos = token.loc.r;
 	}
 
 	if (SUCCEED == evaluate(&result, expression, error, sizeof(error), NULL))
@@ -914,7 +914,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 				zbx_chrcpy_alloc(&filter, &filter_alloc, &filter_offset, ')');
 
 				zbx_free(tag_esc);
-				zbx_vector_str_clear_ext(&values, zbx_ptr_free);
+				zbx_vector_str_clear_ext(&values, zbx_str_free);
 			}
 
 			zbx_vector_str_destroy(&values);
@@ -980,8 +980,8 @@ static int	correlation_add_event_filter(char **sql, size_t *sql_alloc, size_t *s
 			goto out;
 		}
 
-		zbx_replace_string(&expression, token.token.l, &token.token.r, filter);
-		pos = token.token.r;
+		zbx_replace_string(&expression, token.loc.l, &token.loc.r, filter);
+		pos = token.loc.r;
 		zbx_free(filter);
 	}
 

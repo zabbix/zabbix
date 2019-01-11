@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup usrgrp
  */
-class testUserGroup extends CZabbixTest {
+class testUserGroup extends CAPITest {
 
 	public static function usergroup_create() {
 		return [
@@ -139,7 +139,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [[
 					'usrgrpid' => '13',
-					'name' => 'API update with non existent parametr',
+					'name' => 'API update with non existent parameter',
 					'value' => '4'
 				]],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "value".'
@@ -346,7 +346,7 @@ class testUserGroup extends CZabbixTest {
 			foreach ($groups as $group) {
 				if (array_key_exists('name', $group) && $group['name'] != 'Zabbix administrators'){
 					$dbResult = 'select * from usrgrp where name='.zbx_dbstr($group['name']);
-					$this->assertEquals(0, DBcount($dbResult));
+					$this->assertEquals(0, CDBHelper::getCount($dbResult));
 				}
 			}
 		}
@@ -583,7 +583,7 @@ class testUserGroup extends CZabbixTest {
 				$this->assertEquals($dbRow['debug_mode'], $groups['debug_mode']);
 
 				foreach ($groups['userids'] as $user) {
-					$this->assertEquals(1, DBcount('select * from users_groups where userid='.zbx_dbstr($user).
+					$this->assertEquals(1, CDBHelper::getCount('select * from users_groups where userid='.zbx_dbstr($user).
 							' and usrgrpid='.zbx_dbstr($result['result']['usrgrpids'][0])
 					));
 				}
@@ -595,7 +595,7 @@ class testUserGroup extends CZabbixTest {
 			}
 			else {
 				if (array_key_exists('name', $groups) && array_key_exists('usrgrpid', $groups)){
-					$this->assertEquals(0, DBcount('select * from usrgrp where usrgrpid='.
+					$this->assertEquals(0, CDBHelper::getCount('select * from usrgrp where usrgrpid='.
 							zbx_dbstr($groups['usrgrpid']).' and name='.zbx_dbstr($groups['name'])
 					));
 				}
@@ -684,7 +684,7 @@ class testUserGroup extends CZabbixTest {
 		if ($expected_error === null) {
 			foreach ($result['result']['usrgrpids'] as $id) {
 				$dbResult = 'select * from usrgrp where usrgrpid='.zbx_dbstr($id);
-				$this->assertEquals(0, DBcount($dbResult));
+				$this->assertEquals(0, CDBHelper::getCount($dbResult));
 			}
 		}
 	}

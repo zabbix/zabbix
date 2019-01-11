@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -140,9 +140,19 @@ foreach ($data['allowedConditions'] as $condition) {
 	$conditionTypeComboBox->addItem($condition['type'], $condition['name']);
 }
 
-$conditionOperatorsComboBox = new CComboBox('new_condition[operator]', $data['new_condition']['operator']);
-foreach (get_operators_by_conditiontype($data['new_condition']['conditiontype']) as $operator) {
-	$conditionOperatorsComboBox->addItem($operator, condition_operator2str($operator));
+$condition_operators_list = get_operators_by_conditiontype($data['new_condition']['conditiontype']);
+
+if (count($condition_operators_list) > 1) {
+	$condition_operator = new CComboBox('new_condition[operator]', $data['new_condition']['operator']);
+
+	foreach ($condition_operators_list as $operator) {
+		$condition_operator->addItem($operator, condition_operator2str($operator));
+	}
+}
+else {
+	$condition_operator = [new CVar('new_condition[operator]', $condition_operators_list[0]),
+		condition_operator2str($condition_operators_list[0])
+	];
 }
 
 $condition2 = null;
@@ -377,8 +387,8 @@ $action_tab->addRow(_('New condition'),
 					$conditionTypeComboBox,
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$condition2,
-					$condition2 === null ? null : (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$conditionOperatorsComboBox,
+					($condition2 === null) ? null : (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$condition_operator,
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$condition
 				])

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,21 +55,29 @@ class JMXItemChecker extends ItemChecker
 	{
 		super(request);
 
+		String jmx_endpoint;
+
 		try
 		{
-			url = new JMXServiceURL(request.getString(JSON_TAG_JMX_ENDPOINT));
+			jmx_endpoint = request.getString(JSON_TAG_JMX_ENDPOINT);
+		}
+		catch (Exception e)
+		{
+			throw new ZabbixException(e);
+		}
+
+		try
+		{
+			url = new JMXServiceURL(jmx_endpoint);
 			jmxc = null;
 			mbsc = null;
 
 			username = request.optString(JSON_TAG_USERNAME, null);
 			password = request.optString(JSON_TAG_PASSWORD, null);
-
-			if (null != username && null == password || null == username && null != password)
-				throw new IllegalArgumentException("Both JMX endpoint username and password should be either present or empty");
 		}
 		catch (Exception e)
 		{
-			throw new ZabbixException(e);
+			throw new ZabbixException("%s: %s", e, jmx_endpoint);
 		}
 	}
 
@@ -94,9 +102,30 @@ class JMXItemChecker extends ItemChecker
 			for (String key : keys)
 				values.put(getJSONValue(key));
 		}
+		catch (SecurityException e1)
+		{
+			JSONObject value = new JSONObject();
+
+			logger.warn("cannot process keys '{}': {}: {}", new Object[] {keys, ZabbixException.getRootCauseMessage(e1), url});
+			logger.debug("error caused by", e1);
+
+			try
+			{
+				value.put(JSON_TAG_ERROR, ZabbixException.getRootCauseMessage(e1));
+			}
+			catch (JSONException e2)
+			{
+				Object[] logInfo = {JSON_TAG_ERROR, e1.getMessage(), ZabbixException.getRootCauseMessage(e2)};
+				logger.warn("cannot add JSON attribute '{}' with message '{}': {}", logInfo);
+				logger.debug("error caused by", e2);
+			}
+
+			for (int i = 0; i < keys.size(); i++)
+				values.put(value);
+		}
 		catch (Exception e)
 		{
-			throw new ZabbixException(e);
+			throw new ZabbixException("%s: %s", ZabbixException.getRootCauseMessage(e), url);
 		}
 		finally
 		{

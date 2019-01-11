@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -151,16 +151,6 @@ elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])) {
 elseif (hasRequest('add') || hasRequest('update')) {
 	$update = hasRequest('userid');
 	$usrgrps = getRequest('user_groups', []);
-
-	// authentication type
-	if ($usrgrps) {
-		$authType = getGroupAuthenticationType($usrgrps, GROUP_GUI_ACCESS_INTERNAL);
-	}
-	else {
-		$authType = $update
-			? getUserAuthenticationType(getRequest('userid'), GROUP_GUI_ACCESS_INTERNAL)
-			: $config['authentication_type'];
-	}
 
 	// password validation
 	if (getRequest('password1', '') != getRequest('password2', '')) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2091,7 +2091,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 								'name' => 'Availability'
 							]
 						],
-						'name' => 'Free disk space on $1 in %',
+						'name' => 'Free disk space on / in %',
 						'key_' => 'vfs.fs.size[/,pfree]',
 						'jmx_endpoint' => '',
 						'master_item' => [],

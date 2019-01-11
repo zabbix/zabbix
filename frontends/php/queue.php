@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,6 +97,7 @@ if ($config == QUEUE_OVERVIEW) {
 		ITEM_TYPE_AGGREGATE,
 		ITEM_TYPE_EXTERNAL,
 		ITEM_TYPE_DB_MONITOR,
+		ITEM_TYPE_HTTPAGENT,
 		ITEM_TYPE_IPMI,
 		ITEM_TYPE_SSH,
 		ITEM_TYPE_TELNET,

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,13 +21,13 @@
 
 function condition_operator2str($operator) {
 	$operators = [
-		CONDITION_OPERATOR_EQUAL  => '=',
-		CONDITION_OPERATOR_NOT_EQUAL  => '<>',
-		CONDITION_OPERATOR_LIKE  => _('like'),
-		CONDITION_OPERATOR_NOT_LIKE  => _('not like'),
+		CONDITION_OPERATOR_EQUAL  => _('equals'),
+		CONDITION_OPERATOR_NOT_EQUAL  => _('does not equal'),
+		CONDITION_OPERATOR_LIKE  => _('contains'),
+		CONDITION_OPERATOR_NOT_LIKE  => _('does not contain'),
 		CONDITION_OPERATOR_IN => _('in'),
-		CONDITION_OPERATOR_MORE_EQUAL => '>=',
-		CONDITION_OPERATOR_LESS_EQUAL => '<=',
+		CONDITION_OPERATOR_MORE_EQUAL => _('is greater than or equals'),
+		CONDITION_OPERATOR_LESS_EQUAL => _('is less than or equals'),
 		CONDITION_OPERATOR_NOT_IN => _('not in'),
 		CONDITION_OPERATOR_YES => _('Yes'),
 		CONDITION_OPERATOR_NO => _('No')

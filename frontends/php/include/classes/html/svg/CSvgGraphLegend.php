@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,27 +22,30 @@
 class CSvgGraphLegend extends CDiv {
 
 	/**
-	 * Graph labels data array. Every element of array is array with 'name' and 'color' value.
-	 *
-	 * @var array
+	 * @param array  $labels
+	 * @param string $labels[]['name']
+	 * @param string $labels[]['color']
 	 */
-	protected $labels;
-
 	public function __construct(array $labels = []) {
 		parent::__construct();
 
-		$this->labels = $labels;
-		$this->addClass(CSvgTag::ZBX_STYLE_GRAPH_LEGEND);
-	}
-
-	public function toString($destroy = true) {
-		foreach ($this->labels as $label) {
-			parent::addItem((new CDiv($label['name']))
-				// border-color is for legend element ::before pseudo element.
-				->setAttribute('style', 'border-color: '.$label['color'])
-			);
+		foreach ($labels as $label) {
+			// border-color is for legend element ::before pseudo element.
+			parent::addItem((new CDiv($label['name']))->setAttribute('style', 'border-color: '.$label['color']));
 		}
 
-		return parent::toString($destroy);
+		switch (count($labels)) {
+			case 1:
+				$this->addClass(CSvgTag::ZBX_STYLE_GRAPH_LEGEND_SINGLE_ITEM);
+				break;
+
+			case 2:
+				$this->addClass(CSvgTag::ZBX_STYLE_GRAPH_LEGEND_TWO_ITEMS);
+				break;
+
+			default:
+				$this->addClass(CSvgTag::ZBX_STYLE_GRAPH_LEGEND);
+				break;
+		}
 	}
 }

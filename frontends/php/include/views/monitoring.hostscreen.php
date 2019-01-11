@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 **/
 
 
-$screen_widget = new CWidget();
+$web_layout_mode = CView::getLayoutMode();
 
-$filter = new CFilter();
+$screen_widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
 if (empty($data['screen']) || empty($data['host'])) {
 	$screen_widget
@@ -31,13 +31,12 @@ if (empty($data['screen']) || empty($data['host'])) {
 else {
 	$screen_widget->setTitle([
 		$data['screen']['name'].' '._('on').' ',
-		(new CSpan($data['host']['name']))->addClass(ZBX_STYLE_ORANGE)
+		new CSpan($data['host']['name'])
 	]);
 
 	$url = (new CUrl('host_screen.php'))
 		->setArgument('hostid', $data['hostid'])
-		->setArgument('screenid', $data['screenid'])
-		->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+		->setArgument('screenid', $data['screenid']);
 
 	// host screen list
 	if (!empty($data['screens'])) {
@@ -58,7 +57,7 @@ else {
 				->setAttribute('aria-label', _('Main filter'))
 				->addItem((new CList())
 					->addItem($screen_combobox)
-					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+					->addItem(get_icon('fullscreen'))
 				)
 			))
 				->setAttribute('aria-label', _('Content controls'))
@@ -76,16 +75,15 @@ else {
 		'to' => $data['to']
 	]);
 
-	$filter
-		->setProfile($data['profileIdx'], $data['profileIdx2'])
-		->setActiveTab($data['active_tab'])
-		->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
+	$screen_widget->addItem(
+		(new CFilter(new CUrl()))
+			->setProfile($data['profileIdx'], $data['profileIdx2'])
+			->setActiveTab($data['active_tab'])
+			->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to'],
+				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
+	);
 
-	$screen_widget
-		->addItem($filter)
-		->addItem(
-			(new CDiv($screen_builder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
-		);
+	$screen_widget->addItem((new CDiv($screen_builder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
 
 	CScreenBuilder::insertScreenStandardJs($screen_builder->timeline);
 }

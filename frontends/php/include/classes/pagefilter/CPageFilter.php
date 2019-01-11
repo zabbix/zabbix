@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -282,7 +282,7 @@ class CPageFilter {
 	 * Retrieve objects stored in the user profile.
 	 * If the 'select_latest' option is used, the IDs will be loaded from the web.latest.objectid profile values,
 	 * otherwise - from the web.*.objectid field, depending on the use of the 'individual' option.
-	 * If the 'DDReset' option is used, IDs will be reset to zeroes.
+	 * If the 'DDReset' option is used, IDs will be reset to zeros.
 	 * The method also sets the scope for remembering the selected values, see the 'individual' option for more info.
 	 *
 	 * @param array $options
@@ -378,10 +378,11 @@ class CPageFilter {
 	 * @param array  $groups
 	 * @param string $groups[<groupid>]['groupid']
 	 * @param string $groups[<groupid>]['name']
+	 * @param array  $options                        HostGroup API call parameters.
 	 *
 	 * @return array
 	 */
-	public static function enrichParentGroups(array $groups) {
+	public static function enrichParentGroups(array $groups, array $options = []) {
 		$parents = [];
 		foreach ($groups as $group) {
 			$parent = explode('/', $group['name']);
@@ -399,11 +400,18 @@ class CPageFilter {
 		}
 
 		if ($parents) {
-			$groups += API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'filter' => ['name' => array_keys($parents)],
-				'preservekeys' => true
-			]);
+			if (!array_key_exists('output', $options)) {
+				$options['output'] = ['groupid', 'name'];
+			}
+
+			if (!array_key_exists('filter', $options)) {
+				$options['filter'] = [];
+			}
+
+			$options['filter']['name'] = array_keys($parents);
+
+			$options['preservekeys'] = true;
+			$groups += API::HostGroup()->get($options);
 		}
 
 		return $groups;

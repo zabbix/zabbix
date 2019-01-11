@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -155,7 +155,6 @@ class CScreenHostTriggers extends CScreenBase {
 	 * Render table with host or host group problems.
 	 *
 	 * @param array   $filter                  Array of filter options.
-	 * @param int     $filter['fullscreen']    Full screen option.
 	 * @param int     $filter['limit']         Table rows count.
 	 * @param array   $filter['groupids']      Host group ids.
 	 * @param array   $filter['hostids']       Host ids.
@@ -176,9 +175,9 @@ class CScreenHostTriggers extends CScreenBase {
 			'maintenance' => 1,
 			'show_timeline' => 0,
 			'details' => 1,
+			'show_latest_values' => 0,
 			'sort_field' => '',
-			'sort_order' => ZBX_SORT_DOWN,
-			'fullscreen' => (bool) getRequest('fullscreen', false)
+			'sort_order' => ZBX_SORT_DOWN
 		];
 
 		$data = CScreenProblem::getData($filter, $config);
@@ -294,7 +293,7 @@ class CScreenHostTriggers extends CScreenBase {
 				$host_name,
 				(new CCol([
 					(new CLinkAction($problem['name']))
-						->setHint(make_popup_eventlist($trigger, $problem['eventid'], $back_url, $filter['fullscreen']))
+						->setHint(make_popup_eventlist($trigger, $problem['eventid'], $back_url))
 				]))->addClass(getSeverityStyle($problem['severity'])),
 				$clock,
 				zbx_date2age($problem['clock']),

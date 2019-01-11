@@ -71,7 +71,6 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
-	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	libzbxproxy.a
 
 zabbix_proxy_LDADD += $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a

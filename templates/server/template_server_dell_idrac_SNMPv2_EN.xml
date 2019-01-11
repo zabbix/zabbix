@@ -4,7 +4,7 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates/Servers Hardware</name>
+         <name>Templates/Server hardware</name>
       </group>
    </groups>
    <templates>
@@ -19,12 +19,12 @@ MIBs used:&#13;
 IDRAC-MIB-SMIv2</description>
          <groups>
             <group>
-               <name>Templates/Servers Hardware</name>
+               <name>Templates/Server hardware</name>
             </group>
          </groups>
          <applications>
             <application>
-               <name>Disk Arrays</name>
+               <name>Disk arrays</name>
             </application>
             <application>
                <name>Fans</name>
@@ -33,10 +33,10 @@ IDRAC-MIB-SMIv2</description>
                <name>Inventory</name>
             </application>
             <application>
-               <name>Physical Disks</name>
+               <name>Physical disks</name>
             </application>
             <application>
-               <name>Power Supply</name>
+               <name>Power supply</name>
             </application>
             <application>
                <name>Status</name>
@@ -45,7 +45,7 @@ IDRAC-MIB-SMIv2</description>
                <name>Temperature</name>
             </application>
             <application>
-               <name>Virtual Disks</name>
+               <name>Virtual disks</name>
             </application>
          </applications>
          <items>
@@ -742,7 +742,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Power Supply</name>
+                           <name>Power supply</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1052,7 +1052,7 @@ Possible values:&#13;
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1097,7 +1097,7 @@ The physical disk's unique identification number from the manufacturer.</descrip
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -1140,7 +1140,7 @@ Indicates whether the physical disk has received a predictive failure alert.</de
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1185,7 +1185,7 @@ The model number of the physical disk.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -1228,7 +1228,7 @@ The part number of the disk.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -1274,7 +1274,7 @@ The media type of the physical disk. Possible Values:&#13;
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1319,7 +1319,7 @@ The size of the physical disk in megabytes.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -1497,7 +1497,7 @@ Possible values:&#13;
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Virtual Disks</name>
+                           <name>Virtual disks</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1548,7 +1548,7 @@ Possible values:&#13;
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Virtual Disks</name>
+                           <name>Virtual disks</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1597,7 +1597,7 @@ Possible values:&#13;
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Virtual Disks</name>
+                           <name>Virtual disks</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -1644,7 +1644,7 @@ Possible values:&#13;
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Virtual Disks</name>
+                           <name>Virtual disks</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1689,7 +1689,7 @@ The size of the virtual disk in megabytes.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Virtual Disks</name>
+                           <name>Virtual disks</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -1743,7 +1743,7 @@ The data on the virtual disk might no longer be fault tolerant.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Virtual Disks</name>
+                           <name>Virtual disks</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1874,7 +1874,7 @@ Possible values:&#13;
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Disk Arrays</name>
+                           <name>Disk arrays</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1919,7 +1919,7 @@ The controller's name as represented in Storage Management.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Disk Arrays</name>
+                           <name>Disk arrays</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -2077,7 +2077,7 @@ Possible values:&#13;
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Disk Arrays</name>
+                           <name>Disk arrays</name>
                         </application>
                      </applications>
                      <valuemap>

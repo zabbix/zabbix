@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ class CWidgetFormDataOver extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_DATA_OVER);
 
+		// Host groups.
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
 		if (array_key_exists('groupids', $this->data)) {
@@ -34,6 +35,7 @@ class CWidgetFormDataOver extends CWidgetForm {
 		}
 		$this->fields[$field_groups->getName()] = $field_groups;
 
+		// Application field.
 		$field_application = new CWidgetFieldTextBox('application', _('Application'));
 
 		if (array_key_exists('application', $this->data)) {
@@ -42,6 +44,17 @@ class CWidgetFormDataOver extends CWidgetForm {
 
 		$this->fields[$field_application->getName()] = $field_application;
 
+		// Show suppressed problems.
+		$field_show_suppressed = (new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems')))
+			->setDefault(ZBX_PROBLEM_SUPPRESSED_FALSE);
+
+		if (array_key_exists('show_suppressed', $this->data)) {
+			$field_show_suppressed->setValue($this->data['show_suppressed']);
+		}
+
+		$this->fields[$field_show_suppressed->getName()] = $field_show_suppressed;
+
+		// Hosts names location.
 		$field_style = (new CWidgetFieldRadioButtonList('style', _('Hosts location'), [
 			STYLE_LEFT => _('Left'),
 			STYLE_TOP => _('Top')

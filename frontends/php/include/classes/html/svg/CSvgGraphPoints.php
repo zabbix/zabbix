@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,43 +22,31 @@
 class CSvgGraphPoints extends CSvgGroup {
 
 	protected $path;
-
 	protected $itemid;
 	protected $item_name;
-	protected $units;
 	protected $options;
-
-	protected $position_x = 0;
-	protected $position_y = 0;
-
-	protected $width = 0;
-	protected $height = 0;
 
 	public function __construct($path, $metric) {
 		parent::__construct();
 
-		$this->path = $path;
-
+		$this->path = $path ? : [];
 		$this->itemid = $metric['itemid'];
 		$this->item_name = $metric['name'];
-		$this->units = $metric['units'];
-
 		$this->options = $metric['options'] + [
-			'color' => '#b0af07',
-			'fill' => 5,
-			'order' => 1,
-			'pointsize' => 1,
-			'transparency' => 5
+			'color' => CSvgGraph::SVG_GRAPH_DEFAULT_COLOR,
+			'pointsize' => CSvgGraph::SVG_GRAPH_DEFAULT_POINTSIZE,
+			'transparency' => CSvgGraph::SVG_GRAPH_DEFAULT_TRANSPARENCY,
+			'order' => 1
 		];
 	}
 
-	public function getStyles() {
+	public function makeStyles() {
 		$this
-			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_POINTS)
-			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_POINTS.'-'.$this->itemid.'-'.$this->options['order']);
+			->addClass(CSvgTag::ZBX_STYLE_GRAPH_POINTS)
+			->addClass(CSvgTag::ZBX_STYLE_GRAPH_POINTS.'-'.$this->itemid.'-'.$this->options['order']);
 
 		return [
-			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_POINTS.'-'.$this->itemid.'-'.$this->options['order'] => [
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_POINTS.'-'.$this->itemid.'-'.$this->options['order'] => [
 				'fill-opacity' => $this->options['transparency'] * 0.1,
 				'fill' => $this->options['color']
 			]
@@ -67,18 +55,19 @@ class CSvgGraphPoints extends CSvgGroup {
 
 	protected function draw() {
 		foreach ($this->path as $point) {
-			$this->addItem((new CSvgCircle($point[0], $point[1], $this->options['pointsize']))
-				->setAttribute('label', $point[2])
+			$this->addItem(
+				(new CSvgCircle($point[0], $point[1], $this->options['pointsize']))->setAttribute('label', $point[2])
 			);
 		}
 	}
 
 	public function toString($destroy = true) {
 		$this->setAttribute('data-set', 'points')
-			->setAttribute('data-metric', $this->item_name)
+			->setAttribute('data-metric', CHtml::encode($this->item_name))
 			->setAttribute('data-color', $this->options['color'])
 			->addItem(
-				(new CSvgCircle(-10, -10, $this->options['pointsize'] + 2))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
+				(new CSvgCircle(-10, -10, $this->options['pointsize'] + 4))
+					->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 			)
 			->draw();
 

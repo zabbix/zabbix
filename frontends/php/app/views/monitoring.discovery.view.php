@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,14 +21,15 @@
 
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
+$this->addJsFile('layout.mode.js');
 
 $widget = (new CWidget())
 	->setTitle(_('Status of discovery'))
+	->setWebLayoutMode(CView::getLayoutMode())
 	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
 			->addVar('action', 'discovery.view')
-			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CList())
 				->addItem([
@@ -37,7 +38,7 @@ $widget = (new CWidget())
 					$data['pageFilter']->getDiscoveryCB()
 				])
 			),
-		(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])))
+		(new CTag('nav', true, get_icon('fullscreen')))
 			->setAttribute('aria-label', _('Content controls'))
 	]));
 

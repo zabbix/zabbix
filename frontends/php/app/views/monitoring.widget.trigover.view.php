@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,21 +19,13 @@
 **/
 
 
-$back_url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null);
+$back_url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view');
 
-$table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style'], null,
-	$data['fullscreen']);
+$table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style']);
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString(),
-	'footer' => (new CList())
-		->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
-		->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT)
-		->toString()
+	'body' => $table->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,15 +50,14 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 	zbx_vector_uint64_sort(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+	/* read event data */
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select e.eventid,e.source,e.object,e.objectid,e.clock,e.value,e.acknowledged,e.ns,e.name,"
-				"e.severity,max(es.suppress_until)"
-			" from events e"
-				" left join event_suppress es"
-					" on e.eventid=es.eventid"
+			"select eventid,source,object,objectid,clock,value,acknowledged,ns,name,severity"
+			" from events"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid", eventids->values, eventids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " group by e.eventid order by e.eventid");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids->values, eventids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by eventid");
 
 	result = DBselect("%s", sql);
 
@@ -77,8 +76,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		event->ns = atoi(row[7]);
 		event->name = zbx_strdup(NULL, row[8]);
 		event->severity = atoi(row[9]);
-		event->suppressed = (SUCCEED == DBis_null(row[10]) ? ZBX_PROBLEM_SUPPRESSED_FALSE :
-				ZBX_PROBLEM_SUPPRESSED_TRUE);
+		event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
 
 		event->trigger.triggerid = 0;
 
@@ -92,6 +90,31 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 			zbx_vector_uint64_append(&triggerids, event->objectid);
 
 		zbx_vector_ptr_append(events, event);
+	}
+	DBfree_result(result);
+
+	/* read event_suppress data */
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct eventid from event_suppress where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids->values, eventids->values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		DB_EVENT	*event;
+		zbx_uint64_t	eventid;
+
+		ZBX_STR2UINT64(eventid, row[0]);
+		if (FAIL == (index = zbx_vector_ptr_bsearch(events, &eventid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		event = (DB_EVENT *)events->values[index];
+		event->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
 	}
 	DBfree_result(result);
 

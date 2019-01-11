@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ class CControllerWebView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'fullscreen' =>	'in 0,1',
 			'groupid' =>	'db hstgrp.groupid',
 			'hostid' =>		'db hosts.hostid',
 			'sort' =>		'in hostname,name',
@@ -82,7 +81,6 @@ class CControllerWebView extends CController {
 		CProfile::update('web.httpmon.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		$data = [
-			'fullscreen' => $this->getInput('fullscreen', 0),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
 			'page' => $this->getInput('page', 1)
@@ -100,6 +98,8 @@ class CControllerWebView extends CController {
 			'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null,
 			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null
 		]);
+
+		CView::$has_web_layout_mode = true;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Web monitoring'));

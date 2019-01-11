@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 	protected function checkInput() {
 		$fields = [
-			'fullscreen' =>			'in 0,1',
-			'kioskmode' =>			'in 0,1',
 			'dashboardid' =>		'db dashboard.dashboardid',
 			'source_dashboardid' =>	'db dashboard.dashboardid',
 			'groupid' =>			'db hstgrp.groupid',
@@ -82,9 +80,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	protected function doAction() {
-		$fullscreen = (bool) $this->getInput('fullscreen', false);
-		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
-
 		list($this->dashboard, $error) = $this->getDashboard();
 
 		if ($error !== null) {
@@ -93,9 +88,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			return;
 		}
 		elseif ($this->dashboard === null) {
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'dashboard.list')
-				->setArgument('fullscreen', $fullscreen ? '1' : null);
+			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
 			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
 
 			return;
@@ -115,9 +108,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$widgets = self::getWidgets($this->dashboard['widgets']);
 
 			$data = [
+				'dashboard_edit_mode' => ($dashboard['dashboardid'] == 0),
 				'dashboard' => $dashboard,
-				'fullscreen' => $fullscreen,
-				'kioskmode' => $kioskmode,
 				'grid_widgets' => $widgets,
 				'widget_defaults' => CWidgetConfig::getDefaults(),
 				'show_timeselector' => self::showTimeSelector($widgets),
@@ -158,6 +150,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					'hostid' => 0
 				];
 			}
+
+			CView::$has_web_layout_mode = true;
 
 			$response = new CControllerResponseData($data);
 			$response->setTitle(_('Dashboard'));

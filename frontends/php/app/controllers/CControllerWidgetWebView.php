@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ class CControllerWidgetWebView extends CControllerWidget {
 		$this->setType(WIDGET_WEB);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fullscreen' => 'in 0,1',
 			'fields' => 'json'
 		]);
 	}
@@ -49,6 +48,7 @@ class CControllerWidgetWebView extends CControllerWidget {
 				if ($filter_groupids === null) {
 					$filter_groupids = array_keys(API::HostGroup()->get([
 						'output' => [],
+						'real_hosts' => true,
 						'preservekeys' => true
 					]));
 				}
@@ -128,7 +128,6 @@ class CControllerWidgetWebView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'groups' => $groups,
-			'fullscreen' => $this->getInput('fullscreen', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

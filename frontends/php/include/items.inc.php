@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -777,11 +777,11 @@ function get_same_item_for_host($item, $dest_hostids) {
 /**
  * Get parent templates for each given item.
  *
- * @param array  $items                 An array of items.
- * @param string $items[]['itemid']     ID of an item.
- * @param string $items[]['templateid'] ID of parent template item.
- * @param int    $flag                  Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
- *                                      ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param array  $items                  An array of items.
+ * @param string $items[]['itemid']      ID of an item.
+ * @param string $items[]['templateid']  ID of parent template item.
+ * @param int    $flag                   Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
+ *                                       ZBX_FLAG_DISCOVERY_PROTOTYPE).
  *
  * @return array
  */
@@ -838,6 +838,7 @@ function getItemParentTemplates(array $items, $flag) {
 		foreach ($db_items as $db_item) {
 			$data['templates'][$db_item['hostid']] = [];
 			$hostids[$db_item['itemid']] = $db_item['hostid'];
+
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$lld_ruleids[$db_item['itemid']] = $db_item['discoveryRule']['itemid'];
 			}
@@ -857,6 +858,7 @@ function getItemParentTemplates(array $items, $flag) {
 		$parent_item['hostid'] = array_key_exists($parent_item['itemid'], $hostids)
 			? $hostids[$parent_item['itemid']]
 			: 0;
+
 		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$parent_item['lld_ruleid'] = array_key_exists($parent_item['itemid'], $lld_ruleids)
 				? $lld_ruleids[$parent_item['itemid']]
@@ -910,7 +912,7 @@ function getItemParentTemplates(array $items, $flag) {
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
  *
- * @return CLink|CSpan|null
+ * @return array|null
  */
 function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
 	if (!array_key_exists($itemid, $parent_templates['links'])) {
@@ -1000,28 +1002,19 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
 	return $list;
 }
 
-function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
-	$item = get_item_by_itemid($itemid);
-	if (bccomp($hostid,$item['hostid']) == 0) {
-		return $item['itemid'];
-	}
-	if ($item['templateid'] <> 0) {
-		return get_realrule_by_itemid_and_hostid($item['templateid'], $hostid);
-	}
-	return $item['itemid'];
-}
-
 /**
  * Retrieve overview table object for items.
  *
  * @param array  $groupids
- * @param string $application  IDs of applications to filter items by.
+ * @param string $application      IDs of applications to filter items by.
  * @param int    $viewMode
- * @param bool   $fullscreen   Display mode.
+ * @param int    $show_suppressed  Whether to show suppressed problems.
  *
  * @return CTableInfo
  */
-function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscreen = false) {
+
+function getItemsDataOverview(array $groupids, $application, $viewMode,
+		$show_suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE) {
 	// application filter
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
@@ -1053,7 +1046,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 		'applicationids' => $applicationids,
 		'monitored' => true,
 		'preservekeys' => true
-	], ZBX_PROBLEM_SUPPRESSED_TRUE);
+	], ['show_suppressed' => $show_suppressed]);
 
 	foreach ($db_triggers as $db_trigger) {
 		foreach ($db_trigger['items'] as $item) {
@@ -1178,9 +1171,9 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 
 		foreach ($items as $item_name => $item_data) {
 			foreach ($item_data as $ithosts) {
-				$tableRow = [nbsp($item_name)];
+				$tableRow = [(new CColHeader($item_name))->addClass(ZBX_STYLE_NOWRAP)];
 				foreach ($host_names as $host_name) {
-					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name, $fullscreen);
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
 				}
 				$table->addRow($tableRow);
 			}
@@ -1203,12 +1196,12 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 			$host = $hosts[$hostId];
 
 			$name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId], true, $fullscreen));
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId], true));
 
 			$tableRow = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $item_data) {
 				foreach ($item_data as $ithosts) {
-					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name, $fullscreen);
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
 				}
 			}
 			$table->addRow($tableRow);
@@ -1218,7 +1211,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 	return $table;
 }
 
-function getItemDataOverviewCells($tableRow, $ithosts, $hostName, $fullscreen = false) {
+function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	$ack = null;
 	$css = '';
 	$value = UNKNOWN_VALUE;
@@ -1253,7 +1246,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName, $fullscreen = 
 
 	if (isset($ithosts[$hostName])) {
 		$column
-			->setMenuPopup(CMenuPopupHelper::getHistory($item, $fullscreen))
+			->setMenuPopup(CMenuPopupHelper::getHistory($item))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->addClass(ZBX_STYLE_NOWRAP);
 	}

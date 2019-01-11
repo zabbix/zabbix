@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 
-$filter = (new CFilter())
+$filter = (new CFilter(new CUrl('httpconf.php')))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
@@ -73,22 +73,26 @@ $httpForm = (new CForm())
 	->setName('scenarios')
 	->addVar('hostid', $this->data['hostid']);
 
+$url = (new CUrl('httpconf.php'))
+	->setArgument('hostid', $data['hostid'])
+	->getUrl();
+
 $httpTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_httptests'))->onClick("checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		($this->data['hostid'] == 0)
-			? make_sorting_header(_('Host'), 'hostname', $this->data['sort'], $this->data['sortorder'])
+			? make_sorting_header(_('Host'), 'hostname', $data['sort'], $data['sortorder'], $url)
 			: null,
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Number of steps'),
 		_('Interval'),
 		_('Attempts'),
 		_('Authentication'),
 		_('HTTP proxy'),
 		_('Application'),
-		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
 		$this->data['showInfoColumn'] ? _('Info') : null
 	]);
 
@@ -97,14 +101,13 @@ $httpTests = $this->data['httpTests'];
 
 foreach ($httpTests as $httpTestId => $httpTest) {
 	$name = [];
-	if (isset($this->data['parentTemplates'][$httpTestId])) {
-		$template = $this->data['parentTemplates'][$httpTestId];
-		$name[] = (new CLink($template['name'], '?groupid=0&hostid='.$template['id']))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREY);
-		$name[] = NAME_DELIMITER;
-	}
-	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTestId.'&hostid='.$httpTest['hostid']);
+	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates']);
+	$name[] = new CLink(CHtml::encode($httpTest['name']),
+		(new CUrl('httpconf.php'))
+			->setArgument('form', 'update')
+			->setArgument('hostid', $httpTest['hostid'])
+			->setArgument('httptestid', $httpTestId)
+	);
 
 	if ($this->data['showInfoColumn']) {
 		$info_icons = [];

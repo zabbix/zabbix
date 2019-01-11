@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,7 +179,7 @@ void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 				sizeof(zbx_dc_maintenance_tag_t), &found);
 
 		maintenance_tag->maintenanceid = maintenanceid;
-		ZBX_STR2UCHAR(maintenance_tag->operator, row[2]);
+		ZBX_STR2UCHAR(maintenance_tag->op, row[2]);
 		DCstrpool_replace(found, &maintenance_tag->tag, row[3]);
 		DCstrpool_replace(found, &maintenance_tag->value, row[4]);
 
@@ -669,7 +669,7 @@ void	zbx_dc_maintenance_reset_update_flag(int timer)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_maintenance_reset_update_flag                             *
+ * Function: zbx_dc_maintenance_check_update_flag                             *
  *                                                                            *
  * Purpose: checks if the maintenance update flag is set for the specified    *
  *          timer                                                             *
@@ -1105,7 +1105,7 @@ void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenancei
  ******************************************************************************/
 static int	dc_maintenance_tag_value_match(const zbx_dc_maintenance_tag_t *mt, const zbx_tag_t *tag)
 {
-	switch (mt->operator)
+	switch (mt->op)
 	{
 		case ZBX_MAINTENANCE_TAG_OPERATOR_LIKE:
 			return (NULL != strstr(tag->value, mt->value) ? SUCCEED : FAIL);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -189,7 +189,7 @@ class CPieGraphDraw extends CGraphDraw {
 				$to_resolve[] = 'trends';
 			}
 
-			// Otherwise, resolve user macro and parse the string. If successfull, convert to seconds.
+			// Otherwise, resolve user macro and parse the string. If successful, convert to seconds.
 			if ($to_resolve) {
 				$item = CMacrosResolverHelper::resolveTimeUnitMacros([$item], $to_resolve)[0];
 

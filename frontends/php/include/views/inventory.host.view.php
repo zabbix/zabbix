@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,15 +19,7 @@
 **/
 
 
-$hostInventoryWidget = (new CWidget())
-	->setTitle(_('Host inventory'))
-	->setControls((new CList())
-		->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-	);
-
-/*
- * Overview tab
- */
+// Overview tab.
 $overviewFormList = new CFormList();
 
 $host_name = (new CLinkAction($data['host']['host']))
@@ -123,28 +115,29 @@ if ($data['host']['description'] !== '') {
 	);
 }
 
-$fullscreen_param = $data['fullscreen'] ? '&fullscreen=1' : '';
-
 // latest data
 $overviewFormList->addRow(_('Monitoring'),
 	new CHorList([
 		new CLink(_('Web'),
-			'zabbix.php?action=web.view&hostid='.$data['host']['hostid'].$fullscreen_param.url_param('groupid')
+			'zabbix.php?action=web.view&hostid='.$data['host']['hostid'].url_param('groupid')
 		),
 		new CLink(_('Latest data'),
-			'latest.php?form=1&select=&show_details=1&filter_set=Filter'.$fullscreen_param.
-			'&hostids[]='.$data['host']['hostid']
+			(new CUrl('latest.php'))
+				->setArgument('form', '1')
+				->setArgument('select', '')
+				->setArgument('show_details', '1')
+				->setArgument('filter_set', 'Filter')
+				->setArgument('hostids[]', $data['host']['hostid'])
 		),
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
 				->setArgument('filter_hostids[]', $data['host']['hostid'])
 				->setArgument('filter_set', '1')
-				->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 		),
-		new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].$fullscreen_param.url_param('groupid')),
+		new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].url_param('groupid')),
 		new CLink(_('Screens'),
-			'host_screen.php?hostid='.$data['host']['hostid'].$fullscreen_param.url_param('groupid')
+			'host_screen.php?hostid='.$data['host']['hostid'].url_param('groupid')
 		)
 	])
 );
@@ -214,9 +207,11 @@ $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 // append tabs and form
 $hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel(url_param('groupid'))]));
 
-$hostInventoryWidget->addItem((new CForm())
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addItem($hostInventoriesTab)
-);
-
-return $hostInventoryWidget;
+return (new CWidget())
+	->setTitle(_('Host inventory'))
+	->setWebLayoutMode(CView::getLayoutMode())
+	->setControls((new CList())->addItem(get_icon('fullscreen')))
+	->addItem((new CForm())
+		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+		->addItem($hostInventoriesTab)
+	);

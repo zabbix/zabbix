@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,23 +24,12 @@ class CSvgPolygon extends CSvgTag {
 	public function __construct($points) {
 		parent::__construct('polygon', true);
 
-		$p='';
+		$p = '';
+
 		foreach ($points as $point) {
-			$p=$p.' '.$point[0].','.$point[1];
+			$p .= ' '.$point[0].','.$point[1];
 		}
 
-		$this->setAttribute('points', $p);
-	}
-
-	public function setFillColor($color) {
-		$this->setAttribute('fill', $color);
-
-		return $this;
-	}
-
-	public function setStrokeColor($color) {
-		$this->setAttribute('stroke', $color);
-
-		return $this;
+		$this->setAttribute('points', ltrim($p));
 	}
 }

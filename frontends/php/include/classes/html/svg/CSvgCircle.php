@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,11 @@
 
 class CSvgCircle extends CSvgTag {
 
-	public function __construct($x, $y, $pointsize) {
+	public function __construct($x, $y, $diameter) {
 		parent::__construct('circle', true);
 
 		$this->setAttribute('cx', round($x));
 		$this->setAttribute('cy', round($y));
-		$this->setAttribute('r', round($pointsize / 2, 1));
+		$this->setAttribute('r', round($diameter / 2, 1));
 	}
 }

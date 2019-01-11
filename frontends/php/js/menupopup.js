@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,27 +32,24 @@ function getMenuPopupHistory(options) {
 
 	url.setArgument('itemids[]', options.itemid);
 
-	if (typeof options.fullscreen !== 'undefined' && options.fullscreen) {
-		url.setArgument('fullscreen', '1');
-	}
-
 	// latest graphs
 	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
 		url.setArgument('action', 'showgraph');
+		url.setArgument('to', 'now');
 
-		url.setArgument('period', '3600');
+		url.setArgument('from', 'now-1h');
 		items.push({
 			label: t('Last hour graph'),
 			url: url.getUrl()
 		});
 
-		url.setArgument('period', '604800');
+		url.setArgument('from', 'now-7d');
 		items.push({
 			label: t('Last week graph'),
 			url: url.getUrl()
 		});
 
-		url.setArgument('period', '2678400');
+		url.setArgument('from', 'now-1M');
 		items.push({
 			label: t('Last month graph'),
 			url: url.getUrl()
@@ -61,7 +58,7 @@ function getMenuPopupHistory(options) {
 
 	// latest values
 	url.setArgument('action', 'showvalues');
-	url.setArgument('period', '3600');
+	url.setArgument('from', 'now-1h');
 	items.push({
 		label: t('Latest values'),
 		url: url.getUrl()
@@ -85,7 +82,6 @@ function getMenuPopupHistory(options) {
  * @param bool   options['showScreens']     Link to host screen page.
  * @param bool   options['showTriggers']    Link to Monitoring->Problems page.
  * @param bool   options['hasGoTo']         "Go to" block in popup.
- * @param bool   options['fullscreen']      Fullscreen mode.
  * @param {object} trigger_elmnt            UI element which triggered opening of overlay dialogue.
  *
  * @return array
@@ -103,9 +99,8 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 	// go to section
 	if (options.hasGoTo) {
-		var fullscreen = (typeof options.fullscreen !== 'undefined' && options.fullscreen),
-			// inventory
-			host_inventory = {
+		// inventory
+		var	host_inventory = {
 				label: t('Host inventory')
 			},
 			host_inventory_url = new Curl('hostinventories.php'),
@@ -129,17 +124,11 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 		// inventory link
 		host_inventory_url.setArgument('hostid', options.hostid);
-		if (fullscreen) {
-			host_inventory_url.setArgument('fullscreen', '1');
-		}
 		host_inventory.url = host_inventory_url.getUrl();
 
 		// latest data link
 		latest_data_url.setArgument('hostids[]', options.hostid);
 		latest_data_url.setArgument('filter_set', '1');
-		if (fullscreen) {
-			latest_data_url.setArgument('fullscreen', '1');
-		}
 		latest_data.url = latest_data_url.getUrl();
 
 		if (!options.showTriggers) {
@@ -150,9 +139,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			url.setArgument('action', 'problem.view');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('filter_set', '1');
-			if (fullscreen) {
-				url.setArgument('fullscreen', '1');
-			}
 			problems.url = url.getUrl();
 		}
 
@@ -163,9 +149,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			var graphs_url = new Curl('charts.php');
 
 			graphs_url.setArgument('hostid', options.hostid);
-			if (fullscreen) {
-				graphs_url.setArgument('fullscreen', '1');
-			}
 			graphs.url = graphs_url.getUrl();
 		}
 
@@ -176,9 +159,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			var screens_url = new Curl('host_screen.php');
 
 			screens_url.setArgument('hostid', options.hostid);
-			if (fullscreen) {
-				screens_url.setArgument('fullscreen', '1');
-			}
 			screens.url = screens_url.getUrl();
 		}
 
@@ -221,7 +201,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
  * @param {array}  options['urls']                      Local and global map link (optional).
  * @param {string} options['url'][]['label']            Link label.
  * @param {string} options['url'][]['url']              Link url.
- * @param {bool}   options['fullscreen']                Fullscreen mode.
  * @param {object} trigger_elmnt                        UI element which triggered opening of overlay dialogue.
  *
  * @return array
@@ -242,15 +221,11 @@ function getMenuPopupMap(options, trigger_elmnt) {
 	 */
 	if (typeof options.gotos !== 'undefined') {
 		var gotos = [],
-			fullscreen = (typeof options.fullscreen !== 'undefined' && options.fullscreen),
 			show_suppressed = (typeof options.gotos.show_suppressed !== 'undefined' && options.gotos.show_suppressed);
 
 		// inventory
 		if (typeof options.gotos.inventory !== 'undefined') {
 			var url = new Curl('hostinventories.php');
-			if (fullscreen) {
-				url.setArgument('fullscreen', '1');
-			}
 
 			jQuery.each(options.gotos.inventory, function(name, value) {
 				if (value !== null) {
@@ -268,9 +243,6 @@ function getMenuPopupMap(options, trigger_elmnt) {
 		if (typeof options.gotos.latestData !== 'undefined') {
 			var url = new Curl('latest.php');
 			url.setArgument('filter_set', '1');
-			if (fullscreen) {
-				url.setArgument('fullscreen', '1');
-			}
 
 			jQuery.each(options.gotos.latestData, function(name, value) {
 				if (value !== null) {
@@ -300,9 +272,6 @@ function getMenuPopupMap(options, trigger_elmnt) {
 					url.setArgument('filter_show_suppressed', '1');
 				}
 				url.setArgument('filter_set', '1');
-				if (fullscreen) {
-					url.setArgument('fullscreen', '1');
-				}
 
 				jQuery.each(options.gotos.triggerStatus, function(name, value) {
 					if (value !== null) {
@@ -327,9 +296,6 @@ function getMenuPopupMap(options, trigger_elmnt) {
 			}
 			else {
 				var url = new Curl('charts.php');
-				if (fullscreen) {
-					url.setArgument('fullscreen', '1');
-				}
 
 				jQuery.each(options.gotos.graphs, function(name, value) {
 					if (value !== null) {
@@ -354,9 +320,6 @@ function getMenuPopupMap(options, trigger_elmnt) {
 			}
 			else {
 				var url = new Curl('host_screen.php');
-				if (fullscreen) {
-					url.setArgument('fullscreen', '1');
-				}
 
 				jQuery.each(options.gotos.screens, function(name, value) {
 					if (value !== null) {
@@ -380,10 +343,6 @@ function getMenuPopupMap(options, trigger_elmnt) {
 					url.setArgument(name, value);
 				}
 			});
-
-			if (fullscreen) {
-				url.setArgument('fullscreen', '1');
-			}
 
 			gotos.push({
 				label: t('Submap'),
@@ -425,9 +384,6 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				if (typeof options.gotos.events.severity_min !== 'undefined') {
 					url.setArgument('filter_severity', options.gotos.events.severity_min);
 				}
-				if (fullscreen) {
-					url.setArgument('fullscreen', '1');
-				}
 
 				events.url = url.getUrl();
 			}
@@ -455,15 +411,16 @@ function getMenuPopupMap(options, trigger_elmnt) {
 /**
  * Get menu popup refresh section data.
  *
- * @param string   options['widgetName']   Widget name.
- * @param string   options['currentRate']  Current rate value.
- * @param bool     options['multiplier']   Multiplier or time mode.
- * @param array    options['params']       Url parameters (optional).
- * @param callback options['callback']     Callback function on success (optional).
+ * @param {string}   options['widgetName']   Widget name.
+ * @param {string}   options['currentRate']  Current rate value.
+ * @param {bool}     options['multiplier']   Multiplier or time mode.
+ * @param {array}    options['params']       Url parameters (optional).
+ * @param {callback} options['callback']     Callback function on success (optional).
+ * @param {object}   trigger_elmnt           UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupRefresh(options) {
+function getMenuPopupRefresh(options, trigger_elmnt) {
 	var items = [],
 		params = (typeof options.params === 'undefined' || options.params.length == 0) ? {} : options.params,
 		intervals = options.multiplier
@@ -514,7 +471,7 @@ function getMenuPopupRefresh(options) {
 						if (link.data('value') == currentRate) {
 							link
 								.addClass('selected')
-								.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
+								.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
 						}
 						else {
 							link
@@ -523,7 +480,7 @@ function getMenuPopupRefresh(options) {
 						}
 					});
 
-					obj.closest('.action-menu').menuPopup('close', null);
+					obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 				}
 				else {
 					var url = new Curl('zabbix.php');
@@ -545,7 +502,7 @@ function getMenuPopupRefresh(options) {
 								if (link.data('value') == currentRate) {
 									link
 										.addClass('selected')
-										.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
+										.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
 								}
 								else {
 									link
@@ -554,13 +511,13 @@ function getMenuPopupRefresh(options) {
 								}
 							});
 
-							obj.closest('.action-menu').menuPopup('close', null);
+							obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 
 							jQuery('.dashbrd-grid-widget-container')
 								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
 						},
 						error: function() {
-							obj.closest('.action-menu').menuPopup('close', null);
+							obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 							// TODO: gentle message about failed saving of widget refresh rate
 						}
 					});
@@ -620,25 +577,25 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 /**
  * Get menu popup trigger section data.
  *
- * @param string options['triggerid']               Trigger ID.
- * @param object options['items']                   Link to trigger item history page (optional).
- * @param string options['items'][]['name']         Item name.
- * @param object options['items'][]['params']       Item url parameters ("name" => "value").
- * @param object options['acknowledge']             Link to acknowledge page (optional).
- * @param string options['acknowledge']['eventid']  Event ID
- * @param string options['acknowledge']['backurl']  Return url.
- * @param object options['configuration']           Link to trigger configuration page (optional).
- * @param bool	 options['show_description']		Show Description item in context menu. Default: true.
- * @param bool	 options['description_enabled']		Show Description item enabled. Default: true.
- * @param string options['url']                     Trigger url link (optional).
- * @param bool   options['fullscreen']              Fullscreen mode.
+ * @param {string} options['triggerid']               Trigger ID.
+ * @param {object} options['items']                   Link to trigger item history page (optional).
+ * @param {string} options['items'][]['name']         Item name.
+ * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
+ * @param {object} options['acknowledge']             Link to acknowledge page (optional).
+ * @param {string} options['acknowledge']['eventid']  Event ID
+ * @param {string} options['acknowledge']['backurl']  Return URL.
+ * @param {object} options['configuration']           Link to trigger configuration page (optional).
+ * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
+ * @param {bool}   options['show_description']        Show Description item in context menu. Default: true.
+ * @param {bool}   options['description_enabled']     Show Description item enabled. Default: true.
+ * @param {string} options['url']                     Trigger URL link (optional).
+ * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupTrigger(options) {
+function getMenuPopupTrigger(options, trigger_elmnt) {
 	var sections = [],
-		items = [],
-		fullscreen = (typeof options.fullscreen !== 'undefined' && options.fullscreen);
+		items = [];
 
 	// events
 	var events = {
@@ -651,10 +608,6 @@ function getMenuPopupTrigger(options) {
 		url.setArgument('filter_triggerids[]', options.triggerid);
 		url.setArgument('filter_set', '1');
 		url.unsetArgument('sid');
-
-		if (fullscreen) {
-			url.setArgument('fullscreen', '1');
-		}
 
 		events.url = url.getUrl();
 	}
@@ -685,12 +638,12 @@ function getMenuPopupTrigger(options) {
 		};
 
 		if (typeof options.description_enabled === 'undefined' || options.description_enabled !== false) {
-			trigger_descr.clickCallback = function(event) {
+			trigger_descr.clickCallback = function() {
 				jQuery(this).closest('.action-menu').menuPopup('close', null);
 
 				return PopUp('popup.trigdesc.view', {
 					triggerid: options.triggerid
-				}, null, event.target);
+				}, null, trigger_elmnt);
 			}
 		}
 		else {
@@ -718,7 +671,7 @@ function getMenuPopupTrigger(options) {
 	}
 
 	sections[sections.length] = {
-		label: t('Trigger'),
+		label: t('S_TRIGGER'),
 		items: items
 	};
 
@@ -730,10 +683,6 @@ function getMenuPopupTrigger(options) {
 			var url = new Curl('history.php');
 			url.setArgument('action', item.params.action);
 			url.setArgument('itemids[]', item.params.itemid);
-
-			if (fullscreen) {
-				url.setArgument('fullscreen', '1');
-			}
 
 			items[items.length] = {
 				label: item.name,
@@ -937,7 +886,7 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 
 				if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
 					item.clickCallback = function(e) {
-						jQuery(this).closest('.action-menu-top').menuPopup('close', null, false);
+						jQuery(this).closest('.action-menu-top').menuPopup('close', trigger_elm, false);
 						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation, trigger_elm);
 						cancelEvent(e);
 					};
@@ -987,6 +936,8 @@ jQuery(function($) {
 				target = event;
 			}
 
+			opener.attr('data-expanded', 'true');
+
 			// Close other action menus.
 			$('.action-menu-top').not('#' + id).menuPopup('close');
 
@@ -998,6 +949,7 @@ jQuery(function($) {
 
 				if (display === 'block') {
 					menuPopup.fadeOut(0);
+					$(opener).removeAttr('data-expanded');
 				}
 				else {
 					menuPopup.fadeIn(50);
@@ -1100,7 +1052,7 @@ jQuery(function($) {
 			addToOverlaysStack('contextmenu', event.target, 'contextmenu');
 
 			$(document)
-				.on('click', {menu: menuPopup}, menuPopupDocumentCloseHandler)
+				.on('click', {menu: menuPopup, opener: opener}, menuPopupDocumentCloseHandler)
 				.on('keydown', {menu: menuPopup}, menuPopupKeyDownHandler);
 
 			menuPopup.focus();
@@ -1109,6 +1061,7 @@ jQuery(function($) {
 			var menuPopup = $(this);
 			if (!menuPopup.is(trigger_elmnt) && menuPopup.has(trigger_elmnt).length === 0) {
 				menuPopup.data('is-active', false);
+				$(trigger_elmnt).removeAttr('data-expanded');
 				menuPopup.fadeOut(0);
 
 				$('.highlighted', menuPopup).removeClass('highlighted');
@@ -1182,7 +1135,7 @@ jQuery(function($) {
 	};
 
 	function menuPopupDocumentCloseHandler(event) {
-		$(event.data.menu[0]).menuPopup('close');
+		$(event.data.menu[0]).menuPopup('close', event.data.opener);
 	}
 
 	function menuPopupKeyDownHandler(event) {
@@ -1310,7 +1263,7 @@ jQuery(function($) {
 			link = $('<a>', {
 				role: 'menuitem',
 				tabindex: '-1',
-				'aria-label': options.selected ? sprintf(t('%1$s, selected'), options.ariaLabel) : options.ariaLabel
+				'aria-label': options.selected ? sprintf(t('S_SELECTED_SR'), options.ariaLabel) : options.ariaLabel
 			}).data('aria-label', options.ariaLabel);
 
 		if (typeof options.label !== 'undefined') {

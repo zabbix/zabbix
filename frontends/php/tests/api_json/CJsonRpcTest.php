@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 require_once dirname(__FILE__).'/../../include/classes/json/CJson.php';
 
-class CJsonRpcTest extends CZabbixTest {
+class CJsonRpcTest extends CAPITest {
 	/**
 	 * Provides valid requests for JSON RPC.
 	 */

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Test tag based permissions
  */
-class testTagBasedPermissions extends CWebTest {
+class testTagBasedPermissions extends CLegacyWebTest {
 	public $user = 'Tag-user';
 
 	/**
@@ -76,7 +76,10 @@ class testTagBasedPermissions extends CWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
 		}
 
-		// Logout as super admin and login as simple user
+		// Logout as super admin and login as simple user.
+		$this->zbxTestLogout();
+		$this->zbxTestWaitForPageToLoad();
+		$this->webDriver->manage()->deleteAllCookies();
 		$userid = DBfetch(DBselect('SELECT userid FROM users WHERE alias='. zbx_dbstr($this->user)));
 		$this->assertFalse(empty($userid));
 		$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b54f', $userid['userid']);
@@ -176,8 +179,7 @@ class testTagBasedPermissions extends CWebTest {
 		// Check tag filter in Problem widget
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
 		$this->zbxTestTextNotPresent($data['trigger_names']);
-		$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				'0 of 0 problems are shown');
+		$this->zbxTestAssertElementText('//h4[text()="Problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found.');
 		$this->zbxTestCheckFatalErrors();
 
 		// Check problem displaying on Problem page
@@ -284,14 +286,6 @@ class testTagBasedPermissions extends CWebTest {
 		// Check tag filter in Problem widget
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
 		$this->zbxTestTextPresent($data['trigger_names']);
-		if ($countTriggers === 1) {
-		$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				$countTriggers.' of '.$countTriggers.' problem is shown');
-		}
-		else {
-			$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				$countTriggers.' of '.$countTriggers.' problems are shown');
-		}
 		$this->zbxTestCheckFatalErrors();
 
 		// Check problem displaying on Problem page
@@ -395,14 +389,6 @@ class testTagBasedPermissions extends CWebTest {
 		// Check tag filter in Problem widget
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
 		$this->zbxTestTextPresent($data['trigger_names']);
-		if ($countTriggers === 1) {
-		$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				$countTriggers.' of '.$countTriggers.' problem is shown');
-		}
-		else {
-			$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				$countTriggers.' of '.$countTriggers.' problems are shown');
-		}
 		$this->zbxTestCheckFatalErrors();
 
 		// Check problem displaying on Problem page

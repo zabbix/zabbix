@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,16 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageScreens extends CWebTest {
+class testPageScreens extends CLegacyWebTest {
 
 	public static function allScreens() {
-		return DBdata('SELECT screenid,name FROM screens WHERE templateid IS NULL ORDER BY screenid');
+		return CDBHelper::getDataProvider('SELECT screenid,name FROM screens WHERE templateid IS NULL ORDER BY screenid');
 	}
 
 	public function testPageScreens_CheckLayout() {
-		$screens = DBfetchArray(DBSelect('SELECT name FROM screens WHERE templateid IS NULL'));
+		$screens = CDBHelper::getAll('SELECT name FROM screens WHERE templateid IS NULL');
 
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
@@ -63,9 +63,9 @@ class testPageScreens extends CWebTest {
 	*/
 	public function testPageScreens_SimpleUpdate($screen) {
 		$sqlScreen = 'SELECT * FROM screens WHERE screenid='.$screen['screenid'];
-		$oldHashScreen = DBhash($sqlScreen);
+		$oldHashScreen = CDBHelper::getHash($sqlScreen);
 		$sqlScreenItems = 'SELECT * FROM screens_items WHERE screenid='.$screen['screenid'].' ORDER BY screenitemid';
-		$oldHashScreenItems = DBhash($sqlScreenItems);
+		$oldHashScreenItems = CDBHelper::getHash($sqlScreenItems);
 
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
@@ -80,8 +80,8 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestTextPresent('Screen updated');
 
-		$this->assertEquals($oldHashScreen, DBhash($sqlScreen));
-		$this->assertEquals($oldHashScreenItems, DBhash($sqlScreenItems));
+		$this->assertEquals($oldHashScreen, CDBHelper::getHash($sqlScreen));
+		$this->assertEquals($oldHashScreenItems, CDBHelper::getHash($sqlScreenItems));
 	}
 
 	public function testPageScreens_Create() {
@@ -114,10 +114,10 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestCheckHeader('Screens');
 
 		$sql = 'SELECT NULL FROM screens WHERE screenid='.$screen['screenid'];
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = 'SELECT NULL FROM screens_items WHERE screenid='.$screen['screenid'];
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = 'SELECT NULL FROM slides WHERE screenid='.$screen['screenid'];
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 }

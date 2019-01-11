@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,10 +53,6 @@ function local_generateHeader($data) {
 		header('X-Frame-Options: '.$x_frame_options);
 	}
 
-	if ((array_key_exists('https', $_SERVER) && ($_SERVER['https'] == 1 || $_SERVER['https'] === 'on'))
-			|| (array_key_exists('SERVER_PORT', $_SERVER) && $_SERVER['SERVER_PORT'] == 443)) {
-		header('strict-transport-security: max-age=31557600');
-	}
 
 	// construct menu
 	$main_menu = [];
@@ -74,11 +70,12 @@ function local_generateHeader($data) {
 		'user' => [
 			'lang' => CWebUser::$data['lang'],
 			'theme' => CWebUser::$data['theme']
-		]
+		],
+		'web_layout_mode' => $data['web_layout_mode']
 	]);
 	echo $pageHeader->getOutput();
 
-	if ($data['fullscreen'] == 0) {
+	if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 		global $ZBX_SERVER_NAME;
 
 		$pageMenu = new CView('layout.htmlpage.menu', [
@@ -93,7 +90,8 @@ function local_generateHeader($data) {
 				'alias' => CWebUser::$data['alias'],
 				'name' => CWebUser::$data['name'],
 				'surname' => CWebUser::$data['surname']
-			]
+			],
+			'support_url' => getSupportUrl(CWebUser::getLang())
 		]);
 		echo $pageMenu->getOutput();
 	}
@@ -101,7 +99,7 @@ function local_generateHeader($data) {
 	echo '<main>';
 
 	// should be replaced with addPostJS() at some point
-	zbx_add_post_js('initMessages({});');
+	zbx_add_post_js('initMessages();');
 
 	// if a user logs in after several unsuccessful attempts, display a warning
 	if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
@@ -123,13 +121,13 @@ function local_generateHeader($data) {
 	show_messages();
 }
 
-function local_generateFooter($fullscreen) {
+function local_generateFooter($data) {
 	$pageFooter = new CView('layout.htmlpage.footer', [
-		'fullscreen' => $fullscreen,
 		'user' => [
 			'alias' => CWebUser::$data['alias'],
 			'debug_mode' => CWebUser::$data['debug_mode']
-		]
+		],
+		'web_layout_mode' => $data['web_layout_mode']
 	]);
 	echo '</main>'."\n";
 	echo $pageFooter->getOutput();
@@ -155,12 +153,14 @@ function local_showMessage() {
 	}
 }
 
+$data['web_layout_mode'] = CView::getLayoutMode();
+
 local_generateHeader($data);
 local_showMessage();
 echo $data['javascript']['pre'];
 echo $data['main_block'];
 echo $data['javascript']['post'];
-local_generateFooter($data['fullscreen']);
+local_generateFooter($data);
 show_messages();
 
 echo '</body></html>';

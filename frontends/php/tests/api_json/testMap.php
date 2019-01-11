@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup sysmaps
  */
-class testMap extends CZabbixTest {
+class testMap extends CAPITest {
 	/**
 	 * Create map tests data provider.
 	 *
@@ -326,7 +326,7 @@ class testMap extends CZabbixTest {
 						]
 					]
 				],
-				'expected_error' => 'Cannot add "" element of the map "A" due to circular reference.'
+				'expected_error' => 'Cannot add map element of the map "A" due to circular reference.'
 			],
 			// Fail. Can not add map with sub maps having circular reference.
 			[
@@ -375,7 +375,7 @@ class testMap extends CZabbixTest {
 						]
 					]
 				],
-				'expected_error' => 'Cannot add "B map element" element of the map "A" due to circular reference.'
+				'expected_error' => 'Cannot add map element of the map "A" due to circular reference.'
 			],
 			// Success. Can add existing map as sub map. A > B > C.
 			[
@@ -463,7 +463,7 @@ class testMap extends CZabbixTest {
 						]
 					]
 				],
-				'expected_error' => 'Cannot add "New element" element of the map "D" due to circular reference.'
+				'expected_error' => 'Cannot add map element of the map "D" due to circular reference.'
 			],
 			// Fail. Circular validation message do not show private maps name.
 			[
@@ -485,7 +485,7 @@ class testMap extends CZabbixTest {
 						]
 					]
 				],
-				'expected_error' => 'Cannot add "ups!" element of the map "C" due to circular reference.',
+				'expected_error' => 'Cannot add map element of the map "C" due to circular reference.',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix']
 			]
 		];

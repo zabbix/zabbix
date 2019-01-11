@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ class CConfigFile {
 	const CONFIG_ERROR = 2;
 
 	const CONFIG_FILE_PATH = '/conf/zabbix.conf.php';
-	const BRAND_CONFIG_FILE_PATH = '/conf/brand.conf.php';
 
 	private static $supported_db_types = [
 		ZBX_DB_DB2 => true,

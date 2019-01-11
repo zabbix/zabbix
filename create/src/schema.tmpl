@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2001-2018 Zabbix SIA
+-- Copyright (C) 2001-2019 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ FIELD		|userid		|t_id		|	|NOT NULL	|0
 FIELD		|alias		|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|name		|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|surname	|t_varchar(100)	|''	|NOT NULL	|0
-FIELD		|passwd		|t_char(32)	|''	|NOT NULL	|0
+FIELD		|passwd		|t_varchar(32)	|''	|NOT NULL	|0
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|autologout	|t_varchar(32)	|'15m'	|NOT NULL	|0
@@ -1198,7 +1198,9 @@ FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NULL		|0			|-|items
 FIELD		|acknowledgeid	|t_id		|	|NULL		|0			|-|acknowledges
-UNIQUE		|1		|actionid,triggerid,itemid,escalationid
+UNIQUE		|1		|triggerid,itemid,escalationid
+INDEX		|2		|eventid
+INDEX		|3		|nextcheck
 
 TABLE|globalvars|globalvarid|0
 FIELD		|globalvarid	|t_id		|	|NOT NULL	|0
@@ -1649,4 +1651,4 @@ INDEX|1|maintenanceid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050155	|3050155
+ROW		|4000000	|4000003

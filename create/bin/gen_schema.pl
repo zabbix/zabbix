@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 # Zabbix
-# Copyright (C) 2001-2018 Zabbix SIA
+# Copyright (C) 2001-2019 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -30,7 +30,6 @@ my %c = (
 	"database"	=>	"",
 	"after"		=>	"\t{0}\n\n#undef ZBX_TYPE_LONGTEXT_LEN\n#undef ZBX_TYPE_SHORTTEXT_LEN\n\n};\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
-	"t_char"	=>	"ZBX_TYPE_CHAR",
 	"t_text"	=>	"ZBX_TYPE_TEXT",
 	"t_double"	=>	"ZBX_TYPE_FLOAT",
 	"t_id"		=>	"ZBX_TYPE_ID",
@@ -46,7 +45,7 @@ my %c = (
 
 $c{"before"} = "/*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,7 +90,6 @@ my %ibm_db2 = (
 	"after"		=>	"",
 	"table_options"	=>	"",
 	"t_bigint"	=>	"bigint",
-	"t_char"	=>	"varchar",
 	"t_text"	=>	"varchar(2048)",
 	"t_double"	=>	"decfloat(16)",
 	"t_id"		=>	"bigint",
@@ -112,7 +110,6 @@ my %mysql = (
 	"after"		=>	"",
 	"table_options"	=>	" ENGINE=InnoDB",
 	"t_bigint"	=>	"bigint unsigned",
-	"t_char"	=>	"char",
 	"t_text"	=>	"text",
 	"t_double"	=>	"double(16,4)",
 	"t_id"		=>	"bigint unsigned",
@@ -133,7 +130,6 @@ my %oracle = (
 	"after"		=>	"",
 	"table_options"	=>	"",
 	"t_bigint"	=>	"number(20)",
-	"t_char"	=>	"nvarchar2",
 	"t_text"	=>	"nclob",
 	"t_double"	=>	"number(20,4)",
 	"t_id"		=>	"number(20)",
@@ -154,7 +150,6 @@ my %postgresql = (
 	"after"		=>	"",
 	"table_options"	=>	"",
 	"t_bigint"	=>	"numeric(20)",
-	"t_char"	=>	"char",
 	"t_text"	=>	"text",
 	"t_double"	=>	"numeric(16,4)",
 	"t_id"		=>	"bigint",
@@ -175,7 +170,6 @@ my %sqlite3 = (
 	"after"		=>	"",
 	"table_options"	=>	"",
 	"t_bigint"	=>	"bigint",
-	"t_char"	=>	"char",
 	"t_text"	=>	"text",
 	"t_double"	=>	"double(16,4)",
 	"t_id"		=>	"bigint",

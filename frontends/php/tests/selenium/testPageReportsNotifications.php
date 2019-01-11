@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageReportsNotifications extends CWebTest {
+class testPageReportsNotifications extends CLegacyWebTest {
 
 	public function testPageReportsNotifications_CheckLayout() {
 		$this->zbxTestLogin('report4.php');
@@ -34,12 +34,10 @@ class testPageReportsNotifications extends CWebTest {
 		// Check default selected dropdown values
 		$this->zbxTestDropdownAssertSelected('media_type', 'all');
 		$this->zbxTestDropdownAssertSelected('period', 'Weekly');
-		$this->zbxTestDropdownAssertSelected('year', '2018');
+		$this->zbxTestDropdownAssertSelected('year', date('Y'));
 		// Check media type links
-		$media_types = [];
-		$media_types = DBdata('SELECT mediatypeid, description FROM media_type', false);
+		$media_types = CDBHelper::getAll('SELECT mediatypeid, description FROM media_type');
 		foreach ($media_types as $media) {
-			$media = $media[0];
 			$this->zbxTestAssertElementText("//a[contains(@href, 'mediatypeid=".$media['mediatypeid']."')]", $media['description']);
 		}
 
@@ -173,9 +171,8 @@ class testPageReportsNotifications extends CWebTest {
 			$this->zbxTestAssertElementNotPresentId('year');
 			// Check media links not displayed
 			$media_types = [];
-			$media_types = DBdata('SELECT mediatypeid FROM media_type', false);
+			$media_types = CDBHelper::getAll('SELECT mediatypeid FROM media_type');
 			foreach ($media_types as $media) {
-				$media = $media[0];
 				$this->zbxTestAssertElementNotPresentXpath("//a[contains(@href, 'mediatypeid=".$media['mediatypeid']."')]");
 			}
 		}
@@ -191,9 +188,19 @@ class testPageReportsNotifications extends CWebTest {
 		// Compare user data from table and from data provider
 		foreach ($data['users'] as $user) {
 			$user_notifications = [];
-			$get_user_rows = $this->webDriver->findElements(WebDriverBy::xpath('//table/tbody/tr/td['.$user_column_number[$user['alias']].']'));
-			foreach ($get_user_rows as $row) {
-				$user_notifications[] = $row->getText();
+			if ($data['period'] === 'Yearly') {
+				for ($i = 0; $i <= 7; $i++) {
+					$get_user_rows = $this->webDriver->findElements(WebDriverBy::xpath('//table/tbody/tr['.$i.']/td['.$user_column_number[$user['alias']].']'));
+					foreach ($get_user_rows as $row) {
+						$user_notifications[] = $row->getText();
+					}
+				}
+			}
+			else {
+				$get_user_rows = $this->webDriver->findElements(WebDriverBy::xpath('//table/tbody/tr/td['.$user_column_number[$user['alias']].']'));
+				foreach ($get_user_rows as $row) {
+					$user_notifications[] = $row->getText();
+				}
 			}
 			$this->assertEquals($user['notifications'], $user_notifications);
 		}

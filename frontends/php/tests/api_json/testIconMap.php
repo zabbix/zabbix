@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,19 +19,19 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup icon_map
  */
-class testIconMap extends CZabbixTest {
+class testIconMap extends CAPITest {
 
 	public static function iconmap_create() {
 		return [
 			[
 				'iconmap' => [
 					'iconmapid' => 1,
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'default_iconid' => '2',
 					'mappings' =>[
 						[
@@ -286,7 +286,7 @@ class testIconMap extends CZabbixTest {
 				$this->assertEquals($dbRow['default_iconid'], $iconmap[$key]['default_iconid']);
 
 				foreach ($iconmap[$key]['mappings'] as $values) {
-					$this->assertEquals(1, DBcount('select * from icon_mapping where iconmapid='.zbx_dbstr($id).
+					$this->assertEquals(1, CDBHelper::getCount('select * from icon_mapping where iconmapid='.zbx_dbstr($id).
 							' and iconid='.zbx_dbstr($values['iconid']).
 							' and inventory_link='.zbx_dbstr($values['inventory_link']).
 							' and expression='.zbx_dbstr($values['expression']))
@@ -301,7 +301,7 @@ class testIconMap extends CZabbixTest {
 			// Check mappings.
 			[[
 				'iconmap' => [
-					'name' => 'API icon map without mapping parametrs',
+					'name' => 'API icon map without mapping parameters',
 					'default_iconid' => '2',
 					'mappings' =>[
 					]
@@ -619,7 +619,7 @@ class testIconMap extends CZabbixTest {
 				$this->assertSame($data['expected_error'], $result['error']['data']);
 			}
 
-			$this->assertEquals(0, DBcount('select * from icon_map where name='.zbx_dbstr($data['iconmap']['name'])));
+			$this->assertEquals(0, CDBHelper::getCount('select * from icon_map where name='.zbx_dbstr($data['iconmap']['name'])));
 		}
 	}
 
@@ -628,7 +628,7 @@ class testIconMap extends CZabbixTest {
 			[
 				'iconmap' => [[
 					'iconmappingid' => 2,
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'default_iconid' => '2',
 				]],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "iconmappingid".'
@@ -835,7 +835,7 @@ class testIconMap extends CZabbixTest {
 				$this->assertEquals($dbRow['default_iconid'], $iconmaps[$key]['default_iconid']);
 
 				foreach ($iconmaps[$key]['mappings'] as $values) {
-					$this->assertEquals(1, DBcount('select * from icon_mapping where iconmapid='.zbx_dbstr($id).
+					$this->assertEquals(1, CDBHelper::getCount('select * from icon_mapping where iconmapid='.zbx_dbstr($id).
 							' and iconid='.zbx_dbstr($values['iconid']).
 							' and inventory_link='.zbx_dbstr($values['inventory_link']).
 							' and expression='.zbx_dbstr($values['expression']))
@@ -846,7 +846,7 @@ class testIconMap extends CZabbixTest {
 		else {
 			foreach ($iconmaps as $iconmap) {
 				if (array_key_exists('name', $iconmap) && $iconmap['name'] !== 'API icon map'){
-					$this->assertEquals(0, DBcount('select * from icon_map where name='.zbx_dbstr($iconmap['name'])));
+					$this->assertEquals(0, CDBHelper::getCount('select * from icon_map where name='.zbx_dbstr($iconmap['name'])));
 				}
 			}
 		}
@@ -936,8 +936,8 @@ class testIconMap extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['iconmapids'] as $id) {
-				$this->assertEquals(0, DBcount('select * from icon_map where iconmapid='.zbx_dbstr($id)));
-				$this->assertEquals(0, DBcount('select * from icon_mapping where iconmapid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount('select * from icon_map where iconmapid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount('select * from icon_mapping where iconmapid='.zbx_dbstr($id)));
 			}
 		}
 	}

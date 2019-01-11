@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,13 +34,6 @@ class CWebUser {
 	static $extend_session = true;
 
 	/**
-	 * Initialize guest user session if session id is not present.
-	 *
-	 * @var bool
-	 */
-	protected static $init_guest_session = true;
-
-	/**
 	 * Disable automatic cookie setting.
 	 * First checkAuthentication call (performed in initialization phase) will not be sending cookies.
 	 */
@@ -53,13 +46,6 @@ class CWebUser {
 	 */
 	public static function disableSessionExtension() {
 		self::$extend_session = false;
-	}
-
-	/**
-	 * Disable automatic fallback to guest user session initialization when no valid session were found.
-	 */
-	public static function disableGuestAutoLogin() {
-		self::$init_guest_session = false;
 	}
 
 	/**
@@ -121,17 +107,15 @@ class CWebUser {
 	 */
 	public static function logout() {
 		self::$data['sessionid'] = self::getSessionCookie();
-		self::$data = API::User()->logout([]);
-		CSession::destroy();
-		zbx_unsetcookie(ZBX_SESSION_NAME);
+
+		if (API::User()->logout([])) {
+			self::$data = null;
+			CSession::destroy();
+			zbx_unsetcookie(ZBX_SESSION_NAME);
+		}
 	}
 
 	public static function checkAuthentication($sessionId) {
-		if ($sessionId === null && !self::$init_guest_session) {
-			self::setDefault();
-			return false;
-		}
-
 		try {
 			if ($sessionId !== null) {
 				self::$data = API::User()->checkAuthentication([
@@ -272,57 +256,5 @@ class CWebUser {
 	 */
 	public static function getLang() {
 		return (self::$data) ? substr(self::$data['lang'], 0, strpos(self::$data['lang'], '_')) : 'en';
-	}
-
-	/**
-	 * Returns HTTP Authentication user alias value stored in $_SERVER array.
-	 *
-	 * @return string
-	 */
-	public static function getHttpRemoteUser() {
-		$http_user = '';
-
-		foreach (['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
-			if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
-				$http_user = $_SERVER[$key];
-				break;
-			}
-		}
-
-		return $http_user;
-	}
-
-	/**
-	 * Authenticate user using credentials passed by webserver. Success returns session id or null otherwise.
-	 *
-	 * @return null|string
-	 */
-	public static function authenticateHttpUser() {
-		$sessionid = null;
-		$http_user = self::getHttpRemoteUser();
-		$config = $http_user ? select_config() : [];
-
-		if ($http_user && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED) {
-			$parser = new CADNameAttributeParser(['strict' => true]);
-
-			if ($parser->parse($http_user) === CParser::PARSE_SUCCESS) {
-				$strip_domain = explode(',', $config['http_strip_domains']);
-				$strip_domain = array_map('trim', $strip_domain);
-
-				if ($strip_domain && in_array($parser->getDomainName(), $strip_domain)) {
-					$http_user = $parser->getUserName();
-				}
-			}
-
-			self::$data = API::User()->login([
-				'user' => $http_user,
-				'password' => '',
-				'userData' => true
-			]);
-
-			$sessionid = (self::$data && array_key_exists('sessionid', self::$data)) ? self::$data['sessionid'] : null;
-		}
-
-		return $sessionid;
 	}
 }

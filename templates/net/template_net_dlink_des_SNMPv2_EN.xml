@@ -4,7 +4,7 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates/Network Devices</name>
+         <name>Templates/Network devices</name>
       </group>
    </groups>
    <templates>
@@ -23,7 +23,7 @@ version : Firmware: 1.73R008,hardware revision: B1&#13;
 device : DGS-3420-26SC Gigabit Ethernet Switch</description>
          <groups>
             <group>
-               <name>Templates/Network Devices</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications>
@@ -40,7 +40,7 @@ device : DGS-3420-26SC Gigabit Ethernet Switch</description>
                <name>Memory</name>
             </application>
             <application>
-               <name>Power Supply</name>
+               <name>Power supply</name>
             </application>
             <application>
                <name>Temperature</name>
@@ -606,7 +606,7 @@ disconnect : The power unit is not connected.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Power Supply</name>
+                           <name>Power supply</name>
                         </application>
                      </applications>
                      <valuemap>

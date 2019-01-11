@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2018 Zabbix SIA
+ ** Copyright (C) 2001-2019 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -25,16 +25,12 @@
 jQuery(function ($) {
 	"use strict";
 
-	function getRange(start, end, step) {
-		return (new Array(Math.round((end - start) / step))).join(0).split(0).map(function(_, i) {
-			return start + i * step;
-		});
-	}
+	function generateRangeElements(datalist, options) {
+		var value;
 
-	function generateRangeElements(elm, range) {
-		$.map(range, function(value) {
-			$('<option/>').attr('value', value).appendTo(elm);
-		});
+		for (value = options.min; value < options.max; value += options.step) {
+			$('<option/>').attr('value', value).appendTo(datalist);
+		}
 	}
 
 	var methods = {
@@ -48,48 +44,43 @@ jQuery(function ($) {
 		 */
 		init: function() {
 			var tmpl = $('<div class="range-control">' +
-					'<div class="range-control-track"/>' +
-					'<div class="range-control-progress"/>' +
-					'<datalist/>' +
-					'<div class="range-control-thumb"/>' +
-					'<input type="range"/>' +
+					'<div>' +
+						'<div class="range-control-track"/>' +
+						'<div class="range-control-progress"/>' +
+						'<datalist/>' +
+						'<div class="range-control-thumb"/>' +
+						'<input type="range"/>' +
+					'</div>' +
 				'</div>');
 
 			return $(this).each(function(_, input) {
 				var options = $(this).data('options'),
-					listid = (new Date()).getTime().toString(34),
+					datalistid = (new Date()).getTime().toString(34),
 					$input = $(input),
 					$control = tmpl.clone(),
 					$range = $control.find('[type=range]'),
-					step = options.step || 1,
-					min = options.min,
-					max = options.max,
-					range = getRange(min, max, step),
-					interval = Math.ceil((max - min) / step) * step,
-					$datalist = $control.find('datalist').attr('id', listid),
+					$datalist = $control.find('datalist').attr('id', datalistid),
 					$progress = $control.find('.range-control-progress'),
 					$thumb = $control.find('.range-control-thumb'),
 					updateHandler = function() {
 						var value = $range.val(),
-							shift = ((value - min) * 100 / interval);
+							shift = ((value - options.min) * 100 / (options.max - options.min));
 
 						$input.val(value);
 						$progress.css({width: shift + '%'});
 						$thumb.css({left: shift + '%'});
 					};
 
-				if (range) {
-					generateRangeElements($datalist, range);
-				}
+				generateRangeElements($datalist, options);
 
 				$(this).removeAttr('data-options');
 
 				$range
 					.attr({
-						'list': listid,
-						'min': min,
-						'max': max,
-						'step': step,
+						'list': datalistid,
+						'min': options.min,
+						'max': options.max,
+						'step': options.step,
 						'value': $input.val()
 					})
 					.prop('disabled', $input.prop('disabled'))
@@ -108,24 +99,28 @@ jQuery(function ($) {
 					$control.addClass('disabled');
 				}
 
+				$control
+					.width(options.width)
+					.insertBefore($input);
+
 				$input
 					.change(function() {$range.val(this.value); updateHandler();})
-					.before($control);
+					.appendTo($control);
 			});
 		},
 		disable: function() {
 			var $input = $(this),
-				$range = $input.prev('.range-control').find('[type=range]');
+				$range = $input.parent().find('[type=range]');
 
-			$input.prev('.range-control').addClass('disabled');
+			$input.parent().addClass('disabled');
 			$input.prop('disabled', true);
 			$range.prop('disabled', true);
 		},
 		enable: function() {
 			var $input = $(this),
-				$range = $input.prev('.range-control').find('[type=range]');
+				$range = $input.parent().find('[type=range]');
 
-			$input.prev('.range-control').removeClass('disabled');
+			$input.parent().removeClass('disabled');
 			$input.prop('disabled', false);
 			$range.prop('disabled', false);
 		}
@@ -135,8 +130,7 @@ jQuery(function ($) {
 		if (methods[method]) {
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		}
-		else {
-			return methods.init.apply(this, arguments);
-		}
+
+		return methods.init.apply(this, arguments);
 	};
 });

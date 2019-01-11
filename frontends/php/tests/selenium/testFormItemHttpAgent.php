@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup items
  */
-class testFormItemHttpAgent extends CWebTest {
+class testFormItemHttpAgent extends CLegacyWebTest {
 
 	/**
 	 * Host id used in test.
@@ -332,14 +332,14 @@ class testFormItemHttpAgent extends CWebTest {
 			case 'update':
 				$update_item = 'Http agent item for update';
 				$sql_hash = 'SELECT * FROM items ORDER BY itemid';
-				$old_hash = DBhash($sql_hash);
+				$old_hash = CDBHelper::getHash($sql_hash);
 				$this->zbxTestClickLinkTextWait($update_item);
 				break;
 
 			case 'clone':
 				$clone_item = 'Http agent item form';
 				$sql_hash = 'SELECT * FROM items ORDER BY itemid';
-				$old_hash = DBhash($sql_hash);
+				$old_hash = CDBHelper::getHash($sql_hash);
 				$this->zbxTestClickLinkTextWait($clone_item);
 				$this->zbxTestClickWait('clone');
 				break;
@@ -364,13 +364,13 @@ class testFormItemHttpAgent extends CWebTest {
 			case 'create':
 				$this->zbxTestClickWait('add');
 				if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
-					$this->assertEquals(0, DBcount('SELECT NULL FROM items WHERE name='.zbx_dbstr($data['fields']['Name'])));
+					$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name='.zbx_dbstr($data['fields']['Name'])));
 				}
 				break;
 
 			case 'update':
 				$this->zbxTestClickWait('update');
-				$this->assertEquals($old_hash, DBhash($sql_hash));
+				$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 				if (!array_key_exists('error', $data)) {
 					$data['error'] = 'Cannot update item';
 				}
@@ -378,7 +378,7 @@ class testFormItemHttpAgent extends CWebTest {
 
 			case 'clone':
 				$this->zbxTestClickWait('add');
-				$this->assertEquals($old_hash, DBhash($sql_hash));
+				$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 				if (!array_key_exists('error', $data)) {
 					$data['error'] = 'Cannot add item';
 				}
@@ -1056,7 +1056,7 @@ class testFormItemHttpAgent extends CWebTest {
 
 		// Check the results in DB.
 		if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
-			$this->assertEquals(1, DBcount('SELECT NULL FROM items WHERE name='.zbx_dbstr($data['fields']['Name'])));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE name='.zbx_dbstr($data['fields']['Name'])));
 		}
 
 		// Check the results in form after creation.
@@ -1209,7 +1209,7 @@ class testFormItemHttpAgent extends CWebTest {
 
 		// Check the results in DB.
 		if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
-			$this->assertEquals(1, DBcount('SELECT NULL FROM items WHERE name='.zbx_dbstr($data['fields']['Name'])));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE name='.zbx_dbstr($data['fields']['Name'])));
 		}
 
 		// Check the results in form after update.
@@ -1224,7 +1224,7 @@ class testFormItemHttpAgent extends CWebTest {
 	 */
 	public function testFormItemHttpAgent_SimpleUpdate() {
 		$sql_hash = 'SELECT * FROM items ORDER BY itemid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 		$this->zbxTestLogin('items.php?filter_set=1&hostid='.self::HOSTID);
 
 		$sql = 'SELECT name'.
@@ -1233,15 +1233,14 @@ class testFormItemHttpAgent extends CWebTest {
 				' ORDER BY itemid'.
 				' LIMIT 3';
 
-		foreach (DBdata($sql, false) as $item) {
-			$item = $item[0];
+		foreach (CDBHelper::getAll($sql) as $item) {
 			$this->zbxTestClickLinkText($item['name']);
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickWait('update');
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item updated');
 		}
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	/**
@@ -1255,7 +1254,7 @@ class testFormItemHttpAgent extends CWebTest {
 		$data['fields']['Key'] = 'http.cloned.item.'.microtime(true);
 
 		$sql_hash = 'SELECT * FROM items WHERE name='.zbx_dbstr($clone_item);
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('items.php?filter_set=1&hostid='.self::HOSTID);
 		$this->zbxTestClickLinkTextWait($clone_item);
@@ -1281,8 +1280,8 @@ class testFormItemHttpAgent extends CWebTest {
 
 		// Check the results in DB.
 		if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
-			$this->assertEquals(1, DBcount('SELECT NULL FROM items WHERE name='.zbx_dbstr($data['fields']['Name'])));
-			$this->assertEquals($old_hash, DBhash($sql_hash));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE name='.zbx_dbstr($data['fields']['Name'])));
+			$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 		}
 
 		// Check the results in form after clone.
@@ -1308,7 +1307,7 @@ class testFormItemHttpAgent extends CWebTest {
 
 		// Check the results in DB.
 		$sql = 'SELECT * FROM items WHERE name='.zbx_dbstr($name);
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	/**
@@ -1322,7 +1321,7 @@ class testFormItemHttpAgent extends CWebTest {
 			'URL' => 'zabbix.com'
 		];
 		$sql_hash = 'SELECT * FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.' ORDER BY itemid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('items.php?filter_set=1&hostid='.self::HOSTID);
 		$this->zbxTestContentControlButtonClickTextWait('Create item');
@@ -1336,7 +1335,7 @@ class testFormItemHttpAgent extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextNotPresent($data['Name']);
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	/**
@@ -1344,11 +1343,10 @@ class testFormItemHttpAgent extends CWebTest {
 	 */
 	private function executeCancelAction($action) {
 		$sql_hash = 'SELECT * FROM items ORDER BY itemid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 		$this->zbxTestLogin('items.php?filter_set=1&hostid='.self::HOSTID);
 
-		foreach (DBdata('SELECT name FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.' LIMIT 1', false) as $item) {
-			$item = $item[0];
+		foreach (CDBHelper::getAll('SELECT name FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.' LIMIT 1') as $item) {
 			$name = $item['name'];
 			$this->zbxTestClickLinkText($name);
 
@@ -1368,7 +1366,7 @@ class testFormItemHttpAgent extends CWebTest {
 
 				case 'delete':
 					$this->zbxTestClickWait('delete');
-					$this->webDriver->switchTo()->alert()->dismiss();
+					$this->zbxTestDismissAlert();
 					break;
 			}
 
@@ -1384,7 +1382,7 @@ class testFormItemHttpAgent extends CWebTest {
 			}
 		}
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	/**

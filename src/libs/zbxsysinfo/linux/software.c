@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,7 +254,7 @@ next:
 				offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages, mng->name);
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
 
-				zbx_vector_str_clear_ext(&packages, zbx_ptr_free);
+				zbx_vector_str_clear_ext(&packages, zbx_str_free);
 			}
 		}
 	}
@@ -265,7 +265,7 @@ next:
 	{
 		print_packages(buffer + offset, sizeof(buffer) - offset, &packages, NULL);
 
-		zbx_vector_str_clear_ext(&packages, zbx_ptr_free);
+		zbx_vector_str_clear_ext(&packages, zbx_str_free);
 	}
 	else if (0 != offset)
 		buffer[--offset] = '\0';

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ $mediaTypeForm = (new CForm())
 	->setId('media_type_form')
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])
+	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 // Create form list.
@@ -167,7 +168,7 @@ $mediatype_formlist
 		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
 	]))
 	->addRow(_('Enabled'),
-		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
+		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)
 	);
 $tabs->addTab('mediaTab', _('Media type'), $mediatype_formlist);
 

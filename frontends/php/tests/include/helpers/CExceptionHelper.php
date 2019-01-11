@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,10 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/**
+ * Class that allows changing message of an Exception without recreating it.
+ */
+class CExceptionHelper extends Exception {
 
-class CSvgForeignObject extends CSvgTag {
-
-	public function __construct() {
-		parent::__construct('foreignObject', true);
+	/**
+	 * Set exception message.
+	 *
+	 * @param Exception $exception				Exception to be updated.
+	 * @param string    $message				Message to be set.
+	 */
+	public static function setMessage(Exception $exception, $message) {
+		$exception->message = $message;
 	}
 }

@@ -32,7 +32,6 @@
 			jQuery(this).closest('.form_row').remove();
 		});
 
-
 		<?php if (!$hostPrototype['groupPrototypes']): ?>
 			addGroupPrototypeRow({'name': '', 'group_prototypeid': ''});
 		<?php endif ?>
@@ -44,7 +43,8 @@
 		<?php endforeach ?>
 
 		<?php if ($hostPrototype['templateid']): ?>
-			jQuery("#tbl_group_prototypes").find('input, .button').prop("disabled", "disabled");
+			jQuery('#tbl_group_prototypes').find('input').prop('readonly', true);
+			jQuery('#tbl_group_prototypes').find('button').prop('disabled', true);
 		<?php endif ?>
 	});
 </script>

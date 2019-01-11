@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,10 +72,6 @@ function make_decoration($haystack, $needle, $class = null) {
 	}
 
 	return $result;
-}
-
-function nbsp($str) {
-	return str_replace(' ', SPACE, $str);
 }
 
 function prepareUrlParam($value, $name = null) {
@@ -162,40 +158,30 @@ function get_icon($type, $params = []) {
 			return $icon;
 
 		case 'fullscreen':
-			$fullscreen = (bool) $params['fullscreen'];
-			$kioskmode = array_key_exists('kioskmode', $params) ? (bool) $params['kioskmode'] : null;
-
-			$url = new CUrl();
-
-			if ($fullscreen) {
-				if ($kioskmode === null || $kioskmode) {
-					$url
-						->setArgument('fullscreen', null)
-						->setArgument('kioskmode', null);
-
-					$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
+			switch (CView::getLayoutMode()) {
+				case ZBX_LAYOUT_KIOSKMODE:
+					$icon = (new CButton(null, '&nbsp;'))
 						->setTitle(_('Normal view'))
-						->addClass(ZBX_STYLE_BTN_MIN)
-						->addClass($kioskmode ? ZBX_STYLE_BTN_DASHBRD_NORMAL : null);
-				}
-				else {
-					$url
-						->setArgument('fullscreen', '1')
-						->setArgument('kioskmode', '1');
+						->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
+						->addClass(ZBX_LAYOUT_MODE)
+						->addClass(ZBX_STYLE_BTN_DASHBRD_NORMAL)
+						->addClass(ZBX_STYLE_BTN_MIN);
+					break;
 
-					$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
+				case ZBX_LAYOUT_FULLSCREEN:
+					$icon = (new CButton(null, '&nbsp;'))
 						->setTitle(_('Kiosk mode'))
+						->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
+						->addClass(ZBX_LAYOUT_MODE)
 						->addClass(ZBX_STYLE_BTN_KIOSK);
-				}
-			}
-			else {
-				$url
-					->setArgument('fullscreen', '1')
-					->setArgument('kioskmode', null);
+					break;
 
-				$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
-					->setTitle(_('Fullscreen'))
-					->addClass(ZBX_STYLE_BTN_MAX);
+				default:
+					$icon = (new CButton(null, '&nbsp;'))
+						->setTitle(_('Fullscreen'))
+						->setAttribute('data-layout-mode', ZBX_LAYOUT_FULLSCREEN)
+						->addClass(ZBX_LAYOUT_MODE)
+						->addClass(ZBX_STYLE_BTN_MAX);
 			}
 
 			return $icon;
@@ -524,12 +510,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
  *
  * @param int    $sysmapid      Used as value for sysmaid in map link generation.
  * @param string $name          Used as label for map link generation.
- * @param int    $fullscreen    Used as value for fullscreen in map link generation.
  * @param int    $severity_min  Used as value for severity_min in map link generation.
  *
  * @return object
  */
-function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
+function get_header_sysmap_table($sysmapid, $name, $severity_min) {
 	$list = (new CList())
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
@@ -545,7 +530,6 @@ function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 						->setArgument('action', 'map.view')
 						->setArgument('sysmapid', $sysmapid)
 						->setArgument('severity_min', $severity_min)
-						->setArgument('fullscreen', $fullscreen ? '1' : null)
 					)
 				)
 		]);
@@ -564,7 +548,6 @@ function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 					->setArgument('action', 'map.view')
 					->setArgument('sysmapid', $parent_sysmap['sysmapid'])
 					->setArgument('severity_min', $severity_min)
-					->setArgument('fullscreen', $fullscreen ? '1' : null)
 				)
 			);
 		}

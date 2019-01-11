@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ $http_tab = (new CFormList('list_http'))
 );
 
 // LDAP configuration fields.
-if ($data['change_bind_password'] || $data['ldap_bind_password'] === '') {
+if ($data['change_bind_password']) {
 	$password_box = [
 		new CVar('change_bind_password', 1),
 		(new CPassBox('ldap_bind_password', $data['ldap_bind_password']))
@@ -118,7 +118,7 @@ $ldap_tab = (new CFormList('list_ldap'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('User password'), 'ldap_test_password'),
-		(new CPassBox('ldap_test_password'))
+		(new CPassBox('ldap_test_password', $data['ldap_test_password']))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
@@ -127,6 +127,7 @@ $ldap_tab = (new CFormList('list_ldap'))
 	->setTitle(_('Authentication'))
 	->addItem((new CForm())
 		->addVar('action', $data['action_submit'])
+		->addVar('db_authentication_type', $data['db_authentication_type'])
 		->setName('form_auth')
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 		->addItem((new CTabView())
@@ -136,6 +137,10 @@ $ldap_tab = (new CFormList('list_ldap'))
 			->addTab('ldap', _('LDAP settings'), $ldap_tab)
 			->setFooter(makeFormFooter(
 				(new CSubmit('update', _('Update'))),
-				[(new CSubmitButton(_('Test'), 'ldap_test', 1))->setEnabled($data['ldap_enabled'])]
+				[(new CSubmitButton(_('Test'), 'ldap_test', 1))
+					->addStyle(($data['form_refresh'] && get_cookie('tab', 0) == 2) ? '' : 'display: none')
+					->setEnabled($data['ldap_enabled'])
+				]
 			))
+			->onTabChange('jQuery("[name=ldap_test]")[(ui.newTab.index() == 2) ? "show" : "hide"]()')
 ))->show();

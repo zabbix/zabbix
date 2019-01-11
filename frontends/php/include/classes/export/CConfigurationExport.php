@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -484,7 +484,7 @@ class CConfigurationExport {
 			$valuemapids[$item['valuemapid']] = true;
 		}
 
-		// Value map IDs that are zeroes, should be skipped.
+		// Value map IDs that are zeros, should be skipped.
 		unset($valuemapids[0]);
 
 		if ($this->data['valueMaps']) {
@@ -619,7 +619,7 @@ class CConfigurationExport {
 		}
 		unset($item_prototype);
 
-		// Value map IDs that are zeroes, should be skipped.
+		// Value map IDs that are zeros, should be skipped.
 		unset($valuemapids[0]);
 
 		if ($this->data['valueMaps']) {

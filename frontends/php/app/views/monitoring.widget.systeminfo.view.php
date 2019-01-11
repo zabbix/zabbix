@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,7 @@
 
 $output = [
 	'header' => $data['name'],
-	'body' => make_status_of_zbx()->toString(),
-	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'body' => make_status_of_zbx()->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

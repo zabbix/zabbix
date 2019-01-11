@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,14 +19,15 @@
 **/
 
 
-$historyWidget = new CWidget();
+$web_layout_mode = CView::getLayoutMode();
+
+$historyWidget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($data['items'])),
 	'right' => (new CForm('get'))
 		->addVar('itemids', getRequest('itemids'))
 		->addVar('page', 1)
-		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 ];
 $header_row = [];
 $first_item = reset($data['items']);
@@ -93,22 +94,17 @@ if ($data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
 	]));
 }
 
-$action_list->addItem([
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])
-]);
+$action_list->addItem([(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), get_icon('fullscreen')]);
 
 $header['right']->addItem($action_list);
 
 // create filter
-$filter_form = new CFilter();
+$filter_form = new CFilter(new CUrl());
 $filter_tab = [];
 
 if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 	if (array_key_exists($data['value_type'], $data['iv_string']) || !$data['itemids']) {
-		$filter_form
-			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-			->addVar('action', $data['action']);
+		$filter_form->addVar('action', $data['action']);
 
 		$items_data = [];
 		if ($data['items']) {
@@ -210,18 +206,16 @@ if ($data['plaintext']) {
 else {
 	$historyWidget
 		->setTitle($header['left'])
-		->setControls((new CTag('nav', true, $header['right']))
-			->setAttribute('aria-label', _('Content controls'))
-		);
+		->setControls((new CTag('nav', true, $header['right']))->setAttribute('aria-label', _('Content controls')));
 
 	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST) {
-		$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
+		$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to'],
+			$web_layout_mode != ZBX_LAYOUT_KIOSKMODE);
 	}
 
 	if ($data['action'] == HISTORY_BATCH_GRAPH) {
 		$filter_form
 			->hideFilterButtons()
-			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 			->addVar('action', $data['action'])
 			->addVar('itemids', $data['itemids']);
 		$filter_tab = [

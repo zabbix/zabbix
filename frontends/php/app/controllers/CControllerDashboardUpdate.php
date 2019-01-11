@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ class CControllerDashboardUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'fullscreen' =>	'in 0,1',
 			'dashboardid' => 'db dashboard.dashboardid',
 			'userid' => 'db dashboard.userid',
 			'name' => 'db dashboard.name|not_empty',
@@ -243,7 +242,6 @@ class CControllerDashboardUpdate extends CController {
 			$data['redirect'] = (new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.view')
 				->setArgument('dashboardid', $result['dashboardids'][0])
-				->setArgument('fullscreen', $this->getInput('fullscreen', '0') ? '1' : null)
 				->getUrl();
 			CSession::setValue('messageOk', $message);
 		}

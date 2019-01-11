@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,11 @@ $scripts = [$field_groupids->getPostJS()];
 
 // Application.
 $form_list->addRow(CWidgetHelper::getLabel($fields['application']), CWidgetHelper::getTextBox($fields['application']));
+
+// Show suppressed problems.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
+	CWidgetHelper::getCheckBox($fields['show_suppressed'])
+);
 
 // Hosts location.
 $form_list->addRow(CWidgetHelper::getLabel($fields['style']), CWidgetHelper::getRadioButtonList($fields['style']));

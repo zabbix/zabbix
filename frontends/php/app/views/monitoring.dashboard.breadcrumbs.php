@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@
 **/
 
 
-$url_list = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.list')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+$url_list = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
 
 $breadcrumbs = [
 	(new CSpan())->addItem(new CLink(_('All dashboards'), $url_list->getUrl()))
@@ -30,8 +28,7 @@ $breadcrumbs = [
 if ($data['dashboard']['dashboardid'] != 0) {
 	$url_view = (new CUrl('zabbix.php'))
 		->setArgument('action', 'dashboard.view')
-		->setArgument('dashboardid', $data['dashboard']['dashboardid'])
-		->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+		->setArgument('dashboardid', $data['dashboard']['dashboardid']);
 
 	$breadcrumbs[] = '/';
 	$breadcrumbs[] = (new CSpan())

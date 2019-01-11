@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,10 +25,8 @@ class CSvg extends CSvgTag {
 		parent::__construct('svg', true);
 
 		$this
-			->setAttribute('id', uniqid('svg_'))
-			->setAttribute('version', '1.1')
-			->setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-			->setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+			->setAttribute('id', str_replace('.', '', uniqid('svg_', true)))
+			->setAttribute('version', '1.1');
 	}
 
 	protected function startToString() {
@@ -45,14 +43,16 @@ class CSvg extends CSvgTag {
 			}
 		}
 
-		return parent::startToString().(new CTag('style', true, $styles));
+		$styles = (new CTag('style', true, $styles))->toString();
+
+		return parent::startToString().$styles;
 	}
 
 	/**
 	 * Set SVG element width and height.
 	 *
-	 * @param int $width     Width.
-	 * @param int $height    Height.
+	 * @param int $width
+	 * @param int $height
 	 */
 	public function setSize($width, $height) {
 		$this->setAttribute('width', $width.'px');

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,12 +27,13 @@ if (!isset($page['type'])) {
 if (!isset($page['file'])) {
 	$page['file'] = basename($_SERVER['PHP_SELF']);
 }
-$_REQUEST['fullscreen'] = getRequest('fullscreen', 0);
-if ($_REQUEST['fullscreen'] === '1') {
-	if (!defined('ZBX_PAGE_NO_MENU')) {
-		define('ZBX_PAGE_NO_MENU', 1);
-	}
-	define('ZBX_PAGE_FULLSCREEN', 1);
+
+if (!array_key_exists('web_layout_mode', $page)) {
+	$page['web_layout_mode'] = ZBX_LAYOUT_NORMAL;
+}
+
+if (!defined('ZBX_PAGE_NO_MENU') && in_array($page['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE])) {
+	define('ZBX_PAGE_NO_MENU', true);
 }
 
 require_once dirname(__FILE__).'/menu.inc.php';
@@ -45,38 +46,38 @@ switch ($page['type']) {
 	case PAGE_TYPE_IMAGE:
 		set_image_header();
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_XML:
 		header('Content-Type: text/xml');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_JS:
 		header('Content-Type: application/javascript; charset=UTF-8');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_JSON:
 		header('Content-Type: application/json');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_JSON_RPC:
 		header('Content-Type: application/json-rpc');
 		if(!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_CSS:
 		header('Content-Type: text/css; charset=UTF-8');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_TEXT:
@@ -84,21 +85,21 @@ switch ($page['type']) {
 	case PAGE_TYPE_HTML_BLOCK:
 		header('Content-Type: text/plain; charset=UTF-8');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_TEXT_FILE:
 		header('Content-Type: text/plain; charset=UTF-8');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_CSV:
 		header('Content-Type: text/csv; charset=UTF-8');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_HTML:
@@ -130,24 +131,6 @@ switch ($page['type']) {
 
 			header('X-Frame-Options: '.$x_frame_options);
 		}
-
-		if ((array_key_exists('https', $_SERVER) && ($_SERVER['https'] == 1 || $_SERVER['https'] === 'on'))
-				|| (array_key_exists('SERVER_PORT', $_SERVER) && $_SERVER['SERVER_PORT'] == 443)) {
-			header('strict-transport-security: max-age=31557600');
-		}
-
-		global $ZBX_SERVER_NAME;
-
-		// page title
-		$pageTitle = '';
-		if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
-			$pageTitle = $ZBX_SERVER_NAME.NAME_DELIMITER;
-		}
-		$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
-
-		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::getRefresh() != 0) {
-			$pageTitle .= ' ['._s('refreshed every %1$s sec.', CWebUser::getRefresh()).']';
-		}
 		break;
 }
 
@@ -163,7 +146,22 @@ if ($denied_page_requested) {
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
+	global $ZBX_SERVER_NAME;
+
+	// page title
+	$pageTitle = '';
+	if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
+		$pageTitle = $ZBX_SERVER_NAME.NAME_DELIMITER;
+	}
+	$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
+
+	if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::getRefresh() != 0) {
+		$pageTitle .= ' ['._s('refreshed every %1$s sec.', CWebUser::getRefresh()).']';
+	}
+
 	$pageHeader = new CPageHeader($pageTitle);
+	$is_standard_page = (!defined('ZBX_PAGE_NO_MENU')
+		|| in_array($page['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE]));
 
 	$theme = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {
@@ -177,8 +175,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			$pageHeader->addStyle(getTriggerStatusCss($config));
 
 			// perform Zabbix server check only for standard pages
-			if ((!defined('ZBX_PAGE_NO_MENU') || defined('ZBX_PAGE_FULLSCREEN')) && $config['server_check_interval']
-					&& !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
+			if ($is_standard_page && $config['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
 				$page['scripts'][] = 'servercheck.js';
 			}
 		}
@@ -196,8 +193,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	);
 
 	// show GUI messages in pages with menus and in fullscreen mode
-	$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $_REQUEST['fullscreen'] == 1) ? 1 : 0;
-	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&showGuiMessaging='.$showGuiMessaging;
+	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&amp;showGuiMessaging='
+		.($is_standard_page ? '1' : '0');
 	$pageHeader->addJsFile($path);
 
 	if (!empty($page['scripts']) && is_array($page['scripts'])) {
@@ -206,7 +203,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		}
 		$pageHeader->addJsFile($path);
 	}
-
 	$pageHeader->display();
 ?>
 <body lang="<?= CWebUser::getLang() ?>">
@@ -245,7 +241,7 @@ if (CSession::keyExists('messageOk') || CSession::keyExists('messageError')) {
 	CSession::unsetValue(['messageOk', 'messageError']);
 }
 
-if (!defined('ZBX_PAGE_NO_MENU')) {
+if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 	$pageMenu = new CView('layout.htmlpage.menu', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
 		'menu' => [
@@ -258,7 +254,8 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			'alias' => CWebUser::$data['alias'],
 			'name' => CWebUser::$data['name'],
 			'surname' => CWebUser::$data['surname']
-		]
+		],
+		'support_url' => getSupportUrl(CWebUser::getLang())
 	]);
 	echo $pageMenu->getOutput();
 }
@@ -270,8 +267,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 // unset multiple variables
 unset($table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
 
-if ($page['type'] == PAGE_TYPE_HTML && $showGuiMessaging) {
-	zbx_add_post_js('initMessages({});');
+if ($page['type'] == PAGE_TYPE_HTML && $is_standard_page) {
+	zbx_add_post_js('initMessages();');
 }
 
 // if a user logs in after several unsuccessful attempts, display a warning

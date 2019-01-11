@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1920,7 +1920,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	zbx_am_alerter_t	*alerter;
 	int			ret, sent_num = 0, failed_num = 0, now, time_db = 0, time_watchdog = 0, freq_watchdog;
 	int			time_connect;
-	double			time_stat, time_idle = 0, time_now, time_file = 0;
+	double			time_stat, time_idle = 0, time_now, sec;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -2031,18 +2031,11 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		ret = zbx_ipc_service_recv(&alerter_service, 1, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-		/* handle /etc/resolv.conf update and log rotate less often than once a second */
-		if (1.0 < time_now - time_file)
-		{
-			time_file = time_now;
-			zbx_handle_log();
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-			zbx_update_resolver_conf();
-#endif
-		}
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
-			time_idle += zbx_time() - time_now;
+			time_idle += sec - time_now;
 
 		if (NULL != message)
 		{
