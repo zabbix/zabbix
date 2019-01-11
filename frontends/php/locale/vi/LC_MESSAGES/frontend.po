@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-20 11:08+0200\n"
+"POT-Creation-Date: 2019-01-06 01:44+0200\n"
 "PO-Revision-Date: 2018-12-19 15:46+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -898,7 +898,7 @@ msgstr ""
 
 #: app/views/monitoring.problem.view.php:227
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:1149
 #: include/views/configuration.correlation.edit.php:93
@@ -1233,8 +1233,8 @@ msgstr "Giao thức xác thực"
 msgid "Authentication settings updated"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:228
 msgctxt "history source selection method"
 msgid "Auto"
@@ -1438,7 +1438,7 @@ msgid "CERT"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:946
+#: include/classes/graph/CSvgGraph.php:974
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -2471,8 +2471,8 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Không thể đặt lại \"%1$s\" cho item \"%2$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:603
-#: include/classes/api/services/CTemplateScreen.php:701
+#: include/classes/api/services/CTemplateScreen.php:605
+#: include/classes/api/services/CTemplateScreen.php:703
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr ""
@@ -2610,7 +2610,7 @@ msgstr ""
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Không thể cập nhật \"templateid\"  cho screen \"%1$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:691
+#: include/classes/api/services/CTemplateScreen.php:693
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "Không thể cập nhật \"templateid\" cho template screen \"%1$s\"."
@@ -4111,7 +4111,7 @@ msgstr ""
 msgid "Data overview"
 msgstr "Tổng quan dữ liệu"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:42
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:41
 #: include/classes/widgets/views/widget.svggraph.form.view.php:251
 msgid "Data set"
 msgstr ""
@@ -5014,10 +5014,6 @@ msgstr "Các trigger hiển thị OK khi"
 msgid "Display graph"
 msgstr ""
 
-#: include/classes/widgets/views/widget.svggraph.form.view.php:252
-msgid "Display options"
-msgstr ""
-
 #: include/views/monitoring.sysmap.edit.php:132
 msgid "Display problems"
 msgstr ""
@@ -5036,6 +5032,10 @@ msgstr "Hiển thị %1$s của %2$s đã tìm được"
 #: include/func.inc.php:1697
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
+msgstr ""
+
+#: include/classes/widgets/views/widget.svggraph.form.view.php:252
+msgid "Displaying options"
 msgstr ""
 
 #: include/services.inc.php:26
@@ -5392,7 +5392,7 @@ msgstr ""
 msgid "Empty media type ID."
 msgstr ""
 
-#: include/classes/api/services/CService.php:857
+#: include/classes/api/services/CService.php:853
 msgid "Empty name."
 msgstr "Không có tên."
 
@@ -5404,7 +5404,7 @@ msgstr "Tham số rỗng"
 msgid "Empty screen ID for screen."
 msgstr "Không có screen ID cho screen."
 
-#: include/classes/api/services/CTemplateScreen.php:658
+#: include/classes/api/services/CTemplateScreen.php:660
 msgid "Empty screen ID for template screen."
 msgstr "Không có screen ID cho template screen."
 
@@ -6160,7 +6160,7 @@ msgid "Friday"
 msgstr "Thứ sáu"
 
 #: app/views/report.services.php:68 include/classes/html/CFilter.php:283
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:87
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:86
 #: include/views/configuration.services.edit.php:243
 #: include/views/configuration.services.edit.php:289
 #: include/views/js/monitoring.sysmaps.js.php:673 report4.php:195
@@ -6346,7 +6346,7 @@ msgstr "Đồ thị \"%1$s\" không thể kế thừa. Không có các ite
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "Đồ thị \"%1$s\" không thể kế thừa. Không có các item yêu cầu trên \"%2$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:544
+#: include/classes/api/services/CTemplateScreen.php:546
 #, c-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Đồ thị \"%1$s\" đã tồn tại trên template \"%2$s\"."
@@ -6744,7 +6744,7 @@ msgstr ""
 #: app/views/monitoring.problem.view.php:93 history.php:27
 #: include/classes/screens/CScreenProblem.php:1218
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:438 include/forms.inc.php:872
 #: include/views/administration.general.housekeeper.edit.php:117
 #: include/views/configuration.item.list.php:67
@@ -6763,7 +6763,7 @@ msgstr "Lịch sử bị xóa"
 msgid "History clearing can take a long time. Continue?"
 msgstr "Xóa lịch sử có thể mất một thời gian dài. Tiếp tục?"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:54
 msgid "History data selection"
 msgstr ""
 
@@ -7555,7 +7555,7 @@ msgstr ""
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CService.php:1078
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Giá trị trường \"soft\" không chính xác cho sự phụ thuộc đối với dịch vụ \"%1$s\"."
@@ -7593,7 +7593,7 @@ msgstr "SNMP OID không chính xác."
 msgid "Incorrect SNMP community."
 msgstr "SNMP community không chính xác."
 
-#: include/classes/api/services/CService.php:903
+#: include/classes/api/services/CService.php:899
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Sự chấp nhận SLA không chính xác đối với dịch vụ \"%1$s\"."
@@ -7712,7 +7712,7 @@ msgstr "Thao tác người dùng action không chính xác. Người dùn
 msgid "Incorrect action operationid."
 msgstr "operationid action không chính xác."
 
-#: include/classes/api/services/CService.php:870
+#: include/classes/api/services/CService.php:866
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Thuật toán đối với dịch vụ \"%1$s\" không chính xác."
@@ -7792,7 +7792,7 @@ msgstr "Xác thực giao thức cho item \"%1$s\" không chính xác."
 msgid "Incorrect bulk value for interface."
 msgstr ""
 
-#: include/classes/api/services/CService.php:887
+#: include/classes/api/services/CService.php:883
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Tính toán giá trị SLA cho dịch vụ \"%1$s\" không chính xác."
@@ -7963,7 +7963,7 @@ msgstr "Chỉ số hình ảnh không chính xác."
 #: include/classes/api/services/CScreen.php:455
 #: include/classes/api/services/CTemplate.php:406
 #: include/classes/api/services/CTemplate.php:534
-#: include/classes/api/services/CTemplateScreen.php:594
+#: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "Các tham số đầu vào không chính xác."
 
@@ -8103,12 +8103,12 @@ msgstr "Các tham số cho điều kiện không chính xác."
 msgid "Incorrect parameters for maintenance."
 msgstr "Các tham số cho bảo trì không chính xác."
 
-#: include/classes/api/services/CService.php:945
+#: include/classes/api/services/CService.php:941
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Dịch vụ gốc \"%1$s\" không chính xác."
 
-#: include/classes/api/services/CService.php:948
+#: include/classes/api/services/CService.php:944
 msgid "Incorrect parent service."
 msgstr "Dịch vụ gốc không chính xác."
 
@@ -8163,7 +8163,7 @@ msgstr "Thời gian bắt đầu dịch vụ không chính xác."
 msgid "Incorrect service time type."
 msgstr "Kiểu thời gian dịch vụ không chính xác."
 
-#: include/classes/api/services/CService.php:918
+#: include/classes/api/services/CService.php:914
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr ""
@@ -8179,7 +8179,7 @@ msgstr "Giá trị nguồn không chính xác."
 msgid "Incorrect status for host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CService.php:966
+#: include/classes/api/services/CService.php:962
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Trạng thái cho dịch vụ \"%1$s\" không chính xác."
@@ -8188,7 +8188,7 @@ msgstr "Trạng thái cho dịch vụ \"%1$s\" không chính xác."
 msgid "Incorrect style provided for screen element."
 msgstr ""
 
-#: include/classes/api/services/CTemplateScreen.php:659
+#: include/classes/api/services/CTemplateScreen.php:661
 msgid "Incorrect template screen ID."
 msgstr "Template screen ID không chính xác."
 
@@ -8196,7 +8196,7 @@ msgstr "Template screen ID không chính xác."
 msgid "Incorrect templated web scenario step count."
 msgstr ""
 
-#: include/classes/api/services/CService.php:931
+#: include/classes/api/services/CService.php:927
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Trigger ID cho dịch vụ \"%1$s\" không chính xác."
@@ -8842,7 +8842,7 @@ msgstr ""
 #: include/classes/api/services/CScreenItem.php:337
 #: include/classes/api/services/CService.php:200
 #: include/classes/api/services/CService.php:371
-#: include/classes/api/services/CService.php:1207
+#: include/classes/api/services/CService.php:1203
 #: include/classes/core/CJsonRpc.php:199
 msgid "Invalid method parameters."
 msgstr "Phương pháp tham số không hợp lệ."
@@ -8926,8 +8926,8 @@ msgstr "Số đối số không hợp lệ của các tham số."
 #: include/classes/validators/CApiInputValidator.php:1397
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:133
 #: include/classes/widgets/forms/CWidgetFormMap.php:101
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:478
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:479
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
 #, c-format
 msgid "Invalid parameter \"%1$s\": %2$s."
 msgstr ""
@@ -9085,7 +9085,7 @@ msgstr "Item \"%1$s\" không tồn tại trên \"%2$s\"."
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Item \"%1$s\" không thể gắn vào một quá trình kiểm kê số trường đang bị lỗi \"%2$d\". Các lựa chọn là: từ 0 (Không được gắn vào) đến \"%3$d\"."
 
-#: include/classes/api/services/CTemplateScreen.php:562
+#: include/classes/api/services/CTemplateScreen.php:564
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Item \"%1$s\" không tồn tại trên template \"%2$s\"."
@@ -9624,7 +9624,7 @@ msgstr "Latvian (lv_LV)"
 msgid "Left"
 msgstr "Bên trái"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:116
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
 msgid "Left Y"
 msgstr ""
 
@@ -10183,10 +10183,10 @@ msgstr ""
 msgid "Master item"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:141
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:140
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:213
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:478
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:479
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
 msgid "Max"
 msgstr ""
 
@@ -10216,7 +10216,7 @@ msgstr ""
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:239
 #: include/classes/mvc/CController.php:208
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:444
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:445
 #: include/validate.inc.php:454
 #, c-format
 msgid "Maximum time period to display is %1$s day."
@@ -10362,7 +10362,7 @@ msgstr "Không tìm thấy giải pháp"
 msgid "Middle"
 msgstr "Giữa"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:126
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:199
 msgid "Min"
 msgstr ""
@@ -10406,7 +10406,7 @@ msgstr "Sự quan trọng tối thiểu"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:234
 #: include/classes/mvc/CController.php:201
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:439
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:440
 #: include/validate.inc.php:447
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
@@ -10886,7 +10886,7 @@ msgstr ""
 msgid "No \"%1$s\" given for screen."
 msgstr "\"%1$s\" không được đưa ra cho screen."
 
-#: include/classes/api/services/CTemplateScreen.php:657
+#: include/classes/api/services/CTemplateScreen.php:659
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "\"%1$s\" không được đưa ra cho template screen."
@@ -11270,15 +11270,15 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CScript.php:547
 #: include/classes/api/services/CScript.php:592
 #: include/classes/api/services/CScript.php:601
-#: include/classes/api/services/CService.php:993
-#: include/classes/api/services/CService.php:1017
+#: include/classes/api/services/CService.php:989
+#: include/classes/api/services/CService.php:1013
 #: include/classes/api/services/CTask.php:136
 #: include/classes/api/services/CTemplate.php:722
 #: include/classes/api/services/CTemplate.php:744
-#: include/classes/api/services/CTemplateScreen.php:629
-#: include/classes/api/services/CTemplateScreen.php:680
-#: include/classes/api/services/CTemplateScreen.php:743
-#: include/classes/api/services/CTemplateScreen.php:754
+#: include/classes/api/services/CTemplateScreen.php:631
+#: include/classes/api/services/CTemplateScreen.php:682
+#: include/classes/api/services/CTemplateScreen.php:745
+#: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:722
 #: include/classes/api/services/CTrigger.php:633
 #: include/classes/api/services/CTrigger.php:673
@@ -11550,7 +11550,7 @@ msgstr "Số lượng nhánh bộ xử lý trên VMware hypervisor, <url> 
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Số lượng bộ xử lý trên máy ảo VMware, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:287
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:288
 msgid "Number of rows"
 msgstr ""
 
@@ -11939,7 +11939,7 @@ msgstr ""
 
 #: app/views/monitoring.problem.view.php:228
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:379
 #: include/triggers.inc.php:1332
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:1151
@@ -12052,7 +12052,7 @@ msgstr "Ghi đè chu kỳ lịch sử item"
 msgid "Override item trend period"
 msgstr "Ưu tiên chu kỳ item"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:409
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:410
 #: include/classes/widgets/views/widget.svggraph.form.view.php:257
 msgid "Overrides"
 msgstr ""
@@ -12231,7 +12231,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:941
+#: include/classes/graph/CSvgGraph.php:969
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -12703,7 +12703,7 @@ msgstr "Cấp đặc quyền"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:75
 #: include/classes/widgets/forms/CWidgetFormProblems.php:198
 #: include/classes/widgets/forms/CWidgetFormProblems.php:199
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
 #: include/views/configuration.item.list.php:183
 #: include/views/configuration.trigger.prototype.list.php:129
 #: include/views/configuration.triggers.list.php:59
@@ -12728,7 +12728,7 @@ msgid "Problem expression"
 msgstr ""
 
 #: include/classes/widgets/CWidgetConfig.php:43
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:337
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
 msgid "Problem hosts"
 msgstr ""
 
@@ -12913,7 +12913,7 @@ msgid "Queue of items to be updated"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:937
+#: include/classes/graph/CSvgGraph.php:965
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:956
 #: include/classes/screens/CScreenProblem.php:1122 include/events.inc.php:345
@@ -13847,7 +13847,7 @@ msgstr ""
 msgid "Screen"
 msgstr "Screen"
 
-#: include/classes/api/services/CTemplateScreen.php:776
+#: include/classes/api/services/CTemplateScreen.php:778
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr "Screen \"%1$s\" đã tồn tại trên template \"%2$s\"."
@@ -14130,7 +14130,7 @@ msgstr ""
 msgid "Selected elements"
 msgstr "Các phần tử đã chọn"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:324
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:325
 msgid "Selected items only"
 msgstr ""
 
@@ -14245,22 +14245,22 @@ msgstr "thời gian máy chủ"
 msgid "Service"
 msgstr "Dịch vụ"
 
-#: include/classes/api/services/CService.php:1048
+#: include/classes/api/services/CService.php:1044
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Dịch vụ \"%1$s\" không thể bị xóa, bởi vì nó phụ thuộc vào dịch vụ khác."
 
-#: include/classes/api/services/CService.php:1067
+#: include/classes/api/services/CService.php:1063
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Dịch vụ \"%1$s\" không thể phụ thuộc vào chính nó."
 
-#: include/classes/api/services/CService.php:1142
+#: include/classes/api/services/CService.php:1138
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Dịch vụ \"%1$s\" không thể liên kết đến một trigger và có sản phẩm cùng một lúc."
 
-#: include/classes/api/services/CService.php:1119
+#: include/classes/api/services/CService.php:1115
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Dịch vụ \"%1$s\" đã có liên kết tắt cứng đến một dịch vụ khác."
@@ -14270,7 +14270,7 @@ msgstr "Dịch vụ \"%1$s\" đã có liên kết tắt cứng đến mô�
 msgid "Service availability report"
 msgstr ""
 
-#: include/classes/api/services/CService.php:953
+#: include/classes/api/services/CService.php:949
 msgid "Service cannot be parent and child at the same time."
 msgstr "Dịch vụ không thể vừa là cha vừa là con cùng một thời điểm."
 
@@ -14329,7 +14329,7 @@ msgstr "Dịch vụ được cập nhật"
 msgid "Services"
 msgstr "Các dịch vụ"
 
-#: include/classes/api/services/CService.php:1189
+#: include/classes/api/services/CService.php:1185
 msgid "Services form a circular dependency."
 msgstr "Các dịch vụ tạo thành một quan hệ phụ thuộc vòng tròn."
 
@@ -14339,7 +14339,7 @@ msgstr "Các dịch vụ tạo thành một quan hệ phụ thuộc vòng 
 msgid "Session terminated, re-login, please."
 msgstr "Kết thúc phiên làm việc, hãy đăng nhập lại."
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:75
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:74
 msgid "Set custom time period"
 msgstr ""
 
@@ -14373,7 +14373,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblems.php:84
 #: include/classes/widgets/forms/CWidgetFormProblems.php:196
 #: include/classes/widgets/forms/CWidgetFormProblems.php:197
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:350
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
 #: include/events.inc.php:167 include/triggers.inc.php:1239
 #: include/views/configuration.item.list.php:149
 #: include/views/configuration.trigger.prototype.edit.php:65
@@ -14446,9 +14446,9 @@ msgstr ""
 
 #: app/views/monitoring.problem.view.php:89
 #: include/classes/widgets/forms/CWidgetFormProblems.php:33
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:116
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:188
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:260
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:261
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:31
 #: include/views/common.filter.trigger.php:35
 #: include/views/js/monitoring.sysmaps.js.php:76 report2.php:463
@@ -14474,7 +14474,7 @@ msgid "Show latest values"
 msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:73
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:274
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:275
 #: include/views/configuration.graph.edit.php:97
 msgid "Show legend"
 msgstr "Hiển thị chú thích"
@@ -14489,7 +14489,7 @@ msgstr "Hiển thị chú thích"
 msgid "Show lines"
 msgstr "Hiển thị các dòng"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:307
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:308
 msgid "Show problems"
 msgstr ""
 
@@ -14831,7 +14831,7 @@ msgstr "Thời gian bắt đầu khởi động của của máy chủ Zab
 msgid "State"
 msgstr "Tình trạng"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:157
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:229
 msgctxt "history source selection method"
 msgid "Static"
@@ -15185,7 +15185,7 @@ msgstr ""
 #: include/classes/screens/CScreenProblem.php:897
 #: include/classes/screens/CScreenProblem.php:1113
 #: include/classes/widgets/forms/CWidgetFormProblems.php:93
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:376
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
 #: include/events.inc.php:235 include/events.inc.php:463
 #: include/views/administration.usergroups.edit.php:183
 #: include/views/configuration.maintenance.edit.php:267
@@ -15284,8 +15284,8 @@ msgstr ""
 msgid "Template name"
 msgstr "Tên template"
 
-#: include/classes/api/services/CTemplateScreen.php:638
-#: include/classes/api/services/CTemplateScreen.php:718
+#: include/classes/api/services/CTemplateScreen.php:640
+#: include/classes/api/services/CTemplateScreen.php:720
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "Template screen \"%1$s\" đã tồn tại."
@@ -15641,7 +15641,7 @@ msgid "Timestamp"
 msgstr "Nhãn thời gian"
 
 #: include/classes/html/CFilter.php:291
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:99
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:98
 #: include/views/js/monitoring.sysmaps.js.php:673
 msgid "To"
 msgstr "To"
@@ -15743,7 +15743,7 @@ msgstr ""
 msgid "Trend storage period"
 msgstr "Khuynh hướng chu kỳ lưu trữ dữ liệu"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:58
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:457 include/forms.inc.php:877
 #: include/views/administration.general.housekeeper.edit.php:135
 #: include/views/configuration.item.list.php:68
@@ -16244,7 +16244,7 @@ msgstr ""
 msgid "Unblock selected users?"
 msgstr "Bỏ chặn các người dùng được lựa chọn?"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:154
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
 #: include/views/configuration.item.edit.php:685
 #: include/views/configuration.item.massupdate.php:288
@@ -17501,7 +17501,7 @@ msgstr ""
 msgid "X"
 msgstr "X"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:260
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:261
 msgid "X-Axis"
 msgstr ""
 
@@ -17540,8 +17540,8 @@ msgstr "Giá trị cực đại của trục Y"
 
 #: include/classes/api/services/CGraphGeneral.php:314
 #: include/classes/graphdraw/CLineGraphDraw.php:705
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:479
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:480
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:493
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Giá trị cực đại của trục Y phải lớn hơn giá trị cực tiểu trục Y."
 
@@ -18029,8 +18029,8 @@ msgstr ""
 msgid "both username and password should be either present or empty"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:128
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:142
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:141
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:200
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:214
 msgid "calculated"
@@ -18267,7 +18267,7 @@ msgid "fourth"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:324
-msgid "fuzzytime() - Difference between item timestamp value and Zabbix server timestamp is over T seconds (1 - true, 0 - false)"
+msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr ""
 
 #: include/views/configuration.item.edit.php:772
@@ -18309,7 +18309,7 @@ msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:508
 #: include/classes/widgets/CWidgetHelper.php:873
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
 msgid "host pattern"
 msgstr ""
 
@@ -18731,7 +18731,7 @@ msgstr ""
 msgid "prev() - Previous value"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:365
 msgid "problem pattern"
 msgstr ""
 
@@ -18995,7 +18995,7 @@ msgstr ""
 #: include/classes/widgets/CWidgetHelper.php:403
 #: include/classes/widgets/CWidgetHelper.php:448
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:174
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:246
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:247
 #: include/views/administration.general.macros.edit.php:53
 #: include/views/administration.usergroups.edit.php:246
 #: include/views/configuration.action.edit.php:370

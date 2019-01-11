@@ -1644,6 +1644,14 @@ output {
 	color: $dark-yellow;
 }
 
+.suggest-new {
+	border-top: 1px solid $form-border-color;
+
+	span:first-child {
+		font-weight: bold;
+	}
+}
+
 // Forms
 .table-forms-container {
 	margin: 0 0 10px 0;
@@ -4246,8 +4254,8 @@ $form-icon-btn: (
 	stroke-width: 2px;
 }
 .svg-point-highlight {
-	fill: $font-color;
-	fill-opacity: 0.5;
+	fill: $font-color !important;
+	fill-opacity: 0.5 !important;
 }
 
 .svg-graph-preview {
@@ -5629,6 +5637,7 @@ svg {
 .overrides-list {
 	display: table;
 	width: 90%;
+	max-width: 738px;
 	padding-left: 15px;
 
 	.overrides-list-item {
@@ -5732,6 +5741,10 @@ svg {
 			height: 24px;
 		}
 	}
+}
+
+.patternselect {
+	line-height: 14px;
 }
 
 .columns-wrapper {

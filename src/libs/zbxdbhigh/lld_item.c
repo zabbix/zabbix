@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2441,16 +2441,14 @@ static int	lld_items_preproc_susbstitute_params_macros_regsub(const zbx_lld_item
  *                                                                            *
  * Parameters: pp         - [IN] the item preprocessing step                  *
  *             lld_row    - [IN] lld source value                             *
- *             item_key   - [IN] Item name for logging                        *
  *             sub_params - [IN/OUT] the pp params value after substitute     *
- *             error      - [IN/OUT] the lld error message                    *
  *                                                                            *
  * Return value: SUCCEED - if preprocessing steps are valid                   *
  *               FAIL    - if substitute_lld_macros fails                     *
  *                                                                            *
  ******************************************************************************/
 static int	lld_items_preproc_susbstitute_params_macros_generic(const zbx_lld_item_preproc_t * pp,
-		const zbx_lld_row_t * lld_row, const char *item_key, char **sub_params, char **error)
+		const zbx_lld_row_t * lld_row, char **sub_params)
 {
 	int	token_type = ZBX_MACRO_ANY;
 
@@ -2493,7 +2491,7 @@ static int	lld_items_preproc_susbstitute_params_macros(const zbx_lld_item_prepro
 	}
 	else
 	{
-		ret = lld_items_preproc_susbstitute_params_macros_generic(pp, lld_row, item_key, sub_params, error);
+		ret = lld_items_preproc_susbstitute_params_macros_generic(pp, lld_row, sub_params);
 	}
 	return ret;
 }

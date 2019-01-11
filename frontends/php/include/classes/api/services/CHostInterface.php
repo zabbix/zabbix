@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -228,6 +228,7 @@ class CHostInterface extends CApiService {
 			'preservekeys' => true
 		]);
 
+		$check_have_items = [];
 		foreach ($interfaces as &$interface) {
 			if (!check_db_fields($interfaceDBfields, $interface)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -241,6 +242,10 @@ class CHostInterface extends CApiService {
 				$dbInterface = $dbInterfaces[$interface['interfaceid']];
 				if (isset($interface['hostid']) && bccomp($dbInterface['hostid'], $interface['hostid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot switch host for interface.'));
+				}
+
+				if (array_key_exists('type', $interface) && $interface['type'] != $dbInterface['type']) {
+					$check_have_items[] = $interface['interfaceid'];
 				}
 
 				$interface['hostid'] = $dbInterface['hostid'];
@@ -311,6 +316,10 @@ class CHostInterface extends CApiService {
 		// check if any of the affected hosts are discovered
 		if ($update) {
 			$interfaces = $this->extendObjects('interface', $interfaces, ['hostid']);
+
+			if ($check_have_items) {
+				$this->checkIfInterfaceHasItems($check_have_items);
+			}
 		}
 		$this->checkValidator(zbx_objectValues($interfaces, 'hostid'), new CHostNormalValidator([
 			'message' => _('Cannot update interface for discovered host "%1$s".')

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,14 @@ class CFormElement extends CElement {
 	/**
 	 * @inheritdoc
 	 */
+	protected function setElement(RemoteWebElement $element) {
+		parent::setElement($element);
+		$this->invalidate();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	protected function normalize() {
 		if ($this->getTagName() !== 'form') {
 			$this->setElement($this->query('xpath:.//form')->one());
@@ -47,7 +55,7 @@ class CFormElement extends CElement {
 	public function invalidate() {
 		parent::invalidate();
 
-		$this->fields = null;
+		$this->fields = new CElementCollection([]);
 	}
 
 	/**
@@ -60,32 +68,67 @@ class CFormElement extends CElement {
 	}
 
 	/**
+	 * Get form label element by text.
+	 *
+	 * @param string $name    field label text
+	 *
+	 * @return CElement
+	 *
+	 * @throws Exception
+	 */
+	public function getLabel($name) {
+		$prefix = 'xpath:.//ul[@class="table-forms"]/li/div[@class="table-forms-td-left"]';
+		$label = $this->query($prefix.'/label[text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
+
+		if ($label === null) {
+			throw new Exception('Failed to find form label by name: "'.$name.'".');
+		}
+
+		return $label;
+	}
+
+	/**
+	 * Get element field by label element.
+	 *
+	 * @param CElement $label    label element
+	 *
+	 * @return CElement|null
+	 */
+	public function getFieldByLabelElement($label) {
+		$prefix = 'xpath:./../../div[@class="table-forms-td-right"]';
+		$selectors = [
+			'/*[@name][not(@type="hidden")]'		=> 'CElement',
+			'/div[@class="multiselect-wrapper"]'	=> 'CMultiselectElement',
+			'/ul[@class="radio-segmented"]'			=> 'CSegmentedRadioElement',
+			'/div[@class="range-control"]'			=> 'CRangeControlElement'
+		];
+
+		foreach ($selectors as $selector => $class) {
+			if (($element = $label->query($prefix.$selector)->cast($class)->one(false)) !== null) {
+				return $element;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get collection of element fields indexed by label name.
 	 *
 	 * @return CElementCollection
 	 */
 	public function getFields() {
-		if ($this->fields === null) {
-			$fields = [];
-			$selector = 'xpath:./../../div[@class="table-forms-td-right"]';
+		$fields = [];
 
-			foreach ($this->getLabels() as $label) {
-				$element = $label->query($selector.'/*[@name]')->one(false);
-				if ($element === null) {
-					$element = $label->query($selector.'/div[@class="multiselect-wrapper"]')->asMultiselect()->one(false);
-				}
+		foreach ($this->getLabels() as $label) {
+			$element = $this->getFieldByLabelElement($label);
 
-				if ($element === null) {
-					$element = $label->query($selector.'/ul[@class="radio-segmented"]')->asSegmentedRadio()->one(false);
-				}
-
-				if ($element !== null) {
-					$fields[$label->getText()] = $element;
-				}
+			if ($element !== null) {
+				$fields[$label->getText()] = $element;
 			}
-
-			$this->fields = new CElementCollection($fields);
 		}
+
+		$this->fields = new CElementCollection($fields);
 
 		return $this->fields;
 	}
@@ -100,13 +143,43 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	public function getField($name) {
-		$fields = $this->getFields();
+		if (!$this->fields->exists($name)) {
+			$label = $this->getLabel($name);
 
-		if (!$fields->exists($name)) {
-			throw new Exception('Failed to find form field by label name: "'.$name.'".');
+			if (($element = $this->getFieldByLabelElement($label)) === null) {
+				throw new Exception('Failed to find form field by label name: "'.$name.'".');
+			}
+
+			$this->fields->set($name, $element);
 		}
 
-		return $fields->get($name);
+		return $this->fields->get($name);
+	}
+
+	/**
+	 * Get field container element by label name.
+	 *
+	 * @param string $name    field label text
+	 *
+	 * @return CElement
+	 *
+	 * @throws Exception
+	 */
+	public function getFieldContainer($name) {
+		return $this->getLabel($name)->query('xpath:./../../div[@class="table-forms-td-right"]')->one();
+	}
+
+	/**
+	 * Get field elements by label name.
+	 *
+	 * @param string $name    field label text
+	 *
+	 * @return CElementCollection
+	 *
+	 * @throws Exception
+	 */
+	public function getFieldElements($name) {
+		return $this->getFieldContainer($name)->query('xpath:./*')->all();
 	}
 
 	/**
@@ -115,8 +188,12 @@ class CFormElement extends CElement {
 	 * @return $this
 	 */
 	public function selectTab($name) {
-		$xpath = './/ul[contains(@class, "ui-tabs-nav")]//a[text()='.CXPathHelper::escapeQuotes($name).']';
-		return $this->query('xpath', $xpath)->waitUntilPresent()->one()->click();
+		$selector = '/a[text()='.CXPathHelper::escapeQuotes($name).']';
+
+		$this->query('xpath:.//ul[contains(@class, "ui-tabs-nav")]/'.$selector)->waitUntilPresent()->one()->click();
+		$this->query('xpath:.//li[@aria-selected="true"]'.$selector)->waitUntilPresent();
+
+		return $this;
 	}
 
 	/**

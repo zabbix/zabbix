@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -330,7 +330,7 @@ class CScreenProblem extends CScreenBase {
 						'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 						'triggerids' => array_keys($triggerids),
 						'monitored' => true,
-						'skipDependent' => true,
+						'skipDependent' => ($filter['show'] == TRIGGERS_OPTION_ALL) ? null : true,
 						'preservekeys' => true
 					];
 
