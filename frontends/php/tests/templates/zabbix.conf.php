@@ -18,7 +18,7 @@ $ZBX_SERVER_NAME		= 'TEST_SERVER_NAME';
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 
 // PHP runtime error log file for unit tests.
-define('PHPUNIT_ERROR_LOG', '/tmp/zabbix_phpunit.err');
+define('PHPUNIT_ERROR_LOG', '{PHPUNIT_ERROR_LOG}');
 
 if (!defined('PHPUNIT_BASEDIR')) {
 	// Runtime error collection block.
