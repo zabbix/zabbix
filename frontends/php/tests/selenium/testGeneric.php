@@ -125,7 +125,6 @@ class testGeneric extends CLegacyWebTest {
 	public function testGeneric_Pages($url, $title) {
 		$this->zbxTestLogin($url);
 		$this->zbxTestCheckTitle($title);
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckMandatoryStrings();
 	}
 }

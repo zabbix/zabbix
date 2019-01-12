@@ -98,6 +98,5 @@ class testPageItems extends CLegacyWebTest {
 		else {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
 		}
-		$this->zbxTestCheckFatalErrors();
 	}
 }

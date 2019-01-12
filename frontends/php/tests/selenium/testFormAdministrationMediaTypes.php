@@ -106,7 +106,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Media types');
 
 		$this->zbxTestClickButtonText('Create media type');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->zbxTestCheckHeader('Media types');
 		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email',
@@ -131,7 +130,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 
 		if($data['type'] != 'Email') {
 			$this->zbxTestDropdownSelectWait('type', $data['type']);
-			$this->zbxTestCheckFatalErrors();
 			$this->zbxTestAssertNotVisibleId('smtp_server');
 			$this->zbxTestAssertNotVisibleId('smtp_port');
 			$this->zbxTestAssertNotVisibleId('smtp_helo');
@@ -142,7 +140,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 
 		switch ($data['type']) {
 			case 'Email':
-				$this->zbxTestCheckFatalErrors();
 				$this->zbxTestAssertElementValue('smtp_server', $data['smtp_server']);
 				$this->zbxTestAssertAttribute("//input[@id='smtp_server']", "maxlength", 255);
 				$this->zbxTestAssertAttribute("//input[@id='smtp_server']", "size", 20);
@@ -236,7 +233,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestCheckHeader('Media types');
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	/**
@@ -255,7 +251,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestCheckHeader('Media types');
 		$this->zbxTestTextPresent($name);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($oldHashMediaType, CDBHelper::getHash($sql));
 	}
@@ -342,7 +337,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent('Cannot add media type');
 		$this->zbxTestTextPresent('Media type added');
 		$this->zbxTestTextPresent($data['Description']);
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	/**
@@ -358,7 +352,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type updated');
 		$this->zbxTestTextPresent($name);
-		$this->zbxTestCheckFatalErrors();
 
 		$newHashMediaType = CDBHelper::getHash($sqlMediaType);
 		$this->assertEquals($oldHashMediaType, $newHashMediaType);
@@ -386,11 +379,9 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 			$this->zbxTestTextNotPresent('Media type deleted');
 			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete media type');
 			$this->zbxTestTextPresent('Media types used by action');
-			$this->zbxTestCheckFatalErrors();
 		}
 		else {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type deleted');
-			$this->zbxTestCheckFatalErrors();
 			$sql = 'SELECT * FROM media_type WHERE mediatypeid='.zbx_dbstr($id);
 			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
@@ -634,7 +625,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type added');
 				$this->zbxTestCheckTitle('Configuration of media types');
 				$this->zbxTestTextPresent($data['name']);
-				$this->zbxTestCheckFatalErrors();
 				break;
 
 			case TEST_BAD:
@@ -644,7 +634,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 				else {
 					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add media type');
 					$this->zbxTestTextPresent($data['error']);
-					$this->zbxTestCheckFatalErrors();
 				}
 
 				$sql = "SELECT * FROM media_type WHERE description = '".$data['name']."'";
