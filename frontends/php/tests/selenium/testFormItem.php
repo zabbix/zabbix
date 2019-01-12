@@ -2319,7 +2319,6 @@ class testFormItem extends CLegacyWebTest {
 					'SSH agent', 'TELNET agent', 'JMX agent', 'Calculated'])) {
 				$this->zbxTestClick('check_now');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
-				$this->zbxTestCheckFatalErrors();
 			}
 			else {
 				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
@@ -2684,7 +2683,6 @@ class testFormItem extends CLegacyWebTest {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
-				$this->zbxTestCheckFatalErrors();
 
 				$dbResultItem = DBselect("SELECT name,key_,itemid FROM items where key_ = '".$data['key']."'");
 				$rowItem = DBfetch($dbResultItem);

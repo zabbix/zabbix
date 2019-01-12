@@ -48,6 +48,5 @@ class testTriggerExpressions extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Test"]');
 		$this->zbxTestAssertElementText('(//div[@class="overlay-dialogue-body"]//td[@class="'.$css_class.'"])[1]', $expected);
 		$this->zbxTestAssertElementText('(//div[@class="overlay-dialogue-body"]//td[@class="'.$css_class.'"])[2]', $expected);
-		$this->zbxTestCheckFatalErrors();
 	}
 }
