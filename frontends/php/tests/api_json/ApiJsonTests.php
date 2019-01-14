@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/testApplication.php';
 require_once dirname(__FILE__).'/testConfiguration.php';
 require_once dirname(__FILE__).'/testCorrelation.php';
 require_once dirname(__FILE__).'/testDRule.php';
+require_once dirname(__FILE__).'/testHost.php';
 require_once dirname(__FILE__).'/testHostGroup.php';
 require_once dirname(__FILE__).'/testIconMap.php';
 require_once dirname(__FILE__).'/testMaintenance.php';
@@ -53,6 +54,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testConfiguration');
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
+		$suite->addTestSuite('testHost');
 		$suite->addTestSuite('testHostGroup');
 		$suite->addTestSuite('testIconMap');
 		$suite->addTestSuite('testMaintenance');

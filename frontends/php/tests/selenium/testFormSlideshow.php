@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,7 +67,6 @@ class testFormSlideshow extends CLegacyWebTest {
 		// Validate.
 		$this->zbxTestTextPresent($data['name']);
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM slideshows WHERE name='.zbx_dbstr($data['name'])));
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function testFormSlideshow_Clone() {
@@ -102,8 +101,6 @@ class testFormSlideshow extends CLegacyWebTest {
 			$this->assertEquals(1, CDBHelper::getCount('SELECT null FROM slideshows WHERE name='.zbx_dbstr($get_name)));
 			$this->assertEquals(1, CDBHelper::getCount('SELECT null FROM slideshows WHERE name='.zbx_dbstr($new_name)));
 		}
-
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	/**
@@ -134,7 +131,6 @@ class testFormSlideshow extends CLegacyWebTest {
 
 		// Test if slideshow is there.
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	/**
@@ -167,7 +163,6 @@ class testFormSlideshow extends CLegacyWebTest {
 
 		// Validate.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Slide show must contain slides.');
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	/**
@@ -194,8 +189,6 @@ class testFormSlideshow extends CLegacyWebTest {
 			$new_slideshowid = CDBHelper::getRow('SELECT slideshowid FROM slideshows WHERE name='.zbx_dbstr($data['name']));
 			$this->assertEquals($slideshow['slideshowid'], $new_slideshowid['slideshowid']);
 		}
-
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function testFormSlideshow_DeleteFromForm() {
@@ -218,7 +211,5 @@ class testFormSlideshow extends CLegacyWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Slide show deleted');
 			$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM slideshows WHERE slideshowid='.$slideshow['slideshowid']));
 		}
-
-		$this->zbxTestCheckFatalErrors();
 	}
 }

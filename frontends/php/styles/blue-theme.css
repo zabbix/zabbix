@@ -34,13 +34,13 @@ html {
   min-height: 100%; }
 
 body {
-  font-family: Arial, Tahoma, Verdana, sans-serif;
-  font-size: 75%;
   line-height: 1.4em;
   color: #1f2c33;
   background-color: #ebeef0;
   margin-bottom: 60px;
-  min-width: 950px; }
+  min-width: 950px;
+  font-family: Arial, Tahoma, Verdana, sans-serif;
+  font-size: 75%; }
 
 a:link {
   color: #0275b8;
@@ -1154,7 +1154,8 @@ output {
     display: table-cell;
     padding: 5px 0 5px 10px;
     vertical-align: middle;
-    width: 85%; }
+    width: 85%;
+    position: relative; }
     .table-forms .table-forms-td-right.has-before {
       padding-top: 0px; }
     .table-forms .table-forms-td-right td {
@@ -1172,8 +1173,8 @@ output {
         vertical-align: middle; }
         .table-forms .table-forms-td-right td.center .btn-grey {
           margin: 3px 0; }
-  .table-forms .table-forms-td-right {
-    position: relative; }
+    .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
+      margin-top: 5px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {

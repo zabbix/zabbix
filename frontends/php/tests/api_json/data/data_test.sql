@@ -319,6 +319,46 @@ INSERT INTO hosts (hostid,host,name,status,description) VALUES (120003,'Template
 INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers) VALUES (110004,0,120003,'templated-item','','agent.ping[]',30,NULL,'','','','','','');
 INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers,flags) VALUES (110005,0,120003,'templated-lld-rule','','agent.ping[-]',30,NULL,'','','','','','',1);
 
+-- testHost_Delete and testHostGroup_Delete maintenance constraint
+INSERT INTO hstgrp (groupid, name) VALUES (62001, 'Host group for maintenances');
+INSERT INTO hstgrp (groupid, name) VALUES (62002, 'maintenance_has_only_group');
+INSERT INTO hstgrp (groupid, name) VALUES (62003, 'maintenance_has_group_and_host');
+INSERT INTO hstgrp (groupid, name) VALUES (62004, 'maintenance_group_1');
+INSERT INTO hstgrp (groupid, name) VALUES (62005, 'maintenance_group_2');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (61001, 'maintenance_has_only_host', 'maintenance_has_only_host', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (61002, 'maintenance_has_only_group', 'maintenance_has_only_group', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (61003, 'maintenance_has_group_and_host', 'maintenance_has_group_and_host', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (61004, 'maintenance_host_1', 'maintenance_host_1', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (61005, 'maintenance_host_2', 'maintenance_host_2', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50015, 61001, 62001);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50016, 61002, 62001);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50017, 61003, 62001);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50018, 61004, 62001);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50019, 61005, 62001);
+INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60001, 'maintenance_has_only_host', '', 1539723600, 1539810000);
+INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60002, 'maintenance_has_only_group', '', 1539723600, 1539810000);
+INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60003, 'maintenance_has_group_and_host', '', 1539723600, 1539810000);
+INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60004, 'maintenance_two_hosts', '', 1539723600, 1539810000);
+INSERT INTO maintenances (maintenanceid, name, description, active_since, active_till) VALUES (60005, 'maintenance_two_groups', '', 1539723600, 1539810000);
+INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (1, 60001, 61001);
+INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (2, 60003, 61003);
+INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (3, 60004, 61004);
+INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (4, 60004, 61005);
+INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (1, 60002, 62002);
+INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (2, 60003, 62003);
+INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (3, 60005, 62004);
+INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (4, 60005, 62005);
+INSERT INTO timeperiods (timeperiodid) VALUES (1);
+INSERT INTO timeperiods (timeperiodid) VALUES (2);
+INSERT INTO timeperiods (timeperiodid) VALUES (3);
+INSERT INTO timeperiods (timeperiodid) VALUES (4);
+INSERT INTO timeperiods (timeperiodid) VALUES (5);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (1, 60001, 1);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (2, 60002, 2);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (3, 60003, 3);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (4, 60004, 4);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (5, 60005, 5);
+
 -- LLD rules and LLD macro paths
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110006,50009,50022,0,4,'API LLD rule 1','apilldrule1','30s','90d',0,'','',1,'','');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110007,50009,50022,0,4,'API LLD rule 2','apilldrule2','30s','90d',0,'','',1,'','');

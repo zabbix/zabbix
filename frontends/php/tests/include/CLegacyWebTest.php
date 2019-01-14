@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,32 +31,6 @@ define('TEST_ERROR', 2);
  */
 class CLegacyWebTest extends CWebTest {
 	const WAIT_ITERATION = 50;
-
-	// List of strings that should NOT appear on any page.
-	public $failIfExists = [
-		'pg_query',
-		'Error in',
-		'expects parameter',
-		'Undefined index',
-		'Undefined variable',
-		'Undefined offset',
-		'Fatal error',
-		'Call to undefined method',
-		'Invalid argument supplied',
-		'Missing argument',
-		'Warning:',
-		'PHP notice',
-		'PHP warning',
-		'Use of undefined',
-		'You must login',
-		'DEBUG INFO',
-		'Cannot modify header',
-		'Parse error',
-		'syntax error',
-		'Try to read inaccessible property',
-		'Illegal string offset',
-		'must be an array'
-	];
 
 	// List of strings that SHOULD appear on every page.
 	public $failIfNotExists = [
@@ -100,10 +74,6 @@ class CLegacyWebTest extends CWebTest {
 
 	public function zbxTestLogout() {
 		$this->query('xpath://a[@class="top-nav-signout"]')->one()->click();
-	}
-
-	public function zbxTestCheckFatalErrors() {
-		$this->zbxTestTextNotPresent($this->failIfExists);
 	}
 
 	public function zbxTestCheckMandatoryStrings() {
@@ -541,7 +511,6 @@ class CLegacyWebTest extends CWebTest {
 	public function zbxTestTabSwitch($tab) {
 		$this->zbxTestClickXpathWait("//div[@id='tabs']/ul/li/a[text()='$tab']");
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//li[contains(@class, 'ui-tabs-active')]/a[text()='$tab']"));
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxTestTabSwitchById($id, $tab) {
@@ -550,12 +519,10 @@ class CLegacyWebTest extends CWebTest {
 			$this->zbxTestClickXpathWait("//div[@id='tabs']/ul/li/a[text()='$tab']");
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//li[contains(@class, 'ui-tabs-active')]/a[text()='$tab']"));
 		}
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxTestLaunchOverlayDialog($header) {
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@id='overlay_dialogue']/div[@class='dashbrd-widget-head']/h4[text()='$header']"));
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxTestClickAndAcceptAlert($id) {
