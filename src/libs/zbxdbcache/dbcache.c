@@ -1494,6 +1494,7 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 	zbx_timespec_t		*timespecs = NULL;
 	zbx_hashset_t		trigger_info;
 	zbx_vector_ptr_t	trigger_order;
+	zbx_vector_ptr_t	trigger_items;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1524,6 +1525,8 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 	zbx_vector_ptr_create(&trigger_order);
 	zbx_vector_ptr_reserve(&trigger_order, trigger_info.num_slots);
 
+	zbx_vector_ptr_create(&trigger_items);
+
 	if (0 != item_num)
 	{
 		DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, item_num);
@@ -1539,10 +1542,12 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 	}
 
 	zbx_vector_ptr_sort(&trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	evaluate_expressions(&trigger_order);
-	zbx_process_triggers(&trigger_order, trigger_diff);
+	evaluate_expressions(&trigger_order, &trigger_items);
+	zbx_process_triggers(&trigger_order, &trigger_items, trigger_diff);
 
 	DCfree_triggers(&trigger_order);
+
+	zbx_vector_ptr_destroy(&trigger_items);
 
 	zbx_hashset_destroy(&trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);

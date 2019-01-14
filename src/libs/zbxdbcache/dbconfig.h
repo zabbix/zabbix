@@ -101,6 +101,7 @@ typedef struct
 	unsigned char		queue_priority;
 	unsigned char		schedulable;
 	unsigned char		update_triggers;
+	zbx_uint64_t		templateid;
 }
 ZBX_DC_ITEM;
 

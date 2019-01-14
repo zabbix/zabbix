@@ -406,7 +406,9 @@ int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsign
 		zbx_dbsync_row_t	*sync_row;
 
 		if (sync->row_index == sync->rows.values_num)
+		{
 			return FAIL;
+		}
 
 		sync_row = (zbx_dbsync_row_t *)sync->rows.values[sync->row_index++];
 		*rowid = sync_row->rowid;
@@ -628,10 +630,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				",tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,"
 				"maintenanceid"
 			" from hosts"
-			" where status in (%d,%d,%d,%d)"
-				" and flags<>%d",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
+				" where flags<>%d",
 			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
 		return FAIL;
@@ -648,10 +647,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept,"
 				"proxy_address,auto_compress,maintenanceid"
 			" from hosts"
-			" where status in (%d,%d,%d,%d)"
-				" and flags<>%d",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
+				" where flags<>%d",
 			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
 		return FAIL;
@@ -1286,6 +1282,9 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
 		return FAIL;
 
+	if (FAIL == dbsync_compare_uint64(dbrow[57], item->templateid))
+		return FAIL;
+
 	if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&dbsync_env.cache->hosts, &item->hostid)))
 		return FAIL;
 
@@ -1729,18 +1728,18 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.master_itemid,i.timeout,i.url,i.query_fields,i.posts,i.status_codes,"
 				"i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,"
 				"i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,"
-				"i.verify_peer,i.verify_host,i.allow_traps"
+				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
-				" and h.status in (%d,%d)"
+				" and h.status in (%d,%d,%d)"
 				" and i.flags<>%d",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 57, dbsync_item_preproc_row);
+	dbsync_prepare(sync, 58, dbsync_item_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

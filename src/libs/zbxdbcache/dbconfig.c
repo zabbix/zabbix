@@ -2332,6 +2332,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
+		if (NULL == row[57])
+			item->templateid = 0;
+		else
+			ZBX_STR2UINT64(item->templateid, row[57]);
+
 		if (0 != found && ITEM_TYPE_SNMPTRAP == item->type)
 			dc_interface_snmpitems_remove(item);
 
@@ -11872,43 +11877,49 @@ void	zbx_dc_cleanup_data_sessions(void)
 	UNLOCK_CACHE;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: get_host_tags                                                    *
- *                                                                            *
- * Purpose: gather host tags from hosts specified by a list of hostids        *
- *                                                                            *
- ******************************************************************************/
-static void	get_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_vector_ptr_t *host_tags)
+static int	zbx_find_orig_tmpl_item(zbx_uint64_t itemid, ZBX_DC_ITEM **item)
 {
+	if (NULL != (*item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+	{
+		if (0 == (*item)->templateid)
+			return SUCCEED;
+		else
+			return zbx_find_orig_tmpl_item((*item)->templateid, item);
+	}
+
+	return FAIL;
+}
+
+void	DCget_host_tags_by_itemids(const zbx_uint64_t *itemids, size_t itemids_num, zbx_vector_ptr_t *host_tags)
+{
+	ZBX_DC_ITEM		*item;
 	zbx_hashset_iter_t	iter;
 	zbx_dc_host_tag_t	*host_tag;
 	zbx_tag_t		*tag;
 	int			i;
-	const ZBX_DC_HTMPL	*htmpl;
 
-	for (i = 0; i < hostids_num; i++)
+	if (0 == itemids_num)
+		return;
+
+	RDLOCK_CACHE;
+
+	for (i = 0; i < itemids_num; i++)
 	{
-		if (NULL != (htmpl = (const ZBX_DC_HTMPL *)zbx_hashset_search(&config->htmpls, &hostids[i])))
-			get_host_tags(htmpl->templateids.values, htmpl->templateids.values_num, host_tags);
-
-		zbx_hashset_iter_reset(&config->host_tags, &iter);
-		while (NULL != (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_iter_next(&iter)))
+		if (SUCCEED == zbx_find_orig_tmpl_item(itemids[i], &item))
 		{
-			if(host_tag->hostid == hostids[i])
+			zbx_hashset_iter_reset(&config->host_tags, &iter);
+			while (NULL != (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_iter_next(&iter)))
 			{
-				tag = (zbx_tag_t *) zbx_malloc(NULL, sizeof(zbx_tag_t));
-				tag->tag = zbx_strdup(NULL, host_tag->tag);
-				tag->value = zbx_strdup(NULL, host_tag->value);
-				zbx_vector_ptr_append(host_tags, tag);
+				if (host_tag->hostid == item->hostid)
+				{
+					tag = (zbx_tag_t *) zbx_malloc(NULL, sizeof(zbx_tag_t));
+					tag->tag = zbx_strdup(NULL, host_tag->tag);
+					tag->value = zbx_strdup(NULL, host_tag->value);
+					zbx_vector_ptr_append(host_tags, tag);
+				}
 			}
 		}
 	}
-}
 
-void	DCget_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_vector_ptr_t *host_tags)
-{
-	RDLOCK_CACHE;
-	get_host_tags(hostids, hostids_num, host_tags);
 	UNLOCK_CACHE;
 }

@@ -252,6 +252,14 @@ typedef struct _DC_TRIGGER
 }
 DC_TRIGGER;
 
+/* needed to collect and pass data about items that are involved in generating problem events */
+typedef struct
+{
+	zbx_uint64_t		triggerid;
+	zbx_vector_uint64_t	itemids;
+}
+zbx_trigger_items_t;
+
 typedef struct
 {
 	zbx_uint64_t	hostid;
@@ -864,6 +872,6 @@ void	zbx_dc_maintenance_reset_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flags(void);
 
-void	DCget_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_vector_ptr_t *host_tags);
+void	DCget_host_tags_by_itemids(const zbx_uint64_t *itemids, size_t itemids_num, zbx_vector_ptr_t *host_tags);
 
 #endif
