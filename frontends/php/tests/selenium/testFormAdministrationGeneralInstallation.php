@@ -75,7 +75,6 @@ class testFormAdministrationGeneralInstallation extends CLegacyWebTest {
 		// welcome page
 
 		$this->zbxTestCheckTitle('Installation', false);
-		$this->zbxTestTextNotPresent($this->failIfExists);
 		$this->zbxTestTextPresent($this->failIfNotExistsInstall);
 
 		$this->zbxTestAssertElementPresentId('cancel');
@@ -87,7 +86,6 @@ class testFormAdministrationGeneralInstallation extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Installation', false);
 		$this->zbxTestCheckHeader('Check of pre-requisites');
-		$this->zbxTestTextNotPresent($this->failIfExists);
 		$this->zbxTestTextPresent($this->failIfNotExistsInstall);
 		$this->zbxTestTextPresent($this->failIfNotExistsPrereq);
 
@@ -101,7 +99,6 @@ class testFormAdministrationGeneralInstallation extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Installation', false);
 		$this->zbxTestCheckHeader('Configure DB connection');
-		$this->zbxTestTextNotPresent($this->failIfExists);
 		$this->zbxTestTextPresent($this->failIfNotExistsInstall);
 		$this->zbxTestTextPresent($this->failIfNotExistsDBConf);
 
