@@ -424,8 +424,8 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	for (i = 0; i < num; i++)
 	{
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		rc = substitute_key_macros(&items[i].key, NULL, &items[i], NULL, MACRO_TYPE_ITEM_KEY,
-				error, sizeof(error));
+		rc = substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL, MACRO_TYPE_ITEM_KEY, error,
+				sizeof(error));
 
 		if (SUCCEED == rc)
 		{

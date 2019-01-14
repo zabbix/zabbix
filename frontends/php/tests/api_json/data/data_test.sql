@@ -358,3 +358,28 @@ INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timep
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (3, 60003, 3);
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (4, 60004, 4);
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (5, 60005, 5);
+
+-- LLD rules and LLD macro paths
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110006,50009,50022,0,4,'API LLD rule 1','apilldrule1','30s','90d',0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110007,50009,50022,0,4,'API LLD rule 2','apilldrule2','30s','90d',0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110008,50009,50022,0,4,'API LLD rule 3','apilldrule3','30s','90d',0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110009,50009,50022,0,4,'API LLD rule 4','apilldrule4','30s','90d',0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110010,50010,null,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,templateid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110011,50009,50022,110010,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,'','',1,'','');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1,110006,'{#A}','$.list[:1].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (2,110006,'{#B}','$.list[:2].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (3,110006,'{#C}','$.list[:3].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (4,110006,'{#D}','$.list[:4].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (5,110006,'{#E}','$.list[:5].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (6,110007,'{#A}','$.list[:1].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (7,110007,'{#B}','$.list[:2].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (8,110007,'{#C}','$.list[:3].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (9,110008,'{#A}','$.list[:1].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (10,110008,'{#B}','$.list[:2].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (11,110008,'{#C}','$.list[:3].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (12,110010,'{#A}','$.list[:1].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (13,110010,'{#B}','$.list[:2].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (14,110010,'{#C}','$.list[:3].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (15,110011,'{#A}','$.list[:1].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (16,110011,'{#B}','$.list[:2].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (17,110011,'{#C}','$.list[:3].type');

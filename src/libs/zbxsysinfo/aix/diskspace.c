@@ -247,9 +247,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto error;
 	}
 
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	for (i = 0, vm = vms; i < rc; i++)
 	{

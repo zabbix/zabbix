@@ -1787,8 +1787,7 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 		}
 	}
 
-	zbx_json_init(&js, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addarray(&js, ZBX_PROTO_TAG_DATA);
+	zbx_json_initarray(&js, ZBX_JSON_STAT_BUF_LEN);
 
 	for (i = 0; i < data.index.values_num; i++)
 	{

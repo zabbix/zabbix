@@ -30,7 +30,8 @@ class CImportConverterFactory extends CRegistryFactory {
 			'2.0' => new C20ImportConverter(),
 			'3.0' => new C30ImportConverter(),
 			'3.2' => new C32ImportConverter(),
-			'3.4' => new C34ImportConverter()
+			'3.4' => new C34ImportConverter(),
+			'4.0' => new C40ImportConverter()
 		]);
 	}
 }

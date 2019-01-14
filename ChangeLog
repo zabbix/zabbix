@@ -1,6 +1,7 @@
 Changes for 4.2.0alpha3
 
 New features:
+A.F.I...S. [ZBXNEXT-4877] implemented support for custom JSON path in LLD macros (Ivo, vso)
 ..F....... [ZBXNEXT-1190] implemented item prototype mass update and combined adding, updating and removing of applications in single control in item mass update form (Ivo)
 A......... [ZBXNEXT-4933] dropped support of "elementid" in map.create() and map.update() methods (Sasha)
 A......... [ZBXNEXT-4933] dropped support of string format for "headers" and "variables" in httptest.create() and httptest.update() methods (Sasha)

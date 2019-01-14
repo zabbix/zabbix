@@ -269,8 +269,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	while (0 != EnumServicesStatusEx(h_mgr, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
 			(LPBYTE)ssp, sz, &szn, &services, &resume_handle, NULL) || ERROR_MORE_DATA == GetLastError())

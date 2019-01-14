@@ -433,7 +433,13 @@ class C42XmlValidator {
 							'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
 							'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
 							'verify_peer' =>			['type' => XML_STRING | XML_REQUIRED],
-							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED]
+							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED],
+							'lld_macro_paths' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'lld_macro_path', 'rules' => [
+								'lld_macro_path' =>			['type' => XML_ARRAY, 'rules' => [
+									'lld_macro' =>				['type' => XML_STRING | XML_REQUIRED],
+									'path' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]]
 						]]
 					]],
 					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
@@ -930,7 +936,13 @@ class C42XmlValidator {
 							'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
 							'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
 							'verify_peer' =>			['type' => XML_STRING | XML_REQUIRED],
-							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED]
+							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED],
+							'lld_macro_paths' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'lld_macro_path', 'rules' => [
+								'lld_macro_path' =>			['type' => XML_ARRAY, 'rules' => [
+									'lld_macro' =>				['type' => XML_STRING | XML_REQUIRED],
+									'path' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]]
 						]]
 					]],
 					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [

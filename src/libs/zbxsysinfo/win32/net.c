@@ -577,9 +577,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_ifrow_init(&ifrow);
 
