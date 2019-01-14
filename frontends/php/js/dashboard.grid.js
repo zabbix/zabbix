@@ -240,24 +240,35 @@
 	 * @param {object} widget  Moved widget object.
 	 */
 	function realignWidget(data, widget) {
-		var to_row = widget['current_pos']['y'] + widget['current_pos']['height'],
-			overlapped_widgets = [];
 
-		$.each(data['widgets'], function() {
-			if (widget.uniqueid != this.uniqueid && rectOverlap(widget['current_pos'], this['current_pos'])) {
-				overlapped_widgets.push(this);
-			}
-		});
+		var realign = function(widgets, widget) {
+			var next = [];
 
-		overlapped_widgets.sort(function (widget1, widget2) {
-			return widget2['current_pos']['y'] - widget1['current_pos']['y'];
-		});
+			$.each(widgets, function() {
+				var w = this;
 
-		for (var i = 0; i < overlapped_widgets.length; i++) {
-			overlapped_widgets[i]['current_pos']['y'] = to_row;
+				if (widget.uniqueid != w.uniqueid && rectOverlap(widget['current_pos'], w['current_pos'])) {
+					w['current_pos']['y'] = widget['current_pos'].y + widget['current_pos'].height;
+					next.push(w);
+				}
+			});
 
-			realignWidget(data, overlapped_widgets[i]);
+			$.each(next, function() {
+				realign(data.widgets, this);
+			});
 		}
+
+		realign(sortWidgerts(data['widgets']), widget);
+	}
+
+	function sortWidgerts(widgets) {
+		widgets.sort(function(box1, box2) {
+			return box1.pos.y - box2.pos.y;
+		}).each(function(box, index) {
+			box.div.data('widget-index', index);
+		});
+
+		return widgets;
 	}
 
 	/**
@@ -282,11 +293,7 @@
 			});
 		};
 
-		widgets.sort(function(box1, box2) {
-			return box1.pos.y - box2.pos.y;
-		}).each(function(box, index) {
-			box.div.data('widget-index', index);
-		});
+		widgets = sortWidgerts(widgets);
 
 		markAffected(widget.pos);
 
@@ -752,7 +759,7 @@
 
 	function checkWidgetOverlap(data, widget) {
 		resetCurrentPositions(data['widgets']);
-		realignWidget(data, widget);
+		// realignWidget(data, widget);
 
 		$.each(data['widgets'], function() {
 			if (!posEquals(this['pos'], this['current_pos'])) {
@@ -911,6 +918,8 @@
 			stop: function(event, ui) {
 				data['pos-action'] = '';
 				delete data.calculated;
+
+				data.widgets = sortWidgerts(data.widgets);
 
 				setResizableState('enable', data.widgets, '');
 				stopWidgetPositioning($obj, ui.helper, data);
