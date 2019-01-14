@@ -66,4 +66,16 @@ class CDropdownElement extends CElement {
 
 		return $this;
 	}
+
+	/**
+	 * Alias for select.
+	 * @see self::select
+	 *
+	 * @param string $text    option text to be selected
+	 *
+	 * @return $this
+	 */
+	public function fill($text) {
+		return $this->select($text);
+	}
 }
