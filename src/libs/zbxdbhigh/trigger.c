@@ -289,7 +289,8 @@ void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_
 {
 	const char	*__function_name = "zbx_process_triggers";
 
-	int		i;
+	int			i;
+	zbx_trigger_items_t 	*ti;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, triggers->values_num);
 
@@ -303,7 +304,11 @@ void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_
 
 	/* free trigger items */
 	for (i = 0; i < trigger_items->values_num; i++)
-		zbx_free(trigger_items->values[i]);
+	{
+		ti = (zbx_trigger_items_t *)trigger_items->values[i];
+		zbx_vector_uint64_destroy(&ti->itemids);
+		zbx_free(ti);
+	}
 
 	zbx_vector_ptr_sort(trigger_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 out:
