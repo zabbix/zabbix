@@ -659,6 +659,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'hostids' => $data['templateids'],
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'preservekeys' => true
 		]);
 		$json = new CJson();
