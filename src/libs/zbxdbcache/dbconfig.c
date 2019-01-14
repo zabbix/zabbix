@@ -4278,9 +4278,8 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 
 	zbx_dc_host_tag_t	*host_tag;
 
-	int		found, context_existed, update_index, ret;
+	int		found, ret;
 	zbx_uint64_t	hosttagid, hostid;
-	char		*macro = NULL, *context = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -11896,7 +11895,7 @@ void	DCget_host_tags_by_itemids(const zbx_uint64_t *itemids, size_t itemids_num,
 	zbx_hashset_iter_t	iter;
 	zbx_dc_host_tag_t	*host_tag;
 	zbx_tag_t		*tag;
-	int			i;
+	size_t			i;
 
 	if (0 == itemids_num)
 		return;
