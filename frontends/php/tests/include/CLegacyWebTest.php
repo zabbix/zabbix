@@ -478,7 +478,7 @@ class CLegacyWebTest extends CWebTest {
 		$caller = $trace[2];
 
 		if ($caller['class'] !== __CLASS__) {
-			$this->addWarning('Web driver selector should not be used in test cases.');
+			self::addWarning('Web driver selector should not be used in test cases.');
 		}
 
 		return $this->query($type, $locator);
@@ -742,7 +742,7 @@ class CLegacyWebTest extends CWebTest {
 
 	public function __get($attribute) {
 		if ($attribute === 'webDriver') {
-			$this->addWarning('Web driver should not be accessed directly from test cases.');
+			self::addWarning('Web driver should not be accessed directly from test cases.');
 			return CElementQuery::getDriver();
 		}
 
