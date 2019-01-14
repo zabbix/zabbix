@@ -568,7 +568,7 @@ class CTemplate extends CHostGeneral {
 		foreach ($templates as $tnum => $template) {
 			$templateid = $template['templateid'];
 
-			if (!array_key_exists('tags', $template)) {
+			if (!array_key_exists('tags', $template) || !array_key_exists($templateid, $db_templates) ) {
 				unset($templates[$tnum], $db_templates[$templateid]);
 				continue;
 			}
@@ -589,6 +589,10 @@ class CTemplate extends CHostGeneral {
 
 			foreach ($template['tags'] as $tag) {
 				$ins_tags[] = ['hostid' => $templateid] + $tag;
+			}
+
+			if (!array_key_exists($templateid, $db_templates)) {
+				continue;
 			}
 
 			foreach ($db_templates[$templateid]['tags'] as $db_tag) {
