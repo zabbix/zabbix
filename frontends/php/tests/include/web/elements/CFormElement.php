@@ -85,16 +85,18 @@ class CFormElement extends CElement {
 		}
 
 		if ($labels->count() > 1) {
-			CTest::addWarning('Form label "'.$name.'" is not unique.');
-		}
+			$labels = $labels->filter(CElementQuery::VISIBLE);
 
-		foreach ($labels as $label) {
-			if ($label->isVisible()) {
-				return $label;
+			if ($labels->isEmpty()) {
+				throw new Exception('Failed to find visible form label by name: "'.$name.'".');
+			}
+
+			if ($labels->count() > 1) {
+				CTest::addWarning('Form label "'.$name.'" is not unique.');
 			}
 		}
 
-		throw new Exception('Form label with name: "'.$name.'" is not visible.');
+		return $labels->first();
 	}
 
 	/**

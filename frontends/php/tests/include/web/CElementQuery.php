@@ -215,13 +215,13 @@ class CElementQuery implements IWaitable {
 	}
 
 	/**
-	 * Wait until condition is met for target.
+	 * Get element condition callable name.
 	 *
-	 * @param IWaitable $target       target for wait operation
-	 * @param string    $condition    condition to be waited for
-	 * @param array     $params       condition params
+	 * @param string $condition    condition name
+	 *
+	 * @return array
 	 */
-	public static function waitUntil($target, $condition, $params = []) {
+	public static function getConditionCallable($condition) {
 		$conditions = [
 			static::READY => 'getReadyCondition',
 			static::PRESENT => 'getPresentCondition',
@@ -236,12 +236,27 @@ class CElementQuery implements IWaitable {
 			static::NOT_CLICKABLE => 'getNotClickableCondition'
 		];
 
+		if (!array_key_exists($condition, $conditions)) {
+			throw new Exception('Cannot get element condition callable by name "'.$condition.'"!');
+		}
+
+		return $conditions[$condition];
+	}
+
+	/**
+	 * Wait until condition is met for target.
+	 *
+	 * @param IWaitable $target       target for wait operation
+	 * @param string    $condition    condition to be waited for
+	 * @param array     $params       condition params
+	 */
+	public static function waitUntil($target, $condition, $params = []) {
 		$selector = $target->getSelectorAsText();
 		if ($selector !== null) {
 			$selector = ' located by '.$selector;
 		}
 
-		$callable = call_user_func_array([$target, $conditions[$condition]], $params);
+		$callable = call_user_func_array([$target, self::getConditionCallable($condition)], $params);
 		self::wait()->until($callable, 'Failed to wait for element'.$selector.' to be '.$condition.'.');
 	}
 
