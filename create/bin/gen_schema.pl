@@ -629,7 +629,7 @@ sub timescaledb
 			"history_str", "trends", "trends_uint")
 	{
 		print<<EOF
-SELECT create_hypertable('$_', 'clock', chunk_time_interval => 86400);
+SELECT create_hypertable('$_', 'clock', chunk_time_interval => 86400, migrate_data => true);
 SELECT set_adaptive_chunking('$_', chunk_target_size => 'estimate');
 EOF
 		;
