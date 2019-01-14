@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,15 +115,13 @@ $screenBuilder = new CScreenBuilder([
 	'to' => $data['to']
 ]);
 
-$filter = (new CFilter())
-	->setProfile($data['profileIdx'], $data['profileIdx2'])
-	->setActiveTab($data['active_tab'])
-	->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to']);
-
-if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-	$filter->addClass(ZBX_STYLE_HIDDEN);
-}
-$widget->addItem($filter);
+$widget->addItem(
+	(new CFilter(new CUrl()))
+		->setProfile($data['profileIdx'], $data['profileIdx2'])
+		->setActiveTab($data['active_tab'])
+		->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'],
+			$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
+);
 
 $widget->addItem((new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
 

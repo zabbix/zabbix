@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,122 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @backup events
+ */
 class testPageAvailabilityReport extends CLegacyWebTest {
+
+	/**
+	 * SLA calculated events data in format: triggerid, starttime, duration.
+	 * Triggers created via import of data/data_test.sql
+	 * @var array
+	 */
+	public static $SLA_events = [
+		[16027, '01.01.2016 00:00:00', '+1 second'],
+		[16027, '01.01.2017 22:59:00', '+1 hour 59 second'],
+		[16027, '02.01.2017 22:50:00', '+1 hour 11 minutes'],
+		[16028, '01.01.2017 22:59:10', '+1 hour 5 minutes 59 second'],
+		[16028, '10.10.2017 00:00:00', '+1 second'],
+		[16028, '31.12.2017 22:00:00', '+1 hour'],
+		[16029, '31.12.2017 23:00:00', '+1 hour']
+	];
+
+	/**
+	 * Data provider for testPageAvailabilityReportSLA. Array have following schema:
+	 * - SLA availability report filter start time
+	 * - SLA availability report filter end time
+	 * - SLA availability report result table row values. Only 3 first cells of every row are defined.
+	 *
+	 * @return array
+	 */
+	public function dataProviderSLA() {
+		return [
+			['01.01.2016 00:00:00', '30.01.2016 00:00:00', [
+				['A trigger', '', '100.0000%'],
+				['B trigger', '', '100.0000%'],
+				['C trigger', '', '100.0000%']
+			]],
+			['01.01.2016 00:00:00', '20.01.2016 00:00:00', [
+				['A trigger', '0.0001%', '99.9999%'],
+				['B trigger', '', '100.0000%'],
+				['C trigger', '', '100.0000%']
+			]],
+			['01.01.2017 00:00:00', '02.01.2017 23:59:00', [
+				['A trigger', '4.5149%', '95.4851%'],
+				['B trigger', '2.2919%', '97.7081%'],
+				['C trigger', '', '100.0000%']
+			]],
+			['01.01.2017 00:00:00', '01.01.2018 00:00:00', [
+				['A trigger', '0.0251%', '99.9749%'],
+				['B trigger', '0.0240%', '99.9760%'],
+				['C trigger', '0.0114%', '99.9886%']
+			]],
+			['31.12.2017 22:30:00', '01.01.2018 00:30:00', [
+				['A trigger', '', '100.0000%'],
+				['B trigger', '25.0000%', '75.0000%'],
+				['C trigger', '50.0000%', '50.0000%']
+			]],
+			['31.12.2017 22:30:00', '01.01.2018 00:30:00', [
+				['A trigger', '', '100.0000%'],
+				['B trigger', '25.0000%', '75.0000%'],
+				['C trigger', '50.0000%', '50.0000%']
+			]],
+		];
+	}
+
+	/**
+	 * Initialize test data for dataProviderSLA.
+	 */
+	public function testInitializeTestData() {
+		// Generate events data for 'SLA host' trigger items.
+		$eventid = get_dbid('events', 'eventid');
+		$start_time = 'INSERT INTO events (eventid, objectid, clock, value) VALUES (%1$d, %2$d, %3$d, '.TRIGGER_VALUE_TRUE.')';
+		$end_time = 'INSERT INTO events (eventid, objectid, clock, value) VALUES (%1$d, %2$d, %3$d, '.TRIGGER_VALUE_FALSE.')';
+
+		foreach (self::$SLA_events as $event) {
+			array_unshift($event, $eventid);
+			// Event start clock.
+			$event[2] = strtotime($event[2]);
+			DBexecute(vsprintf($start_time, $event));
+
+			// Event end clock.
+			$event[0]++;
+			$event[2] = strtotime($event[3], $event[2]);
+			DBexecute(vsprintf($end_time, $event));
+
+			$eventid = $eventid + 2;
+		}
+	}
+
+	/**
+	 * @dataProvider dataProviderSLA
+	 */
+	public function testPageAvailabilityReportSLA($start_time, $end_time, $sla_item_values) {
+		$args = [
+			'from' => date('Y-m-d H:i:s', strtotime($start_time)),
+			'to' => date('Y-m-d H:i:s', strtotime($end_time)),
+			'filter_hostid' => 50014
+		];
+
+		$this->zbxTestLogin('report2.php?'.http_build_query($args));
+		$table_rows =$this->webDriver->findElements(WebDriverBy::xpath('//table[@class="list-table"]/tbody/tr'));
+		if (!$table_rows) {
+			$this->fail("Failed to get SLA reports table.");
+		}
+
+		foreach ($table_rows as $row) {
+			$cells = $row->findElements(WebDriverBy::xpath('td'));
+			$cells_values = [];
+
+			foreach ($cells as $cell) {
+				$cells_values[] = $cell->getText();
+			}
+
+			// Check only cells 2,3,4 in every row: Label, Problem state value, Ok state value.
+			$this->assertContains(array_slice($cells_values, 1, 3), $sla_item_values);
+		}
+	}
+
 	public function testPageAvailabilityReport_ByHost_CheckLayout() {
 		$this->zbxTestLogin('report2.php?config=0');
 		$this->zbxTestCheckTitle('Availability report');

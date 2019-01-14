@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,45 +94,62 @@ foreach ($data['functions'] as $id => $f) {
 $expression_form_list->addRow(_('Function'), $function_combo_box);
 
 if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
-	foreach ($data['functions'][$data['selectedFunction']]['params'] as $paramid => $param_function) {
-		$param_value = array_key_exists($paramid, $data['params']) ? $data['params'][$paramid] : null;
+	$paramid = 0;
+
+	foreach ($data['functions'][$data['selectedFunction']]['params'] as $param_name => $param_function) {
+		if (array_key_exists($param_name, $data['params'])) {
+			$param_value = $data['params'][$param_name];
+		}
+		else {
+			$param_value = array_key_exists($paramid, $data['params']) ? $data['params'][$paramid] : null;
+		}
+
+		$label = $param_function['A'] ? (new CLabel($param_function['C']))->setAsteriskMark() : $param_function['C'];
 
 		if ($param_function['T'] == T_ZBX_INT) {
 			$param_type_element = null;
 
-			if ($paramid == 0 || ($paramid == 1 && in_array($data['function'], ['regexp', 'iregexp', 'str']))) {
+			if (in_array($param_name, ['last'])) {
 				if (array_key_exists('M', $param_function)) {
-					$param_type_element = new CComboBox('paramtype', $data['paramtype'], null, $param_function['M']);
+					if (in_array($data['selectedFunction'], ['last', 'band', 'strlen'])) {
+						$param_type_element = $param_function['M'][PARAM_TYPE_COUNTS];
+						$label = $param_function['C'];
+						$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_COUNTS))->removeId());
+					}
+					else {
+						$param_type_element = new CComboBox('paramtype',
+							$param_value === '' ? PARAM_TYPE_TIME : $data['paramtype'],
+							null, $param_function['M']
+						);
+					}
 				}
 				else {
 					$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_TIME))->removeId());
 					$param_type_element = _('Time');
 				}
 			}
-
-			if ($paramid == 1 && !in_array($data['function'], ['regexp', 'iregexp', 'str'])) {
+			elseif (in_array($param_name, ['shift'])) {
 				$param_type_element = _('Time');
-				$param_field = (new CTextBox('params['.$paramid.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-			}
-			else {
-				$param_field = ($data['paramtype'] == PARAM_TYPE_COUNTS)
-					? (new CNumericBox('params['.$paramid.']', (int) $param_value, 10))
-						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-					: (new CTextBox('params['.$paramid.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			}
 
-			$expression_form_list->addRow($param_function['C'], [
+			$param_field = (new CTextBox('params['.$param_name.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+
+			$expression_form_list->addRow($label, [
 				$param_field,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				$param_type_element
 			]);
 		}
 		else {
-			$expression_form_list->addRow($param_function['C'],
-				(new CTextBox('params['.$paramid.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			$expression_form_list->addRow($label,
+				(new CTextBox('params['.$param_name.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			);
-			$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_TIME))->removeId());
+			if ($paramid === 0) {
+				$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_TIME))->removeId());
+			}
 		}
+
+		$paramid++;
 	}
 }
 else {
@@ -170,24 +187,17 @@ $output = [
 	],
 	'script_inline' =>
 		'jQuery(function($) {'.
-			'function setReadOnly() {'.
-				'var selected_fn = $("#function option:selected");'.
+			'$.valHooks.input = {'.
+				'get: function(elem) {'.
+					'return elem.value;'.
+				'},'.
+				'set: function(elem, value) {'.
+					'var tmp = elem.value;'.
+						'elem.value = value;'.
 
-				'if (selected_fn.val() === "last" || selected_fn.val() === "strlen" || selected_fn.val() === "band") {'.
-					'if ($("#paramtype option:selected").val() == '.PARAM_TYPE_COUNTS.') {'.
-						'$("#params_0").removeAttr("readonly");'.
-					'}'.
-					'else {'.
-						'$("#params_0").attr("readonly", "readonly");'.
-					'}'.
+					'"description" === elem.id && tmp !== value && reloadPopup(elem.form, "popup.triggerexpr");'.
 				'}'.
-			'}'.
-
-			'setReadOnly();'.
-
-			'$("#paramtype").change(function() {'.
-				'setReadOnly();'.
-			'});'.
+			'};'.
 		'});'
 ];
 

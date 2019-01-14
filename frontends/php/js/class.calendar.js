@@ -1,7 +1,7 @@
 // JavaScript Document
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,8 +59,12 @@ calendar.prototype = {
 	hl_year: null,				// highlighted year number
 	hl_day: null,				// highlighted days number
 	active_section: null,		// Active calendar section. See 'sections' array. Default value set in method clndrshow.
-	monthname: new Array(locale['S_JANUARY'], locale['S_FEBRUARY'], locale['S_MARCH'], locale['S_APRIL'], locale['S_MAY'], locale['S_JUNE'], locale['S_JULY'], locale['S_AUGUST'], locale['S_SEPTEMBER'], locale['S_OCTOBER'], locale['S_NOVEMBER'], locale['S_DECEMBER']),
-	dayname: new Array(locale['S_SUNDAY'], locale['S_MONDAY'], locale['S_TUESDAY'], locale['S_WEDNESDAY'], locale['S_THURSDAY'], locale['S_FRIDAY'], locale['S_SATURDAY']),
+	monthname: new Array(t('S_JANUARY'), t('S_FEBRUARY'), t('S_MARCH'), t('S_APRIL'), t('S_MAY'), t('S_JUNE'),
+		t('S_JULY'), t('S_AUGUST'), t('S_SEPTEMBER'), t('S_OCTOBER'), t('S_NOVEMBER'), t('S_DECEMBER')
+	),
+	dayname: new Array(t('S_SUNDAY'), t('S_MONDAY'), t('S_TUESDAY'), t('S_WEDNESDAY'), t('S_THURSDAY'), t('S_FRIDAY'),
+		t('S_SATURDAY')
+	),
 	sections: new Array('.calendar-year', '.calendar-month', '.calendar-date'),
 	date_time_format: PHP_ZBX_FULL_DATE_TIME,
 	trigger_elmnt: null,		// Calendar visibility trigger element.
@@ -565,7 +569,7 @@ calendar.prototype = {
 		this.clndr_calendar = document.createElement('div');
 		Element.extend(this.clndr_calendar);
 		this.clndr_calendar.className = 'overlay-dialogue calendar';
-		this.clndr_calendar.setAttribute('aria-label', locale['S_Calendar']);
+		this.clndr_calendar.setAttribute('aria-label', t('S_CALENDAR'));
 		this.clndr_calendar.setAttribute('role', 'application');
 		this.clndr_calendar.setAttribute('tabindex', '0');
 		this.clndr_calendar.hide();
@@ -659,33 +663,19 @@ calendar.prototype = {
 		var tr = document.createElement('tr');
 		thead.appendChild(tr);
 
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(locale['S_MONDAY_SHORT_BIG']));
-
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(locale['S_TUESDAY_SHORT_BIG']));
-
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(locale['S_WEDNESDAY_SHORT_BIG']));
-
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(locale['S_THURSDAY_SHORT_BIG']));
-
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(locale['S_FRIDAY_SHORT_BIG']));
-
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(locale['S_SATURDAY_SHORT_BIG']));
-
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(locale['S_SUNDAY_SHORT_BIG']));
+		[
+			t('S_MONDAY_SHORT_BIG'),
+			t('S_TUESDAY_SHORT_BIG'),
+			t('S_WEDNESDAY_SHORT_BIG'),
+			t('S_THURSDAY_SHORT_BIG'),
+			t('S_FRIDAY_SHORT_BIG'),
+			t('S_SATURDAY_SHORT_BIG'),
+			t('S_SUNDAY_SHORT_BIG')
+		].forEach(function(str) {
+			var td = document.createElement('th');
+			td.appendChild(document.createTextNode(str));
+			tr.appendChild(td);
+		});
 
 		/*
 		 * Days calendar

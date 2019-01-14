@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,17 +133,17 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				// get host
 				$hosts = API::Host()->get([
-					'hostids' => $dynamic_hostid,
-					'output' => ['hostid', 'name']
+					'output' => ['hostid', 'host', 'name'],
+					'hostids' => $dynamic_hostid
 				]);
 				$host = reset($hosts);
 
 				// get graph
 				$graph = API::Graph()->get([
-					'graphids' => $resourceid,
 					'output' => API_OUTPUT_EXTEND,
-					'selectHosts' => ['hostid'],
-					'selectGraphItems' => API_OUTPUT_EXTEND
+					'selectGraphItems' => API_OUTPUT_EXTEND,
+					'selectHosts' => [],
+					'graphids' => $resourceid
 				]);
 				$graph = reset($graph);
 
@@ -180,19 +180,25 @@ class CControllerWidgetGraphView extends CControllerWidget {
 							$graph['ymin_type'] = GRAPH_YAXIS_TYPE_CALCULATED;
 						}
 					}
-
-					$graph['hosts'] = $hosts;
 				}
 
 				if ($graph) {
-					// Search if there are any items available for this dynamic host.
-					$new_dynamic = getSameGraphItemsForHost(
-						$graph['gitems'],
-						$dynamic_hostid,
-						false
-					);
+					$graph['hosts'] = $hosts;
 
-					if (!$new_dynamic) {
+					// Search if there are any items available for this dynamic host.
+					$new_dynamic = getSameGraphItemsForHost($graph['gitems'], $dynamic_hostid, false);
+
+					if ($new_dynamic) {
+						// Add destination host data required by CMacrosResolver::resolveGraphPositionalMacros().
+						foreach ($new_dynamic as &$item) {
+							$item['hostid'] = $host['hostid'];
+							$item['host'] = $host['host'];
+						}
+						unset($item);
+
+						$graph['name'] = CMacrosResolverHelper::resolveGraphName($graph['name'], $new_dynamic);
+					}
+					else {
 						$unavailable_object = true;
 					}
 				}
@@ -222,9 +228,10 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				// get graph, used below
 				$graph = API::Graph()->get([
-					'graphids' => $resourceid,
 					'output' => API_OUTPUT_EXTEND,
-					'selectHosts' => ['name']
+					'selectHosts' => ['name'],
+					'graphids' => $resourceid,
+					'expandName' => true
 				]);
 				$graph = reset($graph);
 
@@ -260,7 +267,13 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				$graph_src = '';
-				$header_label = $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name'];
+
+				if (count($graph['hosts']) == 1 || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid != 0) {
+					$header_label = $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name'];
+				}
+				else {
+					$header_label = $graph['name'];
+				}
 
 				if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
 					$chart_file = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
@@ -285,8 +298,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 							$graph_src->setArgument('items['.$new_graph_item['itemid'].']['.$name.']', $value);
 						}
 					}
-
-					$graph_src->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name']);
 				}
 
 				if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {

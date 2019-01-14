@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,6 +188,37 @@ class testTaskCreate extends CAPITest {
 					'itemids' => ['23279']
 				],
 				'expected_error' => null
+			],
+			// Item (ID: 110001): Zabbix agent (active)
+			[
+				'task' => [
+					'type' => '6',
+					'itemids' => ['110001', '110002']
+				],
+				'expected_error' => 'Cannot send request: wrong item type.'
+			],
+			// Item (ID: 110002): Zabbix agent (passive)
+			[
+				'task' => [
+					'type' => '6',
+					'itemids' => ['110002']
+				],
+				'expected_error' => null
+			],
+			// Templated lld and items do not accept "Check now" command
+			[
+				'task' => [
+					'type' => '6',
+					'itemids' => ['110004']
+				],
+				'expected_error' => 'Cannot send request: host is not monitored.'
+			],
+			[
+				'task' => [
+					'type' => '6',
+					'itemids' => ['110005']
+				],
+				'expected_error' => 'Cannot send request: host is not monitored.'
 			]
 		];
 	}

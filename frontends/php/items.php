@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,230 +35,310 @@ $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
-	'interfaceid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
-	'copy_type' =>				[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), 'isset({copy})'],
-	'copy_mode' =>				[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
-	'itemid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
-	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
-	'description' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'key' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Key')],
-	'master_itemid' =>			[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({type}) && {type}=='.ITEM_TYPE_DEPENDENT, _('Master item')],
-	'delay' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
-		'(isset({add}) || isset({update})) && isset({type}) && {type}!='.ITEM_TYPE_TRAPPER.
-			' && {type}!='.ITEM_TYPE_SNMPTRAP.' && {type}!='.ITEM_TYPE_DEPENDENT,
-		_('Update interval')
-	],
-	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
-	'history' =>				[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})',
-		_('History storage period')
-	],
-	'status' =>					[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE]), null],
-	'type' =>					[T_ZBX_INT, O_OPT, null,
-									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-										ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3,
-										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
-										ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-										ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT,
-										ITEM_TYPE_HTTPAGENT
-									]),
-									'isset({add}) || isset({update})'
-								],
-	'trends' =>					[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({value_type}) && '.
-			IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
-		_('Trend storage period')
-	],
-	'value_type' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
-	'valuemapid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		'(isset({add}) || isset({update})) && isset({value_type}) && '.
-		IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')],
-	'authtype' =>				[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
-		'(isset({add}) || isset({update})) && isset({type}) && {type}=='.ITEM_TYPE_SSH],
-	'username' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_TELNET, 'type'), _('User name')],
-	'password' =>				[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({type}) && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_TELNET, 'type')],
-	'publickey' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH.' && {authtype} == '.ITEM_AUTHTYPE_PUBLICKEY],
-	'privatekey' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && ({type}) == '.ITEM_TYPE_SSH.' && ({authtype}) == '.ITEM_AUTHTYPE_PUBLICKEY],
-	$paramsFieldName =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add}) || isset({update})) && isset({type}) && '.
-		IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type'),
-		getParamFieldLabelByType(getRequest('type', 0))],
-	'inventory_link' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), '(isset({add}) || isset({update})) && {value_type} != '.ITEM_VALUE_TYPE_LOG],
-	'snmp_community' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C, 'type'), _('SNMP community')],
-	'snmp_oid' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, '(isset({add}) || isset({update})) && isset({type}) && '.IN(
-		ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3, 'type'), _('SNMP OID')],
-	'port' =>					[T_ZBX_STR, O_OPT, null,	BETWEEN(0, 65535), '(isset({add}) || isset({update})) && isset({type}) && '.IN(
-		ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3, 'type'), _('Port')],
-	'snmpv3_securitylevel' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3],
-	'snmpv3_contextname' =>	[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3],
-	'snmpv3_securityname' =>	[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3],
-	'snmpv3_authprotocol' =>	[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA),
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.' && ({snmpv3_securitylevel} == '.
-		ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.' || {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.')'],
-	'snmpv3_authpassphrase' =>	[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.' && ({snmpv3_securitylevel} == '.
-		ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.' || {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.')'],
-	'snmpv3_privprotocol' =>	[T_ZBX_INT, O_OPT, null,	IN(ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES),
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV],
-	'snmpv3_privpassphrase' =>	[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV],
-	'ipmi_sensor' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM, NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_IPMI, _('IPMI sensor')],
-	'trapper_hosts' =>			[T_ZBX_STR, O_OPT, null,	null,		'(isset({add}) || isset({update})) && isset({type}) && {type} == 2'],
-	'units' =>					[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({value_type}) && '.
-		IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
-	],
-	'logtimefmt' =>				[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({value_type}) && {value_type} == 2'],
-	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
-	'group_itemid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_targetid' =>		    [T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_groupid' =>		    [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
-	'new_application' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'visible' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'applications' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'new_applications' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'del_history' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'jmx_endpoint' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
-	],
-	'timeout' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'url' =>            		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_HTTPAGENT, _('URL')],
-	'query_fields' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'posts' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'status_codes' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'follow_redirects' =>		[T_ZBX_INT, O_OPT, null,
-									IN([HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
-									null
-								],
-	'post_type' =>				[T_ZBX_INT, O_OPT, null,
-									IN([ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
-									null
-								],
-	'http_proxy' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'headers' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'retrieve_mode' =>			[T_ZBX_INT, O_OPT, null,
-									IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
-										HTTPTEST_STEP_RETRIEVE_MODE_BOTH
-									]),
-									null
-								],
-	'request_method' =>			[T_ZBX_INT, O_OPT, null,
-									IN([HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT,
-										HTTPCHECK_REQUEST_HEAD
-									]),
-									null
-								],
-	'output_format' =>			[T_ZBX_INT, O_OPT, null,	IN([HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]), null],
-	'allow_traps' =>			[T_ZBX_INT, O_OPT, null,	IN([HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]),
-									null
-								],
-	'ssl_cert_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'ssl_key_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'ssl_key_password' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'verify_peer' =>			[T_ZBX_INT, O_OPT, null,
-									IN([HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]),
-									null
-								],
-	'verify_host' =>			[T_ZBX_INT, O_OPT, null,
-									IN([HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]),
-									null
-								],
-	'http_authtype' =>			[T_ZBX_INT, O_OPT, null,
-									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
-									null
-								],
-	'http_username' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-									'(isset({add}) || isset({update})) && isset({http_authtype})'.
-										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
-									_('Username')
-								],
-	'http_password' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-									'(isset({add}) || isset({update})) && isset({http_authtype})'.
-										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
-									_('Password')
-								],
+	'hostid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
+	'interfaceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
+	'copy_type' =>					[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), 'isset({copy})'],
+	'copy_mode' =>					[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
+	'itemid' =>						[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
+	'name' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})',
+										_('Name')
+									],
+	'description' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'key' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Key')],
+	'master_itemid' =>				[T_ZBX_STR, O_OPT, null,	null,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_DEPENDENT,
+										_('Master item')
+									],
+	'delay' =>						[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.
+											' && {type} != '.ITEM_TYPE_DEPENDENT,
+										_('Update interval')
+									],
+	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'history' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})',
+										_('History storage period')
+									],
+	'status' =>						[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE]), null],
+	'type' =>						[T_ZBX_INT, O_OPT, null,
+										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
+											ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3,
+											ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
+											ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+											ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
+											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT
+										]),
+										'isset({add}) || isset({update})'
+									],
+	'trends' =>						[T_ZBX_STR, O_OPT, null,	null,
+										'(isset({add}) || isset({update})) && isset({value_type})'.
+											' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
+										_('Trend storage period')
+									],
+	'value_type' =>					[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
+	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,
+										'(isset({add}) || isset({update})) && isset({value_type})'.
+											' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
+									],
+	'authtype' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
+										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH
+									],
+	'username' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_TELNET, 'type'),
+										_('User name')
+									],
+	'password' =>					[T_ZBX_STR, O_OPT, null,	null,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_TELNET, 'type')
+									],
+	'publickey' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_SSH.' && {authtype} == '.ITEM_AUTHTYPE_PUBLICKEY
+									],
+	'privatekey' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_SSH.' && {authtype} == '.ITEM_AUTHTYPE_PUBLICKEY
+									],
+	$paramsFieldName =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+									'(isset({add}) || isset({update})) && isset({type})'.
+											' && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.
+												ITEM_TYPE_CALCULATED, 'type'
+											),
+										getParamFieldLabelByType(getRequest('type', 0))
+									],
+	'inventory_link' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),
+										'(isset({add}) || isset({update})) && {value_type} != '.ITEM_VALUE_TYPE_LOG
+									],
+	'snmp_community' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C, 'type'),
+										_('SNMP community')
+									],
+	'snmp_oid' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,
+												'type'
+											),
+										_('SNMP OID')
+									],
+	'port' =>						[T_ZBX_STR, O_OPT, null,	BETWEEN(0, 65535),
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,
+												'type'
+											),
+										_('Port')
+									],
+	'snmpv3_securitylevel' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_SNMPV3
+									],
+	'snmpv3_contextname' =>			[T_ZBX_STR, O_OPT, null,	null,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_SNMPV3
+									],
+	'snmpv3_securityname' =>		[T_ZBX_STR, O_OPT, null,	null,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_SNMPV3
+									],
+	'snmpv3_authprotocol' =>		[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA),
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_SNMPV3.
+											' && ({snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.
+												' || {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.
+											')'
+									],
+	'snmpv3_authpassphrase' =>		[T_ZBX_STR, O_OPT, null,	null,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_SNMPV3.
+											' && ({snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.
+												' || {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.
+											')'
+									],
+	'snmpv3_privprotocol' =>		[T_ZBX_INT, O_OPT, null,	IN(ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES),
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_SNMPV3.
+											' &&  {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+									],
+	'snmpv3_privpassphrase' =>		[T_ZBX_STR, O_OPT, null,	null,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_SNMPV3.
+											' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+									],
+	'ipmi_sensor' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM, NOT_EMPTY,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_IPMI,
+										_('IPMI sensor')
+									],
+	'trapper_hosts' =>				[T_ZBX_STR, O_OPT, null,	null,
+										'(isset({add}) || isset({update}))'.
+											' && isset({type}) && {type} == '.ITEM_TYPE_TRAPPER
+									],
+	'units' =>						[T_ZBX_STR, O_OPT, null,	null,
+										'(isset({add}) || isset({update})) && isset({value_type})'.
+											' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
+									],
+	'logtimefmt' =>					[T_ZBX_STR, O_OPT, null,	null,
+										'(isset({add}) || isset({update})) && isset({value_type})'.
+											' && {value_type} == '.ITEM_VALUE_TYPE_LOG
+									],
+	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
+	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'copy_targetid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'copy_groupid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,
+										'isset({copy}) && isset({copy_type}) && {copy_type} == 0'
+									],
+	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'massupdate_app_action' =>		[T_ZBX_INT, O_OPT, null,
+										IN([ZBX_MULTISELECT_ADD, ZBX_MULTISELECT_REPLACE,
+											ZBX_MULTISELECT_REMOVE
+										]),
+										null
+									],
+	'del_history' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
+									],
+	'timeout' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'url' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_HTTPAGENT,
+										_('URL')
+									],
+	'query_fields' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'posts' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'status_codes' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'follow_redirects' =>			[T_ZBX_INT, O_OPT, null,
+										IN([HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
+										null
+									],
+	'post_type' =>					[T_ZBX_INT, O_OPT, null,
+										IN([ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
+										null
+									],
+	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'headers' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'retrieve_mode' =>				[T_ZBX_INT, O_OPT, null,
+										IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
+											HTTPTEST_STEP_RETRIEVE_MODE_BOTH
+										]),
+										null
+									],
+	'request_method' =>				[T_ZBX_INT, O_OPT, null,
+										IN([HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT,
+											HTTPCHECK_REQUEST_HEAD
+										]),
+										null
+									],
+	'output_format' =>				[T_ZBX_INT, O_OPT, null,	IN([HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]), null],
+	'allow_traps' =>				[T_ZBX_INT, O_OPT, null,
+										IN([HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]), null
+									],
+	'ssl_cert_file' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'ssl_key_file' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'ssl_key_password' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'verify_peer' =>				[T_ZBX_INT, O_OPT, null, IN([HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]),
+										null
+									],
+	'verify_host' =>				[T_ZBX_INT, O_OPT, null, IN([HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]),
+										null
+									],
+	'http_authtype' =>				[T_ZBX_INT, O_OPT, null,
+										IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
+										null
+									],
+	'http_username' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+										'(isset({add}) || isset({update})) && isset({http_authtype})'.
+											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
+												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
+										_('Username')
+									],
+	'http_password' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+										'(isset({add}) || isset({update})) && isset({http_authtype})'.
+											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
+												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
+										_('Password')
+									],
 	// actions
-	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
-										'"item.massdisable","item.massenable","item.massupdateform",'.
-										'"item.masscheck_now"'
-									),
-									null
-								],
-	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'clone' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'copy' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'massupdate' =>				[T_ZBX_STR, O_OPT, P_SYS, null,	null],
-	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'check_now' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
+	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+										IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
+											'"item.massdisable","item.massenable","item.massupdateform",'.
+											'"item.masscheck_now"'
+										),
+										null
+									],
+	'add' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'clone' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'copy' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'massupdate' =>					[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'check_now' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
 	// filter
-	'filter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_rst' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_groupid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_hostid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_type' =>			[T_ZBX_INT, O_OPT, null,
-									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-										ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3,
-										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
-										ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-										ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT,
-										ITEM_TYPE_HTTPAGENT
-									]),
-									null
-								],
-	'filter_key' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_snmp_community' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_snmpv3_securityname' => [T_ZBX_STR, O_OPT, null, null,		null],
-	'filter_snmp_oid' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_port' =>			[T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Port')],
-	'filter_value_type' =>		[T_ZBX_INT, O_OPT, null,	IN('-1,0,1,2,3,4'), null],
-	'filter_delay' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Update interval')],
-	'filter_history' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('History')],
-	'filter_trends' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Trends')],
-	'filter_status' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]), null],
-	'filter_state' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]), null],
-	'filter_templated_items' => [T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
-	'filter_with_triggers' =>	[T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
-	'filter_discovery' =>		[T_ZBX_INT, O_OPT, null,	IN([-1, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]), null],
-	'filter_ipmi_sensor' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_set' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_groupid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_hostid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_application' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_name' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_type' =>				[T_ZBX_INT, O_OPT, null,
+										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
+											ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3,
+											ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
+											ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+											ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
+											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT
+										]),
+										null
+									],
+	'filter_key' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_snmp_community' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_snmpv3_securityname' => [T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_snmp_oid' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_port' =>				[T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Port')],
+	'filter_value_type' =>			[T_ZBX_INT, O_OPT, null,	IN('-1,0,1,2,3,4'), null],
+	'filter_delay' =>				[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Update interval')],
+	'filter_history' =>				[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('History')],
+	'filter_trends' =>				[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Trends')],
+	'filter_status' =>				[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
+										null
+									],
+	'filter_state' =>				[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]),
+										null
+									],
+	'filter_templated_items' =>		[T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
+	'filter_with_triggers' =>		[T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
+	'filter_discovery' =>			[T_ZBX_INT, O_OPT, null,
+										IN([-1, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]),
+										null
+									],
+	'filter_ipmi_sensor' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	// subfilters
-	'subfilter_set' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_apps' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_types' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_value_types' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_status' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_state' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_templated_items' => [T_ZBX_INT, O_OPT, null, null,		null],
-	'subfilter_with_triggers' => [T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_discovery' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_hosts' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_interval' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_history' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_trends' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_apps' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_types' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_value_types' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_status' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_state' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_templated_items' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_with_triggers' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_discovery' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_hosts' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_interval' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_history' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_trends' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
-	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS,
-									IN('"delay","history","key_","name","status","trends","type"'),
-									null
-								],
-	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sort' =>						[T_ZBX_STR, O_OPT, P_SYS,
+										IN('"delay","history","key_","name","status","trends","type"'),
+										null
+									],
+	'sortorder' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
 $valid_input = check_fields($fields);
@@ -522,6 +602,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (!in_array($type, [ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP])
 			&& hasRequest('delay_flex')) {
 		$intervals = [];
+		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
+		$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
+		$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
 
 		foreach (getRequest('delay_flex') as $interval) {
 			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
@@ -529,12 +612,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					continue;
 				}
 
-				if (strpos($interval['delay'], ';') !== false) {
+				if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
-				elseif (strpos($interval['period'], ';') !== false) {
+				elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['period']));
 					break;
@@ -547,7 +630,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					continue;
 				}
 
-				if (strpos($interval['schedule'], ';') !== false) {
+				if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['schedule']));
 					break;
@@ -573,16 +656,28 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				case ZBX_PREPROC_TRIM:
 				case ZBX_PREPROC_XPATH:
 				case ZBX_PREPROC_JSONPATH:
+				case ZBX_PREPROC_VALIDATE_REGEX:
+				case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+				case ZBX_PREPROC_ERROR_FIELD_JSON:
+				case ZBX_PREPROC_ERROR_FIELD_XML:
+				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 					$step['params'] = $step['params'][0];
 					break;
 
 				case ZBX_PREPROC_REGSUB:
+				case ZBX_PREPROC_VALIDATE_RANGE:
+				case ZBX_PREPROC_ERROR_FIELD_REGEX:
 					$step['params'] = implode("\n", $step['params']);
 					break;
 
 				default:
 					$step['params'] = '';
 			}
+
+			$step += [
+				'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+				'error_handler_params' => ''
+			];
 		}
 		unset($step);
 
@@ -678,7 +773,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'verify_peer', 'verify_host', 'allow_traps'
 				],
 				'selectApplications' => ['applicationid'],
-				'selectPreprocessing' => ['type', 'params'],
+				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'itemids' => getRequest('itemid')
 			]);
 			$db_item = reset($db_items);
@@ -915,6 +1010,9 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 		if (hasRequest('delay_flex')) {
 			$intervals = [];
+			$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
+			$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
+			$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
 
 			foreach (getRequest('delay_flex') as $interval) {
 				if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
@@ -922,12 +1020,12 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 						continue;
 					}
 
-					if (strpos($interval['delay'], ';') !== false) {
+					if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
 						$result = false;
 						info(_s('Invalid interval "%1$s".', $interval['delay']));
 						break;
 					}
-					elseif (strpos($interval['period'], ';')  !== false) {
+					elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
 						$result = false;
 						info(_s('Invalid interval "%1$s".', $interval['period']));
 						break;
@@ -940,7 +1038,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 						continue;
 					}
 
-					if (strpos($interval['schedule'], ';') !== false) {
+					if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
 						$result = false;
 						info(_s('Invalid interval "%1$s".', $interval['schedule']));
 						break;
@@ -959,81 +1057,55 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 		$delay = null;
 	}
 
-	$applications = getRequest('applications');
-	if (isset($applications[0]) && $applications[0] == '0') {
-		$applications = [];
-	}
+	$applications = getRequest('applications', []);
+	$applicationids = [];
 
 	if ($result) {
 		try {
 			DBstart();
 
-			// add new or existing applications
-			if (isset($visible['new_applications']) && !empty($_REQUEST['new_applications'])) {
-				foreach ($_REQUEST['new_applications'] as $newApplication) {
-					if (is_array($newApplication) && isset($newApplication['new'])) {
-						$newApplications[] = [
-							'name' => $newApplication['new'],
-							'hostid' => getRequest('hostid')
-						];
-					}
-					else {
-						$existApplication[] = $newApplication;
-					}
-				}
+			if (array_key_exists('applications', $visible)) {
+				$massupdate_app_action = getRequest('massupdate_app_action');
 
-				if (isset($newApplications)) {
-					if (!$createdApplication = API::Application()->create($newApplications)) {
-						throw new Exception();
-					}
-					if (isset($existApplication)) {
-						$existApplication = array_merge($existApplication, $createdApplication['applicationids']);
-					}
-					else {
-						$existApplication = $createdApplication['applicationids'];
-					}
-				}
-			}
+				if ($massupdate_app_action == ZBX_MULTISELECT_ADD
+						|| $massupdate_app_action == ZBX_MULTISELECT_REPLACE) {
+					$new_applications = [];
 
-			if (isset($visible['applications'])) {
-				if (isset($_REQUEST['applications'])) {
-					if (isset($existApplication)) {
-						$applications = array_unique(array_merge($_REQUEST['applications'], $existApplication));
+					foreach ($applications as $application) {
+						if (is_array($application) && array_key_exists('new', $application)) {
+							$new_applications[] = [
+								'name' => $application['new'],
+								'hostid' => getRequest('hostid')
+							];
+						}
+						else {
+							$applicationids[] = $application;
+						}
 					}
-					else {
-						$applications = $_REQUEST['applications'];
+
+					if ($new_applications) {
+						if ($new_application = API::Application()->create($new_applications)) {
+							$applicationids = array_merge($applicationids, $new_application['applicationids']);
+						}
+						else {
+							throw new Exception();
+						}
 					}
 				}
 				else {
-					if (isset($existApplication)){
-						$applications = $existApplication;
-					}
-					else {
-						$applications = [];
+					foreach ($applications as $application) {
+						$applicationids[] = $application;
 					}
 				}
-			}
-
-			// add applications
-			if (!empty($existApplication) && (!isset($visible['applications']) || !isset($_REQUEST['applications']))) {
-				foreach ($existApplication as $linkApp) {
-					$linkApplications[] = ['applicationid' => $linkApp];
-				}
-				foreach ($itemids as $itemid) {
-					$link_items[] = ['itemid' => $itemid];
-				}
-				$linkApp = [
-					'applications' => $linkApplications,
-					'items' => $link_items
-				];
-				API::Application()->massAdd($linkApp);
 			}
 
 			$items = API::Item()->get([
 				'output' => ['itemid', 'flags', 'type'],
+				'selectApplications' => ['applicationid'],
 				'itemids' => $itemids,
 				'preservekeys' => true
 			]);
+
 			$items_to_update = [];
 
 			if ($items) {
@@ -1066,7 +1138,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'publickey' => getRequest('publickey'),
 					'privatekey' => getRequest('privatekey'),
 					'ipmi_sensor' => getRequest('ipmi_sensor'),
-					'applications' => $applications,
+					'applications' => [],
 					'status' => getRequest('status'),
 					'master_itemid' => getRequest('master_itemid'),
 					'url' =>  getRequest('url'),
@@ -1104,16 +1176,28 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 							case ZBX_PREPROC_TRIM:
 							case ZBX_PREPROC_XPATH:
 							case ZBX_PREPROC_JSONPATH:
+							case ZBX_PREPROC_VALIDATE_REGEX:
+							case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+							case ZBX_PREPROC_ERROR_FIELD_JSON:
+							case ZBX_PREPROC_ERROR_FIELD_XML:
+							case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 								$step['params'] = $step['params'][0];
 								break;
 
 							case ZBX_PREPROC_REGSUB:
+							case ZBX_PREPROC_VALIDATE_RANGE:
+							case ZBX_PREPROC_ERROR_FIELD_REGEX:
 								$step['params'] = implode("\n", $step['params']);
 								break;
 
 							default:
 								$step['params'] = '';
 						}
+
+						$step += [
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						];
 					}
 					unset($step);
 
@@ -1131,6 +1215,36 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					if (array_key_exists($itemid, $items)) {
 						if ($items[$itemid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 							if ($item) {
+								if (array_key_exists('applications', $visible)) {
+									if ($applicationids) {
+										$db_applicationids = zbx_objectValues($items[$itemid]['applications'],
+											'applicationid'
+										);
+
+										switch ($massupdate_app_action) {
+											case ZBX_MULTISELECT_ADD:
+												$upd_applicationids = array_merge($applicationids, $db_applicationids);
+												break;
+
+											case ZBX_MULTISELECT_REPLACE:
+												$upd_applicationids = $applicationids;
+												break;
+
+											case ZBX_MULTISELECT_REMOVE:
+												$upd_applicationids = array_diff($db_applicationids, $applicationids);
+												break;
+										}
+
+										$item['applications'] = array_keys(array_flip($upd_applicationids));
+									}
+									else {
+										if ($massupdate_app_action == ZBX_MULTISELECT_ADD
+												|| $massupdate_app_action == ZBX_MULTISELECT_REMOVE) {
+											unset($item['applications']);
+										}
+									}
+								}
+
 								$items_to_update[] = ['itemid' => $itemid] + $item;
 							}
 						}
@@ -1280,29 +1394,9 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && hasRequest('group_itemid')) {
-	DBstart();
-
 	$group_itemid = getRequest('group_itemid');
 
-	$itemsToDelete = API::Item()->get([
-		'output' => ['key_', 'itemid'],
-		'selectHosts' => ['name'],
-		'itemids' => $group_itemid,
-		'preservekeys' => true
-	]);
-
 	$result = API::Item()->delete($group_itemid);
-
-	if ($result) {
-		foreach ($itemsToDelete as $item) {
-			$host = reset($item['hosts']);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,
-				_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '._('Host').' ['.$host['name'].']'
-			);
-		}
-	}
-
-	$result = DBend($result);
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
@@ -1310,24 +1404,10 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
-	$items = API::Item()->get([
-		'output' => [],
-		'itemids' => getRequest('group_itemid'),
-		'editable' => true,
-		'monitored' => true,
-		'filter' => ['type' => checkNowAllowedTypes()],
-		'preservekeys' => true
+	$result = (bool) API::Task()->create([
+		'type' => ZBX_TM_TASK_CHECK_NOW,
+		'itemids' => getRequest('group_itemid')
 	]);
-
-	if ($items) {
-		$result = (bool) API::Task()->create([
-			'type' => ZBX_TM_TASK_CHECK_NOW,
-			'itemids' => array_keys($items)
-		]);
-	}
-	else {
-		$result = true;
-	}
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
@@ -1357,7 +1437,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 			],
 			'selectHosts' => ['status', 'name'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectPreprocessing' => ['type', 'params'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];
@@ -1478,7 +1558,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
 		'posts' => getRequest('posts', ''),
 		'headers' => getRequest('headers', []),
-		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF)
+		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
+		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_MULTISELECT_ADD)
 	];
 
 	$data['displayApplications'] = true;

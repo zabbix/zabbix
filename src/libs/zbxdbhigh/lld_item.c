@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -208,6 +208,7 @@ typedef struct
 	const zbx_lld_row_t	*lld_row;
 	zbx_vector_ptr_t	preproc_ops;
 	zbx_vector_ptr_t	dependent_items;
+	unsigned char		type;
 }
 zbx_lld_item_t;
 
@@ -216,15 +217,22 @@ typedef struct
 	zbx_uint64_t	item_preprocid;
 	int		step;
 	int		type;
+	int		error_handler;
 	char		*params;
+	char		*error_handler_params;
 
 #define ZBX_FLAG_LLD_ITEM_PREPROC_UNSET				__UINT64_C(0x00)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED			__UINT64_C(0x01)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE			__UINT64_C(0x02)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS			__UINT64_C(0x04)
-#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE							\
-		(ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE | ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS)
-#define ZBX_FLAG_LLD_ITEM_PREPROC_DELETE				__UINT64_C(0x08)
+#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER		__UINT64_C(0x08)
+#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS	__UINT64_C(0x10)
+#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE				\
+		(ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE |		\
+		ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS |		\
+		ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER |	\
+		ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS	\
+		)
 	zbx_uint64_t	flags;
 }
 zbx_lld_item_preproc_t;
@@ -449,6 +457,7 @@ static void	lld_application_free(zbx_lld_application_t *application)
 static void	lld_item_preproc_free(zbx_lld_item_preproc_t *op)
 {
 	zbx_free(op->params);
+	zbx_free(op->error_handler_params);
 	zbx_free(op);
 }
 
@@ -642,6 +651,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		item->key_orig = NULL;
 		item->flags = ZBX_FLAG_LLD_ITEM_UNSET;
 
+		item->type = item_prototype->type;
 		if ((unsigned char)atoi(row[6]) != item_prototype->type)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TYPE;
 
@@ -834,7 +844,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ip.item_preprocid,ip.itemid,ip.step,ip.type,ip.params"
+			"select ip.item_preprocid,ip.itemid,ip.step,ip.type,ip.params,ip.error_handler,"
+				"ip.error_handler_params"
 			" from item_discovery id"
 				" join item_preproc ip"
 					" on id.itemid=ip.itemid"
@@ -863,6 +874,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		preproc_op->step = atoi(row[2]);
 		preproc_op->type = atoi(row[3]);
 		preproc_op->params = zbx_strdup(NULL, row[4]);
+		preproc_op->error_handler = atoi(row[5]);
+		preproc_op->error_handler_params = zbx_strdup(NULL, row[6]);
 		zbx_vector_ptr_append(&item->preproc_ops, preproc_op);
 	}
 	DBfree_result(result);
@@ -871,6 +884,33 @@ out:
 	zbx_vector_uint64_destroy(&parent_itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_user_macro                                                    *
+ *                                                                            *
+ * Purpose: checks if string is user macro                                    *
+ *                                                                            *
+ * Parameters: str - [IN] string to validate                                  *
+ *                                                                            *
+ * Returns: SUCCEED - either "{$MACRO}" or "{$MACRO:"{#MACRO}"}"              *
+ *          FAIL    - not user macro or contains other characters for example:*
+ *                    "dummy{$MACRO}", "{$MACRO}dummy" or "{$MACRO}{$MACRO}"  *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_user_macro(const char *str)
+{
+	zbx_token_t	token;
+
+	if (FAIL == zbx_token_find(str, 0, &token, ZBX_TOKEN_SEARCH_BASIC) ||
+			0 == (token.type & ZBX_TOKEN_USER_MACRO) ||
+			0 != token.loc.l || '\0' != str[token.loc.r + 1])
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -884,8 +924,8 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 	if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 		return;
 
-	/* only new items or items with changed data will be validated */
-	if (0 != item->itemid && 0 == (item->flags & flag))
+	/* only new items or items with changed data or item type will be validated */
+	if (0 != item->itemid && 0 == (item->flags & flag) && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TYPE))
 		return;
 
 	if (SUCCEED != zbx_is_utf8(*field))
@@ -899,13 +939,73 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 		*error = zbx_strdcatf(*error, "Cannot %s item: value \"%s\" is too long.\n",
 				(0 != item->itemid ? "update" : "create"), *field);
 	}
-	else if (ZBX_FLAG_LLD_ITEM_UPDATE_NAME == flag && '\0' == **field)
-	{
-		*error = zbx_strdcatf(*error, "Cannot %s item: name is empty.\n",
-				(0 != item->itemid ? "update" : "create"));
-	}
 	else
-		return;
+	{
+		int	value;
+		char	*errmsg = NULL;
+
+		switch (flag)
+		{
+			case ZBX_FLAG_LLD_ITEM_UPDATE_NAME:
+				if ('\0' != **field)
+					return;
+
+				*error = zbx_strdcatf(*error, "Cannot %s item: name is empty.\n",
+						(0 != item->itemid ? "update" : "create"));
+				break;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_DELAY:
+				switch (item->type)
+				{
+					case ITEM_TYPE_TRAPPER:
+					case ITEM_TYPE_SNMPTRAP:
+					case ITEM_TYPE_DEPENDENT:
+						return;
+				}
+
+				if (SUCCEED == zbx_validate_interval(*field, &errmsg))
+					return;
+
+				*error = zbx_strdcatf(*error, "Cannot %s item: %s\n",
+						(0 != item->itemid ? "update" : "create"), errmsg);
+				zbx_free(errmsg);
+
+				/* delay alone cannot be rolled back as it depends on item type, revert all updates */
+				if (0 != item->itemid)
+				{
+					item->flags &= ZBX_FLAG_LLD_ITEM_DISCOVERED;
+					return;
+				}
+				break;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY:
+				if (SUCCEED == is_user_macro(*field))
+					return;
+
+				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 == value ||
+						(ZBX_HK_HISTORY_MIN <= value && ZBX_HK_PERIOD_MAX >= value)))
+				{
+					return;
+				}
+
+				*error = zbx_strdcatf(*error, "Cannot %s item: invalid history storage period"
+						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
+				break;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS:
+				if (SUCCEED == is_user_macro(*field))
+					return;
+
+				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 == value ||
+						(ZBX_HK_TRENDS_MIN <= value && ZBX_HK_PERIOD_MAX >= value)))
+				{
+					return;
+				}
+
+				*error = zbx_strdcatf(*error, "Cannot %s item: invalid trends storage period"
+						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
+				break;
+			default:
+				return;
+		}
+	}
 
 	if (0 != item->itemid)
 		lld_field_str_rollback(field, field_orig, &item->flags, flag);
@@ -1247,8 +1347,9 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 	int		ret = SUCCEED;
 	zbx_token_t	token;
 	char		err[MAX_STRING_LEN];
-	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
+	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2;
 	const char*	regexp_err = NULL;
+	zbx_uint64_t	value_ui64;
 
 	*err = '\0';
 
@@ -1263,30 +1364,94 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 	switch (pp->type)
 	{
 		case ZBX_PREPROC_REGSUB:
-			zbx_strlcpy(pattern, pp->params, sizeof(pattern));
-			if (NULL == (output = strchr(pattern, '\n')))
+			/* break; is not missing here */
+		case ZBX_PREPROC_ERROR_FIELD_REGEX:
+			zbx_strlcpy(param1, pp->params, sizeof(param1));
+			if (NULL == (param2 = strchr(param1, '\n')))
 			{
 				zbx_snprintf(err, sizeof(err), "cannot find second parameter: %s", pp->params);
 				ret = FAIL;
 				break;
 			}
 
-			*output++ = '\0';
+			*param2 = '\0';
 
-			if (FAIL == (ret = zbx_regexp_compile(pattern, NULL, &regexp_err)))
+			if (FAIL == (ret = zbx_regexp_compile(param1, NULL, &regexp_err)))
 			{
 				zbx_strlcpy(err, regexp_err, sizeof(err));
 			}
 			break;
 		case ZBX_PREPROC_JSONPATH:
+			/* break; is not missing here */
+		case ZBX_PREPROC_ERROR_FIELD_JSON:
 			ret = zbx_json_path_check(pp->params, err, sizeof(err));
 			break;
 		case ZBX_PREPROC_XPATH:
+			/* break; is not missing here */
+		case ZBX_PREPROC_ERROR_FIELD_XML:
 			ret = xml_xpath_check(pp->params, err, sizeof(err));
 			break;
 		case ZBX_PREPROC_MULTIPLIER:
 			if (FAIL == (ret = is_double(pp->params)))
 				zbx_snprintf(err, sizeof(err), "value is not numeric: %s", pp->params);
+			break;
+		case ZBX_PREPROC_VALIDATE_RANGE:
+			zbx_strlcpy(param1, pp->params, sizeof(param1));
+			if (NULL == (param2 = strchr(param1, '\n')))
+			{
+				zbx_snprintf(err, sizeof(err), "cannot find second parameter: %s", pp->params);
+				ret = FAIL;
+				break;
+			}
+			*param2++ = '\0';
+			zbx_lrtrim(param1, " ");
+			zbx_lrtrim(param2, " ");
+
+			if ('\0' != *param1 && FAIL == (ret = is_double(param1)))
+			{
+				zbx_snprintf(err, sizeof(err), "first parameter is not numeric: %s", param1);
+			}
+			else if ('\0' != *param2 && FAIL == (ret = is_double(param2)))
+			{
+				zbx_snprintf(err, sizeof(err), "second parameter is not numeric: %s", param2);
+			}
+			else if ('\0' == *param1 && '\0' == *param2)
+			{
+				zbx_snprintf(err, sizeof(err), "at least one parameter must be defined: %s", pp->params);
+				ret = FAIL;
+			}
+			else if ('\0' != *param1 && '\0' != *param2)
+			{
+				/* use variants to handle uint64 and double values */
+				zbx_variant_t	min, max;
+
+				zbx_variant_set_numeric(&min, param1);
+				zbx_variant_set_numeric(&max, param2);
+
+				if (0 < zbx_variant_compare(&min, &max))
+				{
+					zbx_snprintf(err, sizeof(err), "first parameter '%s' must be less than second "
+							"'%s'", param1, param2);
+					ret = FAIL;
+				}
+
+				zbx_variant_clear(&min);
+				zbx_variant_clear(&max);
+			}
+
+			break;
+		case ZBX_PREPROC_VALIDATE_REGEX:
+			/* break; is not missing here */
+		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+			if (FAIL == (ret = zbx_regexp_compile(pp->params, NULL, &regexp_err)))
+				zbx_strlcpy(err, regexp_err, sizeof(err));
+			break;
+		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+			if (SUCCEED != str2uint64(pp->params, "smhdw", &value_ui64) || 0 == value_ui64)
+			{
+				zbx_snprintf(err, sizeof(err), "invalid time interval: %s", pp->params);
+				ret = FAIL;
+			}
 			break;
 	}
 
@@ -1696,6 +1861,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->parent_itemid = item_prototype->itemid;
 	item->lastcheck = 0;
 	item->ts_delete = 0;
+	item->type = item_prototype->type;
 	item->key_proto = NULL;
 	item->master_itemid = item_prototype->master_itemid;
 
@@ -2297,49 +2463,58 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_items_preproc_step_esc                                       *
+ * Function: substitute_lld_macors_in_preproc_params                          *
  *                                                                            *
  * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
  *          process                                                           *
  *                                                                            *
- * Parameters: pp         - [IN] the item preprocessing step                  *
+ * Parameters: type       - [IN] the item preprocessing step type             *
  *             lld_row    - [IN] lld source value                             *
- *             item_key   - [IN] Item name for logging                        *
- *             sub_params - [IN/OUT] the pp params value after substitute     *
- *             error      - [IN/OUT] the lld error message                    *
- *                                                                            *
- * Return value: SUCCEED - if preprocessing steps are valid                   *
- *               FAIL    - if substitute_lld_macros fails                     *
+ *             sub_params - [IN/OUT] the preprocessing parameters             *
  *                                                                            *
  ******************************************************************************/
-static int	lld_items_preproc_step_esc(const zbx_lld_item_preproc_t * pp, const zbx_lld_row_t * lld_row,
-		const char *item_key, char **sub_params, char **error)
+static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_t *lld_row, char **sub_params)
 {
-	int	ret, token_type = ZBX_MACRO_ANY;
-	char	err[MAX_STRING_LEN];
-
-	*err = '\0';
-
-	switch (pp->type)
+	if (ZBX_PREPROC_REGSUB == type ||
+			ZBX_PREPROC_VALIDATE_REGEX == type ||
+			ZBX_PREPROC_VALIDATE_NOT_REGEX == type ||
+			ZBX_PREPROC_ERROR_FIELD_REGEX == type)
 	{
-		case ZBX_PREPROC_REGSUB:
-			token_type |= ZBX_TOKEN_REGEXP;
-			break;
-		case ZBX_PREPROC_XPATH:
+		char	*param1 = NULL, *param2 = NULL;
+		size_t	sub_params_size;
+
+		zbx_strsplit(*sub_params, '\n', &param1, &param2);
+
+		if (NULL == param2)
+		{
+			zbx_free(param1);
+			zabbix_log(LOG_LEVEL_ERR, "Invalid preprocessing parameters: %s.", *sub_params);
+			THIS_SHOULD_NEVER_HAPPEN;
+			return;
+		}
+
+		substitute_lld_macros(&param1, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP, NULL, 0);
+		substitute_lld_macros(&param2, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT, NULL, 0);
+
+		sub_params_size = strlen(param1) + strlen(param2) + 2;
+		*sub_params = (char*)zbx_realloc(*sub_params, sub_params_size);
+
+		zbx_snprintf(*sub_params, sub_params_size, "%s\n%s", param1, param2);
+
+		zbx_free(param1);
+		zbx_free(param2);
+	}
+	else
+	{
+		int	token_type = ZBX_MACRO_ANY;
+
+		if (ZBX_PREPROC_XPATH == type || ZBX_PREPROC_ERROR_FIELD_XML == type)
+		{
 			token_type |= ZBX_TOKEN_XPATH;
-			break;
+		}
+
+		substitute_lld_macros(sub_params, &lld_row->jp_row, token_type, NULL, 0);
 	}
-
-	*sub_params = zbx_strdup(NULL, pp->params);
-
-	if (SUCCEED != (ret = substitute_lld_macros(sub_params, &lld_row->jp_row, token_type, err, sizeof(err))))
-	{
-		*error = zbx_strdcatf(*error, "Item \"%s\" was not created. Invalid value for preprocessing step #%d: "
-				"%s.\n", item_key, pp->step, err);
-		zbx_free(*sub_params);
-	}
-
-	return ret;
 }
 
 /******************************************************************************
@@ -2351,16 +2526,15 @@ static int	lld_items_preproc_step_esc(const zbx_lld_item_preproc_t * pp, const z
  *                                                                            *
  * Parameters: item_prototypes - [IN] the item prototypes                     *
  *             items           - [IN/OUT] sorted list of items                *
- *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items, char **error)
+static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items)
 {
 	int				i, j, index, preproc_num;
 	zbx_lld_item_t			*item;
 	zbx_lld_item_prototype_t	*item_proto;
 	zbx_lld_item_preproc_t		*ppsrc, *ppdst;
-	char				*sub_params;
+	char				*buffer = NULL;
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -2392,16 +2566,14 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 				ppdst->flags = ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED | ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE;
 				ppdst->step = ppsrc->step;
 				ppdst->type = ppsrc->type;
+				ppdst->params = zbx_strdup(NULL, ppsrc->params);
+				ppdst->error_handler = ppsrc->error_handler;
+				ppdst->error_handler_params = zbx_strdup(NULL, ppsrc->error_handler_params);
 
-				if (SUCCEED != lld_items_preproc_step_esc(ppsrc, item->lld_row, item->key, &sub_params,
-						error))
-				{
-					zbx_free(ppdst);
-					item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
-					break;
-				}
+				substitute_lld_macors_in_preproc_params(ppsrc->type, item->lld_row, &ppdst->params);
+				substitute_lld_macros(&ppdst->error_handler_params, &item->lld_row->jp_row,
+						ZBX_MACRO_ANY, NULL, 0);
 
-				ppdst->params = sub_params;
 				zbx_vector_ptr_append(&item->preproc_ops, ppdst);
 				continue;
 			}
@@ -2424,20 +2596,35 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE;
 			}
 
-			if (SUCCEED != lld_items_preproc_step_esc(ppsrc, item->lld_row, item->key, &sub_params, error))
-			{
-				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
-				break;
-			}
+			buffer = zbx_strdup(buffer, ppsrc->params);
+			substitute_lld_macors_in_preproc_params(ppsrc->type, item->lld_row, &buffer);
 
-			if (0 != strcmp(ppdst->params, sub_params))
+			if (0 != strcmp(ppdst->params, buffer))
 			{
 				zbx_free(ppdst->params);
-				ppdst->params = sub_params;
+				ppdst->params = buffer;
+				buffer = NULL;
 				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS;
 			}
+
+			if (ppdst->error_handler != ppsrc->error_handler)
+			{
+				ppdst->error_handler = ppsrc->error_handler;
+				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER;
+			}
+
+			buffer = zbx_strdup(buffer, ppsrc->error_handler_params);
+			substitute_lld_macros(&buffer, &item->lld_row->jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+			if (0 != strcmp(ppdst->error_handler_params, buffer))
+			{
+				zbx_free(ppdst->error_handler_params);
+				ppdst->error_handler_params = buffer;
+				buffer = NULL;
+				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS;
+			}
 			else
-				zbx_free(sub_params);
+				zbx_free(buffer);
 		}
 	}
 }
@@ -3127,7 +3314,7 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, 
 	if (0 != new_preproc_num)
 	{
 		zbx_db_insert_prepare(&db_insert, "item_preproc", "item_preprocid", "itemid", "step", "type", "params",
-				NULL);
+				"error_handler", "error_handler_params", NULL);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -3146,7 +3333,8 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, 
 			if (0 == preproc_op->item_preprocid)
 			{
 				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), item->itemid, preproc_op->step,
-						preproc_op->type, preproc_op->params);
+						preproc_op->type, preproc_op->params, preproc_op->error_handler,
+						preproc_op->error_handler_params);
 				continue;
 			}
 
@@ -3167,6 +3355,25 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, 
 
 				params_esc = DBdyn_escape_string(preproc_op->params);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cparams='%s'", delim, params_esc);
+
+				zbx_free(params_esc);
+				delim = ',';
+			}
+
+			if (0 != (preproc_op->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cerror_handler=%d", delim,
+						preproc_op->error_handler);
+				delim = ',';
+			}
+
+			if (0 != (preproc_op->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS))
+			{
+				char	*params_esc;
+
+				params_esc = DBdyn_escape_string(preproc_op->error_handler_params);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cerror_handler_params='%s'", delim,
+						params_esc);
 
 				zbx_free(params_esc);
 			}
@@ -4768,7 +4975,8 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 	/* get item prototype preprocessing options */
 
 	result = DBselect(
-			"select ip.itemid,ip.step,ip.type,ip.params from item_preproc ip,item_discovery id"
+			"select ip.itemid,ip.step,ip.type,ip.params,ip.error_handler,ip.error_handler_params"
+			" from item_preproc ip,item_discovery id"
 			" where ip.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
 			lld_ruleid);
@@ -4790,6 +4998,8 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		preproc_op->step = atoi(row[1]);
 		preproc_op->type = atoi(row[2]);
 		preproc_op->params = zbx_strdup(NULL, row[3]);
+		preproc_op->error_handler = atoi(row[4]);
+		preproc_op->error_handler_params = zbx_strdup(NULL, row[5]);
 		zbx_vector_ptr_append(&item_prototype->preproc_ops, preproc_op);
 	}
 	DBfree_result(result);
@@ -4894,7 +5104,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vec
 
 	lld_items_get(&item_prototypes, &items);
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, error);
-	lld_items_preproc_make(&item_prototypes, &items, error);
+	lld_items_preproc_make(&item_prototypes, &items);
 
 	lld_link_dependent_items(&items, &items_index);
 

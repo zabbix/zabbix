@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,10 +87,11 @@ class CAudit {
 				$table_name = 'drules';
 				break;
 
-			case AUDIT_RESOURCE_ICON_MAP:
-				$field_name_resourceid = 'iconmapid';
+			case AUDIT_RESOURCE_GRAPH:
+			case AUDIT_RESOURCE_GRAPH_PROTOTYPE:
+				$field_name_resourceid = 'graphid';
 				$field_name_resourcename = 'name';
-				$table_name = 'icon_map';
+				$table_name = 'graphs';
 				break;
 
 			case AUDIT_RESOURCE_HOST_PROTOTYPE:
@@ -103,6 +104,19 @@ class CAudit {
 				$field_name_resourceid = 'groupid';
 				$field_name_resourcename = 'name';
 				$table_name = 'groups';
+				break;
+
+			case AUDIT_RESOURCE_ICON_MAP:
+				$field_name_resourceid = 'iconmapid';
+				$field_name_resourcename = 'name';
+				$table_name = 'icon_map';
+				break;
+
+			case AUDIT_RESOURCE_ITEM:
+			case AUDIT_RESOURCE_ITEM_PROTOTYPE:
+				$field_name_resourceid = 'itemid';
+				$field_name_resourcename = 'name';
+				$table_name = 'items';
 				break;
 
 			case AUDIT_RESOURCE_MACRO:
@@ -127,6 +141,13 @@ class CAudit {
 				$field_name_resourceid = 'scriptid';
 				$field_name_resourcename = 'name';
 				$table_name = 'scripts';
+				break;
+
+			case AUDIT_RESOURCE_TRIGGER:
+			case AUDIT_RESOURCE_TRIGGER_PROTOTYPE:
+				$field_name_resourceid = 'triggerid';
+				$field_name_resourcename = 'description';
+				$table_name = 'triggers';
 				break;
 
 			case AUDIT_RESOURCE_USER:

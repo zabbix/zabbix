@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -466,6 +466,11 @@
 
 	function updateWidgetContent($obj, data, widget) {
 		if (++widget['update_attempts'] > 1) {
+			return;
+		}
+		else if (widget['update_paused'] == true) {
+			widget['update_attempts'] = 0;
+			startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
 			return;
 		}
 
@@ -1035,11 +1040,11 @@
 				'max-columns': 12,
 				'rows': 0,
 				'updated': false,
-				'editable': true
+				'editable': true,
+				'edit_mode': false
 			};
 			options = $.extend(default_options, options);
 			options['widget-width'] = 100 / options['max-columns'];
-			options['edit_mode'] = false;
 
 			return this.each(function() {
 				var	$this = $(this),
@@ -1122,6 +1127,7 @@
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
 				'update_attempts': 0,
+				'update_paused': false,
 				'initial_load': true,
 				'ready': false,
 				'fields': {},
@@ -1171,6 +1177,36 @@
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
 						refreshWidget($this, data, widget);
+					}
+				});
+			});
+		},
+
+		// Pause specific widget refresh.
+		pauseWidgetRefresh: function(widgetid) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				$.each(data['widgets'], function(index, widget) {
+					if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
+						widget['update_paused'] = true;
+						return false;
+					}
+				});
+			});
+		},
+
+		// Unpause specific widget refresh.
+		unpauseWidgetRefresh: function(widgetid) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				$.each(data['widgets'], function(index, widget) {
+					if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
+						widget['update_paused'] = false;
+						return false;
 					}
 				});
 			});

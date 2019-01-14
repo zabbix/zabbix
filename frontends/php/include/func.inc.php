@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -923,7 +923,13 @@ function zbx_avg($values) {
 	return bcdiv($sum, count($values));
 }
 
-// accepts parameter as integer either
+/**
+ * Check if every character in given string value is a decimal digit.
+ *
+ * @param string | int   $x Value to check.
+ *
+ * @return boolean
+ */
 function zbx_ctype_digit($x) {
 	return ctype_digit(strval($x));
 }
@@ -1069,42 +1075,6 @@ function zbx_nl2br($str) {
 
 function zbx_formatDomId($value) {
 	return str_replace(['[', ']'], ['_', ''], $value);
-}
-
-/**
- * Sort an array of objects so that the objects whose $column value matches $pattern are at the top.
- * Return the first $limit objects.
- *
- * @param array 	$table		array of objects to sort
- * @param string 	$column		name of the $column to search
- * @param string 	$pattern	string to match the value of $column against
- * @param int		$limit		number of objects to return
- *
- * @return array
- */
-function selectByPattern(array $table, $column, $pattern, $limit) {
-	$chunk_size = $limit;
-
-	$rsTable = [];
-	foreach ($table as $num => $row) {
-		if (mb_strtolower($row[$column]) === mb_strtolower($pattern)) {
-			$rsTable = [$num => $row] + $rsTable;
-		}
-		elseif ($limit > 0) {
-			$rsTable[$num] = $row;
-		}
-		else {
-			continue;
-		}
-		$limit--;
-	}
-
-	if (!empty($rsTable)) {
-		$rsTable = array_chunk($rsTable, $chunk_size, true);
-		$rsTable = $rsTable[0];
-	}
-
-	return $rsTable;
 }
 
 /************* SORT *************/
@@ -1905,6 +1875,10 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 			}
 		}
 		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS)->addItem($list);
+	}
+
+	if ($title !== null) {
+		$title = new CSpan($title);
 	}
 
 	// Details link should be in front of title.

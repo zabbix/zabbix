@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 
-$filterForm = new CFilter();
+$filterForm = new CFilter(new CUrl('toptriggers.php'));
 
 // severities
 $severity_columns = [0 => [], 1 => []];
@@ -41,7 +41,9 @@ $filter_column = (new CFormList())
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $filterForm->getName(),
-					'dstfld1' => 'groupids_'
+					'dstfld1' => 'groupids_',
+					'real_hosts' => true,
+					'enrich_parent_groups' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -70,7 +72,7 @@ $filter_column = (new CFormList())
 $filterForm
 	->setProfile($data['filter']['timeline']['profileIdx'])
 	->setActiveTab($data['filter']['active_tab'])
-	->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'], ZBX_DATE_TIME)
+	->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'], true, ZBX_DATE_TIME)
 	->addFilterTab(_('Filter'), [$filter_column]);
 
 // table

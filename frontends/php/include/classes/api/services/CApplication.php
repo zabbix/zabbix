@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -494,11 +494,13 @@ class CApplication extends CApiService {
 	}
 
 	/**
-	 * Add Items to applications.
+	 * Add items to applications.
 	 *
-	 * @param array $data
-	 * @param array $data['applications']
-	 * @param array $data['items']
+	 * @param array  $data
+	 * @param array  $data['applications']
+	 * @param string $data['applications'][]['applicationid']
+	 * @param array  $data['items']
+	 * @param string $data['items'][]['itemid']
 	 *
 	 * @return array
 	 */

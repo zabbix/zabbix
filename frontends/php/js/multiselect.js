@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,8 +117,8 @@ jQuery(function($) {
 		 */
 		addData: function(item) {
 			return this.each(function() {
-				var obj = $(this);
-				var ms = $(this).data('multiSelect');
+				var obj = $(this),
+					ms = $(this).data('multiSelect');
 
 				// clean input if selectedLimit == 1
 				if (ms.options.selectedLimit == 1) {
@@ -162,6 +162,7 @@ jQuery(function($) {
 					ms = $obj.data('multiSelect');
 
 				if (ms.options.disabled === false) {
+					$obj.attr('aria-disabled', true);
 					$('.multiselect-list', $obj).addClass('disabled');
 					$('.multiselect-button > button', $wrapper).attr('disabled', 'disabled');
 					$('input[type=text]', $wrapper).remove();
@@ -186,6 +187,7 @@ jQuery(function($) {
 
 				if (ms.options.disabled === true) {
 					var $input = makeMultiSelectInput($obj);
+					$obj.removeAttr('aria-disabled');
 					$('.multiselect-list', $obj).removeClass('disabled');
 					$('.multiselect-button > button', $wrapper).removeAttr('disabled');
 					$obj.append($input);
@@ -198,6 +200,44 @@ jQuery(function($) {
 
 					ms.values.isAvailableOpened = true;
 					ms.options.disabled = false;
+				}
+			});
+		},
+
+		/**
+		 * Modify one or more multiselect options after multiselect object has been created.
+		 *
+		 * @return jQuery
+		 */
+		modify: function(options) {
+			return this.each(function() {
+				var $obj = $(this),
+					ms = $(this).data('multiSelect');
+
+				for (var ms_key in ms.options) {
+					if (ms_key in options) {
+						ms.options[ms_key] = options[ms_key];
+					}
+
+					/*
+					 * When changing the option "addNew" few things need to happen:
+					 *   1) previous search results must be cleared, in case same search string is requested. So
+					 *      a new request is sent and new results are received. With or without "(new)".
+					 *   2) Already selected "(new)" items must be hidden and disabled, so that they are not sent
+					 *      when form is submitted.
+					 *   3) Already visible block with results must be hidden. It will reappear on new search.
+					 */
+					if (ms_key === 'addNew') {
+						cleanLastSearch($obj);
+
+						$('input[name*="[new]"]', $obj)
+							.prop('disabled', !ms.options[ms_key])
+							.each(function() {
+								$('.selected li[data-id="' + this.value + '"]', $obj).toggle(ms.options[ms_key]);
+							});
+
+						hideAvailable($obj);
+					}
 				}
 			});
 		}
@@ -467,7 +507,7 @@ jQuery(function($) {
 					hideAvailable($obj);
 				}
 			})
-			.on('keypress keydown', function(e) {
+			.on('keydown', function(e) {
 				switch (e.which) {
 
 					case KEY.TAB:
@@ -867,9 +907,9 @@ jQuery(function($) {
 		// highlight matched
 		var text = item.name.toLowerCase(),
 			search = values.search.toLowerCase(),
+			is_new = item.isNew || false,
 			start = 0,
-			end = 0,
-			searchLength = search.length;
+			end = 0;
 
 		while (text.indexOf(search, end) > -1) {
 			end = text.indexOf(search, end);
@@ -881,11 +921,11 @@ jQuery(function($) {
 			}
 
 			li.append($('<span>', {
-				'class': 'suggest-found',
-				text: item.name.substring(end, end + searchLength)
-			}));
+				'class': !is_new ? 'suggest-found' : null,
+				text: item.name.substring(end, end + search.length)
+			})).toggleClass('suggest-new', is_new);
 
-			end += searchLength;
+			end += search.length;
 			start = end;
 		}
 

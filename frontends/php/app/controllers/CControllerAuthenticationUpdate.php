@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -159,10 +159,7 @@ class CControllerAuthenticationUpdate extends CController {
 			]);
 
 			if (!$login) {
-				$this->response->setMessageError($this->hasInput('test')
-					? _('LDAP login was not successful')
-					: _('Login name or password is incorrect!')
-				);
+				$this->response->setMessageError($ldap_validator->getError());
 				$is_valid = false;
 			}
 		}

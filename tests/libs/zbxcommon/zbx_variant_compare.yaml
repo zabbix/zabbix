@@ -1,0 +1,277 @@
+---
+test case: none == none
+in:
+  value1:
+    type: ZBX_VARIANT_NONE
+    value:
+  value2:
+    type: ZBX_VARIANT_NONE
+    value:
+out:
+  return: equal
+---
+test case: none < value
+in:
+  value1:
+    type: ZBX_VARIANT_NONE
+    value:
+  value2:
+    type: ZBX_VARIANT_STR
+    value: abc
+out:
+  return: less
+---
+test case: value > none
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 1.5
+  value2:
+    type: ZBX_VARIANT_NONE
+    value:
+out:
+  return: greater
+---
+test case: string < string
+in:
+  value1:
+    type: ZBX_VARIANT_STR
+    value: abc
+  value2:
+    type: ZBX_VARIANT_STR
+    value: acb
+out:
+  return: less
+---
+test case: string > string
+in:
+  value1:
+    type: ZBX_VARIANT_STR
+    value: acb
+  value2:
+    type: ZBX_VARIANT_STR
+    value: abc
+out:
+  return: greater
+---
+test case: string == string
+in:
+  value1:
+    type: ZBX_VARIANT_STR
+    value: abc
+  value2:
+    type: ZBX_VARIANT_STR
+    value: abc
+out:
+  return: equal
+---
+test case: string < floating
+in:
+  value1:
+    type: ZBX_VARIANT_STR
+    value: 1
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 1.5
+out:
+  return: less
+---
+test case: floating < string
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 1
+  value2:
+    type: ZBX_VARIANT_STR
+    value: 1.5
+out:
+  return: less
+---
+test case: string > floating
+in:
+  value1:
+    type: ZBX_VARIANT_STR
+    value: 2
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 1.5
+out:
+  return: greater
+---
+test case: floating > string
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 2
+  value2:
+    type: ZBX_VARIANT_STR
+    value: 1.5
+out:
+  return: greater
+---
+test case: string == floating
+in:
+  value1:
+    type: ZBX_VARIANT_STR
+    value: 12.34
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 12.34
+out:
+  return: equal
+---
+test case: floating == string
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 0.0
+  value2:
+    type: ZBX_VARIANT_STR
+    value: 0
+out:
+  return: equal
+---
+test case: floating < uint64
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: -1000
+  value2:
+    type: ZBX_VARIANT_UI64
+    value: 0
+out:
+  return: less
+---
+test case: uint64 < floating
+in:
+  value1:
+    type: ZBX_VARIANT_UI64
+    value: 1000
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 1000.5
+out:
+  return: less
+---
+test case: floating > uint64
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 1.5
+  value2:
+    type: ZBX_VARIANT_UI64
+    value: 1
+out:
+  return: greater
+---
+test case: uint64 > floating
+in:
+  value1:
+    type: ZBX_VARIANT_UI64
+    value: 1
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 0.5
+out:
+  return: greater
+---
+test case: floating == uint64
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 1234.0
+  value2:
+    type: ZBX_VARIANT_UI64
+    value: 1234
+out:
+  return: equal
+---
+test case: uint64 == floating
+in:
+  value1:
+    type: ZBX_VARIANT_UI64
+    value: 0
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 0
+out:
+  return: equal
+---
+test case: uint64 < uint64
+in:
+  value1:
+    type: ZBX_VARIANT_UI64
+    value: 1000000000000
+  value2:
+    type: ZBX_VARIANT_UI64
+    value: 1000000000001
+out:
+  return: less
+---
+test case: uint64 > uint64
+in:
+  value1:
+    type: ZBX_VARIANT_UI64
+    value: 1
+  value2:
+    type: ZBX_VARIANT_UI64
+    value: 0
+out:
+  return: greater
+---
+test case: uint64 == uint64
+in:
+  value1:
+    type: ZBX_VARIANT_UI64
+    value: 1000000000000
+  value2:
+    type: ZBX_VARIANT_UI64
+    value: 1000000000000
+out:
+  return: equal
+---
+test case: floating == floating
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 0.000001
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 0.000002
+out:
+  return: equal
+---
+test case: floating == floating
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 0
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 0.000001
+out:
+  return: equal
+---
+test case: floating > floating
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 0.000003
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 0.000001
+out:
+  return: greater
+---
+test case: floating < floating
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 0.00001
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 0.00002
+out:
+  return: less
+...
+

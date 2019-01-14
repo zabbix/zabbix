@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -465,7 +465,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		}
 		else {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::className('msg-good'));
-			$this->zbxTestAssertElementPresentXpath('//output[@class="msg-good"][contains(text(),"copied")]');
+			$this->zbxTestAssertElementPresentXpath('//output[@class="msg-good"]/span[contains(text(),"copied")]');
 
 			// DB check, if copy target was host or template.
 			if ($data['target_type'] === 'Hosts' || $data['target_type'] === 'Templates') {
@@ -501,8 +501,6 @@ class testPageHostGraph extends CLegacyWebTest {
 				}
 			}
 		}
-
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	/**
@@ -603,7 +601,6 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graphs deleted');
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -742,7 +742,7 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
 			if (!isset($itemid)) {
-				$this->zbxTestAssertElementValue('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
+				$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
 			}
 
 			$this->zbxTestTextPresent('Port');
@@ -1298,7 +1298,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "".'
 					]
 				]
 			],
@@ -1313,7 +1313,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-11,00:00-24:00".'
 					]
 				]
 			],
@@ -1328,7 +1328,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,00:00-25:00".'
 					]
 				]
 			],
@@ -1343,7 +1343,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,24:00-00:00".'
 					]
 				]
 			],
@@ -1806,6 +1806,7 @@ class testFormItem extends CLegacyWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'item-snmpv1-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1816,6 +1817,7 @@ class testFormItem extends CLegacyWebTest {
 					'type' => 'SNMPv2 agent',
 					'name' => 'SNMPv2 agent',
 					'key' => 'item-snmpv2-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1826,6 +1828,7 @@ class testFormItem extends CLegacyWebTest {
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'item-snmpv3-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -2177,6 +2180,10 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestClickLinkTextWait($data['master_item']);
 		}
 
+		if (array_key_exists('snmp_oid', $data))	{
+			$this->zbxTestInputTypeOverwrite('snmp_oid', $data['snmp_oid']);
+		}
+
 		$itemFlexFlag = true;
 		if (isset($data['flexPeriod'])) {
 
@@ -2312,7 +2319,6 @@ class testFormItem extends CLegacyWebTest {
 					'SSH agent', 'TELNET agent', 'JMX agent', 'Calculated'])) {
 				$this->zbxTestClick('check_now');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
-				$this->zbxTestCheckFatalErrors();
 			}
 			else {
 				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
@@ -2382,393 +2388,5 @@ class testFormItem extends CLegacyWebTest {
 
 		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings (99 days)');
 		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings (455 days)');
-	}
-
-	public static function preprocessing() {
-		return [
-			// Custom multiplier
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item empty multiplier',
-					'key' => 'item-empty-multiplier',
-					'preprocessing' => [
-						['type' => 'Custom multiplier', 'params' => ''],
-					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item string multiplier',
-					'key' => 'item-string-multiplier',
-					'preprocessing' => [
-						['type' => 'Custom multiplier', 'params' => 'abc'],
-					],
-					'error' => 'Incorrect value for field "params": a numeric value is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item multiplier symbol',
-					'key' => 'item-symbol-multiplier',
-					'preprocessing' => [
-						['type' => 'Custom multiplier', 'params' => '0,0'],
-					],
-					'error' => 'Incorrect value for field "params": a numeric value is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item multiplier symbol',
-					'key' => 'item-symbol-multiplier',
-					'preprocessing' => [
-						['type' => 'Custom multiplier', 'params' => '1a!@#$%^&*()-='],
-					],
-					'error' => 'Incorrect value for field "params": a numeric value is expected.'
-				]
-			],
-			// Empty trim
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item right trim',
-					'key' => 'item-empty-right-trim',
-					'preprocessing' => [
-						['type' => 'Right trim', 'params' => ''],
-					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item left trim',
-					'key' => 'item-empty-left-trim',
-					'preprocessing' => [
-						['type' => 'Left trim', 'params' => ''],
-					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item trim',
-					'key' => 'item-empty-trim',
-					'preprocessing' => [
-						['type' => 'Trim', 'params' => ''],
-					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
-				]
-			],
-			// Structured data
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item XML XPath',
-					'key' => 'item-empty-xpath',
-					'preprocessing' => [
-						['type' => 'XML XPath', 'params' => ''],
-					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item JSON Path',
-					'key' => 'item-empty-jsonpath',
-					'preprocessing' => [
-						['type' => 'JSON Path', 'params' => ''],
-					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
-				]
-			],
-			// Regular expression
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item empty regular expression',
-					'key' => 'item-empty-first-parameter',
-					'preprocessing' => [
-						['type' => 'Regular expression', 'params' => '', 'output' => ''],
-					],
-					'error' => 'Incorrect value for field "params": first parameter is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item empty regular expression',
-					'key' => 'item-empty-first-parameter',
-					'preprocessing' => [
-						['type' => 'Regular expression', 'params' => '', 'output' => 'test output'],
-					],
-					'error' => 'Incorrect value for field "params": first parameter is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item empty regular expression',
-					'key' => 'item-empty-second-parameter',
-					'preprocessing' => [
-						['type' => 'Regular expression', 'params' => 'expression', 'output' => ''],
-					],
-					'error' => 'Incorrect value for field "params": second parameter is expected.'
-				]
-			],
-			// Delta
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item two delta',
-					'key' => 'item-two-delta',
-					'preprocessing' => [
-						['type' => 'Simple change'],
-						['type' => 'Simple change']
-					],
-					'error' => 'Only one change step is allowed.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item two delta per second',
-					'key' => 'item-two-delta-per-second',
-					'preprocessing' => [
-						['type' => 'Change per second'],
-						['type' => 'Change per second']
-					],
-					'error' => 'Only one change step is allowed.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Item two different delta',
-					'key' => 'item-two--different-delta',
-					'preprocessing' => [
-						['type' => 'Simple change'],
-						['type' => 'Change per second']
-					],
-					'error' => 'Only one change step is allowed.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Add all preprocessing',
-					'key' => 'item.preprocessing',
-					'preprocessing' => [
-						['type' => 'Right trim', 'params' => 'abc'],
-						['type' => 'Left trim', 'params' => 'def'],
-						['type' => 'Trim', 'params' => '1a2b3c'],
-						['type' => 'Custom multiplier', 'params' => '123'],
-						['type' => 'Regular expression', 'params' => 'expression', 'output' => 'test output'],
-						['type' => 'Boolean to decimal'],
-						['type' => 'Octal to decimal'],
-						['type' => 'Hexadecimal to decimal'],
-						['type' => 'Simple change']
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Add symblos preprocessing',
-					'key' => 'item.symbols.preprocessing',
-					'preprocessing' => [
-						['type' => 'Right trim', 'params' => '1a!@#$%^&*()-='],
-						['type' => 'Left trim', 'params' => '2b!@#$%^&*()-='],
-						['type' => 'Trim', 'params' => '3c!@#$%^&*()-='],
-						['type' => 'XML XPath', 'params' => '3c!@#$%^&*()-='],
-						['type' => 'JSON Path', 'params' => '3c!@#$%^&*()-='],
-						['type' => 'Custom multiplier', 'params' => '4e+10'],
-						['type' => 'Regular expression', 'params' => '5d!@#$%^&*()-=', 'output' => '6e!@#$%^&*()-=']
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Add the same preprocessing',
-					'key' => 'item.theSamePpreprocessing',
-					'preprocessing' => [
-						['type' => 'Right trim', 'params' => 'abc'],
-						['type' => 'Right trim', 'params' => 'abc'],
-						['type' => 'Left trim', 'params' => 'def'],
-						['type' => 'Left trim', 'params' => 'def'],
-						['type' => 'Trim', 'params' => '1a2b3c'],
-						['type' => 'Trim', 'params' => '1a2b3c'],
-						['type' => 'XML XPath', 'params' => '1a2b3c'],
-						['type' => 'XML XPath', 'params' => '1a2b3c'],
-						['type' => 'JSON Path', 'params' => '1a2b3c'],
-						['type' => 'JSON Path', 'params' => '1a2b3c'],
-						['type' => 'Custom multiplier', 'params' => '123'],
-						['type' => 'Custom multiplier', 'params' => '123'],
-						['type' => 'Regular expression', 'params' => 'expression', 'output' => 'test output'],
-						['type' => 'Regular expression', 'params' => 'expression', 'output' => 'test output'],
-						['type' => 'Boolean to decimal'],
-						['type' => 'Boolean to decimal'],
-						['type' => 'Octal to decimal'],
-						['type' => 'Octal to decimal'],
-						['type' => 'Hexadecimal to decimal'],
-						['type' => 'Hexadecimal to decimal'],
-						['type' => 'Change per second']
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Item with preprocessing rule with user macro',
-					'key' => 'item-user-macro',
-					'preprocessing' => [
-						['type' => 'Regular expression', 'params' => '{$DELIM}(.*)', 'output' => '\1'],
-						['type' => 'Trim', 'params' => '{$DELIM}'],
-						['type' => 'XML XPath', 'params' => 'number(/values/Item/value[../key=\'{$DELIM}\'])'],
-						['type' => 'JSON Path', 'params' => '$.data[\'{$KEY}\']'],
-						['type' => 'Custom multiplier', 'params' => '{$VALUE}']
-					]
-				]
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider preprocessing
-	 */
-	public function testFormItem_CreatePreprocessing($data) {
-		$dbResult = DBselect("SELECT hostid FROM hosts WHERE host='".$this->host."'");
-		$dbRow = DBfetch($dbResult);
-		$hostid = $dbRow['hostid'];
-
-		$this->zbxTestLogin('items.php?hostid='.$hostid.'&form=create');
-		$this->zbxTestCheckTitle('Configuration of items');
-		$this->zbxTestCheckHeader('Items');
-
-		$this->zbxTestInputType('name', $data['name']);
-		$this->zbxTestInputType('key', $data['key']);
-		$this->zbxTestTabSwitch('Preprocessing');
-
-		$stepCount = 0;
-		foreach ($data['preprocessing'] as $options) {
-			$this->zbxTestClickWait('param_add');
-			$this->zbxTestDropdownSelect('preprocessing_'.$stepCount.'_type', $options['type']);
-
-			if (array_key_exists('params', $options) && $options['type'] !== 'Regular expression') {
-				$this->zbxTestInputType('preprocessing_'.$stepCount.'_params_0', $options['params']);
-			}
-			elseif (array_key_exists('params', $options) && $options['type'] === 'Regular expression') {
-				$this->zbxTestInputType('preprocessing_'.$stepCount.'_params_0', $options['params']);
-				$this->zbxTestInputType('preprocessing_'.$stepCount.'_params_1', $options['output']);
-			}
-			$stepCount ++;
-		}
-
-		$this->zbxTestClickWait('add');
-
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->zbxTestCheckTitle('Configuration of items');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
-				$this->zbxTestCheckFatalErrors();
-
-				$dbResultItem = DBselect("SELECT name,key_,itemid FROM items where key_ = '".$data['key']."'");
-				$rowItem = DBfetch($dbResultItem);
-				$this->assertEquals($rowItem['name'], $data['name']);
-				$this->assertEquals($rowItem['key_'], $data['key']);
-
-				$dbResultPreprocessing = DBselect("SELECT * FROM item_preproc where itemid ='".$rowItem['itemid']."'  ORDER BY step ASC");
-				while ($row = DBfetch($dbResultPreprocessing)) {
-					$type[] = $row['type'];
-					$dbParams[] = $row['params'];
-				}
-
-				foreach ($data['preprocessing'] as $key => $options) {
-					$dbType = get_preprocessing_types($type[$key]);
-					$this->assertEquals($options['type'], $dbType);
-
-					switch ($options['type']) {
-						case 'Custom multiplier':
-						case 'Right trim':
-						case 'Left trim ':
-						case 'Trim':
-						case 'XML XPath':
-						case 'JSON Path':
-							$this->assertEquals($options['params'], $dbParams[$key]);
-							break;
-						case 'Regular expression':
-							$reg_exp = $options['params']."\n".$options['output'];
-							$this->assertEquals($reg_exp, $dbParams[$key]);
-							break;
-					}
-				}
-				break;
-
-			case TEST_BAD:
-				$this->zbxTestCheckTitle('Configuration of items');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
-				$this->zbxTestTextPresent($data['error']);
-
-				$sqlItem = "SELECT * FROM items where key_ = '".$data['key']."'";
-				$this->assertEquals(0, CDBHelper::getCount($sqlItem));
-				break;
-		}
-	}
-
-	public function testFormItem_CopyItemPreprocessing() {
-		$preprocessingItemId = '15094';
-		$dbResultHost = DBselect("SELECT hostid FROM hosts WHERE host='".$this->host."'");
-		$dbRowHost = DBfetch($dbResultHost);
-		$hostid = $dbRowHost['hostid'];
-
-		$this->zbxTestLogin('items.php?filter_set=1&hostid=15001');
-		$this->zbxTestCheckTitle('Configuration of items');
-		$this->zbxTestCheckHeader('Items');
-
-		$this->zbxTestCheckboxSelect('group_itemid_'.$preprocessingItemId);
-		$this->zbxTestClickButton('item.masscopyto');
-
-		$this->zbxTestDropdownSelectWait('copy_type', 'Hosts');
-		$this->zbxTestDropdownSelectWait('copy_groupid', 'Zabbix servers');
-		$this->zbxTestCheckboxSelect('copy_targetid_'.$hostid);
-		$this->zbxTestClickWait('copy');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item copied');
-
-		$this->zbxTestClickLinkTextWait('All hosts');
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickLinkTextWait('Items');
-		$this->zbxTestClickLinkTextWait('testInheritanceItemPreprocessing');
-
-		$dbItem = DBselect('SELECT * FROM items WHERE itemid='.$preprocessingItemId);
-		$rowItem = DBfetch($dbItem);
-		$this->zbxTestAssertElementValue('name', $rowItem['name']);
-		$this->zbxTestAssertElementValue('key', $rowItem['key_']);
-		$this->zbxTestTabSwitch('Preprocessing');
-
-		$dbResult = DBselect('SELECT * FROM item_preproc WHERE itemid='.$preprocessingItemId);
-		$itemsPreproc = DBfetchArray($dbResult);
-		foreach ($itemsPreproc as $itemPreproc) {
-			$preprocessing_type = get_preprocessing_types($itemPreproc['type']);
-			$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_type'][readonly]");
-			$this->zbxTestDropdownAssertSelected("preprocessing[".($itemPreproc['step']-1)."][type]", $preprocessing_type);
-			if (($itemPreproc['type']) <=4 || ($itemPreproc['type'] >= 11)) {
-				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0'][readonly]");
-				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_0", $itemPreproc['params']);
-			}
-			elseif ($itemPreproc['type'] == 5) {
-				$reg_exp = preg_split("/\n/", $itemPreproc['params']);
-				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0'][readonly]");
-				$this->zbxTestAssertElementNotPresentXpath("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_1'][readonly]");
-				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_0", $reg_exp[0]);
-				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_1", $reg_exp[1]);
-			}
-		}
 	}
 }
