@@ -54,9 +54,12 @@ class CWebTest extends CTest {
 			$screenshot_name = md5(microtime(true)).'.png';
 
 			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.$screenshot_name, $this->screenshot) !== false) {
+				$runtime_errors = @file_get_contents(PHPUNIT_ERROR_LOG);
+				$runtime_errors = $runtime_errors ? "\n\nRuntime errors:\n".$runtime_errors : '';
+
 				CExceptionHelper::setMessage($exception, 'URL: '.$this->current_url."\n".
 						'Screenshot: '.PHPUNIT_SCREENSHOT_URL.$screenshot_name."\n".
-						$exception->getMessage()
+						$exception->getMessage().$runtime_errors
 				);
 
 				$this->screenshot = null;

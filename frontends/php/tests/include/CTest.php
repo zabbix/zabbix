@@ -111,6 +111,9 @@ class CTest extends PHPUnit_Framework_TestCase {
 		$this->backup = [];
 		self::$warnings = [];
 
+		// Clear contents of error log.
+		@file_put_contents(PHPUNIT_ERROR_LOG, '');
+
 		if (!isset($DB['DB'])) {
 			DBconnect($error);
 		}
@@ -187,6 +190,10 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 		if (self::$warnings) {
 			throw new PHPUnit_Framework_Warning(implode("\n", self::$warnings));
+		}
+
+		if (($errors = @file_get_contents(PHPUNIT_ERROR_LOG))) {
+			$this->fail("Runtime errors:\n".$errors);
 		}
 	}
 

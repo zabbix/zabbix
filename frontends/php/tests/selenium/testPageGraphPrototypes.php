@@ -163,7 +163,6 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestCheckHeader('Graph prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototypes deleted');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
@@ -191,7 +190,6 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete graph prototypes');
 		$this->zbxTestTextPresentInMessageDetails('Cannot delete templated graph prototype.');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}

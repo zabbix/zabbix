@@ -195,8 +195,8 @@ void	zbx_timespec(zbx_timespec_t *ts)
 				}
 				else
 				{
-					ntp_tick.QuadPart = tickPerSecond.QuadPart * (ts->sec - last_ts.sec)
-						+ tickPerSecond.QuadPart * (ts->ns - last_ts.ns) / 1000000000;
+					ntp_tick.QuadPart = tickPerSecond.QuadPart * (ts->sec - last_ts.sec) +
+							tickPerSecond.QuadPart * (ts->ns - last_ts.ns) / 1000000000;
 				}
 
 				/* host system time can shift backwards, then correction is not reasonable */
