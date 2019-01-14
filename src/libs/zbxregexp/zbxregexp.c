@@ -98,22 +98,13 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 
 	if (NULL != regexp)
 	{
-		if (NULL == (extra = pcre_study(pcre_regexp, PCRE_STUDY_JIT_COMPILE, err_msg_static)))
+		if (NULL == (extra = pcre_study(pcre_regexp, PCRE_STUDY_JIT_COMPILE, err_msg_static)) &&
+				NULL != *err_msg_static)
 		{
-			if (NULL != *err_msg_static)
-			{
-				pcre_free(pcre_regexp);
-				return FAIL;
-			}
-
-			extra = (pcre_extra *)zbx_malloc(NULL, sizeof(pcre_extra));
-			extra->flags = 0;
+			pcre_free(pcre_regexp);
+			return FAIL;
 		}
-#if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION)
-		extra->flags |= PCRE_EXTRA_MATCH_LIMIT | PCRE_EXTRA_MATCH_LIMIT_RECURSION;
-		extra->match_limit = 1000000;
-		extra->match_limit_recursion = 1000000;
-#endif
+
 		*regexp = (zbx_regexp_t *)zbx_malloc(NULL, sizeof(zbx_regexp_t));
 		(*regexp)->pcre_regexp = pcre_regexp;
 		(*regexp)->extra = extra;
@@ -221,15 +212,27 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	ZBX_THREAD_LOCAL static int	matches_buff[MATCHES_BUFF_SIZE];
 	int				*ovector = NULL;
 	int				ovecsize = 3 * count;		/* see pcre_exec() in "man pcreapi" why 3 */
+	struct pcre_extra		extra, *pextra;
 
 	if (ZBX_REGEXP_GROUPS_MAX < count)
 		ovector = (int *)zbx_malloc(NULL, (size_t)ovecsize * sizeof(int));
 	else
 		ovector = matches_buff;
 
-	r = pcre_exec(regexp->pcre_regexp, regexp->extra, string, strlen(string), flags, 0, ovector, ovecsize);
-
-	if (0 <= r)	/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
+	if (NULL == regexp->extra)
+	{
+		pextra = &extra;
+		pextra->flags = 0;
+	}
+	else
+		pextra = regexp->extra;
+#if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION)
+	pextra->flags |= PCRE_EXTRA_MATCH_LIMIT | PCRE_EXTRA_MATCH_LIMIT_RECURSION;
+	pextra->match_limit = 1000000;
+	pextra->match_limit_recursion = 1000000;
+#endif
+	/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
+	if (0 <= (r = pcre_exec(regexp->pcre_regexp, pextra, string, strlen(string), flags, 0, ovector, ovecsize)))
 	{
 		if (NULL != matches)
 			memcpy(matches, ovector, (size_t)((0 < r) ? MIN(r, count) : count) * sizeof(zbx_regmatch_t));
