@@ -337,19 +337,21 @@
 					return rectOverlap(bounds, box.current_pos) ? box : null;
 				});
 			},
-			markAffectedWidgets = function(pos) {
+			markAffectedWidgets = function(pos, uid) {
 				$.map(widgets, function(box) {
-					return (!('affected_axis' in box) && rectOverlap(pos, box.current_pos)) ? box : null;
+					return (!('affected_axis' in box) && box.uniqueid != uid && rectOverlap(pos, box.current_pos)) ? box : null;
 				})
 				.each(function(box) {
 					var boundary = $.extend({}, box.current_pos);
 
 					if (axis_key in axis) {
-						boundary[axis_key] = Math.max(0, boundary[axis_key] - axis[size_key]);
-						boundary[size_key] += box.current_pos[axis_key] - boundary[axis_key];
+						console
+							.log(`${box.header}:${axis_key} with overlap=${pos[axis_key] - boundary[axis_key] + boundary[size_key]}`);
+						boundary[axis_key] = Math.max(0, boundary[axis_key] - (pos[axis_key] - boundary[axis_key] + boundary[size_key]));
+						boundary[size_key] = box.current_pos[axis_key] - boundary[axis_key];
 					}
 					else {
-						boundary[size_key] += axis[size_key];
+						boundary[size_key] += pos[axis_key] + pos[size_key] - boundary[axis_key];
 					}
 
 					box.affected_axis = axis_key;
@@ -358,7 +360,7 @@
 			};
 
 		// Get array containing only widgets affected by resize operation.
-		markAffectedWidgets(axis.boundary);
+		markAffectedWidgets(axis.boundary, widget.uniqueid);
 		affected = $.map(widgets, function(box) {
 			return ('affected_axis' in box && box.affected_axis === axis_key && box.uniqueid !== widget.uniqueid)
 				? box
@@ -649,14 +651,7 @@
 			}
 		});
 
-		if (!('prev_pos' in widget)) {
-			widget.prev_pos = $.extend({}, widget.pos);
-
-			if ('y' in changes) {
-				process_order = ['y', 'x'];
-			}
-		}
-		else if (widget.prev_pos.y != widget.current_pos.y || widget.prev_pos.height != widget.current_pos.height) {
+		if (widget.prev_pos.y != widget.current_pos.y || widget.prev_pos.height != widget.current_pos.height) {
 			process_order = ['y', 'x'];
 		}
 
@@ -732,6 +727,8 @@
 				.log('backup indexes', backup_indexes);
 			console
 				.log(`${axis_key} start processing. affected x="${dbg_affected.x.join('", "')}", y="${dbg_affected.y.join('", "')}"`)
+			console
+				.log('axis object:', axis);
 
 			fitWigetsIntoBox(data.widgets, widget, axis);
 		});
@@ -945,6 +942,11 @@
 			minWidth: getCurrentCellWidth(data),
 			start: function(event) {
 				data['pos-action'] = 'resize';
+				widget.prev_pos = $.extend({}, widget.pos);
+				data.widgets.each(function(box) {
+					delete box.affected_axis;
+				});
+
 				setResizableState('disable', data.widgets, widget.uniqueid);
 				startWidgetPositioning($(event.target), data);
 				doWidgetResize($obj, $(event.target), data);
@@ -963,6 +965,8 @@
 			},
 			stop: function(event) {
 				data['pos-action'] = '';
+				delete widget.prev_pos;
+
 				setResizableState('enable', data.widgets, widget.uniqueid);
 				stopWidgetPositioning($obj, $(event.target), data);
 				// Hide resize handles for situation when mouse button was released outside dashboard container area.
