@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,10 +22,10 @@
 define('ZABBIX_VERSION',		'4.2.0alpha3');
 define('ZABBIX_API_VERSION',	'4.2.0');
 define('ZABBIX_EXPORT_VERSION',	'4.2');
-define('ZABBIX_DB_VERSION',	4010004);
+define('ZABBIX_DB_VERSION',	4010007);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2018');
+define('ZABBIX_COPYRIGHT_TO',	'2019');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -192,6 +192,11 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
+
+// Multiselect helper buttons that allow selected objects to be added, replaced or removed.
+define('ZBX_MULTISELECT_ADD',		0);
+define('ZBX_MULTISELECT_REPLACE',	1);
+define('ZBX_MULTISELECT_REMOVE',	2);
 
 // Maximum number of tags to display.
 define('ZBX_TAG_COUNT_DEFAULT', 3);
@@ -1229,6 +1234,7 @@ define('API_H_NAME',			21);
 define('API_RANGE_TIME',		22);
 define('API_COLOR',				23);
 define('API_NUMERIC',			24);
+define('API_LLD_MACRO',			25);
 
 // flags
 define('API_REQUIRED',				0x0001);

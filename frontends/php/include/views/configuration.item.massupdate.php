@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -579,19 +579,43 @@ $itemFormList
 
 // append applications to form list
 if ($data['displayApplications']) {
-	// replace applications
-	$app_to_replace = hasRequest('applications')
-		? CArrayHelper::renameObjectsKeys(API::Application()->get([
-			'output' => ['applicationid', 'name'],
-			'applicationids' => getRequest('applications')
-		]), ['applicationid' => 'id'])
-		: [];
+	$applications = [];
 
-	$replace_app = (new CDiv(
+	if (hasRequest('applications')) {
+		$applicationids = [];
+
+		foreach (getRequest('applications') as $application) {
+			if (is_array($application) && isset($application['new'])) {
+				$applications[] = [
+					'id' => $application['new'],
+					'name' => $application['new'].' ('._x('new', 'new element in multiselect').')',
+					'isNew' => true
+				];
+			}
+			else {
+				$applicationids[] = $application;
+			}
+		}
+
+		$applications = array_merge($applications, $applicationids
+			? CArrayHelper::renameObjectsKeys(API::Application()->get([
+				'output' => ['applicationid', 'name'],
+				'applicationids' => $applicationids
+			]), ['applicationid' => 'id'])
+			: []);
+	}
+
+	$applications_div = (new CDiv([
+		(new CRadioButtonList('massupdate_app_action', (int) $data['massupdate_app_action']))
+			->addValue(_('Add'), ZBX_MULTISELECT_ADD)
+			->addValue(_('Replace'), ZBX_MULTISELECT_REPLACE)
+			->addValue(_('Remove'), ZBX_MULTISELECT_REMOVE)
+			->setModern(true),
 		(new CMultiSelect([
 			'name' => 'applications[]',
 			'object_name' => 'applications',
-			'data' => $app_to_replace,
+			'add_new' => !($data['massupdate_app_action'] == ZBX_MULTISELECT_REMOVE),
+			'data' => $applications,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'applications',
@@ -603,65 +627,15 @@ if ($data['displayApplications']) {
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	))->setId('replaceApp');
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setId('applications_div');
 
 	$itemFormList->addRow(
-		(new CVisibilityBox('visible[applications]', 'replaceApp', _('Original')))
-			->setLabel(_('Replace applications'))
-			->setChecked(isset($data['visible']['applications'])),
-		$replace_app
-	);
-
-	// add new or existing applications
-	$applications_to_add = [];
-	if (hasRequest('new_applications')) {
-		$applicationids = [];
-
-		foreach (getRequest('new_applications') as $newApplication) {
-			if (is_array($newApplication) && isset($newApplication['new'])) {
-				$applications_to_add[] = [
-					'id' => $newApplication['new'],
-					'name' => $newApplication['new'].' ('._x('new', 'new element in multiselect').')',
-					'isNew' => true
-				];
-			}
-			else {
-				$applicationids[] = $newApplication;
-			}
-		}
-
-		$applications_to_add = array_merge($applications_to_add, $applicationids
-			? CArrayHelper::renameObjectsKeys(API::Application()->get([
-				'output' => ['applicationid', 'name'],
-				'applicationids' => $applicationids
-			]), ['applicationid' => 'id'])
-			: []);
-	}
-
-	$newApp = (new CDiv(
-		(new CMultiSelect([
-			'name' => 'new_applications[]',
-			'object_name' => 'applications',
-			'add_new' => true,
-			'data' => $applications_to_add,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'applications',
-					'srcfld1' => 'applicationid',
-					'dstfrm' => $itemForm->getName(),
-					'dstfld1' => 'new_applications_',
-					'hostid' => $data['hostid'],
-					'noempty' => true
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	))->setId('newApp');
-
-	$itemFormList->addRow(
-		(new CVisibilityBox('visible[new_applications]', 'newApp', _('Original')))
-			->setLabel(_('Add new or existing applications'))
-			->setChecked(isset($data['visible']['new_applications'])),
-		$newApp
+		(new CVisibilityBox('visible[applications]', 'applications_div', _('Original')))
+			->setLabel(_('Applications'))
+			->setChecked(array_key_exists('applications', $data['visible'])),
+		$applications_div
 	);
 }
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "comms.h"
 #include "sysinfo.h"
 #include "zbxalgo.h"
+#include "zbxjson.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -861,5 +862,18 @@ void	zbx_dc_maintenance_set_update_flags(void);
 void	zbx_dc_maintenance_reset_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flags(void);
+
+typedef struct
+{
+	char	*lld_macro;
+	char	*path;
+}
+zbx_lld_macro_path_t;
+
+int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro_paths, char **error);
+void	zbx_lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path);
+int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
+		const char *macro, char **value, size_t *value_alloc);
+int	zbx_lld_macro_paths_compare(const void *d1, const void *d2);
 
 #endif

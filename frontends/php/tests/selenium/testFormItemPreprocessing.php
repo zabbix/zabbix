@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -637,7 +637,6 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
-				$this->zbxTestCheckFatalErrors();
 
 				$row_item = CDBHelper::getRow('SELECT name,key_,itemid FROM items where key_ = '.zbx_dbstr($data['key']));
 				$this->assertEquals($row_item['name'], $data['name']);
@@ -887,7 +886,6 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
-		$this->zbxTestCheckFatalErrors();
 
 		// Get item row from DB.
 		$db_item = CDBHelper::getRow('SELECT name,key_,itemid FROM items where key_ = '.zbx_dbstr($item_key));
@@ -1093,7 +1091,6 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
-				$this->zbxTestCheckFatalErrors();
 				$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM items where key_ = '.zbx_dbstr($data['key'])));
 				break;
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -681,6 +681,72 @@ $conditionFormList->addRow(_('Filters'),
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
+/*
+ * LLD Macro tab.
+ */
+$lld_macro_paths_form_list = new CFormList();
+
+$lld_macro_paths_table = (new CTable())
+	->setId('lld_macro_paths')
+	->addStyle('width: 100%;')
+	->setHeader([_('LLD Macro'), _('JSON Path'), '']);
+
+$lld_macro_paths = $data['lld_macro_paths'];
+
+if (!$lld_macro_paths) {
+	$lld_macro_paths = [[
+		'lld_macro' => '',
+		'path' => ''
+	]];
+}
+elseif (!hasRequest('form_refresh')) {
+	CArrayHelper::sort($lld_macro_paths, ['lld_macro']);
+}
+
+if (array_key_exists('item', $data)) {
+	$templated = ($data['item']['templateid'] != 0);
+}
+else {
+	$templated = false;
+}
+
+foreach ($lld_macro_paths as $i => $lld_macro_path) {
+	$lld_macro = (new CTextBox('lld_macro_paths['.$i.'][lld_macro]', $lld_macro_path['lld_macro'],
+		$templated, DB::getFieldLength('lld_macro_path', 'lld_macro')
+	))
+		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+		->addClass(ZBX_STYLE_UPPERCASE)
+		->setAttribute('placeholder', '{#MACRO}');
+
+	$path = (new CTextBox('lld_macro_paths['.$i.'][path]', $lld_macro_path['path'], $templated,
+		DB::getFieldLength('lld_macro_path', 'path')
+	))
+		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+		->setAttribute('placeholder', _('$.path.to.node'));
+
+	$remove = [
+		(new CButton('lld_macro_paths['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+			->setEnabled(!$templated)
+	];
+
+	$lld_macro_paths_table->addRow([$lld_macro, $path, (new CCol($remove))->addClass(ZBX_STYLE_NOWRAP)], 'form_row');
+}
+
+$lld_macro_paths_table->setFooter((new CCol(
+	(new CButton('lld_macro_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-add')
+		->setEnabled(!$templated)
+))->setColSpan(3));
+
+$lld_macro_paths_form_list->addRow(_('LLD Macro'),
+	(new CDiv($lld_macro_paths_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
 // append tabs to form
 $itemTab = (new CTabView())
 	->addTab('itemTab', $data['caption'], $itemFormList)
@@ -692,6 +758,7 @@ $itemTab = (new CTabView())
 				)
 			)
 	)
+	->addTab('lldMacroTab', _('LLD Macro'), $lld_macro_paths_form_list)
 	->addTab('macroTab', _('Filters'), $conditionFormList);
 
 if (!hasRequest('form_refresh')) {

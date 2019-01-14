@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -228,7 +228,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
 		$this->zbxTestTextPresentInMessageDetails($data['error_message']);
-		$this->zbxTestCheckFatalErrors();
 
 		if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
 			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM hosts WHERE flags=2 AND name='.zbx_dbstr($data['name'])));
@@ -369,7 +368,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
 		$this->zbxTestTextPresentInMessageDetails($data['error_message']);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
@@ -464,7 +462,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		else {
 			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$data['name'].'"]');
 		}
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in form.
 		$this->checkFormFields($data);
@@ -496,7 +493,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
 			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$host['name'].'"]');
-			$this->zbxTestCheckFatalErrors();
 		}
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
@@ -582,7 +578,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestTextPresent($data['name']);
 		}
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in form
 		$this->checkFormFields($data);
@@ -848,7 +843,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestClick('add');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added');
-		$this->zbxTestCheckFatalErrors();
 
 		if (array_key_exists('visible_name', $data)) {
 			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$data['visible_name'].'"]');
@@ -908,7 +902,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestClickAndAcceptAlert('delete');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype deleted');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($prototype_name)));
 	}
@@ -927,7 +920,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($discovery_rule);
 		$this->zbxTestClickLinkTextWait('Host prototypes');
-		$this->zbxTestContentControlButtonClickText('Create host prototype');
+		$this->zbxTestContentControlButtonClickTextWait('Create host prototype');
 
 		$this->zbxTestInputType('host', $name);
 		$this->zbxTestTabSwitch('Groups');
@@ -940,7 +933,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Check the results in frontend.
 		$this->zbxTestCheckHeader('Host prototypes');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextNotPresent($name);
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
@@ -990,7 +982,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 			$this->zbxTestCheckHeader('Host prototypes');
 			$this->zbxTestCheckTitle('Configuration of host prototypes');
-			$this->zbxTestCheckFatalErrors();
 
 			if ($action !== 'delete') {
 				$this->zbxTestTextNotPresent($name);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -867,7 +867,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'query_fields' => [],
 					'headers' => [],
 					'key_' => 'empty-lld-rule',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'lld_macro_paths' => []
 				],
 				'empty-lld-rule-jmx' => [
 					'name' => 'empty-lld-rule-jmx',
@@ -922,7 +923,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'query_fields' => [],
 					'headers' => [],
 					'key_' => 'empty-lld-rule-jmx',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'lld_macro_paths' => []
 				],
 				'lld-rule' => [
 					'name' => 'lld-rule',
@@ -1228,7 +1230,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'query_fields' => [],
 					'headers' => [],
 					'key_' => 'lld-rule',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'lld_macro_paths' => []
 				]
 			],
 			'export-template' => [
@@ -1284,7 +1287,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'query_fields' => [],
 					'headers' => [],
 					'key_' => 'empty-lld-rule',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'lld_macro_paths' => []
 				],
 				'lld-rule-jmx' => [
 					'name' => 'lld-rule-jmx',
@@ -1338,7 +1342,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'query_fields' => [],
 					'headers' => [],
 					'key_' => 'lld-rule-jmx',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'lld_macro_paths' => []
 				],
 				'lld-rule' => [
 					'name' => 'lld-rule',
@@ -1640,7 +1645,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'query_fields' => [],
 					'headers' => [],
 					'key_' => 'lld-rule',
-					'trapper_hosts' => ''
+					'trapper_hosts' => '',
+					'lld_macro_paths' => []
 				]
 			]
 		]);
@@ -2448,6 +2454,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		$converterChain->addConverter('3.0', $importConverterFactory->getObject('3.0'));
 		$converterChain->addConverter('3.2', $importConverterFactory->getObject('3.2'));
 		$converterChain->addConverter('3.4', $importConverterFactory->getObject('3.4'));
+		$converterChain->addConverter('4.0', $importConverterFactory->getObject('4.0'));
 
 		$adapter = new CImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
 		$adapter->load($source);

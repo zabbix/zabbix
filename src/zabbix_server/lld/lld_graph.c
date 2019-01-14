@@ -620,7 +620,7 @@ out:
  ******************************************************************************/
 static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *items,
 		const char *name_proto, zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto,
-		const zbx_lld_row_t *lld_row)
+		const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths)
 {
 	const char			*__function_name = "lld_graph_make";
 
@@ -644,7 +644,7 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 	if (NULL != (graph = lld_graph_get(graphs, &lld_row->item_links)))
 	{
 		buffer = zbx_strdup(buffer, name_proto);
-		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_SIMPLE, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_SIMPLE, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		if (0 != strcmp(graph->name, buffer))
 		{
@@ -674,7 +674,7 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 
 		graph->name = zbx_strdup(NULL, name_proto);
 		graph->name_orig = NULL;
-		substitute_lld_macros(&graph->name, jp_row, ZBX_MACRO_SIMPLE, NULL, 0);
+		substitute_lld_macros(&graph->name, jp_row, lld_macro_paths, ZBX_MACRO_SIMPLE, NULL, 0);
 		zbx_lrtrim(graph->name, ZBX_WHITESPACE);
 
 		graph->ymin_itemid = ymin_itemid;
@@ -699,7 +699,7 @@ out:
 
 static void	lld_graphs_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *items,
 		const char *name_proto, zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto,
-		const zbx_vector_ptr_t *lld_rows)
+		const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macro_paths)
 {
 	int	i;
 
@@ -707,7 +707,8 @@ static void	lld_graphs_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 	{
 		zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
-		lld_graph_make(gitems_proto, graphs, items, name_proto, ymin_itemid_proto, ymax_itemid_proto, lld_row);
+		lld_graph_make(gitems_proto, graphs, items, name_proto, ymin_itemid_proto, ymax_itemid_proto, lld_row,
+				lld_macro_paths);
 	}
 
 	zbx_vector_ptr_sort(graphs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -1288,7 +1289,8 @@ out:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error)
+int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
+		const zbx_vector_ptr_t *lld_macro_paths, char **error)
 {
 	const char		*__function_name = "lld_update_graphs";
 
@@ -1353,7 +1355,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		/* making graphs */
 
 		lld_graphs_make(&gitems_proto, &graphs, &items, name_proto, ymin_itemid_proto, ymax_itemid_proto,
-				lld_rows);
+				lld_rows, lld_macro_paths);
 		lld_graphs_validate(hostid, &graphs, error);
 		ret = lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax,
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,

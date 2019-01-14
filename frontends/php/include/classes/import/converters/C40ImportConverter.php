@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ class C40ImportConverter extends CConverter {
 			if (array_key_exists('items', $host)) {
 				$host['items'] = $this->convertItems($host['items']);
 			}
+
 			if (array_key_exists('discovery_rules', $host)) {
 				$host['discovery_rules'] = $this->convertDiscoveryRules($host['discovery_rules']);
 			}
@@ -83,7 +84,10 @@ class C40ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertDiscoveryRules(array $discovery_rules) {
+		$default = $this->getDiscoveryRuleDefaultFields();
+
 		foreach ($discovery_rules as &$discovery_rule) {
+			$discovery_rule += $default;
 			$discovery_rule['item_prototypes'] = $this->convertItems($discovery_rule['item_prototypes']);
 		}
 		unset($discovery_rule);
@@ -110,5 +114,16 @@ class C40ImportConverter extends CConverter {
 		unset($preprocessing_step);
 
 		return $preprocessing_steps;
+	}
+
+	/**
+	 * Return associative array of LLD rule default fields.
+	 *
+	 * @return array
+	 */
+	protected function getDiscoveryRuleDefaultFields() {
+		return [
+			'lld_macro_paths' => []
+		];
 	}
 }

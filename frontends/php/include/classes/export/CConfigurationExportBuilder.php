@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -364,7 +364,8 @@ class CConfigurationExportBuilder {
 				'ssl_key_password' => $discoveryRule['ssl_key_password'],
 				'verify_peer' => $discoveryRule['verify_peer'],
 				'verify_host' => $discoveryRule['verify_host'],
-				'preprocessing' => $discoveryRule['preprocessing'],
+				'lld_macro_paths' => $discoveryRule['lld_macro_paths'],
+				'preprocessing' => $discoveryRule['preprocessing']
 			];
 
 			if (isset($discoveryRule['interface_ref'])) {
