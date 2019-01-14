@@ -87,8 +87,6 @@ static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *tr
 	int			i, new_state, new_value, ret = FAIL;
 	zbx_uint64_t		flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET, event_flags = ZBX_FLAGS_TRIGGER_CREATE_NOTHING;
 	zbx_vector_ptr_t	host_tags;
-	zbx_hashset_iter_t	iter;
-	zbx_tag_t		*tag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " value:%d(%d) new_value:%d",
 			__function_name, trigger->triggerid, trigger->value, trigger->state, trigger->new_value);

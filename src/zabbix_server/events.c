@@ -156,8 +156,6 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		unsigned char trigger_value, const char *error)
 {
 	int			i;
-	zbx_hashset_iter_t	iter;
-	zbx_tag_t		*tag;
 
 	if (events_num == events_alloc)
 	{
