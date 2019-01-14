@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ class testPageMaps extends CLegacyWebTest {
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestCheckHeader('Maps');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Name']");
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Width']");
@@ -79,7 +78,6 @@ class testPageMaps extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestCheckHeader('Maps');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($oldHashMap, CDBHelper::getHash($sqlMap));
 		$this->assertEquals($oldHashElements, CDBHelper::getHash($sqlElements));
@@ -112,7 +110,6 @@ class testPageMaps extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Network map updated');
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestTextPresent('Configuration of network maps');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($oldHashMap, CDBHelper::getHash($sqlMap));
 		$this->assertEquals($oldHashElements, CDBHelper::getHash($sqlElements));
@@ -135,7 +132,6 @@ class testPageMaps extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Network map deleted');
-		$this->zbxTestCheckFatalErrors();
 
 		$sql = "select * from sysmaps where sysmapid=$sysmapid";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -154,10 +150,8 @@ class testPageMaps extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckHeader('Network maps');
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestClickWait('cancel');
 		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function testPageMaps_FilterByName() {
@@ -167,7 +161,6 @@ class testPageMaps extends CLegacyWebTest {
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $this->mapName);
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestTextPresent('Displaying 1 of 1 found');
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function testPageMaps_FilterNone() {
@@ -178,7 +171,6 @@ class testPageMaps extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function testPageMaps_FilterReset() {
@@ -186,6 +178,5 @@ class testPageMaps extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
-		$this->zbxTestCheckFatalErrors();
 	}
 }

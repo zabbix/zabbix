@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-20 11:08+0200\n"
+"POT-Creation-Date: 2019-01-13 23:36+0200\n"
 "PO-Revision-Date: 2018-12-04 06:36+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -898,7 +898,7 @@ msgstr "And"
 
 #: app/views/monitoring.problem.view.php:227
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:1149
 #: include/views/configuration.correlation.edit.php:93
@@ -958,7 +958,7 @@ msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "어플리케이션이 삭제 되었습니다"
 
-#: include/classes/core/CJsonRpc.php:208
+#: include/classes/core/CJsonRpc.php:210
 msgid "Application error."
 msgstr "어플리케이션 에러."
 
@@ -1232,8 +1232,8 @@ msgstr "인증 프로토콜"
 msgid "Authentication settings updated"
 msgstr "인증 설정을 갱신하였습니다"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:228
 msgctxt "history source selection method"
 msgid "Auto"
@@ -1437,7 +1437,7 @@ msgid "CERT"
 msgstr "증명서"
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:946
+#: include/classes/graph/CSvgGraph.php:968
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -1513,11 +1513,6 @@ msgstr "캐나다 (136 글자 수)"
 #: jsLoader.php:120 jsLoader.php:278 jsLoader.php:290
 msgid "Cancel"
 msgstr "취소"
-
-#: include/classes/api/services/CMap.php:1487
-#, c-format
-msgid "Cannot add \"%1$s\" element of the map \"%2$s\" due to circular reference."
-msgstr "순환되어 참조하고 있기 때문에 맵 \"%2$s\"의 \"%1$s\" 요소를 추가할 수 없습니다."
 
 #: include/classes/api/services/CHttpTest.php:710
 #, c-format
@@ -1621,6 +1616,11 @@ msgstr "아이템을 추가할 수 없습니다."
 #: maintenance.php:126
 msgid "Cannot add maintenance"
 msgstr "메인터넌스를 추가할 수 없습니다"
+
+#: include/classes/api/services/CMap.php:1487
+#, c-format
+msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeCreate.php:69
 #: app/controllers/CControllerMediatypeCreate.php:159
@@ -2464,8 +2464,8 @@ msgstr "그래프의 프로토타입 \"%2$s\"에 \"%1$s\"를 설정할 수 없�
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "아이템\"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
 
-#: include/classes/api/services/CTemplateScreen.php:603
-#: include/classes/api/services/CTemplateScreen.php:701
+#: include/classes/api/services/CTemplateScreen.php:605
+#: include/classes/api/services/CTemplateScreen.php:703
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "템플릿 스크린 \"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
@@ -2491,8 +2491,8 @@ msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "스크린\"%1$s\"에 \"templateid\"를 설정할 수 없습니다."
 
 #: include/classes/api/services/CHost.php:881
-#: include/classes/api/services/CHost.php:1684
-#: include/classes/api/services/CHost.php:1828
+#: include/classes/api/services/CHost.php:1705
+#: include/classes/api/services/CHost.php:1849
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "비활성의 상태의 인벤토리 항목은 설정할 수 없습니다."
 
@@ -2501,7 +2501,7 @@ msgstr "비활성의 상태의 인벤토리 항목은 설정할 수 없습니다
 msgid "Cannot set resource ID for screen element."
 msgstr "스크린의 요소의 리소스ID를 설정할 수 없습니다."
 
-#: include/classes/api/services/CHostInterface.php:243
+#: include/classes/api/services/CHostInterface.php:244
 msgid "Cannot switch host for interface."
 msgstr "인터페이스를 위한 호스트를 변경할 수 없습니다."
 
@@ -2576,7 +2576,7 @@ msgstr "트리거 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "트리거 프로토타입 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 
-#: include/classes/api/services/CHost.php:1807
+#: include/classes/api/services/CHost.php:1828
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "디스커버리 된 호스트 \"%1$s\" 의\"%2$s\"를 갱신할 수 없습니다."
@@ -2603,7 +2603,7 @@ msgstr "이미지 \"%1$s\"의 \"imagetype\"를 갱신할 수 없습니다"
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "스크린\"%1$s\"의 \"templateid\"를 갱신할 수 없습니다"
 
-#: include/classes/api/services/CTemplateScreen.php:691
+#: include/classes/api/services/CTemplateScreen.php:693
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "템플릿스크린\"%1$s\"의 \"templateid\"를 갱신할 수 없습니다"
@@ -2714,7 +2714,7 @@ msgstr "아이콘 매핑을 갱신할 수 없습니다"
 msgid "Cannot update image"
 msgstr "이미지를 갱신할 수 없습니다"
 
-#: include/classes/api/services/CHostInterface.php:316
+#: include/classes/api/services/CHostInterface.php:325
 #, c-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "발견된 호스트 \"%1$s\"의 인터페이스를 갱신할 수 없습니다"
@@ -3600,7 +3600,7 @@ msgstr "포함"
 #: include/views/monitoring.screen.list.php:49
 #: include/views/monitoring.screen.php:103
 #: include/views/monitoring.slideconf.list.php:37
-#: include/views/monitoring.slides.php:102
+#: include/views/monitoring.slides.php:95
 #: include/views/monitoring.sysmap.list.php:34 latest.php:330 queue.php:80
 #: report2.php:174 srv_status.php:175 tr_events.php:168
 msgid "Content controls"
@@ -4086,7 +4086,7 @@ msgstr "데이터"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "데이터캐쉬 통계. cache - values (mode: all, float, uint, str, log, text), history (mode: pfree, total, used, free), trend (mode: pfree, total, used, free), text (mode: pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2678
+#: include/classes/graphdraw/CLineGraphDraw.php:2682
 #: include/classes/graphdraw/CPieGraphDraw.php:805
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4101,7 +4101,7 @@ msgstr "데이터가 올바르게 인코딩되어 있지 않습니다."
 msgid "Data overview"
 msgstr "데이터 개요"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:42
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:41
 #: include/classes/widgets/views/widget.svggraph.form.view.php:251
 msgid "Data set"
 msgstr "데이터 셋"
@@ -5005,10 +5005,6 @@ msgstr "복구트리거 표시기간"
 msgid "Display graph"
 msgstr "그래프 표시"
 
-#: include/classes/widgets/views/widget.svggraph.form.view.php:252
-msgid "Display options"
-msgstr "표시 옵션"
-
 #: include/views/monitoring.sysmap.edit.php:132
 msgid "Display problems"
 msgstr "장애의 표시"
@@ -5028,6 +5024,10 @@ msgstr "%2$s 중 %1$s건을 표시하고 있습니다"
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
 msgstr "%3$s 건 중 %1$s 에서 %2$s 까지를 표시하고 있습니다"
+
+#: include/classes/widgets/views/widget.svggraph.form.view.php:252
+msgid "Displaying options"
+msgstr ""
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -5135,14 +5135,14 @@ msgstr "트리거\"%1$s\"의 의존관계가 중복되어 있습니다."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "트리거 프로토타입 \"%1$s\"의 의존관계가 중복되었습니다."
 
-#: include/classes/api/services/CHost.php:1620
-#: include/classes/api/services/CHost.php:1858
+#: include/classes/api/services/CHost.php:1641
+#: include/classes/api/services/CHost.php:1879
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "호스트가 중복되어 있습니다. 같은 호스트 이름 \"%s\"를 지닌 호스트설정이 이미 존재합니다."
 
-#: include/classes/api/services/CHost.php:1627
-#: include/classes/api/services/CHost.php:1878
+#: include/classes/api/services/CHost.php:1648
+#: include/classes/api/services/CHost.php:1899
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "호스트가 중복되어 있습니다. 같은 호스트 표시 이름 \"%s\"를 지닌 호스트가 이미 존재합니다."
@@ -5232,7 +5232,7 @@ msgstr "맵 변경"
 msgid "Edit screen"
 msgstr "스크린 변경"
 
-#: include/views/monitoring.slides.php:94
+#: include/views/monitoring.slides.php:87
 msgid "Edit slide show"
 msgstr "슬라이드 쇼 변경"
 
@@ -5348,7 +5348,7 @@ msgstr "디스커버리 규칙\"%1$s\"의 필터조건 매크로가 공백입니
 #: include/classes/api/services/CDiscoveryRule.php:464
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
-#: include/classes/api/services/CHostInterface.php:374
+#: include/classes/api/services/CHostInterface.php:383
 #: include/classes/api/services/CHost.php:1153
 #: include/classes/api/services/CHostPrototype.php:875
 #: include/classes/api/services/CMaintenance.php:508
@@ -5383,7 +5383,7 @@ msgstr "맵ID가 공백입니다."
 msgid "Empty media type ID."
 msgstr "미디어 타입ID가 공백입니다."
 
-#: include/classes/api/services/CService.php:857
+#: include/classes/api/services/CService.php:853
 msgid "Empty name."
 msgstr "이름이 공백입니다."
 
@@ -5395,7 +5395,7 @@ msgstr "파라미터가 공백입니다."
 msgid "Empty screen ID for screen."
 msgstr "스크린의 스크린ID가 공백입니다."
 
-#: include/classes/api/services/CTemplateScreen.php:658
+#: include/classes/api/services/CTemplateScreen.php:660
 msgid "Empty screen ID for template screen."
 msgstr "템플릿 스크린의 스크린ID가 공백입니다."
 
@@ -5730,7 +5730,7 @@ msgstr "매크로의 전개"
 msgid "Expand single problem"
 msgstr "장애가 1개일때 상세 정보를 열기"
 
-#: include/classes/core/CJsonRpc.php:108
+#: include/classes/core/CJsonRpc.php:110
 #, c-format
 msgid "Expecting JSON-rpc version 2.0, \"%s\" is given."
 msgstr "JSON-rpc version 2.0가 필요합니다, \"%s\" 에서 리퀘스트 되었습니다."
@@ -5910,7 +5910,7 @@ msgstr "항목 \"%1$s\"는 NULL로 설정할 수 없습니다."
 #: include/classes/api/services/CHost.php:743
 #: include/classes/api/services/CTemplate.php:784
 #: include/classes/api/services/CTriggerGeneral.php:236
-#: include/classes/validators/CNewValidator.php:249
+#: include/classes/validators/CNewValidator.php:255
 #: include/validate.inc.php:300
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
@@ -6150,7 +6150,7 @@ msgid "Friday"
 msgstr "금"
 
 #: app/views/report.services.php:68 include/classes/html/CFilter.php:283
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:87
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:86
 #: include/views/configuration.services.edit.php:243
 #: include/views/configuration.services.edit.php:289
 #: include/views/js/monitoring.sysmaps.js.php:673 report4.php:195
@@ -6336,7 +6336,7 @@ msgstr "그래프 \"%1$s\"는 계승할 수 없습니다. 지정된 아이템은
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "그래프 \"%1$s\"는 계승할 수 없습니다. 지정된 아이템은 \"%2$s\"에 존재하지 않습니다."
 
-#: include/classes/api/services/CTemplateScreen.php:544
+#: include/classes/api/services/CTemplateScreen.php:546
 #, c-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "그래프 \"%1$s\"는 템플릿\"%2$s\"에 존재하지 않습니다."
@@ -6515,7 +6515,7 @@ msgstr "그리드"
 #: include/views/monitoring.screen.constructor.edit.php:621
 #: include/views/monitoring.screen.constructor.edit.php:718
 #: include/views/monitoring.screen.php:73
-#: include/views/monitoring.slides.php:76
+#: include/views/monitoring.slides.php:69
 msgid "Group"
 msgstr "그룹"
 
@@ -6593,8 +6593,8 @@ msgstr "그룹"
 msgid "H:i"
 msgstr "H:i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
-#: include/classes/graphdraw/CLineGraphDraw.php:1416
+#: include/classes/graphdraw/CLineGraphDraw.php:1413
+#: include/classes/graphdraw/CLineGraphDraw.php:1420
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -6733,7 +6733,7 @@ msgstr "행을 강조표시"
 #: app/views/monitoring.problem.view.php:93 history.php:27
 #: include/classes/screens/CScreenProblem.php:1218
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:438 include/forms.inc.php:872
 #: include/views/administration.general.housekeeper.edit.php:117
 #: include/views/configuration.item.list.php:67
@@ -6752,7 +6752,7 @@ msgstr "이력이 삭제되었습니다"
 msgid "History clearing can take a long time. Continue?"
 msgstr "이력 삭제에 시간이 걸릴 수도 있습니다. 계속하시겠습니까?"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:54
 msgid "History data selection"
 msgstr "이력 데이터의 선택"
 
@@ -6827,7 +6827,7 @@ msgstr "가로 위치"
 #: include/views/monitoring.charts.php:33
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
-#: include/views/monitoring.slides.php:81
+#: include/views/monitoring.slides.php:74
 #: include/views/reports.toptriggers.php:79 items.php:900 items.php:1273
 #: jsLoader.php:165 latest.php:421 latest.php:438 queue.php:254
 #: report2.php:409 report2.php:431 search.php:125
@@ -6844,8 +6844,8 @@ msgstr "호스트 \"%1$s\"는 이미 존재합니다."
 
 #: include/classes/api/services/CHostGroup.php:1449
 #: include/classes/api/services/CHost.php:806
-#: include/classes/api/services/CHost.php:1608
-#: include/classes/api/services/CHost.php:1784
+#: include/classes/api/services/CHost.php:1629
+#: include/classes/api/services/CHost.php:1805
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "호스트\"%1$s\"에 호스트 그룹을 설정해 주세요."
@@ -6871,7 +6871,7 @@ msgstr "호스트 접속"
 msgid "Host added"
 msgstr "호스트를 추가하였습니다"
 
-#: include/classes/api/services/CHostInterface.php:822
+#: include/classes/api/services/CHostInterface.php:831
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "호스트에 같은 타입의 기본 인터페이스는 2개 이상 설정할 수 없습니다."
 
@@ -7106,8 +7106,8 @@ msgstr "ID \"%1$s\"의 호스트는 사용할 수 없습니다."
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "같은 호스트 이름\"%1$s\"를 지닌 호스트가 이미 존재합니다."
 
-#: include/classes/api/services/CHost.php:1715
-#: include/classes/api/services/CHost.php:1934
+#: include/classes/api/services/CHost.php:1736
+#: include/classes/api/services/CHost.php:1955
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "같은 호스트 이름\"%s\"를 지닌 호스트가 이미 존재합니다."
@@ -7118,8 +7118,8 @@ msgstr "같은 호스트 이름\"%s\"를 지닌 호스트가 이미 존재합니
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "같은 호스트의 표시 이름 \"%1$s\"를 지닌 호스트가 이미 존재합니다."
 
-#: include/classes/api/services/CHost.php:1721
-#: include/classes/api/services/CHost.php:1941
+#: include/classes/api/services/CHost.php:1742
+#: include/classes/api/services/CHost.php:1962
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "같은 호스트의 표시 이름 \"%s\"를 지닌 호스트가 이미 존재합니다."
@@ -7211,7 +7211,7 @@ msgstr "IP 주소"
 msgid "IP address"
 msgstr "IP 주소"
 
-#: include/classes/api/services/CHostInterface.php:266
+#: include/classes/api/services/CHostInterface.php:271
 msgid "IP and DNS cannot be empty for host interface."
 msgstr "호스트 인터페이스의 IP와 DNS는 필수항목입니다"
 
@@ -7542,7 +7542,7 @@ msgstr "맵 \"%2$s\"의 \"private\"값 \"%1$s\"가 올바르지 않습니다."
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
 msgstr "스크린 \"%2$s\"의 \"private\"의 값 \"%1$s\"가 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:1078
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의존관계의 항목 \"soft\"의 값이 올바르지 않습니다."
@@ -7580,7 +7580,7 @@ msgstr "SNMP OID의 값이 올바르지 않습니다."
 msgid "Incorrect SNMP community."
 msgstr "SNMP커뮤니티의 값이 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:903
+#: include/classes/api/services/CService.php:899
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 SLA의 허가값이 올바르지 않습니다."
@@ -7699,7 +7699,7 @@ msgstr "실행하는 액션의 유저 값이 올바르지 않습니다. 사용�
 msgid "Incorrect action operationid."
 msgstr "실행하는 액션의 설정이 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:870
+#: include/classes/api/services/CService.php:866
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 알고리즘이 올바르지 않습니다."
@@ -7731,8 +7731,8 @@ msgstr "설정항목이 잘못되어 있습니다."
 #: include/classes/api/services/CDRule.php:341
 #: include/classes/api/services/CDRule.php:507
 #: include/classes/api/services/CEvent.php:793
-#: include/classes/api/services/CHostInterface.php:233
-#: include/classes/api/services/CHostInterface.php:422
+#: include/classes/api/services/CHostInterface.php:234
+#: include/classes/api/services/CHostInterface.php:431
 #: include/classes/api/services/CHostPrototype.php:392
 #: include/classes/api/services/CHostPrototype.php:413
 #: include/classes/api/services/CItemGeneral.php:258
@@ -7766,7 +7766,7 @@ msgstr "설정항목이 잘못되어 있습니다."
 msgid "Incorrect arguments passed to function."
 msgstr "잘못된 인수의 값이 함수에 전달되었습니다."
 
-#: include/classes/api/services/CHostInterface.php:261
+#: include/classes/api/services/CHostInterface.php:266
 msgid "Incorrect arguments passed to method."
 msgstr "입력항목이 올바르지 않습니다."
 
@@ -7775,18 +7775,18 @@ msgstr "입력항목이 올바르지 않습니다."
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "아이템 \"%1$s\"의 인증 프로토콜이 올바르지 않습니다."
 
-#: include/classes/api/services/CHostInterface.php:665
+#: include/classes/api/services/CHostInterface.php:674
 msgid "Incorrect bulk value for interface."
 msgstr "인터페이스의 bulk의 값이 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:887
+#: include/classes/api/services/CService.php:883
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 SLA의 값의 계산이 올바르지 않습니다."
 
 #: include/classes/api/services/CHost.php:826
-#: include/classes/api/services/CHost.php:1596
-#: include/classes/api/services/CHost.php:1852
+#: include/classes/api/services/CHost.php:1617
+#: include/classes/api/services/CHost.php:1873
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "호스트 \"%s\"에 잘못된 문자열이 사용되어 있습니다."
@@ -7940,8 +7940,8 @@ msgstr "이미지의 인덱스가 올바르지 않습니다."
 #: include/classes/api/services/CAction.php:2820
 #: include/classes/api/services/CAction.php:2832
 #: include/classes/api/services/CHost.php:812
-#: include/classes/api/services/CHost.php:1590
-#: include/classes/api/services/CHost.php:1771
+#: include/classes/api/services/CHost.php:1611
+#: include/classes/api/services/CHost.php:1792
 #: include/classes/api/services/CImage.php:485
 #: include/classes/api/services/CProxy.php:618
 #: include/classes/api/services/CProxy.php:682
@@ -7950,22 +7950,22 @@ msgstr "이미지의 인덱스가 올바르지 않습니다."
 #: include/classes/api/services/CScreen.php:455
 #: include/classes/api/services/CTemplate.php:406
 #: include/classes/api/services/CTemplate.php:534
-#: include/classes/api/services/CTemplateScreen.php:594
+#: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "입력된 파라미터가 올바르지 않습니다."
 
-#: include/classes/api/services/CHostInterface.php:577
+#: include/classes/api/services/CHostInterface.php:586
 #, c-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "인터페이스의 DNS 파라미터 \"%s\"가 올바르지 않습니다."
 
-#: include/classes/api/services/CHostInterface.php:621
+#: include/classes/api/services/CHostInterface.php:630
 #, c-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "인터페이스의 포트 \"%s\"가 올바르지 않습니다."
 
-#: include/classes/api/services/CHost.php:1690
-#: include/classes/api/services/CHost.php:1834
+#: include/classes/api/services/CHost.php:1711
+#: include/classes/api/services/CHost.php:1855
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "인벤토리 항목 \"%s\"이 올바르지 않습니다."
@@ -8090,12 +8090,12 @@ msgstr "액션의 실행조건의 파라미터가 올바르지 않습니다."
 msgid "Incorrect parameters for maintenance."
 msgstr "메인터넌스의 파라미터가 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:945
+#: include/classes/api/services/CService.php:941
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 상위가 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:948
+#: include/classes/api/services/CService.php:944
 msgid "Incorrect parent service."
 msgstr "상위 서비스가 올바르지 않습니다."
 
@@ -8150,7 +8150,7 @@ msgstr "서비스 시작시간이 올바르지 않습니다."
 msgid "Incorrect service time type."
 msgstr "서비스 시간의 종류가 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:918
+#: include/classes/api/services/CService.php:914
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 정렬이 올바르지 않습니다."
@@ -8160,13 +8160,13 @@ msgstr "서비스 \"%1$s\"의 정렬이 올바르지 않습니다."
 msgid "Incorrect source value."
 msgstr "소스 값이 올바르지 않습니다."
 
-#: include/classes/api/services/CHost.php:1662
-#: include/classes/api/services/CHost.php:1802
+#: include/classes/api/services/CHost.php:1683
+#: include/classes/api/services/CHost.php:1823
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "호스트 \"%1$s\" 상태가 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:966
+#: include/classes/api/services/CService.php:962
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "서비스 \"%1$s\" 상태가 올바르지 않습니다."
@@ -8175,7 +8175,7 @@ msgstr "서비스 \"%1$s\" 상태가 올바르지 않습니다."
 msgid "Incorrect style provided for screen element."
 msgstr "스크린 요소 스타일이 올바르지 않습니다."
 
-#: include/classes/api/services/CTemplateScreen.php:659
+#: include/classes/api/services/CTemplateScreen.php:661
 msgid "Incorrect template screen ID."
 msgstr "템플릿 스크린ID가 올바르지 않습니다."
 
@@ -8183,7 +8183,7 @@ msgstr "템플릿 스크린ID가 올바르지 않습니다."
 msgid "Incorrect templated web scenario step count."
 msgstr "템플릿의 웹 시나리오의 스텝 카운트가 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:931
+#: include/classes/api/services/CService.php:927
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 트리거 ID가 올바르지 않습니다."
@@ -8286,15 +8286,15 @@ msgstr "유저 그룹이 올바르지 않습니다."
 #: include/classes/api/services/CDRule.php:571
 #: include/classes/api/services/CItemGeneral.php:529
 #: include/classes/api/services/CItemGeneral.php:2027
-#: include/classes/validators/CNewValidator.php:115
-#: include/classes/validators/CNewValidator.php:127
-#: include/classes/validators/CNewValidator.php:139
-#: include/classes/validators/CNewValidator.php:154
-#: include/classes/validators/CNewValidator.php:168
-#: include/classes/validators/CNewValidator.php:186
-#: include/classes/validators/CNewValidator.php:202
-#: include/classes/validators/CNewValidator.php:218
-#: include/classes/validators/CNewValidator.php:236
+#: include/classes/validators/CNewValidator.php:116
+#: include/classes/validators/CNewValidator.php:129
+#: include/classes/validators/CNewValidator.php:142
+#: include/classes/validators/CNewValidator.php:158
+#: include/classes/validators/CNewValidator.php:172
+#: include/classes/validators/CNewValidator.php:191
+#: include/classes/validators/CNewValidator.php:207
+#: include/classes/validators/CNewValidator.php:223
+#: include/classes/validators/CNewValidator.php:242
 #: include/validate.inc.php:355
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
@@ -8354,9 +8354,20 @@ msgstr "상관관계 \"%3$s\"의 필드 \"%2$s\"의 값 \"%1$s\"이 올바르지
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
 msgstr "미디어 타입 \"%3$s\"를 위한 필드 \"%2$s\"내의 값 \"%1$s\"가 올바르지 않습니다."
 
+#: include/classes/validators/CNewValidator.php:117
+#: include/classes/validators/CNewValidator.php:130
+#: include/classes/validators/CNewValidator.php:143
+#: include/classes/validators/CNewValidator.php:159
+#: include/classes/validators/CNewValidator.php:192
+#: include/classes/validators/CNewValidator.php:243
+#: include/validate.inc.php:358
+#, c-format
+msgid "Incorrect value for \"%1$s\" field."
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:95
-#: app/controllers/CControllerPopupHttpStep.php:104
-#: app/controllers/CControllerPopupHttpStep.php:110
+#: app/controllers/CControllerPopupHttpStep.php:103
+#: app/controllers/CControllerPopupHttpStep.php:109
 #: app/controllers/CControllerPopupMedia.php:94
 #: app/controllers/CControllerPopupMedia.php:105 correlation.php:227
 #: correlation.php:237 correlation.php:243 correlation.php:263
@@ -8394,18 +8405,18 @@ msgstr "미디어 타입 \"%3$s\"를 위한 필드 \"%2$s\"내의 값 \"%1$s\"�
 #: include/classes/api/services/CHostGeneral.php:1023
 #: include/classes/api/services/CHostGeneral.php:1030
 #: include/classes/api/services/CHost.php:770
-#: include/classes/api/services/CHost.php:1494
-#: include/classes/api/services/CHost.php:1500
 #: include/classes/api/services/CHost.php:1515
 #: include/classes/api/services/CHost.php:1521
-#: include/classes/api/services/CHost.php:1526
-#: include/classes/api/services/CHost.php:1532
-#: include/classes/api/services/CHost.php:1540
-#: include/classes/api/services/CHost.php:1546
-#: include/classes/api/services/CHost.php:1555
+#: include/classes/api/services/CHost.php:1536
+#: include/classes/api/services/CHost.php:1542
+#: include/classes/api/services/CHost.php:1547
+#: include/classes/api/services/CHost.php:1553
 #: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1656
-#: include/classes/api/services/CHost.php:1796
+#: include/classes/api/services/CHost.php:1567
+#: include/classes/api/services/CHost.php:1576
+#: include/classes/api/services/CHost.php:1582
+#: include/classes/api/services/CHost.php:1677
+#: include/classes/api/services/CHost.php:1817
 #: include/classes/api/services/CHttpTest.php:969
 #: include/classes/api/services/CHttpTest.php:984
 #: include/classes/api/services/CHttpTest.php:1080
@@ -8509,16 +8520,16 @@ msgstr "미디어 타입 \"%3$s\"를 위한 필드 \"%2$s\"내의 값 \"%1$s\"�
 #: include/classes/helpers/CSvgGraphHelper.php:248
 #: include/classes/import/CConfigurationImport.php:807
 #: include/classes/import/CConfigurationImport.php:845
-#: include/classes/import/CConfigurationImport.php:2461
-#: include/classes/import/CConfigurationImport.php:2565
-#: include/classes/import/CConfigurationImport.php:2575
-#: include/classes/import/CConfigurationImport.php:2611
-#: include/classes/import/CConfigurationImport.php:2620
-#: include/classes/import/CConfigurationImport.php:2626
+#: include/classes/import/CConfigurationImport.php:2460
+#: include/classes/import/CConfigurationImport.php:2564
+#: include/classes/import/CConfigurationImport.php:2574
+#: include/classes/import/CConfigurationImport.php:2610
+#: include/classes/import/CConfigurationImport.php:2619
+#: include/classes/import/CConfigurationImport.php:2625
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
-#: include/classes/validators/CNewValidator.php:260
-#: include/classes/validators/CNewValidator.php:272
+#: include/classes/validators/CNewValidator.php:266
+#: include/classes/validators/CNewValidator.php:278
 #: include/screens.inc.php:321 include/screens.inc.php:335
 #: include/screens.inc.php:450 include/screens.inc.php:464
 #: include/sounds.inc.php:106 usergrps.php:341 usergrps.php:381
@@ -8617,7 +8628,7 @@ msgstr "인스톨러 이름"
 msgid "Interface"
 msgstr "인터페이스"
 
-#: include/classes/api/services/CHostInterface.php:842
+#: include/classes/api/services/CHostInterface.php:851
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "인터페이스는 \"%2$s\"의 아이템\"%1$s\"에 링크되어 있습니다."
@@ -8626,18 +8637,18 @@ msgstr "인터페이스는 \"%2$s\"의 아이템\"%1$s\"에 링크되어 있습�
 msgid "Interface is used by items that require this type of the interface."
 msgstr "인터페이스는 타입의 인터페이스를 이용하는 아이템에서 이용되어 있습니다"
 
-#: include/classes/api/services/CHostInterface.php:270
+#: include/classes/api/services/CHostInterface.php:275
 #, c-format
 msgid "Interface with DNS \"%1$s\" cannot have empty IP address."
 msgstr "DNS \"%1$s\"가 설정된 인터페이스에 IP주소를 설정해 주십시오."
 
-#: include/classes/api/services/CHostInterface.php:276
-#: include/classes/api/services/CHostInterface.php:283
+#: include/classes/api/services/CHostInterface.php:281
+#: include/classes/api/services/CHostInterface.php:288
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on \"%2$s\"."
 msgstr "\"%2$s\"의 \"DNS를 사용\"에 체크가 되어있는 경우, IP주소 \"%1$s\"의 인터페이스의 DNS 이름은 필수항목입니다."
 
-#: include/classes/api/services/CHostInterface.php:289
+#: include/classes/api/services/CHostInterface.php:294
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "IP주소 \"%1$s\"가 설정된 인터페이스에 DNS 이름을 설정해 주세요."
@@ -8657,7 +8668,7 @@ msgctxt "user type"
 msgid "Internal"
 msgstr "내부 이벤트"
 
-#: include/classes/core/CJsonRpc.php:204
+#: include/classes/core/CJsonRpc.php:206
 msgid "Internal JSON-RPC error."
 msgstr "JSON-RPC 내부 에러."
 
@@ -8675,7 +8686,7 @@ msgstr "내부 데이터의 보존기간"
 #: include/classes/api/services/CTriggerGeneral.php:996
 #: include/classes/api/services/CTriggerGeneral.php:1175
 #: include/classes/api/services/CTriggerGeneral.php:1535
-#: include/classes/core/CJsonRpc.php:203
+#: include/classes/core/CJsonRpc.php:205
 #: include/classes/import/validators/CXmlValidatorGeneral.php:147
 #: include/classes/widgets/fields/CWidgetField.php:100
 msgid "Internal error."
@@ -8707,16 +8718,16 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "갱신 간격"
 
-#: include/classes/api/services/CHostInterface.php:605
+#: include/classes/api/services/CHostInterface.php:614
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
 msgstr "IP주소 \"%1$s\"가 올바르지 않습니다."
 
-#: include/classes/core/CJsonRpc.php:184
+#: include/classes/core/CJsonRpc.php:186
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "JSON데이터가 올바르지 않습니다. JSON 텍스트의 Parse중 서버에서 에러가 발생하였습니다."
 
-#: include/classes/core/CJsonRpc.php:188
+#: include/classes/core/CJsonRpc.php:190
 msgid "Invalid Request."
 msgstr "리퀘스트가 올바르지 않습니다."
 
@@ -8829,8 +8840,8 @@ msgstr "매크로 \"%1$s\": %2$s가 올바르지 않습니다."
 #: include/classes/api/services/CScreenItem.php:337
 #: include/classes/api/services/CService.php:200
 #: include/classes/api/services/CService.php:371
-#: include/classes/api/services/CService.php:1207
-#: include/classes/core/CJsonRpc.php:199
+#: include/classes/api/services/CService.php:1203
+#: include/classes/core/CJsonRpc.php:201
 msgid "Invalid method parameters."
 msgstr "메소드의 파라미터가 올바르지 않습니다."
 
@@ -8913,13 +8924,13 @@ msgstr "파라미터의 수가 올바르지 않습니다."
 #: include/classes/validators/CApiInputValidator.php:1397
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:133
 #: include/classes/widgets/forms/CWidgetFormMap.php:101
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:478
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:479
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
 #, c-format
 msgid "Invalid parameter \"%1$s\": %2$s."
 msgstr "파라미터 \"%1$s\"가 올바르지 않습니다 : %2$s."
 
-#: include/classes/core/CJsonRpc.php:198
+#: include/classes/core/CJsonRpc.php:200
 msgid "Invalid params."
 msgstr "파라미터가 올바르지 않습니다."
 
@@ -9072,7 +9083,7 @@ msgstr "아이템\"%1$s\"는 \"%2$s\"에 이미 존재합니다."
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "아이템\"%1$s\"는 항목번호가 존재하지 않는 호스트 인벤토리\"%2$d\"를 자동설정할 수 없습니다. 0 (자동설정안함)에서 %3$d의 사이로 설정해 주십시오."
 
-#: include/classes/api/services/CTemplateScreen.php:562
+#: include/classes/api/services/CTemplateScreen.php:564
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "아이템\"%1$s\"는 템플릿\"%2$s\"에 존재하지 않습니다."
@@ -9332,20 +9343,20 @@ msgstr "JSON 데이터"
 msgid "JSON string is expected"
 msgstr "JSON 문자열로 지정해주세요"
 
-#: include/classes/core/CJsonRpc.php:156
+#: include/classes/core/CJsonRpc.php:158
 #, c-format
 msgid "JSON-rpc error generation failed. No such error \"%s\"."
 msgstr "JSON-rpc에러의 생성실패. 그러한 에러는 없습니다 \"%s\"."
 
-#: include/classes/core/CJsonRpc.php:113
+#: include/classes/core/CJsonRpc.php:115
 msgid "JSON-rpc method is not defined."
 msgstr "JSON-rpc메소드가 없습니다."
 
-#: include/classes/core/CJsonRpc.php:118
+#: include/classes/core/CJsonRpc.php:120
 msgid "JSON-rpc params is not an Array."
 msgstr "JSON-rpc파라미터가 없습니다."
 
-#: include/classes/core/CJsonRpc.php:103
+#: include/classes/core/CJsonRpc.php:105
 msgid "JSON-rpc version is not specified."
 msgstr "JSON-rpc버전가 없습니다."
 
@@ -9610,7 +9621,7 @@ msgstr "라트비아어 (lv_LV)"
 msgid "Left"
 msgstr "왼쪽"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:116
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
 msgid "Left Y"
 msgstr "좌측 Y"
 
@@ -9837,7 +9848,7 @@ msgstr "불명"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "Low-level 디스커버리가 \"취득불가\" 상태"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1377
+#: include/classes/graphdraw/CLineGraphDraw.php:1381
 msgid "M"
 msgstr "M"
 
@@ -9935,7 +9946,7 @@ msgstr "매크로를 갱신하였습니다"
 #: include/views/monitoring.hostscreen.php:57
 #: include/views/monitoring.overview.items.php:45
 #: include/views/monitoring.overview.triggers.php:82
-#: include/views/monitoring.slides.php:89 report2.php:186 report4.php:128
+#: include/views/monitoring.slides.php:82 report2.php:186 report4.php:128
 #: srv_status.php:167
 msgid "Main filter"
 msgstr "메인 필터"
@@ -10169,10 +10180,10 @@ msgstr "형태의 일괄갱신"
 msgid "Master item"
 msgstr "마스터 아이템"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:141
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:140
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:213
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:478
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:479
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
 msgid "Max"
 msgstr "최대치"
 
@@ -10202,8 +10213,8 @@ msgstr "OS가 지원하고 있는 최대 프로세스 수. integer를 리턴"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:239
 #: include/classes/mvc/CController.php:208
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:444
-#: include/validate.inc.php:454
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:445
+#: include/validate.inc.php:457
 #, c-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
@@ -10338,7 +10349,7 @@ msgstr "메시지"
 msgid "Messaging"
 msgstr "알림 표시"
 
-#: include/classes/core/CJsonRpc.php:193
+#: include/classes/core/CJsonRpc.php:195
 msgid "Method not found."
 msgstr "메소드를 찾을 수 없습니다."
 
@@ -10347,7 +10358,7 @@ msgstr "메소드를 찾을 수 없습니다."
 msgid "Middle"
 msgstr "가운데"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:126
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:199
 msgid "Min"
 msgstr "최소치"
@@ -10391,8 +10402,8 @@ msgstr "최소 심각도"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:234
 #: include/classes/mvc/CController.php:201
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:439
-#: include/validate.inc.php:447
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:440
+#: include/validate.inc.php:450
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
@@ -10871,7 +10882,7 @@ msgstr "미디어 타입에 \"%1$s\"이 정의되어 있지 않습니다."
 msgid "No \"%1$s\" given for screen."
 msgstr "스크린에 \"%1$s\"가 정의되어 있지 않습니다."
 
-#: include/classes/api/services/CTemplateScreen.php:657
+#: include/classes/api/services/CTemplateScreen.php:659
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "템플릿스크린에 \"%1$s\"가 정의되어 있지 않습니다."
@@ -10986,13 +10997,13 @@ msgstr "데이터를 찾을 수 없음."
 msgid "No data."
 msgstr "데이터가 없습니다."
 
-#: include/classes/api/services/CHostInterface.php:818
+#: include/classes/api/services/CHostInterface.php:827
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "\"%2$s\"상의 \"%1$s\"타입의 디폴트인터페이스가 설정되어 있지 않습니다"
 
-#: include/classes/core/CJsonRpc.php:209 include/classes/core/CJsonRpc.php:214
-#: include/classes/core/CJsonRpc.php:219
+#: include/classes/core/CJsonRpc.php:211 include/classes/core/CJsonRpc.php:216
+#: include/classes/core/CJsonRpc.php:221
 msgid "No details"
 msgstr "자세한 내용이 없습니다"
 
@@ -11091,8 +11102,8 @@ msgstr "인터페이스를 찾을 수 없습니다."
 msgid "No interface provided for proxy \"%s\"."
 msgstr "프록시\"%s\"에 인터페이스가 설정되어 있지 않습니다"
 
-#: include/classes/api/services/CHost.php:1669
-#: include/classes/api/services/CHost.php:1845
+#: include/classes/api/services/CHost.php:1690
+#: include/classes/api/services/CHost.php:1866
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "호스트\"%s\"에 인터페이스가 설정되어 있지 않습니다"
@@ -11115,7 +11126,7 @@ msgstr "스크린 요소의 아이템 프로토타입ID가 설정되어 있지 �
 msgid "No item with itemid=\"%1$s\"."
 msgstr "아이템ID \"%1$s\"를 지닌 아이템은 존재하지 않습니다."
 
-#: chart3.php:132
+#: chart3.php:137
 msgid "No items defined."
 msgstr "아이템이 설정되어 있지 않습니다"
 
@@ -11197,14 +11208,14 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CHostGroup.php:1159
 #: include/classes/api/services/CHostGroup.php:1281
 #: include/classes/api/services/CHostGroup.php:1301
-#: include/classes/api/services/CHostInterface.php:238
-#: include/classes/api/services/CHostInterface.php:254
-#: include/classes/api/services/CHostInterface.php:385
-#: include/classes/api/services/CHostInterface.php:644
+#: include/classes/api/services/CHostInterface.php:239
+#: include/classes/api/services/CHostInterface.php:259
+#: include/classes/api/services/CHostInterface.php:394
+#: include/classes/api/services/CHostInterface.php:653
 #: include/classes/api/services/CHost.php:1122
 #: include/classes/api/services/CHost.php:1157
-#: include/classes/api/services/CHost.php:1645
-#: include/classes/api/services/CHost.php:1777
+#: include/classes/api/services/CHost.php:1666
+#: include/classes/api/services/CHost.php:1798
 #: include/classes/api/services/CHostPrototype.php:353
 #: include/classes/api/services/CHostPrototype.php:399
 #: include/classes/api/services/CHostPrototype.php:420
@@ -11237,9 +11248,9 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CMap.php:567
 #: include/classes/api/services/CMap.php:971
 #: include/classes/api/services/CMap.php:1029
-#: include/classes/api/services/CMap.php:1540
-#: include/classes/api/services/CMap.php:1978
-#: include/classes/api/services/CMap.php:2040
+#: include/classes/api/services/CMap.php:1539
+#: include/classes/api/services/CMap.php:1977
+#: include/classes/api/services/CMap.php:2039
 #: include/classes/api/services/CMediatype.php:460
 #: include/classes/api/services/CProxy.php:163
 #: include/classes/api/services/CProxy.php:253
@@ -11255,15 +11266,15 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CScript.php:547
 #: include/classes/api/services/CScript.php:592
 #: include/classes/api/services/CScript.php:601
-#: include/classes/api/services/CService.php:993
-#: include/classes/api/services/CService.php:1017
+#: include/classes/api/services/CService.php:989
+#: include/classes/api/services/CService.php:1013
 #: include/classes/api/services/CTask.php:136
 #: include/classes/api/services/CTemplate.php:722
 #: include/classes/api/services/CTemplate.php:744
-#: include/classes/api/services/CTemplateScreen.php:629
-#: include/classes/api/services/CTemplateScreen.php:680
-#: include/classes/api/services/CTemplateScreen.php:743
-#: include/classes/api/services/CTemplateScreen.php:754
+#: include/classes/api/services/CTemplateScreen.php:631
+#: include/classes/api/services/CTemplateScreen.php:682
+#: include/classes/api/services/CTemplateScreen.php:745
+#: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:722
 #: include/classes/api/services/CTrigger.php:633
 #: include/classes/api/services/CTrigger.php:673
@@ -11535,7 +11546,7 @@ msgstr "VMware 하이퍼바이저 상의 프로세서 스레드 수, <url> - VMw
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 상의 프로세서 수, <url> - VMware서비스URL, <uuid> - VMware가상 머신의 호스트 이름"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:287
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:288
 msgid "Number of rows"
 msgstr "행의 수"
 
@@ -11924,7 +11935,7 @@ msgstr "옵션"
 
 #: app/views/monitoring.problem.view.php:228
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:379
 #: include/triggers.inc.php:1332
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:1151
@@ -12037,7 +12048,7 @@ msgstr "아이템 이력의 보존기간을 덮어쓰기"
 msgid "Override item trend period"
 msgstr "아이템 트렌드의 보존기간을 덮어쓰기"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:409
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:410
 #: include/classes/widgets/views/widget.svggraph.form.view.php:257
 msgid "Overrides"
 msgstr "오버라이드"
@@ -12216,7 +12227,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:941
+#: include/classes/graph/CSvgGraph.php:963
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -12264,7 +12275,7 @@ msgstr "PSK 아이덴티티"
 msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr "PSK가 너무 짧습니다. %1$s 자리의 16진수로 설정해 주십시오."
 
-#: include/validate.inc.php:416 include/validate.inc.php:419
+#: include/validate.inc.php:419 include/validate.inc.php:422
 msgid "Page received incorrect data"
 msgstr "잘못된 데이터를 수신하였습니다"
 
@@ -12323,7 +12334,7 @@ msgstr "Parse"
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "Parse SQL 에러 [%1$s] 중 [%2$s]."
 
-#: include/classes/core/CJsonRpc.php:183
+#: include/classes/core/CJsonRpc.php:185
 msgid "Parse error"
 msgstr "Parse 에러"
 
@@ -12548,7 +12559,7 @@ msgstr "호스트 인벤토리 필드의 자동설정"
 msgid "Port"
 msgstr "포트"
 
-#: include/classes/api/services/CHostInterface.php:618
+#: include/classes/api/services/CHostInterface.php:627
 msgid "Port cannot be empty for host interface."
 msgstr "호스트 인터페이스의 포트는 필수항목입니다."
 
@@ -12688,7 +12699,7 @@ msgstr "특권 레벨"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:75
 #: include/classes/widgets/forms/CWidgetFormProblems.php:198
 #: include/classes/widgets/forms/CWidgetFormProblems.php:199
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
 #: include/views/configuration.item.list.php:183
 #: include/views/configuration.trigger.prototype.list.php:129
 #: include/views/configuration.triggers.list.php:59
@@ -12713,7 +12724,7 @@ msgid "Problem expression"
 msgstr "장애의 조건식"
 
 #: include/classes/widgets/CWidgetConfig.php:43
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:337
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
 msgid "Problem hosts"
 msgstr "장애발생 호스트"
 
@@ -12897,7 +12908,7 @@ msgid "Queue of items to be updated"
 msgstr "갱신 대기 아이템의 큐"
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:937
+#: include/classes/graph/CSvgGraph.php:959
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:956
 #: include/classes/screens/CScreenProblem.php:1122 include/events.inc.php:345
@@ -13831,7 +13842,7 @@ msgstr "범위"
 msgid "Screen"
 msgstr "스크린"
 
-#: include/classes/api/services/CTemplateScreen.php:776
+#: include/classes/api/services/CTemplateScreen.php:778
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr "스크린 \"%1$s\"은 템플릿\"%2$s\"에 이미 존재합니다."
@@ -14113,7 +14124,7 @@ msgstr "선택한 상관관계를 삭제하였습니다"
 msgid "Selected elements"
 msgstr "선택한 요소"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:324
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:325
 msgid "Selected items only"
 msgstr "선택한 아이템만"
 
@@ -14228,22 +14239,22 @@ msgstr "서버 시간"
 msgid "Service"
 msgstr "서비스"
 
-#: include/classes/api/services/CService.php:1048
+#: include/classes/api/services/CService.php:1044
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "서비스\"%1$s\"는 삭제할 수 없습니다. 다른 서비스에서의 의존관계가 있습니다."
 
-#: include/classes/api/services/CService.php:1067
+#: include/classes/api/services/CService.php:1063
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "서비스 \"%1$s\"는 자기자신을 의존할 수 없습니다."
 
-#: include/classes/api/services/CService.php:1142
+#: include/classes/api/services/CService.php:1138
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "서비스 \"%1$s\"는 트리거에 링크와 자식을 지니는 것을 동시에 할 수 없습니다."
 
-#: include/classes/api/services/CService.php:1119
+#: include/classes/api/services/CService.php:1115
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "서비스 \"%1$s\"는 이미 다른 서비스에 하드링크되어 있습니다."
@@ -14253,7 +14264,7 @@ msgstr "서비스 \"%1$s\"는 이미 다른 서비스에 하드링크되어 있�
 msgid "Service availability report"
 msgstr "서비스 가동 레포트"
 
-#: include/classes/api/services/CService.php:953
+#: include/classes/api/services/CService.php:949
 msgid "Service cannot be parent and child at the same time."
 msgstr "서비스는 동시에 상위와 하위가 될 수 없습니다."
 
@@ -14312,7 +14323,7 @@ msgstr "서비스를 갱신하였습니다"
 msgid "Services"
 msgstr "서비스"
 
-#: include/classes/api/services/CService.php:1189
+#: include/classes/api/services/CService.php:1185
 msgid "Services form a circular dependency."
 msgstr "서비스의 의존관계가 모순되어있습니다."
 
@@ -14322,7 +14333,7 @@ msgstr "서비스의 의존관계가 모순되어있습니다."
 msgid "Session terminated, re-login, please."
 msgstr "세션이 끊겼습니다. 다시 로그인하여 주십시오."
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:75
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:74
 msgid "Set custom time period"
 msgstr "시간범위의 커스터마이즈"
 
@@ -14356,7 +14367,7 @@ msgstr "LDAP 리페럴을 \"OFF\"로 설정하는데 실패하였습니다."
 #: include/classes/widgets/forms/CWidgetFormProblems.php:84
 #: include/classes/widgets/forms/CWidgetFormProblems.php:196
 #: include/classes/widgets/forms/CWidgetFormProblems.php:197
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:350
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
 #: include/events.inc.php:167 include/triggers.inc.php:1239
 #: include/views/configuration.item.list.php:149
 #: include/views/configuration.trigger.prototype.edit.php:65
@@ -14429,9 +14440,9 @@ msgstr "단축"
 
 #: app/views/monitoring.problem.view.php:89
 #: include/classes/widgets/forms/CWidgetFormProblems.php:33
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:116
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:188
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:260
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:261
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:31
 #: include/views/common.filter.trigger.php:35
 #: include/views/js/monitoring.sysmaps.js.php:76 report2.php:463
@@ -14457,7 +14468,7 @@ msgid "Show latest values"
 msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:73
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:274
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:275
 #: include/views/configuration.graph.edit.php:97
 msgid "Show legend"
 msgstr "범례 보이기"
@@ -14472,7 +14483,7 @@ msgstr "범례 보이기"
 msgid "Show lines"
 msgstr "표시할 행 수"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:307
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:308
 msgid "Show problems"
 msgstr "장애의 표시"
 
@@ -14814,7 +14825,7 @@ msgstr "Zabbix서버의 기동시각, UNIX 타임스탬프."
 msgid "State"
 msgstr "스테이터스"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:157
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:229
 msgctxt "history source selection method"
 msgid "Static"
@@ -14923,11 +14934,11 @@ msgstr "스텝\"%1$s\" [%3$s의 %2$s] 실패: %4$s"
 msgid "Step duration"
 msgstr "스텝 지속기간"
 
-#: app/controllers/CControllerPopupHttpStep.php:160
+#: app/controllers/CControllerPopupHttpStep.php:159
 msgid "Step of web scenario"
 msgstr "Web시나리오 스텝"
 
-#: app/controllers/CControllerPopupHttpStep.php:119
+#: app/controllers/CControllerPopupHttpStep.php:118
 #, c-format
 msgid "Step with name \"%1$s\" already exists."
 msgstr "\"%1$s\"의 이름를 지닌 스텝이 이미 존재합니다."
@@ -15058,7 +15069,7 @@ msgstr "시스템 기본"
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "시스템 에러가 발생했습니다. Zabbix관리자에게 연락해주세요."
 
-#: include/classes/core/CJsonRpc.php:213
+#: include/classes/core/CJsonRpc.php:215
 msgid "System error."
 msgstr "시스템 에러."
 
@@ -15168,7 +15179,7 @@ msgstr "태그 값"
 #: include/classes/screens/CScreenProblem.php:897
 #: include/classes/screens/CScreenProblem.php:1113
 #: include/classes/widgets/forms/CWidgetFormProblems.php:93
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:376
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
 #: include/events.inc.php:235 include/events.inc.php:463
 #: include/views/administration.usergroups.edit.php:183
 #: include/views/configuration.maintenance.edit.php:267
@@ -15267,8 +15278,8 @@ msgstr "템플릿 매크로"
 msgid "Template name"
 msgstr "템플릿 이름"
 
-#: include/classes/api/services/CTemplateScreen.php:638
-#: include/classes/api/services/CTemplateScreen.php:718
+#: include/classes/api/services/CTemplateScreen.php:640
+#: include/classes/api/services/CTemplateScreen.php:720
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "템플릿스크린\"%1$s\"이 이미 존재합니다."
@@ -15294,8 +15305,8 @@ msgstr "템플릿 값"
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "같은 이름 \"%1$s\"를 지닌 템플릿이 이미 존재합니다."
 
-#: include/classes/api/services/CHost.php:1736
-#: include/classes/api/services/CHost.php:1959
+#: include/classes/api/services/CHost.php:1757
+#: include/classes/api/services/CHost.php:1980
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "같은 이름 \"%s\"를 지닌 템플릿이 이미 존재합니다."
@@ -15306,8 +15317,8 @@ msgstr "같은 이름 \"%s\"를 지닌 템플릿이 이미 존재합니다."
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "같은 표시 이름\"%1$s\"를 지닌 템플릿이 이미 존재합니다."
 
-#: include/classes/api/services/CHost.php:1742
-#: include/classes/api/services/CHost.php:1967
+#: include/classes/api/services/CHost.php:1763
+#: include/classes/api/services/CHost.php:1988
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "같은 표시 이름\"%s\"를 지닌 템플릿이 이미 존재합니다"
@@ -15460,11 +15471,11 @@ msgstr "디스커버리된 아이템을 찾을 수 없었습니다. 다음 디�
 msgid "The number of processes. Returns integer"
 msgstr "프로세스 수. integer를 리턴."
 
-#: include/classes/core/CJsonRpc.php:189
+#: include/classes/core/CJsonRpc.php:191
 msgid "The received JSON is not a valid JSON-RPC Request."
 msgstr "수신된 JSON은 올바르지 않은 JSON-RPC리퀘스트 입니다."
 
-#: include/classes/core/CJsonRpc.php:194
+#: include/classes/core/CJsonRpc.php:196
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "수신된 리모트 프로시져는 존재하지 않거나 이용할 수 없습니다."
 
@@ -15624,7 +15635,7 @@ msgid "Timestamp"
 msgstr "타임 스탬프"
 
 #: include/classes/html/CFilter.php:291
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:99
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:98
 #: include/views/js/monitoring.sysmaps.js.php:673
 msgid "To"
 msgstr "종료"
@@ -15700,7 +15711,7 @@ msgstr "변환한 SQL쿼리의 실행결과를 로우레벨 디스커버리의 J
 msgid "Transparency"
 msgstr "투명도"
 
-#: include/classes/core/CJsonRpc.php:218
+#: include/classes/core/CJsonRpc.php:220
 msgid "Transport error."
 msgstr "전송에러."
 
@@ -15726,7 +15737,7 @@ msgstr "트렌드 데이터의 보존기간 \"%1$s\"."
 msgid "Trend storage period"
 msgstr "트랜드 보존기간"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:58
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:457 include/forms.inc.php:877
 #: include/views/administration.general.housekeeper.edit.php:135
 #: include/views/configuration.item.list.php:68
@@ -16226,7 +16237,7 @@ msgstr "블록을 해제"
 msgid "Unblock selected users?"
 msgstr "선택한 사용자의 블록을 해제하시겠습니까?"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:154
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
 #: include/views/configuration.item.edit.php:685
 #: include/views/configuration.item.massupdate.php:288
@@ -17212,7 +17223,7 @@ msgstr "가상 메모리 사이즈의 바이트 단위 혹은 전체에서 퍼�
 msgid "Visible name"
 msgstr "표시명"
 
-#: include/classes/api/services/CHost.php:1870
+#: include/classes/api/services/CHost.php:1891
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "호스트명을 설정하지 않은 경우 표시명은 필수항목입니다."
 
@@ -17414,8 +17425,8 @@ msgstr "쓰기"
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 의존관계 필드가 올바르지 않습니다."
 
-#: include/classes/api/services/CHost.php:1584
-#: include/classes/api/services/CHost.php:1765
+#: include/classes/api/services/CHost.php:1605
+#: include/classes/api/services/CHost.php:1786
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "호스트 \"%1$s\"의 필드가 올바르지 않습니다."
@@ -17482,7 +17493,7 @@ msgstr "URL필드의 값이 올바르지 않습니다."
 msgid "X"
 msgstr "X"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:260
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:261
 msgid "X-Axis"
 msgstr "X축"
 
@@ -17520,9 +17531,9 @@ msgid "Y axis MAX value"
 msgstr "Y축 최댓값"
 
 #: include/classes/api/services/CGraphGeneral.php:314
-#: include/classes/graphdraw/CLineGraphDraw.php:705
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:479
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
+#: include/classes/graphdraw/CLineGraphDraw.php:709
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:480
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:493
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Y축의 최댓값은 Y축의 최솟값보다도 큰 숫자로 설정해주십시오."
 
@@ -17692,7 +17703,7 @@ msgstr "데이터베이스가 정상으로 동작하지 않습니다. 잠시 기
 msgid "ZABBIX"
 msgstr "ZABBIX"
 
-#: include/page_header.php:142
+#: include/page_header.php:156
 msgid "Zabbix"
 msgstr "Zabbix"
 
@@ -17733,7 +17744,7 @@ msgstr "ZABBIX 에이전트 (액티브)"
 msgid "Zabbix aggregate"
 msgstr "ZABBIX 집합"
 
-#: include/validate.inc.php:366
+#: include/validate.inc.php:369
 msgid "Zabbix has received an incorrect request."
 msgstr "잘못된 URL 파라미터"
 
@@ -17828,7 +17839,7 @@ msgstr "boolean을 지정해주세요"
 #: include/classes/api/services/CUser.php:649
 #: include/classes/import/validators/CXmlValidatorGeneral.php:193
 #: include/classes/validators/CApiInputValidator.php:230
-#: include/classes/validators/CNewValidator.php:272
+#: include/classes/validators/CNewValidator.php:278
 msgid "a character string is expected"
 msgstr "문자열로 지정해 주십시오"
 
@@ -17842,7 +17853,7 @@ msgstr "16진수의 색상코드(6자)를 입력해주십시오."
 msgid "a number is expected"
 msgstr "숫자로 지정해주세요"
 
-#: app/controllers/CControllerPopupHttpStep.php:110
+#: app/controllers/CControllerPopupHttpStep.php:109
 #: include/classes/validators/CApiInputValidator.php:422
 #: include/classes/validators/CApiInputValidator.php:564
 #: include/classes/validators/CApiInputValidator.php:959
@@ -17856,7 +17867,7 @@ msgstr "숫자가 너무 큽니다"
 msgid "a numeric value is expected"
 msgstr "숫자로 지정해주세요"
 
-#: include/classes/validators/CNewValidator.php:260
+#: include/classes/validators/CNewValidator.php:266
 msgid "a time is expected"
 msgstr "시간으로 지정해주세요."
 
@@ -17871,9 +17882,9 @@ msgstr "기간을 지정해주세요"
 msgid "a time range is expected"
 msgstr "시간범위를 지정해주세요"
 
-#: app/controllers/CControllerPopupHttpStep.php:104
+#: app/controllers/CControllerPopupHttpStep.php:103
 #: include/classes/validators/CApiInputValidator.php:1174
-#: include/validate.inc.php:227 include/validate.inc.php:567
+#: include/validate.inc.php:227 include/validate.inc.php:570
 msgid "a time unit is expected"
 msgstr "시간의 단위를 지정해주세요"
 
@@ -17893,7 +17904,7 @@ msgstr "필터링된 데이만 영향을 받습니다"
 msgid "agent"
 msgstr "에이전트"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1866
+#: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/html/CSeverity.php:49
 #: include/classes/pagefilter/CPageFilter.php:875
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
@@ -17940,7 +17951,7 @@ msgstr "배열이나 문자열로 지정해주세요"
 msgid "an empty string is expected"
 msgstr "공백문자(empty string)로 지정해 주십시오."
 
-#: include/classes/api/services/CHost.php:1527
+#: include/classes/api/services/CHost.php:1548
 msgid "an even number of hexadecimal characters is expected"
 msgstr "16진수 문자로 입력해주세요"
 
@@ -17983,8 +17994,8 @@ msgstr "자동 등록"
 msgid "auto-registered host"
 msgstr "자동등록 호스트"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1848
-#: include/classes/graphdraw/CLineGraphDraw.php:1870
+#: include/classes/graphdraw/CLineGraphDraw.php:1852
+#: include/classes/graphdraw/CLineGraphDraw.php:1874
 #: include/classes/graphdraw/CPieGraphDraw.php:335 include/graphs.inc.php:85
 #: include/views/js/configuration.graph.edit.js.php:50
 #: include/views/js/configuration.graph.edit.js.php:58
@@ -18010,8 +18021,8 @@ msgstr "점멸"
 msgid "both username and password should be either present or empty"
 msgstr "유저명과 비밀번호를 양쪽에 지정하거나 비워둘 필요가 있습니다"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:128
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:142
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:141
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:200
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:214
 msgid "calculated"
@@ -18038,8 +18049,8 @@ msgstr "변경할 수 없습니다"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:512
 #: include/classes/api/services/CEvent.php:847
-#: include/classes/api/services/CHost.php:1515
-#: include/classes/api/services/CHost.php:1521
+#: include/classes/api/services/CHost.php:1536
+#: include/classes/api/services/CHost.php:1542
 #: include/classes/api/services/CHttpTest.php:984
 #: include/classes/api/services/CItemGeneral.php:485
 #: include/classes/api/services/CItemGeneral.php:512
@@ -18102,7 +18113,7 @@ msgstr "\"%1$s\"에서 시작되는 조건식을 확인해주세요."
 #: include/classes/api/services/CItemGeneral.php:1551
 #: include/classes/api/services/CItemGeneral.php:1557
 #: include/classes/api/services/CItemGeneral.php:1794
-#: include/classes/import/CConfigurationImport.php:2612
+#: include/classes/import/CConfigurationImport.php:2611
 msgid "circular item dependency is not allowed"
 msgstr "모순된 아이템의 의존관계는 허가되지 않습니다."
 
@@ -18249,8 +18260,8 @@ msgid "fourth"
 msgstr "제4"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:324
-msgid "fuzzytime() - Difference between item timestamp value and Zabbix server timestamp is over T seconds (1 - true, 0 - false)"
-msgstr "fuzzytime() - 아이템의 타임스탬프와 Zabbix서버의 타임스탬프의 차이가 T초 이상인가 (0 - T초 이상, 1 - false)"
+msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:772
 #: include/views/configuration.item.edit.php:777
@@ -18291,7 +18302,7 @@ msgstr "호스트가 비활성"
 
 #: include/classes/widgets/CWidgetHelper.php:508
 #: include/classes/widgets/CWidgetHelper.php:873
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
 msgid "host pattern"
 msgstr "호스트 패턴"
 
@@ -18404,7 +18415,7 @@ msgstr "아이템 패턴"
 msgid "key is empty"
 msgstr "키가 설정되지 않았습니다."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1846
+#: include/classes/graphdraw/CLineGraphDraw.php:1850
 #: include/classes/graphdraw/CPieGraphDraw.php:330 include/forms.inc.php:2014
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
@@ -18415,7 +18426,7 @@ msgstr "최신값"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - 최신값"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1983
+#: include/classes/graphdraw/CLineGraphDraw.php:1987
 msgid "left"
 msgstr "왼쪽"
 
@@ -18453,9 +18464,9 @@ msgctxt "month short"
 msgid "m"
 msgstr "m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1377
-#: include/classes/graphdraw/CLineGraphDraw.php:1385
-#: include/classes/graphdraw/CLineGraphDraw.php:1392
+#: include/classes/graphdraw/CLineGraphDraw.php:1381
+#: include/classes/graphdraw/CLineGraphDraw.php:1389
+#: include/classes/graphdraw/CLineGraphDraw.php:1396
 msgid "m-d"
 msgstr "m/d"
 
@@ -18481,8 +18492,8 @@ msgstr "맵"
 msgid "matches"
 msgstr "일치한다"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1849
-#: include/classes/graphdraw/CLineGraphDraw.php:1863
+#: include/classes/graphdraw/CLineGraphDraw.php:1853
+#: include/classes/graphdraw/CLineGraphDraw.php:1867
 #: include/classes/graphdraw/CPieGraphDraw.php:326 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
@@ -18501,13 +18512,13 @@ msgstr "의존 아이템수가 최대 수에 도달하였습니다"
 #: include/classes/api/services/CItemGeneral.php:1587
 #: include/classes/api/services/CItemGeneral.php:1681
 #: include/classes/api/services/CItemGeneral.php:1801
-#: include/classes/import/CConfigurationImport.php:2566
-#: include/classes/import/CConfigurationImport.php:2627
+#: include/classes/import/CConfigurationImport.php:2565
+#: include/classes/import/CConfigurationImport.php:2626
 msgid "maximum number of dependency levels reached"
 msgstr "의존 레벨 수가 최대수에 도달하였습니다"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1847
-#: include/classes/graphdraw/CLineGraphDraw.php:1860
+#: include/classes/graphdraw/CLineGraphDraw.php:1851
+#: include/classes/graphdraw/CLineGraphDraw.php:1864
 #: include/classes/graphdraw/CPieGraphDraw.php:322 include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
@@ -18518,7 +18529,7 @@ msgstr "최소"
 msgid "min() - Minimum value for period T"
 msgstr "min() - 기간T 안의 최소치"
 
-#: include/classes/api/services/CHost.php:1533
+#: include/classes/api/services/CHost.php:1554
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "%1$s 문자 이상 입력해주세요"
@@ -18546,7 +18557,7 @@ msgstr "유효한 LDAP서버가 필요합니다."
 #: include/classes/api/services/CMediatype.php:711
 #: include/classes/api/services/CMediatype.php:730
 #: include/classes/api/services/CMediatype.php:736
-#: include/classes/api/services/CScreen.php:430 include/validate.inc.php:561
+#: include/classes/api/services/CScreen.php:430 include/validate.inc.php:564
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
 msgstr "\"%1$s\"에서 \"%2$s\"의 수치로 설정해주세요"
@@ -18581,7 +18592,7 @@ msgstr "신규"
 msgid "new event tag"
 msgstr "새로운 이벤트의 태그"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1941
+#: include/classes/graphdraw/CLineGraphDraw.php:1945
 #: include/classes/graphdraw/CPieGraphDraw.php:356
 msgid "no data"
 msgstr "데이터 없음"
@@ -18607,7 +18618,7 @@ msgstr "범위 밖"
 #: hostinventoriesoverview.php:76
 #: include/classes/pagefilter/CPageFilter.php:808
 #: include/classes/pagefilter/CPageFilter.php:875 include/forms.inc.php:1126
-#: include/views/monitoring.screen.php:63 slides.php:199
+#: include/views/monitoring.screen.php:63 slides.php:187
 msgid "not selected"
 msgstr "선택되지 않음"
 
@@ -18713,11 +18724,11 @@ msgstr "percentile() - 기간 T의 퍼센테일 P"
 msgid "prev() - Previous value"
 msgstr "prev() - 이전 값"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:365
 msgid "problem pattern"
 msgstr "장애 패턴"
 
-#: include/page_header.php:145 include/views/general.warning.php:21
+#: include/page_header.php:159 include/views/general.warning.php:21
 #, c-format
 msgid "refreshed every %1$s sec."
 msgstr "%1$s 초 마다 갱신"
@@ -18735,7 +18746,7 @@ msgstr "정규 표현"
 msgid "remember selected"
 msgstr "선택상태를 보존"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1983
+#: include/classes/graphdraw/CLineGraphDraw.php:1987
 msgid "right"
 msgstr "오른쪽"
 
@@ -18776,10 +18787,10 @@ msgstr "선택"
 msgid "short description"
 msgstr "짧은 설명"
 
-#: include/classes/api/services/CHost.php:1540
-#: include/classes/api/services/CHost.php:1546
-#: include/classes/api/services/CHost.php:1555
 #: include/classes/api/services/CHost.php:1561
+#: include/classes/api/services/CHost.php:1567
+#: include/classes/api/services/CHost.php:1576
+#: include/classes/api/services/CHost.php:1582
 #: include/classes/api/services/CHttpTest.php:969
 #: include/classes/api/services/CHttpTest.php:1080
 #: include/classes/api/services/CItemGeneral.php:499
@@ -18947,8 +18958,8 @@ msgstr "텍스트 \"%1$s\"가 잘못되었습니다."
 
 #: include/classes/api/services/CEvent.php:805
 #: include/classes/api/services/CEvent.php:905
-#: include/classes/api/services/CHost.php:1495
-#: include/classes/api/services/CHost.php:1501
+#: include/classes/api/services/CHost.php:1516
+#: include/classes/api/services/CHost.php:1522
 #: include/classes/api/services/CItemGeneral.php:1186
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
@@ -18977,7 +18988,7 @@ msgstr "지원되지 않는 버전의 번호입니다."
 #: include/classes/widgets/CWidgetHelper.php:403
 #: include/classes/widgets/CWidgetHelper.php:448
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:174
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:246
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:247
 #: include/views/administration.general.macros.edit.php:53
 #: include/views/administration.usergroups.edit.php:246
 #: include/views/configuration.action.edit.php:370
@@ -19007,9 +19018,9 @@ msgstr "값"
 
 #: include/classes/import/CConfigurationImport.php:808
 #: include/classes/import/CConfigurationImport.php:846
-#: include/classes/import/CConfigurationImport.php:2462
-#: include/classes/import/CConfigurationImport.php:2576
-#: include/classes/import/CConfigurationImport.php:2621
+#: include/classes/import/CConfigurationImport.php:2461
+#: include/classes/import/CConfigurationImport.php:2575
+#: include/classes/import/CConfigurationImport.php:2620
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "값 \"%1$s\"가 존재하지 않습니다"
@@ -19035,8 +19046,8 @@ msgid "value is too long"
 msgstr "값이 너무 깁니다"
 
 #: include/classes/api/services/CHost.php:771
-#: include/classes/api/services/CHost.php:1657
-#: include/classes/api/services/CHost.php:1797
+#: include/classes/api/services/CHost.php:1678
+#: include/classes/api/services/CHost.php:1818
 #: include/classes/api/services/CMapElement.php:102
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681
