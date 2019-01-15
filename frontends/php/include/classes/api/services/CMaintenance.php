@@ -601,6 +601,8 @@ class CMaintenance extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 				}
 
+				$db_timeperiods = zbx_toHash($db_maintenance['timeperiods'], 'timeperiodid');
+
 				foreach ($maintenance['timeperiods'] as &$timeperiod) {
 					if (!is_array($timeperiod)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -608,30 +610,32 @@ class CMaintenance extends CApiService {
 						);
 					}
 
-					// Reset "start_date" to default value in case "timeperiod_type" is not one time only.
-					if (array_key_exists('timeperiod_type', $timeperiod)) {
-						if ($timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
-							$timeperiod['start_date'] = DB::getDefault('timeperiods', 'start_date');
-						}
-					}
-					elseif (array_key_exists('timeperiodid', $timeperiod)) {
-						$db_timeperiods = zbx_toHash($db_maintenance['timeperiods'], 'timeperiodid');
+					$timeperiod_type = array_key_exists('timeperiod_type', $timeperiod)
+						? $timeperiod['timeperiod_type']
+						: null;
+
+					if (array_key_exists('timeperiodid', $timeperiod)) {
 						$timeperiodid = $timeperiod['timeperiodid'];
 
 						// Validate incorrect "timeperiodid".
-						if (array_key_exists($timeperiodid, $db_timeperiods)) {
-							if ($db_timeperiods[$timeperiodid]['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
-								$timeperiod['start_date'] = DB::getDefault('timeperiods', 'start_date');
-							}
-						}
-						else {
+						if (!array_key_exists($timeperiodid, $db_timeperiods)) {
 							self::exception(ZBX_API_ERROR_PERMISSIONS,
 								_('No permissions to referred object or it does not exist!')
 							);
 						}
+
+						if ($timeperiod_type === null) {
+							$timeperiod_type = $db_timeperiods[$timeperiodid]['timeperiod_type'];
+						}
 					}
+
 					// Without "timeperiod_type" it resolves to default TIMEPERIOD_TYPE_ONETIME. But will it be forever?
-					elseif (DB::getDefault('timeperiods', 'timeperiod_type') != TIMEPERIOD_TYPE_ONETIME) {
+					if ($timeperiod_type === null) {
+						$timeperiod_type = DB::getDefault('timeperiods', 'timeperiod_type');
+					}
+
+					// Reset "start_date" to default value in case "timeperiod_type" is not one time only.
+					if ($timeperiod_type != TIMEPERIOD_TYPE_ONETIME) {
 						$timeperiod['start_date'] = DB::getDefault('timeperiods', 'start_date');
 					}
 				}
