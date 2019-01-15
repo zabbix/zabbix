@@ -427,7 +427,7 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
-		$this->validateDependentItems($items, __METHOD__);
+		$this->validateDependentItems($items);
 
 		$json = new CJson();
 
@@ -554,7 +554,6 @@ class CItem extends CItemGeneral {
 
 		parent::checkInput($items, true);
 		self::validateInventoryLinks($items, true);
-		$this->validateDependentItems($items, __METHOD__);
 
 		$db_items = $this->get([
 			'output' => ['flags', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
@@ -563,7 +562,9 @@ class CItem extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type']);
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type', 'master_itemid']);
+
+		$this->validateDependentItems($items);
 
 		$defaults = DB::getDefaults('items');
 		$clean = [
@@ -594,11 +595,8 @@ class CItem extends CItemGeneral {
 		foreach ($items as &$item) {
 			$type_change = ($item['type'] != $db_items[$item['itemid']]['type']);
 
-			if ($item['type'] != ITEM_TYPE_DEPENDENT && $db_items[$item['itemid']]['master_itemid']) {
-				$item['master_itemid'] = null;
-			}
-			elseif (!array_key_exists('master_itemid', $item)) {
-				$item['master_itemid'] = $db_items[$item['itemid']]['master_itemid'];
+			if ($item['type'] != ITEM_TYPE_DEPENDENT && $db_items[$item['itemid']]['master_itemid'] != 0) {
+				$item['master_itemid'] = 0;
 			}
 
 			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {

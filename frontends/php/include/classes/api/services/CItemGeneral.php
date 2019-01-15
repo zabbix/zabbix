@@ -721,11 +721,9 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Updates the children of the item on the given hosts and propagates the inheritance to the child hosts.
 	 *
-	 * @param array      $tpl_items              an array of items to inherit
-	 * @param string     $tpl_items[]['itemid']
-	 * @param int        $tpl_items[]['type']
-	 * @param array|null $hostids                an array of hosts to inherit to; if set to null, the items will be
-	 *                                           inherited to all linked hosts or templates
+	 * @param array      $tpl_items  An array of items to inherit.
+	 * @param array|null $hostids    An array of hosts to inherit to; if set to null, the items will be inherited to all
+	 *                               linked hosts or templates.
 	 */
 	protected function inherit(array $tpl_items, array $hostids = null) {
 		$tpl_items = zbx_toHash($tpl_items, 'itemid');
@@ -774,13 +772,14 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
+		if ($this instanceof CItem || $this instanceof CItemPrototype) {
+			$this->validateDependentItems($new_items);
+		}
+
 		// Save the new items.
 		if ($ins_items) {
 			if ($this instanceof CItem) {
 				static::validateInventoryLinks($ins_items, false);
-			}
-			if ($this instanceof CItem || $this instanceof CItemPrototype) {
-				$this->validateDependentItems($ins_items, get_class($this).'::create');
 			}
 
 			$this->createReal($ins_items);
@@ -789,9 +788,6 @@ abstract class CItemGeneral extends CApiService {
 		if ($upd_items) {
 			if ($this instanceof CItem) {
 				static::validateInventoryLinks($upd_items, true);
-			}
-			if ($this instanceof CItem || $this instanceof CItemPrototype) {
-				$this->validateDependentItems($upd_items, get_class($this).'::update');
 			}
 
 			$this->updateReal($upd_items);
@@ -872,7 +868,7 @@ abstract class CItemGeneral extends CApiService {
 		$chd_items_key = [];
 
 		// Preparing list of items by item templateid.
-		$sql = 'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid,i.master_itemid'.
+		$sql = 'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid'.
 			' FROM items i'.
 			' WHERE '.dbConditionInt('i.templateid', zbx_objectValues($tpl_items, 'itemid'));
 		if ($hostids !== null) {
@@ -911,7 +907,7 @@ abstract class CItemGeneral extends CApiService {
 			$sql_select = ($class === 'CItemPrototype') ? ',id.parent_itemid AS ruleid' : '';
 			$sql_join = ($class === 'CItemPrototype') ? ' JOIN item_discovery id ON i.itemid=id.itemid' : '';
 			$db_items = DBselect(
-				'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid,i.master_itemid'.$sql_select.
+				'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid'.$sql_select.
 					' FROM items i'.$sql_join.
 					' WHERE '.dbConditionInt('i.hostid', $key_hostids).
 						' AND '.dbConditionString('i.key_', [$key_])
@@ -1187,7 +1183,7 @@ abstract class CItemGeneral extends CApiService {
 		$tpl_master_itemids = [];
 
 		foreach ($tpl_items as $tpl_item) {
-			if ($tpl_item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists('master_itemid', $tpl_item)) {
+			if ($tpl_item['type'] == ITEM_TYPE_DEPENDENT/* TODO: && array_key_exists('master_itemid', $tpl_item)*/) {
 				$tpl_master_itemids[$tpl_item['master_itemid']] = true;
 			}
 		}
@@ -1521,299 +1517,211 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Validate items with type ITEM_TYPE_DEPENDENT for create or update operation.
 	 *
-	 * @param array   $items   Array of items.
-	 * @param string  $method  Create or update method.
+	 * @param array  $items
+	 * @param string $items[]['itemid']         (mandatory for updated items)
+	 * @param string $items[]['hostid']
+	 * @param int    $items[]['type']
+	 * @param string $items[]['master_itemid']  (mandatory for ITEM_TYPE_DEPENDENT)
 	 *
 	 * @throws APIException for invalid data.
 	 */
-	protected function validateDependentItems(array $items, $method) {
-		$has_dependent = false;
+	protected function validateDependentItems(array $items) {
+		$dep_items = [];
+		$itemids = [];
 
-		foreach($items as $item) {
+		foreach ($items as $item) {
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				$has_dependent = true;
-				break;
-			};
-		}
-
-		if (!$has_dependent) {
-			return [];
-		}
-
-		$items_cache = zbx_toHash($items, 'itemid');
-		$root_items = [];
-		$items_added = [];
-		$items_moved = [];
-		$items_created = [];
-		$db_items = [];
-		$processed_items = [];
-		$unresolved_master_itemids = [];
-		$has_unresolved_masters = false;
-
-		if ($items_cache) {
-			$options = [
-				'output' => ['itemid', 'type', 'name', 'hostid', 'master_itemid'],
-				'itemids' => array_keys($items_cache),
-				'preservekeys' => true
-			];
-
-			$db_items = API::Item()->get($options);
-
-			if ($this instanceof CItemPrototype) {
-				if ($method === 'CItemPrototype::update') {
-					$options += ['selectDiscoveryRule' => ['itemid']];
-				}
-
-				$db_item_prototypes = API::ItemPrototype()->get($options);
-
-				// Populate 'ruleid' field.
-				if ($method === 'CItemPrototype::update') {
-					foreach ($db_item_prototypes as &$db_item_prototype) {
-						$db_item_prototype['ruleid'] = $db_item_prototype['discoveryRule']['itemid'];
-					}
-					unset($db_item_prototype);
-				}
-
-				$db_items += $db_item_prototypes;
-			}
-
-			foreach ($items as $index => $item) {
-				/**
-				 * All elements of $items array should be accessible by current user therefore should be present
-				 * in $db_items array.
-				 */
-				$itemid = $item['itemid'];
-
-				// When updating validate only dependent items with changed type and/or master_itemid.
-				if ((!array_key_exists('type', $items_cache[$itemid])
-						|| $items_cache[$itemid]['type'] != ITEM_TYPE_DEPENDENT)
-						&& !array_key_exists('master_itemid', $items_cache[$itemid])) {
-					$processed_items[$index] = true;
-				}
-
-				$items_cache[$itemid] += $db_items[$itemid];
-			}
-		}
-
-		do {
-			if ($has_unresolved_masters) {
-				if ($this instanceof CItemPrototype) {
-					$db_masters = DB::select('items', [
-						'output' => ['itemid', 'type', 'flags', 'hostid', 'master_itemid'],
-						'filter' => [
-							'itemid' => array_keys($unresolved_master_itemids),
-							'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE]
-						],
-						'preservekeys' => true
-					]);
-
-					$prototypeids = [];
-					foreach ($db_masters as $itemid => $item) {
-						if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-							$prototypeids[] = $itemid;
-						}
-					}
-
-					if ($prototypeids) {
-						$db_discovery_rules = DB::select('item_discovery', [
-							'output' => ['itemid', 'parent_itemid'],
-							'filter' => [
-								'parent_itemid' => $prototypeids
-							]
-						]);
-
-						foreach ($db_discovery_rules as $drule) {
-							$db_masters[$drule['parent_itemid']]['ruleid'] = $drule['itemid'];
-						}
-					}
-				}
-				else {
-					$db_masters = DB::select('items', [
-						'output' => ['itemid', 'type', 'hostid', 'master_itemid'],
-						'filter' => [
-							'itemid' => array_keys($unresolved_master_itemids),
-							'flags' => ZBX_FLAG_DISCOVERY_NORMAL
-						],
-						'preservekeys' => true
-					]);
-				}
-
-				foreach ($db_masters as $db_masterid => $db_master) {
-					$items_cache[$db_masterid] = $db_master;
-					unset($unresolved_master_itemids[$db_masterid]);
-				}
-
-				if ($unresolved_master_itemids) {
-					reset($unresolved_master_itemids);
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _s('Item "%1$s" does not exist or you have no access to this item',
-							key($unresolved_master_itemids)
-					)));
-				}
-
-				$has_unresolved_masters = false;
-			}
-
-			foreach ($items as $item_index => $item) {
-				if (array_key_exists($item_index, $processed_items)) {
-					// Do not validate already checked items.
-					continue;
-				}
-
-				if (array_key_exists('itemid', $item) && array_key_exists($item['itemid'], $items_cache)) {
-					$item += $items_cache[$item['itemid']];
-				}
-
-				if ($item['type'] != ITEM_TYPE_DEPENDENT) {
-					continue;
-				}
-
-				$dependency_level = 0;
-				$item_masters = [];
-				$master_item = $item;
-				$hostid = $master_item['hostid'];
-
-				if ($this instanceof CItemPrototype) {
-					$ruleid = $master_item['ruleid'];
-				}
+				$dep_items[] = $item;
 
 				if (array_key_exists('itemid', $item)) {
-					$item_masters[$item['itemid']] = true;
+					$itemids[] = $item['itemid'];
 				}
+			}
+		}
 
-				// Traversing up to root item, if next parent should be requested from database store it itemid,
-				// missing parents will be requested in bulk request on next $items scan.
-				while ($master_item && $master_item['type'] == ITEM_TYPE_DEPENDENT) {
-					$master_itemid = $master_item['master_itemid'];
+		if (!$dep_items) {
+			return;
+		}
 
-					if (array_key_exists('itemid', $master_item) && $master_itemid == $master_item['itemid']) {
+		if ($this instanceof CItemPrototype && $itemids) {
+			$db_links = DBselect(
+				'SELECT id.itemid,id.parent_itemid AS ruleid'.
+				' FROM item_discovery id'.
+				' WHERE '.dbConditionId('id.itemid', $itemids)
+			);
+
+			$links = [];
+
+			while ($db_link = DBfetch($db_links)) {
+				$links[$db_link['itemid']] = $db_link['ruleid'];
+			}
+
+			foreach ($dep_items as &$dep_item) {
+				if (array_key_exists('itemid', $dep_item)) {
+					$dep_item['ruleid'] = $links[$dep_item['itemid']];
+				}
+			}
+			unset($dep_item);
+		}
+
+		$master_itemids = [];
+
+		foreach ($dep_items as $dep_item) {
+			$master_itemids[$dep_item['master_itemid']] = true;
+		}
+
+		$master_items = [];
+		$dependent_items = [];
+
+		// Fill relations array by master items (item prototypes).
+		do {
+			if ($this instanceof CItem) {
+				$db_master_items = DBselect(
+					'SELECT i.itemid,i.hostid,i.master_itemid'.
+					' FROM items i'.
+					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL])
+				);
+			}
+			else {
+				$db_master_items = DBselect(
+					'SELECT i.itemid,i.hostid,i.master_itemid,i.flags,id.parent_itemid AS ruleid'.
+					' FROM items i'.
+						' LEFT JOIN item_discovery id'.
+							' ON i.itemid=id.itemid'.
+					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])
+				);
+			}
+
+			while ($db_master_item = DBfetch($db_master_items)) {
+				$master_items[$db_master_item['itemid']] = $db_master_item;
+
+				unset($master_itemids[$db_master_item['itemid']]);
+			}
+
+			if ($master_itemids) {
+				reset($master_itemids);
+
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+						_s('Item "%1$s" does not exist or you have no access to this item', key($master_itemids))
+					)
+				);
+			}
+
+			$master_itemids = [];
+
+			foreach ($master_items as $master_item) {
+				if ($master_item['master_itemid'] != 0
+						&& !array_key_exists($master_item['master_itemid'], $master_items)) {
+					$master_itemids[$master_item['master_itemid']] = true;
+				}
+			}
+		} while ($master_itemids);
+
+		foreach ($dep_items as $dep_item) {
+			$master_item = $master_items[$dep_item['master_itemid']];
+
+			if ($dep_item['hostid'] != $master_item['hostid']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'master_itemid', _('hostid of dependent item and master item should match')
+				));
+			}
+
+			if ($this instanceof CItemPrototype && $master_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+					&& $dep_item['ruleid'] != $master_item['ruleid']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'master_itemid', _('ruleid of dependent item and master item should match')
+				));
+			}
+
+			if (array_key_exists('itemid', $dep_item)) {
+				$master_itemid = $dep_item['master_itemid'];
+
+				while ($master_itemid != 0) {
+					if ($master_itemid == $dep_item['itemid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 							'master_itemid', _('circular item dependency is not allowed')
 						));
 					}
 
-					if ($item_masters && array_key_exists($master_itemid, $item_masters)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('circular item dependency is not allowed')
-						));
-					}
-
-					if (array_key_exists($master_itemid, $items_cache)) {
-						$master_item = $items_cache[$master_itemid];
-						$item_masters[$master_itemid] = true;
-						$dependency_level++;
-					}
-					else {
-						$unresolved_master_itemids[$master_itemid] = true;
-						$has_unresolved_masters = true;
-						break;
-					}
-
-					if ($hostid != $master_item['hostid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('hostid of dependent item and master item should match')
-						));
-					}
-
-					if ($this instanceof CItemPrototype && array_key_exists('discoveryRule', $master_item)
-							&& $ruleid != $master_item['discoveryRule']['itemid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('ruleid of dependent item and master item should match')
-						));
-					}
-
-					if ($dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('maximum number of dependency levels reached')
-						));
-					}
-				}
-
-				// Dependency tree root item is resolved successfully.
-				if ($dependency_level > 0 && $master_item && $master_item['type'] != ITEM_TYPE_DEPENDENT) {
-					$processed_items[$item_index] = true;
-					$master_itemid = $master_item['itemid'];
-					$root_items[$master_itemid] = true;
-
-					if (array_key_exists('itemid', $item) &&
-							$item['type'] == ITEM_TYPE_DEPENDENT &&
-							$item['master_itemid'] != $db_items[$item['itemid']]['master_itemid']) {
-						$itemid = $item['itemid'];
-						$old_master_itemid = $db_items[$itemid]['master_itemid'];
-
-						if (!array_key_exists($master_itemid, $items_added)) {
-							$items_added[$master_itemid] = [$dependency_level => []];
-						}
-						elseif (!array_key_exists($dependency_level, $items_added[$master_itemid])) {
-							$items_added[$master_itemid][$dependency_level] = [];
-						}
-						$items_added[$master_itemid][$dependency_level][$itemid] = $itemid;
-
-						if (!array_key_exists($old_master_itemid, $items_moved)) {
-							$items_moved[$old_master_itemid] = [];
-						}
-						$items_moved[$old_master_itemid][$itemid] = $itemid;
-					}
-					elseif (!array_key_exists('itemid', $item)) {
-						$items_created[$master_itemid] = array_key_exists($master_itemid, $items_created)
-							? $items_created[$master_itemid] + 1
-							: 1;
-					}
+					$master_itemid = $master_items[$master_itemid]['master_itemid'];
 				}
 			}
-		} while ($has_unresolved_masters);
+		}
 
-		// Validate every root master items childrens count.
-		foreach (array_keys($root_items) as $root_itemid) {
-			$dependency_level = 0;
-			$find_itemids = [$root_itemid => $dependency_level];
+		// Fill relations array by dependent items (item prototypes).
+		$root_itemids = [];
 
-			$items_count = array_key_exists($root_itemid, $items_created)
-				? $items_created[$root_itemid]
-				: 0;
-			$counted_masters = [];
+		foreach ($master_items as $master_item) {
+			if ($master_item['master_itemid'] == 0) {
+				$root_itemids[] = $master_item['itemid'];
+			}
+		}
 
-			while (($find_itemids || (array_key_exists($root_itemid, $items_added)
-						&& array_key_exists($dependency_level, $items_added[$root_itemid])))
-						&& $dependency_level <= ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-				/*
-				 * If item was moved to another master item, do not count moved item (and its dependent items)
-				 * in old master dependent items count calculation.
-				 */
-				if (array_key_exists($root_itemid, $items_moved)) {
-					$ignoreids = array_intersect_key($find_itemids, $items_moved[$root_itemid]);
-					$find_itemids = array_diff_key($find_itemids, $ignoreids);
-				}
+		$master_itemids = $root_itemids;
 
-				if (array_key_exists($root_itemid, $items_added)
-						&& array_key_exists($dependency_level, $items_added[$root_itemid])) {
-					$find_itemids += $items_added[$root_itemid][$dependency_level];
-				}
+		do {
+			$db_items = DBselect(
+				'SELECT i.master_itemid,i.itemid'.
+				' FROM items i'.
+				' WHERE '.dbConditionId('i.master_itemid', $master_itemids)
+			);
 
-				$find_itemids = DB::select('items', [
-					'output' => ['itemid'],
-					'filter' => ['master_itemid' => array_keys($find_itemids)],
-					'preservekeys' => true
-				]);
+			$master_itemids = [];
 
-				$find_itemids = array_diff_key($find_itemids, $counted_masters);
-				$items_count = $items_count + count($find_itemids);
+			while ($db_item = DBfetch($db_items)) {
+				$dependent_items[$db_item['master_itemid']][] = $db_item['itemid'];
+				$master_itemids[] = $db_item['itemid'];
+			}
+		} while ($master_itemids);
 
-				$counted_masters += $find_itemids;
-				++$dependency_level;
-
-				if ($items_count > ZBX_DEPENDENT_ITEM_MAX_COUNT) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _('maximum dependent items count reached')
-					));
+		// Adding new items to the tree.
+		foreach ($items as $item) {
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				if (!array_key_exists('itemid', $item)) {
+					$dependent_items[$item['master_itemid']][] = false;
 				}
 			}
+		}
 
-			if (($find_itemids || (array_key_exists($root_itemid, $items_added)
-					&& array_key_exists($dependency_level, $items_added[$root_itemid])))
-					&& $dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
+		foreach ($root_itemids as $root_itemid) {
+			self::checkDependencyDepth($dependent_items, $root_itemid);
+		}
+	}
+
+	/**
+	 * Validate depth and ammount of elements in the tree of the dependent items.
+	 *
+	 * @param array  $dependent_items
+	 * @param string $dependent_items[<master_itemid>][]  List if the dependent item IDs ("false" for new items)
+	 *                                                    by master_itemid.
+	 * @param string $root_itemid                         ID of the item being checked.
+	 * @param int    $level                               Current dependency level.
+	 * @param int    $count                               Current number of elements in the tree.
+	 *
+	 * @throws APIException for invalid data.
+	 */
+	private static function checkDependencyDepth(array $dependent_items, $root_itemid, $level = 0, $count = 1) {
+		if (array_key_exists($root_itemid, $dependent_items)) {
+			if (++$level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 					'master_itemid', _('maximum number of dependency levels reached')
+				));
+			}
+
+			foreach ($dependent_items[$root_itemid] as $master_itemid) {
+				$count++;
+
+				if ($master_itemid !== false) {
+					self::checkDependencyDepth($dependent_items, $master_itemid, $level, $count);
+				}
+			}
+
+			if ($count > ZBX_DEPENDENT_ITEM_MAX_COUNT) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'master_itemid', _('maximum dependent items count reached')
 				));
 			}
 		}
