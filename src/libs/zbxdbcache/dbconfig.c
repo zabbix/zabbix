@@ -11876,26 +11876,41 @@ void	zbx_dc_cleanup_data_sessions(void)
 	UNLOCK_CACHE;
 }
 
-static int	zbx_find_orig_tmpl_item(zbx_uint64_t itemid, ZBX_DC_ITEM **item)
+static void	zbx_gather_tags_from_host(zbx_uint64_t hostid, zbx_vector_ptr_t *host_tags)
 {
-	if (NULL != (*item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
-	{
-		if (0 == (*item)->templateid)
-			return SUCCEED;
-		else
-			return zbx_find_orig_tmpl_item((*item)->templateid, item);
-	}
+	zbx_dc_host_tag_t	*host_tag;
+	zbx_tag_t		*tag;
+	zbx_hashset_iter_t	iter;
 
-	return FAIL;
+	zbx_hashset_iter_reset(&config->host_tags, &iter);
+	while (NULL != (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (host_tag->hostid == hostid)
+		{
+			tag = (zbx_tag_t *) zbx_malloc(NULL, sizeof(zbx_tag_t));
+			tag->tag = zbx_strdup(NULL, host_tag->tag);
+			tag->value = zbx_strdup(NULL, host_tag->value);
+			zbx_vector_ptr_append(host_tags, tag);
+		}
+	}
+}
+
+static void	zbx_gather_tags_from_template_chain(zbx_uint64_t itemid, zbx_vector_ptr_t *host_tags)
+{
+	ZBX_DC_ITEM	*item;
+
+	if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+	{
+		zbx_gather_tags_from_host(item->hostid, host_tags);
+
+		if (0 != item->templateid)
+			zbx_gather_tags_from_template_chain(item->templateid, host_tags);
+	}
 }
 
 void	DCget_host_tags_by_itemids(const zbx_uint64_t *itemids, size_t itemids_num, zbx_vector_ptr_t *host_tags)
 {
-	ZBX_DC_ITEM		*item;
-	zbx_hashset_iter_t	iter;
-	zbx_dc_host_tag_t	*host_tag;
-	zbx_tag_t		*tag;
-	size_t			i;
+	size_t	i;
 
 	if (0 == itemids_num)
 		return;
@@ -11903,22 +11918,7 @@ void	DCget_host_tags_by_itemids(const zbx_uint64_t *itemids, size_t itemids_num,
 	RDLOCK_CACHE;
 
 	for (i = 0; i < itemids_num; i++)
-	{
-		if (SUCCEED == zbx_find_orig_tmpl_item(itemids[i], &item))
-		{
-			zbx_hashset_iter_reset(&config->host_tags, &iter);
-			while (NULL != (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_iter_next(&iter)))
-			{
-				if (host_tag->hostid == item->hostid)
-				{
-					tag = (zbx_tag_t *) zbx_malloc(NULL, sizeof(zbx_tag_t));
-					tag->tag = zbx_strdup(NULL, host_tag->tag);
-					tag->value = zbx_strdup(NULL, host_tag->value);
-					zbx_vector_ptr_append(host_tags, tag);
-				}
-			}
-		}
-	}
+		zbx_gather_tags_from_template_chain(itemids[i], host_tags);
 
 	UNLOCK_CACHE;
 }
