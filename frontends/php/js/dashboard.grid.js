@@ -351,7 +351,7 @@
 				.each(function(box) {
 					var boundary = $.extend({}, box.current_pos);
 
-					if (axis_key in axis) {
+					if ('mirrored' in axis) {
 						console
 							.log(`${box.header}:${axis_key} with overlap=${pos[axis_key] - boundary[axis_key] + boundary[size_key]}`);
 						boundary[axis_key] = Math.max(0, boundary[axis_key] - (pos[axis_key] - boundary[axis_key] + boundary[size_key]));
@@ -381,7 +381,7 @@
 			axis_pos = $.extend({}, widget.current_pos);
 
 		// Resize action for left/up is mirrored right/down action.
-		if (axis_key in axis) {
+		if ('mirrored' in axis) {
 			var dbg_original = axis_pos[axis_key];
 			affected.each(function(box) {
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
@@ -422,8 +422,6 @@
 		});
 
 		overlap = new_max - size_max;
-		console
-			.error(`\t\t\t\t\tcollapsing widgets`);
 		console
 			.log(`affected widgets after compact step (${axis_key}, ${opposite_axis_key}, ${size_key}):`,
 				(function(d){ return $.map(d, function(b){return `"${b.header}: ${b.current_pos[axis_key]}, ${b.current_pos[opposite_axis_key]}, ${b.current_pos[size_key]}"`}).join(', ')})(affected));
@@ -621,7 +619,7 @@
 		if (overlap > 0) {
 			widget.current_pos[size_key] -= overlap;
 
-			if (axis_key in axis) {
+			if ('mirrored' in axis) {
 				widget.current_pos[axis_key] += overlap;
 			}
 
@@ -631,7 +629,7 @@
 		}
 
 		// Resize action for left/up is mirrored right/down action, mirror coordinates back.
-		if (axis_key in axis) {
+		if ('mirrored' in axis) {
 			affected.each(function(box) {
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
 				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
@@ -662,8 +660,6 @@
 			process_order = ['y', 'x'];
 		}
 
-		widget.prev_pos = $.extend({}, widget.current_pos);
-
 		data.widgets.each(function(box) {
 			if (box.uniqueid != widget.uniqueid) {
 				box.current_pos = $.extend({}, box.pos);
@@ -675,10 +671,20 @@
 			return;
 		}
 
-		console.groupCollapsed(`resize step. process order: "${process_order.join('", ')}"`);
+		if (widget.prev_pos.x > widget.current_pos.x) {
+			widget.prev_pos.mirrored.x = true;
+		}
+
+		if (widget.prev_pos.y > widget.current_pos.y) {
+			widget.prev_pos.mirrored.y = true;
+		}
+
+		console.group(`${widget.header} resize step. process order: "${process_order.join('", ')} direction state: ${JSON.stringify(widget.prev_pos.mirrored)}"`);
+		console
+			.log ({current_pos: widget.current_pos, pos: widget.pos, prev_pos:widget.prev_pos, changes: changes});
 		var dbg_affected = {y:[], x:[]};
 
-		var backup_axis = process_order[0],
+		var primary_axis = process_order[0],
 			backup_indexes = [];
 
 		// Diagonal resize.
@@ -689,7 +695,7 @@
 				}
 
 				if ('affected_axis' in box && box.affected_axis === axis_key) {
-					if (backup_axis === axis_key) {
+					if (primary_axis === axis_key) {
 						backup_indexes.push(index);
 					}
 
@@ -702,13 +708,7 @@
 					axis_key: 'x',
 					size_key: 'width',
 					size_min: 1,
-					size_max: data.options['max-columns'],
-					width: changes.width,
-					boundary: $.extend({}, widget.current_pos),
-					scanline: {
-						width: data.options['max-columns'],
-						height: data.options['max-rows']
-					}
+					size_max: data.options['max-columns']
 				};
 			}
 			else {
@@ -716,19 +716,20 @@
 					axis_key: 'y',
 					size_key: 'height',
 					size_min: data.options['widget-min-rows'],
-					size_max: data.options['max-rows'],
-					height: changes.height,
-					boundary: $.extend({}, widget.current_pos),
-					scanline: {
-						width: data.options['max-columns'],
-						height: data.options['max-rows']
-					}
+					size_max: data.options['max-rows']
 				};
 			}
 
-			if (axis_key in changes) {
-				axis[axis_key] = changes[axis_key];
+			if (axis_key in widget.prev_pos.mirrored) {
+				axis.mirrored = true;
 			}
+
+			axis[axis.size_key] = changes[axis.size_key];
+			axis.boundary = $.extend({}, widget.current_pos);
+			axis.scanline = {
+				width: data.options['max-columns'],
+				height: data.options['max-rows']
+			};
 
 			console
 				.log('backup indexes', backup_indexes);
@@ -742,7 +743,7 @@
 
 		// Restore affected on first axis in list.
 		backup_indexes.each(function(index) {
-			data.widgets[index].affected_axis = backup_axis;
+			data.widgets[index].affected_axis = primary_axis;
 		});
 
 		var dbg = {x:[], y:[]}
@@ -755,6 +756,9 @@
 		console
 			.log('final result for affected by changes on axes:', dbg);
 		console.groupEnd();
+
+		// Store current position as previous position for next steps.
+		widget.prev_pos = $.extend(widget.prev_pos, widget.current_pos);
 	}
 
 	function checkWidgetOverlap(data, widget) {
@@ -951,7 +955,7 @@
 			minWidth: getCurrentCellWidth(data),
 			start: function(event) {
 				data['pos-action'] = 'resize';
-				widget.prev_pos = $.extend({}, widget.pos);
+				widget.prev_pos = $.extend({mirrored:{}}, widget.pos);
 				data.widgets.each(function(box) {
 					delete box.affected_axis;
 				});
