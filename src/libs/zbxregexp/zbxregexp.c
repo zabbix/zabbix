@@ -262,6 +262,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
  ******************************************************************************/
 void	zbx_regexp_free(zbx_regexp_t *regexp)
 {
+	/* pcre_free_study() was added to the API for release 8.20 while extra was available before */
 #ifdef PCRE_CONFIG_JIT
 	pcre_free_study(regexp->extra);
 #else
