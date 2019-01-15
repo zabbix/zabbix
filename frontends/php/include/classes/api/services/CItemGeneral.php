@@ -1716,7 +1716,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException for invalid data.
 	 */
-	private static function checkDependencyDepth(array $dependent_items, $root_itemid, $level = 0, $count = 1) {
+	private static function checkDependencyDepth(array $dependent_items, $root_itemid, $level = 0, $count = 0) {
 		if (array_key_exists($root_itemid, $dependent_items)) {
 			if (++$level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
