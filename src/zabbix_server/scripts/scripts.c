@@ -396,8 +396,9 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				goto out;
 			}
 
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, &script->command,
-					MACRO_TYPE_SCRIPT, NULL, 0);
+			if(SUCCEED != substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+					NULL, &script->command, MACRO_TYPE_SCRIPT, error, max_error_len))
+				goto out;
 
 			/* DBget_script_by_scriptid() may overwrite script type with anything but global script... */
 			if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)
@@ -421,7 +422,6 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
 	return ret;
 }
 
