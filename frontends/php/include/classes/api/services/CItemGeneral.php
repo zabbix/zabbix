@@ -1670,12 +1670,14 @@ abstract class CItemGeneral extends CApiService {
 		$master_itemids = $root_itemids;
 
 		do {
-			$db_items = DBselect(
-				'SELECT i.master_itemid,i.itemid'.
+			$sql = 'SELECT i.master_itemid,i.itemid'.
 				' FROM items i'.
-				' WHERE '.dbConditionId('i.master_itemid', $master_itemids).
-					' AND '.dbConditionId('i.itemid', $upd_itemids, true) // Exclude updated items.
-			);
+				' WHERE '.dbConditionId('i.master_itemid', $master_itemids);
+			if ($upd_itemids) {
+				$sql .= ' AND '.dbConditionId('i.itemid', $upd_itemids, true); // Exclude updated items.
+			}
+
+			$db_items = DBselect($sql);
 
 			while ($db_item = DBfetch($db_items)) {
 				$dependent_items[$db_item['master_itemid']][] = $db_item['itemid'];
