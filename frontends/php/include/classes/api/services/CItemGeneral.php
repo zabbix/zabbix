@@ -1527,14 +1527,14 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function validateDependentItems(array $items) {
 		$dep_items = [];
-		$itemids = [];
+		$upd_itemids = [];
 
 		foreach ($items as $item) {
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 				$dep_items[] = $item;
 
 				if (array_key_exists('itemid', $item)) {
-					$itemids[] = $item['itemid'];
+					$upd_itemids[] = $item['itemid'];
 				}
 			}
 		}
@@ -1543,11 +1543,11 @@ abstract class CItemGeneral extends CApiService {
 			return;
 		}
 
-		if ($this instanceof CItemPrototype && $itemids) {
+		if ($this instanceof CItemPrototype && $upd_itemids) {
 			$db_links = DBselect(
 				'SELECT id.itemid,id.parent_itemid AS ruleid'.
 				' FROM item_discovery id'.
-				' WHERE '.dbConditionId('id.itemid', $itemids)
+				' WHERE '.dbConditionId('id.itemid', $upd_itemids)
 			);
 
 			$links = [];
@@ -1571,7 +1571,6 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		$master_items = [];
-		$dependent_items = [];
 
 		// Fill relations array by master items (item prototypes).
 		do {
@@ -1660,29 +1659,41 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
+		$dependent_items = [];
+
+		foreach ($dep_items as $dep_item) {
+			if (array_key_exists('itemid', $dep_item)) {
+				$dependent_items[$dep_item['master_itemid']][] = $dep_item['itemid'];
+			}
+		}
+
 		$master_itemids = $root_itemids;
 
 		do {
 			$db_items = DBselect(
 				'SELECT i.master_itemid,i.itemid'.
 				' FROM items i'.
-				' WHERE '.dbConditionId('i.master_itemid', $master_itemids)
+				' WHERE '.dbConditionId('i.master_itemid', $master_itemids).
+					' AND '.dbConditionId('i.itemid', $upd_itemids, true) // Exclude updated items.
 			);
-
-			$master_itemids = [];
 
 			while ($db_item = DBfetch($db_items)) {
 				$dependent_items[$db_item['master_itemid']][] = $db_item['itemid'];
-				$master_itemids[] = $db_item['itemid'];
+			}
+
+			$_master_itemids = $master_itemids;
+			$master_itemids = [];
+
+			foreach ($_master_itemids as $master_itemid) {
+				if (array_key_exists($master_itemid, $dependent_items)) {
+					$master_itemids = array_merge($master_itemids, $dependent_items[$master_itemid]);
+				}
 			}
 		} while ($master_itemids);
 
-		// Adding new items to the tree.
-		foreach ($items as $item) {
-			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				if (!array_key_exists('itemid', $item)) {
-					$dependent_items[$item['master_itemid']][] = false;
-				}
+		foreach ($dep_items as $dep_item) {
+			if (!array_key_exists('itemid', $dep_item)) {
+				$dependent_items[$dep_item['master_itemid']][] = false;
 			}
 		}
 
