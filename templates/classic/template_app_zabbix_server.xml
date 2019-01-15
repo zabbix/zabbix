@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.2</version>
-    <date>2019-01-09T09:15:38Z</date>
+    <date>2019-01-15T14:23:14Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -2880,7 +2880,7 @@
                             <dynamic>0</dynamic>
                             <sort_triggers>0</sort_triggers>
                             <resource>
-                                <name>Zabbix preprocessing queue</name>
+                                <name>Zabbix internal queues</name>
                                 <host>Template App Zabbix Server</host>
                             </resource>
                             <max_columns>3</max_columns>
@@ -3899,7 +3899,7 @@
             </graph_items>
         </graph>
         <graph>
-            <name>Zabbix preprocessing queue</name>
+            <name>Zabbix internal queues</name>
             <width>900</width>
             <height>200</height>
             <yaxismin>0.0000</yaxismin>
@@ -3918,14 +3918,26 @@
             <graph_items>
                 <graph_item>
                     <sortorder>0</sortorder>
-                    <drawtype>5</drawtype>
-                    <color>1A7C11</color>
+                    <drawtype>0</drawtype>
+                    <color>008800</color>
                     <yaxisside>0</yaxisside>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
                         <host>Template App Zabbix Server</host>
                         <key>zabbix[preprocessing_queue]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <drawtype>0</drawtype>
+                    <color>EE0000</color>
+                    <yaxisside>0</yaxisside>
+                    <calc_fnc>2</calc_fnc>
+                    <type>0</type>
+                    <item>
+                        <host>Template App Zabbix Server</host>
+                        <key>zabbix[lld_queue]</key>
                     </item>
                 </graph_item>
             </graph_items>
