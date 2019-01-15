@@ -158,7 +158,7 @@ jQuery(function($) {
 			 * values_str is used to store user's original syntax.
 			 */
 			var values_str = $('[name="'+data.parentId+'"]').val(),
-				values_arr = values_str.split(/[,|\n]+/).map(str => str.trim());
+				values_arr = values_str.split(/[,|\n]+/).map(function(str) {return str.trim()});
 
 			data.values.forEach(function(val) {
 				if (values_arr.indexOf(val[data.object]) == -1) {
