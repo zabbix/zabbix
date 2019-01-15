@@ -262,7 +262,6 @@ class CSvgGraphXAxis extends CSvgTag {
 				'fill' => 'transparent'
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' text' => [
-				'dominant-baseline' => 'middle',
 				'font-size' => '11px'
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' .'.CSvgTag::ZBX_STYLE_GRAPH_LABEL_MAIN => [
@@ -297,15 +296,15 @@ class CSvgGraphXAxis extends CSvgTag {
 				$this->grids,
 				$this->makeArrow(),
 				// Add period start label.
-				(new CSvgText($this->x, $this->y + $this->label_top_offset, $time_formatted_from))
+				(new CSvgText($this->x + 3, $this->y + $this->label_top_offset, $time_formatted_from))
 					->addClass(CSvgTag::ZBX_STYLE_GRAPH_LABEL_MAIN)
-					->rotate(self::LABEL_ROTATE_DEGREES, $this->x, $this->y + $this->label_top_offset),
+					->rotate(self::LABEL_ROTATE_DEGREES, $this->x + 3, $this->y + $this->label_top_offset),
 				// Add time interval labels.
 				$this->labels,
 				// Add period end label.
-				(new CSvgText($this->x + $this->width, $this->y + $this->label_top_offset, $time_formatted_till))
+				(new CSvgText($this->x + $this->width + 3, $this->y + $this->label_top_offset, $time_formatted_till))
 					->addClass(CSvgTag::ZBX_STYLE_GRAPH_LABEL_MAIN)
-					->rotate(self::LABEL_ROTATE_DEGREES, $this->x + $this->width, $this->y + $this->label_top_offset)
+					->rotate(self::LABEL_ROTATE_DEGREES, $this->x + $this->width + 3, $this->y + $this->label_top_offset)
 			])
 			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_BOTTOM)
 			->toString($destroy);
@@ -536,8 +535,8 @@ class CSvgGraphXAxis extends CSvgTag {
 				break;
 			}
 			elseif ($position > 10) {
-				$this->labels[] = (new CSvgText($position + $this->x + 1, $this->y + $this->label_top_offset, $time_formatted))
-					->rotate(self::LABEL_ROTATE_DEGREES, $position + $this->x + 1, $this->y + $this->label_top_offset)
+				$this->labels[] = (new CSvgText($position + $this->x + 4, $this->y + $this->label_top_offset, $time_formatted))
+					->rotate(self::LABEL_ROTATE_DEGREES, $position + $this->x + 4, $this->y + $this->label_top_offset)
 					->addClass($label_style);
 			}
 
