@@ -39,10 +39,6 @@ zbx_regmatch_t;
 					/* Group \0 contains the matching part of string, groups \1 ...\9 */
 					/* contain captured groups (substrings).                          */
 
-#ifndef PCRE_STUDY_JIT_COMPILE
-	#define PCRE_STUDY_JIT_COMPILE 0
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Function: regexp_compile                                                   *
@@ -98,8 +94,7 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 
 	if (NULL != regexp)
 	{
-		if (NULL == (extra = pcre_study(pcre_regexp, PCRE_STUDY_JIT_COMPILE, err_msg_static)) &&
-				NULL != *err_msg_static)
+		if (NULL == (extra = pcre_study(pcre_regexp, 0, err_msg_static)) && NULL != *err_msg_static)
 		{
 			pcre_free(pcre_regexp);
 			return FAIL;
