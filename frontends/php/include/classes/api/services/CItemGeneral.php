@@ -1375,9 +1375,9 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 						$api_input_rules = [
 							'type' => API_TIME_UNIT,
-							'flags' => ($this instanceof CItemPrototype)
-								? API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
-								: API_NOT_EMPTY | API_ALLOW_USER_MACRO,
+							'flags' => ($this instanceof CItem)
+								? API_NOT_EMPTY | API_ALLOW_USER_MACRO
+								: API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO,
 							'in' => '1:'.ZBX_MAX_TIMESHIFT
 						];
 
