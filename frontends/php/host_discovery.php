@@ -622,10 +622,13 @@ if (isset($_REQUEST['form'])) {
 	$data['conditions'] = getRequest('conditions', []);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['host'] = $host;
-	foreach ($data['preprocessing'] as &$step) {
-		$step['params'] = explode("\n", $step['params']);
+
+	if (!hasRequest('form_refresh')) {
+		foreach ($data['preprocessing'] as &$step) {
+			$step['params'] = explode("\n", $step['params']);
+		}
+		unset($step);
 	}
-	unset($step);
 
 	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
