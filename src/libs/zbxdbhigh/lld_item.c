@@ -1335,14 +1335,14 @@ out:
  *          process                                                           *
  *                                                                            *
  * Parameters: pp       - [IN] the item preprocessing step                    *
- *             item_key - [IN] Item name for logging                          *
+ *             itemid   - [IN] item ID for logging                            *
  *             error    - [IN/OUT] the lld error message                      *
  *                                                                            *
  * Return value: SUCCEED - if preprocessing step is valid                     *
  *               FAIL    - if preprocessing step is not valid                 *
  *                                                                            *
  ******************************************************************************/
-static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, const char * item_key, char ** error)
+static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zbx_uint64_t itemid, char ** error)
 {
 	int		ret = SUCCEED;
 	zbx_token_t	token;
@@ -1457,8 +1457,8 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 
 	if (SUCCEED != ret)
 	{
-		*error = zbx_strdcatf(*error, "Item \"%s\" was not created. Invalid value for preprocessing step #%d: "
-				"%s.\n", item_key, pp->step, err);
+		*error = zbx_strdcatf(*error, "Cannot %s item: invalid value for preprocessing step #%d: %s.\n",
+				(0 != itemid ? "update" : "create"), pp->step, err);
 	}
 
 	return ret;
@@ -1579,8 +1579,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 		if (NULL != zbx_hashset_search(&items_keys, &item->key))
 		{
-			*error = zbx_strdcatf(*error, "Cannot %s item:"
-						" item with the same key \"%s\" already exists.\n",
+			*error = zbx_strdcatf(*error, "Cannot %s item: item with the same key \"%s\" already exists.\n",
 						(0 != item->itemid ? "update" : "create"), item->key);
 
 			if (0 != item->itemid)
@@ -1607,7 +1606,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 		for (j = 0; j < item->preproc_ops.values_num; j++)
 		{
-			if (SUCCEED != lld_items_preproc_step_validate(item->preproc_ops.values[j], item->key, error))
+			if (SUCCEED != lld_items_preproc_step_validate(item->preproc_ops.values[j], item->itemid,
+					error))
 			{
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 				break;
@@ -1722,7 +1722,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 			if (SUCCEED != lld_item_dependencies_check(item, item_prototype, item_dependencies))
 			{
 				*error = zbx_strdcatf(*error,
-						"Cannot create %s item: maximum dependent items count reached.\n",
+						"Cannot create item \"%s\": maximum dependent item count reached.\n",
 						item->key);
 
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
