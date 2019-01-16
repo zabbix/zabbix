@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,6 +58,13 @@ class CElement extends CBaseElement implements IWaitable {
 	protected $parent;
 
 	/**
+	 * Flag that allows to disable normalizing.
+	 *
+	 * @var boolean
+	 */
+	protected $normalized = false;
+
+	/**
 	 * Initialize element.
 	 *
 	 * @param RemoteWebElement $element
@@ -65,10 +72,13 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function __construct(RemoteWebElement $element, $options = []) {
 		$this->setElement($element);
-		$this->normalize();
 
 		foreach ($options as $key => $value) {
 			$this->$key = $value;
+		}
+
+		if (!$this->normalized) {
+			$this->normalize();
 		}
 	}
 
@@ -112,7 +122,9 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		$this->setElement($query->one());
-		$this->normalize();
+		if (!$this->normalized) {
+			$this->normalize();
+		}
 
 		return $this;
 	}
@@ -200,6 +212,51 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function cast($class, $options = []) {
 		return new $class($this, array_merge($options, ['parent' => $this->parent, 'by' => $this->by]));
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getText() {
+		if (!$this->isVisible()) {
+			return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+		}
+
+		return parent::getText();
+	}
+
+	/**
+	 * Highlight the value in the field.
+	 *
+	 * @return $this
+	 */
+	public function selectValue() {
+		$this->click()->sendKeys([WebDriverKeys::CONTROL, 'a', WebDriverKeys::CONTROL]);
+
+		return $this;
+	}
+
+	/**
+	 * Overwrite value in field.
+	 *
+	 * @param $text    text to be written into the field
+	 *
+	 * @return $this
+	 */
+	public function overwrite($text) {
+		return $this->selectValue()->type($text);
+	}
+
+	/**
+	 * Alias for overwrite.
+	 * @see self::overwrite
+	 *
+	 * @param $text    text to be written into the field
+	 *
+	 * @return $this
+	 */
+	public function fill($text) {
+		return $this->overwrite($text);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,6 +44,8 @@ class CCheckBox extends CInput {
 	 * @var int
 	 */
 	private $label_position = self::LABEL_POSITION_RIGHT;
+
+	private $unchecked_value = null;
 
 	public function __construct($name = 'checkbox', $value = '1') {
 		parent::__construct('checkbox', $name, $value);
@@ -110,11 +112,33 @@ class CCheckBox extends CInput {
 		return $this;
 	}
 
+	/**
+	 * Allow to set value for not checked checkbox.
+	 *
+	 * @param string $value    Value for unchecked state.
+	 *
+	 * @return CCheckBox
+	 */
+	public function setUncheckedValue($value) {
+		$this->unchecked_value = $value;
+
+		return $this;
+	}
+
 	public function toString($destroy = true) {
+		$unchecked = '';
+
+		if ($this->unchecked_value !== null) {
+			$unchecked = (new CVar($this->getName(), $this->unchecked_value))
+				->removeId()
+				->setEnabled(!$this->getAttribute('disabled'))
+				->toString();
+		}
+
 		$elements = ($this->label_position == self::LABEL_POSITION_LEFT)
 			? [$this->label, new CSpan()]
 			: [new CSpan(), $this->label];
 
-		return parent::toString($destroy).((new CLabel($elements, $this->getId()))->toString(true));
+		return $unchecked.parent::toString($destroy).((new CLabel($elements, $this->getId()))->toString(true));
 	}
 }

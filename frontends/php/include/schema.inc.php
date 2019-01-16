@@ -7555,6 +7555,35 @@ return [
 			],
 		],
 	],
+	'lld_macro_path' => [
+		'key' => 'lld_macro_pathid',
+		'fields' => [
+			'lld_macro_pathid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
+			],
+			'lld_macro' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'path' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
 	'host_tag' => [
 		'key' => 'hosttagid',
 		'fields' => [

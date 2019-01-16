@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -984,7 +984,6 @@ class testFormWebStep extends CLegacyWebTest {
 				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_bg']"));
 				$this->zbxTestClickWait('add');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added');
-				$this->zbxTestCheckFatalErrors();
 				break;
 			case TEST_BAD:
 				if (array_key_exists('error_msg', $data)) {
@@ -996,7 +995,6 @@ class testFormWebStep extends CLegacyWebTest {
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
-				$this->zbxTestCheckFatalErrors();
 				break;
 			case TEST_ERROR:
 				$get_text = $this->zbxTestGetText("//div[@class='overlay-dialogue-body']/span");

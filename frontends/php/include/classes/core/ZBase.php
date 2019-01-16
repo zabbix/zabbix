@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -440,7 +440,7 @@ class ZBase {
 			foreach ($_REQUEST as $key => $value) {
 				// do not output SID
 				if ($key != 'sid') {
-					$response->addMessage($key.': '.$value);
+					$response->addMessage(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
 			}
 			CSession::setValue('messages', $response->getMessages());

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1319,6 +1319,94 @@ static void	copy_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 
 /******************************************************************************
  *                                                                            *
+ * Function: copy_template_lld_macro_paths                                    *
+ *                                                                            *
+ * Purpose: copy template discovery item lld macro paths                      *
+ *                                                                            *
+ * Parameters: templateids - [IN] array of template IDs                       *
+ *             items       - [IN] array of new/updated items                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	copy_template_lld_macro_paths(const zbx_vector_uint64_t *templateids, const zbx_vector_ptr_t *items)
+{
+	zbx_vector_uint64_t		itemids;
+	zbx_hashset_t			items_t;
+	int				i;
+	const zbx_template_item_t	*item, **pitem;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	DB_ROW				row;
+	DB_RESULT			result;
+	zbx_db_insert_t			db_insert;
+
+	if (0 == items->values_num)
+		return;
+
+	zbx_vector_uint64_create(&itemids);
+	zbx_hashset_create(&items_t, items->values_num, template_item_hash_func, template_item_compare_func);
+
+	/* remove old lld rules macros */
+
+	for (i = 0; i < items->values_num; i++)
+	{
+		item = (const zbx_template_item_t *)items->values[i];
+
+		if (0 == (ZBX_FLAG_DISCOVERY_RULE & item->flags))
+			continue;
+
+		if (NULL == item->key)	/* item already existed */
+			zbx_vector_uint64_append(&itemids, item->itemid);
+
+		zbx_hashset_insert(&items_t, &item, sizeof(zbx_template_item_t *));
+	}
+
+	if (0 != itemids.values_num)
+	{
+		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from lld_macro_path where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+		DBexecute("%s", sql);
+		sql_offset = 0;
+	}
+
+	zbx_db_insert_prepare(&db_insert, "lld_macro_path", "lld_macro_pathid", "itemid", "lld_macro", "path", NULL);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select l.itemid,l.lld_macro,l.path"
+				" from lld_macro_path l,items i"
+				" where l.itemid=i.itemid"
+				" and");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values, templateids->values_num);
+	result = DBselect("%s", sql);
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_template_item_t	item_local, *pitem_local = &item_local;
+
+		ZBX_STR2UINT64(item_local.templateid, row[0]);
+		if (NULL == (pitem = (const zbx_template_item_t **)zbx_hashset_search(&items_t, &pitem_local)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), (*pitem)->itemid, row[1], row[2]);
+
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "lld_macro_pathid");
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	zbx_free(sql);
+	zbx_hashset_destroy(&items_t);
+	zbx_vector_uint64_destroy(&itemids);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: compare_template_items                                           *
  *                                                                            *
  * Purpose: compare templateid of two template items                          *
@@ -1424,6 +1512,7 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	save_template_item_applications(&items);
 	save_template_discovery_prototypes(hostid, &items);
 	copy_template_items_preproc(templateids, &items);
+	copy_template_lld_macro_paths(templateids, &items);
 out:
 	zbx_vector_ptr_clear_ext(&lld_rules, (zbx_clean_func_t)free_lld_rule_map);
 	zbx_vector_ptr_destroy(&lld_rules);

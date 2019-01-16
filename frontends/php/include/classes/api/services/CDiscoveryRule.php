@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,38 +54,40 @@ class CDiscoveryRule extends CItemGeneral {
 		];
 
 		$defOptions = [
-			'groupids'					=> null,
-			'templateids'				=> null,
-			'hostids'					=> null,
-			'itemids'					=> null,
-			'interfaceids'				=> null,
-			'inherited'					=> null,
-			'templated'					=> null,
-			'monitored'					=> null,
-			'editable'					=> false,
-			'nopermissions'				=> null,
+			'groupids'						=> null,
+			'templateids'					=> null,
+			'hostids'						=> null,
+			'itemids'						=> null,
+			'interfaceids'					=> null,
+			'inherited'						=> null,
+			'templated'						=> null,
+			'monitored'						=> null,
+			'editable'						=> false,
+			'nopermissions'					=> null,
 			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> false,
-			'excludeSearch'				=> false,
-			'searchWildcardsEnabled'	=> null,
+			'filter'						=> null,
+			'search'						=> null,
+			'searchByAny'					=> null,
+			'startSearch'					=> false,
+			'excludeSearch'					=> false,
+			'searchWildcardsEnabled'		=> null,
 			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'selectHosts'				=> null,
-			'selectItems'				=> null,
-			'selectTriggers'			=> null,
-			'selectGraphs'				=> null,
-			'selectHostPrototypes'		=> null,
-			'selectFilter'				=> null,
-			'countOutput'				=> false,
-			'groupCount'				=> false,
-			'preservekeys'				=> false,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null,
-			'limitSelects'				=> null
+			'output'						=> API_OUTPUT_EXTEND,
+			'selectHosts'					=> null,
+			'selectItems'					=> null,
+			'selectTriggers'				=> null,
+			'selectGraphs'					=> null,
+			'selectHostPrototypes'			=> null,
+			'selectApplicationPrototypes'	=> null,
+			'selectFilter'					=> null,
+			'selectLLDMacroPaths'			=> null,
+			'countOutput'					=> false,
+			'groupCount'					=> false,
+			'preservekeys'					=> false,
+			'sortfield'						=> '',
+			'sortorder'						=> '',
+			'limit'							=> null,
+			'limitSelects'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
@@ -327,6 +329,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		unset($item);
 
+		$this->validateCreateLLDMacroPaths($items);
 		$this->createReal($items);
 		$this->inherit($items);
 
@@ -351,6 +354,7 @@ class CDiscoveryRule extends CItemGeneral {
 		]);
 
 		$this->checkInput($items, true, $db_items);
+		$this->validateUpdateLLDMacroPaths($items);
 
 		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type']);
 
@@ -642,6 +646,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'output' => $output,
 			'hostids' => $data['templateids'],
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
+			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'preservekeys' => true
 		]);
 		$json = new CJson();
@@ -896,16 +901,29 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$conditions = DB::save('item_condition', $conditions);
 
-		// update formulas
-		$itemConditions = [];
+		$item_conditions = [];
+
 		foreach ($conditions as $condition) {
-			$itemConditions[$condition['itemid']][] = $condition;
+			$item_conditions[$condition['itemid']][] = $condition;
 		}
+
+		$lld_macro_paths = [];
+
 		foreach ($items as $item) {
+			// update formulas
 			if (isset($item['filter']) && $item['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$this->updateFormula($item['itemid'], $item['filter']['formula'], $itemConditions[$item['itemid']]);
+				$this->updateFormula($item['itemid'], $item['filter']['formula'], $item_conditions[$item['itemid']]);
+			}
+
+			// $item['lld_macro_paths'] expects to be filled with validated fields 'lld_macro' and 'path' and values.
+			if (array_key_exists('lld_macro_paths', $item)) {
+				foreach ($item['lld_macro_paths'] as $lld_macro_path) {
+					$lld_macro_paths[] = $lld_macro_path + ['itemid' => $item['itemid']];
+				}
 			}
 		}
+
+		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 	}
 
 	protected function updateReal($items) {
@@ -970,12 +988,142 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-		// update formulas
+		$itemids = [];
+		$lld_macro_paths = [];
+		$db_lld_macro_paths = [];
+
 		foreach ($items as $item) {
+			// update formulas
 			if (isset($item['filter']) && $item['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 				$this->updateFormula($item['itemid'], $item['filter']['formula'], $ruleConditions[$item['itemid']]);
 			}
+
+			// "lld_macro_paths" could be empty or filled with fields "lld_macro", "path" or "lld_macro_pathid".
+			if (array_key_exists('lld_macro_paths', $item)) {
+				$itemids[$item['itemid']] = true;
+
+				if ($item['lld_macro_paths']) {
+					foreach ($item['lld_macro_paths'] as $lld_macro_path) {
+						$lld_macro_paths[] = $lld_macro_path + ['itemid' => $item['itemid']];
+					}
+				}
+			}
 		}
+
+		// Gather all existing LLD macros from given discovery rules.
+		if ($itemids) {
+			$db_lld_macro_paths = DB::select('lld_macro_path', [
+				'output' => ['lld_macro_pathid', 'itemid', 'lld_macro', 'path'],
+				'filter' => ['itemid' => array_keys($itemids)]
+			]);
+		}
+
+		/*
+		 * DB::replaceByPosition() does not allow to change records one by one due to unique indexes on two table
+		 * columns. Problems arise when given records are the same as records in DB and they are sorted differently.
+		 * That's why checking differences between old and new records is done manually.
+		 */
+
+		$lld_macro_paths_to_update = [];
+
+		foreach ($lld_macro_paths as $idx1 => $lld_macro_path) {
+			foreach ($db_lld_macro_paths as $idx2 => $db_lld_macro_path) {
+				if (array_key_exists('lld_macro_pathid', $lld_macro_path)) {
+					// Update records by primary key.
+
+					// Find matching "lld_macro_pathid" and update fields accordingly.
+					if (bccomp($lld_macro_path['lld_macro_pathid'], $db_lld_macro_path['lld_macro_pathid']) == 0) {
+						$fields_to_update = [];
+
+						if (array_key_exists('lld_macro', $lld_macro_path)
+								&& $lld_macro_path['lld_macro'] === $db_lld_macro_path['lld_macro']) {
+							// If same "lld_macro" is found in DB, update only "path" if necessary.
+
+							if (array_key_exists('path', $lld_macro_path)
+									&& $lld_macro_path['path'] !== $lld_macro_path['path']) {
+								$fields_to_update['path'] = $lld_macro_path['path'];
+							}
+						}
+						else {
+							/*
+							 * Update all other fields that correspond to given "lld_macro_pathid". Except for primary
+							 * key "lld_macro_pathid" and "itemid".
+							 */
+
+							foreach ($lld_macro_path as $field => $value) {
+								if ($field !== 'itemid' && $field !== 'lld_macro_pathid') {
+									$fields_to_update[$field] = $value;
+								}
+							}
+						}
+
+						/*
+						 * If there are any changes made, update fields in DB. Otherwise skip updating and result in
+						 * success anyway.
+						 */
+						if ($fields_to_update) {
+							$lld_macro_paths_to_update[] = $fields_to_update
+								+ ['lld_macro_pathid' => $lld_macro_path['lld_macro_pathid']];
+						}
+
+						/*
+						 * Remove processed LLD macros from the list. Macros left in $db_lld_macro_paths will be removed
+						 * afterwards.
+						 */
+						unset($db_lld_macro_paths[$idx2]);
+						unset($lld_macro_paths[$idx1]);
+					}
+					// Incorrect "lld_macro_pathid" cannot be given due to validation done previously.
+				}
+				else {
+					// Add or update fields by given "lld_macro".
+
+					if (bccomp($lld_macro_path['itemid'], $db_lld_macro_path['itemid']) == 0) {
+						if ($lld_macro_path['lld_macro'] === $db_lld_macro_path['lld_macro']) {
+							// If same "lld_macro" is given, add primary key and update only "path", if necessary.
+
+							if ($lld_macro_path['path'] !== $db_lld_macro_path['path']) {
+								$lld_macro_paths_to_update[] = [
+									'lld_macro_pathid' => $db_lld_macro_path['lld_macro_pathid'],
+									'path' => $lld_macro_path['path']
+								];
+							}
+
+							/*
+							 * Remove processed LLD macros from the list. Macros left in $db_lld_macro_paths will
+							 * be removed afterwards. And macros left in $lld_macro_paths will be created.
+							 */
+							unset($db_lld_macro_paths[$idx2]);
+							unset($lld_macro_paths[$idx1]);
+						}
+					}
+				}
+			}
+		}
+
+		// After all data has been collected, proceed with record update in DB.
+		$lld_macro_pathids_to_delete = zbx_objectValues($db_lld_macro_paths, 'lld_macro_pathid');
+
+		if ($lld_macro_pathids_to_delete) {
+			DB::delete('lld_macro_path', ['lld_macro_pathid' => $lld_macro_pathids_to_delete]);
+		}
+
+		if ($lld_macro_paths_to_update) {
+			$data = [];
+
+			foreach ($lld_macro_paths_to_update as $lld_macro_path) {
+				$data[] = [
+					'values' => $lld_macro_path,
+					'where' => [
+						'lld_macro_pathid' => $lld_macro_path['lld_macro_pathid']
+					]
+				];
+			}
+
+			DB::update('lld_macro_path', $data);
+		}
+
+		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 	}
 
 	/**
@@ -1140,6 +1288,197 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 	}
 
+	/**
+	 * Checks if LLD macros contain duplicate names in "lld_macro".
+	 *
+	 * @param array  $lld_macro_paths                 Array of items to validate.
+	 * @param string $lld_macro_paths[]['lld_macro']  LLD macro string (optional for update method).
+	 * @param array  $macro_names                     Array where existing macro names are collected.
+	 * @param string $path                            Path to API object.
+	 *
+	 * @throws APIException if same discovery rules contains duplicate LLD macro names.
+	 */
+	protected function checkDuplicateLLDMacros(array $lld_macro_paths, $macro_names, $path) {
+		foreach ($lld_macro_paths as $num => $lld_macro_path) {
+			if (array_key_exists('lld_macro', $lld_macro_path)) {
+				if (array_key_exists($lld_macro_path['lld_macro'], $macro_names)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', $path.'/lld_macro_paths/'.($num + 1).'/lld_macro',
+							_s('value "%1$s" already exists', $lld_macro_path['lld_macro'])
+						)
+					);
+				}
+
+				$macro_names[$lld_macro_path['lld_macro']] = true;
+			}
+		}
+	}
+
+	/**
+	 * Validates parameters in "lld_macro_paths" property for each item in create method.
+	 *
+	 * @param array  $items                                      Array of items to validate.
+	 * @param array  $items[]['lld_macro_paths']                 Array of LLD macro paths to validate for each
+	 *                                                           discovery rule (optional).
+	 * @param string $items[]['lld_macro_paths'][]['lld_macro']  LLD macro string. Required if "lld_macro_paths" exists.
+	 * @param string $items[]['lld_macro_paths'][]['path']       Path string. Validates as regular string. Required if
+	 *                                                           "lld_macro_paths" exists.
+	 *
+	 * @throws APIException if incorrect fields and values given.
+	 */
+	protected function validateCreateLLDMacroPaths(array $items) {
+		$rules = [
+			'lld_macro_paths' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
+				'lld_macro' =>			['type' => API_LLD_MACRO, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_macro_path', 'lld_macro')],
+				'path' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_macro_path', 'path')]
+			]]
+		];
+
+		foreach ($items as $key => $item) {
+			if (array_key_exists('lld_macro_paths', $item)) {
+				$item = array_intersect_key($item, $rules);
+				$path = '/'.($key + 1);
+
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				$this->checkDuplicateLLDMacros($item['lld_macro_paths'], [], $path);
+			}
+		}
+	}
+
+	/**
+	 * Validates parameters in "lld_macro_paths" property for each item in create method.
+	 *
+	 * @param array  $items                                             Array of items to validate.
+	 * @param array  $items[]['lld_macro_paths']                        Array of LLD macro paths to validate for each
+	 *                                                                  discovery rule (optional).
+	 * @param string $items[]['lld_macro_paths'][]['lld_macro_pathid']  LLD macro path ID from DB (optional).
+	 * @param string $items[]['lld_macro_paths'][]['lld_macro']         LLD macro string. Required if "lld_macro_pathid"
+	 *                                                                  does not exist.
+	 * @param string $items[]['lld_macro_paths'][]['path']              Path string. Validates as regular string.
+	 *                                                                  Required if "lld_macro_pathid" and "lld_macro"
+	 *                                                                  do not exist.
+	 *
+	 * @throws APIException if incorrect fields and values given.
+	 */
+	protected function validateUpdateLLDMacroPaths(array $items) {
+		$rules = [
+			'lld_macro_paths' =>	['type' => API_OBJECTS, 'fields' => [
+				'lld_macro_pathid' =>	['type' => API_ID],
+				'lld_macro' =>			['type' => API_LLD_MACRO, 'length' => DB::getFieldLength('lld_macro_path', 'lld_macro')],
+				'path' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_macro_path', 'path')]
+			]]
+		];
+
+		$items = $this->extendObjects('items', $items, ['templateid']);
+
+		foreach ($items as $key => $item) {
+			if (array_key_exists('lld_macro_paths', $item)) {
+				$itemid = $item['itemid'];
+				$templateid = $item['templateid'];
+
+				$item = array_intersect_key($item, $rules);
+				$path = '/'.($key + 1);
+
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				if (array_key_exists('lld_macro_paths', $item)) {
+					if ($templateid != 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid parameter "%1$s": %2$s.', $path.'/lld_macro_paths',
+								_('cannot update property for templated discovery rule')
+							)
+						);
+					}
+
+					$lld_macro_pathids = [];
+
+					// Check that fields exists, are not empty, do not duplicate and collect IDs to compare with DB.
+					foreach ($item['lld_macro_paths'] as $num => $lld_macro_path) {
+						$subpath = $num + 1;
+
+						// API_NOT_EMPTY will not work, so we need at least one field to be present.
+						if (!array_key_exists('lld_macro', $lld_macro_path)
+								&& !array_key_exists('path', $lld_macro_path)
+								&& !array_key_exists('lld_macro_pathid', $lld_macro_path)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Invalid parameter "%1$s": %2$s.', $path.'/lld_macro_paths/'.$subpath,
+									_('cannot be empty')
+								)
+							);
+						}
+
+						// API 'uniq' => true will not work, because we validate API_ID not API_IDS. So make IDs unique.
+						if (array_key_exists('lld_macro_pathid', $lld_macro_path)) {
+							$lld_macro_pathids[$lld_macro_path['lld_macro_pathid']] = true;
+						}
+						else {
+							/*
+							 * In case "lld_macro_pathid" does not exist, we need to treat it as a new LLD macro with
+							 * both fields present.
+							 */
+							if (array_key_exists('lld_macro', $lld_macro_path)
+									&& !array_key_exists('path', $lld_macro_path)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Invalid parameter "%1$s": %2$s.', $path.'/lld_macro_paths/'.$subpath,
+										_s('the parameter "%1$s" is missing', 'path')
+									)
+								);
+							}
+							elseif (array_key_exists('path', $lld_macro_path)
+									&& !array_key_exists('lld_macro', $lld_macro_path)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Invalid parameter "%1$s": %2$s.', $path.'/lld_macro_paths/'.$subpath,
+										_s('the parameter "%1$s" is missing', 'lld_macro')
+									)
+								);
+							}
+						}
+					}
+
+					$this->checkDuplicateLLDMacros($item['lld_macro_paths'], [], $path);
+
+					/*
+					 * Validate "lld_macro_pathid" field. If "lld_macro_pathid" doesn't correspond to given "itemid"
+					 * or does not exist, throw an exception.
+					 */
+					if ($lld_macro_pathids) {
+						$lld_macro_pathids = array_keys($lld_macro_pathids);
+
+						$db_lld_macro_paths = DBfetchArrayAssoc(DBselect(
+							'SELECT lmp.lld_macro_pathid,lmp.lld_macro'.
+							' FROM lld_macro_path lmp'.
+							' WHERE lmp.itemid='.zbx_dbstr($itemid).
+								' AND '.dbConditionId('lmp.lld_macro_pathid', $lld_macro_pathids)
+						), 'lld_macro_pathid');
+
+						if (count($db_lld_macro_paths) != count($lld_macro_pathids)) {
+							self::exception(ZBX_API_ERROR_PERMISSIONS,
+								_('No permissions to referred object or it does not exist!')
+							);
+						}
+
+						$macro_names = [];
+
+						foreach ($item['lld_macro_paths'] as $num => $lld_macro_path) {
+							if (array_key_exists('lld_macro_pathid', $lld_macro_path)
+									&& !array_key_exists('lld_macro', $lld_macro_path)) {
+								$db_lld_macro_path = $db_lld_macro_paths[$lld_macro_path['lld_macro_pathid']];
+								$macro_names[$db_lld_macro_path['lld_macro']] = true;
+							}
+						}
+
+						$this->checkDuplicateLLDMacros($item['lld_macro_paths'], $macro_names, $path);
+					}
+				}
+			}
+		}
+	}
+
 	protected function inherit(array $items, array $hostids = null) {
 		if (!$items) {
 			return;
@@ -1217,6 +1556,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
+			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'preservekeys' => true
 		]);
 		$srcDiscovery = reset($srcDiscovery);
@@ -1793,6 +2133,24 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
+		if ($options['selectApplicationPrototypes'] !== null
+				&& $options['selectApplicationPrototypes'] != API_OUTPUT_COUNT) {
+			$relation_map = $this->createRelationMap($result, 'itemid', 'application_prototypeid',
+				'application_prototype'
+			);
+
+			$application_prototypes = API::getApiService()->select('application_prototype', [
+				'output' => $options['selectApplicationPrototypes'],
+				'filter' => ['application_prototypeid' => $relation_map->getRelatedIds()],
+				'limit' => $options['limitSelects'],
+				'preservekeys' => true
+			]);
+
+			$result = $relation_map->mapMany($result, $application_prototypes, 'applicationPrototypes',
+				$options['limitSelects']
+			);
+		}
+
 		if ($options['selectFilter'] !== null) {
 			$formulaRequested = $this->outputIsRequested('formula', $options['selectFilter']);
 			$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['selectFilter']);
@@ -1860,6 +2218,30 @@ class CDiscoveryRule extends CItemGeneral {
 				$rule['filter'] = $filters[$rule['itemid']];
 			}
 			unset($rule);
+		}
+
+		// Add LLD macro paths.
+		if ($options['selectLLDMacroPaths'] !== null && $options['selectLLDMacroPaths'] != API_OUTPUT_COUNT) {
+			$lld_macro_paths = API::getApiService()->select('lld_macro_path', [
+				'output' => $this->outputExtend($options['selectLLDMacroPaths'], ['itemid', 'lld_macro_pathid']),
+				'filter' => ['itemid' => $itemIds],
+			]);
+
+			foreach ($result as &$lld_macro_path) {
+				$lld_macro_path['lld_macro_paths'] = [];
+			}
+			unset($lld_macro_path);
+
+			foreach ($lld_macro_paths as $lld_macro_path) {
+				$itemid = $lld_macro_path['itemid'];
+
+				if (!$this->outputIsRequested('lld_macro_pathid', $options['selectLLDMacroPaths'])) {
+					unset($lld_macro_path['lld_macro_pathid']);
+				}
+				unset($lld_macro_path['itemid']);
+
+				$result[$itemid]['lld_macro_paths'][] = $lld_macro_path;
+			}
 		}
 
 		return $result;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1258,6 +1258,42 @@ class CHost extends CHostGeneral {
 		if (!$nopermissions) {
 			$this->checkPermissions($hostIds, _('No permissions to referred object or it does not exist!'));
 		}
+
+		$this->validateDeleteCheckMaintenances($hostIds);
+	}
+
+	/**
+	 * Validates if hosts may be deleted, due to maintenance constrain.
+	 *
+	 * @throws APIException if a constrain failed
+	 *
+	 * @param array $hostids
+	 */
+	protected function validateDeleteCheckMaintenances(array $hostids) {
+		$maintenance = DBfetch(DBselect(
+			'SELECT m.name'.
+			' FROM maintenances m'.
+			' WHERE NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM maintenances_hosts mh'.
+				' WHERE m.maintenanceid=mh.maintenanceid'.
+					' AND '.dbConditionInt('mh.hostid', $hostids, true).
+			')'.
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_groups mg'.
+					' WHERE m.maintenanceid=mg.maintenanceid'.
+				')'
+		));
+
+		if ($maintenance) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
+				'Cannot delete host because maintenance "%1$s" must contain at least one host or host group.',
+				'Cannot delete selected hosts because maintenance "%1$s" must contain at least one host or host group.',
+				$maintenance['name'],
+				count($hostids)
+			));
+		}
 	}
 
 	/**
@@ -1414,19 +1450,40 @@ class CHost extends CHostGeneral {
 		return ['hostids' => $hostIds];
 	}
 
+	/**
+	 * Retrieves and adds additional requested data to the result set.
+	 *
+	 * @param array  $options
+	 * @param array  $result
+	 *
+	 * @return array
+	 */
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$hostids = array_keys($result);
 
-		// adding inventories
+		// adding inventory
 		if ($options['selectInventory'] !== null) {
-			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
 			$inventory = API::getApiService()->select('host_inventory', [
 				'output' => $options['selectInventory'],
-				'filter' => ['hostid' => $hostids]
+				'filter' => ['hostid' => $hostids],
+				'preservekeys' => true
 			]);
-			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
+
+			foreach ($hostids as $hostid) {
+				// There is no DB record if inventory mode is HOST_INVENTORY_DISABLED.
+				if (!array_key_exists($hostid, $inventory)) {
+					$inventory[$hostid] = [
+						'hostid' => (string) $hostid,
+						'inventory_mode' => (string) HOST_INVENTORY_DISABLED
+					];
+				}
+			}
+
+			$relation_map = $this->createRelationMap($result, 'hostid', 'hostid');
+			$inventory = $this->unsetExtraFields($inventory, ['hostid', 'inventory_mode'], $options['selectInventory']);
+			$result = $relation_map->mapOne($result, $inventory, 'inventory');
 		}
 
 		// adding hostinterfaces

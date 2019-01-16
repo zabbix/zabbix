@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,9 +61,37 @@ static int	DBpatch_4010004(void)
 
 	return DBadd_field("item_preproc", &field);
 }
-#endif
 
 static int	DBpatch_4010005(void)
+{
+	const ZBX_TABLE table =
+			{"lld_macro_path", "lld_macro_pathid", 0,
+				{
+					{"lld_macro_pathid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"lld_macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4010006(void)
+{
+	return DBcreate_index("lld_macro_path", "lld_macro_path_1", "itemid,lld_macro", 1);
+}
+
+static int	DBpatch_4010007(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("lld_macro_path", 1, &field);
+}
+
+static int	DBpatch_4010008(void)
 {
 	const ZBX_TABLE table =
 		{"host_tag", "hosttagid", 0,
@@ -80,17 +108,19 @@ static int	DBpatch_4010005(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4010006(void)
+static int	DBpatch_4010009(void)
 {
 	return DBcreate_index("host_tag", "host_tag_1", "hostid", 0);
 }
 
-static int	DBpatch_4010007(void)
+static int	DBpatch_4010010(void)
 {
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("host_tag", 1, &field);
 }
+
+#endif
 
 DBPATCH_START(4010)
 
@@ -103,5 +133,8 @@ DBPATCH_ADD(4010004, 0, 1)
 DBPATCH_ADD(4010005, 0, 1)
 DBPATCH_ADD(4010006, 0, 1)
 DBPATCH_ADD(4010007, 0, 1)
+DBPATCH_ADD(4010008, 0, 1)
+DBPATCH_ADD(4010009, 0, 1)
+DBPATCH_ADD(4010010, 0, 1)
 
 DBPATCH_END()

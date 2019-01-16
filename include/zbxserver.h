@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,17 +77,20 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 #define ZBX_MACRO_SIMPLE	(ZBX_MACRO_ANY | ZBX_TOKEN_SIMPLE_MACRO)
 #define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO)
 
-int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, int flags, char *error,
-		size_t max_error_len);
+int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
+		const char *macro, char **value, size_t *value_alloc);
+int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
+		int flags, char *error, size_t max_error_len);
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, const struct zbx_json_parse *jp_row,
-		int macro_type, char *error, size_t mexerrlen);
+		const zbx_vector_ptr_t *lld_macro_paths, int macro_type, char *error, size_t mexerrlen);
 int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, const struct zbx_json_parse *jp_row,
-		char *error, size_t max_error_len);
-int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row, char *error,
-		int maxerrlen);
+		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t max_error_len);
+int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to);
-int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row, char *error, int maxerrlen);
+int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	xml_xpath_check(const char *xpath, char *error, size_t errlen);
 
 #endif

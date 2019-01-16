@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1756,14 +1756,15 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
  *                                                                            *
  * Purpose: substitutes lld macros in calculated item formula expression      *
  *                                                                            *
- * Parameters: data          - [IN/OUT] the expression                        *
- *             jp_row        - [IN] the lld data row                          *
- *             error         - [IN] pointer to string for reporting errors    *
- *             max_error_len - [IN] size of 'error' string                    *
+ * Parameters: data            - [IN/OUT] the expression                      *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             error           - [IN] pointer to string for reporting errors  *
+ *             max_error_len   - [IN] size of 'error' string                  *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_formula_macros(char **data, const struct zbx_json_parse *jp_row,
-		char *error, size_t max_error_len)
+		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "substitute_formula_macros";
 
@@ -1781,8 +1782,11 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
 		/* substitute LLD macros in the part of the string preceding function parameters */
 
 		zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, par_l + 1);
-		if (SUCCEED != substitute_lld_macros(&tmp, jp_row, ZBX_MACRO_NUMERIC, error, max_error_len))
+		if (SUCCEED != substitute_lld_macros(&tmp, jp_row, lld_macro_paths, ZBX_MACRO_NUMERIC, error,
+				max_error_len))
+		{
 			goto out;
+		}
 
 		tmp_offset = strlen(tmp);
 		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_offset);
@@ -1795,7 +1799,7 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
 		/* substitute LLD macros in function parameters */
 
 		if (SUCCEED != substitute_function_lld_param(e + par_l + 1, par_r - (par_l + 1), 1,
-				&exp, &exp_alloc, &exp_offset, jp_row, error, max_error_len))
+				&exp, &exp_alloc, &exp_offset, jp_row, lld_macro_paths, error, max_error_len))
 		{
 			goto out;
 		}
@@ -1809,7 +1813,7 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
 	/* substitute LLD macros in the remaining part */
 
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e);
-	if (SUCCEED != substitute_lld_macros(&tmp, jp_row, ZBX_MACRO_NUMERIC, error, max_error_len))
+	if (SUCCEED != substitute_lld_macros(&tmp, jp_row, lld_macro_paths, ZBX_MACRO_NUMERIC, error, max_error_len))
 		goto out;
 
 	zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
@@ -1837,14 +1841,15 @@ out:
  *                                                                            *
  * Purpose: creates a new item based on item prototype and lld data row       *
  *                                                                            *
- * Parameters: item_prototype - [IN] the item prototype                       *
- *             lld_row        - [IN] the lld row                              *
+ * Parameters: item_prototype  - [IN] the item prototype                      *
+ *             lld_row         - [IN] the lld row                             *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *                                                                            *
  * Returns: The created item or NULL if cannot create new item from prototype *
  *                                                                            *
  ******************************************************************************/
 static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
-		char **error)
+		const zbx_vector_ptr_t *lld_macro_paths, char **error)
 {
 	const char			*__function_name = "lld_item_make";
 
@@ -1867,31 +1872,31 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->name = zbx_strdup(NULL, item_prototype->name);
 	item->name_proto = NULL;
-	substitute_lld_macros(&item->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->name, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->name, ZBX_WHITESPACE);
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
-	ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err, sizeof(err));
+	ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY, err, sizeof(err));
 
 	item->delay = zbx_strdup(NULL, item_prototype->delay);
 	item->delay_orig = NULL;
-	substitute_lld_macros(&item->delay, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->delay, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->delay, ZBX_WHITESPACE);
 
 	item->history = zbx_strdup(NULL, item_prototype->history);
 	item->history_orig = NULL;
-	substitute_lld_macros(&item->history, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->history, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->history, ZBX_WHITESPACE);
 
 	item->trends = zbx_strdup(NULL, item_prototype->trends);
 	item->trends_orig = NULL;
-	substitute_lld_macros(&item->trends, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->trends, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->trends, ZBX_WHITESPACE);
 
 	item->units = zbx_strdup(NULL, item_prototype->units);
 	item->units_orig = NULL;
-	substitute_lld_macros(&item->units, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->units, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->units, ZBX_WHITESPACE);
 
 	item->params = zbx_strdup(NULL, item_prototype->params);
@@ -1900,16 +1905,16 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 	{
 		if (SUCCEED == ret)
-			ret = substitute_formula_macros(&item->params, jp_row, err, sizeof(err));
+			ret = substitute_formula_macros(&item->params, jp_row, lld_macro_paths, err, sizeof(err));
 	}
 	else
-		substitute_lld_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&item->params, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
 	zbx_lrtrim(item->params, ZBX_WHITESPACE);
 
 	item->ipmi_sensor = zbx_strdup(NULL, item_prototype->ipmi_sensor);
 	item->ipmi_sensor_orig = NULL;
-	substitute_lld_macros(&item->ipmi_sensor, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->ipmi_sensor, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
 
 	item->snmp_oid = zbx_strdup(NULL, item_prototype->snmp_oid);
@@ -1917,45 +1922,45 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	if (SUCCEED == ret && (ITEM_TYPE_SNMPv1 == item_prototype->type || ITEM_TYPE_SNMPv2c == item_prototype->type ||
 			ITEM_TYPE_SNMPv3 == item_prototype->type))
 	{
-		ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, err, sizeof(err));
+		ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_SNMP_OID, err, sizeof(err));
 	}
 	zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
 
 	item->username = zbx_strdup(NULL, item_prototype->username);
 	item->username_orig = NULL;
-	substitute_lld_macros(&item->username, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->username, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->username, ZBX_WHITESPACE); is not missing here */
 
 	item->password = zbx_strdup(NULL, item_prototype->password);
 	item->password_orig = NULL;
-	substitute_lld_macros(&item->password, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->password, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->password, ZBX_WHITESPACE); is not missing here */
 
 	item->description = zbx_strdup(NULL, item_prototype->description);
 	item->description_orig = NULL;
-	substitute_lld_macros(&item->description, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->description, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->description, ZBX_WHITESPACE);
 
 	item->jmx_endpoint = zbx_strdup(NULL, item_prototype->jmx_endpoint);
 	item->jmx_endpoint_orig = NULL;
-	substitute_lld_macros(&item->jmx_endpoint, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->jmx_endpoint, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
 
 	item->timeout = zbx_strdup(NULL, item_prototype->timeout);
 	item->timeout_orig = NULL;
-	substitute_lld_macros(&item->timeout, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->timeout, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->timeout, ZBX_WHITESPACE);
 
 	item->url = zbx_strdup(NULL, item_prototype->url);
 	item->url_orig = NULL;
-	substitute_lld_macros(&item->url, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->url, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->url, ZBX_WHITESPACE);
 
 	item->query_fields = zbx_strdup(NULL, item_prototype->query_fields);
 	item->query_fields_orig = NULL;
 
 	if (SUCCEED == ret)
-		ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, err, sizeof(err));
+		ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, lld_macro_paths, err, sizeof(err));
 
 	item->posts = zbx_strdup(NULL, item_prototype->posts);
 	item->posts_orig = NULL;
@@ -1963,49 +1968,49 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	switch (item_prototype->post_type)
 	{
 		case ZBX_POSTTYPE_JSON:
-			substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_JSON, NULL, 0);
+			substitute_lld_macros(&item->posts, jp_row, lld_macro_paths, ZBX_MACRO_JSON, NULL, 0);
 			break;
 		case ZBX_POSTTYPE_XML:
-			if (SUCCEED == ret && FAIL == (ret = substitute_macros_xml(&item->posts, NULL, jp_row, err,
-					sizeof(err))))
+			if (SUCCEED == ret && FAIL == (ret = substitute_macros_xml(&item->posts, NULL, jp_row,
+					lld_macro_paths, err, sizeof(err))))
 			{
 				zbx_lrtrim(err, ZBX_WHITESPACE);
 			}
 			break;
 		default:
-			substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_ANY, NULL, 0);
+			substitute_lld_macros(&item->posts, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 			/* zbx_lrtrim(item->posts, ZBX_WHITESPACE); is not missing here */
 			break;
 	}
 
 	item->status_codes = zbx_strdup(NULL, item_prototype->status_codes);
 	item->status_codes_orig = NULL;
-	substitute_lld_macros(&item->status_codes, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->status_codes, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->status_codes, ZBX_WHITESPACE);
 
 	item->http_proxy = zbx_strdup(NULL, item_prototype->http_proxy);
 	item->http_proxy_orig = NULL;
-	substitute_lld_macros(&item->http_proxy, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->http_proxy, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->http_proxy, ZBX_WHITESPACE);
 
 	item->headers = zbx_strdup(NULL, item_prototype->headers);
 	item->headers_orig = NULL;
-	substitute_lld_macros(&item->headers, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->headers, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->headers, ZBX_WHITESPACE); is not missing here */
 
 	item->ssl_cert_file = zbx_strdup(NULL, item_prototype->ssl_cert_file);
 	item->ssl_cert_file_orig = NULL;
-	substitute_lld_macros(&item->ssl_cert_file, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->ssl_cert_file, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
 
 	item->ssl_key_file = zbx_strdup(NULL, item_prototype->ssl_key_file);
 	item->ssl_key_file_orig = NULL;
-	substitute_lld_macros(&item->ssl_key_file, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->ssl_key_file, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
 
 	item->ssl_key_password = zbx_strdup(NULL, item_prototype->ssl_key_password);
 	item->ssl_key_password_orig = NULL;
-	substitute_lld_macros(&item->ssl_key_password, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->ssl_key_password, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
 
 	item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
@@ -2032,13 +2037,14 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
  *                                                                            *
  * Purpose: updates an existing item based on item prototype and lld data row *
  *                                                                            *
- * Parameters: item_prototype - [IN] the item prototype                       *
- *             lld_row        - [IN] the lld row                              *
- *             item           - [IN] an existing item or NULL                 *
+ * Parameters: item_prototype  - [IN] the item prototype                      *
+ *             lld_row         - [IN] the lld row                             *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             item            - [IN] an existing item or NULL                *
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
-		zbx_lld_item_t *item, char **error)
+		const zbx_vector_ptr_t *lld_macro_paths, zbx_lld_item_t *item, char **error)
 {
 	const char		*__function_name = "lld_item_update";
 
@@ -2048,7 +2054,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	buffer = zbx_strdup(buffer, item_prototype->name);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->name, buffer))
 	{
@@ -2062,8 +2068,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	{
 		buffer = zbx_strdup(buffer, item_prototype->key);
 
-		if (SUCCEED == substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, err,
-				sizeof(err)))
+		if (SUCCEED == substitute_key_macros(&buffer, NULL, NULL, jp_row, lld_macro_paths,
+				MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
 		{
 			item->key_orig = item->key;
 			item->key = buffer;
@@ -2075,7 +2081,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->delay);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->delay, buffer))
 	{
@@ -2086,7 +2092,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->history);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->history, buffer))
 	{
@@ -2097,7 +2103,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->trends);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->trends, buffer))
 	{
@@ -2108,7 +2114,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->units);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->units, buffer))
 	{
@@ -2122,7 +2128,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 	{
-		if (SUCCEED == substitute_formula_macros(&buffer, jp_row, err, sizeof(err)))
+		if (SUCCEED == substitute_formula_macros(&buffer, jp_row, lld_macro_paths, err, sizeof(err)))
 		{
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
@@ -2139,7 +2145,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 	else
 	{
-		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		if (0 != strcmp(item->params, buffer))
@@ -2152,7 +2158,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->ipmi_sensor);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->ipmi_sensor, buffer))
 	{
@@ -2163,7 +2169,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->snmp_oid);
-	substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
+	substitute_key_macros(&buffer, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_SNMP_OID, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->snmp_oid, buffer))
 	{
@@ -2174,7 +2180,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->username);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->username, buffer))
 	{
@@ -2185,7 +2191,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->password);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->password, buffer))
 	{
@@ -2196,7 +2202,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->description);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->description, buffer))
 	{
@@ -2207,7 +2213,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->jmx_endpoint);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->jmx_endpoint, buffer))
 	{
@@ -2218,7 +2224,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->timeout);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->timeout, buffer))
 	{
@@ -2229,7 +2235,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->url);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->url, buffer))
 	{
@@ -2241,7 +2247,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 	buffer = zbx_strdup(buffer, item_prototype->query_fields);
 
-	if (FAIL == substitute_macros_in_json_pairs(&buffer, jp_row, err, sizeof(err)))
+	if (FAIL == substitute_macros_in_json_pairs(&buffer, jp_row, lld_macro_paths, err, sizeof(err)))
 		*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
 
 	if (0 != strcmp(item->query_fields, buffer))
@@ -2256,18 +2262,18 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 	if (ZBX_POSTTYPE_JSON == item_prototype->post_type)
 	{
-		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_JSON, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_JSON, NULL, 0);
 	}
 	else if (ZBX_POSTTYPE_XML == item_prototype->post_type)
 	{
-		if (FAIL == substitute_macros_xml(&buffer, NULL, jp_row, err, sizeof(err)))
+		if (FAIL == substitute_macros_xml(&buffer, NULL, jp_row, lld_macro_paths, err, sizeof(err)))
 		{
 			zbx_lrtrim(err, ZBX_WHITESPACE);
 			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
 		}
 	}
 	else
-		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->posts, buffer))
 	{
@@ -2278,7 +2284,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->status_codes);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->status_codes, buffer))
 	{
@@ -2289,7 +2295,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->http_proxy);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->http_proxy, buffer))
 	{
@@ -2300,7 +2306,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->headers);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/*zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->headers, buffer))
 	{
@@ -2311,7 +2317,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->ssl_cert_file);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->ssl_cert_file, buffer))
 	{
@@ -2322,7 +2328,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->ssl_key_file);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->ssl_key_file, buffer))
 	{
@@ -2333,7 +2339,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->ssl_key_password);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->ssl_key_password, buffer))
 	{
@@ -2360,6 +2366,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  *                                                                            *
  * Parameters: item_prototypes - [IN] the item prototypes                     *
  *             lld_rows        - [IN] the lld data rows                       *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row  *
  *             items           - [IN/OUT] sorted list of items                *
  *             items_index     - [OUT] index of items based on prototype ids  *
  *                                     and lld rows. Used to quckly find an   *
@@ -2368,7 +2375,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_rows,
-		zbx_vector_ptr_t *items, zbx_hashset_t *items_index, char **error)
+		const zbx_vector_ptr_t *lld_macro_paths, zbx_vector_ptr_t *items, zbx_hashset_t *items_index,
+		char **error)
 {
 	const char			*__function_name = "lld_items_make";
 	int				i, j, index;
@@ -2410,8 +2418,8 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 
 			buffer = zbx_strdup(buffer, item->key_proto);
 
-			if (SUCCEED != substitute_key_macros(&buffer, NULL, NULL, &lld_row->jp_row, MACRO_TYPE_ITEM_KEY,
-					NULL, 0))
+			if (SUCCEED != substitute_key_macros(&buffer, NULL, NULL, &lld_row->jp_row, lld_macro_paths,
+					MACRO_TYPE_ITEM_KEY, NULL, 0))
 			{
 				continue;
 			}
@@ -2443,7 +2451,8 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 
 			if (NULL == (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index, &item_index_local)))
 			{
-				if (NULL != (item = lld_item_make(item_prototype, item_index_local.lld_row, error)))
+				if (NULL != (item = lld_item_make(item_prototype, item_index_local.lld_row,
+						lld_macro_paths, error)))
 				{
 					/* add the created item to items vector and update index */
 					zbx_vector_ptr_append(items, item);
@@ -2452,7 +2461,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 				}
 			}
 			else
-				lld_item_update(item_prototype, item_index_local.lld_row, item_index->item, error);
+				lld_item_update(item_prototype, item_index_local.lld_row, lld_macro_paths, item_index->item, error);
 		}
 	}
 
@@ -2468,12 +2477,14 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
  * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
  *          process                                                           *
  *                                                                            *
- * Parameters: type       - [IN] the item preprocessing step type             *
- *             lld_row    - [IN] lld source value                             *
- *             sub_params - [IN/OUT] the preprocessing parameters             *
+ * Parameters: type            - [IN] the item preprocessing step type        *
+ *             lld_row         - [IN] lld source value                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             sub_params      - [IN/OUT] the preprocessing parameters        *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_t *lld_row, char **sub_params)
+static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_t *lld_row,
+		const zbx_vector_ptr_t *lld_macro_paths, char **sub_params)
 {
 	if (ZBX_PREPROC_REGSUB == type ||
 			ZBX_PREPROC_VALIDATE_REGEX == type ||
@@ -2493,8 +2504,10 @@ static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_
 			return;
 		}
 
-		substitute_lld_macros(&param1, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP, NULL, 0);
-		substitute_lld_macros(&param2, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT, NULL, 0);
+		substitute_lld_macros(&param1, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP,
+				NULL, 0);
+		substitute_lld_macros(&param2, &lld_row->jp_row, lld_macro_paths,
+				ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT, NULL, 0);
 
 		sub_params_size = strlen(param1) + strlen(param2) + 2;
 		*sub_params = (char*)zbx_realloc(*sub_params, sub_params_size);
@@ -2513,7 +2526,7 @@ static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_
 			token_type |= ZBX_TOKEN_XPATH;
 		}
 
-		substitute_lld_macros(sub_params, &lld_row->jp_row, token_type, NULL, 0);
+		substitute_lld_macros(sub_params, &lld_row->jp_row, lld_macro_paths, token_type, NULL, 0);
 	}
 }
 
@@ -2525,10 +2538,12 @@ static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_
  *          based on item item prototypes                                     *
  *                                                                            *
  * Parameters: item_prototypes - [IN] the item prototypes                     *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items)
+static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
+		const zbx_vector_ptr_t *lld_macro_paths, zbx_vector_ptr_t *items)
 {
 	int				i, j, index, preproc_num;
 	zbx_lld_item_t			*item;
@@ -2570,9 +2585,10 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 				ppdst->error_handler = ppsrc->error_handler;
 				ppdst->error_handler_params = zbx_strdup(NULL, ppsrc->error_handler_params);
 
-				substitute_lld_macors_in_preproc_params(ppsrc->type, item->lld_row, &ppdst->params);
+				substitute_lld_macors_in_preproc_params(ppsrc->type, item->lld_row, lld_macro_paths,
+						&ppdst->params);
 				substitute_lld_macros(&ppdst->error_handler_params, &item->lld_row->jp_row,
-						ZBX_MACRO_ANY, NULL, 0);
+						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
 				zbx_vector_ptr_append(&item->preproc_ops, ppdst);
 				continue;
@@ -2597,7 +2613,7 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 			}
 
 			buffer = zbx_strdup(buffer, ppsrc->params);
-			substitute_lld_macors_in_preproc_params(ppsrc->type, item->lld_row, &buffer);
+			substitute_lld_macors_in_preproc_params(ppsrc->type, item->lld_row, lld_macro_paths, &buffer);
 
 			if (0 != strcmp(ppdst->params, buffer))
 			{
@@ -2614,7 +2630,7 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 			}
 
 			buffer = zbx_strdup(buffer, ppsrc->error_handler_params);
-			substitute_lld_macros(&buffer, &item->lld_row->jp_row, ZBX_MACRO_ANY, NULL, 0);
+			substitute_lld_macros(&buffer, &item->lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
 			if (0 != strcmp(ppdst->error_handler_params, buffer))
 			{
@@ -4333,13 +4349,16 @@ static void	lld_applications_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *appl
  *                                                                            *
  * Parameters: application_prototype - [IN] the application prototype         *
  *             lld_row               - [IN] the lld row                       *
+ *             lld_macro_paths       - [IN] use json path to extract from     *
+ *                                          lld_row                           *
  *             applications          - [IN/OUT] the applications              *
  *             applications_index    - [IN/OUT] the application index by      *
  *                                              prototype id and lld row      *
  *                                                                            *
  ******************************************************************************/
 static void	lld_application_make(const zbx_lld_application_prototype_t *application_prototype,
-		const zbx_lld_row_t *lld_row, zbx_vector_ptr_t *applications, zbx_hashset_t *applications_index)
+		const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths, zbx_vector_ptr_t *applications,
+		zbx_hashset_t *applications_index)
 {
 	zbx_lld_application_t		*application;
 	zbx_lld_application_index_t	*application_index, application_index_local;
@@ -4358,7 +4377,7 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		application->ts_delete = 0;
 
 		application->name = zbx_strdup(NULL, application_prototype->name);
-		substitute_lld_macros(&application->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&application->name, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(application->name, ZBX_WHITESPACE);
 
 		application->name_proto = zbx_strdup(NULL, application_prototype->name);
@@ -4378,7 +4397,7 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME))
 		{
 			buffer = zbx_strdup(NULL, application_prototype->name);
-			substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+			substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 			if (0 != strcmp(application->name, buffer))
@@ -4410,7 +4429,8 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
  *                                                                            *
  ******************************************************************************/
 static void	lld_applications_make(const zbx_vector_ptr_t *application_prototypes,
-		const zbx_vector_ptr_t *lld_rows, zbx_vector_ptr_t *applications, zbx_hashset_t *applications_index)
+		const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macro_paths,
+		zbx_vector_ptr_t *applications, zbx_hashset_t *applications_index)
 {
 	const char			*__function_name = "lld_applications_make";
 	int				i, j;
@@ -4432,7 +4452,7 @@ static void	lld_applications_make(const zbx_vector_ptr_t *application_prototypes
 			lld_row = (zbx_lld_row_t *)lld_rows->values[j];
 
 			buffer = zbx_strdup(buffer, application->name_proto);
-			substitute_lld_macros(&buffer, &lld_row->jp_row, ZBX_MACRO_ANY, NULL, 0);
+			substitute_lld_macros(&buffer, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 			if (0 == strcmp(application->name, buffer))
@@ -4456,7 +4476,8 @@ static void	lld_applications_make(const zbx_vector_ptr_t *application_prototypes
 		for (j = 0; j < lld_rows->values_num; j++)
 		{
 			lld_application_make((zbx_lld_application_prototype_t *)application_prototypes->values[i],
-					(zbx_lld_row_t *)lld_rows->values[j], applications, applications_index);
+					(zbx_lld_row_t *)lld_rows->values[j], lld_macro_paths, applications,
+					applications_index);
 		}
 	}
 
@@ -5064,8 +5085,8 @@ static void	lld_link_dependent_items(zbx_vector_ptr_t *items, zbx_hashset_t *ite
  *               FAIL    - items cannot be added/updated                      *
  *                                                                            *
  ******************************************************************************/
-int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error,
-		int lifetime, int lastcheck)
+int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
+		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	const char		*__function_name = "lld_update_items";
 
@@ -5097,14 +5118,14 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vec
 	zbx_hashset_create(&items_applications, 100, lld_item_application_hash_func, lld_item_application_compare_func);
 
 	lld_applications_get(lld_ruleid, &applications);
-	lld_applications_make(&application_prototypes, lld_rows, &applications, &applications_index);
+	lld_applications_make(&application_prototypes, lld_rows, lld_macro_paths, &applications, &applications_index);
 	lld_applications_validate(hostid, lld_ruleid, &applications, &applications_index, error);
 
 	lld_item_application_prototypes_get(&item_prototypes, &application_prototypes);
 
 	lld_items_get(&item_prototypes, &items);
-	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, error);
-	lld_items_preproc_make(&item_prototypes, &items);
+	lld_items_make(&item_prototypes, lld_rows, lld_macro_paths, &items, &items_index, error);
+	lld_items_preproc_make(&item_prototypes, lld_macro_paths, &items);
 
 	lld_link_dependent_items(&items, &items_index);
 

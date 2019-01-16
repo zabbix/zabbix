@@ -1,7 +1,7 @@
 ---
 test case: parse file /proc/net/dev
 out:
-  json: '{"data":[{"{#IFNAME}":"lo"},{"{#IFNAME}":"eth1"},{"{#IFNAME}":"veth992d5b0"},{"{#IFNAME}":"docker0"}]}'
+  json: '[{"{#IFNAME}":"lo"},{"{#IFNAME}":"eth1"},{"{#IFNAME}":"veth992d5b0"},{"{#IFNAME}":"docker0"}]'
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
@@ -14,7 +14,7 @@ files:
 # one entry is missing a delimiter - semicolon
 test case: ignore invalid entries in /proc/net/dev
 out:
-  json: '{"data":[{"{#IFNAME}":"lo"},{"{#IFNAME}":"docker0"}]}'
+  json: '[{"{#IFNAME}":"lo"},{"{#IFNAME}":"docker0"}]'
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
@@ -27,7 +27,7 @@ files:
 # input file is missing delimiter - semicolon
 test case: invalid /proc/net/dev content
 out:
-  json: '{"data":[]}'
+  json: '[]'
 files:
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit

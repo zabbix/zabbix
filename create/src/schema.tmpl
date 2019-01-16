@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2001-2018 Zabbix SIA
+-- Copyright (C) 2001-2019 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -1649,16 +1649,23 @@ FIELD		|maintenanceid	|t_id		|	|NOT NULL	|0			|1|maintenances
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|operator	|t_integer	|'2'	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
-INDEX|1|maintenanceid
+INDEX		|1		|maintenanceid
+
+TABLE|lld_macro_path|lld_macro_pathid|ZBX_TEMPLATE
+FIELD		|lld_macro_pathid|t_id		|	|NOT NULL	|0
+FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
+FIELD		|lld_macro	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|path		|t_varchar(255)	|''	|NOT NULL	|0
+UNIQUE		|1		|itemid,lld_macro
 
 TABLE|host_tag|hosttagid|ZBX_TEMPLATE
-FIELD		|hosttagid|t_id		|	|NOT NULL	|0
-FIELD		|hostid	|t_id		|	|NOT NULL	|0			|1|hosts
+FIELD		|hosttagid	|t_id		|	|NOT NULL	|0
+FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
-INDEX|1|hostid
+INDEX		|1		|hostid
 
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4010007	|4010007
+ROW		|4010010	|4010010
