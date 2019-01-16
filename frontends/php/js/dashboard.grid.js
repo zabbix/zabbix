@@ -670,23 +670,17 @@
 			widget.prev_pos.mirrored.y = true;
 		}
 
-		var dbg_affected = {y:[], x:[]};
-
-		var primary_axis = process_order[0],
-			backup_indexes = [];
-
-		console.groupCollapsed(`${widget.header} resize step. ${primary_axis} is set as primary axis, process order: "${process_order.join('", "')}" direction state: ${JSON.stringify(widget.prev_pos.mirrored)}"`);
+		console.groupCollapsed(`${widget.header} resize step. ${process_order[0]} is set as primary axis, process order: "${process_order.join('", "')}" direction state: ${JSON.stringify(widget.prev_pos.mirrored)}"`);
 		console
 				.log ({current_pos: widget.current_pos, pos: widget.pos, prev_pos:widget.prev_pos, changes: changes});
 
+		// Store current position as previous position for next steps.
+		widget.prev_pos = $.extend(widget.prev_pos, widget.current_pos);
+
 		// Diagonal resize.
 		process_order.each(function(axis_key) {
-			data.widgets.each(function(box, index) {
+			data.widgets.each(function(box) {
 				if ('affected_axis' in box && box.affected_axis === axis_key) {
-					if (primary_axis === axis_key) {
-						backup_indexes.push(index);
-					}
-
 					delete box.affected_axis;
 				}
 			});
@@ -719,13 +713,6 @@
 				height: data.options['max-rows']
 			};
 
-			console
-				.log('backup indexes', backup_indexes);
-			console
-				.log(`%c${axis_key} start processing.`, 'font-weight: bold');
-			console
-				.log('axis object:', axis);
-
 			fitWigetsIntoBox(data.widgets, widget, axis);
 
 			console
@@ -736,15 +723,6 @@
 				.log(`affected by y: "${$.map(data.widgets, function(b) { return b.affected_axis == 'y' ? b.header : null}).join('", "')}"`);
 		});
 
-		// Restore affected on first axis in list.
-		// console.groupCollapsed(`restoring affected on primary axis ${primary_axis}`);
-		// backup_indexes.each(function(index) {
-		// 	console
-		//		.log(`${data.widgets[index].header} was restored`);
-		// 	data.widgets[index].affected_axis = primary_axis;
-		// });
-		// console.groupEnd();
-
 		console
 			.log('final result for affected by changes on axes:');
 		console
@@ -752,9 +730,6 @@
 		console
 			.log(`\t\ty: "${$.map(data.widgets, function(b) { return b.affected_axis == 'y' ? b.header : null}).join('", "')}"`);
 		console.groupEnd();
-
-		// Store current position as previous position for next steps.
-		widget.prev_pos = $.extend(widget.prev_pos, widget.current_pos);
 	}
 
 	function checkWidgetOverlap(data, widget) {
