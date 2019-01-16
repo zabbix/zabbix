@@ -636,31 +636,17 @@
 	 * @param {object} widget          Moved widget object.
 	 */
 	function realignResize(data, widget) {
-		var changes = {},
-			axis,
-			process_order = ['x', 'y'];
-
-		// Fill changes object with difference between current_pos and pos. Do not set not changed values.
-		$.each(widget.current_pos, function(k, v) {
-			if (widget.pos[k] != v) {
-				changes[k] = v - widget.pos[k];
-			}
-		});
-
-		if (widget.prev_pos.y != widget.current_pos.y || widget.prev_pos.height != widget.current_pos.height) {
-			process_order = ['y', 'x'];
-		}
+		var axis,
+			process_order = (widget.prev_pos.x != widget.current_pos.x
+				|| widget.prev_pos.width != widget.current_pos.width)
+					? process_order = ['x', 'y']
+					: process_order = ['y', 'x'];
 
 		data.widgets.each(function(box) {
 			if (box.uniqueid != widget.uniqueid) {
 				box.current_pos = $.extend({}, box.pos);
 			}
 		});
-
-		// Exit if there are no affected widgets.
-		if (('width' in changes) === false && ('height' in changes) === false) {
-			return;
-		}
 
 		if (widget.prev_pos.x > widget.current_pos.x) {
 			widget.prev_pos.mirrored.x = true;
@@ -670,14 +656,14 @@
 			widget.prev_pos.mirrored.y = true;
 		}
 
-		console.groupCollapsed(`${widget.header} resize step. ${process_order[0]} is set as primary axis, process order: "${process_order.join('", "')}" direction state: ${JSON.stringify(widget.prev_pos.mirrored)}"`);
+		console.groupCollapsed(`${widget.header} resize step. ${process_order[0]} is set as primary axis,  direction state: ${JSON.stringify(widget.prev_pos.mirrored)}"`);
 		console
-				.log ({current_pos: widget.current_pos, pos: widget.pos, prev_pos:widget.prev_pos, changes: changes});
+				.log ({current_pos: widget.current_pos, pos: widget.pos, prev_pos:widget.prev_pos});
 
 		// Store current position as previous position for next steps.
 		widget.prev_pos = $.extend(widget.prev_pos, widget.current_pos);
 
-		// Diagonal resize.
+		// Process changes for every axis.
 		process_order.each(function(axis_key) {
 			data.widgets.each(function(box) {
 				if ('affected_axis' in box && box.affected_axis === axis_key) {
@@ -687,7 +673,6 @@
 
 			if (axis_key === 'x') {
 				axis = {
-					axis_key: 'x',
 					size_key: 'width',
 					size_min: 1,
 					size_max: data.options['max-columns']
@@ -695,7 +680,6 @@
 			}
 			else {
 				axis = {
-					axis_key: 'y',
 					size_key: 'height',
 					size_min: data.options['widget-min-rows'],
 					size_max: data.options['max-rows']
@@ -706,7 +690,7 @@
 				axis.mirrored = true;
 			}
 
-			axis[axis.size_key] = changes[axis.size_key];
+			axis.axis_key = axis_key;
 			axis.boundary = $.extend({}, widget.current_pos);
 			axis.scanline = {
 				width: data.options['max-columns'],
@@ -718,9 +702,9 @@
 			console
 				.log(`%c${axis_key} processed, widget current position: ${JSON.stringify(widget.current_pos)}`, 'font-weight: bold');
 			console
-				.log(`affected by x: "${$.map(data.widgets, function(b) { return b.affected_axis == 'x' ? b.header : null}).join('", "')}"`);
+				.log(`\taffected by x: "${$.map(data.widgets, function(b) { return b.affected_axis == 'x' ? b.header : null}).join('", "')}"`);
 			console
-				.log(`affected by y: "${$.map(data.widgets, function(b) { return b.affected_axis == 'y' ? b.header : null}).join('", "')}"`);
+				.log(`\taffected by y: "${$.map(data.widgets, function(b) { return b.affected_axis == 'y' ? b.header : null}).join('", "')}"`);
 		});
 
 		console
