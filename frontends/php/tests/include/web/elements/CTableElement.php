@@ -96,6 +96,17 @@ class CTableElement extends CElement {
 	}
 
 	/**
+	 * Get table row by index.
+	 *
+	 * @param $index    row index
+	 *
+	 * @return CTableRow
+	 */
+	public function getRow($index) {
+		return $this->query('xpath:./tbody/tr['.((int)$index + 1).']')->asTableRow(['parent' => $this])->one();
+	}
+
+	/**
 	 * Get indexed collections of table columns.
 	 *
 	 * @return array

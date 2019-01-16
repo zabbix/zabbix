@@ -120,12 +120,17 @@ elseif ($items = getRequest('items', [])) {
 			access_deny();
 		}
 		$host = reset($dbItems[$item['itemid']]['hosts']);
-		unset($dbItems[$item['itemid']]['hosts']);
 		$graph_items[] = $dbItems[$item['itemid']] + $item + [
 			'host' => $host['host'],
 			'hostname' => $host['name']
 		];
 	}
+
+	foreach ($graph_items as &$graph_item) {
+		unset($graph_item['hosts']);
+	}
+	unset($graph_item);
+
 	$name = getRequest('name', '');
 }
 else {

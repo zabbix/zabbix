@@ -58,6 +58,13 @@ class CElement extends CBaseElement implements IWaitable {
 	protected $parent;
 
 	/**
+	 * Flag that allows to disable normalizing.
+	 *
+	 * @var boolean
+	 */
+	protected $normalized = false;
+
+	/**
 	 * Initialize element.
 	 *
 	 * @param RemoteWebElement $element
@@ -65,10 +72,13 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function __construct(RemoteWebElement $element, $options = []) {
 		$this->setElement($element);
-		$this->normalize();
 
 		foreach ($options as $key => $value) {
 			$this->$key = $value;
+		}
+
+		if (!$this->normalized) {
+			$this->normalize();
 		}
 	}
 
@@ -112,7 +122,9 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		$this->setElement($query->one());
-		$this->normalize();
+		if (!$this->normalized) {
+			$this->normalize();
+		}
 
 		return $this;
 	}
@@ -211,6 +223,40 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		return parent::getText();
+	}
+
+	/**
+	 * Highlight the value in the field.
+	 *
+	 * @return $this
+	 */
+	public function selectValue() {
+		$this->click()->sendKeys([WebDriverKeys::CONTROL, 'a', WebDriverKeys::CONTROL]);
+
+		return $this;
+	}
+
+	/**
+	 * Overwrite value in field.
+	 *
+	 * @param $text    text to be written into the field
+	 *
+	 * @return $this
+	 */
+	public function overwrite($text) {
+		return $this->selectValue()->type($text);
+	}
+
+	/**
+	 * Alias for overwrite.
+	 * @see self::overwrite
+	 *
+	 * @param $text    text to be written into the field
+	 *
+	 * @return $this
+	 */
+	public function fill($text) {
+		return $this->overwrite($text);
 	}
 
 	/**

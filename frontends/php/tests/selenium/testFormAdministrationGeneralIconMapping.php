@@ -138,7 +138,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot create icon map');
 		$this->zbxTestTextPresent($data['error']);
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB
 		if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
@@ -258,7 +257,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map created');
 		$this->zbxTestCheckTitle('Configuration of icon mapping');
 		$this->zbxTestCheckHeader('Icon mapping');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB.
 		if (array_key_exists('check_db', $data) && $data['check_db'] === true) {
@@ -308,7 +306,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		// Check the results in frontend.
 		$this->zbxTestCheckTitle('Configuration of icon mapping');
 		$this->zbxTestCheckHeader('Icon mapping');
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextNotPresent('CancelCreation');
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
@@ -435,7 +432,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update icon map');
 		$this->zbxTestTextPresent($data['error']);
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
@@ -545,7 +541,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map updated');
 		$this->zbxTestCheckTitle('Configuration of icon mapping');
 		$this->zbxTestCheckHeader('Icon mapping');
-		$this->zbxTestCheckFatalErrors();
 
 		if (array_key_exists('check_db', $data)) {
 			$expressions = [];
@@ -591,7 +586,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			$this->zbxTestClick('cancel');
 			$this->zbxTestCheckTitle('Configuration of icon mapping');
 			$this->zbxTestCheckHeader('Icon mapping');
-			$this->zbxTestCheckFatalErrors();
 			$this->zbxTestTextNotPresent($iconmap['name'].' (updated)');
 		}
 
@@ -684,7 +678,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot create icon map');
 		$this->zbxTestTextPresent($data['error']);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
@@ -799,7 +792,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map created');
 		$this->zbxTestCheckTitle('Configuration of icon mapping');
 		$this->zbxTestCheckHeader('Icon mapping');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB.
 		if (array_key_exists('check_db', $data)) {
@@ -832,7 +824,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			// Check the results in frontend.
 			$this->zbxTestCheckTitle('Configuration of icon mapping');
 			$this->zbxTestCheckHeader('Icon mapping');
-			$this->zbxTestCheckFatalErrors();
 			$this->zbxTestTextNotPresent($iconmap['name'].' (cloned)');
 		}
 
@@ -852,7 +843,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map deleted');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB.
 		$sql = 'SELECT * FROM icon_map WHERE name='.zbx_dbstr($name);
@@ -875,7 +865,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 		// Check the results in frontend.
 		$this->zbxTestCheckTitle('Configuration of icon mapping');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));

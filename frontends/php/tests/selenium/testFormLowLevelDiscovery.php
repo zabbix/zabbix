@@ -1785,7 +1785,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'JMX agent'])) {
 				$this->zbxTestClick('check_now');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
-				$this->zbxTestCheckFatalErrors();
 			}
 			else {
 				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
@@ -1914,7 +1913,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestClickWait('add');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created');
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextPresent($data['name']);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
@@ -2056,7 +2054,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add discovery rule');
 		$this->zbxTestTextPresentInMessageDetails($data['error_message']);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
 	}
