@@ -432,26 +432,26 @@
 				col,
 				collapsed,
 				collapsed_pos,
-				margins_backup;
+				margins_backup,
+				axis_boundaries = {};
+
 			scanline[size_key] = 1;
 
 			/**
 			 * Build affected boundaries object with minimum and maximum value on opposite axis for every widget.
 			 * Key in axis_boundaries object will be widget uniqueid and value boundaries object described above.
 			 */
-			var axis_boundaries = {};
 			affected.each(function(box) {
 				var min = box.current_pos[opposite_axis_key],
 					max = min + box.current_pos[opposite_size_key],
 					size = box.current_pos[size_key],
 					affected_box = $.extend({}, box.current_pos),
 					boxes = [],
-					bounds_changes = true,
-					rprevent = 20;
+					bounds_changes = true;
 
 				affected_box[size_key] = new_max - affected_box[axis_key] - affected_box[size_key];
 
-				while (bounds_changes && rprevent--) {
+				while (bounds_changes) {
 					bounds_changes = false;
 					affected_box[axis_key] += size;
 					affected_box[opposite_axis_key] = min;
@@ -472,11 +472,6 @@
 
 						size = Math.min(size, box.current_pos[size_key]);
 					});
-				}
-
-				if (!rprevent) {
-					console
-						.error('!!! possible recursion break on 20 iterations');
 				}
 
 				axis_boundaries[box.uniqueid] = {debug: box.header, min: min, max: max};
@@ -615,7 +610,6 @@
 
 			affected.each(function(box) {
 				box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - overlap, box.pos[axis_key]);
-				// TODO: if axis position was fixed by box.pos[axis_key] check box size!
 			});
 		}
 
@@ -671,31 +665,27 @@
 				}
 			});
 
-			if (axis_key === 'x') {
-				axis = {
-					size_key: 'width',
-					size_min: 1,
-					size_max: data.options['max-columns']
-				};
-			}
-			else {
-				axis = {
-					size_key: 'height',
-					size_min: data.options['widget-min-rows'],
-					size_max: data.options['max-rows']
-				};
+			axis = {
+				axis_key: axis_key,
+				size_key: 'width',
+				size_min: 1,
+				size_max: data.options['max-columns'],
+				boundary: $.extend({}, widget.current_pos),
+				scanline: {
+					width: data.options['max-columns'],
+					height: data.options['max-rows']
+				}
+			};
+
+			if (axis_key === 'y') {
+				axis.size_key = 'height';
+				axis.size_min = data.options['widget-min-rows'];
+				axis.size_max = data.options['max-rows'];
 			}
 
 			if (axis_key in widget.prev_pos.mirrored) {
 				axis.mirrored = true;
 			}
-
-			axis.axis_key = axis_key;
-			axis.boundary = $.extend({}, widget.current_pos);
-			axis.scanline = {
-				width: data.options['max-columns'],
-				height: data.options['max-rows']
-			};
 
 			fitWigetsIntoBox(data.widgets, widget, axis);
 
