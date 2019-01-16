@@ -1501,11 +1501,18 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
 
+typedef void * zbx_variant_data_bin_t;
+
 typedef union
 {
-	zbx_uint64_t	ui64;
-	double		dbl;
-	char		*str;
+	zbx_uint64_t		ui64;
+	double			dbl;
+
+	/* null terminated string */
+	char			*str;
+
+	/* length prefixed (4 bytes) binary data */
+	zbx_variant_data_bin_t	*bin;
 }
 zbx_variant_data_t;
 
@@ -1520,12 +1527,14 @@ zbx_variant_t;
 #define ZBX_VARIANT_STR		1
 #define ZBX_VARIANT_DBL		2
 #define ZBX_VARIANT_UI64	3
+#define ZBX_VARIANT_BIN		4
 
 void	zbx_variant_clear(zbx_variant_t *value);
 void	zbx_variant_set_none(zbx_variant_t *value);
 void	zbx_variant_set_str(zbx_variant_t *value, char *text);
 void	zbx_variant_set_dbl(zbx_variant_t *value, double dbl);
 void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t ui64);
+void	zbx_variant_set_bin(zbx_variant_t *value, zbx_variant_data_bin_t *value_bin);
 void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source);
 int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);
 
@@ -1535,6 +1544,9 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 
 int	zbx_validate_value_dbl(double value);
 int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2);
+
+zbx_variant_data_bin_t	*zbx_variant_data_bin_copy(const zbx_variant_data_bin_t *bin);
+zbx_variant_data_bin_t	*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size);
 
 void	zbx_update_env(double time_now);
 
