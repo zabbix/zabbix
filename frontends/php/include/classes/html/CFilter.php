@@ -104,7 +104,7 @@ class CFilter extends CDiv {
 		$this->form = (new CForm('get'))
 			->cleanItems()
 			->setAttribute('name', $this->name)
-			->setId('id', $this->name);
+			->setId($this->name);
 	}
 
 	public function getName() {
