@@ -1324,7 +1324,7 @@ out:
  *          process                                                           *
  *                                                                            *
  * Parameters: pp       - [IN] the item preprocessing step                    *
- *             itemid   - [IN] item ID for logging                          *
+ *             itemid   - [IN] item ID for logging                            *
  *             error    - [IN/OUT] the lld error message                      *
  *                                                                            *
  * Return value: SUCCEED - if preprocessing step is valid                     *
