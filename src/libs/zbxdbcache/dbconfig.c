@@ -11573,6 +11573,38 @@ int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to,
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCget_host_inventory_value_by_hostid                             *
+ *                                                                            *
+ * Purpose: find inventory value in automatically populated cache, if not     *
+ *          found then look in main inventory cache                           *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **replace_to, int value_idx)
+{
+	const ZBX_DC_HOST_INVENTORY	*dc_inventory;
+	int				ret = FAIL;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_inventory = (const ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories_auto, &hostid)) &&
+			NULL != dc_inventory->values[value_idx])
+	{
+		*replace_to = zbx_strdup(*replace_to, dc_inventory->values[value_idx]);
+		ret = SUCCEED;
+	}
+	else if (NULL != (dc_inventory = (const ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories, &hostid)))
+	{
+		*replace_to = zbx_strdup(*replace_to, dc_inventory->values[value_idx]);
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_dc_get_trigger_dependencies                                  *
  *                                                                            *
  * Purpose: checks/returns trigger dependencies for a set of triggers         *
@@ -11879,7 +11911,7 @@ void	zbx_dc_cleanup_data_sessions(void)
 static void	zbx_gather_tags_from_host(zbx_uint64_t hostid, zbx_vector_ptr_t *host_tags)
 {
 	zbx_dc_host_tag_t	*host_tag;
-	zbx_tag_t		*tag;
+	zbx_host_tag_t		*tag;
 	zbx_hashset_iter_t	iter;
 
 	zbx_hashset_iter_reset(&config->host_tags, &iter);
@@ -11887,9 +11919,10 @@ static void	zbx_gather_tags_from_host(zbx_uint64_t hostid, zbx_vector_ptr_t *hos
 	{
 		if (host_tag->hostid == hostid)
 		{
-			tag = (zbx_tag_t *) zbx_malloc(NULL, sizeof(zbx_tag_t));
-			tag->tag = zbx_strdup(NULL, host_tag->tag);
-			tag->value = zbx_strdup(NULL, host_tag->value);
+			tag = (zbx_host_tag_t *) zbx_malloc(NULL, sizeof(zbx_host_tag_t));
+			tag->hostid = hostid;
+			tag->tag.tag = zbx_strdup(NULL, host_tag->tag);
+			tag->tag.value = zbx_strdup(NULL, host_tag->value);
 			zbx_vector_ptr_append(host_tags, tag);
 		}
 	}

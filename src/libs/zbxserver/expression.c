@@ -2224,6 +2224,29 @@ static int	get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, 
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_host_inventory_by_itemid                                     *
+ *                                                                            *
+ * Purpose: request host inventory value by macro and hostid                  *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_host_inventory_by_hostid(const char *macro, zbx_uint64_t hostid, char **replace_to)
+{
+	int	i;
+
+	for (i = 0; NULL != inventory_fields[i].macro; i++)
+	{
+		if (0 == strcmp(macro, inventory_fields[i].macro))
+			return DCget_host_inventory_value_by_hostid(hostid, replace_to, inventory_fields[i].idx);
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: compare_tags                                                     *
  *                                                                            *
  * Purpose: comparison function to sort tags by tag/value                     *
@@ -4145,15 +4168,30 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
-					cache_trigger_hostids(&hostids, event->trigger.expression,
+					if (macro_type & MACRO_TYPE_TRIGGER_TAG)
+					{
+						cache_trigger_hostids(&hostids, event->trigger.expression,
 							event->trigger.recovery_expression);
-					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+
+						DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+					}
+					else /* MACRO_TYPE_HOST_TAG */
+					{
+						DCget_user_macro(hostid, 1, m, &replace_to);
+					}
 					pos = token.loc.r;
 				}
 				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
 				{
-					ret = get_host_inventory(m, event->trigger.expression, &replace_to,
-							N_functionid);
+					if (macro_type & MACRO_TYPE_TRIGGER_TAG)
+					{
+						ret = get_host_inventory(m, event->trigger.expression, &replace_to,
+								N_functionid);
+					}
+					else /* MACRO_TYPE_HOST_TAG */
+					{
+						ret = get_host_inventory_by_hostid(m, *hostid, &replace_to);
+					}
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{

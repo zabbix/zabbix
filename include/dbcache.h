@@ -217,6 +217,13 @@ typedef struct
 }
 zbx_tag_t;
 
+typedef struct
+{
+	zbx_tag_t	tag;	/* First member to make sure that zbx_host_tag_t is castable to zbx_tag_t! */
+	zbx_uint64_t	hostid;
+}
+zbx_host_tag_t;
+
 #define ZBX_DC_TRIGGER_PROBLEM_EXPRESSION	0x1	/* this flag shows that trigger value recalculation is  */
 							/* initiated by a time-based function or a new value of */
 							/* an item in problem expression */
@@ -643,6 +650,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 
 void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values);
 int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx);
+int	DCget_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **replace_to, int value_idx);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
 #define ZBX_CONFSTATS_BUFFER_USED	2
@@ -767,7 +775,7 @@ typedef struct
 }
 zbx_hc_item_t;
 
-void	zbx_free_tag(zbx_tag_t *tag);
+void	zbx_free_tag(zbx_tag_t *tag); /* to be used with zbx_tag_t and zbx_host_tag_t */
 
 int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error);
 void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version);

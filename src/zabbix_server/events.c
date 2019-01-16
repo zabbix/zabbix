@@ -81,33 +81,26 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: process_tag                                                      *
- *                                                                            *
- * Purpose: Add tag to event object.                                          *
- *          Resolve tag macros. Prevent duplicates from appearing.            *
- *                                                                            *
- * Parameters: trigger_or_host_tag - [IN] tag object to add                   *
- *             macro_type          - [OUT] can be:                            *
- *                                           - MACRO_TYPE_TRIGGER_TAG         *
- *                                           - MACRO_TYPE_HOST_TAG            *
- *                                                                            *
- ******************************************************************************/
-static void	process_tag(const zbx_tag_t *trigger_or_host_tag, int macro_type)
+static void	substitute_trigger_tag_macro(char **str)
 {
-	zbx_tag_t	*tag;
-
-	tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
-	tag->tag = zbx_strdup(NULL, trigger_or_host_tag->tag);
-	tag->value = zbx_strdup(NULL, trigger_or_host_tag->value);
-
 	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-			NULL, &tag->tag, macro_type, NULL, 0);
+			NULL, str, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+}
 
-	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-			NULL, &tag->value, macro_type, NULL, 0);
+static void	substitute_host_tag_macro(zbx_uint64_t hostid, char **str)
+{
+	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, &hostid, NULL, NULL, NULL,
+			NULL, str, MACRO_TYPE_HOST_TAG, NULL, 0);
+}
 
+static void	copy_tag_fields(const zbx_tag_t *src, zbx_tag_t *dst)
+{
+	dst->tag = zbx_strdup(NULL, src->tag);
+	dst->value = zbx_strdup(NULL, src->value);
+}
+
+static void	validate_and_add_tag(zbx_tag_t *tag)
+{
 	if (TAG_NAME_LEN < zbx_strlen_utf8(tag->tag))
 		tag->tag[zbx_strlen_utf8_nchars(tag->tag, TAG_NAME_LEN)] = '\0';
 	if (TAG_VALUE_LEN < zbx_strlen_utf8(tag->value))
@@ -120,6 +113,31 @@ static void	process_tag(const zbx_tag_t *trigger_or_host_tag, int macro_type)
 		zbx_vector_ptr_append(&events[events_num].tags, tag);
 	else
 		zbx_free_tag(tag);
+}
+
+static void	process_trigger_tag(const zbx_tag_t *tt)
+{
+	zbx_tag_t	*tag;
+
+	tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+	copy_tag_fields(tt, tag);
+
+	substitute_trigger_tag_macro(&tag->tag);
+	substitute_trigger_tag_macro(&tag->value);
+	validate_and_add_tag(tag);
+}
+
+static void	process_host_tag(const zbx_host_tag_t *ht)
+{
+	zbx_host_tag_t	*tag;
+
+	tag = (zbx_host_tag_t *)zbx_malloc(NULL, sizeof(zbx_host_tag_t));
+	tag->hostid = ht->hostid;
+	copy_tag_fields(&ht->tag, &tag->tag);
+
+	substitute_host_tag_macro(tag->hostid, &tag->tag.tag);
+	substitute_host_tag_macro(tag->hostid, &tag->tag.value);
+	validate_and_add_tag(&tag->tag);
 }
 
 /******************************************************************************
@@ -203,13 +221,13 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		if (NULL != trigger_tags)
 		{
 			for (i = 0; i < trigger_tags->values_num; i++)
-				process_tag((const zbx_tag_t *)trigger_tags->values[i], MACRO_TYPE_TRIGGER_TAG);
+				process_trigger_tag((const zbx_tag_t *)trigger_tags->values[i]);
 		}
 
 		if (NULL != host_tags)
 		{
 			for (i = 0; i < host_tags->values_num; i++)
-				process_tag((const zbx_tag_t *)host_tags->values[i], MACRO_TYPE_HOST_TAG);
+				process_host_tag((const zbx_host_tag_t *)host_tags->values[i]);
 		}
 	}
 	else if (EVENT_SOURCE_INTERNAL == source && NULL != error)
