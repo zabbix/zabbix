@@ -33,6 +33,7 @@ class CControllerTimeSelectorUpdate extends CController {
 
 	public function __construct() {
 		$this->range_time_parser = new CRangeTimeParser();
+		$this->disableSIDvalidation();
 	}
 
 	protected function checkInput() {

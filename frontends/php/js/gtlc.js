@@ -46,7 +46,7 @@
 jQuery(function ($){
 	var container = $('.filter-space').first(),
 		xhr = null,
-		endpoint = new Curl('zabbix.php'),
+		endpoint = new Curl('zabbix.php', false),
 		element = {
 			from: container.find('[name=from]'),
 			to: container.find('[name=to]'),
@@ -539,8 +539,7 @@ var timeControl = {
 
 				// url
 				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
-					var graphUrl = new Curl(obj.src);
-					graphUrl.unsetArgument('sid');
+					var graphUrl = new Curl(obj.src, false);
 					graphUrl.setArgument('width', obj.objDims.width - 1);
 
 					obj.src = graphUrl.getUrl();
