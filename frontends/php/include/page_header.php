@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -131,19 +131,6 @@ switch ($page['type']) {
 
 			header('X-Frame-Options: '.$x_frame_options);
 		}
-
-		global $ZBX_SERVER_NAME;
-
-		// page title
-		$pageTitle = '';
-		if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
-			$pageTitle = $ZBX_SERVER_NAME.NAME_DELIMITER;
-		}
-		$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
-
-		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::getRefresh() != 0) {
-			$pageTitle .= ' ['._s('refreshed every %1$s sec.', CWebUser::getRefresh()).']';
-		}
 		break;
 }
 
@@ -159,6 +146,19 @@ if ($denied_page_requested) {
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
+	global $ZBX_SERVER_NAME;
+
+	// page title
+	$pageTitle = '';
+	if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
+		$pageTitle = $ZBX_SERVER_NAME.NAME_DELIMITER;
+	}
+	$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
+
+	if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::getRefresh() != 0) {
+		$pageTitle .= ' ['._s('refreshed every %1$s sec.', CWebUser::getRefresh()).']';
+	}
+
 	$pageHeader = new CPageHeader($pageTitle);
 	$is_standard_page = (!defined('ZBX_PAGE_NO_MENU')
 		|| in_array($page['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE]));

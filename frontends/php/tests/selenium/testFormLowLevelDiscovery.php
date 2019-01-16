@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1785,7 +1785,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'JMX agent'])) {
 				$this->zbxTestClick('check_now');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
-				$this->zbxTestCheckFatalErrors();
 			}
 			else {
 				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
@@ -1914,7 +1913,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestClickWait('add');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created');
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextPresent($data['name']);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
@@ -2056,8 +2054,180 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add discovery rule');
 		$this->zbxTestTextPresentInMessageDetails($data['error_message']);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
+	}
+
+	public function getLLDMacroTabData() {
+		return [
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Macro with empty path',
+					'key' => 'macro-with-empty-path',
+					'macros' => [
+						['macro' => '{#MACRO}', 'path'=>''],
+					],
+					'path' => '',
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Macro without #',
+					'key' => 'macro-without-hash',
+					'macros' => [
+						['macro' => '{MACRO}', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Macro with cyrillic symbols',
+					'key' => 'macro-with-cyrillic-symbols',
+					'macros' => [
+						['macro' => '{#МАКРО}', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Macro with special symbols',
+					'key' => 'macro-with-with-special-symbols',
+					'macros' => [
+						['macro' => '{#MACRO!@$%^&*()_+|?}', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'LLD with empty macro',
+					'key' => 'lld-with-empty-macro',
+					'macros' => [
+						['macro' => '', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'LLD with context macro',
+					'key' => 'lld-with-context-macro',
+					'macros' => [
+						['macro' => '{$MACRO:A}', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'LLD with two equal macros',
+					'key' => 'lld-with-two-equal-macros',
+					'macros' => [
+						['macro' => '{#MACRO}', 'path'=>'$.path.a'],
+						['macro' => '{#MACRO}', 'path'=>'$.path.b'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2/lld_macro": value "{#MACRO}" already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'LLD with valid macro and path',
+					'key' => 'lld-with-valid-macro-and-path',
+					'macros' => [
+						['macro' => '{#MACRO1}', 'path'=>'$.path'],
+						['macro' => '{#MACRO2}', 'path'=>"$['а']['!@#$%^&*()_+']"]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getLLDMacroTabData
+	 */
+	public function testFormLowLevelDiscovery_LLDMacroTab($data) {
+		$sqlItems = "select * from items order by itemid";
+		$oldHashItems = CDBHelper::getHash($sqlItems);
+
+		$this->page->login()->open('host_discovery.php?hostid='.$this->hostid);
+		$this->query('button:Create discovery rule')->one()->click();
+
+		$form = $this->query('name:itemForm')->asForm()->one();
+		$form->getField('Name')->fill($data['name']);
+		$form->getField('Key')->fill($data['key']);
+		$form->selectTab('LLD Macro');
+
+		$macros = $form->getField('LLD Macro'); // table
+		$button = $macros->query('button:Add')->one();
+		$last = count($data['macros']) - 1;
+
+		foreach ($data['macros'] as $i => $lld_macro) {
+			$row = $macros->getRows()->get($i); // row
+			$row->getColumn('LLD Macro')->query('tag:input')->one()->fill($lld_macro['macro']);
+			$row->getColumn('JSON Path')->query('tag:input')->one()->fill($lld_macro['path']);
+
+			if ($i !== $last) {
+				$button->click();
+			}
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		$expected = $data['expected'];
+		switch ($expected) {
+			case TEST_GOOD:
+				// Get global message.
+				$message = CMessageElement::find()->one();
+				// Check if message is positive.
+				$this->assertTrue($message->isGood());
+				// Check message title.
+				$this->assertEquals('Discovery rule created', $message->getTitle());
+
+				// Check the results in DB.
+				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($data['key'])));
+
+				// Check the results in form.
+				$this->checkLLDMacroFormFields($data);
+				break;
+			case TEST_BAD:
+				// Get global message.
+				$message = CMessageElement::find()->one();
+				// Check if message is negative.
+				$this->assertTrue($message->isBad());
+				// Check message title.
+				$this->assertEquals('Cannot add discovery rule', $message->getTitle());
+				$this->assertTrue($message->hasLine($data['error_details']));
+
+				// Check that DB hash is not changed.
+				$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
+				break;
+		}
+	}
+
+	private function checkLLDMacroFormFields($data) {
+		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['key']));
+		$this->page->open('host_discovery.php?form=update&itemid='.$id);
+		$form = $this->query('name:itemForm')->asForm()->one();
+		$form->selectTab('LLD Macro');
+
+		foreach ($data['macros'] as $i => $lld_macro) {
+			$macro = $this->query('id:lld_macro_paths_'.$i.'_lld_macro')->one()->getAttribute('value');
+			$this->assertEquals($lld_macro['macro'], $macro);
+
+			$path = $this->query('id:lld_macro_paths_'.$i.'_path')->one()->getAttribute('value');
+			$this->assertEquals($lld_macro['path'], $path);
+		}
 	}
 }

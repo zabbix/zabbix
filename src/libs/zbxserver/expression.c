@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -5858,6 +5858,7 @@ int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_jso
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(item);
 	ZBX_UNUSED(jp_row);
+	ZBX_UNUSED(lld_macro_paths);
 	zbx_snprintf(error, maxerrlen, "Support for XML was not compiled in");
 	return FAIL;
 #else
