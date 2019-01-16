@@ -547,9 +547,9 @@ unlock:
  ******************************************************************************/
 void	zbx_get_all_process_stats(zbx_process_info_t *stats)
 {
-	const char		*__function_name = "zbx_get_all_process_stats";
-	int			current;
-	unsigned char		proc_type;
+	const char	*__function_name = "zbx_get_all_process_stats";
+	int		current;
+	unsigned char	proc_type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -563,15 +563,14 @@ void	zbx_get_all_process_stats(zbx_process_info_t *stats)
 
 	for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
 	{
-		int			process_forks, proc_num;
-		zbx_process_info_t	process_info;
-		unsigned int		total_avg = 0, counter_avg_busy = 0, counter_avg_idle = 0,
-					total_max = 0, counter_max_busy = 0, counter_max_idle = 0,
-					total_min = 0, counter_min_busy = 0, counter_min_idle = 0;
+		int		proc_num;
+		unsigned int	total_avg = 0, counter_avg_busy = 0, counter_avg_idle = 0,
+				total_max = 0, counter_max_busy = 0, counter_max_idle = 0,
+				total_min = 0, counter_min_busy = 0, counter_min_idle = 0;
 
-		process_forks = get_process_type_forks(proc_type);
+		stats[proc_type].count = get_process_type_forks(proc_type);
 
-		for (proc_num = 0; proc_num < process_forks; proc_num++)
+		for (proc_num = 0; proc_num < stats[proc_type].count; proc_num++)
 		{
 			zbx_stat_process_t	*process;
 			unsigned short		one_total = 0, busy_counter, idle_counter;
@@ -617,21 +616,14 @@ void	zbx_get_all_process_stats(zbx_process_info_t *stats)
 			}
 		}
 
-		process_info.process_type = proc_type;
+		stats[proc_type].busy_avg = (0 == total_avg ? 0 : 100. * (double)counter_avg_busy / (double)total_avg);
+		stats[proc_type].busy_max = (0 == total_max ? 0 : 100. * (double)counter_max_busy / (double)total_max);
+		stats[proc_type].busy_min = (0 == total_min ? 0 : 100. * (double)counter_min_busy / (double)total_min);
 
-		process_info.busy_avg = (0 == total_avg ? 0 : 100. * (double)counter_avg_busy / (double)total_avg);
-		process_info.busy_max = (0 == total_max ? 0 : 100. * (double)counter_max_busy / (double)total_max);
-		process_info.busy_min = (0 == total_min ? 0 : 100. * (double)counter_min_busy / (double)total_min);
-
-		process_info.idle_avg = (0 == total_avg ? 0 : 100. * (double)counter_avg_idle / (double)total_avg);
-		process_info.idle_max = (0 == total_max ? 0 : 100. * (double)counter_max_idle / (double)total_max);
-		process_info.idle_min = (0 == total_min ? 0 : 100. * (double)counter_min_idle / (double)total_min);
-
-		process_info.count = process_forks;
-
-		stats[proc_type] = process_info;
+		stats[proc_type].idle_avg = (0 == total_avg ? 0 : 100. * (double)counter_avg_idle / (double)total_avg);
+		stats[proc_type].idle_max = (0 == total_max ? 0 : 100. * (double)counter_max_idle / (double)total_max);
+		stats[proc_type].idle_min = (0 == total_min ? 0 : 100. * (double)counter_min_idle / (double)total_min);
 	}
-
 unlock:
 	UNLOCK_SM;
 

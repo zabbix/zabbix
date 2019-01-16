@@ -34,7 +34,6 @@
 /* the process statistics */
 typedef struct
 {
-	int	process_type;
 	double	busy_max;
 	double	busy_min;
 	double	busy_avg;
