@@ -24,6 +24,7 @@ extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TIMEOUT;
 
 void	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESULT *result);
+void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, int from, int to, AGENT_RESULT *result);
 
 int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result);
 

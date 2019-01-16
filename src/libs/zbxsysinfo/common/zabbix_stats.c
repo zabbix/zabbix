@@ -25,27 +25,25 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_zabbix_stats                                             *
+ * Function: get_remote_zabbix_stats                                          *
  *                                                                            *
- * Purpose: create Zabbix stats request                                       *
+ * Purpose: send Zabbix stats request and receive the result data             *
  *                                                                            *
- * Parameters: ip     - [IN] external Zabbix instance hostname                *
+ * Parameters: json   - [IN] the request                                      *
+ *             ip     - [IN] external Zabbix instance hostname                *
  *             port   - [IN] external Zabbix instance port                    *
  *             result - [OUT] check result                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESULT *result)
+static void	get_remote_zabbix_stats(struct zbx_json *json, const char *ip, unsigned short port,
+		AGENT_RESULT *result)
 {
 	zbx_socket_t	s;
-	struct zbx_json	json;
-
-	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_ZABBIX_STATS, ZBX_JSON_TYPE_STRING);
 
 	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, ip, port, CONFIG_TIMEOUT, ZBX_TCP_SEC_UNENCRYPTED,
 			NULL, NULL))
 	{
-		if (SUCCEED == zbx_tcp_send(&s, json.buffer))
+		if (SUCCEED == zbx_tcp_send(&s, json->buffer))
 		{
 			if (SUCCEED == zbx_tcp_recv(&s))
 			{
@@ -75,12 +73,68 @@ void	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESU
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_remote_zabbix_stats                                      *
+ *                                                                            *
+ * Purpose: create Zabbix stats request                                       *
+ *                                                                            *
+ * Parameters: ip     - [IN] external Zabbix instance hostname                *
+ *             port   - [IN] external Zabbix instance port                    *
+ *             result - [OUT] check result                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESULT *result)
+{
+	struct zbx_json	json;
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_ZABBIX_STATS, ZBX_JSON_TYPE_STRING);
+
+	get_remote_zabbix_stats(&json, ip, port, result);
+
+	zbx_json_free(&json);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_remote_zabbix_stats_queue                                *
+ *                                                                            *
+ * Purpose: create Zabbix stats queue request                                 *
+ *                                                                            *
+ * Parameters: ip     - [IN] external Zabbix instance hostname                *
+ *             port   - [IN] external Zabbix instance port                    *
+ *             from   - [IN] lower limit for delay                            *
+ *             to     - [IN] upper limit for delay                            *
+ *             result - [OUT] check result                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, int from, int to, AGENT_RESULT *result)
+{
+	struct zbx_json	json;
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_ZABBIX_STATS, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_TYPE, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE, ZBX_JSON_TYPE_STRING);
+
+	zbx_json_addobject(&json, ZBX_PROTO_TAG_PARAMS);
+
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_FROM, from);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_TO, to);
+
+	zbx_json_close(&json);
+
+	get_remote_zabbix_stats(&json, ip, port, result);
+
+	zbx_json_free(&json);
+}
+
 int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*ip_str,*port_str;
 	unsigned short	port_number;
 
-	if (2 < request->nparam)
+	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
@@ -102,8 +156,49 @@ int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	zbx_get_remote_zabbix_stats(ip_str, port_number, result);
+	if (2 >= request->nparam)
+	{
+		zbx_get_remote_zabbix_stats(ip_str, port_number, result);
+	}
+	else
+	{
+		char	*tmp;
 
+		tmp = get_rparam(request, 2);
+
+		if (0 == strcmp(tmp, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
+		{
+			int	from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
+
+			if (NULL != (tmp = get_rparam(request, 3)) && '\0' != *tmp &&
+					FAIL == is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid forth parameter."));
+				goto out;
+			}
+
+			if (NULL != (tmp = get_rparam(request, 4)) && '\0' != *tmp &&
+					FAIL == is_time_suffix(tmp, &to, ZBX_LENGTH_UNLIMITED))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
+				goto out;
+			}
+
+			if (ZBX_QUEUE_TO_INFINITY != to && from > to)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Parameters represent an invalid"
+						"interval."));
+				goto out;
+			}
+
+			zbx_get_remote_zabbix_stats_queue(ip_str, port_number, from, to, result);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		}
+	}
+out:
 	if (0 != ISSET_MSG(result))
 		return SYSINFO_RET_FAIL;
 	else

@@ -919,36 +919,68 @@ out:
  * Purpose: process Zabbix stats request                                      *
  *                                                                            *
  * Parameters: sock  - [IN] the request socket                                *
+ *             jp    - [IN] the request data                                  *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	send_internal_stats_json(zbx_socket_t *sock)
+static int	send_internal_stats_json(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	const char	*__function_name = "send_internal_stats_json";
-	int		ret;
+	const char		*__function_name = "send_internal_stats_json";
+	struct zbx_json		json;
+	struct zbx_json_parse	jp_data;
+	char			type[MAX_STRING_LEN];
+	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL != CONFIG_STATS_ALLOWED_IP &&
-			SUCCEED == (ret = zbx_tcp_check_allowed_peers(sock,CONFIG_STATS_ALLOWED_IP)))
+	if (NULL == CONFIG_STATS_ALLOWED_IP ||
+			SUCCEED != (ret = zbx_tcp_check_allowed_peers(sock,CONFIG_STATS_ALLOWED_IP)))
 	{
-		struct zbx_json	json;
+		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
+		goto out;
+	}
 
-		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)) &&
+			0 == strcmp(type, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE) &&
+			SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_PARAMS, &jp_data))
+	{
+		char	from_str[MAX_STRING_LEN], to_str[MAX_STRING_LEN];
+		int	from, to;
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_FROM, from_str, sizeof(from_str)) &&
+				SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_TO, to_str, sizeof(to_str)))
+		{
+			if (SUCCEED == is_uint64(from_str, &from) && SUCCEED == is_uint64(to_str, &to))
+			{
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
+						DCget_item_queue(NULL, from, to));
+			}
+		}
+	}
+	else
+	{
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 
 		zbx_get_zabbix_stats(&json);
 
 		zbx_json_close(&json);
-
-		(void)zbx_tcp_send(sock, json.buffer);
-
-		zbx_json_free(&json);
 	}
-	else
-		zbx_send_response(sock, FAIL, "Permission denied.", CONFIG_TIMEOUT);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
+
+	(void)zbx_tcp_send(sock, json.buffer);
+
+	zbx_json_free(&json);
+
+	ret = SUCCEED;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1086,7 +1118,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
 			{
-				ret = send_internal_stats_json(sock);
+				ret = send_internal_stats_json(sock, &jp);
 			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);
