@@ -1700,7 +1700,8 @@ class testDiscoveryRule extends CAPITest {
 			}
 
 			$db_preprocessing = CDBHelper::getAll(
-				'SELECT ip.item_preprocid,ip.itemid,ip.step,i.templateid,ip.type,ip.params,ip.error_handler,ip.error_handler_params'.
+				'SELECT ip.item_preprocid,ip.itemid,ip.step,i.templateid,ip.type,ip.params,ip.error_handler,'.
+						'ip.error_handler_params'.
 				' FROM item_preproc ip,items i'.
 				' WHERE '.dbConditionId('ip.itemid', array_keys($itemids)).
 					' AND ip.itemid=i.itemid'.
@@ -1710,7 +1711,8 @@ class testDiscoveryRule extends CAPITest {
 			$this->call('discoveryrule.update', $discoveryrules, $expected_error);
 
 			$db_upd_preprocessing = CDBHelper::getAll(
-				'SELECT ip.item_preprocid,ip.itemid,ip.step,i.templateid,ip.type,ip.params,ip.error_handler,ip.error_handler_params'.
+				'SELECT ip.item_preprocid,ip.itemid,ip.step,i.templateid,ip.type,ip.params,ip.error_handler,'.
+						'ip.error_handler_params'.
 				' FROM item_preproc ip,items i'.
 				' WHERE '.dbConditionId('ip.itemid', array_keys($itemids)).
 					' AND ip.itemid=i.itemid'.
@@ -2909,6 +2911,223 @@ class testDiscoveryRule extends CAPITest {
 		}
 		else {
 			$this->assertSame($result['result'], $get_result);
+		}
+	}
+
+	public static function discoveryrule_copy_data() {
+		return [
+			// Check empty LLD rule IDs.
+			[
+				'params' => [
+					'hostids' => ['50009']
+				],
+				'expected_error' => 'No discovery rule IDs given.'
+			],
+			[
+				'params' => [
+					'discoveryids' => '',
+					'hostids' => ['50009']
+				],
+				'expected_error' => 'No discovery rule IDs given.'
+			],
+			[
+				'params' => [
+					'discoveryids' => [],
+					'hostids' => ['50009']
+				],
+				'expected_error' => 'No discovery rule IDs given.'
+			],
+			// Check empty host IDs.
+			[
+				'params' => [
+					'discoveryids' => ['110006']
+				],
+				'expected_error' => 'No host IDs given.'
+			],
+			[
+				'params' => [
+					'discoveryids' => ['110006'],
+					'hostids' => ''
+				],
+				'expected_error' => 'No host IDs given.'
+			],
+			[
+				'params' => [
+					'discoveryids' => ['110006'],
+					'hostids' => []
+				],
+				'expected_error' => 'No host IDs given.'
+			],
+			// Check same host.
+			[
+				'params' => [
+					'discoveryids' => ['110006'],
+					'hostids' => ['50009']
+				],
+				'expected_error' => 'Item with key "apilldrule1" already exists on "API Host".'
+			],
+			// Check invalid host.
+			[
+				'params' => [
+					'discoveryids' => ['110006'],
+					'hostids' => ['1']
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// Check invalid rule.
+			[
+				'params' => [
+					'discoveryids' => ['1'],
+					'hostids' => ['50012']
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// Copy from host to template.
+			[
+				'params' => [
+					'discoveryids' => ['110006'],
+					'hostids' => ['50010']
+				],
+				'expected_error' => 'Cannot find host interface on "API Template" for item key "apilldrule1".'
+			],
+			// Check duplicate hosts.
+			[
+				'params' => [
+					'discoveryids' => ['110006'],
+					'hostids' => ['50012', '50012']
+				],
+				'expected_error' => 'Item with key "apilldrule1" already exists on "API Host for read permissions".'
+			],
+			// Check duplicate rules.
+			[
+				'params' => [
+					'discoveryids' => ['110006', '110006'],
+					'hostids' => ['50012']
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+				// TODO: Error is very strange and API should be checked for bugs.
+			],
+			// Check successful copy to two hosts.
+			[
+				'params' => [
+					'discoveryids' => ['110006'],
+					'hostids' => ['50012', '50013']
+				],
+				'expected_error' => null
+			]
+		];
+
+		// NOTE: There are no discovered hosts to check copying to them.
+	}
+
+	/**
+	 * @dataProvider discoveryrule_copy_data
+	 * @backup items
+	 */
+	public function testDiscoveryRule_Copy($params, $expected_error) {
+		$result = $this->call('discoveryrule.copy', $params, $expected_error);
+
+		if ($expected_error === null) {
+			$this->assertTrue($result['result']);
+
+			// Get all discovery rule fields.
+			$src_items = CDBHelper::getAll(
+				'SELECT i.type,i.snmp_community,i.snmp_oid,i.name,i.key_,i.delay,i.history,i.trends,'.
+						'i.status,i.value_type,i.trapper_hosts,i.units,i.snmpv3_securityname,i.snmpv3_securitylevel,'.
+						'i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.logtimefmt,i.valuemapid,'.
+						'i.params,i.ipmi_sensor,i.authtype,i.username,i.password,i.publickey,i.privatekey,'.
+						'i.flags,i.port,i.description,i.inventory_link,i.lifetime,i.snmpv3_authprotocol,'.
+						'i.snmpv3_privprotocol,i.snmpv3_contextname,i.jmx_endpoint,i.url,i.query_fields,i.timeout,'.
+						'i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,'.
+						'i.request_method,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,i.verify_peer,'.
+						'i.verify_host,i.allow_traps'.
+				' FROM items i'.
+				' WHERE '.dbConditionId('i.itemid', $params['discoveryids'])
+			);
+			$src_items = zbx_toHash($src_items, 'key_');
+			/*
+			 * NOTE: Metadata like lastlogsize, mtime should not be copied. Fields like hostid, interfaceid, itemid
+			 * are not selected, since they will be different.
+			 */
+
+			// Find same items on destination hosts.
+			foreach ($params['discoveryids'] as $itemid) {
+				$dst_items = CDBHelper::getAll(
+					'SELECT src.type,src.snmp_community,src.snmp_oid,src.name,src.key_,'.
+						'src.delay,src.history,src.trends,src.status,src.value_type,src.trapper_hosts,src.units,'.
+						'src.snmpv3_securityname,src.snmpv3_securitylevel,src.snmpv3_authpassphrase,'.
+						'src.snmpv3_privpassphrase,src.logtimefmt,src.valuemapid,src.params,'.
+						'src.ipmi_sensor,src.authtype,src.username,src.password,src.publickey,src.privatekey,'.
+						'src.flags,src.port,src.description,src.inventory_link,src.lifetime,'.
+						'src.snmpv3_authprotocol,src.snmpv3_privprotocol,src.snmpv3_contextname,src.jmx_endpoint,'.
+						'src.url,src.query_fields,src.timeout,src.posts,src.status_codes,src.follow_redirects,'.
+						'src.post_type,src.http_proxy,src.headers,src.retrieve_mode,src.request_method,'.
+						'src.ssl_cert_file,src.ssl_key_file,src.ssl_key_password,src.verify_peer,src.verify_host,'.
+						'src.allow_traps'.
+					' FROM items src,items dest'.
+					' WHERE dest.itemid='.zbx_dbstr($itemid).
+						' AND src.key_=dest.key_'.
+						' AND '.dbConditionInt('src.hostid', $params['hostids'])
+				);
+
+				foreach ($dst_items as $dst_item) {
+					$this->assertSame($src_items[$dst_item['key_']], $dst_item);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @dataProvider discoveryrule_copy_data
+	 * @backup items
+	 */
+	public function testDiscoveryRulePreprocessing_Copy($params, $expected_error) {
+		$result = $this->call('discoveryrule.copy', $params, $expected_error);
+
+		if ($expected_error === null) {
+			$this->assertTrue($result['result']);
+
+			// Get all discovery rule fields.
+			$src_preprocessing = CDBHelper::getAll(
+				'SELECT ip.step,ip.type,ip.params,ip.error_handler,ip.error_handler_params,i.key_'.
+				' FROM item_preproc ip,items i'.
+				' WHERE i.itemid=ip.itemid'.
+					' AND '.dbConditionId('i.itemid', $params['discoveryids'])
+			);
+
+			$src = [];
+			foreach ($src_preprocessing as $src_preproc_step) {
+				$src[$src_preproc_step['key_']][$src_preproc_step['step']] = $src_preproc_step;
+			}
+
+			// Find same items on destination hosts.
+			foreach ($params['discoveryids'] as $itemid) {
+				$dst_preprocessing = CDBHelper::getAll(
+					'SELECT ip.step,ip.type,ip.params,ip.error_handler,ip.error_handler_params,src.key_,src.hostid'.
+					' FROM item_preproc ip,items src,items dest'.
+					' WHERE dest.itemid='.zbx_dbstr($itemid).
+						' AND src.key_=dest.key_'.
+						' AND ip.itemid=dest.itemid'.
+						' AND '.dbConditionInt('src.hostid', $params['hostids'])
+				);
+
+				$dst = [];
+				foreach ($dst_preprocessing as $dst_preproc_step) {
+					$dst[$dst_preproc_step['hostid']][$dst_preproc_step['key_']][$dst_preproc_step['step']] =
+						$dst_preproc_step;
+				}
+
+				foreach ($dst as $discoveryrules) {
+					foreach ($discoveryrules as $key => $preprocessing) {
+						foreach ($preprocessing as &$preprocessing_step) {
+							unset($preprocessing_step['hostid']);
+						}
+						unset($preprocessing_step);
+
+						$this->assertSame($src[$key], $preprocessing);
+					}
+				}
+			}
 		}
 	}
 
