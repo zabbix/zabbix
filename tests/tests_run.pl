@@ -375,4 +375,3 @@ foreach my $test_suite (@test_suites)
 {
 	exit(-1) unless ($test_suite->{'failures'} + $test_suite->{'errors'} == 0);
 }
-
