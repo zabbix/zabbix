@@ -27,6 +27,28 @@
 			->toString()
 	?>
 </script>
+<script type="text/x-jquery-tmpl" id="hostSourceRowTPL">
+	<?=	(new CListItem([
+			(new CInput('radio', 'host_source', '#{dcheckid}'))
+				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+				->setId('host_source_#{dcheckid}'),
+			new CLabel([new CSpan(), '#{name}'], 'host_source_#{dcheckid}')
+		]))
+			->setId('host_source_row_#{dcheckid}')
+			->toString()
+	?>
+</script>
+<script type="text/x-jquery-tmpl" id="nameSourceRowTPL">
+	<?=	(new CListItem([
+			(new CInput('radio', 'name_source', '#{dcheckid}'))
+				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+				->setId('name_source_#{dcheckid}'),
+			new CLabel([new CSpan(), '#{name}'], 'name_source_#{dcheckid}')
+		]))
+			->setId('name_source_row_#{dcheckid}')
+			->toString()
+	?>
+</script>
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
 <?=
 	(new CDiv(
@@ -239,7 +261,9 @@
 	function addPopupValues(list) {
 		// templates
 		var dcheckRowTpl = new Template(jQuery('#dcheckRowTPL').html()),
-			uniqRowTpl = new Template(jQuery('#uniqRowTPL').html());
+			uniqRowTpl = new Template(jQuery('#uniqRowTPL').html()),
+			hostSourceRowTPL = new Template(jQuery('#hostSourceRowTPL').html()),
+			nameSourceRowTPL = new Template(jQuery('#nameSourceRowTPL').html());
 
 		for (var i = 0; i < list.length; i++) {
 			if (empty(list[i])) {
@@ -313,28 +337,34 @@
 				jQuery('#dcheckCell_' + value.dcheckid + ' span').text(value['name']);
 			}
 
-			// update device uniqueness criteria
 			var availableDeviceTypes = [ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3],
-				uniquenessCriteria = jQuery('#uniqueness_criteria_row_' + value.dcheckid);
+				elements = {
+					uniqueness_criteria: ['ip', uniqRowTpl.evaluate(value)],
+					host_source: ['dns', hostSourceRowTPL.evaluate(value)],
+					name_source: ['host', nameSourceRowTPL.evaluate(value)]
+				};
 
-			if (jQuery.inArray(parseInt(value.type, 10), availableDeviceTypes) > -1) {
-				var new_uniqueness_criteria = uniqRowTpl.evaluate(value);
-				if (uniquenessCriteria.length) {
-					var checked_id = jQuery('input:radio[name=uniqueness_criteria]:checked').attr('id');
-					uniquenessCriteria.replaceWith(new_uniqueness_criteria);
-					jQuery('#' + checked_id).prop('checked', true);
+			jQuery.each(elements, function(key, param) {
+				var	obj = jQuery('#' + key + '_row_' + value.dcheckid);
+
+				if (jQuery.inArray(parseInt(value.type, 10), availableDeviceTypes) > -1) {
+					var new_obj = param[1];
+					if (obj.length) {
+						var checked_id = jQuery('input:radio[name=' + key + ']:checked').attr('id');
+						obj.replaceWith(new_obj);
+						jQuery('#' + checked_id).prop('checked', true);
+					}
+					else {
+						jQuery('#' + key).append(new_obj);
+					}
 				}
 				else {
-					jQuery('#uniqueness_criteria').append(new_uniqueness_criteria);
+					if (obj.length) {
+						obj.remove();
+						jQuery('#' + key + '_' + param[0]).prop('checked', true);
+					}
 				}
-			}
-			else {
-				if (uniquenessCriteria.length) {
-					uniquenessCriteria.remove();
-
-					selectUniquenessCriteriaDefault();
-				}
-			}
+			});
 		}
 	}
 
@@ -343,16 +373,23 @@
 
 		delete(ZBX_CHECKLIST[dcheckid]);
 
-		// remove uniqueness criteria
-		var obj = jQuery('#uniqueness_criteria_' + dcheckid);
+		var elements = {
+			uniqueness_criteria_: 'ip',
+			host_source_: 'dns',
+			name_source_: 'host'
+		};
 
-		if (obj.length) {
-			if (obj.is(':checked')) {
-				selectUniquenessCriteriaDefault();
+		jQuery.each(elements, function(key, def) {
+			var obj = jQuery('#' + key + dcheckid);
+
+			if (obj.length) {
+				if (obj.is(':checked')) {
+					jQuery('#' + key + def).prop('checked', true);
+				}
+				jQuery('#' + key + 'row_' + dcheckid).remove();
 			}
+		});
 
-			jQuery('#uniqueness_criteria_row_' + dcheckid).remove();
-		}
 	}
 
 	function showNewCheckForm(e, dcheckId) {
@@ -424,10 +461,19 @@
 
 				// ignore "name" value because it is virtual
 				if (name !== 'name') {
-					if(name == 'key_' && typeOfSnmp(check_type)) {
+					if (name == 'key_' && typeOfSnmp(check_type)) {
 						// Use key_ value in snmp_oid input.
 
 						jQuery('#snmp_oid').val(itemObj.val());
+					}
+					else if (name === 'host_source' || name === 'name_source') {
+						if (jQuery('#' + name + '_' + dcheckId).is(':checked')) {
+							var def = (name === 'host_source') ? 'dns' : 'host';
+							jQuery('#' + name + '_' + dcheckId).prop('checked', false);
+							jQuery('#' + name + '_' + def).prop('checked', true);
+						}
+						// continue
+						return true;
 					}
 					else {
 						jQuery('#' + name).val(itemObj.val());
@@ -692,14 +738,12 @@
 		});
 	}
 
-	function selectUniquenessCriteriaDefault() {
-		jQuery('#uniqueness_criteria_ip').prop('checked', true);
-	}
-
 	jQuery(document).ready(function() {
 		addPopupValues(<?= zbx_jsvalue(array_values($this->data['drule']['dchecks'])) ?>);
 
 		jQuery("input:radio[name='uniqueness_criteria'][value=<?= zbx_jsvalue($this->data['drule']['uniqueness_criteria']) ?>]").attr('checked', 'checked');
+		jQuery("input:radio[name='host_source'][value=<?= zbx_jsvalue($this->data['drule']['host_source']) ?>]").attr('checked', 'checked');
+		jQuery("input:radio[name='name_source'][value=<?= zbx_jsvalue($this->data['drule']['name_source']) ?>]").attr('checked', 'checked');
 
 		jQuery('#newCheck').click(showNewCheckForm);
 		jQuery('#clone').click(function() {

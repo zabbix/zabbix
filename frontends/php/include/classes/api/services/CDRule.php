@@ -710,7 +710,7 @@ class CDRule extends CApiService {
 			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'status'],
 			'selectDChecks' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
-				'snmpv3_privprotocol', 'snmpv3_contextname'
+				'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source'
 			],
 			'druleids' => $druleids,
 			'editable' => true,

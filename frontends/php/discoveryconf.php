@@ -40,6 +40,8 @@ $fields = [
 	],
 	'status' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'uniqueness_criteria' => [T_ZBX_STR, O_OPT, null, null,	'isset({add}) || isset({update})', _('Device uniqueness criteria')],
+	'host_source' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
+	'name_source' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
 	'g_druleid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'dchecks' =>		[null, O_OPT, null,		null,		null],
 	// actions
@@ -80,7 +82,7 @@ if (isset($_REQUEST['druleid'])) {
 		'selectDChecks' => [
 			'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
-			'snmpv3_contextname'
+			'snmpv3_contextname', 'host_source', 'name_source'
 		],
 		'editable' => true
 	]);
@@ -128,12 +130,35 @@ if (hasRequest('add') || hasRequest('update')) {
 	$dChecks = getRequest('dchecks', []);
 	$uniq = getRequest('uniqueness_criteria', 0);
 
+	$host_source = getRequest('host_source', ZBX_DISCOVERY_HOST_FROM);
+	$name_source = getRequest('name_source', ZBX_DISCOVERY_NAME_FROM);
+
 	foreach ($dChecks as $dcnum => $check) {
 		if (substr($check['dcheckid'], 0, 3) === 'new') {
 			unset($dChecks[$dcnum]['dcheckid']);
 		}
 
 		$dChecks[$dcnum]['uniq'] = ($uniq == $dcnum) ? 1 : 0;
+
+		if ($host_source < 0) {
+			$dChecks[$dcnum]['host_source'] = $host_source + ZBX_DISCOVERY_VALUE;
+		}
+		elseif ($host_source == $check['dcheckid']) {
+			$dChecks[$dcnum]['host_source'] = ZBX_DISCOVERY_VALUE;
+		}
+		else {
+			$dChecks[$dcnum]['host_source'] = ZBX_DISCOVERY_DNS;
+		}
+
+		if ($name_source < 0) {
+			$dChecks[$dcnum]['name_source'] = $name_source + ZBX_DISCOVERY_VALUE;
+		}
+		elseif ($name_source == $check['dcheckid']) {
+			$dChecks[$dcnum]['name_source'] = ZBX_DISCOVERY_VALUE;
+		}
+		else {
+			$dChecks[$dcnum]['name_source'] = ZBX_DISCOVERY_UNSPEC;
+		}
 	}
 
 	$discoveryRule = [
@@ -243,11 +268,26 @@ if (isset($_REQUEST['form'])) {
 	if (isset($data['druleid']) && !isset($_REQUEST['form_refresh'])) {
 		$data['drule'] = reset($dbDRule);
 		$data['drule']['uniqueness_criteria'] = -1;
+		$data['drule']['host_source'] = null;
+		$data['drule']['name_source'] = null;
 
 		if (!empty($data['drule']['dchecks'])) {
 			foreach ($data['drule']['dchecks'] as $id => $dcheck) {
 				if ($dcheck['uniq']) {
 					$data['drule']['uniqueness_criteria'] = $dcheck['dcheckid'];
+				}
+
+				if ($dcheck['host_source'] == ZBX_DISCOVERY_VALUE) {
+					$data['drule']['host_source'] = $dcheck['dcheckid'];
+				}
+				elseif ($data['drule']['host_source'] === null) {
+					$data['drule']['host_source'] = $dcheck['host_source'];
+				}
+				if ($dcheck['name_source'] == ZBX_DISCOVERY_VALUE) {
+					$data['drule']['name_source'] = $dcheck['dcheckid'];
+				}
+				elseif ($data['drule']['name_source'] === null) {
+					$data['drule']['name_source'] = $dcheck['name_source'];
 				}
 			}
 		}
@@ -261,6 +301,8 @@ if (isset($_REQUEST['form'])) {
 		$data['drule']['dchecks'] = getRequest('dchecks', []);
 		$data['drule']['nextcheck'] = getRequest('nextcheck', 0);
 		$data['drule']['uniqueness_criteria'] = getRequest('uniqueness_criteria', -1);
+		$data['drule']['host_source'] = getRequest('host_source', ZBX_DISCOVERY_HOST_FROM);
+		$data['drule']['name_source'] = getRequest('name_source', ZBX_DISCOVERY_NAME_FROM);
 	}
 
 	if (!empty($data['drule']['dchecks'])) {
