@@ -346,25 +346,36 @@
 			},
 			markAffectedWidgets = function(pos, uid) {
 				$.map(widgets, function(box) {
-					return (!('affected_axis' in box) && box.uniqueid != uid && rectOverlap(pos, box.current_pos)) ? box : null;
+					return (!('affected_axis' in box) && box.uniqueid != uid && rectOverlap(pos, box.current_pos))
+						? box
+						: null;
 				})
 				.each(function(box) {
 					var boundary = $.extend({}, box.current_pos);
 
-					if ('mirrored' in axis) {
-						console
-							.log(`${box.header}:${axis_key} with overlap=${pos[axis_key] - boundary[axis_key] + boundary[size_key]}`);
-						boundary[axis_key] = Math.max(0, boundary[axis_key] - (pos[axis_key] - boundary[axis_key] + boundary[size_key]));
-						boundary[size_key] = box.current_pos[axis_key] - boundary[axis_key];
-					}
-					else {
-						boundary[size_key] += pos[axis_key] + pos[size_key] - boundary[axis_key];
-					}
-
+					boundary[size_key] += pos[axis_key] + pos[size_key] - boundary[axis_key];
 					box.affected_axis = axis_key;
+
 					markAffectedWidgets(boundary);
 				});
-			};
+			},
+			axis_pos = $.extend({}, widget.current_pos),
+			margins = {},
+			overlap = 0;
+
+		// Resize action for left/up is mirrored right/down action.
+		if ('mirrored' in axis) {
+			var dbg_original = axis_pos[axis_key];
+			widgets.each(function(box) {
+				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
+				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
+			});
+			axis_pos[axis_key] = size_max - axis_pos[axis_key] - axis_pos[size_key];
+			axis.boundary[axis_key] = size_max - axis.boundary[axis_key] - axis.boundary[size_key];
+
+			console
+				.log(`mirrorring coordinates: axis_pos[${axis_key}] from ${dbg_original} to ${axis_pos[axis_key]}`)
+		}
 
 		// Get array containing only widgets affected by resize operation.
 		markAffectedWidgets(axis.boundary, widget.uniqueid);
@@ -375,23 +386,6 @@
 		});
 
 		widgets.each(function(b) {b.div.css('background-color', 'affected_axis' in b ? (b.affected_axis == 'x' ? 'rgba(255, 0, 0, 0.1)' : 'rgba(0, 255, 0, 0.1)') : '' )});
-
-		var margins = {},
-			overlap = 0,
-			axis_pos = $.extend({}, widget.current_pos);
-
-		// Resize action for left/up is mirrored right/down action.
-		if ('mirrored' in axis) {
-			var dbg_original = axis_pos[axis_key];
-			affected.each(function(box) {
-				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
-				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
-			});
-			axis_pos[axis_key] = size_max - axis_pos[axis_key] - axis_pos[size_key];
-
-			console
-				.log(`mirrorring coordinates: axis_pos[${axis_key}] from ${dbg_original} to ${axis_pos[axis_key]}`)
-		}
 
 		affected = affected.sort(function(box1, box2) {
 			return box1.current_pos[axis_key] - box2.current_pos[axis_key];
@@ -619,18 +613,15 @@
 		if (overlap > 0) {
 			widget.current_pos[size_key] -= overlap;
 
-			if ('mirrored' in axis) {
-				widget.current_pos[axis_key] += overlap;
-			}
-
 			affected.each(function(box) {
 				box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - overlap, box.pos[axis_key]);
+				// TODO: if axis position was fixed by box.pos[axis_key] check box size!
 			});
 		}
 
 		// Resize action for left/up is mirrored right/down action, mirror coordinates back.
 		if ('mirrored' in axis) {
-			affected.each(function(box) {
+			widgets.each(function(box) {
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
 				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
 			});
@@ -679,21 +670,18 @@
 			widget.prev_pos.mirrored.y = true;
 		}
 
-		console.group(`${widget.header} resize step. process order: "${process_order.join('", ')} direction state: ${JSON.stringify(widget.prev_pos.mirrored)}"`);
-		console
-			.log ({current_pos: widget.current_pos, pos: widget.pos, prev_pos:widget.prev_pos, changes: changes});
 		var dbg_affected = {y:[], x:[]};
 
 		var primary_axis = process_order[0],
 			backup_indexes = [];
 
+		console.groupCollapsed(`${widget.header} resize step. ${primary_axis} is set as primary axis, process order: "${process_order.join('", "')}" direction state: ${JSON.stringify(widget.prev_pos.mirrored)}"`);
+		console
+				.log ({current_pos: widget.current_pos, pos: widget.pos, prev_pos:widget.prev_pos, changes: changes});
+
 		// Diagonal resize.
 		process_order.each(function(axis_key) {
 			data.widgets.each(function(box, index) {
-				if ('affected_axis' in box) {
-					dbg_affected[box.affected_axis].push(box.header);
-				}
-
 				if ('affected_axis' in box && box.affected_axis === axis_key) {
 					if (primary_axis === axis_key) {
 						backup_indexes.push(index);
@@ -734,27 +722,35 @@
 			console
 				.log('backup indexes', backup_indexes);
 			console
-				.log(`${axis_key} start processing. affected x="${dbg_affected.x.join('", "')}", y="${dbg_affected.y.join('", "')}"`)
+				.log(`%c${axis_key} start processing.`, 'font-weight: bold');
 			console
 				.log('axis object:', axis);
 
 			fitWigetsIntoBox(data.widgets, widget, axis);
+
+			console
+				.log(`%c${axis_key} processed, widget current position: ${JSON.stringify(widget.current_pos)}`, 'font-weight: bold');
+			console
+				.log(`affected by x: "${$.map(data.widgets, function(b) { return b.affected_axis == 'x' ? b.header : null}).join('", "')}"`);
+			console
+				.log(`affected by y: "${$.map(data.widgets, function(b) { return b.affected_axis == 'y' ? b.header : null}).join('", "')}"`);
 		});
 
 		// Restore affected on first axis in list.
-		backup_indexes.each(function(index) {
-			data.widgets[index].affected_axis = primary_axis;
-		});
-
-		var dbg = {x:[], y:[]}
-		data.widgets.each(function(box) {
-			if ('affected_axis' in box) {
-				dbg[box.affected_axis].push(box.header);
-			}
-		});
+		// console.groupCollapsed(`restoring affected on primary axis ${primary_axis}`);
+		// backup_indexes.each(function(index) {
+		// 	console
+		//		.log(`${data.widgets[index].header} was restored`);
+		// 	data.widgets[index].affected_axis = primary_axis;
+		// });
+		// console.groupEnd();
 
 		console
-			.log('final result for affected by changes on axes:', dbg);
+			.log('final result for affected by changes on axes:');
+		console
+			.log(`\t\tx: "${$.map(data.widgets, function(b) { return b.affected_axis == 'x' ? b.header : null}).join('", "')}"`);
+		console
+			.log(`\t\ty: "${$.map(data.widgets, function(b) { return b.affected_axis == 'y' ? b.header : null}).join('", "')}"`);
 		console.groupEnd();
 
 		// Store current position as previous position for next steps.
