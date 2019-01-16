@@ -108,6 +108,634 @@ class testDiscoveryRule extends CAPITest {
 		// TODO: perform advanced checks and other fields.
 	}
 
+	public static function discoveryrule_preprocessing_create_data() {
+		$def_options = [
+			'name' => 'API LLD rule 5',
+			'key_' => 'apilldrule5',
+			'hostid' => '50009',
+			'type' => '0',
+			'interfaceid' => '50022',
+			'delay' => '30s'
+		];
+
+		// Check preprocessing fields.
+		return [
+			// Check incorrect preprocessing type.
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => ''
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			// Check no fields given.
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[]
+					]
+				],
+				'expected_error' => 'Item pre-processing is missing parameters: type, params, error_handler, error_handler_params'
+			],
+			// Check empty fields.
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => null,
+							'params' => null,
+							'error_handler' => null,
+							'error_handler_params' => null
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "type": cannot be empty.'
+			],
+			// Check invalid type (array).
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => [],
+							'params' => null,
+							'error_handler' => null,
+							'error_handler_params' => null
+						]
+					]
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			// Check invalid type (string).
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => 'abc',
+							'params' => '',
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "type": unexpected value "abc".'
+			],
+			// Check invalid type (integer).
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => 666,
+							'params' => '',
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "type": unexpected value "666".'
+			],
+			// Check unallowed type (integer).
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_OCT2DEC,
+							'params' => '',
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "type": unexpected value "'.ZBX_PREPROC_OCT2DEC.'".'
+			],
+			// Check empty params, but valid type.
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => '',
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": cannot be empty.'
+			],
+			// Check invalid params, but valid type.
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => [],
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			// Check second parameter for this type.
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => '^abc$',
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": second parameter is expected.'
+			],
+			// Check if error handler is empty.
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "".'
+			],
+			// Check if error handler is valid (array).
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => [],
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			// Check if error handler is valid (string).
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => 'abc',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "abc".'
+			],
+			// Check if error handler is valid (integer).
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => 666,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "666".'
+			],
+			// Check if error handler params is empty (should not be).
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+			],
+			// Check if error handler params is valid (array).
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => []
+						]
+					]
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			// Check if error handler params is empty (should be).
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => 'abc'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			// Check if error handler params is empty (should be).
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => 'abc'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			// Check ather types.
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_ERROR.'".'
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "params": a time unit is expected.'
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '{#MACRO}',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '{#MACRO}',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_VALUE,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_VALUE.'".'
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '1h',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_ERROR.'".'
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
+			],
+			// Check two steps.
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '1h',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						],
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '1h',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Only one throttling step is allowed.'
+			],
+			// Check valid LLD rules.
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => []
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc\n123$",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_VALUE,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						],
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'def',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '{$MACRO}',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '{#MACRO}',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => $def_options + [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '1h',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			]
+		];
+
+		// TODO: Create tests for items and item prototypes. It uses the same function to validate pre-processing fields.
+	}
+
+	/**
+	 * @dataProvider discoveryrule_preprocessing_create_data
+	 * @backup items
+	 */
+	public function testDiscoveryRulePreprocessing_Create(array $discoveryrules, $expected_error) {
+		$result = $this->call('discoveryrule.create', $discoveryrules, $expected_error);
+
+		// Accept single and multiple LLD rules just like API method. Work with multi-dimensional array in result.
+		if (!array_key_exists(0, $discoveryrules)) {
+			$discoveryrules = zbx_toArray($discoveryrules);
+		}
+
+		if ($expected_error === null) {
+			foreach ($result['result']['itemids'] as $num => $id) {
+				if (array_key_exists('preprocessing', $discoveryrules[$num])) {
+					foreach ($discoveryrules[$num]['preprocessing'] as $idx => $preprocessing) {
+						// Collect one step at a time. Steps should match the order in which they were given.
+						$db_preprocessing = CDBHelper::getRow(
+							'SELECT ip.type,ip.params,ip.error_handler,ip.error_handler_params'.
+							' FROM item_preproc ip'.
+							' WHERE ip.itemid='.zbx_dbstr($id).
+								' AND ip.step='.zbx_dbstr($idx + 1)
+						);
+
+						$this->assertEquals($db_preprocessing['type'], $preprocessing['type']);
+						$this->assertSame($db_preprocessing['params'], $preprocessing['params']);
+						$this->assertEquals($db_preprocessing['error_handler'], $preprocessing['error_handler']);
+						$this->assertSame($db_preprocessing['error_handler_params'],
+							$preprocessing['error_handler_params']
+						);
+					}
+				}
+			}
+		}
+
+		// TODO: Create a test to check if preprocessing steps are inherited on host.
+	}
+
 	public static function discoveryrule_lld_macro_paths_create_data() {
 		$def_options = [
 			'name' => 'API LLD rule 5',
@@ -361,9 +989,827 @@ class testDiscoveryRule extends CAPITest {
 				}
 			}
 		}
+
+		// TODO: Create a test to check if LLD macro paths are inherited on host.
 	}
 
 	// TODO: create a separate test to perform updates on discovery rules and its properties.
+
+	public static function discoveryrule_preprocessing_update_data() {
+		/*
+		 * Test data mostly just duplicates the data from create() test, but with few exceptions because:
+		 *   1) create and update both allow "preprocessing" to be empty.
+		 *   2) No individual step update, so it's just replacing everything with the new array.
+		 */
+
+		return [
+			// Check invalid preprocessing type.
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => ''
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[]
+					]
+				],
+				'expected_error' => 'Item pre-processing is missing parameters: type, params, error_handler, error_handler_params'
+			],
+			// Check empty fields.
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => null,
+							'params' => null,
+							'error_handler' => null,
+							'error_handler_params' => null
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "type": cannot be empty.'
+			],
+			// Check invalid type (array).
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => [],
+							'params' => null,
+							'error_handler' => null,
+							'error_handler_params' => null
+						]
+					]
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			// Check invalid type (string).
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => 'abc',
+							'params' => '',
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "type": unexpected value "abc".'
+			],
+			// Check invalid type (integer).
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => 666,
+							'params' => '',
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "type": unexpected value "666".'
+			],
+			// Check unallowed type (integer).
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_OCT2DEC,
+							'params' => '',
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "type": unexpected value "'.ZBX_PREPROC_OCT2DEC.'".'
+			],
+			// Check empty params, but valid type.
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => '',
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": cannot be empty.'
+			],
+			// Check invalid params, but valid type.
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => [],
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			// Check second parameter for this type.
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => '^abc$',
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": second parameter is expected.'
+			],
+			// Check if error handler is empty.
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "".'
+			],
+			// Check if error handler is valid (array).
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => [],
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			// Check if error handler is valid (string).
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => 'abc',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "abc".'
+			],
+			// Check if error handler is valid (integer).
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => 666,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "666".'
+			],
+			// Check if error handler params is empty (should not be).
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+			],
+			// Check if error handler params is valid (array).
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => []
+						]
+					]
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			// Check if error handler params is empty (should be).
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => 'abc'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			// Check if error handler params is empty (should be).
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => 'abc'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			// Check ather types.
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_ERROR.'".'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "params": a time unit is expected.'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '{#MACRO}',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '{#MACRO}',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_VALUE,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_VALUE.'".'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '1h',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_ERROR.'".'
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
+			],
+			// Check two steps.
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '1h',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						],
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '1h',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Only one throttling step is allowed.'
+			],
+			// Check individual step update with only one parameter.
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'item_preprocid' => '5716',
+							'params' => '2h'
+						]
+					]
+				],
+				'expected_error' => 'Item pre-processing is missing parameters: type, error_handler, error_handler_params'
+			],
+			// Check templated steps update.
+			[
+				'discoveryrule' => [
+					'itemid' => '110011',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc\n123$",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				// After ZBX-3783 (112) is fixed, this will fail with error.
+				'expected_error' => null
+			],
+			// Check replacing of steps, but also give specific step ID (which is ignored).
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'item_preprocid' => '5536',
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc\n123$",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Check valid LLD rules.
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => []
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc\n123$",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_VALUE,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						],
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'def',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '{$MACRO}',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '{#MACRO}',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'discoveryrule' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '1h',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Check different discovery rule that has no old steps set.
+			[
+				'discoveryrule' => [
+					'itemid' => '110009',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+							'params' => '1h',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider discoveryrule_preprocessing_update_data
+	 * @backup items
+	 */
+	public function testDiscoveryRulePreprocessing_Update($discoveryrules, $expected_error) {
+		if ($expected_error === null) {
+			// Before updating, collect old data for given discovery rules.
+			$itemids = [];
+
+			if (array_key_exists(0, $discoveryrules)) {
+				foreach ($discoveryrules as $discoveryrule) {
+					$itemids[$discoveryrule['itemid']] = true;
+				}
+			}
+			else {
+				$itemids[$discoveryrules['itemid']] = true;
+			}
+
+			$db_preprocessing = CDBHelper::getAll(
+				'SELECT ip.item_preprocid,ip.itemid,ip.step,i.templateid,ip.type,ip.params,ip.error_handler,ip.error_handler_params'.
+				' FROM item_preproc ip,items i'.
+				' WHERE '.dbConditionId('ip.itemid', array_keys($itemids)).
+					' AND ip.itemid=i.itemid'.
+				' ORDER BY ip.itemid ASC,ip.step ASC'
+			);
+
+			$this->call('discoveryrule.update', $discoveryrules, $expected_error);
+
+			$db_upd_preprocessing = CDBHelper::getAll(
+				'SELECT ip.item_preprocid,ip.itemid,ip.step,i.templateid,ip.type,ip.params,ip.error_handler,ip.error_handler_params'.
+				' FROM item_preproc ip,items i'.
+				' WHERE '.dbConditionId('ip.itemid', array_keys($itemids)).
+					' AND ip.itemid=i.itemid'.
+				' ORDER BY ip.itemid ASC,ip.step ASC'
+			);
+
+			// Accept single and multiple LLD rules just like API method. Work with multi-dimensional array in result.
+			if (!array_key_exists(0, $discoveryrules)) {
+				$discoveryrules = zbx_toArray($discoveryrules);
+			}
+
+			// Compare records from DB before and after API call.
+			foreach ($discoveryrules as $discoveryrule) {
+				$old_preprocessing = [];
+				$new_preprocessing = [];
+
+				if ($db_preprocessing) {
+					foreach ($db_preprocessing as $db_preproc_step) {
+						$itemid = $db_preproc_step['itemid'];
+						if (bccomp($itemid, $discoveryrule['itemid']) == 0) {
+							$old_preprocessing[$itemid][$db_preproc_step['step']] = $db_preproc_step;
+						}
+					}
+				}
+
+				if ($db_upd_preprocessing) {
+					foreach ($db_upd_preprocessing as $db_upd_preproc_step) {
+						$itemid = $db_upd_preproc_step['itemid'];
+						if (bccomp($itemid, $discoveryrule['itemid']) == 0) {
+							$new_preprocessing[$itemid][$db_upd_preproc_step['step']] = $db_upd_preproc_step;
+						}
+					}
+				}
+
+				// If new pre-processing steps are set.
+				if (array_key_exists('preprocessing', $discoveryrule)) {
+					if ($discoveryrule['preprocessing']) {
+						foreach ($discoveryrule['preprocessing'] as $num => $preprocessing_step) {
+							if ($old_preprocessing) {
+								$old_preproc_step = $old_preprocessing[$discoveryrule['itemid']][$num + 1];
+
+								if ($old_preproc_step['templateid'] == 0) {
+									// If not templated discovery rule, it's allowed to change steps.
+									$this->assertNotEmpty($new_preprocessing);
+
+									// New steps must exist.
+									$new_preproc_step = $new_preprocessing[$discoveryrule['itemid']][$num + 1];
+
+									$this->assertEquals($preprocessing_step['type'], $new_preproc_step['type']);
+									$this->assertSame($preprocessing_step['params'], $new_preproc_step['params']);
+									$this->assertEquals($preprocessing_step['error_handler'],
+										$new_preproc_step['error_handler']
+									);
+									$this->assertSame($preprocessing_step['error_handler_params'],
+										$new_preproc_step['error_handler_params']
+									);
+								}
+								else {
+									// Pre-processing steps for templated discovery rule should stay the same.
+									$this->assertSame($old_preprocessing, $new_preprocessing);
+								}
+							}
+							else {
+								/*
+								 * If this is not a templated discovery rule, check if there are steps created and check
+								 * each step.
+								 */
+								$this->assertNotEmpty($new_preprocessing);
+
+								// New steps must exist.
+								$new_preproc_step = $new_preprocessing[$discoveryrule['itemid']][$num + 1];
+
+								$this->assertEquals($preprocessing_step['type'], $new_preproc_step['type']);
+								$this->assertSame($preprocessing_step['params'], $new_preproc_step['params']);
+								$this->assertEquals($preprocessing_step['error_handler'],
+									$new_preproc_step['error_handler']
+								);
+								$this->assertSame($preprocessing_step['error_handler_params'],
+									$new_preproc_step['error_handler_params']
+								);
+							}
+						}
+					}
+					else {
+						// No steps are set, so old records should be cleared.
+						$this->assertEmpty($new_preprocessing);
+					}
+				}
+				else {
+					// No new pre-processing steps are set, so nothing should change at all. Arrays should be the same.
+					$this->assertSame($old_preprocessing, $new_preprocessing);
+				}
+			}
+		}
+		else {
+			// Call method and make sure it really returns the error.
+			$this->call('discoveryrule.update', $discoveryrules, $expected_error);
+		}
+	}
 
 	public static function discoveryrule_lld_macro_paths_update_data() {
 		return [
@@ -1070,7 +2516,7 @@ class testDiscoveryRule extends CAPITest {
 					}
 				}
 				else {
-					// No new LLD macro paths are set, so nothing should change at all. Arrays should be the same
+					// No new LLD macro paths are set, so nothing should change at all. Arrays should be the same.
 					$this->assertSame($old_lld_macro_paths, $new_lld_macro_paths);
 				}
 			}
@@ -1081,9 +2527,48 @@ class testDiscoveryRule extends CAPITest {
 		}
 	}
 
-	public static function discoveryrule_delete_data() {
+	public static function discoveryrule_preprocessing_delete_data() {
 		return [
-			// Check successful delete of discovery rule and related objects.
+			// Check successful delete of discovery rule and pre-processing data.
+			[
+				'discoveryrule' => [
+					'110006'
+				],
+				'expected_error' => null
+			]
+		];
+
+		// TODO: add templated discovery rules.
+	}
+
+	/**
+	 * @dataProvider discoveryrule_preprocessing_delete_data
+	 * @backup items
+	 */
+	public function testDiscoveryRulePreprocessing_Delete($discoveryrule, $expected_error) {
+		$result = $this->call('discoveryrule.delete', $discoveryrule, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['ruleids'] as $id) {
+				$this->assertEquals(0, CDBHelper::getCount(
+					'SELECT i.itemid FROM items i WHERE i.itemid='.zbx_dbstr($id)
+				));
+
+				// Check related tables.
+				$this->assertEquals(0, CDBHelper::getCount(
+					'SELECT ip.item_preprocid'.
+					' FROM item_preproc ip'.
+					' WHERE ip.itemid='.zbx_dbstr($id)
+				));
+			}
+		}
+
+		// TODO: add templated discovery rules and check on errors.
+	}
+
+	public static function discoveryrule_lld_macro_paths_delete_data() {
+		return [
+			// Check successful delete of discovery rule and LLD macro paths.
 			[
 				'discoveryrule' => [
 					'110009'
@@ -1096,10 +2581,10 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	/**
-	 * @dataProvider discoveryrule_delete_data
+	 * @dataProvider discoveryrule_lld_macro_paths_delete_data
 	 * @backup items
 	 */
-	public function testDiscoveryRule_Delete($discoveryrule, $expected_error) {
+	public function testDiscoveryRuleLLDMacroPaths_Delete($discoveryrule, $expected_error) {
 		$result = $this->call('discoveryrule.delete', $discoveryrule, $expected_error);
 
 		if ($expected_error === null) {
@@ -1128,8 +2613,33 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'get_result' =>[
 				],
-				'expected_error' => true,
-			],
+				'expected_error' => true
+			]
+		];
+
+		// TODO: add other discovery rule properties.
+	}
+
+	/**
+	 * @dataProvider discoveryrule_get_data
+	 */
+	public function testDiscoveryRule_Get($discoveryrule, $get_result, $expected_error) {
+		// TODO: fill this test with more fields to check.
+
+		$result = $this->call('discoveryrule.get', $discoveryrule);
+
+		if ($expected_error === false) {
+			foreach ($result['result'] as $entry) {
+				$this->assertSame($entry['itemid'], $get_result['itemid']);
+			}
+		}
+		else {
+			$this->assertSame($result['result'], $get_result);
+		}
+	}
+
+	public static function discoveryrule_lld_macro_paths_get_data() {
+		return [
 			[
 				'discoveryrule' => [
 					'output' => ['itemid'],
@@ -1205,7 +2715,7 @@ class testDiscoveryRule extends CAPITest {
 				'discoveryrule' => [
 					'output' => ['itemid'],
 					'itemids' => '110006',
-					'selectLLDMacroPaths' => ['extend']
+					'selectLLDMacroPaths' => 'extend'
 				],
 				'get_result' => [
 					'itemid' => '110006',
@@ -1240,15 +2750,13 @@ class testDiscoveryRule extends CAPITest {
 				'expected_error' => false
 			]
 		];
-
-		// TODO: add other discovery rule properties.
 	}
 
 	/**
-	 * @dataProvider discoveryrule_get_data
+	 * @dataProvider discoveryrule_lld_macro_paths_get_data
 	 */
-	public function testDiscoveryRule_Get($discoveryrule, $get_result, $expected_error) {
-		$result = $this->call('application.get', $discoveryrule);
+	public function testDiscoveryRuleLLDMacroPaths_Get($discoveryrule, $get_result, $expected_error) {
+		$result = $this->call('discoveryrule.get', $discoveryrule);
 
 		if ($expected_error === false) {
 			foreach ($result['result'] as $entry) {
@@ -1264,6 +2772,138 @@ class testDiscoveryRule extends CAPITest {
 				}
 				else {
 					$this->assertArrayNotHasKey('lld_macro_paths', $get_result);
+				}
+			}
+		}
+		else {
+			$this->assertSame($result['result'], $get_result);
+		}
+	}
+
+	public static function discoveryrule_preprocessing_get_data() {
+		return [
+			[
+				'discoveryrule' => [
+					'output' => ['itemid'],
+					'itemids' => '110006',
+					'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params']
+				],
+				'get_result' => [
+					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						],
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^def$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => ''
+						],
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^ghi$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_VALUE,
+							'error_handler_params' => 'xxx'
+						],
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^jkl$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => 'error'
+						]
+					]
+				],
+				'expected_error' => false
+			],
+			[
+				'discoveryrule' => [
+					'output' => ['itemid'],
+					'itemids' => '110010',
+					'selectPreprocessing' => ['params']
+				],
+				'get_result' => [
+					'itemid' => '110010',
+					'preprocessing' => [
+						[
+							'params' => '$.path.to.node1'
+						],
+						[
+							'params' => '$.path.to.node2'
+						],
+						[
+							'params' => '$.path.to.node3'
+						],
+						[
+							'params' => '$.path.to.node4'
+						]
+					]
+				],
+				'expected_error' => false
+			],
+			[
+				'discoveryrule' => [
+					'output' => ['itemid'],
+					'itemids' => '110011',
+					'selectPreprocessing' => 'extend'
+				],
+				'get_result' => [
+					'itemid' => '110011',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node1',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						],
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node2',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => ''
+						],
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node3',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_VALUE,
+							'error_handler_params' => 'xxx'
+						],
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node4',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => 'error'
+						]
+					]
+				],
+				'expected_error' => false
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider discoveryrule_preprocessing_get_data
+	 */
+	public function testDiscoveryRulePreprocessing_Get($discoveryrule, $get_result, $expected_error) {
+		$result = $this->call('discoveryrule.get', $discoveryrule);
+
+		if ($expected_error === false) {
+			foreach ($result['result'] as $entry) {
+				$this->assertSame($entry['itemid'], $get_result['itemid']);
+
+				// Check related objects.
+				if (array_key_exists('selectPreprocessing', $discoveryrule)) {
+					$this->assertArrayHasKey('preprocessing', $get_result);
+
+					if (array_key_exists('preprocessing', $get_result)) {
+						$this->assertEquals($entry['preprocessing'], $get_result['preprocessing']);
+					}
+				}
+				else {
+					$this->assertArrayNotHasKey('preprocessing', $get_result);
 				}
 			}
 		}
