@@ -28,7 +28,7 @@ void	zbx_preproc_op_history_free(zbx_preproc_op_history_t *ophistory)
 	zbx_free(ophistory);
 }
 
-const zbx_preproc_op_history_t	*zbx_preproc_history_get_value(zbx_vector_ptr_t *history, int type)
+const zbx_preproc_op_history_t	*zbx_preproc_history_get_value(zbx_vector_ptr_t *history, int index)
 {
 	int				i;
 	zbx_preproc_op_history_t	*ophistory;
@@ -37,14 +37,14 @@ const zbx_preproc_op_history_t	*zbx_preproc_history_get_value(zbx_vector_ptr_t *
 	{
 		ophistory = (zbx_preproc_op_history_t *)history->values[i];
 
-		if (ophistory->type == type)
+		if (ophistory->index == index)
 			return ophistory;
 	}
 
 	return NULL;
 }
 
-void	zbx_preproc_history_set_value(zbx_vector_ptr_t *history, int type, const zbx_variant_t *data,
+void	zbx_preproc_history_set_value(zbx_vector_ptr_t *history, int index, const zbx_variant_t *data,
 		const zbx_timespec_t *ts)
 {
 	int				i;
@@ -54,14 +54,14 @@ void	zbx_preproc_history_set_value(zbx_vector_ptr_t *history, int type, const zb
 	{
 		ophistory = (zbx_preproc_op_history_t *)history->values[i];
 
-		if (ophistory->type == type)
+		if (ophistory->index == index)
 			break;
 	}
 
 	if (i == history->values_num)
 	{
 		ophistory = zbx_malloc(NULL, sizeof(zbx_preproc_op_history_t));
-		ophistory->type = type;
+		ophistory->index = index;
 		zbx_vector_ptr_append(history, ophistory);
 	}
 

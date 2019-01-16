@@ -68,7 +68,7 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 		zbx_variant_t		history_value;
 		zbx_timespec_t		history_ts;
 
-		if (NULL != (ophistory = zbx_preproc_history_get_value(&history_in, op->type)))
+		if (NULL != (ophistory = zbx_preproc_history_get_value(&history_in, i)))
 		{
 			history_value = ophistory->value;
 			history_ts = ophistory->ts;
@@ -84,7 +84,7 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 			break;
 
 		if (ZBX_VARIANT_NONE != history_value.type)
-			zbx_preproc_history_set_value(&history_out, op->type, &history_value, &history_ts);
+			zbx_preproc_history_set_value(&history_out, i, &history_value, &history_ts);
 
 		zbx_variant_clear(&history_value);
 

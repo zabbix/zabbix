@@ -247,7 +247,7 @@ zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemi
 	{
 		zbx_preproc_op_history_t	*ophistory = (zbx_preproc_op_history_t *)history->values[i];
 
-		*offset++ = PACKED_FIELD(&ophistory->type, sizeof(unsigned char));
+		*offset++ = PACKED_FIELD(&ophistory->index, sizeof(unsigned char));
 		*offset++ = PACKED_FIELD(&ophistory->value.type, sizeof(unsigned char));
 
 		switch (ophistory->value.type)
@@ -349,7 +349,7 @@ zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *v
 	{
 		zbx_preproc_op_history_t	*ophistory = (zbx_preproc_op_history_t *)history->values[i];
 
-		*offset++ = PACKED_FIELD(&ophistory->type, sizeof(unsigned char));
+		*offset++ = PACKED_FIELD(&ophistory->index, sizeof(unsigned char));
 		*offset++ = PACKED_FIELD(&ophistory->value.type, sizeof(unsigned char));
 
 		switch (ophistory->value.type)
@@ -527,7 +527,7 @@ void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, unsigned char *value_typ
 
 			ophistory = zbx_malloc(NULL, sizeof(zbx_preproc_op_history_t));
 
-			offset += zbx_deserialize_char(offset, &ophistory->type);
+			offset += zbx_deserialize_char(offset, &ophistory->index);
 			offset += zbx_deserialize_char(offset, &ophistory->value.type);
 
 			switch (ophistory->value.type)
@@ -617,7 +617,7 @@ void	zbx_preprocessor_unpack_result(zbx_variant_t *value, zbx_vector_ptr_t *hist
 
 			ophistory = zbx_malloc(NULL, sizeof(zbx_preproc_op_history_t));
 
-			offset += zbx_deserialize_char(offset, &ophistory->type);
+			offset += zbx_deserialize_char(offset, &ophistory->index);
 			offset += zbx_deserialize_char(offset, &ophistory->value.type);
 
 			switch (ophistory->value.type)
