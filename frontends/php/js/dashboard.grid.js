@@ -639,8 +639,8 @@
 		var axis,
 			process_order = (widget.prev_pos.x != widget.current_pos.x
 				|| widget.prev_pos.width != widget.current_pos.width)
-					? process_order = ['x', 'y']
-					: process_order = ['y', 'x'];
+					? ['x', 'y']
+					: ['y', 'x'];
 
 		data.widgets.each(function(box) {
 			if (box.uniqueid != widget.uniqueid) {
