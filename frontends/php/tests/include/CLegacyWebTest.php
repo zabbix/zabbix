@@ -257,7 +257,7 @@ class CLegacyWebTest extends CWebTest {
 
 	public function zbxTestMultiselectNew($id, $string) {
 		$xpath = 'xpath://div[contains(@class, "multiselect") and @id="'.$id.'"]/input';
-		$this->query($xpath)->one()->clear()->sendKeys($string);
+		$this->query($xpath)->one()->overwrite($string);
 		$this->zbxTestClickXpathWait(
 			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='available']".
 			"/ul[@class='multiselect-suggest']/li[@data-id='$string']"
@@ -435,7 +435,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestAssertAttribute($xpath, $attribute, $value = 'true') {
-		$this->assertEquals($this->query('xpath:'.$xpath)->one()->getAttribute($attribute), $value);
+		$this->assertEquals($value, $this->query('xpath:'.$xpath)->one()->getAttribute($attribute));
 	}
 
 	public function zbxTestAssertElementNotPresentId($id) {
@@ -708,6 +708,7 @@ class CLegacyWebTest extends CWebTest {
 							"/option[@value='{$value}']";
 
 		$this->zbxTestClickXpathWait($xpath);
+		$this->zbxTestWaitForPageToLoad();
 	}
 
 	/**
