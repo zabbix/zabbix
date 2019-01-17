@@ -339,7 +339,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	*output = zbx_strdup(NULL, duk_safe_to_string(es->impl->ctx, -1));
 	duk_pop(es->impl->ctx);
-	es->impl->error_num = 0;;
+	es->impl->error_num = 0;
 
 	return SUCCEED;
 }
