@@ -1596,6 +1596,10 @@ class CDiscoveryRule extends CItemGeneral {
 			unset($condition);
 		}
 
+		if (!$dstDiscovery['lld_macro_paths']) {
+			unset($dstDiscovery['lld_macro_paths']);
+		}
+
 		// if this is a plain host, map discovery interfaces
 		if ($srcHost['status'] != HOST_STATUS_TEMPLATE) {
 			// find a matching interface

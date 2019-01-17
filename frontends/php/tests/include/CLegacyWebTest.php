@@ -257,7 +257,7 @@ class CLegacyWebTest extends CWebTest {
 
 	public function zbxTestMultiselectNew($id, $string) {
 		$xpath = 'xpath://div[contains(@class, "multiselect") and @id="'.$id.'"]/input';
-		$this->query($xpath)->one()->clear()->sendKeys($string);
+		$this->query($xpath)->one()->overwrite($string);
 		$this->zbxTestClickXpathWait(
 			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='available']".
 			"/ul[@class='multiselect-suggest']/li[@data-id='$string']"
@@ -435,7 +435,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestAssertAttribute($xpath, $attribute, $value = 'true') {
-		$this->assertEquals($this->query('xpath:'.$xpath)->one()->getAttribute($attribute), $value);
+		$this->assertEquals($value, $this->query('xpath:'.$xpath)->one()->getAttribute($attribute));
 	}
 
 	public function zbxTestAssertElementNotPresentId($id) {
@@ -478,7 +478,7 @@ class CLegacyWebTest extends CWebTest {
 		$caller = $trace[2];
 
 		if ($caller['class'] !== __CLASS__) {
-			$this->addWarning('Web driver selector should not be used in test cases.');
+			self::addWarning('Web driver selector should not be used in test cases.');
 		}
 
 		return $this->query($type, $locator);
@@ -708,6 +708,7 @@ class CLegacyWebTest extends CWebTest {
 							"/option[@value='{$value}']";
 
 		$this->zbxTestClickXpathWait($xpath);
+		$this->zbxTestWaitForPageToLoad();
 	}
 
 	/**
@@ -742,7 +743,7 @@ class CLegacyWebTest extends CWebTest {
 
 	public function __get($attribute) {
 		if ($attribute === 'webDriver') {
-			$this->addWarning('Web driver should not be accessed directly from test cases.');
+			self::addWarning('Web driver should not be accessed directly from test cases.');
 			return CElementQuery::getDriver();
 		}
 

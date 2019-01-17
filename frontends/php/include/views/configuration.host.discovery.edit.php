@@ -689,7 +689,7 @@ $lld_macro_paths_form_list = new CFormList();
 $lld_macro_paths_table = (new CTable())
 	->setId('lld_macro_paths')
 	->addStyle('width: 100%;')
-	->setHeader([_('LLD Macro'), _('JSONPath'), '']);
+	->setHeader([_('LLD macro'), _('JSONPath'), '']);
 
 $lld_macro_paths = $data['lld_macro_paths'];
 
@@ -741,7 +741,7 @@ $lld_macro_paths_table->setFooter((new CCol(
 		->setEnabled(!$templated)
 ))->setColSpan(3));
 
-$lld_macro_paths_form_list->addRow(_('LLD Macro'),
+$lld_macro_paths_form_list->addRow(_('LLD macros'),
 	(new CDiv($lld_macro_paths_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -758,7 +758,7 @@ $itemTab = (new CTabView())
 				)
 			)
 	)
-	->addTab('lldMacroTab', _('LLD Macro'), $lld_macro_paths_form_list)
+	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list)
 	->addTab('macroTab', _('Filters'), $conditionFormList);
 
 if (!hasRequest('form_refresh')) {
