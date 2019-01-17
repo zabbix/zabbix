@@ -22,10 +22,9 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 class testDiscoveryRule extends CAPITest {
-	public static function discoveryrule_create_data() {
+	public static function discoveryrule_create_data_invalid() {
 		return [
-			// Check permissions to host.
-			[
+			'Test invalid permissions to host' => [
 				'discoveryrule' => [
 					'name' => 'API LLD rule 5',
 					'key_' => 'apilldrule5',
@@ -36,8 +35,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			// Check if correct interface ID.
-			[
+			'Test invalid interface ID' => [
 				'discoveryrule' => [
 					'name' => 'API LLD rule 5',
 					'key_' => 'apilldrule5',
@@ -48,8 +46,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Item uses host interface from non-parent host.'
 			],
-			// Check if LLD rule name and key already exists.
-			[
+			'Test if LLD rule name and key already exists' => [
 				'discoveryrule' => [
 					'name' => 'API LLD rule 4',
 					'key_' => 'apilldrule4',
@@ -59,9 +56,15 @@ class testDiscoveryRule extends CAPITest {
 					'delay' => '30s'
 				],
 				'expected_error' => 'Item with key "apilldrule4" already exists on "API Host".'
-			],
-			// Create a LLD rule with default properties.
-			[
+			]
+		];
+
+		// TODO: add other properties, multiple rules, duplicates etc.
+	}
+
+	public static function discoveryrule_create_data_valid() {
+		return [
+			'Test valid LLD rule with default properties' => [
 				'discoveryrule' => [
 					'name' => 'API LLD rule 5',
 					'key_' => 'apilldrule5',
@@ -78,7 +81,8 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	/**
-	 * @dataProvider discoveryrule_create_data
+	 * @dataProvider discoveryrule_create_data_invalid
+	 * @dataProvider discoveryrule_create_data_valid
 	 * @backup items
 	 */
 	public function testDiscoveryRule_Create(array $discoveryrules, $expected_error) {
@@ -108,8 +112,10 @@ class testDiscoveryRule extends CAPITest {
 		// TODO: perform advanced checks and other fields.
 	}
 
-	public static function discoveryrule_preprocessing_create_data() {
-		$def_options = [
+	public static function discoveryrule_preprocessing_create_data_invalid() {
+		$test_data = self::discoveryrule_preprocessing_data_invalid();
+
+		$default_options = [
 			'name' => 'API LLD rule 5',
 			'key_' => 'apilldrule5',
 			'hostid' => '50009',
@@ -118,588 +124,36 @@ class testDiscoveryRule extends CAPITest {
 			'delay' => '30s'
 		];
 
-		// Check preprocessing fields.
-		return [
-			// Check incorrect preprocessing type.
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => ''
-				],
-				'expected_error' => 'Incorrect arguments passed to function.'
-			],
-			// Check no fields given.
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[]
-					]
-				],
-				'expected_error' => 'Item pre-processing is missing parameters: type, params, error_handler, error_handler_params'
-			],
-			// Check empty fields.
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => null,
-							'params' => null,
-							'error_handler' => null,
-							'error_handler_params' => null
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "type": cannot be empty.'
-			],
-			// Check invalid type (array).
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => [],
-							'params' => null,
-							'error_handler' => null,
-							'error_handler_params' => null
-						]
-					]
-				],
-				'expected_error' => 'Incorrect arguments passed to function.'
-			],
-			// Check invalid type (string).
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => 'abc',
-							'params' => '',
-							'error_handler' => '',
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "type": unexpected value "abc".'
-			],
-			// Check invalid type (integer).
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => 666,
-							'params' => '',
-							'error_handler' => '',
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "type": unexpected value "666".'
-			],
-			// Check unallowed type (integer).
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_OCT2DEC,
-							'params' => '',
-							'error_handler' => '',
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "type": unexpected value "'.ZBX_PREPROC_OCT2DEC.'".'
-			],
-			// Check empty params, but valid type.
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => '',
-							'error_handler' => '',
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "params": cannot be empty.'
-			],
-			// Check invalid params, but valid type.
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => [],
-							'error_handler' => '',
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect arguments passed to function.'
-			],
-			// Check second parameter for this type.
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => '^abc$',
-							'error_handler' => '',
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "params": second parameter is expected.'
-			],
-			// Check if error handler is empty.
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => "^abc$\n123",
-							'error_handler' => '',
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "".'
-			],
-			// Check if error handler is valid (array).
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => "^abc$\n123",
-							'error_handler' => [],
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect arguments passed to function.'
-			],
-			// Check if error handler is valid (string).
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => "^abc$\n123",
-							'error_handler' => 'abc',
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "abc".'
-			],
-			// Check if error handler is valid (integer).
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => "^abc$\n123",
-							'error_handler' => 666,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "666".'
-			],
-			// Check if error handler params is empty (should not be).
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => "^abc$\n123",
-							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
-			],
-			// Check if error handler params is valid (array).
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => "^abc$\n123",
-							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
-							'error_handler_params' => []
-						]
-					]
-				],
-				'expected_error' => 'Incorrect arguments passed to function.'
-			],
-			// Check if error handler params is empty (should be).
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => "^abc$\n123",
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => 'abc'
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
-			],
-			// Check if error handler params is empty (should be).
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => "^abc$\n123",
-							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
-							'error_handler_params' => 'abc'
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
-			],
-			// Check ather types.
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_JSONPATH,
-							'params' => '$.path.to.node',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => 'Error param'
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_JSONPATH,
-							'params' => '$.path.to.node',
-							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
-							'error_handler_params' => 'Error param'
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => 'Error param'
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
-							'error_handler_params' => 'Error param'
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_ERROR.'".'
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => 'Error param'
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
-							'error_handler_params' => 'Error param'
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "params": a time unit is expected.'
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-							'params' => '{#MACRO}',
-							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-							'params' => '{#MACRO}',
-							'error_handler' => ZBX_PREPROC_FAIL_SET_VALUE,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_VALUE.'".'
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-							'params' => '1h',
-							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_ERROR.'".'
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
-			],
-			// Check two steps.
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-							'params' => '1h',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						],
-						[
-							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-							'params' => '1h',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Only one throttling step is allowed.'
-			],
-			// Check valid LLD rules.
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => []
-				],
-				'expected_error' => null
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => "^abc\n123$",
-							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
-							'error_handler_params' => 'Error param'
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_JSONPATH,
-							'params' => '$.path.to.node',
-							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_JSONPATH,
-							'params' => '$.path.to.node',
-							'error_handler' => ZBX_PREPROC_FAIL_SET_VALUE,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_JSONPATH,
-							'params' => '$.path.to.node',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						],
-						[
-							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
-							'params' => 'def',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-							'params' => '{$MACRO}',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-							'params' => '{#MACRO}',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'discoveryrule' => $def_options + [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-							'params' => '1h',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => null
-			]
+		foreach ($test_data as &$test) {
+			$test['discoveryrule'] += $default_options;
+		}
+		unset($test);
+
+		return $test_data;
+	}
+
+	public static function discoveryrule_preprocessing_create_data_valid() {
+		$test_data = self::discoveryrule_preprocessing_data_valid();
+		$default_options = [
+			'name' => 'API LLD rule 5',
+			'key_' => 'apilldrule5',
+			'hostid' => '50009',
+			'type' => '0',
+			'interfaceid' => '50022',
+			'delay' => '30s'
 		];
 
-		// TODO: Create tests for items and item prototypes. It uses the same function to validate pre-processing fields.
+		foreach ($test_data as &$test) {
+			$test['discoveryrule'] += $default_options;
+		}
+		unset($test);
+
+		return $test_data;
 	}
 
 	/**
-	 * @dataProvider discoveryrule_preprocessing_create_data
+	 * @dataProvider discoveryrule_preprocessing_create_data_invalid
+	 * @dataProvider discoveryrule_preprocessing_create_data_valid
 	 * @backup items
 	 */
 	public function testDiscoveryRulePreprocessing_Create(array $discoveryrules, $expected_error) {
@@ -736,8 +190,133 @@ class testDiscoveryRule extends CAPITest {
 		// TODO: Create a test to check if preprocessing steps are inherited on host.
 	}
 
-	public static function discoveryrule_lld_macro_paths_create_data() {
-		$def_options = [
+	// TODO: Create API tests for items and item prototypes. It uses the same function to validate pre-processing fields.
+
+	public static function discoveryrule_lld_macro_paths_data_invalid() {
+		return [
+			'Test incorrect parameter type for lld_macro_paths' => [
+				'discoveryrule' => [
+					'lld_macro_paths' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths": an array is expected.'
+			],
+			'Test incorrect parameter type for lld_macro' => [
+				'discoveryrule' => [
+					'lld_macro_paths' => [
+						[
+							'lld_macro' => false
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a character string is expected.'
+			],
+			'Test incorrect type for lld_macro (multiple macro path index)' => [
+				'discoveryrule' => [
+					'lld_macro_paths' => [
+						[
+							'lld_macro' => '{#A}',
+							'path' => '$.list[:1].type'
+						],
+						[
+							'lld_macro' => '{#B}',
+							'path' => '$.list[:2].type'
+						],
+						[
+							'lld_macro' => false
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/3/lld_macro": a character string is expected.'
+			],
+			'Test empty lld_macro' => [
+				'discoveryrule' => [
+					'lld_macro_paths' => [
+						[
+							'lld_macro' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
+			],
+			'Test incorrect value for lld_macro' => [
+				'discoveryrule' => [
+					'lld_macro_paths' => [
+						[
+							'lld_macro' => 'abc'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+			],
+			'Test missing path parameter for lld_macro_paths' => [
+				'discoveryrule' => [
+					'lld_macro_paths' => [
+						[
+							'lld_macro' => '{#A}'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1": the parameter "path" is missing.'
+			],
+			'Test incorrect type for path parameter in lld_macro_paths' => [
+				'discoveryrule' => [
+					'lld_macro_paths' => [
+						[
+							'lld_macro' => '{#A}',
+							'path' => false
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/path": a character string is expected.'
+			],
+			'Test empty path parameter in lld_macro_paths' => [
+				'discoveryrule' => [
+					'lld_macro_paths' => [
+						[
+							'lld_macro' => '{#A}',
+							'path' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
+			],
+			'Test duplicate lld_macro entries' => [
+				'discoveryrule' => [
+					'lld_macro_paths' => [
+						[
+							'lld_macro' => '{#A}',
+							'path' => '$.list[:1].type'
+						],
+						[
+							'lld_macro' => '{#B}',
+							'path' => '$.list[:2].type'
+						],
+						[
+							'lld_macro' => '{#B}',
+							'path' => '$.list[:2].type'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/3/lld_macro": value "{#B}" already exists.'
+			],
+			'Test unexpected parameters lld_macro_paths' => [
+				'discoveryrule' => [
+					'lld_macro_paths' => [
+						[
+							'lld_macro' => '{#A}',
+							'path' => '$.list[:1].type',
+							'param' => 'value'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1": unexpected parameter "param".'
+			]
+		];
+	}
+
+	public static function discoveryrule_lld_macro_paths_create_data_invalid() {
+		$test_data = self::discoveryrule_lld_macro_paths_data_invalid();
+		$default_options = [
 			'name' => 'API LLD rule 5',
 			'key_' => 'apilldrule5',
 			'hostid' => '50009',
@@ -746,18 +325,15 @@ class testDiscoveryRule extends CAPITest {
 			'delay' => '30s'
 		];
 
-		return [
-			// Check LLD macro paths: incorrect parameter type.
-			[
-				'discoveryrule' => $def_options + [
-					'lld_macro_paths' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths": an array is expected.'
-			],
-			// Check LLD macro paths: incorrect parameter type (multiple rules index).
-			[
+		foreach ($test_data as &$test) {
+			$test['discoveryrule'] += $default_options;
+		}
+		unset($test);
+
+		return $test_data + [
+			'Test multiple discovery rules and one is broken' => [
 				'discoveryrule' => [
-					$def_options + [
+					$default_options + [
 						'lld_macro_paths' => [
 							[
 								'lld_macro' => '{#A}',
@@ -777,118 +353,65 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/2/lld_macro_paths": an array is expected.'
 			],
-			// Check LLD macro paths: empty array.
-			[
-				'discoveryrule' => $def_options + [
+			'Test empty lld_macro_paths' => [
+				'discoveryrule' => $default_options + [
 					'lld_macro_paths' => []
 				],
 				'expected_error' => 'Invalid parameter "/1/lld_macro_paths": cannot be empty.'
 			],
-			// Check LLD macro paths: empty array of arrays.
-			[
-				'discoveryrule' => $def_options + [
+			'Test no parameters in lld_macro_paths (create)' => [
+				'discoveryrule' => $default_options + [
 					'lld_macro_paths' => [[]]
 				],
 				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1": the parameter "lld_macro" is missing.'
+			]
+		];
+	}
+
+	public static function discoveryrule_lld_macro_paths_update_data_invalid() {
+		$test_data = self::discoveryrule_lld_macro_paths_data_invalid();
+		$default_options = ['itemid' => '110006'];
+
+		foreach ($test_data as &$test) {
+			$test['discoveryrule'] += $default_options;
+		}
+		unset($test);
+
+		return $test_data + [
+			'Test incorrect second lld_macro_paths type' => [
+				'discoveryrule' => [
+					[
+						'itemid' => '110006',
+						'lld_macro_paths' => []
+					],
+					[
+						'itemid' => '110007',
+						'lld_macro_paths' => ''
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2/lld_macro_paths": an array is expected.'
 			],
-			// Check LLD macro paths: incorrect type for "lld_macro".
-			[
-				'discoveryrule' => $def_options + [
+			'Test no parameters in lld_macro_paths (update)' => [
+				'discoveryrule' => $default_options + [
+					'lld_macro_paths' => [[]]
+				],
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1": cannot be empty.'
+			],
+			'Test incorrect lld_macro_pathid' => [
+				'discoveryrule' => $default_options + [
 					'lld_macro_paths' => [
 						[
-							'lld_macro' => false
+							'lld_macro_pathid' => '999999',
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a character string is expected.'
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			// Check LLD macro paths: incorrect type for "lld_macro" (multiple macro path index).
-			[
-				'discoveryrule' => $def_options + [
+			'Test duplicate LLD macro paths entries by giving lld_macro_pathid and existing lld_macro' => [
+				'discoveryrule' => $default_options + [
 					'lld_macro_paths' => [
 						[
-							'lld_macro' => '{#A}',
-							'path' => '$.list[:1].type'
-						],
-						[
-							'lld_macro' => '{#B}',
-							'path' => '$.list[:2].type'
-						],
-						[
-							'lld_macro' => false
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/3/lld_macro": a character string is expected.'
-			],
-			// Check LLD macro paths: empty "lld_macro".
-			[
-				'discoveryrule' => $def_options + [
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
-			],
-			// Check LLD macro paths: incorrect value for "lld_macro".
-			[
-				'discoveryrule' => $def_options + [
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => 'abc'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
-			],
-			// Check LLD macro paths: missing "path" parameter.
-			[
-				'discoveryrule' => $def_options + [
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => '{#A}'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1": the parameter "path" is missing.'
-			],
-			// Check LLD macro paths: incorrect type for "path".
-			[
-				'discoveryrule' => $def_options + [
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => '{#A}',
-							'path' => false
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/path": a character string is expected.'
-			],
-			// Check LLD macro paths: empty "path".
-			[
-				'discoveryrule' => $def_options + [
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => '{#A}',
-							'path' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
-			],
-			// Check LLD macro paths: duplicate LLD macro paths entries.
-			[
-				'discoveryrule' => $def_options + [
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => '{#A}',
-							'path' => '$.list[:1].type'
-						],
-						[
-							'lld_macro' => '{#B}',
-							'path' => '$.list[:2].type'
+							'lld_macro_pathid' => '2',
 						],
 						[
 							'lld_macro' => '{#B}',
@@ -896,24 +419,31 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/3/lld_macro": value "{#B}" already exists.'
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/2/lld_macro": value "{#B}" already exists.'
 			],
-			// Check LLD macro paths: check unexpected parameters.
-			[
-				'discoveryrule' => $def_options + [
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => '{#A}',
-							'path' => '$.list[:1].type',
-							'param' => 'value'
-						]
-					]
+			'Test removal of LLD macro paths on templated discovery rule' => [
+				'discoveryrule' => [
+					'itemid' => '110011',
+					'lld_macro_paths' => []
 				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1": unexpected parameter "param".'
-			],
-			// Check successful creation of LLD rule with LLD macro paths on a host.
-			[
-				'discoveryrule' => $def_options + [
+				'expected_error' => 'Invalid parameter "/1/lld_macro_paths": cannot update property for templated discovery rule.'
+			]
+		];
+	}
+
+	public static function discoveryrule_lld_macro_paths_create_data_valid() {
+		$default_options = [
+			'name' => 'API LLD rule 5',
+			'key_' => 'apilldrule5',
+			'hostid' => '50009',
+			'type' => '0',
+			'interfaceid' => '50022',
+			'delay' => '30s'
+		];
+
+		return [
+			'Test successful creation of LLD rule with LLD macro paths on a host' => [
+				'discoveryrule' => $default_options + [
 					'lld_macro_paths' => [
 						[
 							'lld_macro' => '{#A}',
@@ -931,8 +461,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Check successful creation of LLD rule with LLD macro paths on a template.
-			[
+			'Test successful creation of LLD rule with LLD macro paths on a template' => [
 				'discoveryrule' => [
 					'name' => 'API LLD rule 5',
 					'key_' => 'apilldrule5',
@@ -960,7 +489,8 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	/**
-	 * @dataProvider discoveryrule_lld_macro_paths_create_data
+	 * @dataProvider discoveryrule_lld_macro_paths_create_data_invalid
+	 * @dataProvider discoveryrule_lld_macro_paths_create_data_valid
 	 * @backup items
 	 */
 	public function testDiscoveryRuleLLDMacroPaths_Create(array $discoveryrules, $expected_error) {
@@ -995,35 +525,25 @@ class testDiscoveryRule extends CAPITest {
 
 	// TODO: create a separate test to perform updates on discovery rules and its properties.
 
-	public static function discoveryrule_preprocessing_update_data() {
-		/*
-		 * Test data mostly just duplicates the data from create() test, but with few exceptions because:
-		 *   1) create and update both allow "preprocessing" to be empty.
-		 *   2) No individual step update, so it's just replacing everything with the new array.
-		 */
-
+	public static function discoveryrule_preprocessing_data_invalid() {
+		// Check preprocessing fields.
 		return [
-			// Check invalid preprocessing type.
-			[
+			'Test incorrect preprocessing type' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => ''
 				],
 				'expected_error' => 'Incorrect arguments passed to function.'
 			],
-			[
+			'Test no preprocessing fields' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[]
 					]
 				],
 				'expected_error' => 'Item pre-processing is missing parameters: type, params, error_handler, error_handler_params'
 			],
-			// Check empty fields.
-			[
+			'Test empty preprocessing fields (null)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => null,
@@ -1035,10 +555,34 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "type": cannot be empty.'
 			],
-			// Check invalid type (array).
-			[
+			'Test empty preprocessing fields (bool)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => false,
+							'params' => null,
+							'error_handler' => null,
+							'error_handler_params' => null
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "type": cannot be empty.'
+			],
+			'Test empty preprocessing fields (string)' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => '',
+							'params' => null,
+							'error_handler' => null,
+							'error_handler_params' => null
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "type": cannot be empty.'
+			],
+			'Test invalid preprocessing type (array)' => [
+				'discoveryrule' => [
 					'preprocessing' => [
 						[
 							'type' => [],
@@ -1050,10 +594,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect arguments passed to function.'
 			],
-			// Check invalid type (string).
-			[
+			'Test invalid preprocessing type (string)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => 'abc',
@@ -1065,10 +607,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "type": unexpected value "abc".'
 			],
-			// Check invalid type (integer).
-			[
+			'Test invalid preprocessing type (integer)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => 666,
@@ -1080,10 +620,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "type": unexpected value "666".'
 			],
-			// Check unallowed type (integer).
-			[
+			'Test unallowed preprocessing type (integer)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_OCT2DEC,
@@ -1095,10 +633,34 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "type": unexpected value "'.ZBX_PREPROC_OCT2DEC.'".'
 			],
-			// Check empty params, but valid type.
-			[
+			'Test valid type but empty preprocessing params (null)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => null,
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": cannot be empty.'
+			],
+			'Test valid type but empty preprocessing params (bool)' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => false,
+							'error_handler' => '',
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": cannot be empty.'
+			],
+			'Test valid type but empty preprocessing params (string)' => [
+				'discoveryrule' => [
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -1110,10 +672,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "params": cannot be empty.'
 			],
-			// Check invalid params, but valid type.
-			[
+			'Test valid type but incorrect preprocessing params (array)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -1125,10 +685,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect arguments passed to function.'
 			],
-			// Check second parameter for this type.
-			[
+			'Test preprocessing params second parameter' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -1140,10 +698,34 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "params": second parameter is expected.'
 			],
-			// Check if error handler is empty.
-			[
+			'Test empty preprocessing error handler (null)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => null,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "".'
+			],
+			'Test empty preprocessing error handler (bool)' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => false,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "".'
+			],
+			'Test empty preprocessing error handler (string)' => [
+				'discoveryrule' => [
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -1155,10 +737,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "".'
 			],
-			// Check if error handler is valid (array).
-			[
+			'Test incorrect preprocessing error handler (array)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -1170,10 +750,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect arguments passed to function.'
 			],
-			// Check if error handler is valid (string).
-			[
+			'Test incorrect preprocessing error handler (string)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -1185,10 +763,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "abc".'
 			],
-			// Check if error handler is valid (integer).
-			[
+			'Test incorrect preprocessing error handler (integer)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -1200,10 +776,34 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "666".'
 			],
-			// Check if error handler params is empty (should not be).
-			[
+			'Test empty preprocessing error handler params (null)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => null
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+			],
+			'Test empty preprocessing error handler params (bool)' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc$\n123",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => false
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+			],
+			'Test empty preprocessing error handler params (string)' => [
+				'discoveryrule' => [
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -1215,10 +815,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
 			],
-			// Check if error handler params is valid (array).
-			[
+			'Test incorrect preprocessing error handler params (array)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -1230,10 +828,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect arguments passed to function.'
 			],
-			// Check if error handler params is empty (should be).
-			[
+			'Test filled preprocessing error handler params (ZBX_PREPROC_REGSUB + ZBX_PREPROC_FAIL_DEFAULT)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -1245,10 +841,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
 			],
-			// Check if error handler params is empty (should be).
-			[
+			'Test filled preprocessing error handler params (ZBX_PREPROC_REGSUB + ZBX_PREPROC_FAIL_DISCARD_VALUE)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -1260,10 +854,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
 			],
-			// Check ather types.
-			[
+			'Test filled preprocessing error handler params (ZBX_PREPROC_JSONPATH + ZBX_PREPROC_FAIL_DEFAULT)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_JSONPATH,
@@ -1275,9 +867,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
 			],
-			[
+			'Test filled preprocessing error handler params (ZBX_PREPROC_JSONPATH + ZBX_PREPROC_FAIL_DISCARD_VALUE)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_JSONPATH,
@@ -1289,9 +880,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
 			],
-			[
+			'Test empty preprocessing error handler params (ZBX_PREPROC_VALIDATE_NOT_REGEX + ZBX_PREPROC_FAIL_SET_ERROR)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
@@ -1303,9 +893,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
 			],
-			[
+			'Test filled preprocessing error handler params (ZBX_PREPROC_VALIDATE_NOT_REGEX + ZBX_PREPROC_FAIL_DEFAULT)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
@@ -1317,9 +906,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
 			],
-			[
+			'Test filled preprocessing error handler params (ZBX_PREPROC_VALIDATE_NOT_REGEX + ZBX_PREPROC_FAIL_DISCARD_VALUE)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
@@ -1331,9 +919,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
 			],
-			[
+			'Test unallowed preprocessing error handler for type ZBX_PREPROC_ERROR_FIELD_JSON' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
@@ -1345,9 +932,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_ERROR.'".'
 			],
-			[
+			'Test filled preprocessing error handler params (ZBX_PREPROC_ERROR_FIELD_JSON + ZBX_PREPROC_FAIL_DEFAULT)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
@@ -1359,9 +945,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
 			],
-			[
+			'Test unallowed preprocessing error handler for type ZBX_PREPROC_ERROR_FIELD_JSON' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
@@ -1373,9 +958,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
 			],
-			[
+			'Test incorrect preprocessing params for type ZBX_PREPROC_THROTTLE_TIMED_VALUE' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
@@ -1387,9 +971,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "params": a time unit is expected.'
 			],
-			[
+			'Test unallowed preprocessing error handler (ZBX_PREPROC_THROTTLE_TIMED_VALUE + ZBX_PREPROC_FAIL_DISCARD_VALUE)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
@@ -1401,9 +984,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
 			],
-			[
+			'Test unallowed preprocessing error handler (ZBX_PREPROC_THROTTLE_TIMED_VALUE + ZBX_PREPROC_FAIL_SET_VALUE)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
@@ -1415,9 +997,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_VALUE.'".'
 			],
-			[
+			'Test unallowed preprocessing error handler (ZBX_PREPROC_THROTTLE_TIMED_VALUE + ZBX_PREPROC_FAIL_SET_ERROR)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
@@ -1429,9 +1010,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_ERROR.'".'
 			],
-			[
+			'Test unallowed preprocessing error handler (ZBX_PREPROC_ERROR_FIELD_JSON + ZBX_PREPROC_FAIL_DISCARD_VALUE)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
@@ -1443,10 +1023,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
 			],
-			// Check two steps.
-			[
+			'Test two preprocessing steps for type ZBX_PREPROC_THROTTLE_TIMED_VALUE' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
@@ -1463,63 +1041,20 @@ class testDiscoveryRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Only one throttling step is allowed.'
-			],
-			// Check individual step update with only one parameter.
-			[
+			]
+		];
+	}
+
+	public static function discoveryrule_preprocessing_data_valid() {
+		return [
+			'Test valid empty preprocessing' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
-					'preprocessing' => [
-						[
-							'item_preprocid' => '5716',
-							'params' => '2h'
-						]
-					]
-				],
-				'expected_error' => 'Item pre-processing is missing parameters: type, error_handler, error_handler_params'
-			],
-			// Check templated steps update.
-			[
-				'discoveryrule' => [
-					'itemid' => '110011',
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => "^abc\n123$",
-							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
-							'error_handler_params' => 'Error param'
-						]
-					]
-				],
-				// After ZBX-3783 (112) is fixed, this will fail with error.
-				'expected_error' => null
-			],
-			// Check replacing of steps, but also give specific step ID (which is ignored).
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'preprocessing' => [
-						[
-							'item_preprocid' => '5536',
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => "^abc\n123$",
-							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
-							'error_handler_params' => 'Error param'
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			// Check valid LLD rules.
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => []
 				],
 				'expected_error' => null
 			],
-			[
+			'Test valid preprocessing (ZBX_PREPROC_REGSUB + ZBX_PREPROC_FAIL_SET_ERROR)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -1531,9 +1066,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			[
+			'Test valid preprocessing (ZBX_PREPROC_JSONPATH + ZBX_PREPROC_FAIL_DISCARD_VALUE)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_JSONPATH,
@@ -1545,9 +1079,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			[
+			'Test valid preprocessing (ZBX_PREPROC_JSONPATH + ZBX_PREPROC_FAIL_SET_VALUE)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_JSONPATH,
@@ -1559,9 +1092,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			[
+			'Test valid preprocessing (ZBX_PREPROC_JSONPATH + ZBX_PREPROC_FAIL_DEFAULT)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_JSONPATH,
@@ -1573,9 +1105,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			[
+			'Test valid preprocessing (ZBX_PREPROC_VALIDATE_NOT_REGEX + ZBX_PREPROC_FAIL_DEFAULT)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
@@ -1587,9 +1118,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			[
+			'Test two valid preprocessing steps (same)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
@@ -1607,9 +1137,27 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			[
+			'Test two valid preprocessing steps (different)' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						],
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid preprocessing (ZBX_PREPROC_ERROR_FIELD_JSON + ZBX_PREPROC_FAIL_DEFAULT)' => [
+				'discoveryrule' => [
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
@@ -1621,9 +1169,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			[
+			'Test valid preprocessing with user macro for type ZBX_PREPROC_THROTTLE_TIMED_VALUE' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
@@ -1635,9 +1182,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			[
+			'Test valid preprocessing with LLD macro for type ZBX_PREPROC_THROTTLE_TIMED_VALUE' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
@@ -1649,9 +1195,8 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			[
+			'Test valid preprocessing with time unit for type ZBX_PREPROC_THROTTLE_TIMED_VALUE' => [
 				'discoveryrule' => [
-					'itemid' => '110006',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE,
@@ -1662,9 +1207,74 @@ class testDiscoveryRule extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			]
+		];
+	}
+
+	public static function discoveryrule_preprocessing_update_data_invalid() {
+		$test_data = self::discoveryrule_preprocessing_data_invalid();
+		$default_options = ['itemid' => '110006'];
+
+		foreach ($test_data as &$test) {
+			$test['discoveryrule'] += $default_options;
+		}
+		unset($test);
+
+		return $test_data + [
+			'Test individual preprocessing step update with only one parameter' => [
+				'discoveryrule' => $default_options + [
+					'preprocessing' => [
+						[
+							'item_preprocid' => '5716',
+							'params' => '2h'
+						]
+					]
+				],
+				'expected_error' => 'Item pre-processing is missing parameters: type, error_handler, error_handler_params'
+			]
+		];
+	}
+
+	public static function discoveryrule_preprocessing_update_data_valid() {
+		$test_data = self::discoveryrule_preprocessing_data_valid();
+		$default_options = ['itemid' => '110006'];
+
+		foreach ($test_data as &$test) {
+			$test['discoveryrule'] += $default_options;
+		}
+		unset($test);
+
+		return $test_data + [
+			'Test templated discovery rule preprocessing step update' => [
+				'discoveryrule' => [
+					'itemid' => '110011',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc\n123$",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				// After ZBX-3783 (112) is fixed, this will fail with error.
+				'expected_error' => null
 			],
-			// Check different discovery rule that has no old steps set.
-			[
+			'Test replacing preprocessing steps by ID' => [
+				'discoveryrule' => $default_options + [
+					'preprocessing' => [
+						[
+							'item_preprocid' => '5536',
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc\n123$",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid update by adding new preprocessing steps' => [
 				'discoveryrule' => [
 					'itemid' => '110009',
 					'preprocessing' => [
@@ -1682,7 +1292,8 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	/**
-	 * @dataProvider discoveryrule_preprocessing_update_data
+	 * @dataProvider discoveryrule_preprocessing_update_data_invalid
+	 * @dataProvider discoveryrule_preprocessing_update_data_valid
 	 * @backup items
 	 */
 	public function testDiscoveryRulePreprocessing_Update($discoveryrules, $expected_error) {
@@ -1813,221 +1424,23 @@ class testDiscoveryRule extends CAPITest {
 		}
 	}
 
-	public static function discoveryrule_lld_macro_paths_update_data() {
+	public static function discoveryrule_lld_macro_paths_update_data_valid() {
 		return [
-			// Check LLD macro paths: incorrect parameter type.
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths": an array is expected.'
-			],
-			// Check LLD macro paths: incorrect parameter type (multiple rules index).
-			[
-				'discoveryrule' => [
-					[
-						'itemid' => '110006',
-						'lld_macro_paths' => []
-					],
-					[
-						'itemid' => '110007',
-						'lld_macro_paths' => ''
-					]
-				],
-				'expected_error' => 'Invalid parameter "/2/lld_macro_paths": an array is expected.'
-			],
-			// Check LLD macro paths: empty array of arrays.
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => [[]]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1": cannot be empty.'
-			],
-			// Check LLD macro paths: incorrect type for "lld_macro".
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => false
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a character string is expected.'
-			],
-			// Check LLD macro paths: incorrect type for "lld_macro" (multiple macro path index).
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => '{#A}',
-							'path' => '$.list[:1].type'
-						],
-						[
-							'lld_macro' => '{#B}',
-							'path' => '$.list[:2].type'
-						],
-						[
-							'lld_macro' => false
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/3/lld_macro": a character string is expected.'
-			],
-			// Check LLD macro paths: empty "lld_macro".
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
-			],
-			// Check LLD macro paths: incorrect value for "lld_macro".
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => 'abc'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
-			],
-			// Check LLD macro paths: missing "path" parameter.
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => '{#A}'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1": the parameter "path" is missing.'
-			],
-			// Check LLD macro paths: incorrect type for "path".
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => '{#A}',
-							'path' => false
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/path": a character string is expected.'
-			],
-			// Check LLD macro paths: empty "path".
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => '{#A}',
-							'path' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
-			],
-			// Check LLD macro paths: duplicate LLD macro paths entries.
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => '{#A}',
-							'path' => '$.list[:1].type'
-						],
-						[
-							'lld_macro' => '{#B}',
-							'path' => '$.list[:2].type'
-						],
-						[
-							'lld_macro' => '{#B}',
-							'path' => '$.list[:2].type'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/3/lld_macro": value "{#B}" already exists.'
-			],
-			// Check LLD macro paths: check unexpected parameters.
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => [
-						[
-							'lld_macro' => '{#A}',
-							'path' => '$.list[:1].type',
-							'param' => 'value'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/1": unexpected parameter "param".'
-			],
-			// Check LLD macro paths: incorrect "lld_macro_pathid".
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => [
-						[
-							'lld_macro_pathid' => '999999',
-						]
-					]
-				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			// Check LLD macro paths: duplicate LLD macro paths entries by giving "lld_macro_pathid" and existing "lld_macro".
-			[
-				'discoveryrule' => [
-					'itemid' => '110006',
-					'lld_macro_paths' => [
-						[
-							'lld_macro_pathid' => '2',
-						],
-						[
-							'lld_macro' => '{#B}',
-							'path' => '$.list[:2].type'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths/2/lld_macro": value "{#B}" already exists.'
-			],
-			// Try to delete LLD macro paths on templated discovery rule and fail.
-			[
-				'discoveryrule' => [
-					'itemid' => '110011',
-					'lld_macro_paths' => []
-				],
-				'expected_error' => 'Invalid parameter "/1/lld_macro_paths": cannot update property for templated discovery rule.'
-			],
-			// Check successful update of LLD rule by clearing the records on host.
-			[
+			'Test successful clearing of records for lld_macro_paths on host' => [
 				'discoveryrule' => [
 					'itemid' => '110008',
 					'lld_macro_paths' => []
 				],
 				'expected_error' => null
 			],
-			// Check successful update of LLD rule by clearing the records on template. Make sure inheritance works.
-			[
+			'Test successful clearing of records for lld_macro_paths on template' => [
 				'discoveryrule' => [
 					'itemid' => '110010',
 					'lld_macro_paths' => []
 				],
 				'expected_error' => null
 			],
-			// Check successful update of LLD rule by updating (doing nothing) existing records by "lld_macro_pathid".
-			[
+			'Test successful update by not chaning existing records by giving lld_macro_pathid' => [
 				'discoveryrule' => [
 					'itemid' => '110007',
 					'lld_macro_paths' => [
@@ -2044,8 +1457,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Check successful update of LLD rule by updating (doing nothing) existing records by "lld_macro_pathid" and same value "lld_macro".
-			[
+			'Test successful update by not chaning existing records by giving lld_macro_pathid and same lld_macro' => [
 				'discoveryrule' => [
 					'itemid' => '110007',
 					'lld_macro_paths' => [
@@ -2065,8 +1477,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Check successful update of LLD rule by updating "path" for existing records by "lld_macro_pathid".
-			[
+			'Test successful update of path for existing records by giving lld_macro_pathid' => [
 				'discoveryrule' => [
 					'itemid' => '110007',
 					'lld_macro_paths' => [
@@ -2086,8 +1497,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Check successful update of LLD rule by updating both "lld_macro" and "path" for existing records by "lld_macro_pathid".
-			[
+			'Test successful update of lld_macro and path for existing records by giving lld_macro_pathid' => [
 				'discoveryrule' => [
 					'itemid' => '110007',
 					'lld_macro_paths' => [
@@ -2110,8 +1520,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Check success update of LLD macro paths: add new records.
-			[
+			'Test successful update of lld_macro_paths by adding new records' => [
 				'discoveryrule' => [
 					'itemid' => '110007',
 					'lld_macro_paths' => [
@@ -2132,8 +1541,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Check success update of LLD macro paths: partial replace, delete and add new records all in one go.
-			[
+			'Test successful update of lld_macro_paths with partial replace, delete and adding new records in one request' => [
 				'discoveryrule' => [
 					'itemid' => '110006',
 					'lld_macro_paths' => [
@@ -2163,8 +1571,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Check success update of LLD macro paths: partial replace. Similar to previous, but with minor changes.
-			[
+			'Test successful update of lld_macro_paths with partial replace' => [
 				'discoveryrule' => [
 					'itemid' => '110006',
 					'lld_macro_paths' => [
@@ -2194,8 +1601,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Check success update of LLD macro paths: replace with exact values
-			[
+			'Test successful update of lld_macro_paths by replaceing them with exact values' => [
 				'discoveryrule' => [
 					'itemid' => '110006',
 					'lld_macro_paths' => [
@@ -2223,8 +1629,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Check success update of LLD macro paths: replace only one with new value, leaving rest the same.
-			[
+			'Test successful update of lld_macro_paths by replacing only one with new value and leaving rest the same' => [
 				'discoveryrule' => [
 					'itemid' => '110006',
 					'lld_macro_paths' => [
@@ -2252,8 +1657,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Check success update of LLD macro paths: replace only one record with new path.
-			[
+			'Test successful update of lld_macro_paths by replace only one record with new path' => [
 				'discoveryrule' => [
 					'itemid' => '110006',
 					'lld_macro_paths' => [
@@ -2281,8 +1685,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Check success update of LLD macro paths: delete one record.
-			[
+			'Test successful update of lld_macro_paths by deleting one record' => [
 				'discoveryrule' => [
 					'itemid' => '110006',
 					'lld_macro_paths' => [
@@ -2310,7 +1713,8 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	/**
-	 * @dataProvider discoveryrule_lld_macro_paths_update_data
+	 * @dataProvider discoveryrule_lld_macro_paths_update_data_invalid
+	 * @dataProvider discoveryrule_lld_macro_paths_update_data_valid
 	 * @backup items
 	 */
 	public function testDiscoveryRuleLLDMacroPaths_Update($discoveryrules, $expected_error) {
@@ -2531,8 +1935,7 @@ class testDiscoveryRule extends CAPITest {
 
 	public static function discoveryrule_preprocessing_delete_data() {
 		return [
-			// Check successful delete of discovery rule and pre-processing data.
-			[
+			'Test successful delete of LLD rule and preprocessing data' => [
 				'discoveryrule' => [
 					'110006'
 				],
@@ -2556,7 +1959,7 @@ class testDiscoveryRule extends CAPITest {
 					'SELECT i.itemid FROM items i WHERE i.itemid='.zbx_dbstr($id)
 				));
 
-				// Check related tables.
+				// Check related tables - preprocessing.
 				$this->assertEquals(0, CDBHelper::getCount(
 					'SELECT ip.item_preprocid'.
 					' FROM item_preproc ip'.
@@ -2570,8 +1973,7 @@ class testDiscoveryRule extends CAPITest {
 
 	public static function discoveryrule_lld_macro_paths_delete_data() {
 		return [
-			// Check successful delete of discovery rule and LLD macro paths.
-			[
+			'Test successful delete of LLD rule and LLD macro paths' => [
 				'discoveryrule' => [
 					'110009'
 				],
@@ -2595,7 +1997,7 @@ class testDiscoveryRule extends CAPITest {
 					'SELECT i.itemid FROM items i WHERE i.itemid='.zbx_dbstr($id)
 				));
 
-				// Check related tables.
+				// Check related tables - LLD macro paths.
 				$this->assertEquals(0, CDBHelper::getCount(
 					'SELECT lmp.lld_macro_pathid'.
 					' FROM lld_macro_path lmp'.
@@ -2607,15 +2009,32 @@ class testDiscoveryRule extends CAPITest {
 		// TODO: add templated discovery rules and check on errors.
 	}
 
-	public static function discoveryrule_get_data() {
+	public static function discoveryrule_get_data_invalid() {
 		return [
-			[
+			'Test getting non-existing LLD rule' => [
 				'discoveryrule' => [
 					'itemids' => '123456'
 				],
-				'get_result' =>[
+				'get_result' => [
 				],
-				'expected_error' => true
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			]
+		];
+
+		// TODO: add other discovery rule properties.
+	}
+
+	public static function discoveryrule_get_data_valid() {
+		return [
+			'Test getting existing LLD rule' => [
+				'discoveryrule' => [
+					'output' => ['itemid'],
+					'itemids' => ['110006']
+				],
+				'get_result' => [
+					'itemid' => '110006'
+				],
+				'expected_error' => null
 			]
 		];
 
@@ -2623,14 +2042,15 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	/**
-	 * @dataProvider discoveryrule_get_data
+	 * @dataProvider discoveryrule_get_data_invalid
+	 * @dataProvider discoveryrule_get_data_valid
 	 */
 	public function testDiscoveryRule_Get($discoveryrule, $get_result, $expected_error) {
 		// TODO: fill this test with more fields to check.
 
 		$result = $this->call('discoveryrule.get', $discoveryrule);
 
-		if ($expected_error === false) {
+		if ($expected_error === null) {
 			foreach ($result['result'] as $entry) {
 				$this->assertSame($entry['itemid'], $get_result['itemid']);
 			}
@@ -2640,12 +2060,12 @@ class testDiscoveryRule extends CAPITest {
 		}
 	}
 
-	public static function discoveryrule_lld_macro_paths_get_data() {
+	public static function discoveryrule_lld_macro_paths_get_data_valid() {
 		return [
-			[
+			'Test getting lld_macro and path' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
-					'itemids' => '110006',
+					'itemids' => ['110006'],
 					'selectLLDMacroPaths' => ['lld_macro', 'path']
 				],
 				'get_result' => [
@@ -2673,9 +2093,9 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => false
+				'expected_error' => null
 			],
-			[
+			'Test getting lld_macro_pathid, lld_macro and path' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
 					'itemids' => '110006',
@@ -2711,9 +2131,9 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => false
+				'expected_error' => null
 			],
-			[
+			'Test getting all LLD macro path fields' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
 					'itemids' => '110006',
@@ -2749,18 +2169,18 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => false
+				'expected_error' => null
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider discoveryrule_lld_macro_paths_get_data
+	 * @dataProvider discoveryrule_lld_macro_paths_get_data_valid
 	 */
 	public function testDiscoveryRuleLLDMacroPaths_Get($discoveryrule, $get_result, $expected_error) {
 		$result = $this->call('discoveryrule.get', $discoveryrule);
 
-		if ($expected_error === false) {
+		if ($expected_error === null) {
 			foreach ($result['result'] as $entry) {
 				$this->assertSame($entry['itemid'], $get_result['itemid']);
 
@@ -2782,9 +2202,9 @@ class testDiscoveryRule extends CAPITest {
 		}
 	}
 
-	public static function discoveryrule_preprocessing_get_data() {
+	public static function discoveryrule_preprocessing_get_data_valid() {
 		return [
-			[
+			'Test getting type, params, error_handler and error_handler_params from preprocessing' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
 					'itemids' => '110006',
@@ -2819,9 +2239,9 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => false
+				'expected_error' => null
 			],
-			[
+			'Test getting params from preprocessing' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
 					'itemids' => '110010',
@@ -2844,9 +2264,9 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => false
+				'expected_error' => null
 			],
-			[
+			'Test getting all preprocessing fields' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
 					'itemids' => '110011',
@@ -2881,18 +2301,18 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => false
+				'expected_error' => null
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider discoveryrule_preprocessing_get_data
+	 * @dataProvider discoveryrule_preprocessing_get_data_valid
 	 */
 	public function testDiscoveryRulePreprocessing_Get($discoveryrule, $get_result, $expected_error) {
 		$result = $this->call('discoveryrule.get', $discoveryrule);
 
-		if ($expected_error === false) {
+		if ($expected_error === null) {
 			foreach ($result['result'] as $entry) {
 				$this->assertSame($entry['itemid'], $get_result['itemid']);
 
@@ -2914,101 +2334,97 @@ class testDiscoveryRule extends CAPITest {
 		}
 	}
 
-	public static function discoveryrule_copy_data() {
+	public static function discoveryrule_copy_data_invalid() {
 		return [
-			// Check empty LLD rule IDs.
-			[
+			'Test no discoveryids given when copying LLD rule' => [
 				'params' => [
 					'hostids' => ['50009']
 				],
 				'expected_error' => 'No discovery rule IDs given.'
 			],
-			[
+			'Test empty discoveryids when copying LLD rule' => [
 				'params' => [
 					'discoveryids' => '',
 					'hostids' => ['50009']
 				],
 				'expected_error' => 'No discovery rule IDs given.'
 			],
-			[
+			'Test incorrect discoveryids type when copying LLD rule' => [
 				'params' => [
 					'discoveryids' => [],
 					'hostids' => ['50009']
 				],
 				'expected_error' => 'No discovery rule IDs given.'
 			],
-			// Check empty host IDs.
-			[
+			'Test no hostids given when copying LLD rule' => [
 				'params' => [
 					'discoveryids' => ['110006']
 				],
 				'expected_error' => 'No host IDs given.'
 			],
-			[
+			'Test empty hostids when copying LLD rule' => [
 				'params' => [
 					'discoveryids' => ['110006'],
 					'hostids' => ''
 				],
 				'expected_error' => 'No host IDs given.'
 			],
-			[
+			'Test incorrect hostids type when copying LLD rule' => [
 				'params' => [
 					'discoveryids' => ['110006'],
 					'hostids' => []
 				],
 				'expected_error' => 'No host IDs given.'
 			],
-			// Check same host.
-			[
+			'Test copying on same host or when destination host already has that key' => [
 				'params' => [
 					'discoveryids' => ['110006'],
 					'hostids' => ['50009']
 				],
 				'expected_error' => 'Item with key "apilldrule1" already exists on "API Host".'
 			],
-			// Check invalid host.
-			[
+			'Test copying on non-existing host' => [
 				'params' => [
 					'discoveryids' => ['110006'],
 					'hostids' => ['1']
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			// Check invalid rule.
-			[
+			'Test copying a non-existing LLD rule' => [
 				'params' => [
 					'discoveryids' => ['1'],
 					'hostids' => ['50012']
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			// Copy from host to template.
-			[
+			'Test copying LLD rule to a template' => [
 				'params' => [
 					'discoveryids' => ['110006'],
 					'hostids' => ['50010']
 				],
 				'expected_error' => 'Cannot find host interface on "API Template" for item key "apilldrule1".'
 			],
-			// Check duplicate hosts.
-			[
+			'Test duplicate hosts in request' => [
 				'params' => [
 					'discoveryids' => ['110006'],
 					'hostids' => ['50012', '50012']
 				],
 				'expected_error' => 'Item with key "apilldrule1" already exists on "API Host for read permissions".'
 			],
-			// Check duplicate rules.
-			[
+			'Test duplicate LLD rules in request' => [
 				'params' => [
 					'discoveryids' => ['110006', '110006'],
 					'hostids' => ['50012']
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 				// TODO: Error is very strange and API should be checked for bugs.
-			],
-			// Check successful copy to two hosts.
-			[
+			]
+		];
+	}
+
+	public static function discoveryrule_copy_data_valid() {
+		return [
+			'Test successful LLD rule copy to two hosts' => [
 				'params' => [
 					'discoveryids' => ['110006'],
 					'hostids' => ['50012', '50013']
@@ -3016,12 +2432,11 @@ class testDiscoveryRule extends CAPITest {
 				'expected_error' => null
 			]
 		];
-
-		// NOTE: There are no discovered hosts to check copying to them.
 	}
 
 	/**
-	 * @dataProvider discoveryrule_copy_data
+	 * @dataProvider discoveryrule_copy_data_invalid
+	 * @dataProvider discoveryrule_copy_data_valid
 	 * @backup items
 	 */
 	public function testDiscoveryRule_Copy($params, $expected_error) {
@@ -3078,7 +2493,8 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	/**
-	 * @dataProvider discoveryrule_copy_data
+	 * @dataProvider discoveryrule_copy_data_invalid
+	 * @dataProvider discoveryrule_copy_data_valid
 	 * @backup items
 	 */
 	public function testDiscoveryRuleLLDMacroPaths_Copy($params, $expected_error) {
@@ -3131,7 +2547,8 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	/**
-	 * @dataProvider discoveryrule_copy_data
+	 * @dataProvider discoveryrule_copy_data_invalid
+	 * @dataProvider discoveryrule_copy_data_valid
 	 * @backup items
 	 */
 	public function testDiscoveryRulePreprocessing_Copy($params, $expected_error) {
@@ -3140,7 +2557,7 @@ class testDiscoveryRule extends CAPITest {
 		if ($expected_error === null) {
 			$this->assertTrue($result['result']);
 
-			// Get discovery rule and pre-processign fields.
+			// Get discovery rule and pre-processing fields.
 			$src_preprocessing = CDBHelper::getAll(
 				'SELECT ip.step,ip.type,ip.params,ip.error_handler,ip.error_handler_params,i.key_'.
 				' FROM item_preproc ip,items i'.
