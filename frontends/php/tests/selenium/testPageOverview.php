@@ -770,7 +770,6 @@ class testPageOverview extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
 			$this->zbxTestAssertElementPresentXpath("//header");
 			$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
-			$this->zbxTestCheckFatalErrors();
 		}
 		catch (Exception $e) {
 			// Reset fullscreen/kiosk mode.

@@ -52,7 +52,6 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Configuration updated');
 
-		$this->zbxTestCheckFatalErrors();
 		$this->assertEquals($oldHash, CDBHelper::getHash($sqlHash));
 	}
 
@@ -161,7 +160,6 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 			case TEST_GOOD:
 				$this->zbxTestTextNotPresent('Page received incorrect data');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Configuration updated');
-				$this->zbxTestCheckFatalErrors();
 				$result = DBfetch(DBselect('SELECT work_period FROM config'));
 				$this->assertEquals($work_period, $result['work_period']);
 				break;

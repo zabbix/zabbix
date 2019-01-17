@@ -60,16 +60,9 @@ $favourite_icon = get_icon('favourite', [
 
 $refresh_icon = get_icon('screenconf');
 
-if ($this->data['screen']) {
-	$refresh_icon->setMenuPopup(CMenuPopupHelper::getRefresh(
-		WIDGET_SLIDESHOW,
-		'x'.$this->data['refreshMultiplier'],
-		true,
-		[
-			'elementid' => $this->data['elementId']
-		]
-	));
-}
+$refresh_icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SLIDESHOW, 'x'.$this->data['refreshMultiplier'], true,
+	['elementid' => $this->data['elementId']]
+));
 
 if (isset($this->data['isDynamicItems'])) {
 	$controls->addItem([

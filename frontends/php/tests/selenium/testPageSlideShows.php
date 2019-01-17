@@ -119,7 +119,6 @@ class testPageSlideShows extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Slide show deleted');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM slideshows'));
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM slides'));

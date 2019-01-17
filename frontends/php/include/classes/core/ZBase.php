@@ -439,7 +439,7 @@ class ZBase {
 			foreach ($_REQUEST as $key => $value) {
 				// do not output SID
 				if ($key != 'sid') {
-					$response->addMessage($key.': '.$value);
+					$response->addMessage(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
 			}
 			CSession::setValue('messages', $response->getMessages());
