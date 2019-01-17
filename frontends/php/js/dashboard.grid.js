@@ -1272,12 +1272,11 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
 					current_url = new Curl(location.href),
-					url = new Curl('zabbix.php');
+					url = new Curl('zabbix.php', false);
 
 				// Don't show warning about existing updates
 				data['options']['updated'] = false;
 
-				url.unsetArgument('sid');
 				url.setArgument('action', 'dashboard.view');
 				if (current_url.getArgument('dashboardid')) {
 					url.setArgument('dashboardid', current_url.getArgument('dashboardid'));
