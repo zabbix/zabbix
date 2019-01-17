@@ -123,6 +123,7 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_items(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync);

@@ -102,8 +102,17 @@ typedef struct
 	unsigned char		schedulable;
 	unsigned char		update_triggers;
 	zbx_uint64_t		templateid;
+	zbx_uint64_t		parent_itemid; /* from joined item_discovery table */
 }
 ZBX_DC_ITEM;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	zbx_uint64_t		templateid;
+}
+ZBX_DC_TEMPLATE_ITEM;
 
 typedef struct
 {
@@ -711,6 +720,7 @@ typedef struct
 
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
+	zbx_hashset_t		template_items;		/* template items selected from items table */
 	zbx_hashset_t		numitems;
 	zbx_hashset_t		snmpitems;
 	zbx_hashset_t		ipmiitems;

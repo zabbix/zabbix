@@ -1285,6 +1285,9 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	if (FAIL == dbsync_compare_uint64(dbrow[57], item->templateid))
 		return FAIL;
 
+	if (FAIL == dbsync_compare_uint64(dbrow[58], item->parent_itemid))
+		return FAIL;
+
 	if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&dbsync_env.cache->hosts, &item->hostid)))
 		return FAIL;
 
@@ -1636,6 +1639,17 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	return SUCCEED;
 }
 
+static int	dbsync_compare_template_item(const ZBX_DC_TEMPLATE_ITEM *item, const DB_ROW dbrow)
+{
+	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_uint64(dbrow[2], item->templateid))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: dbsync_item_preproc_row                                          *
@@ -1700,9 +1714,6 @@ static char	**dbsync_item_preproc_row(char **row)
  *                                                                            *
  * Purpose: compares items table with cached configuration data               *
  *                                                                            *
- * Parameter: cache - [IN] the configuration cache                            *
- *            sync  - [OUT] the changeset                                     *
- *                                                                            *
  * Return value: SUCCEED - the changeset was successfully calculated          *
  *               FAIL    - otherwise                                          *
  *                                                                            *
@@ -1728,18 +1739,17 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.master_itemid,i.timeout,i.url,i.query_fields,i.posts,i.status_codes,"
 				"i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,"
 				"i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,"
-				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid"
-			" from items i,hosts h"
-			" where i.hostid=h.hostid"
-				" and h.status in (%d,%d,%d)"
-				" and i.flags<>%d",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
-			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
+				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid,id.parent_itemid"
+			" from items i"
+			" inner join hosts h on i.hostid=h.hostid"
+			" left join item_discovery id on i.itemid=id.itemid"
+			" where h.status in (%d,%d)",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)))
 	{
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 58, dbsync_item_preproc_row);
+	dbsync_prepare(sync, 59, dbsync_item_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -1777,6 +1787,72 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	DBfree_result(result);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dbsync_compare_template_items                                *
+ *                                                                            *
+ * Purpose: compares items that belong to templates with configuration cache  *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync)
+{
+	DB_ROW			dbrow;
+	DB_RESULT		result;
+	zbx_hashset_t		ids;
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		rowid;
+	ZBX_DC_TEMPLATE_ITEM	*item;
+	char			**row;
+
+	if (NULL == (result = DBselect(
+			"select i.itemid,i.hostid,i.templateid from items i inner join hosts h on i.hostid=h.hostid"
+			" where h.status=%d", HOST_STATUS_TEMPLATE)))
+	{
+		return FAIL;
+	}
+
+	dbsync_prepare(sync, 3, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		sync->dbresult = result;
+		return SUCCEED;
+	}
+
+	zbx_hashset_create(&ids, dbsync_env.cache->template_items.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	while (NULL != (dbrow = DBfetch(result)))
+	{
+		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
+
+		ZBX_STR2UINT64(rowid, dbrow[0]);
+		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
+
+		row = dbsync_preproc_row(sync, dbrow);
+
+		if (NULL == (item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_search(&dbsync_env.cache->template_items, &rowid)))
+			tag = ZBX_DBSYNC_ROW_ADD;
+		else if (FAIL == dbsync_compare_template_item(item, row))
+			tag = ZBX_DBSYNC_ROW_UPDATE;
+
+		if (ZBX_DBSYNC_ROW_NONE != tag)
+			dbsync_add_row(sync, rowid, tag, row);
+	}
+
+	zbx_hashset_iter_reset(&dbsync_env.cache->template_items, &iter);
+	while (NULL != (item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL == zbx_hashset_search(&ids, &item->itemid))
+			dbsync_add_row(sync, item->itemid, ZBX_DBSYNC_ROW_REMOVE, NULL);
+	}
 
 	return SUCCEED;
 }
