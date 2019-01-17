@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,16 +60,9 @@ $favourite_icon = get_icon('favourite', [
 
 $refresh_icon = get_icon('screenconf');
 
-if ($this->data['screen']) {
-	$refresh_icon->setMenuPopup(CMenuPopupHelper::getRefresh(
-		WIDGET_SLIDESHOW,
-		'x'.$this->data['refreshMultiplier'],
-		true,
-		[
-			'elementid' => $this->data['elementId']
-		]
-	));
-}
+$refresh_icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SLIDESHOW, 'x'.$this->data['refreshMultiplier'], true,
+	['elementid' => $this->data['elementId']]
+));
 
 if (isset($this->data['isDynamicItems'])) {
 	$controls->addItem([

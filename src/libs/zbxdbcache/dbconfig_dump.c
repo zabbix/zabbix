@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1058,7 +1058,7 @@ static int	maintenance_tag_compare(const void *v1, const void *v2)
 	if (0 != (ret = (strcmp(tag1->value, tag2->value))))
 		return ret;
 
-	ZBX_RETURN_IF_NOT_EQUAL(tag1->operator, tag2->operator);
+	ZBX_RETURN_IF_NOT_EQUAL(tag1->op, tag2->op);
 
 	return 0;
 }
@@ -1082,7 +1082,7 @@ static void	DCdump_maintenance_tags(zbx_dc_maintenance_t *maintenance)
 	{
 		zbx_dc_maintenance_tag_t	*tag = (zbx_dc_maintenance_tag_t *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "    maintenancetagid:" ZBX_FS_UI64 " operator:%u tag:'%s' value:'%s'",
-				tag->maintenancetagid, tag->operator, tag->tag, tag->value);
+				tag->maintenancetagid, tag->op, tag->tag, tag->value);
 	}
 
 	zbx_vector_ptr_destroy(&index);

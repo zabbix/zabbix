@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -770,7 +770,6 @@ class testPageOverview extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
 			$this->zbxTestAssertElementPresentXpath("//header");
 			$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
-			$this->zbxTestCheckFatalErrors();
 		}
 		catch (Exception $e) {
 			// Reset fullscreen/kiosk mode.
