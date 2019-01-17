@@ -65,31 +65,30 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
 
 	/* zabbix[process,<type>,<mode>,<state>] */
-	for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
-		memset(&process_stats[proc_type], 0, sizeof(zbx_process_info_t));
-
-	zbx_get_all_process_stats(process_stats);
 
 	zbx_json_addobject(json, "process");
 
-	for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
+	if (SUCCEED == zbx_get_all_process_stats(process_stats))
 	{
-		if (0 == process_stats[proc_type].count)
-			continue;
+		for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
+		{
+			if (0 == process_stats[proc_type].count)
+				continue;
 
-		zbx_json_addobject(json, get_process_type_string(proc_type));
-		zbx_json_addobject(json, "busy");
-		zbx_json_addfloat(json, "avg", process_stats[proc_type].busy_avg);
-		zbx_json_addfloat(json, "max", process_stats[proc_type].busy_max);
-		zbx_json_addfloat(json, "min", process_stats[proc_type].busy_min);
-		zbx_json_close(json);
-		zbx_json_addobject(json, "idle");
-		zbx_json_addfloat(json, "avg", process_stats[proc_type].idle_avg);
-		zbx_json_addfloat(json, "max", process_stats[proc_type].idle_max);
-		zbx_json_addfloat(json, "min", process_stats[proc_type].idle_min);
-		zbx_json_close(json);
-		zbx_json_adduint64(json, "count", process_stats[proc_type].count);
-		zbx_json_close(json);
+			zbx_json_addobject(json, get_process_type_string(proc_type));
+			zbx_json_addobject(json, "busy");
+			zbx_json_addfloat(json, "avg", process_stats[proc_type].busy_avg);
+			zbx_json_addfloat(json, "max", process_stats[proc_type].busy_max);
+			zbx_json_addfloat(json, "min", process_stats[proc_type].busy_min);
+			zbx_json_close(json);
+			zbx_json_addobject(json, "idle");
+			zbx_json_addfloat(json, "avg", process_stats[proc_type].idle_avg);
+			zbx_json_addfloat(json, "max", process_stats[proc_type].idle_max);
+			zbx_json_addfloat(json, "min", process_stats[proc_type].idle_min);
+			zbx_json_close(json);
+			zbx_json_adduint64(json, "count", process_stats[proc_type].count);
+			zbx_json_close(json);
+		}
 	}
 
 	zbx_json_close(json);

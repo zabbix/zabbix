@@ -545,10 +545,10 @@ unlock:
  * Parameters: stats - [OUT] process metrics                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_all_process_stats(zbx_process_info_t *stats)
+int	zbx_get_all_process_stats(zbx_process_info_t *stats)
 {
 	const char	*__function_name = "zbx_get_all_process_stats";
-	int		current;
+	int		current, ret = FAIL;
 	unsigned char	proc_type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -624,10 +624,14 @@ void	zbx_get_all_process_stats(zbx_process_info_t *stats)
 		stats[proc_type].idle_max = (0 == total_max ? 0 : 100. * (double)counter_max_idle / (double)total_max);
 		stats[proc_type].idle_min = (0 == total_min ? 0 : 100. * (double)counter_min_idle / (double)total_min);
 	}
+
+	ret = SUCCEED;
 unlock:
 	UNLOCK_SM;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 static int	sleep_remains;

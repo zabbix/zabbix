@@ -53,7 +53,7 @@ void	update_selfmon_counter(unsigned char state);
 void	collect_selfmon_stats(void);
 void	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
 		unsigned char state, double *value);
-void	zbx_get_all_process_stats(zbx_process_info_t *stats);
+int	zbx_get_all_process_stats(zbx_process_info_t *stats);
 void	zbx_sleep_loop(int sleeptime);
 void	zbx_sleep_forever(void);
 void	zbx_wakeup(void);
