@@ -81,8 +81,8 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'testInheritanceDiscoveryRuleWithLLDMacro',
-					'key' => 'discovery-rule-inheritance-with-macro',
+					'name' => 'testInheritanceDiscoveryRuleWithLLDMacros',
+					'key' => 'discovery-rule-inheritance-with-macros',
 					'macros' => [
 						['macro' => '{#MACRO1}', 'path'=>'$.path.1'],
 						['macro' => '{#MACRO2}', 'path'=>'$.path.1']
@@ -102,7 +102,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 		$this->zbxTestInputType('key', $data['key']);
 
 		if (array_key_exists('macros', $data)) {
-			$this->zbxTestTabSwitch('LLD Macro');
+			$this->zbxTestTabSwitch('LLD macros');
 
 		foreach ($data['macros'] as $i => $lld_macro) {
 			$this->zbxTestInputType('lld_macro_paths_'.$i.'_lld_macro', $lld_macro['macro'] );
@@ -155,7 +155,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 				$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@value="'.$data['name'].'"][@readonly]');
 				$this->zbxTestAssertElementPresentXpath('//input[@id="key"][@value="'.$data['key'].'"][@readonly]');
 				if (array_key_exists('macros', $data)) {
-					$this->zbxTestTabSwitch('LLD Macro');
+					$this->zbxTestTabSwitch('LLD macros');
 					foreach ($data['macros'] as $i => $lld_macro) {
 						$this->zbxTestAssertElementPresentXpath('//input[@id="lld_macro_paths_'.$i.'_lld_macro"][@value="'.$lld_macro['macro'].'"][@readonly]');
 						$this->zbxTestAssertElementPresentXpath('//input[@id="lld_macro_paths_'.$i.'_path"][@value="'.$lld_macro['path'].'"][@readonly]');

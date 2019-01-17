@@ -2058,7 +2058,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
 	}
 
-	public function getLLDMacroTabData() {
+	public function getLLDMacrosTabData() {
 		return [
 			[
 				[
@@ -2154,9 +2154,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	}
 
 	/**
-	 * @dataProvider getLLDMacroTabData
+	 * @dataProvider getLLDMacrosTabData
 	 */
-	public function testFormLowLevelDiscovery_LLDMacroTab($data) {
+	public function testFormLowLevelDiscovery_LLDMacrosTab($data) {
 		$sqlItems = "select * from items order by itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
@@ -2166,15 +2166,15 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$form = $this->query('name:itemForm')->asForm()->one();
 		$form->getField('Name')->fill($data['name']);
 		$form->getField('Key')->fill($data['key']);
-		$form->selectTab('LLD Macro');
+		$form->selectTab('LLD macros');
 
-		$macros = $form->getField('LLD Macro'); // table
+		$macros = $form->getField('LLD macros'); // table
 		$button = $macros->query('button:Add')->one();
 		$last = count($data['macros']) - 1;
 
 		foreach ($data['macros'] as $i => $lld_macro) {
 			$row = $macros->getRows()->get($i); // row
-			$row->getColumn('LLD Macro')->query('tag:input')->one()->fill($lld_macro['macro']);
+			$row->getColumn('LLD macro')->query('tag:input')->one()->fill($lld_macro['macro']);
 			$row->getColumn('JSON Path')->query('tag:input')->one()->fill($lld_macro['path']);
 
 			if ($i !== $last) {
@@ -2199,7 +2199,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($data['key'])));
 
 				// Check the results in form.
-				$this->checkLLDMacroFormFields($data);
+				$this->checkLLDMacrosFormFields($data);
 				break;
 			case TEST_BAD:
 				// Get global message.
@@ -2216,11 +2216,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 	}
 
-	private function checkLLDMacroFormFields($data) {
+	private function checkLLDMacrosFormFields($data) {
 		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['key']));
 		$this->page->open('host_discovery.php?form=update&itemid='.$id);
 		$form = $this->query('name:itemForm')->asForm()->one();
-		$form->selectTab('LLD Macro');
+		$form->selectTab('LLD macros');
 
 		foreach ($data['macros'] as $i => $lld_macro) {
 			$macro = $this->query('id:lld_macro_paths_'.$i.'_lld_macro')->one()->getAttribute('value');
