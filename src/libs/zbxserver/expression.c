@@ -2676,7 +2676,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 	char			c, *replace_to = NULL, sql[64];
 	const char		*m, *replace = NULL;
-	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, found,
+	int			N_functionid, indexed_macro, require_numeric, require_address, ret, res = SUCCEED,
+				pos = 0, found,
 				raw_value;
 	size_t			data_alloc, data_len, replace_len;
 	DC_INTERFACE		interface;
@@ -2710,6 +2711,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 	{
 		indexed_macro = 0;
 		require_numeric = 0;
+		require_address = 0;
 		N_functionid = 1;
 		raw_value = 0;
 
@@ -3986,50 +3988,20 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
 				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
-				{
-					if (SUCCEED == is_ip(interface.ip_orig) ||
-							SUCCEED == zbx_validate_hostname(interface.ip_orig))
-					{
 						replace_to = zbx_strdup(replace_to, interface.ip_orig);
-					}
-					else
-					{
-						zbx_snprintf(error, maxerrlen, "Invalid macro '%s' value.", m);
-						res = FAIL;
-					}
-				}
+				require_address = 1;
 			}
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 			{
 				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
-				{
-					if (SUCCEED == is_ip(interface.dns_orig) ||
-							SUCCEED == zbx_validate_hostname(interface.dns_orig))
-					{
-						replace_to = zbx_strdup(replace_to, interface.dns_orig);
-					}
-					else
-					{
-						zbx_snprintf(error, maxerrlen, "Invalid macro '%s' value.", m);
-						res = FAIL;
-					}
-				}
+					replace_to = zbx_strdup(replace_to, interface.dns_orig);
+				require_address = 1;
 			}
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 			{
 				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
-				{
-					if (SUCCEED == is_ip(interface.addr) ||
-							SUCCEED == zbx_validate_hostname(interface.addr))
-					{
-						replace_to = zbx_strdup(replace_to, interface.addr);
-					}
-					else
-					{
-						zbx_snprintf(error, maxerrlen, "Invalid macro '%s' value.", m);
-						res = FAIL;
-					}
-				}
+					replace_to = zbx_strdup(replace_to, interface.addr);
+				require_address = 1;
 			}
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_HTTPTEST_FIELD))
@@ -4253,17 +4225,26 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			if (SUCCEED != (ret = zbx_calculate_macro_function(*data, &token.data.func_macro, &replace_to)))
 				zbx_free(replace_to);
 		}
-
-		if (1 == require_numeric && NULL != replace_to)
+		if (NULL != replace_to)
 		{
-			if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
+			if (1 == require_numeric)
 			{
-				wrap_negative_double_suffix(&replace_to, NULL);
+				if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
+				{
+					wrap_negative_double_suffix(&replace_to, NULL);
+				}
+				else if (NULL != error)
+				{
+					zbx_snprintf(error, maxerrlen, "Macro '%.*s' value is not numeric",
+							(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
+				}
 			}
-			else if (NULL != error)
+			else if (1 == require_address && SUCCEED != is_ip(replace_to) &&
+					SUCCEED != zbx_validate_hostname(replace_to))
 			{
-				zbx_snprintf(error, maxerrlen, "Macro '%.*s' value is not numeric",
+				zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
 						(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
+				res = FAIL;
 			}
 		}
 
