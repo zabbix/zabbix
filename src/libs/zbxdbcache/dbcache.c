@@ -98,18 +98,6 @@ static ZBX_DC_IDS	*ids = NULL;
 
 typedef struct
 {
-	zbx_uint64_t	history_counter;	/* the total number of processed values */
-	zbx_uint64_t	history_float_counter;	/* the number of processed float values */
-	zbx_uint64_t	history_uint_counter;	/* the number of processed uint values */
-	zbx_uint64_t	history_str_counter;	/* the number of processed str values */
-	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
-	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
-	zbx_uint64_t	notsupported_counter;	/* the number of processed not supported items */
-}
-ZBX_DC_STATS;
-
-typedef struct
-{
 	zbx_hashset_t		trends;
 	ZBX_DC_STATS		stats;
 
@@ -186,26 +174,20 @@ static int	hc_queue_get_size(void);
  *                                                                            *
  ******************************************************************************/
 
-void	DCget_stats_all(zbx_wcache_info_t *stats)
+void	DCget_stats_all(zbx_wcache_info_t *wcache_info)
 {
 	LOCK_CACHE;
 
-	stats->values_all = cache->stats.history_counter;
-	stats->values_float = cache->stats.history_float_counter;
-	stats->values_uint = cache->stats.history_uint_counter;
-	stats->values_str = cache->stats.history_str_counter;
-	stats->values_log = cache->stats.history_log_counter;
-	stats->values_text = cache->stats.history_text_counter;
-	stats->values_notsupported = cache->stats.notsupported_counter;
-	stats->history_free = hc_mem->free_size;
-	stats->history_total = hc_mem->total_size;
-	stats->index_free = hc_index_mem->free_size;
-	stats->index_total = hc_index_mem->total_size;
+	wcache_info->stats = cache->stats;
+	wcache_info->history_free = hc_mem->free_size;
+	wcache_info->history_total = hc_mem->total_size;
+	wcache_info->index_free = hc_index_mem->free_size;
+	wcache_info->index_total = hc_index_mem->total_size;
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
-		stats->trend_free = trend_mem->free_size;
-		stats->trend_total = trend_mem->orig_size;
+		wcache_info->trend_free = trend_mem->free_size;
+		wcache_info->trend_total = trend_mem->orig_size;
 	}
 
 	UNLOCK_CACHE;

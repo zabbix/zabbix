@@ -43,7 +43,7 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_config_cache_info_t	count_stats;
 	zbx_vc_stats_t		vc_stats;
 	zbx_vmware_stats_t	vmware_stats;
-	zbx_wcache_info_t	wcache_stats;
+	zbx_wcache_info_t	wcache_info;
 	zbx_process_info_t	process_stats[ZBX_PROCESS_TYPE_COUNT];
 	int			proc_type;
 
@@ -147,43 +147,43 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	}
 
 	/* zabbix[wcache,<cache>,<mode>] */
-	DCget_stats_all(&wcache_stats);
+	DCget_stats_all(&wcache_info);
 	zbx_json_addobject(json, "wcache");
 	zbx_json_addobject(json, "values");
-	zbx_json_adduint64(json, "all", wcache_stats.values_all);
-	zbx_json_adduint64(json, "float", wcache_stats.values_float);
-	zbx_json_adduint64(json, "uint", wcache_stats.values_uint);
-	zbx_json_adduint64(json, "str", wcache_stats.values_str);
-	zbx_json_adduint64(json, "log", wcache_stats.values_log);
-	zbx_json_adduint64(json, "text", wcache_stats.values_text);
-	zbx_json_adduint64(json, "not supported", wcache_stats.values_notsupported);
+	zbx_json_adduint64(json, "all", wcache_info.stats.history_counter);
+	zbx_json_adduint64(json, "float", wcache_info.stats.history_float_counter);
+	zbx_json_adduint64(json, "uint", wcache_info.stats.history_float_counter);
+	zbx_json_adduint64(json, "str", wcache_info.stats.history_str_counter);
+	zbx_json_adduint64(json, "log", wcache_info.stats.history_log_counter);
+	zbx_json_adduint64(json, "text", wcache_info.stats.history_text_counter);
+	zbx_json_adduint64(json, "not supported", wcache_info.stats.notsupported_counter);
 	zbx_json_close(json);
 	zbx_json_addobject(json, "history");
-	zbx_json_addfloat(json, "pfree", 100 * (double)wcache_stats.history_free / wcache_stats.history_total);
-	zbx_json_adduint64(json, "free", wcache_stats.history_free);
-	zbx_json_adduint64(json, "total", wcache_stats.history_total);
-	zbx_json_adduint64(json, "used", wcache_stats.history_total - wcache_stats.history_free);
-	zbx_json_adduint64(json, "pused", 100 * (double)(wcache_stats.history_total - wcache_stats.history_free) /
-			wcache_stats.history_total);
+	zbx_json_addfloat(json, "pfree", 100 * (double)wcache_info.history_free / wcache_info.history_total);
+	zbx_json_adduint64(json, "free", wcache_info.history_free);
+	zbx_json_adduint64(json, "total", wcache_info.history_total);
+	zbx_json_adduint64(json, "used", wcache_info.history_total - wcache_info.history_free);
+	zbx_json_adduint64(json, "pused", 100 * (double)(wcache_info.history_total - wcache_info.history_free) /
+			wcache_info.history_total);
 	zbx_json_close(json);
 	zbx_json_addobject(json, "index");
-	zbx_json_addfloat(json, "pfree", 100 * (double)wcache_stats.index_free / wcache_stats.index_total);
-	zbx_json_adduint64(json, "free", wcache_stats.index_free);
-	zbx_json_adduint64(json, "total", wcache_stats.index_total);
-	zbx_json_adduint64(json, "used", wcache_stats.index_total - wcache_stats.index_free);
-	zbx_json_adduint64(json, "pused", 100 * (double)(wcache_stats.index_total - wcache_stats.index_free) /
-			wcache_stats.index_total);
+	zbx_json_addfloat(json, "pfree", 100 * (double)wcache_info.index_free / wcache_info.index_total);
+	zbx_json_adduint64(json, "free", wcache_info.index_free);
+	zbx_json_adduint64(json, "total", wcache_info.index_total);
+	zbx_json_adduint64(json, "used", wcache_info.index_total - wcache_info.index_free);
+	zbx_json_adduint64(json, "pused", 100 * (double)(wcache_info.index_total - wcache_info.index_free) /
+			wcache_info.index_total);
 	zbx_json_close(json);
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		zbx_json_addobject(json, "trend");
-		zbx_json_addfloat(json, "pfree", 100 * (double)wcache_stats.trend_free / wcache_stats.trend_total);
-		zbx_json_adduint64(json, "free", wcache_stats.trend_free);
-		zbx_json_adduint64(json, "total", wcache_stats.trend_total);
-		zbx_json_adduint64(json, "used", wcache_stats.trend_total - wcache_stats.trend_free);
-		zbx_json_adduint64(json, "pused", 100 * (double)(wcache_stats.trend_total - wcache_stats.trend_free) /
-				wcache_stats.trend_total);
+		zbx_json_addfloat(json, "pfree", 100 * (double)wcache_info.trend_free / wcache_info.trend_total);
+		zbx_json_adduint64(json, "free", wcache_info.trend_free);
+		zbx_json_adduint64(json, "total", wcache_info.trend_total);
+		zbx_json_adduint64(json, "used", wcache_info.trend_total - wcache_info.trend_free);
+		zbx_json_adduint64(json, "pused", 100 * (double)(wcache_info.trend_total - wcache_info.trend_free) /
+				wcache_info.trend_total);
 		zbx_json_close(json);
 	}
 

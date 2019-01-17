@@ -551,16 +551,22 @@ typedef struct
 }
 zbx_config_cache_info_t;
 
+typedef struct
+{
+	zbx_uint64_t	history_counter;	/* the total number of processed values */
+	zbx_uint64_t	history_float_counter;	/* the number of processed float values */
+	zbx_uint64_t	history_uint_counter;	/* the number of processed uint values */
+	zbx_uint64_t	history_str_counter;	/* the number of processed str values */
+	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
+	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
+	zbx_uint64_t	notsupported_counter;	/* the number of processed not supported items */
+}
+ZBX_DC_STATS;
+
 /* the write cache statistics */
 typedef struct
 {
-	zbx_uint64_t	values_all;
-	zbx_uint64_t	values_float;
-	zbx_uint64_t	values_uint;
-	zbx_uint64_t	values_str;
-	zbx_uint64_t	values_log;
-	zbx_uint64_t	values_text;
-	zbx_uint64_t	values_notsupported;
+	ZBX_DC_STATS	stats;
 	zbx_uint64_t	history_free;
 	zbx_uint64_t	history_total;
 	zbx_uint64_t	index_free;
@@ -603,7 +609,7 @@ void	free_database_cache(void);
 #define ZBX_STATS_HISTORY_INDEX_PUSED	20
 #define ZBX_STATS_HISTORY_INDEX_PFREE	21
 void	*DCget_stats(int request);
-void	DCget_stats_all(zbx_wcache_info_t *stats);
+void	DCget_stats_all(zbx_wcache_info_t *wcache_info);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
