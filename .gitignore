@@ -169,6 +169,9 @@ src/libs/zbxdbhigh/dbschema.c
 src/libs/zbxdbupgrade/.deps
 src/libs/zbxdbupgrade/Makefile
 src/libs/zbxdbupgrade/Makefile.in
+src/libs/zbxembed/.deps
+src/libs/zbxembed/Makefile
+src/libs/zbxembed/Makefile.in
 src/libs/zbxexec/.deps
 src/libs/zbxexec/Makefile
 src/libs/zbxexec/Makefile.in
