@@ -904,8 +904,8 @@ typedef enum
 }
 zbx_httptest_auth_t;
 
-#define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
-#define ZBX_TASK_FLAG_FOREGROUND      0x02
+#define ZBX_TASK_FLAG_MULTIPLE_AGENTS	0x01
+#define ZBX_TASK_FLAG_FOREGROUND	0x02
 
 typedef struct
 {
