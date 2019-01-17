@@ -83,6 +83,7 @@ extern char		*CONFIG_SOURCE_IP;
 #define ZBX_INIT_UPD_XML_SIZE		(100 * ZBX_KIBIBYTE)
 #define zbx_xml_free_doc(xdoc)		if (NULL != xdoc)\
 						xmlFreeDoc(xdoc)
+#define ZBX_VMWARE_DS_REFRESH_VERSION	6
 
 static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
@@ -2480,7 +2481,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 
 	id_esc = xml_escape_dyn(id);
 
-	if (ZBX_VMWARE_TYPE_VSPHERE == service->type
+	if (ZBX_VMWARE_TYPE_VSPHERE == service->type && ZBX_VMWARE_DS_REFRESH_VERSION > atoi(service->version)
 			&& SUCCEED != vmware_service_refresh_datastore_info(easyhandle, id_esc, &error))
 	{
 		zbx_free(id_esc);
