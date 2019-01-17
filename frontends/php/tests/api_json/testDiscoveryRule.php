@@ -3081,13 +3081,66 @@ class testDiscoveryRule extends CAPITest {
 	 * @dataProvider discoveryrule_copy_data
 	 * @backup items
 	 */
+	public function testDiscoveryRuleLLDMacroPaths_Copy($params, $expected_error) {
+		$result = $this->call('discoveryrule.copy', $params, $expected_error);
+
+		if ($expected_error === null) {
+			$this->assertTrue($result['result']);
+
+			// Get discovery rule and LLD macro path fields.
+			$src_lld_macro_paths = CDBHelper::getAll(
+				'SELECT lmp.lld_macro,lmp.path,i.key_'.
+				' FROM lld_macro_path lmp,items i'.
+				' WHERE i.itemid=lmp.itemid'.
+					' AND '.dbConditionId('i.itemid', $params['discoveryids'])
+			);
+
+			$src = [];
+			foreach ($src_lld_macro_paths as $src_lld_macro_path) {
+				$src[$src_lld_macro_path['key_']][] = $src_lld_macro_path;
+			}
+
+			// Find same items on destination hosts.
+			foreach ($params['discoveryids'] as $itemid) {
+				$dst_lld_macro_paths = CDBHelper::getAll(
+					'SELECT lmp.lld_macro,lmp.path,src.key_,src.hostid'.
+					' FROM lld_macro_path lmp,items src,items dest'.
+					' WHERE dest.itemid='.zbx_dbstr($itemid).
+						' AND src.key_=dest.key_'.
+						' AND lmp.itemid=dest.itemid'.
+						' AND '.dbConditionInt('src.hostid', $params['hostids'])
+				);
+
+				$dst = [];
+				foreach ($dst_lld_macro_paths as $dst_lld_macro_path) {
+					$dst[$dst_lld_macro_path['hostid']][$dst_lld_macro_path['key_']][] = $dst_lld_macro_path;
+				}
+
+				foreach ($dst as $discoveryrules) {
+					foreach ($discoveryrules as $key => $lld_macro_paths) {
+						foreach ($lld_macro_paths as &$lld_macro_path) {
+							unset($lld_macro_path['hostid']);
+						}
+						unset($lld_macro_path);
+
+						$this->assertSame($src[$key], $lld_macro_paths);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @dataProvider discoveryrule_copy_data
+	 * @backup items
+	 */
 	public function testDiscoveryRulePreprocessing_Copy($params, $expected_error) {
 		$result = $this->call('discoveryrule.copy', $params, $expected_error);
 
 		if ($expected_error === null) {
 			$this->assertTrue($result['result']);
 
-			// Get all discovery rule fields.
+			// Get discovery rule and pre-processign fields.
 			$src_preprocessing = CDBHelper::getAll(
 				'SELECT ip.step,ip.type,ip.params,ip.error_handler,ip.error_handler_params,i.key_'.
 				' FROM item_preproc ip,items i'.
