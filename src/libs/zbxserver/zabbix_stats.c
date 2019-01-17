@@ -65,6 +65,9 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
 
 	/* zabbix[process,<type>,<mode>,<state>] */
+	for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
+		memset(&process_stats[proc_type], 0, sizeof(zbx_process_info_t));
+
 	zbx_get_all_process_stats(process_stats);
 
 	zbx_json_addobject(json, "process");
