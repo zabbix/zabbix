@@ -1712,11 +1712,12 @@ abstract class CItemGeneral extends CApiService {
 	 *                                                    by master_itemid.
 	 * @param string $root_itemid                         ID of the item being checked.
 	 * @param int    $level                               Current dependency level.
-	 * @param int    $count                               Current number of elements in the tree.
 	 *
 	 * @throws APIException for invalid data.
 	 */
-	private static function checkDependencyDepth(array $dependent_items, $root_itemid, $level = 0, $count = 0) {
+	private static function checkDependencyDepth(array $dependent_items, $root_itemid, $level = 0) {
+		$count = 0;
+
 		if (array_key_exists($root_itemid, $dependent_items)) {
 			if (++$level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
@@ -1728,7 +1729,7 @@ abstract class CItemGeneral extends CApiService {
 				$count++;
 
 				if ($master_itemid !== false) {
-					self::checkDependencyDepth($dependent_items, $master_itemid, $level, $count);
+					$count += self::checkDependencyDepth($dependent_items, $master_itemid, $level);
 				}
 			}
 
@@ -1738,6 +1739,8 @@ abstract class CItemGeneral extends CApiService {
 				));
 			}
 		}
+
+		return $count;
 	}
 
 	/**
