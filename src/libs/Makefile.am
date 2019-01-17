@@ -28,7 +28,8 @@ DIST_SUBDIRS = \
 	zbxhttp \
 	zbxipcservice \
 	zbxhistory \
-	zbxcompress
+	zbxcompress \
+	zbxembed
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -45,7 +46,8 @@ SERVER_SUBDIRS = \
 	zbxself \
 	zbxtasks \
 	zbxhistory \
-	zbxcompress
+	zbxcompress \
+	zbxembed
 else
 if PROXY
 PROXY_SUBDIRS = \
