@@ -3988,7 +3988,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
 				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
-						replace_to = zbx_strdup(replace_to, interface.ip_orig);
+					replace_to = zbx_strdup(replace_to, interface.ip_orig);
 				require_address = 1;
 			}
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
@@ -4225,6 +4225,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			if (SUCCEED != (ret = zbx_calculate_macro_function(*data, &token.data.func_macro, &replace_to)))
 				zbx_free(replace_to);
 		}
+
 		if (NULL != replace_to)
 		{
 			if (1 == require_numeric)
