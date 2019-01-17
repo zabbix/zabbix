@@ -225,7 +225,10 @@ FIELD		|uniq		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_authprotocol|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_privprotocol|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_contextname|t_varchar(255)|''	|NOT NULL	|ZBX_PROXY
+FIELD		|host_source|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
+FIELD		|name_source|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|druleid
+INDEX		|2		|druleid,host_source,name_source
 
 TABLE|applications|applicationid|ZBX_TEMPLATE
 FIELD		|applicationid	|t_id		|	|NOT NULL	|0
@@ -1069,6 +1072,7 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|dcheckid	|t_id		|	|NULL		|0			|-|dchecks
 FIELD		|dns		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|clock
+INDEX		|2		|druleid
 
 TABLE|events|eventid|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0
@@ -1661,4 +1665,4 @@ UNIQUE		|1		|itemid,lld_macro
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4010007	|4010007
+ROW		|4010011	|4010011

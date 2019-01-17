@@ -91,6 +91,30 @@ static int	DBpatch_4010007(void)
 	return DBadd_foreign_key("lld_macro_path", 1, &field);
 }
 
+static int	DBpatch_4010008(void)
+{
+	const ZBX_FIELD	field = {"host_source", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
+static int	DBpatch_4010009(void)
+{
+	const ZBX_FIELD	field = {"name_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
+static int	DBpatch_4010010(void)
+{
+	return DBcreate_index("dchecks", "dchecks_2", "druleid,host_source,name_source", 2);
+}
+
+static int	DBpatch_4010011(void)
+{
+	return DBcreate_index("proxy_dhistory", "proxy_dhistory_2", "druleid", 2);
+}
+
 #endif
 
 DBPATCH_START(4010)
@@ -104,5 +128,9 @@ DBPATCH_ADD(4010004, 0, 1)
 DBPATCH_ADD(4010005, 0, 1)
 DBPATCH_ADD(4010006, 0, 1)
 DBPATCH_ADD(4010007, 0, 1)
+DBPATCH_ADD(4010008, 0, 1)
+DBPATCH_ADD(4010009, 0, 1)
+DBPATCH_ADD(4010010, 0, 1)
+DBPATCH_ADD(4010011, 0, 1)
 
 DBPATCH_END()
