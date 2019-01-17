@@ -377,7 +377,7 @@ INSERT INTO triggers (triggerid, expression, description, priority, flags, comme
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (18077, 40072, 30002, 'last', '');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30002, 30001);
 
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags, master_itemid) VALUES (40073, 18, 120004, 'Item_child {#NAME}', '', 'item_child[{#NAME}]', '0', NULL, '', '', '', '', '', '', 3, 2, 40070);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags, master_itemid) VALUES (40073, 18, 120004, 'Item_child {#NAME}', '', 'item_child[{#NAME}]', '0', NULL, '', '', '', '', '', '', 3, 2, 40071);
 INSERT INTO triggers (triggerid, expression, description, priority, flags, comments) VALUES (30003,'{18078}>0','Trigger {#NAME}', 2, 2, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (18078, 40073, 30003, 'last', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14047, 40073, 40070, '');
