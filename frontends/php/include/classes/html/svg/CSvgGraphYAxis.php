@@ -91,7 +91,8 @@ class CSvgGraphYAxis extends CSvgTag {
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' text' => [
 				'fill' => $this->text_color,
 				'font-size' => '11px',
-				'alignment-baseline' => 'middle'
+				'alignment-baseline' => 'middle',
+				'dominant-baseline' => 'middle'
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS_RIGHT.' text' => [
 				'text-anchor' => 'start'
@@ -178,7 +179,7 @@ class CSvgGraphYAxis extends CSvgTag {
 			// Flip upside down.
 			$y = $this->height - $y;
 
-			$labels[] = new CSvgText($this->x + $x, $this->y + $y + 2.5, $label);
+			$labels[] = new CSvgText($this->x + $x, $this->y + $y, $label);
 		}
 
 		return $labels;
