@@ -107,12 +107,12 @@ static int	DBpatch_4010009(void)
 
 static int	DBpatch_4010010(void)
 {
-	return DBcreate_index("dchecks", "dchecks_2", "druleid,host_source,name_source", 2);
+	return DBcreate_index("dchecks", "dchecks_2", "druleid,host_source,name_source", 0);
 }
 
 static int	DBpatch_4010011(void)
 {
-	return DBcreate_index("proxy_dhistory", "proxy_dhistory_2", "druleid", 2);
+	return DBcreate_index("proxy_dhistory", "proxy_dhistory_2", "druleid", 0);
 }
 
 #endif
