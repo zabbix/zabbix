@@ -201,8 +201,12 @@ void	DCget_stats_all(zbx_wcache_info_t *stats)
 	stats->history_total = hc_mem->total_size;
 	stats->index_free = hc_index_mem->free_size;
 	stats->index_total = hc_index_mem->total_size;
-	stats->trend_free = trend_mem->free_size;
-	stats->trend_total = trend_mem->orig_size;
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	{
+		stats->trend_free = trend_mem->free_size;
+		stats->trend_total = trend_mem->orig_size;
+	}
 
 	UNLOCK_CACHE;
 }

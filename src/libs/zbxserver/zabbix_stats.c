@@ -27,6 +27,8 @@
 
 #include "zabbix_stats.h"
 
+extern unsigned char	program_type;
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_send_zabbix_stats                                            *
@@ -102,13 +104,14 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_json_addfloat(json, "requiredperformance", count_stats.requiredperformance);
 
 	/* zabbix[triggers] */
-	zbx_json_adduint64(json, "triggers", count_stats.triggers);
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		zbx_json_adduint64(json, "triggers", count_stats.triggers);
 
 	/* zabbix[uptime] */
 	zbx_json_adduint64(json, "uptime", time(NULL) - CONFIG_SERVER_STARTUP_TIME);
 
 	/* zabbix[vcache,...] */
-	if (SUCCEED == zbx_vc_get_statistics(&vc_stats))
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && SUCCEED == zbx_vc_get_statistics(&vc_stats))
 	{
 		zbx_json_addobject(json, "vcache");
 		zbx_json_addobject(json, "buffer");
@@ -169,13 +172,18 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_json_adduint64(json, "pused", 100 * (double)(wcache_stats.index_total - wcache_stats.index_free) /
 			wcache_stats.index_total);
 	zbx_json_close(json);
-	zbx_json_addobject(json, "trend");
-	zbx_json_addfloat(json, "pfree", 100 * (double)wcache_stats.trend_free / wcache_stats.trend_total);
-	zbx_json_adduint64(json, "free", wcache_stats.trend_free);
-	zbx_json_adduint64(json, "total", wcache_stats.trend_total);
-	zbx_json_adduint64(json, "used", wcache_stats.trend_total - wcache_stats.trend_free);
-	zbx_json_adduint64(json, "pused", 100 * (double)(wcache_stats.trend_total - wcache_stats.trend_free) /
-			wcache_stats.trend_total);
-	zbx_json_close(json);
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	{
+		zbx_json_addobject(json, "trend");
+		zbx_json_addfloat(json, "pfree", 100 * (double)wcache_stats.trend_free / wcache_stats.trend_total);
+		zbx_json_adduint64(json, "free", wcache_stats.trend_free);
+		zbx_json_adduint64(json, "total", wcache_stats.trend_total);
+		zbx_json_adduint64(json, "used", wcache_stats.trend_total - wcache_stats.trend_free);
+		zbx_json_adduint64(json, "pused", 100 * (double)(wcache_stats.trend_total - wcache_stats.trend_free) /
+				wcache_stats.trend_total);
+		zbx_json_close(json);
+	}
+
 	zbx_json_close(json);
 }
