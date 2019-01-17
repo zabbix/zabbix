@@ -1695,7 +1695,7 @@ function getParamFieldLabelByType($itemType) {
  *    - get_preprocessing_types(<wrong type>, true, [5, 4, 2])     Returns an empty string: ''.
  *    - get_preprocessing_types(null, false, [5, 12, 15, 16, 20])  Returns subarrays in one array maintaining index:
  *                                                                     [5] => Regular expression
- *                                                                     [12] => JSON Path
+ *                                                                     [12] => JSONPath
  *                                                                     [15] => Does not match regular expression
  *                                                                     [16] => Check for error in JSON
  *                                                                     [20] => Discard unchanged with heartbeat
@@ -1730,7 +1730,7 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 		],
 		ZBX_PREPROC_JSONPATH => [
 			'id' => _('Structured data'),
-			'name' => _('JSON Path')
+			'name' => _('JSONPath')
 		],
 		ZBX_PREPROC_MULTIPLIER => [
 			'id' => _('Arithmetic'),

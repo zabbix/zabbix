@@ -689,7 +689,7 @@ $lld_macro_paths_form_list = new CFormList();
 $lld_macro_paths_table = (new CTable())
 	->setId('lld_macro_paths')
 	->addStyle('width: 100%;')
-	->setHeader([_('LLD Macro'), _('JSON Path'), '']);
+	->setHeader([_('LLD Macro'), _('JSONPath'), '']);
 
 $lld_macro_paths = $data['lld_macro_paths'];
 

@@ -129,10 +129,10 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Item JSON Path',
+					'name' => 'Item JSONPath',
 					'key' => 'item-empty-jsonpath',
 					'preprocessing' => [
-						['type' => 'JSON Path', 'parameter_1' => ''],
+						['type' => 'JSONPath', 'parameter_1' => ''],
 					],
 					'error' => 'Incorrect value for field "params": cannot be empty.'
 				]
@@ -532,7 +532,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 						['type' => 'Left trim', 'parameter_1' => '2b!@#$%^&*()-='],
 						['type' => 'Trim', 'parameter_1' => '3c!@#$%^&*()-='],
 						['type' => 'XML XPath', 'parameter_1' => '3c!@#$%^&*()-='],
-						['type' => 'JSON Path', 'parameter_1' => '3c!@#$%^&*()-='],
+						['type' => 'JSONPath', 'parameter_1' => '3c!@#$%^&*()-='],
 						['type' => 'Custom multiplier', 'parameter_1' => '4e+10'],
 						['type' => 'Regular expression', 'parameter_1' => '5d!@#$%^&*()-=', 'parameter_2' => '6e!@#$%^&*()-='],
 						['type' => 'Matches regular expression', 'parameter_1' => '7f!@#$%^&*()-='],
@@ -558,8 +558,8 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
 						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
 						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
-						['type' => 'JSON Path', 'parameter_1' => '1a2b3c'],
-						['type' => 'JSON Path', 'parameter_1' => '1a2b3c'],
+						['type' => 'JSONPath', 'parameter_1' => '1a2b3c'],
+						['type' => 'JSONPath', 'parameter_1' => '1a2b3c'],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
 						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
@@ -596,7 +596,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 						['type' => 'Right trim', 'parameter_1' => '{$MACRO}'],
 						['type' => 'Left trim', 'parameter_1' => '{$USER}'],
 						['type' => 'XML XPath', 'parameter_1' => 'number(/values/Item/value[../key=\'{$DELIM}\'])'],
-						['type' => 'JSON Path', 'parameter_1' => '$.data[\'{$KEY}\']'],
+						['type' => 'JSONPath', 'parameter_1' => '$.data[\'{$KEY}\']'],
 						['type' => 'Custom multiplier', 'parameter_1' => '{$VALUE}'],
 						['type' => 'In range', 'parameter_1' => '{$FROM}', 'parameter_2' => '{$TO}'],
 						['type' => 'Matches regular expression', 'parameter_1' => '{$EXPRESSION}(.*)'],
@@ -659,7 +659,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 						case 'Left trim':
 						case 'Trim':
 						case 'XML XPath':
-						case 'JSON Path':
+						case 'JSONPath':
 						case 'Matches regular expression':
 						case 'Does not match regular expression':
 						case 'Check for error in JSON':
@@ -767,7 +767,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 						['type' => 'Right trim', 'parameter_1' => 'right_trim'],
 						['type' => 'Left trim', 'parameter_1' => 'left_trim'],
 						['type' => 'XML XPath', 'parameter_1' => '/xml/path'],
-						['type' => 'JSON Path', 'parameter_1' => '/json/path'],
+						['type' => 'JSONPath', 'parameter_1' => '/json/path'],
 						['type' => 'Custom multiplier', 'parameter_1' => '5'],
 						['type' => 'Simple change'],
 						['type' => 'Boolean to decimal'],
@@ -845,7 +845,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 			switch ($options['type']) {
 				case 'Regular expression':
 				case 'XML XPath':
-				case 'JSON Path':
+				case 'JSONPath':
 				case 'Custom multiplier':
 				case 'Simple change':
 				case 'Change per second':
@@ -902,7 +902,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 			switch ($options['type']) {
 				case 'Regular expression':
 				case 'XML XPath':
-				case 'JSON Path':
+				case 'JSONPath':
 				case 'Custom multiplier':
 				case 'Simple change':
 				case 'Change per second':
@@ -1045,7 +1045,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		$preprocessing = [
 			['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
 			['type' => 'XML XPath', 'parameter_1' => '/xml/path'],
-			['type' => 'JSON Path', 'parameter_1' => '/json/path'],
+			['type' => 'JSONPath', 'parameter_1' => '/json/path'],
 			['type' => 'Custom multiplier', 'parameter_1' => '5'],
 			['type' => 'Simple change'],
 			['type' => 'Boolean to decimal'],
