@@ -686,9 +686,7 @@ var timeControl = {
 				jQuery('#'+obj.containerid).removeClass('dashbrd-widget-graph-link');
 			}
 		});
-		jQuery(document).off('dblclick', 'img')
-			.off('mousedown', 'img')
-			.off('mousemove', 'img');
+		jQuery(document).off('dblclick mousedown', 'img');
 	},
 
 	/**
