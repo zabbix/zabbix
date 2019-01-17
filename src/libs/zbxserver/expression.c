@@ -4228,8 +4228,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 		if (NULL != replace_to)
 		{
-			zbx_token_t	token_replace;
-
 			if (1 == require_numeric)
 			{
 				if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
@@ -4242,8 +4240,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 							(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
 				}
 			}
-			else if (1 == require_address && SUCCEED == zbx_token_find(replace_to, 0, &token_replace,
-					ZBX_TOKEN_SEARCH_BASIC) && 0 != (token_replace.type & ZBX_TOKEN_USER_MACRO))
+			else if (1 == require_address && NULL != strstr(replace_to, "{$"))
 			{
 				/* Macros should be already expanded. An unexpanded user macro means either unknown */
 				/* macro or macro value validation failure.                                         */
