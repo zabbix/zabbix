@@ -227,8 +227,7 @@ FIELD		|snmpv3_privprotocol|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|snmpv3_contextname|t_varchar(255)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|host_source|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
 FIELD		|name_source|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-INDEX		|1		|druleid
-INDEX		|2		|druleid,host_source,name_source
+INDEX		|1		|druleid,host_source,name_source
 
 TABLE|applications|applicationid|ZBX_TEMPLATE
 FIELD		|applicationid	|t_id		|	|NOT NULL	|0
@@ -1665,4 +1664,4 @@ UNIQUE		|1		|itemid,lld_macro
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4010011	|4010011
+ROW		|4010013	|4010013
