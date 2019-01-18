@@ -31,7 +31,7 @@ zbx_es_t;
 int	zbx_es_init(zbx_es_t *es, char **error);
 int	zbx_es_destroy(zbx_es_t *es, char **error);
 int	zbx_es_initialized(zbx_es_t *es);
-int	zbx_es_error_num(zbx_es_t *es);
+int	zbx_es_get_runtime_error_num(zbx_es_t *es);
 int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, char **error);
 int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,
         char **error);

@@ -32,15 +32,15 @@ struct zbx_es_impl
 	duk_context	*ctx;
 	size_t		total_alloc;
 	jmp_buf	env;
-	time_t		exec_time;
+	time_t		start_time;
 	char		*error;
-	int		error_num;
+	int		rt_error_num;
 };
 
-#define ZBX_ES_SCRIPT_HEADER	"function(value){"
+#define ZBX_ES_SCRIPT_HEADER	"func(value){"
 
 /*
- * Memory allocation routines to limit script memory usage.
+ * Memory allocation routines to track and limit script memory usage.
  */
 
 static void	*es_malloc(void *udata, duk_size_t size)
@@ -50,12 +50,14 @@ static void	*es_malloc(void *udata, duk_size_t size)
 
 	if (impl->total_alloc + size + 8 > ZBX_ES_MEMORY_LIMIT)
 	{
-		(void)duk_fatal(impl->ctx, "Memory limit exceeded");
+		(void)duk_fatal(impl->ctx, "memory limit exceeded");
+
+		/* never returns as longjmp is called by error handler */
 		return NULL;
 	}
 
 	impl->total_alloc += (size + 8);
-	uptr = malloc(size + 8);
+	uptr = zbx_malloc(NULL, size + 8);
 	*uptr++ = size;
 
 	return uptr;
@@ -77,12 +79,14 @@ static void	*es_realloc(void *udata, void *ptr, duk_size_t size)
 
 	if (impl->total_alloc + size + 8 - old_size > ZBX_ES_MEMORY_LIMIT)
 	{
-		(void)duk_fatal(impl->ctx, "Memory limit exceeded");
+		(void)duk_fatal(impl->ctx, "memory limit exceeded");
+
+		/* never returns as longjmp is called by error handler */
 		return NULL;
 	}
 
 	impl->total_alloc += size + 8 - old_size;
-	uptr = realloc(uptr, size + 8);
+	uptr = zbx_realloc(uptr, size + 8);
 	*uptr++ = size;
 
 	return uptr;
@@ -96,7 +100,7 @@ static void	es_free(void *udata, void *ptr)
 	if (NULL != ptr)
 	{
 		impl->total_alloc -= (*(--uptr) + 8);
-		free(uptr);
+		zbx_free(uptr);
 	}
 }
 
@@ -126,7 +130,7 @@ int	zbx_es_timeout(void *udata)
 {
 	zbx_es_impl_t	*impl = (zbx_es_impl_t *)udata;
 
-	if (time(NULL) - impl->exec_time > ZBX_ES_TIMEOUT)
+	if (time(NULL) - impl->start_time > ZBX_ES_TIMEOUT)
 		return 1;
 
 	return 0;
@@ -213,9 +217,9 @@ int	zbx_es_initialized(zbx_es_t *es)
  * Purpose: returns the number of consecutive runtime errors                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_es_error_num(zbx_es_t *es)
+int	zbx_es_get_runtime_error_num(zbx_es_t *es)
 {
-	return es->impl->error_num;
+	return es->impl->rt_error_num;
 }
 
 /******************************************************************************
@@ -250,9 +254,9 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 		return FAIL;
 	}
 
+	/* wrap the code block into a function: func(value){<code>} */
 	len = strlen(script);
 	ptr = func = zbx_malloc(NULL, len + ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_HEADER) + 2);
-
 	memcpy(ptr, ZBX_ES_SCRIPT_HEADER, ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_HEADER));
 	ptr += ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_HEADER);
 	memcpy(ptr, script, len);
@@ -314,7 +318,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	if (0 != setjmp(es->impl->env))
 	{
-		es->impl->error_num++;
+		es->impl->rt_error_num++;
 		*error = zbx_strdup(*error, es->impl->error);
 		return FAIL;
 	}
@@ -324,12 +328,11 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	duk_load_function(es->impl->ctx);
 	duk_push_string(es->impl->ctx, param);
 
-	/* set execution timeout starting value */
-	es->impl->exec_time = time(NULL);
+	es->impl->start_time = time(NULL);
 
 	if (DUK_EXEC_SUCCESS != duk_pcall(es->impl->ctx, 1))
 	{
-		es->impl->error_num++;
+		es->impl->rt_error_num++;
 		duk_get_prop_string(es->impl->ctx, -1, "stack");
 		*error = zbx_strdup(*error, duk_get_string(es->impl->ctx, -1));
 		duk_pop(es->impl->ctx);
@@ -339,7 +342,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	*output = zbx_strdup(NULL, duk_safe_to_string(es->impl->ctx, -1));
 	duk_pop(es->impl->ctx);
-	es->impl->error_num = 0;
+	es->impl->rt_error_num = 0;
 
 	return SUCCEED;
 }
