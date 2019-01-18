@@ -376,6 +376,8 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	duk_pop(es->impl->ctx);
 	es->impl->rt_error_num = 0;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __function_name, *output);
+
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
