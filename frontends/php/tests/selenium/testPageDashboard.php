@@ -85,12 +85,14 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
 		$this->zbxTestClickWait('addrm_fav');
+		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favourites']);
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
 		$this->zbxTestDropdownSelectWait('graphid', $this->graphMemory);
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
 		$this->zbxTestClickWait('addrm_fav');
+		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favourites']);
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
@@ -134,6 +136,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
 		$this->zbxTestClickWait('addrm_fav');
+		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favourites']);
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
