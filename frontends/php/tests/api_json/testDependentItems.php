@@ -26,170 +26,425 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  */
 class testDependentItems extends CAPITest {
 
-	public static function getUpdateData() {
+	private static function getItems($hostid, $master_itemid, $prefix, $from, $to) {
+		$items = [];
+
+		for ($i = $from; $i <= $to; $i++) {
+			$items[] = [
+				'hostid' => $hostid,
+				'name' => $prefix.'.'.$i,
+				'type' => 18,			// ITEM_TYPE_DEPENDENT
+				'key_' => $prefix.'.'.$i,
+				'value_type' => 1,		// ITEM_VALUE_TYPE_STR
+				'master_itemid' => $master_itemid
+			];
+		}
+
+		return $items;
+	}
+
+	private static function getItemPrototypes($hostid, $ruleid, $master_itemid, $prefix, $from, $to) {
+		$items = [];
+
+		for ($i = $from; $i <= $to; $i++) {
+			$items[] = [
+				'hostid' => $hostid,
+				'ruleid' => $ruleid,
+				'name' => $prefix.'.'.$i,
+				'type' => 18,			// ITEM_TYPE_DEPENDENT
+				'key_' => $prefix.'.'.$i,
+				'value_type' => 1,		// ITEM_VALUE_TYPE_STR
+				'master_itemid' => $master_itemid
+			];
+		}
+
+		return $items;
+	}
+
+	public static function getTestCases() {
 		return [
+			// Simple update master item.
 			[
-				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
+				'error' => null,
 				'method' => 'item.update',
 				'request_data' => [
-					'itemid' => 40554,
-					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => 40553
+					'itemid' => 1001	// dependent.items.template.1:master.item.1
 				]
 			],
+			// Simple update master item prototype.
+			[
+				'error' => null,
+				'method' => 'itemprototype.update',
+				'request_data' => [
+					'itemid' => 1018	// dependent.items.template.1:master.item.proto.1
+				]
+			],
+			// Simple update discovered master item.
+			[
+				'error' => null,
+				'method' => 'item.update',
+				'request_data' => [
+					'itemid' => 2304	// dependent.items.host.7:net.if[eth0]
+				]
+			],
+			// Simple update dependent item.
+			[
+				'error' => null,
+				'method' => 'item.update',
+				'request_data' => [
+					'itemid' => 1015	// dependent.items.template.1:dependent.item.1.2.2.2
+				]
+			],
+			// Simple update dependent item prototype.
+			[
+				'error' => null,
+				'method' => 'itemprototype.update',
+				'request_data' => [
+					'itemid' => 1032	// dependent.items.template.1:dependent.item.proto.1.2.2.2
+				]
+			],
+			// Simple update discovered dependent item.
+			[
+				'error' => null,
+				'method' => 'item.update',
+				'request_data' => [
+					'itemid' => 2305	// dependent.items.host.7:net.if.in[eth0]
+				]
+			],
+			// Simple update templated master item.
+			[
+				'error' => null,
+				'method' => 'item.update',
+				'request_data' => [
+					'itemid' => 1301	// dependent.items.host.1:master.item.1
+				]
+			],
+			// Simple update templated master item prototype.
+			[
+				'error' => null,
+				'method' => 'itemprototype.update',
+				'request_data' => [
+					'itemid' => 1318	// dependent.items.host.1:master.item.proto.1
+				]
+			],
+			// Simple update templated dependent item.
+			[
+				'error' => null,
+				'method' => 'item.update',
+				'request_data' => [
+					'itemid' => 1315	// dependent.items.host.1:dependent.item.1.2.2.2
+				]
+			],
+			// Simple update templated dependent item prototype.
+			[
+				'error' => null,
+				'method' => 'itemprototype.update',
+				'request_data' => [
+					'itemid' => 1332	// dependent.items.host.1:dependent.item.proto.1.2.2.2
+				]
+			],
+			// Circular dependency to itself (update).
 			[
 				'error' => 'Incorrect value for field "master_itemid": circular item dependency is not allowed.',
 				'method' => 'item.update',
 				'request_data' => [
-					'itemid' => 40569,
-					'master_itemid' => 40573
+					'itemid' => 1015,	// dependent.items.template.1:dependent.item.1.2.2.2
+					'master_itemid' => 1015
 				]
 			],
+			// Circular dependency to itself (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": circular item dependency is not allowed.',
+				'method' => 'itemprototype.update',
+				'request_data' => [
+					'itemid' => 1032,	// dependent.items.template.1:dependent.item.proto.1.2.2.2
+					'master_itemid' => 1032
+				]
+			],
+			// Circular dependency to between several items (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": circular item dependency is not allowed.',
+				'method' => 'item.update',
+				'request_data' => [
+					'itemid' => 1003,	// dependent.items.template.1:dependent.item.1.2
+					'master_itemid' => 1015
+				]
+			],
+			// Circular dependency to between several item prototypes (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": circular item dependency is not allowed.',
+				'method' => 'itemprototype.update',
+				'request_data' => [
+					'itemid' => 1020,	// dependent.items.template.1:dependent.item.proto.1.2
+					'master_itemid' => 1032
+				]
+			],
+			// Set "master_itemid" for not-dependent item (create).
+			[
+				'error' => 'Incorrect value for field "master_itemid": should be empty.',
+				'method' => 'item.create',
+				'request_data' => [
+					'hostid' => 1001,		// dependent.items.template.1
+					'name' => 'trap.2',
+					'type' => 2,			// ITEM_TYPE_TRAPPER
+					'key_' => 'trap.2',
+					'value_type' => 1,		// ITEM_VALUE_TYPE_STR
+					'master_itemid' => 1001	// dependent.items.template.1:master.item.1
+				]
+			],
+			// Set "master_itemid" for not-dependent item prototype (create).
+			[
+				'error' => 'Incorrect value for field "master_itemid": should be empty.',
+				'method' => 'itemprototype.create',
+				'request_data' => [
+					'hostid' => 1001,		// dependent.items.template.1
+					'ruleid' => 1017,		// dependent.items.template.1:discovery.rule.1
+					'name' => 'item.proto.2',
+					'type' => 2,			// ITEM_TYPE_TRAPPER
+					'key_' => 'item.proto.2',
+					'value_type' => 1,		// ITEM_VALUE_TYPE_STR
+					'master_itemid' => 1001	// dependent.items.template.1:master.item.1
+				]
+			],
+			// Set "master_itemid" for not-dependent item (update).
 			[
 				'error' => 'Incorrect value for field "master_itemid": should be empty.',
 				'method' => 'item.update',
 				'request_data' => [
-					'itemid' => 40575,
-					'master_itemid' => 40574
+					'itemid' => 1016,		// dependent.items.template.1:trap.1
+					'master_itemid' => 1001	// dependent.items.template.1:master.item.1
 				]
 			],
+			// Set "master_itemid" for not-dependent item prototype (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": should be empty.',
+				'method' => 'itemprototype.update',
+				'request_data' => [
+					'itemid' => 1033,		// dependent.items.template.1:item.proto.1
+					'master_itemid' => 1001	// dependent.items.template.1:master.item.1
+				]
+			],
+			// Check for maximum depth for the items tree (create). Add 4th level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
+				'method' => 'item.create',
+				// 1001: dependent.items.template.1
+				// 1008: dependent.items.template.1:dependent.item.1.1.1.1
+				'request_data' => self::getItems(1001, 1008, 'dependent.item.1.1.1.1', 1, 1)
+			],
+			// Check for maximum depth for the item prototypes tree (create). Add 4th level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
+				'method' => 'itemprototype.create',
+				// 1001: dependent.items.template.1
+				// 1017: dependent.items.template.1:discovery.rule.1
+				// 1025: dependent.items.template.1:dependent.item.proto.1.1.1.1
+				'request_data' => self::getItemPrototypes(1001, 1017, 1025, 'dependent.item.1.1.1.1', 1, 1)
+			],
+			// Check for maximum depth of the items tree (update). Add 4th level.
 			[
 				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
 				'method' => 'item.update',
 				'request_data' => [
-					'itemid' => 40575,
-					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => 40574
+					'itemid' => 1016,		// dependent.items.template.1:trap.1
+					'type' => 18,			// ITEM_TYPE_DEPENDENT
+					'master_itemid' => 1008	// dependent.items.template.1:dependent.item.1.1.1.1
 				]
 			],
+			// Check for maximum depth of the item prototypes tree (update). Add 4th level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
+				'method' => 'itemprototype.update',
+				'request_data' => [
+					'itemid' => 1033,		// dependent.items.template.1:item.proto.1
+					'type' => 18,			// ITEM_TYPE_DEPENDENT
+					'master_itemid' => 1025	// dependent.items.template.1:dependent.item.proto.1.1.1.1
+				]
+			],
+			// Check for maximum depth of the items tree (update). Add 4th level at the top.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
+				'method' => 'item.update',
+				'request_data' => [
+					'itemid' => 1702,		// dependent.items.template.4:item.2
+					'type' => 18,			// ITEM_TYPE_DEPENDENT
+					'master_itemid' => 1701	// dependent.items.template.4:item.1
+				]
+			],
+			// Check for maximum depth of the mixed tree (update). Add 4th level at the top.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
+				'method' => 'item.update',
+				'request_data' => [
+					'itemid' => 1902,		// dependent.items.template.5:item.2
+					'type' => 18,			// ITEM_TYPE_DEPENDENT
+					'master_itemid' => 1901	// dependent.items.template.5:item.1
+				]
+			],
+			// Check for maximum depth of the item prototypes tree (update). Add 4th level at the top.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
+				'method' => 'itemprototype.update',
+				'request_data' => [
+					'itemid' => 2103,		// dependent.items.template.6:item.proto.2
+					'type' => 18,			// ITEM_TYPE_DEPENDENT
+					'master_itemid' => 2102	// dependent.items.template.6:item.proto.1
+				]
+			],
+			// Check for maximum depth of the items tree (link a template).
 			[
 				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
 				'method' => 'template.update',
 				'request_data' => [
-					'templateid' => 99010,
+					'templateid' => 1005,	// dependent.items.template.2
 					'hosts' => [
-						['hostid' => 99009]
+						['hostid' => 1006]	// dependent.items.host.2
 					]
 				]
 			],
+			// Check for maximum depth of the mixed tree (link a template).
 			[
 				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
-				'method' => 'itemprototype.create',
+				'method' => 'template.update',
 				'request_data' => [
-					'name' => 'test',
-					'key_' => 'di_max_levels',
-					'value_type' => ITEM_VALUE_TYPE_UINT64,
-					'delay' => '30s',
-					'hostid' => 99009,
-					'ruleid' => 90006,
-					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => 40578
+					'templateid' => 1005,	// dependent.items.template.2
+					'hosts' => [
+						['hostid' => 1007]	// dependent.items.host.3
+					]
 				]
-			]
+			],
+			// Check for maximum count of items in the tree on the template level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
+				'method' => 'item.create',
+				// 1001: dependent.items.template.1
+				// 1001: dependent.items.template.1:master.item.1
+				'request_data' => self::getItems(1001, 1001, 'dependent.item.1', 3, 988)
+			],
+			// Check for maximum count of items in the tree on the template level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
+				'method' => 'item.create',
+				// 1001: dependent.items.template.1
+				// 1002: dependent.items.template.1:dependent.item.1.1
+				// 1003: dependent.items.template.1:dependent.item.1.2
+				'request_data' => array_merge(
+					self::getItems(1001, 1002, 'dependent.item.1.1', 3, 495),
+					self::getItems(1001, 1003, 'dependent.item.1.2', 3, 495)
+				)
+			],
+			// Check for maximum count of items in the tree on the host level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
+				'method' => 'item.create',
+				// 1004: dependent.items.host.1
+				// 1301: dependent.items.host.1:master.item.1
+				'request_data' => self::getItems(1004, 1301, 'dependent.item.1', 3, 988)
+			],
+			// Check for maximum count of items in the tree on the host level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
+				'method' => 'item.create',
+				// 1004: dependent.items.host.1
+				// 1302: dependent.items.host.1:dependent.item.1.1
+				// 1303: dependent.items.host.1:dependent.item.1.2
+				'request_data' => array_merge(
+					self::getItems(1004, 1302, 'dependent.item.1.1', 3, 495),
+					self::getItems(1004, 1303, 'dependent.item.1.2', 3, 495)
+				)
+			],
+			// Check for maximum count of items in the tree on the template level.
+			[
+				'error' => null,
+				'method' => 'item.create',
+				// 1001: dependent.items.template.1
+				// 1002: dependent.items.template.1:dependent.item.1.1
+				// 1003: dependent.items.template.1:dependent.item.1.2
+				'request_data' => array_merge(
+					self::getItems(1001, 1002, 'dependent.item.1.1', 3, 495),
+					self::getItems(1001, 1003, 'dependent.item.1.2', 3, 494)
+				)
+			],
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
+				'method' => 'item.create',
+				// 1001: dependent.items.template.1
+				// 1003: dependent.items.template.1:dependent.item.1.2
+				'request_data' => array_merge(self::getItems(1001, 1003, 'dependent.item.1.2', 495, 495))
+			],
+			// Check for maximum count of item prototypes in the tree on the template level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
+				'method' => 'itemprototype.create',
+				// 1001: dependent.items.template.1
+				// 1017: dependent.items.template.1:discovery.rule.1
+				// 1018: dependent.items.template.1:master.item.proto.1
+				'request_data' => self::getItemPrototypes(1001, 1017, 1018, 'dependent.item.proto.1', 3, 988)
+			],
+			// Check for maximum count of item prototypes in the tree on the template level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
+				'method' => 'itemprototype.create',
+				// 1001: dependent.items.template.1
+				// 1017: dependent.items.template.1:discovery.rule.1
+				// 1019: dependent.items.template.1:dependent.item.proto.1.1
+				// 1020: dependent.items.template.1:dependent.item.proto.1.2
+				'request_data' => array_merge(
+					self::getItemPrototypes(1001, 1017, 1019, 'dependent.item.proto.1.1', 3, 495),
+					self::getItemPrototypes(1001, 1017, 1020, 'dependent.item.proto.1.2', 3, 495)
+				)
+			],
+			// Check for maximum count of item prototypes in the tree on the host level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
+				'method' => 'itemprototype.create',
+				// 1004: dependent.items.host.1
+				// 1317: dependent.items.template.1:discovery.rule.1
+				// 1318: dependent.items.host.1:master.item.proto.1
+				'request_data' => self::getItemPrototypes(1004, 1317, 1318, 'dependent.item.proto.1', 3, 988)
+			],
+			// Check for maximum count of item prototypes in the tree on the host level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
+				'method' => 'itemprototype.create',
+				// 1004: dependent.items.host.1
+				// 1317: dependent.items.template.1:discovery.rule.1
+				// 1319: dependent.items.host.1:dependent.item.proto.1.1
+				// 1320: dependent.items.host.1:dependent.item.proto.1.2
+				'request_data' => array_merge(
+					self::getItemPrototypes(1004, 1317, 1319, 'dependent.item.proto.1.1', 3, 495),
+					self::getItemPrototypes(1004, 1317, 1320, 'dependent.item.proto.1.2', 3, 495)
+				)
+			],
+			// Check for maximum count of item prototypes in the tree on the template level.
+			[
+				'error' => null,
+				'method' => 'itemprototype.create',
+				// 1001: dependent.items.template.1
+				// 1017: dependent.items.template.1:discovery.rule.1
+				// 1019: dependent.items.template.1:dependent.item.proto.1.1
+				// 1020: dependent.items.template.1:dependent.item.proto.1.2
+				'request_data' => array_merge(
+					self::getItemPrototypes(1001, 1017, 1019, 'dependent.item.proto.1.1', 3, 495),
+					self::getItemPrototypes(1001, 1017, 1020, 'dependent.item.proto.1.2', 3, 494)
+				)
+			],
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
+				'method' => 'itemprototype.create',
+				// 1001: dependent.items.template.1
+				// 1017: dependent.items.template.1:discovery.rule.1
+				// 1020: dependent.items.template.1:dependent.item.proto.1.2
+				'request_data' => array_merge(
+					self::getItemPrototypes(1001, 1017, 1020, 'dependent.item.proto.1.2', 495, 495)
+				)
+			],
 		];
 	}
-
 	/**
-	* @dataProvider getUpdateData
-	*/
+	 * @dataProvider getTestCases
+	 */
 	public function testDependentItems_Update($error, $method, $request_data) {
-		$this->call($method, $request_data, $error);
-	}
-
-	public static function getCreateData() {
-		$items = [];
-		$prototypes = [];
-
-		for ($index = 3; $index < 1000; $index++) {
-			$items[] = [
-				'name' => 'dependent_'.$index,
-				'key_' => 'dependent_'.$index,
-				'hostid' => 99010,
-				'interfaceid' => null,
-				'type' => ITEM_TYPE_DEPENDENT,
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => 0,
-				'history' => '90d',
-				'status' => ITEM_STATUS_ACTIVE,
-				'params' => '',
-				'description' => '',
-				'flags' => 0,
-				'master_itemid' => 40581
-			];
-
-			$prototypes[] = [
-				'name' => 'dependent_prototype_'.$index,
-				'key_' => 'dependent_prototype_'.$index,
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => '30s',
-				'hostid' => 99009,
-				'ruleid' => 90006,
-				'type' => ITEM_TYPE_DEPENDENT,
-				'master_itemid' => 40567
-			];
-		}
-
-		return [
-			[
-				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
-				'method' => 'item.create',
-				'request_data' => $items
-			],
-			[
-				'error' => null,
-				'method' => 'item.create',
-				'request_data' => array_slice($items, 1)
-			],
-			[
-				'error' => null,
-				'method' => 'item.update',
-				'request_data' => [
-					'itemid' => 40581,
-					'name' => 'updated master item'
-				]
-			],
-			[
-				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
-				'method' => 'itemprototype.create',
-				'request_data' => [
-					'name' => 'test',
-					'key_' => 'di_max_levels',
-					'value_type' => ITEM_VALUE_TYPE_UINT64,
-					'delay' => '30s',
-					'hostid' => 99010,
-					'ruleid' => 90007,
-					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => 40581
-				]
-			],
-			[
-				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
-				'method' => 'itemprototype.create',
-				'request_data' => [
-					'hostid' => 99010,
-					'ruleid' => 90007,
-				] + reset($prototypes)
-			],
-			[
-				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
-				'method' => 'itemprototype.create',
-				'request_data' => [
-					'name' => 'should not allow to create dependent on item',
-					'master_itemid' => 40574
-				] + reset($prototypes)
-			],
-			[
-				'error' => null,
-				'method' => 'itemprototype.create',
-				'request_data' => array_slice($prototypes, 1)
-			]
-		];
-	}
-
-	/**
-	* @dataProvider getCreateData
-	*/
-	public function testDependentItems_Create($error, $method, $request_data) {
 		$this->call($method, $request_data, $error);
 	}
 }
