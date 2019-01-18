@@ -733,7 +733,7 @@ abstract class CItemGeneral extends CApiService {
 			$_tpl_items = [];
 
 			foreach ($tpl_items as $tpl_item) {
-				if ($tpl_item['type'] != ITEM_TYPE_DEPENDENT//* || TODO: !array_key_exists('master_itemid', $tpl_item)*/
+				if ($tpl_item['type'] != ITEM_TYPE_DEPENDENT
 						|| !array_key_exists($tpl_item['master_itemid'], $tpl_items)) {
 					$_tpl_items[$tpl_item['itemid']] = $tpl_item;
 				}
@@ -1170,7 +1170,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @param array      $tpl_items
 	 * @param int        $tpl_items[<itemid>]['type']
-	 * @param string     $tpl_items[<itemid>]['master_itemid']  (optional)
+	 * @param string     $tpl_items[<itemid>]['master_itemid']
 	 * @param array      $new_items
 	 * @param string     $new_items[<itemid>]['hostid']
 	 * @param int        $new_items[<itemid>]['type']
@@ -1183,7 +1183,7 @@ abstract class CItemGeneral extends CApiService {
 		$tpl_master_itemids = [];
 
 		foreach ($tpl_items as $tpl_item) {
-			if ($tpl_item['type'] == ITEM_TYPE_DEPENDENT/* TODO: && array_key_exists('master_itemid', $tpl_item)*/) {
+			if ($tpl_item['type'] == ITEM_TYPE_DEPENDENT) {
 				$tpl_master_itemids[$tpl_item['master_itemid']] = true;
 			}
 		}
