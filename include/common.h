@@ -1528,5 +1528,7 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
+#define ZBX_FALLTHROUGH			__attribute__ ((fallthrough))
+
 #endif
 

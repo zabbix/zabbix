@@ -3829,6 +3829,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 				if (SUCCEED == (ret = zbx_token_parse_objectid(expression, ptr, token)))
 					break;
 				/* break; is not missing here */
+				ZBX_FALLTHROUGH;
 			default:
 				if (SUCCEED != (ret = zbx_token_parse_macro(expression, ptr, token)))
 					ret = zbx_token_parse_simple_macro(expression, ptr, token);

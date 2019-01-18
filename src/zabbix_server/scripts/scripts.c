@@ -144,6 +144,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 			item.publickey = script->publickey;
 			item.privatekey = script->privatekey;
 			/* break; is not missing here */
+			ZBX_FALLTHROUGH;
 		case ZBX_SCRIPT_TYPE_TELNET:
 			item.username = script->username;
 			item.password = script->password;
@@ -361,6 +362,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
 					&script->privatekey, MACRO_TYPE_COMMON, NULL, 0);
 			/* break; is not missing here */
+			ZBX_FALLTHROUGH;
 		case ZBX_SCRIPT_TYPE_TELNET:
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
 					&script->port, MACRO_TYPE_COMMON, NULL, 0);
