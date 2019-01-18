@@ -32,3 +32,24 @@
 		.trigger('change', false);
 	});
 </script>
+<script type="text/javascript">
+	+function($) {
+		function flagged_filter_priority() {
+			var form = $('form[name="zbx_filter"]');
+			var inputs = form.find('input[name^=filter_priority]');
+			var flag_input = $('<input>', {value: '0', type:'hidden', name:'filter_priority_flag'});
+
+			inputs.removeAttr('name')
+			form.append(flag_input)
+
+			inputs.change(function() {
+				var new_flag = 0
+				inputs.each(function(i, node) {
+					node.checked && (new_flag += (1 << node.value))
+				})
+				flag_input.val(new_flag)
+			})
+		}
+		$(flagged_filter_priority)
+	}(jQuery)
+</script>

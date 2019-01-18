@@ -283,8 +283,8 @@ $fields = [
 	// filter
 	'filter_set' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_groupid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_hostid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_groupids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_hostids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'filter_application' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_name' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_type' =>				[T_ZBX_INT, O_OPT, null,
@@ -382,65 +382,27 @@ else {
 	}
 }
 
-// Set sub-groups of selected group.
-$filter_groupids = [];
-
-if (hasRequest('filter_groupid')) {
-	$filter_groupids = [getRequest('filter_groupid')];
-
-	$filter_groups = API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $filter_groupids,
-		'preservekeys' => true
-	]);
-
-	$filter_groups_names = [];
-
-	foreach ($filter_groups as $group) {
-		$filter_groups_names[] = $group['name'].'/';
-	}
-
-	if ($filter_groups_names) {
-		$child_groups = API::HostGroup()->get([
-			'output' => ['groupid'],
-			'search' => ['name' => $filter_groups_names],
-			'searchByAny' => true,
-			'startSearch' => true
-		]);
-
-		foreach ($child_groups as $child_group) {
-			$filter_groupids[] = $child_group['groupid'];
-		}
-	}
+if (hasRequest('filter_groupids') && !isWritableHostGroups(getRequest('filter_groupids'))) {
+	access_deny();
 }
-
-if ($filter_groupids) {
-	$count = API::HostGroup()->get([
-		'groupids' => $filter_groupids,
-		'editable' => true,
-		'countOutput' => true
-	]);
-
-	if ($count != count($filter_groupids)) {
-		access_deny();
-	}
-}
-
-if (getRequest('filter_hostid') && !isWritableHostTemplates([getRequest('filter_hostid')])) {
+if (getRequest('filter_hostids') && !isWritableHostTemplates(getRequest('filter_hostids'))) {
 	access_deny();
 }
 
+// Set sub-groups of selected groups.
+$filter_groupids = getSubGroups(getRequest('filter_groupids', []));
+
 if (!empty($hosts)) {
 	$host = reset($hosts);
-	$_REQUEST['filter_hostid'] = $host['hostid'];
+	$_REQUEST['filter_hostids'] = [$host['hostid']];
 }
 
 /*
  * Filter
  */
 if (hasRequest('filter_set')) {
-	CProfile::update('web.items.filter_groupid', getRequest('filter_groupid', 0), PROFILE_TYPE_ID);
-	CProfile::update('web.items.filter_hostid', getRequest('filter_hostid', 0), PROFILE_TYPE_ID);
+	CProfile::updateArray('web.items.filter_groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
+	CProfile::updateArray('web.items.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
 	CProfile::update('web.items.filter_application', getRequest('filter_application', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
@@ -470,7 +432,10 @@ if (hasRequest('filter_set')) {
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
-	CProfile::delete('web.items.filter_groupid');
+	if (count(CProfile::getArray('web.items.filter_hostids', [])) != 1) {
+		CProfile::delete('web.items.filter_hostids');
+	}
+	CProfile::delete('web.items.filter_groupids');
 	CProfile::delete('web.items.filter_application');
 	CProfile::delete('web.items.filter_name');
 	CProfile::delete('web.items.filter_type');
@@ -491,8 +456,8 @@ elseif (hasRequest('filter_rst')) {
 	DBend();
 }
 
-$_REQUEST['filter_groupid'] = CProfile::get('web.items.filter_groupid', 0);
-$_REQUEST['filter_hostid'] = CProfile::get('web.items.filter_hostid', 0);
+$_REQUEST['filter_groupids'] = CProfile::getArray('web.items.filter_groupids', []);
+$_REQUEST['filter_hostids'] = CProfile::getArray('web.items.filter_hostids', []);
 $_REQUEST['filter_application'] = CProfile::get('web.items.filter_application', '');
 $_REQUEST['filter_name'] = CProfile::get('web.items.filter_name', '');
 $_REQUEST['filter_type'] = CProfile::get('web.items.filter_type', -1);
@@ -528,17 +493,17 @@ foreach ($subfiltersList as $name) {
 	}
 }
 
-$filterHostId = getRequest('filter_hostid');
-if (!hasRequest('form') && $filterHostId) {
+$filter_hostids = getRequest('filter_hostids');
+if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
 		$host = API::Host()->get([
 			'output' => ['hostid'],
-			'hostids' => $filterHostId
+			'hostids' => $filter_hostids
 		]);
 		if (!$host) {
 			$host = API::Template()->get([
 				'output' => ['templateid'],
-				'templateids' => $filterHostId
+				'templateids' => $filter_hostids
 			]);
 		}
 		$host = reset($host);
@@ -1712,21 +1677,24 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-	$_REQUEST['hostid'] = empty($_REQUEST['filter_hostid']) ? null : $_REQUEST['filter_hostid'];
-
-	$config = select_config();
+	if (count($filter_hostids) == 1) {
+		$hostid = reset($filter_hostids);
+	}
+	else {
+		$hostid = null;
+	}
 
 	$data = [
 		'form' => getRequest('form'),
-		'hostid' => getRequest('hostid'),
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'config' => $config
+		'config' => select_config(),
+		'filter_hostids' => $filter_hostids,
+		'hostid' => $hostid
 	];
 
 	// items
 	$options = [
-		'hostids' => $data['hostid'],
 		'search' => [],
 		'output' => [
 			'itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type', 'error',
@@ -1739,44 +1707,17 @@ else {
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => $data['config']['search_limit'] + 1
 	];
 	$preFilter = count($options, COUNT_RECURSIVE);
 
-	$filter_groupid = getRequest('filter_groupid', []);
-	if ($filter_groupid) {
-		$filter_groupids = [$filter_groupid];
-		$filter_groups = API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $filter_groupids,
-			'preservekeys' => true
-		]);
-
-		$filter_groups_names = [];
-		foreach ($filter_groups as $group) {
-			$filter_groups_names[] = $group['name'].'/';
-		}
-
-		if ($filter_groups_names) {
-			$child_groups = API::HostGroup()->get([
-				'output' => ['groupid'],
-				'search' => ['name' => $filter_groups_names],
-				'searchByAny' => true,
-				'startSearch' => true
-			]);
-
-			foreach ($child_groups as $child_group) {
-				$filter_groupids[] = $child_group['groupid'];
-			}
-		}
-
-		if ($filter_groupids) {
-			$options['groupids'] = $filter_groupids;
-		}
+	if ($filter_hostids) {
+		$options['hostids'] = $filter_hostids;
 	}
-	if (isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
-		$data['filter_hostid'] = $_REQUEST['filter_hostid'];
+	if ($filter_groupids) {
+		$options['groupids'] = $filter_groupids;
 	}
+
 	if (isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application'])) {
 		$options['application'] = $_REQUEST['filter_application'];
 	}
@@ -1876,14 +1817,7 @@ else {
 		$options['filter']['ipmi_sensor'] = $_REQUEST['filter_ipmi_sensor'];
 	}
 
-	$data['filterSet'] = ($options['hostids'] || $preFilter != count($options, COUNT_RECURSIVE));
-	if ($data['filterSet']) {
-		$data['items'] = API::Item()->get($options);
-	}
-	else {
-		$data['items'] = [];
-	}
-
+	$data['items'] = API::Item()->get($options);
 	$data['parent_templates'] = [];
 
 	// Set values for subfilters, if any of subfilters = false then item shouldn't be shown.
@@ -1896,7 +1830,7 @@ else {
 		foreach ($data['items'] as &$item) {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
 
-			if (empty($data['filter_hostid'])) {
+			if ($data['hostid'] == 0) {
 				$host = reset($item['hosts']);
 				$item['host'] = $host['name'];
 			}
@@ -2005,8 +1939,7 @@ else {
 		}
 	}
 
-	// Draw the filter and subfilter.
-	$data['flicker'] = getItemFilterForm($data['items']);
+	$data['main_filter'] = getItemFilterForm($data['items']);
 
 	// Remove subfiltered items.
 	foreach ($data['items'] as $number => $item) {

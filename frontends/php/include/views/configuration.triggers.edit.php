@@ -107,8 +107,7 @@ $popup_options = [
 	'dstfld1' => $data['expression_field_name']
 ];
 
-if ($data['groupid'] && $data['hostid']) {
-	$popup_options['groupid'] = $data['groupid'];
+if ($data['hostid']) {
 	$popup_options['hostid'] = $data['hostid'];
 }
 
@@ -306,8 +305,7 @@ $popup_options = [
 	'dstfrm' => $triggersForm->getName(),
 	'dstfld1' => $data['recovery_expression_field_name']
 ];
-if ($data['groupid'] && $data['hostid']) {
-	$popup_options['groupid'] = $data['groupid'];
+if ($data['hostid']) {
 	$popup_options['hostid'] = $data['hostid'];
 }
 
@@ -624,7 +622,6 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						'srcfld1' => 'triggerid',
 						'reference' => 'deptrigger',
 						'hostid' => $data['hostid'],
-						'groupid' => $data['groupid'],
 						'multiselect' => '1',
 						'with_triggers' => '1',
 						'noempty' => '1'

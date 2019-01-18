@@ -321,11 +321,19 @@ foreach ($data['hosts'] as $host) {
 			CViewHelper::showNum($host['applications'])
 		],
 		[
-			new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']),
+			new CLink(_('Items'),
+				(new CUrl('items.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$host['hostid']])
+			),
 			CViewHelper::showNum($host['items'])
 		],
 		[
-			new CLink(_('Triggers'), 'triggers.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+			new CLink(_('Triggers'),
+				(new CUrl('triggers.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$host['hostid']])
+			),
 			CViewHelper::showNum($host['triggers'])
 		],
 		[

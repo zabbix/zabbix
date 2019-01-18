@@ -412,3 +412,44 @@ INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (14,1
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (15,110011,'{#A}','$.list[:1].type');
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (16,110011,'{#B}','$.list[:2].type');
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (17,110011,'{#C}','$.list[:3].type');
+
+-- testtriggerfilter
+insert into hstgrp (groupid,name,internal) values (139000,'triggerstester',0);
+insert into hosts (hostid,host,name,status,description) values (130000,'triggerstester','triggerstester',0,'');
+insert into hosts (hostid,host,name,status,description) values (131000,'triggerstestertmpl','triggerstestertmpl',3,'');
+insert into hosts_groups (hostgroupid, hostid, groupid) values (139100, 130000, 139000);
+insert into hosts_groups (hostgroupid, hostid, groupid) values (139200, 131000, 139000);
+insert into items (itemid,hostid,type,name,key_) values (132000,130000,2,'triggerstesteritem','triggerstesteritem');
+insert into items (itemid,hostid,type,name,key_) values (132001,131000,2,'triggerstesteritemtmpl','triggerstesteritemtmpl');
+insert into items (itemid,hostid,type,name,key_,flags) values (132002,130000,2,'triggerstesteritemlld','triggerstesteritemlld',1);
+insert into items (itemid,hostid,type,name,key_,flags) values (132003,131000,2,'triggerstesteritemlldtmpl','triggerstesteritemlldtmpl',1);
+insert into items (itemid,hostid,type,name,key_,flags) values (132004,130000,2,'triggerstesteritemproto[{#t}]','triggerstesteritemproto[{#t}]',2);
+insert into items (itemid,hostid,type,name,key_,flags) values (132005,131000,2,'triggerstesteritemprototmpl[{#t}]','triggerstesteritemprototmpl[{#t}]',2);
+insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values (138000,132004,132002,'triggerstesteritemproto[{#t}]');
+insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values (138001,132005,132003,'triggerstesteritemprototmpl[{#t}]');
+
+insert into triggers (triggerid,expression,description,priority) values (134000,'{135000}=0','triggerstester_t0',0);
+insert into functions (functionid,itemid,triggerid,name,parameter) values (135000,132000,134000,'now','0');
+insert into triggers (triggerid,expression,description,priority) values (134001,'{135001}=0','triggerstester_t1',1);
+insert into functions (functionid,itemid,triggerid,name,parameter) values (135001,132000,134001,'now','0');
+insert into triggers (triggerid,expression,description,priority) values (134002,'{135002}=0','triggerstester_t2',2);
+insert into functions (functionid,itemid,triggerid,name,parameter) values (135002,132000,134002,'now','0');
+insert into triggers (triggerid,expression,description,priority) values (134003,'{135003}=0','triggerstester_t3',3);
+insert into functions (functionid,itemid,triggerid,name,parameter) values (135003,132000,134003,'now','0');
+insert into triggers (triggerid,expression,description,priority) values (134004,'{135004}=0','triggerstester_t4',4);
+insert into functions (functionid,itemid,triggerid,name,parameter) values (135004,132000,134004,'now','0');
+insert into triggers (triggerid,expression,description,priority) values (134005,'{135005}=0','triggerstester_t5',5);
+insert into functions (functionid,itemid,triggerid,name,parameter) values (135005,132000,134005,'now','0');
+
+insert into triggers (triggerid,expression,description,priority,flags) values (134106,'{135106}=0','triggerstesterlld_t0',0,2);
+insert into functions (functionid,itemid,triggerid,name,parameter) values (135106,132004,134106,'now','0');
+
+-- discovered
+INSERT INTO items (itemid,hostid,type,name,key_,flags) VALUES (132006,130000,2,'TriggersTesterItemLLDDiscovered[res1]','TriggersTesterItemLLDDiscovered[res1]',4);
+INSERT INTO triggers (triggerid,expression,description,priority,flags) VALUES (134118,'{135118}=0','TriggersTesterLLDTmpl_T0[res1]',0,4);
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (135118,132006,134118,'now','0');
+INSERT INTO trigger_discovery (triggerid,parent_triggerid) VALUES (134118,134106);
+insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values (138002,132006,132004,'triggerstesteritemprototmpl[{#t}]');
+-- T4 depends on T5 depends on T0 (LLD discovered version)
+INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up) VALUES (138888,134004,134005);
+INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up) VALUES (138889,134005,134118);

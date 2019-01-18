@@ -21,22 +21,52 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.list.js.php';
 
-if (!$data['hostid']) {
-	$create_button = (new CSubmit('form', _('Create trigger (select host first)')))->setEnabled(false);
-}
-else {
-	$create_button = new CSubmit('form', _('Create trigger'));
-}
-
 $filter_column1 = (new CFormList())
-	->addRow(_('Severity'),
-		new CSeverity([
-			'name' => 'filter_priority',
-			'value' => (int) $data['filter_priority'],
-			'all' => true
-		])
+	->addRow((new CLabel(_('Host group'), 'filter_groupids')),
+		(new CMultiSelect([
+			'name' => 'filter_groupids[]',
+			'object_name' => 'hostGroup',
+			'data' => $data['filter_groupids_ms'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => 'groupids',
+					'dstfld1' => 'filter_groupids_',
+					'editable' => true
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('State'),
+	->addRow((new CLabel(_('Host'), 'filter_hostids')),
+		(new CMultiSelect([
+			'name' => 'filter_hostids[]',
+			'object_name' => 'hosts',
+			'data' => $data['filter_hostids_ms'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_templates',
+					'srcfld1' => 'hostid',
+					'dstfrm' => 'hostids',
+					'dstfld1' => 'filter_hostids_',
+					'editable' => true,
+					'templated_hosts' => true
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Name'),
+		(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Severity'),
+		(new CCheckBoxList('filter_priority', $data['filter_priority']))
+			->addCheckBox(_('Not classified'), TRIGGER_SEVERITY_NOT_CLASSIFIED)
+			->addCheckBox(_('Information'), TRIGGER_SEVERITY_INFORMATION)
+			->addCheckBox(_('Warning'), TRIGGER_SEVERITY_WARNING)
+			->addCheckBox(_('Average'), TRIGGER_SEVERITY_AVERAGE)
+			->addCheckBox(_('High'), TRIGGER_SEVERITY_HIGH)
+			->addCheckBox(_('Disaster'), TRIGGER_SEVERITY_DISASTER)
+	)->addRow(_('State'),
 		(new CRadioButtonList('filter_state', (int) $data['filter_state']))
 			->addValue(_('all'), -1)
 			->addValue(_('Normal'), TRIGGER_STATE_NORMAL)
@@ -106,35 +136,41 @@ $filter_tags_table->addRow(
 	))->setColSpan(3)
 );
 
-$filter_column2 = (new CFormList())->addRow(_('Tags'), $filter_tags_table);
+$filter_column2 = (new CFormList())
+	->addRow(_('Tags'), $filter_tags_table)
+	->addRow(_('Inherited'),
+		(new CRadioButtonList('filter_inherited', (int) $data['filter_inherited']))
+			->addValue(_('all'), -1)
+			->addValue(_('Yes'), 1)
+			->addValue(_('No'), 0)
+			->setModern(true)
+	)
+	->addRow(_('Discovered'),
+		(new CRadioButtonList('filter_discovered', (int) $data['filter_discovered']))
+			->addValue(_('all'), -1)
+			->addValue(_('Yes'), 1)
+			->addValue(_('No'), 0)
+			->setModern(true)
+	)
+	->addRow(_('With dependencies'),
+		(new CRadioButtonList('filter_dependent', (int) $data['filter_dependent']))
+			->addValue(_('all'), -1)
+			->addValue(_('Yes'), 1)
+			->addValue(_('No'), 0)
+			->setModern(true)
+	);
 
 $filter = (new CFilter(new CUrl('triggers.php')))
-	->setProfile($data['profileIdx'])
+	->setProfile($data['profile_idx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
 	->setControls(new CList([
-		(new CForm('get'))
-			->cleanItems()
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getGroupsCB()
-				])
-				->addItem([
-					new CLabel(_('Host'), 'hostid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getHostsCB()
-				])
-			),
-		(new CTag('nav', true, ($data['hostid'] != 0)
+		(new CTag('nav', true, ($data['show_header_host_table'])
 			? new CRedirectButton(_('Create trigger'), (new CUrl('triggers.php'))
-				->setArgument('groupid', $data['pageFilter']->groupid)
-				->setArgument('hostid', $data['pageFilter']->hostid)
+				->setArgument('hostid', $data['hostid'])
 				->setArgument('form', 'create')
 				->getUrl()
 			)
@@ -142,7 +178,7 @@ $widget = (new CWidget())
 		))->setAttribute('aria-label', _('Content controls'))
 	]));
 
-if ($data['hostid']) {
+if ($data['show_header_host_table']) {
 	$widget->addItem(get_header_host_table('triggers', $data['hostid']));
 }
 
@@ -165,11 +201,11 @@ $triggers_table = (new CTableInfo())->setHeader([
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
 	$data['show_value_column'] ? _('Value') : null,
-	($data['hostid'] == 0) ? _('Host') : null,
+	!$data['show_header_host_table'] ? _('Host') : null,
 	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-	$data['showInfoColumn'] ? _('Info') : null,
+	$data['show_info_column'] ? _('Info') : null,
 	_('Tags')
 ]);
 
@@ -180,6 +216,11 @@ $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['trig
 
 foreach ($data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
+	$trigger_hostid = $data['hostid'];
+	if ($trigger_hostid == 0) {
+		$trigger_host = reset($trigger['hosts']);
+		$trigger_hostid = $trigger_host['hostid'];
+	}
 
 	// description
 	$description = [];
@@ -200,35 +241,38 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	$description[] = new CLink(
 		CHtml::encode($trigger['description']),
-		'triggers.php?form=update&hostid='.$data['hostid'].'&triggerid='.$triggerid
+		(new CUrl('triggers.php'))
+			->setArgument('form', 'update')
+			->setArgument('triggerid', $triggerid)
+			->setArgument('hostid', $trigger_hostid)
 	);
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];
-		$triggerDependencies = [];
+		$trigger_deps = [];
 
 		foreach ($trigger['dependencies'] as $dependency) {
-			$depTrigger = $data['dependencyTriggers'][$dependency['triggerid']];
+			$dep_trigger = $data['dep_triggers'][$dependency['triggerid']];
 
-			$depTriggerDescription = CHtml::encode(
-				implode(', ', zbx_objectValues($depTrigger['hosts'], 'name')).NAME_DELIMITER.$depTrigger['description']
+			$dep_trigger_desc = CHtml::encode(
+				implode(', ', zbx_objectValues($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description']
 			);
 
-			$triggerDependencies[] = (new CLink($depTriggerDescription,
-				'triggers.php?form=update&triggerid='.$depTrigger['triggerid']
+			$trigger_deps[] = (new CLink($dep_trigger_desc,
+				'triggers.php?form=update&triggerid='.$dep_trigger['triggerid']
 			))
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(triggerIndicatorStyle($depTrigger['status']));
+				->addClass(triggerIndicatorStyle($dep_trigger['status']));
 
-			$triggerDependencies[] = BR();
+			$trigger_deps[] = BR();
 		}
-		array_pop($triggerDependencies);
+		array_pop($trigger_deps);
 
-		$description = array_merge($description, [(new CDiv($triggerDependencies))->addClass('dependencies')]);
+		$description = array_merge($description, [(new CDiv($trigger_deps))->addClass('dependencies')]);
 	}
 
 	// info
-	if ($data['showInfoColumn']) {
+	if ($data['show_info_column']) {
 		$info_icons = [];
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
 			$info_icons[] = makeErrorIcon($trigger['error']);
@@ -251,7 +295,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	// hosts
 	$hosts = null;
-	if ($data['hostid'] == 0) {
+	if (!$data['show_header_host_table']) {
 		foreach ($trigger['hosts'] as $hostid => $host) {
 			if (!empty($hosts)) {
 				$hosts[] = ', ';
@@ -285,8 +329,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$description,
 		$expression,
 		$status,
-		$data['showInfoColumn'] ? makeInformationList($info_icons) : null,
-		$data['tags'][$triggerid]
+		$data['show_info_column'] ? makeInformationList($info_icons) : null,
+		array_key_exists($triggerid, $data['tags']) ? $data['tags'][$triggerid] : ''
 	]);
 }
 

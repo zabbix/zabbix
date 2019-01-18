@@ -72,7 +72,9 @@ foreach ($data['items'] as $item) {
 		else {
 			$link = ($item['master_item']['source'] === 'itemprototypes')
 				? (new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				: (new CUrl('items.php'))->setArgument('hostid', $item['hostid']);
+				: (new CUrl('items.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$item['hostid']]);
 
 			$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
 				$link

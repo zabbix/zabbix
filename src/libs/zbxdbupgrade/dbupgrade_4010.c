@@ -91,6 +91,54 @@ static int	DBpatch_4010007(void)
 	return DBadd_foreign_key("lld_macro_path", 1, &field);
 }
 
+static int	DBpatch_4010008(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.items.filter_groupids'"
+				" where idx='web.items.filter_groupid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+
+static int	DBpatch_4010009(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.items.filter_hostids'"
+				" where idx='web.items.filter_hostid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4010010(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.items.filter_inherited'"
+				" where idx='web.items.filter_templated_items'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4010011(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.triggers.filter_priority' and value_int='-1'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4010)
@@ -104,5 +152,9 @@ DBPATCH_ADD(4010004, 0, 1)
 DBPATCH_ADD(4010005, 0, 1)
 DBPATCH_ADD(4010006, 0, 1)
 DBPATCH_ADD(4010007, 0, 1)
+DBPATCH_ADD(4010008, 0, 1)
+DBPATCH_ADD(4010009, 0, 1)
+DBPATCH_ADD(4010010, 0, 1)
+DBPATCH_ADD(4010011, 0, 1)
 
 DBPATCH_END()
