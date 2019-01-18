@@ -1592,9 +1592,7 @@ abstract class CItemGeneral extends CApiService {
 						' LEFT JOIN item_discovery id'.
 							' ON i.itemid=id.itemid'.
 					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
-						' AND '.dbConditionInt('i.flags',
-							[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
-						)
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])
 				);
 			}
 
