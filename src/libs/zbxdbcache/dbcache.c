@@ -173,7 +173,6 @@ static int	hc_queue_get_size(void);
  * Parameters: stats - [OUT] write cache metrics                              *
  *                                                                            *
  ******************************************************************************/
-
 void	DCget_stats_all(zbx_wcache_info_t *wcache_info)
 {
 	LOCK_CACHE;
