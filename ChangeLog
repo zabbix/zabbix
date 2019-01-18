@@ -5,6 +5,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+........S. [ZBX-15331] updated LLD item creation/updating error messages (asitals)
 ..F....... [ZBX-15465] removed html non-breaking space from visiblity checkbox labels (miks)
 ..F....... [ZBX-15307] fixed upper level maps positioning in Monitoring Map screen (talbergs)
 ...G...PS. [ZBX-15428] improved regular expression performance by studying compiled pattern (vso)
