@@ -650,7 +650,37 @@
 			widget.prev_pos.mirrored.y = true;
 		}
 
-		console.groupCollapsed(`${widget.header} resize step. ${process_order[0]} is set as primary axis,  direction state: ${JSON.stringify(widget.prev_pos.mirrored)}"`);
+		// Situation when there are changes on both axes should be handled as special case.
+		if (process_order[0] == 'x' && (widget.prev_pos.y != widget.current_pos.y
+				|| widget.prev_pos.height != widget.current_pos.height)) {
+			$.map(data.widgets, function(box) {
+				return (!('affected_axis' in box) && widget.uniqueid != box.uniqueid
+					&& rectOverlap(widget.current_pos, box.current_pos))
+					? box
+					: null;
+			}).each(function(box) {
+				// Mark affected_axis as y if affected box is affected by only changing y position or height.
+				var pos = {
+					x: widget.prev_pos.x,
+					y: widget.current_pos.y,
+					width: widget.prev_pos.width,
+					height: widget.current_pos.height
+				}
+
+				if (rectOverlap(pos, box.current_pos)) {
+					box.affected_axis = 'y';
+					console
+						.log(`%cfixed ${box.header} affected axis`, 'color: green');
+				}
+			});
+		}
+
+		console.groupCollapsed(`%c${widget.header} resize step. ${process_order[0]} is set as primary axis,  direction state: ${JSON.stringify(widget.prev_pos.mirrored)}"`,
+			(widget.prev_pos.y != widget.current_pos.y || widget.prev_pos.height != widget.current_pos.height)
+			&& (widget.prev_pos.x != widget.current_pos.x || widget.prev_pos.width != widget.current_pos.width)
+			? 'color: red'
+			: ''
+		);
 		console
 				.log ({current_pos: widget.current_pos, pos: widget.pos, prev_pos:widget.prev_pos});
 
@@ -686,6 +716,9 @@
 			if (axis_key in widget.prev_pos.mirrored) {
 				axis.mirrored = true;
 			}
+
+			console
+				.log(`%caffected on opposite ${axis_key == 'x' ? 'y' : 'x'} axis: ${$.map(data.widgets, function(b) { return b.affected_axis && b.affected_axis != axis_key ? b.header : null}).join(', ')}`, 'font-weight: bold');
 
 			fitWigetsIntoBox(data.widgets, widget, axis);
 
