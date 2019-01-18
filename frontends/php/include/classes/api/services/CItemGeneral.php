@@ -1518,10 +1518,11 @@ abstract class CItemGeneral extends CApiService {
 	 * Validate items with type ITEM_TYPE_DEPENDENT for create or update operation.
 	 *
 	 * @param array  $items
-	 * @param string $items[]['itemid']         (mandatory for updated items)
+	 * @param string $items[]['itemid']         (mandatory for updated items and item prototypes)
 	 * @param string $items[]['hostid']
 	 * @param int    $items[]['type']
 	 * @param string $items[]['master_itemid']  (mandatory for ITEM_TYPE_DEPENDENT)
+	 * @param int    $items[]['flags']          (mandatory for items)
 	 *
 	 * @throws APIException for invalid data.
 	 */
@@ -1531,7 +1532,9 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($items as $item) {
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				$dep_items[] = $item;
+				if ($this instanceof CItemPrototype || $item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+					$dep_items[] = $item;
+				}
 
 				if (array_key_exists('itemid', $item)) {
 					$upd_itemids[] = $item['itemid'];
@@ -1579,7 +1582,7 @@ abstract class CItemGeneral extends CApiService {
 					'SELECT i.itemid,i.hostid,i.master_itemid'.
 					' FROM items i'.
 					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
-						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL])
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])
 				);
 			}
 			else {
@@ -1589,7 +1592,9 @@ abstract class CItemGeneral extends CApiService {
 						' LEFT JOIN item_discovery id'.
 							' ON i.itemid=id.itemid'.
 					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
-						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])
+						' AND '.dbConditionInt('i.flags',
+							[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+						)
 				);
 			}
 
