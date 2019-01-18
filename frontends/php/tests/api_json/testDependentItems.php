@@ -111,6 +111,94 @@ class testDependentItems extends CAPITest {
 					'itemid' => 2305	// dependent.items.host.7:net.if.in[eth0]
 				]
 			],
+			// Set incorrect master_itemid for item (create).
+			[
+				'error' => 'Incorrect value for field "master_itemid": Item "2499" does not exist or you have no access to this item.',
+				'method' => 'item.create',
+				// 1015: dependent.items.host.8
+				// 2499: this ID does not exists in the DB
+				'request_data' => self::getItems(1015, 2499, 'dependent.item.1', 2, 2)
+			],
+			// Set incorrect master_itemid for item (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": Item "2499" does not exist or you have no access to this item.',
+				'method' => 'item.update',
+				'request_data' => [
+					'itemid' => 2402,		// dependent.items.host.8:dependent.item.1.1
+					'master_itemid' => 2499	// this ID does not exists in the DB
+				]
+			],
+			// Set incorrect master_itemid for item prototype (create).
+			[
+				'error' => 'Incorrect value for field "master_itemid": Item "2499" does not exist or you have no access to this item.',
+				'method' => 'itemprototype.create',
+				// 1015: dependent.items.host.8
+				// 2403: dependent.items.host.8:discovery.rule.1
+				// 2499: this ID does not exists in the DB
+				'request_data' => self::getItemPrototypes(1015, 2403, 2499, 'dependent.item.proto.1', 2, 2)
+			],
+			// Set incorrect master_itemid for item prototype (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": Item "2499" does not exist or you have no access to this item.',
+				'method' => 'itemprototype.update',
+				'request_data' => [
+					'itemid' => 2405,		// dependent.items.host.8:dependent.item.proto.1.1
+					'master_itemid' => 2499	// this ID does not exists in the DB
+				]
+			],
+			// Set master_itemid from other host for item (create).
+			[
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'method' => 'item.create',
+				// 1015: dependent.items.host.8
+				// 2501: dependent.items.host.9:master.item.1
+				'request_data' => self::getItems(1015, 2501, 'dependent.item.1', 2, 2)
+			],
+			// Set master_itemid from other host for item (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'method' => 'item.update',
+				'request_data' => [
+					'itemid' => 2402,		// dependent.items.host.8:dependent.item.1.1
+					'master_itemid' => 2501	// dependent.items.host.9:master.item.1
+				]
+			],
+			// Set master_itemid from other host for item prototype (create).
+			[
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'method' => 'itemprototype.create',
+				// 1015: dependent.items.host.8
+				// 2403: dependent.items.host.8:discovery.rule.1
+				// 2504: dependent.items.host.9:master.item.proto.1
+				'request_data' => self::getItemPrototypes(1015, 2403, 2504, 'dependent.item.proto.1', 2, 2)
+			],
+			// Set master_itemid from other host for item prototype (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'method' => 'itemprototype.update',
+				'request_data' => [
+					'itemid' => 2405,		// dependent.items.host.8:dependent.item.proto.1.1
+					'master_itemid' => 2504	// dependent.items.host.9:master.item.proto.1
+				]
+			],
+			// Set master_itemid from other discovery rule (create).
+			[
+				'error' => 'Incorrect value for field "master_itemid": ruleid of dependent item and master item should match.',
+				'method' => 'itemprototype.create',
+				// 1015: dependent.items.host.8
+				// 2403: dependent.items.host.8:discovery.rule.1
+				// 2407: dependent.items.host.8:master.item.proto.2
+				'request_data' => self::getItemPrototypes(1015, 2403, 2407, 'dependent.item.proto.1', 2, 2)
+			],
+			// Set master_itemid from other discovery rule (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": ruleid of dependent item and master item should match.',
+				'method' => 'itemprototype.update',
+				'request_data' => [
+					'itemid' => 2405,		// dependent.items.host.8:dependent.item.proto.1.1
+					'master_itemid' => 2407	// dependent.items.host.8:master.item.proto.2
+				]
+			],
 			// Create dependent item, which depends on discovered item. Shuld to fail after ZBX-15286.
 			[
 				'error' => null,

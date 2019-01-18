@@ -632,6 +632,35 @@ INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6301
 INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6302, 2301, 2303);
 INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6303, 2302, 2304);
 INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6304, 2303, 2305);
+
+-- dependent items: dependent.items.host.8
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (1015, 'dependent.items.host.8', 'dependent.items.host.8', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (1015, 1015, 1003);
+INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (1008, 1015, 1, '127.0.0.1', 1, '10050', 1);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers                 ) VALUES (2401, 1015, 'master.item.1'                 ,  2, 'master.item.1'                 , 1, '90d', 0, NULL, NULL, '', '', '', '');
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers                 ) VALUES (2402, 1015, 'dependent.item.1.1'            , 18, 'dependent.item.1.1'            , 1, '90d', 0, 2401, NULL, '', '', '', '');
+INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status,                templateid, params, description, posts, headers, lifetime, flags) VALUES (2403, 1015, 'discovery.rule.1'              ,  2, 'discovery.rule.1'              , 4,        0,       NULL, '', '', '', '', '30d', 1);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2404, 1015, 'master.item.proto.1'           ,  2, 'master.item.proto.1'           , 1, '90d', 0, NULL, NULL, '', '', '', '',        2);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2405, 1015, 'dependent.item.proto.1.1'      , 18, 'dependent.item.proto.1.1'      , 1, '90d', 0, 2404, NULL, '', '', '', '',        2);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status,                templateid, params, description, posts, headers, lifetime, flags) VALUES (2406, 1015, 'discovery.rule.2'              ,  2, 'discovery.rule.2'              , 4,        0,       NULL, '', '', '', '', '30d', 1);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2407, 1015, 'master.item.proto.2'           ,  2, 'master.item.proto.2'           , 1, '90d', 0, NULL, NULL, '', '', '', '',        2);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2408, 1015, 'dependent.item.proto.2.1'      , 18, 'dependent.item.proto.2.1'      , 1, '90d', 0, 2407, NULL, '', '', '', '',        2);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6401, 2403, 2404);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6402, 2403, 2405);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6403, 2406, 2407);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6404, 2406, 2408);
+
+-- dependent items: dependent.items.host.9
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (1016, 'dependent.items.host.9', 'dependent.items.host.9', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (1016, 1016, 1003);
+INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (1009, 1016, 1, '127.0.0.1', 1, '10050', 1);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers                 ) VALUES (2501, 1016, 'master.item.1'                 ,  2, 'master.item.1'                 , 1, '90d', 0, NULL, NULL, '', '', '', '');
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers                 ) VALUES (2502, 1016, 'dependent.item.1.1'            , 18, 'dependent.item.1.1'            , 1, '90d', 0, 2501, NULL, '', '', '', '');
+INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status,                templateid, params, description, posts, headers, lifetime, flags) VALUES (2503, 1016, 'discovery.rule.1'              ,  2, 'discovery.rule.1'              , 4,        0,       NULL, '', '', '', '', '30d', 1);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2504, 1016, 'master.item.proto.1'           ,  2, 'master.item.proto.1'           , 1, '90d', 0, NULL, NULL, '', '', '', '',        2);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2505, 1016, 'dependent.item.proto.1.1'      , 18, 'dependent.item.proto.1.1'      , 1, '90d', 0, 2504, NULL, '', '', '', '',        2);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6501, 2503, 2504);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6502, 2503, 2505);
 -- dependent items: END
 
 -- testTaskCreate
