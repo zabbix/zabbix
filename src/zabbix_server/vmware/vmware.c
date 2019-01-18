@@ -2417,7 +2417,7 @@ static int	vmware_service_refresh_datastore_info(CURL *easyhandle, const char *i
 #	define ZBX_POST_REFRESH_DATASTORE							\
 		ZBX_POST_VSPHERE_HEADER								\
 		"<ns0:RefreshDatastoreStorageInfo>"						\
-			"<ns0:_this type=\"HostSystem\">%s</ns0:_this>"				\
+			"<ns0:_this type=\"Datastore\">%s</ns0:_this>"				\
 		"</ns0:RefreshDatastoreStorageInfo>"						\
 		ZBX_POST_VSPHERE_FOOTER
 
