@@ -3986,6 +3986,31 @@ svg {
 .patternselect {
   line-height: 14px; }
 
+ul.checkbox-list {
+  line-height: 20px;
+  display: flex;
+  flex-wrap: wrap; }
+  ul.checkbox-list > li {
+    ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+    -webkit-box-flex: 0; }
+
+ul.checkbox-list.col-2 > li {
+  -ms-flex: 0 0 50%;
+  flex: 0 0 50%;
+  max-width: 50%; }
+
+ul.checkbox-list.col-3 > li {
+  -ms-flex: 0 0 33.33333%;
+  flex: 0 0 33.33333%;
+  max-width: 33.33333%; }
+
+ul.checkbox-list.col-4 > li {
+  -ms-flex: 0 0 25%;
+  flex: 0 0 25%;
+  max-width: 25%; }
+
 .columns-wrapper {
   display: flex;
   flex-wrap: wrap;

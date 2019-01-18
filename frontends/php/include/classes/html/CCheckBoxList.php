@@ -82,7 +82,7 @@ class CCheckBoxList extends CList {
 	/*
 	 * @return string
 	 */
-	public function toString()
+	public function toString($destroy = true)
 	{
 		foreach ($this->values as $value) {
 			parent::addItem(
@@ -92,6 +92,6 @@ class CCheckBoxList extends CList {
 			);
 		}
 
-		return parent::toString();
+		return parent::toString($destroy);
 	}
 }
