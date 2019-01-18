@@ -39,7 +39,7 @@ typedef struct
 zbx_preproc_history_t;
 
 void	zbx_preproc_op_history_free(zbx_preproc_op_history_t *ophistory);
-const zbx_preproc_op_history_t	*zbx_preproc_history_get_value(zbx_vector_ptr_t *history, int index);
+zbx_preproc_op_history_t	*zbx_preproc_history_get_value(zbx_vector_ptr_t *history, int index);
 void	zbx_preproc_history_add_value(zbx_vector_ptr_t *history, int index, zbx_variant_t *data,
 		const zbx_timespec_t *ts);
 

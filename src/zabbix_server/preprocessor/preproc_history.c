@@ -28,7 +28,7 @@ void	zbx_preproc_op_history_free(zbx_preproc_op_history_t *ophistory)
 	zbx_free(ophistory);
 }
 
-const zbx_preproc_op_history_t	*zbx_preproc_history_get_value(zbx_vector_ptr_t *history, int index)
+zbx_preproc_op_history_t	*zbx_preproc_history_get_value(zbx_vector_ptr_t *history, int index)
 {
 	int				i;
 	zbx_preproc_op_history_t	*ophistory;

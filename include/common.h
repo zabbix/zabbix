@@ -1479,6 +1479,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_ERROR_FIELD_REGEX		18
 #define ZBX_PREPROC_THROTTLE_VALUE		19
 #define ZBX_PREPROC_THROTTLE_TIMED_VALUE	20
+#define ZBX_PREPROC_SCRIPT			21
 
 #define ZBX_PREPROC_FAIL_DEFAULT	0
 #define ZBX_PREPROC_FAIL_DISCARD_VALUE	1
@@ -1547,6 +1548,7 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 
 zbx_variant_data_bin_t	*zbx_variant_data_bin_copy(const zbx_variant_data_bin_t *bin);
 zbx_variant_data_bin_t	*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size);
+zbx_uint32_t	zbx_variant_data_bin_get(const zbx_variant_data_bin_t *bin, void **data);
 
 void	zbx_update_env(double time_now);
 

@@ -37,7 +37,7 @@ struct zbx_es_impl
 	int		rt_error_num;
 };
 
-#define ZBX_ES_SCRIPT_HEADER	"func(value){"
+#define ZBX_ES_SCRIPT_HEADER	"function(value){"
 
 /*
  * Memory allocation routines to track and limit script memory usage.
@@ -151,22 +151,31 @@ int	zbx_es_timeout(void *udata)
  ******************************************************************************/
 int	zbx_es_init(zbx_es_t *es, char **error)
 {
+	const char	*__function_name = "zbx_es_init";
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
 	es->impl = zbx_malloc(NULL, sizeof(zbx_es_impl_t));
 	memset(es->impl, 0, sizeof(zbx_es_impl_t));
 
 	if (0 != setjmp(es->impl->env))
 	{
 		*error = zbx_strdup(*error, es->impl->error);
-		return FAIL;
+		goto out;
 	}
 
 	if (NULL == (es->impl->ctx = duk_create_heap(es_malloc, es_realloc, es_free, es->impl, es_handle_error)))
 	{
 		*error = zbx_strdup(*error, "cannot create context");
-		return FAIL;
+		goto out;
 	}
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
+			ZBX_NULL2EMPTY_STR(*error));
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
@@ -184,13 +193,21 @@ int	zbx_es_init(zbx_es_t *es, char **error)
  ******************************************************************************/
 int	zbx_es_destroy(zbx_es_t *es, char **error)
 {
+	const char	*__function_name = "zbx_es_destroy";
+	int		ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
 	ZBX_UNUSED(error);
 
 	duk_destroy_heap(es->impl->ctx);
 	zbx_free(es->impl->error);
 	zbx_free(es->impl);
 
-	return SUCCEED;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
+			ZBX_NULL2EMPTY_STR(*error));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -243,18 +260,23 @@ int	zbx_es_get_runtime_error_num(zbx_es_t *es)
  ******************************************************************************/
 int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, char **error)
 {
+	const char	*__function_name = "zbx_es_compile";
+
 	unsigned char	*buffer;
 	duk_size_t	sz;
 	char		*func, *ptr;
 	size_t		len;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 != setjmp(es->impl->env))
 	{
 		*error = zbx_strdup(*error, es->impl->error);
-		return FAIL;
+		goto out;
 	}
 
-	/* wrap the code block into a function: func(value){<code>} */
+	/* wrap the code block into a function: function(value){<code>} */
 	len = strlen(script);
 	ptr = func = zbx_malloc(NULL, len + ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_HEADER) + 2);
 	memcpy(ptr, ZBX_ES_SCRIPT_HEADER, ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_HEADER));
@@ -271,7 +293,7 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 	if (0 != duk_pcompile(es->impl->ctx, DUK_COMPILE_FUNCTION))
 	{
 		*error = zbx_strdup(*error, duk_safe_to_string(es->impl->ctx, -1));
-		return FAIL;
+		goto out;
 	}
 
 	duk_dump_function(es->impl->ctx);
@@ -283,7 +305,12 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 
 	duk_pop(es->impl->ctx);
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
+			ZBX_NULL2EMPTY_STR(*error));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -312,7 +339,12 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,
 	char **error)
 {
+	const char	*__function_name = "zbx_es_execute";
+
 	void	*buffer;
+	int	ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	ZBX_UNUSED(script);
 
@@ -320,7 +352,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	{
 		es->impl->rt_error_num++;
 		*error = zbx_strdup(*error, es->impl->error);
-		return FAIL;
+		goto out;
 	}
 
 	buffer = duk_push_fixed_buffer(es->impl->ctx, size);
@@ -337,12 +369,17 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 		*error = zbx_strdup(*error, duk_get_string(es->impl->ctx, -1));
 		duk_pop(es->impl->ctx);
 		duk_pop(es->impl->ctx);
-		return FAIL;
+		goto out;
 	}
 
 	*output = zbx_strdup(NULL, duk_safe_to_string(es->impl->ctx, -1));
 	duk_pop(es->impl->ctx);
 	es->impl->rt_error_num = 0;
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
+			ZBX_NULL2EMPTY_STR(*error));
+
+	return ret;
 }

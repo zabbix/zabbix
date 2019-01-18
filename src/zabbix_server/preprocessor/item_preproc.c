@@ -28,8 +28,11 @@
 
 #include "zbxregexp.h"
 #include "zbxjson.h"
+#include "zbxembed.h"
 
 #include "item_preproc.h"
+
+static zbx_es_t	es_env;
 
 /******************************************************************************
  *                                                                            *
@@ -1499,6 +1502,58 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_script                                              *
+ *                                                                            *
+ * Purpose: executes script passed with params                                *
+ *                                                                            *
+ * Parameters: value    - [IN/OUT] the value to process                       *
+ *             params   - [IN] the script to execute                          *
+ *             bytecode - [IN] precompiled bytecode, can be NULL              *
+ *             errmsg   - [OUT] error message                                 *
+ *                                                                            *
+ * Return value: SUCCEED - the value was calculated successfully              *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_script(zbx_variant_t *value, const char *params, zbx_variant_t *bytecode, char **errmsg)
+{
+	char		*code = NULL, *output;
+	int		size, ret;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	if (SUCCEED != zbx_es_initialized(&es_env))
+	{
+		if (SUCCEED != zbx_es_init(&es_env, errmsg))
+			return FAIL;
+	}
+
+	if (ZBX_VARIANT_BIN != bytecode->type)
+	{
+		if (SUCCEED != zbx_es_compile(&es_env, params, &code, &size, errmsg))
+			return FAIL;
+
+		zbx_variant_clear(bytecode);
+		zbx_variant_set_bin(bytecode, zbx_variant_data_bin_create(code, size));
+		zbx_free(code);
+	}
+
+	size = zbx_variant_data_bin_get(bytecode->data.bin, (void **)&code);
+
+	if (SUCCEED == (ret = zbx_es_execute(&es_env, params, code, size, value->data.str, &output, errmsg)))
+	{
+		zbx_variant_clear(value);
+		zbx_variant_set_str(value, output);
+	}
+
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_item_preproc                                                 *
@@ -1586,6 +1641,9 @@ int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, 
 		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			ret = item_preproc_throttle_timed_value(value, ts, op->params, history_value, history_ts,
 					&errmsg);
+			break;
+		case ZBX_PREPROC_SCRIPT:
+			ret = item_preproc_script(value, op->params, history_value, &errmsg);
 			break;
 		default:
 			errmsg = zbx_dsprintf(NULL, "unknown preprocessing operation");
