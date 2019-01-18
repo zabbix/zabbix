@@ -54,7 +54,7 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_timespec_t			*ts;
 	zbx_preproc_op_t		*steps;
 	zbx_vector_ptr_t		history_in, history_out;
-	const zbx_preproc_op_history_t	*ophistory;
+	zbx_preproc_op_history_t	*ophistory;
 
 	zbx_vector_ptr_create(&history_in);
 	zbx_vector_ptr_create(&history_out);
@@ -71,6 +71,7 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 		if (NULL != (ophistory = zbx_preproc_history_get_value(&history_in, i)))
 		{
 			history_value = ophistory->value;
+			zbx_variant_set_none(&ophistory->value);
 			history_ts = ophistory->ts;
 		}
 		else
@@ -81,12 +82,16 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 		}
 
 		if (SUCCEED != zbx_item_preproc(i + 1, value_type, &value, ts, op, &history_value, &history_ts, &error))
+		{
+			zbx_variant_clear(&history_value);
 			break;
+		}
 
 		if (ZBX_VARIANT_NONE != history_value.type)
-			zbx_preproc_history_set_value(&history_out, i, &history_value, &history_ts);
-
-		zbx_variant_clear(&history_value);
+		{
+			/* the value is byte copied to history_out vector and doesn't have to be cleared */
+			zbx_preproc_history_add_value(&history_out, i, &history_value, &history_ts);
+		}
 
 		if (ZBX_VARIANT_NONE == value.type)
 			break;

@@ -44,27 +44,16 @@ const zbx_preproc_op_history_t	*zbx_preproc_history_get_value(zbx_vector_ptr_t *
 	return NULL;
 }
 
-void	zbx_preproc_history_set_value(zbx_vector_ptr_t *history, int index, const zbx_variant_t *data,
+void	zbx_preproc_history_add_value(zbx_vector_ptr_t *history, int index, zbx_variant_t *data,
 		const zbx_timespec_t *ts)
 {
-	int				i;
 	zbx_preproc_op_history_t	*ophistory;
 
-	for (i = 0; i < history->values_num; i++)
-	{
-		ophistory = (zbx_preproc_op_history_t *)history->values[i];
-
-		if (ophistory->index == index)
-			break;
-	}
-
-	if (i == history->values_num)
-	{
-		ophistory = zbx_malloc(NULL, sizeof(zbx_preproc_op_history_t));
-		ophistory->index = index;
-		zbx_vector_ptr_append(history, ophistory);
-	}
-
-	zbx_variant_set_variant(&ophistory->value, data);
+	ophistory = zbx_malloc(NULL, sizeof(zbx_preproc_op_history_t));
+	ophistory->index = index;
+	ophistory->value = *data;
 	ophistory->ts = *ts;
+	zbx_vector_ptr_append(history, ophistory);
+
+	zbx_variant_set_none(data);
 }

@@ -338,6 +338,7 @@ static int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, co
 	}
 
 	*history_ts = *ts;
+	zbx_variant_clear(history_value);
 	zbx_variant_set_variant(history_value, &value_num);
 	zbx_variant_clear(&value_num);
 
@@ -1443,8 +1444,7 @@ static int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_
 
 	ret = zbx_variant_compare(value, history_value);
 
-	/* a byte copy of history value is made before and will be cleared at the end, */
-	/* so it can be overwritten without clearing here                              */
+	zbx_variant_clear(history_value);
 	zbx_variant_set_variant(history_value, value);
 
 	if (0 == ret)
@@ -1486,8 +1486,7 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
 
 	ret = zbx_variant_compare(value, history_value);
 
-	/* a byte copy of history value is made before and will be cleared at the end, */
-	/* so it can be overwritten without clearing here                              */
+	zbx_variant_clear(history_value);
 	zbx_variant_set_variant(history_value, value);
 
 	if (ZBX_VARIANT_NONE != history_value->type)
