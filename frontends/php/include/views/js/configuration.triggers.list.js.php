@@ -49,6 +49,7 @@
 				})
 				flag_input.val(new_flag)
 			})
+			inputs.change()
 		}
 		$(flagged_filter_priority)
 	}(jQuery)

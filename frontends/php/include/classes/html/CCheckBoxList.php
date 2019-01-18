@@ -22,41 +22,76 @@
 class CCheckBoxList extends CList {
 
 	/**
+	 * @var array $values
+	 */
+	public $values;
+
+	/**
 	 * @var string $name
 	 */
 	protected $name;
-	/**
-	 * @var array $checked_values
-	 */
-	protected $checked_values;
 
 	/**
 	 * @param string $name
-	 * @param array $checked_values
 	 */
-	public function __construct($name, $checked_values = []) {
+	public function __construct($name) {
 		parent::__construct();
 
-		$this->addClass(ZBX_STYLE_COLUMNS);
-		$this->addStyle('line-height: 20px;');
+		$this->addClass(ZBX_STYLE_CHECKBOX_LIST);
 		$this->name = $name;
-		$this->checked_values = array_flip($checked_values);
+		$this->values = [];
 	}
 
 	/**
-	 * @param string $label
-	 * @param string $value
+	 * @param array $values
 	 *
 	 * @return CCheckBoxList
 	 */
-	public function addCheckBox($label, $value) {
-		parent::addItem(
-			(new CCheckBox($this->name.'['.$value.']', $value))
-				->setLabel($label)
-				->setChecked(array_key_exists($value, $this->checked_values)),
-			ZBX_STYLE_COLUMN_33
-		);
+	public function setChecked(array $values)
+	{
+		$values = array_flip($values);
+
+		foreach ($this->values as &$value) {
+			$value['checked'] = array_key_exists($value['value'], $values);
+		}
+		unset($value);
 
 		return $this;
+	}
+
+	/**
+	 * @param array $values
+	 *
+	 * @return CCheckBoxList
+	 */
+	public function setOptions(array $values)
+	{
+		$this->values = [];
+
+		foreach ($values as $value) {
+			$this->values[] = $value + [
+				'name' => '',
+				'value' => null,
+				'checked' => false
+			];
+		}
+
+		return $this;
+	}
+
+	/*
+	 * @return string
+	 */
+	public function toString()
+	{
+		foreach ($this->values as $value) {
+			parent::addItem(
+				(new CCheckBox($this->name.'['.$value['value'].']', $value['value']))
+					->setLabel($value['name'])
+					->setChecked($value['checked'])
+			);
+		}
+
+		return parent::toString();
 	}
 }

@@ -48,9 +48,7 @@ if (!empty($data['hostid'])) {
 	$itemForm->addVar('hostid', $data['hostid']);
 }
 
-$url = (new CUrl('items.php'))
-	->setArgument('hostid', $data['hostid'])
-	->getUrl();
+$url = (new CUrl('items.php'))->getUrl();
 
 // create table
 $itemTable = (new CTableInfo())

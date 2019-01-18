@@ -59,14 +59,12 @@ $filter_column1 = (new CFormList())
 		(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Severity'),
-		(new CCheckBoxList('filter_priority', $data['filter_priority']))
-			->addCheckBox(_('Not classified'), TRIGGER_SEVERITY_NOT_CLASSIFIED)
-			->addCheckBox(_('Information'), TRIGGER_SEVERITY_INFORMATION)
-			->addCheckBox(_('Warning'), TRIGGER_SEVERITY_WARNING)
-			->addCheckBox(_('Average'), TRIGGER_SEVERITY_AVERAGE)
-			->addCheckBox(_('High'), TRIGGER_SEVERITY_HIGH)
-			->addCheckBox(_('Disaster'), TRIGGER_SEVERITY_DISASTER)
-	)->addRow(_('State'),
+		(new CCheckBoxList('filter_priority'))
+			->setOptions($data['config_priorities'])
+			->setChecked($data['filter_priority'])
+			->addClass(ZBX_STYLE_COL_3)
+	)
+	->addRow(_('State'),
 		(new CRadioButtonList('filter_state', (int) $data['filter_state']))
 			->addValue(_('all'), -1)
 			->addValue(_('Normal'), TRIGGER_STATE_NORMAL)
@@ -189,9 +187,7 @@ $triggers_form = (new CForm())
 	->setName('triggersForm')
 	->addVar('hostid', $data['hostid']);
 
-$url = (new CUrl('triggers.php'))
-	->setArgument('hostid', $data['hostid'])
-	->getUrl();
+$url = (new CUrl('triggers.php'))->getUrl();
 
 // create table
 $triggers_table = (new CTableInfo())->setHeader([

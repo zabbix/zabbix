@@ -173,14 +173,6 @@ if ($triggerIds) {
 	}
 }
 
-if (hasRequest('filter_groupids') && !isWritableHostGroups(getRequest('filter_groupids'))) {
-	access_deny();
-}
-
-if (hasRequest('filter_hostids') && !isWritableHostTemplates(getRequest('filter_hostids'))) {
-	access_deny();
-}
-
 if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 	access_deny();
 }
@@ -886,8 +878,8 @@ else {
 		CProfile::update('web.triggers.filter_dependent', $filter_dependent, PROFILE_TYPE_INT);
 		CProfile::update('web.triggers.filter_name', $filter_name, PROFILE_TYPE_STR);
 		CProfile::updateArray('web.triggers.filter_priority', $filter_priority, PROFILE_TYPE_INT);
-		CProfile::updateArray('web.triggers.filter_groupids', $filter_groupids, PROFILE_TYPE_INT);
-		CProfile::updateArray('web.triggers.filter_hostids', $filter_hostids, PROFILE_TYPE_INT);
+		CProfile::updateArray('web.triggers.filter_groupids', $filter_groupids, PROFILE_TYPE_ID);
+		CProfile::updateArray('web.triggers.filter_hostids', $filter_hostids, PROFILE_TYPE_ID);
 		CProfile::update('web.triggers.filter_state', $filter_state, PROFILE_TYPE_INT);
 		CProfile::update('web.triggers.filter_status', $filter_status, PROFILE_TYPE_INT);
 		CProfile::update('web.triggers.filter.evaltype', $filter_evaltype, PROFILE_TYPE_INT);
@@ -937,8 +929,17 @@ else {
 		}
 	}
 
+	$config_priorities = [];
+	foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
+		$config_priorities[] = [
+			'name' => getSeverityName($severity, $config),
+			'value' => $severity
+		];
+	}
+
 	$data = [
 		'config' => $config,
+		'config_priorities' => $config_priorities,
 		'hostid' => $hostid,
 		'triggers' => $triggers,
 		'profile_idx' => 'web.triggers.filter',

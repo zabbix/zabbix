@@ -382,13 +382,6 @@ else {
 	}
 }
 
-if (hasRequest('filter_groupids') && !isWritableHostGroups(getRequest('filter_groupids'))) {
-	access_deny();
-}
-if (getRequest('filter_hostids') && !isWritableHostTemplates(getRequest('filter_hostids'))) {
-	access_deny();
-}
-
 // Set sub-groups of selected groups.
 $filter_groupids = getSubGroups(getRequest('filter_groupids', []));
 
