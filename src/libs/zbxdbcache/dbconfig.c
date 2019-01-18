@@ -3032,7 +3032,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DCsync_template_items(zbx_dbsync_t *sync, int flags)
+static void	DCsync_template_items(zbx_dbsync_t *sync)
 {
 	const char		*__function_name = "DCsync_items";
 
@@ -4990,7 +4990,7 @@ void	DCsync_configuration(unsigned char mode)
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_template_items(&template_items_sync, flags);
+	DCsync_template_items(&template_items_sync);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
