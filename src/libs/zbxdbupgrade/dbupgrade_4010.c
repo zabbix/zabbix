@@ -117,12 +117,17 @@ static int	DBpatch_4010011(void)
 
 static int	DBpatch_4010012(void)
 {
+	return DBcreate_index("dchecks", "dchecks_1", "druleid,host_source,name_source", 0);
+}
+
+static int	DBpatch_4010013(void)
+{
 	const ZBX_FIELD	field = {"druleid", NULL, "drules", "druleid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("dchecks", 1, &field);
 }
 
-static int	DBpatch_4010013(void)
+static int	DBpatch_4010014(void)
 {
 	return DBcreate_index("proxy_dhistory", "proxy_dhistory_2", "druleid", 0);
 }
@@ -146,5 +151,6 @@ DBPATCH_ADD(4010010, 0, 1)
 DBPATCH_ADD(4010011, 0, 1)
 DBPATCH_ADD(4010012, 0, 1)
 DBPATCH_ADD(4010013, 0, 1)
+DBPATCH_ADD(4010014, 0, 1)
 
 DBPATCH_END()
