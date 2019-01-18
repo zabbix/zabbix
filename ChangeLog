@@ -8,6 +8,7 @@ A......... [ZBXNEXT-4933] dropped support of string format for "headers" and "va
 ..F....... [ZBXNEXT-4873] implemented single dot datasets to be drawn as points in line vector graphs (miks)
 
 Bug fixes:
+........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
 ........S. [ZBX-15331] updated LLD item creation/updating error messages (asitals)
 ..F....... [ZBX-15465] removed html non-breaking space from visiblity checkbox labels (miks)
 ..F....... [ZBX-15307] fixed upper level maps positioning in Monitoring Map screen (talbergs)
@@ -105,6 +106,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
 ........S. [ZBX-15331] updated LLD item creation/updating error messages (asitals)
 ..F....... [ZBX-15465] removed html non-breaking space from visiblity checkbox labels (miks)
 ..F....... [ZBX-15307] fixed upper level maps positioning in Monitoring Map screen (talbergs)
@@ -2276,6 +2278,7 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
 ...G...PS. [ZBX-11761] added warnings in case of TLS identity mismatch (akozlovs)
 A......... [ZBX-15355] fixed undefined index in configuration.import API call (Sasha)
 A......... [ZBX-15354] fixed undefined index in API calls without "auth" parameter (Sasha)
