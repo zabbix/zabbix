@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-13 23:36+0200\n"
+"POT-Creation-Date: 2019-01-20 01:43+0200\n"
 "PO-Revision-Date: 2018-12-19 15:45+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -1201,8 +1201,8 @@ msgstr "Ağu"
 msgid "August"
 msgstr "Ağustos"
 
-#: app/views/administration.authentication.edit.php:127
-#: app/views/administration.authentication.edit.php:135
+#: app/views/administration.authentication.edit.php:137
+#: app/views/administration.authentication.edit.php:145
 #: app/views/administration.mediatype.edit.php:87 include/menu.inc.php:263
 #: include/views/configuration.httpconf.edit.php:283
 #: include/views/configuration.httpconf.list.php:92
@@ -1229,7 +1229,7 @@ msgstr ""
 msgid "Authentication method"
 msgstr "Kimlik doğrulama yöntemi"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:232
+#: app/controllers/CControllerAuthenticationUpdate.php:238
 msgid "Authentication method changed"
 msgstr ""
 
@@ -1249,7 +1249,7 @@ msgstr "Kimlik doğrulama parola deyimi"
 msgid "Authentication protocol"
 msgstr "Kimlik doğrulama protokolü"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:231
+#: app/controllers/CControllerAuthenticationUpdate.php:237
 msgid "Authentication settings updated"
 msgstr ""
 
@@ -1347,7 +1347,7 @@ msgstr "Arkaplan rengi"
 msgid "Background image"
 msgstr "Arkaplan resmi"
 
-#: app/views/administration.authentication.edit.php:93
+#: app/views/administration.authentication.edit.php:98
 msgid "Base DN"
 msgstr "Base DN"
 
@@ -1363,11 +1363,11 @@ msgstr ""
 msgid "Basic"
 msgstr "Temel"
 
-#: app/views/administration.authentication.edit.php:103
+#: app/views/administration.authentication.edit.php:110
 msgid "Bind DN"
 msgstr "Bind DN"
 
-#: app/views/administration.authentication.edit.php:113
+#: app/views/administration.authentication.edit.php:121
 msgid "Bind password"
 msgstr "Bağlanma parolası"
 
@@ -1924,6 +1924,20 @@ msgstr[1] "Gruplar silinemiyor"
 #: hosts.php:798 hosts.php:811
 msgid "Cannot delete host"
 msgstr "Ana makine silinemiyor"
+
+#: include/classes/api/services/CHost.php:1189
+#, c-format
+msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
+msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
+msgstr[0] ""
+msgstr[1] ""
+
+#: include/classes/api/services/CHostGroup.php:1503
+#, c-format
+msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
+msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
+msgstr[0] ""
+msgstr[1] ""
 
 #: include/classes/api/services/CDiscoveryRule.php:532
 msgid "Cannot delete host prototype."
@@ -2544,8 +2558,8 @@ msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "\"%1$s\" ekranında \"templateid\" ayarlanamıyor."
 
 #: include/classes/api/services/CHost.php:881
-#: include/classes/api/services/CHost.php:1705
-#: include/classes/api/services/CHost.php:1849
+#: include/classes/api/services/CHost.php:1741
+#: include/classes/api/services/CHost.php:1885
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Devre dışı envanter için envanter alanları tanımlanamaz."
 
@@ -2629,7 +2643,7 @@ msgstr "\"%2$s\" tetikleyicisi için \"%1$s\" ayarlanamıyor."
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "\"%2$s\" tetikleyici prototipi için \"%1$s\" ayarlanamıyor."
 
-#: include/classes/api/services/CHost.php:1828
+#: include/classes/api/services/CHost.php:1864
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "\"%1$s\" keşfedilmiş ana makinesi için \"%2$s\" ayarlanamıyor."
@@ -2665,7 +2679,7 @@ msgstr "Şablon ekranı \"%1$s\" için \"templateid\" güncellenemiyor."
 msgid "Cannot update a discovered graph."
 msgstr "Keşfedilmiş bir grafik güncellenemiyor."
 
-#: include/classes/api/services/CHostGroup.php:780
+#: include/classes/api/services/CHostGroup.php:797
 msgid "Cannot update a discovered host group."
 msgstr "Keşfedilmiş bir ana makine grubu güncellenemiyor."
 
@@ -2682,7 +2696,7 @@ msgstr "Eylem güncellenemez"
 msgid "Cannot update application"
 msgstr "Uygulama güncellenemiyor"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:236
+#: app/controllers/CControllerAuthenticationUpdate.php:242
 msgid "Cannot update authentication"
 msgstr ""
 
@@ -2736,9 +2750,9 @@ msgstr "Grafik prototipi güncellenemiyor"
 msgid "Cannot update group"
 msgstr "Grup güncellenemiyor"
 
-#: include/classes/api/services/CHostGroup.php:986
-#: include/classes/api/services/CHostGroup.php:1090
-#: include/classes/api/services/CHostGroup.php:1226
+#: include/classes/api/services/CHostGroup.php:1003
+#: include/classes/api/services/CHostGroup.php:1107
+#: include/classes/api/services/CHostGroup.php:1243
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Keşfedilen ana makine \"%1$s\" için gruplar güncellenemiyor."
@@ -2906,8 +2920,8 @@ msgstr "Keşif kontrolü doğrulanamıyor: geçersiz istek veya Zabbix sunucusuy
 msgid "Case sensitive"
 msgstr "Büyük/küçük harf duyarlı"
 
-#: app/views/administration.authentication.edit.php:52
-#: app/views/administration.authentication.edit.php:108
+#: app/views/administration.authentication.edit.php:53
+#: app/views/administration.authentication.edit.php:115
 msgid "Case sensitive login"
 msgstr ""
 
@@ -2953,7 +2967,7 @@ msgctxt "verb"
 msgid "Change"
 msgstr "Değiştir"
 
-#: app/views/administration.authentication.edit.php:70
+#: app/views/administration.authentication.edit.php:72
 #: app/views/administration.mediatype.edit.php:138
 #: include/views/administration.users.edit.php:128
 msgid "Change password"
@@ -3348,7 +3362,7 @@ msgstr "Eylemlerin yapılandırması"
 msgid "Configuration of applications"
 msgstr "Uygulamaların yapılandırması"
 
-#: app/controllers/CControllerAuthenticationEdit.php:127
+#: app/controllers/CControllerAuthenticationEdit.php:120
 msgid "Configuration of authentication"
 msgstr ""
 
@@ -4304,7 +4318,7 @@ msgstr "Öntanımlı gecikme"
 msgid "Default host inventory mode"
 msgstr "Öntanımlı ana makine envanter kipi"
 
-#: app/views/administration.authentication.edit.php:41
+#: app/views/administration.authentication.edit.php:42
 msgid "Default login form"
 msgstr ""
 
@@ -4677,7 +4691,7 @@ msgstr "Web senaryosu silinsin mi?"
 msgid "Deleted"
 msgstr "Silindi"
 
-#: include/classes/api/services/CHost.php:1305
+#: include/classes/api/services/CHost.php:1341
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Silindi: \"%1$s\" ana makinesi."
@@ -5198,14 +5212,14 @@ msgstr "\"%1$s\" tetikleyicisinde bağımlılıklar mükerrer."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "\"%1$s\" tetikleyici prototipinde bağımlılıklar mükerrer."
 
-#: include/classes/api/services/CHost.php:1641
-#: include/classes/api/services/CHost.php:1879
+#: include/classes/api/services/CHost.php:1677
+#: include/classes/api/services/CHost.php:1915
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Mükerrer ana makine. Aynı ana makine adına (\"%s\") sahip ana makine halihazırda verilerde bulunuyor."
 
-#: include/classes/api/services/CHost.php:1648
-#: include/classes/api/services/CHost.php:1899
+#: include/classes/api/services/CHost.php:1684
+#: include/classes/api/services/CHost.php:1935
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Mükerrer ana makine. Aynı görünür ana makine adlı (\"%s\") ana makine halihazırda verilerde bulunuyor."
@@ -5485,7 +5499,7 @@ msgstr "Etkinleştir"
 msgid "Enable HTTP authentication"
 msgstr ""
 
-#: app/views/administration.authentication.edit.php:77
+#: app/views/administration.authentication.edit.php:79
 msgid "Enable LDAP authentication"
 msgstr ""
 
@@ -5970,7 +5984,7 @@ msgstr "\"%1$s\" alanı NULL olarak ayarlanamıyor."
 #: include/classes/api/services/CDRule.php:318
 #: include/classes/api/services/CDRule.php:493
 #: include/classes/api/services/CDRule.php:503
-#: include/classes/api/services/CHostGroup.php:897
+#: include/classes/api/services/CHostGroup.php:914
 #: include/classes/api/services/CHost.php:743
 #: include/classes/api/services/CTemplate.php:784
 #: include/classes/api/services/CTriggerGeneral.php:236
@@ -6584,12 +6598,12 @@ msgstr "Izgara"
 msgid "Group"
 msgstr "Grup"
 
-#: include/classes/api/services/CHostGroup.php:551
+#: include/classes/api/services/CHostGroup.php:715
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "\"%1$s\" grubu, bir ana makine prototipi tarafından kullanıldığı için silinemez."
 
-#: include/classes/api/services/CHostGroup.php:600
+#: include/classes/api/services/CHostGroup.php:764
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr "\"%1$s\" grubu, bir korelasyon koşulunda kullanıldığından silinemiyor."
@@ -6681,7 +6695,7 @@ msgstr ""
 msgid "HTTP authentication"
 msgstr "HTTP kimlik doğrulaması"
 
-#: app/views/administration.authentication.edit.php:44
+#: app/views/administration.authentication.edit.php:45
 msgid "HTTP login form"
 msgstr ""
 
@@ -6693,7 +6707,7 @@ msgstr ""
 msgid "HTTP proxy"
 msgstr "HTTP vekil sunucusu"
 
-#: app/views/administration.authentication.edit.php:136
+#: app/views/administration.authentication.edit.php:146
 msgid "HTTP settings"
 msgstr ""
 
@@ -6909,10 +6923,10 @@ msgstr[1] "Ana makineler"
 msgid "Host \"%1$s\" already exists."
 msgstr "\"%1$s\" ana makinesi zaten var."
 
-#: include/classes/api/services/CHostGroup.php:1449
+#: include/classes/api/services/CHostGroup.php:1466
 #: include/classes/api/services/CHost.php:806
-#: include/classes/api/services/CHost.php:1629
-#: include/classes/api/services/CHost.php:1805
+#: include/classes/api/services/CHost.php:1665
+#: include/classes/api/services/CHost.php:1841
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "\"%1$s\" ana makinesi, ana makine grubu olmadan bulunamaz."
@@ -6983,17 +6997,17 @@ msgstr[1] "Ana makineler etkin"
 msgid "Host group"
 msgstr "Ana makine grubu"
 
-#: include/classes/api/services/CHostGroup.php:731
+#: include/classes/api/services/CHostGroup.php:643
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "\"%1$s\" ana makine grubu zaten var."
 
-#: include/classes/api/services/CHostGroup.php:584
+#: include/classes/api/services/CHostGroup.php:748
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "\"%1$s\" adlı ana makine grubu, genel bir komut dizisinde kullanıldığından silinemiyor."
 
-#: include/classes/api/services/CHostGroup.php:537
+#: include/classes/api/services/CHostGroup.php:701
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "\"%1$s\" ana makine grubu dahilidir ve silinemez."
@@ -7176,8 +7190,8 @@ msgstr "\"%1$s\" ID'li ana makine mevcut değil."
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "\"%1$s\" adında bir ana makine halihazırda mevcut."
 
-#: include/classes/api/services/CHost.php:1736
-#: include/classes/api/services/CHost.php:1955
+#: include/classes/api/services/CHost.php:1772
+#: include/classes/api/services/CHost.php:1991
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "\"%s\" adlı ana makine zaten var."
@@ -7188,8 +7202,8 @@ msgstr "\"%s\" adlı ana makine zaten var."
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "\"%1$s\" görünür adlı bir ana makine halihazırda mevcut."
 
-#: include/classes/api/services/CHost.php:1742
-#: include/classes/api/services/CHost.php:1962
+#: include/classes/api/services/CHost.php:1778
+#: include/classes/api/services/CHost.php:1998
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "\"%s\" görünen adlı ana makine zaten var."
@@ -7855,8 +7869,8 @@ msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "\"%1$s\" servisi için yanlış SLA hesaplaması."
 
 #: include/classes/api/services/CHost.php:826
-#: include/classes/api/services/CHost.php:1617
-#: include/classes/api/services/CHost.php:1873
+#: include/classes/api/services/CHost.php:1653
+#: include/classes/api/services/CHost.php:1909
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "\"%s\" ana makine adı için yanlış karakterler kullanıldı."
@@ -8010,8 +8024,8 @@ msgstr "Yanlış resim indeksi."
 #: include/classes/api/services/CAction.php:2820
 #: include/classes/api/services/CAction.php:2832
 #: include/classes/api/services/CHost.php:812
-#: include/classes/api/services/CHost.php:1611
-#: include/classes/api/services/CHost.php:1792
+#: include/classes/api/services/CHost.php:1647
+#: include/classes/api/services/CHost.php:1828
 #: include/classes/api/services/CImage.php:485
 #: include/classes/api/services/CProxy.php:618
 #: include/classes/api/services/CProxy.php:682
@@ -8034,8 +8048,8 @@ msgstr "Yanlış arayüz DNS parametresi \"%s\" sağlandı."
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Yanlış arayüz bağlantı noktası \"%s\" sağlandı."
 
-#: include/classes/api/services/CHost.php:1711
-#: include/classes/api/services/CHost.php:1855
+#: include/classes/api/services/CHost.php:1747
+#: include/classes/api/services/CHost.php:1891
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Yanlış envanter alanı \"%s\"."
@@ -8230,8 +8244,8 @@ msgstr "\"%1$s\" servisi için yanlış sıralama düzeni."
 msgid "Incorrect source value."
 msgstr "Yanlış kaynak değeri."
 
-#: include/classes/api/services/CHost.php:1683
-#: include/classes/api/services/CHost.php:1823
+#: include/classes/api/services/CHost.php:1719
+#: include/classes/api/services/CHost.php:1859
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "\"%1$s\" ana makinesi için yanlış durum."
@@ -8370,7 +8384,7 @@ msgstr "Yanlış kullanıcı grubu."
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "\"%2$s\" alanı için yanlış değer \"%1$s\"."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:132
+#: app/controllers/CControllerAuthenticationUpdate.php:134
 #: include/classes/api/services/CAction.php:1678
 #: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:351
@@ -8475,18 +8489,18 @@ msgstr ""
 #: include/classes/api/services/CHostGeneral.php:1023
 #: include/classes/api/services/CHostGeneral.php:1030
 #: include/classes/api/services/CHost.php:770
-#: include/classes/api/services/CHost.php:1515
-#: include/classes/api/services/CHost.php:1521
-#: include/classes/api/services/CHost.php:1536
-#: include/classes/api/services/CHost.php:1542
-#: include/classes/api/services/CHost.php:1547
-#: include/classes/api/services/CHost.php:1553
-#: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1567
-#: include/classes/api/services/CHost.php:1576
-#: include/classes/api/services/CHost.php:1582
-#: include/classes/api/services/CHost.php:1677
-#: include/classes/api/services/CHost.php:1817
+#: include/classes/api/services/CHost.php:1551
+#: include/classes/api/services/CHost.php:1557
+#: include/classes/api/services/CHost.php:1572
+#: include/classes/api/services/CHost.php:1578
+#: include/classes/api/services/CHost.php:1583
+#: include/classes/api/services/CHost.php:1589
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1612
+#: include/classes/api/services/CHost.php:1618
+#: include/classes/api/services/CHost.php:1713
+#: include/classes/api/services/CHost.php:1853
 #: include/classes/api/services/CHttpTest.php:969
 #: include/classes/api/services/CHttpTest.php:984
 #: include/classes/api/services/CHttpTest.php:1080
@@ -8608,7 +8622,7 @@ msgstr ""
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "\"%1$s\" alanı için yanlış değer: %2$s."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:124
+#: app/controllers/CControllerAuthenticationUpdate.php:126
 #: app/controllers/CControllerPopupTriggerWizard.php:125
 #: include/validate.inc.php:346
 #, c-format
@@ -9526,7 +9540,7 @@ msgstr "LDAP"
 msgid "LDAP authentication"
 msgstr "LDAP kimlik doğrulaması"
 
-#: app/views/administration.authentication.edit.php:83
+#: app/views/administration.authentication.edit.php:86
 msgid "LDAP host"
 msgstr "LDAP ana makinesi"
 
@@ -9534,11 +9548,11 @@ msgstr "LDAP ana makinesi"
 msgid "LDAP is not configured"
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:180
+#: app/controllers/CControllerAuthenticationUpdate.php:182
 msgid "LDAP login successful"
 msgstr "LDAP girişi başarılı"
 
-#: app/views/administration.authentication.edit.php:137
+#: app/views/administration.authentication.edit.php:147
 msgid "LDAP settings"
 msgstr ""
 
@@ -9899,7 +9913,7 @@ msgstr "Günlük zaman biçimi"
 msgid "Log unmatched SNMP traps"
 msgstr "Eşleşmemiş SNMP trap'lerini sistem günlüğüne kaydet"
 
-#: app/views/administration.authentication.edit.php:115 auditlogs.php:138
+#: app/views/administration.authentication.edit.php:123 auditlogs.php:138
 #: include/func.inc.php:1826 include/func.inc.php:1841
 #: include/menu.inc.php:292 include/views/administration.auditlogs.list.php:44
 #: include/views/administration.users.list.php:89 index_http.php:91
@@ -11187,8 +11201,8 @@ msgstr "Hiçbir arabirim bulunamadı."
 msgid "No interface provided for proxy \"%s\"."
 msgstr "\"%s\" vekil sunucusu için hiçbir arayüz sağlanmadı."
 
-#: include/classes/api/services/CHost.php:1690
-#: include/classes/api/services/CHost.php:1866
+#: include/classes/api/services/CHost.php:1726
+#: include/classes/api/services/CHost.php:1902
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "\"%s\" ana makinesi için arayüz yok."
@@ -11286,21 +11300,21 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CGraphPrototype.php:717
 #: include/classes/api/services/CHostBase.php:49
 #: include/classes/api/services/CHostGeneral.php:56
-#: include/classes/api/services/CHostGroup.php:532
-#: include/classes/api/services/CHostGroup.php:788
-#: include/classes/api/services/CHostGroup.php:1027
-#: include/classes/api/services/CHostGroup.php:1058
-#: include/classes/api/services/CHostGroup.php:1159
-#: include/classes/api/services/CHostGroup.php:1281
-#: include/classes/api/services/CHostGroup.php:1301
+#: include/classes/api/services/CHostGroup.php:696
+#: include/classes/api/services/CHostGroup.php:805
+#: include/classes/api/services/CHostGroup.php:1044
+#: include/classes/api/services/CHostGroup.php:1075
+#: include/classes/api/services/CHostGroup.php:1176
+#: include/classes/api/services/CHostGroup.php:1298
+#: include/classes/api/services/CHostGroup.php:1318
 #: include/classes/api/services/CHostInterface.php:239
 #: include/classes/api/services/CHostInterface.php:259
 #: include/classes/api/services/CHostInterface.php:394
 #: include/classes/api/services/CHostInterface.php:653
 #: include/classes/api/services/CHost.php:1122
 #: include/classes/api/services/CHost.php:1157
-#: include/classes/api/services/CHost.php:1666
-#: include/classes/api/services/CHost.php:1798
+#: include/classes/api/services/CHost.php:1702
+#: include/classes/api/services/CHost.php:1834
 #: include/classes/api/services/CHostPrototype.php:353
 #: include/classes/api/services/CHostPrototype.php:399
 #: include/classes/api/services/CHostPrototype.php:420
@@ -11845,7 +11859,7 @@ msgstr "Bir kere"
 msgid "One"
 msgstr "Bir"
 
-#: include/classes/api/services/CHostGroup.php:1169
+#: include/classes/api/services/CHostGroup.php:1186
 msgid "One of the objects is left without a host group."
 msgstr "Nesnelerden biri, ana makine grubu olmadan bırakıldı."
 
@@ -11858,7 +11872,7 @@ msgstr "Yalnızca bir kere"
 msgid "One-time downtime"
 msgstr "Bir kerelik aksama süresi"
 
-#: include/classes/api/services/CHostGroup.php:743
+#: include/classes/api/services/CHostGroup.php:655
 msgid "Only Super Admins can create host groups."
 msgstr "Yalnızca Süper Yöneticiler ana makine grupları oluşturabilir."
 
@@ -12626,7 +12640,7 @@ msgstr "Lehçe (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Ana makine envanter alanını doldurur"
 
-#: app/views/administration.authentication.edit.php:88
+#: app/views/administration.authentication.edit.php:92
 #: app/views/administration.proxy.edit.php:43 disc_prototypes.php:105
 #: host_discovery.php:105 include/classes/setup/CSetupWizard.php:279
 #: include/forms.inc.php:472 include/views/configuration.action.edit.php:995
@@ -13317,7 +13331,7 @@ msgstr "Uzak komut"
 msgid "Remove"
 msgstr "Kaldır"
 
-#: app/views/administration.authentication.edit.php:47
+#: app/views/administration.authentication.edit.php:48
 msgid "Remove domain name"
 msgstr ""
 
@@ -14084,7 +14098,7 @@ msgstr "Betikler"
 msgid "Search"
 msgstr "Ara"
 
-#: app/views/administration.authentication.edit.php:98
+#: app/views/administration.authentication.edit.php:104
 msgid "Search attribute"
 msgstr "Arama özniteliği"
 
@@ -15328,7 +15342,7 @@ msgstr "Şablon"
 msgid "Template \"%1$s\" already exists."
 msgstr "\"%1$s\" şablonu zaten var."
 
-#: include/classes/api/services/CHostGroup.php:1454
+#: include/classes/api/services/CHostGroup.php:1471
 #: include/classes/api/services/CTemplate.php:368
 #: include/classes/api/services/CTemplate.php:988
 #, c-format
@@ -15395,8 +15409,8 @@ msgstr "Şablon değeri"
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "\"%1$s\" aynı adlı şablon halihazırda mevcut."
 
-#: include/classes/api/services/CHost.php:1757
-#: include/classes/api/services/CHost.php:1980
+#: include/classes/api/services/CHost.php:1793
+#: include/classes/api/services/CHost.php:2016
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "\"%s\" ile aynı adlı şablon halihazırda mevcut."
@@ -15407,8 +15421,8 @@ msgstr "\"%s\" ile aynı adlı şablon halihazırda mevcut."
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "\"%1$s\" ile aynı görünür adlı şablon halihazırda mevcut."
 
-#: include/classes/api/services/CHost.php:1763
-#: include/classes/api/services/CHost.php:1988
+#: include/classes/api/services/CHost.php:1799
+#: include/classes/api/services/CHost.php:2024
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "\"%s\" ile aynı görünen isimli şablon zaten var."
@@ -15441,7 +15455,7 @@ msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "\"%1$s\" şablonlarının \"%2$s\" ana makinelerinden bağlantıları kaldırıldı."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:147
-#: app/views/administration.authentication.edit.php:140
+#: app/views/administration.authentication.edit.php:150
 #: app/views/popup.testtriggerexpr.php:110
 #: include/views/administration.general.regularexpressions.edit.php:139
 #: include/views/configuration.trigger.prototype.edit.php:239
@@ -15451,7 +15465,7 @@ msgstr "\"%1$s\" şablonlarının \"%2$s\" ana makinelerinden bağlantıları ka
 msgid "Test"
 msgstr "Test"
 
-#: app/views/administration.authentication.edit.php:114
+#: app/views/administration.authentication.edit.php:122
 msgid "Test authentication"
 msgstr "Kimlik doğrulama testi"
 
@@ -16516,7 +16530,7 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Açık"
 
-#: app/views/administration.authentication.edit.php:139
+#: app/views/administration.authentication.edit.php:149
 #: app/views/administration.mediatype.edit.php:233
 #: app/views/administration.proxy.edit.php:132
 #: app/views/administration.script.edit.php:127
@@ -16624,7 +16638,7 @@ msgstr "Güncelleme: %s"
 msgid "Upload"
 msgstr "Karşıya yükle"
 
-#: include/html.inc.php:542 include/html.inc.php:555
+#: include/html.inc.php:542 include/html.inc.php:545
 msgid "Upper level maps"
 msgstr "Daha üst seviye haritalar"
 
@@ -16845,7 +16859,7 @@ msgstr ""
 msgid "User name"
 msgstr "Kullanıcı adı"
 
-#: app/views/administration.authentication.edit.php:120
+#: app/views/administration.authentication.edit.php:129
 msgid "User password"
 msgstr "Kullanıcı parolası"
 
@@ -17323,7 +17337,7 @@ msgstr "Bayt cinsinden veya toplam yüzdesi olarak sanal alan boyutu. Bayt için
 msgid "Visible name"
 msgstr "Görünen isim"
 
-#: include/classes/api/services/CHost.php:1891
+#: include/classes/api/services/CHost.php:1927
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Ana makine adı eksikse görünür adı boş olamaz."
 
@@ -17527,8 +17541,8 @@ msgstr "Yaz"
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "\"%1$s\" servisi için olan bağımlılıklar için yanlış alanlar."
 
-#: include/classes/api/services/CHost.php:1605
-#: include/classes/api/services/CHost.php:1786
+#: include/classes/api/services/CHost.php:1641
+#: include/classes/api/services/CHost.php:1822
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "\"%1$s\" ana makinesi için yanlış alanlar."
@@ -17858,7 +17872,7 @@ msgstr "Zabbix dahili"
 msgid "Zabbix internal authentication"
 msgstr "Zabbix dahili kimlik doğrulama"
 
-#: app/views/administration.authentication.edit.php:43
+#: app/views/administration.authentication.edit.php:44
 msgid "Zabbix login form"
 msgstr ""
 
@@ -18053,7 +18067,7 @@ msgstr "bir dizi veya bir string bekleniyor"
 msgid "an empty string is expected"
 msgstr "boş bir string bekleniyor"
 
-#: include/classes/api/services/CHost.php:1548
+#: include/classes/api/services/CHost.php:1584
 msgid "an even number of hexadecimal characters is expected"
 msgstr "çift sayıda onaltılık karakter bekleniyor"
 
@@ -18151,8 +18165,8 @@ msgstr "değiştirilemez"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:512
 #: include/classes/api/services/CEvent.php:847
-#: include/classes/api/services/CHost.php:1536
-#: include/classes/api/services/CHost.php:1542
+#: include/classes/api/services/CHost.php:1572
+#: include/classes/api/services/CHost.php:1578
 #: include/classes/api/services/CHttpTest.php:984
 #: include/classes/api/services/CItemGeneral.php:485
 #: include/classes/api/services/CItemGeneral.php:512
@@ -18630,7 +18644,7 @@ msgstr "min"
 msgid "min() - Minimum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1554
+#: include/classes/api/services/CHost.php:1590
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "minimum uzunluk %1$s karakter"
@@ -18645,7 +18659,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
 
-#: app/views/administration.authentication.edit.php:114
+#: app/views/administration.authentication.edit.php:122
 msgid "must be a valid LDAP user"
 msgstr "geçerli bir LDAP kullanısı olmak zorunda"
 
@@ -18888,10 +18902,10 @@ msgstr "seçilen"
 msgid "short description"
 msgstr "kısa tanımlama"
 
-#: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1567
-#: include/classes/api/services/CHost.php:1576
-#: include/classes/api/services/CHost.php:1582
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1612
+#: include/classes/api/services/CHost.php:1618
 #: include/classes/api/services/CHttpTest.php:969
 #: include/classes/api/services/CHttpTest.php:1080
 #: include/classes/api/services/CItemGeneral.php:499
@@ -19059,8 +19073,8 @@ msgstr "beklenmedik metin \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:805
 #: include/classes/api/services/CEvent.php:905
-#: include/classes/api/services/CHost.php:1516
-#: include/classes/api/services/CHost.php:1522
+#: include/classes/api/services/CHost.php:1552
+#: include/classes/api/services/CHost.php:1558
 #: include/classes/api/services/CItemGeneral.php:1186
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
@@ -19147,8 +19161,8 @@ msgid "value is too long"
 msgstr "değer çok uzun"
 
 #: include/classes/api/services/CHost.php:771
-#: include/classes/api/services/CHost.php:1678
-#: include/classes/api/services/CHost.php:1818
+#: include/classes/api/services/CHost.php:1714
+#: include/classes/api/services/CHost.php:1854
 #: include/classes/api/services/CMapElement.php:102
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681
