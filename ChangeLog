@@ -2280,6 +2280,7 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-15220] fixed displaying of last value for values received in the same second (Sasha)
 ........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
 ...G...PS. [ZBX-11761] added warnings in case of TLS identity mismatch (akozlovs)
 A......... [ZBX-15355] fixed undefined index in configuration.import API call (Sasha)
