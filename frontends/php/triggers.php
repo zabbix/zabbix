@@ -70,7 +70,6 @@ $fields = [
 	// Filter.
 	'filter_set' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
-	'filter_priority_flag' =>					[T_ZBX_INT, O_OPT, null,	null,			null],
 	'filter_priority' =>						[T_ZBX_INT, O_OPT, null,
 													IN([
 														TRIGGER_SEVERITY_NOT_CLASSIFIED,
@@ -642,21 +641,7 @@ else {
 		$filter_dependent = getRequest('filter_dependent', -1);
 		$filter_name = getRequest('filter_name', '');
 
-		if (hasRequest('filter_priority_flag')) {
-			$filter_priority = [];
-			$filter_priority_flag = getRequest('filter_priority_flag', 0);
-			$severity_ctn = TRIGGER_SEVERITY_COUNT;
-
-			while($severity_ctn > 0) {
-
-				if ($filter_priority_flag & (1 << --$severity_ctn)) {
-					$filter_priority[] = $severity_ctn;
-				}
-			}
-		}
-		else {
-			$filter_priority = getRequest('filter_priority', []);
-		}
+		$filter_priority = getRequest('filter_priority', []);
 		$filter_groupids = getRequest('filter_groupids', []);
 		$filter_hostids = getRequest('filter_hostids', []);
 		$filter_state = getRequest('filter_state', -1);
