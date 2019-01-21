@@ -438,7 +438,7 @@ class CHttpTest extends CApiService {
 		unset($db_httptest);
 
 		$db_httpsteps = DB::select('httpstep', [
-			'output' => ['httpstepid', 'httptestid', 'name', 'no', 'url', 'timeout', 'posts', 'required',
+			'output' => ['httpstepid', 'httptestid', 'name', 'no', 'url', 'timeout', 'required',
 				'status_codes', 'follow_redirects', 'retrieve_mode'
 			],
 			'filter' => ['httptestid' => array_keys($db_httptests)]
@@ -1065,13 +1065,13 @@ class CHttpTest extends CApiService {
 						$db_httpstep = $db_httptest['steps'][$httpstep['httpstepid']];
 						$httpstep += ['retrieve_mode' => $db_httpstep['retrieve_mode']];
 						$httpstep += [
-							'posts' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
-								? $db_httpstep['posts']
-								: '',
 							'required' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 								? $db_httpstep['required']
 								: ''
 						];
+						if (($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)) {
+							$httpstep['posts'] = '';
+						}
 					}
 
 					if ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {

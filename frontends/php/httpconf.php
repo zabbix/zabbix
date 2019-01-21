@@ -366,8 +366,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			foreach ($httpTest['steps'] as $snum => $step) {
 				if (array_key_exists('httpstepid', $step) && array_key_exists($step['httpstepid'], $dbHttpSteps)) {
 					$db_step = $dbHttpSteps[$step['httpstepid']];
-					$new_step = CArrayHelper::unsetEqualValues($step, $db_step, ['httpstepid', 'posts']);
-
+					$new_step = CArrayHelper::unsetEqualValues($step, $db_step, ['httpstepid']);
 					foreach (['headers', 'variables', 'posts', 'query_fields'] as $field_name) {
 						if (!array_key_exists($field_name, $new_step)
 								|| !is_array($new_step[$field_name]) || !is_array($db_step[$field_name])
@@ -375,19 +374,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 							continue;
 						}
 
-						if ($field_name !== 'posts') {
-							$changed = false;
-							foreach ($new_step[$field_name] as $key => $field) {
-								if ($db_step[$field_name][$key]['name'] !== $field['name']
-										|| $db_step[$field_name][$key]['value'] !== $field['value']) {
-									$changed = true;
-									break;
-								}
+						$changed = false;
+						foreach ($new_step[$field_name] as $key => $field) {
+							if ($db_step[$field_name][$key]['name'] !== $field['name']
+									|| $db_step[$field_name][$key]['value'] !== $field['value']) {
+								$changed = true;
+								break;
 							}
+						}
 
-							if (!$changed) {
-								unset($new_step[$field_name]);
-							}
+						if (!$changed) {
+							unset($new_step[$field_name]);
 						}
 					}
 					$httpTest['steps'][$snum] = $new_step;
