@@ -108,6 +108,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+A......... [ZBX-14896] fixed low performance of the SQL statement when link template to many hosts (Sasha)
 A......... [ZBX-15220] fixed displaying of last value for values received in the same second (Sasha)
 ........S. [ZBX-15451] fixed event correlation when "Event tag pair" condition is used and tag contains special characters (asitals)
 ........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
