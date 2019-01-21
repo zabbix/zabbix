@@ -25,8 +25,11 @@
 #include "common.h"
 #include "zbxjson.h"
 #include "dbcache.h"
+#include "zbxembed.h"
 
 #include "../../../src/zabbix_server/preprocessor/item_preproc.h"
+
+zbx_es_t	es_engine;
 
 static int	str_to_preproc_type(const char *str)
 {

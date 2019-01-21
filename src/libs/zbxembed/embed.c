@@ -182,7 +182,7 @@ void	zbx_es_destroy(zbx_es_t *es)
 int	zbx_es_init_env(zbx_es_t *es, char **error)
 {
 	const char	*__function_name = "zbx_es_init_env";
-	int		ret = FAIL;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -191,12 +191,14 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 
 	if (0 != setjmp(es->env->loc))
 	{
+		ret = FAIL;
 		*error = zbx_strdup(*error, es->env->error);
 		goto out;
 	}
 
 	if (NULL == (es->env->ctx = duk_create_heap(es_malloc, es_realloc, es_free, es->env, es_handle_error)))
 	{
+		ret = FAIL;
 		*error = zbx_strdup(*error, "cannot create context");
 		goto out;
 	}
@@ -296,12 +298,13 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 	duk_size_t	sz;
 	char		*func, *ptr;
 	size_t		len;
-	int		ret = FAIL;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 != setjmp(es->env->loc))
 	{
+		ret = FAIL;
 		*error = zbx_strdup(*error, es->env->error);
 		goto out;
 	}
@@ -322,6 +325,7 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 
 	if (0 != duk_pcompile(es->env->ctx, DUK_COMPILE_FUNCTION))
 	{
+		ret = FAIL;
 		*error = zbx_strdup(*error, duk_safe_to_string(es->env->ctx, -1));
 		goto out;
 	}
@@ -372,7 +376,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	const char	*__function_name = "zbx_es_execute";
 
 	void	*buffer;
-	int	ret = FAIL;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -380,6 +384,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	if (0 != setjmp(es->env->loc))
 	{
+		ret = FAIL;
 		es->env->rt_error_num++;
 		*error = zbx_strdup(*error, es->env->error);
 		goto out;
@@ -394,6 +399,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	if (DUK_EXEC_SUCCESS != duk_pcall(es->env->ctx, 1))
 	{
+		ret = FAIL;
 		es->env->rt_error_num++;
 		duk_get_prop_string(es->env->ctx, -1, "stack");
 		*error = zbx_strdup(*error, duk_get_string(es->env->ctx, -1));
