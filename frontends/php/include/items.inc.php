@@ -1687,7 +1687,7 @@ function getParamFieldLabelByType($itemType) {
 
 /**
  * Get either one or all item preprocessing types.
- * If grouped set to true, returns group labels. Returns empty string if no specific type is found.
+ * If $grouped set to true, returns group labels. Returns empty string if no specific type is found.
  *
  * Usage examples:
  *    - get_preprocessing_types(null, true, [5, 4, 2])             Returns array as defined.
@@ -1701,7 +1701,7 @@ function getParamFieldLabelByType($itemType) {
  *                                                                     [20] => Discard unchanged with heartbeat
  *
  * @param int   $type             Item preprocessing type.
- * @param bool  $grouped          Group label flag. If specific type is given, this parameter doesn't matter.
+ * @param bool  $grouped          Group label flag. If specific type is given, this parameter does not matter.
  * @param array $supported_types  Array of supported pre-processing types. If none are given, empty array is returned.
  *
  * @return array|string
@@ -1709,83 +1709,83 @@ function getParamFieldLabelByType($itemType) {
 function get_preprocessing_types($type = null, $grouped = true, array $supported_types = []) {
 	$types = [
 		ZBX_PREPROC_REGSUB => [
-			'id' => _('Text'),
+			'group' => _('Text'),
 			'name' => _('Regular expression')
 		],
 		ZBX_PREPROC_TRIM => [
-			'id' => _('Text'),
+			'group' => _('Text'),
 			'name' => _('Trim')
 		],
 		ZBX_PREPROC_RTRIM => [
-			'id' => _('Text'),
+			'group' => _('Text'),
 			'name' => _('Right trim')
 		],
 		ZBX_PREPROC_LTRIM => [
-			'id' => _('Text'),
+			'group' => _('Text'),
 			'name' => _('Left trim')
 		],
 		ZBX_PREPROC_XPATH => [
-			'id' => _('Structured data'),
+			'group' => _('Structured data'),
 			'name' => _('XML XPath')
 		],
 		ZBX_PREPROC_JSONPATH => [
-			'id' => _('Structured data'),
+			'group' => _('Structured data'),
 			'name' => _('JSONPath')
 		],
 		ZBX_PREPROC_MULTIPLIER => [
-			'id' => _('Arithmetic'),
+			'group' => _('Arithmetic'),
 			'name' => _('Custom multiplier')
 		],
 		ZBX_PREPROC_DELTA_VALUE => [
-			'id' => _x('Change', 'noun'),
+			'group' => _x('Change', 'noun'),
 			'name' => _('Simple change')
 		],
 		ZBX_PREPROC_DELTA_SPEED => [
-			'id' => _x('Change', 'noun'),
+			'group' => _x('Change', 'noun'),
 			'name' => _('Change per second')
 		],
 		ZBX_PREPROC_BOOL2DEC => [
-			'id' => _('Numeral systems'),
+			'group' => _('Numeral systems'),
 			'name' => _('Boolean to decimal')
 		],
 		ZBX_PREPROC_OCT2DEC => [
-			'id' => _('Numeral systems'),
+			'group' => _('Numeral systems'),
 			'name' => _('Octal to decimal')
 		],
 		ZBX_PREPROC_HEX2DEC => [
-			'id' => _('Numeral systems'),
+			'group' => _('Numeral systems'),
 			'name' => _('Hexadecimal to decimal')
 		],
 		ZBX_PREPROC_VALIDATE_RANGE => [
-			'id' => _('Validation'),
+			'group' => _('Validation'),
 			'name' => _('In range')
 		],
 		ZBX_PREPROC_VALIDATE_REGEX => [
-			'id' => _('Validation'),
+			'group' => _('Validation'),
 			'name' => _('Matches regular expression')
 		],
 		ZBX_PREPROC_VALIDATE_NOT_REGEX => [
-			'id' => _('Validation'),
+			'group' => _('Validation'),
 			'name' => _('Does not match regular expression')
 		],
 		ZBX_PREPROC_ERROR_FIELD_JSON => [
-			'id' => _('Validation'),
+			'group' => _('Validation'),
 			'name' => _('Check for error in JSON')
 		],
 		ZBX_PREPROC_ERROR_FIELD_XML => [
-			'id' => _('Validation'),
+			'group' => _('Validation'),
 			'name' => _('Check for error in XML')
 		],
 		ZBX_PREPROC_ERROR_FIELD_REGEX => [
-			'id' => _('Validation'),
+			'group' => _('Validation'),
 			'name' => _('Check for error using regular expression')
 		],
 		ZBX_PREPROC_THROTTLE_VALUE => [
-			'id' => _('Throttling'),
+			'group' => _('Throttling'),
 			'name' => _('Discard unchanged')
 		],
 		ZBX_PREPROC_THROTTLE_TIMED_VALUE => [
-			'id' => _('Throttling'),
+			'group' => _('Throttling'),
 			'name' => _('Discard unchanged with heartbeat')
 		]
 	];
@@ -1794,7 +1794,7 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 
 	foreach ($types as $_type => $data) {
 		if (in_array($_type, $supported_types)) {
-			$filtered_types[$data['id']][$_type] = $data['name'];
+			$filtered_types[$data['group']][$_type] = $data['name'];
 		}
 	}
 

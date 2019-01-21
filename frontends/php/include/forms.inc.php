@@ -1407,8 +1407,6 @@ function getItemPreprocessing($form, $preprocessing, $readonly, $types) {
 
 	$sortable = (count($preprocessing) > 1 && !$readonly);
 
-	$i = 0;
-
 	foreach ($preprocessing as $i => $step) {
 		// Create a combo box with preprocessing types.
 		if ($readonly) {
@@ -1504,8 +1502,8 @@ function getItemPreprocessing($form, $preprocessing, $readonly, $types) {
 				break;
 		}
 
-		// Create checkbox "Custom on fail" and enable or disable it depending on preprocessing type.
-		$on_fail = (new CCheckBox('preprocessing['.$i.'][on_fail]'));
+		// Create checkbox "Custom on fail" and enable or disable depending on preprocessing type.
+		$on_fail = new CCheckBox('preprocessing['.$i.'][on_fail]');
 
 		switch ($step['type']) {
 			case ZBX_PREPROC_RTRIM:
@@ -1525,7 +1523,6 @@ function getItemPreprocessing($form, $preprocessing, $readonly, $types) {
 				if ($step['error_handler'] != ZBX_PREPROC_FAIL_DEFAULT) {
 					$on_fail->setChecked(true);
 				}
-
 				break;
 		}
 
