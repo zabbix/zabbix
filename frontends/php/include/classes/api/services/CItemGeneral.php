@@ -979,7 +979,7 @@ abstract class CItemGeneral extends CApiService {
 					$chd_item = $chd_items_tpl[$chd_host['hostid']][$tpl_item['itemid']];
 
 					if ($tpl_item['key_'] !== $chd_item['key_']) {
-						$upd_keys_by_hostid[$chd_host['hostid']][] = $tpl_item['key_'];
+						$upd_keys_by_hostid[$tpl_item['key_']][] = $chd_host['hostid'];
 					}
 				}
 				// Update by key.
@@ -1068,8 +1068,8 @@ abstract class CItemGeneral extends CApiService {
 		// Check if item with a new key already exists on the child host.
 		if ($upd_keys_by_hostid) {
 			$sql_where = [];
-			foreach ($upd_keys_by_hostid as $hostid => $keys) {
-				$sql_where[] = dbConditionInt('i.hostid', [$hostid]).' AND '.dbConditionString('i.key_', $keys);
+			foreach ($upd_keys_by_hostid as $key => $hostids) {
+				$sql_where[] = dbConditionInt('i.hostid', $hostids).' AND i.key_='.zbx_dbstr($key);
 			}
 
 			$sql = 'SELECT i.hostid,i.key_'.
