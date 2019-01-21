@@ -936,7 +936,7 @@ static int	send_internal_stats_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == CONFIG_STATS_ALLOWED_IP ||
-			SUCCEED != (ret = zbx_tcp_check_allowed_peers(sock,CONFIG_STATS_ALLOWED_IP)))
+			SUCCEED != zbx_tcp_check_allowed_peers(sock, CONFIG_STATS_ALLOWED_IP))
 	{
 		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
@@ -948,7 +948,7 @@ static int	send_internal_stats_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			0 == strcmp(type, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE) &&
 			SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_PARAMS, &jp_data))
 	{
-		char	from_str[MAX_STRING_LEN], to_str[MAX_STRING_LEN];
+		char	from_str[ZBX_MAX_UINT64_LEN + 1], to_str[ZBX_MAX_UINT64_LEN + 1];
 		int	from, to;
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_FROM, from_str, sizeof(from_str)) &&
