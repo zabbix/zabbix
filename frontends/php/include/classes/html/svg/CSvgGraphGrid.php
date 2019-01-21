@@ -21,43 +21,36 @@
 
 class CSvgGraphGrid extends CSvgTag {
 
-	protected $points_value = [];
-	protected $points_time = [];
+	const GRID_DIMENSION_HORIZONTAL = 0;
+	const GRID_DIMENSION_VERTICAL = 1;
 
-	protected $position_x = 0;
-	protected $position_y = 0;
-
+	protected $grid_points = [];
+	protected $grid_dimension;
 	protected $color;
 
-	public function __construct(array $points_value, array $points_time) {
+	// Instance counter is used to make separate CSS style for each grid instance.
+	protected static $counter = 0;
+	protected $instance_counter;
+
+	public function __construct(array $grid_points) {
 		parent::__construct('g', true);
 
-		$this
-			->setAttribute('shape-rendering', 'crispEdges')
-			->addClass(CSvgTag::ZBX_STYLE_GRAPH_GRID);
-
-		$this->points_value = $points_value;
-		$this->points_time = $points_time;
+		$this->grid_dimension = self::GRID_DIMENSION_HORIZONTAL;
+		$this->grid_points = $grid_points;
+		$this->instance_counter = ++self::$counter;
 	}
 
 	public function makeStyles() {
 		return [
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_GRID.' path' => [
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_GRID.'-'.$this->instance_counter.' path' => [
 				'stroke-dasharray' => '2,2',
 				'stroke' => $this->color
 			]
 		];
 	}
 
-	public function setPosition($x, $y) {
-		$this->position_x = $x;
-		$this->position_y = $y;
-
-		return $this;
-	}
-
 	/**
-	 * Set color.
+	 * Set grid line color.
 	 *
 	 * @param string $color  Color value.
 	 *
@@ -69,31 +62,57 @@ class CSvgGraphGrid extends CSvgTag {
 		return $this;
 	}
 
-	public function toString($destroy = true) {
-		parent::addItem($this->draw());
+	/**
+	 * Set grid dimension.
+	 *
+	 * @param int $dimension  Grid dimension.
+	 *
+	 * @return CSvgGraphGrid
+	 */
+	public function setDimension($dimension) {
+		$this->grid_dimension = $dimension;
 
-		return parent::toString($destroy);
+		return $this;
 	}
 
-	protected function draw() {
-		$path = (new CSvgPath());
+	protected function drawHorizontalGrid() {
+		$path = new CSvgPath();
 
-		foreach ($this->points_time as $pos => $time) {
-			if (($this->position_x + $pos) <= ($this->position_x + $this->width)) {
+		foreach ($this->grid_points as $pos) {
+			if (($this->y + $this->height - $pos) <= ($this->y + $this->height)) {
 				$path
-					->moveTo($this->position_x + $pos, $this->position_y)
-					->lineTo($this->position_x + $pos, $this->position_y + $this->height);
-			}
-		}
-
-		foreach ($this->points_value as $pos => $value) {
-			if (($this->position_y + $this->height - $pos) <= ($this->position_y + $this->height)) {
-				$path
-					->moveTo($this->position_x, $this->position_y + $this->height - $pos)
-					->lineTo($this->position_x + $this->width, $this->position_y + $this->height - $pos);
+					->moveTo($this->x, $this->y + $this->height - $pos)
+					->lineTo($this->x + $this->width, $this->y + $this->height - $pos);
 			}
 		}
 
 		return $path;
+	}
+
+	protected function drawVerticalGrid() {
+		$path = new CSvgPath();
+
+		foreach ($this->grid_points as $pos) {
+			if (($this->x + $pos) <= ($this->x + $this->width)) {
+				$path
+					->moveTo($this->x + $pos, $this->y)
+					->lineTo($this->x + $pos, $this->y + $this->height);
+			}
+		}
+
+		return $path;
+	}
+
+	public function toString($destroy = true) {
+		$this
+			->setAttribute('shape-rendering', 'crispEdges')
+			->addClass(CSvgTag::ZBX_STYLE_GRAPH_GRID.'-'.$this->instance_counter);
+
+		parent::addItem($this->grid_dimension == self::GRID_DIMENSION_HORIZONTAL
+			? $this->drawHorizontalGrid()
+			: $this->drawVerticalGrid()
+		);
+
+		return parent::toString($destroy);
 	}
 }

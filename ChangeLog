@@ -1,6 +1,7 @@
 Changes for 4.2.0alpha3
 
 New features:
+..F....... [ZBXNEXT-4872] reworked SVG graph x-axis timeline (miks)
 A.F.I...S. [ZBXNEXT-4877] implemented support for custom JSON path in LLD macros (Ivo, vso)
 ..F....... [ZBXNEXT-1190] implemented item prototype mass update and combined adding, updating and removing of applications in single control in item mass update form (Ivo)
 A......... [ZBXNEXT-4933] dropped support of "elementid" in map.create() and map.update() methods (Sasha)
@@ -105,6 +106,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.4rc1
 
 New features:
+..F....... [ZBXNEXT-4872] reworked SVG graph x-axis timeline (miks)
 ..F....... [ZBXNEXT-4873] implemented single dot datasets to be drawn as points in line vector graphs (miks)
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
