@@ -365,7 +365,7 @@ class CTrigger extends CTriggerGeneral {
 
 			$this->dbFilter('triggers t', $options, $sqlParts);
 
-			if (isset($options['filter']['host']) && $options['filter']['host'] !== null) {
+			if (array_key_exists('host', $options['filter']) && $options['filter']['host'] !== null) {
 				zbx_value2array($options['filter']['host']);
 
 				$sqlParts['from']['functions'] = 'functions f';
@@ -377,7 +377,7 @@ class CTrigger extends CTriggerGeneral {
 				$sqlParts['where']['host'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
-			if (isset($options['filter']['hostid']) && $options['filter']['hostid'] !== null) {
+			if (array_key_exists('hostid', $options['filter']) && $options['filter']['hostid'] !== null) {
 				zbx_value2array($options['filter']['hostid']);
 
 				$sqlParts['from']['functions'] = 'functions f';
@@ -584,7 +584,7 @@ class CTrigger extends CTriggerGeneral {
 			$this->inherit($trigger);
 
 			// replace dependencies
-			if (isset($trigger['dependencies'])) {
+			if (array_key_exists('dependencies', $trigger)) {
 				$this->deleteDependencies($trigger);
 
 				if ($trigger['dependencies']) {

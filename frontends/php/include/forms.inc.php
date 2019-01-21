@@ -509,7 +509,7 @@ function getItemFilterForm(&$items) {
 	// generate array with values for subfilters of selected items
 	foreach ($items as $item) {
 		// hosts
-		if (zbx_empty($filter_hostids)) {
+		if ($filter_hostids) {
 			$host = reset($item['hosts']);
 
 			if (!isset($item_params['hosts'][$host['hostid']])) {
@@ -821,7 +821,7 @@ function getItemFilterForm(&$items) {
 	}
 
 	// output
-	if (zbx_empty($filter_hostids) && count($item_params['hosts']) > 1) {
+	if ($filter_hostids && count($item_params['hosts']) > 1) {
 		$hosts_output = prepareSubfilterOutput(_('Hosts'), $item_params['hosts'], $subfilter_hosts, 'subfilter_hosts');
 		$table_subfilter->addRow([$hosts_output]);
 	}

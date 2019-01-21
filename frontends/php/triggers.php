@@ -264,7 +264,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		switch ($recovery_mode) {
 			case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
 				$trigger['recovery_expression'] = $recovery_expression;
-				// Break; is not missing here.
+				// break; is not missing here.
 
 			case ZBX_RECOVERY_MODE_EXPRESSION:
 				$trigger['correlation_mode'] = $correlation_mode;
@@ -319,7 +319,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 						if ($db_trigger['recovery_expression'] !== $recovery_expression) {
 							$trigger['recovery_expression'] = $recovery_expression;
 						}
-						// Break; is not missing here.
+						// break; is not missing here.
 
 					case ZBX_RECOVERY_MODE_EXPRESSION:
 
@@ -942,7 +942,7 @@ else {
 		'config_priorities' => $config_priorities,
 		'hostid' => $hostid,
 		'triggers' => $triggers,
-		'profile_idx' => 'web.triggers.filter',
+		'profileIdx' => 'web.triggers.filter',
 		'active_tab' => $active_tab,
 		'sort' => $sort,
 		'sortorder' => $sortorder,
@@ -960,7 +960,7 @@ else {
 		'filter_dependent' => $filter_dependent,
 		'show_info_column' => $show_info_column,
 		'show_value_column' => $show_value_column,
-		'show_header_host_table' => (count($filter_hostids) == 1),
+		'single_host_selected' => (count($filter_hostids) == 1),
 		'parent_templates' => getTriggerParentTemplates($triggers, ZBX_FLAG_DISCOVERY_NORMAL),
 		'paging' => getPagingLine($triggers, $sortorder, $url),
 		'dep_triggers' => $dep_triggers,

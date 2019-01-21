@@ -62,7 +62,7 @@ $filter_column1 = (new CFormList())
 		(new CCheckBoxList('filter_priority'))
 			->setOptions($data['config_priorities'])
 			->setChecked($data['filter_priority'])
-			->addClass(ZBX_STYLE_COL_3)
+			->addClass(ZBX_STYLE_COLUMNS_3)
 	)
 	->addRow(_('State'),
 		(new CRadioButtonList('filter_state', (int) $data['filter_state']))
@@ -159,14 +159,14 @@ $filter_column2 = (new CFormList())
 	);
 
 $filter = (new CFilter(new CUrl('triggers.php')))
-	->setProfile($data['profile_idx'])
+	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
 	->setControls(new CList([
-		(new CTag('nav', true, ($data['show_header_host_table'])
+		(new CTag('nav', true, ($data['single_host_selected'])
 			? new CRedirectButton(_('Create trigger'), (new CUrl('triggers.php'))
 				->setArgument('hostid', $data['hostid'])
 				->setArgument('form', 'create')
@@ -176,7 +176,7 @@ $widget = (new CWidget())
 		))->setAttribute('aria-label', _('Content controls'))
 	]));
 
-if ($data['show_header_host_table']) {
+if ($data['single_host_selected']) {
 	$widget->addItem(get_header_host_table('triggers', $data['hostid']));
 }
 
@@ -197,7 +197,7 @@ $triggers_table = (new CTableInfo())->setHeader([
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
 	$data['show_value_column'] ? _('Value') : null,
-	!$data['show_header_host_table'] ? _('Host') : null,
+	!$data['single_host_selected'] ? _('Host') : null,
 	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
@@ -291,7 +291,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	// hosts
 	$hosts = null;
-	if (!$data['show_header_host_table']) {
+	if (!$data['single_host_selected']) {
 		foreach ($trigger['hosts'] as $hostid => $host) {
 			if (!empty($hosts)) {
 				$hosts[] = ', ';
