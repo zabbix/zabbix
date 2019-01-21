@@ -186,8 +186,7 @@ int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (ZBX_QUEUE_TO_INFINITY != to && from > to)
 			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Parameters represent an invalid"
-						"interval."));
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Parameters represent an invalid interval."));
 				return SYSINFO_RET_FAIL;
 			}
 
