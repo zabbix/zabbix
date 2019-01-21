@@ -66,6 +66,15 @@ $data = [
 ];
 CProfile::update('web.hostscreen.screenid', $data['screenid'], PROFILE_TYPE_ID);
 
+$host = API::Host()->get([
+	'output' => [],
+	'hostids' => $data['hostid']
+]);
+
+if (!$host) {
+	access_deny();
+}
+
 // get screen list
 $data['screens'] = API::TemplateScreen()->get([
 	'hostids' => $data['hostid'],
