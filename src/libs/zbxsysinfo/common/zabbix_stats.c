@@ -120,7 +120,7 @@ void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, int 
 	zbx_json_addobject(&json, ZBX_PROTO_TAG_PARAMS);
 
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_FROM, from);
-	zbx_json_adduint64(&json, ZBX_PROTO_TAG_TO, to);
+	zbx_json_addint64(&json, ZBX_PROTO_TAG_TO, to);
 
 	zbx_json_close(&json);
 
