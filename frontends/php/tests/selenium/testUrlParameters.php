@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -628,8 +628,8 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_not_present' => 'Latest data',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Incorrect value "Array" for "groupids" field.',
-							'Incorrect value "Array" for "hostids" field.'
+							'Incorrect value for "groupids" field.',
+							'Incorrect value for "hostids" field.'
 						]
 					],
 					[

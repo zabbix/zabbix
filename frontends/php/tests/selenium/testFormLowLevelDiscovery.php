@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -997,7 +997,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "".'
 					]
 				]
 			],
@@ -1012,7 +1012,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-11,00:00-24:00".'
 					]
 				]
 			],
@@ -1027,7 +1027,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,00:00-25:00".'
 					]
 				]
 			],
@@ -1042,7 +1042,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,24:00-00:00".'
 					]
 				]
 			],
@@ -1785,7 +1785,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'JMX agent'])) {
 				$this->zbxTestClick('check_now');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
-				$this->zbxTestCheckFatalErrors();
 			}
 			else {
 				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
@@ -1914,7 +1913,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestClickWait('add');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created');
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextPresent($data['name']);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
@@ -2056,7 +2054,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add discovery rule');
 		$this->zbxTestTextPresentInMessageDetails($data['error_message']);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
 	}

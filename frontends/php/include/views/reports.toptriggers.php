@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,8 @@ $filter_column = (new CFormList())
 					'srcfld1' => 'groupid',
 					'dstfrm' => $filterForm->getName(),
 					'dstfld1' => 'groupids_',
-					'real_hosts' => true
+					'real_hosts' => true,
+					'enrich_parent_groups' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,6 +175,7 @@ class CScreenHostTriggers extends CScreenBase {
 			'maintenance' => 1,
 			'show_timeline' => 0,
 			'details' => 1,
+			'show_latest_values' => 0,
 			'sort_field' => '',
 			'sort_order' => ZBX_SORT_DOWN
 		];

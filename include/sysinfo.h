@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -285,7 +285,11 @@ int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
+#ifdef _WINDOWS
+typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event);
+#else
 typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
+#endif
 
 typedef struct
 {

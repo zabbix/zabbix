@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -202,7 +202,8 @@ class CWidgetHelper {
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form_name,
 					'dstfld1' => zbx_formatDomId($field_name),
-					'real_hosts' => true
+					'real_hosts' => true,
+					'enrich_parent_groups' => true
 				]
 			],
 			'add_post_js' => false
@@ -1230,6 +1231,7 @@ class CWidgetHelper {
 	 * @return string
 	 */
 	public static function makeStringFromChunks(array $chunks) {
+		ksort($chunks);
 		return implode('', $chunks);
 	}
 

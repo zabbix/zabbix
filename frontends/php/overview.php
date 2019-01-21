@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -199,7 +199,9 @@ if ($type == SHOW_TRIGGERS) {
 		$problem_options = [
 			'show_suppressed' => $filter['show_suppressed'],
 			'min_severity' => $filter['showSeverity'],
-			'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null
+			'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null,
+			'recent' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
+			'any' => ($filter['showTriggers'] == TRIGGERS_OPTION_ALL) ? true : null
 		];
 
 		$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];

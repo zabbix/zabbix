@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -434,7 +434,7 @@ class CMaintenance extends CApiService {
 			}
 
 			add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAINTENANCE, $maintenanceids[$mnum],
-				$maintenance['name'], null
+				$maintenance['name'], null, self::$userData['userid']
 			);
 		}
 		DB::insert('maintenances_hosts', $insertHosts);
@@ -928,7 +928,7 @@ class CMaintenance extends CApiService {
 
 		foreach ($maintenances as $maintenanceid => $maintenance) {
 			add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, $maintenanceid, $maintenance['name'],
-				null
+				null, self::$userData['userid']
 			);
 		}
 

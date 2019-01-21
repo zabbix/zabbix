@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -927,6 +927,8 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addstring(&json_data, "{#DATACENTER.NAME}", hv->datacenter_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#CLUSTER.NAME}",
 				NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#PARENT.NAME}", hv->parent_name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#PARENT.TYPE}", hv->parent_type, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
 	}
 

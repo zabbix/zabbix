@@ -680,7 +680,8 @@ output {
     position: relative;
     border-bottom: 1px solid #888;
     line-height: 18px;
-    vertical-align: top; }
+    vertical-align: top;
+    max-width: 300px; }
   .list-table tbody th {
     text-align: left; }
   .list-table .vertical_rotation_inner {
@@ -1090,6 +1091,11 @@ output {
   font-weight: bold;
   color: #af6b00; }
 
+.suggest-new {
+  border-top: 1px solid #888; }
+  .suggest-new span:first-child {
+    font-weight: bold; }
+
 .table-forms-container, .browser-warning-container {
   margin: 0 0 10px 0;
   background-color: #fff;
@@ -1392,6 +1398,8 @@ select {
     background-color: #fff; }
     .checkbox-radio + label span:active {
       border-color: #888; }
+  .checkbox-radio + label.label-pos-left span {
+    margin-left: 4px; }
   .checkbox-radio:focus + label span {
     border-color: #000; }
   .checkbox-radio:checked:focus + label span {
@@ -2905,8 +2913,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   stroke-width: 2px; }
 
 .svg-point-highlight {
-  fill: #000;
-  fill-opacity: 0.5; }
+  fill: #000 !important;
+  fill-opacity: 0.5 !important; }
 
 .svg-graph-preview {
   margin-top: 10px;
@@ -3901,6 +3909,7 @@ svg {
 .overrides-list {
   display: table;
   width: 90%;
+  max-width: 738px;
   padding-left: 15px; }
   .overrides-list .overrides-list-item {
     display: table-row; }
@@ -3972,6 +3981,9 @@ svg {
       line-height: 24px;
       padding: 0px 5px;
       height: 24px; }
+
+.patternselect {
+  line-height: 14px; }
 
 .columns-wrapper {
   display: flex;
