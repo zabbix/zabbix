@@ -167,7 +167,7 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_json_adduint64(json, "free", wcache_info.history_free);
 	zbx_json_adduint64(json, "total", wcache_info.history_total);
 	zbx_json_adduint64(json, "used", wcache_info.history_total - wcache_info.history_free);
-	zbx_json_adduint64(json, "pused", 100 * (double)(wcache_info.history_total - wcache_info.history_free) /
+	zbx_json_addfloat(json, "pused", 100 * (double)(wcache_info.history_total - wcache_info.history_free) /
 			wcache_info.history_total);
 	zbx_json_close(json);
 
@@ -176,7 +176,7 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_json_adduint64(json, "free", wcache_info.index_free);
 	zbx_json_adduint64(json, "total", wcache_info.index_total);
 	zbx_json_adduint64(json, "used", wcache_info.index_total - wcache_info.index_free);
-	zbx_json_adduint64(json, "pused", 100 * (double)(wcache_info.index_total - wcache_info.index_free) /
+	zbx_json_addfloat(json, "pused", 100 * (double)(wcache_info.index_total - wcache_info.index_free) /
 			wcache_info.index_total);
 	zbx_json_close(json);
 
