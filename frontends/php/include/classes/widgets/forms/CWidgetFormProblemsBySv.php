@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,6 +90,16 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 		}
 
 		$this->fields[$field_hide_empty_groups->getName()] = $field_hide_empty_groups;
+
+		// Show last values.
+		$field_show_latest_values = (new CWidgetFieldCheckBox('show_latest_values', _('Show latest values')))
+			->setFlags(CWidgetField::FLAG_ACKNOWLEDGES);
+
+		if (array_key_exists('show_latest_values', $this->data)) {
+			$field_show_latest_values->setValue($this->data['show_latest_values']);
+		}
+
+		$this->fields[$field_show_latest_values->getName()] = $field_show_latest_values;
 
 		// Problem display.
 		$field_ext_ack = (new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [

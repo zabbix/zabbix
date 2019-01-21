@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 				$histories = call_user_func_array('array_merge', $histories);
 
 				foreach ($histories as &$history) {
-					switch ($items) {
+					switch ($items[$history['itemid']]['value_type']) {
 						case ITEM_VALUE_TYPE_FLOAT:
 							sscanf($history['value'], '%f', $history['value']);
 							break;

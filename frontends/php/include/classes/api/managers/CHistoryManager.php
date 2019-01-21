@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -140,18 +140,79 @@ class CHistoryManager {
 	private function getLastValuesFromSql($items, $limit, $period) {
 		$results = [];
 
-		foreach ($items as $item) {
-			$values = DBfetchArray(DBselect(
-				'SELECT *'.
-				' FROM '.self::getTableName($item['value_type']).' h'.
-				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-					($period ? ' AND h.clock>'.(time() - $period) : '').
-				' ORDER BY h.clock DESC',
-				$limit
-			));
+		if ($period) {
+			$period = time() - $period;
+		}
 
-			if ($values) {
-				$results[$item['itemid']] = $values;
+		if ($limit == 1) {
+			foreach ($items as $item) {
+				$values = DBfetchArray(DBselect(
+					'SELECT *'.
+					' FROM '.self::getTableName($item['value_type']).' h'.
+					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+						' AND h.clock=('.
+							'SELECT MAX(h2.clock)'.
+							' FROM '.self::getTableName($item['value_type']).' h2'.
+							' WHERE h2.itemid='.zbx_dbstr($item['itemid']).
+								($period ? ' AND h2.clock>'.$period : '').
+						')'.
+					' ORDER BY h.ns DESC',
+					$limit
+				));
+
+				if ($values) {
+					$results[$item['itemid']] = $values;
+				}
+			}
+		}
+		else {
+			foreach ($items as $item) {
+				$values = DBfetchArray(DBselect(
+					'SELECT *'.
+					' FROM '.self::getTableName($item['value_type']).' h'.
+					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+						($period ? ' AND h.clock>'.$period : '').
+					' ORDER BY h.clock DESC',
+					$limit + 1
+				));
+
+				if ($values) {
+					$count = count($values);
+					$clock = $values[$count - 1]['clock'];
+
+					if ($count == $limit + 1 && $values[$count - 2]['clock'] == $clock) {
+						do {
+							unset($values[--$count]);
+						} while ($values && $values[$count - 1]['clock'] == $clock);
+
+						$db_values = DBselect(
+							'SELECT *'.
+							' FROM '.self::getTableName($item['value_type']).' h'.
+							' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+								' AND h.clock='.$clock.
+							' ORDER BY h.ns DESC',
+							$limit - $count
+						);
+
+						while ($db_value = DBfetch($db_values)) {
+							$values[] = $db_value;
+							$count++;
+						}
+					}
+
+					CArrayHelper::sort($values, [
+						['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+					]);
+
+					$values = array_values($values);
+
+					while ($count > $limit) {
+						unset($values[--$count]);
+					}
+
+					$results[$item['itemid']] = $values;
+				}
 			}
 		}
 

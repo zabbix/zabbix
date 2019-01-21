@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -173,7 +173,6 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($old_drules, CDBHelper::getHash($sql_drules));
 		$this->assertEquals($old_dchecks, CDBHelper::getHash($sql_dchecks));
@@ -318,7 +317,6 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created');
 		$this->zbxTestTextPresent($data['name']);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM drules WHERE name='.zbx_dbstr($data['name'])));
 		$cheks = 'SELECT NULL FROM dchecks WHERE druleid IN ('.
@@ -405,7 +403,6 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestClick('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($old_drules, CDBHelper::getHash($sql_drules));
 		$this->assertEquals($old_dchecks, CDBHelper::getHash($sql_dchecks));
@@ -476,7 +473,6 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule updated');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckHeader('Discovery rules');
-		$this->zbxTestCheckFatalErrors();
 
 		if (!array_key_exists('name', $data)) {
 			$data['name'] = $data['old_name'];
@@ -523,7 +519,6 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 			$this->zbxTestClickWait('update');
 			// Check the results in frontend.
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule updated');
-			$this->zbxTestCheckFatalErrors();
 		}
 
 		$this->assertEquals($old_drules, CDBHelper::getHash($sql_drules));
@@ -622,7 +617,6 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestClickAndAcceptAlert('delete');
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule deleted');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB.
 		$sql = 'SELECT * FROM drules WHERE name='.zbx_dbstr($name);
@@ -733,7 +727,6 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		// Check the results in frontend.
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckHeader('Discovery rules');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($old_drules, CDBHelper::getHash($sql_drules));
 		$this->assertEquals($old_dchecks, CDBHelper::getHash($sql_dchecks));

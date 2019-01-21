@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,6 +74,11 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['hide_empty_groups']),
 	CWidgetHelper::getCheckBox($fields['hide_empty_groups'])
+);
+
+// Show latest values.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_latest_values']),
+	CWidgetHelper::getCheckBox($fields['show_latest_values'])
 );
 
 // Problem display.

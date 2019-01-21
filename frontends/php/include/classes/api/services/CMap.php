@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1484,8 +1484,7 @@ class CMap extends CMapElement {
 			foreach ($map['selements'] as $selement) {
 				if (!$this->validateCircularReferenceRecursive($selement, $cref_mapids)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot add "%1$s" element of the map "%2$s" due to circular reference.',
-							$selement['label'], $map['name'])
+						_s('Cannot add map element of the map "%1$s" due to circular reference.', $map['name'])
 					);
 				}
 			}

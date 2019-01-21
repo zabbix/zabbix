@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,7 +254,6 @@ class CHttpTest extends CApiService {
 	 * @return array
 	 */
 	public function create($httptests) {
-		$httptests = $this->convertHttpPairs($httptests);
 		$this->validateCreate($httptests);
 
 		$httptests = Manager::HttpTest()->persist($httptests);
@@ -343,7 +342,6 @@ class CHttpTest extends CApiService {
 	 * @return array
 	 */
 	public function update($httptests) {
-		$httptests = $this->convertHttpPairs($httptests);
 		$this->validateUpdate($httptests, $db_httptests);
 
 		Manager::HttpTest()->persist($httptests);
@@ -1084,73 +1082,5 @@ class CHttpTest extends CApiService {
 			unset($httpstep);
 		}
 		unset($httptest);
-	}
-
-	/**
-	 * Convert string to HTTP pair array.
-	 *
-	 * @param string $data
-	 * @param string $delimiter
-	 *
-	 * @return mixed
-	 */
-	private function convertHTTPPairString($data, $delimiter) {
-		/* converts to pair array */
-		$pairs = array_values(array_filter(explode("\n", str_replace("\r", "\n", $data))));
-		foreach ($pairs as &$pair) {
-			$pair = explode($delimiter, $pair, 2);
-			$pair = [
-				'name' => $pair[0],
-				'value' => array_key_exists(1, $pair) ? $pair[1] : ''
-			];
-		}
-		unset($pair);
-
-		return $pairs;
-	}
-
-	/**
-	 * Convert headers and variables from string to HTTP pair array.
-	 * @deprecated conversion will be removed in future
-	 *
-	 * @param array  $httptests
-	 *
-	 * @return array
-	 */
-	private function convertHttpPairs($httptests) {
-		reset($httptests);
-
-		if (!is_int(key($httptests))) {
-			$httptests = [$httptests];
-		}
-
-		$fields = [
-			'headers' => ':',
-			'variables' => '='
-		];
-
-		foreach ($httptests as &$httptest) {
-			foreach ($fields as $field => $delimiter) {
-				if (is_array($httptest) && array_key_exists($field, $httptest) && is_string($httptest[$field])) {
-					$this->deprecated('using string format for field "'.$field.'" is deprecated.');
-					$httptest[$field] = $this->convertHTTPPairString($httptest[$field], $delimiter);
-				}
-			}
-
-			if (array_key_exists('steps', $httptest) && is_array($httptest['steps'])) {
-				foreach ($httptest['steps'] as &$step) {
-					foreach ($fields as $field => $delimiter) {
-						if (is_array($step) && array_key_exists($field, $step) && is_string($step[$field])) {
-							$this->deprecated('using string format for field "'.$field.'" is deprecated.');
-							$step[$field] = $this->convertHTTPPairString($step[$field], $delimiter);
-						}
-					}
-				}
-				unset($step);
-			}
-		}
-		unset($httptest);
-
-		return $httptests;
 	}
 }

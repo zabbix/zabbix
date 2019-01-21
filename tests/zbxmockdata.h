@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,6 +59,7 @@ zbx_mock_error_t	zbx_mock_vector_element(zbx_mock_handle_t vector, zbx_mock_hand
 zbx_mock_error_t	zbx_mock_string(zbx_mock_handle_t string, const char **value);
 zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, size_t *length);
 zbx_mock_error_t	zbx_mock_parameter(const char *path, zbx_mock_handle_t *parameter);
+zbx_mock_error_t	zbx_mock_parameter_exists(const char *path);
 zbx_mock_error_t	zbx_mock_uint64(zbx_mock_handle_t object, zbx_uint64_t *value);
 
 /* date/time support */

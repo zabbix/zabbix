@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1068,6 +1068,14 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	if (!$data['is_discovery_rule']) {
 		$data['preprocessing'] = getRequest('preprocessing', []);
+
+		foreach ($data['preprocessing'] as &$step) {
+			$step += [
+				'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+				'error_handler_params' => ''
+			];
+		}
+		unset($step);
 	}
 
 	// types, http items only for internal processes

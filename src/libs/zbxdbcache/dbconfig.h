@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -229,6 +229,7 @@ ZBX_DC_MASTERITEM;
 typedef struct
 {
 	zbx_uint64_t		itemid;
+	int			update_time;
 	zbx_vector_ptr_t	preproc_ops;
 }
 ZBX_DC_PREPROCITEM;
@@ -260,8 +261,6 @@ typedef struct
 	unsigned char	allow_traps;
 }
 ZBX_DC_HTTPITEM;
-
-typedef zbx_item_history_value_t	ZBX_DC_DELTAITEM;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 typedef struct
@@ -628,8 +627,10 @@ typedef struct
 	zbx_uint64_t	item_preprocid;
 	zbx_uint64_t	itemid;
 	int		step;
+	int		error_handler;
 	unsigned char	type;
 	const char	*params;
+	const char	*error_handler_params;
 }
 zbx_dc_preproc_op_t;
 

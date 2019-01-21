@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -426,7 +426,7 @@ class CConfigurationExport {
 		$items = API::Item()->get([
 			'output' => $this->dataFields['item'],
 			'selectApplications' => ['name', 'flags'],
-			'selectPreprocessing' => ['type', 'params'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'hostids' => array_keys($hosts),
 			'inherited' => false,
 			'webitems' => true,
@@ -532,6 +532,7 @@ class CConfigurationExport {
 		$discovery_rules = API::DiscoveryRule()->get([
 			'output' => $this->dataFields['drule'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
+			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'hostids' => array_keys($hosts),
 			'inherited' => false,
 			'preservekeys' => true
@@ -574,7 +575,7 @@ class CConfigurationExport {
 			'selectApplications' => ['name'],
 			'selectApplicationPrototypes' => ['name'],
 			'selectDiscoveryRule' => ['itemid'],
-			'selectPreprocessing' => ['type', 'params'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'inherited' => false,
 			'preservekeys' => true

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 void	zbx_mock_test_entry(void **state)
 {
 	const char		*str, *no_custom = NULL;
-	int			value, expected_ret, ret, custom;
+	int			value, expected_ret, ret;
 	zbx_custom_interval_t	*custom_intervals;
 	zbx_mock_handle_t	handle;
 
