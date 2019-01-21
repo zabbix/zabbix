@@ -2986,9 +2986,9 @@ typedef struct duk_hthread duk_context;
 
 /* __OVERRIDE_DEFINES__ */
 
-int	zbx_es_timeout(void *);
+int	zbx_es_check_timeout(void *);
 
-#define DUK_USE_EXEC_TIMEOUT_CHECK	zbx_es_timeout
+#define DUK_USE_EXEC_TIMEOUT_CHECK	zbx_es_check_timeout
 #define DUK_USE_INTERRUPT_COUNTER
 #define DUK_USE_JSON_STRINGIFY_FASTPATH
 #undef DUK_USE_ZERO_BUFFER_DATA

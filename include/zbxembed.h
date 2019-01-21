@@ -20,17 +20,19 @@
 #ifndef ZABBIX_EMBED_H
 #define ZABBIX_EMBED_H
 
-typedef struct zbx_es_impl zbx_es_impl_t;
+typedef struct zbx_es_env zbx_es_env_t;
 
 typedef struct
 {
-	zbx_es_impl_t	*impl;
+	zbx_es_env_t	*env;
 }
 zbx_es_t;
 
-int	zbx_es_init(zbx_es_t *es, char **error);
-int	zbx_es_destroy(zbx_es_t *es, char **error);
-int	zbx_es_initialized(zbx_es_t *es);
+void	zbx_es_init(zbx_es_t *es);
+void	zbx_es_destroy(zbx_es_t *es);
+int	zbx_es_init_env(zbx_es_t *es, char **error);
+int	zbx_es_destroy_env(zbx_es_t *es, char **error);
+int	zbx_es_is_env_initialized(zbx_es_t *es);
 int	zbx_es_get_runtime_error_num(zbx_es_t *es);
 int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, char **error);
 int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,

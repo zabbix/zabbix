@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "log.h"
 
 /* LIBXML2 is used */
 #ifdef HAVE_LIBXML2
@@ -32,7 +33,7 @@
 
 #include "item_preproc.h"
 
-static zbx_es_t	es_env;
+extern  zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
@@ -1520,21 +1521,21 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
  ******************************************************************************/
 static int	item_preproc_script(zbx_variant_t *value, const char *params, zbx_variant_t *bytecode, char **errmsg)
 {
-	char		*code = NULL, *output;
+	char		*code = NULL, *output, *error = NULL;
 	int		size, ret;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
-	if (SUCCEED != zbx_es_initialized(&es_env))
+	if (SUCCEED != zbx_es_is_env_initialized(&es_engine))
 	{
-		if (SUCCEED != zbx_es_init(&es_env, errmsg))
+		if (SUCCEED != zbx_es_init_env(&es_engine, errmsg))
 			return FAIL;
 	}
 
 	if (ZBX_VARIANT_BIN != bytecode->type)
 	{
-		if (SUCCEED != zbx_es_compile(&es_env, params, &code, &size, errmsg))
+		if (SUCCEED != zbx_es_compile(&es_engine, params, &code, &size, errmsg))
 			return FAIL;
 
 		zbx_variant_clear(bytecode);
@@ -1544,12 +1545,22 @@ static int	item_preproc_script(zbx_variant_t *value, const char *params, zbx_var
 
 	size = zbx_variant_data_bin_get(bytecode->data.bin, (void **)&code);
 
-	if (SUCCEED == (ret = zbx_es_execute(&es_env, params, code, size, value->data.str, &output, errmsg)))
+	if (SUCCEED == (ret = zbx_es_execute(&es_engine, params, code, size, value->data.str, &output, errmsg)))
 	{
 		zbx_variant_clear(value);
 		zbx_variant_set_str(value, output);
 	}
-
+	else
+	{
+		if (3 <= zbx_es_get_runtime_error_num(&es_engine))
+		{
+			if (SUCCEED != zbx_es_destroy_env(&es_engine, &error))
+			{
+				zabbix_log(LOG_LEVEL_WARNING,
+						"Cannot destroy embedded scripting engine environment: %s", error);
+			}
+		}
+	}
 
 	return ret;
 }

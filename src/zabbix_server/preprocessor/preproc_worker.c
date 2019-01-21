@@ -24,6 +24,7 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "preprocessing.h"
+#include "zbxembed.h"
 
 #include "sysinfo.h"
 #include "preproc_worker.h"
@@ -32,6 +33,8 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+
+zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
@@ -131,6 +134,8 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
+	zbx_es_init(&es_engine);
+
 	zbx_ipc_message_init(&message);
 
 	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_PREPROCESSING, 10, &error))
@@ -172,6 +177,8 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 		zbx_ipc_message_clean(&message);
 	}
+
+	zbx_es_destroy(&es_engine);
 
 	return 0;
 }
