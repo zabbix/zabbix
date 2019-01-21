@@ -131,7 +131,7 @@ void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, int 
 
 int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*ip_str,*port_str;
+	char		*ip_str, *port_str;
 	unsigned short	port_number;
 
 	if (5 < request->nparam)
@@ -174,21 +174,21 @@ int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 					FAIL == is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid forth parameter."));
-				goto out;
+				return SYSINFO_RET_FAIL;
 			}
 
 			if (NULL != (tmp = get_rparam(request, 4)) && '\0' != *tmp &&
 					FAIL == is_time_suffix(tmp, &to, ZBX_LENGTH_UNLIMITED))
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-				goto out;
+				return SYSINFO_RET_FAIL;
 			}
 
 			if (ZBX_QUEUE_TO_INFINITY != to && from > to)
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Parameters represent an invalid"
 						"interval."));
-				goto out;
+				return SYSINFO_RET_FAIL;
 			}
 
 			zbx_get_remote_zabbix_stats_queue(ip_str, port_number, from, to, result);
@@ -196,9 +196,10 @@ int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			return SYSINFO_RET_FAIL;
 		}
 	}
-out:
+
 	if (0 != ISSET_MSG(result))
 		return SYSINFO_RET_FAIL;
 	else
