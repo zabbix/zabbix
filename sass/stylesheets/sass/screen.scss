@@ -2165,6 +2165,10 @@ select {
 		}
 	}
 
+	+ label.label-pos-left span {
+		margin-left: 4px;
+	}
+
 	&:focus + label span {
 		border-color: $form-border-focus-color;
 	}
