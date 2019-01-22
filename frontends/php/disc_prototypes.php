@@ -1176,6 +1176,7 @@ if (isset($_REQUEST['form'])) {
 	$data = getItemFormData($itemPrototype);
 	$data['config'] = select_config();
 	$data['trends_default'] = DB::getDefault('items', 'trends');
+	$data['preprocessing_types'] = CItemPrototype::$supported_preprocessing_types;
 
 	// Sort interfaces to be listed starting with one selected as 'main'.
 	CArrayHelper::sort($data['interfaces'], [
@@ -1239,6 +1240,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_MULTISELECT_ADD),
 		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_MULTISELECT_ADD),
+		'preprocessing_types' => CItemPrototype::$supported_preprocessing_types
 	];
 
 	if (hasRequest('applications')) {

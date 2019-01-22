@@ -379,7 +379,7 @@ foreach ($data['preprocessing'] as $i => $step) {
 
 	$preproc_types_cbbox = new CComboBox('preprocessing['.$i.'][type]', $step['type']);
 
-	foreach (get_preprocessing_types() as $group) {
+	foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $group) {
 		$cb_group = new COptGroup($group['label']);
 
 		foreach ($group['types'] as $type => $label) {

@@ -30,27 +30,12 @@
 	);
 
 	if (!$readonly):
-		// Locate caller of common file.
-		foreach (get_included_files() as $path) {
-			if (strpos($path, 'configuration.item.prototype.edit.js.php') !== false) {
-				$types = CItemPrototype::$supported_preprocessing_types;
-				break;
-			}
-			elseif (strpos($path, 'configuration.host.discovery.edit.js.php') !== false) {
-				$types = CDiscoveryRule::$supported_preprocessing_types;
-				break;
-			}
-			elseif (strpos($path, 'configuration.item.edit.js.php') !== false) {
-				$types = CItem::$supported_preprocessing_types;
-				break;
-			}
-		}
 		?>
 		<script type="text/x-jquery-tmpl" id="preprocessing_steps_row">
 			<?php
 			$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
 
-			foreach (get_preprocessing_types(null, true, $types) as $group) {
+			foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $group) {
 				$cb_group = new COptGroup($group['label']);
 
 				foreach ($group['types'] as $type => $label) {

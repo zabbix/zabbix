@@ -1496,6 +1496,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	$data['config'] = select_config();
 	$data['host'] = $host;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
+	$data['preprocessing_types'] = CItem::$supported_preprocessing_types;
 
 	// Sort interfaces to be listed starting with one selected as 'main'.
 	CArrayHelper::sort($data['interfaces'], [
@@ -1559,7 +1560,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'posts' => getRequest('posts', ''),
 		'headers' => getRequest('headers', []),
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_MULTISELECT_ADD)
+		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_MULTISELECT_ADD),
+		'preprocessing_types' => CItem::$supported_preprocessing_types
 	];
 
 	$data['displayApplications'] = true;
