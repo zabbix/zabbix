@@ -360,15 +360,14 @@ static int	variant_compare_bin(const zbx_variant_t *value1, const zbx_variant_t 
 {
 	if (ZBX_VARIANT_BIN == value1->type)
 	{
-		zbx_uint32_t	size1, size2;
+		const zbx_uint32_t	*size1 = (const zbx_uint32_t *)value1->data.bin;
+		const zbx_uint32_t	*size2 = (const zbx_uint32_t *)value2->data.bin;
 
 		if (ZBX_VARIANT_BIN != value2->type)
 			return 1;
 
-		memcpy(&size1, value1->data.bin, sizeof(size1));
-		memcpy(&size2, value2->data.bin, sizeof(size2));
-		ZBX_RETURN_IF_NOT_EQUAL(size1, size2);
-		return memcmp(value1->data.bin, value2->data.bin, size1 + sizeof(size1));
+		ZBX_RETURN_IF_NOT_EQUAL(*size1, *size2);
+		return memcmp(value1->data.bin + sizeof(zbx_uint32_t), value2->data.bin + sizeof(zbx_uint32_t), *size1);
 	}
 
 	return -1;
