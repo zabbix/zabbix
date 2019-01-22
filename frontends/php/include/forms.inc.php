@@ -1585,10 +1585,11 @@ function getItemPreprocessing($form, $preprocessing, $readonly, $types) {
 						->addClass(ZBX_STYLE_COLUMN_10)
 						->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 						->addClass(ZBX_STYLE_COLUMN_CENTER),
-					(new CDiv((new CButton('param_add', _('Remove')))
+					(new CDiv((new CButton('preprocessing['.$i.'][remove]', _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-remove')
 						->setEnabled(!$readonly)
+						->removeId()
 					))
 						->addClass(ZBX_STYLE_COLUMN_10)
 						->addClass(ZBX_STYLE_COLUMN_MIDDLE),

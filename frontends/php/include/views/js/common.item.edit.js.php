@@ -80,6 +80,7 @@
 					(new CDiv((new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-remove')
+						->removeId()
 					))
 						->addClass(ZBX_STYLE_COLUMN_10)
 						->addClass(ZBX_STYLE_COLUMN_MIDDLE)
