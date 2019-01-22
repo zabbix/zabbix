@@ -1407,7 +1407,9 @@ function getItemPreprocessing($form, $preprocessing, $readonly, $types) {
 
 	$sortable = (count($preprocessing) > 1 && !$readonly);
 
-	foreach ($preprocessing as $i => $step) {
+	$i = 0;
+
+	foreach ($preprocessing as $step) {
 		// Create a combo box with preprocessing types.
 		if ($readonly) {
 			$preproc_types_cbbox = (new CTextBox('preprocessing['.$i.'][type_name]',
@@ -1598,6 +1600,8 @@ function getItemPreprocessing($form, $preprocessing, $readonly, $types) {
 				->addClass('preprocessing-list-item')
 				->addClass('sortable')
 		);
+
+		$i++;
 	}
 
 	$preprocessing_list->addItem(
