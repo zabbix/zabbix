@@ -104,12 +104,12 @@
 	(memcpy(value, buffer, sizeof(*value)), sizeof(*value))
 
 /* length prefixed binary data */
-#define zbx_deserialize_bin(buffer, value, value_len)						\
-	(											\
-			memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),			\
-			*value = (void *)zbx_malloc(NULL, value_len + sizeof(zbx_uint32_t)),	\
-			memcpy(*(value), buffer, value_len + sizeof(zbx_uint32_t)),		\
-			value_len + sizeof(zbx_uint32_t)					\
+#define zbx_deserialize_bin(buffer, value, value_len)					\
+	(										\
+		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),			\
+		*value = (void *)zbx_malloc(NULL, value_len + sizeof(zbx_uint32_t)),	\
+		memcpy(*(value), buffer, value_len + sizeof(zbx_uint32_t)),		\
+		value_len + sizeof(zbx_uint32_t)					\
 	)
 #endif
 
