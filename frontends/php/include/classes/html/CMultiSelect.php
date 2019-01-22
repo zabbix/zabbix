@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -172,9 +172,10 @@ class CMultiSelect extends CTag {
 				$parameters = $options['popup']['parameters'];
 
 				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'real_hosts', 'monitored_hosts',
-					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'webitems',
-					'normal_only', 'numeric', 'with_simple_graph_items', 'with_triggers', 'value_types', 'excludeids',
-					'disableids'];
+					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
+					'webitems', 'normal_only', 'numeric', 'with_simple_graph_items', 'with_triggers', 'value_types',
+					'excludeids', 'disableids', 'enrich_parent_groups'
+				];
 
 				foreach ($parameters as $field => $value) {
 					if (!in_array($field, $valid_fields)) {
@@ -203,6 +204,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('hostid', $parameters) && $parameters['hostid'] > 0) {
 					$popup_parameters['only_hostid'] = $parameters['hostid'];
 					$autocomplete_parameters['hostid'] = $parameters['hostid'];
+				}
+
+				if (array_key_exists('parent_discoveryid', $parameters) && $parameters['parent_discoveryid'] > 0) {
+					$popup_parameters['parent_discoveryid'] = $parameters['parent_discoveryid'];
+					$autocomplete_parameters['parent_discoveryid'] = $parameters['parent_discoveryid'];
 				}
 
 				if (array_key_exists('numeric', $parameters) && $parameters['numeric']) {
@@ -267,6 +273,11 @@ class CMultiSelect extends CTag {
 
 				if (array_key_exists('disableids', $parameters) && $parameters['disableids']) {
 					$popup_parameters['disableids'] = $parameters['disableids'];
+				}
+
+				if (array_key_exists('enrich_parent_groups', $parameters) && $parameters['enrich_parent_groups']) {
+					$popup_parameters['enrich_parent_groups'] = '1';
+					$autocomplete_parameters['enrich_parent_groups'] = '1';
 				}
 			}
 		}

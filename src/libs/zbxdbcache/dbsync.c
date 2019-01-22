@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -3133,18 +3133,33 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
  ******************************************************************************/
 static char	**dbsync_item_pp_preproc_row(char **row)
 {
+#define ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM		0x01
+#define ZBX_DBSYNC_ITEM_PP_COLUMN_ERR_PARAM	0x02
+
 	zbx_uint64_t	hostid;
+	unsigned int	flags = 0;
 
 	if (SUCCEED == dbsync_check_row_macros(row, 3))
+		flags |= ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM;
+
+	if (SUCCEED == dbsync_check_row_macros(row, 7))
+		flags |= ZBX_DBSYNC_ITEM_PP_COLUMN_ERR_PARAM;
+
+	if (0 != flags)
 	{
-		/* get associated host identifier */
 		ZBX_STR2UINT64(hostid, row[5]);
 
-		/* expand user macros */
-		row[3] = zbx_dc_expand_user_macros(row[3], &hostid, 1, NULL);
+		if (0 != (flags & ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM))
+			row[3] = zbx_dc_expand_user_macros(row[3], &hostid, 1, NULL);
+
+		if (0 != (flags & ZBX_DBSYNC_ITEM_PP_COLUMN_ERR_PARAM))
+			row[7] = zbx_dc_expand_user_macros(row[7], &hostid, 1, NULL);
 	}
 
 	return row;
+
+#undef ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM
+#undef ZBX_DBSYNC_ITEM_PP_COLUMN_ERR_PARAM
 }
 
 /******************************************************************************
@@ -3174,6 +3189,12 @@ static int	dbsync_compare_item_preproc(const zbx_dc_preproc_op_t *preproc, const
 	if (FAIL == dbsync_compare_int(dbrow[4], preproc->step))
 		return FAIL;
 
+	if (FAIL == dbsync_compare_int(dbrow[6], preproc->error_handler))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[7], preproc->error_handler_params))
+		return FAIL;
+
 	return SUCCEED;
 }
 
@@ -3201,7 +3222,8 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	char			**row;
 
 	if (NULL == (result = DBselect(
-			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step,i.hostid"
+			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step,i.hostid,pp.error_handler,"
+				"pp.error_handler_params"
 			" from item_preproc pp,items i,hosts h"
 			" where pp.itemid=i.itemid"
 				" and i.hostid=h.hostid"
@@ -3213,7 +3235,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 6, dbsync_item_pp_preproc_row);
+	dbsync_prepare(sync, 8, dbsync_item_pp_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -3372,7 +3394,7 @@ int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync)
  ******************************************************************************/
 static int	dbsync_compare_maintenance_tag(const zbx_dc_maintenance_tag_t *maintenance_tag, const DB_ROW dbrow)
 {
-	if (FAIL == dbsync_compare_int(dbrow[2], maintenance_tag->operator))
+	if (FAIL == dbsync_compare_int(dbrow[2], maintenance_tag->op))
 		return FAIL;
 
 	if (FAIL == dbsync_compare_str(dbrow[3], maintenance_tag->tag))

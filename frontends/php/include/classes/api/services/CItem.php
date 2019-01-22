@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -722,7 +722,7 @@ class CItem extends CItemGeneral {
 		$tpl_items = $this->get([
 			'output' => $output,
 			'selectApplications' => ['applicationid'],
-			'selectPreprocessing' => ['type', 'params'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'hostids' => $data['templateids'],
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true

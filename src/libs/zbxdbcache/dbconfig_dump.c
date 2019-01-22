@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -486,12 +486,14 @@ static void	DCdump_preprocitem(const ZBX_DC_PREPROCITEM *preprocitem)
 	int	i;
 
 	zabbix_log(LOG_LEVEL_TRACE, "  preprocessing:");
+	zabbix_log(LOG_LEVEL_TRACE, "  update_time:%d", preprocitem->update_time);
 
 	for (i = 0; i < preprocitem->preproc_ops.values_num; i++)
 	{
 		zbx_dc_preproc_op_t	*op = (zbx_dc_preproc_op_t *)preprocitem->preproc_ops.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "      opid:" ZBX_FS_UI64 " step:%d type:%u params:'%s'",
-				op->item_preprocid, op->step, op->type, op->params);
+		zabbix_log(LOG_LEVEL_TRACE, "      opid:" ZBX_FS_UI64 " step:%d type:%u params:'%s'"
+				" error_handler:%d error_handler_params:'%s'",
+				op->item_preprocid, op->step, op->type, op->params, op->error_handler, op->error_handler_params);
 	}
 }
 
@@ -1059,7 +1061,7 @@ static int	maintenance_tag_compare(const void *v1, const void *v2)
 	if (0 != (ret = (strcmp(tag1->value, tag2->value))))
 		return ret;
 
-	ZBX_RETURN_IF_NOT_EQUAL(tag1->operator, tag2->operator);
+	ZBX_RETURN_IF_NOT_EQUAL(tag1->op, tag2->op);
 
 	return 0;
 }
@@ -1083,7 +1085,7 @@ static void	DCdump_maintenance_tags(zbx_dc_maintenance_t *maintenance)
 	{
 		zbx_dc_maintenance_tag_t	*tag = (zbx_dc_maintenance_tag_t *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "    maintenancetagid:" ZBX_FS_UI64 " operator:%u tag:'%s' value:'%s'",
-				tag->maintenancetagid, tag->operator, tag->tag, tag->value);
+				tag->maintenancetagid, tag->op, tag->tag, tag->value);
 	}
 
 	zbx_vector_ptr_destroy(&index);

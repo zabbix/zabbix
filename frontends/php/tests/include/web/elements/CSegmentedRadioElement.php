@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,5 +56,24 @@ class CSegmentedRadioElement extends CElement {
 		$this->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($text).']')->waitUntilVisible()->one()->click();
 
 		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isEnabled($enabled = true) {
+		return (($this->getLabels()->filter(CElementQuery::ATTRIBUTES_NOT_PRESENT, ['disabled'])->count() > 0) === $enabled);
+	}
+
+	/**
+	 * Alias for select.
+	 * @see self::select
+	 *
+	 * @param string $text    label text to be selected
+	 *
+	 * @return $this
+	 */
+	public function fill($text) {
+		return $this->select($text);
 	}
 }

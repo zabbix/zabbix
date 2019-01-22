@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,17 +42,18 @@ void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags
 void	lld_field_uint64_rollback(zbx_uint64_t *field, zbx_uint64_t *field_orig, zbx_uint64_t *flags,
 		zbx_uint64_t flag);
 
-int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error,
-		int lifetime, int lastcheck);
+int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
+		const zbx_vector_ptr_t *lld_macros, char **error, int lifetime, int lastcheck);
 
 void	lld_item_links_sort(zbx_vector_ptr_t *lld_rows);
 
-int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error);
+int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macros, char **error);
 
-int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error);
+int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
+		const zbx_vector_ptr_t *lld_macros, char **error);
 
-void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, char **error, int lifetime,
-		int lastcheck);
+void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macros,
+		char **error, int lifetime, int lastcheck);
 
 int	lld_end_of_life(int lastcheck, int lifetime);
 

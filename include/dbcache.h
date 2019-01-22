@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -472,15 +472,6 @@ ZBX_DC_TREND;
 
 typedef struct
 {
-	zbx_uint64_t		itemid;
-	zbx_timespec_t		timestamp;
-	zbx_variant_t		value;
-	unsigned char		value_type;
-}
-zbx_item_history_value_t;
-
-typedef struct
-{
 	zbx_uint64_t	itemid;
 	history_value_t	value;
 	zbx_uint64_t	lastlogsize;
@@ -527,7 +518,9 @@ zbx_counter_type_t;
 typedef struct
 {
 	unsigned char	type;
+	unsigned char	error_handler;
 	char		*params;
+	char		*error_handler_params;
 }
 zbx_preproc_op_t;
 
@@ -539,6 +532,7 @@ typedef struct
 
 	int			dep_itemids_num;
 	int			preproc_ops_num;
+	int			update_time;
 
 	zbx_uint64_t		*dep_itemids;
 	zbx_preproc_op_t	*preproc_ops;
