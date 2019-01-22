@@ -2290,8 +2290,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.25rc1
 
-New features:
-
 Bug fixes:
 A......... [ZBX-15220] fixed displaying of last value for values received in the same second (Sasha)
 ........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
