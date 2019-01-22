@@ -977,7 +977,6 @@ static int	send_internal_stats_json(zbx_socket_t *sock, struct zbx_json_parse *j
 						ZBX_PROTO_TAG_TO);
 				goto param_error;
 			}
-
 		}
 		else
 			to = ZBX_QUEUE_TO_INFINITY;

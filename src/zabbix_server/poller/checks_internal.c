@@ -852,6 +852,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(tmp, "stats"))			/* zabbix[stats,...] */
 	{
+		char		*ip_str, *port_str;
 		unsigned short	port_number;
 		struct zbx_json	json;
 
@@ -861,17 +862,14 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		tmp = get_rparam(&request, 1);
-		tmp1 = get_rparam(&request, 2);
+		ip_str = get_rparam(&request, 1);
+		port_str = get_rparam(&request, 2);
 
-		if (NULL == tmp || '\0' == *tmp)
-			tmp = "127.0.0.1";
-
-		if (NULL == tmp1 || '\0' == *tmp1)
+		if (NULL == port_str || '\0' == *port_str)
 		{
 			port_number = ZBX_DEFAULT_SERVER_PORT;
 		}
-		else if (SUCCEED != is_ushort(tmp1, &port_number))
+		else if (SUCCEED != is_ushort(port_str, &port_number))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
@@ -879,7 +877,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (3 >= nparams)
 		{
-			if (0 == strcmp(tmp, "127.0.0.1") || 0 == strcmp(tmp, "localhost"))
+			if ((NULL == ip_str || '\0' == *ip_str) && (NULL == port_str || '\0' == *port_str))
 			{
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -896,7 +894,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				zbx_json_free(&json);
 			}
 			else
-				zbx_get_remote_zabbix_stats(tmp, port_number, result);
+				zbx_get_remote_zabbix_stats(ip_str, port_number, result);
 		}
 		else
 		{
@@ -904,24 +902,22 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 			if (0 == strcmp(tmp1, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
 			{
-				char	*from_str, *to_str;
+				tmp = get_rparam(&request, 4);		/* from */
+				tmp1 = get_rparam(&request, 5);		/* to */
 
-				from_str = get_rparam(&request, 4);
-				to_str = get_rparam(&request, 5);
-
-				if (0 == strcmp(tmp, "127.0.0.1") || 0 == strcmp(tmp, "localhost"))
+				if ((NULL == ip_str || '\0' == *ip_str) && (NULL == port_str || '\0' == *port_str))
 				{
 					int	from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
 
-					if (NULL != from_str && '\0' != *tmp1 &&
-							FAIL == is_time_suffix(from_str, &from, ZBX_LENGTH_UNLIMITED))
+					if (NULL != tmp && '\0' != *tmp &&
+							FAIL == is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
 					{
 						SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 						goto out;
 					}
 
-					if (NULL != to_str && '\0' != *tmp1 &&
-							FAIL == is_time_suffix(to_str, &to, ZBX_LENGTH_UNLIMITED))
+					if (NULL != tmp1 && '\0' != *tmp1 &&
+							FAIL == is_time_suffix(tmp1, &to, ZBX_LENGTH_UNLIMITED))
 					{
 						SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
 						goto out;
@@ -944,7 +940,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 					zbx_json_free(&json);
 				}
 				else
-					zbx_get_remote_zabbix_stats_queue(tmp, port_number, from_str, to_str, result);
+					zbx_get_remote_zabbix_stats_queue(ip_str, port_number, tmp, tmp1, result);
 			}
 			else
 			{

@@ -144,7 +144,7 @@ void	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESU
  *             result - [OUT] check result                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, char *from, char *to,
+void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,
 		AGENT_RESULT *result)
 {
 	struct zbx_json	json;
@@ -200,18 +200,18 @@ int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		char	*tmp;
+		const char	*tmp;
 
 		tmp = get_rparam(request, 2);
 
 		if (0 == strcmp(tmp, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
 		{
-			char	*to;
+			const char	*tmp1;
 
-			tmp = get_rparam(request, 3);
-			to = get_rparam(request, 4);
+			tmp = get_rparam(request, 3);		/* from */
+			tmp1 = get_rparam(request, 4);		/* to */
 
-			zbx_get_remote_zabbix_stats_queue(ip_str, port_number, tmp, to, result);
+			zbx_get_remote_zabbix_stats_queue(ip_str, port_number, tmp, tmp1, result);
 		}
 		else
 		{
