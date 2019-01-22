@@ -94,10 +94,10 @@ $discoveryFormList->addRow(_('Device uniqueness criteria'),
 // append host source to form list
 $discoveryFormList->addRow(_('Host name'),
 	(new CDiv(
-		(new CRadioButtonList('host_source', (int) ($this->data['drule']['host_source']-ZBX_DISCOVERY_VALUE)))
+		(new CRadioButtonList('host_source', (int) ($this->data['drule']['host_source'])))
 			->makeVertical()
-			->addValue(_('DNS name'), ZBX_DISCOVERY_HOST_FROM, zbx_formatDomId('host_source_dns'))
-			->addValue(_('IP address'), ZBX_DISCOVERY_HOST_FROM + 1, zbx_formatDomId('host_source_ip'))
+			->addValue(_('DNS name'), ZBX_DISCOVERY_DNS, zbx_formatDomId('host_source_chk_dns'))
+			->addValue(_('IP address'), ZBX_DISCOVERY_IP, zbx_formatDomId('host_source_chk_ip'))
 	))
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -106,11 +106,11 @@ $discoveryFormList->addRow(_('Host name'),
 // append name source to form list
 $discoveryFormList->addRow(_('Visible name'),
 	(new CDiv(
-		(new CRadioButtonList('name_source', (int) ($this->data['drule']['name_source']-ZBX_DISCOVERY_VALUE)))
+		(new CRadioButtonList('name_source', (int) ($this->data['drule']['name_source'])))
 			->makeVertical()
-			->addValue(_('Host name'), ZBX_DISCOVERY_NAME_FROM, zbx_formatDomId('name_source_host'))
-			->addValue(_('DNS name'), ZBX_DISCOVERY_NAME_FROM + 1, zbx_formatDomId('name_source_dns'))
-			->addValue(_('IP address'), ZBX_DISCOVERY_NAME_FROM + 2, zbx_formatDomId('name_source_ip'))
+			->addValue(_('Host name'), ZBX_DISCOVERY_UNSPEC, zbx_formatDomId('name_source_chk_host'))
+			->addValue(_('DNS name'), ZBX_DISCOVERY_DNS, zbx_formatDomId('name_source_chk_dns'))
+			->addValue(_('IP address'), ZBX_DISCOVERY_IP, zbx_formatDomId('name_source_chk_ip'))
 	))
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

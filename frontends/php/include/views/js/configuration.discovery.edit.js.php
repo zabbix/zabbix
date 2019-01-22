@@ -340,8 +340,8 @@
 			var availableDeviceTypes = [ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3],
 				elements = {
 					uniqueness_criteria: ['ip', uniqRowTpl.evaluate(value)],
-					host_source: ['dns', hostSourceRowTPL.evaluate(value)],
-					name_source: ['host', nameSourceRowTPL.evaluate(value)]
+					host_source: ['chk_dns', hostSourceRowTPL.evaluate(value)],
+					name_source: ['chk_host', nameSourceRowTPL.evaluate(value)]
 				};
 
 			jQuery.each(elements, function(key, param) {
@@ -375,8 +375,8 @@
 
 		var elements = {
 			uniqueness_criteria_: 'ip',
-			host_source_: 'dns',
-			name_source_: 'host'
+			host_source_: 'chk_dns',
+			name_source_: 'chk_host'
 		};
 
 		jQuery.each(elements, function(key, def) {
@@ -468,7 +468,7 @@
 					}
 					else if (name === 'host_source' || name === 'name_source') {
 						if (jQuery('#' + name + '_' + dcheckId).is(':checked')) {
-							var def = (name === 'host_source') ? 'dns' : 'host';
+							var def = (name === 'host_source') ? 'chk_dns' : 'chk_host';
 							jQuery('#' + name + '_' + dcheckId).prop('checked', false);
 							jQuery('#' + name + '_' + def).prop('checked', true);
 						}
@@ -753,6 +753,27 @@
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();
+		});
+
+		jQuery('#host_source,#name_source').on('click', 'input', function() {
+			var base_value = jQuery(this).val(),
+				chk_type = jQuery(this).attr('id').split('_')[2],
+				def_value = (jQuery(this).attr('name') === 'name_source'
+					? <?=ZBX_DISCOVERY_UNSPEC?> : <?=ZBX_DISCOVERY_DNS?>);
+
+			jQuery('[name ^= dchecks][name *= ' + jQuery(this).attr('name') + ']').each( function() {
+				var chk_id = jQuery(this).attr('name').split('][')[0].split('[')[1];
+
+				if (chk_type === 'chk') {
+					jQuery(this).val(base_value);
+				}
+				else if (chk_type === chk_id) {
+					jQuery(this).val(<?=ZBX_DISCOVERY_VALUE?>);
+				}
+				else {
+					jQuery(this).val(def_value);
+				}
+			});
 		});
 	});
 </script>

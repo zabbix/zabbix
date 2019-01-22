@@ -130,35 +130,12 @@ if (hasRequest('add') || hasRequest('update')) {
 	$dChecks = getRequest('dchecks', []);
 	$uniq = getRequest('uniqueness_criteria', 0);
 
-	$host_source = getRequest('host_source', ZBX_DISCOVERY_HOST_FROM);
-	$name_source = getRequest('name_source', ZBX_DISCOVERY_NAME_FROM);
-
 	foreach ($dChecks as $dcnum => $check) {
 		if (substr($check['dcheckid'], 0, 3) === 'new') {
 			unset($dChecks[$dcnum]['dcheckid']);
 		}
 
 		$dChecks[$dcnum]['uniq'] = ($uniq == $dcnum) ? 1 : 0;
-
-		if ($host_source < 0) {
-			$dChecks[$dcnum]['host_source'] = $host_source + ZBX_DISCOVERY_VALUE;
-		}
-		elseif ($host_source == $check['dcheckid']) {
-			$dChecks[$dcnum]['host_source'] = ZBX_DISCOVERY_VALUE;
-		}
-		else {
-			$dChecks[$dcnum]['host_source'] = ZBX_DISCOVERY_DNS;
-		}
-
-		if ($name_source < 0) {
-			$dChecks[$dcnum]['name_source'] = $name_source + ZBX_DISCOVERY_VALUE;
-		}
-		elseif ($name_source == $check['dcheckid']) {
-			$dChecks[$dcnum]['name_source'] = ZBX_DISCOVERY_VALUE;
-		}
-		else {
-			$dChecks[$dcnum]['name_source'] = ZBX_DISCOVERY_UNSPEC;
-		}
 	}
 
 	$discoveryRule = [
@@ -301,8 +278,8 @@ if (isset($_REQUEST['form'])) {
 		$data['drule']['dchecks'] = getRequest('dchecks', []);
 		$data['drule']['nextcheck'] = getRequest('nextcheck', 0);
 		$data['drule']['uniqueness_criteria'] = getRequest('uniqueness_criteria', -1);
-		$data['drule']['host_source'] = getRequest('host_source', ZBX_DISCOVERY_HOST_FROM);
-		$data['drule']['name_source'] = getRequest('name_source', ZBX_DISCOVERY_NAME_FROM);
+		$data['drule']['host_source'] = getRequest('host_source', ZBX_DISCOVERY_DNS);
+		$data['drule']['name_source'] = getRequest('name_source', ZBX_DISCOVERY_UNSPEC);
 	}
 
 	if (!empty($data['drule']['dchecks'])) {
