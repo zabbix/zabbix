@@ -14162,7 +14162,7 @@ msgstr "已选择，%1$s 在 %2$d 位置的 %3$d"
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
-msgstr "已选择，％1$s，只读，位于 ％3$d 的位置 ％2$d"
+msgstr ""
 
 #: jsLoader.php:177
 msgid "Send backward"
