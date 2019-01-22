@@ -25,6 +25,40 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: check_response                                                   *
+ *                                                                            *
+ * Purpose: Check whether JSON response is "success" or "failed"              *
+ *                                                                            *
+ * Parameters: response - [IN] the request                                    *
+ *             result   - [OUT] check result                                  *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_response(char *response, AGENT_RESULT *result)
+{
+	struct zbx_json_parse	jp;
+	char			value[MAX_STRING_LEN];
+	char			info[MAX_STRING_LEN];
+	int			ret;
+
+	ret = zbx_json_open(response, &jp);
+
+	if (SUCCEED == ret)
+		ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value));
+
+	if (SUCCEED == ret && 0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
+		ret = FAIL;
+
+	if (FAIL == ret && SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s", info));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_remote_zabbix_stats                                          *
  *                                                                            *
  * Purpose: send Zabbix stats request and receive the result data             *
@@ -45,9 +79,10 @@ static void	get_remote_zabbix_stats(struct zbx_json *json, const char *ip, unsig
 	{
 		if (SUCCEED == zbx_tcp_send(&s, json->buffer))
 		{
-			if (SUCCEED == zbx_tcp_recv(&s))
+			if (SUCCEED == zbx_tcp_recv(&s) && NULL != s.buffer)
 			{
-				set_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
+				if (SUCCEED == check_response(s.buffer, result))
+					set_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
 			}
 			else
 			{
@@ -109,7 +144,8 @@ void	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESU
  *             result - [OUT] check result                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, int from, int to, AGENT_RESULT *result)
+void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, char *from, char *to,
+		AGENT_RESULT *result)
 {
 	struct zbx_json	json;
 
@@ -119,8 +155,10 @@ void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, int 
 
 	zbx_json_addobject(&json, ZBX_PROTO_TAG_PARAMS);
 
-	zbx_json_adduint64(&json, ZBX_PROTO_TAG_FROM, from);
-	zbx_json_addint64(&json, ZBX_PROTO_TAG_TO, to);
+	if (NULL != from && '\0' != from[0])
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_FROM, from, ZBX_JSON_TYPE_STRING);
+	if (NULL != to && '\0' != to[0])
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_TO, to, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_close(&json);
 
@@ -168,29 +206,12 @@ int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (0 == strcmp(tmp, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
 		{
-			int	from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
+			char	*to;
 
-			if (NULL != (tmp = get_rparam(request, 3)) && '\0' != *tmp &&
-					FAIL == is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid forth parameter."));
-				return SYSINFO_RET_FAIL;
-			}
+			tmp = get_rparam(request, 3);
+			to = get_rparam(request, 4);
 
-			if (NULL != (tmp = get_rparam(request, 4)) && '\0' != *tmp &&
-					FAIL == is_time_suffix(tmp, &to, ZBX_LENGTH_UNLIMITED))
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-				return SYSINFO_RET_FAIL;
-			}
-
-			if (ZBX_QUEUE_TO_INFINITY != to && from > to)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Parameters represent an invalid interval."));
-				return SYSINFO_RET_FAIL;
-			}
-
-			zbx_get_remote_zabbix_stats_queue(ip_str, port_number, from, to, result);
+			zbx_get_remote_zabbix_stats_queue(ip_str, port_number, tmp, to, result);
 		}
 		else
 		{

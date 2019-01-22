@@ -1529,9 +1529,5 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
-/* queue delay */
-#define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
-#define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
-
 #endif
 

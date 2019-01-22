@@ -904,31 +904,36 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 			if (0 == strcmp(tmp1, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
 			{
-				int	from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
+				char	*from_str, *to_str;
 
-				if (NULL != (tmp1 = get_rparam(&request, 4)) && '\0' != *tmp1 &&
-						FAIL == is_time_suffix(tmp1, &from, ZBX_LENGTH_UNLIMITED))
-				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-					goto out;
-				}
-
-				if (NULL != (tmp1 = get_rparam(&request, 5)) && '\0' != *tmp1 &&
-						FAIL == is_time_suffix(tmp1, &to, ZBX_LENGTH_UNLIMITED))
-				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
-					goto out;
-				}
-
-				if (ZBX_QUEUE_TO_INFINITY != to && from > to)
-				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Parameters represent an invalid"
-							"interval."));
-					goto out;
-				}
+				from_str = get_rparam(&request, 4);
+				to_str = get_rparam(&request, 5);
 
 				if (0 == strcmp(tmp, "127.0.0.1") || 0 == strcmp(tmp, "localhost"))
 				{
+					int	from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
+
+					if (NULL != from_str && '\0' != *tmp1 &&
+							FAIL == is_time_suffix(from_str, &from, ZBX_LENGTH_UNLIMITED))
+					{
+						SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
+						goto out;
+					}
+
+					if (NULL != to_str && '\0' != *tmp1 &&
+							FAIL == is_time_suffix(to_str, &to, ZBX_LENGTH_UNLIMITED))
+					{
+						SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
+						goto out;
+					}
+
+					if (ZBX_QUEUE_TO_INFINITY != to && from > to)
+					{
+						SET_MSG_RESULT(result, zbx_strdup(NULL, "Parameters represent an"
+								" invalid interval."));
+						goto out;
+					}
+
 					zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 					zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
@@ -939,7 +944,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 					zbx_json_free(&json);
 				}
 				else
-					zbx_get_remote_zabbix_stats_queue(tmp, port_number, from, to, result);
+					zbx_get_remote_zabbix_stats_queue(tmp, port_number, from_str, to_str, result);
 			}
 			else
 			{
