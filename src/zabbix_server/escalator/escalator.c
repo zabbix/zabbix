@@ -1057,7 +1057,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 					script.authtype = (unsigned char)atoi(row[7]);
 					script.publickey = zbx_strdup(script.publickey, row[10]);
 					script.privatekey = zbx_strdup(script.privatekey, row[11]);
-					/*-fallthrough*/
+					ZBX_FALLTHROUGH
 				case ZBX_SCRIPT_TYPE_TELNET:
 					script.port = zbx_strdup(script.port, row[6]);
 					script.username = zbx_strdup(script.username, row[8]);
@@ -2274,10 +2274,10 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 			case ZBX_ESCALATION_CANCEL:
 				escalation_cancel(escalation, action, event, error);
 				zbx_free(error);
-				/*-fallthrough*/
+				ZBX_FALLTHROUGH
 			case ZBX_ESCALATION_DELETE:
 				zbx_vector_uint64_append(&escalationids, escalation->escalationid);
-				/*-fallthrough*/
+				ZBX_FALLTHROUGH
 			case ZBX_ESCALATION_SKIP:
 				goto cancel_warning;	/* error is NULL on skip */
 			case ZBX_ESCALATION_SUPPRESS:
