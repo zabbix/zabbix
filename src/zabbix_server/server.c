@@ -494,6 +494,7 @@ static void	zbx_set_defaults(void)
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
 {
+	char	*ch_error;
 	int	err = 0;
 
 	if (0 == CONFIG_UNREACHABLE_POLLER_FORKS && 0 != CONFIG_POLLER_FORKS + CONFIG_JAVAPOLLER_FORKS)
@@ -519,6 +520,13 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (NULL != CONFIG_SOURCE_IP && SUCCEED != is_supported_ip(CONFIG_SOURCE_IP))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
+		err = 1;
+	}
+
+	if (NULL != CONFIG_STATS_ALLOWED_IP && FAIL == zbx_validate_peer_list(CONFIG_STATS_ALLOWED_IP, &ch_error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"StatsAllowedIP\" configuration parameter: %s", ch_error);
+		zbx_free(ch_error);
 		err = 1;
 	}
 #if !defined(HAVE_IPV6)
