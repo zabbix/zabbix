@@ -69,7 +69,7 @@ static int	check_response(char *response, AGENT_RESULT *result)
  *             result - [OUT] check result                                    *
  *                                                                            *
  ******************************************************************************/
-static void	get_remote_zabbix_stats(struct zbx_json *json, const char *ip, unsigned short port,
+static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip, unsigned short port,
 		AGENT_RESULT *result)
 {
 	zbx_socket_t	s;
