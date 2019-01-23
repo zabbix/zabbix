@@ -47,7 +47,7 @@ class testPageMaintenance extends CLegacyWebTest {
 	* @dataProvider allMaintenances
 	*/
 	public function testPageMaintenance_SimpleUpdate($maintenance) {
-		$this->markTestSkipped();
+//		$this->markTestSkipped();
 		$name = $maintenance['name'];
 		$maintenanceid = $maintenance['maintenanceid'];
 
@@ -71,6 +71,7 @@ class testPageMaintenance extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Maintenance updated');
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestTextPresent('Maintenance periods');
+//		$this->putBreak();
 
 		$this->assertEquals($oldHashMaintenance, CDBHelper::getHash($sqlMaintenance), "Chuck Norris: Maintenance update changed data in table 'maintenances'");
 		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts), "Chuck Norris: Maintenance update changed data in table 'maintenances_hosts'");
