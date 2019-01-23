@@ -1548,7 +1548,9 @@ static int	item_preproc_script(zbx_variant_t *value, const char *params, zbx_var
 	if (SUCCEED == (ret = zbx_es_execute(&es_engine, params, code, size, value->data.str, &output, errmsg)))
 	{
 		zbx_variant_clear(value);
-		zbx_variant_set_str(value, output);
+
+		if (NULL != output)
+			zbx_variant_set_str(value, output);
 	}
 	else
 	{

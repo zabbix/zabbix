@@ -399,20 +399,39 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	if (DUK_EXEC_SUCCESS != duk_pcall(es->env->ctx, 1))
 	{
+		duk_small_int_t	rc = 0;
+
 		ret = FAIL;
 		es->env->rt_error_num++;
-		duk_get_prop_string(es->env->ctx, -1, "stack");
-		*error = zbx_strdup(*error, duk_get_string(es->env->ctx, -1));
+
+		if (0 != duk_is_object(es->env->ctx, -1))
+		{
+			/* try to get 'stack' property of the object on stack, assuming it's an Error object */
+			if (0 != (rc = duk_get_prop_string(es->env->ctx, -1, "stack")))
+				*error = zbx_strdup(*error, duk_get_string(es->env->ctx, -1));
+
+			duk_pop(es->env->ctx);
+		}
+
+		/* If the object does not have stack property, return the object itself as error. */
+		/* This allows to simply throw "error message" from scripts                       */
+		if (0 == rc)
+			*error = zbx_strdup(*error, duk_safe_to_string(es->env->ctx, -1));
+
 		duk_pop(es->env->ctx);
-		duk_pop(es->env->ctx);
+
 		goto out;
 	}
 
-	*output = zbx_strdup(NULL, duk_safe_to_string(es->env->ctx, -1));
+	if (0 == duk_check_type_mask(es->env->ctx, -1, DUK_TYPE_MASK_NULL | DUK_TYPE_MASK_UNDEFINED))
+		*output = zbx_strdup(NULL, duk_safe_to_string(es->env->ctx, -1));
+	else
+		*output = NULL;
+
 	duk_pop(es->env->ctx);
 	es->env->rt_error_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __function_name, *output);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __function_name, ZBX_NULL2EMPTY_STR(*output));
 
 	ret = SUCCEED;
 out:
