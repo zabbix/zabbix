@@ -169,7 +169,7 @@ void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, cons
 
 int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*ip_str, *port_str, *tmp;
+	const char	*ip_str, *port_str, *tmp;
 	unsigned short	port_number;
 
 	if (5 < request->nparam)
