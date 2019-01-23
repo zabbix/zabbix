@@ -803,7 +803,6 @@ else {
 
 	$triggers = API::Trigger()->get($options);
 
-	// Sort for paging.
 	if ($sort === 'status') {
 		orderTriggersByStatus($triggers, $sortorder);
 	}
@@ -811,18 +810,9 @@ else {
 		order_result($triggers, $sort, $sortorder);
 	}
 
-	// Paging.
 	$url = (new CUrl('triggers.php'))
 		->setArgument('filter_groupids', $filter_groupids)
 		->setArgument('filter_hostids', $filter_hostids);
-
-	// Sort for displaying full results.
-	if ($sort === 'status') {
-		orderTriggersByStatus($triggers, $sortorder);
-	}
-	else {
-		order_result($triggers, $sort, $sortorder);
-	}
 
 	$dep_triggerids = [];
 
