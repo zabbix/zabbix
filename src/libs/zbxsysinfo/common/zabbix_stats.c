@@ -91,33 +91,23 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
 			if (SUCCEED == zbx_tcp_recv(&s) && NULL != s.buffer)
 			{
 				if ('\0' == *s.buffer)
-				{
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL,
-							"Received empty response from [%s:%hu].", ip, port));
-				}
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Received empty response."));
 				else if (SUCCEED == check_response(s.buffer, result))
 					set_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
 			}
 			else
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL,
-						"Cannot obtain internal statistics from [%s:%hu] (%s).",
-						ip, port, zbx_socket_strerror()));
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain internal statistics: %s",
+						zbx_socket_strerror()));
 			}
 		}
 		else
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot send request to [%s:%hu] (%s).",
-					ip, port, zbx_socket_strerror()));
-		}
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot send request: %s", zbx_socket_strerror()));
 
 		zbx_tcp_close(&s);
 	}
 	else
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to [%s:%hu] (%s).",
-				ip, port, zbx_socket_strerror()));
-	}
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get remote stats failed: %s", zbx_socket_strerror()));
 }
 
 /******************************************************************************
