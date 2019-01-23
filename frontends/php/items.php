@@ -1145,7 +1145,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'post_type' => getRequest('post_type'),
 					'posts' => getRequest('posts'),
 					'headers' => getRequest('headers', []),
-					'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF)
+					'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
+					'preprocessing' => []
 				];
 
 				if ($item['headers']) {
@@ -1563,6 +1564,14 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_MULTISELECT_ADD),
 		'preprocessing_types' => CItem::$supported_preprocessing_types
 	];
+
+	foreach ($data['preprocessing'] as &$step) {
+		$step += [
+			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+			'error_handler_params' => ''
+		];
+	}
+	unset($step);
 
 	$data['displayApplications'] = true;
 	$data['displayInterfaces'] = true;
