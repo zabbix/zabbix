@@ -116,6 +116,14 @@ ZBX_DC_TEMPLATE_ITEM;
 
 typedef struct
 {
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	zbx_uint64_t		templateid;
+}
+ZBX_DC_PROTOTYPE_ITEM;
+
+typedef struct
+{
 	zbx_uint64_t	hostid;
 	const char	*key;
 	ZBX_DC_ITEM	*item_ptr;
@@ -721,6 +729,7 @@ typedef struct
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
 	zbx_hashset_t		template_items;		/* template items selected from items table */
+	zbx_hashset_t		prototype_items;	/* item prototypes selected from items table */
 	zbx_hashset_t		numitems;
 	zbx_hashset_t		snmpitems;
 	zbx_hashset_t		ipmiitems;

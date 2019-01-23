@@ -3028,7 +3028,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 static void	DCsync_template_items(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_items";
+	const char		*__function_name = "DCsync_template_items";
 
 	char			**row;
 	zbx_uint64_t		rowid, itemid;
@@ -3059,6 +3059,44 @@ static void	DCsync_template_items(zbx_dbsync_t *sync)
 			continue;
 
 		zbx_hashset_remove_direct(&config->template_items, item);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static void	DCsync_prototype_items(zbx_dbsync_t *sync)
+{
+	const char		*__function_name = "DCsync_prototype_items";
+
+	char			**row;
+	zbx_uint64_t		rowid, itemid;
+	unsigned char		tag;
+	int			ret, found;
+	ZBX_DC_PROTOTYPE_ITEM 	*item;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+		item = (ZBX_DC_PROTOTYPE_ITEM *)DCfind_id(&config->prototype_items, itemid, sizeof(ZBX_DC_PROTOTYPE_ITEM), &found);
+
+		ZBX_STR2UINT64(item->hostid, row[1]);
+
+		ZBX_DBROW2UINT64(item->templateid, row[2]);
+	}
+
+	/* remove deleted template items from buffer */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&config->prototype_items, &rowid)))
+			continue;
+
+		zbx_hashset_remove_direct(&config->prototype_items, item);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -4776,10 +4814,11 @@ void	DCsync_configuration(unsigned char mode)
 			update_sec, maintenance_sec, maintenance_sec2;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
-			template_items_sync, triggers_sync, tdep_sync, func_sync, expr_sync, action_sync, action_op_sync,
-			action_condition_sync, trigger_tag_sync, host_tag_sync, correlation_sync, corr_condition_sync,
-			corr_operation_sync, hgroups_sync, itempp_sync, maintenance_sync, maintenance_period_sync,
-			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync;
+			template_items_sync, prototype_items_sync, triggers_sync, tdep_sync, func_sync, expr_sync,
+			action_sync, action_op_sync, action_condition_sync, trigger_tag_sync, host_tag_sync,
+			correlation_sync, corr_condition_sync, corr_operation_sync, hgroups_sync, itempp_sync,
+			maintenance_sync, maintenance_period_sync, maintenance_tag_sync, maintenance_group_sync,
+			maintenance_host_sync, hgroup_host_sync;
 
 	zbx_uint64_t	update_flags = 0;
 
@@ -4798,6 +4837,7 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_dbsync_init(&if_sync, mode);
 	zbx_dbsync_init(&items_sync, mode);
 	zbx_dbsync_init(&template_items_sync, mode);
+	zbx_dbsync_init(&prototype_items_sync, mode);
 	zbx_dbsync_init(&triggers_sync, mode);
 	zbx_dbsync_init(&tdep_sync, mode);
 	zbx_dbsync_init(&func_sync, mode);
@@ -4965,6 +5005,11 @@ void	DCsync_configuration(unsigned char mode)
 	isec = zbx_time() - sec;
 
 	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_prototype_items(&prototype_items_sync))
+		goto out;
+	isec = zbx_time() - sec;
+
+	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_item_preprocs(&itempp_sync))
 		goto out;
 	itempp_sec = zbx_time() - sec;
@@ -4982,6 +5027,10 @@ void	DCsync_configuration(unsigned char mode)
 
 	sec = zbx_time();
 	DCsync_template_items(&template_items_sync);
+	isec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	DCsync_prototype_items(&prototype_items_sync);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -5177,6 +5226,10 @@ void	DCsync_configuration(unsigned char mode)
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, isec, isec2, template_items_sync.add_num,
 				template_items_sync.update_num, template_items_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() prototype_items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__function_name, isec, isec2, prototype_items_sync.add_num,
+				prototype_items_sync.update_num, prototype_items_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, tsec, tsec2, triggers_sync.add_num, triggers_sync.update_num,
@@ -5378,6 +5431,7 @@ out:
 	zbx_dbsync_clear(&if_sync);
 	zbx_dbsync_clear(&items_sync);
 	zbx_dbsync_clear(&template_items_sync);
+	zbx_dbsync_clear(&prototype_items_sync);
 	zbx_dbsync_clear(&triggers_sync);
 	zbx_dbsync_clear(&tdep_sync);
 	zbx_dbsync_clear(&func_sync);
@@ -5774,6 +5828,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->preprocitems, 0);
 	CREATE_HASHSET(config->httpitems, 0);
 	CREATE_HASHSET(config->template_items, 0);
+	CREATE_HASHSET(config->prototype_items, 0);
 	CREATE_HASHSET(config->functions, 100);
 	CREATE_HASHSET(config->triggers, 100);
 	CREATE_HASHSET(config->trigdeps, 0);
