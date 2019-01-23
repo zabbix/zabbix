@@ -169,7 +169,7 @@ void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, cons
 
 int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*ip_str, *port_str;
+	char		*ip_str, *port_str, *tmp;
 	unsigned short	port_number;
 
 	if (5 < request->nparam)
@@ -178,13 +178,10 @@ int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	ip_str = get_rparam(request, 0);
-	port_str = get_rparam(request, 1);
-
-	if (NULL == ip_str || '\0' == *ip_str)
+	if (NULL == (ip_str = get_rparam(request, 0)) || '\0' == *ip_str)
 		ip_str = "127.0.0.1";
 
-	if (NULL == port_str || '\0' == *port_str)
+	if (NULL == (port_str = get_rparam(request, 1)) || '\0' == *port_str)
 	{
 		port_number = ZBX_DEFAULT_SERVER_PORT;
 	}
@@ -194,30 +191,19 @@ int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (2 >= request->nparam)
+	if (3 > request->nparam)
 	{
 		zbx_get_remote_zabbix_stats(ip_str, port_number, result);
 	}
+	else if (0 == strcmp((tmp = get_rparam(request, 2)), ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
+	{
+		zbx_get_remote_zabbix_stats_queue(ip_str, port_number, get_rparam(request, 3),
+				get_rparam(request, 4), result);
+	}
 	else
 	{
-		const char	*tmp;
-
-		tmp = get_rparam(request, 2);
-
-		if (0 == strcmp(tmp, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
-		{
-			const char	*tmp1;
-
-			tmp = get_rparam(request, 3);		/* from */
-			tmp1 = get_rparam(request, 4);		/* to */
-
-			zbx_get_remote_zabbix_stats_queue(ip_str, port_number, tmp, tmp1, result);
-		}
-		else
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-			return SYSINFO_RET_FAIL;
-		}
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (0 != ISSET_MSG(result))
