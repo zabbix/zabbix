@@ -12053,7 +12053,8 @@ static void	zbx_gather_tags_from_template_chain(zbx_uint64_t itemid, zbx_vector_
 
 static void	zbx_obtain_host_tags_from_item(zbx_uint64_t itemid, zbx_vector_ptr_t *host_tags)
 {
-	ZBX_DC_ITEM	*item, *lld_item;
+	ZBX_DC_ITEM		*item;
+	ZBX_DC_PROTOTYPE_ITEM	*lld_item;
 
 	if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
 	{
@@ -12065,7 +12066,7 @@ static void	zbx_obtain_host_tags_from_item(zbx_uint64_t itemid, zbx_vector_ptr_t
 		/* check for discovered item */
 		if (0 != item->parent_itemid && 4 == item->flags)
 		{
-			if (NULL != (lld_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &item->parent_itemid)))
+			if (NULL != (lld_item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&config->prototype_items, &item->parent_itemid)))
 			{
 				zbx_gather_tags_from_template_chain(lld_item->templateid, host_tags);
 			}
