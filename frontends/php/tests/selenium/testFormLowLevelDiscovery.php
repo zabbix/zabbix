@@ -1825,7 +1825,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 	}
 
-		public static function getCreateFiltersData() {
+		public static function getFiltersTabData() {
 			return [
 				[
 					[
@@ -1886,9 +1886,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 
 	/**
-	 * @dataProvider getCreateFiltersData
+	 * Test creation of a discovery rule with data filling in Filters tab.
+	 *
+	 * @dataProvider getFiltersTabData
 	 */
-	public function testFormLowLevelDiscovery_CreateFiltersMacros($data) {
+	public function testFormLowLevelDiscovery_FiltersTab($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
@@ -1918,7 +1920,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
 	}
 
-	public static function getCreateFiltersMacrosValidationData() {
+	public static function getFiltersTabValidationData() {
 		return [
 			[
 				[
@@ -2026,9 +2028,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	}
 
 	/**
-	 * @dataProvider getCreateFiltersMacrosValidationData
+	 * @dataProvider getFiltersTabValidationData
 	 */
-	public function testFormLowLevelDiscovery_FiltersMacrosValidation($data) {
+	public function testFormLowLevelDiscovery_FiltersTabValidation($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
@@ -2068,7 +2070,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'macros' => [
 						['macro' => '{#MACRO}', 'path'=>''],
 					],
-					'path' => '',
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
 				]
 			],
@@ -2154,11 +2155,13 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	}
 
 	/**
+	 * Test creation of a discovery rule with data filling in Macros tab.
+	 *
 	 * @dataProvider getLLDMacrosTabData
 	 */
 	public function testFormLowLevelDiscovery_LLDMacrosTab($data) {
-		$sqlItems = "select * from items order by itemid";
-		$oldHashItems = CDBHelper::getHash($sqlItems);
+		$sql_items = "SELECT * FROM items ORDER BY itemid";
+		$old_hash = CDBHelper::getHash($sql_items);
 
 		$this->page->login()->open('host_discovery.php?hostid='.$this->hostid);
 		$this->query('button:Create discovery rule')->one()->click();
@@ -2168,12 +2171,12 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$form->getField('Key')->fill($data['key']);
 		$form->selectTab('LLD macros');
 
-		$macros = $form->getField('LLD macros'); // table
-		$button = $macros->query('button:Add')->one();
+		$macros_table = $form->getField('LLD macros');
+		$button = $macros_table->query('button:Add')->one();
 		$last = count($data['macros']) - 1;
 
 		foreach ($data['macros'] as $i => $lld_macro) {
-			$row = $macros->getRows()->get($i); // row
+			$row = $macros_table->getRows()->get($i);
 			$row->getColumn('LLD macro')->query('tag:input')->one()->fill($lld_macro['macro']);
 			$row->getColumn('JSON Path')->query('tag:input')->one()->fill($lld_macro['path']);
 
@@ -2185,11 +2188,12 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
+		// Get global message.
+		$message = CMessageElement::find()->one();
+
 		$expected = $data['expected'];
 		switch ($expected) {
 			case TEST_GOOD:
-				// Get global message.
-				$message = CMessageElement::find()->one();
 				// Check if message is positive.
 				$this->assertTrue($message->isGood());
 				// Check message title.
@@ -2202,8 +2206,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$this->checkLLDMacrosFormFields($data);
 				break;
 			case TEST_BAD:
-				// Get global message.
-				$message = CMessageElement::find()->one();
 				// Check if message is negative.
 				$this->assertTrue($message->isBad());
 				// Check message title.
@@ -2211,7 +2213,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$this->assertTrue($message->hasLine($data['error_details']));
 
 				// Check that DB hash is not changed.
-				$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
+				$this->assertEquals($old_hash, CDBHelper::getHash($sql_items));
 				break;
 		}
 	}
@@ -2221,12 +2223,14 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->page->open('host_discovery.php?form=update&itemid='.$id);
 		$form = $this->query('name:itemForm')->asForm()->one();
 		$form->selectTab('LLD macros');
+		$table = $form->getField('LLD macros');
 
 		foreach ($data['macros'] as $i => $lld_macro) {
-			$macro = $this->query('id:lld_macro_paths_'.$i.'_lld_macro')->one()->getAttribute('value');
+			$row = $table->getRows()->get($i);
+			$macro = $row->getColumn('LLD macro')->query('tag:input')->one()->getAttribute('value');
 			$this->assertEquals($lld_macro['macro'], $macro);
 
-			$path = $this->query('id:lld_macro_paths_'.$i.'_path')->one()->getAttribute('value');
+			$path = $row->getColumn('JSON Path')->query('tag:input')->one()->getAttribute('value');
 			$this->assertEquals($lld_macro['path'], $path);
 		}
 	}

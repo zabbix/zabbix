@@ -103,11 +103,14 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 
 		if (array_key_exists('macros', $data)) {
 			$this->zbxTestTabSwitch('LLD macros');
+			$last = count($data['macros']) - 1;
 
-		foreach ($data['macros'] as $i => $lld_macro) {
-			$this->zbxTestInputType('lld_macro_paths_'.$i.'_lld_macro', $lld_macro['macro'] );
-			$this->zbxTestInputType('lld_macro_paths_'.$i.'_path', $lld_macro['path'] );
-			$this->zbxTestClick('lld_macro_add');
+			foreach ($data['macros'] as $i => $lld_macro) {
+				$this->zbxTestInputType('lld_macro_paths_'.$i.'_lld_macro', $lld_macro['macro'] );
+				$this->zbxTestInputType('lld_macro_paths_'.$i.'_path', $lld_macro['path'] );
+				if ($i !== $last) {
+					$this->zbxTestClick('lld_macro_add');
+				}
 			}
 		}
 
