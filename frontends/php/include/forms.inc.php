@@ -1371,6 +1371,7 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	return $data;
 }
+
 /**
  * Get list of item pre-processing data and return a prepared HTML object.
  *
@@ -1385,7 +1386,7 @@ function getItemFormData(array $item = [], array $options = []) {
  *
  * @return CList
  */
-function getItemPreprocessing($form, $preprocessing, $readonly, $types) {
+function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, array $types) {
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
 		->addClass('preprocessing-list')
