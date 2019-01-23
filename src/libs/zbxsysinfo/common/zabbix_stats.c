@@ -58,7 +58,7 @@ static int	check_response(const char *response, AGENT_RESULT *result)
 		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, buffer, sizeof(buffer)))
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find tag: %s.", ZBX_PROTO_TAG_INFO));
 		else
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s", buffer));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain internal statistics: %s", buffer));
 
 		return FAIL;
 	}
@@ -91,7 +91,10 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
 			if (SUCCEED == zbx_tcp_recv(&s) && NULL != s.buffer)
 			{
 				if ('\0' == *s.buffer)
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Received empty response."));
+				{
+					SET_MSG_RESULT(result, zbx_strdup(NULL,
+							"Cannot obtain internal statistics: received empty response."));
+				}
 				else if (SUCCEED == check_response(s.buffer, result))
 					set_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
 			}
@@ -102,12 +105,18 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
 			}
 		}
 		else
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot send request: %s", zbx_socket_strerror()));
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain internal statistics: %s",
+					zbx_socket_strerror()));
+		}
 
 		zbx_tcp_close(&s);
 	}
 	else
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get remote stats failed: %s", zbx_socket_strerror()));
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain internal statistics: %s",
+				zbx_socket_strerror()));
+	}
 }
 
 /******************************************************************************
