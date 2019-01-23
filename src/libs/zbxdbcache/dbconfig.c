@@ -2333,16 +2333,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
 		/* template item */
-		if (NULL == row[57])
-			item->templateid = 0;
-		else
-			ZBX_STR2UINT64(item->templateid, row[57]);
+		ZBX_DBROW2UINT64(item->templateid, row[57]);
 
 		/* LLD item prototype */
-		if (NULL == row[58])
-			item->parent_itemid = 0;
-		else
-			ZBX_STR2UINT64(item->parent_itemid, row[58]);
+		ZBX_DBROW2UINT64(item->parent_itemid, row[58]);
 
 		if (0 != found && ITEM_TYPE_SNMPTRAP == item->type)
 			dc_interface_snmpitems_remove(item);
@@ -3055,10 +3049,7 @@ static void	DCsync_template_items(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(item->hostid, row[1]);
 
-		if (NULL == row[2])
-			item->templateid = 0;
-		else
-			ZBX_STR2UINT64(item->templateid, row[2]);
+		ZBX_DBROW2UINT64(item->templateid, row[2]);
 	}
 
 	/* remove deleted template items from buffer */
