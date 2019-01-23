@@ -155,9 +155,9 @@ void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, cons
 
 	zbx_json_addobject(&json, ZBX_PROTO_TAG_PARAMS);
 
-	if (NULL != from && '\0' != from[0])
+	if (NULL != from && '\0' != *from)
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_FROM, from, ZBX_JSON_TYPE_STRING);
-	if (NULL != to && '\0' != to[0])
+	if (NULL != to && '\0' != *to)
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_TO, to, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_close(&json);
