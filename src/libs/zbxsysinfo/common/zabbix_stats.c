@@ -115,7 +115,7 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connection to [%s:%hu] (%s).",
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to [%s:%hu] (%s).",
 				ip, port, zbx_socket_strerror()));
 	}
 }
