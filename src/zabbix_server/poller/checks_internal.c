@@ -852,7 +852,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(tmp, "stats"))			/* zabbix[stats,...] */
 	{
-		char		*ip_str, *port_str;
+		const char	*ip_str, *port_str, *ip;
 		unsigned short	port_number;
 		struct zbx_json	json;
 
@@ -862,10 +862,12 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		ip_str = get_rparam(&request, 1);
-		port_str = get_rparam(&request, 2);
+		if (NULL == (ip_str = get_rparam(&request, 1)) || '\0' == *ip_str)
+			ip = "127.0.0.1";
+		else
+			ip = ip_str;
 
-		if (NULL == port_str || '\0' == *port_str)
+		if (NULL == (port_str = get_rparam(&request, 2)) || '\0' == *port_str)
 		{
 			port_number = ZBX_DEFAULT_SERVER_PORT;
 		}
@@ -894,7 +896,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				zbx_json_free(&json);
 			}
 			else
-				zbx_get_remote_zabbix_stats(ip_str, port_number, result);
+				zbx_get_remote_zabbix_stats(ip, port_number, result);
 		}
 		else
 		{
@@ -940,7 +942,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 					zbx_json_free(&json);
 				}
 				else
-					zbx_get_remote_zabbix_stats_queue(ip_str, port_number, tmp, tmp1, result);
+					zbx_get_remote_zabbix_stats_queue(ip, port_number, tmp, tmp1, result);
 			}
 			else
 			{
