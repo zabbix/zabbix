@@ -1760,8 +1760,9 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 			" from items i"
 			" inner join hosts h on i.hostid=h.hostid"
 			" left join item_discovery id on i.itemid=id.itemid"
-			" where h.status in (%d,%d)",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)))
+			" where h.status in (%d,%d) and i.flags<>%d",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE)))
+
 	{
 		return FAIL;
 	}
