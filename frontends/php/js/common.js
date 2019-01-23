@@ -423,17 +423,15 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 
 	var url = new Curl('zabbix.php');
 	url.setArgument('action', action);
-	jQuery.each(options, function(key, value) {
-		url.setArgument(key, value);
-	});
 
 	jQuery.ajax({
 		url: url.getUrl(),
-		type: 'get',
+		type: 'post',
 		dataType: 'json',
 		beforeSend: function(jqXHR) {
 			overlayDialogue(ovelay_properties, trigger_elmnt, jqXHR);
 		},
+		data: options,
 		success: function(resp) {
 			if (typeof resp.errors !== 'undefined') {
 				ovelay_properties['content'] = resp.errors;
