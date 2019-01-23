@@ -630,7 +630,10 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				",tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,"
 				"maintenanceid"
 			" from hosts"
-				" where flags<>%d",
+			" where status in (%d,%d,%d,%d)"
+				" and flags<>%d",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
 		return FAIL;
@@ -647,7 +650,10 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept,"
 				"proxy_address,auto_compress,maintenanceid"
 			" from hosts"
-				" where flags<>%d",
+			" where status in (%d,%d,%d,%d)"
+				" and flags<>%d",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
 		return FAIL;
