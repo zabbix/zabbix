@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-20 01:49+0200\n"
+"POT-Creation-Date: 2019-01-22 10:39+0200\n"
 "PO-Revision-Date: 2014-10-03 08:43+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -31,7 +31,7 @@ msgstr ""
 msgid "\"%1$s\" is expected"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1324
+#: include/classes/api/services/CItemGeneral.php:1415
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
 msgstr ""
@@ -94,7 +94,7 @@ msgid_plural "%1$s Items"
 msgstr[0] "%1$s Συλλέκτη"
 msgstr[1] "%1$s Συλλέκτες"
 
-#: include/classes/api/services/CItemGeneral.php:2227
+#: include/classes/api/services/CItemGeneral.php:2168
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
@@ -1488,7 +1488,7 @@ msgid "CERT"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:968
+#: include/classes/graph/CSvgGraph.php:938
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -1776,17 +1776,17 @@ msgstr ""
 msgid "Cannot clear history"
 msgstr "Αδύνατη η εκκαθάριση ιστορικού"
 
-#: include/classes/api/services/CDiscoveryRule.php:1931
+#: include/classes/api/services/CDiscoveryRule.php:1880
 msgid "Cannot clone graph prototypes."
 msgstr "Αδύνατη η κλωνοποίηση προτότυπων γραφημάτων."
 
-#: include/classes/api/services/CDiscoveryRule.php:1979
+#: include/classes/api/services/CDiscoveryRule.php:1928
 msgid "Cannot clone host prototypes."
 msgstr "Αδύνατη η κλωνοποίηση πρωτότυπων ξενιστών."
 
-#: include/classes/api/services/CDiscoveryRule.php:1736
-#: include/classes/api/services/CDiscoveryRule.php:1792
-#: include/classes/api/services/CDiscoveryRule.php:1810
+#: include/classes/api/services/CDiscoveryRule.php:1685
+#: include/classes/api/services/CDiscoveryRule.php:1741
+#: include/classes/api/services/CDiscoveryRule.php:1759
 msgid "Cannot clone item prototypes."
 msgstr "Αδύνατη η κλωνοποίηση προτότυπων συλλεκτών."
 
@@ -2084,11 +2084,11 @@ msgstr ""
 msgid "Cannot delete templated host prototype."
 msgstr "Αδύνατη η διαγραφή σχεδιότυπου πρωτότυπου ξενιστή."
 
-#: include/classes/api/services/CItemPrototype.php:876
+#: include/classes/api/services/CItemPrototype.php:875
 msgid "Cannot delete templated item prototype."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:706
+#: include/classes/api/services/CItem.php:704
 msgid "Cannot delete templated item."
 msgstr "Αδύνατη η διαγραφή σχεδιότυπου συλλέκτη."
 
@@ -2303,8 +2303,8 @@ msgstr "Δεν βρίσκω ξενιστή \"%1$s\" χρησιμοποιούμε
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Δεν βρίσκω ομάδα ξενιστή \"%1$s\" για πρωτότυπο ξενιστή \"%2$s\" κανόνα εντοπισμού \"%3$s\" σε \"%4$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1599
-#: include/classes/api/services/CDiscoveryRule.php:1763
+#: include/classes/api/services/CDiscoveryRule.php:1548
+#: include/classes/api/services/CDiscoveryRule.php:1712
 #: include/classes/api/services/CItemGeneral.php:116 include/items.inc.php:506
 #: include/items.inc.php:653
 #, c-format
@@ -2404,7 +2404,7 @@ msgstr "Αδύνατον ο μορφότυπος Δένδρου. Έλεγξε τ
 msgid "Cannot format tree."
 msgstr "Αδύνατον ο μορφότυπος δένδρου."
 
-#: include/classes/api/services/CTemplate.php:805
+#: include/classes/api/services/CTemplate.php:803
 msgid "Cannot have empty visible template name."
 msgstr "Δεν μπορώ να έχω κενό ορατό όνομα σχεδιότυπου."
 
@@ -2440,8 +2440,8 @@ msgstr "Αδύνατη η εισαγωγή έκφρασης εναύσματος
 msgid "Cannot link template"
 msgstr "Αδύνατη η συσχέτιση σχεδιότυπου"
 
-#: include/classes/api/services/CTemplate.php:892
-#: include/classes/api/services/CTemplate.php:906
+#: include/classes/api/services/CTemplate.php:890
+#: include/classes/api/services/CTemplate.php:904
 msgid "Cannot link template."
 msgstr "Αδύνατη η συσχέτιση σχεδιότυπου."
 
@@ -2453,7 +2453,7 @@ msgstr "Αδύνατη η αποσύνδεση."
 msgid "Cannot mass update host name."
 msgstr "Αδύνατη η μαζική ενημέρωση ονόματος ξενιστή."
 
-#: include/classes/api/services/CTemplate.php:1030
+#: include/classes/api/services/CTemplate.php:1028
 msgid "Cannot mass update template name."
 msgstr "Αδύνατη η μαζική ενημέρωση ονόματος σχεδιότυπου."
 
@@ -2461,7 +2461,7 @@ msgstr "Αδύνατη η μαζική ενημέρωση ονόματος σχ�
 msgid "Cannot mass update visible host name."
 msgstr "Αδύνατη η μαζική ενημέρωση ορατού ονόματος ξενιστή."
 
-#: include/classes/api/services/CTemplate.php:995
+#: include/classes/api/services/CTemplate.php:993
 msgid "Cannot mass update visible template name."
 msgstr "Αδύνατη η μαζική ενημέρωση ορατού ονόματος σχεδιότυπου."
 
@@ -2489,8 +2489,8 @@ msgstr "Αδύνατη η εκτέλεση πρότασης ενημέρωσης
 msgid "Cannot process applications from different hosts or templates."
 msgstr "Αδύνατη η επεξεργασία κατηγοριών από διαφορετικούς ξενιστές ή σχεδιότυπα."
 
-#: include/classes/api/services/CItemGeneral.php:2235
-#: include/classes/api/services/CItemGeneral.php:2262
+#: include/classes/api/services/CItemGeneral.php:2176
+#: include/classes/api/services/CItemGeneral.php:2203
 msgid "Cannot read JSON."
 msgstr ""
 
@@ -2499,8 +2499,8 @@ msgstr ""
 msgid "Cannot read JSON: %1$s."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2222
-#: include/classes/api/services/CItemGeneral.php:2226
+#: include/classes/api/services/CItemGeneral.php:2163
+#: include/classes/api/services/CItemGeneral.php:2167
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
@@ -2609,15 +2609,15 @@ msgstr "Αδύνατη η εναλλαγή ξενιστή για διεπαφή.
 msgid "Cannot unblock users"
 msgstr "Αδύνατη η απεμπλοκή χρηστών"
 
-#: include/classes/api/services/CHostGeneral.php:563
+#: include/classes/api/services/CHostGeneral.php:559
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός σεναρίων ιστού."
 
-#: include/classes/api/services/CHostGeneral.php:624
+#: include/classes/api/services/CHostGeneral.php:620
 msgid "Cannot unlink and clear applications."
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός κατηγοριών."
 
-#: include/classes/api/services/CHostGeneral.php:367
+#: include/classes/api/services/CHostGeneral.php:363
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός κανόνων εντοπισμού"
 
@@ -2625,12 +2625,12 @@ msgstr "Αδύνατη η αποσύνδεση και καθαρισμός κα�
 msgid "Cannot unlink template"
 msgstr "Αδύνατη η αποσύνδεση σχεδιότυπου"
 
-#: include/classes/api/services/CTemplate.php:857
-#: include/classes/api/services/CTemplate.php:880
+#: include/classes/api/services/CTemplate.php:855
+#: include/classes/api/services/CTemplate.php:878
 msgid "Cannot unlink template."
 msgstr "Αδύνατη η αποσύνδεση σχεδιότυπου."
 
-#: include/classes/api/services/CHostGeneral.php:273
+#: include/classes/api/services/CHostGeneral.php:269
 #, c-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Αδύνατη η αποσύνδεση εναύσματος \"%s\", έχει συλλέκτες από σχεδιότυπο συνδεδεμένο με ξενιστή."
@@ -2905,7 +2905,7 @@ msgid "Cannot update templated applications."
 msgstr "Αδύνατη η ενημέρωση σχεδιότυπων κατηγοριών."
 
 #: include/classes/api/services/CTemplate.php:754
-#: include/classes/api/services/CTemplate.php:1090
+#: include/classes/api/services/CTemplate.php:1088
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Αδύνατη η ενημέρωση σχεδιότυπων εντοπισμένου ξενιστή \"%1$s\"."
@@ -5423,8 +5423,8 @@ msgstr ""
 msgid "Elasticsearch error: %1$s."
 msgstr ""
 
-#: include/classes/api/managers/CHistoryManager.php:652
-#: include/classes/api/managers/CHistoryManager.php:661
+#: include/classes/api/managers/CHistoryManager.php:713
+#: include/classes/api/managers/CHistoryManager.php:722
 #, c-format
 msgid "Elasticsearch url is not set for type: %1$s."
 msgstr ""
@@ -6076,7 +6076,7 @@ msgstr "Πεδίο \"%1$s\" δεν ορίζεται NULL."
 #: include/classes/api/services/CDRule.php:503
 #: include/classes/api/services/CHostGroup.php:914
 #: include/classes/api/services/CHost.php:743
-#: include/classes/api/services/CTemplate.php:784
+#: include/classes/api/services/CTemplate.php:782
 #: include/classes/api/services/CTriggerGeneral.php:236
 #: include/classes/validators/CNewValidator.php:255
 #: include/validate.inc.php:300
@@ -6767,6 +6767,8 @@ msgstr "H:i"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1413
 #: include/classes/graphdraw/CLineGraphDraw.php:1420
+#: include/classes/html/svg/CSvgGraphXAxis.php:456
+#: include/classes/html/svg/CSvgGraphXAxis.php:463
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -7286,7 +7288,7 @@ msgstr "Ξενιστής ενημερώθηκε"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:1056
+#: include/classes/api/services/CTemplate.php:1054
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Ξενιστής με ίδιο όνομα \"%1$s\" υπάρχει ήδη."
@@ -7298,7 +7300,7 @@ msgid "Host with the same name \"%s\" already exists."
 msgstr "Ξενιστής με ίδιο όνομα \"%s\" υπάρχει ήδη."
 
 #: include/classes/api/services/CTemplate.php:460
-#: include/classes/api/services/CTemplate.php:1021
+#: include/classes/api/services/CTemplate.php:1019
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Ξενιστής με ίδιο ορατό όνομα \"%1$s\" υπάρχει ήδη."
@@ -7653,6 +7655,10 @@ msgstr ""
 msgid "Inaccessible item"
 msgstr ""
 
+#: include/classes/screens/CScreenProblem.php:393
+msgid "Inaccessible maintenance"
+msgstr ""
+
 #: app/controllers/CControllerDashboardWidgetEdit.php:103
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:84
 msgid "Inaccessible map"
@@ -7926,18 +7932,18 @@ msgstr "Λανθασμένα ορίσματα πέρασαν στην συνάρ
 #: include/classes/api/services/CHostPrototype.php:392
 #: include/classes/api/services/CHostPrototype.php:413
 #: include/classes/api/services/CItemGeneral.php:258
-#: include/classes/api/services/CItemGeneral.php:1171
-#: include/classes/api/services/CItemGeneral.php:1196
-#: include/classes/api/services/CItemGeneral.php:1219
-#: include/classes/api/services/CItemGeneral.php:1249
-#: include/classes/api/services/CItemGeneral.php:1263
-#: include/classes/api/services/CItemGeneral.php:1289
-#: include/classes/api/services/CItemGeneral.php:1335
-#: include/classes/api/services/CItemGeneral.php:1358
-#: include/classes/api/services/CItemGeneral.php:1409
-#: include/classes/api/services/CItemGeneral.php:1420
-#: include/classes/api/services/CItemGeneral.php:1435
-#: include/classes/api/services/CItemGeneral.php:1446
+#: include/classes/api/services/CItemGeneral.php:1262
+#: include/classes/api/services/CItemGeneral.php:1287
+#: include/classes/api/services/CItemGeneral.php:1310
+#: include/classes/api/services/CItemGeneral.php:1340
+#: include/classes/api/services/CItemGeneral.php:1354
+#: include/classes/api/services/CItemGeneral.php:1380
+#: include/classes/api/services/CItemGeneral.php:1426
+#: include/classes/api/services/CItemGeneral.php:1449
+#: include/classes/api/services/CItemGeneral.php:1500
+#: include/classes/api/services/CItemGeneral.php:1511
+#: include/classes/api/services/CItemGeneral.php:1526
+#: include/classes/api/services/CItemGeneral.php:1537
 #: include/classes/api/services/CMapElement.php:46
 #: include/classes/api/services/CMapElement.php:90
 #: include/classes/api/services/CMapElement.php:109
@@ -7992,7 +7998,7 @@ msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Λανθασμένοι χαρακτήρες σε χρήση για όνομα διαμεσολαβητή \"%1$s\"."
 
 #: include/classes/api/services/CTemplate.php:411
-#: include/classes/api/services/CTemplate.php:1064
+#: include/classes/api/services/CTemplate.php:1062
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Λανθασμένοι χαρακτήρες σε χρήση για όνομα σχεδιότυπου \"%1$s\"."
@@ -8479,7 +8485,7 @@ msgstr "Λανθασμένη ομάδα χρήστη."
 #: include/classes/api/services/CDRule.php:558
 #: include/classes/api/services/CDRule.php:571
 #: include/classes/api/services/CItemGeneral.php:529
-#: include/classes/api/services/CItemGeneral.php:2206
+#: include/classes/api/services/CItemGeneral.php:2147
 #: include/classes/validators/CNewValidator.php:116
 #: include/classes/validators/CNewValidator.php:129
 #: include/classes/validators/CNewValidator.php:142
@@ -8578,7 +8584,7 @@ msgstr ""
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
 #: include/classes/api/services/CDiscoveryRule.php:1282
-#: include/classes/api/services/CDiscoveryRule.php:1702
+#: include/classes/api/services/CDiscoveryRule.php:1651
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:214
@@ -8598,8 +8604,6 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:804
 #: include/classes/api/services/CEvent.php:847
 #: include/classes/api/services/CEvent.php:904
-#: include/classes/api/services/CHostGeneral.php:1023
-#: include/classes/api/services/CHostGeneral.php:1030
 #: include/classes/api/services/CHost.php:770
 #: include/classes/api/services/CHost.php:1551
 #: include/classes/api/services/CHost.php:1557
@@ -8626,40 +8630,36 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:517
 #: include/classes/api/services/CItemGeneral.php:523
 #: include/classes/api/services/CItemGeneral.php:536
-#: include/classes/api/services/CItemGeneral.php:1201
-#: include/classes/api/services/CItemGeneral.php:1207
-#: include/classes/api/services/CItemGeneral.php:1223
-#: include/classes/api/services/CItemGeneral.php:1232
-#: include/classes/api/services/CItemGeneral.php:1254
-#: include/classes/api/services/CItemGeneral.php:1268
-#: include/classes/api/services/CItemGeneral.php:1275
-#: include/classes/api/services/CItemGeneral.php:1281
-#: include/classes/api/services/CItemGeneral.php:1294
-#: include/classes/api/services/CItemGeneral.php:1305
-#: include/classes/api/services/CItemGeneral.php:1315
-#: include/classes/api/services/CItemGeneral.php:1322
-#: include/classes/api/services/CItemGeneral.php:1340
-#: include/classes/api/services/CItemGeneral.php:1363
+#: include/classes/api/services/CItemGeneral.php:1292
+#: include/classes/api/services/CItemGeneral.php:1298
+#: include/classes/api/services/CItemGeneral.php:1314
+#: include/classes/api/services/CItemGeneral.php:1323
+#: include/classes/api/services/CItemGeneral.php:1345
+#: include/classes/api/services/CItemGeneral.php:1359
+#: include/classes/api/services/CItemGeneral.php:1366
+#: include/classes/api/services/CItemGeneral.php:1372
+#: include/classes/api/services/CItemGeneral.php:1385
+#: include/classes/api/services/CItemGeneral.php:1396
+#: include/classes/api/services/CItemGeneral.php:1406
 #: include/classes/api/services/CItemGeneral.php:1413
-#: include/classes/api/services/CItemGeneral.php:1426
-#: include/classes/api/services/CItemGeneral.php:1439
+#: include/classes/api/services/CItemGeneral.php:1431
 #: include/classes/api/services/CItemGeneral.php:1454
-#: include/classes/api/services/CItemGeneral.php:1464
-#: include/classes/api/services/CItemGeneral.php:1688
-#: include/classes/api/services/CItemGeneral.php:1729
-#: include/classes/api/services/CItemGeneral.php:1735
-#: include/classes/api/services/CItemGeneral.php:1752
-#: include/classes/api/services/CItemGeneral.php:1759
-#: include/classes/api/services/CItemGeneral.php:1765
-#: include/classes/api/services/CItemGeneral.php:1850
-#: include/classes/api/services/CItemGeneral.php:1859
-#: include/classes/api/services/CItemGeneral.php:1972
-#: include/classes/api/services/CItemGeneral.php:1979
-#: include/classes/api/services/CItemGeneral.php:2145
-#: include/classes/api/services/CItem.php:774
-#: include/classes/api/services/CItem.php:782
-#: include/classes/api/services/CItemPrototype.php:944
-#: include/classes/api/services/CItemPrototype.php:952
+#: include/classes/api/services/CItemGeneral.php:1504
+#: include/classes/api/services/CItemGeneral.php:1517
+#: include/classes/api/services/CItemGeneral.php:1530
+#: include/classes/api/services/CItemGeneral.php:1545
+#: include/classes/api/services/CItemGeneral.php:1555
+#: include/classes/api/services/CItemGeneral.php:1788
+#: include/classes/api/services/CItemGeneral.php:1808
+#: include/classes/api/services/CItemGeneral.php:1815
+#: include/classes/api/services/CItemGeneral.php:1825
+#: include/classes/api/services/CItemGeneral.php:1905
+#: include/classes/api/services/CItemGeneral.php:1919
+#: include/classes/api/services/CItemGeneral.php:2086
+#: include/classes/api/services/CItem.php:772
+#: include/classes/api/services/CItem.php:780
+#: include/classes/api/services/CItemPrototype.php:943
+#: include/classes/api/services/CItemPrototype.php:951
 #: include/classes/api/services/CMaintenance.php:468
 #: include/classes/api/services/CMaintenance.php:637
 #: include/classes/api/services/CMapElement.php:74
@@ -9075,11 +9075,11 @@ msgstr "Άκυρος αριθμός παραμέτρων."
 #: include/classes/api/services/CDiscoveryRule.php:1409
 #: include/classes/api/services/CDiscoveryRule.php:1427
 #: include/classes/api/services/CDiscoveryRule.php:1435
-#: include/classes/api/services/CItemGeneral.php:2161
-#: include/classes/api/services/CItemGeneral.php:2168
-#: include/classes/api/services/CItemGeneral.php:2176
-#: include/classes/api/services/CItemGeneral.php:2185
-#: include/classes/api/services/CItemGeneral.php:2192
+#: include/classes/api/services/CItemGeneral.php:2102
+#: include/classes/api/services/CItemGeneral.php:2109
+#: include/classes/api/services/CItemGeneral.php:2117
+#: include/classes/api/services/CItemGeneral.php:2126
+#: include/classes/api/services/CItemGeneral.php:2133
 #: include/classes/api/services/CUser.php:649
 #: include/classes/api/services/CUser.php:660
 #: include/classes/validators/CApiInputValidator.php:234
@@ -9293,7 +9293,7 @@ msgstr "Ο συλλέκτης \"%1$s\" υπάρχει ήδη σε \"%2$s\", κλ
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
 msgstr "Συλλέκτης \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
 
-#: include/classes/api/services/CItem.php:954
+#: include/classes/api/services/CItem.php:891
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Ο συλλέκτης \"%1$s\" δεν συμπληρώνει ελλιπές πεδίο απογραφής ξενιστή \"%2$d\". Επιλογές: απο 0 (μήν συμπληρώνεις) έως %3$d."
@@ -9303,8 +9303,8 @@ msgstr "Ο συλλέκτης \"%1$s\" δεν συμπληρώνει ελλιπ�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Συλλέκτης \"%1$s\" δέν υπάρχει σε σχεδιότυπο \"%2$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1703
-#: include/classes/api/services/CItemGeneral.php:1689
+#: include/classes/api/services/CDiscoveryRule.php:1652
+#: include/classes/api/services/CItemGeneral.php:1789
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr ""
@@ -9362,7 +9362,7 @@ msgstr "Συλλέκτης σε \"ανυποστήρικτη\" κατάστασ�
 msgid "Item not selected"
 msgstr "Συλλέκτης μή επιλεγμένος"
 
-#: include/classes/api/services/CItemGeneral.php:1191
+#: include/classes/api/services/CItemGeneral.php:1282
 #, c-format
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr ""
@@ -9381,7 +9381,7 @@ msgstr "Πρωτότυπος συλλέκτης"
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Πρωτότυπος συλλέκτης \"%1$s\" υπάρχει ήδη σε \"%2$s\", κληρονομημένος από άλλο σχεδιότυπο."
 
-#: include/classes/api/services/CItemGeneral.php:1006
+#: include/classes/api/services/CItemGeneral.php:1040
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", linked to another rule."
 msgstr ""
@@ -9462,32 +9462,32 @@ msgstr ""
 msgid "Item with ID \"%1$s\" is not available."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:721
+#: include/classes/api/services/CItemGeneral.php:668
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως κανόνας εντοπισμού."
 
-#: include/classes/api/services/CItemGeneral.php:727
+#: include/classes/api/services/CItemGeneral.php:674
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως συλλέκτης δημιουργηθείς απο πρωτότυπο συλλέκτη."
 
-#: include/classes/api/services/CItemGeneral.php:724
+#: include/classes/api/services/CItemGeneral.php:671
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως πρωτότυπος συλλέκτης."
 
-#: include/classes/api/services/CItemGeneral.php:718
+#: include/classes/api/services/CItemGeneral.php:665
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως συλλέκτης."
 
-#: include/classes/api/services/CItemGeneral.php:730
+#: include/classes/api/services/CItemGeneral.php:677
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως άγνωστο στοιχείο συλλέκτη."
 
-#: include/classes/api/services/CItemGeneral.php:1581
+#: include/classes/api/services/CItemGeneral.php:1672
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
@@ -10095,6 +10095,7 @@ msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "Κανόνας εντοπισμού χαμηλού επιπέδου σε \"ανυποστήρικτη\" κατάσταση"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
+#: include/classes/html/svg/CSvgGraphXAxis.php:424
 msgid "M"
 msgstr ""
 
@@ -11505,8 +11506,8 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/api/services/CItemGeneral.php:209
 #: include/classes/api/services/CItemGeneral.php:311
 #: include/classes/api/services/CItemGeneral.php:326
-#: include/classes/api/services/CItem.php:699
-#: include/classes/api/services/CItemPrototype.php:869
+#: include/classes/api/services/CItem.php:697
+#: include/classes/api/services/CItemPrototype.php:868
 #: include/classes/api/services/CMaintenance.php:263
 #: include/classes/api/services/CMaintenance.php:292
 #: include/classes/api/services/CMaintenance.php:305
@@ -12095,7 +12096,7 @@ msgstr ""
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Απαριθμώνται μόνο συλλέκτες εκχωρημένοι σε ενεργούς ξενιστές"
 
-#: include/classes/api/services/CItemGeneral.php:1369
+#: include/classes/api/services/CItemGeneral.php:1460
 msgid "Only one change step is allowed."
 msgstr ""
 
@@ -12103,8 +12104,8 @@ msgstr ""
 msgid "Only one check can be unique."
 msgstr "Μόνο ένας έλεγχος μπορεί να είναι μοναδικός."
 
-#: include/classes/api/services/CItemGeneral.php:1346
-#: include/classes/api/services/CItemGeneral.php:1391
+#: include/classes/api/services/CItemGeneral.php:1437
+#: include/classes/api/services/CItemGeneral.php:1482
 msgid "Only one throttling step is allowed."
 msgstr ""
 
@@ -12540,7 +12541,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:963
+#: include/classes/graph/CSvgGraph.php:933
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -13236,7 +13237,7 @@ msgid "Queue of items to be updated"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:959
+#: include/classes/graph/CSvgGraph.php:929
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:956
 #: include/classes/screens/CScreenProblem.php:1122 include/events.inc.php:345
@@ -15599,7 +15600,7 @@ msgstr "Το σχεδιότυπο \"%1$s\" υπάρχει ήδη."
 
 #: include/classes/api/services/CHostGroup.php:1471
 #: include/classes/api/services/CTemplate.php:368
-#: include/classes/api/services/CTemplate.php:988
+#: include/classes/api/services/CTemplate.php:986
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr ""
@@ -15659,7 +15660,7 @@ msgstr "Το σχεδιότυπο ενημερώθηκε"
 msgid "Template value"
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:1043
+#: include/classes/api/services/CTemplate.php:1041
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Σχεδιότυπο με ίδιο όνομα \"%1$s\" υπάρχει ήδη."
@@ -15671,7 +15672,7 @@ msgid "Template with the same name \"%s\" already exists."
 msgstr "Το σχεδιότυπο με ίδιο όνομα \"%s\" υπάρχει ήδη."
 
 #: include/classes/api/services/CTemplate.php:447
-#: include/classes/api/services/CTemplate.php:1008
+#: include/classes/api/services/CTemplate.php:1006
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Σχεδιότυπο με ίδιο ορατό όνομα \"%1$s\" υπάρχει ήδη."
@@ -16388,7 +16389,7 @@ msgstr "Τρίτη"
 msgid "Turkish (tr_TR)"
 msgstr "Τουρκικά (tr_TR)"
 
-#: include/classes/api/services/CItem.php:1015
+#: include/classes/api/services/CItem.php:952
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Δύο συλλέκτες (\"%1$s\" και \"%2$s\") δεν μπορούν να συμπληρώσουν ίδιο πεδίο απογραφής ξενιστή \"%3$s\", αυτό θα οδηγούσε σε σύγκρουση."
@@ -16713,42 +16714,42 @@ msgstr "Αποσύνδεση από σχεδιότυπο"
 msgid "Unlink from templates"
 msgstr "Αποσύνδεση από σχεδιότυπα"
 
-#: include/classes/api/services/CHostGeneral.php:630
+#: include/classes/api/services/CHostGeneral.php:626
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Κατηγορία \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:376
+#: include/classes/api/services/CHostGeneral.php:372
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Κανόνας εντοπισμού \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:533
+#: include/classes/api/services/CHostGeneral.php:529
 #, c-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Γράφημα \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:517
+#: include/classes/api/services/CHostGeneral.php:513
 #, c-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Πρωτότυπο γράφημα \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:466
+#: include/classes/api/services/CHostGeneral.php:462
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Πρωτότυπος ξενιστής \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:392
+#: include/classes/api/services/CHostGeneral.php:388
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Συλλέκτης \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:411
+#: include/classes/api/services/CHostGeneral.php:407
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Πρωτότυπος συλλέκτης \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:572
+#: include/classes/api/services/CHostGeneral.php:568
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Σενάριο ιστού \"%1$s\" σε \"%2$s\"."
@@ -17912,7 +17913,7 @@ msgstr ""
 msgid "XML data"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2222
+#: include/classes/api/services/CItemGeneral.php:2163
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
 msgstr ""
@@ -18068,8 +18069,8 @@ msgstr "Δεν καθορίσατε στόχους για γενική δέσμ�
 #: include/classes/api/services/CTemplate.php:388
 #: include/classes/api/services/CTemplate.php:529
 #: include/classes/api/services/CTemplate.php:561
-#: include/classes/api/services/CTemplate.php:980
-#: include/classes/api/services/CTemplate.php:1085
+#: include/classes/api/services/CTemplate.php:978
+#: include/classes/api/services/CTemplate.php:1083
 #: include/classes/api/services/CUserMacro.php:266
 #: include/classes/api/services/CUserMacro.php:350
 #: include/classes/api/services/CUserMacro.php:443
@@ -18263,9 +18264,9 @@ msgid "a number is too large"
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:320
-#: include/classes/api/services/CItemGeneral.php:1233
-#: include/classes/api/services/CItemGeneral.php:1306
-#: include/classes/api/services/CItemGeneral.php:1316
+#: include/classes/api/services/CItemGeneral.php:1324
+#: include/classes/api/services/CItemGeneral.php:1397
+#: include/classes/api/services/CItemGeneral.php:1407
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
 msgstr ""
@@ -18334,8 +18335,8 @@ msgstr "όλα τα μέσα"
 
 #: include/classes/api/services/CDRule.php:463
 #: include/classes/api/services/CDRule.php:470
-#: include/classes/api/services/CItemGeneral.php:2161
-#: include/classes/api/services/CItemGeneral.php:2185
+#: include/classes/api/services/CItemGeneral.php:2102
+#: include/classes/api/services/CItemGeneral.php:2126
 #: include/classes/import/validators/CXmlValidatorGeneral.php:207
 #: include/classes/validators/CApiInputValidator.php:374
 #: include/classes/validators/CApiInputValidator.php:512
@@ -18460,12 +18461,12 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:512
 #: include/classes/api/services/CItemGeneral.php:518
 #: include/classes/api/services/CItemGeneral.php:524
-#: include/classes/api/services/CItemGeneral.php:1201
-#: include/classes/api/services/CItemGeneral.php:1223
-#: include/classes/api/services/CItemGeneral.php:1254
-#: include/classes/api/services/CItemGeneral.php:1268
-#: include/classes/api/services/CItemGeneral.php:1294
-#: include/classes/api/services/CItemGeneral.php:1465
+#: include/classes/api/services/CItemGeneral.php:1292
+#: include/classes/api/services/CItemGeneral.php:1314
+#: include/classes/api/services/CItemGeneral.php:1345
+#: include/classes/api/services/CItemGeneral.php:1359
+#: include/classes/api/services/CItemGeneral.php:1385
+#: include/classes/api/services/CItemGeneral.php:1556
 #: include/classes/api/services/CMapElement.php:95
 #: include/classes/api/services/CMapElement.php:114
 #: include/classes/api/services/CMapElement.php:152
@@ -18498,7 +18499,7 @@ msgstr ""
 msgid "cannot be empty"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2177
+#: include/classes/api/services/CItemGeneral.php:2118
 msgid "cannot convert to JSON, result value too long"
 msgstr ""
 
@@ -18519,10 +18520,7 @@ msgstr ""
 msgid "check expression starting from \"%1$s\""
 msgstr "έλεγχος έκφρασης κινουμένη από \"%1$s\""
 
-#: include/classes/api/services/CHostGeneral.php:1024
-#: include/classes/api/services/CItemGeneral.php:1730
-#: include/classes/api/services/CItemGeneral.php:1736
-#: include/classes/api/services/CItemGeneral.php:1973
+#: include/classes/api/services/CItemGeneral.php:1826
 #: include/classes/import/CConfigurationImport.php:2619
 msgid "circular item dependency is not allowed"
 msgstr ""
@@ -18661,7 +18659,7 @@ msgstr ""
 msgid "first"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1276
+#: include/classes/api/services/CItemGeneral.php:1367
 msgid "first parameter is expected"
 msgstr ""
 
@@ -18721,7 +18719,7 @@ msgstr ""
 msgid "host pattern"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1753
+#: include/classes/api/services/CItemGeneral.php:1809
 msgid "hostid of dependent item and master item should match"
 msgstr ""
 
@@ -18883,6 +18881,9 @@ msgstr "μ"
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
 #: include/classes/graphdraw/CLineGraphDraw.php:1389
 #: include/classes/graphdraw/CLineGraphDraw.php:1396
+#: include/classes/html/svg/CSvgGraphXAxis.php:424
+#: include/classes/html/svg/CSvgGraphXAxis.php:432
+#: include/classes/html/svg/CSvgGraphXAxis.php:439
 msgid "m-d"
 msgstr ""
 
@@ -18909,7 +18910,7 @@ msgstr "χάρτης"
 msgid "matches"
 msgstr "ταιριάσματα"
 
-#: include/classes/api/services/CItemGeneral.php:1324
+#: include/classes/api/services/CItemGeneral.php:1415
 #: include/classes/graphdraw/CLineGraphDraw.php:1853
 #: include/classes/graphdraw/CLineGraphDraw.php:1867
 #: include/classes/graphdraw/CPieGraphDraw.php:326 include/graphs.inc.php:80
@@ -18925,20 +18926,17 @@ msgstr "μεγ."
 msgid "max() - Maximum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1851
+#: include/classes/api/services/CItemGeneral.php:1920
 msgid "maximum dependent items count reached"
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:1031
-#: include/classes/api/services/CItemGeneral.php:1766
-#: include/classes/api/services/CItemGeneral.php:1860
-#: include/classes/api/services/CItemGeneral.php:1980
+#: include/classes/api/services/CItemGeneral.php:1906
 #: include/classes/import/CConfigurationImport.php:2573
 #: include/classes/import/CConfigurationImport.php:2634
 msgid "maximum number of dependency levels reached"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1324
+#: include/classes/api/services/CItemGeneral.php:1415
 #: include/classes/graphdraw/CLineGraphDraw.php:1851
 #: include/classes/graphdraw/CLineGraphDraw.php:1864
 #: include/classes/graphdraw/CPieGraphDraw.php:322 include/graphs.inc.php:78
@@ -19031,8 +19029,8 @@ msgstr ""
 msgid "none"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2168
-#: include/classes/api/services/CItemGeneral.php:2192
+#: include/classes/api/services/CItemGeneral.php:2109
+#: include/classes/api/services/CItemGeneral.php:2133
 msgid "nonempty key and value pair expected"
 msgstr ""
 
@@ -19195,7 +19193,7 @@ msgstr ""
 msgid "root"
 msgstr "root"
 
-#: include/classes/api/services/CItemGeneral.php:1760
+#: include/classes/api/services/CItemGeneral.php:1816
 msgid "ruleid of dependent item and master item should match"
 msgstr ""
 
@@ -19209,7 +19207,7 @@ msgctxt "adjective"
 msgid "second"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1282
+#: include/classes/api/services/CItemGeneral.php:1373
 msgid "second parameter is expected"
 msgstr ""
 
@@ -19235,11 +19233,11 @@ msgstr "σύντομη περιγραφή"
 #: include/classes/api/services/CHttpTest.php:1076
 #: include/classes/api/services/CItemGeneral.php:499
 #: include/classes/api/services/CItemGeneral.php:537
-#: include/classes/api/services/CItemGeneral.php:1340
-#: include/classes/api/services/CItemGeneral.php:1363
-#: include/classes/api/services/CItemGeneral.php:1427
-#: include/classes/api/services/CItemGeneral.php:1455
-#: include/classes/api/services/CItemGeneral.php:2145
+#: include/classes/api/services/CItemGeneral.php:1431
+#: include/classes/api/services/CItemGeneral.php:1454
+#: include/classes/api/services/CItemGeneral.php:1518
+#: include/classes/api/services/CItemGeneral.php:1546
+#: include/classes/api/services/CItemGeneral.php:2086
 #: include/classes/api/services/CMaintenance.php:468
 #: include/classes/api/services/CMaintenance.php:637
 #: include/classes/api/services/CProxy.php:661
@@ -19405,9 +19403,9 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:905
 #: include/classes/api/services/CHost.php:1552
 #: include/classes/api/services/CHost.php:1558
-#: include/classes/api/services/CItemGeneral.php:1208
-#: include/classes/api/services/CItemGeneral.php:1414
-#: include/classes/api/services/CItemGeneral.php:1440
+#: include/classes/api/services/CItemGeneral.php:1299
+#: include/classes/api/services/CItemGeneral.php:1505
+#: include/classes/api/services/CItemGeneral.php:1531
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
 #: include/classes/api/services/CTriggerGeneral.php:574

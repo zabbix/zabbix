@@ -1,6 +1,7 @@
 Changes for 4.2.0alpha3
 
 New features:
+..F....... [ZBXNEXT-4872] reworked SVG graph x-axis timeline (miks)
 A.F.I...S. [ZBXNEXT-4877] implemented support for custom JSON path in LLD macros (Ivo, vso)
 ..F....... [ZBXNEXT-1190] implemented item prototype mass update and combined adding, updating and removing of applications in single control in item mass update form (Ivo)
 A......... [ZBXNEXT-4933] dropped support of "elementid" in map.create() and map.update() methods (Sasha)
@@ -8,6 +9,10 @@ A......... [ZBXNEXT-4933] dropped support of string format for "headers" and "va
 ..F....... [ZBXNEXT-4873] implemented single dot datasets to be drawn as points in line vector graphs (miks)
 
 Bug fixes:
+A......... [ZBX-13335] fixed low performance with linkage of items and item prototypes to a lot of hosts (Sasha)
+..F....... [ZBX-15435] fixed "Undefined index" errors in the "Problems" widget with multiple active maintenances which part of these are inaccessible (Sasha)
+.......PS. [ZBX-15417] changed vmware collector to perform datastore configuration refresh only when directly monitoring ESXi version lower than v6.0 (MVekslers)
+A......... [ZBX-14896] fixed low performance of the SQL statement when link template to many hosts (Sasha)
 A......... [ZBX-15220] fixed displaying of last value for values received in the same second (Sasha)
 ........S. [ZBX-15451] fixed event correlation when "Event tag pair" condition is used and tag contains special characters (asitals)
 ........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
@@ -18,6 +23,7 @@ A......... [ZBX-15220] fixed displaying of last value for values received in the
 ...G...PS. [ZBX-11761] added warnings in case of TLS identity mismatch (akozlovs)
 A......... [ZBX-15373] fixed removal of trigger when deleting discovered item; fixed removal of dependent child items when removing master item (vmurzins)
 A......... [ZBX-14613] fixed hostgroup.delete and host.delete API methods to validate maintenance constraint (talbergs)
+..F....... [ZBX-14863] fixed authentication settings form of LDAP anonymous binding (gcalenko)
 ..F....... [ZBX-15374] fixed SQL and PHP errors on chart3.php page (Sasha)
 ...G...... [ZBX-15301] fixed monotonous lag behind in Windows "system.localtime" (MVekslers)
 ..F....... [ZBX-15377] fixed error messages for arrays in GET parameters (Sasha)
@@ -104,10 +110,15 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.4rc1
 
 New features:
+..F....... [ZBXNEXT-4872] reworked SVG graph x-axis timeline (miks)
 ..F....... [ZBXNEXT-4873] implemented single dot datasets to be drawn as points in line vector graphs (miks)
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+A......... [ZBX-13335] fixed low performance with linkage of items and item prototypes to a lot of hosts (Sasha)
+..F....... [ZBX-15435] fixed "Undefined index" errors in the "Problems" widget with multiple active maintenances which part of these are inaccessible (Sasha)
+.......PS. [ZBX-15417] changed vmware collector to perform datastore configuration refresh only when directly monitoring ESXi version lower than v6.0 (MVekslers)
+A......... [ZBX-14896] fixed low performance of the SQL statement when link template to many hosts (Sasha)
 A......... [ZBX-15220] fixed displaying of last value for values received in the same second (Sasha)
 ........S. [ZBX-15451] fixed event correlation when "Event tag pair" condition is used and tag contains special characters (asitals)
 ........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
@@ -2278,8 +2289,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 
 --------------------------------------------------------------------------------
 Changes for 3.0.25rc1
-
-New features:
 
 Bug fixes:
 A......... [ZBX-15220] fixed displaying of last value for values received in the same second (Sasha)
