@@ -925,12 +925,11 @@ out:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	send_internal_stats_json(zbx_socket_t *sock, struct zbx_json_parse *jp)
+static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "send_internal_stats_json";
 	struct zbx_json		json;
-	struct zbx_json_parse	jp_data;
-	char			type[MAX_STRING_LEN], *error = NULL;
+	char			type[MAX_STRING_LEN], error[MAX_STRING_LEN];
 	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -940,57 +939,46 @@ static int	send_internal_stats_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming stats request: %s",
 				NULL == CONFIG_STATS_ALLOWED_IP ? "StatsAllowedIP not set" : zbx_socket_strerror());
-		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
+		strscpy(error, "Permission denied.");
 		goto out;
 	}
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)) &&
-			0 == strcmp(type, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE) &&
-			SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_PARAMS, &jp_data))
+			0 == strcmp(type, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
 	{
-		char	from_str[ZBX_MAX_UINT64_LEN + 1], to_str[ZBX_MAX_UINT64_LEN + 1];
-		int	from, to;
+		char			from_str[ZBX_MAX_UINT64_LEN + 1], to_str[ZBX_MAX_UINT64_LEN + 1];
+		int			from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
+		struct zbx_json_parse	jp_data;
 
-		if (NULL != zbx_json_pair_by_name(&jp_data, ZBX_PROTO_TAG_FROM))
+		if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_PARAMS, &jp_data))
 		{
-			zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_FROM, from_str, sizeof(from_str));
-
-			if (FAIL == is_time_suffix(from_str, &from, ZBX_LENGTH_UNLIMITED))
+			if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_FROM, from_str, sizeof(from_str))
+					&& FAIL == is_time_suffix(from_str, &from, ZBX_LENGTH_UNLIMITED))
 			{
-				error = zbx_dsprintf(error, "Failed to parse stats request tag: %s.",
+				zbx_snprintf(error, sizeof(error), "Failed to parse stats request tag: %s.",
 						ZBX_PROTO_TAG_FROM);
 				goto param_error;
 			}
-		}
-		else
-			from = ZBX_QUEUE_FROM_DEFAULT;
 
-		if (NULL != zbx_json_pair_by_name(&jp_data, ZBX_PROTO_TAG_TO))
-		{
-			zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_TO, to_str, sizeof(to_str));
-
-			if (FAIL == is_time_suffix(to_str, &to, ZBX_LENGTH_UNLIMITED))
+			if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_TO, to_str, sizeof(to_str)) &&
+					FAIL == is_time_suffix(to_str, &to, ZBX_LENGTH_UNLIMITED))
 			{
-				error = zbx_dsprintf(error, "Failed to parse stats request tag: %s.",
+				zbx_snprintf(error, sizeof(error), "Failed to parse stats request tag: %s.",
 						ZBX_PROTO_TAG_TO);
 				goto param_error;
 			}
-		}
-		else
-			to = ZBX_QUEUE_TO_INFINITY;
 
-		if (ZBX_QUEUE_TO_INFINITY != to && from > to)
-		{
-			error = zbx_strdup(error, "Stats request tag parameters represent an invalid interval.");
-			goto param_error;
+			if (ZBX_QUEUE_TO_INFINITY != to && from > to)
+			{
+				strscpy(error, "Stats request tag parameters represent an invalid interval.");
+				goto param_error;
+			}
 		}
 
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
-				ZBX_JSON_TYPE_STRING);
-		zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
-				DCget_item_queue(NULL, from, to));
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+		zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE, DCget_item_queue(NULL, from, to));
 	}
 	else
 	{
@@ -1002,22 +990,14 @@ static int	send_internal_stats_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		zbx_json_close(&json);
 	}
 
+	(void)zbx_tcp_send(sock, json.buffer);
 	ret = SUCCEED;
 param_error:
-	if (SUCCEED != ret)
-	{
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, (NULL != error ? error : "Unknown error."),
-						ZBX_JSON_TYPE_STRING);
-	}
-
-	(void)zbx_tcp_send(sock, json.buffer);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
-
 	zbx_json_free(&json);
-	zbx_free(error);
 out:
+	if (SUCCEED != ret)
+		zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
