@@ -257,6 +257,7 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function fill($text) {
 		return $this->overwrite($text);
+//		return $this->clear()->type($text);
 	}
 
 	/**
