@@ -91,6 +91,13 @@ static int	DBpatch_4010007(void)
 	return DBadd_foreign_key("lld_macro_path", 1, &field);
 }
 
+static int	DBpatch_4010008(void)
+{
+	const ZBX_FIELD	field = {"db_extension", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 #endif
 
 DBPATCH_START(4010)
@@ -104,5 +111,6 @@ DBPATCH_ADD(4010004, 0, 1)
 DBPATCH_ADD(4010005, 0, 1)
 DBPATCH_ADD(4010006, 0, 1)
 DBPATCH_ADD(4010007, 0, 1)
+DBPATCH_ADD(4010008, 0, 1)
 
 DBPATCH_END()

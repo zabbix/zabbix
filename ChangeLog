@@ -1,6 +1,7 @@
 Changes for 4.2.0alpha3
 
 New features:
+....I...S. [ZBXNEXT-4868] added TimescaleDB support (kalimulin)
 ..F....... [ZBXNEXT-4872] reworked SVG graph x-axis timeline (miks)
 A.F.I...S. [ZBXNEXT-4877] implemented support for custom JSON path in LLD macros (Ivo, vso)
 ..F....... [ZBXNEXT-1190] implemented item prototype mass update and combined adding, updating and removing of applications in single control in item mass update form (Ivo)
