@@ -85,7 +85,6 @@ zbx_hash_t	zbx_hash_lookup2(const void *data, size_t len, zbx_hash_t seed)
 		case 2:		a = a + ((zbx_hash_t)p[1] << 8);
 			ZBX_FALLTHROUGH;
 		case 1:		a = a + p[0];
-			ZBX_FALLTHROUGH;
 	}
 
 	mix(a, b, c);
@@ -160,7 +159,6 @@ zbx_hash_t	zbx_hash_murmur2(const void *data, size_t len, zbx_hash_t seed)
 			ZBX_FALLTHROUGH;
 		case 1: hash ^= p[0];
 			hash *= m;
-			ZBX_FALLTHROUGH;
 	}
 
 	hash ^= hash >> 13;
