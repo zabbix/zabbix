@@ -130,7 +130,7 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
  *             result - [OUT] check result                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESULT *result)
+int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESULT *result)
 {
 	struct zbx_json	json;
 
@@ -140,6 +140,8 @@ void	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESU
 	get_remote_zabbix_stats(&json, ip, port, result);
 
 	zbx_json_free(&json);
+
+	return 0 == ISSET_MSG(result) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -155,7 +157,7 @@ void	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESU
  *             result - [OUT] check result                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,
+int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,
 		AGENT_RESULT *result)
 {
 	struct zbx_json	json;
@@ -176,6 +178,8 @@ void	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, cons
 	get_remote_zabbix_stats(&json, ip, port, result);
 
 	zbx_json_free(&json);
+
+	return 0 == ISSET_MSG(result) ? SUCCEED : FAIL;
 }
 
 int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -204,12 +208,16 @@ int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (3 > request->nparam)
 	{
-		zbx_get_remote_zabbix_stats(ip_str, port_number, result);
+		if (SUCCEED != zbx_get_remote_zabbix_stats(ip_str, port_number, result))
+			return SYSINFO_RET_FAIL;
 	}
 	else if (0 == strcmp((tmp = get_rparam(request, 2)), ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
 	{
-		zbx_get_remote_zabbix_stats_queue(ip_str, port_number, get_rparam(request, 3),
-				get_rparam(request, 4), result);
+		if (SUCCEED != zbx_get_remote_zabbix_stats_queue(ip_str, port_number, get_rparam(request, 3),
+				get_rparam(request, 4), result))
+		{
+			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 	{
@@ -217,8 +225,5 @@ int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (0 != ISSET_MSG(result))
-		return SYSINFO_RET_FAIL;
-	else
-		return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }

@@ -895,8 +895,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 				zbx_json_free(&json);
 			}
-			else
-				zbx_get_remote_zabbix_stats(ip, port_number, result);
+			else if (SUCCEED != zbx_get_remote_zabbix_stats(ip, port_number, result))
+				goto out;
 		}
 		else
 		{
@@ -941,8 +941,11 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 					zbx_json_free(&json);
 				}
-				else
-					zbx_get_remote_zabbix_stats_queue(ip, port_number, tmp, tmp1, result);
+				else if (SUCCEED != zbx_get_remote_zabbix_stats_queue(ip, port_number, tmp, tmp1,
+						result))
+				{
+					goto out;
+				}
 			}
 			else
 			{
@@ -950,9 +953,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				goto out;
 			}
 		}
-
-		if (0 != ISSET_MSG(result))
-			goto out;
 	}
 	else
 	{
