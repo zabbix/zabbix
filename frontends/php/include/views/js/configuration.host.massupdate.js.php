@@ -1,4 +1,4 @@
-<script type="text/x-jquery-tmpl" id="tag-row">
+<script type="text/x-jquery-tmpl" id="tag-row-tmpl">
 	<?= renderTagTableRow('#{rowNum}') ?>
 </script>
 
@@ -13,19 +13,17 @@
 			});
 		<?php endif ?>
 
-		$('#tags-table').dynamicRows({
-			template: '#tag-row'
-		});
+		$('#tags-table').dynamicRows({template: '#tag-row-tmpl'});
 
 		$('#mass_replace_tpls').on('change', function() {
 			$('#mass_clear_tpls').prop('disabled', !this.checked);
 		}).trigger('change');
 
-		$('#inventory_mode').change(function() {
+		$('#inventory_mode').on('change', function() {
 			$('.formrow-inventory').toggle($(this).val() !== '<?php echo HOST_INVENTORY_DISABLED; ?>');
-		}).change();
+		}).trigger('change');
 
-		$('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
+		$('#tls_connect, #tls_in_psk, #tls_in_cert').on('change', function() {
 			// If certificate is selected or checked.
 			if ($('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
 					|| $('#tls_in_cert').is(':checked')) {
@@ -59,7 +57,7 @@
 		$('input[name=tls_connect]').trigger('change');
 
 		// Depending on checkboxes, create a value for hidden field 'tls_accept'.
-		$('#hostForm').submit(function() {
+		$('#hostForm').on('submit', function() {
 			var tls_accept = 0x00;
 
 			if ($('#tls_in_none').is(':checked')) {

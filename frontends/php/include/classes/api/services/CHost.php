@@ -97,11 +97,11 @@ class CHost extends CHostGeneral {
 			'with_graphs'				=> null,
 			'with_applications'			=> null,
 			'withInventory'				=> null,
-			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
-			'tags'						=> null,
 			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
+			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
+			'tags'						=> null,
 			'filter'					=> null,
 			'search'					=> null,
 			'searchInventory'			=> null,
@@ -386,7 +386,7 @@ class CHost extends CHostGeneral {
 		}
 
 		// tags
-		if (is_array($options['tags']) && $options['tags']) {
+		if ($options['tags'] !== null && $options['tags']) {
 			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
 				'host_tag', 'hostid'
 			);
@@ -703,81 +703,9 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		$this->updateTags($hosts, $db_hosts);
+		$this->updateTags($hosts, 'hostid');
 
 		return ['hostids' => $hostids];
-	}
-
-	/**
-	 * Compares input tags with tags stored in the database and performs tag deleting and inserting.
-	 *
-	 * @param array  $hosts
-	 * @param int    $hosts[]['hostid']
-	 * @param array  $hosts[]['tags']
-	 * @param string $hosts[]['tags'][]['tag']
-	 * @param string $hosts[]['tags'][]['value']
-	 * @param array  $db_hosts
-	 * @param int    $db_hosts[<hostid>]
-	 */
-	private function updateTags(array $hosts, array $db_hosts) {
-		$options = [
-			'output' => ['hosttagid', 'hostid', 'tag', 'value'],
-			'filter' => ['hostid' => array_keys($db_hosts)]
-		];
-		$db_tags = DBselect(DB::makeSql('host_tag', $options));
-
-		foreach ($db_hosts as &$db_host) {
-			$db_host['tags'] = [];
-		}
-		unset($db_host);
-
-		while ($db_tag = DBfetch($db_tags)) {
-			$db_host = &$db_hosts[$db_tag['hostid']];
-			$db_host['tags'][] = $db_tag;
-		}
-		unset($db_host);
-
-		$ins_tags = [];
-		$del_hosttagids = [];
-
-		foreach ($hosts as $hnum => $host) {
-			$hostid = $host['hostid'];
-
-			if (!array_key_exists('tags', $host)) {
-				unset($hosts[$hnum], $db_hosts[$hostid]);
-				continue;
-			}
-
-			foreach ($host['tags'] as $tag_num => $tag) {
-				$tag += ['value' => ''];
-
-				foreach ($db_hosts[$hostid]['tags'] as $db_tag_num => $db_tag) {
-					if ($tag['tag'] === $db_tag['tag'] && $tag['value'] === $db_tag['value']) {
-						unset($hosts[$hnum]['tags'][$tag_num], $db_hosts[$hostid]['tags'][$db_tag_num]);
-					}
-				}
-			}
-		}
-
-		foreach ($hosts as $host) {
-			$hostid = $host['hostid'];
-
-			foreach ($host['tags'] as $tag) {
-				$ins_tags[] = ['hostid' => $hostid] + $tag;
-			}
-
-			foreach ($db_hosts[$hostid]['tags'] as $db_tag) {
-				$del_hosttagids[] = $db_tag['hosttagid'];
-			}
-		}
-
-		if ($del_hosttagids) {
-			DB::delete('host_tag', ['hosttagid' => $del_hosttagids]);
-		}
-
-		if ($ins_tags) {
-			DB::insert('host_tag', $ins_tags);
-		}
 	}
 
 	/**

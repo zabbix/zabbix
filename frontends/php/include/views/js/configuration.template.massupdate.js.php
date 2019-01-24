@@ -1,4 +1,4 @@
-<script type="text/x-jquery-tmpl" id="tag-row">
+<script type="text/x-jquery-tmpl" id="tag-row-tmpl">
 	<?= renderTagTableRow('#{rowNum}') ?>
 </script>
 
@@ -13,9 +13,7 @@
 			});
 		<?php endif ?>
 
-		$('#tags-table').dynamicRows({
-			template: '#tag-row'
-		});
+		$('#tags-table').dynamicRows({template: '#tag-row-tmpl'});
 
 		$('#mass_replace_tpls').on('change', function() {
 			$('#mass_clear_tpls').prop('disabled', !this.checked);

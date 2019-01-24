@@ -960,15 +960,73 @@ abstract class CHostGeneral extends CHostBase {
 			unset($host);
 
 			while ($tag = DBfetch($tags)) {
-				$host = &$result[$tag['hostid']];
-
-				unset($tag['hosttagid'], $tag['hostid']);
-				$host['tags'][] = $tag;
+				$result[$tag['hostid']]['tags'][] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value']
+				];
 			}
-			unset($host);
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Compares input tags with tags stored in the database and performs tag deleting and inserting.
+	 *
+	 * @param array  $hosts
+	 * @param int    $hosts[]['hostid']
+	 * @param int    $hosts[]['templateid']
+	 * @param array  $hosts[]['tags']
+	 * @param string $hosts[]['tags'][]['tag']
+	 * @param string $hosts[]['tags'][]['value']
+	 * @param string $id_field
+	 */
+	protected function updateTags(array $hosts, $id_field) {
+		$db_hosts = [];
+		$ins_tags = [];
+		$del_hosttagids = [];
+
+		$options = [
+			'output' => ['hosttagid', 'hostid', 'tag', 'value'],
+			'filter' => ['hostid' => zbx_objectValues($hosts, $id_field)]
+		];
+
+		$db_tags = DBselect(DB::makeSql('host_tag', $options));
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$db_hosts[$db_tag['hostid']]['tags'][] = $db_tag;
+			$del_hosttagids[$db_tag['hosttagid']] = true;
+		}
+
+		foreach ($hosts as $host) {
+			if (array_key_exists('tags', $host)) {
+				foreach ($host['tags'] as $tag) {
+					$tag += ['value' => ''];
+
+					if (array_key_exists($host[$id_field], $db_hosts)) {
+						foreach ($db_hosts[$host[$id_field]]['tags'] as $db_tag) {
+							if ($tag['tag'] === $db_tag['tag'] && $tag['value'] === $db_tag['value']) {
+								unset($del_hosttagids[$db_tag['hosttagid']]);
+								$tag = null;
+								break;
+							}
+						}
+					}
+
+					if ($tag !== null) {
+						$ins_tags[] = ['hostid' => $host[$id_field]] + $tag;
+					}
+				}
+			}
+		}
+
+		if ($del_hosttagids) {
+			DB::delete('host_tag', ['hosttagid' => array_keys($del_hosttagids)]);
+		}
+
+		if ($ins_tags) {
+			DB::insert('host_tag', $ins_tags);
+		}
 	}
 
 	/**

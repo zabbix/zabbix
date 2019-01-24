@@ -1,12 +1,10 @@
-<script type="text/x-jquery-tmpl" id="tag-row">
+<script type="text/x-jquery-tmpl" id="tag-row-tmpl">
 	<?= renderTagTableRow('#{rowNum}') ?>
 </script>
 
 <script type="text/javascript">
 	jQuery(function($) {
-		$('#tags-table').dynamicRows({
-			template: '#tag-row'
-		});
+		$('#tags-table').dynamicRows({template: '#tag-row-tmpl'});
 	});
 
 	/**

@@ -1,4 +1,4 @@
-<script type="text/x-jquery-tmpl" id="filter-tag-row">
+<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
 	<?= (new CRow([
 			(new CTextBox('filter_tags[#{rowNum}][tag]'))
 				->setAttribute('placeholder', _('tag'))
@@ -20,13 +20,12 @@
 			->toString()
 	?>
 </script>
+
 <script type="text/javascript">
 	jQuery(function($) {
-		$('#filter-tags').dynamicRows({
-			template: '#filter-tag-row'
-		});
+		$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
 
-		$('#filter_monitored_by').change(function() {
+		$('#filter_monitored_by').on('change', function() {
 			var filter_monitored_by = $('input[name=filter_monitored_by]:checked').val();
 
 			if (filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY ?>) {

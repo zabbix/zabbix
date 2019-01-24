@@ -627,7 +627,9 @@ else {
 
 		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
-				'templates.php?form=update&templateid='.$template['templateid']
+				(new CUrl('templates.php'))
+					->setArgument('form','update')
+					->setArgument('templateid', $template['templateid'])
 			))->setTarget('_blank');
 		}
 		else {

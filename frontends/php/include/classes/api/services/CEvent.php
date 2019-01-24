@@ -425,7 +425,7 @@ class CEvent extends CApiService {
 		}
 
 		// tags
-		if ($options['tags']) {
+		if ($options['tags'] !== null && $options['tags']) {
 			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'e',
 				'event_tag', 'eventid'
 			);

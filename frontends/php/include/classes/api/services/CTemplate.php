@@ -69,11 +69,11 @@ class CTemplate extends CHostGeneral {
 			'with_triggers'				=> null,
 			'with_graphs'				=> null,
 			'with_httptests'			=> null,
-			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
-			'tags'						=> null,
 			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
+			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
+			'tags'						=> null,
 			'filter'					=> null,
 			'search'					=> '',
 			'searchByAny'				=> null,
@@ -240,7 +240,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		// tags
-		if (is_array($options['tags']) && $options['tags']) {
+		if ($options['tags'] !== null && $options['tags']) {
 			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
 				'host_tag', 'hostid'
 			);
@@ -536,81 +536,9 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		$this->updateTags($templates);
+		$this->updateTags($templates, 'templateid');
 
 		return ['templateids' => zbx_objectValues($templates, 'templateid')];
-	}
-
-	/**
-	 * Compares input tags with tags stored in the database and performs tag deleting and inserting.
-	 *
-	 * @param array  $templates
-	 * @param int    $templates[]['templateid']
-	 * @param array  $templates[]['tags']
-	 * @param string $templates[]['tags'][]['tag']
-	 * @param string $templates[]['tags'][]['value']
-	 */
-	private function updateTags(array $templates) {
-		$options = [
-			'output' => ['hosttagid', 'hostid', 'tag', 'value'],
-			'filter' => ['hostid' => zbx_objectValues($templates, 'templateid')]
-		];
-		$db_tags = DBselect(DB::makeSql('host_tag', $options));
-
-		$db_templates = [];
-		while ($db_tag = DBfetch($db_tags)) {
-			$db_templates[$db_tag['hostid']]['tags'][] = $db_tag;
-		}
-
-		$ins_tags = [];
-		$del_hosttagids = [];
-
-		foreach ($templates as $tnum => $template) {
-			$templateid = $template['templateid'];
-
-			if (!array_key_exists('tags', $template)) {
-				unset($templates[$tnum], $db_templates[$templateid]);
-				continue;
-			}
-
-			if (!array_key_exists($templateid, $db_templates)) {
-				continue;
-			}
-
-			foreach ($template['tags'] as $tag_num => $tag) {
-				$tag += ['value' => ''];
-
-				foreach ($db_templates[$templateid]['tags'] as $db_tag_num => $db_tag) {
-					if ($tag['tag'] === $db_tag['tag'] && $tag['value'] === $db_tag['value']) {
-						unset($templates[$tnum]['tags'][$tag_num], $db_templates[$templateid]['tags'][$db_tag_num]);
-					}
-				}
-			}
-		}
-
-		foreach ($templates as $template) {
-			$templateid = $template['templateid'];
-
-			foreach ($template['tags'] as $tag) {
-				$ins_tags[] = ['hostid' => $templateid] + $tag;
-			}
-
-			if (!array_key_exists($templateid, $db_templates)) {
-				continue;
-			}
-
-			foreach ($db_templates[$templateid]['tags'] as $db_tag) {
-				$del_hosttagids[] = $db_tag['hosttagid'];
-			}
-		}
-
-		if ($del_hosttagids) {
-			DB::delete('host_tag', ['hosttagid' => $del_hosttagids]);
-		}
-
-		if ($ins_tags) {
-			DB::insert('host_tag', $ins_tags);
-		}
 	}
 
 	/**

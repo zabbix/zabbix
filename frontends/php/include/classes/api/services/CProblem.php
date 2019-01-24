@@ -67,10 +67,10 @@ class CProblem extends CApiService {
 			'eventid_till'				=> null,
 			'acknowledged'				=> null,
 			'suppressed'				=> null,
-			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
-			'tags'						=> null,
 			'recent'					=> null,
 			'any'						=> null,	// (internal) true if need not filtred by r_eventid
+			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
+			'tags'						=> null,
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
@@ -279,14 +279,14 @@ class CProblem extends CApiService {
 		}
 
 		// tags
-		if ($options['tags']) {
+		if ($options['tags'] !== null && $options['tags']) {
 			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'p',
 				'problem_tag', 'eventid'
 			);
 		}
 
 		// recent
-		if ($options['recent']) {
+		if ($options['recent'] !== null && $options['recent']) {
 			$config = select_config();
 			$ok_events_from = time() - timeUnitToSeconds($config['ok_period']);
 
