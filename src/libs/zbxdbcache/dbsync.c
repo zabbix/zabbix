@@ -1872,6 +1872,9 @@ int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync)
 			dbsync_add_row(sync, item->itemid, ZBX_DBSYNC_ROW_REMOVE, NULL);
 	}
 
+	zbx_hashset_destroy(&ids);
+	DBfree_result(result);
+
 	return SUCCEED;
 }
 
@@ -1937,6 +1940,9 @@ int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync)
 		if (NULL == zbx_hashset_search(&ids, &item->itemid))
 			dbsync_add_row(sync, item->itemid, ZBX_DBSYNC_ROW_REMOVE, NULL);
 	}
+
+	zbx_hashset_destroy(&ids);
+	DBfree_result(result);
 
 	return SUCCEED;
 }
