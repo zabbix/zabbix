@@ -1465,10 +1465,14 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				break;
 
 			case ZBX_PREPROC_XPATH:
+			case ZBX_PREPROC_ERROR_FIELD_XML:
+				$params[0]->setAttribute('placeholder', _('XPath'));
+				$params[1]->addStyle('display: none;');
+				break;
+
 			case ZBX_PREPROC_JSONPATH:
 			case ZBX_PREPROC_ERROR_FIELD_JSON:
-			case ZBX_PREPROC_ERROR_FIELD_XML:
-				$params[0]->setAttribute('placeholder', _('path'));
+				$params[0]->setAttribute('placeholder', _('$.path.to.node'));
 				$params[1]->addStyle('display: none;');
 				break;
 

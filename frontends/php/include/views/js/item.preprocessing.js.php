@@ -149,11 +149,17 @@
 						break;
 
 					case '<?= ZBX_PREPROC_XPATH ?>':
-					case '<?= ZBX_PREPROC_JSONPATH ?>':
-					case '<?= ZBX_PREPROC_ERROR_FIELD_JSON ?>':
 					case '<?= ZBX_PREPROC_ERROR_FIELD_XML ?>':
 						$(params[0])
-							.attr('placeholder', <?= CJs::encodeJson(_('path')) ?>)
+							.attr('placeholder', <?= CJs::encodeJson(_('XPath')) ?>)
+							.show();
+						$(params[1]).hide();
+						break;
+
+					case '<?= ZBX_PREPROC_JSONPATH ?>':
+					case '<?= ZBX_PREPROC_ERROR_FIELD_JSON ?>':
+						$(params[0])
+							.attr('placeholder', <?= CJs::encodeJson(_('$.path.to.node')) ?>)
 							.show();
 						$(params[1]).hide();
 						break;
