@@ -80,7 +80,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #endif
 
 #if defined(__GNUC__) && __GNUC__ >= 7
-#	define ZBX_FALLTHROUGH	__attribute__ ((fallthrough));
+#	define ZBX_FALLTHROUGH	__attribute__ ((fallthrough))
 #else
 #	define ZBX_FALLTHROUGH
 #endif
