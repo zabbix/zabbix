@@ -79,6 +79,12 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
 #endif
 
+#if defined(__GNUC__) && __GNUC__ >= 7
+#	define ZBX_FALLTHROUGH	__attribute__ ((fallthrough));
+#else
+#	define ZBX_FALLTHROUGH
+#endif
+
 #define	SUCCEED		0
 #define	FAIL		-1
 #define	NOTSUPPORTED	-2
@@ -1527,16 +1533,6 @@ char	*zbx_create_token(zbx_uint64_t seed);
 
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
-
-#if defined(__GNUC__)
-#	if 7 <= __GNUC__
-#		define ZBX_FALLTHROUGH		__attribute__ ((fallthrough));
-#	else
-#		define ZBX_FALLTHROUGH
-#	endif
-#else
-#	define ZBX_FALLTHROUGH
-#endif
 
 #endif
 
