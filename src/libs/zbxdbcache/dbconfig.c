@@ -4353,9 +4353,10 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
 
-	zbx_dc_host_tag_t	*host_tag;
+	zbx_dc_host_tag_t		*host_tag;
+	zbx_dc_host_tag_index_t		*host_tag_index_entry;
 
-	int		found, ret;
+	int		found, append, index, ret;
 	zbx_uint64_t	hosttagid, hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -4369,20 +4370,62 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(hosttagid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
 
-		host_tag = (zbx_dc_host_tag_t *)DCfind_id(&config->host_tags, hosttagid, sizeof(zbx_dc_host_tag_t), &found);
+		host_tag = (zbx_dc_host_tag_t *)DCfind_id(&config->host_tags, hosttagid,
+				sizeof(zbx_dc_host_tag_t), &found);
 
 		/* store new information in host_tag structure */
 		host_tag->hostid = hostid;
 		DCstrpool_replace(found, &host_tag->tag, row[2]);
 		DCstrpool_replace(found, &host_tag->value, row[3]);
+
+		/* update host_tags_index*/
+		host_tag_index_entry = (zbx_dc_host_tag_index_t *)DCfind_id(&config->host_tags_index, hostid,
+				sizeof(zbx_dc_host_tag_index_t), &found);
+
+		if (0 == found)
+		{
+			zbx_vector_ptr_create_ext(&host_tag_index_entry->tags, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
+			append = 1;
+		}
+		else
+		{
+			append = (FAIL == zbx_vector_ptr_search(&host_tag_index_entry->tags, host_tag,
+				ZBX_DEFAULT_PTR_COMPARE_FUNC)) ? 1 : 0;
+		}
+
+		if (1 == append)
+		{
+			zbx_vector_ptr_append(&host_tag_index_entry->tags, host_tag);
+		}
 	}
 
-	/* remove deleted host macros from buffer */
+	/* remove deleted host tags from buffer */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
 		if (NULL == (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_search(&config->host_tags, &rowid)))
 			continue;
 
+		/* update host_tags_index*/
+		host_tag_index_entry = (zbx_dc_host_tag_index_t *)DCfind_id(&config->host_tags_index, host_tag->hostid,
+				sizeof(zbx_dc_host_tag_index_t), &found);
+
+		if (1 == found && FAIL != (index = zbx_vector_ptr_search(&host_tag_index_entry->tags, host_tag,
+				ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+		{
+			zbx_vector_ptr_remove(&host_tag_index_entry->tags, index);
+		}
+
+		/* recreate empty tags vector to release used memory */
+		if (0 == host_tag_index_entry->tags.values_num)
+		{
+			zbx_vector_ptr_destroy(&host_tag_index_entry->tags);
+			zbx_vector_ptr_create_ext(&host_tag_index_entry->tags, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
+			zbx_hashset_remove_direct(&config->host_tags_index, host_tag_index_entry);
+		}
+
+		/* clear host_tag structure */
 		zbx_strpool_release(host_tag->tag);
 		zbx_strpool_release(host_tag->value);
 
@@ -5847,6 +5890,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->action_conditions, 0);
 	CREATE_HASHSET(config->trigger_tags, 0);
 	CREATE_HASHSET(config->host_tags, 0);
+	CREATE_HASHSET(config->host_tags_index, 0);
 	CREATE_HASHSET(config->correlations, 0);
 	CREATE_HASHSET(config->corr_conditions, 0);
 	CREATE_HASHSET(config->corr_operations, 0);
@@ -12020,19 +12064,20 @@ void	zbx_dc_cleanup_data_sessions(void)
 
 static void	zbx_gather_tags_from_host(zbx_uint64_t hostid, zbx_vector_ptr_t *host_tags)
 {
-	zbx_dc_host_tag_t	*host_tag;
-	zbx_host_tag_t		*tag;
-	zbx_hashset_iter_t	iter;
+	zbx_dc_host_tag_index_t 	*dc_tag_index;
+	zbx_dc_host_tag_t		*dc_tag;
+	zbx_host_tag_t			*tag;
+	int				i;
 
-	zbx_hashset_iter_reset(&config->host_tags, &iter);
-	while (NULL != (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_iter_next(&iter)))
+	if (NULL != (dc_tag_index = zbx_hashset_search(&config->host_tags_index, &hostid)))
 	{
-		if (host_tag->hostid == hostid)
+		for (i = 0; i < dc_tag_index->tags.values_num; i++)
 		{
+			dc_tag = (zbx_dc_host_tag_t *)dc_tag_index->tags.values[i];
 			tag = (zbx_host_tag_t *) zbx_malloc(NULL, sizeof(zbx_host_tag_t));
 			tag->hostid = hostid;
-			tag->tag.tag = zbx_strdup(NULL, host_tag->tag);
-			tag->tag.value = zbx_strdup(NULL, host_tag->value);
+			tag->tag.tag = zbx_strdup(NULL, dc_tag->tag);
+			tag->tag.value = zbx_strdup(NULL, dc_tag->value);
 			zbx_vector_ptr_append(host_tags, tag);
 		}
 	}

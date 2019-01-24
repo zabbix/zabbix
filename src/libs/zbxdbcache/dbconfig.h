@@ -570,6 +570,14 @@ zbx_dc_host_tag_t;
 
 typedef struct
 {
+	zbx_uint64_t		hostid;
+	zbx_vector_ptr_t	tags;
+		/* references to zbx_dc_host_tag_t records cached in config-> host_tags hashset */
+}
+zbx_dc_host_tag_index_t;
+
+typedef struct
+{
 	const char	*tag;
 }
 zbx_dc_corr_condition_tag_t;
@@ -770,6 +778,7 @@ typedef struct
 	zbx_hashset_t		action_conditions;
 	zbx_hashset_t		trigger_tags;
 	zbx_hashset_t		host_tags;
+	zbx_hashset_t		host_tags_index;		/* host tag index by hostid */
 	zbx_hashset_t		correlations;
 	zbx_hashset_t		corr_conditions;
 	zbx_hashset_t		corr_operations;
