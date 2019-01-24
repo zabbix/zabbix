@@ -1529,8 +1529,8 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
 #if defined(__GNUC__)
-#	if (__GNUC__ >= 7)
-#		define ZBX_FALLTHROUGH			__attribute__ ((fallthrough));
+#	if 7 <= __GNUC__
+#		define ZBX_FALLTHROUGH		__attribute__ ((fallthrough));
 #	else
 #		define ZBX_FALLTHROUGH
 #	endif
