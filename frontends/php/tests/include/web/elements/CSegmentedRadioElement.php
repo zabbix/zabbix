@@ -57,4 +57,23 @@ class CSegmentedRadioElement extends CElement {
 
 		return $this;
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isEnabled($enabled = true) {
+		return (($this->getLabels()->filter(CElementQuery::ATTRIBUTES_NOT_PRESENT, ['disabled'])->count() > 0) === $enabled);
+	}
+
+	/**
+	 * Alias for select.
+	 * @see self::select
+	 *
+	 * @param string $text    label text to be selected
+	 *
+	 * @return $this
+	 */
+	public function fill($text) {
+		return $this->select($text);
+	}
 }

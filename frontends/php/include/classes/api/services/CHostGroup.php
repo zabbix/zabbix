@@ -508,100 +508,12 @@ class CHostGroup extends CApiService {
 	 * @param array $groupids
 	 * @param bool 	$nopermissions
 	 *
+	 * @throws APIException if the input is invalid.
+	 *
 	 * @return array
 	 */
 	public function delete(array $groupids, $nopermissions = false) {
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-		if (!CApiInputValidator::validate($api_input_rules, $groupids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$db_groups = $this->get([
-			'output' => ['groupid', 'name', 'internal'],
-			'groupids' => $groupids,
-			'editable' => true,
-			'selectHosts' => ['hostid', 'host'],
-			'selectTemplates' => ['templateid', 'host'],
-			'preservekeys' => true,
-			'nopermissions' => $nopermissions
-		]);
-
-		foreach ($groupids as $groupid) {
-			if (!array_key_exists($groupid, $db_groups)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-			if ($db_groups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host group "%1$s" is internal and can not be deleted.', $db_groups[$groupid]['name'])
-				);
-			}
-		}
-
-		// check if a group is used in a group prototype
-		$groupPrototype = DBFetch(DBselect(
-			'SELECT groupid'.
-			' FROM group_prototype gp'.
-			' WHERE '.dbConditionInt('groupid', $groupids),
-			1
-		));
-		if ($groupPrototype) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Group "%1$s" cannot be deleted, because it is used by a host prototype.',
-					$db_groups[$groupPrototype['groupid']]['name']
-				)
-			);
-		}
-
-		$hosts_to_unlink = [];
-		$templates_to_unlink = [];
-
-		foreach ($db_groups as $db_group) {
-			foreach ($db_group['hosts'] as $host) {
-				$hosts_to_unlink[] = $host;
-			}
-
-			foreach ($db_group['templates'] as $template) {
-				$templates_to_unlink[] = $template;
-			}
-		}
-
-		$this->verifyHostsAndTemplatesAreUnlinkable($hosts_to_unlink, $templates_to_unlink, $groupids);
-
-		$dbScripts = API::Script()->get([
-			'groupids' => $groupids,
-			'output' => ['scriptid', 'groupid'],
-			'nopermissions' => true
-		]);
-
-		if (!empty($dbScripts)) {
-			foreach ($dbScripts as $script) {
-				if ($script['groupid'] == 0) {
-					continue;
-				}
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host group "%1$s" cannot be deleted, because it is used in a global script.',
-						$db_groups[$script['groupid']]['name']
-					)
-				);
-			}
-		}
-
-		$corr_condition_group = DBFetch(DBselect(
-			'SELECT cg.groupid'.
-			' FROM corr_condition_group cg'.
-			' WHERE '.dbConditionInt('cg.groupid', $groupids),
-			1
-		));
-
-		if ($corr_condition_group) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Group "%1$s" cannot be deleted, because it is used in a correlation condition.',
-					$db_groups[$corr_condition_group['groupid']]['name']
-				)
-			);
-		}
+		$this->validateDelete($groupids, $db_groups, $nopermissions);
 
 		// delete screens items
 		$resources = [
@@ -624,18 +536,18 @@ class CHostGroup extends CApiService {
 		// disable actions
 		// actions from conditions
 		$actionids = [];
-		$dbActions = DBselect(
+		$db_actions = DBselect(
 			'SELECT DISTINCT c.actionid'.
 			' FROM conditions c'.
 			' WHERE c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
 				' AND '.dbConditionString('c.value', $groupids)
 		);
-		while ($dbAction = DBfetch($dbActions)) {
-			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
+		while ($db_action = DBfetch($db_actions)) {
+			$actionids[$db_action['actionid']] = $db_action['actionid'];
 		}
 
 		// actions from operations
-		$dbActions = DBselect(
+		$db_actions = DBselect(
 			'SELECT o.actionid'.
 			' FROM operations o,opgroup og'.
 			' WHERE o.operationid=og.operationid AND '.dbConditionInt('og.groupid', $groupids).
@@ -644,8 +556,8 @@ class CHostGroup extends CApiService {
 			' FROM operations o,opcommand_grp ocg'.
 			' WHERE o.operationid=ocg.operationid AND '.dbConditionInt('ocg.groupid', $groupids)
 		);
-		while ($dbAction = DBfetch($dbActions)) {
-			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
+		while ($db_action = DBfetch($db_actions)) {
+			$actionids[$db_action['actionid']] = $db_action['actionid'];
 		}
 
 		if (!empty($actionids)) {
@@ -665,45 +577,45 @@ class CHostGroup extends CApiService {
 
 		// delete action operation groups
 		$operationids = [];
-		$dbOperations = DBselect(
+		$db_operations = DBselect(
 			'SELECT DISTINCT og.operationid'.
 			' FROM opgroup og'.
 			' WHERE '.dbConditionInt('og.groupid', $groupids)
 		);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+		while ($db_operation = DBfetch($db_operations)) {
+			$operationids[$db_operation['operationid']] = $db_operation['operationid'];
 		}
 		DB::delete('opgroup', [
 			'groupid' => $groupids
 		]);
 
 		// delete action operation commands
-		$dbOperations = DBselect(
+		$db_operations = DBselect(
 			'SELECT DISTINCT ocg.operationid'.
 			' FROM opcommand_grp ocg'.
 			' WHERE '.dbConditionInt('ocg.groupid', $groupids)
 		);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+		while ($db_operation = DBfetch($db_operations)) {
+			$operationids[$db_operation['operationid']] = $db_operation['operationid'];
 		}
 		DB::delete('opcommand_grp', [
 			'groupid' => $groupids
 		]);
 
 		// delete empty operations
-		$delOperationids = [];
-		$dbOperations = DBselect(
+		$del_operationids = [];
+		$db_operations = DBselect(
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
 			' WHERE '.dbConditionInt('o.operationid', $operationids).
 				' AND NOT EXISTS (SELECT NULL FROM opgroup og WHERE o.operationid=og.operationid)'.
 				' AND NOT EXISTS (SELECT NULL FROM opcommand_grp ocg WHERE o.operationid=ocg.operationid)'
 		);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+		while ($db_operation = DBfetch($db_operations)) {
+			$del_operationids[$db_operation['operationid']] = $db_operation['operationid'];
 		}
 
-		DB::delete('operations', ['operationid' => $delOperationids]);
+		DB::delete('operations', ['operationid' => $del_operationids]);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
@@ -751,6 +663,111 @@ class CHostGroup extends CApiService {
 		}
 
 		$this->checkDuplicates(zbx_objectValues($groups, 'name'));
+	}
+
+	/**
+	 * Validates if groups can be deleted.
+	 *
+	 * @param array $groupids
+	 * @param array $db_groups
+	 * @param bool $nopermissions
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateDelete(array $groupids, array &$db_groups = null, $nopermissions) {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $groupids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_groups = $this->get([
+			'output' => ['groupid', 'name', 'internal'],
+			'groupids' => $groupids,
+			'editable' => true,
+			'selectHosts' => ['hostid', 'host'],
+			'selectTemplates' => ['templateid', 'host'],
+			'preservekeys' => true,
+			'nopermissions' => $nopermissions
+		]);
+
+		foreach ($groupids as $groupid) {
+			if (!array_key_exists($groupid, $db_groups)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+			if ($db_groups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Host group "%1$s" is internal and can not be deleted.', $db_groups[$groupid]['name'])
+				);
+			}
+		}
+
+		// check if a group is used in a group prototype
+		$group_prototype = DBFetch(DBselect(
+			'SELECT groupid'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionInt('groupid', $groupids),
+			1
+		));
+		if ($group_prototype) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Group "%1$s" cannot be deleted, because it is used by a host prototype.',
+					$db_groups[$group_prototype['groupid']]['name']
+				)
+			);
+		}
+
+		$hosts_to_unlink = [];
+		$templates_to_unlink = [];
+
+		foreach ($db_groups as $db_group) {
+			foreach ($db_group['hosts'] as $host) {
+				$hosts_to_unlink[] = $host;
+			}
+
+			foreach ($db_group['templates'] as $template) {
+				$templates_to_unlink[] = $template;
+			}
+		}
+
+		$this->verifyHostsAndTemplatesAreUnlinkable($hosts_to_unlink, $templates_to_unlink, $groupids);
+
+		$db_scripts = API::Script()->get([
+			'groupids' => $groupids,
+			'output' => ['scriptid', 'groupid'],
+			'nopermissions' => true
+		]);
+
+		if (!empty($db_scripts)) {
+			foreach ($db_scripts as $script) {
+				if ($script['groupid'] == 0) {
+					continue;
+				}
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Host group "%1$s" cannot be deleted, because it is used in a global script.',
+						$db_groups[$script['groupid']]['name']
+					)
+				);
+			}
+		}
+
+		$corr_condition_group = DBFetch(DBselect(
+			'SELECT cg.groupid'.
+			' FROM corr_condition_group cg'.
+			' WHERE '.dbConditionInt('cg.groupid', $groupids),
+			1
+		));
+
+		if ($corr_condition_group) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Group "%1$s" cannot be deleted, because it is used in a correlation condition.',
+					$db_groups[$corr_condition_group['groupid']]['name']
+				)
+			);
+		}
+
+		$this->validateDeleteCheckMaintenances($groupids);
 	}
 
 	/**
@@ -1454,6 +1471,40 @@ class CHostGroup extends CApiService {
 					_s('Template "%1$s" cannot be without host group.', $template_names[$objectid])
 				);
 			}
+		}
+	}
+
+	/**
+	 * Validates if host groups may be deleted, due to maintenance constrain.
+	 *
+	 * @throws APIException if a constrain failed
+	 *
+	 * @param array $groupids
+	 */
+	protected function validateDeleteCheckMaintenances(array $groupids) {
+		$maintenance = DBfetch(DBselect(
+			'SELECT m.name'.
+			' FROM maintenances m'.
+			' WHERE NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM maintenances_groups mg'.
+				' WHERE m.maintenanceid=mg.maintenanceid'.
+					' AND '.dbConditionInt('mg.groupid', $groupids, true).
+			')'.
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_hosts mh'.
+					' WHERE m.maintenanceid=mh.maintenanceid'.
+				')'
+		));
+
+		if ($maintenance) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
+				'Cannot delete host group because maintenance "%1$s" must contain at least one host or host group.',
+				'Cannot delete selected host groups because maintenance "%1$s" must contain at least one host or host group.',
+				$maintenance['name'],
+				count($groupids)
+			));
 		}
 	}
 }

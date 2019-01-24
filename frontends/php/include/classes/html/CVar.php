@@ -84,4 +84,19 @@ class CVar {
 
 		return $this;
 	}
+
+	/**
+	 * Enable or disable the element.
+	 *
+	 * @param bool $value
+	 *
+	 * @return CVar
+	 */
+	public function setEnabled($value) {
+		foreach ($this->var_container as $item) {
+			$item->setEnabled($value);
+		}
+
+		return $this;
+	}
 }

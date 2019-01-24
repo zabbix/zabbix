@@ -66,4 +66,15 @@ class CWidgetElement extends CElement {
 		$this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->click();
 		return $this->query('xpath://div[@data-dialogueid="widgetConfg"]//form')->waitUntilVisible()->asForm()->one();
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getReadyCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return ($target->query('xpath:.//div[@class="preloader-container"]')->one(false) === null);
+		};
+	}
 }
