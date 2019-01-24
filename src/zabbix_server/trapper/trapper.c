@@ -954,27 +954,27 @@ static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_pa
 
 		if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_PARAMS, &jp_data))
 		{
-			zbx_snprintf(error, sizeof(error), "Cannot find tag: %s.", ZBX_PROTO_TAG_PARAMS);
+			zbx_snprintf(error, sizeof(error), "cannot find tag: %s", ZBX_PROTO_TAG_PARAMS);
 			goto param_error;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_FROM, from_str, sizeof(from_str))
 				&& FAIL == is_time_suffix(from_str, &from, ZBX_LENGTH_UNLIMITED))
 		{
-			strscpy(error, "Invalid 'from' parameter.");
+			strscpy(error, "invalid 'from' parameter");
 			goto param_error;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_TO, to_str, sizeof(to_str)) &&
 				FAIL == is_time_suffix(to_str, &to, ZBX_LENGTH_UNLIMITED))
 		{
-			strscpy(error, "Invalid 'to' parameter.");
+			strscpy(error, "invalid 'to' parameter");
 			goto param_error;
 		}
 
 		if (ZBX_QUEUE_TO_INFINITY != to && from > to)
 		{
-			strscpy(error, "Parameters represent an invalid interval.");
+			strscpy(error, "parameters represent an invalid interval");
 			goto param_error;
 		}
 
