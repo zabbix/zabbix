@@ -65,27 +65,27 @@ zbx_hash_t	zbx_hash_lookup2(const void *data, size_t len, zbx_hash_t seed)
 	switch (len)
 	{
 		case 11:	c = c + ((zbx_hash_t)p[10] << 24);
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 		case 10:	c = c + ((zbx_hash_t)p[9] << 16);
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 		case 9:		c = c + ((zbx_hash_t)p[8] << 8);
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 		case 8:		b = b + ((zbx_hash_t)p[7] << 24);
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 		case 7:		b = b + ((zbx_hash_t)p[6] << 16);
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 		case 6:		b = b + ((zbx_hash_t)p[5] << 8);
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 		case 5:		b = b + p[4];
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 		case 4:		a = a + ((zbx_hash_t)p[3] << 24);
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 		case 3:		a = a + ((zbx_hash_t)p[2] << 16);
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 		case 2:		a = a + ((zbx_hash_t)p[1] << 8);
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 		case 1:		a = a + p[0];
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 	}
 
 	mix(a, b, c);
@@ -155,9 +155,9 @@ zbx_hash_t	zbx_hash_murmur2(const void *data, size_t len, zbx_hash_t seed)
 	switch (len)
 	{
 		case 3:	hash ^= p[2] << 16;
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 		case 2: hash ^= p[1] << 8;
-		ZBX_FALLTHROUGH;
+			ZBX_FALLTHROUGH;
 		case 1: hash ^= p[0];
 			hash *= m;
 			ZBX_FALLTHROUGH;
