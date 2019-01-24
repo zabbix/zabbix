@@ -1,4 +1,4 @@
-<script type="text/x-jquery-tmpl" id="preprocessing_steps_row">
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-tmpl">
 	<?php
 	$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
 
@@ -77,7 +77,7 @@
 			});
 		}
 
-		var preproc_row_tpl = new Template($('#preprocessing_steps_row').html()),
+		var preproc_row_tpl = new Template($('#preprocessing-steps-tmpl').html()),
 			preprocessing = $('#preprocessing');
 
 		preprocessing.sortable({
