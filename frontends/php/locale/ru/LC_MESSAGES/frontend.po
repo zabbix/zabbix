@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-13 23:40+0200\n"
+"POT-Creation-Date: 2019-01-22 10:39+0200\n"
 "PO-Revision-Date: 2018-09-28 11:24+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -22,12 +22,12 @@ msgstr ""
 #: include/classes/import/validators/C32XmlValidator.php:1007
 #: include/classes/import/validators/C34XmlValidator.php:1111
 #: include/classes/import/validators/C40XmlValidator.php:1290
-#: include/classes/import/validators/C42XmlValidator.php:1298
+#: include/classes/import/validators/C42XmlValidator.php:1310
 #, c-format
 msgid "\"%1$s\" is expected"
 msgstr "\"%1$s\" ожидалось"
 
-#: include/classes/api/services/CItemGeneral.php:1324
+#: include/classes/api/services/CItemGeneral.php:1415
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
 msgstr ""
@@ -46,6 +46,11 @@ msgstr "\"%s\" должно быть между 1970.01.01 и 2038.01.18."
 #: include/classes/import/validators/C10XmlValidator.php:436
 msgid "\"host:key\" pair is expected"
 msgstr "ожидается пара \"узел сети:ключ\""
+
+#: include/views/configuration.host.discovery.edit.php:726
+#: include/views/js/configuration.host.discovery.edit.js.php:50
+msgid "$.path.to.node"
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:520
 #, c-format
@@ -88,7 +93,7 @@ msgstr[0] "%1$s элемент данных"
 msgstr[1] "%1$s элемента данных"
 msgstr[2] "%1$s элементов данных"
 
-#: include/classes/api/services/CItemGeneral.php:2227
+#: include/classes/api/services/CItemGeneral.php:2168
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
@@ -606,7 +611,8 @@ msgstr "Активно до"
 #: include/views/configuration.host.discovery.edit.php:209
 #: include/views/configuration.host.discovery.edit.php:554
 #: include/views/configuration.host.discovery.edit.php:674
-#: include/views/configuration.host.discovery.edit.php:713
+#: include/views/configuration.host.discovery.edit.php:739
+#: include/views/configuration.host.discovery.edit.php:780
 #: include/views/configuration.host.edit.php:116
 #: include/views/configuration.host.edit.php:132
 #: include/views/configuration.host.edit.php:148
@@ -1239,8 +1245,8 @@ msgstr "Авг"
 msgid "August"
 msgstr "Август"
 
-#: app/views/administration.authentication.edit.php:127
-#: app/views/administration.authentication.edit.php:135
+#: app/views/administration.authentication.edit.php:137
+#: app/views/administration.authentication.edit.php:145
 #: app/views/administration.mediatype.edit.php:89 include/menu.inc.php:265
 #: include/views/configuration.httpconf.edit.php:283
 #: include/views/configuration.httpconf.list.php:92
@@ -1268,7 +1274,7 @@ msgstr "Ошибка при аутентификации: %1$s."
 msgid "Authentication method"
 msgstr "Метод аутентификации"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:232
+#: app/controllers/CControllerAuthenticationUpdate.php:238
 msgid "Authentication method changed"
 msgstr "Метод аутентификации изменён"
 
@@ -1290,7 +1296,7 @@ msgstr "Пароль аутентификации"
 msgid "Authentication protocol"
 msgstr "Протокол аутентификации"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:231
+#: app/controllers/CControllerAuthenticationUpdate.php:237
 msgid "Authentication settings updated"
 msgstr "Настройки аутентификации обновлены"
 
@@ -1388,7 +1394,7 @@ msgstr "Цвет фона"
 msgid "Background image"
 msgstr "Фоновое изображение"
 
-#: app/views/administration.authentication.edit.php:93
+#: app/views/administration.authentication.edit.php:98
 msgid "Base DN"
 msgstr "База для поиска (Base DN)"
 
@@ -1404,11 +1410,11 @@ msgstr "Основной цвет"
 msgid "Basic"
 msgstr "Простая"
 
-#: app/views/administration.authentication.edit.php:103
+#: app/views/administration.authentication.edit.php:110
 msgid "Bind DN"
 msgstr "Имя для подключения (Bind DN)"
 
-#: app/views/administration.authentication.edit.php:113
+#: app/views/administration.authentication.edit.php:121
 msgid "Bind password"
 msgstr "Пароль подключения (Bind password)"
 
@@ -1501,7 +1507,7 @@ msgid "CERT"
 msgstr "CERT"
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:968
+#: include/classes/graph/CSvgGraph.php:938
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -1622,13 +1628,13 @@ msgstr "Не удалось добавить условие корреляции
 msgid "Cannot add dependency from a host to a template."
 msgstr "Не удалось добавить зависимость от узла сети к шаблону."
 
-#: include/classes/api/services/CDiscoveryRule.php:847
+#: include/classes/api/services/CDiscoveryRule.php:851
 #: include/triggers.inc.php:527
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 msgstr "Не удалось добавить зависимость от триггера \"%1$s:%2$s\" к несуществующему триггеру \"%3$s:%4$s\"."
 
-#: host_discovery.php:474
+#: host_discovery.php:516
 msgid "Cannot add discovery rule"
 msgstr "Не удалось добавить правило обнаружения"
 
@@ -1789,21 +1795,21 @@ msgstr "Не удалось вызвать метод \"%1$s.%2$s\" без па�
 msgid "Cannot clear history"
 msgstr "Не удалось очистить историю"
 
-#: include/classes/api/services/CDiscoveryRule.php:1588
+#: include/classes/api/services/CDiscoveryRule.php:1880
 msgid "Cannot clone graph prototypes."
 msgstr "Не удалось клонировать прототипы графиков."
 
-#: include/classes/api/services/CDiscoveryRule.php:1636
+#: include/classes/api/services/CDiscoveryRule.php:1928
 msgid "Cannot clone host prototypes."
 msgstr "Не удалось клонировать прототипы узлов сети."
 
-#: include/classes/api/services/CDiscoveryRule.php:1393
-#: include/classes/api/services/CDiscoveryRule.php:1449
-#: include/classes/api/services/CDiscoveryRule.php:1467
+#: include/classes/api/services/CDiscoveryRule.php:1685
+#: include/classes/api/services/CDiscoveryRule.php:1741
+#: include/classes/api/services/CDiscoveryRule.php:1759
 msgid "Cannot clone item prototypes."
 msgstr "Не удалось клонировать прототипы элементов данных."
 
-#: include/classes/api/services/CDiscoveryRule.php:760
+#: include/classes/api/services/CDiscoveryRule.php:764
 msgid "Cannot clone trigger prototypes."
 msgstr "Не удалось клонировать прототипы триггеров."
 
@@ -1938,11 +1944,11 @@ msgstr "Не удалось удалить зависимость"
 msgid "Cannot delete discovered application \"%1$s\"."
 msgstr "Не удалось удалить обнаруженную группу элементов данных \"%1$s\"."
 
-#: discoveryconf.php:186 host_discovery.php:274
+#: discoveryconf.php:186 host_discovery.php:276
 msgid "Cannot delete discovery rule"
 msgstr "Не удалось удалить правило обнаружения"
 
-#: discoveryconf.php:228 host_discovery.php:517
+#: discoveryconf.php:228 host_discovery.php:559
 msgid "Cannot delete discovery rules"
 msgstr "Не удалось удалить правила обнаружения"
 
@@ -1973,7 +1979,23 @@ msgstr[2] "Не удалось удалить группы"
 msgid "Cannot delete host"
 msgstr "Не удалось удалить узел сети"
 
-#: include/classes/api/services/CDiscoveryRule.php:533
+#: include/classes/api/services/CHost.php:1189
+#, c-format
+msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
+msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/classes/api/services/CHostGroup.php:1503
+#, c-format
+msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
+msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/classes/api/services/CDiscoveryRule.php:536
 msgid "Cannot delete host prototype."
 msgstr "Не удалось удалить прототип узлов сети."
 
@@ -2090,15 +2112,15 @@ msgstr ""
 msgid "Cannot delete templated host prototype."
 msgstr "Невозможно удалить прототип узлов сети унаследованный из шаблона."
 
-#: include/classes/api/services/CItemPrototype.php:876
+#: include/classes/api/services/CItemPrototype.php:875
 msgid "Cannot delete templated item prototype."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:706
+#: include/classes/api/services/CItem.php:704
 msgid "Cannot delete templated item."
 msgstr "Невозможно удалить элемент данных унаследованный из шаблона."
 
-#: include/classes/api/services/CDiscoveryRule.php:484
+#: include/classes/api/services/CDiscoveryRule.php:487
 msgid "Cannot delete templated items."
 msgstr "Невозможно удалить элементы данных унаследованные из шаблонов."
 
@@ -2162,7 +2184,7 @@ msgstr[0] "Не удалось деактивировать корреляцию
 msgstr[1] "Не удалось деактивировать корреляции"
 msgstr[2] "Не удалось деактивировать корреляции"
 
-#: discoveryconf.php:213 host_discovery.php:507
+#: discoveryconf.php:213 host_discovery.php:549
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Не удалось деактивировать правило обнаружения"
@@ -2234,7 +2256,7 @@ msgstr[0] "Не удалось активировать корреляцию"
 msgstr[1] "Не удалось активировать корреляции"
 msgstr[2] "Не удалось активировать корреляции"
 
-#: discoveryconf.php:212 host_discovery.php:506
+#: discoveryconf.php:212 host_discovery.php:548
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Не удалось активировать правило обнаружения"
@@ -2322,13 +2344,13 @@ msgstr "Не удалось найти узел сети \"%1$s\" использ
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти узел сети \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1086
+#: include/classes/import/CConfigurationImport.php:1094
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти группу узлов сети \"%1$s\" для прототипа узлов сети \"%2$s\" правила обнаружения \"%3$s\" на \"%4$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1256
-#: include/classes/api/services/CDiscoveryRule.php:1420
+#: include/classes/api/services/CDiscoveryRule.php:1548
+#: include/classes/api/services/CDiscoveryRule.php:1712
 #: include/classes/api/services/CItemGeneral.php:116 include/items.inc.php:506
 #: include/items.inc.php:653
 #, c-format
@@ -2345,32 +2367,32 @@ msgstr "Не удалось найти иконку \"%1$s\" используе�
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти иконку \"%1$s\" используемую на карте сети \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1470
+#: include/classes/import/CConfigurationImport.php:1478
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как MAX значение оси Y в графике \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1239
+#: include/classes/import/CConfigurationImport.php:1247
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как MAX значение оси Y в прототипе графиков \"%3$s\" правила обнаружения \"%4$s\" у \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1454
+#: include/classes/import/CConfigurationImport.php:1462
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как MIN значение оси Y в графике \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1219
+#: include/classes/import/CConfigurationImport.php:1227
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как MIN значение оси Y в прототипе графиков \"%3$s\" правила обнаружения \"%4$s\" у \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1489
+#: include/classes/import/CConfigurationImport.php:1497
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый в графике \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1259
+#: include/classes/import/CConfigurationImport.php:1267
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый в прототипе графиков \"%3$s\" правила обнаружения \"%4$s\" у \"%5$s\"."
@@ -2399,7 +2421,7 @@ msgstr "Не удалось найти объекты с именем"
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти комплексный экран \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1109
+#: include/classes/import/CConfigurationImport.php:1117
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти шаблон \"%1$s\" для прототипа узлов сети \"%2$s\" правила обнаружения \"%3$s\" на \"%4$s\"."
@@ -2415,7 +2437,7 @@ msgstr "Не удалось найти триггер \"%1$s\" использу�
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Не удалось найти преобразование значений \"%1$s\" используемое в элементе данных \"%2$s\" на \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1014
+#: include/classes/import/CConfigurationImport.php:1022
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти преобразование значений \"%1$s\" используемое в прототипу элементов данных \"%2$s\" в правиле обнаружения \"%3$s\" на \"%4$s\"."
@@ -2428,7 +2450,7 @@ msgstr "Не удалось построить дерево. Проверьте 
 msgid "Cannot format tree."
 msgstr "Не удалось построить дерево."
 
-#: include/classes/api/services/CTemplate.php:805
+#: include/classes/api/services/CTemplate.php:803
 msgid "Cannot have empty visible template name."
 msgstr "Видимое имя шаблона не может быть пустым."
 
@@ -2466,8 +2488,8 @@ msgstr "Не удалось вставить выражение триггера
 msgid "Cannot link template"
 msgstr "Не удалось присоединить шаблон"
 
-#: include/classes/api/services/CTemplate.php:892
-#: include/classes/api/services/CTemplate.php:906
+#: include/classes/api/services/CTemplate.php:890
+#: include/classes/api/services/CTemplate.php:904
 msgid "Cannot link template."
 msgstr "Не удалось присоединить шаблон."
 
@@ -2479,7 +2501,7 @@ msgstr "Не удалось выполнить выход."
 msgid "Cannot mass update host name."
 msgstr "Невозможно массово обновить имя узла сети."
 
-#: include/classes/api/services/CTemplate.php:1030
+#: include/classes/api/services/CTemplate.php:1028
 msgid "Cannot mass update template name."
 msgstr "Невозможно массово обновить имя шаблона."
 
@@ -2487,7 +2509,7 @@ msgstr "Невозможно массово обновить имя шаблон
 msgid "Cannot mass update visible host name."
 msgstr "Невозможно массово обновить видимое имя узла сети."
 
-#: include/classes/api/services/CTemplate.php:995
+#: include/classes/api/services/CTemplate.php:993
 msgid "Cannot mass update visible template name."
 msgstr "Невозможно массово обновить видимое имя шаблона."
 
@@ -2515,8 +2537,8 @@ msgstr "Невозможно выполнить запрос обновлени�
 msgid "Cannot process applications from different hosts or templates."
 msgstr "Не удалось обработать группы элементов данных из разных узлов сети или шаблонов."
 
-#: include/classes/api/services/CItemGeneral.php:2235
-#: include/classes/api/services/CItemGeneral.php:2262
+#: include/classes/api/services/CItemGeneral.php:2176
+#: include/classes/api/services/CItemGeneral.php:2203
 msgid "Cannot read JSON."
 msgstr "Не удалось прочитать JSON."
 
@@ -2525,8 +2547,8 @@ msgstr "Не удалось прочитать JSON."
 msgid "Cannot read JSON: %1$s."
 msgstr "Не удалось прочитать JSON: %1$s."
 
-#: include/classes/api/services/CItemGeneral.php:2222
-#: include/classes/api/services/CItemGeneral.php:2226
+#: include/classes/api/services/CItemGeneral.php:2163
+#: include/classes/api/services/CItemGeneral.php:2167
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
@@ -2557,7 +2579,7 @@ msgstr "Не удалось сохранить виджет \"%1$s\"."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Не удалось отправить команду, проверьте соединение с Zabbix сервером \"%1$s\"."
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:967 items.php:1416
+#: host_discovery.php:286 host_discovery.php:571 items.php:967 items.php:1416
 msgid "Cannot send request"
 msgstr "Не удалось отправить запрос"
 
@@ -2617,8 +2639,8 @@ msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "Не удалось установить \"templateid\" для комплексного экрана \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:881
-#: include/classes/api/services/CHost.php:1705
-#: include/classes/api/services/CHost.php:1849
+#: include/classes/api/services/CHost.php:1741
+#: include/classes/api/services/CHost.php:1885
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Невозможно задать поля инвентарных данных при отключенной инвентаризации."
 
@@ -2635,15 +2657,15 @@ msgstr "Не удалось переключить узел сети на инт
 msgid "Cannot unblock users"
 msgstr "Не удалось разблокировать пользователей"
 
-#: include/classes/api/services/CHostGeneral.php:563
+#: include/classes/api/services/CHostGeneral.php:559
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Не удалось отсоединить и очистить Веб-сценарии."
 
-#: include/classes/api/services/CHostGeneral.php:624
+#: include/classes/api/services/CHostGeneral.php:620
 msgid "Cannot unlink and clear applications."
 msgstr "Не удалось отсоединить и очистить группы элементов данных."
 
-#: include/classes/api/services/CHostGeneral.php:367
+#: include/classes/api/services/CHostGeneral.php:363
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Не удалось отсоединить и очистить правила обнаружения"
 
@@ -2651,12 +2673,12 @@ msgstr "Не удалось отсоединить и очистить прав�
 msgid "Cannot unlink template"
 msgstr "Не удалось отсоединить шаблон"
 
-#: include/classes/api/services/CTemplate.php:857
-#: include/classes/api/services/CTemplate.php:880
+#: include/classes/api/services/CTemplate.php:855
+#: include/classes/api/services/CTemplate.php:878
 msgid "Cannot unlink template."
 msgstr "Не удалось отсоединить шаблон."
 
-#: include/classes/api/services/CHostGeneral.php:273
+#: include/classes/api/services/CHostGeneral.php:269
 #, c-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Не удалось отсоединить триггер \"%s\", он содержит элементы данных из шаблона, которые остаются присоединенными к узлу сети."
@@ -2702,7 +2724,7 @@ msgstr "Не удалось обновить \"%1$s\" для триггера \"
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для прототипа триггера \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1828
+#: include/classes/api/services/CHost.php:1864
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "Не удалось обновить \"%1$s\" у обнаруженного узла сети \"%2$s\"."
@@ -2738,7 +2760,7 @@ msgstr "Не удалось обновить \"templateid\" для шаблон�
 msgid "Cannot update a discovered graph."
 msgstr "Невозможно обновить обнаруженный график."
 
-#: include/classes/api/services/CHostGroup.php:780
+#: include/classes/api/services/CHostGroup.php:797
 msgid "Cannot update a discovered host group."
 msgstr "Невозможно обновить обнаруженную группу узлов сети."
 
@@ -2755,7 +2777,7 @@ msgstr "Не удалось обновить действие"
 msgid "Cannot update application"
 msgstr "Не удалось обновить группу элементов данных"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:236
+#: app/controllers/CControllerAuthenticationUpdate.php:242
 msgid "Cannot update authentication"
 msgstr "Не удалось обновить аутентификацию"
 
@@ -2782,7 +2804,7 @@ msgstr "Не удалось обновить описание"
 msgid "Cannot update discovered application \"%1$s\"."
 msgstr "Не удалось обновить обнаруженную группу элементов данных \"%1$s\"."
 
-#: discoveryconf.php:155 host_discovery.php:477
+#: discoveryconf.php:155 host_discovery.php:519
 msgid "Cannot update discovery rule"
 msgstr "Не удалось обновить правило обнаружения"
 
@@ -2810,9 +2832,9 @@ msgstr "Не удалось обновить прототип графиков"
 msgid "Cannot update group"
 msgstr "Не удалось обновить группу"
 
-#: include/classes/api/services/CHostGroup.php:986
-#: include/classes/api/services/CHostGroup.php:1090
-#: include/classes/api/services/CHostGroup.php:1226
+#: include/classes/api/services/CHostGroup.php:1003
+#: include/classes/api/services/CHostGroup.php:1107
+#: include/classes/api/services/CHostGroup.php:1243
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Не удалось обновить группы для обнаруженного узла сети \"%1$s\"."
@@ -2932,7 +2954,7 @@ msgid "Cannot update templated applications."
 msgstr "Не удалось обновить шаблонные группы элементов данных."
 
 #: include/classes/api/services/CTemplate.php:754
-#: include/classes/api/services/CTemplate.php:1090
+#: include/classes/api/services/CTemplate.php:1088
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Не удалось обновить шаблоны для обнаруженного узла сети \"%1$s\"."
@@ -2987,8 +3009,8 @@ msgstr "Не удалось проверить проверку обнаруже
 msgid "Case sensitive"
 msgstr "Регистрозависимое"
 
-#: app/views/administration.authentication.edit.php:52
-#: app/views/administration.authentication.edit.php:108
+#: app/views/administration.authentication.edit.php:53
+#: app/views/administration.authentication.edit.php:115
 msgid "Case sensitive login"
 msgstr "Регистрозависимое имя входа"
 
@@ -3034,7 +3056,7 @@ msgctxt "verb"
 msgid "Change"
 msgstr "Изменить"
 
-#: app/views/administration.authentication.edit.php:70
+#: app/views/administration.authentication.edit.php:72
 #: app/views/administration.mediatype.edit.php:140
 #: include/views/administration.users.edit.php:128
 msgid "Change password"
@@ -3094,7 +3116,7 @@ msgstr ""
 msgid "Check for error using regular expression"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:698
+#: include/views/configuration.host.discovery.edit.php:765
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.item.edit.php:1172
 #: include/views/configuration.item.list.php:286
@@ -3235,7 +3257,7 @@ msgstr "Часы"
 #: include/views/configuration.correlation.edit.php:277
 #: include/views/configuration.discovery.edit.php:110
 #: include/views/configuration.graph.edit.php:465
-#: include/views/configuration.host.discovery.edit.php:695
+#: include/views/configuration.host.discovery.edit.php:762
 #: include/views/configuration.host.edit.php:812
 #: include/views/configuration.hostgroups.edit.php:58
 #: include/views/configuration.host.prototype.edit.php:436
@@ -3375,7 +3397,7 @@ msgstr "Условие \"%2$s\" не используется в формуле 
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for correlation \"%1$s\"."
 msgstr "Условие \"%2$s\" не используется в формуле \"%3$s\" для корреляции \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1081
+#: include/classes/api/services/CDiscoveryRule.php:1228
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
 msgstr "Условие \"%2$s\" не используется в формуле \"%3$s\" правила обнаружения \"%1$s\"."
@@ -3390,7 +3412,7 @@ msgstr "Условие \"%2$s\" используемое в формуле \"%3$
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for correlation \"%1$s\" is not defined."
 msgstr "Условие \"%2$s\" используемое в формуле \"%3$s\" для корреляции \"%1$s\" не определено."
 
-#: include/classes/api/services/CDiscoveryRule.php:1080
+#: include/classes/api/services/CDiscoveryRule.php:1227
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
 msgstr "Условие \"%2$s\" используемое в формуле \"%3$s\" правила обнаружения \"%1$s\" не определено."
@@ -3442,7 +3464,7 @@ msgstr "Настройка действий"
 msgid "Configuration of applications"
 msgstr "Настройка групп элементов данных"
 
-#: app/controllers/CControllerAuthenticationEdit.php:127
+#: app/controllers/CControllerAuthenticationEdit.php:120
 msgid "Configuration of authentication"
 msgstr "Настройка аутентификации"
 
@@ -4414,7 +4436,7 @@ msgstr "Задержка по умолчанию"
 msgid "Default host inventory mode"
 msgstr "Режим инвентаризации узлов сети по умолчанию"
 
-#: app/views/administration.authentication.edit.php:41
+#: app/views/administration.authentication.edit.php:42
 msgid "Default login form"
 msgstr "Диалог входа в систему по умолчанию"
 
@@ -4535,7 +4557,7 @@ msgid "Delete dashboard?"
 msgstr "Удалить панель?"
 
 #: include/views/configuration.discovery.edit.php:111
-#: include/views/configuration.host.discovery.edit.php:705
+#: include/views/configuration.host.discovery.edit.php:772
 msgid "Delete discovery rule?"
 msgstr "Удалить правило обнаружения?"
 
@@ -4789,7 +4811,7 @@ msgstr "Удалить веб-сценарий?"
 msgid "Deleted"
 msgstr "Удален"
 
-#: include/classes/api/services/CHost.php:1305
+#: include/classes/api/services/CHost.php:1341
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Удалено: Узел сети \"%1$s\"."
@@ -5129,29 +5151,29 @@ msgstr "Правило обнаружения \"%1$s\" уже существуе
 msgid "Discovery rule \"%1$s\" is used in \"%2$s\" action."
 msgstr "Правило обнаружения \"%1$s\" используется в \"%2$s\" действии."
 
-#: discoveryconf.php:161 host_discovery.php:474
+#: discoveryconf.php:161 host_discovery.php:516
 msgid "Discovery rule created"
 msgstr "Правило обнаружения создано"
 
-#: discoveryconf.php:186 host_discovery.php:274
+#: discoveryconf.php:186 host_discovery.php:276
 msgid "Discovery rule deleted"
 msgstr "Правило обнаружения удалено"
 
-#: discoveryconf.php:210 host_discovery.php:504
+#: discoveryconf.php:210 host_discovery.php:546
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Правило обнаружения деактивировано"
 msgstr[1] "Правила обнаружения деактивированы"
 msgstr[2] "Правила обнаружения деактивированы"
 
-#: discoveryconf.php:209 host_discovery.php:503
+#: discoveryconf.php:209 host_discovery.php:545
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Правило обнаружения активировано"
 msgstr[1] "Правила обнаружения активированы"
 msgstr[2] "Правила обнаружения активированы"
 
-#: discoveryconf.php:154 host_discovery.php:477
+#: discoveryconf.php:154 host_discovery.php:519
 msgid "Discovery rule updated"
 msgstr "Правило обнаружения обновлено"
 
@@ -5166,7 +5188,7 @@ msgstr "Правило обнаружения обновлено"
 msgid "Discovery rules"
 msgstr "Правила обнаружения"
 
-#: discoveryconf.php:228 host_discovery.php:517
+#: discoveryconf.php:228 host_discovery.php:559
 msgid "Discovery rules deleted"
 msgstr "Правила обнаружения удалены"
 
@@ -5333,14 +5355,14 @@ msgstr "Дублирующиеся зависимости в триггере \"
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Дубликат зависимостей в прототипе триггеров \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1641
-#: include/classes/api/services/CHost.php:1879
+#: include/classes/api/services/CHost.php:1677
+#: include/classes/api/services/CHost.php:1915
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Дубликат узла сети. Узел сети с таким же именем \"%s\" уже существует в данных."
 
-#: include/classes/api/services/CHost.php:1648
-#: include/classes/api/services/CHost.php:1899
+#: include/classes/api/services/CHost.php:1684
+#: include/classes/api/services/CHost.php:1935
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Дубликат узла сети. Узел сети с таким же видимым именем \"%s\" уже существует в данных."
@@ -5457,8 +5479,8 @@ msgstr "Эффективное значение"
 msgid "Elasticsearch error: %1$s."
 msgstr "Ошибка Elasticsearch: %1$s."
 
-#: include/classes/api/managers/CHistoryManager.php:652
-#: include/classes/api/managers/CHistoryManager.php:661
+#: include/classes/api/managers/CHistoryManager.php:713
+#: include/classes/api/managers/CHistoryManager.php:722
 #, c-format
 msgid "Elasticsearch url is not set for type: %1$s."
 msgstr "Elasticsearch url не указан для типа: %1$s."
@@ -5531,19 +5553,19 @@ msgstr "Пустой ID корреляции."
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr "Пустой ID формулы условия фильтра для действия \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1108
+#: include/classes/api/services/CDiscoveryRule.php:1255
 #, c-format
 msgid "Empty filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "Пустой ID формулы условия фильтра для правила обнаружения \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1100
+#: include/classes/api/services/CDiscoveryRule.php:1247
 #, c-format
 msgid "Empty filter condition macro for discovery rule \"%1$s\"."
 msgstr "Пустой макрос условия фильтра для правила обнаружения \"%1$s\"."
 
 #: include/classes/api/services/CCorrelation.php:516
 #: include/classes/api/services/CCorrelation.php:693
-#: include/classes/api/services/CDiscoveryRule.php:465
+#: include/classes/api/services/CDiscoveryRule.php:468
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
 #: include/classes/api/services/CHostInterface.php:383
@@ -5620,7 +5642,7 @@ msgstr "Активировать"
 msgid "Enable HTTP authentication"
 msgstr "Активация HTTP аутентификации"
 
-#: app/views/administration.authentication.edit.php:77
+#: app/views/administration.authentication.edit.php:79
 msgid "Enable LDAP authentication"
 msgstr "Активация LDAP аутентификации"
 
@@ -6107,9 +6129,9 @@ msgstr "Поле \"%1$s\" не может быть NULL."
 #: include/classes/api/services/CDRule.php:318
 #: include/classes/api/services/CDRule.php:493
 #: include/classes/api/services/CDRule.php:503
-#: include/classes/api/services/CHostGroup.php:897
+#: include/classes/api/services/CHostGroup.php:914
 #: include/classes/api/services/CHost.php:743
-#: include/classes/api/services/CTemplate.php:784
+#: include/classes/api/services/CTemplate.php:782
 #: include/classes/api/services/CTriggerGeneral.php:236
 #: include/classes/validators/CNewValidator.php:255
 #: include/validate.inc.php:300
@@ -6247,7 +6269,7 @@ msgid "Filter"
 msgstr "Фильтр"
 
 #: include/views/configuration.host.discovery.edit.php:679
-#: include/views/configuration.host.discovery.edit.php:688
+#: include/views/configuration.host.discovery.edit.php:755
 msgid "Filters"
 msgstr "Фильтры"
 
@@ -6724,12 +6746,12 @@ msgstr "Сетка"
 msgid "Group"
 msgstr "Группа"
 
-#: include/classes/api/services/CHostGroup.php:551
+#: include/classes/api/services/CHostGroup.php:715
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "Группа \"%1$s\" не может быть удалена, так как используется прототипом узлов сети."
 
-#: include/classes/api/services/CHostGroup.php:600
+#: include/classes/api/services/CHostGroup.php:764
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr "Группа узлов сети \"%1$s\" не может быть удалена, так как она используется в условии корреляции."
@@ -6802,6 +6824,8 @@ msgstr "H:i"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1413
 #: include/classes/graphdraw/CLineGraphDraw.php:1420
+#: include/classes/html/svg/CSvgGraphXAxis.php:456
+#: include/classes/html/svg/CSvgGraphXAxis.php:463
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -6826,7 +6850,7 @@ msgstr "HTTP агент"
 msgid "HTTP authentication"
 msgstr "HTTP аутентификация"
 
-#: app/views/administration.authentication.edit.php:44
+#: app/views/administration.authentication.edit.php:45
 msgid "HTTP login form"
 msgstr "HTTP диалог входа в систему"
 
@@ -6838,7 +6862,7 @@ msgstr "HTTP диалог входа в систему"
 msgid "HTTP proxy"
 msgstr "HTTP прокси"
 
-#: app/views/administration.authentication.edit.php:136
+#: app/views/administration.authentication.edit.php:146
 msgid "HTTP settings"
 msgstr "Настройки HTTP"
 
@@ -7057,10 +7081,10 @@ msgstr[2] "Узлы сети"
 msgid "Host \"%1$s\" already exists."
 msgstr "Узел сети \"%1$s\" уже существует."
 
-#: include/classes/api/services/CHostGroup.php:1449
+#: include/classes/api/services/CHostGroup.php:1466
 #: include/classes/api/services/CHost.php:806
-#: include/classes/api/services/CHost.php:1629
-#: include/classes/api/services/CHost.php:1805
+#: include/classes/api/services/CHost.php:1665
+#: include/classes/api/services/CHost.php:1841
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "Узел сети \"%1$s\" не может быть без группы узлов сети."
@@ -7134,17 +7158,17 @@ msgstr[2] "Узлы сети активированы"
 msgid "Host group"
 msgstr "Группа узлов сети"
 
-#: include/classes/api/services/CHostGroup.php:731
+#: include/classes/api/services/CHostGroup.php:643
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Группа узлов сети \"%1$s\" уже существует."
 
-#: include/classes/api/services/CHostGroup.php:584
+#: include/classes/api/services/CHostGroup.php:748
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Группа узлов сети \"%1$s\" не может быть удалена, так как используется в глобальном скрипте."
 
-#: include/classes/api/services/CHostGroup.php:537
+#: include/classes/api/services/CHostGroup.php:701
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "Группа узлов сети \"%1$s\" является внутренней и не может быть удалена."
@@ -7324,25 +7348,25 @@ msgstr "Узел сети обновлен"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "Узел сети с ID \"%1$s\" недоступен."
 
-#: include/classes/api/services/CTemplate.php:1056
+#: include/classes/api/services/CTemplate.php:1054
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Узел сети с таким же именем \"%1$s\" уже существует."
 
-#: include/classes/api/services/CHost.php:1736
-#: include/classes/api/services/CHost.php:1955
+#: include/classes/api/services/CHost.php:1772
+#: include/classes/api/services/CHost.php:1991
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Узел сети с таким же именем \"%s\" уже существует."
 
 #: include/classes/api/services/CTemplate.php:460
-#: include/classes/api/services/CTemplate.php:1021
+#: include/classes/api/services/CTemplate.php:1019
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Узел сети с таким же видимым именем \"%1$s\" уже существует."
 
-#: include/classes/api/services/CHost.php:1742
-#: include/classes/api/services/CHost.php:1962
+#: include/classes/api/services/CHost.php:1778
+#: include/classes/api/services/CHost.php:1998
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Узел сети с таким же видимым именем \"%s\" уже существует."
@@ -7691,6 +7715,10 @@ msgstr "Недоступный узел сети"
 msgid "Inaccessible item"
 msgstr "Недоступный элемент данных"
 
+#: include/classes/screens/CScreenProblem.php:393
+msgid "Inaccessible maintenance"
+msgstr ""
+
 #: app/controllers/CControllerDashboardWidgetEdit.php:103
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:84
 msgid "Inaccessible map"
@@ -7964,18 +7992,18 @@ msgstr "В функцию переданы некорректные аргуме
 #: include/classes/api/services/CHostPrototype.php:392
 #: include/classes/api/services/CHostPrototype.php:413
 #: include/classes/api/services/CItemGeneral.php:258
-#: include/classes/api/services/CItemGeneral.php:1171
-#: include/classes/api/services/CItemGeneral.php:1196
-#: include/classes/api/services/CItemGeneral.php:1219
-#: include/classes/api/services/CItemGeneral.php:1249
-#: include/classes/api/services/CItemGeneral.php:1263
-#: include/classes/api/services/CItemGeneral.php:1289
-#: include/classes/api/services/CItemGeneral.php:1335
-#: include/classes/api/services/CItemGeneral.php:1358
-#: include/classes/api/services/CItemGeneral.php:1409
-#: include/classes/api/services/CItemGeneral.php:1420
-#: include/classes/api/services/CItemGeneral.php:1435
-#: include/classes/api/services/CItemGeneral.php:1446
+#: include/classes/api/services/CItemGeneral.php:1262
+#: include/classes/api/services/CItemGeneral.php:1287
+#: include/classes/api/services/CItemGeneral.php:1310
+#: include/classes/api/services/CItemGeneral.php:1340
+#: include/classes/api/services/CItemGeneral.php:1354
+#: include/classes/api/services/CItemGeneral.php:1380
+#: include/classes/api/services/CItemGeneral.php:1426
+#: include/classes/api/services/CItemGeneral.php:1449
+#: include/classes/api/services/CItemGeneral.php:1500
+#: include/classes/api/services/CItemGeneral.php:1511
+#: include/classes/api/services/CItemGeneral.php:1526
+#: include/classes/api/services/CItemGeneral.php:1537
 #: include/classes/api/services/CMapElement.php:46
 #: include/classes/api/services/CMapElement.php:90
 #: include/classes/api/services/CMapElement.php:109
@@ -8017,8 +8045,8 @@ msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Некорректное вычисляемое значение SLA для услуги \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:826
-#: include/classes/api/services/CHost.php:1617
-#: include/classes/api/services/CHost.php:1873
+#: include/classes/api/services/CHost.php:1653
+#: include/classes/api/services/CHost.php:1909
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Использованы некорректные символы в имени узла сети \"%s\"."
@@ -8030,7 +8058,7 @@ msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Использованы некорректные символы в имени прокси \"%1$s\"."
 
 #: include/classes/api/services/CTemplate.php:411
-#: include/classes/api/services/CTemplate.php:1064
+#: include/classes/api/services/CTemplate.php:1062
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Использованы некорректные символы в имени шаблона \"%1$s\"."
@@ -8040,7 +8068,7 @@ msgstr "Использованы некорректные символы в им
 msgid "Incorrect conditions for action \"%1$s\"."
 msgstr "Некорректные условия в действии \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1074
+#: include/classes/api/services/CDiscoveryRule.php:1221
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "Некорректные условия в правиле обнаружения \"%1$s\"."
@@ -8059,7 +8087,7 @@ msgstr "Некорректное пользовательское выражен
 msgid "Incorrect custom expression \"%2$s\" for correlation \"%1$s\": %3$s."
 msgstr "Некорректное пользовательское выражение \"%2$s\" для корреляции \"%1$s\": %3$s."
 
-#: include/classes/api/services/CDiscoveryRule.php:1079
+#: include/classes/api/services/CDiscoveryRule.php:1226
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
 msgstr "Некорректное пользовательское выражение \"%2$s\" для правила обнаружения \"%1$s\": %3$s."
@@ -8104,7 +8132,7 @@ msgstr "Некорректный загружаемый файл."
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr "Некорректный ID формулы условия фильтра для действия \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1109
+#: include/classes/api/services/CDiscoveryRule.php:1256
 #, c-format
 msgid "Incorrect filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "Некорректный ID формулы условия фильтра для правила обнаружения \"%1$s\"."
@@ -8114,7 +8142,7 @@ msgstr "Некорректный ID формулы условия фильтра
 msgid "Incorrect filter condition formula ID given for correlation \"%1$s\"."
 msgstr "Задан некорректный ID формулы условия фильтра для корреляции \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1101
+#: include/classes/api/services/CDiscoveryRule.php:1248
 #, c-format
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr "Некорректный макрос условия фильтра для правила обнаружения \"%1$s\"."
@@ -8124,7 +8152,7 @@ msgstr "Некорректный макрос условия фильтра дл
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr "Некорректный оператор условия фильтра для действия \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1113
+#: include/classes/api/services/CDiscoveryRule.php:1260
 #, c-format
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr "Некорректный оператор условия фильтра для правила обнаружения \"%1$s\"."
@@ -8172,8 +8200,8 @@ msgstr "Некорректный индекс изображения."
 #: include/classes/api/services/CAction.php:2821
 #: include/classes/api/services/CAction.php:2833
 #: include/classes/api/services/CHost.php:812
-#: include/classes/api/services/CHost.php:1611
-#: include/classes/api/services/CHost.php:1792
+#: include/classes/api/services/CHost.php:1647
+#: include/classes/api/services/CHost.php:1828
 #: include/classes/api/services/CImage.php:485
 #: include/classes/api/services/CProxy.php:618
 #: include/classes/api/services/CProxy.php:682
@@ -8196,8 +8224,8 @@ msgstr "Для интерфейса указан некорректный пар
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Для интерфейса указан некорректный порт \"%s\"."
 
-#: include/classes/api/services/CHost.php:1711
-#: include/classes/api/services/CHost.php:1855
+#: include/classes/api/services/CHost.php:1747
+#: include/classes/api/services/CHost.php:1891
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Некорректное поле \"%s\" инвентарных данных."
@@ -8392,8 +8420,8 @@ msgstr "Некорректный порядок сортировки у услу
 msgid "Incorrect source value."
 msgstr "Некорректное значение источника."
 
-#: include/classes/api/services/CHost.php:1683
-#: include/classes/api/services/CHost.php:1823
+#: include/classes/api/services/CHost.php:1719
+#: include/classes/api/services/CHost.php:1859
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Некорректное состояние для узла сети \"%1$s\"."
@@ -8466,7 +8494,7 @@ msgstr "Некорректный тип вычисления для действ
 msgid "Incorrect type of calculation for correlation \"%1$s\"."
 msgstr "Некорректный тип вычисления для корреляции \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1067
+#: include/classes/api/services/CDiscoveryRule.php:1214
 #, c-format
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr "Некорректный тип вычисления для правила обнаружения \"%1$s\"."
@@ -8506,7 +8534,7 @@ msgstr "Некорректная группа пользователей."
 #: include/classes/api/services/CAction.php:1745
 #: include/classes/api/services/CAction.php:2777
 #: include/classes/api/services/CAction.php:2921
-#: include/classes/api/services/CDiscoveryRule.php:1015
+#: include/classes/api/services/CDiscoveryRule.php:1162
 #: include/classes/api/services/CDRule.php:237
 #: include/classes/api/services/CDRule.php:244
 #: include/classes/api/services/CDRule.php:292
@@ -8517,7 +8545,7 @@ msgstr "Некорректная группа пользователей."
 #: include/classes/api/services/CDRule.php:558
 #: include/classes/api/services/CDRule.php:571
 #: include/classes/api/services/CItemGeneral.php:529
-#: include/classes/api/services/CItemGeneral.php:2206
+#: include/classes/api/services/CItemGeneral.php:2147
 #: include/classes/validators/CNewValidator.php:116
 #: include/classes/validators/CNewValidator.php:129
 #: include/classes/validators/CNewValidator.php:142
@@ -8532,7 +8560,7 @@ msgstr "Некорректная группа пользователей."
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:132
+#: app/controllers/CControllerAuthenticationUpdate.php:134
 #: include/classes/api/services/CAction.php:1678
 #: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:351
@@ -8615,8 +8643,8 @@ msgstr ""
 #: include/classes/api/services/CCorrelation.php:1101
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
-#: include/classes/api/services/CDiscoveryRule.php:1135
-#: include/classes/api/services/CDiscoveryRule.php:1359
+#: include/classes/api/services/CDiscoveryRule.php:1282
+#: include/classes/api/services/CDiscoveryRule.php:1651
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:214
@@ -8636,21 +8664,19 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:804
 #: include/classes/api/services/CEvent.php:847
 #: include/classes/api/services/CEvent.php:904
-#: include/classes/api/services/CHostGeneral.php:1023
-#: include/classes/api/services/CHostGeneral.php:1030
 #: include/classes/api/services/CHost.php:770
-#: include/classes/api/services/CHost.php:1515
-#: include/classes/api/services/CHost.php:1521
-#: include/classes/api/services/CHost.php:1536
-#: include/classes/api/services/CHost.php:1542
-#: include/classes/api/services/CHost.php:1547
-#: include/classes/api/services/CHost.php:1553
-#: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1567
-#: include/classes/api/services/CHost.php:1576
-#: include/classes/api/services/CHost.php:1582
-#: include/classes/api/services/CHost.php:1677
-#: include/classes/api/services/CHost.php:1817
+#: include/classes/api/services/CHost.php:1551
+#: include/classes/api/services/CHost.php:1557
+#: include/classes/api/services/CHost.php:1572
+#: include/classes/api/services/CHost.php:1578
+#: include/classes/api/services/CHost.php:1583
+#: include/classes/api/services/CHost.php:1589
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1612
+#: include/classes/api/services/CHost.php:1618
+#: include/classes/api/services/CHost.php:1713
+#: include/classes/api/services/CHost.php:1853
 #: include/classes/api/services/CHttpTest.php:967
 #: include/classes/api/services/CHttpTest.php:982
 #: include/classes/api/services/CHttpTest.php:1076
@@ -8664,40 +8690,36 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:517
 #: include/classes/api/services/CItemGeneral.php:523
 #: include/classes/api/services/CItemGeneral.php:536
-#: include/classes/api/services/CItemGeneral.php:1201
-#: include/classes/api/services/CItemGeneral.php:1207
-#: include/classes/api/services/CItemGeneral.php:1223
-#: include/classes/api/services/CItemGeneral.php:1232
-#: include/classes/api/services/CItemGeneral.php:1254
-#: include/classes/api/services/CItemGeneral.php:1268
-#: include/classes/api/services/CItemGeneral.php:1275
-#: include/classes/api/services/CItemGeneral.php:1281
-#: include/classes/api/services/CItemGeneral.php:1294
-#: include/classes/api/services/CItemGeneral.php:1305
-#: include/classes/api/services/CItemGeneral.php:1315
-#: include/classes/api/services/CItemGeneral.php:1322
-#: include/classes/api/services/CItemGeneral.php:1340
-#: include/classes/api/services/CItemGeneral.php:1363
+#: include/classes/api/services/CItemGeneral.php:1292
+#: include/classes/api/services/CItemGeneral.php:1298
+#: include/classes/api/services/CItemGeneral.php:1314
+#: include/classes/api/services/CItemGeneral.php:1323
+#: include/classes/api/services/CItemGeneral.php:1345
+#: include/classes/api/services/CItemGeneral.php:1359
+#: include/classes/api/services/CItemGeneral.php:1366
+#: include/classes/api/services/CItemGeneral.php:1372
+#: include/classes/api/services/CItemGeneral.php:1385
+#: include/classes/api/services/CItemGeneral.php:1396
+#: include/classes/api/services/CItemGeneral.php:1406
 #: include/classes/api/services/CItemGeneral.php:1413
-#: include/classes/api/services/CItemGeneral.php:1426
-#: include/classes/api/services/CItemGeneral.php:1439
+#: include/classes/api/services/CItemGeneral.php:1431
 #: include/classes/api/services/CItemGeneral.php:1454
-#: include/classes/api/services/CItemGeneral.php:1464
-#: include/classes/api/services/CItemGeneral.php:1688
-#: include/classes/api/services/CItemGeneral.php:1729
-#: include/classes/api/services/CItemGeneral.php:1735
-#: include/classes/api/services/CItemGeneral.php:1752
-#: include/classes/api/services/CItemGeneral.php:1759
-#: include/classes/api/services/CItemGeneral.php:1765
-#: include/classes/api/services/CItemGeneral.php:1850
-#: include/classes/api/services/CItemGeneral.php:1859
-#: include/classes/api/services/CItemGeneral.php:1972
-#: include/classes/api/services/CItemGeneral.php:1979
-#: include/classes/api/services/CItemGeneral.php:2145
-#: include/classes/api/services/CItem.php:774
-#: include/classes/api/services/CItem.php:782
-#: include/classes/api/services/CItemPrototype.php:944
-#: include/classes/api/services/CItemPrototype.php:952
+#: include/classes/api/services/CItemGeneral.php:1504
+#: include/classes/api/services/CItemGeneral.php:1517
+#: include/classes/api/services/CItemGeneral.php:1530
+#: include/classes/api/services/CItemGeneral.php:1545
+#: include/classes/api/services/CItemGeneral.php:1555
+#: include/classes/api/services/CItemGeneral.php:1788
+#: include/classes/api/services/CItemGeneral.php:1808
+#: include/classes/api/services/CItemGeneral.php:1815
+#: include/classes/api/services/CItemGeneral.php:1825
+#: include/classes/api/services/CItemGeneral.php:1905
+#: include/classes/api/services/CItemGeneral.php:1919
+#: include/classes/api/services/CItemGeneral.php:2086
+#: include/classes/api/services/CItem.php:772
+#: include/classes/api/services/CItem.php:780
+#: include/classes/api/services/CItemPrototype.php:943
+#: include/classes/api/services/CItemPrototype.php:951
 #: include/classes/api/services/CMaintenance.php:468
 #: include/classes/api/services/CMaintenance.php:637
 #: include/classes/api/services/CMapElement.php:74
@@ -8763,12 +8785,12 @@ msgstr ""
 #: include/classes/helpers/CSvgGraphHelper.php:248
 #: include/classes/import/CConfigurationImport.php:807
 #: include/classes/import/CConfigurationImport.php:845
-#: include/classes/import/CConfigurationImport.php:2460
-#: include/classes/import/CConfigurationImport.php:2564
-#: include/classes/import/CConfigurationImport.php:2574
-#: include/classes/import/CConfigurationImport.php:2610
-#: include/classes/import/CConfigurationImport.php:2619
-#: include/classes/import/CConfigurationImport.php:2625
+#: include/classes/import/CConfigurationImport.php:2468
+#: include/classes/import/CConfigurationImport.php:2572
+#: include/classes/import/CConfigurationImport.php:2582
+#: include/classes/import/CConfigurationImport.php:2618
+#: include/classes/import/CConfigurationImport.php:2627
+#: include/classes/import/CConfigurationImport.php:2633
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
 #: include/classes/validators/CNewValidator.php:266
@@ -8781,7 +8803,7 @@ msgstr ""
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "Некорректное значение для поля \"%1$s\": %2$s."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:124
+#: app/controllers/CControllerAuthenticationUpdate.php:126
 #: app/controllers/CControllerPopupTriggerWizard.php:125
 #: include/validate.inc.php:346
 #, c-format
@@ -9048,7 +9070,7 @@ msgstr "Ошибочный период хранения внутренних д
 
 #: disc_prototypes.php:394 disc_prototypes.php:399 disc_prototypes.php:412
 #: disc_prototypes.php:730 disc_prototypes.php:735 disc_prototypes.php:748
-#: host_discovery.php:310 host_discovery.php:315 host_discovery.php:328
+#: host_discovery.php:312 host_discovery.php:317 host_discovery.php:330
 #: items.php:617 items.php:622 items.php:635 items.php:1025 items.php:1030
 #: items.php:1043
 #, c-format
@@ -9108,65 +9130,72 @@ msgstr "Ошибочное количество параметров."
 #: app/controllers/CControllerDashboardUpdate.php:125
 #: app/controllers/CControllerDashboardUpdate.php:134
 #: app/controllers/CControllerDashboardUpdate.php:142
-#: include/classes/api/services/CItemGeneral.php:2161
-#: include/classes/api/services/CItemGeneral.php:2168
-#: include/classes/api/services/CItemGeneral.php:2176
-#: include/classes/api/services/CItemGeneral.php:2185
-#: include/classes/api/services/CItemGeneral.php:2192
+#: include/classes/api/services/CDiscoveryRule.php:1306
+#: include/classes/api/services/CDiscoveryRule.php:1392
+#: include/classes/api/services/CDiscoveryRule.php:1409
+#: include/classes/api/services/CDiscoveryRule.php:1427
+#: include/classes/api/services/CDiscoveryRule.php:1435
+#: include/classes/api/services/CItemGeneral.php:2102
+#: include/classes/api/services/CItemGeneral.php:2109
+#: include/classes/api/services/CItemGeneral.php:2117
+#: include/classes/api/services/CItemGeneral.php:2126
+#: include/classes/api/services/CItemGeneral.php:2133
 #: include/classes/api/services/CUser.php:649
 #: include/classes/api/services/CUser.php:660
-#: include/classes/validators/CApiInputValidator.php:230
-#: include/classes/validators/CApiInputValidator.php:235
-#: include/classes/validators/CApiInputValidator.php:240
-#: include/classes/validators/CApiInputValidator.php:270
-#: include/classes/validators/CApiInputValidator.php:331
-#: include/classes/validators/CApiInputValidator.php:338
-#: include/classes/validators/CApiInputValidator.php:370
-#: include/classes/validators/CApiInputValidator.php:375
-#: include/classes/validators/CApiInputValidator.php:417
-#: include/classes/validators/CApiInputValidator.php:422
-#: include/classes/validators/CApiInputValidator.php:475
-#: include/classes/validators/CApiInputValidator.php:508
-#: include/classes/validators/CApiInputValidator.php:513
-#: include/classes/validators/CApiInputValidator.php:554
-#: include/classes/validators/CApiInputValidator.php:559
-#: include/classes/validators/CApiInputValidator.php:564
-#: include/classes/validators/CApiInputValidator.php:593
-#: include/classes/validators/CApiInputValidator.php:648
-#: include/classes/validators/CApiInputValidator.php:655
-#: include/classes/validators/CApiInputValidator.php:682
-#: include/classes/validators/CApiInputValidator.php:727
-#: include/classes/validators/CApiInputValidator.php:756
-#: include/classes/validators/CApiInputValidator.php:761
-#: include/classes/validators/CApiInputValidator.php:798
-#: include/classes/validators/CApiInputValidator.php:803
-#: include/classes/validators/CApiInputValidator.php:846
-#: include/classes/validators/CApiInputValidator.php:855
-#: include/classes/validators/CApiInputValidator.php:861
-#: include/classes/validators/CApiInputValidator.php:889
-#: include/classes/validators/CApiInputValidator.php:899
-#: include/classes/validators/CApiInputValidator.php:905
-#: include/classes/validators/CApiInputValidator.php:941
-#: include/classes/validators/CApiInputValidator.php:952
-#: include/classes/validators/CApiInputValidator.php:959
-#: include/classes/validators/CApiInputValidator.php:986
-#: include/classes/validators/CApiInputValidator.php:996
-#: include/classes/validators/CApiInputValidator.php:1021
-#: include/classes/validators/CApiInputValidator.php:1026
-#: include/classes/validators/CApiInputValidator.php:1052
+#: include/classes/validators/CApiInputValidator.php:234
+#: include/classes/validators/CApiInputValidator.php:239
+#: include/classes/validators/CApiInputValidator.php:244
+#: include/classes/validators/CApiInputValidator.php:274
+#: include/classes/validators/CApiInputValidator.php:335
+#: include/classes/validators/CApiInputValidator.php:342
+#: include/classes/validators/CApiInputValidator.php:374
+#: include/classes/validators/CApiInputValidator.php:379
+#: include/classes/validators/CApiInputValidator.php:421
+#: include/classes/validators/CApiInputValidator.php:426
+#: include/classes/validators/CApiInputValidator.php:479
+#: include/classes/validators/CApiInputValidator.php:512
+#: include/classes/validators/CApiInputValidator.php:517
+#: include/classes/validators/CApiInputValidator.php:558
+#: include/classes/validators/CApiInputValidator.php:563
+#: include/classes/validators/CApiInputValidator.php:568
+#: include/classes/validators/CApiInputValidator.php:597
+#: include/classes/validators/CApiInputValidator.php:652
+#: include/classes/validators/CApiInputValidator.php:659
+#: include/classes/validators/CApiInputValidator.php:686
+#: include/classes/validators/CApiInputValidator.php:731
+#: include/classes/validators/CApiInputValidator.php:760
+#: include/classes/validators/CApiInputValidator.php:765
+#: include/classes/validators/CApiInputValidator.php:802
+#: include/classes/validators/CApiInputValidator.php:807
+#: include/classes/validators/CApiInputValidator.php:850
+#: include/classes/validators/CApiInputValidator.php:859
+#: include/classes/validators/CApiInputValidator.php:865
+#: include/classes/validators/CApiInputValidator.php:893
+#: include/classes/validators/CApiInputValidator.php:903
+#: include/classes/validators/CApiInputValidator.php:909
+#: include/classes/validators/CApiInputValidator.php:945
+#: include/classes/validators/CApiInputValidator.php:956
+#: include/classes/validators/CApiInputValidator.php:963
+#: include/classes/validators/CApiInputValidator.php:990
+#: include/classes/validators/CApiInputValidator.php:1000
+#: include/classes/validators/CApiInputValidator.php:1025
+#: include/classes/validators/CApiInputValidator.php:1030
+#: include/classes/validators/CApiInputValidator.php:1054
 #: include/classes/validators/CApiInputValidator.php:1059
-#: include/classes/validators/CApiInputValidator.php:1086
-#: include/classes/validators/CApiInputValidator.php:1093
-#: include/classes/validators/CApiInputValidator.php:1120
-#: include/classes/validators/CApiInputValidator.php:1129
-#: include/classes/validators/CApiInputValidator.php:1174
-#: include/classes/validators/CApiInputValidator.php:1185
+#: include/classes/validators/CApiInputValidator.php:1085
+#: include/classes/validators/CApiInputValidator.php:1092
+#: include/classes/validators/CApiInputValidator.php:1119
+#: include/classes/validators/CApiInputValidator.php:1126
+#: include/classes/validators/CApiInputValidator.php:1153
+#: include/classes/validators/CApiInputValidator.php:1162
+#: include/classes/validators/CApiInputValidator.php:1207
 #: include/classes/validators/CApiInputValidator.php:1218
-#: include/classes/validators/CApiInputValidator.php:1273
-#: include/classes/validators/CApiInputValidator.php:1360
-#: include/classes/validators/CApiInputValidator.php:1365
-#: include/classes/validators/CApiInputValidator.php:1392
-#: include/classes/validators/CApiInputValidator.php:1397
+#: include/classes/validators/CApiInputValidator.php:1251
+#: include/classes/validators/CApiInputValidator.php:1306
+#: include/classes/validators/CApiInputValidator.php:1393
+#: include/classes/validators/CApiInputValidator.php:1398
+#: include/classes/validators/CApiInputValidator.php:1425
+#: include/classes/validators/CApiInputValidator.php:1430
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:133
 #: include/classes/widgets/forms/CWidgetFormMap.php:101
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:479
@@ -9208,7 +9237,7 @@ msgstr "Ошибочный второй параметр."
 #: include/classes/import/validators/C32XmlValidator.php:1007
 #: include/classes/import/validators/C34XmlValidator.php:1111
 #: include/classes/import/validators/C40XmlValidator.php:1290
-#: include/classes/import/validators/C42XmlValidator.php:1298
+#: include/classes/import/validators/C42XmlValidator.php:1310
 #: include/classes/import/validators/CXmlValidatorGeneral.php:90
 #: include/classes/import/validators/CXmlValidatorGeneral.php:105
 #: include/classes/import/validators/CXmlValidatorGeneral.php:124
@@ -9324,7 +9353,7 @@ msgstr "Элемент данных \"%1$s\" уже существует у \"%2
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
 msgstr "Элемент данных \"%1$s\" уже существует у \"%2$s\"."
 
-#: include/classes/api/services/CItem.php:954
+#: include/classes/api/services/CItem.php:891
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Элемент данных \"%1$s\" не может заполнять отсутствующее поле под номером \"%2$d\" инвентарных данных узла сети. Выберите из: от 0 (не заполнять) до %3$d."
@@ -9334,8 +9363,8 @@ msgstr "Элемент данных \"%1$s\" не может заполнять 
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Элемент данных \"%1$s\" не существует у шаблона \"%2$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1360
-#: include/classes/api/services/CItemGeneral.php:1689
+#: include/classes/api/services/CDiscoveryRule.php:1652
+#: include/classes/api/services/CItemGeneral.php:1789
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "Элемент данных \"%1$s\" не существует или у вас нет прав доступа к нему"
@@ -9396,12 +9425,12 @@ msgstr "Элемент данных в \"неподдерживаемом\" со
 msgid "Item not selected"
 msgstr "Элемент данных не выбран"
 
-#: include/classes/api/services/CItemGeneral.php:1191
+#: include/classes/api/services/CItemGeneral.php:1282
 #, c-format
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr "Отсутствуют параметры у предобработки элемента данных: %1$s"
 
-#: include/classes/api/services/CDiscoveryRule.php:1140
+#: include/classes/api/services/CDiscoveryRule.php:1287
 msgid "Item pre-processing is not allowed for discovery rules."
 msgstr "Предобработка элементов данных не разрешена для правил обнаружения."
 
@@ -9415,7 +9444,7 @@ msgstr "Прототип элемента данных"
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Прототип элемента данных \"%1$s\" уже существует у \"%2$s\", унаследован из другого шаблона."
 
-#: include/classes/api/services/CItemGeneral.php:1006
+#: include/classes/api/services/CItemGeneral.php:1040
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", linked to another rule."
 msgstr "Прототип элемента данных \"%1$s\" уже существует у \"%2$s\", присоединен к другому правилу."
@@ -9496,32 +9525,32 @@ msgstr "Элемент данных не будет обновляться. Ин
 msgid "Item with ID \"%1$s\" is not available."
 msgstr "Элемент данных с ID \"%1$s\" недоступен."
 
-#: include/classes/api/services/CItemGeneral.php:721
+#: include/classes/api/services/CItemGeneral.php:668
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как правило обнаружения."
 
-#: include/classes/api/services/CItemGeneral.php:727
+#: include/classes/api/services/CItemGeneral.php:674
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как элемент данных созданный из прототипа элементов данных."
 
-#: include/classes/api/services/CItemGeneral.php:724
+#: include/classes/api/services/CItemGeneral.php:671
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как прототип элемента данных."
 
-#: include/classes/api/services/CItemGeneral.php:718
+#: include/classes/api/services/CItemGeneral.php:665
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как элемент данных."
 
-#: include/classes/api/services/CItemGeneral.php:730
+#: include/classes/api/services/CItemGeneral.php:677
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как неизвестный элемент данных."
 
-#: include/classes/api/services/CItemGeneral.php:1581
+#: include/classes/api/services/CItemGeneral.php:1672
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Элемент данных с ключом \"%1$s\" уже существует у \"%2$s\"."
@@ -9589,6 +9618,7 @@ msgid "JMX interfaces"
 msgstr "Интерфейсы JMX"
 
 #: include/items.inc.php:1738
+#: include/views/configuration.host.discovery.edit.php:693
 msgid "JSON Path"
 msgstr "Путь JSON"
 
@@ -9713,7 +9743,7 @@ msgstr "LDAP"
 msgid "LDAP authentication"
 msgstr "LDAP аутентификация"
 
-#: app/views/administration.authentication.edit.php:83
+#: app/views/administration.authentication.edit.php:86
 msgid "LDAP host"
 msgstr "Хост LDAP"
 
@@ -9721,13 +9751,22 @@ msgstr "Хост LDAP"
 msgid "LDAP is not configured"
 msgstr "LDAP не настроен"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:180
+#: app/controllers/CControllerAuthenticationUpdate.php:182
 msgid "LDAP login successful"
 msgstr "Успешный вход через LDAP"
 
-#: app/views/administration.authentication.edit.php:137
+#: app/views/administration.authentication.edit.php:147
 msgid "LDAP settings"
 msgstr "Настройки LDAP"
+
+#: include/views/configuration.host.discovery.edit.php:693
+msgid "LLD macro"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:745
+#: include/views/configuration.host.discovery.edit.php:754
+msgid "LLD macros"
+msgstr ""
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:1100
@@ -10095,7 +10134,7 @@ msgstr "Формат времени в журнале (логе)"
 msgid "Log unmatched SNMP traps"
 msgstr "Журналировать не совпадающие SNMP трапы"
 
-#: app/views/administration.authentication.edit.php:115 auditlogs.php:138
+#: app/views/administration.authentication.edit.php:123 auditlogs.php:138
 #: include/func.inc.php:1790 include/func.inc.php:1805
 #: include/menu.inc.php:294 include/views/administration.auditlogs.list.php:44
 #: include/views/administration.users.list.php:89 index_http.php:91
@@ -10125,6 +10164,7 @@ msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "Правило низкоуровневого обнаружения в \"неподдерживаемом\" состоянии"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
+#: include/classes/html/svg/CSvgGraphXAxis.php:424
 msgid "M"
 msgstr "M"
 
@@ -11195,7 +11235,7 @@ msgstr "Не указан \"%1$s\" для шаблона комплексног�
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr "Не указано \"%2$s\" для условия фильтра действия \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1117
+#: include/classes/api/services/CDiscoveryRule.php:1264
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of discovery rule \"%1$s\"."
 msgstr "Не указано \"%2$s\" для условия фильтра правила обнаружения \"%1$s\"."
@@ -11205,7 +11245,7 @@ msgstr "Не указано \"%2$s\" для условия фильтра пра
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr "Не указан \"%2$s\" для фильтра в действии \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1085
+#: include/classes/api/services/CDiscoveryRule.php:1232
 #, c-format
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr "Не указано \"%2$s\" для фильтра в правиле обнаружения \"%1$s\"."
@@ -11308,7 +11348,7 @@ msgstr "Нет интерфейса по умолчанию для \"%1$s\" ти
 msgid "No details"
 msgstr "Без деталей"
 
-#: include/classes/api/services/CDiscoveryRule.php:603
+#: include/classes/api/services/CDiscoveryRule.php:606
 msgid "No discovery rule IDs given."
 msgstr "ID правил обнаружения не указаны."
 
@@ -11349,7 +11389,7 @@ msgstr "Не найден прототип графика с таким ID дл�
 msgid "No graphs added."
 msgstr "Графики не добавлены."
 
-#: include/classes/api/services/CDiscoveryRule.php:606
+#: include/classes/api/services/CDiscoveryRule.php:609
 msgid "No host IDs given."
 msgstr "Не указаны ID узлов сети."
 
@@ -11405,8 +11445,8 @@ msgstr "Интерфейс не найден."
 msgid "No interface provided for proxy \"%s\"."
 msgstr "Не указан интерфейс для прокси \"%s\"."
 
-#: include/classes/api/services/CHost.php:1690
-#: include/classes/api/services/CHost.php:1866
+#: include/classes/api/services/CHost.php:1726
+#: include/classes/api/services/CHost.php:1902
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "Нет интерфейсов для узла сети \"%s\"."
@@ -11485,9 +11525,10 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CDashboard.php:368
 #: include/classes/api/services/CDashboard.php:393
 #: include/classes/api/services/CDashboard.php:1233
-#: include/classes/api/services/CDiscoveryRule.php:481
-#: include/classes/api/services/CDiscoveryRule.php:582
-#: include/classes/api/services/CDiscoveryRule.php:618
+#: include/classes/api/services/CDiscoveryRule.php:484
+#: include/classes/api/services/CDiscoveryRule.php:585
+#: include/classes/api/services/CDiscoveryRule.php:621
+#: include/classes/api/services/CDiscoveryRule.php:1461
 #: include/classes/api/services/CDRule.php:183
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CDRule.php:336
@@ -11504,21 +11545,21 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CGraphPrototype.php:717
 #: include/classes/api/services/CHostBase.php:49
 #: include/classes/api/services/CHostGeneral.php:56
-#: include/classes/api/services/CHostGroup.php:532
-#: include/classes/api/services/CHostGroup.php:788
-#: include/classes/api/services/CHostGroup.php:1027
-#: include/classes/api/services/CHostGroup.php:1058
-#: include/classes/api/services/CHostGroup.php:1159
-#: include/classes/api/services/CHostGroup.php:1281
-#: include/classes/api/services/CHostGroup.php:1301
+#: include/classes/api/services/CHostGroup.php:696
+#: include/classes/api/services/CHostGroup.php:805
+#: include/classes/api/services/CHostGroup.php:1044
+#: include/classes/api/services/CHostGroup.php:1075
+#: include/classes/api/services/CHostGroup.php:1176
+#: include/classes/api/services/CHostGroup.php:1298
+#: include/classes/api/services/CHostGroup.php:1318
 #: include/classes/api/services/CHostInterface.php:239
 #: include/classes/api/services/CHostInterface.php:259
 #: include/classes/api/services/CHostInterface.php:394
 #: include/classes/api/services/CHostInterface.php:653
 #: include/classes/api/services/CHost.php:1122
 #: include/classes/api/services/CHost.php:1157
-#: include/classes/api/services/CHost.php:1666
-#: include/classes/api/services/CHost.php:1798
+#: include/classes/api/services/CHost.php:1702
+#: include/classes/api/services/CHost.php:1834
 #: include/classes/api/services/CHostPrototype.php:353
 #: include/classes/api/services/CHostPrototype.php:399
 #: include/classes/api/services/CHostPrototype.php:420
@@ -11538,8 +11579,8 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CItemGeneral.php:209
 #: include/classes/api/services/CItemGeneral.php:311
 #: include/classes/api/services/CItemGeneral.php:326
-#: include/classes/api/services/CItem.php:699
-#: include/classes/api/services/CItemPrototype.php:869
+#: include/classes/api/services/CItem.php:697
+#: include/classes/api/services/CItemPrototype.php:868
 #: include/classes/api/services/CMaintenance.php:263
 #: include/classes/api/services/CMaintenance.php:292
 #: include/classes/api/services/CMaintenance.php:305
@@ -11661,7 +11702,7 @@ msgstr "Нет триггера с triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Триггеры не заданы."
 
-#: include/classes/validators/CApiInputValidator.php:618
+#: include/classes/validators/CApiInputValidator.php:622
 msgid "Non-boolean flags are deprecated."
 msgstr "Не-логические флаги устарели."
 
@@ -12065,7 +12106,7 @@ msgstr "Один раз"
 msgid "One"
 msgstr "Одна"
 
-#: include/classes/api/services/CHostGroup.php:1169
+#: include/classes/api/services/CHostGroup.php:1186
 msgid "One of the objects is left without a host group."
 msgstr "Один из объектов остался без группы узлов сети."
 
@@ -12078,7 +12119,7 @@ msgstr "Единовременно"
 msgid "One-time downtime"
 msgstr "Однократная недоступность"
 
-#: include/classes/api/services/CHostGroup.php:743
+#: include/classes/api/services/CHostGroup.php:655
 msgid "Only Super Admins can create host groups."
 msgstr "Только Супер Администраторы могут создавать группы узлов сети."
 
@@ -12128,7 +12169,7 @@ msgstr "Только администраторы могут указывать 
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Подсчитываются только элементы данных у активированных узлов сети"
 
-#: include/classes/api/services/CItemGeneral.php:1369
+#: include/classes/api/services/CItemGeneral.php:1460
 msgid "Only one change step is allowed."
 msgstr "Разрешен только один шаг изменения."
 
@@ -12136,8 +12177,8 @@ msgstr "Разрешен только один шаг изменения."
 msgid "Only one check can be unique."
 msgstr "Только одна проверка может быть уникальной."
 
-#: include/classes/api/services/CItemGeneral.php:1346
-#: include/classes/api/services/CItemGeneral.php:1391
+#: include/classes/api/services/CItemGeneral.php:1437
+#: include/classes/api/services/CItemGeneral.php:1482
 msgid "Only one throttling step is allowed."
 msgstr ""
 
@@ -12574,7 +12615,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:963
+#: include/classes/graph/CSvgGraph.php:933
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -12630,7 +12671,7 @@ msgstr "Страница получила некорректные данные"
 msgid "Parameter"
 msgstr "Параметр"
 
-#: include/classes/validators/CApiInputValidator.php:678
+#: include/classes/validators/CApiInputValidator.php:682
 #, c-format
 msgid "Parameter \"%1$s\" is deprecated."
 msgstr "Параметр \"%1$s\" устарел."
@@ -12693,7 +12734,7 @@ msgid "Passive"
 msgstr "Пассивный"
 
 #: app/views/administration.mediatype.edit.php:164 disc_prototypes.php:266
-#: host_discovery.php:207 httpconf.php:58
+#: host_discovery.php:208 httpconf.php:58
 #: include/classes/setup/CSetupWizard.php:248
 #: include/views/administration.users.edit.php:109
 #: include/views/administration.users.edit.php:140
@@ -12892,7 +12933,7 @@ msgstr "Польский (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Заполнение поля инвентаря узла сети"
 
-#: app/views/administration.authentication.edit.php:88
+#: app/views/administration.authentication.edit.php:92
 #: app/views/administration.proxy.edit.php:43 disc_prototypes.php:121
 #: host_discovery.php:105 include/classes/setup/CSetupWizard.php:279
 #: include/forms.inc.php:472 include/views/configuration.action.edit.php:995
@@ -13269,7 +13310,7 @@ msgid "Queue of items to be updated"
 msgstr "Очередь элементов данных ожидающих обновления"
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:959
+#: include/classes/graph/CSvgGraph.php:929
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:956
 #: include/classes/screens/CScreenProblem.php:1122 include/events.inc.php:345
@@ -13512,6 +13553,7 @@ msgstr "Удаленная команда"
 #: include/views/configuration.host.discovery.edit.php:226
 #: include/views/configuration.host.discovery.edit.php:547
 #: include/views/configuration.host.discovery.edit.php:660
+#: include/views/configuration.host.discovery.edit.php:729
 #: include/views/configuration.httpconf.edit.php:243
 #: include/views/configuration.item.edit.php:163
 #: include/views/configuration.item.edit.php:258
@@ -13564,6 +13606,7 @@ msgstr "Удаленная команда"
 #: include/views/js/configuration.discovery.edit.js.php:10
 #: include/views/js/configuration.graph.edit.js.php:93
 #: include/views/js/configuration.host.discovery.edit.js.php:31
+#: include/views/js/configuration.host.discovery.edit.js.php:51
 #: include/views/js/configuration.host.edit.js.php:47
 #: include/views/js/configuration.host.prototype.edit.js.php:7
 #: include/views/js/configuration.httpconf.edit.js.php:21
@@ -13599,7 +13642,7 @@ msgstr "Удаленная команда"
 msgid "Remove"
 msgstr "Удалить"
 
-#: app/views/administration.authentication.edit.php:47
+#: app/views/administration.authentication.edit.php:48
 msgid "Remove domain name"
 msgstr "Удаление имени домена"
 
@@ -13682,7 +13725,7 @@ msgstr "Запрос тела"
 msgid "Request body type"
 msgstr "Типа запроса тела"
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:967 items.php:1416
+#: host_discovery.php:286 host_discovery.php:571 items.php:967 items.php:1416
 msgid "Request sent successfully"
 msgstr "Запрос успешно отправлен"
 
@@ -14370,7 +14413,7 @@ msgstr "Скрипты"
 msgid "Search"
 msgstr "Поиск"
 
-#: app/views/administration.authentication.edit.php:98
+#: app/views/administration.authentication.edit.php:104
 msgid "Search attribute"
 msgstr "Атрибут поиска"
 
@@ -15629,9 +15672,9 @@ msgstr "Шаблон"
 msgid "Template \"%1$s\" already exists."
 msgstr "Шаблон \"%1$s\" уже существует."
 
-#: include/classes/api/services/CHostGroup.php:1454
+#: include/classes/api/services/CHostGroup.php:1471
 #: include/classes/api/services/CTemplate.php:368
-#: include/classes/api/services/CTemplate.php:988
+#: include/classes/api/services/CTemplate.php:986
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "Шаблон \"%1$s\" не может быть без группы узлов сети."
@@ -15691,25 +15734,25 @@ msgstr "Шаблон обновлен"
 msgid "Template value"
 msgstr "Значение шаблона"
 
-#: include/classes/api/services/CTemplate.php:1043
+#: include/classes/api/services/CTemplate.php:1041
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Шаблон с таким же именем \"%1$s\" уже существует."
 
-#: include/classes/api/services/CHost.php:1757
-#: include/classes/api/services/CHost.php:1980
+#: include/classes/api/services/CHost.php:1793
+#: include/classes/api/services/CHost.php:2016
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Шаблон с таким же именем \"%s\" уже существует."
 
 #: include/classes/api/services/CTemplate.php:447
-#: include/classes/api/services/CTemplate.php:1008
+#: include/classes/api/services/CTemplate.php:1006
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Шаблон с таким же видимым именем \"%1$s\" уже существует."
 
-#: include/classes/api/services/CHost.php:1763
-#: include/classes/api/services/CHost.php:1988
+#: include/classes/api/services/CHost.php:1799
+#: include/classes/api/services/CHost.php:2024
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Шаблон с таким же видимым именем \"%s\" уже существует."
@@ -15743,7 +15786,7 @@ msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Шаблоны \"%1$s\" отсоединены от узлов сети \"%2$s\"."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:147
-#: app/views/administration.authentication.edit.php:140
+#: app/views/administration.authentication.edit.php:150
 #: app/views/popup.testtriggerexpr.php:110
 #: include/views/administration.general.regularexpressions.edit.php:139
 #: include/views/configuration.trigger.prototype.edit.php:239
@@ -15753,7 +15796,7 @@ msgstr "Шаблоны \"%1$s\" отсоединены от узлов сети 
 msgid "Test"
 msgstr "Тест"
 
-#: app/views/administration.authentication.edit.php:114
+#: app/views/administration.authentication.edit.php:122
 msgid "Test authentication"
 msgstr "Тест аутентификации"
 
@@ -16175,7 +16218,7 @@ msgstr "Триггер \"%1$s\" уже существует у \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "Триггер \"%1$s\" принадлежит шаблонам с разными связями."
 
-#: include/classes/import/CConfigurationImport.php:1610
+#: include/classes/import/CConfigurationImport.php:1618
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Триггер \"%1$s\" зависит от триггера \"%2$s\", который не существует."
@@ -16296,7 +16339,7 @@ msgstr "Прототип триггера \"%1$s\" принадлежит шаб
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Прототип триггеров \"%1$s\" содержит прототипы элементов данных из нескольких правил обнаружения."
 
-#: include/classes/import/CConfigurationImport.php:1332
+#: include/classes/import/CConfigurationImport.php:1340
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Прототип триггеров \"%1$s\" зависит от триггера \"%2$s\", который не существует."
@@ -16425,7 +16468,7 @@ msgstr "Вторник"
 msgid "Turkish (tr_TR)"
 msgstr "Турецкий (tr_TR)"
 
-#: include/classes/api/services/CItem.php:1015
+#: include/classes/api/services/CItem.php:952
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Два элемента данных (\"%1$s\" и \"%2$s\") не могут заполнять одно поле \"%3$s\" инвентарных данных узла сети, это может привести к конфликту."
@@ -16535,7 +16578,7 @@ msgid "UNKNOWN"
 msgstr "НЕИЗВЕСТНО"
 
 #: app/views/popup.httpstep.php:50 app/views/popup.triggerwizard.php:183
-#: disc_prototypes.php:207 host_discovery.php:152
+#: disc_prototypes.php:207 host_discovery.php:153
 #: include/classes/widgets/CWidgetConfig.php:50
 #: include/classes/widgets/forms/CWidgetFormUrl.php:31
 #: include/screens.inc.php:44
@@ -16750,42 +16793,42 @@ msgstr "Отсоединить от шаблона"
 msgid "Unlink from templates"
 msgstr "Отсоединить от шаблонов"
 
-#: include/classes/api/services/CHostGeneral.php:630
+#: include/classes/api/services/CHostGeneral.php:626
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Группа элементов данных \"%1$s\" от \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:376
+#: include/classes/api/services/CHostGeneral.php:372
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Правило обнаружения \"%1$s\" от \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:533
+#: include/classes/api/services/CHostGeneral.php:529
 #, c-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: График \"%1$s\" от \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:517
+#: include/classes/api/services/CHostGeneral.php:513
 #, c-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Прототип графиков \"%1$s\" от \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:466
+#: include/classes/api/services/CHostGeneral.php:462
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Прототип узлов сети \"%1$s\" от \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:392
+#: include/classes/api/services/CHostGeneral.php:388
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Элемент данных \"%1$s\" от \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:411
+#: include/classes/api/services/CHostGeneral.php:407
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Прототип элементов данных \"%1$s\" от \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:572
+#: include/classes/api/services/CHostGeneral.php:568
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Веб-сценарий \"%1$s\" от \"%2$s\"."
@@ -16809,7 +16852,7 @@ msgstr "Неподдерживаемый формат импорта \"%1$s\"."
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr "Неподдерживаемый параметр \"%2$s\" для действия условия фильтра \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1118
+#: include/classes/api/services/CDiscoveryRule.php:1265
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of discovery rule \"%1$s\"."
 msgstr "Неподдерживаемый параметр \"%2$s\" для правила обнаружения условия фильтра \"%1$s\"."
@@ -16819,7 +16862,7 @@ msgstr "Неподдерживаемый параметр \"%2$s\" для пра
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr "Неподдерживаемый параметр \"%2$s\" для фильтра в действии \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1086
+#: include/classes/api/services/CDiscoveryRule.php:1233
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr "Неподдерживаемый параметр \"%2$s\" для фильтра в правиле обнаружения \"%1$s\"."
@@ -16834,7 +16877,7 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Доступен"
 
-#: app/views/administration.authentication.edit.php:139
+#: app/views/administration.authentication.edit.php:149
 #: app/views/administration.mediatype.edit.php:241
 #: app/views/administration.proxy.edit.php:132
 #: app/views/administration.script.edit.php:127
@@ -16864,7 +16907,7 @@ msgstr "Доступен"
 #: include/views/configuration.correlation.edit.php:276
 #: include/views/configuration.discovery.edit.php:108
 #: include/views/configuration.graph.edit.php:449
-#: include/views/configuration.host.discovery.edit.php:709
+#: include/views/configuration.host.discovery.edit.php:776
 #: include/views/configuration.host.edit.php:810
 #: include/views/configuration.hostgroups.edit.php:57
 #: include/views/configuration.host.massupdate.php:371
@@ -16944,7 +16987,7 @@ msgstr "Обновлено: %s"
 msgid "Upload"
 msgstr "Загрузить"
 
-#: include/html.inc.php:542 include/html.inc.php:555
+#: include/html.inc.php:542 include/html.inc.php:545
 msgid "Upper level maps"
 msgstr "Карты верхнего уровня"
 
@@ -17168,7 +17211,7 @@ msgstr "Меню пользователя"
 msgid "User name"
 msgstr "Имя пользователя"
 
-#: app/views/administration.authentication.edit.php:120
+#: app/views/administration.authentication.edit.php:129
 msgid "User password"
 msgstr "Пароль пользователя"
 
@@ -17232,7 +17275,7 @@ msgstr "Пользователь/Получатель"
 #: app/views/administration.mediatype.edit.php:95
 #: app/views/administration.mediatype.edit.php:159
 #: app/views/administration.mediatype.list.php:93 disc_prototypes.php:259
-#: host_discovery.php:201 include/views/configuration.host.edit.php:666
+#: host_discovery.php:202 include/views/configuration.host.edit.php:666
 #: include/views/configuration.host.prototype.edit.php:335
 #: include/views/general.login.php:60 index.php:33 items.php:257
 msgid "Username"
@@ -17652,7 +17695,7 @@ msgstr "Размер виртуального пространства в бай
 msgid "Visible name"
 msgstr "Видимое имя"
 
-#: include/classes/api/services/CHost.php:1891
+#: include/classes/api/services/CHost.php:1927
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Видимое имя не может быть пустым, если имя узла сети не заполнено."
 
@@ -17714,7 +17757,7 @@ msgstr "Веб-сценарий \"%1$s\" уже существует у узла
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Веб-сценарий \"%1$s\" уже существует."
 
-#: include/classes/import/CConfigurationImport.php:1382
+#: include/classes/import/CConfigurationImport.php:1390
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Веб-сценарий \"%1$s\" на \"%2$s\": группа элементов данных \"%3$s\" не существует."
@@ -17860,8 +17903,8 @@ msgstr "Запись"
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Ошибочные поля для зависимости услуги \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1605
-#: include/classes/api/services/CHost.php:1786
+#: include/classes/api/services/CHost.php:1641
+#: include/classes/api/services/CHost.php:1822
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Ошибочные поля для узла сети \"%1$s\"."
@@ -17952,7 +17995,7 @@ msgstr "XML XPath"
 msgid "XML data"
 msgstr "XML данные"
 
-#: include/classes/api/services/CItemGeneral.php:2222
+#: include/classes/api/services/CItemGeneral.php:2163
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
 msgstr "XML пустой"
@@ -18021,7 +18064,7 @@ msgstr "YYYY-MM-DD hh:mm"
 #: include/classes/import/validators/C32XmlValidator.php:1007
 #: include/classes/import/validators/C34XmlValidator.php:1111
 #: include/classes/import/validators/C40XmlValidator.php:1290
-#: include/classes/import/validators/C42XmlValidator.php:1298
+#: include/classes/import/validators/C42XmlValidator.php:1310
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr "YYYY-MM-DDThh:mm:ssZ"
@@ -18108,8 +18151,8 @@ msgstr "Вы не указали цели глобального скрипта 
 #: include/classes/api/services/CTemplate.php:388
 #: include/classes/api/services/CTemplate.php:529
 #: include/classes/api/services/CTemplate.php:561
-#: include/classes/api/services/CTemplate.php:980
-#: include/classes/api/services/CTemplate.php:1085
+#: include/classes/api/services/CTemplate.php:978
+#: include/classes/api/services/CTemplate.php:1083
 #: include/classes/api/services/CUserMacro.php:266
 #: include/classes/api/services/CUserMacro.php:350
 #: include/classes/api/services/CUserMacro.php:443
@@ -18193,7 +18236,7 @@ msgstr "Внутренний Zabbix"
 msgid "Zabbix internal authentication"
 msgstr "Внутренняя аутентификация Zabbix"
 
-#: app/views/administration.authentication.edit.php:43
+#: app/views/administration.authentication.edit.php:44
 msgid "Zabbix login form"
 msgstr "Диалог входа в систему Zabbix"
 
@@ -18267,7 +18310,7 @@ msgstr "[Ошибочное значение дня: \"%s\" ]"
 msgid "[Wrong value for month: \"%s\" ]"
 msgstr "[Ошибочное значение месяца: \"%s\" ]"
 
-#: include/classes/validators/CApiInputValidator.php:593
+#: include/classes/validators/CApiInputValidator.php:597
 msgid "a boolean is expected"
 msgstr "ожидается логическое"
 
@@ -18275,33 +18318,37 @@ msgstr "ожидается логическое"
 #: include/classes/api/services/CTriggerGeneral.php:257
 #: include/classes/api/services/CUser.php:649
 #: include/classes/import/validators/CXmlValidatorGeneral.php:193
-#: include/classes/validators/CApiInputValidator.php:230
+#: include/classes/validators/CApiInputValidator.php:234
 #: include/classes/validators/CNewValidator.php:278
 msgid "a character string is expected"
 msgstr "ожидается строка символов"
 
-#: include/classes/validators/CApiInputValidator.php:271
+#: include/classes/validators/CApiInputValidator.php:275
 msgid "a hexadecimal colour code (6 symbols) is expected"
 msgstr "ожидается код цвета в шестнадцатеричном формате (6 символов)"
 
-#: include/classes/validators/CApiInputValidator.php:417
-#: include/classes/validators/CApiInputValidator.php:554
-#: include/classes/validators/CApiInputValidator.php:952
+#: include/classes/validators/CApiInputValidator.php:1059
+msgid "a low-level discovery macro is expected"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:421
+#: include/classes/validators/CApiInputValidator.php:558
+#: include/classes/validators/CApiInputValidator.php:956
 msgid "a number is expected"
 msgstr "ожидается число"
 
 #: app/controllers/CControllerPopupHttpStep.php:109
-#: include/classes/validators/CApiInputValidator.php:422
-#: include/classes/validators/CApiInputValidator.php:564
-#: include/classes/validators/CApiInputValidator.php:959
-#: include/classes/validators/CApiInputValidator.php:1185
+#: include/classes/validators/CApiInputValidator.php:426
+#: include/classes/validators/CApiInputValidator.php:568
+#: include/classes/validators/CApiInputValidator.php:963
+#: include/classes/validators/CApiInputValidator.php:1218
 msgid "a number is too large"
 msgstr "число слишком большое"
 
 #: include/classes/api/services/CDRule.php:320
-#: include/classes/api/services/CItemGeneral.php:1233
-#: include/classes/api/services/CItemGeneral.php:1306
-#: include/classes/api/services/CItemGeneral.php:1316
+#: include/classes/api/services/CItemGeneral.php:1324
+#: include/classes/api/services/CItemGeneral.php:1397
+#: include/classes/api/services/CItemGeneral.php:1407
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
 msgstr "ожидается цифровое значение"
@@ -18311,23 +18358,23 @@ msgid "a time is expected"
 msgstr "ожидается время"
 
 #: app/controllers/CControllerPopupMedia.php:110
-#: include/classes/validators/CApiInputValidator.php:1093
+#: include/classes/validators/CApiInputValidator.php:1126
 #: include/validate.inc.php:216
 msgid "a time period is expected"
 msgstr "ожидается период времени"
 
-#: include/classes/validators/CApiInputValidator.php:1059
+#: include/classes/validators/CApiInputValidator.php:1092
 #: include/validate.inc.php:235
 msgid "a time range is expected"
 msgstr "ожидался период времени"
 
 #: app/controllers/CControllerPopupHttpStep.php:103
-#: include/classes/validators/CApiInputValidator.php:1174
+#: include/classes/validators/CApiInputValidator.php:1207
 #: include/validate.inc.php:227 include/validate.inc.php:570
 msgid "a time unit is expected"
 msgstr "ожидается единица времени"
 
-#: include/classes/validators/CApiInputValidator.php:1026
+#: include/classes/validators/CApiInputValidator.php:1030
 msgid "a user macro is expected"
 msgstr "ожидается пользовательский макрос"
 
@@ -18370,18 +18417,18 @@ msgstr "все способы оповещения"
 
 #: include/classes/api/services/CDRule.php:463
 #: include/classes/api/services/CDRule.php:470
-#: include/classes/api/services/CItemGeneral.php:2161
-#: include/classes/api/services/CItemGeneral.php:2185
+#: include/classes/api/services/CItemGeneral.php:2102
+#: include/classes/api/services/CItemGeneral.php:2126
 #: include/classes/import/validators/CXmlValidatorGeneral.php:207
-#: include/classes/validators/CApiInputValidator.php:370
-#: include/classes/validators/CApiInputValidator.php:508
-#: include/classes/validators/CApiInputValidator.php:648
-#: include/classes/validators/CApiInputValidator.php:756
-#: include/classes/validators/CApiInputValidator.php:798
+#: include/classes/validators/CApiInputValidator.php:374
+#: include/classes/validators/CApiInputValidator.php:512
+#: include/classes/validators/CApiInputValidator.php:652
+#: include/classes/validators/CApiInputValidator.php:760
+#: include/classes/validators/CApiInputValidator.php:802
 msgid "an array is expected"
 msgstr "ожидается массив"
 
-#: include/classes/validators/CApiInputValidator.php:727
+#: include/classes/validators/CApiInputValidator.php:731
 msgid "an array or a character string is expected"
 msgstr "ожидается массив или строка символов"
 
@@ -18390,7 +18437,7 @@ msgstr "ожидается массив или строка символов"
 msgid "an empty string is expected"
 msgstr "ожидается пустая строка"
 
-#: include/classes/api/services/CHost.php:1548
+#: include/classes/api/services/CHost.php:1584
 msgid "an even number of hexadecimal characters is expected"
 msgstr "ожидается четное количество шестнадцатеричных символов"
 
@@ -18481,6 +18528,7 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CCorrelation.php:1101
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
+#: include/classes/api/services/CDiscoveryRule.php:1410
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:319
@@ -18488,19 +18536,19 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:512
 #: include/classes/api/services/CEvent.php:847
-#: include/classes/api/services/CHost.php:1536
-#: include/classes/api/services/CHost.php:1542
+#: include/classes/api/services/CHost.php:1572
+#: include/classes/api/services/CHost.php:1578
 #: include/classes/api/services/CHttpTest.php:982
 #: include/classes/api/services/CItemGeneral.php:485
 #: include/classes/api/services/CItemGeneral.php:512
 #: include/classes/api/services/CItemGeneral.php:518
 #: include/classes/api/services/CItemGeneral.php:524
-#: include/classes/api/services/CItemGeneral.php:1201
-#: include/classes/api/services/CItemGeneral.php:1223
-#: include/classes/api/services/CItemGeneral.php:1254
-#: include/classes/api/services/CItemGeneral.php:1268
-#: include/classes/api/services/CItemGeneral.php:1294
-#: include/classes/api/services/CItemGeneral.php:1465
+#: include/classes/api/services/CItemGeneral.php:1292
+#: include/classes/api/services/CItemGeneral.php:1314
+#: include/classes/api/services/CItemGeneral.php:1345
+#: include/classes/api/services/CItemGeneral.php:1359
+#: include/classes/api/services/CItemGeneral.php:1385
+#: include/classes/api/services/CItemGeneral.php:1556
 #: include/classes/api/services/CMapElement.php:95
 #: include/classes/api/services/CMapElement.php:114
 #: include/classes/api/services/CMapElement.php:152
@@ -18521,25 +18569,29 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:532
 #: include/classes/api/services/CUser.php:660
-#: include/classes/validators/CApiInputValidator.php:240
-#: include/classes/validators/CApiInputValidator.php:375
-#: include/classes/validators/CApiInputValidator.php:513
-#: include/classes/validators/CApiInputValidator.php:559
-#: include/classes/validators/CApiInputValidator.php:761
-#: include/classes/validators/CApiInputValidator.php:803
+#: include/classes/validators/CApiInputValidator.php:244
+#: include/classes/validators/CApiInputValidator.php:379
+#: include/classes/validators/CApiInputValidator.php:517
+#: include/classes/validators/CApiInputValidator.php:563
+#: include/classes/validators/CApiInputValidator.php:765
+#: include/classes/validators/CApiInputValidator.php:807
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/widgets/forms/CWidgetFormMap.php:101 usergrps.php:341
 #: usergrps.php:381 usergrps.php:384
 msgid "cannot be empty"
 msgstr "не может быть пустым"
 
-#: include/classes/api/services/CItemGeneral.php:2177
+#: include/classes/api/services/CItemGeneral.php:2118
 msgid "cannot convert to JSON, result value too long"
 msgstr "не удалось сконвертировать в JSON, значение результата слишком длинное"
 
 #: include/classes/helpers/CElasticsearchHelper.php:86
 msgid "cannot perform Scroll API request, data could be truncated"
 msgstr "не удалось выполнить Scroll API запрос, данные могут быть обрезаны"
+
+#: include/classes/api/services/CDiscoveryRule.php:1393
+msgid "cannot update property for templated discovery rule"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:246
 msgid "change() - Difference between last and previous value"
@@ -18550,11 +18602,8 @@ msgstr "change() - Разница между последним и предыд�
 msgid "check expression starting from \"%1$s\""
 msgstr "проверьте выражение начиная с \"%1$s\""
 
-#: include/classes/api/services/CHostGeneral.php:1024
-#: include/classes/api/services/CItemGeneral.php:1730
-#: include/classes/api/services/CItemGeneral.php:1736
-#: include/classes/api/services/CItemGeneral.php:1973
-#: include/classes/import/CConfigurationImport.php:2611
+#: include/classes/api/services/CItemGeneral.php:1826
+#: include/classes/import/CConfigurationImport.php:2619
 msgid "circular item dependency is not allowed"
 msgstr "закольцованная зависимость элементов данных не разрешена"
 
@@ -18633,7 +18682,7 @@ msgstr "по убыванию"
 msgid "diff() - Difference between last and preceding values (1 - true, 0 - false)"
 msgstr "diff() - Разница между последним и предыдущим значениями (1 - правда, 0 - ложь)"
 
-#: include/classes/validators/CApiInputValidator.php:996
+#: include/classes/validators/CApiInputValidator.php:1000
 msgid "directory or script name cannot be empty"
 msgstr "директория или имя скрипта не могут быть пустыми"
 
@@ -18692,7 +18741,7 @@ msgstr "ошибка при разборе JSON"
 msgid "first"
 msgstr "первый"
 
-#: include/classes/api/services/CItemGeneral.php:1276
+#: include/classes/api/services/CItemGeneral.php:1367
 msgid "first parameter is expected"
 msgstr "ожидается первый параметр"
 
@@ -18751,7 +18800,7 @@ msgstr "узел сети без наблюдения"
 msgid "host pattern"
 msgstr "шаблон узла сети"
 
-#: include/classes/api/services/CItemGeneral.php:1753
+#: include/classes/api/services/CItemGeneral.php:1809
 msgid "hostid of dependent item and master item should match"
 msgstr "hostid зависимого элемента данных и мастер элемента данных должны совпадать"
 
@@ -18794,7 +18843,7 @@ msgstr "внутренний"
 msgid "invalid address range \"%1$s\""
 msgstr "ошибочный диапазон адресов \"%1$s\""
 
-#: include/classes/validators/CApiInputValidator.php:235
+#: include/classes/validators/CApiInputValidator.php:239
 msgid "invalid byte sequence in UTF-8"
 msgstr "ошибочная последовательность байт в UTF-8"
 
@@ -18809,15 +18858,15 @@ msgstr "ошибочная задержка"
 msgid "invalid history storage period"
 msgstr "недопустимый период хранения истории"
 
-#: include/classes/validators/CApiInputValidator.php:855
+#: include/classes/validators/CApiInputValidator.php:859
 msgid "invalid host group name"
 msgstr "ошибочное имя группы узлов сети"
 
-#: include/classes/validators/CApiInputValidator.php:899
+#: include/classes/validators/CApiInputValidator.php:903
 msgid "invalid host name"
 msgstr "ошибочное имя узла сети"
 
-#: include/classes/validators/CApiInputValidator.php:1129
+#: include/classes/validators/CApiInputValidator.php:1162
 msgid "invalid regular expression"
 msgstr "ошибочное регулярное выражение"
 
@@ -18839,7 +18888,7 @@ msgstr "больше чем или равно"
 msgid "is less than or equals"
 msgstr "меньше чем или равно"
 
-#: include/classes/validators/CApiInputValidator.php:1365
+#: include/classes/validators/CApiInputValidator.php:1398
 msgid "is not enclosed in {} or is malformed"
 msgstr "не заключено в {} или ошибочно"
 
@@ -18913,6 +18962,9 @@ msgstr "м"
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
 #: include/classes/graphdraw/CLineGraphDraw.php:1389
 #: include/classes/graphdraw/CLineGraphDraw.php:1396
+#: include/classes/html/svg/CSvgGraphXAxis.php:424
+#: include/classes/html/svg/CSvgGraphXAxis.php:432
+#: include/classes/html/svg/CSvgGraphXAxis.php:439
 msgid "m-d"
 msgstr "m-d"
 
@@ -18939,7 +18991,7 @@ msgstr "карта сети"
 msgid "matches"
 msgstr "совпадает"
 
-#: include/classes/api/services/CItemGeneral.php:1324
+#: include/classes/api/services/CItemGeneral.php:1415
 #: include/classes/graphdraw/CLineGraphDraw.php:1853
 #: include/classes/graphdraw/CLineGraphDraw.php:1867
 #: include/classes/graphdraw/CPieGraphDraw.php:326 include/graphs.inc.php:80
@@ -18955,20 +19007,17 @@ msgstr "макс"
 msgid "max() - Maximum value for period T"
 msgstr "max() - Максимальное значение за период Т"
 
-#: include/classes/api/services/CItemGeneral.php:1851
+#: include/classes/api/services/CItemGeneral.php:1920
 msgid "maximum dependent items count reached"
 msgstr "достигнуто максимальное количество зависимых элементов данных"
 
-#: include/classes/api/services/CHostGeneral.php:1031
-#: include/classes/api/services/CItemGeneral.php:1766
-#: include/classes/api/services/CItemGeneral.php:1860
-#: include/classes/api/services/CItemGeneral.php:1980
-#: include/classes/import/CConfigurationImport.php:2565
-#: include/classes/import/CConfigurationImport.php:2626
+#: include/classes/api/services/CItemGeneral.php:1906
+#: include/classes/import/CConfigurationImport.php:2573
+#: include/classes/import/CConfigurationImport.php:2634
 msgid "maximum number of dependency levels reached"
 msgstr "достигнуто максимальное количество уровней зависимостей"
 
-#: include/classes/api/services/CItemGeneral.php:1324
+#: include/classes/api/services/CItemGeneral.php:1415
 #: include/classes/graphdraw/CLineGraphDraw.php:1851
 #: include/classes/graphdraw/CLineGraphDraw.php:1864
 #: include/classes/graphdraw/CPieGraphDraw.php:322 include/graphs.inc.php:78
@@ -18984,7 +19033,7 @@ msgstr "мин"
 msgid "min() - Minimum value for period T"
 msgstr "min() - Минимальное значение за период Т"
 
-#: include/classes/api/services/CHost.php:1554
+#: include/classes/api/services/CHost.php:1590
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "минимальная длина %1$s символов"
@@ -18999,7 +19048,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "мс"
 
-#: app/views/administration.authentication.edit.php:114
+#: app/views/administration.authentication.edit.php:122
 msgid "must be a valid LDAP user"
 msgstr "должен быть действительным пользователем LDAP"
 
@@ -19017,8 +19066,8 @@ msgstr "должен быть действительным пользовате�
 msgid "must be between \"%1$s\" and \"%2$s\""
 msgstr "должно быть между \"%1$s\" и \"%2$s\""
 
-#: include/classes/validators/CApiInputValidator.php:862
-#: include/classes/validators/CApiInputValidator.php:906
+#: include/classes/validators/CApiInputValidator.php:866
+#: include/classes/validators/CApiInputValidator.php:910
 msgid "must contain at least one low-level discovery macro"
 msgstr "должно содержать по крайней мере один макрос низкоуровневого обнаружения"
 
@@ -19061,8 +19110,8 @@ msgstr "nodata() - Отсутствие полученных данных за �
 msgid "none"
 msgstr "нет"
 
-#: include/classes/api/services/CItemGeneral.php:2168
-#: include/classes/api/services/CItemGeneral.php:2192
+#: include/classes/api/services/CItemGeneral.php:2109
+#: include/classes/api/services/CItemGeneral.php:2133
 msgid "nonempty key and value pair expected"
 msgstr "ожидался не пустая пара ключа и значения"
 
@@ -19225,7 +19274,7 @@ msgstr "справа"
 msgid "root"
 msgstr "root"
 
-#: include/classes/api/services/CItemGeneral.php:1760
+#: include/classes/api/services/CItemGeneral.php:1816
 msgid "ruleid of dependent item and master item should match"
 msgstr "ruleid зависимого элемента данных и основного элемента данных должны совпадать"
 
@@ -19239,7 +19288,7 @@ msgctxt "adjective"
 msgid "second"
 msgstr "второй"
 
-#: include/classes/api/services/CItemGeneral.php:1282
+#: include/classes/api/services/CItemGeneral.php:1373
 msgid "second parameter is expected"
 msgstr "ожидается второй параметр"
 
@@ -19257,19 +19306,19 @@ msgstr "выбрано"
 msgid "short description"
 msgstr "краткое описание"
 
-#: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1567
-#: include/classes/api/services/CHost.php:1576
-#: include/classes/api/services/CHost.php:1582
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1612
+#: include/classes/api/services/CHost.php:1618
 #: include/classes/api/services/CHttpTest.php:967
 #: include/classes/api/services/CHttpTest.php:1076
 #: include/classes/api/services/CItemGeneral.php:499
 #: include/classes/api/services/CItemGeneral.php:537
-#: include/classes/api/services/CItemGeneral.php:1340
-#: include/classes/api/services/CItemGeneral.php:1363
-#: include/classes/api/services/CItemGeneral.php:1427
-#: include/classes/api/services/CItemGeneral.php:1455
-#: include/classes/api/services/CItemGeneral.php:2145
+#: include/classes/api/services/CItemGeneral.php:1431
+#: include/classes/api/services/CItemGeneral.php:1454
+#: include/classes/api/services/CItemGeneral.php:1518
+#: include/classes/api/services/CItemGeneral.php:1546
+#: include/classes/api/services/CItemGeneral.php:2086
 #: include/classes/api/services/CMaintenance.php:468
 #: include/classes/api/services/CMaintenance.php:637
 #: include/classes/api/services/CProxy.php:661
@@ -19346,8 +19395,10 @@ msgstr "шаблон с ID \"%1$s\" был встречен %2$s раз"
 #: app/controllers/CControllerDashboardUpdate.php:135
 #: app/controllers/CControllerDashboardUpdate.php:143
 #: include/classes/api/services/CDashboard.php:385
+#: include/classes/api/services/CDiscoveryRule.php:1428
+#: include/classes/api/services/CDiscoveryRule.php:1436
 #: include/classes/api/services/CHttpTest.php:750
-#: include/classes/validators/CApiInputValidator.php:683
+#: include/classes/validators/CApiInputValidator.php:687
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
 msgstr "параметр \"%1$s\" отсутствует"
@@ -19397,7 +19448,7 @@ msgstr "триггер со связями нельзя переместить �
 msgid "type here to search"
 msgstr "начните печатать для поиска"
 
-#: include/classes/validators/CApiInputValidator.php:1397
+#: include/classes/validators/CApiInputValidator.php:1430
 msgid "unacceptible URL"
 msgstr "неприемлемый URL"
 
@@ -19411,7 +19462,7 @@ msgstr "неожиданное завершение макроса"
 
 #: include/classes/api/services/CHttpTest.php:464
 #: include/classes/api/services/CHttpTest.php:488
-#: include/classes/validators/CApiInputValidator.php:655
+#: include/classes/validators/CApiInputValidator.php:659
 #, c-format
 msgid "unexpected parameter \"%1$s\""
 msgstr "неожиданный параметр \"%1$s\""
@@ -19431,11 +19482,11 @@ msgstr "неожиданный текст \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:805
 #: include/classes/api/services/CEvent.php:905
-#: include/classes/api/services/CHost.php:1516
-#: include/classes/api/services/CHost.php:1522
-#: include/classes/api/services/CItemGeneral.php:1208
-#: include/classes/api/services/CItemGeneral.php:1414
-#: include/classes/api/services/CItemGeneral.php:1440
+#: include/classes/api/services/CHost.php:1552
+#: include/classes/api/services/CHost.php:1558
+#: include/classes/api/services/CItemGeneral.php:1299
+#: include/classes/api/services/CItemGeneral.php:1505
+#: include/classes/api/services/CItemGeneral.php:1531
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
 #: include/classes/api/services/CTriggerGeneral.php:574
@@ -19492,45 +19543,51 @@ msgstr "неподдерживаемый номер версии"
 msgid "value"
 msgstr "значение"
 
+#: include/classes/api/services/CDiscoveryRule.php:1307
+#, c-format
+msgid "value \"%1$s\" already exists"
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:808
 #: include/classes/import/CConfigurationImport.php:846
-#: include/classes/import/CConfigurationImport.php:2461
-#: include/classes/import/CConfigurationImport.php:2575
-#: include/classes/import/CConfigurationImport.php:2620
+#: include/classes/import/CConfigurationImport.php:2469
+#: include/classes/import/CConfigurationImport.php:2583
+#: include/classes/import/CConfigurationImport.php:2628
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "значение \"%1$s\" не найдено"
 
-#: include/classes/validators/CApiInputValidator.php:1219
-#: include/classes/validators/CApiInputValidator.php:1273
+#: include/classes/validators/CApiInputValidator.php:1252
+#: include/classes/validators/CApiInputValidator.php:1306
 #, c-format
 msgid "value %1$s already exists"
 msgstr "значение %1$s уже существует"
 
-#: include/classes/validators/CApiInputValidator.php:338
-#: include/classes/validators/CApiInputValidator.php:846
-#: include/classes/validators/CApiInputValidator.php:889
-#: include/classes/validators/CApiInputValidator.php:941
-#: include/classes/validators/CApiInputValidator.php:986
-#: include/classes/validators/CApiInputValidator.php:1021
-#: include/classes/validators/CApiInputValidator.php:1052
-#: include/classes/validators/CApiInputValidator.php:1086
-#: include/classes/validators/CApiInputValidator.php:1120
-#: include/classes/validators/CApiInputValidator.php:1360
-#: include/classes/validators/CApiInputValidator.php:1392
+#: include/classes/validators/CApiInputValidator.php:342
+#: include/classes/validators/CApiInputValidator.php:850
+#: include/classes/validators/CApiInputValidator.php:893
+#: include/classes/validators/CApiInputValidator.php:945
+#: include/classes/validators/CApiInputValidator.php:990
+#: include/classes/validators/CApiInputValidator.php:1025
+#: include/classes/validators/CApiInputValidator.php:1054
+#: include/classes/validators/CApiInputValidator.php:1085
+#: include/classes/validators/CApiInputValidator.php:1119
+#: include/classes/validators/CApiInputValidator.php:1153
+#: include/classes/validators/CApiInputValidator.php:1393
+#: include/classes/validators/CApiInputValidator.php:1425
 msgid "value is too long"
 msgstr "значение слишком длинное"
 
 #: include/classes/api/services/CHost.php:771
-#: include/classes/api/services/CHost.php:1678
-#: include/classes/api/services/CHost.php:1818
+#: include/classes/api/services/CHost.php:1714
+#: include/classes/api/services/CHost.php:1854
 #: include/classes/api/services/CMapElement.php:75
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681
 #: include/classes/api/services/CMap.php:1129
 #: include/classes/api/services/CMap.php:1135
-#: include/classes/validators/CApiInputValidator.php:332
-#: include/classes/validators/CApiInputValidator.php:476
+#: include/classes/validators/CApiInputValidator.php:336
+#: include/classes/validators/CApiInputValidator.php:480
 #, c-format
 msgid "value must be one of %1$s"
 msgstr "значение должно быть одно из %1$s"
