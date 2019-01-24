@@ -927,10 +927,10 @@ out:
  ******************************************************************************/
 static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
-	const char		*__function_name = "send_internal_stats_json";
-	struct zbx_json		json;
-	char			type[MAX_STRING_LEN], error[MAX_STRING_LEN];
-	int			ret = FAIL;
+	const char	*__function_name = "send_internal_stats_json";
+	struct zbx_json	json;
+	char		type[MAX_STRING_LEN], error[MAX_STRING_LEN];
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
