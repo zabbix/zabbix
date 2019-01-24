@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	jQuery(function($) {
-		var	editableTable = function (elm, tmpl) {
+		var	editableTable = function(elm, tmpl) {
 			var table = $(elm),
 				row_template = new Template($(tmpl).html()),
 				insert_point = table.find('tbody tr[data-insert-point]'),
@@ -29,7 +29,7 @@
 					}
 				});
 
-				table.on('click', '[data-row-action]', function (e) {
+				table.on('click', '[data-row-action]', function(e) {
 					e.preventDefault();
 
 					switch ($(e.currentTarget).data('row-action')) {
