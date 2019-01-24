@@ -129,6 +129,9 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
  *             port   - [IN] external Zabbix instance port                    *
  *             result - [OUT] check result                                    *
  *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESULT *result)
 {
@@ -155,6 +158,9 @@ int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESUL
  *             from   - [IN] lower limit for delay                            *
  *             to     - [IN] upper limit for delay                            *
  *             result - [OUT] check result                                    *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,
