@@ -78,7 +78,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 		$this->zbxTestTextPresent($data['name']);
 
-		$this->zbxTestCheckFatalErrors();
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
@@ -141,8 +140,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$error = $this->zbxTestGetText('//ul[@class=\'msg-details-border\']');
 		$this->assertContains($data['error_message'], $error);
 
-		$this->zbxTestCheckFatalErrors();
-
 		if 	(array_key_exists('name', $data) && $data['name'] === 'Event correlation for update') {
 			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 			$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -176,7 +173,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 
-		$this->zbxTestCheckFatalErrors();
 		// Name longer than 255 symbols is truncated on frontend, check the shortened name in DB
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($db_name);
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -345,7 +341,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextPresent($data['name']);
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -427,7 +422,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add correlation condition');
 		$this->zbxTestAssertElementText('//ul[@class=\'msg-details-border\']', $data['error_message']);
-		$this->zbxTestCheckFatalErrors();
 
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -511,7 +505,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextPresent($data['name']);
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -634,7 +627,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add correlation');
 		$error = $this->zbxTestGetText('//ul[@class=\'msg-details-border\']');
 		$this->assertContains($data['error_message'], $error);
-		$this->zbxTestCheckFatalErrors();
 
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -652,7 +644,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation added');
 		$this->zbxTestTextPresent('Cloned correlation');
-		$this->zbxTestCheckFatalErrors();
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Cloned correlation' AND description='Test description clone'";
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -680,7 +671,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation updated');
 		$this->zbxTestTextPresent('Event correlation for update');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
@@ -708,7 +698,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation updated');
 		$this->zbxTestTextPresent('New event correlation for update');
-		$this->zbxTestCheckFatalErrors();
 
 		$sql = "SELECT NULL FROM correlation WHERE name='New event correlation for update' AND description='New test description update'";
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -733,7 +722,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation deleted');
 		$this->zbxTestTextNotVisibleOnPage('Event correlation for delete');
-		$this->zbxTestCheckFatalErrors();
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for delete'";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -751,7 +739,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClick('cancel');
 
 		$this->zbxTestTextPresent('Event correlation for cancel');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}

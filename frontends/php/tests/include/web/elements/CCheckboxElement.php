@@ -59,4 +59,38 @@ class CCheckboxElement extends CElement {
 	public function uncheck() {
 		return $this->set(false);
 	}
+
+	/**
+	 * Get label element.
+	 *
+	 * @return CElement|null
+	 */
+	public function getLabel() {
+		return $this->query('xpath:../label')->one(false);
+	}
+
+	/**
+	 * Get label text.
+	 *
+	 * @return string|null
+	 */
+	public function getText() {
+		if (($label = $this->getLabel()) !== null) {
+			return $label->getText();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Alias for set.
+	 * @see self::set
+	 *
+	 * @param boolean $checked    checked or not
+	 *
+	 * @return $this
+	 */
+	public function fill($checked) {
+		return $this->set($checked);
+	}
 }

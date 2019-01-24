@@ -1329,13 +1329,12 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 			psk_len = (size_t)psk_bin_len;
 		}
 		else
-		{
-			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find requested PSK identity \"%s\"",
-						__function_name, psk_identity);
-			}
-		}
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\"", psk_identity);
+	}
+	else if (0 < my_psk_identity_len)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\", available PSK identity"
+				" \"%s\"", psk_identity, my_psk_identity);
 	}
 
 	if (0 < psk_len)
@@ -1484,14 +1483,14 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 		}
 		else
 		{
-			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find requested PSK identity \"%s\"",
-						__function_name, identity);
-			}
-
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\"", identity);
 			goto fail;
 		}
+	}
+	else if (0 < my_psk_identity_len)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\", available PSK identity"
+				" \"%s\"", identity, my_psk_identity);
 	}
 
 	if (0 < psk_len)

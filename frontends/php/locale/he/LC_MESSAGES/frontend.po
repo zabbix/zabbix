@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-06 01:44+0200\n"
+"POT-Creation-Date: 2019-01-22 10:34+0200\n"
 "PO-Revision-Date: 2018-11-30 14:01+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -78,7 +78,7 @@ msgid_plural "%1$s Items"
 msgstr[0] "פריט %1$s"
 msgstr[1] "%1$s פריטים"
 
-#: include/classes/api/services/CItemGeneral.php:2048
+#: include/classes/api/services/CItemGeneral.php:1989
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
@@ -976,7 +976,7 @@ msgid_plural "Applications deleted"
 msgstr[0] "היישום נמחק"
 msgstr[1] "היישומים נמחקו"
 
-#: include/classes/core/CJsonRpc.php:208
+#: include/classes/core/CJsonRpc.php:210
 msgid "Application error."
 msgstr "שגיאת יישום."
 
@@ -1200,8 +1200,8 @@ msgstr "אוג׳"
 msgid "August"
 msgstr "אוגוסט"
 
-#: app/views/administration.authentication.edit.php:127
-#: app/views/administration.authentication.edit.php:135
+#: app/views/administration.authentication.edit.php:137
+#: app/views/administration.authentication.edit.php:145
 #: app/views/administration.mediatype.edit.php:87 include/menu.inc.php:263
 #: include/views/configuration.httpconf.edit.php:283
 #: include/views/configuration.httpconf.list.php:92
@@ -1228,7 +1228,7 @@ msgstr "האימות נכשל: %1$s."
 msgid "Authentication method"
 msgstr "שיטת אימות"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:232
+#: app/controllers/CControllerAuthenticationUpdate.php:238
 msgid "Authentication method changed"
 msgstr "שיטת האימות הוחלפה"
 
@@ -1248,7 +1248,7 @@ msgstr "מילת צופן אימות"
 msgid "Authentication protocol"
 msgstr "פרוטוקול אימות"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:231
+#: app/controllers/CControllerAuthenticationUpdate.php:237
 msgid "Authentication settings updated"
 msgstr "הגדרות האימות עודכנו"
 
@@ -1346,7 +1346,7 @@ msgstr "צבע הרקע"
 msgid "Background image"
 msgstr "תמונת רקע"
 
-#: app/views/administration.authentication.edit.php:93
+#: app/views/administration.authentication.edit.php:98
 msgid "Base DN"
 msgstr "DN בסיס"
 
@@ -1362,11 +1362,11 @@ msgstr "צבע בסיס"
 msgid "Basic"
 msgstr "בסיסית"
 
-#: app/views/administration.authentication.edit.php:103
+#: app/views/administration.authentication.edit.php:110
 msgid "Bind DN"
 msgstr "DN איגוד"
 
-#: app/views/administration.authentication.edit.php:113
+#: app/views/administration.authentication.edit.php:121
 msgid "Bind password"
 msgstr "ססמת איגוד"
 
@@ -1457,7 +1457,7 @@ msgid "CERT"
 msgstr "CERT"
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:974
+#: include/classes/graph/CSvgGraph.php:938
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -1533,11 +1533,6 @@ msgstr "קנדה (136 תווים)"
 #: jsLoader.php:120 jsLoader.php:278 jsLoader.php:290
 msgid "Cancel"
 msgstr "ביטול"
-
-#: include/classes/api/services/CMap.php:1487
-#, c-format
-msgid "Cannot add \"%1$s\" element of the map \"%2$s\" due to circular reference."
-msgstr "לא ניתן להוסיף רכיב „%1$s” של המפה „%2$s” עקב הפניה מעגלית."
 
 #: include/classes/api/services/CHttpTest.php:710
 #, c-format
@@ -1642,6 +1637,11 @@ msgstr "לא ניתן להוסיף פריטים."
 msgid "Cannot add maintenance"
 msgstr "לא ניתן להוסיף עבודת תחזוקה"
 
+#: include/classes/api/services/CMap.php:1487
+#, c-format
+msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeCreate.php:69
 #: app/controllers/CControllerMediatypeCreate.php:159
 msgid "Cannot add media type"
@@ -1745,17 +1745,17 @@ msgstr "לא ניתן לקרוא לשיטה „%1$s.%2$s” ללא משתנים.
 msgid "Cannot clear history"
 msgstr "לא ניתן לפנות את ההיסטוריה"
 
-#: include/classes/api/services/CDiscoveryRule.php:1587
+#: include/classes/api/services/CDiscoveryRule.php:1536
 msgid "Cannot clone graph prototypes."
 msgstr "לא ניתן לשכפל את האבטיפוס לתרשימים."
 
-#: include/classes/api/services/CDiscoveryRule.php:1635
+#: include/classes/api/services/CDiscoveryRule.php:1584
 msgid "Cannot clone host prototypes."
 msgstr "לא ניתן לשכפל את אבות הטיפוס של המארחים."
 
-#: include/classes/api/services/CDiscoveryRule.php:1392
-#: include/classes/api/services/CDiscoveryRule.php:1448
-#: include/classes/api/services/CDiscoveryRule.php:1466
+#: include/classes/api/services/CDiscoveryRule.php:1341
+#: include/classes/api/services/CDiscoveryRule.php:1397
+#: include/classes/api/services/CDiscoveryRule.php:1415
 msgid "Cannot clone item prototypes."
 msgstr "לא ניתן לשכפל את אבות הטיפוס של הפריטים."
 
@@ -1923,6 +1923,20 @@ msgstr[1] "לא ניתן למחוק קבוצות"
 msgid "Cannot delete host"
 msgstr "לא ניתן למחוק מארח"
 
+#: include/classes/api/services/CHost.php:1189
+#, c-format
+msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
+msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
+msgstr[0] ""
+msgstr[1] ""
+
+#: include/classes/api/services/CHostGroup.php:1503
+#, c-format
+msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
+msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/classes/api/services/CDiscoveryRule.php:532
 msgid "Cannot delete host prototype."
 msgstr "לא ניתן למחוק את אבטיפוס המארח."
@@ -2036,11 +2050,11 @@ msgstr ""
 msgid "Cannot delete templated host prototype."
 msgstr "לא ניתן למחוק אבטיפוס מארח בתבנית."
 
-#: include/classes/api/services/CItemPrototype.php:876
+#: include/classes/api/services/CItemPrototype.php:875
 msgid "Cannot delete templated item prototype."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:706
+#: include/classes/api/services/CItem.php:704
 msgid "Cannot delete templated item."
 msgstr "לא ניתן למחוק פריט בתבנית."
 
@@ -2254,8 +2268,8 @@ msgstr "לא ניתן למצוא את המארח „%1$s” הנמצא בשימ�
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "לא ניתן למצוא את קבוצת המארחים „%1$s” עבור האבטיפוס למארח „%2$s” של כלל הגילוי „%3$s” על „%4$s”."
 
-#: include/classes/api/services/CDiscoveryRule.php:1255
-#: include/classes/api/services/CDiscoveryRule.php:1419
+#: include/classes/api/services/CDiscoveryRule.php:1204
+#: include/classes/api/services/CDiscoveryRule.php:1368
 #: include/classes/api/services/CItemGeneral.php:116 include/items.inc.php:506
 #: include/items.inc.php:653
 #, c-format
@@ -2355,7 +2369,7 @@ msgstr "לא ניתן לעצב את העץ. יש לבדוק את המבנה הל
 msgid "Cannot format tree."
 msgstr "לא ניתן לסגנן את העץ."
 
-#: include/classes/api/services/CTemplate.php:805
+#: include/classes/api/services/CTemplate.php:803
 msgid "Cannot have empty visible template name."
 msgstr "שם התצוגה של התבנית לא יכול להיות ריק."
 
@@ -2391,8 +2405,8 @@ msgstr "לא ניתן להוסיף ביטוי הקפצה"
 msgid "Cannot link template"
 msgstr "לא ניתן לקשר תבנית"
 
-#: include/classes/api/services/CTemplate.php:892
-#: include/classes/api/services/CTemplate.php:906
+#: include/classes/api/services/CTemplate.php:890
+#: include/classes/api/services/CTemplate.php:904
 msgid "Cannot link template."
 msgstr "לא ניתן לקשר תבנית."
 
@@ -2404,7 +2418,7 @@ msgstr "לא ניתן לצאת."
 msgid "Cannot mass update host name."
 msgstr "לא ניתן לעדכן את שמות המארחים בכמות."
 
-#: include/classes/api/services/CTemplate.php:1030
+#: include/classes/api/services/CTemplate.php:1028
 msgid "Cannot mass update template name."
 msgstr "לא ניתן לעדכן את שם התבנית."
 
@@ -2412,7 +2426,7 @@ msgstr "לא ניתן לעדכן את שם התבנית."
 msgid "Cannot mass update visible host name."
 msgstr "לא ניתן לעדכן כמותית את שמות התצוגה למארחים."
 
-#: include/classes/api/services/CTemplate.php:995
+#: include/classes/api/services/CTemplate.php:993
 msgid "Cannot mass update visible template name."
 msgstr "לא ניתן לעדכן כמותית את שם תצוגת התבנית."
 
@@ -2440,8 +2454,8 @@ msgstr "לא ניתן לבצע פעולת update על הטבלה „%1$s” לל
 msgid "Cannot process applications from different hosts or templates."
 msgstr "לא ניתן לעבד יישומים ממארחים או תבניות שונים."
 
-#: include/classes/api/services/CItemGeneral.php:2056
-#: include/classes/api/services/CItemGeneral.php:2083
+#: include/classes/api/services/CItemGeneral.php:1997
+#: include/classes/api/services/CItemGeneral.php:2024
 msgid "Cannot read JSON."
 msgstr "אין אפשרות לקרוא JSON."
 
@@ -2450,8 +2464,8 @@ msgstr "אין אפשרות לקרוא JSON."
 msgid "Cannot read JSON: %1$s."
 msgstr "לא ניתן לקרוא JSON:‏ %1$s."
 
-#: include/classes/api/services/CItemGeneral.php:2043
-#: include/classes/api/services/CItemGeneral.php:2047
+#: include/classes/api/services/CItemGeneral.php:1984
+#: include/classes/api/services/CItemGeneral.php:1988
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
@@ -2542,8 +2556,8 @@ msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "לא ניתן להגדיר את „templateid” עבור המסך „%1$s”."
 
 #: include/classes/api/services/CHost.php:881
-#: include/classes/api/services/CHost.php:1684
-#: include/classes/api/services/CHost.php:1828
+#: include/classes/api/services/CHost.php:1741
+#: include/classes/api/services/CHost.php:1885
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "לא ניתן להגדיר את שדות המלאי עבור מלאי מושבת."
 
@@ -2552,7 +2566,7 @@ msgstr "לא ניתן להגדיר את שדות המלאי עבור מלאי מ
 msgid "Cannot set resource ID for screen element."
 msgstr "לא ניתן להגדיר מזהה משאב עבור פריט מסך."
 
-#: include/classes/api/services/CHostInterface.php:243
+#: include/classes/api/services/CHostInterface.php:244
 msgid "Cannot switch host for interface."
 msgstr "לא ניתן להחליף מארח למנשק."
 
@@ -2560,15 +2574,15 @@ msgstr "לא ניתן להחליף מארח למנשק."
 msgid "Cannot unblock users"
 msgstr "לא ניתן לשחרר משתמשים"
 
-#: include/classes/api/services/CHostGeneral.php:563
+#: include/classes/api/services/CHostGeneral.php:559
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "לא ניתן לנתק ולפנות תרחישי רשת."
 
-#: include/classes/api/services/CHostGeneral.php:624
+#: include/classes/api/services/CHostGeneral.php:620
 msgid "Cannot unlink and clear applications."
 msgstr "לא ניתן לנתק ולפנות יישומים."
 
-#: include/classes/api/services/CHostGeneral.php:367
+#: include/classes/api/services/CHostGeneral.php:363
 msgid "Cannot unlink and clear discovery rules"
 msgstr "לא ניתן לנתק ולפנות את כללי הגילוי"
 
@@ -2576,12 +2590,12 @@ msgstr "לא ניתן לנתק ולפנות את כללי הגילוי"
 msgid "Cannot unlink template"
 msgstr "לא ניתן לנתק ולפנות תבנית"
 
-#: include/classes/api/services/CTemplate.php:857
-#: include/classes/api/services/CTemplate.php:880
+#: include/classes/api/services/CTemplate.php:855
+#: include/classes/api/services/CTemplate.php:878
 msgid "Cannot unlink template."
 msgstr "לא ניתן לנתק ולפנות תבנית."
 
-#: include/classes/api/services/CHostGeneral.php:273
+#: include/classes/api/services/CHostGeneral.php:269
 #, c-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "לא ניתן לנתק את ההקפצה „%s”, קיימים פריטים מהתבנית שנשארו מקושרים למארח."
@@ -2627,7 +2641,7 @@ msgstr "לא ניתן לעדכן את „%1$s“ עבור ההקפצה „%2$s�
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "לא ניתן לעדכן את „%1$s” עבור אבטיפוס ההקפצה „%2$s”."
 
-#: include/classes/api/services/CHost.php:1807
+#: include/classes/api/services/CHost.php:1864
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "לא ניתן לעדכן את „%2$s“ עבור המארח שהתגלה „%1$s“."
@@ -2663,7 +2677,7 @@ msgstr "לא ניתן לעדכן את ה־„templateid“ עבור תבנית �
 msgid "Cannot update a discovered graph."
 msgstr "לא ניתן לעדכן את התרשים שהתגלה."
 
-#: include/classes/api/services/CHostGroup.php:780
+#: include/classes/api/services/CHostGroup.php:797
 msgid "Cannot update a discovered host group."
 msgstr "לא ניתן לעדכן קבוצת מארחים שהתגלתה."
 
@@ -2680,7 +2694,7 @@ msgstr "לא ניתן לעדכן משימה"
 msgid "Cannot update application"
 msgstr "לא ניתן לעדכן יישום"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:236
+#: app/controllers/CControllerAuthenticationUpdate.php:242
 msgid "Cannot update authentication"
 msgstr "לא ניתן לעדכן את האימות"
 
@@ -2734,9 +2748,9 @@ msgstr "לא ניתן לעדכן את האבטיפוס של התרשים"
 msgid "Cannot update group"
 msgstr "לא ניתן לעדכן קבוצה"
 
-#: include/classes/api/services/CHostGroup.php:986
-#: include/classes/api/services/CHostGroup.php:1090
-#: include/classes/api/services/CHostGroup.php:1226
+#: include/classes/api/services/CHostGroup.php:1003
+#: include/classes/api/services/CHostGroup.php:1107
+#: include/classes/api/services/CHostGroup.php:1243
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "לא ניתן לעדכן קבוצות עבור המארח שהתגלה „%1$s”."
@@ -2767,7 +2781,7 @@ msgstr "לא ניתן לעדכן סמל מפה"
 msgid "Cannot update image"
 msgstr "לא ניתן לעדכן תמונה"
 
-#: include/classes/api/services/CHostInterface.php:316
+#: include/classes/api/services/CHostInterface.php:325
 #, c-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "לא ניתן לעדכן את המנשק עבור המארח שהתגלה „%1$s“."
@@ -2850,7 +2864,7 @@ msgid "Cannot update templated applications."
 msgstr "לא ניתן לעדכן את היישומים בתבנית."
 
 #: include/classes/api/services/CTemplate.php:754
-#: include/classes/api/services/CTemplate.php:1090
+#: include/classes/api/services/CTemplate.php:1088
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "לא ניתן לעדכן את התבניות במארח שהתגלה „%1$s”."
@@ -2904,8 +2918,8 @@ msgstr "לא ניתן לאמת את בדיקת הגילוי: בקשה שגויה
 msgid "Case sensitive"
 msgstr "תלוי רישיות"
 
-#: app/views/administration.authentication.edit.php:52
-#: app/views/administration.authentication.edit.php:108
+#: app/views/administration.authentication.edit.php:53
+#: app/views/administration.authentication.edit.php:115
 msgid "Case sensitive login"
 msgstr "כניסה תלוית רישיות"
 
@@ -2951,7 +2965,7 @@ msgctxt "verb"
 msgid "Change"
 msgstr "שינוי"
 
-#: app/views/administration.authentication.edit.php:70
+#: app/views/administration.authentication.edit.php:72
 #: app/views/administration.mediatype.edit.php:138
 #: include/views/administration.users.edit.php:128
 msgid "Change password"
@@ -3346,7 +3360,7 @@ msgstr "הגדרת משימות"
 msgid "Configuration of applications"
 msgstr "הגדרת יישומים"
 
-#: app/controllers/CControllerAuthenticationEdit.php:127
+#: app/controllers/CControllerAuthenticationEdit.php:120
 msgid "Configuration of authentication"
 msgstr "הגדרת האימות"
 
@@ -3655,7 +3669,7 @@ msgstr "מכיל"
 #: include/views/monitoring.screen.list.php:49
 #: include/views/monitoring.screen.php:103
 #: include/views/monitoring.slideconf.list.php:37
-#: include/views/monitoring.slides.php:102
+#: include/views/monitoring.slides.php:95
 #: include/views/monitoring.sysmap.list.php:34 latest.php:330 queue.php:80
 #: report2.php:174 srv_status.php:175 tr_events.php:168
 msgid "Content controls"
@@ -4145,7 +4159,7 @@ msgstr "נתונים"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "סטטיסטיקת מטמון נתונים. מטמון - אחד מהערכים (מצבים: all,‏ float,‏ uint,‏ str,‏ log,‏ text), היסטוריה (מצבים: pfree,‏ total,‏ used,‏ free), מגמה (מצבים: pfree,‏ total,‏ used,‏ free), טקסט (מצבים: pfree,‏ total,‏ used,‏ free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2678
+#: include/classes/graphdraw/CLineGraphDraw.php:2682
 #: include/classes/graphdraw/CPieGraphDraw.php:805
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4302,7 +4316,7 @@ msgstr "עיכוב בררת מחדל"
 msgid "Default host inventory mode"
 msgstr "מצב מאגר כבררת מחדל למארחים"
 
-#: app/views/administration.authentication.edit.php:41
+#: app/views/administration.authentication.edit.php:42
 msgid "Default login form"
 msgstr "טופס כניסה כבררת מחדל"
 
@@ -4675,7 +4689,7 @@ msgstr "למחוק תרחיש רשת?"
 msgid "Deleted"
 msgstr "נמחק"
 
-#: include/classes/api/services/CHost.php:1305
+#: include/classes/api/services/CHost.php:1341
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "נמחק: המארח „%1$s“."
@@ -5196,14 +5210,14 @@ msgstr "תלויות כפולות בהקפצה „%1$s”."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "תלויות כפולות באבטיפוס הקפצה „%1$s”."
 
-#: include/classes/api/services/CHost.php:1620
-#: include/classes/api/services/CHost.php:1858
+#: include/classes/api/services/CHost.php:1677
+#: include/classes/api/services/CHost.php:1915
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "מארח כפול. כבר קיים מארח עם אותו שם המארח „%s” בנתונים."
 
-#: include/classes/api/services/CHost.php:1627
-#: include/classes/api/services/CHost.php:1878
+#: include/classes/api/services/CHost.php:1684
+#: include/classes/api/services/CHost.php:1935
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "מארח כפול. כבר קיים מארח עם אותו שם התצוגה „%s” בנתונים."
@@ -5293,7 +5307,7 @@ msgstr "עריכת מפה"
 msgid "Edit screen"
 msgstr "עריכת מסך"
 
-#: include/views/monitoring.slides.php:94
+#: include/views/monitoring.slides.php:87
 msgid "Edit slide show"
 msgstr "עריכת מצגת"
 
@@ -5320,8 +5334,8 @@ msgstr "ערך יעיל"
 msgid "Elasticsearch error: %1$s."
 msgstr "שגיאת Elasticsearch:‏ %1$s."
 
-#: include/classes/api/managers/CHistoryManager.php:652
-#: include/classes/api/managers/CHistoryManager.php:661
+#: include/classes/api/managers/CHistoryManager.php:713
+#: include/classes/api/managers/CHistoryManager.php:722
 #, c-format
 msgid "Elasticsearch url is not set for type: %1$s."
 msgstr "כתובת ה־Elasticsearch אינה מוגדרת לסוג: %1$s."
@@ -5409,7 +5423,7 @@ msgstr "מאקרו תנאי מסנן ריק לכלל הגילוי „%1$s”."
 #: include/classes/api/services/CDiscoveryRule.php:464
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
-#: include/classes/api/services/CHostInterface.php:374
+#: include/classes/api/services/CHostInterface.php:383
 #: include/classes/api/services/CHost.php:1153
 #: include/classes/api/services/CHostPrototype.php:875
 #: include/classes/api/services/CMaintenance.php:508
@@ -5483,7 +5497,7 @@ msgstr "הפעלה"
 msgid "Enable HTTP authentication"
 msgstr "הפעלת אימות HTTP"
 
-#: app/views/administration.authentication.edit.php:77
+#: app/views/administration.authentication.edit.php:79
 msgid "Enable LDAP authentication"
 msgstr "הפעלת אימות מול LDAP"
 
@@ -5792,7 +5806,7 @@ msgstr "הרחבת מאקרואים"
 msgid "Expand single problem"
 msgstr "הרחבת בעיה יחידה"
 
-#: include/classes/core/CJsonRpc.php:108
+#: include/classes/core/CJsonRpc.php:110
 #, c-format
 msgid "Expecting JSON-rpc version 2.0, \"%s\" is given."
 msgstr "אמור להיות JSON-rpc בגרסה 2.0, הערך „%s” הועבר."
@@ -5968,11 +5982,11 @@ msgstr "לא ניתן להגדיר את השדה „%1$s” כריק (NULL)."
 #: include/classes/api/services/CDRule.php:318
 #: include/classes/api/services/CDRule.php:493
 #: include/classes/api/services/CDRule.php:503
-#: include/classes/api/services/CHostGroup.php:897
+#: include/classes/api/services/CHostGroup.php:914
 #: include/classes/api/services/CHost.php:743
-#: include/classes/api/services/CTemplate.php:784
+#: include/classes/api/services/CTemplate.php:782
 #: include/classes/api/services/CTriggerGeneral.php:236
-#: include/classes/validators/CNewValidator.php:249
+#: include/classes/validators/CNewValidator.php:255
 #: include/validate.inc.php:300
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
@@ -6578,16 +6592,16 @@ msgstr "רשת"
 #: include/views/monitoring.screen.constructor.edit.php:621
 #: include/views/monitoring.screen.constructor.edit.php:718
 #: include/views/monitoring.screen.php:73
-#: include/views/monitoring.slides.php:76
+#: include/views/monitoring.slides.php:69
 msgid "Group"
 msgstr "קבוצה"
 
-#: include/classes/api/services/CHostGroup.php:551
+#: include/classes/api/services/CHostGroup.php:715
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "לא ניתן למחוק את הקבוצה „%1$s”, כיוון שנעשה בה שימוש לטובת אבטיפוס מארח."
 
-#: include/classes/api/services/CHostGroup.php:600
+#: include/classes/api/services/CHostGroup.php:764
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr "לא ניתן למחוק את הקבוצה „%1$s”, כיוון שנעשה בה שימוש לטובת תנאי יחס."
@@ -6657,8 +6671,10 @@ msgstr "קבוצות"
 msgid "H:i"
 msgstr "H:i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
-#: include/classes/graphdraw/CLineGraphDraw.php:1416
+#: include/classes/graphdraw/CLineGraphDraw.php:1413
+#: include/classes/graphdraw/CLineGraphDraw.php:1420
+#: include/classes/html/svg/CSvgGraphXAxis.php:456
+#: include/classes/html/svg/CSvgGraphXAxis.php:463
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -6679,7 +6695,7 @@ msgstr "סוכן HTTP"
 msgid "HTTP authentication"
 msgstr "אימות HTTP"
 
-#: app/views/administration.authentication.edit.php:44
+#: app/views/administration.authentication.edit.php:45
 msgid "HTTP login form"
 msgstr "טופס כניסה HTTP"
 
@@ -6691,7 +6707,7 @@ msgstr "טופס כניסה HTTP"
 msgid "HTTP proxy"
 msgstr "מתווך HTTP"
 
-#: app/views/administration.authentication.edit.php:136
+#: app/views/administration.authentication.edit.php:146
 msgid "HTTP settings"
 msgstr "הגדרות HTTP"
 
@@ -6891,7 +6907,7 @@ msgstr "יישור אופקי"
 #: include/views/monitoring.charts.php:33
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
-#: include/views/monitoring.slides.php:81
+#: include/views/monitoring.slides.php:74
 #: include/views/reports.toptriggers.php:79 items.php:900 items.php:1273
 #: jsLoader.php:165 latest.php:421 latest.php:438 queue.php:254
 #: report2.php:409 report2.php:431 search.php:125
@@ -6907,10 +6923,10 @@ msgstr[1] "מארחים"
 msgid "Host \"%1$s\" already exists."
 msgstr "המארח „%1$s” כבר קיים."
 
-#: include/classes/api/services/CHostGroup.php:1449
+#: include/classes/api/services/CHostGroup.php:1466
 #: include/classes/api/services/CHost.php:806
-#: include/classes/api/services/CHost.php:1608
-#: include/classes/api/services/CHost.php:1784
+#: include/classes/api/services/CHost.php:1665
+#: include/classes/api/services/CHost.php:1841
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "המארח „%1$s” לא יכול להישאר בלי קבוצת מארחים."
@@ -6936,7 +6952,7 @@ msgstr "גישה למארח"
 msgid "Host added"
 msgstr "נוסף מארח"
 
-#: include/classes/api/services/CHostInterface.php:822
+#: include/classes/api/services/CHostInterface.php:831
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "למארח לא יכול להיות יותר ממנשק בררת מחדל יחיד מאותו הסוג."
 
@@ -6981,17 +6997,17 @@ msgstr[1] "מארחים מופעלים"
 msgid "Host group"
 msgstr "קבוצת מארחים"
 
-#: include/classes/api/services/CHostGroup.php:731
+#: include/classes/api/services/CHostGroup.php:643
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "קבוצת המארחים „%1$s” כבר קיימת."
 
-#: include/classes/api/services/CHostGroup.php:584
+#: include/classes/api/services/CHostGroup.php:748
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "לא ניתן למחוק את קבוצת המארחים „%1$s”, כיוון שנעשה בה שימוש בסקריפט כללי."
 
-#: include/classes/api/services/CHostGroup.php:537
+#: include/classes/api/services/CHostGroup.php:701
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "קבוצת המארחים „%1$s” היא פנימית ואי אפשר למחוק אותה."
@@ -7169,25 +7185,25 @@ msgstr "המארח עודכן"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "מארח עם המזהה „%1$s” אינו זמין."
 
-#: include/classes/api/services/CTemplate.php:1056
+#: include/classes/api/services/CTemplate.php:1054
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "מארח עם אותו השם „%1$s” כבר קיים."
 
-#: include/classes/api/services/CHost.php:1715
-#: include/classes/api/services/CHost.php:1934
+#: include/classes/api/services/CHost.php:1772
+#: include/classes/api/services/CHost.php:1991
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "מארח עם אותו השם „%s” כבר קיים."
 
 #: include/classes/api/services/CTemplate.php:460
-#: include/classes/api/services/CTemplate.php:1021
+#: include/classes/api/services/CTemplate.php:1019
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "מארח עם אותו שם התצוגה „%1$s” כבר קיים."
 
-#: include/classes/api/services/CHost.php:1721
-#: include/classes/api/services/CHost.php:1941
+#: include/classes/api/services/CHost.php:1778
+#: include/classes/api/services/CHost.php:1998
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "מארח עם אותו שם התצוגה „%s” כבר קיים."
@@ -7279,7 +7295,7 @@ msgstr "IP"
 msgid "IP address"
 msgstr "כתובת IP"
 
-#: include/classes/api/services/CHostInterface.php:266
+#: include/classes/api/services/CHostInterface.php:271
 msgid "IP and DNS cannot be empty for host interface."
 msgstr "כתובות ה־IP וה־DNS לא יכולות להישאר ריקות עבור מנשק מארח."
 
@@ -7530,6 +7546,10 @@ msgstr "מארח לא נגיש"
 #: app/controllers/CControllerDashboardWidgetEdit.php:241
 msgid "Inaccessible item"
 msgstr "פריט בלתי נגיש"
+
+#: include/classes/screens/CScreenProblem.php:393
+msgid "Inaccessible maintenance"
+msgstr ""
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:103
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:84
@@ -7799,18 +7819,18 @@ msgstr "ארגומנטים שגויים הועברו לפונקציה"
 #: include/classes/api/services/CDRule.php:341
 #: include/classes/api/services/CDRule.php:507
 #: include/classes/api/services/CEvent.php:793
-#: include/classes/api/services/CHostInterface.php:233
-#: include/classes/api/services/CHostInterface.php:422
+#: include/classes/api/services/CHostInterface.php:234
+#: include/classes/api/services/CHostInterface.php:431
 #: include/classes/api/services/CHostPrototype.php:392
 #: include/classes/api/services/CHostPrototype.php:413
 #: include/classes/api/services/CItemGeneral.php:258
-#: include/classes/api/services/CItemGeneral.php:1156
-#: include/classes/api/services/CItemGeneral.php:1174
-#: include/classes/api/services/CItemGeneral.php:1196
-#: include/classes/api/services/CItemGeneral.php:1222
-#: include/classes/api/services/CItemGeneral.php:1235
-#: include/classes/api/services/CItemGeneral.php:1264
-#: include/classes/api/services/CItemGeneral.php:1278
+#: include/classes/api/services/CItemGeneral.php:1247
+#: include/classes/api/services/CItemGeneral.php:1265
+#: include/classes/api/services/CItemGeneral.php:1287
+#: include/classes/api/services/CItemGeneral.php:1313
+#: include/classes/api/services/CItemGeneral.php:1326
+#: include/classes/api/services/CItemGeneral.php:1355
+#: include/classes/api/services/CItemGeneral.php:1369
 #: include/classes/api/services/CMapElement.php:46
 #: include/classes/api/services/CMapElement.php:117
 #: include/classes/api/services/CMapElement.php:129
@@ -7834,7 +7854,7 @@ msgstr "ארגומנטים שגויים הועברו לפונקציה"
 msgid "Incorrect arguments passed to function."
 msgstr "ארגומנטים שגויים הועברו לפונקציה."
 
-#: include/classes/api/services/CHostInterface.php:261
+#: include/classes/api/services/CHostInterface.php:266
 msgid "Incorrect arguments passed to method."
 msgstr "ארגומנטים שגויים הועברו לשיטה."
 
@@ -7843,7 +7863,7 @@ msgstr "ארגומנטים שגויים הועברו לשיטה."
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "פרוטוקול אימות שגוי עבור הפריט „%1$s”."
 
-#: include/classes/api/services/CHostInterface.php:665
+#: include/classes/api/services/CHostInterface.php:674
 msgid "Incorrect bulk value for interface."
 msgstr "ערך כמותי שגוי עבור המנשק."
 
@@ -7853,8 +7873,8 @@ msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "ערך חישוב ה־SLA לשירות „%1$s” שגוי."
 
 #: include/classes/api/services/CHost.php:826
-#: include/classes/api/services/CHost.php:1596
-#: include/classes/api/services/CHost.php:1852
+#: include/classes/api/services/CHost.php:1653
+#: include/classes/api/services/CHost.php:1909
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "נעשה שימוש בתווים שגויים לשם המארח „%s”."
@@ -7866,7 +7886,7 @@ msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "נעשה שימוש בתווים שגויים לשם המתווך „%1$s”."
 
 #: include/classes/api/services/CTemplate.php:411
-#: include/classes/api/services/CTemplate.php:1064
+#: include/classes/api/services/CTemplate.php:1062
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "נעשה שימוש בתווים שגויים לשם התבנית „%1$s”."
@@ -8008,8 +8028,8 @@ msgstr "מפתח תמונה שגוי."
 #: include/classes/api/services/CAction.php:2820
 #: include/classes/api/services/CAction.php:2832
 #: include/classes/api/services/CHost.php:812
-#: include/classes/api/services/CHost.php:1590
-#: include/classes/api/services/CHost.php:1771
+#: include/classes/api/services/CHost.php:1647
+#: include/classes/api/services/CHost.php:1828
 #: include/classes/api/services/CImage.php:485
 #: include/classes/api/services/CProxy.php:618
 #: include/classes/api/services/CProxy.php:682
@@ -8022,18 +8042,18 @@ msgstr "מפתח תמונה שגוי."
 msgid "Incorrect input parameters."
 msgstr "הפרמטרים של הקלט שגויים."
 
-#: include/classes/api/services/CHostInterface.php:577
+#: include/classes/api/services/CHostInterface.php:586
 #, c-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "סופק פרמטר DNS מנשק שגוי „%s”."
 
-#: include/classes/api/services/CHostInterface.php:621
+#: include/classes/api/services/CHostInterface.php:630
 #, c-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "צוינה פתחה שגויה „%s” למנשק."
 
-#: include/classes/api/services/CHost.php:1690
-#: include/classes/api/services/CHost.php:1834
+#: include/classes/api/services/CHost.php:1747
+#: include/classes/api/services/CHost.php:1891
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "שדה שגוי במאגר „%s”."
@@ -8228,8 +8248,8 @@ msgstr "סדר המיון לשירות „%1$s” שגוי."
 msgid "Incorrect source value."
 msgstr "ערך המקור שגוי."
 
-#: include/classes/api/services/CHost.php:1662
-#: include/classes/api/services/CHost.php:1802
+#: include/classes/api/services/CHost.php:1719
+#: include/classes/api/services/CHost.php:1859
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "מצב שגוי עבור מארח „%1$s”."
@@ -8353,22 +8373,22 @@ msgstr "קבוצת משתמשים שגויה."
 #: include/classes/api/services/CDRule.php:558
 #: include/classes/api/services/CDRule.php:571
 #: include/classes/api/services/CItemGeneral.php:529
-#: include/classes/api/services/CItemGeneral.php:2027
-#: include/classes/validators/CNewValidator.php:115
-#: include/classes/validators/CNewValidator.php:127
-#: include/classes/validators/CNewValidator.php:139
-#: include/classes/validators/CNewValidator.php:154
-#: include/classes/validators/CNewValidator.php:168
-#: include/classes/validators/CNewValidator.php:186
-#: include/classes/validators/CNewValidator.php:202
-#: include/classes/validators/CNewValidator.php:218
-#: include/classes/validators/CNewValidator.php:236
+#: include/classes/api/services/CItemGeneral.php:1968
+#: include/classes/validators/CNewValidator.php:116
+#: include/classes/validators/CNewValidator.php:129
+#: include/classes/validators/CNewValidator.php:142
+#: include/classes/validators/CNewValidator.php:158
+#: include/classes/validators/CNewValidator.php:172
+#: include/classes/validators/CNewValidator.php:191
+#: include/classes/validators/CNewValidator.php:207
+#: include/classes/validators/CNewValidator.php:223
+#: include/classes/validators/CNewValidator.php:242
 #: include/validate.inc.php:355
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "ערך שגוי „%1$s” לשדה „%2$s”."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:132
+#: app/controllers/CControllerAuthenticationUpdate.php:134
 #: include/classes/api/services/CAction.php:1678
 #: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:351
@@ -8422,9 +8442,20 @@ msgstr "ערך שגוי „%1$s” בשדה „%2$s” עבור היחס „%3$s
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
 msgstr "ערך שגוי „%1$s” בשדה „%2$s” עבור סוג המדיה „%3$s”."
 
+#: include/classes/validators/CNewValidator.php:117
+#: include/classes/validators/CNewValidator.php:130
+#: include/classes/validators/CNewValidator.php:143
+#: include/classes/validators/CNewValidator.php:159
+#: include/classes/validators/CNewValidator.php:192
+#: include/classes/validators/CNewValidator.php:243
+#: include/validate.inc.php:358
+#, c-format
+msgid "Incorrect value for \"%1$s\" field."
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:95
-#: app/controllers/CControllerPopupHttpStep.php:104
-#: app/controllers/CControllerPopupHttpStep.php:110
+#: app/controllers/CControllerPopupHttpStep.php:103
+#: app/controllers/CControllerPopupHttpStep.php:109
 #: app/controllers/CControllerPopupMedia.php:94
 #: app/controllers/CControllerPopupMedia.php:105 correlation.php:227
 #: correlation.php:237 correlation.php:243 correlation.php:263
@@ -8439,7 +8470,7 @@ msgstr "ערך שגוי „%1$s” בשדה „%2$s” עבור סוג המדי�
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
 #: include/classes/api/services/CDiscoveryRule.php:1134
-#: include/classes/api/services/CDiscoveryRule.php:1358
+#: include/classes/api/services/CDiscoveryRule.php:1307
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:214
@@ -8459,21 +8490,19 @@ msgstr "ערך שגוי „%1$s” בשדה „%2$s” עבור סוג המדי�
 #: include/classes/api/services/CEvent.php:804
 #: include/classes/api/services/CEvent.php:847
 #: include/classes/api/services/CEvent.php:904
-#: include/classes/api/services/CHostGeneral.php:1023
-#: include/classes/api/services/CHostGeneral.php:1030
 #: include/classes/api/services/CHost.php:770
-#: include/classes/api/services/CHost.php:1494
-#: include/classes/api/services/CHost.php:1500
-#: include/classes/api/services/CHost.php:1515
-#: include/classes/api/services/CHost.php:1521
-#: include/classes/api/services/CHost.php:1526
-#: include/classes/api/services/CHost.php:1532
-#: include/classes/api/services/CHost.php:1540
-#: include/classes/api/services/CHost.php:1546
-#: include/classes/api/services/CHost.php:1555
-#: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1656
-#: include/classes/api/services/CHost.php:1796
+#: include/classes/api/services/CHost.php:1551
+#: include/classes/api/services/CHost.php:1557
+#: include/classes/api/services/CHost.php:1572
+#: include/classes/api/services/CHost.php:1578
+#: include/classes/api/services/CHost.php:1583
+#: include/classes/api/services/CHost.php:1589
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1612
+#: include/classes/api/services/CHost.php:1618
+#: include/classes/api/services/CHost.php:1713
+#: include/classes/api/services/CHost.php:1853
 #: include/classes/api/services/CHttpTest.php:969
 #: include/classes/api/services/CHttpTest.php:984
 #: include/classes/api/services/CHttpTest.php:1080
@@ -8487,31 +8516,27 @@ msgstr "ערך שגוי „%1$s” בשדה „%2$s” עבור סוג המדי�
 #: include/classes/api/services/CItemGeneral.php:517
 #: include/classes/api/services/CItemGeneral.php:523
 #: include/classes/api/services/CItemGeneral.php:536
-#: include/classes/api/services/CItemGeneral.php:1179
-#: include/classes/api/services/CItemGeneral.php:1185
-#: include/classes/api/services/CItemGeneral.php:1200
-#: include/classes/api/services/CItemGeneral.php:1209
-#: include/classes/api/services/CItemGeneral.php:1227
-#: include/classes/api/services/CItemGeneral.php:1240
-#: include/classes/api/services/CItemGeneral.php:1247
-#: include/classes/api/services/CItemGeneral.php:1253
-#: include/classes/api/services/CItemGeneral.php:1269
-#: include/classes/api/services/CItemGeneral.php:1283
-#: include/classes/api/services/CItemGeneral.php:1509
-#: include/classes/api/services/CItemGeneral.php:1550
-#: include/classes/api/services/CItemGeneral.php:1556
-#: include/classes/api/services/CItemGeneral.php:1573
-#: include/classes/api/services/CItemGeneral.php:1580
-#: include/classes/api/services/CItemGeneral.php:1586
-#: include/classes/api/services/CItemGeneral.php:1671
-#: include/classes/api/services/CItemGeneral.php:1680
-#: include/classes/api/services/CItemGeneral.php:1793
-#: include/classes/api/services/CItemGeneral.php:1800
-#: include/classes/api/services/CItemGeneral.php:1966
-#: include/classes/api/services/CItem.php:774
-#: include/classes/api/services/CItem.php:782
-#: include/classes/api/services/CItemPrototype.php:944
-#: include/classes/api/services/CItemPrototype.php:952
+#: include/classes/api/services/CItemGeneral.php:1270
+#: include/classes/api/services/CItemGeneral.php:1276
+#: include/classes/api/services/CItemGeneral.php:1291
+#: include/classes/api/services/CItemGeneral.php:1300
+#: include/classes/api/services/CItemGeneral.php:1318
+#: include/classes/api/services/CItemGeneral.php:1331
+#: include/classes/api/services/CItemGeneral.php:1338
+#: include/classes/api/services/CItemGeneral.php:1344
+#: include/classes/api/services/CItemGeneral.php:1360
+#: include/classes/api/services/CItemGeneral.php:1374
+#: include/classes/api/services/CItemGeneral.php:1609
+#: include/classes/api/services/CItemGeneral.php:1629
+#: include/classes/api/services/CItemGeneral.php:1636
+#: include/classes/api/services/CItemGeneral.php:1646
+#: include/classes/api/services/CItemGeneral.php:1726
+#: include/classes/api/services/CItemGeneral.php:1740
+#: include/classes/api/services/CItemGeneral.php:1907
+#: include/classes/api/services/CItem.php:772
+#: include/classes/api/services/CItem.php:780
+#: include/classes/api/services/CItemPrototype.php:943
+#: include/classes/api/services/CItemPrototype.php:951
 #: include/classes/api/services/CMaintenance.php:468
 #: include/classes/api/services/CMaintenance.php:637
 #: include/classes/api/services/CMapElement.php:101
@@ -8577,16 +8602,16 @@ msgstr "ערך שגוי „%1$s” בשדה „%2$s” עבור סוג המדי�
 #: include/classes/helpers/CSvgGraphHelper.php:248
 #: include/classes/import/CConfigurationImport.php:807
 #: include/classes/import/CConfigurationImport.php:845
-#: include/classes/import/CConfigurationImport.php:2461
-#: include/classes/import/CConfigurationImport.php:2565
-#: include/classes/import/CConfigurationImport.php:2575
-#: include/classes/import/CConfigurationImport.php:2611
-#: include/classes/import/CConfigurationImport.php:2620
-#: include/classes/import/CConfigurationImport.php:2626
+#: include/classes/import/CConfigurationImport.php:2460
+#: include/classes/import/CConfigurationImport.php:2564
+#: include/classes/import/CConfigurationImport.php:2574
+#: include/classes/import/CConfigurationImport.php:2610
+#: include/classes/import/CConfigurationImport.php:2619
+#: include/classes/import/CConfigurationImport.php:2625
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
-#: include/classes/validators/CNewValidator.php:260
-#: include/classes/validators/CNewValidator.php:272
+#: include/classes/validators/CNewValidator.php:266
+#: include/classes/validators/CNewValidator.php:278
 #: include/screens.inc.php:321 include/screens.inc.php:335
 #: include/screens.inc.php:450 include/screens.inc.php:464
 #: include/sounds.inc.php:106 usergrps.php:341 usergrps.php:381
@@ -8595,7 +8620,7 @@ msgstr "ערך שגוי „%1$s” בשדה „%2$s” עבור סוג המדי�
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "ערך שגוי עבור השדה „%1$s”:‏ %2$s."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:124
+#: app/controllers/CControllerAuthenticationUpdate.php:126
 #: app/controllers/CControllerPopupTriggerWizard.php:125
 #: include/validate.inc.php:346
 #, c-format
@@ -8685,7 +8710,7 @@ msgstr "שם המתקין"
 msgid "Interface"
 msgstr "מנשק"
 
-#: include/classes/api/services/CHostInterface.php:842
+#: include/classes/api/services/CHostInterface.php:851
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "המנשק מקושר לפריט „%1$s” תחת „%2$s”."
@@ -8694,18 +8719,18 @@ msgstr "המנשק מקושר לפריט „%1$s” תחת „%2$s”."
 msgid "Interface is used by items that require this type of the interface."
 msgstr "נעשה שימוש במנשק על ידי פריטים שדורשים סוג כזה של מנשק."
 
-#: include/classes/api/services/CHostInterface.php:270
+#: include/classes/api/services/CHostInterface.php:275
 #, c-format
 msgid "Interface with DNS \"%1$s\" cannot have empty IP address."
 msgstr "למנשק עם ה־DNS‏ „%1$s” לא יכולה להיות כתובת IP ריקה."
 
-#: include/classes/api/services/CHostInterface.php:276
-#: include/classes/api/services/CHostInterface.php:283
+#: include/classes/api/services/CHostInterface.php:281
+#: include/classes/api/services/CHostInterface.php:288
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on \"%2$s\"."
 msgstr "למנשק עם כתובת ה־IP‏ „%1$s” לא יכול להיות שם ריק בתור DNS בזמן שקיים מאפיין „שימוש ב־DNS” על „%2$s”."
 
-#: include/classes/api/services/CHostInterface.php:289
+#: include/classes/api/services/CHostInterface.php:294
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "למנשק עם כתובת ה־IP‏ „%1$s” לא יכול להיות שם ריק בתור DNS."
@@ -8725,7 +8750,7 @@ msgctxt "user type"
 msgid "Internal"
 msgstr "פנימי"
 
-#: include/classes/core/CJsonRpc.php:204
+#: include/classes/core/CJsonRpc.php:206
 msgid "Internal JSON-RPC error."
 msgstr "שגיאת JSON-RPC פנימית."
 
@@ -8743,7 +8768,7 @@ msgstr "תקופת אחסון נתונים פנימיים"
 #: include/classes/api/services/CTriggerGeneral.php:996
 #: include/classes/api/services/CTriggerGeneral.php:1175
 #: include/classes/api/services/CTriggerGeneral.php:1535
-#: include/classes/core/CJsonRpc.php:203
+#: include/classes/core/CJsonRpc.php:205
 #: include/classes/import/validators/CXmlValidatorGeneral.php:147
 #: include/classes/widgets/fields/CWidgetField.php:100
 msgid "Internal error."
@@ -8775,16 +8800,16 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "משך"
 
-#: include/classes/api/services/CHostInterface.php:605
+#: include/classes/api/services/CHostInterface.php:614
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
 msgstr "כתובת IP שגויה „%1$s”."
 
-#: include/classes/core/CJsonRpc.php:184
+#: include/classes/core/CJsonRpc.php:186
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "JSON שגוי. אירעה שגיאה בשרת בעת פענוח הטקסט ב־JSON."
 
-#: include/classes/core/CJsonRpc.php:188
+#: include/classes/core/CJsonRpc.php:190
 msgid "Invalid Request."
 msgstr "בקשה שגויה."
 
@@ -8898,7 +8923,7 @@ msgstr "מאקרו שגוי „%1$s”‏: %2$s."
 #: include/classes/api/services/CService.php:200
 #: include/classes/api/services/CService.php:371
 #: include/classes/api/services/CService.php:1203
-#: include/classes/core/CJsonRpc.php:199
+#: include/classes/core/CJsonRpc.php:201
 msgid "Invalid method parameters."
 msgstr "הפרמטרים לשיטה שגויים."
 
@@ -8920,11 +8945,11 @@ msgstr "מספר הפרמטרים שגוי."
 #: app/controllers/CControllerDashboardUpdate.php:125
 #: app/controllers/CControllerDashboardUpdate.php:134
 #: app/controllers/CControllerDashboardUpdate.php:142
-#: include/classes/api/services/CItemGeneral.php:1982
-#: include/classes/api/services/CItemGeneral.php:1989
-#: include/classes/api/services/CItemGeneral.php:1997
-#: include/classes/api/services/CItemGeneral.php:2006
-#: include/classes/api/services/CItemGeneral.php:2013
+#: include/classes/api/services/CItemGeneral.php:1923
+#: include/classes/api/services/CItemGeneral.php:1930
+#: include/classes/api/services/CItemGeneral.php:1938
+#: include/classes/api/services/CItemGeneral.php:1947
+#: include/classes/api/services/CItemGeneral.php:1954
 #: include/classes/api/services/CUser.php:649
 #: include/classes/api/services/CUser.php:660
 #: include/classes/validators/CApiInputValidator.php:230
@@ -8987,7 +9012,7 @@ msgstr "מספר הפרמטרים שגוי."
 msgid "Invalid parameter \"%1$s\": %2$s."
 msgstr "פרמטר שגוי „%1$s”‏: %2$s."
 
-#: include/classes/core/CJsonRpc.php:198
+#: include/classes/core/CJsonRpc.php:200
 msgid "Invalid params."
 msgstr "פרמטרים שגויים."
 
@@ -9135,7 +9160,7 @@ msgstr "הפריט „%1$s” כבר קיים תחת „%2$s”, התקבל בי
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
 msgstr "הפריט „%1$s” כבר קיים תחת „%2$s”."
 
-#: include/classes/api/services/CItem.php:954
+#: include/classes/api/services/CItem.php:891
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "הפריט %1$s לא יכול לאכלס שדה מאגר ריק של מארח מספר „%2$d”. האפשרויות הן: החל מ־0 (לא לאכלס) ועד %3$d."
@@ -9145,8 +9170,8 @@ msgstr "הפריט %1$s לא יכול לאכלס שדה מאגר ריק של מ�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "הפריט „%1$s” לא קיים בתבנית „%2$s”."
 
-#: include/classes/api/services/CDiscoveryRule.php:1359
-#: include/classes/api/services/CItemGeneral.php:1510
+#: include/classes/api/services/CDiscoveryRule.php:1308
+#: include/classes/api/services/CItemGeneral.php:1610
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "הפריט „%1$s” לא קיים או שאין לך גישה לפריט הזה"
@@ -9204,7 +9229,7 @@ msgstr "פריט במצב „לא נתמך”"
 msgid "Item not selected"
 msgstr "לא נבחר פריט"
 
-#: include/classes/api/services/CItemGeneral.php:1169
+#: include/classes/api/services/CItemGeneral.php:1260
 #, c-format
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr "חסרים פרמטרים בעיבוד הטרומי של הפריט: %1$s"
@@ -9223,7 +9248,7 @@ msgstr "אבטיפוס פריט"
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "אבטיפוס הפריט „%1$s” כבר קיים תחת „%2$s”, התקבל בירושה מתבנית אחרת."
 
-#: include/classes/api/services/CItemGeneral.php:1006
+#: include/classes/api/services/CItemGeneral.php:1040
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", linked to another rule."
 msgstr "אבטיפוס הפריט „%1$s” כבר קיים תחת „%2$s”, מקושר לכלל אחר."
@@ -9298,32 +9323,32 @@ msgstr "הפריט לא יעבור רענון. ההפרש בינן העדכונ�
 msgid "Item with ID \"%1$s\" is not available."
 msgstr "פריט עם המזהה „%1$s” אינו זמין."
 
-#: include/classes/api/services/CItemGeneral.php:721
+#: include/classes/api/services/CItemGeneral.php:668
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "פריט עם המפתח „%1$s” כבר קיים תחת „%2$s” ככלל גילוי."
 
-#: include/classes/api/services/CItemGeneral.php:727
+#: include/classes/api/services/CItemGeneral.php:674
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "פריט עם המפתח „%1$s” כבר קיים תחת „%2$s” כפריט שנוצר מאבטיפוס פריט."
 
-#: include/classes/api/services/CItemGeneral.php:724
+#: include/classes/api/services/CItemGeneral.php:671
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "פריט עם המפתח „%1$s” כבר קיים תחת „%2$s” כאבטיפוס פריט."
 
-#: include/classes/api/services/CItemGeneral.php:718
+#: include/classes/api/services/CItemGeneral.php:665
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "פריט עם המפתח „%1$s” כבר קיים תחת „%2$s” כפריט."
 
-#: include/classes/api/services/CItemGeneral.php:730
+#: include/classes/api/services/CItemGeneral.php:677
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "פריט עם המפתח „%1$s” כבר קיים תחת „%2$s” כרכיב בלתי ידוע של פריט."
 
-#: include/classes/api/services/CItemGeneral.php:1402
+#: include/classes/api/services/CItemGeneral.php:1493
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "פריט עם המפתח „%1$s” כבר קיים תחת „%2$s”."
@@ -9404,20 +9429,20 @@ msgstr "נתוני JSON"
 msgid "JSON string is expected"
 msgstr "אמורה להיות מחרוזת JSON"
 
-#: include/classes/core/CJsonRpc.php:156
+#: include/classes/core/CJsonRpc.php:158
 #, c-format
 msgid "JSON-rpc error generation failed. No such error \"%s\"."
 msgstr "יצירת שגיאת JSON-rpc. אין כזאת שגיאה „%s”."
 
-#: include/classes/core/CJsonRpc.php:113
+#: include/classes/core/CJsonRpc.php:115
 msgid "JSON-rpc method is not defined."
 msgstr "שיטת ה־JSON-rpc אינה מוגדרת."
 
-#: include/classes/core/CJsonRpc.php:118
+#: include/classes/core/CJsonRpc.php:120
 msgid "JSON-rpc params is not an Array."
 msgstr "הפרמטרים של JSON-rpc אינם מערך."
 
-#: include/classes/core/CJsonRpc.php:103
+#: include/classes/core/CJsonRpc.php:105
 msgid "JSON-rpc version is not specified."
 msgstr "גרסת ה־JSON-rpc לא צוינה."
 
@@ -9513,7 +9538,7 @@ msgstr "LDAP"
 msgid "LDAP authentication"
 msgstr "אימות LDAP"
 
-#: app/views/administration.authentication.edit.php:83
+#: app/views/administration.authentication.edit.php:86
 msgid "LDAP host"
 msgstr "מארח LDAP"
 
@@ -9521,11 +9546,11 @@ msgstr "מארח LDAP"
 msgid "LDAP is not configured"
 msgstr "לא מוגדר LDAP"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:180
+#: app/controllers/CControllerAuthenticationUpdate.php:182
 msgid "LDAP login successful"
 msgstr "הכניסה עם LDAP הצליחה"
 
-#: app/views/administration.authentication.edit.php:137
+#: app/views/administration.authentication.edit.php:147
 msgid "LDAP settings"
 msgstr "הגדרות LDAP"
 
@@ -9886,7 +9911,7 @@ msgstr "תבנית הזמן ליומן"
 msgid "Log unmatched SNMP traps"
 msgstr "תיעוד מלכודות SNMP שאינן תואמות"
 
-#: app/views/administration.authentication.edit.php:115 auditlogs.php:138
+#: app/views/administration.authentication.edit.php:123 auditlogs.php:138
 #: include/func.inc.php:1826 include/func.inc.php:1841
 #: include/menu.inc.php:292 include/views/administration.auditlogs.list.php:44
 #: include/views/administration.users.list.php:89 index_http.php:91
@@ -9915,7 +9940,8 @@ msgstr "אבד"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "כלל גילוי ברמה נמוכה במצב „לא נתמך“"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1377
+#: include/classes/graphdraw/CLineGraphDraw.php:1381
+#: include/classes/html/svg/CSvgGraphXAxis.php:424
 msgid "M"
 msgstr "M"
 
@@ -10013,7 +10039,7 @@ msgstr "תבניות המאקרו עודכנו"
 #: include/views/monitoring.hostscreen.php:57
 #: include/views/monitoring.overview.items.php:45
 #: include/views/monitoring.overview.triggers.php:82
-#: include/views/monitoring.slides.php:89 report2.php:186 report4.php:128
+#: include/views/monitoring.slides.php:82 report2.php:186 report4.php:128
 #: srv_status.php:167
 msgid "Main filter"
 msgstr "מסנן ראשי"
@@ -10281,7 +10307,7 @@ msgstr "מספר התהליכים המרבי שנתמך על ידי מערכת �
 #: app/controllers/CControllerTimeSelectorUpdate.php:239
 #: include/classes/mvc/CController.php:208
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:445
-#: include/validate.inc.php:454
+#: include/validate.inc.php:457
 #, c-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
@@ -10420,7 +10446,7 @@ msgstr "הודעות"
 msgid "Messaging"
 msgstr "התכתבות"
 
-#: include/classes/core/CJsonRpc.php:193
+#: include/classes/core/CJsonRpc.php:195
 msgid "Method not found."
 msgstr "השיטה לא נמצאה."
 
@@ -10474,7 +10500,7 @@ msgstr "רמת חומרה מזערית"
 #: app/controllers/CControllerTimeSelectorUpdate.php:234
 #: include/classes/mvc/CController.php:201
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:440
-#: include/validate.inc.php:447
+#: include/validate.inc.php:450
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
@@ -11069,13 +11095,13 @@ msgstr "לא נמצאו נתונים."
 msgid "No data."
 msgstr "אין נתונים."
 
-#: include/classes/api/services/CHostInterface.php:818
+#: include/classes/api/services/CHostInterface.php:827
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "אין מנשק בררת מחדל עבור הסוג „%1$s” תחת „%2$s”."
 
-#: include/classes/core/CJsonRpc.php:209 include/classes/core/CJsonRpc.php:214
-#: include/classes/core/CJsonRpc.php:219
+#: include/classes/core/CJsonRpc.php:211 include/classes/core/CJsonRpc.php:216
+#: include/classes/core/CJsonRpc.php:221
 msgid "No details"
 msgstr "אין פרטים"
 
@@ -11174,8 +11200,8 @@ msgstr "לא נמצא מנשק."
 msgid "No interface provided for proxy \"%s\"."
 msgstr "לא סופק מנשק למתווך „%s”."
 
-#: include/classes/api/services/CHost.php:1669
-#: include/classes/api/services/CHost.php:1845
+#: include/classes/api/services/CHost.php:1726
+#: include/classes/api/services/CHost.php:1902
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "אין מנשקים למארח „%s”."
@@ -11198,7 +11224,7 @@ msgstr "לא צוין מזהה אבטיפוס פריט לרכיב מסך."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "אין פריט עם itemid (מזהה פריט)=„%1$s”."
 
-#: chart3.php:132
+#: chart3.php:137
 msgid "No items defined."
 msgstr "לא הוגדרו פריטים."
 
@@ -11273,21 +11299,21 @@ msgstr "אין הרשאות לגישה למערכת."
 #: include/classes/api/services/CGraphPrototype.php:717
 #: include/classes/api/services/CHostBase.php:49
 #: include/classes/api/services/CHostGeneral.php:56
-#: include/classes/api/services/CHostGroup.php:532
-#: include/classes/api/services/CHostGroup.php:788
-#: include/classes/api/services/CHostGroup.php:1027
-#: include/classes/api/services/CHostGroup.php:1058
-#: include/classes/api/services/CHostGroup.php:1159
-#: include/classes/api/services/CHostGroup.php:1281
-#: include/classes/api/services/CHostGroup.php:1301
-#: include/classes/api/services/CHostInterface.php:238
-#: include/classes/api/services/CHostInterface.php:254
-#: include/classes/api/services/CHostInterface.php:385
-#: include/classes/api/services/CHostInterface.php:644
+#: include/classes/api/services/CHostGroup.php:696
+#: include/classes/api/services/CHostGroup.php:805
+#: include/classes/api/services/CHostGroup.php:1044
+#: include/classes/api/services/CHostGroup.php:1075
+#: include/classes/api/services/CHostGroup.php:1176
+#: include/classes/api/services/CHostGroup.php:1298
+#: include/classes/api/services/CHostGroup.php:1318
+#: include/classes/api/services/CHostInterface.php:239
+#: include/classes/api/services/CHostInterface.php:259
+#: include/classes/api/services/CHostInterface.php:394
+#: include/classes/api/services/CHostInterface.php:653
 #: include/classes/api/services/CHost.php:1122
 #: include/classes/api/services/CHost.php:1157
-#: include/classes/api/services/CHost.php:1645
-#: include/classes/api/services/CHost.php:1777
+#: include/classes/api/services/CHost.php:1702
+#: include/classes/api/services/CHost.php:1834
 #: include/classes/api/services/CHostPrototype.php:353
 #: include/classes/api/services/CHostPrototype.php:399
 #: include/classes/api/services/CHostPrototype.php:420
@@ -11307,8 +11333,8 @@ msgstr "אין הרשאות לגישה למערכת."
 #: include/classes/api/services/CItemGeneral.php:209
 #: include/classes/api/services/CItemGeneral.php:311
 #: include/classes/api/services/CItemGeneral.php:326
-#: include/classes/api/services/CItem.php:699
-#: include/classes/api/services/CItemPrototype.php:869
+#: include/classes/api/services/CItem.php:697
+#: include/classes/api/services/CItemPrototype.php:868
 #: include/classes/api/services/CMaintenance.php:263
 #: include/classes/api/services/CMaintenance.php:292
 #: include/classes/api/services/CMaintenance.php:305
@@ -11320,9 +11346,9 @@ msgstr "אין הרשאות לגישה למערכת."
 #: include/classes/api/services/CMap.php:567
 #: include/classes/api/services/CMap.php:971
 #: include/classes/api/services/CMap.php:1029
-#: include/classes/api/services/CMap.php:1540
-#: include/classes/api/services/CMap.php:1978
-#: include/classes/api/services/CMap.php:2040
+#: include/classes/api/services/CMap.php:1539
+#: include/classes/api/services/CMap.php:1977
+#: include/classes/api/services/CMap.php:2039
 #: include/classes/api/services/CMediatype.php:460
 #: include/classes/api/services/CProxy.php:163
 #: include/classes/api/services/CProxy.php:253
@@ -11832,7 +11858,7 @@ msgstr "פעם אחת"
 msgid "One"
 msgstr "אחד"
 
-#: include/classes/api/services/CHostGroup.php:1169
+#: include/classes/api/services/CHostGroup.php:1186
 msgid "One of the objects is left without a host group."
 msgstr "אחד מהפריטים נותר ללא קבוצת מארחים."
 
@@ -11845,7 +11871,7 @@ msgstr "פעם אחת בלבד"
 msgid "One-time downtime"
 msgstr "חוסר פעילות חד־פעמית"
 
-#: include/classes/api/services/CHostGroup.php:743
+#: include/classes/api/services/CHostGroup.php:655
 msgid "Only Super Admins can create host groups."
 msgstr "רק משתמשי על יכולים ליצור קבוצות מארחים."
 
@@ -11895,7 +11921,7 @@ msgstr "רק מנהלים יכולים להגדיר בעלות על מצגת."
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "רק פריטים שהוקצו למארחים פעילים נספרים"
 
-#: include/classes/api/services/CItemGeneral.php:1289
+#: include/classes/api/services/CItemGeneral.php:1380
 msgid "Only one change step is allowed."
 msgstr "מותר רק שינוי אחד לצעד."
 
@@ -12300,7 +12326,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:969
+#: include/classes/graph/CSvgGraph.php:933
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -12348,7 +12374,7 @@ msgstr "זהות PSK"
 msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr "ה־PSK קצר מדי. הכמות המזערית ביותר היא %1$s ספרות הקסדצימליות."
 
-#: include/validate.inc.php:416 include/validate.inc.php:419
+#: include/validate.inc.php:419 include/validate.inc.php:422
 msgid "Page received incorrect data"
 msgstr "העמוד קיבל נתונים שגויים"
 
@@ -12407,7 +12433,7 @@ msgstr "ניתוח"
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "שגיאה בפענוח SQL ‏[%1$s] ב־[%2$s]."
 
-#: include/classes/core/CJsonRpc.php:183
+#: include/classes/core/CJsonRpc.php:185
 msgid "Parse error"
 msgstr "שגיאת פענוח"
 
@@ -12613,7 +12639,7 @@ msgstr "פולנית (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "ממלא שדה במאגר המארח"
 
-#: app/views/administration.authentication.edit.php:88
+#: app/views/administration.authentication.edit.php:92
 #: app/views/administration.proxy.edit.php:43 disc_prototypes.php:105
 #: host_discovery.php:105 include/classes/setup/CSetupWizard.php:279
 #: include/forms.inc.php:472 include/views/configuration.action.edit.php:995
@@ -12632,7 +12658,7 @@ msgstr "ממלא שדה במאגר המארח"
 msgid "Port"
 msgstr "פתחה"
 
-#: include/classes/api/services/CHostInterface.php:618
+#: include/classes/api/services/CHostInterface.php:627
 msgid "Port cannot be empty for host interface."
 msgstr "הפתחה לא יכולה להיות ריקה עבור מנשק המארח."
 
@@ -12982,7 +13008,7 @@ msgid "Queue of items to be updated"
 msgstr "תור של פריטים לעדכון"
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:965
+#: include/classes/graph/CSvgGraph.php:929
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:956
 #: include/classes/screens/CScreenProblem.php:1122 include/events.inc.php:345
@@ -13304,7 +13330,7 @@ msgstr "פקודה מרוחקת"
 msgid "Remove"
 msgstr "הסרה"
 
-#: app/views/administration.authentication.edit.php:47
+#: app/views/administration.authentication.edit.php:48
 msgid "Remove domain name"
 msgstr "הסרת שם מתחם"
 
@@ -14071,7 +14097,7 @@ msgstr "סקריפטים"
 msgid "Search"
 msgstr "חיפוש"
 
-#: app/views/administration.authentication.edit.php:98
+#: app/views/administration.authentication.edit.php:104
 msgid "Search attribute"
 msgstr "מאפיין חיפוש"
 
@@ -15010,11 +15036,11 @@ msgstr "השלב „%1$s” [%2$s מתוך %3$s] נכשל: %4$s"
 msgid "Step duration"
 msgstr "משך מהלך"
 
-#: app/controllers/CControllerPopupHttpStep.php:160
+#: app/controllers/CControllerPopupHttpStep.php:159
 msgid "Step of web scenario"
 msgstr "שלב בתרחיש הרשת"
 
-#: app/controllers/CControllerPopupHttpStep.php:119
+#: app/controllers/CControllerPopupHttpStep.php:118
 #, c-format
 msgid "Step with name \"%1$s\" already exists."
 msgstr "מהלך עם השם „%1$s” כבר קיים."
@@ -15145,7 +15171,7 @@ msgstr "בררת מחדל של המערכת"
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "אירעה שגיאת מערכת. נא ליצור קשר עם מנהלי ה־Zabbix."
 
-#: include/classes/core/CJsonRpc.php:213
+#: include/classes/core/CJsonRpc.php:215
 msgid "System error."
 msgstr "שגיאת מערכת."
 
@@ -15314,9 +15340,9 @@ msgstr "תבנית"
 msgid "Template \"%1$s\" already exists."
 msgstr "התבנית „%1$s“ כבר קיימת."
 
-#: include/classes/api/services/CHostGroup.php:1454
+#: include/classes/api/services/CHostGroup.php:1471
 #: include/classes/api/services/CTemplate.php:368
-#: include/classes/api/services/CTemplate.php:988
+#: include/classes/api/services/CTemplate.php:986
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "התבנית „%1$s” לא יכולה להיות ללא קבוצת מארחים."
@@ -15376,25 +15402,25 @@ msgstr "תבנית עודכנה"
 msgid "Template value"
 msgstr "ערך של תבנית"
 
-#: include/classes/api/services/CTemplate.php:1043
+#: include/classes/api/services/CTemplate.php:1041
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "תבנית בשם זהה „%1$s” כבר קיימת."
 
-#: include/classes/api/services/CHost.php:1736
-#: include/classes/api/services/CHost.php:1959
+#: include/classes/api/services/CHost.php:1793
+#: include/classes/api/services/CHost.php:2016
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "תבנית בשם זהה „%s” כבר קיימת."
 
 #: include/classes/api/services/CTemplate.php:447
-#: include/classes/api/services/CTemplate.php:1008
+#: include/classes/api/services/CTemplate.php:1006
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "כבר קיימת תבנית עם אותו שם התצוגה „%1$s”."
 
-#: include/classes/api/services/CHost.php:1742
-#: include/classes/api/services/CHost.php:1967
+#: include/classes/api/services/CHost.php:1799
+#: include/classes/api/services/CHost.php:2024
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "כבר קיימת תבנית עם אותו שם התצוגה „%1$s”."
@@ -15427,7 +15453,7 @@ msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "התבניות „%1$s” נותקו מהמארחים „%2$s”."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:147
-#: app/views/administration.authentication.edit.php:140
+#: app/views/administration.authentication.edit.php:150
 #: app/views/popup.testtriggerexpr.php:110
 #: include/views/administration.general.regularexpressions.edit.php:139
 #: include/views/configuration.trigger.prototype.edit.php:239
@@ -15437,7 +15463,7 @@ msgstr "התבניות „%1$s” נותקו מהמארחים „%2$s”."
 msgid "Test"
 msgstr "בדיקה"
 
-#: app/views/administration.authentication.edit.php:114
+#: app/views/administration.authentication.edit.php:122
 msgid "Test authentication"
 msgstr "בדיקת אימות"
 
@@ -15549,11 +15575,11 @@ msgstr "הפריט לא יתגלה עוד ויימחק בפעם הבאה שית�
 msgid "The number of processes. Returns integer"
 msgstr "מספר התהליכים. מחזירה מספר שלם וחיובי"
 
-#: include/classes/core/CJsonRpc.php:189
+#: include/classes/core/CJsonRpc.php:191
 msgid "The received JSON is not a valid JSON-RPC Request."
 msgstr "ה־JSON שהתקבל הוא לא בקשת JSON-RPC תקנית."
 
-#: include/classes/core/CJsonRpc.php:194
+#: include/classes/core/CJsonRpc.php:196
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "הפקודה המרוחקת המבוקשת אינה קיימת / זמינה"
 
@@ -15789,7 +15815,7 @@ msgstr "התמרת תוצאות שאילתת SQL לפריט JSON לטובת גי
 msgid "Transparency"
 msgstr "שקיפות"
 
-#: include/classes/core/CJsonRpc.php:218
+#: include/classes/core/CJsonRpc.php:220
 msgid "Transport error."
 msgstr "שגיאת העברה."
 
@@ -16097,7 +16123,7 @@ msgstr "יום שלישי"
 msgid "Turkish (tr_TR)"
 msgstr "טורקית (tr_TR)"
 
-#: include/classes/api/services/CItem.php:1015
+#: include/classes/api/services/CItem.php:952
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "אין אפשרות ששני פריטים שונים („%1$s” ו־„%2$s”) ימלאו את שדה המאגר „%3$s”, מצב כזה עשוי להוביל להתנגשות."
@@ -16417,42 +16443,42 @@ msgstr "הפרדה מתבנית"
 msgid "Unlink from templates"
 msgstr "הפרדה מתבניות"
 
-#: include/classes/api/services/CHostGeneral.php:630
+#: include/classes/api/services/CHostGeneral.php:626
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "מופרד: יישום „%1$s” על „%2$s”."
 
-#: include/classes/api/services/CHostGeneral.php:376
+#: include/classes/api/services/CHostGeneral.php:372
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "נותק: כלל הגילוי „%1$s“ על „%2$s“."
 
-#: include/classes/api/services/CHostGeneral.php:533
+#: include/classes/api/services/CHostGeneral.php:529
 #, c-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "מופרד: תרשים „%1$s” על „%2$s”."
 
-#: include/classes/api/services/CHostGeneral.php:517
+#: include/classes/api/services/CHostGeneral.php:513
 #, c-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "מופרד: אבטיפוס תרשים „%1$s” על „%2$s”."
 
-#: include/classes/api/services/CHostGeneral.php:466
+#: include/classes/api/services/CHostGeneral.php:462
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "מופרד: אבטיפוס מארח „%1$s” על „%2$s”."
 
-#: include/classes/api/services/CHostGeneral.php:392
+#: include/classes/api/services/CHostGeneral.php:388
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "מופרד: פריט „%1$s” על „%2$s”."
 
-#: include/classes/api/services/CHostGeneral.php:411
+#: include/classes/api/services/CHostGeneral.php:407
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "מופרד: אבטיפוס פריט „%1$s” על „%2$s”."
 
-#: include/classes/api/services/CHostGeneral.php:572
+#: include/classes/api/services/CHostGeneral.php:568
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "מופרד: תרחיש רשת „%1$s” על „%2$s”."
@@ -16501,7 +16527,7 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "פעיל"
 
-#: app/views/administration.authentication.edit.php:139
+#: app/views/administration.authentication.edit.php:149
 #: app/views/administration.mediatype.edit.php:233
 #: app/views/administration.proxy.edit.php:132
 #: app/views/administration.script.edit.php:127
@@ -16609,7 +16635,7 @@ msgstr "עודכן: %s"
 msgid "Upload"
 msgstr "העלאה"
 
-#: include/html.inc.php:542 include/html.inc.php:555
+#: include/html.inc.php:542 include/html.inc.php:545
 msgid "Upper level maps"
 msgstr "מפות ברמות עליונות"
 
@@ -16830,7 +16856,7 @@ msgstr "תפריט משתמש"
 msgid "User name"
 msgstr "שם משתמש"
 
-#: app/views/administration.authentication.edit.php:120
+#: app/views/administration.authentication.edit.php:129
 msgid "User password"
 msgstr "ססמת המשתמש"
 
@@ -17308,7 +17334,7 @@ msgstr "גודל נפח וירטואלי באחוזים מהכלל. מחזירה
 msgid "Visible name"
 msgstr "שם תצוגה"
 
-#: include/classes/api/services/CHost.php:1870
+#: include/classes/api/services/CHost.php:1927
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "שם התצוגה לא יכול להיות ריק אם אין שם מארח."
 
@@ -17512,8 +17538,8 @@ msgstr "כתיבה"
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "שדות שגויים לתלות עבור שירות „%1$s”."
 
-#: include/classes/api/services/CHost.php:1584
-#: include/classes/api/services/CHost.php:1765
+#: include/classes/api/services/CHost.php:1641
+#: include/classes/api/services/CHost.php:1822
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "שדות שגויים עבור המארח „%1$s”."
@@ -17603,7 +17629,7 @@ msgstr "XML XPath"
 msgid "XML data"
 msgstr "נתוני XML"
 
-#: include/classes/api/services/CItemGeneral.php:2043
+#: include/classes/api/services/CItemGeneral.php:1984
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
 msgstr "ה־XML ריק"
@@ -17618,7 +17644,7 @@ msgid "Y axis MAX value"
 msgstr "ערך מרבי של ציר ה־Y"
 
 #: include/classes/api/services/CGraphGeneral.php:314
-#: include/classes/graphdraw/CLineGraphDraw.php:705
+#: include/classes/graphdraw/CLineGraphDraw.php:709
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:480
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:493
 msgid "Y axis MAX value must be greater than Y axis MIN value."
@@ -17758,8 +17784,8 @@ msgstr "לא ציינת יעדים עבור סקריפט גלובלי של מש�
 #: include/classes/api/services/CTemplate.php:388
 #: include/classes/api/services/CTemplate.php:529
 #: include/classes/api/services/CTemplate.php:561
-#: include/classes/api/services/CTemplate.php:980
-#: include/classes/api/services/CTemplate.php:1085
+#: include/classes/api/services/CTemplate.php:978
+#: include/classes/api/services/CTemplate.php:1083
 #: include/classes/api/services/CUserMacro.php:266
 #: include/classes/api/services/CUserMacro.php:350
 #: include/classes/api/services/CUserMacro.php:443
@@ -17790,7 +17816,7 @@ msgstr "מסד הנתונים שלך אינו פועל כראוי. נא להמת
 msgid "ZABBIX"
 msgstr "ZABBIX"
 
-#: include/page_header.php:142
+#: include/page_header.php:156
 msgid "Zabbix"
 msgstr "Zabbix"
 
@@ -17831,7 +17857,7 @@ msgstr "סוכן Zabbix (פעיל)"
 msgid "Zabbix aggregate"
 msgstr "אוגר Zabbix"
 
-#: include/validate.inc.php:366
+#: include/validate.inc.php:369
 msgid "Zabbix has received an incorrect request."
 msgstr "מערכת ה־Zabbix קיבלה בקשה שגויה."
 
@@ -17843,7 +17869,7 @@ msgstr "Zabbix פנימי"
 msgid "Zabbix internal authentication"
 msgstr "אימות פנימי של Zabbix"
 
-#: app/views/administration.authentication.edit.php:43
+#: app/views/administration.authentication.edit.php:44
 msgid "Zabbix login form"
 msgstr "טופס כניסה ל־Zabbix"
 
@@ -17926,7 +17952,7 @@ msgstr "אמור להיות בוליאני"
 #: include/classes/api/services/CUser.php:649
 #: include/classes/import/validators/CXmlValidatorGeneral.php:193
 #: include/classes/validators/CApiInputValidator.php:230
-#: include/classes/validators/CNewValidator.php:272
+#: include/classes/validators/CNewValidator.php:278
 msgid "a character string is expected"
 msgstr "אמור להיות מחרוזת תווים"
 
@@ -17940,7 +17966,7 @@ msgstr "אמור להיות קוד צבע הקסדצימלי (6 תווים)"
 msgid "a number is expected"
 msgstr "אמור להיות מספר"
 
-#: app/controllers/CControllerPopupHttpStep.php:110
+#: app/controllers/CControllerPopupHttpStep.php:109
 #: include/classes/validators/CApiInputValidator.php:422
 #: include/classes/validators/CApiInputValidator.php:564
 #: include/classes/validators/CApiInputValidator.php:959
@@ -17949,12 +17975,12 @@ msgid "a number is too large"
 msgstr "המספר גדול מדי"
 
 #: include/classes/api/services/CDRule.php:320
-#: include/classes/api/services/CItemGeneral.php:1210
+#: include/classes/api/services/CItemGeneral.php:1301
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
 msgstr "אמור להיות ערך מספרי"
 
-#: include/classes/validators/CNewValidator.php:260
+#: include/classes/validators/CNewValidator.php:266
 msgid "a time is expected"
 msgstr "אמור להיות זמן"
 
@@ -17969,9 +17995,9 @@ msgstr "אמור להיות טווח זמנים"
 msgid "a time range is expected"
 msgstr "אמור להיות טווח זמן"
 
-#: app/controllers/CControllerPopupHttpStep.php:104
+#: app/controllers/CControllerPopupHttpStep.php:103
 #: include/classes/validators/CApiInputValidator.php:1174
-#: include/validate.inc.php:227 include/validate.inc.php:567
+#: include/validate.inc.php:227 include/validate.inc.php:570
 msgid "a time unit is expected"
 msgstr "אמור להיות יחידת זמן"
 
@@ -17991,7 +18017,7 @@ msgstr "משפיע על הנתונים המסוננים"
 msgid "agent"
 msgstr "סוכן"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1866
+#: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/html/CSeverity.php:49
 #: include/classes/pagefilter/CPageFilter.php:875
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
@@ -18018,8 +18044,8 @@ msgstr "כל סוגי המדיה"
 
 #: include/classes/api/services/CDRule.php:463
 #: include/classes/api/services/CDRule.php:470
-#: include/classes/api/services/CItemGeneral.php:1982
-#: include/classes/api/services/CItemGeneral.php:2006
+#: include/classes/api/services/CItemGeneral.php:1923
+#: include/classes/api/services/CItemGeneral.php:1947
 #: include/classes/import/validators/CXmlValidatorGeneral.php:207
 #: include/classes/validators/CApiInputValidator.php:370
 #: include/classes/validators/CApiInputValidator.php:508
@@ -18038,7 +18064,7 @@ msgstr "אמור להיות מערך או מחרוזת תווים"
 msgid "an empty string is expected"
 msgstr "אמור להיות מחרוזת ריקה"
 
-#: include/classes/api/services/CHost.php:1527
+#: include/classes/api/services/CHost.php:1584
 msgid "an even number of hexadecimal characters is expected"
 msgstr "אמור להיות מספר זוגי או תווים הקסדצימליים"
 
@@ -18081,8 +18107,8 @@ msgstr "רישום אוטומטי"
 msgid "auto-registered host"
 msgstr "מארח שנרשם אוטומטית"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1848
-#: include/classes/graphdraw/CLineGraphDraw.php:1870
+#: include/classes/graphdraw/CLineGraphDraw.php:1852
+#: include/classes/graphdraw/CLineGraphDraw.php:1874
 #: include/classes/graphdraw/CPieGraphDraw.php:335 include/graphs.inc.php:85
 #: include/views/js/configuration.graph.edit.js.php:50
 #: include/views/js/configuration.graph.edit.js.php:58
@@ -18136,17 +18162,17 @@ msgstr "לא ניתן לשנות"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:512
 #: include/classes/api/services/CEvent.php:847
-#: include/classes/api/services/CHost.php:1515
-#: include/classes/api/services/CHost.php:1521
+#: include/classes/api/services/CHost.php:1572
+#: include/classes/api/services/CHost.php:1578
 #: include/classes/api/services/CHttpTest.php:984
 #: include/classes/api/services/CItemGeneral.php:485
 #: include/classes/api/services/CItemGeneral.php:512
 #: include/classes/api/services/CItemGeneral.php:518
 #: include/classes/api/services/CItemGeneral.php:524
-#: include/classes/api/services/CItemGeneral.php:1179
-#: include/classes/api/services/CItemGeneral.php:1200
-#: include/classes/api/services/CItemGeneral.php:1227
-#: include/classes/api/services/CItemGeneral.php:1240
+#: include/classes/api/services/CItemGeneral.php:1270
+#: include/classes/api/services/CItemGeneral.php:1291
+#: include/classes/api/services/CItemGeneral.php:1318
+#: include/classes/api/services/CItemGeneral.php:1331
 #: include/classes/api/services/CMapElement.php:122
 #: include/classes/api/services/CMapElement.php:147
 #: include/classes/api/services/CMapElement.php:185
@@ -18179,7 +18205,7 @@ msgstr "לא ניתן לשנות"
 msgid "cannot be empty"
 msgstr "לא יכול להישאר ריק"
 
-#: include/classes/api/services/CItemGeneral.php:1998
+#: include/classes/api/services/CItemGeneral.php:1939
 msgid "cannot convert to JSON, result value too long"
 msgstr "לא ניתן להמיר ל־JSON, ערך התוצאה ארוך מדי"
 
@@ -18196,11 +18222,8 @@ msgstr "change()‎ - שינוי בין הערך האחרון לקודמו"
 msgid "check expression starting from \"%1$s\""
 msgstr "ביטוי החיפוש מתחיל מ־„%1$s“"
 
-#: include/classes/api/services/CHostGeneral.php:1024
-#: include/classes/api/services/CItemGeneral.php:1551
-#: include/classes/api/services/CItemGeneral.php:1557
-#: include/classes/api/services/CItemGeneral.php:1794
-#: include/classes/import/CConfigurationImport.php:2612
+#: include/classes/api/services/CItemGeneral.php:1647
+#: include/classes/import/CConfigurationImport.php:2611
 msgid "circular item dependency is not allowed"
 msgstr "תלות מעגלית לפריט אסורה"
 
@@ -18333,7 +18356,7 @@ msgstr "פענוח ה־JSON נכשל"
 msgid "first"
 msgstr "ראשון"
 
-#: include/classes/api/services/CItemGeneral.php:1248
+#: include/classes/api/services/CItemGeneral.php:1339
 msgid "first parameter is expected"
 msgstr "אמור להיות הפרמטר הראשון"
 
@@ -18392,7 +18415,7 @@ msgstr "המארח לא מנוטר"
 msgid "host pattern"
 msgstr "תבנית מארח"
 
-#: include/classes/api/services/CItemGeneral.php:1574
+#: include/classes/api/services/CItemGeneral.php:1630
 msgid "hostid of dependent item and master item should match"
 msgstr "ה־hostid (מזהה מארח) של הפריט התלוי ופריט ההורה צריכים להיות תואמים"
 
@@ -18501,7 +18524,7 @@ msgstr "תבנית פריט"
 msgid "key is empty"
 msgstr "המפתח ריק"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1846
+#: include/classes/graphdraw/CLineGraphDraw.php:1850
 #: include/classes/graphdraw/CPieGraphDraw.php:330 include/forms.inc.php:2014
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
@@ -18512,7 +18535,7 @@ msgstr "אחרון"
 msgid "last() - Last (most recent) T value"
 msgstr "last()‎ - ערך ה־T (העדכני ביותר)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1983
+#: include/classes/graphdraw/CLineGraphDraw.php:1987
 msgid "left"
 msgstr "שמאל"
 
@@ -18550,9 +18573,12 @@ msgctxt "month short"
 msgid "m"
 msgstr "m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1377
-#: include/classes/graphdraw/CLineGraphDraw.php:1385
-#: include/classes/graphdraw/CLineGraphDraw.php:1392
+#: include/classes/graphdraw/CLineGraphDraw.php:1381
+#: include/classes/graphdraw/CLineGraphDraw.php:1389
+#: include/classes/graphdraw/CLineGraphDraw.php:1396
+#: include/classes/html/svg/CSvgGraphXAxis.php:424
+#: include/classes/html/svg/CSvgGraphXAxis.php:432
+#: include/classes/html/svg/CSvgGraphXAxis.php:439
 msgid "m-d"
 msgstr "m-d"
 
@@ -18578,8 +18604,8 @@ msgstr "מפה"
 msgid "matches"
 msgstr "התאמות"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1849
-#: include/classes/graphdraw/CLineGraphDraw.php:1863
+#: include/classes/graphdraw/CLineGraphDraw.php:1853
+#: include/classes/graphdraw/CLineGraphDraw.php:1867
 #: include/classes/graphdraw/CPieGraphDraw.php:326 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
@@ -18590,21 +18616,18 @@ msgstr "מרבי"
 msgid "max() - Maximum value for period T"
 msgstr "max()‎ - ערך מרבי במשך T"
 
-#: include/classes/api/services/CItemGeneral.php:1672
+#: include/classes/api/services/CItemGeneral.php:1741
 msgid "maximum dependent items count reached"
 msgstr "כמות הפריטים התלויים המרבית מולאה"
 
-#: include/classes/api/services/CHostGeneral.php:1031
-#: include/classes/api/services/CItemGeneral.php:1587
-#: include/classes/api/services/CItemGeneral.php:1681
-#: include/classes/api/services/CItemGeneral.php:1801
-#: include/classes/import/CConfigurationImport.php:2566
-#: include/classes/import/CConfigurationImport.php:2627
+#: include/classes/api/services/CItemGeneral.php:1727
+#: include/classes/import/CConfigurationImport.php:2565
+#: include/classes/import/CConfigurationImport.php:2626
 msgid "maximum number of dependency levels reached"
 msgstr "כמות הרמות המרבית לתלויות מולאה"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1847
-#: include/classes/graphdraw/CLineGraphDraw.php:1860
+#: include/classes/graphdraw/CLineGraphDraw.php:1851
+#: include/classes/graphdraw/CLineGraphDraw.php:1864
 #: include/classes/graphdraw/CPieGraphDraw.php:322 include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
@@ -18615,7 +18638,7 @@ msgstr "מזערי"
 msgid "min() - Minimum value for period T"
 msgstr "min()‎ - ערך מזערי במשך T"
 
-#: include/classes/api/services/CHost.php:1533
+#: include/classes/api/services/CHost.php:1590
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "האורך המזערי הוא %1$s תווים"
@@ -18630,7 +18653,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "מש"
 
-#: app/views/administration.authentication.edit.php:114
+#: app/views/administration.authentication.edit.php:122
 msgid "must be a valid LDAP user"
 msgstr "חייב להיות משתמש LDAP תקני"
 
@@ -18643,7 +18666,7 @@ msgstr "חייב להיות משתמש LDAP תקני"
 #: include/classes/api/services/CMediatype.php:711
 #: include/classes/api/services/CMediatype.php:730
 #: include/classes/api/services/CMediatype.php:736
-#: include/classes/api/services/CScreen.php:430 include/validate.inc.php:561
+#: include/classes/api/services/CScreen.php:430 include/validate.inc.php:564
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
 msgstr "חייב להיות בין „%1$s“ לבין „%2$s“"
@@ -18678,7 +18701,7 @@ msgstr "חדש"
 msgid "new event tag"
 msgstr "תגית אירוע חדשה"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1941
+#: include/classes/graphdraw/CLineGraphDraw.php:1945
 #: include/classes/graphdraw/CPieGraphDraw.php:356
 msgid "no data"
 msgstr "אין נתונים"
@@ -18691,8 +18714,8 @@ msgstr "nodata()‎ - לא התקבלו נתונים במשך T (1 - אמת, 0 -
 msgid "none"
 msgstr "ללא"
 
-#: include/classes/api/services/CItemGeneral.php:1989
-#: include/classes/api/services/CItemGeneral.php:2013
+#: include/classes/api/services/CItemGeneral.php:1930
+#: include/classes/api/services/CItemGeneral.php:1954
 msgid "nonempty key and value pair expected"
 msgstr "אמור היה להיות צמד של מפתח וערך שאינם ריקים"
 
@@ -18704,7 +18727,7 @@ msgstr "לא בין"
 #: hostinventoriesoverview.php:76
 #: include/classes/pagefilter/CPageFilter.php:808
 #: include/classes/pagefilter/CPageFilter.php:875 include/forms.inc.php:1126
-#: include/views/monitoring.screen.php:63 slides.php:199
+#: include/views/monitoring.screen.php:63 slides.php:187
 msgid "not selected"
 msgstr "לא נבחר"
 
@@ -18814,7 +18837,7 @@ msgstr "prev()‎ - ערך קודם"
 msgid "problem pattern"
 msgstr "תבנית תקלה"
 
-#: include/page_header.php:145 include/views/general.warning.php:21
+#: include/page_header.php:159 include/views/general.warning.php:21
 #, c-format
 msgid "refreshed every %1$s sec."
 msgstr "מתרענן בכל %1$s שניות."
@@ -18832,7 +18855,7 @@ msgstr "ביטוי רגולרי"
 msgid "remember selected"
 msgstr "שמירת הנבחרים"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1983
+#: include/classes/graphdraw/CLineGraphDraw.php:1987
 msgid "right"
 msgstr "ימינה"
 
@@ -18847,7 +18870,7 @@ msgstr "ימינה"
 msgid "root"
 msgstr "שורש"
 
-#: include/classes/api/services/CItemGeneral.php:1581
+#: include/classes/api/services/CItemGeneral.php:1637
 msgid "ruleid of dependent item and master item should match"
 msgstr "מזהה כלל (ruleid) של פריט תלוי ופריט אב אמורים להיות תואמים"
 
@@ -18861,7 +18884,7 @@ msgctxt "adjective"
 msgid "second"
 msgstr "שני"
 
-#: include/classes/api/services/CItemGeneral.php:1254
+#: include/classes/api/services/CItemGeneral.php:1345
 msgid "second parameter is expected"
 msgstr "אמור להיות פרמטר שני"
 
@@ -18873,17 +18896,17 @@ msgstr "נבחר"
 msgid "short description"
 msgstr "תיאור קצר"
 
-#: include/classes/api/services/CHost.php:1540
-#: include/classes/api/services/CHost.php:1546
-#: include/classes/api/services/CHost.php:1555
-#: include/classes/api/services/CHost.php:1561
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1612
+#: include/classes/api/services/CHost.php:1618
 #: include/classes/api/services/CHttpTest.php:969
 #: include/classes/api/services/CHttpTest.php:1080
 #: include/classes/api/services/CItemGeneral.php:499
 #: include/classes/api/services/CItemGeneral.php:537
-#: include/classes/api/services/CItemGeneral.php:1269
-#: include/classes/api/services/CItemGeneral.php:1283
-#: include/classes/api/services/CItemGeneral.php:1966
+#: include/classes/api/services/CItemGeneral.php:1360
+#: include/classes/api/services/CItemGeneral.php:1374
+#: include/classes/api/services/CItemGeneral.php:1907
 #: include/classes/api/services/CMaintenance.php:468
 #: include/classes/api/services/CMaintenance.php:637
 #: include/classes/api/services/CProxy.php:661
@@ -19044,9 +19067,9 @@ msgstr "הטקסט „%1$s“ בלתי צפוי"
 
 #: include/classes/api/services/CEvent.php:805
 #: include/classes/api/services/CEvent.php:905
-#: include/classes/api/services/CHost.php:1495
-#: include/classes/api/services/CHost.php:1501
-#: include/classes/api/services/CItemGeneral.php:1186
+#: include/classes/api/services/CHost.php:1552
+#: include/classes/api/services/CHost.php:1558
+#: include/classes/api/services/CItemGeneral.php:1277
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
 #: include/classes/api/services/CTriggerGeneral.php:574
@@ -19104,9 +19127,9 @@ msgstr "ערך"
 
 #: include/classes/import/CConfigurationImport.php:808
 #: include/classes/import/CConfigurationImport.php:846
-#: include/classes/import/CConfigurationImport.php:2462
-#: include/classes/import/CConfigurationImport.php:2576
-#: include/classes/import/CConfigurationImport.php:2621
+#: include/classes/import/CConfigurationImport.php:2461
+#: include/classes/import/CConfigurationImport.php:2575
+#: include/classes/import/CConfigurationImport.php:2620
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "הערך „%1$s” לא נמצא"
@@ -19132,8 +19155,8 @@ msgid "value is too long"
 msgstr "הערך ארוך מדי"
 
 #: include/classes/api/services/CHost.php:771
-#: include/classes/api/services/CHost.php:1657
-#: include/classes/api/services/CHost.php:1797
+#: include/classes/api/services/CHost.php:1714
+#: include/classes/api/services/CHost.php:1854
 #: include/classes/api/services/CMapElement.php:102
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681
