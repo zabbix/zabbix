@@ -4161,23 +4161,15 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 			}
 		}
-		else if (macro_type & (MACRO_TYPE_TRIGGER_TAG | MACRO_TYPE_HOST_TAG))
+		else if (macro_type & MACRO_TYPE_TRIGGER_TAG)
 		{
 			if (EVENT_SOURCE_TRIGGERS == event->source)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
-					if (macro_type & MACRO_TYPE_TRIGGER_TAG)
-					{
-						cache_trigger_hostids(&hostids, event->trigger.expression,
-							event->trigger.recovery_expression);
-
-						DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
-					}
-					else /* MACRO_TYPE_HOST_TAG */
-					{
-						DCget_user_macro(hostid, 1, m, &replace_to);
-					}
+					cache_trigger_hostids(&hostids, event->trigger.expression,
+						event->trigger.recovery_expression);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 					pos = token.loc.r;
 				}
 				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
@@ -4220,18 +4212,63 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_PORT);
 				}
-				else if (macro_type & MACRO_TYPE_TRIGGER_TAG)
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 				{
-					if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
-					{
-						ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
-								raw_value);
-					}
-					else if (0 == strcmp(m, MVAR_ITEM_VALUE))
-					{
-						ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
-								event->clock, event->ns, raw_value);
-					}
+					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
+							raw_value);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
+				{
+					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
+							event->clock, event->ns, raw_value);
+				}
+			}
+		}
+		else if (0 == indexed_macro && macro_type & MACRO_TYPE_HOST_TAG)
+		{
+			/* Using dc_item to pass itemid and hostid only, all other fields are not initialized! */
+
+			if (EVENT_SOURCE_TRIGGERS == event->source)
+			{
+				if (ZBX_TOKEN_USER_MACRO == token.type)
+				{
+					DCget_user_macro((const uint64_t *)dc_item->host.hostid, 1, m, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+				{
+					get_host_inventory_by_hostid(m, dc_item->host.hostid, &replace_to);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_ID))
+				{
+					get_host_value(dc_item->itemid, &replace_to, ZBX_REQUEST_HOST_ID);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_HOST))
+				{
+					get_host_value(dc_item->itemid, &replace_to, ZBX_REQUEST_HOST_HOST);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_NAME))
+				{
+					get_host_value(dc_item->itemid, &replace_to, ZBX_REQUEST_HOST_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_IP))
+				{
+					get_interface_value(dc_item->host.hostid, dc_item->itemid, &replace_to,
+							ZBX_REQUEST_HOST_IP);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_DNS))
+				{
+					get_interface_value(dc_item->host.hostid, dc_item->itemid, &replace_to,
+							ZBX_REQUEST_HOST_DNS);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_CONN))
+				{
+					get_interface_value(dc_item->host.hostid, dc_item->itemid, &replace_to,
+							ZBX_REQUEST_HOST_CONN);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_PORT))
+				{
+					get_interface_value(dc_item->host.hostid, dc_item->itemid, &replace_to,
+							ZBX_REQUEST_HOST_PORT);
 				}
 			}
 		}

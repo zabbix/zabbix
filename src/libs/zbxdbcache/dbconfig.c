@@ -12111,11 +12111,12 @@ static void	zbx_obtain_host_tags_from_item(zbx_uint64_t itemid, zbx_vector_ptr_t
 			n = host_tags->values_num;
 			zbx_gather_tags_from_template_chain(item->templateid, host_tags);
 
-			/* assing hostid values to newly gathered tags */
+			/* assing hostid and itemid values to newly gathered tags */
 			for (i = n; i < host_tags->values_num; i++)
 			{
 				tag = (zbx_host_tag_t *)host_tags->values[i];
 				tag->hostid = item->hostid;
+				tag->itemid = item->itemid;
 			}
 		}
 

@@ -221,6 +221,7 @@ typedef struct
 {
 	zbx_tag_t	tag;	/* First member to make sure that zbx_host_tag_t is castable to zbx_tag_t! */
 	zbx_uint64_t	hostid;
+	zbx_uint64_t	itemid;
 }
 zbx_host_tag_t;
 
