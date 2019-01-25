@@ -4182,15 +4182,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
 				{
-					if (macro_type & MACRO_TYPE_TRIGGER_TAG)
-					{
-						ret = get_host_inventory(m, event->trigger.expression, &replace_to,
-								N_functionid);
-					}
-					else /* MACRO_TYPE_HOST_TAG */
-					{
-						ret = get_host_inventory_by_hostid(m, *hostid, &replace_to);
-					}
+					ret = get_host_inventory(m, event->trigger.expression, &replace_to,
+							N_functionid);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
