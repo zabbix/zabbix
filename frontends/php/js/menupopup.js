@@ -147,7 +147,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		}
 		else {
 			var graphs_url = new Curl('charts.php', false);
-
 			graphs_url.setArgument('hostid', options.hostid);
 			graphs.url = graphs_url.getUrl();
 		}
@@ -157,7 +156,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		}
 		else {
 			var screens_url = new Curl('host_screen.php', false);
-
 			screens_url.setArgument('hostid', options.hostid);
 			screens.url = screens_url.getUrl();
 		}
@@ -481,7 +479,6 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 				}
 				else {
 					var url = new Curl('zabbix.php');
-
 					url.setArgument('action', 'dashboard.widget.rfrate');
 
 					jQuery.ajax({
@@ -604,7 +601,6 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		url.setArgument('action', 'problem.view');
 		url.setArgument('filter_triggerids[]', options.triggerid);
 		url.setArgument('filter_set', '1');
-
 		events.url = url.getUrl();
 	}
 	else {
@@ -616,7 +612,6 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	// acknowledge
 	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
 		var url = new Curl('zabbix.php', false);
-
 		url.setArgument('action', 'acknowledge.edit');
 		url.setArgument('eventids[]', options.acknowledge.eventid);
 		url.setArgument('backurl', options.acknowledge.backurl);
@@ -650,7 +645,9 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 
 	// configuration
 	if (typeof options.configuration !== 'undefined' && options.configuration) {
-		var url = new Curl('triggers.php?form=update&triggerid=' + options.triggerid, false);
+		var url = new Curl('triggers.php', false);
+		url.setArgument('form', 'update');
+		url.setArgument('triggerid', options.triggerid);
 
 		items[items.length] = {
 			label: t('Configuration'),

@@ -1271,7 +1271,7 @@
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
-					current_url = new Curl(location.href),
+					current_url = new Curl(),
 					url = new Curl('zabbix.php', false);
 
 				// Don't show warning about existing updates
