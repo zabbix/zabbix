@@ -649,6 +649,23 @@ else {
 		$filter_value = getRequest('filter_value', -1);
 		$filter_evaltype = getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR);
 		$filter_tags = getRequest('filter_tags', []);
+
+		if ($filter_groupids) {
+			$filter_groupids = array_keys(API::HostGroup()->get([
+				'output' => ['groupid'],
+				'groupids' => $filter_groupids,
+				'preservekeys' => true
+			]));
+		}
+
+		if ($filter_hostids) {
+			$filter_hostids = array_keys(API::Host()->get([
+				'output' => ['hostid'],
+				'hostids' => $filter_hostids,
+				'templated_hosts' => true,
+				'preservekeys' => true
+			]));
+		}
 	}
 	elseif (getRequest('filter_rst')) {
 		$filter_inherited = -1;
@@ -695,15 +712,6 @@ else {
 
 	if ($filter_groupids) {
 		$filter_groupids_enriched = getSubGroups($filter_groupids);
-	}
-	// Preserve compatibility with old urls across zabbix.
-	$hostid = getRequest('hostid', null);
-
-	if ($hostid === null) {
-		$hostid = array_key_exists(0, $filter_hostids) ? reset($filter_hostids) : null;
-	}
-	else {
-		$filter_hostids = [$hostid];
 	}
 
 	$sort = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
@@ -912,10 +920,13 @@ else {
 		];
 	}
 
+	$single_selected_hostid = 0;
+	if (count($filter_hostids) == 1) {
+		$single_selected_hostid = reset($filter_hostids);
+	}
 	$data = [
 		'config' => $config,
 		'config_priorities' => $config_priorities,
-		'hostid' => $hostid,
 		'triggers' => $triggers,
 		'profileIdx' => 'web.triggers.filter',
 		'active_tab' => $active_tab,
@@ -935,13 +946,12 @@ else {
 		'filter_dependent' => $filter_dependent,
 		'show_info_column' => $show_info_column,
 		'show_value_column' => $show_value_column,
-		'single_host_selected' => (count($filter_hostids) == 1),
+		'single_selected_hostid' => $single_selected_hostid,
 		'parent_templates' => getTriggerParentTemplates($triggers, ZBX_FLAG_DISCOVERY_NORMAL),
 		'paging' => getPagingLine($triggers, $sortorder, $url),
 		'dep_triggers' => $dep_triggers,
 		'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags)
 	];
-	// Render view.
 	$triggersView = new CView('configuration.triggers.list', $data);
 
 	$triggersView->render();

@@ -166,9 +166,9 @@ $filter = (new CFilter(new CUrl('triggers.php')))
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
 	->setControls(new CList([
-		(new CTag('nav', true, ($data['single_host_selected'])
+		(new CTag('nav', true, ($data['single_selected_hostid'] != 0)
 			? new CRedirectButton(_('Create trigger'), (new CUrl('triggers.php'))
-				->setArgument('hostid', $data['hostid'])
+				->setArgument('hostid', $data['single_selected_hostid'])
 				->setArgument('form', 'create')
 				->getUrl()
 			)
@@ -176,16 +176,15 @@ $widget = (new CWidget())
 		))->setAttribute('aria-label', _('Content controls'))
 	]));
 
-if ($data['single_host_selected']) {
-	$widget->addItem(get_header_host_table('triggers', $data['hostid']));
+if ($data['single_selected_hostid'] != 0) {
+	$widget->addItem(get_header_host_table('triggers', $data['single_selected_hostid']));
 }
 
 $widget->addItem($filter);
 
 // create form
 $triggers_form = (new CForm())
-	->setName('triggersForm')
-	->addVar('hostid', $data['hostid']);
+	->setName('triggersForm');
 
 $url = (new CUrl('triggers.php'))->getUrl();
 
@@ -197,7 +196,7 @@ $triggers_table = (new CTableInfo())->setHeader([
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
 	$data['show_value_column'] ? _('Value') : null,
-	!$data['single_host_selected'] ? _('Host') : null,
+	$data['single_selected_hostid'] == 0 ? _('Host') : null,
 	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
@@ -212,11 +211,6 @@ $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['trig
 
 foreach ($data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
-	$trigger_hostid = $data['hostid'];
-	if ($trigger_hostid == 0) {
-		$trigger_host = reset($trigger['hosts']);
-		$trigger_hostid = $trigger_host['hostid'];
-	}
 
 	// description
 	$description = [];
@@ -240,7 +234,6 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		(new CUrl('triggers.php'))
 			->setArgument('form', 'update')
 			->setArgument('triggerid', $triggerid)
-			->setArgument('hostid', $trigger_hostid)
 	);
 
 	if ($trigger['dependencies']) {
@@ -283,7 +276,6 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 				? 'trigger.massenable'
 				: 'trigger.massdisable'
 			).
-			'&hostid='.$data['hostid'].
 			'&g_triggerid='.$triggerid))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
@@ -291,7 +283,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	// hosts
 	$hosts = null;
-	if (!$data['single_host_selected']) {
+	if ($data['single_selected_hostid'] == 0) {
 		foreach ($trigger['hosts'] as $hostid => $host) {
 			if (!empty($hosts)) {
 				$hosts[] = ', ';
@@ -330,7 +322,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$data['hostid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$data['single_selected_hostid'].'";');
 
 // append table to form
 $triggers_form->addItem([
@@ -344,7 +336,6 @@ $triggers_form->addItem([
 			'trigger.massupdateform' => ['name' => _('Mass update')],
 			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?')]
 		],
-		$data['hostid']
 	)
 ]);
 
