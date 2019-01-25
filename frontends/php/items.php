@@ -487,6 +487,7 @@ foreach ($subfiltersList as $name) {
 }
 
 $filter_hostids = getRequest('filter_hostids');
+$filter_groupids = getRequest('filter_groupids');
 if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
 		$host = API::Host()->get([
