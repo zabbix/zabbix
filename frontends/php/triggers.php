@@ -675,6 +675,9 @@ else {
 		$filter_priority = [];
 		$filter_groupids = [];
 		$filter_hostids = getRequest('filter_hostids', CProfile::getArray('web.triggers.filter_hostids', []));
+		if (count($filter_hostids) != 1) {
+			$filter_hostids = [];
+		}
 		$filter_state = -1;
 		$filter_status = -1;
 		$filter_value = -1;
