@@ -487,6 +487,7 @@ typedef struct
 	int		default_inventory_mode;
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
+	const char	*db_extension;
 	/* housekeeping related configuration data */
 	zbx_config_hk_t	hk;
 }

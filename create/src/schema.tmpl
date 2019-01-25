@@ -610,6 +610,7 @@ FIELD		|http_strip_domains	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|http_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_configured		|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
+FIELD		|db_extension	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -1661,4 +1662,4 @@ UNIQUE		|1		|itemid,lld_macro
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4010007	|4010007
+ROW		|4010008	|4010008
