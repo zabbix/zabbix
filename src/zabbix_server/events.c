@@ -81,22 +81,15 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
 	return SUCCEED;
 }
 
-static void	substitute_trigger_tag_macro(char **str)
+static zbx_tag_t	*duplicate_tag(const zbx_tag_t *tag)
 {
-	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-			NULL, str, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
-}
+	zbx_tag_t	*t;
 
-static void	substitute_host_tag_macro(const DC_ITEM *dc_item, char **str)
-{
-	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, dc_item, NULL,
-			NULL, str, MACRO_TYPE_HOST_TAG, NULL, 0);
-}
+	t = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+	t->tag = zbx_strdup(NULL, tag->tag);
+	t->value = zbx_strdup(NULL, tag->value);
 
-static void	copy_tag_fields(const zbx_tag_t *src, zbx_tag_t *dst)
-{
-	dst->tag = zbx_strdup(NULL, src->tag);
-	dst->value = zbx_strdup(NULL, src->value);
+	return t;
 }
 
 static void	validate_and_add_tag(zbx_tag_t *tag)
@@ -115,34 +108,41 @@ static void	validate_and_add_tag(zbx_tag_t *tag)
 		zbx_free_tag(tag);
 }
 
-static void	process_trigger_tag(const zbx_tag_t *tt)
+static void	substitute_trigger_tag_macro(char **str)
 {
-	zbx_tag_t	*tag;
-
-	tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
-	copy_tag_fields(tt, tag);
-
-	substitute_trigger_tag_macro(&tag->tag);
-	substitute_trigger_tag_macro(&tag->value);
-	validate_and_add_tag(tag);
+	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
+			NULL, str, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
 }
 
-static void	process_host_tag(const zbx_host_tag_t *ht)
+static void	process_trigger_tag(const zbx_tag_t *tag)
 {
-	zbx_host_tag_t	*tag;
+	zbx_tag_t	*t;
+
+	t = duplicate_tag(tag);
+	substitute_trigger_tag_macro(&t->tag);
+	substitute_trigger_tag_macro(&t->value);
+	validate_and_add_tag(t);
+}
+
+static void	substitute_host_tag_macro(const DC_ITEM *dc_item, char **str)
+{
+	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, dc_item, NULL,
+			NULL, str, MACRO_TYPE_HOST_TAG, NULL, 0);
+}
+
+static void	process_host_tag(const zbx_host_tag_t *host_tag)
+{
+	zbx_tag_t	*t;
 	DC_ITEM		dc_item; /* used to pass data into substitute_simple_macros() function */
 
-	tag = (zbx_host_tag_t *)zbx_malloc(NULL, sizeof(zbx_host_tag_t));
-	tag->hostid = ht->hostid;
-	copy_tag_fields(&ht->tag, &tag->tag);
+	t = duplicate_tag(&host_tag->tag);
 
-	dc_item.host.hostid = ht->hostid;
-	dc_item.itemid = ht->itemid;
+	dc_item.host.hostid = host_tag->hostid;
+	dc_item.itemid = host_tag->itemid;
 
-	substitute_host_tag_macro(&dc_item, &tag->tag.tag);
-	substitute_host_tag_macro(&dc_item, &tag->tag.value);
-
-	validate_and_add_tag(&tag->tag);
+	substitute_host_tag_macro(&dc_item, &t->tag);
+	substitute_host_tag_macro(&dc_item, &t->value);
+	validate_and_add_tag(t);
 }
 
 static void	get_host_tags_by_expression(const char *expression, zbx_vector_ptr_t *host_tags)
@@ -246,7 +246,7 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		for (i = 0; i < host_tags.values_num; i++)
 		{
 			process_host_tag((const zbx_host_tag_t *)host_tags.values[i]);
-			zbx_free_tag(host_tags.values[i]);
+			zbx_free_host_tag(host_tags.values[i]);
 		}
 
 		zbx_vector_ptr_destroy(&host_tags);

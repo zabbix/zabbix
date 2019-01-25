@@ -219,9 +219,9 @@ zbx_tag_t;
 
 typedef struct
 {
-	zbx_tag_t	tag;	/* First member to make sure that zbx_host_tag_t is castable to zbx_tag_t! */
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	itemid;
+	zbx_tag_t	tag;
 }
 zbx_host_tag_t;
 
@@ -776,7 +776,8 @@ typedef struct
 }
 zbx_hc_item_t;
 
-void	zbx_free_tag(zbx_tag_t *tag); /* to be used with zbx_tag_t and zbx_host_tag_t */
+void	zbx_free_tag(zbx_tag_t *tag);
+void	zbx_free_host_tag(zbx_host_tag_t *host_tag);
 
 int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error);
 void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version);

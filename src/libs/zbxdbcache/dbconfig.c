@@ -6733,6 +6733,13 @@ void	zbx_free_tag(zbx_tag_t *tag)
 	zbx_free(tag);
 }
 
+void	zbx_free_host_tag(zbx_host_tag_t *host_tag)
+{
+	zbx_free(host_tag->tag.tag);
+	zbx_free(host_tag->tag.value);
+	zbx_free(host_tag);
+}
+
 static void	DCclean_trigger(DC_TRIGGER *trigger)
 {
 	zbx_free(trigger->new_error);
