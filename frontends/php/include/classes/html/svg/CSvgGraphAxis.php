@@ -20,9 +20,9 @@
 
 
 /**
- * SVG graphs Y axis class.
+ * SVG graphs axis class.
  */
-class CSvgGraphYAxis extends CSvgTag {
+class CSvgGraphAxis extends CSvgTag {
 
 	/**
 	 * CSS class name for axis container.
@@ -70,7 +70,8 @@ class CSvgGraphYAxis extends CSvgTag {
 	public function __construct(array $labels, $type) {
 		$this->css_class = [
 			GRAPH_YAXIS_SIDE_RIGHT => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_RIGHT,
-			GRAPH_YAXIS_SIDE_LEFT => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_LEFT
+			GRAPH_YAXIS_SIDE_LEFT => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_LEFT,
+			GRAPH_YAXIS_SIDE_BOTTOM => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_BOTTOM
 		];
 
 		$this->labels = $labels;
@@ -99,6 +100,9 @@ class CSvgGraphYAxis extends CSvgTag {
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS_LEFT.' text' => [
 				'text-anchor' => 'end'
+			],
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS_BOTTOM.' text' => [
+				'text-anchor' => 'middle'
 			]
 		];
 	}
@@ -108,7 +112,7 @@ class CSvgGraphYAxis extends CSvgTag {
 	 *
 	 * @param string $color  Color value.
 	 *
-	 * @return CSvgGraphYAxis
+	 * @return CSvgGraphAxis
 	 */
 	public function setTextColor($color) {
 		$this->text_color = $color;
@@ -121,7 +125,7 @@ class CSvgGraphYAxis extends CSvgTag {
 	 *
 	 * @param string $color  Color value.
 	 *
-	 * @return CSvgGraphYAxis
+	 * @return CSvgGraphAxis
 	 */
 	public function setLineColor($color) {
 		$this->line_color = $color;
@@ -137,22 +141,42 @@ class CSvgGraphYAxis extends CSvgTag {
 	private function getAxis() {
 		$offset = ceil(self::ZBX_ARROW_SIZE / 2);
 
-		$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT) ? $this->x : $this->x + $this->width;
-		$y = $this->y - self::ZBX_ARROW_OFFSET;
+		if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
+			$x = $this->x + $this->width + self::ZBX_ARROW_OFFSET;
+			$y = $this->y;
 
-		return [
-			// Draw axis line.
-			(new CSvgPath())
-				->setAttribute('shape-rendering', 'crispEdges')
-				->moveTo($x, $y)
-				->lineTo($x, $this->height + $y + self::ZBX_ARROW_OFFSET),
-			// Draw arrow.
-			(new CSvgPath())
-				->moveTo($x, $y - self::ZBX_ARROW_SIZE)
-				->lineTo($x - $offset, $y)
-				->lineTo($x + $offset, $y)
-				->closePath()
-		];
+			return [
+				// Draw axis line.
+				(new CSvgPath())
+					->setAttribute('shape-rendering', 'crispEdges')
+					->moveTo($this->x, $y)
+					->lineTo($x, $y),
+				// Draw arrow.
+				(new CSvgPath())
+					->moveTo($x + self::ZBX_ARROW_SIZE, $y)
+					->lineTo($x, $y - $offset)
+					->lineTo($x, $y + $offset)
+					->closePath()
+			];
+		}
+		else {
+			$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT) ? $this->x : $this->x + $this->width;
+			$y = $this->y - self::ZBX_ARROW_OFFSET;
+
+			return [
+				// Draw axis line.
+				(new CSvgPath())
+					->setAttribute('shape-rendering', 'crispEdges')
+					->moveTo($x, $y)
+					->lineTo($x, $this->height + $y + self::ZBX_ARROW_OFFSET),
+				// Draw arrow.
+				(new CSvgPath())
+					->moveTo($x, $y - self::ZBX_ARROW_SIZE)
+					->lineTo($x - $offset, $y)
+					->lineTo($x + $offset, $y)
+					->closePath()
+			];
+		}
 	}
 
 	/**
@@ -165,21 +189,41 @@ class CSvgGraphYAxis extends CSvgTag {
 		$y = 0;
 		$labels = [];
 
-		// Label margin from axis.
-		$margin = 5;
-		$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT) ? $margin : $this->width - $margin;
+		if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
+			$axis = 'x';
+			$y = $this->height - CSvgGraph::SVG_GRAPH_X_AXIS_LABEL_MARGIN;
+		}
+		else {
+			$axis = 'y';
+			$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT)
+				? CSvgGraph::SVG_GRAPH_Y_AXIS_RIGHT_LABEL_MARGIN
+				: $this->width - CSvgGraph::SVG_GRAPH_Y_AXIS_LEFT_LABEL_MARGIN;
+		}
 
 		foreach ($this->labels as $pos => $label) {
-			$y = $pos;
+			$$axis = $pos;
 
-			if ($this->type == GRAPH_YAXIS_SIDE_RIGHT && $y == 0) {
-				continue;
+			if ($this->type == GRAPH_YAXIS_SIDE_LEFT || $this->type == GRAPH_YAXIS_SIDE_RIGHT) {
+				// Flip upside down.
+				$y = $this->height - $y;
 			}
 
-			// Flip upside down.
-			$y = $this->height - $y;
+			if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
+				if (count($labels) == 0) {
+					$text_tag_x = max($this->x + $x, strlen($label) * 4);
+				}
+				elseif (end($this->labels) === $label) {
+					$text_tag_x = (strlen($label) * 4 > $this->width - $x) ? $this->x + $x - 10 : $this->x + $x;
+				}
+				else {
+					$text_tag_x = $this->x + $x;
+				}
+			}
+			else {
+				$text_tag_x = $this->x + $x;
+			}
 
-			$labels[] = new CSvgText($this->x + $x, $this->y + $y, $label);
+			$labels[] = new CSvgText($text_tag_x, $this->y + $y, $label);
 		}
 
 		return $labels;
