@@ -93,6 +93,13 @@ static int	DBpatch_4010007(void)
 
 static int	DBpatch_4010008(void)
 {
+	const ZBX_FIELD	field = {"db_extension", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4010009(void)
+{
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -104,7 +111,7 @@ static int	DBpatch_4010008(void)
 }
 
 
-static int	DBpatch_4010009(void)
+static int	DBpatch_4010010(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -116,7 +123,7 @@ static int	DBpatch_4010009(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_4010010(void)
+static int	DBpatch_4010011(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -128,7 +135,7 @@ static int	DBpatch_4010010(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_4010011(void)
+static int	DBpatch_4010012(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -156,5 +163,6 @@ DBPATCH_ADD(4010008, 0, 1)
 DBPATCH_ADD(4010009, 0, 1)
 DBPATCH_ADD(4010010, 0, 1)
 DBPATCH_ADD(4010011, 0, 1)
+DBPATCH_ADD(4010012, 0, 1)
 
 DBPATCH_END()
