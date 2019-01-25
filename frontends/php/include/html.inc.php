@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -540,19 +540,19 @@ function get_header_sysmap_table($sysmapid, $name, $severity_min) {
 		$parent_maps = (new CList())
 			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _('Upper level maps'))
-			->addClass(ZBX_STYLE_OBJECT_GROUP);
+			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+			->addClass(ZBX_STYLE_OBJECT_GROUP)
+			->addItem((new CSpan())->addItem(_('Upper level maps').':'));
 
 		foreach ($parent_sysmaps as $parent_sysmap) {
-			$parent_maps->addItem(
+			$parent_maps->addItem((new CSpan())->addItem(
 				new CLink($parent_sysmap['name'], (new CUrl('zabbix.php'))
 					->setArgument('action', 'map.view')
 					->setArgument('sysmapid', $parent_sysmap['sysmapid'])
 					->setArgument('severity_min', $severity_min)
-				)
+				))
 			);
 		}
-
-		$list->addItem(_('Upper level maps').':');
 
 		return new CHorList([$list, $parent_maps]);
 	}

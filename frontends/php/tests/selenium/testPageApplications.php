@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,8 +129,6 @@ class testPageApplications extends CLegacyWebTest {
 			}
 			$this->zbxTestTextPresent($group_app);
 		}
-
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function selectApplications($app_names, $host) {
@@ -177,7 +175,6 @@ class testPageApplications extends CLegacyWebTest {
 
 		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Items disabled');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB, that selected application items disabled.
 		$sql='SELECT NULL FROM items i INNER JOIN items_applications ia ON ia.itemid=i.itemid WHERE '
@@ -197,7 +194,6 @@ class testPageApplications extends CLegacyWebTest {
 
 		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Items disabled');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB, that all application items disabled.
 		$sql = 'SELECT NULL FROM items i LEFT JOIN items_applications ia ON ia.itemid=i.itemid '
@@ -216,7 +212,6 @@ class testPageApplications extends CLegacyWebTest {
 
 		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Items enabled');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB, that selected application items enabled.
 		$sql='SELECT NULL FROM items i INNER JOIN items_applications ia ON ia.itemid=i.itemid WHERE '
@@ -236,7 +231,6 @@ class testPageApplications extends CLegacyWebTest {
 
 		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Items enabled');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB, that all application items enabled.
 		$sql = 'SELECT NULL FROM items i LEFT JOIN items_applications ia ON ia.itemid=i.itemid '
@@ -256,7 +250,6 @@ class testPageApplications extends CLegacyWebTest {
 
 		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Application deleted');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the result in DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM applications WHERE ' . dbConditionInt('applicationid', array_keys($result['apps']))));
@@ -278,7 +271,6 @@ class testPageApplications extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete applications');
 		$this->zbxTestTextPresent('Cannot delete templated application.');
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}

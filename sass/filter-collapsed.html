@@ -50,7 +50,7 @@
 				</nav>
 				<ul class="top-nav-icons">
 					<li>
-						<form method="get" action="search.php" accept-charset="utf-8" role="search"><input type="text" id="search" name="search" value="" maxlength="255" autocomplete="off" class="search"><button type="submit" class="btn-search">&nbsp;</button></form>
+						<form method="get" action="zabbix.php" accept-charset="utf-8" role="search"><input type="hidden" name="action" value="search"><input type="text" id="search" name="search" value="" maxlength="255" autocomplete="off" class="search" aria-label="type here to search"><button type="submit" class="btn-search" title="Search">&nbsp;</button></form>
 					</li>
 					<li>
 						<ul role="navigation" aria-label="User menu">
@@ -428,6 +428,6 @@
 	<div id="action_buttons" class="action-buttons"><span id="selected_count" class="selected-item-count">2 selected</span><button type="submit" name="action" value="host.massenable" class="btn-alt" disabled confirm="Enable selected hosts?">Enable</button><button type="submit" name="action" value="host.massdisable" class="btn-alt" confirm="Disable selected hosts?">Disable</button><button type="submit" name="action" value="host.export" class="btn-alt">Export</button><button type="submit" name="action" value="host.massupdateform" class="btn-alt">Mass update</button><button type="submit" name="action" value="host.massdelete" class="btn-alt" confirm="Delete selected hosts?">Delete</button></div>
 </form>
 </main>
-<footer role="contentinfo">© 2001–2018, Zabbix SIA</footer>
+<footer role="contentinfo">© 2001–2019, Zabbix SIA</footer>
 </body>
 </html>

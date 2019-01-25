@@ -39,13 +39,13 @@ html {
   min-height: 100%; }
 
 body {
-  font-family: Arial, Tahoma, Verdana, sans-serif;
-  font-size: 75%;
   line-height: 1.4em;
   color: #fff;
   background-color: #111;
   margin-bottom: 60px;
-  min-width: 950px; }
+  min-width: 950px;
+  font-family: Arial, Tahoma, Verdana, sans-serif;
+  font-size: 75%; }
 
 a:link {
   color: #f8f8f8;
@@ -680,7 +680,8 @@ output {
     position: relative;
     border-bottom: 1px solid #333;
     line-height: 18px;
-    vertical-align: top; }
+    vertical-align: top;
+    max-width: 300px; }
   .list-table tbody th {
     text-align: left; }
   .list-table .vertical_rotation_inner {
@@ -1090,6 +1091,11 @@ output {
   font-weight: bold;
   color: #ffa20d; }
 
+.suggest-new {
+  border-top: 1px solid #666; }
+  .suggest-new span:first-child {
+    font-weight: bold; }
+
 .table-forms-container, .browser-warning-container {
   margin: 0 0 10px 0;
   background-color: #000;
@@ -1135,7 +1141,8 @@ output {
     display: table-cell;
     padding: 5px 0 5px 10px;
     vertical-align: middle;
-    width: 85%; }
+    width: 85%;
+    position: relative; }
     .table-forms .table-forms-td-right.has-before {
       padding-top: 0px; }
     .table-forms .table-forms-td-right td {
@@ -1153,8 +1160,8 @@ output {
         vertical-align: middle; }
         .table-forms .table-forms-td-right td.center .btn-grey {
           margin: 3px 0; }
-  .table-forms .table-forms-td-right {
-    position: relative; }
+    .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
+      margin-top: 5px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -1392,6 +1399,8 @@ select {
     background-color: #383838; }
     .checkbox-radio + label span:active {
       border-color: #666; }
+  .checkbox-radio + label.label-pos-left span {
+    margin-left: 4px; }
   .checkbox-radio:focus + label span {
     border-color: #bbb; }
   .checkbox-radio:checked:focus + label span {
@@ -2905,8 +2914,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   stroke-width: 2px; }
 
 .svg-point-highlight {
-  fill: #fff;
-  fill-opacity: 0.5; }
+  fill: #fff !important;
+  fill-opacity: 0.5 !important; }
 
 .svg-graph-preview {
   margin-top: 10px;
@@ -3901,6 +3910,7 @@ svg {
 .overrides-list {
   display: table;
   width: 90%;
+  max-width: 738px;
   padding-left: 15px; }
   .overrides-list .overrides-list-item {
     display: table-row; }
@@ -3973,15 +3983,26 @@ svg {
       padding: 0px 5px;
       height: 24px; }
 
+.patternselect {
+  line-height: 14px; }
+
 .columns-wrapper {
   display: flex;
-  flex-wrap: wrap; }
-  .columns-wrapper .column-5,
-  .columns-wrapper .column-10,
-  .columns-wrapper .column-33,
-  .columns-wrapper .column-50,
-  .columns-wrapper .column-90,
-  .columns-wrapper .column-95 {
+  flex-wrap: wrap;
+  /**
+   * Dynamically generated classes
+   *
+   * .column-5
+   * .column-10
+   * .column-20
+   * .column-33
+   * .column-40
+   * .column-50
+   * .column-80
+   * .column-90
+   * .column-95
+   */ }
+  .columns-wrapper [class^=column-] {
     -webkit-box-flex: 0; }
   .columns-wrapper .column-5 {
     -ms-flex: 0 0 5%;
@@ -3991,14 +4012,26 @@ svg {
     -ms-flex: 0 0 10%;
     flex: 0 0 10%;
     max-width: 10%; }
+  .columns-wrapper .column-20 {
+    -ms-flex: 0 0 20%;
+    flex: 0 0 20%;
+    max-width: 20%; }
   .columns-wrapper .column-33 {
     -ms-flex: 0 0 33.33333%;
     flex: 0 0 33.33333%;
     max-width: 33.33333%; }
+  .columns-wrapper .column-40 {
+    -ms-flex: 0 0 40%;
+    flex: 0 0 40%;
+    max-width: 40%; }
   .columns-wrapper .column-50 {
     -ms-flex: 0 0 50%;
     flex: 0 0 50%;
     max-width: 50%; }
+  .columns-wrapper .column-80 {
+    -ms-flex: 0 0 80%;
+    flex: 0 0 80%;
+    max-width: 80%; }
   .columns-wrapper .column-90 {
     -ms-flex: 0 0 90%;
     flex: 0 0 90%;
@@ -4007,6 +4040,66 @@ svg {
     -ms-flex: 0 0 95%;
     flex: 0 0 95%;
     max-width: 95%; }
+  .columns-wrapper .column-center {
+    display: flex;
+    justify-content: center;
+    text-align: center; }
+  .columns-wrapper .column-middle {
+    display: flex;
+    align-items: center; }
+
+.preprocessing-list {
+  display: table;
+  min-width: 100%;
+  padding-left: 10px; }
+  @media screen and (min-width: 1200px) {
+    .preprocessing-list {
+      min-width: 80%; } }
+  @media screen and (min-width: 1400px) {
+    .preprocessing-list {
+      min-width: 70%; } }
+  @media screen and (min-width: 1600px) {
+    .preprocessing-list {
+      min-width: 60%; } }
+  .preprocessing-list .columns-wrapper {
+    position: relative; }
+    .preprocessing-list .columns-wrapper [class^=column-] {
+      box-sizing: border-box;
+      padding: 5px 5px 5px 0; }
+      .preprocessing-list .columns-wrapper [class^=column-]:last-child {
+        padding-right: 0; }
+      .preprocessing-list .columns-wrapper [class^=column-] input[type=text], .preprocessing-list .columns-wrapper [class^=column-] select {
+        width: 100%; }
+  .preprocessing-list .preprocessing-list-head {
+    line-height: 24px; }
+    .preprocessing-list .preprocessing-list-head [class^=column-] {
+      padding: 0 5px 0 0;
+      color: #cacaca; }
+      .preprocessing-list .preprocessing-list-head [class^=column-]:first-child {
+        padding-left: 20px; }
+  .preprocessing-list .preprocessing-list-item .drag-icon {
+    position: absolute;
+    top: 5px;
+    margin-left: -20px; }
+  .preprocessing-list .preprocessing-list-item .step-number {
+    width: 15px;
+    margin-right: 5px;
+    line-height: 24px;
+    text-align: right; }
+  .preprocessing-list .preprocessing-list-item .preprocessing-step > .column-40 {
+    display: flex; }
+  .preprocessing-list .preprocessing-list-item .on-fail-options {
+    margin: 0 0 5px 20px; }
+    .preprocessing-list .preprocessing-list-item .on-fail-options > .column-80 > div {
+      padding-right: 5px; }
+      .preprocessing-list .preprocessing-list-item .on-fail-options > .column-80 > div:last-child {
+        flex: 1; }
+  .preprocessing-list .preprocessing-list-foot {
+    line-height: 24px; }
+    .preprocessing-list .preprocessing-list-foot > div {
+      margin-left: -10px; }
+  .preprocessing-list > li:nth-last-of-type(2) > .on-fail-options {
+    margin-bottom: 0; }
 
 @keyframes fadein {
   from {

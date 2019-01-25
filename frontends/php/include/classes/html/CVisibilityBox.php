@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ class CVisibilityBox extends CCheckBox {
 	 * @return CVisibilityBox
 	 */
 	public function setLabel($label) {
-		parent::setLabel($label.SPACE);
+		parent::setLabel($label);
 		$this->setLabelPosition(self::LABEL_POSITION_LEFT);
 
 		return $this;
