@@ -780,9 +780,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		/* headers defined in a step overwrite headers defined in scenario */
 		if (NULL != httpstep.headers && '\0' != *httpstep.headers)
-			zbx_http_add_headers(httpstep.headers, &headers_slist);
+			zbx_http_add_headers(httpstep.headers, &headers_slist, easyhandle);
 		else if (NULL != httptest->headers && '\0' != *httptest->headers)
-			zbx_http_add_headers(httptest->headers, &headers_slist);
+			zbx_http_add_headers(httptest->headers, &headers_slist, easyhandle);
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
 		{

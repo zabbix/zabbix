@@ -32,7 +32,7 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
 		char **error);
 char	*zbx_http_get_header(char **headers);
-void	zbx_http_add_headers(char *headers, struct curl_slist **headers_slist);
+void	zbx_http_add_headers(char *headers, struct curl_slist **headers_slist, CURL *easyhandle);
 #endif
 
 #endif
