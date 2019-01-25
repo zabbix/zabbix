@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,13 +19,13 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.2.0alpha2');
+define('ZABBIX_VERSION',		'4.2.0alpha3');
 define('ZABBIX_API_VERSION',	'4.2.0');
-define('ZABBIX_EXPORT_VERSION',	'4.0');
-define('ZABBIX_DB_VERSION',		4010002);
+define('ZABBIX_EXPORT_VERSION',	'4.2');
+define('ZABBIX_DB_VERSION',	4010008);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2018');
+define('ZABBIX_COPYRIGHT_TO',	'2019');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -192,6 +192,11 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
+
+// Multiselect helper buttons that allow selected objects to be added, replaced or removed.
+define('ZBX_MULTISELECT_ADD',		0);
+define('ZBX_MULTISELECT_REPLACE',	1);
+define('ZBX_MULTISELECT_REMOVE',	2);
 
 // Maximum number of tags to display.
 define('ZBX_TAG_COUNT_DEFAULT', 3);
@@ -529,19 +534,33 @@ define('ITEM_LOGTYPE_VERBOSE',			10);
 define('ITEM_DELAY_FLEXIBLE',	0);
 define('ITEM_DELAY_SCHEDULING',	1);
 
-// item pre-processing
-define('ZBX_PREPROC_MULTIPLIER',	1);
-define('ZBX_PREPROC_RTRIM',			2);
-define('ZBX_PREPROC_LTRIM',			3);
-define('ZBX_PREPROC_TRIM',			4);
-define('ZBX_PREPROC_REGSUB',		5);
-define('ZBX_PREPROC_BOOL2DEC',		6);
-define('ZBX_PREPROC_OCT2DEC',		7);
-define('ZBX_PREPROC_HEX2DEC',		8);
-define('ZBX_PREPROC_DELTA_VALUE',	9);
-define('ZBX_PREPROC_DELTA_SPEED',	10);
-define('ZBX_PREPROC_XPATH',			11);
-define('ZBX_PREPROC_JSONPATH',		12);
+// Item pre-processing types.
+define('ZBX_PREPROC_MULTIPLIER',			1);
+define('ZBX_PREPROC_RTRIM',					2);
+define('ZBX_PREPROC_LTRIM',					3);
+define('ZBX_PREPROC_TRIM',					4);
+define('ZBX_PREPROC_REGSUB',				5);
+define('ZBX_PREPROC_BOOL2DEC',				6);
+define('ZBX_PREPROC_OCT2DEC',				7);
+define('ZBX_PREPROC_HEX2DEC',				8);
+define('ZBX_PREPROC_DELTA_VALUE',			9);
+define('ZBX_PREPROC_DELTA_SPEED',			10);
+define('ZBX_PREPROC_XPATH',					11);
+define('ZBX_PREPROC_JSONPATH',				12);
+define('ZBX_PREPROC_VALIDATE_RANGE',		13);
+define('ZBX_PREPROC_VALIDATE_REGEX',		14);
+define('ZBX_PREPROC_VALIDATE_NOT_REGEX',	15);
+define('ZBX_PREPROC_ERROR_FIELD_JSON',		16);
+define('ZBX_PREPROC_ERROR_FIELD_XML',		17);
+define('ZBX_PREPROC_ERROR_FIELD_REGEX',		18);
+define('ZBX_PREPROC_THROTTLE_VALUE',		19);
+define('ZBX_PREPROC_THROTTLE_TIMED_VALUE',	20);
+
+// Item pre-processing error handlers.
+define('ZBX_PREPROC_FAIL_DEFAULT',			0);
+define('ZBX_PREPROC_FAIL_DISCARD_VALUE',	1);
+define('ZBX_PREPROC_FAIL_SET_VALUE',		2);
+define('ZBX_PREPROC_FAIL_SET_ERROR',		3);
 
 define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
@@ -1215,6 +1234,7 @@ define('API_H_NAME',			21);
 define('API_RANGE_TIME',		22);
 define('API_COLOR',				23);
 define('API_NUMERIC',			24);
+define('API_LLD_MACRO',			25);
 
 // flags
 define('API_REQUIRED',				0x0001);
@@ -1680,14 +1700,21 @@ define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
-// html layout columns
+// HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
-define('ZBX_STYLE_COLUMN_5', 'column-5');	// column occupies 5% width of column wrapper.
-define('ZBX_STYLE_COLUMN_10', 'column-10');	// column occupies 10% width of column wrapper.
+// column occupies x% width of column wrapper
+define('ZBX_STYLE_COLUMN_5', 'column-5');
+define('ZBX_STYLE_COLUMN_10', 'column-10');
+define('ZBX_STYLE_COLUMN_20', 'column-20');
 define('ZBX_STYLE_COLUMN_33', 'column-33'); // column occupies 1/3 width of column wrapper.
-define('ZBX_STYLE_COLUMN_50', 'column-50'); // column occupies 50% width of column wrapper.
-define('ZBX_STYLE_COLUMN_90', 'column-90'); // column occupies 90% width of column wrapper.
-define('ZBX_STYLE_COLUMN_95', 'column-95'); // column occupies 95% width of column wrapper.
+define('ZBX_STYLE_COLUMN_40', 'column-40');
+define('ZBX_STYLE_COLUMN_50', 'column-50');
+define('ZBX_STYLE_COLUMN_80', 'column-80');
+define('ZBX_STYLE_COLUMN_90', 'column-90');
+define('ZBX_STYLE_COLUMN_95', 'column-95');
+// column visual options
+define('ZBX_STYLE_COLUMN_CENTER', 'column-center');
+define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');

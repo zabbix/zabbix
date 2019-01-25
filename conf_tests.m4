@@ -1,6 +1,6 @@
 #
 # Zabbix
-# Copyright (C) 2001-2018 Zabbix SIA
+# Copyright (C) 2001-2019 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@ AC_DEFUN([CONF_TESTS],[
 		tests/libs/zbxsysinfo/common/Makefile
 		tests/libs/zbxcommshigh/Makefile
 		tests/libs/zbxalgo/Makefile
+		tests/zabbix_server/Makefile
+		tests/zabbix_server/preprocessor/Makefile
 		])
 		AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
 	])

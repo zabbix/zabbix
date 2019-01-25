@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -170,6 +170,16 @@ class CElementCollection implements Iterator {
 	}
 
 	/**
+	 * Set element by key.
+	 *
+	 * @param mixed $key        array key
+	 * @param mixed $element    element to be set
+	 */
+	public function set($key, $element) {
+		$this->elements[$key] = $element;
+	}
+
+	/**
 	 * Perform action on all array elements.
 	 *
 	 * @param string $method    method name
@@ -278,6 +288,34 @@ class CElementCollection implements Iterator {
 		}
 
 		return $text;
+	}
+
+	/**
+	 * Filter element collection based on a specified condition and params.
+	 *
+	 * @param string $condition    condition to be filtered by
+	 * @param array  $params       condition params
+	 *
+	 * @return CElementCollection
+	 * @throws Exception
+	 */
+	public function filter($condition, $params = []) {
+		$method = CElementQuery::getConditionCallable($condition);
+
+		$elements = [];
+		foreach ($this->elements as $key => $element) {
+			$callable = call_user_func_array([$element, $method], $params);
+
+			try {
+				if (call_user_func($callable) === true) {
+					$elements[$key] = $element;
+				}
+			} catch (Exception $e) {
+				// Code is not missing here.
+			}
+		}
+
+		return new CElementCollection($elements, $this->element_class);
 	}
 
 	/**

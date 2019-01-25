@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -340,6 +340,7 @@ typedef struct
 	int		default_inventory_mode;
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
+	char		*db_extension;
 
 	/* housekeeping related configuration data */
 	zbx_config_hk_t	hk;
@@ -352,6 +353,10 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED		0x00000008
 #define ZBX_CONFIG_FLAGS_SNMPTRAP_LOGGING		0x00000010
 #define ZBX_CONFIG_FLAGS_HOUSEKEEPER			0x00000020
+#define ZBX_CONFIG_FLAGS_DB_EXTENSION			0x00000040
+
+/* possible values for database extensions (if flag ZBX_CONFIG_FLAGS_DB_EXTENSION set) */
+#define ZBX_CONFIG_DB_EXTENSION_TIMESCALE		"timescaledb"
 
 typedef struct
 {
@@ -467,15 +472,6 @@ ZBX_DC_TREND;
 
 typedef struct
 {
-	zbx_uint64_t		itemid;
-	zbx_timespec_t		timestamp;
-	zbx_variant_t		value;
-	unsigned char		value_type;
-}
-zbx_item_history_value_t;
-
-typedef struct
-{
 	zbx_uint64_t	itemid;
 	history_value_t	value;
 	zbx_uint64_t	lastlogsize;
@@ -522,7 +518,9 @@ zbx_counter_type_t;
 typedef struct
 {
 	unsigned char	type;
+	unsigned char	error_handler;
 	char		*params;
+	char		*error_handler_params;
 }
 zbx_preproc_op_t;
 
@@ -534,6 +532,7 @@ typedef struct
 
 	int			dep_itemids_num;
 	int			preproc_ops_num;
+	int			update_time;
 
 	zbx_uint64_t		*dep_itemids;
 	zbx_preproc_op_t	*preproc_ops;
@@ -655,6 +654,11 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
+
+/* options for hk.history_mode, trends_mode */
+#define ZBX_HK_MODE_DISABLED		ZBX_HK_OPTION_DISABLED
+#define ZBX_HK_MODE_REGULAR		ZBX_HK_OPTION_ENABLED
+#define ZBX_HK_MODE_PARTITION		2
 
 #define ZBX_HK_HISTORY_MIN	SEC_PER_HOUR
 #define ZBX_HK_TRENDS_MIN	SEC_PER_DAY

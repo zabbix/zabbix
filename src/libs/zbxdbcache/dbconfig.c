@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -836,7 +836,7 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 
 static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 {
-#define SELECTED_FIELD_COUNT	27
+#define SELECTED_FIELD_COUNT	28
 
 	const char	*__function_name = "DCsync_config";
 	const ZBX_TABLE	*config_table;
@@ -847,7 +847,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_services_mode", "hk_services", "hk_audit_mode", "hk_audit",
 					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
-					"default_inventory_mode"};	/* sync with zbx_dbsync_compare_config() */
+					"default_inventory_mode", "db_extension"};	/* sync with zbx_dbsync_compare_config() */
 	const char	*row[SELECTED_FIELD_COUNT];
 	size_t		i;
 	int		j, found = 1, refresh_unsupported, ret;
@@ -911,6 +911,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 
 	config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
 	config->config->default_inventory_mode = atoi(row[26]);
+	DCstrpool_replace(found, &config->config->db_extension, row[27]);
 
 	for (j = 0; TRIGGER_SEVERITY_COUNT > j; j++)
 		DCstrpool_replace(found, &config->config->severity_name[j], row[3 + j]);
@@ -962,9 +963,18 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "history data housekeeping will be disabled and all items will"
 				" store their history due to invalid global override settings");
-		config->config->hk.history_mode = ZBX_HK_OPTION_DISABLED;
+		config->config->hk.history_mode = ZBX_HK_MODE_DISABLED;
 		config->config->hk.history = 1;	/* just enough to make 0 == items[i].history condition fail */
 	}
+
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_HK_MODE_DISABLED != config->config->hk.history_mode &&
+			ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
+			0 == zbx_strcmp_null(config->config->db_extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+	{
+		config->config->hk.history_mode = ZBX_HK_MODE_PARTITION;
+	}
+#endif
 
 	config->config->hk.trends_mode = atoi(row[23]);
 	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.trends_global = atoi(row[24])) &&
@@ -972,9 +982,18 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "trends data housekeeping will be disabled and all numeric items"
 				" will store their history due to invalid global override settings");
-		config->config->hk.trends_mode = ZBX_HK_OPTION_DISABLED;
+		config->config->hk.trends_mode = ZBX_HK_MODE_DISABLED;
 		config->config->hk.trends = 1;	/* just enough to make 0 == items[i].trends condition fail */
 	}
+
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_HK_MODE_DISABLED != config->config->hk.trends_mode &&
+			ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
+			0 == zbx_strcmp_null(config->config->db_extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+	{
+		config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
+	}
+#endif
 
 	if (SUCCEED == ret && SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))	/* table must have */
 		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");	/* only one record */
@@ -1324,6 +1343,10 @@ done:
 		{
 			if (HOST_STATUS_MONITORED == status && HOST_STATUS_MONITORED != host->status)
 				host->data_expected_from = now;
+
+			/* reset host status if host status has been changed (e.g., if host has been disabled) */
+			if (status != host->status)
+				host->reset_availability = 1;
 
 			/* reset host status if host proxy assignment has been changed */
 			if (proxy_hostid != host->proxy_hostid)
@@ -2129,8 +2152,6 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		ZBX_DC_HOST	*host;
-
 		if (NULL == (interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &rowid)))
 			continue;
 
@@ -4282,7 +4303,7 @@ static int	dc_compare_preprocops_by_step(const void *d1, const void *d2)
  *           3 - params                                                       *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_item_preproc(zbx_dbsync_t *sync)
+static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 {
 	const char		*__function_name = "DCsync_item_preproc";
 
@@ -4321,6 +4342,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 				zbx_vector_ptr_create_ext(&preprocitem->preproc_ops, __config_mem_malloc_func,
 						__config_mem_realloc_func, __config_mem_free_func);
 			}
+
+			preprocitem->update_time = timestamp;
 		}
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
@@ -4330,6 +4353,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 		ZBX_STR2UCHAR(op->type, row[2]);
 		DCstrpool_replace(found, &op->params, row[3]);
 		op->step = atoi(row[4]);
+		op->error_handler = atoi(row[6]);
+		DCstrpool_replace(found, &op->error_handler_params, row[7]);
 
 		if (0 == found)
 		{
@@ -4365,6 +4390,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 		}
 
 		zbx_strpool_release(op->params);
+		zbx_strpool_release(op->error_handler_params);
 		zbx_hashset_remove_direct(&config->preprocops, op);
 	}
 
@@ -4855,7 +4881,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	sec = zbx_time();
 	/* relies on items, must be after DCsync_items() */
-	DCsync_item_preproc(&itempp_sync);
+	DCsync_item_preproc(&itempp_sync, sec);
 	itempp_sec2 = zbx_time() - sec;
 	config->item_sync_ts = time(NULL);
 	FINISH_SYNC;
@@ -6624,6 +6650,7 @@ static int	dc_preproc_item_init(zbx_preproc_item_t *item, zbx_uint64_t itemid)
 
 	item->preproc_ops = NULL;
 	item->preproc_ops_num = 0;
+	item->update_time = 0;
 
 	return SUCCEED;
 }
@@ -6675,6 +6702,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 
 		item->preproc_ops_num = dc_preprocitem->preproc_ops.values_num;
 		item->preproc_ops = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) * item->preproc_ops_num);
+		item->update_time = dc_preprocitem->update_time;
 
 		for (i = 0; i < dc_preprocitem->preproc_ops.values_num; i++)
 		{
@@ -6682,6 +6710,8 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 			op = &item->preproc_ops[i];
 			op->type = dc_op->type;
 			op->params = zbx_strdup(NULL, dc_op->params);
+			op->error_handler = dc_op->error_handler;
+			op->error_handler_params = zbx_strdup(NULL, dc_op->error_handler_params);
 		}
 	}
 
@@ -10264,6 +10294,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_HOUSEKEEPER))
 		cfg->hk = config->config->hk;
 
+	if (0 != (flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
+		cfg->db_extension = zbx_strdup(NULL, config->config->db_extension);
+
 	UNLOCK_CACHE;
 
 	cfg->flags = flags;
@@ -10290,6 +10323,9 @@ void	zbx_config_clean(zbx_config_t *cfg)
 
 		zbx_free(cfg->severity_name);
 	}
+
+	if (0 != (cfg->flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
+		zbx_free(cfg->db_extension);
 }
 
 /******************************************************************************

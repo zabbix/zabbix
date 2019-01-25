@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		errcodes[i] = FAIL;
 
 		items[i].key = zbx_strdup(items[i].key, items[i].key_orig);
-		if (SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL,
+		if (SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
 				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
