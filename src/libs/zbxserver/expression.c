@@ -2223,29 +2223,6 @@ static int	get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, 
 
 /******************************************************************************
  *                                                                            *
- * Function: get_host_inventory_by_itemid                                     *
- *                                                                            *
- * Purpose: request host inventory value by macro and hostid                  *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	get_host_inventory_by_hostid(const char *macro, zbx_uint64_t hostid, char **replace_to)
-{
-	int	i;
-
-	for (i = 0; NULL != inventory_fields[i].macro; i++)
-	{
-		if (0 == strcmp(macro, inventory_fields[i].macro))
-			return DCget_host_inventory_value_by_hostid(hostid, replace_to, inventory_fields[i].idx);
-	}
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: compare_tags                                                     *
  *                                                                            *
  * Purpose: comparison function to sort tags by tag/value                     *
