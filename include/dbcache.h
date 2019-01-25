@@ -880,6 +880,6 @@ void	zbx_dc_maintenance_reset_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flags(void);
 
-void	DCget_host_tags_by_itemids(const zbx_uint64_t *itemids, size_t itemids_num, zbx_vector_ptr_t *host_tags);
+void	DCget_host_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num, zbx_vector_ptr_t *host_tags);
 
 #endif

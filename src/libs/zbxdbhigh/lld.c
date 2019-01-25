@@ -850,7 +850,7 @@ error:
 					zbx_host_key_string(lld_ruleid));
 
 			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
-					NULL, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, 0, NULL);
+					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
 		}
 		else
 		{
@@ -858,7 +858,7 @@ error:
 					zbx_host_key_string(lld_ruleid), error);
 
 			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts,
-					ITEM_STATE_NOTSUPPORTED, NULL, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, 0, error);
+					ITEM_STATE_NOTSUPPORTED, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, error);
 		}
 
 		zbx_process_events(NULL, NULL);

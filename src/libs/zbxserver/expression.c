@@ -4334,14 +4334,12 @@ static int	extract_expression_functionids(zbx_vector_uint64_t *functionids, cons
 	return (NULL == bl ? SUCCEED : FAIL);
 }
 
-static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_ptr_t *triggers,
-					zbx_vector_ptr_t *trigger_items)
+static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_ptr_t *triggers)
 {
 	const char	*__function_name = "zbx_extract_functionids";
 
 	DC_TRIGGER		*tr;
 	int			i, values_num_save;
-	zbx_trigger_items_t	*ti;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __function_name, triggers->values_num);
 
@@ -4372,11 +4370,6 @@ static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
 			functionids->values_num = values_num_save;
 		}
-
-		ti = (zbx_trigger_items_t *)zbx_malloc(NULL, sizeof(zbx_trigger_items_t));
-		ti->triggerid = tr->triggerid;
-		zbx_vector_uint64_create(&ti->itemids);
-		zbx_vector_ptr_append(trigger_items, ti);
 	}
 
 	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -4632,7 +4625,7 @@ static void	func_clean(void *ptr)
  *                                                                            *
  ******************************************************************************/
 static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, zbx_hashset_t *funcs,
-		zbx_hashset_t *ifuncs, const zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_items)
+		zbx_hashset_t *ifuncs, const zbx_vector_ptr_t *triggers)
 {
 	const char	*__function_name = "zbx_populate_function_items";
 
@@ -4642,7 +4635,6 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 	int			*errcodes = NULL;
 	zbx_ifunc_t		ifunc_local;
 	zbx_func_t		*func, func_local;
-	zbx_trigger_items_t	*ti;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __function_name, functionids->values_num);
 
@@ -4666,13 +4658,6 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 		{
 			tr = (DC_TRIGGER *)triggers->values[j];
 			func_local.timespec = tr->timespec;
-
-			if (FAIL != (j = zbx_vector_ptr_search(trigger_items, &tr->triggerid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-			{
-				ti = (zbx_trigger_items_t *)trigger_items->values[j];
-				zbx_vector_uint64_append(&ti->itemids, functions[i].itemid);
-			}
 		}
 		else
 		{
@@ -4967,7 +4952,7 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
  * Comments: example: "({15}>10) or ({123}=1)" => "(26.416>10) or (0=1)"      *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_functions(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_items, zbx_vector_ptr_t *unknown_msgs)
+static void	substitute_functions(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *unknown_msgs)
 {
 	const char		*__function_name = "substitute_functions";
 
@@ -4977,7 +4962,7 @@ static void	substitute_functions(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *t
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&functionids);
-	zbx_extract_functionids(&functionids, triggers, trigger_items);
+	zbx_extract_functionids(&functionids, triggers);
 
 	if (0 == functionids.values_num)
 		goto empty;
@@ -4988,7 +4973,7 @@ static void	substitute_functions(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *t
 	zbx_hashset_create_ext(&funcs, triggers->values_num, func_hash_func, func_compare_func, func_clean,
 				ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	zbx_populate_function_items(&functionids, &funcs, &ifuncs, triggers, trigger_items);
+	zbx_populate_function_items(&functionids, &funcs, &ifuncs, triggers);
 
 	if (0 != ifuncs.num_data)
 	{
@@ -5016,7 +5001,7 @@ empty:
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	evaluate_expressions(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_items)
+void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 {
 	const char	*__function_name = "evaluate_expressions";
 
@@ -5048,7 +5033,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_
 	/* Therefore initialize error messages vector but do not reserve any space. */
 	zbx_vector_ptr_create(&unknown_msgs);
 
-	substitute_functions(triggers, trigger_items, &unknown_msgs);
+	substitute_functions(triggers, &unknown_msgs);
 
 	/* calculate new trigger values based on their recovery modes and expression evaluations */
 	for (i = 0; i < triggers->values_num; i++)

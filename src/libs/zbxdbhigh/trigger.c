@@ -32,17 +32,6 @@
 #define ZBX_FLAGS_TRIGGER_CREATE_EVENT										\
 		(ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT | ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT)
 
-static void 	zbx_get_host_tags_from_itemids(zbx_vector_ptr_t *host_tags, zbx_uint64_t triggerid,
-						zbx_vector_ptr_t *trigger_items)
-{
-	int	i;
-
-	if (FAIL != (i = zbx_vector_ptr_search(trigger_items, &triggerid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-	{
-		zbx_trigger_items_t* ti = (zbx_trigger_items_t *)trigger_items->values[i];
-		DCget_host_tags_by_itemids(ti->itemids.values, ti->itemids.values_num, host_tags);
-	}
-}
 
 /******************************************************************************
  *                                                                            *
@@ -78,15 +67,13 @@ static void 	zbx_get_host_tags_from_itemids(zbx_vector_ptr_t *host_tags, zbx_uin
  *        '-' - should never happen                                           *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *trigger_items,
-					zbx_vector_ptr_t *diffs)
+static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
 {
 	const char		*__function_name = "zbx_process_trigger";
 
 	const char		*new_error;
-	int			i, new_state, new_value, ret = FAIL;
+	int			new_state, new_value, ret = FAIL;
 	zbx_uint64_t		flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET, event_flags = ZBX_FLAGS_TRIGGER_CREATE_NOTHING;
-	zbx_vector_ptr_t	host_tags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " value:%d(%d) new_value:%d",
 			__function_name, trigger->triggerid, trigger->value, trigger->state, trigger->new_value);
@@ -132,26 +119,17 @@ static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *tr
 
 	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT))
 	{
-		zbx_vector_ptr_create(&host_tags);
-
-		zbx_get_host_tags_from_itemids(&host_tags, trigger->triggerid, trigger_items);
-
 		zbx_add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 				&trigger->timespec, new_value, trigger->description,
 				trigger->expression_orig, trigger->recovery_expression_orig,
-				trigger->priority, trigger->type, &trigger->tags, &host_tags,
+				trigger->priority, trigger->type, &trigger->tags,
 				trigger->correlation_mode, trigger->correlation_tag, trigger->value, NULL);
-
-		for (i = 0; i < host_tags.values_num; i++)
-			zbx_free_tag(host_tags.values[i]);
-
-		zbx_vector_ptr_destroy(&host_tags);
 	}
 
 	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
 	{
 		zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-				&trigger->timespec, new_state, NULL, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, 0, new_error);
+				&trigger->timespec, new_state, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, new_error);
 	}
 
 	zbx_append_trigger_diff(diffs, trigger->triggerid, trigger->priority, flags, trigger->value, new_state,
@@ -283,12 +261,11 @@ static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
  *                              (zbx_clean_func_t)zbx_trigger_diff_free);     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_items, zbx_vector_ptr_t *trigger_diff)
+void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_diff)
 {
 	const char	*__function_name = "zbx_process_triggers";
 
-	int			i;
-	zbx_trigger_items_t 	*ti;
+	int	i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, triggers->values_num);
 
@@ -298,15 +275,7 @@ void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_
 	zbx_vector_ptr_sort(triggers, zbx_trigger_topoindex_compare);
 
 	for (i = 0; i < triggers->values_num; i++)
-		zbx_process_trigger((struct _DC_TRIGGER *)triggers->values[i], trigger_items, trigger_diff);
-
-	/* free trigger items */
-	for (i = 0; i < trigger_items->values_num; i++)
-	{
-		ti = (zbx_trigger_items_t *)trigger_items->values[i];
-		zbx_vector_uint64_destroy(&ti->itemids);
-		zbx_free(ti);
-	}
+		zbx_process_trigger((struct _DC_TRIGGER *)triggers->values[i], trigger_diff);
 
 	zbx_vector_ptr_sort(trigger_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 out:

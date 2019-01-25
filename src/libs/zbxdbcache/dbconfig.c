@@ -12119,18 +12119,23 @@ static void	zbx_obtain_host_tags_from_item(zbx_uint64_t itemid, zbx_vector_ptr_t
 	}
 }
 
-void	DCget_host_tags_by_itemids(const zbx_uint64_t *itemids, size_t itemids_num, zbx_vector_ptr_t *host_tags)
+void	DCget_host_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num, zbx_vector_ptr_t *host_tags)
 {
-	size_t	i;
-
-	if (0 == itemids_num)
-		return;
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_ITEM	*dc_item;
+	size_t			i;
 
 	RDLOCK_CACHE;
 
-	for (i = 0; i < itemids_num; i++)
+	for (i = 0; i < functionids_num; i++)
 	{
-		zbx_obtain_host_tags_from_item(itemids[i], host_tags);
+		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionids[i])))
+			continue;
+
+		if (NULL == (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
+			continue;
+
+		zbx_obtain_host_tags_from_item(dc_item->itemid, host_tags);
 	}
 
 	UNLOCK_CACHE;

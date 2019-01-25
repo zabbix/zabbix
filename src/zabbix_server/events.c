@@ -140,6 +140,16 @@ static void	process_host_tag(const zbx_host_tag_t *ht)
 	validate_and_add_tag(&tag->tag);
 }
 
+static void	get_host_tags_by_expression(const char *expression, zbx_vector_ptr_t *host_tags)
+{
+	zbx_vector_uint64_t	functionids;
+
+	zbx_vector_uint64_create(&functionids);
+	get_functionids(&functionids, expression);
+	DCget_host_tags_by_functionids(functionids.values, functionids.values_num, host_tags);
+	zbx_vector_uint64_destroy(&functionids);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_add_event                                                    *
@@ -169,11 +179,12 @@ static void	process_host_tag(const zbx_host_tag_t *ht)
 int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags, zbx_vector_ptr_t *host_tags,
+		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *error)
 {
 	int			i;
+	zbx_vector_ptr_t	host_tags;
 
 	if (events_num == events_alloc)
 	{
@@ -224,11 +235,16 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 				process_trigger_tag((const zbx_tag_t *)trigger_tags->values[i]);
 		}
 
-		if (NULL != host_tags)
+		zbx_vector_ptr_create(&host_tags);
+		get_host_tags_by_expression(trigger_expression, &host_tags);
+
+		for (i = 0; i < host_tags.values_num; i++)
 		{
-			for (i = 0; i < host_tags->values_num; i++)
-				process_host_tag((const zbx_host_tag_t *)host_tags->values[i]);
+			process_host_tag((const zbx_host_tag_t *)host_tags.values[i]);
+			zbx_free_tag(host_tags.values[i]);
 		}
+
+		zbx_vector_ptr_destroy(&host_tags);
 	}
 	else if (EVENT_SOURCE_INTERNAL == source && NULL != error)
 		events[events_num].name = zbx_strdup(NULL, error);
@@ -266,8 +282,7 @@ static int	close_trigger_event(zbx_uint64_t eventid, zbx_uint64_t objectid, cons
 
 	index = zbx_add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, objectid, ts, TRIGGER_VALUE_OK,
 			trigger_description, trigger_expression, trigger_recovery_expression, trigger_priority,
-			trigger_type, NULL, NULL, ZBX_TRIGGER_CORRELATION_NONE, "", TRIGGER_VALUE_PROBLEM,
-			NULL);
+			trigger_type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "", TRIGGER_VALUE_PROBLEM, NULL);
 
 	recovery_local.eventid = eventid;
 	recovery_local.objectid = objectid;

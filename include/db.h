@@ -550,7 +550,7 @@ typedef struct
 }
 zbx_trigger_diff_t;
 
-void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_items, zbx_vector_ptr_t *diffs);
+void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *diffs);
 void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *diffs);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
