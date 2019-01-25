@@ -245,8 +245,8 @@ if (isset($_REQUEST['form'])) {
 	if (isset($data['druleid']) && !isset($_REQUEST['form_refresh'])) {
 		$data['drule'] = reset($dbDRule);
 		$data['drule']['uniqueness_criteria'] = -1;
-		$data['drule']['host_source'] = null;
-		$data['drule']['name_source'] = null;
+		$data['drule']['host_source'] = ZBX_DISCOVERY_DNS;
+		$data['drule']['name_source'] = ZBX_DISCOVERY_UNSPEC;
 
 		if (!empty($data['drule']['dchecks'])) {
 			foreach ($data['drule']['dchecks'] as $id => $dcheck) {
@@ -255,16 +255,11 @@ if (isset($_REQUEST['form'])) {
 				}
 
 				if ($dcheck['host_source'] == ZBX_DISCOVERY_VALUE) {
-					$data['drule']['host_source'] = $dcheck['dcheckid'];
+					$data['drule']['host_source'] = '_'.$dcheck['dcheckid'];
 				}
-				elseif ($data['drule']['host_source'] === null) {
-					$data['drule']['host_source'] = $dcheck['host_source'];
-				}
+
 				if ($dcheck['name_source'] == ZBX_DISCOVERY_VALUE) {
-					$data['drule']['name_source'] = $dcheck['dcheckid'];
-				}
-				elseif ($data['drule']['name_source'] === null) {
-					$data['drule']['name_source'] = $dcheck['name_source'];
+					$data['drule']['name_source'] = '_'.$dcheck['dcheckid'];
 				}
 			}
 		}

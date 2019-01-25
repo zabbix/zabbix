@@ -29,8 +29,9 @@
 </script>
 <script type="text/x-jquery-tmpl" id="hostSourceRowTPL">
 	<?=	(new CListItem([
-			(new CInput('radio', 'host_source', '#{dcheckid}'))
+			(new CInput('radio', 'host_source', '_#{dcheckid}'))
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+				->setAttribute('data-id', '#{dcheckid}')
 				->setId('host_source_#{dcheckid}'),
 			new CLabel([new CSpan(), '#{name}'], 'host_source_#{dcheckid}')
 		]))
@@ -40,8 +41,9 @@
 </script>
 <script type="text/x-jquery-tmpl" id="nameSourceRowTPL">
 	<?=	(new CListItem([
-			(new CInput('radio', 'name_source', '#{dcheckid}'))
+			(new CInput('radio', 'name_source', '_#{dcheckid}'))
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+				->setAttribute('data-id', '#{dcheckid}')
 				->setId('name_source_#{dcheckid}'),
 			new CLabel([new CSpan(), '#{name}'], 'name_source_#{dcheckid}')
 		]))
@@ -731,6 +733,9 @@
 					dCheck.name += ' "' + dCheck.key_ + '"';
 				}
 
+				dCheck.host_source = '<?= ZBX_DISCOVERY_DNS ?>';
+				dCheck.name_source = '<?= ZBX_DISCOVERY_UNSPEC ?>';
+
 				addPopupValues([dCheck]);
 
 				jQuery('#new_check_form').remove();
@@ -755,25 +760,18 @@
 			jQuery('#name').focus();
 		});
 
-		jQuery('#host_source,#name_source').on('click', 'input', function() {
-			var base_value = jQuery(this).val(),
-				chk_type = jQuery(this).attr('id').split('_')[2],
-				def_value = (jQuery(this).attr('name') === 'name_source'
-					? <?=ZBX_DISCOVERY_UNSPEC?> : <?=ZBX_DISCOVERY_DNS?>);
+		jQuery('#host_source,#name_source').on('change', 'input', function() {
+			var elm = jQuery(this),
+				name = elm.attr('name');
 
-			jQuery('[name ^= dchecks][name *= ' + jQuery(this).attr('name') + ']').each( function() {
-				var chk_id = jQuery(this).attr('name').split('][')[0].split('[')[1];
-
-				if (chk_type === 'chk') {
-					jQuery(this).val(base_value);
-				}
-				else if (chk_type === chk_id) {
-					jQuery(this).val(<?=ZBX_DISCOVERY_VALUE?>);
-				}
-				else {
-					jQuery(this).val(def_value);
-				}
-			});
+			if (elm.data('id')) {
+				jQuery('[name^=dchecks][name$="[' + name + ']"]')
+					.val((name === 'name_source') ? <?= ZBX_DISCOVERY_UNSPEC ?> : <?= ZBX_DISCOVERY_DNS ?>);
+				jQuery('[name="dchecks[' + elm.data('id') + '][' + name + ']"]').val(<?= ZBX_DISCOVERY_VALUE ?>);
+			}
+			else {
+				jQuery('[name^=dchecks][name$="[' + name + ']"]').val(elm.val());
+			}
 		});
 	});
 </script>

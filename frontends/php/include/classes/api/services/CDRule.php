@@ -457,6 +457,10 @@ class CDRule extends CApiService {
 	protected function validateDChecks(array $dchecks) {
 		$uniq = 0;
 		$item_key_parser = new CItemKey();
+		$source_values = [
+			'name_source' => [ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE],
+			'host_source' => [ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE]
+		];
 
 		if (!is_array($dchecks)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -485,15 +489,21 @@ class CDRule extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect port range.'));
 			}
 
-			$source_values = [ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE];
+			foreach ($source_values as $field => $values) {
+				if (!array_key_exists($field, $dcheck)) {
+					continue;
+				}
 
-			foreach (['name_source', 'host_source'] as $field) {
-				if (array_key_exists($field, $dcheck) && !in_array($dcheck[$field], $source_values)) {
+				if (!in_array($dcheck[$field], $values)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value for field "%1$s": %2$s.', $field, $dcheck[$field])
 					);
 				}
-				array_shift($source_values);
+
+				// Only one check can be equal ZBX_DISCOVERY_VALUE for 'host_source' and 'name_source' fields.
+				if ($dcheck[$field] == ZBX_DISCOVERY_VALUE) {
+					array_pop($source_values[$field]);
+				}
 			}
 
 			$dcheck_types = [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
