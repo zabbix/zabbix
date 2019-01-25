@@ -12075,7 +12075,6 @@ static void	zbx_gather_tags_from_host(zbx_uint64_t hostid, zbx_vector_ptr_t *hos
 		{
 			dc_tag = (zbx_dc_host_tag_t *)dc_tag_index->tags.values[i];
 			tag = (zbx_host_tag_t *) zbx_malloc(NULL, sizeof(zbx_host_tag_t));
-			tag->hostid = hostid;
 			tag->tag.tag = zbx_strdup(NULL, dc_tag->tag);
 			tag->tag.value = zbx_strdup(NULL, dc_tag->value);
 			zbx_vector_ptr_append(host_tags, tag);
@@ -12100,13 +12099,25 @@ static void	zbx_obtain_host_tags_from_item(zbx_uint64_t itemid, zbx_vector_ptr_t
 {
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_PROTOTYPE_ITEM	*lld_item;
+	zbx_host_tag_t		*tag;
+	int			n, i;
 
 	if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
 	{
 		zbx_gather_tags_from_host(item->hostid, host_tags);
 
 		if (0 != item->templateid)
+		{
+			n = host_tags->values_num;
 			zbx_gather_tags_from_template_chain(item->templateid, host_tags);
+
+			/* assing hostid values to newly gathered tags */
+			for (i = n; i < host_tags->values_num; i++)
+			{
+				tag = (zbx_host_tag_t *)host_tags->values[i];
+				tag->hostid = item->hostid;
+			}
+		}
 
 		/* check for discovered item */
 		if (0 != item->parent_itemid && 4 == item->flags)
