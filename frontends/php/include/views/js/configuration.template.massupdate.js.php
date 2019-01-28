@@ -7,8 +7,7 @@
 		<?php if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN): ?>
 			$('input[name=mass_update_groups]').on('change', function() {
 				$('#groups_').multiSelect('setOption', 'addNew',
-					(this.value == <?= ZBX_MASSUPDATE_ACTION_ADD ?>
-						|| this.value == <?= ZBX_MASSUPDATE_ACTION_REPLACE ?>)
+					(this.value == <?= ZBX_ACTION_ADD ?> || this.value == <?= ZBX_ACTION_REPLACE ?>)
 				);
 			});
 		<?php endif ?>

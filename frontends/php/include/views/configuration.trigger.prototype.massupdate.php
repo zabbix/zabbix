@@ -74,10 +74,10 @@ $tags_form_list = (new CFormList('tags-form-list'))
 			->setLabel(_('Tags'))
 			->setChecked(array_key_exists('tags', $data['visible'])),
 		(new CDiv([
-			(new CRadioButtonList('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD))
-				->addValue(_('Add'), ZBX_MASSUPDATE_ACTION_ADD)
-				->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
-				->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
+			(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
+				->addValue(_('Add'), ZBX_ACTION_ADD)
+				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
 				->setModern(true)
 				->addStyle('margin-bottom: 10px;'),
 			renderTagTable($data['tags'])

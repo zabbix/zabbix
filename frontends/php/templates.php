@@ -46,10 +46,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields = [
 	'groups'			=> [T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
-	'mass_update_groups' => [T_ZBX_INT, O_OPT, null,
-								IN([ZBX_MASSUPDATE_ACTION_ADD, ZBX_MASSUPDATE_ACTION_REPLACE,
-									ZBX_MASSUPDATE_ACTION_REMOVE
-								]),
+	'mass_update_groups' => [T_ZBX_INT, O_OPT, null,	IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 								null
 							],
 	'clear_templates'	=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
@@ -62,10 +59,7 @@ $fields = [
 	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
 	'groupid'			=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
 	'tags'				=> [T_ZBX_STR, O_OPT, null,		null,	null],
-	'mass_update_tags'	=> [T_ZBX_INT, O_OPT, null,
-								IN([ZBX_MASSUPDATE_ACTION_ADD, ZBX_MASSUPDATE_ACTION_REPLACE,
-									ZBX_MASSUPDATE_ACTION_REMOVE
-								]),
+	'mass_update_tags'	=> [T_ZBX_INT, O_OPT, null,		IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 								null
 							],
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
@@ -250,9 +244,9 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 		}
 
 		if (array_key_exists('tags', $visible)) {
-			$mass_update_tags = getRequest('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD);
+			$mass_update_tags = getRequest('mass_update_tags', ZBX_ACTION_ADD);
 
-			if ($mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD || $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
+			if ($mass_update_tags == ZBX_ACTION_ADD || $mass_update_tags == ZBX_ACTION_REMOVE) {
 				$options['selectTags'] = ['tag', 'value'];
 			}
 
@@ -270,10 +264,9 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 		if (array_key_exists('groups', $visible)) {
 			$new_groupids = [];
 			$remove_groupids = [];
-			$mass_update_groups = getRequest('mass_update_groups', ZBX_MASSUPDATE_ACTION_ADD);
+			$mass_update_groups = getRequest('mass_update_groups', ZBX_ACTION_ADD);
 
-			if ($mass_update_groups == ZBX_MASSUPDATE_ACTION_ADD
-					|| $mass_update_groups == ZBX_MASSUPDATE_ACTION_REPLACE) {
+			if ($mass_update_groups == ZBX_ACTION_ADD || $mass_update_groups == ZBX_ACTION_REPLACE) {
 				if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 					$ins_groups = [];
 
@@ -298,7 +291,7 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 					$new_groupids = getRequest('groups', []);
 				}
 			}
-			elseif ($mass_update_groups == ZBX_MASSUPDATE_ACTION_REMOVE) {
+			elseif ($mass_update_groups == ZBX_ACTION_REMOVE) {
 				$remove_groupids = getRequest('groups', []);
 			}
 		}
@@ -332,13 +325,13 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 
 		foreach ($templates as &$template) {
 			if (array_key_exists('groups', $visible)) {
-				if ($new_groupids && $mass_update_groups == ZBX_MASSUPDATE_ACTION_ADD) {
+				if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
 					$current_groupids = zbx_objectValues($template['groups'], 'groupid');
 					$template['groups'] = zbx_toObject(array_unique(array_merge($current_groupids, $new_groupids)),
 						'groupid'
 					);
 				}
-				elseif ($new_groupids && $mass_update_groups == ZBX_MASSUPDATE_ACTION_REPLACE) {
+				elseif ($new_groupids && $mass_update_groups == ZBX_ACTION_REPLACE) {
 					$template['groups'] = zbx_toObject($new_groupids, 'groupid');
 				}
 				elseif ($remove_groupids) {
@@ -354,7 +347,7 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 			}
 
 			if (array_key_exists('tags', $visible)) {
-				if ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD) {
+				if ($tags && $mass_update_tags == ZBX_ACTION_ADD) {
 					$unique_tags = [];
 
 					foreach (array_merge($template['tags'], $tags) as $tag) {
@@ -363,10 +356,10 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 
 					$template['tags'] = array_values($unique_tags);
 				}
-				elseif ($mass_update_tags == ZBX_MASSUPDATE_ACTION_REPLACE) {
+				elseif ($mass_update_tags == ZBX_ACTION_REPLACE) {
 					$template['tags'] = $tags;
 				}
-				elseif ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
+				elseif ($tags && $mass_update_tags == ZBX_ACTION_REMOVE) {
 					$diff_tags = [];
 
 					foreach ($template['tags'] as $a) {

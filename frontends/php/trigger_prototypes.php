@@ -55,9 +55,7 @@ $fields = [
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
 	'mass_update_tags'	=>						[T_ZBX_INT, O_OPT, null,
-													IN([ZBX_MASSUPDATE_ACTION_ADD, ZBX_MASSUPDATE_ACTION_REPLACE,
-														ZBX_MASSUPDATE_ACTION_REMOVE
-													]),
+													IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 													null
 												],
 	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
@@ -390,9 +388,9 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 		];
 
 		if (array_key_exists('tags', $visible)) {
-			$mass_update_tags = getRequest('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD);
+			$mass_update_tags = getRequest('mass_update_tags', ZBX_ACTION_ADD);
 
-			if ($mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD || $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
+			if ($mass_update_tags == ZBX_ACTION_ADD || $mass_update_tags == ZBX_ACTION_REMOVE) {
 				$options['selectTags'] = ['tag', 'value'];
 			}
 
@@ -421,7 +419,7 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 					}
 
 					if (array_key_exists('tags', $visible)) {
-						if ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD) {
+						if ($tags && $mass_update_tags == ZBX_ACTION_ADD) {
 							$unique_tags = [];
 
 							foreach (array_merge($triggers[$triggerid]['tags'], $tags) as $tag) {
@@ -430,10 +428,10 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 
 							$trigger['tags'] = array_values($unique_tags);
 						}
-						elseif ($mass_update_tags == ZBX_MASSUPDATE_ACTION_REPLACE) {
+						elseif ($mass_update_tags == ZBX_ACTION_REPLACE) {
 							$trigger['tags'] = $tags;
 						}
-						elseif ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
+						elseif ($tags && $mass_update_tags == ZBX_ACTION_REMOVE) {
 							$diff_tags = [];
 
 							foreach ($triggers[$triggerid]['tags'] as $a) {

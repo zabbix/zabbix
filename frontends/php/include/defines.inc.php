@@ -193,11 +193,6 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
 
-// Multiselect helper buttons that allow selected objects to be added, replaced or removed.
-define('ZBX_MULTISELECT_ADD',		0);
-define('ZBX_MULTISELECT_REPLACE',	1);
-define('ZBX_MULTISELECT_REMOVE',	2);
-
 // Maximum number of tags to display.
 define('ZBX_TAG_COUNT_DEFAULT', 3);
 
@@ -1279,10 +1274,6 @@ define('DAY_IN_YEAR', 365);
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
 
-define('ZBX_MASSUPDATE_ACTION_ADD',		0);
-define('ZBX_MASSUPDATE_ACTION_REPLACE',	1);
-define('ZBX_MASSUPDATE_ACTION_REMOVE',	2);
-
 // Layout
 define('ZBX_LAYOUT_NORMAL',     0);
 define('ZBX_LAYOUT_FULLSCREEN', 1);
@@ -1315,6 +1306,11 @@ define('ZBX_HOST_INTERFACE_WIDTH',				750);
 
 // overviews help
 define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
+
+// Helper buttons that allow selected objects to be added, replaced or removed.
+define('ZBX_ACTION_ADD',		0);
+define('ZBX_ACTION_REPLACE',	1);
+define('ZBX_ACTION_REMOVE',		2);
 
 // Maximum width for popups in Actions column for problems.
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);

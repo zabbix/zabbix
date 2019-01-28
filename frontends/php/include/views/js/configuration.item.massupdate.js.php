@@ -289,7 +289,7 @@
 
 		$('input[name=massupdate_app_action]').change(function() {
 			var massupdate_app_action = $('input[name=massupdate_app_action]:checked').val(),
-				add_new = !(massupdate_app_action == <?= ZBX_MULTISELECT_REMOVE ?>);
+				add_new = !(massupdate_app_action == <?= ZBX_ACTION_REMOVE ?>);
 
 			$('#applications_').multiSelect('modify', {'addNew': add_new});
 		});
@@ -297,7 +297,7 @@
 		<?php if (array_key_exists('parent_discoveryid', $data)): ?>
 			$('input[name=massupdate_app_prot_action]').change(function() {
 				var massupdate_app_prot_action = $('input[name=massupdate_app_prot_action]:checked').val(),
-					add_new = !(massupdate_app_prot_action == <?= ZBX_MULTISELECT_REMOVE ?>);
+					add_new = !(massupdate_app_prot_action == <?= ZBX_ACTION_REMOVE ?>);
 
 				$('#application_prototypes_').multiSelect('modify', {'addNew': add_new});
 			});
