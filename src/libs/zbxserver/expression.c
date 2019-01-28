@@ -4232,7 +4232,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
-					DCget_user_macro((const uint64_t *)dc_item->host.hostid, 1, m, &replace_to);
+					DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
 				{
