@@ -3301,9 +3301,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Remote Zabbix server:process.housekeeper.avg.busy.avg(10m)}&gt;75</expression>
+            <expression>{Template App Remote Zabbix server:process.housekeeper.avg.busy.avg(30m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Remote Zabbix server:process.housekeeper.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Template App Remote Zabbix server:process.housekeeper.avg.busy.avg(30m)}&lt;65</recovery_expression>
             <name>Zabbix housekeeper processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>

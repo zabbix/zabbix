@@ -1763,7 +1763,7 @@
                     <preprocessing>
                         <step>
                             <type>12</type>
-                            <params>$.data.wcache.values.['not supported']</params>
+                            <params>$.data.wcache.values['not supported']</params>
                             <error_handler>0</error_handler>
                             <error_handler_params/>
                         </step>
@@ -2448,7 +2448,7 @@
             <expression>{Template App Remote Zabbix proxy:process.history_syncer.avg.busy.avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
             <recovery_expression>{Template App Remote Zabbix proxy:process.history_syncer.avg.busy.avg(10m)}&lt;65</recovery_expression>
-            <name>Zabbix history_syncer processes more than 75% busy</name>
+            <name>Zabbix history syncer processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
             <url/>
