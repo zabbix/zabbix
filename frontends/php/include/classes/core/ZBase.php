@@ -307,6 +307,9 @@ class ZBase {
 
 	/**
 	 * Initialize translations.
+	 *
+	 * @param array  $user_data          Array of user data.
+	 * @param string $user_data['lang']  Language.
 	 */
 	protected function initLocales(array $user_data) {
 		init_mbstrings();
