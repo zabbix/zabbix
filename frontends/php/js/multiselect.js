@@ -205,34 +205,6 @@ jQuery(function($) {
 		},
 
 		/**
-		 * Set multi select option.
-		 *
-		 * @param {string} key
-		 * @param {*}      value
-		 *
-		 * @return jQuery
-		 */
-		setOption: function(key, value) {
-			return this.each(function() {
-				var $obj = $(this),
-					ms = $(this).data('multiSelect');
-
-				ms.options[key] = value;
-
-				if (key === 'addNew') {
-					$('input[name*="[new]"]', $obj)
-						.prop('disabled', !value)
-						.each(function() {
-							$('.selected li[data-id="'+this.value+'"]', $obj).toggle(value);
-						});
-
-					hideAvailable($obj);
-					cleanLastSearch($obj);
-				}
-			});
-		},
-
-		/**
 		 * Modify one or more multiselect options after multiselect object has been created.
 		 *
 		 * @return jQuery

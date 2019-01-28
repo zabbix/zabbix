@@ -6,9 +6,10 @@
 	jQuery(function($) {
 		<?php if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN): ?>
 			$('input[name=mass_update_groups]').on('change', function() {
-				$('#groups_').multiSelect('setOption', 'addNew',
-					(this.value == <?= ZBX_ACTION_ADD ?> || this.value == <?= ZBX_ACTION_REPLACE ?>)
-				);
+				var mass_update_groups = $(this).is(':checked').val(),
+					add_new = !(mass_update_groups == <?= ZBX_ACTION_REMOVE ?>);
+
+				$('#groups_').multiSelect('modify', {'addNew': add_new});
 			});
 		<?php endif ?>
 
