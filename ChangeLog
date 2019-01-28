@@ -1,7 +1,5 @@
 Changes for 4.0.4rc2
 
-New features:
-
 Bug fixes:
 ..F....... [ZBXNEXT-4872] reverted SVG graph timeline changes to previous state (miks)
 
