@@ -249,6 +249,10 @@ if (isset($_REQUEST['form'])) {
 		$data['drule']['name_source'] = ZBX_DISCOVERY_UNSPEC;
 
 		if (!empty($data['drule']['dchecks'])) {
+			$dcheck = reset($data['drule']['dchecks']);
+			$data['drule']['host_source'] = $dcheck['host_source'];
+			$data['drule']['name_source'] = $dcheck['name_source'];
+
 			foreach ($data['drule']['dchecks'] as $id => $dcheck) {
 				if ($dcheck['uniq']) {
 					$data['drule']['uniqueness_criteria'] = $dcheck['dcheckid'];

@@ -581,6 +581,16 @@
 			delete dCheck.snmp_oid;
 		}
 
+		var elements = {
+			host_source: '<?= ZBX_DISCOVERY_DNS ?>',
+			name_source: '<?= ZBX_DISCOVERY_UNSPEC ?>'
+		};
+
+		jQuery.each(elements, function(key, value) {
+			var source = jQuery('[name="' + key + '"]:checked');
+			dCheck[key] = (source.length > 0 && !source.attr('data-id')) ? source.val() : value;
+		});
+
 		// get check id
 		dCheck.dcheckid = (typeof dcheckId === 'undefined') ? getUniqueId() : dcheckId;
 
@@ -732,9 +742,6 @@
 				if (dCheck.key_) {
 					dCheck.name += ' "' + dCheck.key_ + '"';
 				}
-
-				dCheck.host_source = '<?= ZBX_DISCOVERY_DNS ?>';
-				dCheck.name_source = '<?= ZBX_DISCOVERY_UNSPEC ?>';
 
 				addPopupValues([dCheck]);
 
