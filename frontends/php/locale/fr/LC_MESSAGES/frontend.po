@@ -2071,7 +2071,7 @@ msgstr "Impossible de supprimer le déclencheur d'un modèle \"%1$s:%2$s\"."
 #: include/classes/api/services/CTriggerPrototype.php:541
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr "Impossible de supprimer le prototype de déclencheur basé sur un modèle \"%1$s:%2$s\"."
+msgstr "Impossible de supprimer le prototype de déclencheur basé sur un modèle."
 
 #: include/classes/api/services/CHttpTest.php:557
 #, c-format
