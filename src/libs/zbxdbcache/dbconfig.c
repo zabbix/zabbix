@@ -11691,6 +11691,38 @@ void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_get_host_inventory_value_by_hostid                            *
+ *                                                                            *
+ * Purpose: find inventory value in automatically populated cache, if not     *
+ *          found then look in main inventory cache                           *
+ *                                                                            *
+ * Comments: This function must be called inside configuration cache read     *
+ *           (or write) lock.                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_get_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **replace_to, int value_idx)
+{
+	const ZBX_DC_HOST_INVENTORY	*dc_inventory;
+
+	if (NULL != (dc_inventory = (const ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories_auto,
+			&hostid)) && NULL != dc_inventory->values[value_idx])
+	{
+		*replace_to = zbx_strdup(*replace_to, dc_inventory->values[value_idx]);
+		return SUCCEED;
+	}
+
+	if (NULL != (dc_inventory = (const ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories,
+			&hostid)))
+	{
+		*replace_to = zbx_strdup(*replace_to, dc_inventory->values[value_idx]);
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCget_host_inventory_value_by_itemid                             *
  *                                                                            *
  * Purpose: find inventory value in automatically populated cache, if not     *
@@ -11699,26 +11731,13 @@ void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values)
  ******************************************************************************/
 int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx)
 {
-	const ZBX_DC_ITEM		*dc_item;
-	const ZBX_DC_HOST_INVENTORY	*dc_inventory;
-	int				ret = FAIL;
+	const ZBX_DC_ITEM	*dc_item;
+	int			ret = FAIL;
 
 	RDLOCK_CACHE;
 
 	if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
-	{
-		if (NULL != (dc_inventory = (const ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories_auto, &dc_item->hostid)) &&
-				NULL != dc_inventory->values[value_idx])
-		{
-			*replace_to = zbx_strdup(*replace_to, dc_inventory->values[value_idx]);
-			ret = SUCCEED;
-		}
-		else if (NULL != (dc_inventory = (const ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories, &dc_item->hostid)))
-		{
-			*replace_to = zbx_strdup(*replace_to, dc_inventory->values[value_idx]);
-			ret = SUCCEED;
-		}
-	}
+		ret = dc_get_host_inventory_value_by_hostid(dc_item->hostid, replace_to, value_idx);
 
 	UNLOCK_CACHE;
 
@@ -11735,22 +11754,11 @@ int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to,
  ******************************************************************************/
 int	DCget_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **replace_to, int value_idx)
 {
-	const ZBX_DC_HOST_INVENTORY	*dc_inventory;
-	int				ret = FAIL;
+	int	ret;
 
 	RDLOCK_CACHE;
 
-	if (NULL != (dc_inventory = (const ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories_auto, &hostid)) &&
-			NULL != dc_inventory->values[value_idx])
-	{
-		*replace_to = zbx_strdup(*replace_to, dc_inventory->values[value_idx]);
-		ret = SUCCEED;
-	}
-	else if (NULL != (dc_inventory = (const ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories, &hostid)))
-	{
-		*replace_to = zbx_strdup(*replace_to, dc_inventory->values[value_idx]);
-		ret = SUCCEED;
-	}
+	ret = dc_get_host_inventory_value_by_hostid(hostid, replace_to, value_idx);
 
 	UNLOCK_CACHE;
 
