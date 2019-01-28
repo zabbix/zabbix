@@ -1645,28 +1645,6 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	return SUCCEED;
 }
 
-static int	dbsync_compare_template_item(const ZBX_DC_TEMPLATE_ITEM *item, const DB_ROW dbrow)
-{
-	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_uint64(dbrow[2], item->templateid))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	dbsync_compare_prototype_item(const ZBX_DC_PROTOTYPE_ITEM *item, const DB_ROW dbrow)
-{
-	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_uint64(dbrow[2], item->templateid))
-		return FAIL;
-
-	return SUCCEED;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: dbsync_item_preproc_row                                          *
@@ -1809,6 +1787,17 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 	return SUCCEED;
 }
 
+static int	dbsync_compare_template_item(const ZBX_DC_TEMPLATE_ITEM *item, const DB_ROW dbrow)
+{
+	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_uint64(dbrow[2], item->templateid))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_dbsync_compare_template_items                                *
@@ -1856,8 +1845,11 @@ int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync)
 
 		row = dbsync_preproc_row(sync, dbrow);
 
-		if (NULL == (item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_search(&dbsync_env.cache->template_items, &rowid)))
+		if (NULL == (item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_search(&dbsync_env.cache->template_items,
+				&rowid)))
+		{
 			tag = ZBX_DBSYNC_ROW_ADD;
+		}
 		else if (FAIL == dbsync_compare_template_item(item, row))
 			tag = ZBX_DBSYNC_ROW_UPDATE;
 
@@ -1878,9 +1870,20 @@ int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync)
 	return SUCCEED;
 }
 
+static int	dbsync_compare_prototype_item(const ZBX_DC_PROTOTYPE_ITEM *item, const DB_ROW dbrow)
+{
+	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_uint64(dbrow[2], item->templateid))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dbsync_compare_template_items                                *
+ * Function: zbx_dbsync_compare_prototype_items                               *
  *                                                                            *
  * Purpose: compares lld item prototypes with configuration cache             *
  *                                                                            *
@@ -1925,8 +1928,11 @@ int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync)
 
 		row = dbsync_preproc_row(sync, dbrow);
 
-		if (NULL == (item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&dbsync_env.cache->prototype_items, &rowid)))
+		if (NULL == (item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&dbsync_env.cache->prototype_items,
+				&rowid)))
+		{
 			tag = ZBX_DBSYNC_ROW_ADD;
+		}
 		else if (FAIL == dbsync_compare_prototype_item(item, row))
 			tag = ZBX_DBSYNC_ROW_UPDATE;
 

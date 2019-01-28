@@ -3083,14 +3083,15 @@ static void	DCsync_prototype_items(zbx_dbsync_t *sync)
 			break;
 
 		ZBX_STR2UINT64(itemid, row[0]);
-		item = (ZBX_DC_PROTOTYPE_ITEM *)DCfind_id(&config->prototype_items, itemid, sizeof(ZBX_DC_PROTOTYPE_ITEM), &found);
+		item = (ZBX_DC_PROTOTYPE_ITEM *)DCfind_id(&config->prototype_items, itemid,
+				sizeof(ZBX_DC_PROTOTYPE_ITEM), &found);
 
 		ZBX_STR2UINT64(item->hostid, row[1]);
 
 		ZBX_DBROW2UINT64(item->templateid, row[2]);
 	}
 
-	/* remove deleted template items from buffer */
+	/* remove deleted prototype items from buffer */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
 		if (NULL == (item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&config->prototype_items, &rowid)))
@@ -5040,14 +5041,10 @@ void	DCsync_configuration(unsigned char mode)
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_items(&items_sync))
 		goto out;
-	isec = zbx_time() - sec;
 
-	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_template_items(&template_items_sync))
 		goto out;
-	isec = zbx_time() - sec;
 
-	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_prototype_items(&prototype_items_sync))
 		goto out;
 	isec = zbx_time() - sec;
@@ -5058,28 +5055,24 @@ void	DCsync_configuration(unsigned char mode)
 	itempp_sec = zbx_time() - sec;
 
 	START_SYNC;
-	sec = zbx_time();
+
 	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
+	sec = zbx_time();
 	DCsync_interfaces(&if_sync);
 	ifsec2 = zbx_time() - sec;
 
-	sec = zbx_time();
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
+	sec = zbx_time();
 	DCsync_items(&items_sync, flags);
-	isec2 = zbx_time() - sec;
-
-	sec = zbx_time();
 	DCsync_template_items(&template_items_sync);
-	isec2 = zbx_time() - sec;
-
-	sec = zbx_time();
 	DCsync_prototype_items(&prototype_items_sync);
 	isec2 = zbx_time() - sec;
 
-	sec = zbx_time();
 	/* relies on items, must be after DCsync_items() */
+	sec = zbx_time();
 	DCsync_item_preproc(&itempp_sync, sec);
 	itempp_sec2 = zbx_time() - sec;
+
 	config->item_sync_ts = time(NULL);
 	FINISH_SYNC;
 
