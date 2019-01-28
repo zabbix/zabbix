@@ -428,10 +428,10 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 		url: url.getUrl(),
 		type: 'post',
 		dataType: 'json',
+		data: options,
 		beforeSend: function(jqXHR) {
 			overlayDialogue(ovelay_properties, trigger_elmnt, jqXHR);
 		},
-		data: options,
 		success: function(resp) {
 			if (typeof resp.errors !== 'undefined') {
 				ovelay_properties['content'] = resp.errors;
