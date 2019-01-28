@@ -318,7 +318,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$expression,
 		$status,
 		$data['show_info_column'] ? makeInformationList($info_icons) : null,
-		array_key_exists($triggerid, $data['tags']) ? $data['tags'][$triggerid] : ''
+		$data['tags'][$triggerid]
 	]);
 }
 
