@@ -124,34 +124,34 @@ static void	process_trigger_tag(const zbx_tag_t *tag)
 	validate_and_add_tag(t);
 }
 
-static void	substitute_host_tag_macro(const DC_ITEM *dc_item, char **str)
+static void	substitute_item_tag_macro(const DC_ITEM *dc_item, char **str)
 {
 	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, dc_item, NULL,
-			NULL, str, MACRO_TYPE_HOST_TAG, NULL, 0);
+			NULL, str, MACRO_TYPE_ITEM_TAG, NULL, 0);
 }
 
-static void	process_host_tag(const zbx_host_tag_t *host_tag)
+static void	process_item_tag(const zbx_item_tag_t *item_tag)
 {
 	zbx_tag_t	*t;
 	DC_ITEM		dc_item; /* used to pass data into substitute_simple_macros() function */
 
-	t = duplicate_tag(&host_tag->tag);
+	t = duplicate_tag(&item_tag->tag);
 
-	dc_item.host.hostid = host_tag->hostid;
-	dc_item.itemid = host_tag->itemid;
+	dc_item.host.hostid = item_tag->hostid;
+	dc_item.itemid = item_tag->itemid;
 
-	substitute_host_tag_macro(&dc_item, &t->tag);
-	substitute_host_tag_macro(&dc_item, &t->value);
+	substitute_item_tag_macro(&dc_item, &t->tag);
+	substitute_item_tag_macro(&dc_item, &t->value);
 	validate_and_add_tag(t);
 }
 
-static void	get_host_tags_by_expression(const char *expression, zbx_vector_ptr_t *host_tags)
+static void	get_item_tags_by_expression(const char *expression, zbx_vector_ptr_t *item_tags)
 {
 	zbx_vector_uint64_t	functionids;
 
 	zbx_vector_uint64_create(&functionids);
 	get_functionids(&functionids, expression);
-	DCget_host_tags_by_functionids(functionids.values, functionids.values_num, host_tags);
+	zbx_dc_get_item_tags_by_functionids(functionids.values, functionids.values_num, item_tags);
 	zbx_vector_uint64_destroy(&functionids);
 }
 
@@ -189,7 +189,7 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		unsigned char trigger_value, const char *error)
 {
 	int			i;
-	zbx_vector_ptr_t	host_tags;
+	zbx_vector_ptr_t	item_tags;
 
 	if (events_num == events_alloc)
 	{
@@ -240,16 +240,16 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 				process_trigger_tag((const zbx_tag_t *)trigger_tags->values[i]);
 		}
 
-		zbx_vector_ptr_create(&host_tags);
-		get_host_tags_by_expression(trigger_expression, &host_tags);
+		zbx_vector_ptr_create(&item_tags);
+		get_item_tags_by_expression(trigger_expression, &item_tags);
 
-		for (i = 0; i < host_tags.values_num; i++)
+		for (i = 0; i < item_tags.values_num; i++)
 		{
-			process_host_tag((const zbx_host_tag_t *)host_tags.values[i]);
-			zbx_free_host_tag(host_tags.values[i]);
+			process_item_tag((const zbx_item_tag_t *)item_tags.values[i]);
+			zbx_free_item_tag(item_tags.values[i]);
 		}
 
-		zbx_vector_ptr_destroy(&host_tags);
+		zbx_vector_ptr_destroy(&item_tags);
 	}
 	else if (EVENT_SOURCE_INTERNAL == source && NULL != error)
 		events[events_num].name = zbx_strdup(NULL, error);

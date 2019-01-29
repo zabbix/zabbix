@@ -4224,7 +4224,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 			}
 		}
-		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_HOST_TAG))
+		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_ITEM_TAG))
 		{
 			/* Using dc_item to pass itemid and hostid only, all other fields are not initialized! */
 

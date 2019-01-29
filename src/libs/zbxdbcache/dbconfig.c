@@ -6726,11 +6726,11 @@ void	zbx_free_tag(zbx_tag_t *tag)
 	zbx_free(tag);
 }
 
-void	zbx_free_host_tag(zbx_host_tag_t *host_tag)
+void	zbx_free_item_tag(zbx_item_tag_t *item_tag)
 {
-	zbx_free(host_tag->tag.tag);
-	zbx_free(host_tag->tag.value);
-	zbx_free(host_tag);
+	zbx_free(item_tag->tag.tag);
+	zbx_free(item_tag->tag.value);
+	zbx_free(item_tag);
 }
 
 static void	DCclean_trigger(DC_TRIGGER *trigger)
@@ -12070,11 +12070,11 @@ void	zbx_dc_cleanup_data_sessions(void)
 	UNLOCK_CACHE;
 }
 
-static void	zbx_gather_tags_from_host(zbx_uint64_t hostid, zbx_vector_ptr_t *host_tags)
+static void	zbx_gather_tags_from_host(zbx_uint64_t hostid, zbx_vector_ptr_t *item_tags)
 {
 	zbx_dc_host_tag_index_t 	*dc_tag_index;
 	zbx_dc_host_tag_t		*dc_tag;
-	zbx_host_tag_t			*tag;
+	zbx_item_tag_t			*tag;
 	int				i;
 
 	if (NULL != (dc_tag_index = zbx_hashset_search(&config->host_tags_index, &hostid)))
@@ -12082,43 +12082,43 @@ static void	zbx_gather_tags_from_host(zbx_uint64_t hostid, zbx_vector_ptr_t *hos
 		for (i = 0; i < dc_tag_index->tags.values_num; i++)
 		{
 			dc_tag = (zbx_dc_host_tag_t *)dc_tag_index->tags.values[i];
-			tag = (zbx_host_tag_t *) zbx_malloc(NULL, sizeof(zbx_host_tag_t));
+			tag = (zbx_item_tag_t *) zbx_malloc(NULL, sizeof(zbx_item_tag_t));
 			tag->tag.tag = zbx_strdup(NULL, dc_tag->tag);
 			tag->tag.value = zbx_strdup(NULL, dc_tag->value);
-			zbx_vector_ptr_append(host_tags, tag);
+			zbx_vector_ptr_append(item_tags, tag);
 		}
 	}
 }
 
-static void	zbx_gather_tags_from_template_chain(zbx_uint64_t itemid, zbx_vector_ptr_t *host_tags)
+static void	zbx_gather_tags_from_template_chain(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 {
 	ZBX_DC_TEMPLATE_ITEM	*item;
 
 	if (NULL != (item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_search(&config->template_items, &itemid)))
 	{
-		zbx_gather_tags_from_host(item->hostid, host_tags);
+		zbx_gather_tags_from_host(item->hostid, item_tags);
 
 		if (0 != item->templateid)
-			zbx_gather_tags_from_template_chain(item->templateid, host_tags);
+			zbx_gather_tags_from_template_chain(item->templateid, item_tags);
 	}
 }
 
-static void	zbx_obtain_host_tags_from_item(zbx_uint64_t itemid, zbx_vector_ptr_t *host_tags)
+static void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 {
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_PROTOTYPE_ITEM	*lld_item;
-	zbx_host_tag_t		*tag;
+	zbx_item_tag_t		*tag;
 	int			n, i;
 
 	if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
 		return;
 
-	n = host_tags->values_num;
+	n = item_tags->values_num;
 
-	zbx_gather_tags_from_host(item->hostid, host_tags);
+	zbx_gather_tags_from_host(item->hostid, item_tags);
 
 	if (0 != item->templateid)
-		zbx_gather_tags_from_template_chain(item->templateid, host_tags);
+		zbx_gather_tags_from_template_chain(item->templateid, item_tags);
 
 	/* check for discovered item */
 	if (0 != item->parent_itemid && 4 == item->flags)
@@ -12127,20 +12127,21 @@ static void	zbx_obtain_host_tags_from_item(zbx_uint64_t itemid, zbx_vector_ptr_t
 				&item->parent_itemid)))
 		{
 			if (0 != item->templateid)
-				zbx_gather_tags_from_template_chain(lld_item->templateid, host_tags);
+				zbx_gather_tags_from_template_chain(lld_item->templateid, item_tags);
 		}
 	}
 
 	/* assign hostid and itemid values to newly gathered tags */
-	for (i = n; i < host_tags->values_num; i++)
+	for (i = n; i < item_tags->values_num; i++)
 	{
-		tag = (zbx_host_tag_t *)host_tags->values[i];
+		tag = (zbx_item_tag_t *)item_tags->values[i];
 		tag->hostid = item->hostid;
 		tag->itemid = item->itemid;
 	}
 }
 
-void	DCget_host_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num, zbx_vector_ptr_t *host_tags)
+void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num,
+		zbx_vector_ptr_t *item_tags)
 {
 	const ZBX_DC_FUNCTION	*dc_function;
 	size_t			i;
@@ -12149,10 +12150,13 @@ void	DCget_host_tags_by_functionids(const zbx_uint64_t *functionids, size_t func
 
 	for (i = 0; i < functionids_num; i++)
 	{
-		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionids[i])))
+		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+				&functionids[i])))
+		{
 			continue;
+		}
 
-		zbx_obtain_host_tags_from_item(dc_function->itemid, host_tags);
+		zbx_get_item_tags(dc_function->itemid, item_tags);
 	}
 
 	UNLOCK_CACHE;

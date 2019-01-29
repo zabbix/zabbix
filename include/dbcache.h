@@ -223,7 +223,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	zbx_tag_t	tag;
 }
-zbx_host_tag_t;
+zbx_item_tag_t;
 
 #define ZBX_DC_TRIGGER_PROBLEM_EXPRESSION	0x1	/* this flag shows that trigger value recalculation is  */
 							/* initiated by a time-based function or a new value of */
@@ -777,7 +777,7 @@ typedef struct
 zbx_hc_item_t;
 
 void	zbx_free_tag(zbx_tag_t *tag);
-void	zbx_free_host_tag(zbx_host_tag_t *host_tag);
+void	zbx_free_item_tag(zbx_item_tag_t *host_tag);
 
 int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error);
 void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version);
@@ -882,6 +882,6 @@ void	zbx_dc_maintenance_reset_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flags(void);
 
-void	DCget_host_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num, zbx_vector_ptr_t *host_tags);
+void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num, zbx_vector_ptr_t *host_tags);
 
 #endif
