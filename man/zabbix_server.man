@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_SERVER 8 "2018\-10\-11" Zabbix
+.TH ZABBIX_SERVER 8 "2019\-01\-29" Zabbix
 .SH NAME
 zabbix_server \- Zabbix server daemon
 .SH SYNOPSIS

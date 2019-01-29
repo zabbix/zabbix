@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_AGENTD 8 "2018\-10\-11" Zabbix
+.TH ZABBIX_AGENTD 8 "2019\-01\-29" Zabbix
 .SH NAME
 zabbix_agentd \- Zabbix agent daemon
 .SH SYNOPSIS
