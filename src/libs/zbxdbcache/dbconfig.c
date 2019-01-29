@@ -12126,7 +12126,7 @@ static void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 		if (NULL != (lld_item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&config->prototype_items,
 				&item->parent_itemid)))
 		{
-			if (0 != item->templateid)
+			if (0 != lld_item->templateid)
 				zbx_gather_tags_from_template_chain(lld_item->templateid, item_tags);
 		}
 	}
