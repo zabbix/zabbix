@@ -49,7 +49,7 @@ zbx_uint32_t	zbx_variant_data_bin_get(const zbx_variant_data_bin_t *bin, void **
 
 	memcpy(&size, bin, sizeof(zbx_uint32_t));
 	if (NULL != data)
-		*data =  ((char *)bin) + sizeof(size);
+		*data = ((char *)bin) + sizeof(size);
 	return size;
 }
 
@@ -277,15 +277,13 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 			return "";
 		case ZBX_VARIANT_BIN:
 			memcpy(&size, value->data.bin, sizeof(size));
-			len = MIN(sizeof(buffer) / 3,  size);
-			if (0 != len)
+			if (0 != (len = MIN(sizeof(buffer) / 3, size)))
 			{
-				unsigned char	*ptr = (unsigned char *)value->data.bin + sizeof(size);
+				const unsigned char	*ptr = (const unsigned char *)value->data.bin + sizeof(size);
 
 				for (i = 0; i < len; i++)
-				{
 					zbx_snprintf(buffer + i * 3, sizeof(buffer) - i * 3, "%02x ", ptr[i]);
-				}
+
 				buffer[i * 3 - 1] = '\0';
 			}
 			else
