@@ -761,7 +761,10 @@ typedef struct
 	zbx_hashset_t		hosts_p;		/* for searching proxies by 'host' name */
 	zbx_hashset_t		proxies;
 	zbx_hashset_t		host_inventories;
-	zbx_hashset_t		host_inventories_auto;	/* for caching of automatically populated host inventories */
+	zbx_hashset_t		host_inventories_auto;	/* For caching of automatically populated host inventories. */
+	 	 	 	 	 	 	/* Configuration syncer will read host_inventories without  */
+							/* locking cache and therefore it cannot be updated by      */
+							/* by history syncers when new data is received.	    */
 	zbx_hashset_t		ipmihosts;
 	zbx_hashset_t		htmpls;
 	zbx_hashset_t		gmacros;
