@@ -1175,10 +1175,6 @@
 				}
 				widget['content_body'].append(resp.body);
 
-				if (typeof(resp.body_class) !== 'undefined') {
-					widget['content_body'].addClass(resp.body_class);
-				}
-
 				if (typeof(resp.debug) !== 'undefined') {
 					widget['content_body'].append(resp.debug);
 				}
@@ -1604,8 +1600,6 @@
 				else {
 					data.new_widget_placeholder.container.removeAttr('style');
 				}
-
-				resizeDashboardGrid($obj, data);
 			})
 			.on('mouseenter mousemove', function(event) {
 				var drag = (data['pos-action'] === 'add'),
@@ -1701,7 +1695,9 @@
 					}
 				}
 
-				resizeDashboardGrid($obj, data, pos.y + pos.height);
+				if ((pos.y + pos.height) > data['options']['rows']) {
+					resizeDashboardGrid($obj, data, pos.y + pos.height);
+				}
 				data.add_widget_dimension = $.extend(data.add_widget_dimension, pos);
 
 				data.new_widget_placeholder.container
