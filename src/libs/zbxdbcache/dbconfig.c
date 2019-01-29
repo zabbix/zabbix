@@ -3045,10 +3045,10 @@ static void	DCsync_template_items(zbx_dbsync_t *sync)
 			break;
 
 		ZBX_STR2UINT64(itemid, row[0]);
-		item = (ZBX_DC_TEMPLATE_ITEM *)DCfind_id(&config->template_items, itemid, sizeof(ZBX_DC_TEMPLATE_ITEM), &found);
+		item = (ZBX_DC_TEMPLATE_ITEM *)DCfind_id(&config->template_items, itemid, sizeof(ZBX_DC_TEMPLATE_ITEM),
+				&found);
 
 		ZBX_STR2UINT64(item->hostid, row[1]);
-
 		ZBX_DBROW2UINT64(item->templateid, row[2]);
 	}
 
@@ -3087,7 +3087,6 @@ static void	DCsync_prototype_items(zbx_dbsync_t *sync)
 				sizeof(ZBX_DC_PROTOTYPE_ITEM), &found);
 
 		ZBX_STR2UINT64(item->hostid, row[1]);
-
 		ZBX_DBROW2UINT64(item->templateid, row[2]);
 	}
 
