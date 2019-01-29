@@ -1,7 +1,7 @@
 <?php
 /*
  ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,6 +68,28 @@ class CArrayHelper {
 		foreach ($keys as $key) {
 			if (array_key_exists($key, $array)) {
 				$result[$key] = $array[$key];
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Select sub-array of array items with keys in given numeric range.
+	 *
+	 * @static
+	 *
+	 * @param array $array    Array with numeric keys to test for given range.
+	 * @param int   $start    Range start value.
+	 * @param int   $end      Range end value.
+	 *
+	 * @return array
+	 */
+	public static function getByKeysRange(array $array, $start, $end) {
+		$result = [];
+		foreach ($array as $key => $val) {
+			if ($key >= $start && $key <= $end) {
+				$result[$key] = $val;
 			}
 		}
 

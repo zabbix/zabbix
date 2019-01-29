@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -458,14 +458,14 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 				"hk_events_discovery,hk_events_autoreg,hk_services_mode,"
 				"hk_services,hk_audit_mode,hk_audit,hk_sessions_mode,hk_sessions,"
 				"hk_history_mode,hk_history_global,hk_history,hk_trends_mode,"
-				"hk_trends_global,hk_trends,default_inventory_mode"
+				"hk_trends_global,hk_trends,default_inventory_mode,db_extension"
 			" from config"
 			" order by configid")))
 	{
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 27, NULL);
+	dbsync_prepare(sync, 28, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

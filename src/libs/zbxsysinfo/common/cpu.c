@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,8 +53,7 @@ int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	for (i = 0; i < cpus.values_num; i++)
 	{

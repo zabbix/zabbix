@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "discovery_groupid:" ZBX_FS_UI64, config->config->discovery_groupid);
 	zabbix_log(LOG_LEVEL_TRACE, "snmptrap_logging:%u", config->config->snmptrap_logging);
 	zabbix_log(LOG_LEVEL_TRACE, "default_inventory_mode:%d", config->config->default_inventory_mode);
+	zabbix_log(LOG_LEVEL_TRACE, "db_extension: %s", config->config->db_extension);
 
 	zabbix_log(LOG_LEVEL_TRACE, "severity names:");
 	for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)

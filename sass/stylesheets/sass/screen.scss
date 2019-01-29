@@ -11,15 +11,16 @@ html {
 }
 
 body {
-	font: {
-		family: $font-stack;
-		size: $font-body-size;
-	}
 	line-height: $body-line-height;
 	color: $font-color;
 	background-color: $body-bg-color;
 	margin-bottom: 60px;
 	min-width: 950px;
+
+	font: {
+		family: $font-stack;
+		size: $font-body-size;
+	}
 }
 
 a {
@@ -1644,6 +1645,14 @@ output {
 	color: $dark-yellow;
 }
 
+.suggest-new {
+	border-top: 1px solid $form-border-color;
+
+	span:first-child {
+		font-weight: bold;
+	}
+}
+
 // Forms
 .table-forms-container {
 	margin: 0 0 10px 0;
@@ -1725,6 +1734,7 @@ output {
 		padding: 5px 0 5px 10px;
 		vertical-align: middle;
 		width: 85%;
+		position: relative;
 
 		&.has-before {
 			padding-top: 0px;
@@ -1754,10 +1764,12 @@ output {
 				}
 			}
 		}
-	}
 
-	.table-forms-td-right {
-		position: relative;
+		.table-forms-separator {
+			.radio-segmented + .multiselect-wrapper {
+				margin-top: 5px;
+			}
+		}
 	}
 
 	h4 {
@@ -2155,6 +2167,10 @@ select {
 		&:active {
 			border-color: $form-border-color;
 		}
+	}
+
+	+ label.label-pos-left span {
+		margin-left: 4px;
 	}
 
 	&:focus + label span {
@@ -4246,8 +4262,8 @@ $form-icon-btn: (
 	stroke-width: 2px;
 }
 .svg-point-highlight {
-	fill: $font-color;
-	fill-opacity: 0.5;
+	fill: $font-color !important;
+	fill-opacity: 0.5 !important;
 }
 
 .svg-graph-preview {
