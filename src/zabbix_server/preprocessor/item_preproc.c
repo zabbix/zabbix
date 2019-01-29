@@ -1522,7 +1522,7 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
 static int	item_preproc_script(zbx_variant_t *value, const char *params, zbx_variant_t *bytecode, char **errmsg)
 {
 	char	*code, *output, *error = NULL;
-	int	size, ret;
+	int	size;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
@@ -1545,26 +1545,23 @@ static int	item_preproc_script(zbx_variant_t *value, const char *params, zbx_var
 
 	size = zbx_variant_data_bin_get(bytecode->data.bin, (void **)&code);
 
-	if (SUCCEED == (ret = zbx_es_execute(&es_engine, params, code, size, value->data.str, &output, errmsg)))
+	if (SUCCEED != zbx_es_execute(&es_engine, params, code, size, value->data.str, &output, errmsg))
 	{
-		zbx_variant_clear(value);
-
-		if (NULL != output)
-			zbx_variant_set_str(value, output);
-	}
-	else
-	{
-		if (3 <= zbx_es_get_runtime_error_num(&es_engine))
+		if (3 <= zbx_es_get_runtime_error_num(&es_engine) && SUCCEED != zbx_es_destroy_env(&es_engine, &error))
 		{
-			if (SUCCEED != zbx_es_destroy_env(&es_engine, &error))
-			{
-				zabbix_log(LOG_LEVEL_WARNING,
-						"Cannot destroy embedded scripting engine environment: %s", error);
-			}
+			zabbix_log(LOG_LEVEL_WARNING,
+					"Cannot destroy embedded scripting engine environment: %s", error);
 		}
+
+		return FAIL;
 	}
 
-	return ret;
+	zbx_variant_clear(value);
+
+	if (NULL != output)
+		zbx_variant_set_str(value, output);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
