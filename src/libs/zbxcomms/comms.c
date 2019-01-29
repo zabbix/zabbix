@@ -23,6 +23,13 @@
 #include "../zbxcrypto/tls_tcp.h"
 #include "zbxcompress.h"
 
+#ifdef _WINDOWS
+#include <VersionHelpers.h>
+#ifndef WSA_FLAG_NO_HANDLE_INHERIT
+#	define WSA_FLAG_NO_HANDLE_INHERIT	0x80	/* allow compilation on older Windows systems */
+#endif
+#endif
+
 #define IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
 #define IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
 
@@ -976,7 +983,11 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 					current_ai->ai_protocol)))
 #endif
 			{
+#ifdef _WINDOWS
+				zbx_set_socket_strerror("WSASocket() for [[%s]:%s] failed: %s",
+#else
 				zbx_set_socket_strerror("socket() for [[%s]:%s] failed: %s",
+#endif
 						ip ? ip : "-", port, strerror_from_system(zbx_socket_last_error()));
 #ifdef _WINDOWS
 				if (WSAEAFNOSUPPORT == zbx_socket_last_error())
@@ -1154,7 +1165,11 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 		if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
 #endif
 		{
-			zbx_set_socket_strerror("socket() for [[%s]:%hu] failed: %s",
+#ifdef _WINDOWS
+				zbx_set_socket_strerror("WSASocket() for [[%s]:%hu] failed: %s",
+#else
+				zbx_set_socket_strerror("socket() for [[%s]:%hu] failed: %s",
+#endif
 					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
 			goto out;
 		}
