@@ -236,34 +236,43 @@
 	/**
 	 * Rearrange widgets on drag operation.
 	 *
-	 * @param {array}  data    Array of widgets objects.
-	 * @param {object} widget  Moved widget object.
+	 * @param {array}  widgets  Array of widgets objects.
+	 * @param {object} widget   Moved widget object.
 	 */
-	function realignWidget(data, widget) {
-
-		var realign = function(widgets, widget) {
+	function realignWidget(widgets, widget) {
+		var realign = function(widgets, widget, allow_reorder) {
 			var next = [];
 
-			$.each(widgets, function() {
-				var w = this;
-
-				if (widget.uniqueid != w.uniqueid && rectOverlap(widget['current_pos'], w['current_pos'])) {
-					w['current_pos']['y'] = widget['current_pos'].y + widget['current_pos'].height;
-					next.push(w);
+			widgets.forEach(function(w) {
+				if (widget.uniqueid != w.uniqueid) {
+					if (rectOverlap(widget.current_pos, w.current_pos)
+						|| (!allow_reorder && 'affected_by_id' in w && w.affected_by_id == widget.uniqueid)
+					) {
+						w.current_pos.y = Math.max(w.current_pos.y, widget.current_pos.y + widget.current_pos.height);
+						next.push(w);
+					}
 				}
 			});
 
-			$.each(next, function() {
-				realign(data.widgets, this);
+			next.forEach(function(widget) {
+				realign(widgets, widget, false);
 			});
 		}
 
-		realign(sortWidgerts(data['widgets']), widget);
+		widgets.each(function(w) {
+			if (widget.uniqueid != w.uniqueid) {
+				w.current_pos = $.extend({}, w.pos);
+			}
+		});
+
+		realign(sortWidgets(widgets), widget, true);
 	}
 
-	function sortWidgerts(widgets) {
+	function sortWidgets(widgets, by_current) {
+		var by_current = by_current || false;
+
 		widgets.sort(function(box1, box2) {
-			return box1.pos.y - box2.pos.y;
+			return by_current ? box1.current_pos.y - box2.current_pos.y : box1.pos.y - box2.pos.y;
 		}).each(function(box, index) {
 			box.div.data('widget-index', index);
 		});
@@ -279,43 +288,44 @@
 	 * @param {number} max_rows  Dashboard rows count.
 	 */
 	function dragPrepare(widgets, widget, max_rows) {
-		var markAffected = function(pos) {
-			var box_pos = $.extend({}, pos);
-			box_pos.height++;
+		var markAffected = function(widgets, affected_by, affected_by_draggable) {
+			var w_pos = $.extend({}, affected_by.pos);
+			w_pos.height++;
 
-			$.map(widgets, function(box) {
-				return (!('affected' in box) && rectOverlap(box_pos, box.pos)) ? box : null;
-			}).each(function(box) {
-				if (box.uniqueid != widget.uniqueid) {
-					box.affected = 1;
-					markAffected(box.pos);
+			$.map(widgets, function(w) {
+				return !('affected' in w) && rectOverlap(w_pos, w.pos) ? w : null;
+			}).each(function(w) {
+				if (w.uniqueid != widget.uniqueid) {
+					w.affected = true;
+					w.affected_by_id = affected_by.uniqueid;
+					if (affected_by_draggable) {
+						w.affected_by_draggable = affected_by.uniqueid;
+					}
+					markAffected(widgets, w, affected_by_draggable);
 				}
 			});
 		};
 
-		widgets = sortWidgerts(widgets);
+		markAffected(widgets, widget, true);
 
-		markAffected(widget.pos);
+		widgets.forEach(function(w) {
+			delete w.affected;
+		});
 
-		widgets.each(function(box) {
-			box.div.css('background-color', '');
-			if (!('affected' in box)) {
-				return;
+		widgets.forEach(function(w) {
+			markAffected(widgets, w, false);
+		});
+
+		widgets.forEach(function(w) {
+			if ('affected_by_draggable' in w) {
+				w.pos.y -= widget.pos.height;
+
+				widgets.each(function(b) {
+					if (b.uniqueid != w.uniqueid && b.uniqueid != widget.uniqueid && rectOverlap(b.pos, w.pos)) {
+						w.pos.y = Math.max(w.pos.y, b.pos.y + b.pos.height);
+					}
+				});
 			}
-
-			delete box.affected;
-
-			box.pos.y = box.pos.y - widget.pos.height;
-			box.div.css('background-color', 'rgba(255, 0, 0, 0.1)');
-
-			widgets.each(function(b) {
-				if (b.uniqueid == box.uniqueid || b.uniqueid == widget.uniqueid || !rectOverlap(b.pos, box.pos)) {
-					return;
-				}
-
-				box.pos.y = Math.max(box.pos.y, b.pos.y + b.pos.height);
-				box.div.css('background-color', 'rgba(255, 0, 0, 0.6)');
-			});
 		});
 	}
 
@@ -404,6 +414,10 @@
 
 			if (box.current_pos[axis_key] > new_pos) {
 				// Should keep widget original position if compacted value is less than original.
+				for (i = box.current_pos[opposite_axis_key]; i < last; i++) {
+					margins[i] = box.current_pos[axis_key] + box.current_pos[size_key];
+				}
+
 				return;
 			}
 
@@ -613,6 +627,40 @@
 			});
 		}
 
+		/**
+		 * Perform additional check on validity of collapsed size. Collapsing is done if there is collision between
+		 * box on axis_key and box on {axis_key+scanline[size_key]} therefore box can be collapsed on collision with
+		 * itself, such situation can lead to missdetection of ability to be collapsed.
+		 */
+		affected.sort(function(box1, box2) {
+			return box2.current_pos[axis_key] - box1.current_pos[axis_key];
+		}).each(function(box) {
+			if (box.pos[size_key] > box.current_pos[size_key]) {
+				console
+					.groupCollapsed(`${size_key} correction on ${box.header}`);
+				var new_pos = $.extend({}, box.current_pos),
+					size = Math.min(box.pos[size_key], size_max - box.current_pos[axis_key]);
+
+				new_pos[size_key] = box.pos[size_key];
+				$.map(affected, function(col_box) {
+					return col_box.uniqueid != box.uniqueid && rectOverlap(col_box.current_pos, new_pos)
+						? col_box
+						: null;
+				}).each(function(col_box) {
+					console
+						.log(`${col_box.header} check ${axis_key}=${col_box.current_pos[axis_key]}, ${size_key}=${col_box.current_pos[axis_key] - box.current_pos[axis_key]}`);
+					size = Math.min(size,
+						col_box.current_pos[axis_key] - box.current_pos[axis_key]
+					);
+				});
+
+				console
+					.log(`${box.header} stepback fixed ${size_key} from ${box.current_pos[size_key]} to ${Math.max(size, size_min)}`);
+				console.groupEnd();
+				box.current_pos[size_key] = Math.max(size, size_min);
+			}
+		});
+
 		// Resize action for left/up is mirrored right/down action, mirror coordinates back.
 		if ('mirrored' in axis) {
 			widgets.each(function(box) {
@@ -805,21 +853,19 @@
 		setDivPosition(data['placeholder'], data, pos, true);
 
 		if (!posEquals(pos, widget['current_pos'])) {
-			resetCurrentPositions(data['widgets']);
 			widget['current_pos'] = pos;
+			realignWidget(data['widgets'], widget);
 
-			realignWidget(data, widget);
-
-			data.widgets.each(function(box) {
-				if (widget.uniqueid != box.uniqueid) {
-					setDivPosition(box['div'], data, box['current_pos'], false);
+			data['widgets'].forEach(function(w) {
+				if (widget.uniqueid != w.uniqueid) {
+					setDivPosition(w['div'], data, w['current_pos'], false);
 				}
 
-				rows = Math.max(rows, box.current_pos.y + box.current_pos.height);
+				rows = Math.max(rows, w['current_pos'].y + w['current_pos'].height);
 			});
 
-			if (rows != data['options']['rows']) {
-				data['options']['rows'] = rows;
+			if (rows > data['options']['rows']) {
+				data['options']['rows_actual'] = rows;
 				resizeDashboardGrid($obj, data, rows);
 			}
 		}
@@ -876,17 +922,17 @@
 				setResizableState('disable', data.widgets, '');
 
 				var	widget = getWidgetByTarget(data.widgets, ui.helper);
-				console.groupCollapsed(`start drag ${widget.header} is dragged`);
-				console
-					.log('initial position of widgets:', $.map(data.widgets, function(b) {return $.extend({header: b.header}, b.pos)}));
+				// console.groupCollapsed(`start drag ${widget.header} is dragged`);
+				// console
+				// 	.log('initial position of widgets:', $.map(data.widgets, function(b) {return $.extend({header: b.header}, b.pos)}));
 				dragPrepare(data.widgets, widget, data['options']['max-rows']);
-				console
-					.log('modified position of widgets:', $.map(data.widgets, function(b) {return $.extend({header: b.header}, b.pos)}));
-				console.groupEnd();
+				// console
+				// 	.log('modified position of widgets:', $.map(data.widgets, function(b) {return $.extend({header: b.header}, b.pos)}));
+				// console.groupEnd();
 
 				startWidgetPositioning(ui.helper, data);
 				widget.current_pos = $.extend({}, widget.pos);
-				realignWidget(data, widget);
+				//realignWidget(data, widget);
 			},
 			drag: function(event, ui) {
 				// Limit element draggable area for X and Y axis.
@@ -901,10 +947,17 @@
 				data['pos-action'] = '';
 				delete data.calculated;
 
-				data.widgets = sortWidgerts(data.widgets);
+				data.widgets = sortWidgets(data.widgets).each(function(widget) {
+					delete widget.affected_by_draggable;
+					delete widget.affected_by_id;
+					delete widget.affected;
+				});
 
 				setResizableState('enable', data.widgets, '');
 				stopWidgetPositioning($obj, ui.helper, data);
+
+				data['options']['rows'] = data['options']['rows_actual'];
+				resizeDashboardGrid($obj, data, data['options']['rows_actual']);
 			}
 		});
 	}
@@ -1121,6 +1174,11 @@
 					widget['content_body'].append(resp.messages);
 				}
 				widget['content_body'].append(resp.body);
+
+				if (typeof(resp.body_class) !== 'undefined') {
+					widget['content_body'].addClass(resp.body_class);
+				}
+
 				if (typeof(resp.debug) !== 'undefined') {
 					widget['content_body'].append(resp.debug);
 				}
