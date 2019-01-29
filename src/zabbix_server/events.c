@@ -889,7 +889,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 			{
 				tag = (zbx_tag_t *)event->tags.values[i];
 				if (0 == strcmp(tag->tag, condition->data.tag_pair.newtag))
-					zbx_vector_str_append(&values, DBdyn_escape_string(tag->value));
+					zbx_vector_str_append(&values, zbx_strdup(NULL, tag->value));
 			}
 
 			if (0 == values.values_num)

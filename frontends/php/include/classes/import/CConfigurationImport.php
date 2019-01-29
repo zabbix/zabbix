@@ -1635,8 +1635,7 @@ class CConfigurationImport {
 	 * @return null
 	 */
 	protected function processImages() {
-		if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN
-				|| (!$this->options['images']['updateExisting'] && !$this->options['images']['createMissing'])) {
+		if (!$this->options['images']['updateExisting'] && !$this->options['images']['createMissing']) {
 			return;
 		}
 

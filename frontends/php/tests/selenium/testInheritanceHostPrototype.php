@@ -350,7 +350,6 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		$this->zbxTestCheckHeader('Host prototypes');
-		$this->zbxTestCheckFatalErrors();
 
 		$prototype_on_template = $this->sqlForHostPrototypeCompare($data['template']);
 		$prototype_on_host = $this->sqlForHostPrototypeCompare($data['host']);
@@ -473,7 +472,6 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 		else {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added');
-			$this->zbxTestCheckFatalErrors();
 
 			$this->zbxTestTextPresent($data['host_prototype']);
 			if (array_key_exists('cloned_visible_name', $data)) {
