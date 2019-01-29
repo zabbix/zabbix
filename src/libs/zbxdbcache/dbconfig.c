@@ -4405,17 +4405,20 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 		host_tag_index_entry = (zbx_dc_host_tag_index_t *)zbx_hashset_search(&config->host_tags_index,
 				&host_tag->hostid);
 
-		if (NULL != host_tag_index_entry && FAIL != (index = zbx_vector_ptr_search(&host_tag_index_entry->tags,
-				host_tag, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+		if (NULL != host_tag_index_entry)
 		{
-			zbx_vector_ptr_remove(&host_tag_index_entry->tags, index);
-		}
+			if (FAIL != (index = zbx_vector_ptr_search(&host_tag_index_entry->tags, host_tag,
+					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+			{
+				zbx_vector_ptr_remove(&host_tag_index_entry->tags, index);
+			}
 
-		/* remove index entry if it's empty */
-		if (0 == host_tag_index_entry->tags.values_num)
-		{
-			zbx_vector_ptr_destroy(&host_tag_index_entry->tags);
-			zbx_hashset_remove_direct(&config->host_tags_index, host_tag_index_entry);
+			/* remove index entry if it's empty */
+			if (0 == host_tag_index_entry->tags.values_num)
+			{
+				zbx_vector_ptr_destroy(&host_tag_index_entry->tags);
+				zbx_hashset_remove_direct(&config->host_tags_index, host_tag_index_entry);
+			}
 		}
 
 		/* clear host_tag structure */
