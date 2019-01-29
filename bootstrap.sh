@@ -22,4 +22,6 @@ autoheader
 automake -a
 automake
 
-[ -f m4/conf_tests.m4 ] && rm -f m4/conf_tests.m4
+if [ -f m4/conf_tests.m4 ]; then
+	rm -f m4/conf_tests.m4
+fi
