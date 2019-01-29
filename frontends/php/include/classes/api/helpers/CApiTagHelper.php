@@ -65,14 +65,24 @@ class CApiTagHelper {
 		$sql_where = [];
 
 		foreach ($values_by_tag as $tag => $values) {
+			if (!is_array($values) || count($values) == 0) {
+				$values = '';
+			}
+			elseif (count($values) == 1) {
+				$values = ' AND '.$values[0];
+			}
+			else {
+				$values = $values ? ' AND ('.implode(' OR ', $values).')' : '';
+			}
+
 			$sql_where[] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM '.$table.
 				' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.
-					' AND '.$table.'.tag='.zbx_dbstr($tag).
-					((is_array($values) && $values) ? ' AND ('.implode(' OR ', $values).')' : '').
+					' AND '.$table.'.tag='.zbx_dbstr($tag).$values.
 			')';
 		}
+
 		$sql_where = implode(($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ', $sql_where);
 
 		return (count($values_by_tag) > 1 && $evaltype == TAG_EVAL_TYPE_OR) ? '('.$sql_where.')' : $sql_where;
