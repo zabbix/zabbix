@@ -33,7 +33,7 @@
 
 #include "item_preproc.h"
 
-extern  zbx_es_t	es_engine;
+extern zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
@@ -1521,8 +1521,8 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
  ******************************************************************************/
 static int	item_preproc_script(zbx_variant_t *value, const char *params, zbx_variant_t *bytecode, char **errmsg)
 {
-	char		*code = NULL, *output, *error = NULL;
-	int		size, ret;
+	char	*code = NULL, *output, *error = NULL;
+	int	size, ret;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;

@@ -67,9 +67,8 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 
 	for (i = 0; i < steps_num; i++)
 	{
-		zbx_preproc_op_t	*op = &steps[i];
-		zbx_variant_t		history_value;
-		zbx_timespec_t		history_ts;
+		zbx_variant_t	history_value;
+		zbx_timespec_t	history_ts;
 
 		if (NULL != (ophistory = zbx_preproc_history_get_value(&history_in, i)))
 		{
@@ -84,7 +83,8 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 			history_ts.ns = 0;
 		}
 
-		if (SUCCEED != zbx_item_preproc(i + 1, value_type, &value, ts, op, &history_value, &history_ts, &error))
+		if (SUCCEED != zbx_item_preproc(i + 1, value_type, &value, ts, steps + i, &history_value, &history_ts,
+				&error))
 		{
 			zbx_variant_clear(&history_value);
 			break;
