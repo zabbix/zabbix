@@ -2190,6 +2190,7 @@ Changes for 3.0.26rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.25
