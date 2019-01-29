@@ -29,7 +29,7 @@ function zbx_svggraph_widget_trigger(hook_name) {
 
 	switch (hook_name) {
 		case 'onResizeEnd':
-			jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget', grid.widget['uniqueid']);
+			jQuery('.dashbrd-grid-container').dashboardGrid('refreshWidget', grid.widget['uniqueid']);
 			break;
 
 		case 'onEditStart':

@@ -20,6 +20,10 @@
 
 
 class CControllerWidgetGraphView extends CControllerWidget {
+	/**
+	 * Default value for widgets bottom padding.
+	 */
+	const DEFAULT_WIDGET_BOTTOM_PADDING = 8;
 
 	public function __construct() {
 		parent::__construct();
@@ -46,6 +50,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 		$width = (int) $this->getInput('content_width', 100);
 		$height = (int) $this->getInput('content_height', 100);
+		$height += self::DEFAULT_WIDGET_BOTTOM_PADDING;   // padding compensator
 
 		$dataid = 'graph_'.$uniqueid;
 		$containerid = 'graph_container_'.$uniqueid;

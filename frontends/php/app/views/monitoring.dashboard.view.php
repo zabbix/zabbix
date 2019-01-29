@@ -169,7 +169,7 @@ else {
 
 	$widget
 		->addItem($timeline)
-		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
+		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
 		->show();
 
 	/*
@@ -219,7 +219,7 @@ else {
 
 	// Initialize dashboard grid.
 	$this->addPostJS(
-		'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
+		'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
 			'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
 			'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
 			'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widget_defaults']).')'.

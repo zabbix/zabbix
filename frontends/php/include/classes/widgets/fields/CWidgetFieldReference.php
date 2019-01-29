@@ -49,7 +49,7 @@ class CWidgetFieldReference extends CWidgetField {
 		return
 			'var reference_field = jQuery("input[name=\"'.$this->getName().'\"]", "'.$form_selector.'");'.
 			'if (!reference_field.val().length) {'.
-				'var reference = jQuery(".dashbrd-grid-widget-container").dashboardGrid("makeReference");'.
+				'var reference = jQuery(".dashbrd-grid-container").dashboardGrid("makeReference");'.
 				'reference_field.val(reference);'.
 			'}';
 	}

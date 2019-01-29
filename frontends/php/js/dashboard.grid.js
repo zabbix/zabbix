@@ -47,6 +47,10 @@
 				}))
 			)
 		);
+		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container'})
+			.append(widget['content_header'])
+			.append(widget['content_body'])
+			.append(widget['content_script']);
 
 		return $('<div>', {
 			'class': 'dashbrd-grid-widget' + (!widget['widgetid'].length ? ' new-widget' : ''),
@@ -56,12 +60,7 @@
 			}
 		})
 			.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
-			.append(
-				$('<div>', {'class': 'dashbrd-grid-widget-padding'})
-					.append(widget['content_header'])
-					.append(widget['content_body'])
-					.append(widget['content_script'])
-			);
+			.append(widget['container']);
 	}
 
 	function makeWidgetInfoBtns(btns) {
@@ -156,7 +155,7 @@
 	}
 
 	function getCurrentCellWidth(data) {
-		return $('.dashbrd-grid-widget-container').width() / data['options']['max-columns'];
+		return $('.dashbrd-grid-container').width() / data['options']['max-columns'];
 	}
 
 	function setDivPosition($div, data, pos, is_placeholder) {
@@ -527,6 +526,11 @@
 					widget['content_body'].append(resp.messages);
 				}
 				widget['content_body'].append(resp.body);
+
+				if (typeof(resp.container_class) !== 'undefined') {
+					widget['container'].addClass(resp.container_class);
+				}
+
 				if (typeof(resp.debug) !== 'undefined') {
 					$(resp.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
 				}
@@ -626,7 +630,7 @@
 						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
 						var pos = findEmptyPosition($obj, data, type),
 							scroll_by = (pos['y'] * data['options']['widget-height'])
-								- $('.dashbrd-grid-widget-container').scrollTop(),
+								- $('.dashbrd-grid-container').scrollTop(),
 							widget_data = {
 								'type': type,
 								'header': name,
@@ -645,8 +649,8 @@
 						if (scroll_by > 0) {
 							var new_height = (pos['y'] + pos['height']) * data['options']['widget-height'];
 
-							if (new_height > $('.dashbrd-grid-widget-container').height()) {
-								$('.dashbrd-grid-widget-container').height(new_height);
+							if (new_height > $('.dashbrd-grid-container').height()) {
+								$('.dashbrd-grid-container').height(new_height);
 							}
 
 							$('html, body')

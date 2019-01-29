@@ -2203,7 +2203,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 9px 5px;
   width: 100%; }
 
-.dashbrd-grid-widget-container {
+.dashbrd-grid-container {
   position: relative;
   margin: -4px; }
 
@@ -2260,14 +2260,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border-color: #383838; }
   .dashbrd-grid-widget-content .msg-good, .dashbrd-grid-widget-content .msg-bad {
     margin: 0 10px; }
-  .dashbrd-grid-widget-content .flickerfreescreen {
-    top: 3px; }
 
 .dashbrd-grid-widget {
   display: flex;
   position: absolute; }
 
-.dashbrd-grid-widget-padding {
+.dashbrd-grid-widget-container {
   display: flex;
   flex-grow: 1;
   flex-direction: column;
@@ -2276,6 +2274,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   background-color: #2b2b2b;
   border: 1px solid #303030;
   padding-bottom: 8px; }
+
+.dashbrd-widget-graph {
+  padding-bottom: 0; }
 
 .dashbrd-grid-widget-head {
   position: relative;
@@ -2540,14 +2541,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: block; }
   .dashbrd-widget-graph-link:link {
     border: none; }
-  .dashbrd-widget-graph-link:focus:after {
-    content: "";
-    background: rgba(66, 154, 227, 0.35);
-    height: 2px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -2px; }
 
 .action-menu {
   position: absolute;
