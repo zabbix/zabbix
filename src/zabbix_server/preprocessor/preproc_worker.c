@@ -48,16 +48,15 @@ zbx_es_t	es_engine;
  ******************************************************************************/
 static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
 {
-	zbx_uint32_t			size = 0;
-	unsigned char			*data = NULL, value_type;
-	zbx_uint64_t			itemid;
-	zbx_variant_t			value;
-	int				i, steps_num;
-	char				*error = NULL;
-	zbx_timespec_t			*ts;
-	zbx_preproc_op_t		*steps;
-	zbx_vector_ptr_t		history_in, history_out;
-	zbx_preproc_op_history_t	*ophistory;
+	zbx_uint32_t		size = 0;
+	unsigned char		*data = NULL, value_type;
+	zbx_uint64_t		itemid;
+	zbx_variant_t		value;
+	int			i, steps_num;
+	char			*error = NULL;
+	zbx_timespec_t		*ts;
+	zbx_preproc_op_t	*steps;
+	zbx_vector_ptr_t	history_in, history_out;
 
 	zbx_vector_ptr_create(&history_in);
 	zbx_vector_ptr_create(&history_out);
@@ -67,8 +66,9 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 
 	for (i = 0; i < steps_num; i++)
 	{
-		zbx_variant_t	history_value;
-		zbx_timespec_t	history_ts;
+		zbx_preproc_op_history_t	*ophistory;
+		zbx_variant_t			history_value;
+		zbx_timespec_t			history_ts;
 
 		if (NULL != (ophistory = zbx_preproc_history_get_value(&history_in, i)))
 		{
