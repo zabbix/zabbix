@@ -4357,7 +4357,7 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 	zbx_dc_host_tag_t		*host_tag;
 	zbx_dc_host_tag_index_t		*host_tag_index_entry;
 
-	int		found, append, index, ret;
+	int		found, index, ret;
 	zbx_uint64_t	hosttagid, hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -4380,23 +4380,17 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 		DCstrpool_replace(found, &host_tag->value, row[3]);
 
 		/* update host_tags_index*/
-		host_tag_index_entry = (zbx_dc_host_tag_index_t *)DCfind_id(&config->host_tags_index, hostid,
-				sizeof(zbx_dc_host_tag_index_t), &found);
+		if (tag == ZBX_DBSYNC_ROW_ADD)
+		{
+			host_tag_index_entry = (zbx_dc_host_tag_index_t *)DCfind_id(&config->host_tags_index, hostid,
+					sizeof(zbx_dc_host_tag_index_t), &found);
 
-		if (0 == found)
-		{
-			zbx_vector_ptr_create_ext(&host_tag_index_entry->tags, __config_mem_malloc_func,
-					__config_mem_realloc_func, __config_mem_free_func);
-			append = 1;
-		}
-		else
-		{
-			append = (FAIL == zbx_vector_ptr_search(&host_tag_index_entry->tags, host_tag,
-				ZBX_DEFAULT_PTR_COMPARE_FUNC)) ? 1 : 0;
-		}
+			if (0 == found)
+			{
+				zbx_vector_ptr_create_ext(&host_tag_index_entry->tags, __config_mem_malloc_func,
+						__config_mem_realloc_func, __config_mem_free_func);
+			}
 
-		if (1 == append)
-		{
 			zbx_vector_ptr_append(&host_tag_index_entry->tags, host_tag);
 		}
 	}
@@ -4408,21 +4402,19 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 			continue;
 
 		/* update host_tags_index*/
-		host_tag_index_entry = (zbx_dc_host_tag_index_t *)DCfind_id(&config->host_tags_index, host_tag->hostid,
-				sizeof(zbx_dc_host_tag_index_t), &found);
+		host_tag_index_entry = (zbx_dc_host_tag_index_t *)zbx_hashset_search(&config->host_tags_index,
+				&host_tag->hostid);
 
-		if (1 == found && FAIL != (index = zbx_vector_ptr_search(&host_tag_index_entry->tags, host_tag,
-				ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+		if (NULL != host_tag_index_entry && FAIL != (index = zbx_vector_ptr_search(&host_tag_index_entry->tags,
+				host_tag, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 		{
 			zbx_vector_ptr_remove(&host_tag_index_entry->tags, index);
 		}
 
-		/* recreate empty tags vector to release used memory */
+		/* remove index entry if it's empty */
 		if (0 == host_tag_index_entry->tags.values_num)
 		{
 			zbx_vector_ptr_destroy(&host_tag_index_entry->tags);
-			zbx_vector_ptr_create_ext(&host_tag_index_entry->tags, __config_mem_malloc_func,
-					__config_mem_realloc_func, __config_mem_free_func);
 			zbx_hashset_remove_direct(&config->host_tags_index, host_tag_index_entry);
 		}
 
