@@ -1166,9 +1166,9 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 #endif
 		{
 #ifdef _WINDOWS
-				zbx_set_socket_strerror("WSASocket() for [[%s]:%hu] failed: %s",
+			zbx_set_socket_strerror("WSASocket() for [[%s]:%hu] failed: %s",
 #else
-				zbx_set_socket_strerror("socket() for [[%s]:%hu] failed: %s",
+			zbx_set_socket_strerror("socket() for [[%s]:%hu] failed: %s",
 #endif
 					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
 			goto out;
