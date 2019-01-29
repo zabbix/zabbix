@@ -12110,39 +12110,39 @@ static void	zbx_obtain_host_tags_from_item(zbx_uint64_t itemid, zbx_vector_ptr_t
 	zbx_host_tag_t		*tag;
 	int			n, i;
 
-	if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+	if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+		return;
+
+	n = host_tags->values_num;
+
+	zbx_gather_tags_from_host(item->hostid, host_tags);
+
+	if (0 != item->templateid)
+		zbx_gather_tags_from_template_chain(item->templateid, host_tags);
+
+	/* check for discovered item */
+	if (0 != item->parent_itemid && 4 == item->flags)
 	{
-		zbx_gather_tags_from_host(item->hostid, host_tags);
-
-		if (0 != item->templateid)
+		if (NULL != (lld_item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&config->prototype_items,
+				&item->parent_itemid)))
 		{
-			n = host_tags->values_num;
-			zbx_gather_tags_from_template_chain(item->templateid, host_tags);
-
-			/* assing hostid and itemid values to newly gathered tags */
-			for (i = n; i < host_tags->values_num; i++)
-			{
-				tag = (zbx_host_tag_t *)host_tags->values[i];
-				tag->hostid = item->hostid;
-				tag->itemid = item->itemid;
-			}
-		}
-
-		/* check for discovered item */
-		if (0 != item->parent_itemid && 4 == item->flags)
-		{
-			if (NULL != (lld_item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&config->prototype_items, &item->parent_itemid)))
-			{
+			if (0 != item->templateid)
 				zbx_gather_tags_from_template_chain(lld_item->templateid, host_tags);
-			}
 		}
+	}
+
+	/* assign hostid and itemid values to newly gathered tags */
+	for (i = n; i < host_tags->values_num; i++)
+	{
+		tag = (zbx_host_tag_t *)host_tags->values[i];
+		tag->hostid = item->hostid;
+		tag->itemid = item->itemid;
 	}
 }
 
 void	DCget_host_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num, zbx_vector_ptr_t *host_tags)
 {
 	const ZBX_DC_FUNCTION	*dc_function;
-	const ZBX_DC_ITEM	*dc_item;
 	size_t			i;
 
 	RDLOCK_CACHE;
@@ -12152,10 +12152,7 @@ void	DCget_host_tags_by_functionids(const zbx_uint64_t *functionids, size_t func
 		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionids[i])))
 			continue;
 
-		if (NULL == (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
-			continue;
-
-		zbx_obtain_host_tags_from_item(dc_item->itemid, host_tags);
+		zbx_obtain_host_tags_from_item(dc_function->itemid, host_tags);
 	}
 
 	UNLOCK_CACHE;
