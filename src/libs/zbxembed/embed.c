@@ -204,6 +204,12 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 	}
 	ret = SUCCEED;
 out:
+	if (SUCCEED != ret)
+	{
+		zbx_free(es->env->error);
+		zbx_free(es->env);
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 
