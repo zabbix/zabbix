@@ -330,7 +330,7 @@ jQuery(function ($){
 		})
 		.on('click', 'a', function(e) {
 			// Prevent click on graph image parent <a/> element when clicked inside graph selectable area.
-			if ($(e.target).is('img') && prevent_click) {
+			if ($(e.target).is('img') && prevent_click && $(this).hasClass('dashbrd-widget-graph-link')) {
 				return cancelEvent(e);
 			}
 		});
