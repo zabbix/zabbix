@@ -182,11 +182,11 @@ $fields = [
 	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'application_prototypes' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'massupdate_app_action' =>		[T_ZBX_INT, O_OPT, null,
-										IN([ZBX_MULTISELECT_ADD, ZBX_MULTISELECT_REPLACE, ZBX_MULTISELECT_REMOVE]),
+										IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 										null
 									],
 	'massupdate_app_prot_action' =>	[T_ZBX_INT, O_OPT, null,
-										IN([ZBX_MULTISELECT_ADD, ZBX_MULTISELECT_REPLACE, ZBX_MULTISELECT_REMOVE]),
+										IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 										null
 									],
 	'history' =>					[T_ZBX_STR, O_OPT, null,	null, 'isset({add}) || isset({update})',
@@ -770,8 +770,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 			if (array_key_exists('applications', $visible)) {
 				$massupdate_app_action = getRequest('massupdate_app_action');
 
-				if ($massupdate_app_action == ZBX_MULTISELECT_ADD
-						|| $massupdate_app_action == ZBX_MULTISELECT_REPLACE) {
+				if ($massupdate_app_action == ZBX_ACTION_ADD || $massupdate_app_action == ZBX_ACTION_REPLACE) {
 					$new_applications = [];
 
 					foreach ($applications as $application) {
@@ -806,8 +805,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 			if (array_key_exists('applicationPrototypes', $visible)) {
 				$massupdate_app_prot_action = getRequest('massupdate_app_prot_action');
 
-				if ($massupdate_app_prot_action == ZBX_MULTISELECT_ADD
-						|| $massupdate_app_prot_action == ZBX_MULTISELECT_REPLACE) {
+				if ($massupdate_app_prot_action == ZBX_ACTION_ADD
+						|| $massupdate_app_prot_action == ZBX_ACTION_REPLACE) {
 					$new_application_prototypes = [];
 
 					foreach ($application_prototypes as $application_prototype) {
@@ -938,15 +937,15 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 									);
 
 									switch ($massupdate_app_action) {
-										case ZBX_MULTISELECT_ADD:
+										case ZBX_ACTION_ADD:
 											$upd_applicationids = array_merge($applicationids, $db_applicationids);
 											break;
 
-										case ZBX_MULTISELECT_REPLACE:
+										case ZBX_ACTION_REPLACE:
 											$upd_applicationids = $applicationids;
 											break;
 
-										case ZBX_MULTISELECT_REMOVE:
+										case ZBX_ACTION_REMOVE:
 											$upd_applicationids = array_diff($db_applicationids, $applicationids);
 											break;
 									}
@@ -962,8 +961,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 									 * No applications were submitted in form. In case we want to replace applications,
 									 * leave $item['applications'] empty, remove it otherwise.
 									 */
-									if ($massupdate_app_action == ZBX_MULTISELECT_ADD
-											|| $massupdate_app_action == ZBX_MULTISELECT_REMOVE) {
+									if ($massupdate_app_action == ZBX_ACTION_ADD
+											|| $massupdate_app_action == ZBX_ACTION_REMOVE) {
 										unset($item_prototype['applications']);
 									}
 								}
@@ -980,7 +979,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 								$application_prototypes = [];
 
 								switch ($massupdate_app_prot_action) {
-									case ZBX_MULTISELECT_ADD:
+									case ZBX_ACTION_ADD:
 										// Append submitted existing application prototypes.
 										if ($application_prototypeids) {
 											$upd_application_prototypeids = array_unique(
@@ -1007,7 +1006,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 										}
 										break;
 
-									case ZBX_MULTISELECT_REPLACE:
+									case ZBX_ACTION_REPLACE:
 										if ($application_prototypeids) {
 											$upd_application_prototypeids = $application_prototypeids;
 										}
@@ -1022,7 +1021,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 										}
 										break;
 
-									case ZBX_MULTISELECT_REMOVE:
+									case ZBX_ACTION_REMOVE:
 										if ($application_prototypeids) {
 											$upd_application_prototypeids = array_diff($ex_application_prototypeids,
 												$application_prototypeids
@@ -1059,7 +1058,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 									$item_prototype['applicationPrototypes'] = $application_prototypes;
 								}
 								else {
-									if ($massupdate_app_prot_action == ZBX_MULTISELECT_REPLACE) {
+									if ($massupdate_app_prot_action == ZBX_ACTION_REPLACE) {
 										$item_prototype['applicationPrototypes'] = [];
 									}
 									else {
@@ -1237,8 +1236,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'posts' => getRequest('posts', ''),
 		'headers' => getRequest('headers', []),
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_MULTISELECT_ADD),
-		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_MULTISELECT_ADD),
+		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
+		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_ACTION_ADD),
 	];
 
 	if (hasRequest('applications')) {

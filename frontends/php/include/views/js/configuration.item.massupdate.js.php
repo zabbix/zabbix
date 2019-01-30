@@ -287,19 +287,17 @@
 			t.data('editableTable', et);
 		});
 
-		$('input[name=massupdate_app_action]').change(function() {
-			var massupdate_app_action = $('input[name=massupdate_app_action]:checked').val(),
-				add_new = !(massupdate_app_action == <?= ZBX_ACTION_REMOVE ?>);
-
-			$('#applications_').multiSelect('modify', {'addNew': add_new});
+		$('input[name=massupdate_app_action]').on('change', function() {
+			$('#applications_').multiSelect('modify', {
+				'addNew': ($(this).val() == <?= ZBX_ACTION_ADD ?> || $(this).val() == <?= ZBX_ACTION_REPLACE ?>)
+			});
 		});
 
 		<?php if (array_key_exists('parent_discoveryid', $data)): ?>
-			$('input[name=massupdate_app_prot_action]').change(function() {
-				var massupdate_app_prot_action = $('input[name=massupdate_app_prot_action]:checked').val(),
-					add_new = !(massupdate_app_prot_action == <?= ZBX_ACTION_REMOVE ?>);
-
-				$('#application_prototypes_').multiSelect('modify', {'addNew': add_new});
+			$('input[name=massupdate_app_prot_action]').on('change', function() {
+				$('#application_prototypes_').multiSelect('modify', {
+					'addNew': ($(this).val() == <?= ZBX_ACTION_ADD ?> || $(this).val() == <?= ZBX_ACTION_REPLACE ?>)
+				});
 			});
 		<?php endif ?>
 	});

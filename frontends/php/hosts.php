@@ -71,8 +71,7 @@ $fields = [
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'tags' =>					[T_ZBX_STR, O_OPT, null,			null,		null],
 	'mass_update_tags' =>		[T_ZBX_INT, O_OPT, null,
-									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE
-									]),
+									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 									null
 								],
 	'templates' =>				[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
