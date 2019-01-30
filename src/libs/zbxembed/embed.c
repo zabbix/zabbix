@@ -230,7 +230,12 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ZBX_UNUSED(error);
+	if (0 != setjmp(es->env->loc))
+	{
+		ret = FAIL;
+		*error = zbx_strdup(*error, es->env->error);
+		goto out;
+	}
 
 	duk_destroy_heap(es->env->ctx);
 	zbx_free(es->env->error);
@@ -239,6 +244,7 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 
+out:
 	return ret;
 }
 
