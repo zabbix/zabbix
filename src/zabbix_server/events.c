@@ -92,7 +92,7 @@ static zbx_tag_t	*duplicate_tag(const zbx_tag_t *tag)
 	return t;
 }
 
-static void	validate_and_add_tag(zbx_tag_t *tag)
+static void	validate_and_add_tag(DB_EVENT* event, zbx_tag_t *tag)
 {
 	if (TAG_NAME_LEN < zbx_strlen_utf8(tag->tag))
 		tag->tag[zbx_strlen_utf8_nchars(tag->tag, TAG_NAME_LEN)] = '\0';
@@ -102,35 +102,35 @@ static void	validate_and_add_tag(zbx_tag_t *tag)
 	zbx_lrtrim(tag->tag, ZBX_WHITESPACE);
 	zbx_lrtrim(tag->value, ZBX_WHITESPACE);
 
-	if (SUCCEED == validate_event_tag(&events[events_num], tag))
-		zbx_vector_ptr_append(&events[events_num].tags, tag);
+	if (SUCCEED == validate_event_tag(event, tag))
+		zbx_vector_ptr_append(&event->tags, tag);
 	else
 		zbx_free_tag(tag);
 }
 
-static void	substitute_trigger_tag_macro(char **str)
+static void	substitute_trigger_tag_macro(const DB_EVENT* event, char **str)
 {
-	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
+	substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 			NULL, str, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
 }
 
-static void	process_trigger_tag(const zbx_tag_t *tag)
+static void	process_trigger_tag(DB_EVENT* event, const zbx_tag_t *tag)
 {
 	zbx_tag_t	*t;
 
 	t = duplicate_tag(tag);
-	substitute_trigger_tag_macro(&t->tag);
-	substitute_trigger_tag_macro(&t->value);
-	validate_and_add_tag(t);
+	substitute_trigger_tag_macro(event, &t->tag);
+	substitute_trigger_tag_macro(event, &t->value);
+	validate_and_add_tag(event, t);
 }
 
-static void	substitute_item_tag_macro(const DC_ITEM *dc_item, char **str)
+static void	substitute_item_tag_macro(const DB_EVENT* event, const DC_ITEM *dc_item, char **str)
 {
-	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, dc_item, NULL,
+	substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, dc_item, NULL,
 			NULL, str, MACRO_TYPE_ITEM_TAG, NULL, 0);
 }
 
-static void	process_item_tag(const zbx_item_tag_t *item_tag)
+static void	process_item_tag(DB_EVENT* event, const zbx_item_tag_t *item_tag)
 {
 	zbx_tag_t	*t;
 	DC_ITEM		dc_item; /* used to pass data into substitute_simple_macros() function */
@@ -140,9 +140,9 @@ static void	process_item_tag(const zbx_item_tag_t *item_tag)
 	dc_item.host.hostid = item_tag->hostid;
 	dc_item.itemid = item_tag->itemid;
 
-	substitute_item_tag_macro(&dc_item, &t->tag);
-	substitute_item_tag_macro(&dc_item, &t->value);
-	validate_and_add_tag(t);
+	substitute_item_tag_macro(event, &dc_item, &t->tag);
+	substitute_item_tag_macro(event, &dc_item, &t->value);
+	validate_and_add_tag(event, t);
 }
 
 static void	get_item_tags_by_expression(const char *expression, zbx_vector_ptr_t *item_tags)
@@ -237,7 +237,7 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		if (NULL != trigger_tags)
 		{
 			for (i = 0; i < trigger_tags->values_num; i++)
-				process_trigger_tag((const zbx_tag_t *)trigger_tags->values[i]);
+				process_trigger_tag(&events[events_num], (const zbx_tag_t *)trigger_tags->values[i]);
 		}
 
 		zbx_vector_ptr_create(&item_tags);
@@ -245,7 +245,7 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 
 		for (i = 0; i < item_tags.values_num; i++)
 		{
-			process_item_tag((const zbx_item_tag_t *)item_tags.values[i]);
+			process_item_tag(&events[events_num], (const zbx_item_tag_t *)item_tags.values[i]);
 			zbx_free_item_tag(item_tags.values[i]);
 		}
 
