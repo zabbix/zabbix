@@ -336,7 +336,6 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 
 	duk_push_string(es->env->ctx, func);
 	duk_push_string(es->env->ctx, "function");
-	zbx_free(func);
 
 	if (0 != duk_pcompile(es->env->ctx, DUK_COMPILE_FUNCTION))
 	{
@@ -359,6 +358,8 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 
 	duk_pop(es->env->ctx);
 out:
+	zbx_free(func);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 
