@@ -563,7 +563,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 	$today = strtotime('today');
 	$last_clock = 0;
 
-	$triggers_hosts = getTriggersHostsList($triggers);
+	$triggers_hosts = getTriggersHostsList($triggers, $problems);
 	$triggers_hosts = makeTriggersHostsList($triggers_hosts);
 
 	$tags = makeTags($problems);
