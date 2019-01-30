@@ -282,6 +282,7 @@ function getSystemStatusData(array $filter) {
 			$data['triggers'] = $maked_data['triggers'];
 		}
 	}
+
 	return $data;
 }
 
