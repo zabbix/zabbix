@@ -347,14 +347,17 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 
 	duk_dump_function(es->env->ctx);
 
-	buffer = (unsigned char *)duk_get_buffer(es->env->ctx, -1, &sz);
-	*size = sz;
-	*code = zbx_malloc(NULL, sz);
-	memcpy(*code, buffer, sz);
+	if (NULL != (buffer = (unsigned char *)duk_get_buffer(es->env->ctx, -1, &sz)))
+	{
+		*size = sz;
+		*code = zbx_malloc(NULL, sz);
+		memcpy(*code, buffer, sz);
+		ret = SUCCEED;
+	}
+	else
+		*error = zbx_strdup(*error, "empty function compilation result");
 
 	duk_pop(es->env->ctx);
-
-	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
