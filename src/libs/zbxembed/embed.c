@@ -40,6 +40,21 @@ struct zbx_es_env
 
 #define ZBX_ES_SCRIPT_HEADER	"function(value){"
 
+/******************************************************************************
+ *                                                                            *
+ * Function: es_handle_error                                                  *
+ *                                                                            *
+ * Purpose: fatal error handler                                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	es_handle_error(void *udata, const char *msg)
+{
+	zbx_es_env_t	*env = (zbx_es_env_t *)udata;
+
+	env->error = zbx_strdup(env->error, msg);
+	longjmp(env->loc, 1);
+}
+
 /*
  * Memory allocation routines to track and limit script memory usage.
  */
@@ -51,7 +66,10 @@ static void	*es_malloc(void *udata, duk_size_t size)
 
 	if (env->total_alloc + size + 8 > ZBX_ES_MEMORY_LIMIT)
 	{
-		(void)duk_fatal(env->ctx, "memory limit exceeded");
+		if (NULL == env->ctx)
+			es_handle_error(udata, "memory limit exceeded");
+		else
+			(void)duk_fatal(env->ctx, "memory limit exceeded");
 
 		/* never returns as longjmp is called by error handler */
 		return NULL;
@@ -103,21 +121,6 @@ static void	es_free(void *udata, void *ptr)
 		env->total_alloc -= (*(--uptr) + 8);
 		zbx_free(uptr);
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: es_handle_error                                                  *
- *                                                                            *
- * Purpose: fatal error handler                                               *
- *                                                                            *
- ******************************************************************************/
-static void	es_handle_error(void *udata, const char *msg)
-{
-	zbx_es_env_t	*env = (zbx_es_env_t *)udata;
-
-	env->error = zbx_strdup(env->error, msg);
-	longjmp(env->loc, 1);
 }
 
 /******************************************************************************
