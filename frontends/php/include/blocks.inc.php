@@ -275,14 +275,13 @@ function getSystemStatusData(array $filter) {
 				'preservekeys' => true
 			])
 		];
-	}
 
-	if (array_key_exists('show_latest_values', $filter) && $filter['show_latest_values'] == 1) {
-		$maked_data = CScreenProblem::makeData(['problems' => $problems_data, 'triggers' => $data['triggers']],
-			['show' => 0, 'details' => 0, 'show_latest_values' => $filter['show_latest_values']], false);
-		$data['triggers'] = $maked_data['triggers'];
+		if (array_key_exists('show_latest_values', $filter) && $filter['show_latest_values'] == 1) {
+			$maked_data = CScreenProblem::makeData(['problems' => $problems_data, 'triggers' => $data['triggers']],
+				['show' => 0, 'details' => 0, 'show_latest_values' => $filter['show_latest_values']], false);
+			$data['triggers'] = $maked_data['triggers'];
+		}
 	}
-
 	return $data;
 }
 
