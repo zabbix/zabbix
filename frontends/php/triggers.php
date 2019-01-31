@@ -896,26 +896,26 @@ else {
 		}
 	}
 	elseif (getRequest('filter_rst')) {
-		CProfile::delete('web.triggers.filter_inherited');
-		CProfile::delete('web.triggers.filter_discovered');
-		CProfile::delete('web.triggers.filter_dependent');
-		CProfile::delete('web.triggers.filter_name');
-		CProfile::delete('web.triggers.filter_priority');
-		CProfile::delete('web.triggers.filter_groupids');
+		CProfile::deleteIdx('web.triggers.filter_inherited');
+		CProfile::deleteIdx('web.triggers.filter_discovered');
+		CProfile::deleteIdx('web.triggers.filter_dependent');
+		CProfile::deleteIdx('web.triggers.filter_name');
+		CProfile::deleteIdx('web.triggers.filter_priority');
+		CProfile::deleteIdx('web.triggers.filter_groupids');
 
 		if (count($filter_hostids) != 1) {
-			CProfile::delete('web.triggers.filter_hostids');
+			CProfile::deleteIdx('web.triggers.filter_hostids');
 		}
 
-		CProfile::delete('web.triggers.filter_state');
-		CProfile::delete('web.triggers.filter_status');
-		CProfile::delete('web.triggers.filter.evaltype');
+		CProfile::deleteIdx('web.triggers.filter_state');
+		CProfile::deleteIdx('web.triggers.filter_status');
+		CProfile::deleteIdx('web.triggers.filter.evaltype');
 		CProfile::deleteIdx('web.triggers.filter.tags.tag');
 		CProfile::deleteIdx('web.triggers.filter.tags.value');
 		CProfile::deleteIdx('web.triggers.filter.tags.operator');
 
 		if ($show_value_column) {
-			CProfile::delete('web.triggers.filter_value');
+			CProfile::deleteIdx('web.triggers.filter_value');
 		}
 	}
 

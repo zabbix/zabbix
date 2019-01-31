@@ -426,26 +426,26 @@ if (hasRequest('filter_set')) {
 elseif (hasRequest('filter_rst')) {
 	DBStart();
 	if (count(CProfile::getArray('web.items.filter_hostids', [])) != 1) {
-		CProfile::delete('web.items.filter_hostids');
+		CProfile::deleteIdx('web.items.filter_hostids');
 	}
-	CProfile::delete('web.items.filter_groupids');
-	CProfile::delete('web.items.filter_application');
-	CProfile::delete('web.items.filter_name');
-	CProfile::delete('web.items.filter_type');
-	CProfile::delete('web.items.filter_key');
-	CProfile::delete('web.items.filter_snmp_community');
-	CProfile::delete('web.items.filter_snmpv3_securityname');
-	CProfile::delete('web.items.filter_snmp_oid');
-	CProfile::delete('web.items.filter_port');
-	CProfile::delete('web.items.filter_value_type');
-	CProfile::delete('web.items.filter_delay');
-	CProfile::delete('web.items.filter_history');
-	CProfile::delete('web.items.filter_trends');
-	CProfile::delete('web.items.filter_status');
-	CProfile::delete('web.items.filter_state');
-	CProfile::delete('web.items.filter_templated_items');
-	CProfile::delete('web.items.filter_with_triggers');
-	CProfile::delete('web.items.filter_ipmi_sensor');
+	CProfile::deleteIdx('web.items.filter_groupids');
+	CProfile::deleteIdx('web.items.filter_application');
+	CProfile::deleteIdx('web.items.filter_name');
+	CProfile::deleteIdx('web.items.filter_type');
+	CProfile::deleteIdx('web.items.filter_key');
+	CProfile::deleteIdx('web.items.filter_snmp_community');
+	CProfile::deleteIdx('web.items.filter_snmpv3_securityname');
+	CProfile::deleteIdx('web.items.filter_snmp_oid');
+	CProfile::deleteIdx('web.items.filter_port');
+	CProfile::deleteIdx('web.items.filter_value_type');
+	CProfile::deleteIdx('web.items.filter_delay');
+	CProfile::deleteIdx('web.items.filter_history');
+	CProfile::deleteIdx('web.items.filter_trends');
+	CProfile::deleteIdx('web.items.filter_status');
+	CProfile::deleteIdx('web.items.filter_state');
+	CProfile::deleteIdx('web.items.filter_templated_items');
+	CProfile::deleteIdx('web.items.filter_with_triggers');
+	CProfile::deleteIdx('web.items.filter_ipmi_sensor');
 	DBend();
 }
 
