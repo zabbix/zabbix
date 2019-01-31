@@ -1258,7 +1258,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$dbResult = DBselect('SELECT * FROM item_preproc WHERE itemid='.$itemid);
 			$itemsPreproc = DBfetchArray($dbResult);
 			foreach ($itemsPreproc as $itemPreproc) {
-				$preprocessing_type = get_preprocessing_types($itemPreproc['type']);
+				$preprocessing_type = get_preprocessing_types($itemPreproc['type'], false, CItemPrototype::$supported_preprocessing_types);
 				$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($itemPreproc['step']-1)."_type_name']", 'readonly');
 				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_type_name", $preprocessing_type);
 				if ((1 <= $itemPreproc['type']) && ($itemPreproc['type'] <= 4)) {

@@ -60,6 +60,8 @@
 #include "taskmanager/taskmanager.h"
 #include "preprocessor/preproc_manager.h"
 #include "preprocessor/preproc_worker.h"
+#include "lld/lld_manager.h"
+#include "lld/lld_worker.h"
 #include "events.h"
 #include "../libs/zbxdbcache/valuecache.h"
 #include "setproctitle.h"
@@ -185,6 +187,8 @@ int	CONFIG_IPMIMANAGER_FORKS	= 0;
 int	CONFIG_ALERTMANAGER_FORKS	= 1;
 int	CONFIG_PREPROCMAN_FORKS		= 1;
 int	CONFIG_PREPROCESSOR_FORKS	= 3;
+int	CONFIG_LLDMANAGER_FORKS		= 1;
+int	CONFIG_LLDWORKER_FORKS		= 2;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -410,6 +414,16 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_PREPROCESSOR;
 		*local_process_num = local_server_num - server_count + CONFIG_PREPROCESSOR_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_LLDMANAGER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_LLDMANAGER;
+		*local_process_num = local_server_num - server_count + CONFIG_LLDMANAGER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_LLDWORKER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_LLDWORKER;
+		*local_process_num = local_server_num - server_count + CONFIG_LLDWORKER_FORKS;
 	}
 	else
 		return FAIL;
@@ -731,6 +745,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"ExportFileSize",		&CONFIG_EXPORT_FILE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	ZBX_MEBIBYTE,	ZBX_GIBIBYTE},
+		{"StartLLDProcessors",		&CONFIG_LLDWORKER_FORKS,		TYPE_INT,
+			PARM_OPT,	1,			100},
 		{NULL}
 	};
 
@@ -1076,7 +1092,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_JAVAPOLLER_FORKS
 			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
 			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS + CONFIG_IPMIMANAGER_FORKS
-			+ CONFIG_ALERTMANAGER_FORKS + CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS;
+			+ CONFIG_ALERTMANAGER_FORKS + CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS
+			+ CONFIG_LLDMANAGER_FORKS + CONFIG_LLDWORKER_FORKS;
 	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
@@ -1186,6 +1203,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 			case ZBX_PROCESS_TYPE_ALERTMANAGER:
 				zbx_thread_start(alert_manager_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_LLDMANAGER:
+				zbx_thread_start(lld_manager_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_LLDWORKER:
+				zbx_thread_start(lld_worker_thread, &thread_args, &threads[i]);
 				break;
 		}
 	}

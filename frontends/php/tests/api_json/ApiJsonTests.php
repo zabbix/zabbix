@@ -42,6 +42,7 @@ require_once dirname(__FILE__).'/testValuemap.php';
 require_once dirname(__FILE__).'/testWebScenario.php';
 require_once dirname(__FILE__).'/testMap.php';
 require_once dirname(__FILE__).'/testDiscoveryRule.php';
+require_once dirname(__FILE__).'/testDependentItems.php';
 
 class ApiJsonTests {
 	public static function suite() {
@@ -53,6 +54,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testAction');
 		$suite->addTestSuite('testApplication');
 		$suite->addTestSuite('testConfiguration');
+		$suite->addTestSuite('testDependentItems');
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
 		$suite->addTestSuite('testHost');

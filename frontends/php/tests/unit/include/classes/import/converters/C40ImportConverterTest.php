@@ -27,15 +27,57 @@ class C40ImportConverterTest extends CImportConverterTest {
 				[
 					'templates' => [
 						[
+							'items' => [
+								[
+									'preprocessing' => [
+										[
+											'type' => '12',
+											'params' => '$.path.to.node'
+										]
+									]
+								]
+							],
 							'discovery_rules' => [
-								[]
+								[
+									'item_prototypes' => [
+										[
+											'preprocessing' => [
+												[
+													'type' => '12',
+													'params' => '$.path.to.node'
+												]
+											]
+										]
+									]
+								]
 							]
 						]
 					],
 					'hosts' => [
 						[
+							'items' => [
+								[
+									'preprocessing' => [
+										[
+											'type' => '12',
+											'params' => '$.path.to.node'
+										]
+									]
+								]
+							],
 							'discovery_rules' => [
-								[]
+								[
+									'item_prototypes' => [
+										[
+											'preprocessing' => [
+												[
+													'type' => '12',
+													'params' => '$.path.to.node'
+												]
+											]
+										]
+									]
+								]
 							]
 						]
 					]
@@ -43,18 +85,68 @@ class C40ImportConverterTest extends CImportConverterTest {
 				[
 					'templates' => [
 						[
+							'items' => [
+								[
+									'preprocessing' => [
+										[
+											'type' => '12',
+											'params' => '$.path.to.node',
+											'error_handler' => '0',
+											'error_handler_params' => ''
+										]
+									]
+								]
+							],
 							'discovery_rules' => [
 								[
-									'lld_macro_paths' => []
+									'item_prototypes' => [
+										[
+											'preprocessing' => [
+												[
+													'type' => '12',
+													'params' => '$.path.to.node',
+													'error_handler' => '0',
+													'error_handler_params' => ''
+												]
+											]
+										]
+									],
+									'lld_macro_paths' => [],
+									'preprocessing' => []
 								]
 							]
 						]
 					],
 					'hosts' => [
 						[
+							'items' => [
+								[
+									'preprocessing' => [
+										[
+											'type' => '12',
+											'params' => '$.path.to.node',
+											'error_handler' => '0',
+											'error_handler_params' => ''
+										]
+									]
+								]
+							],
 							'discovery_rules' => [
 								[
-									'lld_macro_paths' => []
+									'item_prototypes' => [
+										[
+											'preprocessing' => [
+												[
+													'type' => '12',
+													'params' => '$.path.to.node',
+													'error_handler' => '0',
+													'error_handler_params' => ''
+												]
+											]
+										]
+									],
+									'lld_macro_paths' => [],
+									'preprocessing' => []
 								]
 							]
 						]
