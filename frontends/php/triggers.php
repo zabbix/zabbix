@@ -765,6 +765,10 @@ else {
 			: ZBX_FLAG_DISCOVERY_NORMAL;
 	}
 
+	if ($show_value_column && $filter_value != -1) {
+		$options['filter']['value'] = $filter_value;
+	}
+
 	if ($filter_name !== '') {
 		$options['search']['description'] = $filter_name;
 	}
