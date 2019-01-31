@@ -2683,6 +2683,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     min-width: 650px; }
   .overlay-dialogue .msg-bad,
   .overlay-dialogue .msg-good {
+    position: -webkit-sticky;
     position: sticky;
     top: 0;
     z-index: 1000; }
@@ -4482,12 +4483,13 @@ svg {
     margin-left: -5px;
     width: 10px;
     height: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 1px white;
+    border-radius: 50%;
     background: #4796c4; }
   .range-control.range-control-focus .range-control-thumb {
+    margin-top: -6.66667px;
+    margin-left: -6.66667px;
     background: #4796c4;
-    box-shadow: 0 0 0 2px #8599a4; }
+    border: 2px solid #8599a4; }
   .range-control.range-control-focus .range-control-progress {
     background: #4796c4; }
   .range-control.disabled {
