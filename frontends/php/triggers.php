@@ -651,11 +651,13 @@ else {
 		$filter_tags = getRequest('filter_tags', []);
 
 		if ($filter_groupids) {
-			$filter_groupids = array_keys(API::HostGroup()->get([
-				'output' => ['groupid'],
+			$filter_groupids = API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
 				'groupids' => $filter_groupids,
 				'preservekeys' => true
-			]));
+			]);
+			$filter_groupids_ms = CArrayHelper::renameObjectsKeys($filter_groupids, ['groupid' => 'id']);
+			$filter_groupids = array_keys($filter_groupids);
 		}
 
 		if ($filter_hostids) {
@@ -691,6 +693,14 @@ else {
 		$filter_name = CProfile::get('web.triggers.filter_name', '');
 		$filter_priority = CProfile::getArray('web.triggers.filter_priority', []);
 		$filter_groupids = CProfile::getArray('web.triggers.filter_groupids', []);
+
+		if ($filter_groupids) {
+			$filter_groupids_ms = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $filter_groupids
+			]), ['groupid' => 'id']);
+		}
+
 		$filter_hostids = CProfile::getArray('web.triggers.filter_hostids', []);
 		$filter_state = CProfile::get('web.triggers.filter_state', -1);
 		$filter_status = CProfile::get('web.triggers.filter_status', -1);
@@ -798,13 +808,6 @@ else {
 	if ($filter_tags) {
 		$options['evaltype'] = $filter_evaltype;
 		$options['tags'] = $filter_tags;
-	}
-
-	if ($filter_groupids) {
-		$filter_groupids_ms = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $filter_groupids,
-		]), ['groupid' => 'id']);
 	}
 
 	if ($filter_hostids) {
