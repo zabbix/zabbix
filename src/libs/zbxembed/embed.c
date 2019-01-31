@@ -74,11 +74,8 @@ static void	*es_malloc(void *udata, duk_size_t size)
 	if (env->total_alloc + size + 8 > ZBX_ES_MEMORY_LIMIT)
 	{
 		if (NULL == env->ctx)
-			es_handle_error(udata, "memory limit exceeded");
-		else
-			(void)duk_fatal(env->ctx, "memory limit exceeded");
+			env->error = zbx_strdup(env->error, "cannot allocate memory");
 
-		/* never returns as longjmp is called by error handler */
 		return NULL;
 	}
 
@@ -105,9 +102,9 @@ static void	*es_realloc(void *udata, void *ptr, duk_size_t size)
 
 	if (env->total_alloc + size + 8 - old_size > ZBX_ES_MEMORY_LIMIT)
 	{
-		(void)duk_fatal(env->ctx, "memory limit exceeded");
+		if (NULL == env->ctx)
+			env->error = zbx_strdup(env->error, "cannot allocate memory");
 
-		/* never returns as longjmp is called by error handler */
 		return NULL;
 	}
 
