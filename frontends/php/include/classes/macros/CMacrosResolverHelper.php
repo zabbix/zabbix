@@ -540,12 +540,13 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Set every trigger items array elements order by item usage order in trigger expression.
+	 * Set every trigger items array elements order by item usage order in trigger expression and recovery expression.
 	 *
-	 * @param array  $triggers                        Array of triggers.
-	 * @param string $triggers[]['expression']        Trigger expression used to define order of trigger items.
-	 * @param array  $triggers[]['items]              Items to be sorted.
-	 * @param string $triggers[]['items][]['itemid']  Item id.
+	 * @param array  $triggers                            Array of triggers.
+	 * @param string $triggers[]['expression']            Trigger expression used to define order of trigger items.
+	 * @param string $triggers[]['recovery_expression']   Trigger expression used to define order of trigger items.
+	 * @param array  $triggers[]['items]                  Items to be sorted.
+	 * @param string $triggers[]['items][]['itemid']      Item id.
 	 *
 	 * @return array
 	 */
