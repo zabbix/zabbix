@@ -21,14 +21,11 @@
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
-/**
- * @backup triggers
- */
 class testTriggers extends CAPITest {
 
-	public static function trigger_get() {
-		$triggerids = [134118, 134000, 134001, 134002, 134003, 134004, 134005];
-		$dependent_triggerids = [134004, 134005];
+	public static function trigger_get_data() {
+		$triggerids = ['134118', '134000', '134001', '134002', '134003', '134004', '134005'];
+		$dependent_triggerids = ['134004', '134005'];
 
 		return [
 			[
@@ -67,7 +64,7 @@ class testTriggers extends CAPITest {
 			[
 				'params' => [
 					'output' => ['triggerids'],
-					'hostids' => [130000],
+					'hostids' => ['130000'],
 					'dependent' => true
 				],
 				'expect' => [
@@ -78,7 +75,7 @@ class testTriggers extends CAPITest {
 			[
 				'params' => [
 					'output' => ['triggerids'],
-					'hostids' => [130000],
+					'hostids' => ['130000'],
 					'dependent' => false
 				],
 				'expect' => [
@@ -90,7 +87,7 @@ class testTriggers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider trigger_get
+	* @dataProvider trigger_get_data
 	*/
 	public function testTrigger_Get($params, $expect) {
 		$response = $this->call('trigger.get', $params, $expect['error']);
@@ -101,6 +98,6 @@ class testTriggers extends CAPITest {
 		$triggerids = array_column($response['result'], 'triggerid');
 		sort($triggerids);
 		sort($expect['triggerids']);
-		$this->assertEquals(implode(',', $expect['triggerids']), implode(',', $triggerids));
+		$this->assertSame($expect['triggerids'], $triggerids);
 	}
 }
