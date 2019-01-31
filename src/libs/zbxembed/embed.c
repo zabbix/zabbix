@@ -26,6 +26,9 @@
 #define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 10)
 #define ZBX_ES_TIMEOUT		10
 
+/* maximum number of consequent runtime errors after which it's treated as fatal error */
+#define ZBX_ES_MAX_CONSEQUENT_RT_ERROR	3
+
 struct zbx_es_env
 {
 	duk_context	*ctx;
@@ -34,6 +37,7 @@ struct zbx_es_env
 
 	char		*error;
 	int		rt_error_num;
+	int		fatal_error;
 
 	jmp_buf		loc;
 };
@@ -51,6 +55,9 @@ static void	es_handle_error(void *udata, const char *msg)
 {
 	zbx_es_env_t	*env = (zbx_es_env_t *)udata;
 
+	zabbix_log(LOG_LEVEL_WARNING, "Cannot process javascript, fatal error: %s", msg);
+
+	env->fatal_error = 1;
 	env->error = zbx_strdup(env->error, msg);
 	longjmp(env->loc, 1);
 }
@@ -276,14 +283,20 @@ int	zbx_es_is_env_initialized(zbx_es_t *es)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_es_error_num                                                 *
+ * Function: zbx_es_fatal_error                                               *
  *                                                                            *
- * Purpose: returns the number of consecutive runtime errors                  *
+ * Purpose: checks if fatal error has occurred                                *
+ *                                                                            *
+ * Comments: Fatal error may put the scripting engine in unknown state, it's  *
+ *           safer to destroy it instead of continuing to work with it.       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_es_get_runtime_error_num(zbx_es_t *es)
+int	zbx_es_fatal_error(zbx_es_t *es)
 {
-	return es->env->rt_error_num;
+	if (0 != es->env->fatal_error || ZBX_ES_MAX_CONSEQUENT_RT_ERROR < es->env->rt_error_num)
+		return SUCCEED;
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -311,11 +324,18 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 
 	unsigned char	*buffer;
 	duk_size_t	sz;
-	char		*func, *ptr;
+	char		*func = NULL, *ptr;
 	size_t		len;
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED == zbx_es_fatal_error(es))
+	{
+		ret = FAIL;
+		*error = zbx_strdup(*error, "cannot continue javascript processing after fatal scripting engine error");
+		goto out;
+	}
 
 	if (0 != setjmp(es->env->loc))
 	{
@@ -398,6 +418,13 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED == zbx_es_fatal_error(es))
+	{
+		ret = FAIL;
+		*error = zbx_strdup(*error, "cannot continue javascript processing after fatal scripting engine error");
+		goto out;
+	}
 
 	ZBX_UNUSED(script);
 
