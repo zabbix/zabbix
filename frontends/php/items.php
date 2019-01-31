@@ -1682,7 +1682,6 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'config' => select_config(),
-		'filter_hostids' => $filter_hostids,
 		'hostid' => $hostid
 	];
 
