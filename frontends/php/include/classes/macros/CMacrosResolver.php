@@ -1914,4 +1914,77 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		return $label;
 	}
+
+	/**
+	 * Set every trigger items array elements order by item usage order in trigger expression.
+	 *
+	 * @param array  $triggers                        Array of triggers.
+	 * @param string $triggers[]['expression']        Trigger expression used to define order of trigger items.
+	 * @param array  $triggers[]['items]              Items to be sorted.
+	 * @param string $triggers[]['items][]['itemid']  Item id.
+	 *
+	 * @return array
+	 */
+	public function sortItemsByExpressionOrder(array $triggers) {
+		$functionids = [];
+		$trigger_functionids = [];
+		$functionids_hash = [];
+		$types = [
+			'macros' => [
+				'trigger' => ['{TRIGGER.VALUE}']
+			],
+			'functionids' => true,
+			'lldmacros' => true,
+			'usermacros' => true
+		];
+
+		foreach ($triggers as $key => $trigger) {
+			$matched_macros = $this->extractMacros([$trigger['expression']], $types);
+
+			$trigger_functionids[$key] = [];
+
+			foreach (array_keys($matched_macros['functionids']) as $functionid) {
+				$functionid = substr($functionid, 1, -1); // strip curly braces
+
+				$functionids[$functionid] = true;
+				$trigger_functionids[$key][] = $functionid;
+			}
+		}
+
+		if (!$functionids) {
+			return;
+		}
+
+		$cursor = DBselect(
+			'SELECT f.functionid,f.itemid'.
+			' FROM functions f'.
+			' WHERE '.dbConditionInt('f.functionid', array_keys($functionids))
+		);
+
+		while ($row = DBfetch($cursor)) {
+			$functionids_hash[$row['functionid']] = $row['itemid'];
+		}
+
+		foreach ($triggers as $key => &$trigger) {
+			if (count($trigger['items']) < 2) {
+				continue;
+			}
+
+			$ordered_items = [];
+
+			// Convert functionid to itemid and initialize array keys in expression item order.
+			foreach ($trigger_functionids[$key] as $functionid) {
+				$ordered_items[$functionids_hash[$functionid]] = [];
+			}
+
+			foreach ($trigger['items'] as $item) {
+				$ordered_items[$item['itemid']] = $item;
+			}
+
+			$trigger['items'] = array_values($ordered_items);
+		}
+		unset($trigger);
+
+		return $triggers;
+	}
 }

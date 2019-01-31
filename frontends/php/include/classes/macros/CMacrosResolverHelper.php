@@ -538,4 +538,20 @@ class CMacrosResolverHelper {
 
 		return self::$macrosResolver->resolveTimeUnitMacros($data, ['sources' => $field_names]);
 	}
+
+	/**
+	 * Set every trigger items array elements order by item usage order in trigger expression.
+	 *
+	 * @param array  $triggers                        Array of triggers.
+	 * @param string $triggers[]['expression']        Trigger expression used to define order of trigger items.
+	 * @param array  $triggers[]['items]              Items to be sorted.
+	 * @param string $triggers[]['items][]['itemid']  Item id.
+	 *
+	 * @return array
+	 */
+	public static function sortItemsByExpressionOrder(array $triggers) {
+		self::init();
+
+		return self::$macrosResolver->sortItemsByExpressionOrder($triggers);
+	}
 }

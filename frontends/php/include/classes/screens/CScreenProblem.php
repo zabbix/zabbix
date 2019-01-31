@@ -590,19 +590,9 @@ class CScreenProblem extends CScreenBase {
 
 			// Sort items.
 			if ($filter['show_latest_values'] == 1) {
+				$data['triggers'] = CMacrosResolverHelper::sortItemsByExpressionOrder($data['triggers']);
+
 				foreach ($data['triggers'] as &$trigger) {
-					if (count($trigger['items']) > 1) {
-						$order = [];
-						$pos = 0;
-						foreach ($trigger['expression_html'] as $expression_parts) {
-							if (is_array($expression_parts) && $expression_parts[1] instanceof CLink) {
-								$order[$expression_parts[1]->getAttribute('data-itemid')] = $pos++;
-							}
-						}
-						usort($trigger['items'], function ($a, $b) use ($order) {
-							return ($order[$a['itemid']] > $order[$b['itemid']]) ? 1 : -1;
-						});
-					}
 					$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
 				}
 				unset($trigger);
