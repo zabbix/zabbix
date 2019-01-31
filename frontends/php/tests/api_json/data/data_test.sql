@@ -745,13 +745,15 @@ INSERT INTO triggers (triggerid, expression, description, priority, flags, comme
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (18079, 40074, 30004, 'last', '');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30004, 30003);
 
--- LLD rules and LLD macro paths
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110006,50009,50022,0,4,'API LLD rule 1','apilldrule1','30s','90d',0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110007,50009,50022,0,4,'API LLD rule 2','apilldrule2','30s','90d',0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110008,50009,50022,0,4,'API LLD rule 3','apilldrule3','30s','90d',0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110009,50009,50022,0,4,'API LLD rule 4','apilldrule4','30s','90d',0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110010,50010,null,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,templateid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110011,50009,50022,110010,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,'','',1,'','');
+-- LLD rules
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110006,50009,50022,0,4,'API LLD rule 1','apilldrule1','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110007,50009,50022,0,4,'API LLD rule 2','apilldrule2','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110008,50009,50022,0,4,'API LLD rule 3','apilldrule3','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110009,50009,50022,0,4,'API LLD rule 4','apilldrule4','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110010,50010,null,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,templateid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110011,50009,50022,110010,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,0,'','',1,'','');
+
+-- LLD macro paths
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1,110006,'{#A}','$.list[:1].type');
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (2,110006,'{#B}','$.list[:2].type');
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (3,110006,'{#C}','$.list[:3].type');
@@ -769,3 +771,17 @@ INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (14,1
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (15,110011,'{#A}','$.list[:1].type');
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (16,110011,'{#B}','$.list[:2].type');
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (17,110011,'{#C}','$.list[:3].type');
+
+-- LLD preprocessing
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5520,110006,1,5,"^abc$\n123",0,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5521,110006,2,5,"^def$\n123",1,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5522,110006,3,5,"^ghi$\n123",2,'xxx');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5523,110006,4,5,"^jkl$\n123",3,'error');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5524,110010,1,12,'$.path.to.node1',0,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5525,110010,2,12,'$.path.to.node2',1,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5526,110010,3,12,'$.path.to.node3',2,'xxx');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5527,110010,4,12,'$.path.to.node4',3,'error');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5528,110011,1,12,'$.path.to.node1',0,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5529,110011,2,12,'$.path.to.node2',1,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5530,110011,3,12,'$.path.to.node3',2,'xxx');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5531,110011,4,12,'$.path.to.node4',3,'error');
