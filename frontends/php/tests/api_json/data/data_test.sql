@@ -773,10 +773,14 @@ INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (16,1
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (17,110011,'{#C}','$.list[:3].type');
 
 -- LLD preprocessing
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5520,110006,1,5,'^abc$\n123',0,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5521,110006,2,5,'^def$\n123',1,'');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5522,110006,3,5,'^ghi$\n123',2,'xxx');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5523,110006,4,5,'^jkl$\n123',3,'error');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5520,110006,1,5,'^abc$
+123',0,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5521,110006,2,5,'^def$
+123',1,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5522,110006,3,5,'^ghi$
+123',2,'xxx');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5523,110006,4,5,'^jkl$
+123',3,'error');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5524,110010,1,12,'$.path.to.node1',0,'');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5525,110010,2,12,'$.path.to.node2',1,'');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (5526,110010,3,12,'$.path.to.node3',2,'xxx');
