@@ -2,6 +2,7 @@ Changes for 4.0.4rc3
 
 Bug fixes:
 ..F....... [ZBX-15412] fixed Name column overlaps the Application column in the Template view (vasilijs)
+
 --------------------------------------------------------------------------------
 Changes for 4.0.4rc2
 
