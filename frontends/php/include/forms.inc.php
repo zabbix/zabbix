@@ -326,7 +326,7 @@ function getItemFilterForm(&$items) {
 		]), ['groupid' => 'id'])
 		: [];
 
-	$filterColumn1->addRow((new CLabel(_('Host group'), 'filter_groupid_ms')),
+	$filterColumn1->addRow((new CLabel(_('Host groups'), 'filter_groupid_ms')),
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
 			'object_name' => 'hostGroup',
@@ -371,7 +371,7 @@ function getItemFilterForm(&$items) {
 		]), ['hostid' => 'id'])
 		: [];
 
-	$filterColumn1->addRow((new CLabel(_('Host'), 'filter_hostid_ms')),
+	$filterColumn1->addRow((new CLabel(_('Hosts'), 'filter_hostid_ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
 			'object_name' => 'hosts',

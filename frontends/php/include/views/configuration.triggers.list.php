@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/js/configuration.triggers.list.js.php';
 
 $filter_column1 = (new CFormList())
-	->addRow((new CLabel(_('Host group'), 'filter_groupids')),
+	->addRow((new CLabel(_('Host groups'), 'filter_groupids')),
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
 			'object_name' => 'hostGroup',
@@ -38,7 +38,7 @@ $filter_column1 = (new CFormList())
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow((new CLabel(_('Host'), 'filter_hostids')),
+	->addRow((new CLabel(_('Hosts'), 'filter_hostids')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
 			'object_name' => 'hosts',
