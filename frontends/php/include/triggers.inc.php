@@ -740,17 +740,13 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
  * @param int		$problem_options['show_suppressed']  Whether to show triggers with suppressed problems.
  * @param int		$problem_options['min_severity']     (optional) Minimal problem severity.
  * @param int		$problem_options['time_from']        (optional) The time starting from which the problems were created.
- * @param boolean	$problem_options['recent']			 (optional) show recent problems.
- * @param boolean	$problem_options['any']				 (optional) show resolved and not resolved problems.
  *
  * @return array
  */
 function getTriggersWithActualSeverity(array $trigger_options, array $problem_options) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-		'time_from' => null,
-		'recent' => null,
-		'any' => null
+		'time_from' => null
 	];
 
 	$triggers = API::Trigger()->get($trigger_options);
@@ -758,8 +754,10 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 	$problem_triggerids = [];
 
 	foreach ($triggers as $triggerid => &$trigger) {
-		$problem_triggerids[] = $triggerid;
-		$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
+			$problem_triggerids[] = $triggerid;
+			$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+		}
 	}
 	unset($trigger);
 
@@ -768,13 +766,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['objectid', 'severity'],
 			'objectids' => $problem_triggerids,
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
-			'time_from' => $problem_options['time_from'],
-			'recent' => $problem_options['recent'],
-			'any' => $problem_options['any']
+			'time_from' => $problem_options['time_from']
 		]);
-
-		$triggerids = zbx_objectValues($problems, 'objectid');
-		$triggers = array_intersect_key($triggers, array_fill_keys($triggerids, ''));
 
 		foreach ($problems as $problem) {
 			if ($triggers[$problem['objectid']]['priority'] < $problem['severity']) {
@@ -782,7 +775,10 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			}
 		}
 
-		foreach ($triggers as $triggerid => $trigger) {
+		$triggerids = zbx_objectValues($problems, 'objectid');
+		$problem_triggers = array_intersect_key($triggers, array_fill_keys($triggerids, ''));
+
+		foreach ($problem_triggers as $triggerid => $trigger) {
 			if ($trigger['priority'] < $problem_options['min_severity']) {
 				unset($triggers[$triggerid]);
 			}
