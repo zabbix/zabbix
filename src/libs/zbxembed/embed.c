@@ -193,19 +193,19 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	ret = FAIL;
+
 	es->env = zbx_malloc(NULL, sizeof(zbx_es_env_t));
 	memset(es->env, 0, sizeof(zbx_es_env_t));
 
 	if (0 != setjmp(es->env->loc))
 	{
-		ret = FAIL;
 		*error = zbx_strdup(*error, es->env->error);
 		goto out;
 	}
 
 	if (NULL == (es->env->ctx = duk_create_heap(es_malloc, es_realloc, es_free, es->env, es_handle_error)))
 	{
-		ret = FAIL;
 		*error = zbx_strdup(*error, "cannot create context");
 		goto out;
 	}
@@ -239,7 +239,7 @@ out:
 int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 {
 	const char	*__function_name = "zbx_es_destroy_env";
-	int		ret = SUCCEED;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -254,10 +254,11 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 	zbx_free(es->env->error);
 	zbx_free(es->env);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
-			ZBX_NULL2EMPTY_STR(*error));
-
+	ret = SUCCEED;
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
+		ZBX_NULL2EMPTY_STR(*error));
+
 	return ret;
 }
 
@@ -321,22 +322,23 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 
 	unsigned char	*buffer;
 	duk_size_t	sz;
-	char		*func = NULL, *ptr;
+	char		*func, *ptr;
 	size_t		len;
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	func = NULL;
+	ret = FAIL;
+
 	if (SUCCEED == zbx_es_fatal_error(es))
 	{
-		ret = FAIL;
 		*error = zbx_strdup(*error, "cannot continue javascript processing after fatal scripting engine error");
 		goto out;
 	}
 
 	if (0 != setjmp(es->env->loc))
 	{
-		ret = FAIL;
 		*error = zbx_strdup(*error, es->env->error);
 		goto out;
 	}
@@ -356,7 +358,6 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 
 	if (0 != duk_pcompile(es->env->ctx, DUK_COMPILE_FUNCTION))
 	{
-		ret = FAIL;
 		*error = zbx_strdup(*error, duk_safe_to_string(es->env->ctx, -1));
 		goto out;
 	}
@@ -416,9 +417,10 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	ret = FAIL;
+
 	if (SUCCEED == zbx_es_fatal_error(es))
 	{
-		ret = FAIL;
 		*error = zbx_strdup(*error, "cannot continue javascript processing after fatal scripting engine error");
 		goto out;
 	}
@@ -427,7 +429,6 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	if (0 != setjmp(es->env->loc))
 	{
-		ret = FAIL;
 		es->env->rt_error_num++;
 		*error = zbx_strdup(*error, es->env->error);
 		goto out;
@@ -444,7 +445,6 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	{
 		duk_small_int_t	rc = 0;
 
-		ret = FAIL;
 		es->env->rt_error_num++;
 
 		if (0 != duk_is_object(es->env->ctx, -1))
