@@ -1141,7 +1141,7 @@ class CWidgetHelper {
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-					'jQuery(".'.ZBX_STYLE_RANGE_CONTROL.'[data-options]").rangeControl();'.
+					'jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'[data-options]").rangeControl();'.
 					'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length > 1) {'.
 						'jQuery("#data_sets .drag-icon").removeClass("disabled");'.
 						'jQuery("#data_sets").sortable("enable");'.
@@ -1158,7 +1158,7 @@ class CWidgetHelper {
 			'});',
 
 			// Initialize rangeControl UI elements.
-			'jQuery(".'.ZBX_STYLE_RANGE_CONTROL.'", jQuery("#data_sets")).rangeControl();',
+			'jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'", jQuery("#data_sets")).rangeControl();',
 
 			// Expand dataset when click in pattern fields.
 			'jQuery("#data_sets").on("click", "'.implode(', ', [
