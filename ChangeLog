@@ -122,12 +122,12 @@ Changes for 4.0.4rc3
 New features:
 
 Bug fixes:
+..F....... [ZBX-15412] fixed Name column overlaps the Application column in the Template view (vasilijs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.4rc2
 
 Bug fixes:
-..F....... [ZBX-15412] fixed Name column overlaps the Application column in the Template view (vasilijs)
 ..F....... [ZBXNEXT-4872] reverted SVG graph timeline changes to previous state (miks)
 
 --------------------------------------------------------------------------------
