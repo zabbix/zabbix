@@ -25,6 +25,14 @@
 
 #include "operations.h"
 
+typedef enum
+{
+	ZBX_DISCOVERY_UNSPEC = 0,
+	ZBX_DISCOVERY_DNS,
+	ZBX_DISCOVERY_IP,
+	ZBX_DISCOVERY_VALUE
+}zbx_discovery_type_t;
+
 /******************************************************************************
  *                                                                            *
  * Function: select_discovered_host                                           *
@@ -205,7 +213,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 	DB_ROW			row;
 	DB_ROW			row2;
 	zbx_uint64_t		dhostid, hostid = 0, proxy_hostid;
-	char			*host = NULL, *host_esc, *host_unique;
+	char			*host = NULL, *host_esc, *host_unique, *host_visible = NULL;
 	unsigned short		port;
 	zbx_vector_uint64_t	groupids;
 	unsigned char		svc_type, interface_type;
@@ -231,7 +239,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 		if (EVENT_OBJECT_DHOST == event->object)
 		{
 			result = DBselect(
-					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type"
+					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type,"
+						"dc.host_source, dc.name_source"
 					" from drules dr,dchecks dc,dservices ds"
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
@@ -242,7 +251,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 		else
 		{
 			result = DBselect(
-					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type"
+					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type,"
+						"dc.host_source, dc.name_source"
 					" from drules dr,dchecks dc,dservices ds,dservices ds1"
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
@@ -297,18 +307,74 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 
 			if (0 == hostid)
 			{
+				DB_RESULT		result_name, result_visible_name;
+				DB_ROW			row_name, row_visible_name;
+				int 			host_source, name_source;
+
+				host_source = atoi(row[6]);
+				name_source = atoi(row[7]);
+
+				if (ZBX_DISCOVERY_IP == host_source)
+					host = zbx_strdup(host, row[2]);
+				else
+					host = zbx_strdup(host, row[3]);
+
+				result_name = DBselect(
+						"select ds.value"
+						" from drules dr, dchecks dc"
+						" left join dservices ds"
+							" on ds.dcheckid=dc.dcheckid"
+							" and ds.dhostid=" ZBX_FS_UI64
+						" where dc.druleid=dr.druleid"
+							" and dr.status=%d"
+							" and dc.host_source=%d",
+							dhostid, DRULE_STATUS_MONITORED, ZBX_DISCOVERY_VALUE);
+				if (NULL != (row_name = DBfetch(result_name)))
+				{
+					if (SUCCEED == zbx_db_is_null(row_name[0]))
+						zabbix_log(LOG_LEVEL_WARNING, "cannot proceed host name");
+					else
+						host = zbx_strdup(host, row_name[0]);
+				}
+
+				DBfree_result(result_name);
 				hostid = DBget_maxid("hosts");
 
 				/* for host uniqueness purposes */
-				host = zbx_strdup(host, '\0' != *row[3] ? row[3] : row[2]);
-
 				make_hostname(host);	/* replace not-allowed symbols */
 				host_unique = DBget_unique_hostname_by_sample(host);
 				zbx_free(host);
 
+				if (ZBX_DISCOVERY_IP == name_source)
+					host_visible = zbx_strdup(host_visible, row[2]);
+				else if (ZBX_DISCOVERY_DNS == name_source)
+					host_visible = zbx_strdup(host_visible, row[3]);
+				else
+					host_visible = zbx_strdup(host_visible, host_unique);
+				result_visible_name = DBselect(
+						"select ds.value"
+						" from drules dr, dchecks dc"
+						" left join dservices ds"
+							" on ds.dcheckid=dc.dcheckid"
+							" and ds.dhostid=" ZBX_FS_UI64
+						" where dc.druleid=dr.druleid"
+							" and dr.status=%d"
+							" and dc.name_source=%d"
+							,
+							dhostid, DRULE_STATUS_MONITORED, ZBX_DISCOVERY_VALUE);
+				if (NULL != (row_visible_name = DBfetch(result_visible_name)))
+				{
+					if (SUCCEED == zbx_db_is_null(row_visible_name[0]))
+						zabbix_log(LOG_LEVEL_WARNING, "cannot proceed visible name");
+					else
+						host_visible = zbx_strdup(host_visible, row_visible_name[0]);
+				}
+
+				DBfree_result(result_visible_name);
+
 				zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid", "host", "name",
 						NULL);
-				zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, host_unique, host_unique);
+				zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, host_unique, host_visible);
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
 
@@ -318,6 +384,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				DBadd_interface(hostid, interface_type, 1, row[2], row[3], port);
 
 				zbx_free(host_unique);
+				zbx_free(host_visible);
 
 				add_discovered_host_groups(hostid, &groupids);
 			}

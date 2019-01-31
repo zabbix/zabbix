@@ -433,7 +433,7 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 			"select dcheckid,type,key_,snmp_community,snmpv3_securityname,snmpv3_securitylevel,"
 				"snmpv3_authpassphrase,snmpv3_privpassphrase,snmpv3_authprotocol,snmpv3_privprotocol,"
-				"ports,snmpv3_contextname"
+				"ports,snmpv3_contextname,host_source, name_source"
 			" from dchecks"
 			" where druleid=" ZBX_FS_UI64,
 			drule->druleid);

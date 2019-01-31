@@ -399,9 +399,6 @@ static void	discovery_update_service_status(DB_DHOST *dhost, const DB_DSERVICE *
 	zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts, service_status,
 			NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
 
-	zbx_process_events(NULL, NULL);
-	zbx_clean_events();
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -467,6 +464,9 @@ void	discovery_update_host(DB_DHOST *dhost, int status, int now)
 	const char	*__function_name = "discovery_update_host";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_process_events(NULL, NULL);
+	zbx_clean_events();
 
 	if (0 != dhost->dhostid)
 		discovery_update_host_status(dhost, status, now);
