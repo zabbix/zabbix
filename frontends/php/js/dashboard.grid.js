@@ -177,14 +177,11 @@
 		return $('.dashbrd-grid-widget-container').width() / data['options']['max-columns'];
 	}
 
-	function setDivPosition($div, data, pos, is_placeholder) {
-		var cell_w = is_placeholder ? data['cell-width'] : data['options']['widget-width'],
-			unit = is_placeholder ? 'px' : '%';
-
+	function setDivPosition($div, data, pos) {
 		$div.css({
-			left: cell_w * pos['x'] + unit,
+			left: data['options']['widget-width'] * pos['x'] + '%',
 			top: data['options']['widget-height'] * pos['y'] + 'px',
-			width: cell_w * pos['width'] + unit,
+			width: data['options']['widget-width'] * pos['width'] + '%',
 			height: data['options']['widget-height'] * pos['height'] + 'px'
 		});
 	}
@@ -794,7 +791,7 @@
 		$.each(data['widgets'], function() {
 			if (!posEquals(this['pos'], this['current_pos'])) {
 				this['pos'] = this['current_pos'];
-				setDivPosition(this['div'], data, this['pos'], false);
+				setDivPosition(this['div'], data, this['pos']);
 			}
 
 			delete this['current_pos'];
@@ -819,7 +816,7 @@
 
 			data.widgets.each(function(box) {
 				if (widget.uniqueid != box.uniqueid) {
-					setDivPosition(box['div'], data, box['current_pos'], false);
+					setDivPosition(box['div'], data, box['current_pos']);
 				}
 
 				rows = Math.max(rows, box.current_pos.y + box.current_pos.height);
@@ -835,7 +832,7 @@
 			}
 		}
 
-		setDivPosition(data['placeholder'], data, pos, true);
+		setDivPosition(data['placeholder'], data, pos);
 	}
 
 	/**
@@ -850,7 +847,7 @@
 			pos = getDivPosition($obj, data, $div),
 			rows = 0;
 
-		setDivPosition(data['placeholder'], data, pos, true);
+		setDivPosition(data['placeholder'], data, pos);
 
 		if (!posEquals(pos, widget['current_pos'])) {
 			widget['current_pos'] = pos;
@@ -858,7 +855,7 @@
 
 			data['widgets'].forEach(function(w) {
 				if (widget.uniqueid != w.uniqueid) {
-					setDivPosition(w['div'], data, w['current_pos'], false);
+					setDivPosition(w['div'], data, w['current_pos']);
 				}
 
 				rows = Math.max(rows, w['current_pos'].y + w['current_pos'].height);
@@ -900,7 +897,7 @@
 			// should be present only while dragging
 			delete this['current_pos'];
 		});
-		setDivPosition($div, data, widget['pos'], false);
+		setDivPosition($div, data, widget['pos']);
 		resizeDashboardGrid($obj, data);
 	}
 
@@ -1639,15 +1636,19 @@
 
 				if (drag) {
 					if (('top' in data.add_widget_dimension) === false) {
-						data.add_widget_dimension = $.extend(data.add_widget_dimension, {top: y, left: x});
+						data.add_widget_dimension = $.extend(data.add_widget_dimension, {top: Math.min(y, data.add_widget_dimension.y), left: x});
 					}
 
 					pos = {
-						y: Math.min(y, data.add_widget_dimension.top),
 						x: Math.min(x, data.add_widget_dimension.left),
+						y: Math.min(y, (data.add_widget_dimension.top < y)
+							? data.add_widget_dimension.y
+							: data.add_widget_dimension.top
+						),
 						width: Math.abs(data.add_widget_dimension.left - x) + 1,
-						height: Math.max(2, Math.abs(data.add_widget_dimension.top - y) + 1 +
-							(data.add_widget_dimension.top > y ? 1 : 0)
+						height: Math.max(2, (data.add_widget_dimension.top < y)
+							? y - data.add_widget_dimension.top + 1
+							: data.add_widget_dimension.top - y + 2
 						)
 					};
 
@@ -1662,9 +1663,12 @@
 					}
 				}
 				else {
-					// Proceed only when coordinates have been changed.
-					if (data.add_widget_dimension.y == y && data.add_widget_dimension.x == x) {
+					if (rectOverlap(data.add_widget_dimension, {x: x, y: y, width: 1, height: 1})) {
 						return;
+					}
+
+					if (data.add_widget_dimension.y < pos.y) {
+						--pos.y;
 					}
 
 					$.each(data.widgets, function(_, box) {
@@ -1698,6 +1702,7 @@
 				if ((pos.y + pos.height) > data['options']['rows']) {
 					resizeDashboardGrid($obj, data, pos.y + pos.height);
 				}
+
 				data.add_widget_dimension = $.extend(data.add_widget_dimension, pos);
 
 				data.new_widget_placeholder.container
@@ -2088,7 +2093,7 @@
 				data['widgets'].push(widget);
 				$this.append(widget['div']);
 
-				setDivPosition(widget['div'], data, widget['pos'], false);
+				setDivPosition(widget['div'], data, widget['pos']);
 				checkWidgetOverlap(data, widget);
 
 				resizeDashboardGrid($this, data);
