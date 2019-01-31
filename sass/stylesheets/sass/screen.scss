@@ -5768,9 +5768,7 @@ ul.checkbox-list {
 }
 
 @each $num, $width in (
-	2: 50%,
 	3: 33.33333%,
-	4: 25%,
 ) {
 	ul.checkbox-list.col-#{$num} > li {
 		-ms-flex: 0 0 $width;
