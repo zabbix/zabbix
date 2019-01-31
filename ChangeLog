@@ -1,8 +1,15 @@
+Changes for 4.2.0alpha4
+
+New features:
+
+Bug fixes:
+...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
+
+--------------------------------------------------------------------------------
 Changes for 4.2.0alpha3
 
 New features:
 ....I...S. [ZBXNEXT-4868] added TimescaleDB support (kalimulin)
-..F....... [ZBXNEXT-4872] reworked SVG graph x-axis timeline (miks)
 A.F.I...S. [ZBXNEXT-4877] implemented support for custom JSON path in LLD macros (Ivo, vso)
 ..F....... [ZBXNEXT-1190] implemented item prototype mass update and combined adding, updating and removing of applications in single control in item mass update form (Ivo)
 A......... [ZBXNEXT-4933] dropped support of "elementid" in map.create() and map.update() methods (Sasha)
@@ -39,7 +46,7 @@ A......... [ZBX-15355] fixed undefined index in configuration.import API call (S
 A......... [ZBX-14926] fixed empty "inventory" property being returned by API if inventory mode is disabled (agriscenko)
 A......... [ZBX-15354] fixed undefined index in API calls without "auth" parameter (Sasha)
 ...G...PS. [ZBX-15399] fixed IPv4 connections not being accepted when IPv6 mask is used (akozlovs)
-A......... [ZBX-14331] fixed error allowed to change interface type which is already used by items (gcalenko)
+A......... [ZBX-14331] fixed error allowing users to change type of a host interface that already has items attached (gcalenko)
 ........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
 ..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
 ..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
@@ -108,6 +115,12 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.4rc2
+
+Bug fixes:
+..F....... [ZBXNEXT-4872] reverted SVG graph timeline changes to previous state (miks)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.4rc1
 
 New features:
@@ -145,7 +158,7 @@ A......... [ZBX-15355] fixed undefined index in configuration.import API call (S
 A......... [ZBX-14926] fixed empty "inventory" property being returned by API if inventory mode is disabled (agriscenko)
 A......... [ZBX-15354] fixed undefined index in API calls without "auth" parameter (Sasha)
 ...G...PS. [ZBX-15399] fixed IPv4 connections not being accepted when IPv6 mask is used (akozlovs)
-A......... [ZBX-14331] fixed error allowed to change interface type which is already used by items (gcalenko)
+A......... [ZBX-14331] fixed error allowing users to change type of a host interface that already has items attached (gcalenko)
 ..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
 ..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
 ........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
@@ -2289,6 +2302,19 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.26rc1
+
+New features:
+
+Bug fixes:
+...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.25
+
+3.0.25rc1 was released as 3.0.25 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.25rc1
 
 Bug fixes:
@@ -2297,7 +2323,7 @@ A......... [ZBX-15220] fixed displaying of last value for values received in the
 ...G...PS. [ZBX-11761] added warnings in case of TLS identity mismatch (akozlovs)
 A......... [ZBX-15355] fixed undefined index in configuration.import API call (Sasha)
 A......... [ZBX-15354] fixed undefined index in API calls without "auth" parameter (Sasha)
-A......... [ZBX-14331] fixed error allowed to change interface type which is already used by items (gcalenko)
+A......... [ZBX-14331] fixed error allowing users to change type of a host interface that already has items attached (gcalenko)
 ........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
 A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
 A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
