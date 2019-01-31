@@ -119,8 +119,6 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.4rc3
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-15412] fixed Name column overlaps the Application column in the Template view (vasilijs)
 
