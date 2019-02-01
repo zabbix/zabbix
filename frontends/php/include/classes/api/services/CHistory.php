@@ -37,43 +37,91 @@ class CHistory extends CApiService {
 	 * Get history data.
 	 *
 	 * @param array  $options
-	 * @param array  $options['itemids']
-	 * @param bool   $options['editable']
-	 * @param string $options['pattern']
-	 * @param int    $options['limit']
-	 * @param string $options['order']
+	 * @param int    $options['history']                       History object type to return.
+	 * @param array  $options['hostids']                       Return only history from the given hosts.
+	 * @param array  $options['itemids']                       Return only history from the given items.
+	 * @param int    $options['time_from']                     Return only values that have been received after or at
+	 *                                                         the given time.
+	 * @param int    $options['time_till']                     Return only values that have been received before or at
+	 *                                                         the given time.
+	 * @param array  $options['filter']                        Return only those results that exactly match the given
+	 *                                                         filter.
+	 * @param int    $options['filter']['itemid']
+	 * @param int    $options['filter']['clock']
+	 * @param mixed  $options['filter']['value']
+	 * @param int    $options['filter']['ns']
+	 * @param array  $options['search']                        Return results that match the given wildcard search
+	 *                                                         (case-insensitive).
+	 * @param string $options['search']['value']
+	 * @param bool   $options['searchByAny']                   If set to true return results that match any of the
+	 *                                                         criteria given in the filter or search parameter instead
+	 *                                                         of all of them.
+	 * @param bool   $options['startSearch']                   Return results that match the given wildcard search
+	 *                                                         (case-insensitive).
+	 * @param bool   $options['excludeSearch']                 Return results that do not match the criteria given in
+	 *                                                         the search parameter.
+	 * @param bool   $options['searchWildcardsEnabled']        If set to true enables the use of “*” as a wildcard
+	 *                                                         character in the search parameter.
+	 * @param array  $options['output']                        Object properties to be returned.
+	 * @param bool   $options['countOutput']                   Return the number of records in the result instead of the
+	 *                                                         actual data.
+	 * @param array  $options['sortfield']                     Sort the result by the given properties. Refer to a
+	 *                                                         specific API get method description for a list of
+	 *                                                         properties that can be used for sorting. Macros are not
+	 *                                                         expanded before sorting.
+	 * @param string $options['sortorder']                     Order of sorting. If an array is passed, each value will
+	 *                                                         be matched to the corresponding property given in the
+	 *                                                         sortfield parameter.
+	 * @param int    $options['limit']                         Limit the number of records returned.
+	 * @param bool   $options['nopermissions']                 Select values without checking permissions of hosts.
+	 * @param bool   $options['editable']                      If set to true return only objects that the user has
+	 *                                                         write permissions to.
+	 * @param bool   $options['preservekeys']                  Use IDs as keys in the resulting array.
 	 *
-	 * @return array|int item data as array or false if error
+	 * @return array|int    Item data as array or false if error.
 	 */
 	public function get($options = []) {
-		$def_options = [
-			'history'					=> ITEM_VALUE_TYPE_UINT64,
-			'hostids'					=> null,
-			'itemids'					=> null,
-			'editable'					=> false,
-			'nopermissions'				=> null,
-			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> false,
-			'excludeSearch'				=> false,
-			'searchWildcardsEnabled'	=> null,
-			'time_from'					=> null,
-			'time_till'					=> null,
-			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'countOutput'				=> false,
-			'groupCount'				=> false,
-			'preservekeys'				=> false,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null
-		];
-		$options = zbx_array_merge($def_options, $options);
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// filter and search
+			'history' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT]), 'default' => ITEM_VALUE_TYPE_UINT64],
+			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'itemids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'time_from' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'time_till' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'value' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'value' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 
-		if ((USER_TYPE_SUPER_ADMIN != self::$userData['type'] && !$options['nopermissions']) ||
-				$options['hostids'] !== null) {
+			// output
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'value', 'ns']), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+
+			// sort and limit
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'default' => []],
+			'sortorder' =>				['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]), 'default' => null],
+			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+
+			// flags
+			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false],
+			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if ((USER_TYPE_SUPER_ADMIN != self::$userData['type'] && !$options['nopermissions'])
+				|| $options['hostids'] !== null) {
 			$items = API::Item()->get([
 				'output' => ['itemid'],
 				'itemids' => $options['itemids'],
@@ -111,8 +159,7 @@ class CHistory extends CApiService {
 			'from'		=> [],
 			'where'		=> [],
 			'group'		=> [],
-			'order'		=> [],
-			'limit'		=> null
+			'order'		=> []
 		];
 
 		if (!$table_name = CHistoryManager::getTableName($options['history'])) {
@@ -137,71 +184,19 @@ class CHistory extends CApiService {
 		}
 
 		// filter
-		if (is_array($options['filter'])) {
+		if ($options['filter']) {
 			$this->dbFilter($sql_parts['from']['history'], $options, $sql_parts);
 		}
 
 		// search
-		if (is_array($options['search'])) {
+		if ($options['search']) {
 			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			unset($sql_parts['select']['clock']);
-			$sql_parts['select']['history'] = 'h.*';
-		}
-
-		// countOutput
-		if ($options['countOutput']) {
-			$options['sortfield'] = '';
-			$sql_parts['select'] = ['count(DISTINCT h.hostid) as rowscount'];
-
-			// groupCount
-			if ($options['groupCount']) {
-				foreach ($sql_parts['group'] as $key => $fields) {
-					$sql_parts['select'][$key] = $fields;
-				}
-			}
-		}
-
-		// sorting
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($table_name, $this->tableAlias(), $options, $sql_parts);
 
-		// limit
-		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
-		}
-
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
-
-		$sql_select = '';
-		$sql_from = '';
-		$sql_order = '';
-
-		if ($sql_parts['select']) {
-			$sql_select .= implode(',', $sql_parts['select']);
-		}
-
-		if ($sql_parts['from']) {
-			$sql_from .= implode(',', $sql_parts['from']);
-		}
-
-		$sql_where = $sql_parts['where'] ? ' WHERE '.implode(' AND ', $sql_parts['where']) : '';
-
-		if ($sql_parts['order']) {
-			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
-		}
-
-		$sql_limit = $sql_parts['limit'];
-		$sql = 'SELECT '.$sql_select.
-				' FROM '.$sql_from.
-				$sql_where.
-				$sql_order;
-		$db_res = DBselect($sql, $sql_limit);
+		$db_res = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		while ($data = DBfetch($db_res)) {
 			if ($options['countOutput']) {

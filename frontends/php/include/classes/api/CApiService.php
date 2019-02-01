@@ -455,7 +455,9 @@ class CApiService {
 	 * @return array		The resulting SQL parts array
 	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$pkFieldId = $this->fieldId($this->pk($tableName), $tableAlias);
+		// If table do not have a primary key, use whole row to select distinct rows.
+		$pk = $this->pk($tableName);
+		$pkFieldId = $this->fieldId(($pk ? : '*'), $tableAlias);
 
 		// count
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
@@ -472,7 +474,7 @@ class CApiService {
 		// custom output
 		elseif (is_array($options['output'])) {
 			// the pk field must always be included for the API to work properly
-			$sqlParts['select'] = [$pkFieldId];
+			$sqlParts['select'] = $pk ? [$pkFieldId] : [];
 			foreach ($options['output'] as $field) {
 				if ($this->hasField($field, $tableName)) {
 					$sqlParts['select'][] = $this->fieldId($field, $tableAlias);
