@@ -36,7 +36,7 @@ $filter_column1 = (new CFormList())
 					'editable' => true
 				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
 	->addRow((new CLabel(_('Hosts'), 'filter_hostids')),
 		(new CMultiSelect([
@@ -53,10 +53,10 @@ $filter_column1 = (new CFormList())
 					'templated_hosts' => true
 				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
 	->addRow(_('Name'),
-		(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
 	->addRow(_('Severity'),
 		(new CCheckBoxList('filter_priority'))
