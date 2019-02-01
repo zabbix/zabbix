@@ -353,7 +353,7 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 	*ptr++ = '}';
 	*ptr = '\0';
 
-	duk_push_string(es->env->ctx, func);
+	duk_push_lstring(es->env->ctx, func, ptr - func);
 	duk_push_string(es->env->ctx, "function");
 
 	if (0 != duk_pcompile(es->env->ctx, DUK_COMPILE_FUNCTION))
