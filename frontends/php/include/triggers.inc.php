@@ -2238,16 +2238,7 @@ function orderTriggersByStatus(array &$triggers, $sortorder = ZBX_SORT_UP) {
  *
  * @return array
  */
-function getTriggersHostsList(array $triggers, array $problems = []) {
-	if ($problems) {
-		$objectids = [];
-		foreach ($problems as $problem) {
-			$objectids[$problem['objectid']] = true;
-		}
-
-		$triggers = array_intersect_key($triggers, $objectids);
-	}
-
+function getTriggersHostsList(array $triggers) {
 	$hostids = [];
 
 	foreach ($triggers as $trigger) {
