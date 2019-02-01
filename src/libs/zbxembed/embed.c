@@ -26,6 +26,8 @@
 #define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 10)
 #define ZBX_ES_TIMEOUT		10
 
+#define ZBX_ES_STACK_LIMIT	1000
+
 /* maximum number of consequent runtime errors after which it's treated as fatal error */
 #define ZBX_ES_MAX_CONSEQUENT_RT_ERROR	3
 
@@ -294,6 +296,13 @@ int	zbx_es_fatal_error(zbx_es_t *es)
 	if (0 != es->env->fatal_error || ZBX_ES_MAX_CONSEQUENT_RT_ERROR < es->env->rt_error_num)
 		return SUCCEED;
 
+	if (ZBX_ES_STACK_LIMIT < duk_get_top(es->env->ctx))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "embedded scripting engine stack exceeded limits,"
+				" resetting scripting environment");
+		return SUCCEED;
+	}
+
 	return FAIL;
 }
 
@@ -359,6 +368,7 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 	if (0 != duk_pcompile(es->env->ctx, DUK_COMPILE_FUNCTION))
 	{
 		*error = zbx_strdup(*error, duk_safe_to_string(es->env->ctx, -1));
+		duk_pop(es->env->ctx);
 		goto out;
 	}
 
