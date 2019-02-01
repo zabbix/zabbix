@@ -530,7 +530,7 @@
 									margin = Math.max(margin, margins[i]);
 								}
 
-								if (margin && margin <= size_max) {
+								if (margin && margin < size_max) {
 									console
 										.log(`${box.header} check on ${col_box.header} ignore collapse resize step, margin=${margin}, start_pos=${start_pos}, stop_pos=${stop_pos}`);
 									box.new_pos[axis_key] = box.current_pos[axis_key];
@@ -988,6 +988,7 @@
 					delete box.affected_axis;
 				});
 
+				data.new_widget_placeholder.container.hide();
 				setResizableState('disable', data.widgets, widget.uniqueid);
 				startWidgetPositioning($(event.target), data);
 				doWidgetResize($obj, $(event.target), data);
