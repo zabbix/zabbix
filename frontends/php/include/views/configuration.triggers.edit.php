@@ -107,7 +107,8 @@ $popup_options = [
 	'dstfld1' => $data['expression_field_name']
 ];
 
-if ($data['hostid']) {
+if ($data['groupid'] && $data['hostid']) {
+	$popup_options['groupid'] = $data['groupid'];
 	$popup_options['hostid'] = $data['hostid'];
 }
 
@@ -305,7 +306,9 @@ $popup_options = [
 	'dstfrm' => $triggersForm->getName(),
 	'dstfld1' => $data['recovery_expression_field_name']
 ];
-if ($data['hostid']) {
+
+if ($data['groupid'] && $data['hostid']) {
+	$popup_options['groupid'] = $data['groupid'];
 	$popup_options['hostid'] = $data['hostid'];
 }
 
