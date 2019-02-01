@@ -379,9 +379,6 @@
 			});
 			axis_pos[axis_key] = size_max - axis_pos[axis_key] - axis_pos[size_key];
 			axis.boundary[axis_key] = size_max - axis.boundary[axis_key] - axis.boundary[size_key];
-
-			console
-				.log(`mirrorring coordinates: axis_pos[${axis_key}] from ${dbg_original} to ${axis_pos[axis_key]}`)
 		}
 
 		// Get array containing only widgets affected by resize operation.
@@ -391,8 +388,6 @@
 				? box
 				: null;
 		});
-
-		widgets.each(function(b) {b.div.css('background-color', 'affected_axis' in b ? (b.affected_axis == 'x' ? 'rgba(255, 0, 0, 0.1)' : 'rgba(0, 255, 0, 0.1)') : '' )});
 
 		affected = affected.sort(function(box1, box2) {
 			return box1.current_pos[axis_key] - box2.current_pos[axis_key];
@@ -427,9 +422,6 @@
 		});
 
 		overlap = new_max - size_max;
-		console
-			.log(`affected widgets after compact step (${axis_key}, ${opposite_axis_key}, ${size_key}):`,
-				(function(d){ return $.map(d, function(b){return `"${b.header}: ${b.current_pos[axis_key]}, ${b.current_pos[opposite_axis_key]}, ${b.current_pos[size_key]}"`}).join(', ')})(affected));
 
 		// Compact widget by resizing.
 		if (overlap > 0) {
@@ -488,9 +480,6 @@
 				axis_boundaries[box.uniqueid] = {debug: box.header, min: min, max: max};
 			});
 
-			console
-				.log('axis_boundaries', axis_boundaries);
-
 			while (slot < new_max && overlap > 0) {
 				margins_backup = $.extend({}, margins);
 				collapsed_pos = {};
@@ -499,15 +488,6 @@
 				scanline[axis_key] += scanline[size_key];
 				next_col = getAffectedInBounds(scanline);
 				collapsed = next_col.length > 0;
-
-				console
-					.log(`slot=${slot}, overlap=${overlap}`);
-				console
-					.log('current pos:'+(function(d){ return $.map(d, function(b){return `${b.header}: ${b.current_pos[axis_key]}, ${b.current_pos[opposite_axis_key]}`}).join(', ')})(col));
-				console
-					.log('next    pos:'+(function(d){ return $.map(d, function(b){return `${b.header}: ${b.current_pos[axis_key]}, ${b.current_pos[opposite_axis_key]}`}).join(', ')})(next_col));
-				console
-					.log(`\tmargins    :`,JSON.stringify(margins));
 
 				$.each(next_col, function(_, box) {
 					if ('pos' in box && box.pos[axis_key] > slot) {
@@ -531,8 +511,6 @@
 								}
 
 								if (margin && margin < size_max) {
-									console
-										.log(`${box.header} check on ${col_box.header} ignore collapse resize step, margin=${margin}, start_pos=${start_pos}, stop_pos=${stop_pos}`);
 									box.new_pos[axis_key] = box.current_pos[axis_key];
 									return true;
 								}
@@ -540,8 +518,6 @@
 									for (i = start_pos; i < stop_pos; i++) {
 										margins[i] = margins_backup[i] - scanline[size_key];
 									}
-									console
-										.log(`${box.header} check on ${col_box.header} will be collapsed, margin=${margin}, start_pos=${start_pos}, stop_pos=${stop_pos}`);
 								}
 
 								col_box.new_pos = $.extend({}, col_box.current_pos);
@@ -564,8 +540,6 @@
 				});
 
 				if (collapsed) {
-					console
-						.log(`\tcollapsed_pos:`, JSON.parse(JSON.stringify(collapsed_pos)));
 					affected.each(function(box) {
 						if (box.current_pos[axis_key] > slot && box.current_pos[opposite_axis_key] in collapsed_pos) {
 							var old_value = box.current_pos[axis_key];
@@ -573,12 +547,6 @@
 							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - scanline[size_key],
 								box.pos[axis_key]
 							);
-							console
-								.log(`${box.header} moved from ${old_value} to ${box.current_pos[axis_key]}, pos.${axis_key}=${box.pos[axis_key]}`);
-						}
-						else {
-							console
-								.log(`${box.header} keep same position ${axis_key}, slot=${slot}`, $.extend({}, box.current_pos));
 						}
 					});
 
@@ -597,14 +565,7 @@
 
 				next_col.concat(col).each(function(box) {
 					if (collapsed && 'new_pos' in box) {
-						console
-							.log(`${box.header} was moved or resized`);
-						console
-							.log(`\tcurrent_pos`, JSON.parse(JSON.stringify(box.current_pos)));
-						console
-							.log(`\tnew_pos`, JSON.parse(JSON.stringify(box.new_pos)));
 						box.current_pos = box.new_pos;
-						box.div.css('background-color', axis_key == 'x' ? 'rgba(255, 0, 0, 0.3)' : 'rgba(0, 255, 0, 0.3)');
 					}
 
 					delete box.new_pos;
@@ -633,8 +594,6 @@
 			return box2.current_pos[axis_key] - box1.current_pos[axis_key];
 		}).each(function(box) {
 			if (box.pos[size_key] > box.current_pos[size_key]) {
-				console
-					.groupCollapsed(`${size_key} correction on ${box.header}`);
 				var new_pos = $.extend({}, box.current_pos),
 					size = Math.min(box.pos[size_key], size_max - box.current_pos[axis_key]);
 
@@ -644,16 +603,11 @@
 						? col_box
 						: null;
 				}).each(function(col_box) {
-					console
-						.log(`${col_box.header} check ${axis_key}=${col_box.current_pos[axis_key]}, ${size_key}=${col_box.current_pos[axis_key] - box.current_pos[axis_key]}`);
 					size = Math.min(size,
 						col_box.current_pos[axis_key] - box.current_pos[axis_key]
 					);
 				});
 
-				console
-					.log(`${box.header} stepback fixed ${size_key} from ${box.current_pos[size_key]} to ${Math.max(size, size_min)}`);
-				console.groupEnd();
 				box.current_pos[size_key] = Math.max(size, size_min);
 			}
 		});
@@ -714,20 +668,9 @@
 
 				if (rectOverlap(pos, box.current_pos)) {
 					box.affected_axis = 'y';
-					console
-						.log(`%cfixed ${box.header} affected axis`, 'color: green');
 				}
 			});
 		}
-
-		console.groupCollapsed(`%c${widget.header} resize step. ${process_order[0]} is set as primary axis,  direction state: ${JSON.stringify(widget.prev_pos.mirrored)}"`,
-			(widget.prev_pos.y != widget.current_pos.y || widget.prev_pos.height != widget.current_pos.height)
-			&& (widget.prev_pos.x != widget.current_pos.x || widget.prev_pos.width != widget.current_pos.width)
-			? 'color: red'
-			: ''
-		);
-		console
-				.log ({current_pos: widget.current_pos, pos: widget.pos, prev_pos:widget.prev_pos});
 
 		// Store current position as previous position for next steps.
 		widget.prev_pos = $.extend(widget.prev_pos, widget.current_pos);
@@ -762,26 +705,8 @@
 				axis.mirrored = true;
 			}
 
-			console
-				.log(`%caffected on opposite ${axis_key == 'x' ? 'y' : 'x'} axis: ${$.map(data.widgets, function(b) { return b.affected_axis && b.affected_axis != axis_key ? b.header : null}).join(', ')}`, 'font-weight: bold');
-
 			fitWigetsIntoBox(data.widgets, widget, axis);
-
-			console
-				.log(`%c${axis_key} processed, widget current position: ${JSON.stringify(widget.current_pos)}`, 'font-weight: bold');
-			console
-				.log(`\taffected by x: "${$.map(data.widgets, function(b) { return b.affected_axis == 'x' ? b.header : null}).join('", "')}"`);
-			console
-				.log(`\taffected by y: "${$.map(data.widgets, function(b) { return b.affected_axis == 'y' ? b.header : null}).join('", "')}"`);
 		});
-
-		console
-			.log('final result for affected by changes on axes:');
-		console
-			.log(`\t\tx: "${$.map(data.widgets, function(b) { return b.affected_axis == 'x' ? b.header : null}).join('", "')}"`);
-		console
-			.log(`\t\ty: "${$.map(data.widgets, function(b) { return b.affected_axis == 'y' ? b.header : null}).join('", "')}"`);
-		console.groupEnd();
 	}
 
 	function checkWidgetOverlap(data, widget) {
@@ -915,21 +840,13 @@
 					'left-max': $obj.width() - ui.helper.width(),
 					'top-max': data.options['max-rows'] * data.options['widget-height'] - ui.helper.height()
 				};
-
 				setResizableState('disable', data.widgets, '');
 
 				var	widget = getWidgetByTarget(data.widgets, ui.helper);
-				// console.groupCollapsed(`start drag ${widget.header} is dragged`);
-				// console
-				// 	.log('initial position of widgets:', $.map(data.widgets, function(b) {return $.extend({header: b.header}, b.pos)}));
-				dragPrepare(data.widgets, widget, data['options']['max-rows']);
-				// console
-				// 	.log('modified position of widgets:', $.map(data.widgets, function(b) {return $.extend({header: b.header}, b.pos)}));
-				// console.groupEnd();
 
+				dragPrepare(data.widgets, widget, data['options']['max-rows']);
 				startWidgetPositioning(ui.helper, data);
 				widget.current_pos = $.extend({}, widget.pos);
-				//realignWidget(data, widget);
 			},
 			drag: function(event, ui) {
 				// Limit element draggable area for X and Y axis.
