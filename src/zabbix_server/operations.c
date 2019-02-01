@@ -212,7 +212,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 	DB_RESULT		result2;
 	DB_ROW			row;
 	DB_ROW			row2;
-	zbx_uint64_t		dhostid, hostid = 0, proxy_hostid;
+	zbx_uint64_t		dhostid, hostid = 0, proxy_hostid, druleid;
 	char			*host = NULL, *host_esc, *host_unique, *host_visible = NULL;
 	unsigned short		port;
 	zbx_vector_uint64_t	groupids;
@@ -240,7 +240,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 		{
 			result = DBselect(
 					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type,"
-						"dc.host_source, dc.name_source"
+						"dc.host_source, dc.name_source, dr.druleid"
 					" from drules dr,dchecks dc,dservices ds"
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
@@ -252,7 +252,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 		{
 			result = DBselect(
 					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type,"
-						"dc.host_source, dc.name_source"
+						"dc.host_source, dc.name_source, dr.druleid"
 					" from drules dr,dchecks dc,dservices ds,dservices ds1"
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
@@ -265,6 +265,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(dhostid, row[0]);
+			ZBX_STR2UINT64(druleid, row[8]);
 			ZBX_DBROW2UINT64(proxy_hostid, row[1]);
 			svc_type = (unsigned char)atoi(row[5]);
 
@@ -327,8 +328,9 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 							" and ds.dhostid=" ZBX_FS_UI64
 						" where dc.druleid=dr.druleid"
 							" and dr.status=%d"
-							" and dc.host_source=%d",
-							dhostid, DRULE_STATUS_MONITORED, ZBX_DISCOVERY_VALUE);
+							" and dc.host_source=%d"
+							" and dr.druleid=" ZBX_FS_UI64,
+							dhostid, DRULE_STATUS_MONITORED, ZBX_DISCOVERY_VALUE, druleid);
 				if (NULL != (row_name = DBfetch(result_name)))
 				{
 					if (SUCCEED == zbx_db_is_null(row_name[0]))
@@ -360,8 +362,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 						" where dc.druleid=dr.druleid"
 							" and dr.status=%d"
 							" and dc.name_source=%d"
-							,
-							dhostid, DRULE_STATUS_MONITORED, ZBX_DISCOVERY_VALUE);
+							" and dr.druleid=" ZBX_FS_UI64,
+							dhostid, DRULE_STATUS_MONITORED, ZBX_DISCOVERY_VALUE, druleid);
 				if (NULL != (row_visible_name = DBfetch(result_visible_name)))
 				{
 					if (SUCCEED == zbx_db_is_null(row_visible_name[0]))
