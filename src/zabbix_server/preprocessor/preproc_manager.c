@@ -27,11 +27,13 @@
 #include "sysinfo.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
+#include "zbxlld.h"
 
 #include "preprocessing.h"
 #include "preproc_manager.h"
 #include "linked_list.h"
 #include "preproc_history.h"
+
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num, CONFIG_PREPROCESSOR_FORKS;
@@ -412,15 +414,44 @@ static void	preprocessor_free_request(zbx_preprocessing_request_t *request)
  *                                                                            *
  * Function: preprocessor_flush_value                                         *
  *                                                                            *
- * Purpose: add new value to the local history cache                          *
+ * Purpose: add new value to the local history cache or send to LLD manager   *
  *                                                                            *
- * Parameters: value - [IN] value to be added                                 *
+ * Parameters: value - [IN] value to be added or sent                         *
  *                                                                            *
  ******************************************************************************/
-static void	preprocessor_flush_value(zbx_preproc_item_value_t *value)
+static void	preprocessor_flush_value(const zbx_preproc_item_value_t *value)
 {
-	dc_add_history(value->itemid, value->item_value_type, value->item_flags, value->result, value->ts, value->state,
-			value->error);
+	if (0 == (value->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+	{
+		dc_add_history(value->itemid, value->item_value_type, value->item_flags, value->result, value->ts,
+				value->state, value->error);
+	}
+	else
+	{
+		const char	*value_text = NULL;
+		unsigned char	meta = 0;
+		zbx_uint64_t	lastlogsize = 0;
+		int		mtime = 0;
+
+		if (NULL != value->result)
+		{
+			if (NULL != GET_TEXT_RESULT(value->result))
+				value_text = *(GET_TEXT_RESULT(value->result));
+
+			if (0 != ISSET_META(value->result))
+			{
+				meta = 1;
+				lastlogsize = value->result->lastlogsize;
+				mtime = value->result->mtime;
+			}
+		}
+
+		if (NULL != value_text || NULL != value->error || 0 != meta)
+		{
+			zbx_lld_process_value(value->itemid, value_text, value->ts, meta, lastlogsize, mtime,
+					value->error);
+		}
+	}
 }
 
 /******************************************************************************

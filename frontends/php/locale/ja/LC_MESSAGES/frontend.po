@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-22 10:39+0200\n"
-"PO-Revision-Date: 2019-01-21 10:00+0300\n"
+"POT-Creation-Date: 2019-01-28 15:54+0200\n"
+"PO-Revision-Date: 2019-01-28 07:22+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1548057623.000000\n"
+"X-POOTLE-MTIME: 1548652974.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1465,7 +1465,7 @@ msgid "CERT"
 msgstr "証明書"
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:938
+#: include/classes/graph/CSvgGraph.php:968
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -6688,8 +6688,6 @@ msgstr "H:i"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1413
 #: include/classes/graphdraw/CLineGraphDraw.php:1420
-#: include/classes/html/svg/CSvgGraphXAxis.php:456
-#: include/classes/html/svg/CSvgGraphXAxis.php:463
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -7573,7 +7571,7 @@ msgstr "アクセスできないアイテム"
 
 #: include/classes/screens/CScreenProblem.php:393
 msgid "Inaccessible maintenance"
-msgstr ""
+msgstr "アクセスできないメンテナンス"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:103
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:84
@@ -10000,7 +9998,6 @@ msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "ローレベルディスカバリが\"取得不可\"の状態"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
-#: include/classes/html/svg/CSvgGraphXAxis.php:424
 msgid "M"
 msgstr "M"
 
@@ -12439,7 +12436,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:933
+#: include/classes/graph/CSvgGraph.php:963
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -13132,7 +13129,7 @@ msgid "Queue of items to be updated"
 msgstr "更新待ちアイテムのキュー"
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:929
+#: include/classes/graph/CSvgGraph.php:959
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:956
 #: include/classes/screens/CScreenProblem.php:1122 include/events.inc.php:345
@@ -18758,9 +18755,6 @@ msgstr "m"
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
 #: include/classes/graphdraw/CLineGraphDraw.php:1389
 #: include/classes/graphdraw/CLineGraphDraw.php:1396
-#: include/classes/html/svg/CSvgGraphXAxis.php:424
-#: include/classes/html/svg/CSvgGraphXAxis.php:432
-#: include/classes/html/svg/CSvgGraphXAxis.php:439
 msgid "m-d"
 msgstr "m/d"
 
