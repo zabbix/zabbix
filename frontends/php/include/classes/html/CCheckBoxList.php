@@ -24,7 +24,7 @@ class CCheckBoxList extends CList {
 	/**
 	 * @var array $values
 	 */
-	public $values;
+	protected $values;
 
 	/**
 	 * @var string $name
@@ -47,8 +47,7 @@ class CCheckBoxList extends CList {
 	 *
 	 * @return CCheckBoxList
 	 */
-	public function setChecked(array $values)
-	{
+	public function setChecked(array $values) {
 		$values = array_flip($values);
 
 		foreach ($this->values as &$value) {
@@ -64,8 +63,7 @@ class CCheckBoxList extends CList {
 	 *
 	 * @return CCheckBoxList
 	 */
-	public function setOptions(array $values)
-	{
+	public function setOptions(array $values) {
 		$this->values = [];
 
 		foreach ($values as $value) {
@@ -80,10 +78,11 @@ class CCheckBoxList extends CList {
 	}
 
 	/*
+	 * @param bool $destroy
+	 *
 	 * @return string
 	 */
-	public function toString($destroy = true)
-	{
+	public function toString($destroy = true) {
 		foreach ($this->values as $value) {
 			parent::addItem(
 				(new CCheckBox($this->name.'['.$value['value'].']', $value['value']))

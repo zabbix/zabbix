@@ -67,7 +67,7 @@ $fields = [
 													]),
 													null
 												],
-	// Filter.
+	// Filter related fields.
 	'filter_set' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_priority' =>						[T_ZBX_INT, O_OPT, null,
@@ -97,7 +97,7 @@ $fields = [
 													IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), null
 												],
 	'filter_tags' =>							[T_ZBX_STR, O_OPT, null,	null,			null],
-	// Actions.
+	// Action related fields.
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
 														'"trigger.massenable","trigger.massupdate","trigger.massupdateform"'
@@ -617,7 +617,7 @@ elseif (isset($_REQUEST['form'])) {
 		'tags' => getRequest('tags', []),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
-		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
 	];
 
 	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($data));
