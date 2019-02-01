@@ -35,7 +35,7 @@ class testPageTriggers extends CLegacyWebTest {
 	* @dataProvider data
 	*/
 	public function testPageTriggers_CheckLayout($data) {
-		$this->zbxTestLogin('triggers.php?hostid='.$data['hostid']);
+		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 
@@ -73,94 +73,74 @@ class testPageTriggers extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Delete');
 	}
 
-
 	public static function getTagsFilterData() {
 		return [
 			[
 				[
-					'tags_operator' => 'And/Or',
-					'tags' => [
-						['tag_name' =>'TagA', 'value' => 'a', 'operator' => 'Equal'],
-						['tag_name' =>'TagK', 'value' => 'K', 'operator' => 'Like']
+					'tag_options' => [
+						'operator' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'value' => 'a', 'type' => 'Equals'],
+							['name' => 'TagK', 'value' => 'K', 'type' => 'Contains']
+						]
 					],
-					'results' => [
+					'result' => [
 						'Third trigger for tag filtering'
-					],
-					'not_results' => [
-						'First trigger for tag filtering',
-						'Second trigger for tag filtering',
-						'Fourth trigger for tag filtering',
-						'Fifth trigger for tag filtering (no tags)'
 					]
 				]
 			],
 			[
 				[
-					'tags_operator' => 'And/Or',
-					'tags' => [
-						['tag_name' =>'TagA', 'value' => 'A', 'operator' => 'Like'],
-						['tag_name' =>'TagK', 'value' => 'K', 'operator' => 'Like']
+					'tag_options' => [
+						'operator' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'value' => 'A', 'type' => 'Contains'],
+							['name' => 'TagK', 'value' => 'K', 'type' => 'Contains']
+						]
 					],
-					'results' => [
+					'result' => [
 						'Third trigger for tag filtering'
-					],
-					'not_results' => [
-						'First trigger for tag filtering',
-						'Second trigger for tag filtering',
-						'Fourth trigger for tag filtering',
-						'Fifth trigger for tag filtering (no tags)'
 					]
 				]
 			],
 			[
 				[
-					'tags_operator' => 'Or',
-					'tags' => [
-						['tag_name' =>'TagA', 'value' => 'A', 'operator' => 'Like'],
-						['tag_name' =>'TagK', 'value' => 'K', 'operator' => 'Like']
+					'tag_options' => [
+						'operator' => 'Or',
+						'tags' => [
+							['name' => 'TagA', 'value' => 'A', 'type' => 'Contains'],
+							['name' => 'TagK', 'value' => 'K', 'type' => 'Contains']
+						]
 					],
-					'results' => [
-						'Third trigger for tag filtering',
-						'First trigger for tag filtering'
-					],
-					'not_results' => [
-						'Second trigger for tag filtering',
-						'Fourth trigger for tag filtering',
-						'Fifth trigger for tag filtering (no tags)'
+					'result' => [
+						'First trigger for tag filtering',
+						'Third trigger for tag filtering'
 					]
 				]
 			],
 			[
 				[
-					'tags_operator' => 'Or',
-					'tags' => [
-						['tag_name' =>'TagZ', 'value' => 'Z', 'operator' => 'Equal'],
-						['tag_name' =>'TagI', 'value' => 'I', 'operator' => 'Equal']
-					],
-					'not_results' => [
-						'First trigger for tag filtering',
-						'Second trigger for tag filtering',
-						'Third trigger for tag filtering',
-						'Fourth trigger for tag filtering',
-						'Fifth trigger for tag filtering (no tags)'
+					'tag_options' => [
+						'operator' => 'Or',
+						'tags' => [
+							['name' => 'TagZ', 'value' => 'Z', 'type' => 'Equals'],
+							['name' => 'TagI', 'value' => 'I', 'type' => 'Equals']
+						]
 					]
 				]
 			],
 			[
 				[
-					'tags_operator' => 'Or',
-					'tags' => [
-						['tag_name' =>'TagZ', 'value' => 'z', 'operator' => 'Equal'],
-						['tag_name' =>'TagI', 'value' => 'i', 'operator' => 'Equal']
+					'tag_options' => [
+						'operator' => 'Or',
+						'tags' => [
+							['name' => 'TagZ', 'value' => 'z', 'type' => 'Equals'],
+							['name' => 'TagI', 'value' => 'i', 'type' => 'Equals']
+						]
 					],
-					'results' => [
-						'Third trigger for tag filtering',
-						'Second trigger for tag filtering'
-					],
-					'not_results' => [
-						'First trigger for tag filtering',
-						'Fourth trigger for tag filtering',
-						'Fifth trigger for tag filtering (no tags)'
+					'result' => [
+						'Second trigger for tag filtering',
+						'Third trigger for tag filtering'
 					]
 				]
 			]
@@ -172,48 +152,422 @@ class testPageTriggers extends CLegacyWebTest {
 	 * @dataProvider getTagsFilterData
 	 */
 	public function testPageTriggers_TagsFilter($data) {
-		$this->zbxTestLogin('triggers.php?hostid='.$this->hostid);
-		$this->zbxTestCheckTitle('Configuration of triggers');
-		$this->zbxTestCheckHeader('Triggers');
-		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 5 of 5 found');
-
-		$this->zbxTestClickXpath('//label[text()="'.$data['tags_operator'].'"]');
-
-		foreach ($data['tags'] as $i => $tag) {
-			$this->zbxTestInputTypeWait('filter_tags_'.$i.'_tag', $tag['tag_name']);
-			$this->zbxTestInputType('filter_tags_'.$i.'_value', $tag['value'] );
-
-			$operator = ($tag['operator'] === 'Like') ?  0 : 1;
-			$this->zbxTestClickXpath('//label[@for="filter_tags_'.$i.'_operator_'.$operator.'"]');
-			$this->zbxTestClick('filter_tags_add');
-		}
-		$this->zbxTestClickButtonText('Apply');
-
-		if (array_key_exists('results', $data)) {
-			$result_count = count($data['results']);
-			$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying '.$result_count.' of '.$result_count.' found');
-			$this->zbxTestTextPresent($data['results']);
-		}
-		else {
-			$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 0 of 0 found');
-		}
-
-		$this->zbxTestTextNotPresent($data['not_results']);
+		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid);
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$this->setTags($data['tag_options']);
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->checkFilterResults($data);
 	}
 
-	public function testPageTriggers_TagsResetFilter() {
-		$this->zbxTestLogin('triggers.php?hostid='.$this->hostid);
-		$this->zbxTestCheckTitle('Configuration of triggers');
-		$this->zbxTestCheckHeader('Triggers');
-		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 5 of 5 found');
-		$this->zbxTestTextPresent([
-			'First trigger for tag filtering',
-			'Second trigger for tag filtering',
-			'Third trigger for tag filtering',
-			'Fourth trigger for tag filtering',
-			'Fifth trigger for tag filtering (no tags)'
-		]);
+	public function testPageTriggers_ResetTagsFilter() {
+		$data = [
+			'result' => [
+				'Fifth trigger for tag filtering (no tags)',
+				'First trigger for tag filtering',
+				'Fourth trigger for tag filtering',
+				'Second trigger for tag filtering',
+				'Third trigger for tag filtering'
+			]
+		];
+
+		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid);
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form->getField('Tags')->query('id:filter_tags_0_tag')->one()->fill('Tag1234');
+		$form->submit();
+		$this->page->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+		$this->assertEquals(['No data found.'], $table->getRows()->asText());
+
+		$form->query('button:Reset')->one()->click();
+		$this->page->waitUntilReady();
+		$this->checkFilterResults($data);
+	}
+
+	public static function getFilterData() {
+		return [
+			// With all severity options. All triggers
+			[
+				[
+					'filter_options' => [
+						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+					],
+					'result' => [
+						'Dependent trigger ONE',
+						'Discovered trigger one',
+						'Inheritance trigger with tags',
+						'Trigger disabled with tags'
+					]
+				]
+			],
+			// With two severity options.
+			[
+				[
+					'filter_options' => [
+						'Severity' => ['Average', 'Disaster'],
+					],
+					'result' => [
+						'Discovered trigger one',
+						'Trigger disabled with tags'
+					]
+				]
+			],
+			// Not inherited.
+			[
+				[
+					'filter_options' => [
+						'Inherited' =>'No'
+					],
+					'result' => [
+						'Dependent trigger ONE',
+						'Discovered trigger one',
+						'Trigger disabled with tags'
+					]
+				]
+			],
+			// Discovered.
+			[
+				[
+					'filter_options' => [
+						'Discovered' => 'Yes'
+					],
+					'result' => [
+						'Discovered trigger one'
+					]
+				]
+			],
+			// With dependencies.
+			[
+				[
+					'filter_options' => [
+						'With dependencies' => 'Yes'
+					],
+					'result' => [
+						'Dependent trigger ONE',
+						'Inheritance trigger with tags'
+					]
+				]
+			],
+			// Filter by name (not case sensetive).
+			[
+				[
+					'filter_options' => [
+						'Name' => 'One'
+					],
+					'result' => [
+						'Dependent trigger ONE',
+						'Discovered trigger one'
+					]
+				]
+			],
+			// Normal state.
+			[
+				[
+					'filter_options' => [
+						'State' => 'Normal'
+					],
+					'result' => [
+						'Dependent trigger ONE',
+						'Discovered trigger one'
+					]
+				]
+			],
+			// Status enabled/disabled.
+			[
+				[
+					'filter_options' => [
+						'Status' => 'Enabled'
+					],
+					'result' => [
+						'Dependent trigger ONE',
+						'Discovered trigger one',
+						'Inheritance trigger with tags'
+					]
+				]
+			],
+			[
+				[
+					'filter_options' => [
+						'Status' => 'Disabled'
+					],
+					'result' => [
+						'Trigger disabled with tags',
+					]
+				]
+			],
+			// Value Ok/Problem.
+			[
+				[
+					'filter_options' => [
+						'Value' => 'Ok'
+					],
+					'result' => [
+						'Dependent trigger ONE',
+						'Discovered trigger one',
+						'Trigger disabled with tags'
+					]
+				]
+			],
+			[
+				[
+					'filter_options' => [
+						'Value' => 'Problem'
+					],
+					'result' => [
+						'Inheritance trigger with tags'
+					]
+				]
+			],
+			// All filter options.
+			[
+				[
+					'filter_options' => [
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
+						'Name' =>'Inheritance trigger',
+						'Severity' => 'Not classified',
+						'State' =>'Unknown',
+						'Value' =>'Problem',
+						'Inherited' =>'Yes',
+						'Discovered' =>'No',
+						'With dependencies' =>'Yes',
+					],
+					'tag_options' => [
+						'operator' => 'Or',
+						'tags' => [
+							['name' => 'server', 'value' => 'selenium', 'type' => 'Equals'],
+							['name' => 'Street', 'value' => 'dzelzavas', 'type' => 'Contains']
+						]
+					],
+					'result' => [
+						'Inheritance trigger with tags'
+					]
+				]
+			],
+			// No results.
+			[
+				[
+					'filter_options' => [
+						'Host groups' => 'Zabbix servers',
+					]
+				]
+			],
+			[
+				[
+					'filter_options' => [
+						'State' => 'Normal',
+						'Inherited' => 'Yes'
+					]
+				]
+			],
+			[
+				[
+					'filter_options' => [
+						'State' => 'Unknown',
+						'With dependencies' => 'No'
+					]
+				]
+			],
+			[
+				[
+					'filter_options' => [
+						'Inherited' => 'Yes',
+						'With dependencies' => 'No'
+					]
+				]
+			],
+			[
+				[
+					'filter_options' => [
+						'Inherited' => 'Yes',
+						'Discovered' => 'Yes',
+						'With dependencies' => 'Yes'
+					]
+				]
+			],
+			[
+				[
+					'filter_options' => [
+						'Status' => 'Disabled',
+						'Value' => 'Problem'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getFilterData
+	 */
+	public function testPageTriggers_Filter($data) {
+		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]=99062');
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+
+		$form->fill($data['filter_options']);
+
+		if (array_key_exists('tag_options', $data)) {
+			$this->setTags($data['tag_options']);
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->checkFilterResults($data);
+	}
+
+	private function setTags($data) {
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$tag_table = $form->getField('Tags');
+
+		$tag_table->getRow(0)->query('class:radio-segmented')->asSegmentedRadio()->one()->select($data['operator']);
+
+		$button = $tag_table->query('button:Add')->one();
+		$last = count($data['tags']) - 1;
+		foreach ($data['tags'] as $i => $tag) {
+			$tag_row = $tag_table->getRow($i+1);
+			// TODO: after update to latest trunk, column will start from 0
+			$tag_row->getColumn(1)->query('tag:input')->one()->fill($tag['name']);
+			$tag_row->getColumn(2)->query('class:radio-segmented')->asSegmentedRadio()->one()->select($tag['type']);
+			$tag_row->getColumn(3)->query('tag:input')->one()->fill($tag['value']);
+
+			if ($i !== $last) {
+				$button->click();
+			}
+		}
+	}
+
+	private function checkFilterResults($data) {
+		$table = $this->query('class:list-table')->asTable()->one();
+		if (array_key_exists('result', $data)) {
+			foreach ($table->getRows() as $i => $row) {
+				$host_name = $row->getColumn('Name')->query('xpath:./a[not(@class)]')->one()->getText();
+				$this->assertEquals($data['result'][$i], $host_name);
+			}
+			$this->assertEquals(count($data['result']), $table->getRows()->count());
+		}
+		else {
+			// Check that table contain one row with text "No data found."
+			$this->assertEquals(['No data found.'], $table->getRows()->asText());
+		}
+	}
+
+	public static function getHostAndGroupData() {
+		return [
+			// One host group without host.
+			[
+				[
+					'filter_options' => [
+						'Host groups' => 'Group to check triggers filtering'
+					],
+					'result' => [
+						['Host for triggers filtering' => 'Dependent trigger ONE'],
+						['Host for triggers filtering' => 'Discovered trigger one'],
+						['Host for triggers filtering' => 'Inheritance trigger with tags'],
+						['Host for triggers filtering' => 'Trigger disabled with tags']
+					]
+				]
+			],
+			// Two host group without host.
+			[
+				[
+					'filter_options' => [
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
+						'Severity' => 'Average',
+						'Name' => 'tag',
+					],
+					'result' => [
+						['ЗАББИКС Сервер' => 'Test trigger to check tag filter on problem page'],
+						['Host for trigger tags filtering' => 'Third trigger for tag filtering'],
+						['Host for triggers filtering' => 'Trigger disabled with tags']
+					]
+				]
+			],
+			// Two hosts without host group.
+			[
+				[
+					'hosts' => [
+						['group' => 'Zabbix servers', 'host' => 'Host for trigger tags filtering'],
+						['group' => 'Group to check triggers filtering', 'host' => 'Host for triggers filtering']
+					],
+					'filter_options' => [
+						'Severity' => 'Average'
+					],
+					'result' => [
+						['Host for trigger tags filtering' => 'Third trigger for tag filtering'],
+						['Host for triggers filtering' => 'Trigger disabled with tags']
+					]
+				]
+			],
+			// Two hosts and two their host groups.
+			[
+				[
+					'filter_options' => [
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
+					],
+					'hosts' => [
+						['group' => 'Zabbix servers', 'host' => 'Host for trigger tags filtering'],
+						['group' => 'Group to check triggers filtering', 'host' => 'Host for triggers filtering']
+					],
+					'result' => [
+						['Host for triggers filtering' => 'Dependent trigger ONE'],
+						['Host for triggers filtering' => 'Discovered trigger one'],
+						['Host for trigger tags filtering' => 'Fifth trigger for tag filtering (no tags)'],
+						['Host for trigger tags filtering' => 'First trigger for tag filtering'],
+						['Host for trigger tags filtering' => 'Fourth trigger for tag filtering'],
+						['Host for triggers filtering' => 'Inheritance trigger with tags'],
+						['Host for trigger tags filtering' => 'Second trigger for tag filtering'],
+						['Host for trigger tags filtering' => 'Third trigger for tag filtering'],
+						['Host for triggers filtering' => 'Trigger disabled with tags']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getHostAndGroupData
+	 */
+	public function testPageTriggers_FilterHostAndGroups($data) {
+		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]=99062');
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+
+		// Trigger create button enabled and breadcrumbs exist.
+		$this->assertTrue($this->query('button:Create trigger')->one()->isEnabled());
+		$this->assertFalse($this->query('class:filter-breadcrumb')->all()->isEmpty());
+		// Clear hosts and host groups in filter fields.
+		$form->getField('Hosts')->asMultiselect()->clear();
+		$form->getField('Host groups')->asMultiselect()->clear();
+
+		$form->fill($data['filter_options']);
+
+		if (array_key_exists('hosts', $data)) {
+			foreach ($data['hosts'] as $host) {
+				$overlay = $form->getField('Hosts')->asMultiselect()->edit();
+				$overlay_form = $this->query('xpath://div[@id="overlay_dialogue"]//form')->waitUntilVisible()->asForm()->one();
+				$group = $overlay_form->query('name:groupid')->asDropdown()->one();
+				if ($group->getText() != $host['group']) {
+					$group->fill($host['group']);
+					$overlay_form->waitUntilReloaded();
+				}
+				$overlay->query('link:'.$host['host'])->one()->click();
+				$overlay->waitUntilNotPresent();
+			}
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		// Trigger create button disabled and breadcrumbs not exist.
+		$this->assertFalse($this->query('button:Create trigger (select host first)')->one()->isEnabled());
+		$this->assertTrue($this->query('class:filter-breadcrumb')->all()->isEmpty());
+		// Check results in table.
+		$table = $this->query('class:list-table')->asTable()->one();
+		foreach ($table->getRows() as $i => $row) {
+			$get_host = $row->getColumn('Name')->query('xpath:./a[not(@class)]')->one()->getText();
+			$get_group = $row->getColumn('Host')->getText();
+			foreach ($data['result'][$i] as $group => $host) {
+				$this->assertEquals($host, $get_host);
+				$this->assertEquals($group, $get_group);
+			}
+		}
+		$this->assertEquals(count($data['result']), $table->getRows()->count());
 	}
 }

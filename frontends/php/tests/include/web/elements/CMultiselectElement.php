@@ -76,12 +76,14 @@ class CMultiselectElement extends CElement {
 			if (!is_array($labels)) {
 				$labels = [$labels];
 			}
-
-			$table = $this->edit()->getContent()->asTable();
+			$overlay = $this->edit();
+			$table = $overlay->getContent()->asTable();
 
 			foreach ($labels as $label) {
 				$table->findRow('Name', $label)->select();
 			}
+			$overlay->getFooter()->query('button:Select')->one()->click();
+			$overlay->waitUntilNotPresent();
 		}
 
 		return $this;
