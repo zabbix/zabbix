@@ -117,8 +117,8 @@ class CFormElement extends CElement {
 			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
 			'CMultiselectElement'		=> '/div[@class="multiselect-control"]',
 			'CSegmentedRadioElement'	=> [
-				'/ul[@class="radio-segmented"]',
-				'/div/ul[@class="radio-segmented"]',
+				'/ul[@class="radio-list-control"]',
+				'/div/ul[@class="radio-list-control"]',
 			],
 			'CCheckboxListElement'		=> '/ul[@class="list-check-radio"]',
 			'CTableElement'				=> [

@@ -1224,37 +1224,37 @@ output {
   .list-hor-check-radio li:last-child {
     margin-right: 0; }
 
-.radio-segmented {
+.radio-list-control {
   white-space: nowrap; }
-  .radio-segmented li {
+  .radio-list-control li {
     position: relative;
     display: inline-block;
     margin: 0 -1px 0 0; }
-    .radio-segmented li:first-child {
+    .radio-list-control li:first-child {
       -webkit-border-radius: 3px 0 0 3px;
       -moz-border-radius: 3px 0 0 3px;
       border-radius: 3px 0 0 3px; }
-      .radio-segmented li:first-child label {
+      .radio-list-control li:first-child label {
         -webkit-border-radius: 2px 0 0 2px;
         -moz-border-radius: 2px 0 0 2px;
         border-radius: 2px 0 0 2px; }
-    .radio-segmented li:last-child {
+    .radio-list-control li:last-child {
       -webkit-border-radius: 0 3px 3px 0;
       -moz-border-radius: 0 3px 3px 0;
       border-radius: 0 3px 3px 0; }
-      .radio-segmented li:last-child label {
+      .radio-list-control li:last-child label {
         -webkit-border-radius: 0 2px 2px 0;
         -moz-border-radius: 0 2px 2px 0;
         border-radius: 0 2px 2px 0; }
-    .radio-segmented li:only-child {
+    .radio-list-control li:only-child {
       -webkit-border-radius: 3px;
       -moz-border-radius: 3px;
       border-radius: 3px; }
-      .radio-segmented li:only-child label {
+      .radio-list-control li:only-child label {
         -webkit-border-radius: 2px;
         -moz-border-radius: 2px;
         border-radius: 2px; }
-  .radio-segmented label {
+  .radio-list-control label {
     padding: 4px 11px;
     border: 1px solid #acbbc2;
     -webkit-transition: background-color 0.2s ease-out;
@@ -1262,45 +1262,45 @@ output {
     transition: background-color 0.2s ease-out;
     line-height: 1.2em;
     display: inline-block; }
-  .radio-segmented input[type="radio"] {
+  .radio-list-control input[type="radio"] {
     position: absolute !important;
     top: auto !important;
     width: 1px !important;
     height: 1px !important;
     opacity: 0;
     filter: alpha(opacity=0); }
-    .radio-segmented input[type="radio"] + label {
+    .radio-list-control input[type="radio"] + label {
       color: #1f2c33;
       border-color: #acbbc2;
       background-color: #fff; }
-      .radio-segmented input[type="radio"] + label:hover {
+      .radio-list-control input[type="radio"] + label:hover {
         background-color: #e8f5ff; }
-      .radio-segmented input[type="radio"] + label:active {
+      .radio-list-control input[type="radio"] + label:active {
         border-color: #acbbc2;
         background-color: #e8f5ff; }
-    .radio-segmented input[type="radio"]:focus + label {
+    .radio-list-control input[type="radio"]:focus + label {
       border-color: #02659f;
       background-color: #e8f5ff;
       position: relative;
       z-index: 2; }
-    .radio-segmented input[type="radio"]:checked + label {
+    .radio-list-control input[type="radio"]:checked + label {
       color: #fff;
       border-color: #768d99;
       background-color: #768d99;
       position: relative;
       z-index: 1; }
-    .radio-segmented input[type="radio"]:checked:focus + label {
+    .radio-list-control input[type="radio"]:checked:focus + label {
       -webkit-box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
       -moz-box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
       box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
       position: relative;
       z-index: 2; }
-    .radio-segmented input[type="radio"]:checked[disabled] + label {
+    .radio-list-control input[type="radio"]:checked[disabled] + label {
       background-color: #d6dde1 !important;
       -webkit-transition: none;
       -moz-transition: none;
       transition: none; }
-    .radio-segmented input[type="radio"][disabled] + label {
+    .radio-list-control input[type="radio"][disabled] + label {
       -webkit-transition: none;
       -moz-transition: none;
       transition: none; }
@@ -1914,7 +1914,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: 0.3;
     background-color: transparent; }
 
-.multiselect[aria-disabled], .radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
+.multiselect[aria-disabled], .radio-list-control input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
   color: #acbbc2;
   background-color: #ebebeb !important;
   border-color: #ccd5d9; }

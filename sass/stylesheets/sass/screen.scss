@@ -1845,7 +1845,7 @@ output {
 	}
 }
 
-.radio-segmented {
+.radio-list-control {
 	white-space: nowrap;
 
 	li {
@@ -6769,7 +6769,7 @@ Text on html5 input types
 
 ```html_example
 <p>
-<ul class="radio-segmented">
+<ul class="radio-list-control">
    <li><input type="radio" id="RadioSegm1"><label for="RadioSegm1">Radio 1</label></li><li><input type="radio" id="RadioSegm2"><label for="RadioSegm2">Radio 2</label></li><li><input type="radio" id="RadioSegm3" disabled><label for="RadioSegm3">Radio 3</label></li>
 </ul>
 </p>

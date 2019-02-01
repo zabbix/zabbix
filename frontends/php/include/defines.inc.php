@@ -1597,7 +1597,6 @@ define('ZBX_STYLE_PAGE_TITLE', 'page-title-general');
 define('ZBX_STYLE_PROGRESS_BAR_BG', 'progress-bar-bg');
 define('ZBX_STYLE_PROGRESS_BAR_CONTAINER', 'progress-bar-container');
 define('ZBX_STYLE_PROGRESS_BAR_LABEL', 'progress-bar-label');
-define('ZBX_STYLE_RADIO_SEGMENTED', 'radio-segmented');
 define('ZBX_STYLE_RED', 'red');
 define('ZBX_STYLE_RED_BG', 'red-bg');
 define('ZBX_STYLE_REL_CONTAINER', 'rel-container');

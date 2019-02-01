@@ -20,6 +20,10 @@
 
 
 class CRadioButtonList extends CList {
+	/**
+	 * Default CSS class name for HTML root element.
+	 */
+	const ZBX_STYLE_CLASS = 'radio-list-control';
 
 	const ORIENTATION_HORIZONTAL = 'horizontal';
 	const ORIENTATION_VERTICAL = 'vertical';
@@ -83,7 +87,7 @@ class CRadioButtonList extends CList {
 
 	public function toString($destroy = true) {
 		if ($this->modern) {
-			$this->addClass(ZBX_STYLE_RADIO_SEGMENTED);
+			$this->addClass(static::ZBX_STYLE_CLASS);
 		}
 		else {
 			$this->addClass($this->orientation == self::ORIENTATION_HORIZONTAL
