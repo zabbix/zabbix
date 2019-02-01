@@ -122,10 +122,7 @@ jQuery(function($) {
 		if (typeof data.ajax !== 'undefined' && data.ajax) {
 			var	url = new Curl('zabbix.php'),
 				ajax_data = {
-					data: {
-						hostid: data.hostid,
-						has_goto: (typeof data.has_goto === 'undefined' || data.has_goto) ? 1 : 0
-					}
+					data: data.data
 				};
 
 			url.setArgument('action', 'menu.popup');
@@ -141,7 +138,6 @@ jQuery(function($) {
 					return false;
 				},
 				error: function() {
-					alert('fail');
 					return false;
 				}
 			});

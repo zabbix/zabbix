@@ -99,11 +99,13 @@ class CMenuPopupHelper {
 		$data = [
 			'ajax' => true,
 			'type' => 'host',
-			'hostid' => $hostid
+			'data' => [
+				'hostid' => $hostid
+			]
 		];
 
 		if ($has_goto === false) {
-			$data['has_goto'] = $has_goto;
+			$data['data']['has_goto'] = $has_goto ? '1' : '0';
 		}
 
 		return $data;

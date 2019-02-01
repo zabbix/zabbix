@@ -52,7 +52,9 @@ class CControllerMenuPopup extends CController {
 
 		switch ($this->getInput('type')) {
 			case 'host':
-				$hosts = $data['has_goto']
+				$has_goto = !array_key_exists('has_goto', $data) || $data['has_goto'];
+
+				$hosts = $has_goto
 					? API::Host()->get([
 						'output' => ['hostid', 'status'],
 						'selectGraphs' => API_OUTPUT_COUNT,
@@ -67,7 +69,7 @@ class CControllerMenuPopup extends CController {
 				if ($hosts) {
 					$scripts = API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']];
 
-					$output['data'] = CMenuPopupHelper::getHost($hosts[0], $scripts, (bool) $data['has_goto']);
+					$output['data'] = CMenuPopupHelper::getHost($hosts[0], $scripts, (bool) $has_goto);
 				}
 				else {
 					error(_('No permissions to referred object or it does not exist!'));
