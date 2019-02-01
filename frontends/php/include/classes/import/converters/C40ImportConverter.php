@@ -125,7 +125,8 @@ class C40ImportConverter extends CConverter {
 	 */
 	protected function getDiscoveryRuleDefaultFields() {
 		return [
-			'lld_macro_paths' => []
+			'lld_macro_paths' => [],
+			'preprocessing' => []
 		];
 	}
 }

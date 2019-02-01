@@ -23,6 +23,13 @@
 #include "../zbxcrypto/tls_tcp.h"
 #include "zbxcompress.h"
 
+#ifdef _WINDOWS
+#include <VersionHelpers.h>
+#ifndef WSA_FLAG_NO_HANDLE_INHERIT
+#	define WSA_FLAG_NO_HANDLE_INHERIT	0x80	/* allow compilation on older Windows systems */
+#endif
+#endif
+
 #define IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
 #define IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
 
@@ -914,6 +921,14 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 	char		port[8], *ip, *ips, *delim;
 	int		i, err, on, ret = FAIL;
+#ifdef _WINDOWS
+	/* WSASocket() option to prevent inheritance is available on */
+	/* Windows Server 2008 R2 or newer and on Windows 7 SP1 or newer */
+	static int	no_inherit_wsapi = -1;
+
+	if (-1 == no_inherit_wsapi)
+		no_inherit_wsapi = IsWindows7SP1OrGreater() || (IsWindowsServer() && IsWindows7OrGreater());
+#endif
 
 	ZBX_SOCKET_START();
 
@@ -952,11 +967,27 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 			if (PF_INET != current_ai->ai_family && PF_INET6 != current_ai->ai_family)
 				continue;
 
+#ifdef _WINDOWS
+			/* WSA_FLAG_NO_HANDLE_INHERIT prevents socket inheritance if we call CreateProcess() */
+			/* later on. If it's not available we still try to avoid inheritance by calling  */
+			/* SetHandleInformation() below. WSA_FLAG_OVERLAPPED is not mandatory but stronly */
+			/* recommended for every socket */
+			s->sockets[s->num_socks] = WSASocket(current_ai->ai_family, current_ai->ai_socktype,
+					current_ai->ai_protocol, NULL, 0,
+					(0 != no_inherit_wsapi ? WSA_FLAG_NO_HANDLE_INHERIT : 0) |
+					WSA_FLAG_OVERLAPPED);
+			if (ZBX_SOCKET_ERROR == s->sockets[s->num_socks])
+#else
 			if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] =
 					socket(current_ai->ai_family, current_ai->ai_socktype | SOCK_CLOEXEC,
 					current_ai->ai_protocol)))
+#endif
 			{
+#ifdef _WINDOWS
+				zbx_set_socket_strerror("WSASocket() for [[%s]:%s] failed: %s",
+#else
 				zbx_set_socket_strerror("socket() for [[%s]:%s] failed: %s",
+#endif
 						ip ? ip : "-", port, strerror_from_system(zbx_socket_last_error()));
 #ifdef _WINDOWS
 				if (WSAEAFNOSUPPORT == zbx_socket_last_error())
@@ -973,6 +1004,18 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 #endif
 			on = 1;
 #ifdef _WINDOWS
+			/* If WSA_FLAG_NO_HANDLE_INHERIT not available, prevent listening socket from */
+			/* inheritance with the old API. Disabling handle inheritance in WSASocket() instead of */
+			/* SetHandleInformation() is preferred because it provides atomicity and gets the job done */
+			/* on systems with non-IFS LSPs installed. So there is a chance that the socket will be still */
+			/* inherited on Windows XP with 3rd party firewall/antivirus installed */
+			if (0 == no_inherit_wsapi && 0 == SetHandleInformation((HANDLE)s->sockets[s->num_socks],
+					HANDLE_FLAG_INHERIT, 0))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "SetHandleInformation() failed: %s",
+						strerror_from_system(GetLastError()));
+			}
+
 			/* prevent other processes from binding to the same port */
 			/* SO_EXCLUSIVEADDRUSE is mutually exclusive with SO_REUSEADDR */
 			/* on Windows SO_REUSEADDR has different semantics than on Unix */
@@ -1076,6 +1119,14 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 	ZBX_SOCKADDR	serv_addr;
 	char		*ip, *ips, *delim;
 	int		i, on, ret = FAIL;
+#ifdef _WINDOWS
+	/* WSASocket() option to prevent inheritance is available on */
+	/* Windows Server 2008 R2 or newer and on Windows 7 SP1 or newer */
+	static int	no_inherit_wsapi = -1;
+
+	if (-1 == no_inherit_wsapi)
+		no_inherit_wsapi = IsWindows7SP1OrGreater() || (IsWindowsServer() && IsWindows7OrGreater());
+#endif
 
 	ZBX_SOCKET_START();
 
@@ -1102,9 +1153,23 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 			goto out;
 		}
 
+#if defined(_WINDOWS)
+		/* WSA_FLAG_NO_HANDLE_INHERIT prevents socket inheritance if we call CreateProcess() */
+		/* later on. If it's not available we still try to avoid inheritance by calling  */
+		/* SetHandleInformation() below. WSA_FLAG_OVERLAPPED is not mandatory but stronly */
+		/* recommended for every socket */
+		s->sockets[s->num_socks] = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0,
+				(0 != no_inherit_wsapi ? WSA_FLAG_NO_HANDLE_INHERIT : 0) | WSA_FLAG_OVERLAPPED);
+		if (ZBX_SOCKET_ERROR == s->sockets[s->num_socks])
+#else
 		if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
+#endif
 		{
+#ifdef _WINDOWS
+			zbx_set_socket_strerror("WSASocket() for [[%s]:%hu] failed: %s",
+#else
 			zbx_set_socket_strerror("socket() for [[%s]:%hu] failed: %s",
+#endif
 					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
 			goto out;
 		}
@@ -1114,6 +1179,18 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 #endif
 		on = 1;
 #ifdef _WINDOWS
+		/* If WSA_FLAG_NO_HANDLE_INHERIT not available, prevent listening socket from */
+		/* inheritance with the old API. Disabling handle inheritance in WSASocket() instead of */
+		/* SetHandleInformation() is preferred because it provides atomicity and gets the job done */
+		/* on systems with non-IFS LSPs installed. So there is a chance that the socket will be still */
+		/* inherited on Windows XP with 3rd party firewall/antivirus installed */
+		if (0 == no_inherit_wsapi && 0 == SetHandleInformation((HANDLE)s->sockets[s->num_socks],
+				HANDLE_FLAG_INHERIT, 0))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "SetHandleInformation() failed: %s",
+					strerror_from_system(GetLastError()));
+		}
+
 		/* prevent other processes from binding to the same port */
 		/* SO_EXCLUSIVEADDRUSE is mutually exclusive with SO_REUSEADDR */
 		/* on Windows SO_REUSEADDR has different semantics than on Unix */
