@@ -654,6 +654,7 @@ else {
 			$filter_groupids = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $filter_groupids,
+				'editable' => true,
 				'preservekeys' => true
 			]);
 			$filter_groupids_ms = CArrayHelper::renameObjectsKeys($filter_groupids, ['groupid' => 'id']);
@@ -697,7 +698,8 @@ else {
 		if ($filter_groupids) {
 			$filter_groupids_ms = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'groupids' => $filter_groupids
+				'groupids' => $filter_groupids,
+				'editable' => true
 			]), ['groupid' => 'id']);
 		}
 
@@ -717,6 +719,7 @@ else {
 			];
 		}
 	}
+
 	// Skip empty tags.
 	$filter_tags = array_filter($filter_tags, function ($v) {
 		return boolval($v['tag']);

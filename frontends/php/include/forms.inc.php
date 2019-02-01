@@ -322,7 +322,8 @@ function getItemFilterForm(&$items) {
 	$group_filter = !empty($filter_groupids)
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
-			'groupids' => $filter_groupids
+			'groupids' => $filter_groupids,
+			'editable' => true
 		]), ['groupid' => 'id'])
 		: [];
 
@@ -367,7 +368,8 @@ function getItemFilterForm(&$items) {
 		? CArrayHelper::renameObjectsKeys(API::Host()->get([
 			'output' => ['hostid', 'name'],
 			'hostids' => $filter_hostids,
-			'templated_hosts' => true
+			'templated_hosts' => true,
+			'editable' => true
 		]), ['hostid' => 'id'])
 		: [];
 
