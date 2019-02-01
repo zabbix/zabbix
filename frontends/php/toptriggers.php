@@ -198,13 +198,9 @@ CArrayHelper::sort($data['triggers'], [
 
 $data['hosts'] = API::Host()->get([
 	'output' => ['hostid', 'status'],
-	'selectGraphs' => API_OUTPUT_COUNT,
-	'selectScreens' => API_OUTPUT_COUNT,
 	'hostids' => $trigger_hostids,
 	'preservekeys' => true
 ]);
-
-$data['scripts'] = API::Script()->getScriptsByHosts($trigger_hostids);
 
 // render view
 $historyView = new CView('reports.toptriggers', $data);

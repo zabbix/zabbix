@@ -216,12 +216,9 @@ class CScreenHostTriggers extends CScreenBase {
 		}
 		$hostids = array_keys($hostids);
 
-		$scripts = API::Script()->getScriptsByHosts($hostids);
 		$hosts = API::Host()->get([
 			'hostids' => $hostids,
-			'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenance_type', 'maintenanceid'],
-			'selectGraphs' => API_OUTPUT_COUNT,
-			'selectScreens' => API_OUTPUT_COUNT,
+			'output' => ['hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'],
 			'preservekeys' => true
 		]);
 
@@ -249,7 +246,7 @@ class CScreenHostTriggers extends CScreenBase {
 			$host = reset($trigger['hosts']);
 			$host = $hosts[$host['hostid']];
 			$host_name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
+				->setMenuPopup(CMenuPopupHelper::getAjaxHost($host['hostid']));
 
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
 					&& array_key_exists($host['maintenanceid'], $maintenances)) {

@@ -61,22 +61,7 @@ jQuery(function($) {
 		changeClass(comboBox);
 	});
 
-	/**
-	 * Build menu popup for given elements.
-	 */
-	$(document).on('keydown click', '[data-menu-popup]', function(event) {
-		var obj = $(this),
-			data = obj.data('menu-popup');
-
-		if (event.type === 'keydown') {
-			if (event.which != 13) {
-				return;
-			}
-
-			event.preventDefault();
-			event.target = this;
-		}
-
+	function showMenuPopup(obj, data, event) {
 		switch (data.type) {
 			case 'history':
 				data = getMenuPopupHistory(data);
@@ -116,6 +101,54 @@ jQuery(function($) {
 		}
 
 		obj.menuPopup(data, event);
+	}
+
+	/**
+	 * Build menu popup for given elements.
+	 */
+	$(document).on('keydown click', '[data-menu-popup]', function(event) {
+		var obj = $(this),
+			data = obj.data('menu-popup');
+
+		if (event.type === 'keydown') {
+			if (event.which != 13) {
+				return;
+			}
+
+			event.preventDefault();
+			event.target = this;
+		}
+
+		if (typeof data.ajax !== 'undefined' && data.ajax) {
+			var	url = new Curl('zabbix.php'),
+				ajax_data = {
+					data: {
+						hostid: data.hostid,
+						has_goto: (typeof data.has_goto === 'undefined' || data.has_goto) ? 1 : 0
+					}
+				};
+
+			url.setArgument('action', 'menu.popup');
+			url.setArgument('type', data.type);
+
+			$.ajax({
+				url: url.getUrl(),
+				method: 'POST',
+				data: ajax_data,
+				dataType: 'json',
+				success: function(resp) {
+					showMenuPopup(obj, resp.data, event);
+					return false;
+				},
+				error: function() {
+					alert('fail');
+					return false;
+				}
+			});
+		}
+		else {
+			showMenuPopup(obj, data, event)
+		}
 
 		return false;
 	});

@@ -81,8 +81,7 @@ $table = (new CTableInfo())->setHeader([_('Host'), _('Trigger'), _('Severity'), 
 foreach ($data['triggers'] as $trigger) {
 	$hostId = $trigger['hosts'][0]['hostid'];
 
-	$hostName = (new CLinkAction($trigger['hosts'][0]['name']))
-		->setMenuPopup(CMenuPopupHelper::getHost($data['hosts'][$hostId], $data['scripts'][$hostId]));
+	$hostName = (new CLinkAction($trigger['hosts'][0]['name']))->setMenuPopup(CMenuPopupHelper::getAjaxHost($hostId));
 	if ($data['hosts'][$hostId]['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);
 	}

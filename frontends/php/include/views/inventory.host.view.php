@@ -23,11 +23,7 @@
 $overviewFormList = new CFormList();
 
 $host_name = (new CLinkAction($data['host']['host']))
-	->setMenuPopup(CMenuPopupHelper::getHost(
-		$data['host'],
-		$data['hostScripts'][$data['host']['hostid']],
-		false
-	));
+	->setMenuPopup(CMenuPopupHelper::getAjaxHost($data['host']['hostid'], false));
 
 if ($data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
 		&& array_key_exists($data['host']['maintenanceid'], $data['maintenances'])) {

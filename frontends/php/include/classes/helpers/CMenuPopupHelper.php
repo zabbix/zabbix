@@ -56,31 +56,54 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getHost(array $host, array $scripts = null, $has_goto = true) {
+	public static function getHost(array $host, array $scripts = [], $has_goto = true) {
 		$data = [
 			'type' => 'host',
 			'hostid' => $host['hostid'],
-			'showGraphs' => (bool) $host['graphs'],
-			'showScreens' => (bool) $host['screens'],
-			'showTriggers' => ($host['status'] == HOST_STATUS_MONITORED),
 			'hasGoTo' => $has_goto
 		];
 
-		if ($scripts) {
-			foreach ($scripts as &$script) {
-				$script['name'] = trimPath($script['name']);
-			}
-			unset($script);
+		if ($has_goto) {
+			$data['showGraphs'] = (bool) $host['graphs'];
+			$data['showScreens'] = (bool) $host['screens'];
+			$data['showTriggers'] = ($host['status'] == HOST_STATUS_MONITORED);
+		}
 
-			CArrayHelper::sort($scripts, ['name']);
+		foreach ($scripts as &$script) {
+			$script['name'] = trimPath($script['name']);
+		}
+		unset($script);
 
-			foreach (array_values($scripts) as $script) {
-				$data['scripts'][] = [
-					'name' => $script['name'],
-					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
-				];
-			}
+		CArrayHelper::sort($scripts, ['name']);
+
+		foreach (array_values($scripts) as $script) {
+			$data['scripts'][] = [
+				'name' => $script['name'],
+				'scriptid' => $script['scriptid'],
+				'confirmation' => $script['confirmation']
+			];
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Prepare data for Ajax host menu popup.
+	 *
+	 * @param string $hostid
+	 * @param bool   $has_goto     Show "Go to" block in popup.
+	 *
+	 * @return array
+	 */
+	public static function getAjaxHost($hostid, $has_goto = true) {
+		$data = [
+			'ajax' => true,
+			'type' => 'host',
+			'hostid' => $hostid
+		];
+
+		if ($has_goto === false) {
+			$data['has_goto'] = $has_goto;
 		}
 
 		return $data;
