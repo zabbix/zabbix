@@ -466,17 +466,21 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 		goto out;
 	}
 
-	if (0 == duk_check_type_mask(es->env->ctx, -1, DUK_TYPE_MASK_NULL | DUK_TYPE_MASK_UNDEFINED))
-		*output = zbx_strdup(NULL, duk_safe_to_string(es->env->ctx, -1));
+	if (0 == duk_check_type(es->env->ctx, -1, DUK_TYPE_UNDEFINED))
+	{
+		if (0 != duk_check_type(es->env->ctx, -1, DUK_TYPE_NULL))
+			*output = NULL;
+		else
+			*output = zbx_strdup(NULL, duk_safe_to_string(es->env->ctx, -1));
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __function_name, ZBX_NULL2EMPTY_STR(*output));
+		ret = SUCCEED;
+	}
 	else
-		*output = NULL;
+		*error = zbx_strdup(*error, "undefined return value");
 
 	duk_pop(es->env->ctx);
 	es->env->rt_error_num = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __function_name, ZBX_NULL2EMPTY_STR(*output));
-
-	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
