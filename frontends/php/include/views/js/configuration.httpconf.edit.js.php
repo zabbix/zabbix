@@ -567,12 +567,16 @@
 					jQuery('input[name="post_type"][value="<?= ZBX_POSTTYPE_RAW ?>"]', jQuery('#'+formid))
 						.prop('checked', true);
 
-					overlayDialogue({
-						'title': <?= CJs::encodeJson(_('Error')); ?>,
-						'content': jQuery('<span>').html(<?=
+					var overlay_elem = jQuery('<span>').html(<?=
 							CJs::encodeJson(
 								_('Cannot convert POST data from raw data format to form field data format.').'<br><br>'
-							); ?> + e),
+							); ?> + e)
+
+					var overlayid = getOverlayDialogueId();
+					overlayDialogue({
+						'title': <?= CJs::encodeJson(_('Error')); ?>,
+						'dialogueid': overlayid,
+						'content': overlay_elem,
 						'buttons': [
 							{
 								title: <?= CJs::encodeJson(_('Ok')); ?>,
@@ -582,6 +586,8 @@
 							}
 						]
 					});
+
+					addToOverlaysStack(overlayid, overlay_elem, 'popup')
 
 					return false;
 				}
