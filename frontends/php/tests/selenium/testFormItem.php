@@ -1156,14 +1156,7 @@ class testFormItem extends CLegacyWebTest {
 			$dbResult = DBselect('SELECT * FROM item_preproc WHERE itemid='.$itemid);
 			$itemsPreproc = DBfetchArray($dbResult);
 			foreach ($itemsPreproc as $itemPreproc) {
-				// The array of allowed types must be synced with CItem::$supported_preprocessing_types.
-				$preprocessing_type = get_preprocessing_types($itemPreproc['type'], false, [ZBX_PREPROC_REGSUB,
-					ZBX_PREPROC_TRIM, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
-					ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_BOOL2DEC,
-					ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX,
-					ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML,
-					ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE
-				]);
+				$preprocessing_type = get_preprocessing_types($itemPreproc['type']);
 				$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($itemPreproc['step']-1)."_type_name']", 'readonly');
 				$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_type_name", $preprocessing_type);
 				if ((1 <= $itemPreproc['type']) && ($itemPreproc['type'] <= 4)) {

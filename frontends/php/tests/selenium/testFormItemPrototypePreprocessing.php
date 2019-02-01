@@ -131,10 +131,10 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Item JSONPath',
+					'name' => 'Item JSON Path',
 					'key' => 'item-empty-jsonpath',
 					'preprocessing' => [
-						['type' => 'JSONPath', 'parameter_1' => ''],
+						['type' => 'JSON Path', 'parameter_1' => ''],
 					],
 					'error' => 'Incorrect value for field "params": cannot be empty.'
 				]
@@ -534,7 +534,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 						['type' => 'Left trim', 'parameter_1' => '2b!@#$%^&*()-='],
 						['type' => 'Trim', 'parameter_1' => '3c!@#$%^&*()-='],
 						['type' => 'XML XPath', 'parameter_1' => '3c!@#$%^&*()-='],
-						['type' => 'JSONPath', 'parameter_1' => '3c!@#$%^&*()-='],
+						['type' => 'JSON Path', 'parameter_1' => '3c!@#$%^&*()-='],
 						['type' => 'Custom multiplier', 'parameter_1' => '4e+10'],
 						['type' => 'Regular expression', 'parameter_1' => '5d!@#$%^&*()-=', 'parameter_2' => '6e!@#$%^&*()-='],
 						['type' => 'Matches regular expression', 'parameter_1' => '7f!@#$%^&*()-='],
@@ -560,8 +560,8 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
 						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
 						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
-						['type' => 'JSONPath', 'parameter_1' => '1a2b3c'],
-						['type' => 'JSONPath', 'parameter_1' => '1a2b3c'],
+						['type' => 'JSON Path', 'parameter_1' => '1a2b3c'],
+						['type' => 'JSON Path', 'parameter_1' => '1a2b3c'],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
 						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
@@ -598,7 +598,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 						['type' => 'Right trim', 'parameter_1' => '{$MACRO}'],
 						['type' => 'Left trim', 'parameter_1' => '{$USER}'],
 						['type' => 'XML XPath', 'parameter_1' => 'number(/values/Item/value[../key=\'{$DELIM}\'])'],
-						['type' => 'JSONPath', 'parameter_1' => '$.data[\'{$KEY}\']'],
+						['type' => 'JSON Path', 'parameter_1' => '$.data[\'{$KEY}\']'],
 						['type' => 'Custom multiplier', 'parameter_1' => '{$VALUE}'],
 						['type' => 'In range', 'parameter_1' => '{$FROM}', 'parameter_2' => '{$TO}'],
 						['type' => 'Matches regular expression', 'parameter_1' => '{$EXPRESSION}(.*)'],
@@ -648,15 +648,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 
 				// Check results in DB.
 				foreach ($data['preprocessing'] as $key => $options) {
-					// The array of allowed types must be synced with CItemPrototype::$supported_preprocessing_types.
-					$dbType = get_preprocessing_types($type[$key], false, [ZBX_PREPROC_REGSUB, ZBX_PREPROC_TRIM,
-						ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
-						ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_BOOL2DEC,
-						ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC, ZBX_PREPROC_VALIDATE_RANGE,
-						ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON,
-						ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_VALUE,
-						ZBX_PREPROC_THROTTLE_TIMED_VALUE
-					]);
+					$dbType = get_preprocessing_types($type[$key]);
 					$this->assertEquals($options['type'], $dbType);
 
 					switch ($options['type']) {
@@ -665,7 +657,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 						case 'Left trim':
 						case 'Trim':
 						case 'XML XPath':
-						case 'JSONPath':
+						case 'JSON Path':
 						case 'Matches regular expression':
 						case 'Does not match regular expression':
 						case 'Check for error in JSON':
@@ -706,7 +698,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 						['type' => 'Right trim', 'parameter_1' => 'right_trim'],
 						['type' => 'Left trim', 'parameter_1' => 'left_trim'],
 						['type' => 'XML XPath', 'parameter_1' => '/xml/path'],
-						['type' => 'JSONPath', 'parameter_1' => '/json/path'],
+						['type' => 'JSON Path', 'parameter_1' => '/json/path'],
 						['type' => 'Custom multiplier', 'parameter_1' => '5'],
 						['type' => 'Simple change'],
 						['type' => 'Boolean to decimal'],
@@ -778,7 +770,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 			switch ($options['type']) {
 				case 'Regular expression':
 				case 'XML XPath':
-				case 'JSONPath':
+				case 'JSON Path':
 				case 'Custom multiplier':
 				case 'Simple change':
 				case 'Change per second':
@@ -835,7 +827,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 			switch ($options['type']) {
 				case 'Regular expression':
 				case 'XML XPath':
-				case 'JSONPath':
+				case 'JSON Path':
 				case 'Custom multiplier':
 				case 'Simple change':
 				case 'Change per second':
@@ -976,7 +968,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 		$preprocessing = [
 			['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
 			['type' => 'XML XPath', 'parameter_1' => '/xml/path'],
-			['type' => 'JSONPath', 'parameter_1' => '/json/path'],
+			['type' => 'JSON Path', 'parameter_1' => '/json/path'],
 			['type' => 'Custom multiplier', 'parameter_1' => '5'],
 			['type' => 'Simple change'],
 			['type' => 'Boolean to decimal'],

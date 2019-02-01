@@ -680,10 +680,8 @@ output {
     position: relative;
     border-bottom: 1px solid #333;
     line-height: 18px;
-    vertical-align: top; }
-    .list-table tbody th.latest-value,
-    .list-table td.latest-value {
-      max-width: 300px; }
+    vertical-align: top;
+    max-width: 300px; }
   .list-table tbody th {
     text-align: left; }
   .list-table .vertical_rotation_inner {

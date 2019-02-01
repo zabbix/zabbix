@@ -1219,10 +1219,6 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "preprocessing manager";
 		case ZBX_PROCESS_TYPE_PREPROCESSOR:
 			return "preprocessing worker";
-		case ZBX_PROCESS_TYPE_LLDMANAGER:
-			return "lld manager";
-		case ZBX_PROCESS_TYPE_LLDWORKER:
-			return "lld worker";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

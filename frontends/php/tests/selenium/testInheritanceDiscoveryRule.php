@@ -155,7 +155,6 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 				// Host form check.
 				$this->zbxTestLogin('host_discovery.php?hostid='.$this->hostid);
 				$this->zbxTestClickLinkText($data['name']);
-				$this->zbxTestWaitForPageToLoad();
 				$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@value="'.$data['name'].'"][@readonly]');
 				$this->zbxTestAssertElementPresentXpath('//input[@id="key"][@value="'.$data['key'].'"][@readonly]');
 				if (array_key_exists('macros', $data)) {

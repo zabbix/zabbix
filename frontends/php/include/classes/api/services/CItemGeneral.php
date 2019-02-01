@@ -624,8 +624,6 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create');
-
-			$this->validateItemPreprocessing($fullItem, $update ? 'update' : 'create');
 		}
 		unset($item);
 
@@ -832,7 +830,8 @@ abstract class CItemGeneral extends CApiService {
 	 *                                                                            prototypes.
 	 * @param string     $tpl_items[<itemid>]['applicationPrototypes'][]['name']
 	 * @param array      $tpl_items[<itemid>]['applications']                     (optional) Array of applicationids.
-	 * @param array      $tpl_items[<itemid>]['preprocessing']                    (optional)
+	 * @param array      $tpl_items[<itemid>]['preprocessing']                    (optional) Suitable for items and item
+	 *                                                                            prototypes.
 	 * @param int        $tpl_items[<itemid>]['preprocessing'][]['type']
 	 * @param string     $tpl_items[<itemid>]['preprocessing'][]['params']
 	 * @param int        $tpl_items[<itemid>]['flags']
@@ -1075,7 +1074,9 @@ abstract class CItemGeneral extends CApiService {
 					}
 				}
 
-				if (array_key_exists('preprocessing', $new_item)) {
+				// For items and item prototypes.
+				if (($class === 'CItem' || $class === 'CItemPrototype')
+						&& array_key_exists('preprocessing', $new_item)) {
 					foreach ($new_item['preprocessing'] as $preprocessing) {
 						if ($chd_item) {
 							$preprocessing['itemid'] = $chd_item['itemid'];
@@ -1261,7 +1262,7 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			$type_validator = new CLimitedSetValidator(['values' => $this::$supported_preprocessing_types]);
+			$type_validator = new CLimitedSetValidator(['values' => array_keys(get_preprocessing_types(null, false))]);
 
 			$error_handler_validator = new CLimitedSetValidator([
 				'values' => [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE,
@@ -1466,9 +1467,9 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 						$api_input_rules = [
 							'type' => API_TIME_UNIT,
-							'flags' => ($this instanceof CItem)
-								? API_NOT_EMPTY | API_ALLOW_USER_MACRO
-								: API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO,
+							'flags' => ($this instanceof CItemPrototype)
+								? API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
+								: API_NOT_EMPTY | API_ALLOW_USER_MACRO,
 							'in' => '1:'.ZBX_MAX_TIMESHIFT
 						];
 
@@ -1687,29 +1688,6 @@ abstract class CItemGeneral extends CApiService {
 				'preservekeys' => true
 			]);
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
-		}
-
-		if ($options['selectPreprocessing'] !== null && $options['selectPreprocessing'] != API_OUTPUT_COUNT) {
-			$db_item_preproc = API::getApiService()->select('item_preproc', [
-				'output' => $this->outputExtend($options['selectPreprocessing'], ['itemid', 'step']),
-				'filter' => ['itemid' => array_keys($result)],
-			]);
-
-			CArrayHelper::sort($db_item_preproc, ['step']);
-
-			foreach ($result as &$item) {
-				$item['preprocessing'] = [];
-			}
-			unset($item);
-
-			foreach ($db_item_preproc as $step) {
-				$itemid = $step['itemid'];
-				unset($step['item_preprocid'], $step['itemid'], $step['step']);
-
-				if (array_key_exists($itemid, $result)) {
-					$result[$itemid]['preprocessing'][] = $step;
-				}
-			}
 		}
 
 		return $result;

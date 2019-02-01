@@ -1898,6 +1898,7 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 	zbx_uint64_t	flags = ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK;
 	const char	*item_error = NULL;
 	zbx_item_diff_t	*diff;
+	int		object;
 
 	if (0 != (ZBX_DC_FLAG_META & h->flags))
 	{
@@ -1917,8 +1918,11 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" became not supported: %s",
 					item->host.host, item->key_orig, h->value.str);
 
-			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state, NULL,
-					NULL, NULL, 0, 0, NULL, 0, NULL, 0, h->value.err);
+			object = (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags) ?
+					EVENT_OBJECT_LLDRULE : EVENT_OBJECT_ITEM);
+
+			zbx_add_event(EVENT_SOURCE_INTERNAL, object, item->itemid, &h->ts, h->state, NULL, NULL, NULL,
+					0, 0, NULL, 0, NULL, 0, h->value.err);
 
 			if (0 != strcmp(item->error, h->value.err))
 				item_error = h->value.err;
@@ -1969,6 +1973,63 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 
 /******************************************************************************
  *                                                                            *
+ * Function: db_save_item_changes                                             *
+ *                                                                            *
+ * Purpose: save item state, error, mtime, lastlogsize changes to             *
+ *          database                                                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_save_item_changes(size_t *sql_offset, const zbx_vector_ptr_t *item_diff)
+{
+	int			i;
+	const zbx_item_diff_t	*diff;
+	char			*value_esc;
+
+	for (i = 0; i < item_diff->values_num; i++)
+	{
+		char	delim = ' ';
+
+		diff = (const zbx_item_diff_t *)item_diff->values[i];
+
+		if (0 == (ZBX_FLAGS_ITEM_DIFF_UPDATE_DB & diff->flags))
+			continue;
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, "update items set");
+
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE & diff->flags))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%clastlogsize=" ZBX_FS_UI64, delim,
+					diff->lastlogsize);
+			delim = ',';
+		}
+
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME & diff->flags))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%cmtime=%d", delim, diff->mtime);
+			delim = ',';
+		}
+
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE & diff->flags))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%cstate=%d", delim, (int)diff->state);
+			delim = ',';
+		}
+
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & diff->flags))
+		{
+			value_esc = DBdyn_escape_field("items", "error", diff->error);
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%cerror='%s'", delim, value_esc);
+			zbx_free(value_esc);
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", diff->itemid);
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, sql_offset);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBmass_update_items                                              *
  *                                                                            *
  * Purpose: update item data and inventory in database                        *
@@ -2000,7 +2061,7 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (i != item_diff->values_num)
-			zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff);
+			db_save_item_changes(&sql_offset, item_diff);
 
 		if (0 != inventory_values->values_num)
 			DCadd_update_inventory_sql(&sql_offset, inventory_values);

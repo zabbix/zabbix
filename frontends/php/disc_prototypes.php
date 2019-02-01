@@ -875,8 +875,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'post_type' => getRequest('post_type'),
 					'posts' => getRequest('posts'),
 					'headers' => getRequest('headers', []),
-					'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-					'preprocessing' => []
+					'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF)
 				];
 
 				if ($item_prototype['headers']) {
@@ -907,28 +906,16 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 							case ZBX_PREPROC_TRIM:
 							case ZBX_PREPROC_XPATH:
 							case ZBX_PREPROC_JSONPATH:
-							case ZBX_PREPROC_VALIDATE_REGEX:
-							case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-							case ZBX_PREPROC_ERROR_FIELD_JSON:
-							case ZBX_PREPROC_ERROR_FIELD_XML:
-							case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 								$step['params'] = $step['params'][0];
 								break;
 
 							case ZBX_PREPROC_REGSUB:
-							case ZBX_PREPROC_VALIDATE_RANGE:
-							case ZBX_PREPROC_ERROR_FIELD_REGEX:
 								$step['params'] = implode("\n", $step['params']);
 								break;
 
 							default:
 								$step['params'] = '';
 						}
-
-						$step += [
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						];
 					}
 					unset($step);
 
@@ -1189,7 +1176,6 @@ if (isset($_REQUEST['form'])) {
 	$data = getItemFormData($itemPrototype);
 	$data['config'] = select_config();
 	$data['trends_default'] = DB::getDefault('items', 'trends');
-	$data['preprocessing_types'] = CItemPrototype::$supported_preprocessing_types;
 
 	// Sort interfaces to be listed starting with one selected as 'main'.
 	CArrayHelper::sort($data['interfaces'], [
@@ -1253,16 +1239,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_MULTISELECT_ADD),
 		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_MULTISELECT_ADD),
-		'preprocessing_types' => CItemPrototype::$supported_preprocessing_types
 	];
-
-	foreach ($data['preprocessing'] as &$step) {
-		$step += [
-			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-			'error_handler_params' => ''
-		];
-	}
-	unset($step);
 
 	if (hasRequest('applications')) {
 		$applicationids = [];

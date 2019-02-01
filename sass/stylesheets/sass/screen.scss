@@ -1075,9 +1075,7 @@ output {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
-		&.latest-value {
-			max-width: 300px;
-		}
+		max-width: 300px;
 	}
 
 	tbody th {

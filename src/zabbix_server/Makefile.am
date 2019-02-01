@@ -20,8 +20,7 @@ SUBDIRS = \
 	ipmi \
 	odbc \
 	scripts \
-	preprocessor \
-	lld
+	preprocessor
 
 sbin_PROGRAMS = zabbix_server
 
@@ -63,9 +62,6 @@ zabbix_server_LDADD = \
 	odbc/libzbxodbc.a \
 	scripts/libzbxscripts.a \
 	preprocessor/libpreprocessor.a \
-	poller/libzbxpoller_server.a \
-	lld/libzbxlld.a \
-	libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
@@ -95,7 +91,8 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
-	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
+	libzbxserver.a
 
 if HAVE_IPMI
 zabbix_server_LDADD += ipmi/libipmi.a

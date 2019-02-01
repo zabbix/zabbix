@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-28 15:54+0200\n"
+"POT-Creation-Date: 2019-01-22 10:39+0200\n"
 "PO-Revision-Date: 2017-11-10 20:32+0300\n"
 "Last-Translator: Anıl <ozbekanil@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1487,7 +1487,7 @@ msgid "CERT"
 msgstr "SERT"
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:968
+#: include/classes/graph/CSvgGraph.php:938
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -6757,6 +6757,8 @@ msgstr "H.i"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1413
 #: include/classes/graphdraw/CLineGraphDraw.php:1420
+#: include/classes/html/svg/CSvgGraphXAxis.php:456
+#: include/classes/html/svg/CSvgGraphXAxis.php:463
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -10081,6 +10083,7 @@ msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "\"Desteklenmiyor\" durumundaki düşük seviye keşif kuralı"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
+#: include/classes/html/svg/CSvgGraphXAxis.php:424
 msgid "M"
 msgstr "M"
 
@@ -12525,7 +12528,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:963
+#: include/classes/graph/CSvgGraph.php:933
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -13219,7 +13222,7 @@ msgid "Queue of items to be updated"
 msgstr "Güncellenecek öğelerin sırası"
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:959
+#: include/classes/graph/CSvgGraph.php:929
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:956
 #: include/classes/screens/CScreenProblem.php:1122 include/events.inc.php:345
@@ -18860,6 +18863,9 @@ msgstr "ay"
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
 #: include/classes/graphdraw/CLineGraphDraw.php:1389
 #: include/classes/graphdraw/CLineGraphDraw.php:1396
+#: include/classes/html/svg/CSvgGraphXAxis.php:424
+#: include/classes/html/svg/CSvgGraphXAxis.php:432
+#: include/classes/html/svg/CSvgGraphXAxis.php:439
 msgid "m-d"
 msgstr "a-g"
 

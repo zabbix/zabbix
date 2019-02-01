@@ -1687,125 +1687,97 @@ function getParamFieldLabelByType($itemType) {
 
 /**
  * Get either one or all item preprocessing types.
- * If $grouped set to true, returns group labels. Returns empty string if no specific type is found.
+ * If grouped set to true, returns group labels. Returns empty string if no specific type is found.
  *
  * Usage examples:
- *    - get_preprocessing_types(null, true, [5, 4, 2])             Returns array as defined.
- *    - get_preprocessing_types(4, true, [5, 4, 2])                Returns string: 'Trim'.
- *    - get_preprocessing_types(<wrong type>, true, [5, 4, 2])     Returns an empty string: ''.
- *    - get_preprocessing_types(null, false, [5, 12, 15, 16, 20])  Returns subarrays in one array maintaining index:
- *                                                                     [5] => Regular expression
- *                                                                     [12] => JSONPath
- *                                                                     [15] => Does not match regular expression
- *                                                                     [16] => Check for error in JSON
- *                                                                     [20] => Discard unchanged with heartbeat
+ *    - get_preprocessing_types()              Returns array as defined.
+ *    - get_preprocessing_types(4)             Returns string: 'Trim'.
+ *    - get_preprocessing_types(<wrong type>)  Returns an empty string: ''.
+ *    - get_preprocessing_types(null, false)   Returns subarrays in one array maintaining index:
+ *                                               [5] => Regular expression
+ *                                               [4] => Trim
+ *                                               [2] => Right trim
+ *                                               [3] => Left trim
+ *                                               [11] => XML XPath
+ *                                               [12] => JSON Path
+ *                                               [1] => Custom multiplier
+ *                                               [9] => Simple change
+ *                                               [10] => Speed per second
+ *                                               [6] => Boolean to decimal
+ *                                               [7] => Octal to decimal
+ *                                               [8] => Hexadecimal to decimal
+ *                                               [13] => In range
+ *                                               [14] => Matches regular expression
+ *                                               [15] => Does not match regular expression
+ *                                               [16] => Check for error in JSON
+ *                                               [17] => Check for error in XML
+ *                                               [18] => Check for error using regular expression
+ *                                               [19] => Discard unchanged
+ *                                               [20] => Discard unchanged with heartbeat
  *
- * @param int   $type             Item preprocessing type.
- * @param bool  $grouped          Group label flag. If specific type is given, this parameter does not matter.
- * @param array $supported_types  Array of supported pre-processing types. If none are given, empty array is returned.
+ * @param int  $type     Item preprocessing type.
+ * @param bool $grouped  Group label flag.
  *
  * @return array|string
  */
-function get_preprocessing_types($type = null, $grouped = true, array $supported_types = []) {
-	$types = [
-		ZBX_PREPROC_REGSUB => [
-			'group' => _('Text'),
-			'name' => _('Regular expression')
+function get_preprocessing_types($type = null, $grouped = true) {
+	$groups = [
+		[
+			'label' => _('Text'),
+			'types' => [
+				ZBX_PREPROC_REGSUB => _('Regular expression'),
+				ZBX_PREPROC_TRIM => _('Trim'),
+				ZBX_PREPROC_RTRIM => _('Right trim'),
+				ZBX_PREPROC_LTRIM => _('Left trim')
+			]
 		],
-		ZBX_PREPROC_TRIM => [
-			'group' => _('Text'),
-			'name' => _('Trim')
+		[
+			'label' => _('Structured data'),
+			'types' => [
+				ZBX_PREPROC_XPATH => _('XML XPath'),
+				ZBX_PREPROC_JSONPATH => _('JSON Path')
+			]
 		],
-		ZBX_PREPROC_RTRIM => [
-			'group' => _('Text'),
-			'name' => _('Right trim')
+		[
+			'label' => _('Arithmetic'),
+			'types' => [
+				ZBX_PREPROC_MULTIPLIER => _('Custom multiplier')
+			]
 		],
-		ZBX_PREPROC_LTRIM => [
-			'group' => _('Text'),
-			'name' => _('Left trim')
+		[
+			'label' => _x('Change', 'noun'),
+			'types' => [
+				ZBX_PREPROC_DELTA_VALUE => _('Simple change'),
+				ZBX_PREPROC_DELTA_SPEED => _('Change per second')
+			]
 		],
-		ZBX_PREPROC_XPATH => [
-			'group' => _('Structured data'),
-			'name' => _('XML XPath')
+		[
+			'label' => _('Numeral systems'),
+			'types' => [
+				ZBX_PREPROC_BOOL2DEC => _('Boolean to decimal'),
+				ZBX_PREPROC_OCT2DEC => _('Octal to decimal'),
+				ZBX_PREPROC_HEX2DEC => _('Hexadecimal to decimal')
+			]
 		],
-		ZBX_PREPROC_JSONPATH => [
-			'group' => _('Structured data'),
-			'name' => _('JSONPath')
+		[
+			'label' => _('Validation'),
+			'types' => [
+				ZBX_PREPROC_VALIDATE_RANGE => _('In range'),
+				ZBX_PREPROC_VALIDATE_REGEX => _('Matches regular expression'),
+				ZBX_PREPROC_VALIDATE_NOT_REGEX => _('Does not match regular expression'),
+				ZBX_PREPROC_ERROR_FIELD_JSON => _('Check for error in JSON'),
+				ZBX_PREPROC_ERROR_FIELD_XML => _('Check for error in XML'),
+				ZBX_PREPROC_ERROR_FIELD_REGEX => _('Check for error using regular expression')
+			]
 		],
-		ZBX_PREPROC_MULTIPLIER => [
-			'group' => _('Arithmetic'),
-			'name' => _('Custom multiplier')
-		],
-		ZBX_PREPROC_DELTA_VALUE => [
-			'group' => _x('Change', 'noun'),
-			'name' => _('Simple change')
-		],
-		ZBX_PREPROC_DELTA_SPEED => [
-			'group' => _x('Change', 'noun'),
-			'name' => _('Change per second')
-		],
-		ZBX_PREPROC_BOOL2DEC => [
-			'group' => _('Numeral systems'),
-			'name' => _('Boolean to decimal')
-		],
-		ZBX_PREPROC_OCT2DEC => [
-			'group' => _('Numeral systems'),
-			'name' => _('Octal to decimal')
-		],
-		ZBX_PREPROC_HEX2DEC => [
-			'group' => _('Numeral systems'),
-			'name' => _('Hexadecimal to decimal')
-		],
-		ZBX_PREPROC_VALIDATE_RANGE => [
-			'group' => _('Validation'),
-			'name' => _('In range')
-		],
-		ZBX_PREPROC_VALIDATE_REGEX => [
-			'group' => _('Validation'),
-			'name' => _('Matches regular expression')
-		],
-		ZBX_PREPROC_VALIDATE_NOT_REGEX => [
-			'group' => _('Validation'),
-			'name' => _('Does not match regular expression')
-		],
-		ZBX_PREPROC_ERROR_FIELD_JSON => [
-			'group' => _('Validation'),
-			'name' => _('Check for error in JSON')
-		],
-		ZBX_PREPROC_ERROR_FIELD_XML => [
-			'group' => _('Validation'),
-			'name' => _('Check for error in XML')
-		],
-		ZBX_PREPROC_ERROR_FIELD_REGEX => [
-			'group' => _('Validation'),
-			'name' => _('Check for error using regular expression')
-		],
-		ZBX_PREPROC_THROTTLE_VALUE => [
-			'group' => _('Throttling'),
-			'name' => _('Discard unchanged')
-		],
-		ZBX_PREPROC_THROTTLE_TIMED_VALUE => [
-			'group' => _('Throttling'),
-			'name' => _('Discard unchanged with heartbeat')
+		[
+			'label' => _('Throttling'),
+			'types' => [
+				ZBX_PREPROC_THROTTLE_VALUE => _('Discard unchanged'),
+				ZBX_PREPROC_THROTTLE_TIMED_VALUE => _('Discard unchanged with heartbeat')
+			]
 		]
 	];
-
-	$filtered_types = [];
-
-	foreach ($types as $_type => $data) {
-		if (in_array($_type, $supported_types)) {
-			$filtered_types[$data['group']][$_type] = $data['name'];
-		}
-	}
-
-	$groups = [];
-
-	foreach ($filtered_types as $label => $types) {
-		$groups[] = [
-			'label' => $label,
-			'types' => $types
-		];
-	}
 
 	if ($type !== null) {
 		foreach ($groups as $group) {

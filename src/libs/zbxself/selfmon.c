@@ -115,8 +115,6 @@ extern int	CONFIG_IPMIMANAGER_FORKS;
 extern int	CONFIG_ALERTMANAGER_FORKS;
 extern int	CONFIG_PREPROCMAN_FORKS;
 extern int	CONFIG_PREPROCESSOR_FORKS;
-extern int	CONFIG_LLDMANAGER_FORKS;
-extern int	CONFIG_LLDWORKER_FORKS;
 
 extern unsigned char	process_type;
 extern int		process_num;
@@ -194,10 +192,6 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_PREPROCMAN_FORKS;
 		case ZBX_PROCESS_TYPE_PREPROCESSOR:
 			return CONFIG_PREPROCESSOR_FORKS;
-		case ZBX_PROCESS_TYPE_LLDMANAGER:
-			return CONFIG_LLDMANAGER_FORKS;
-		case ZBX_PROCESS_TYPE_LLDWORKER:
-			return CONFIG_LLDWORKER_FORKS;
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

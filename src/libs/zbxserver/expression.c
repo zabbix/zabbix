@@ -26,7 +26,6 @@
 #include "valuecache.h"
 #include "macrofunc.h"
 #include "zbxregexp.h"
-#include "dbcache.h"
 #ifdef HAVE_LIBXML2
 #	include <libxml/parser.h>
 #	include <libxml/tree.h>
@@ -5993,4 +5992,3 @@ int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
 	return SUCCEED;
 #endif
 }
-
