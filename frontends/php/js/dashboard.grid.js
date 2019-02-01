@@ -711,7 +711,6 @@
 
 	function checkWidgetOverlap(data, widget) {
 		resetCurrentPositions(data['widgets']);
-		// realignWidget(data, widget);
 
 		$.each(data['widgets'], function() {
 			if (!posEquals(this['pos'], this['current_pos'])) {
@@ -1187,7 +1186,8 @@
 
 		if (widget === null || ('type' in widget) === false) {
 			if (widget && 'pos' in widget) {
-				pos = $.extend({}, data.widget_defaults[type].size, widget.pos); // pos contains unused properties left and top for some reason.
+				// Pos contains unused properties left and top for some reason.
+				pos = $.extend({}, data.widget_defaults[type].size, widget.pos);
 
 				$.map(data.widgets, function(box) {
 					return rectOverlap(box.pos, pos) ? box : null;
@@ -1305,7 +1305,7 @@
 			'height': data['widget_defaults'][type]['size']['height']
 		}
 
-		// go y by row and try to position widget in each space
+		// Go y by row and try to position widget in each space.
 		var	max_col = data['options']['max-columns'] - pos['width'],
 			found = false,
 			x, y;
@@ -1672,17 +1672,17 @@
 	function deleteWidget($obj, data, widget) {
 		var index = widget['div'].data('widget-index');
 
-		// remove div from the grid
+		// Remove div from the grid.
 		widget['div'].find('[data-hintbox=1]').trigger('remove');
 		widget['div'].remove();
 		data['widgets'].splice(index, 1);
 
-		// update widget-index for all following widgets
+		// Update widget-index for all following widgets.
 		for (var i = index; i < data['widgets'].length; i++) {
 			data['widgets'][i]['div'].data('widget-index', i);
 		}
 
-		// mark dashboard as updated
+		// Mark dashboard as updated.
 		data['options']['updated'] = true;
 		resizeDashboardGrid($obj, data);
 	}
@@ -1713,7 +1713,8 @@
 		});
 
 		var ajax_data = {
-			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
+			// Can be undefined if dashboard is new.
+			dashboardid: data['dashboard']['id'],
 			name: data['dashboard']['name'],
 			userid: data['dashboard']['userid'],
 			widgets: ajax_widgets
@@ -1758,7 +1759,7 @@
 	}
 
 	function updateWidgetDynamic($obj, data, widget) {
-		// this function may be called for widget that is not in data['widgets'] array yet.
+		// This function may be called for widget that is not in data['widgets'] array yet.
 		if (typeof(widget['fields']['dynamic']) !== 'undefined' && widget['fields']['dynamic'] === '1') {
 			if (data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
 				widget['dynamic'] = {
@@ -1784,7 +1785,7 @@
 			$.each(data['widgets'], function(index, widget) {
 				if (widget['uniqueid'] === ref) {
 					ref = false;
-					return false; // break
+					return false;
 				}
 			});
 		}
@@ -1833,7 +1834,7 @@
 
 		$.each(triggers, function(index, trigger) {
 			if (typeof(window[trigger['function']]) !== typeof(Function)) {
-				return true; // continue
+				return true;
 			}
 
 			var params = [];
@@ -1847,7 +1848,7 @@
 				) {
 					if (widget === null) {
 						var widgets = methods.getWidgetsBy.call($obj, 'uniqueid', trigger['uniqueid']);
-						// will return only first element
+						// Will return only first element.
 						if (widgets.length > 0) {
 							grid['widget'] = widgets[0];
 						}
@@ -2076,7 +2077,7 @@
 			});
 		},
 
-		// Make widgets editable - Header icons, Resizeable, Draggable
+		// Make widgets editable - Header icons, Resizeable, Draggable.
 		setModeEditDashboard: function() {
 			return this.each(function() {
 				var	$this = $(this),
@@ -2089,7 +2090,7 @@
 			});
 		},
 
-		// Save changes and remove editable elements from widget - Header icons, Resizeable, Draggable
+		// Save changes and remove editable elements from widget - Header icons, Resizeable, Draggable.
 		saveDashboardChanges: function() {
 			return this.each(function() {
 				var	$this = $(this),
@@ -2102,7 +2103,7 @@
 			});
 		},
 
-		// Discard changes and remove editable elements from widget - Header icons, Resizeable, Draggable
+		// Discard changes and remove editable elements from widget - Header icons, Resizeable, Draggable.
 		cancelEditDashboard: function() {
 			return this.each(function() {
 				var	$this = $(this),
@@ -2110,7 +2111,7 @@
 					current_url = new Curl(location.href),
 					url = new Curl('zabbix.php');
 
-				// Don't show warning about existing updates
+				// Don't show warning about existing updates.
 				data['options']['updated'] = false;
 
 				url.unsetArgument('sid');
@@ -2127,7 +2128,7 @@
 			});
 		},
 
-		// After pressing "Edit" button on widget
+		// After pressing "Edit" button on widget.
 		editWidget: function(widget, trigger_elmnt) {
 			return this.each(function() {
 				var	$this = $(this),
@@ -2137,7 +2138,7 @@
 			});
 		},
 
-		// After pressing "delete" button on widget
+		// After pressing "delete" button on widget.
 		deleteWidget: function(widget) {
 			return this.each(function() {
 				var	$this = $(this),
@@ -2159,7 +2160,7 @@
 					footer = $('.overlay-dialogue-footer', data.dialogue['div']),
 					header = $('.dashbrd-widget-head', data.dialogue['div']),
 					form = $('form', body),
-					widget = data.dialogue['widget'], // widget currently being edited
+					widget = data.dialogue['widget'], // Widget currently being edited.
 					url = new Curl('zabbix.php'),
 					ajax_data = {},
 					fields;
@@ -2272,7 +2273,7 @@
 			return widgets_found;
 		},
 
-		// Register widget as data receiver shared by other widget
+		// Register widget as data receiver shared by other widget.
 		registerDataExchange: function(obj) {
 			return this.each(function() {
 				var $this = $(this),
@@ -2511,7 +2512,7 @@
 					data['triggers'][hook_name] = [];
 				}
 
-				// add trigger with each name only once
+				// Add trigger with each name only once.
 				if (typeof(options['trigger_name']) !== 'undefined') {
 					trigger_name = options['trigger_name'];
 					$.each(data['triggers'][hook_name], function(index, trigger) {
