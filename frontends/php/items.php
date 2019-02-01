@@ -1982,10 +1982,8 @@ else {
 	$data['trigger_parent_templates'] = getTriggerParentTemplates($data['itemTriggers'], ZBX_FLAG_DISCOVERY_NORMAL);
 
 	// determine, show or not column of errors
-	if (isset($hosts)) {
-		$host = reset($hosts);
-
-		$data['showInfoColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
+	if (($data['hostid'] != 0 && array_key_exists('templateid', $host))) {
+		$data['showInfoColumn'] = false;
 	}
 	else {
 		$data['showInfoColumn'] = true;
