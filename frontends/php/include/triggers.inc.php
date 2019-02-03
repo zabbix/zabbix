@@ -687,10 +687,8 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 	$hostids = array_keys($hosts);
 
 	$trigger_options = [
-		'output' => ['triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags',
-			'comments'],
-		'selectHosts' => ['hostid', 'name', 'status'],
-		'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments'],
+		'selectHosts' => ['hostid', 'name'],
 		'hostids' => $hostids,
 		'monitored' => true,
 		'skipDependent' => true,
@@ -711,20 +709,6 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 	}
 
 	$triggers = getTriggersWithActualSeverity($trigger_options, $problem_options);
-
-	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
-
-	$rw_triggers = API::Trigger()->get([
-		'output' => [],
-		'triggerids' => array_keys($triggers),
-		'editable' => true,
-		'preservekeys' => true
-	]);
-
-	foreach ($triggers as $triggerid => &$trigger) {
-		$trigger['editable'] = array_key_exists($triggerid, $rw_triggers);
-	}
-	unset($trigger);
 
 	return [$hosts, $triggers];
 }
@@ -851,13 +835,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				'triggerid' => $trigger['triggerid'],
 				'value' => $trigger['value'],
 				'lastchange' => $trigger['lastchange'],
-				'priority' => $trigger['priority'],
-				'flags' => $trigger['flags'],
-				'url' => $trigger['url'],
-				'hosts' => $trigger['hosts'],
-				'items' => $trigger['items'],
-				'description_enabled' => ($trigger['comments'] !== ''
-					|| ($trigger['editable'] && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL))
+				'priority' => $trigger['priority']
 			];
 			$trcounter[$host['name']][$trigger_name]++;
 		}
@@ -1008,8 +986,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$options = ['description_enabled' => $trigger['description_enabled']];
-		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge, $options));
+		$column->setMenuPopup(CMenuPopupHelper::getAjaxTrigger($trigger['triggerid'], $acknowledge));
 	}
 
 	return $column;

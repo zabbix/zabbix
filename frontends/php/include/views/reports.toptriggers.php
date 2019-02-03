@@ -87,7 +87,7 @@ foreach ($data['triggers'] as $trigger) {
 	}
 
 	$triggerDescription = (new CLinkAction($trigger['description']))
-		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, null, ['show_description' => false]));
+		->setMenuPopup(CMenuPopupHelper::getAjaxTrigger($trigger['triggerid'], [], false));
 
 	$table->addRow([
 		$hostName,

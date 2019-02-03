@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in host',
+			'type' => 'required|in host,trigger',
 			'data' => 'required|array'
 		];
 
@@ -74,6 +74,45 @@ class CControllerMenuPopup extends CController {
 				else {
 					error(_('No permissions to referred object or it does not exist!'));
 				}
+				break;
+
+			case 'trigger':
+				$triggers = API::Trigger()->get([
+					'output' => ['triggerid', 'expression', 'url', 'flags', 'comments'],
+					'selectHosts' => ['hostid', 'name', 'status'],
+					'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+					'triggerids' => $data['triggerid']
+				]);
+
+				if ($triggers) {
+					$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
+
+					$trigger = $triggers[0];
+
+					$options = [
+						'show_description' => !array_key_exists('show_description', $data) || $data['show_description']
+					];
+
+					if ($options['show_description']) {
+						$rw_triggers = API::Trigger()->get([
+							'output' => [],
+							'triggerids' => $trigger['triggerid'],
+							'editable' => true
+						]);
+
+						$editable = (bool) $rw_triggers;
+						$options['description_enabled'] = ($trigger['comments'] !== ''
+							|| ($editable && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL));
+					}
+
+					$acknowledge = array_key_exists('acknowledge', $data) ? $data['acknowledge'] : [];
+
+					$output['data'] = CMenuPopupHelper::getTrigger($trigger, $acknowledge, $options);
+				}
+				else {
+					error(_('No permissions to referred object or it does not exist!'));
+				}
+
 				break;
 		}
 

@@ -211,7 +211,6 @@ class CMenuPopupHelper {
 	 * @param string $trigger['url']                    Trigger URL.
 	 * @param array  $acknowledge                       Acknowledge link parameters (optional).
 	 * @param string $acknowledge['eventid']            Event ID.
-	 * @param string $acknowledge['screenid']           Screen ID (optional).
 	 * @param string $acknowledge['backurl']            Return URL (optional).
 	 * @param array  $options
 	 * @param bool   $options['show_description']       (optional) default: true
@@ -281,6 +280,37 @@ class CMenuPopupHelper {
 				? $trigger['url']
 				: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($trigger['url'], false,
 						false)).'\');';
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Prepare data for Ajax trigger menu popup.
+	 *
+	 * @param string $triggerid
+	 * @param array  $acknowledge             Acknowledge link parameters (optional).
+	 * @param string $acknowledge['eventid']
+	 * @param string $acknowledge['backurl']
+	 * @param bool   $show_description
+	 *
+	 * @return array
+	 */
+	public static function getAjaxTrigger($triggerid, array $acknowledge = [], $show_description = true) {
+		$data = [
+			'ajax' => true,
+			'type' => 'trigger',
+			'data' => [
+				'triggerid' => $triggerid
+			]
+		];
+
+		if ($acknowledge) {
+			$data['data']['acknowledge'] = $acknowledge;
+		}
+
+		if ($show_description === false) {
+			$data['data']['show_description'] = $show_description ? '1' : '0';
 		}
 
 		return $data;

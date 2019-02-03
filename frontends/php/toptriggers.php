@@ -172,15 +172,12 @@ while ($row = DBfetch($result)) {
 }
 
 $data['triggers'] = API::Trigger()->get([
-	'output' => ['triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'],
-	'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+	'output' => ['triggerid', 'description', 'expression', 'priority', 'lastchange'],
 	'selectHosts' => ['hostid', 'status', 'name'],
 	'triggerids' => array_keys($triggersEventCount),
 	'expandDescription' => true,
 	'preservekeys' => true
 ]);
-
-$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
 
 $trigger_hostids = [];
 
