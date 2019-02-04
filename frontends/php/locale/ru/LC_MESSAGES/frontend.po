@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-02-03 01:45+0200\n"
-"PO-Revision-Date: 2018-09-28 11:24+0300\n"
+"PO-Revision-Date: 2019-02-03 00:51+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1538126671.000000\n"
+"X-POOTLE-MTIME: 1549147899.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -30,7 +30,7 @@ msgstr "\"%1$s\" ожидалось"
 #: include/classes/api/services/CItemGeneral.php:1414
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "Значение \"%1$s\" должно быть меньше или равно \"%2$s\" значению"
 
 #: include/classes/api/services/CMaintenance.php:353
 #: include/classes/api/services/CMaintenance.php:358
@@ -52,7 +52,7 @@ msgstr "ожидается пара \"узел сети:ключ\""
 #: include/views/js/configuration.host.discovery.edit.js.php:52
 #: include/views/js/item.preprocessing.js.php:162
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.путь.к.ноде"
 
 #: include/classes/api/services/CDRule.php:520
 #, c-format
@@ -1685,7 +1685,7 @@ msgstr "Не удалось добавить обслуживание"
 #: include/classes/api/services/CMap.php:1487
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "Не удалось добавить элемент карты на карту \"%1$s\" по причине цикличности."
 
 #: app/controllers/CControllerMediatypeCreate.php:70
 #: app/controllers/CControllerMediatypeCreate.php:160
@@ -1775,11 +1775,11 @@ msgstr "Не удалось добавить виджеты в режиме ки
 
 #: include/classes/validators/CLdapAuthValidator.php:72
 msgid "Cannot bind anonymously to LDAP server."
-msgstr ""
+msgstr "Не удалось привязать анонимно к LDAP серверу."
 
 #: include/classes/validators/CLdapAuthValidator.php:71
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "Не удалось привязать к LDAP серверу."
 
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
@@ -1815,7 +1815,7 @@ msgstr "Не удалось закрыть проблему: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:70
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "Не удалось подключиться к LDAP серверу."
 
 #: include/classes/setup/CSetupWizard.php:255
 msgid "Cannot connect to the database."
@@ -1978,17 +1978,17 @@ msgstr "Не удалось удалить узел сети"
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось удалить узел сети так как обслуживание \"%1$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
+msgstr[1] "Не удалось удалить выбранные узлы сети так как обслуживание \"%1$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
+msgstr[2] "Не удалось удалить выбранные узлы сети так как обслуживание \"%1$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
 
 #: include/classes/api/services/CHostGroup.php:1503
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось удалить группу узлов сети так как обслуживание \"%1$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
+msgstr[1] "Не удалось удалить группы узлов сети так как обслуживание \"%1$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
+msgstr[2] "Не удалось удалить групп узлов сети так как обслуживание \"%1$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
 
 #: include/classes/api/services/CDiscoveryRule.php:548
 msgid "Cannot delete host prototype."
@@ -2097,11 +2097,11 @@ msgstr "Не удалось удалить группу элементов да�
 
 #: include/classes/api/services/CGraphPrototype.php:575
 msgid "Cannot delete templated graph prototype."
-msgstr ""
+msgstr "Не удалось удалить прототип графиков унаследованный из шаблона."
 
 #: include/classes/api/services/CGraph.php:559
 msgid "Cannot delete templated graph."
-msgstr ""
+msgstr "Не удалось удалить график унаследованный из шаблона."
 
 #: include/classes/api/services/CHostPrototype.php:1071
 msgid "Cannot delete templated host prototype."
@@ -2109,7 +2109,7 @@ msgstr "Невозможно удалить прототип узлов сети
 
 #: include/classes/api/services/CItemPrototype.php:890
 msgid "Cannot delete templated item prototype."
-msgstr ""
+msgstr "Не удалось удалить прототип элементов данных унаследованный из шаблона."
 
 #: include/classes/api/services/CItem.php:719
 msgid "Cannot delete templated item."
@@ -2127,7 +2127,7 @@ msgstr "Невозможно удалить триггер \"%1$s:%2$s\" уна�
 #: include/classes/api/services/CTriggerPrototype.php:541
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr ""
+msgstr "Не удалось удалить прототип графиков \"%1$s:%2$s\" унаследованный из шаблона."
 
 #: include/classes/api/services/CHttpTest.php:555
 #, c-format
@@ -2879,7 +2879,7 @@ msgstr[2] "Не удалось обновить прототипы элемен�
 
 #: disc_prototypes.php:1116
 msgid "Cannot update item prototypes"
-msgstr ""
+msgstr "Не удалось обновить прототипы элементов данных"
 
 #: items.php:1287
 msgid "Cannot update items"
@@ -3024,7 +3024,7 @@ msgstr "Отлов всех SNMP трапов, которые не были по
 #: include/views/js/monitoring.sysmaps.js.php:11
 #: include/views/monitoring.screen.constructor.edit.php:872
 msgid "Centre"
-msgstr ""
+msgstr "По центру"
 
 #: app/views/administration.proxy.edit.php:91
 #: app/views/administration.proxy.edit.php:99
@@ -3102,15 +3102,15 @@ msgstr "Проверьте часть выражения начиная с \"%1$
 
 #: include/items.inc.php:1773
 msgid "Check for error in JSON"
-msgstr ""
+msgstr "Проверьте на ошибку в JSON"
 
 #: include/items.inc.php:1777
 msgid "Check for error in XML"
-msgstr ""
+msgstr "Проверьте на ошибку в XML"
 
 #: include/items.inc.php:1781
 msgid "Check for error using regular expression"
-msgstr ""
+msgstr "Проверьте на ошибку при использовании регулярного выражения"
 
 #: include/views/configuration.host.discovery.edit.php:760
 #: include/views/configuration.host.discovery.list.php:157
