@@ -64,13 +64,24 @@ class CDashboardElement extends CElement {
 	/**
 	 * Get widget by name.
 	 *
-	 * @param string $name
+	 * @param string  $name            widget name
+	 * @param boolean $should_exist    if method is allowed to return null as a result
 	 *
-	 * @return CWidgetElement
+	 * @return CWidgetElement|null
 	 */
-	public function getWidget($name) {
-		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($name).']/../../..')->waitUntilPresent()->asWidget()->one();
+	public function getWidget($name, $should_exist = true) {
+		$query = $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
+				CXPathHelper::escapeQuotes($name).']/../../..');
+
+		if ($should_exist) {
+			$query->waitUntilPresent();
+		}
+
+		if (($widget = $query->asWidget()->one($should_exist)) !== null) {
+			$widget->waitUntilReady();
+		}
+
+		return $widget;
 	}
 
 	/**
@@ -109,7 +120,7 @@ class CDashboardElement extends CElement {
 		$controls->query('id:dashbrd-add-widget')->one()->click();
 
 		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widgetConfg"]')
-				->waitUntilVisible()->asOverlayDialog()->one();
+				->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
 	}
 
 	/**

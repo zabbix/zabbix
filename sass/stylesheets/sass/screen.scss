@@ -1075,7 +1075,9 @@ output {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
-		max-width: 300px;
+		&.latest-value {
+			max-width: 300px;
+		}
 	}
 
 	tbody th {
@@ -2167,6 +2169,10 @@ select {
 		&:active {
 			border-color: $form-border-color;
 		}
+	}
+
+	+ label.label-pos-left span {
+		margin-left: 4px;
 	}
 
 	&:focus + label span {

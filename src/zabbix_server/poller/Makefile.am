@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxpoller.a
+noinst_LIBRARIES = libzbxpoller.a libzbxpoller_server.a libzbxpoller_proxy.a
 
 libzbxpoller_a_SOURCES = \
 	checks_agent.c checks_agent.h \
@@ -17,5 +17,13 @@ libzbxpoller_a_SOURCES = \
 	checks_calculated.c checks_calculated.h \
 	checks_http.c checks_http.h \
 	poller.c poller.h
+	
+libzbxpoller_server_a_SOURCES = \
+	checks_internal_server.c checks_internal.h
+
+libzbxpoller_proxy_a_SOURCES = \
+	checks_internal_proxy.c checks_internal.h
 
 libzbxpoller_a_CFLAGS = -I@top_srcdir@/src/libs/zbxsysinfo/simple -I@top_srcdir@/src/libs/zbxdbcache @SNMP_CFLAGS@ @SSH2_CFLAGS@
+
+libzbxpoller_server_a_CFLAGS = -I@top_srcdir@/src/libs/zbxdbcache 

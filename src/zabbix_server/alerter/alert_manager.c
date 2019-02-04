@@ -601,7 +601,7 @@ static zbx_am_alertpool_t	*am_pop_alertpool(zbx_am_mediatype_t *mediatype)
 
 /******************************************************************************
  *                                                                            *
- * Function: am_remove_alertpool                                              *
+ * Function: am_release_alertpool                                             *
  *                                                                            *
  * Purpose: removes alert pool                                                *
  *                                                                            *
@@ -877,7 +877,7 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
  * Parameters: manager - [IN] the manager                                     *
  *             client  - [IN] the connected alerter                           *
  *                                                                            *
- * Return value: The IPMI poller                                              *
+ * Return value: The alerter                                                  *
  *                                                                            *
  ******************************************************************************/
 static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_client_t *client)

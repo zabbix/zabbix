@@ -392,7 +392,7 @@ zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *v
  * Purpose: unpack item value data from IPC data buffer                       *
  *                                                                            *
  * Parameters: value    - [OUT] unpacked item value                           *
- *             data	- [IN]  IPC data buffer                               *
+ *             data     - [IN]  IPC data buffer                               *
  *                                                                            *
  * Return value: size of packed data                                          *
  *                                                                            *
@@ -706,31 +706,16 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
 {
 	const char			*__function_name = "zbx_preprocess_item_value";
-	zbx_preproc_item_value_t	value;
+	zbx_preproc_item_value_t	value = {.itemid = itemid, .item_value_type = item_value_type, .result = result,
+					.error = error, .item_flags = item_flags, .state = state, .ts = ts};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (ITEM_STATE_NOTSUPPORTED != state && 0 != (item_flags & ZBX_FLAG_DISCOVERY_RULE))
-	{
-		if (NULL != result && NULL != GET_TEXT_RESULT(result))
-			lld_process_discovery_rule(itemid, result->text, ts);
-
-		goto out;
-	}
-	value.itemid = itemid;
-	value.item_value_type = item_value_type;
-	value.result = result;
-	value.error = error;
-	value.item_flags = item_flags;
-	value.state = state;
-	value.ts = ts;
-
 	preprocessor_pack_value(&cached_message, &value);
-	cached_values++;
 
-	if (MAX_VALUES_LOCAL < cached_values)
+	if (MAX_VALUES_LOCAL < ++cached_values)
 		zbx_preprocessor_flush();
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

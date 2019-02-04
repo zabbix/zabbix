@@ -53,7 +53,8 @@ dbschema_oracle:
 dbschema_postgresql:
 	cd database/postgresql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) schema.sql
+	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) timescaledb.sql
 
 dbschema_sqlite3:
 	cd database/sqlite3 && \
