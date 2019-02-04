@@ -31,6 +31,7 @@ function getMenuPopupHistory(options) {
 		url = new Curl('history.php');
 
 	url.setArgument('itemids[]', options.itemid);
+	url.unsetArgument('sid');
 
 	// latest graphs
 	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
@@ -124,11 +125,13 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 		// inventory link
 		host_inventory_url.setArgument('hostid', options.hostid);
+		host_inventory_url.unsetArgument('sid');
 		host_inventory.url = host_inventory_url.getUrl();
 
 		// latest data link
 		latest_data_url.setArgument('hostids[]', options.hostid);
 		latest_data_url.setArgument('filter_set', '1');
+		latest_data_url.unsetArgument('sid');
 		latest_data.url = latest_data_url.getUrl();
 
 		if (!options.showTriggers) {
@@ -139,6 +142,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			url.setArgument('action', 'problem.view');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('filter_set', '1');
+			url.unsetArgument('sid');
 			problems.url = url.getUrl();
 		}
 
@@ -149,6 +153,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			var graphs_url = new Curl('charts.php');
 
 			graphs_url.setArgument('hostid', options.hostid);
+			graphs_url.unsetArgument('sid');
 			graphs.url = graphs_url.getUrl();
 		}
 
@@ -159,6 +164,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			var screens_url = new Curl('host_screen.php');
 
 			screens_url.setArgument('hostid', options.hostid);
+			screens_url.unsetArgument('sid');
 			screens.url = screens_url.getUrl();
 		}
 
@@ -624,6 +630,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		url.setArgument('action', 'acknowledge.edit');
 		url.setArgument('eventids[]', options.acknowledge.eventid);
 		url.setArgument('backurl', options.acknowledge.backurl);
+		url.unsetArgument('sid');
 
 		items[items.length] = {
 			label: t('Acknowledge'),
@@ -655,6 +662,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	// configuration
 	if (typeof options.configuration !== 'undefined' && options.configuration) {
 		var url = new Curl('triggers.php?form=update&triggerid=' + options.triggerid);
+		url.unsetArgument('sid');
 
 		items[items.length] = {
 			label: t('Configuration'),
@@ -683,6 +691,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 			var url = new Curl('history.php');
 			url.setArgument('action', item.params.action);
 			url.setArgument('itemids[]', item.params.itemid);
+			url.unsetArgument('sid');
 
 			items[items.length] = {
 				label: item.name,
@@ -715,7 +724,7 @@ function getMenuPopupItem(options, trigger_elmnt) {
 	var items = [];
 
 	// create
-	items[items.length] = {
+	items.push({
 		label: t('Create trigger'),
 		clickCallback: function() {
 			jQuery(this).closest('.action-menu').menuPopup('close', null);
@@ -724,7 +733,7 @@ function getMenuPopupItem(options, trigger_elmnt) {
 				itemid: options.itemid
 			}, null, trigger_elmnt);
 		}
-	};
+	});
 
 	var edit_trigger = {
 		label: t('Edit trigger')
@@ -735,7 +744,7 @@ function getMenuPopupItem(options, trigger_elmnt) {
 		var triggers = [];
 
 		jQuery.each(options.triggers, function(i, trigger) {
-			triggers[triggers.length] = {
+			triggers.push({
 				label: trigger.name,
 				clickCallback: function() {
 					jQuery(this).closest('.action-menu-top').menuPopup('close', null);
@@ -745,7 +754,7 @@ function getMenuPopupItem(options, trigger_elmnt) {
 						triggerid: trigger.triggerid
 					}, null, trigger_elmnt);
 				}
-			};
+			});
 		});
 
 		edit_trigger.items = triggers;
@@ -754,7 +763,7 @@ function getMenuPopupItem(options, trigger_elmnt) {
 		edit_trigger.disabled = true;
 	}
 
-	items[items.length] = edit_trigger;
+	items.push(edit_trigger);
 
 	var url = new Curl('items.php');
 
@@ -764,10 +773,10 @@ function getMenuPopupItem(options, trigger_elmnt) {
 	url.setArgument('master_itemid', options.itemid);
 	url.unsetArgument('sid');
 
-	items[items.length] = {
+	items.push({
 		label: t('Create dependent item'),
 		url: url.getUrl()
-	};
+	});
 
 	return [{
 		label: options.name,
