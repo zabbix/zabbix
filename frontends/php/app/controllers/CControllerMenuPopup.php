@@ -23,8 +23,8 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in host,trigger',
-			'data' => 'required|array'
+			'type' => 'required|in host,trigger,triggerMacro',
+			'data' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -46,7 +46,7 @@ class CControllerMenuPopup extends CController {
 	}
 
 	protected function doAction() {
-		$data = $this->getInput('data');
+		$data = $this->hasInput('data') ? $this->getInput('data') : [];
 
 		$output = [];
 
@@ -112,7 +112,10 @@ class CControllerMenuPopup extends CController {
 				else {
 					error(_('No permissions to referred object or it does not exist!'));
 				}
+				break;
 
+			case 'triggerMacro':
+				$output['data'] = ['type' => 'triggerMacro'];
 				break;
 		}
 

@@ -341,8 +341,9 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getTriggerMacro() {
+	public static function getAjaxTriggerMacro() {
 		return [
+			'ajax' => true,
 			'type' => 'triggerMacro'
 		];
 	}

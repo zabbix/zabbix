@@ -110,7 +110,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 	// insert macro button
 	$insertMacroButton = (new CButton('insert_macro', _('Insert expression')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->setMenuPopup(CMenuPopupHelper::getTriggerMacro());
+		->setMenuPopup(CMenuPopupHelper::getAjaxTriggerMacro());
 	if ($data['limited']) {
 		$insertMacroButton->setAttribute('disabled', 'disabled');
 	}

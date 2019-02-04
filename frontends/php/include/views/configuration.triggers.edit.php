@@ -135,7 +135,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 	$expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$expression_row[] = (new CButton('insert_macro', _('Insert expression')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->setMenuPopup(CMenuPopupHelper::getTriggerMacro())
+		->setMenuPopup(CMenuPopupHelper::getAjaxTriggerMacro())
 		->setEnabled(!$readonly);
 	$expression_row[] = BR();
 
