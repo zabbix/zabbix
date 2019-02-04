@@ -9891,7 +9891,6 @@ void	DCget_count_stats_all(zbx_config_cache_info_t *stats)
 	stats->items = config->status->items_active_normal + config->status->items_active_notsupported;
 	stats->items_unsupported = config->status->items_active_notsupported;
 	stats->requiredperformance = config->status->required_performance;
-	stats->triggers = config->status->triggers_enabled_ok + config->status->triggers_enabled_problem;
 
 	UNLOCK_CACHE;
 }

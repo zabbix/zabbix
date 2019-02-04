@@ -546,7 +546,6 @@ typedef struct
 	zbx_uint64_t	hosts;
 	zbx_uint64_t	items;
 	zbx_uint64_t	items_unsupported;
-	zbx_uint64_t	triggers;
 	double		requiredperformance;
 }
 zbx_config_cache_info_t;

@@ -23,7 +23,6 @@
 #include "zbxself.h"
 #include "valuecache.h"
 #include "../../zabbix_server/vmware/vmware.h"
-#include "preproc.h"
 
 #include "zabbix_stats.h"
 
@@ -41,7 +40,6 @@ extern unsigned char	program_type;
 void	zbx_get_zabbix_stats(struct zbx_json *json)
 {
 	zbx_config_cache_info_t	count_stats;
-	zbx_vc_stats_t		vc_stats;
 	zbx_vmware_stats_t	vmware_stats;
 	zbx_wcache_info_t	wcache_info;
 	zbx_process_info_t	process_stats[ZBX_PROCESS_TYPE_COUNT];
@@ -64,15 +62,10 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	/* zabbix[item_unsupported] */
 	zbx_json_adduint64(json, "item_unsupported", count_stats.items_unsupported);
 
-	/* zabbix[triggers] */
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		zbx_json_adduint64(json, "triggers", count_stats.triggers);
-
 	/* zabbix[requiredperformance] */
 	zbx_json_addfloat(json, "requiredperformance", count_stats.requiredperformance);
 
-	/* zabbix[preprocessing_queue] */
-	zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
+	zbx_get_zabbix_stats_ext(json);
 
 	/* zabbix[process,<type>,<mode>,<state>] */
 	zbx_json_addobject(json, "process");
@@ -110,30 +103,6 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_json_adduint64(json, "used", *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_USED));
 	zbx_json_addfloat(json, "pused", *(double *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_PUSED));
 	zbx_json_close(json);
-
-	/* zabbix[vcache,...] */
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && SUCCEED == zbx_vc_get_statistics(&vc_stats))
-	{
-		zbx_json_addobject(json, "vcache");
-
-		zbx_json_addobject(json, "buffer");
-		zbx_json_adduint64(json, "total", vc_stats.total_size);
-		zbx_json_adduint64(json, "free", vc_stats.free_size);
-		zbx_json_addfloat(json, "pfree", (double)vc_stats.free_size / vc_stats.total_size * 100);
-		zbx_json_adduint64(json, "used", vc_stats.total_size - vc_stats.free_size);
-		zbx_json_addfloat(json, "pused", (double)(vc_stats.total_size - vc_stats.free_size) /
-				vc_stats.total_size * 100);
-		zbx_json_close(json);
-
-		zbx_json_addobject(json, "cache");
-		zbx_json_adduint64(json, "requests", vc_stats.hits + vc_stats.misses);
-		zbx_json_adduint64(json, "hits", vc_stats.hits);
-		zbx_json_adduint64(json, "misses", vc_stats.misses);
-		zbx_json_adduint64(json, "mode", vc_stats.mode);
-		zbx_json_close(json);
-
-		zbx_json_close(json);
-	}
 
 	/* zabbix[vmware,buffer,<mode>] */
 	if (SUCCEED == zbx_vmware_get_statistics(&vmware_stats))
