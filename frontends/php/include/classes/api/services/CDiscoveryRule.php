@@ -1140,57 +1140,6 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 	}
 
-	protected function inherit(array $items, array $hostids = null) {
-		if (!$items) {
-			return;
-		}
-
-		// Prepare the child discovery rules.
-		$new_items = $this->prepareInheritedItems($items, $hostids);
-		if (!$new_items) {
-			return;
-		}
-
-		$ins_items = [];
-		$upd_items = [];
-		foreach ($new_items as $new_item) {
-			if (array_key_exists('itemid', $new_item)) {
-				$upd_items[] = $new_item;
-			}
-			else {
-				$ins_items[] = $new_item;
-			}
-		}
-
-		// Save the new items.
-		$this->createReal($ins_items);
-		$this->updateReal($upd_items);
-
-		$new_items = array_merge($upd_items, $ins_items);
-
-		// Inheriting items from the templates.
-		$tpl_items = DBselect(
-			'SELECT i.itemid'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
-				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
-		);
-
-		$tpl_itemids = [];
-		while ($tpl_item = DBfetch($tpl_items)) {
-			$tpl_itemids[$tpl_item['itemid']] = true;
-		}
-
-		foreach ($new_items as $index => $new_item) {
-			if (!array_key_exists($new_item['itemid'], $tpl_itemids)) {
-				unset($new_items[$index]);
-			}
-		}
-
-		$this->inherit($new_items);
-	}
-
 	/**
 	 * Copies the given discovery rule to the specified host.
 	 *

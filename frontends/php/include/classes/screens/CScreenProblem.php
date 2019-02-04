@@ -378,19 +378,19 @@ class CScreenProblem extends CScreenBase {
 			}
 		}
 
-		$maintenances = $maintenanceids
-			? API::Maintenance()->get([
+		if ($maintenanceids) {
+			$maintenances = API::Maintenance()->get([
 				'output' => ['name'],
 				'maintenanceids' => $maintenanceids,
 				'preservekeys' => true
-			])
-			: [];
+			]);
 
-		if ($maintenances) {
 			foreach ($problems as &$problem) {
 				if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
 					foreach ($problem['suppression_data'] as &$data) {
-						$data['maintenance_name'] = $maintenances[$data['maintenanceid']]['name'];
+						$data['maintenance_name'] = array_key_exists($data['maintenanceid'], $maintenances)
+							? $maintenances[$data['maintenanceid']]['name']
+							: _('Inaccessible maintenance');
 					}
 					unset($data);
 				}
@@ -1235,6 +1235,6 @@ class CScreenProblem extends CScreenBase {
 			->setHint($hint_table, '', true)
 		);
 
-		return new CCol($tooltip);
+		return (new CCol($tooltip))->addClass('latest-value');
 	}
 }
