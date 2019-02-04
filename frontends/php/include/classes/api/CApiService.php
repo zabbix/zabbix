@@ -455,14 +455,16 @@ class CApiService {
 	 * @return array		The resulting SQL parts array
 	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// If table do not have a primary key, use whole row to select distinct rows.
+		// If table do not have a primary key, use COUNT(*) to select number of rows.
 		$pk = $this->pk($tableName);
-		$pkFieldId = $this->fieldId(($pk ? : '*'), $tableAlias);
+		$pkFieldId = $this->fieldId($pk, $tableAlias);
 
 		// count
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
-			$sqlParts['select'] = ['COUNT(DISTINCT '.$pkFieldId.') AS rowscount'];
+			$sqlParts['select'] = $pk
+				? ['COUNT(DISTINCT '.$pkFieldId.') AS rowscount']
+				: ['COUNT(*) AS rowscount'];
 
 			// select columns used by group count
 			if (array_key_exists('groupCount', $options) && $options['groupCount']) {
