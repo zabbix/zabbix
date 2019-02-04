@@ -668,6 +668,12 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function drawCanvasRightYAxis() {
 		$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
+
+		// Do not draw label at the bottom of right Y axis to avoid label averlapping with horizontal axis arrow.
+		if (array_key_exists(0, $grid_values)) {
+			unset($grid_values[0]);
+		}
+
 		$this->addItem(
 			(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_RIGHT))
 				->setSize($this->offset_right, $this->canvas_height)
