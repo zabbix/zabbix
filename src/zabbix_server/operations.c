@@ -373,6 +373,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 					else
 						host_visible = zbx_strdup(host_visible, row_visible_name[0]);
 				}
+				make_hostname(host_visible);	/* replace not-allowed symbols */
 
 				DBfree_result(result_visible_name);
 
