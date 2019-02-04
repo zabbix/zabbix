@@ -3299,11 +3299,10 @@ $form-icon-btn: (
 	margin: .25rem;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
-	padding-bottom: 8px;
 }
 
-.dashbrd-widget-graph {
-	padding-bottom: 0;
+.dashbrd-widget-default {
+	padding-bottom: 8px;
 }
 
 .dashbrd-grid-widget-head {

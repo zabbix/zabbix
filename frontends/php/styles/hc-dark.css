@@ -2235,11 +2235,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   min-width: 8.33333%;
   margin: .25rem;
   background-color: #000;
-  border: 1px solid #444;
-  padding-bottom: 8px; }
+  border: 1px solid #444; }
 
-.dashbrd-widget-graph {
-  padding-bottom: 0; }
+.dashbrd-widget-default {
+  padding-bottom: 8px; }
 
 .dashbrd-grid-widget-head {
   position: relative;

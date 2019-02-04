@@ -485,7 +485,7 @@
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
 			'storage': widget['storage'],
 			'content_width': widget['content_body'].width(),
-			'content_height': widget['content_body'].height() - 4 // -4 is added to avoid scrollbar
+			'content_height': getContentBodyHeight(widget)
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -526,10 +526,6 @@
 					widget['content_body'].append(resp.messages);
 				}
 				widget['content_body'].append(resp.body);
-
-				if (typeof(resp.container_class) !== 'undefined') {
-					widget['container'].addClass(resp.container_class);
-				}
 
 				if (typeof(resp.debug) !== 'undefined') {
 					$(resp.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
@@ -582,6 +578,22 @@
 		});
 
 		widget['initial_load'] = false;
+	}
+
+	function getContentBodyHeight(widget) {
+		var padding = 0;
+
+		if (widget['type'] == 'graph') {
+			padding = 5;
+		}
+		else if (widget['type'] == 'svggraph') {
+			padding = 7;
+		}
+		else {
+			widget['container'].addClass('dashbrd-widget-default');
+		}
+
+		return widget['content_body'].height() - padding;
 	}
 
 	function refreshWidget($obj, data, widget) {

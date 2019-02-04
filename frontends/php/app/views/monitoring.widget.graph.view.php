@@ -88,8 +88,7 @@ if ($data['widget']['initial_load'] == 1) {
 	$output = [
 		'header' => $data['name'],
 		'body' => $flickerfree_item->toString(),
-		'script_inline' => $script,
-		'container_class' => 'dashbrd-widget-graph'
+		'script_inline' => $script
 	];
 }
 
