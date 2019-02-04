@@ -1008,6 +1008,25 @@ static int	housekeeping_problems(int now)
 	return deleted;
 }
 
+static int	housekeeping_proxy_dhistory(int now)
+{
+	const char	*__function_name = "housekeeping_proxy_dhistory";
+
+	int		deleted = 0, rc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
+
+	rc = DBexecute("delete from proxy_dhistory where clock<>0 and clock<%d", now - SEC_PER_DAY);
+
+	if (ZBX_DB_OK <= rc)
+		deleted = rc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+
+	return deleted;
+}
+
+
 static int	get_housekeeping_period(double time_slept)
 {
 	if (SEC_PER_HOUR > time_slept)
@@ -1021,6 +1040,7 @@ static int	get_housekeeping_period(double time_slept)
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	int	now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions, d_services, d_audit, sleeptime;
+	int	d_proxy_dhistory;
 	double	sec, time_slept, time_now;
 	char	sleeptext[25];
 
@@ -1090,15 +1110,17 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old audit log items]", get_process_type_string(process_type));
 		d_audit = housekeeping_audit(now);
 
+		zbx_setproctitle("%s [removing old proxy_dhistory]", get_process_type_string(process_type));
+		d_proxy_dhistory = housekeeping_proxy_dhistory(now);
+
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
 		d_cleanup = housekeeping_cleanup();
-
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items/triggers, %d events, %d problems,"
-				" %d sessions, %d alarms, %d audit items in " ZBX_FS_DBL " sec, %s]",
+				" %d sessions, %d alarms, %d audit, %d proxy_dhistory items in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends,
-				d_cleanup, d_events, d_problems, d_sessions, d_services, d_audit, sec,
+				d_cleanup, d_events, d_problems, d_sessions, d_services, d_audit, d_proxy_dhistory, sec,
 				sleeptext);
 
 		zbx_config_clean(&cfg);

@@ -334,7 +334,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				if (NULL != (row_name = DBfetch(result_name)))
 				{
 					if (SUCCEED == zbx_db_is_null(row_name[0]))
-						zabbix_log(LOG_LEVEL_WARNING, "cannot proceed host name");
+						zabbix_log(LOG_LEVEL_WARNING, "wrong discovered host name");
 					else
 						host = zbx_strdup(host, row_name[0]);
 				}
@@ -367,7 +367,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				if (NULL != (row_visible_name = DBfetch(result_visible_name)))
 				{
 					if (SUCCEED == zbx_db_is_null(row_visible_name[0]))
-						zabbix_log(LOG_LEVEL_WARNING, "cannot proceed visible name");
+						zabbix_log(LOG_LEVEL_WARNING, "wrong discovered visible name");
 					else
 						host_visible = zbx_strdup(host_visible, row_visible_name[0]);
 				}
