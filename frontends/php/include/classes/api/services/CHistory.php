@@ -76,7 +76,6 @@ class CHistory extends CApiService {
 	 * @param bool   $options['nopermissions']                 Select values without checking permissions of hosts.
 	 * @param bool   $options['editable']                      If set to true return only objects that the user has
 	 *                                                         write permissions to.
-	 * @param bool   $options['preservekeys']                  Use IDs as keys in the resulting array.
 	 *
 	 * @throws Exception
 	 * @return array|int    Data array or number of rows.
@@ -114,8 +113,7 @@ class CHistory extends CApiService {
 
 			// Flags properties.
 			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false],
-			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
-			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
+			'editable' =>				['type' => API_BOOLEAN, 'default' => false]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -200,15 +198,11 @@ class CHistory extends CApiService {
 
 		while ($data = DBfetch($db_res)) {
 			if ($options['countOutput']) {
-				$result = $data;
+				$result = $data['rowscount'];
 			}
 			else {
 				$result[] = $data;
 			}
-		}
-
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
 		}
 
 		return $result;
