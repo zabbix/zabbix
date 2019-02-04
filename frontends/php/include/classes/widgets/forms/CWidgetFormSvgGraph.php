@@ -501,11 +501,11 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			$compare = true;
 
 			if (strlen(substr(strrchr($righty_min, '.'), 1)) > 4) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), _('too mach decimal places'));
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), _('too much decimal points'));
 				$compare = false;
 			}
 			if (strlen(substr(strrchr($righty_max, '.'), 1))  > 4) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _('too mach decimal places'));
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _('too much decimal points'));
 				$compare = false;
 			}
 
