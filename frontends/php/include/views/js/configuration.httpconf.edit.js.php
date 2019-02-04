@@ -279,7 +279,7 @@
 				for (var p = 0; p < pairs.length; p++) {
 					if (allPairs[pairs[p]].formid === formid
 							&& (type === '' || allPairs[pairs[p]].type === type)) {
-						jQuery('[id="pairRow_' + pairs[p] + '"]').remove();
+						jQuery('#pairRow_' + pairs[p]).remove();
 						delete allPairs[pairs[p]];
 					}
 				}
