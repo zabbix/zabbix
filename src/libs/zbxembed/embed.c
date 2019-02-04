@@ -439,7 +439,6 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	if (0 != setjmp(es->env->loc))
 	{
-		es->env->rt_error_num++;
 		*error = zbx_strdup(*error, es->env->error);
 		goto out;
 	}
