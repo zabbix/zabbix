@@ -67,34 +67,6 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 
 	zbx_get_zabbix_stats_ext(json);
 
-	/* zabbix[process,<type>,<mode>,<state>] */
-	zbx_json_addobject(json, "process");
-
-	if (SUCCEED == zbx_get_all_process_stats(process_stats))
-	{
-		for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
-		{
-			if (0 == process_stats[proc_type].count)
-				continue;
-
-			zbx_json_addobject(json, get_process_type_string(proc_type));
-			zbx_json_addobject(json, "busy");
-			zbx_json_addfloat(json, "avg", process_stats[proc_type].busy_avg);
-			zbx_json_addfloat(json, "max", process_stats[proc_type].busy_max);
-			zbx_json_addfloat(json, "min", process_stats[proc_type].busy_min);
-			zbx_json_close(json);
-			zbx_json_addobject(json, "idle");
-			zbx_json_addfloat(json, "avg", process_stats[proc_type].idle_avg);
-			zbx_json_addfloat(json, "max", process_stats[proc_type].idle_max);
-			zbx_json_addfloat(json, "min", process_stats[proc_type].idle_min);
-			zbx_json_close(json);
-			zbx_json_adduint64(json, "count", process_stats[proc_type].count);
-			zbx_json_close(json);
-		}
-	}
-
-	zbx_json_close(json);
-
 	/* zabbix[rcache,<cache>,<mode>] */
 	zbx_json_addobject(json, "rcache");
 	zbx_json_adduint64(json, "total", *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_TOTAL));
@@ -159,6 +131,34 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 		zbx_json_addfloat(json, "pused", 100 * (double)(wcache_info.trend_total - wcache_info.trend_free) /
 				wcache_info.trend_total);
 		zbx_json_close(json);
+	}
+
+	zbx_json_close(json);
+
+	/* zabbix[process,<type>,<mode>,<state>] */
+	zbx_json_addobject(json, "process");
+
+	if (SUCCEED == zbx_get_all_process_stats(process_stats))
+	{
+		for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
+		{
+			if (0 == process_stats[proc_type].count)
+				continue;
+
+			zbx_json_addobject(json, get_process_type_string(proc_type));
+			zbx_json_addobject(json, "busy");
+			zbx_json_addfloat(json, "avg", process_stats[proc_type].busy_avg);
+			zbx_json_addfloat(json, "max", process_stats[proc_type].busy_max);
+			zbx_json_addfloat(json, "min", process_stats[proc_type].busy_min);
+			zbx_json_close(json);
+			zbx_json_addobject(json, "idle");
+			zbx_json_addfloat(json, "avg", process_stats[proc_type].idle_avg);
+			zbx_json_addfloat(json, "max", process_stats[proc_type].idle_max);
+			zbx_json_addfloat(json, "min", process_stats[proc_type].idle_min);
+			zbx_json_close(json);
+			zbx_json_adduint64(json, "count", process_stats[proc_type].count);
+			zbx_json_close(json);
+		}
 	}
 
 	zbx_json_close(json);
