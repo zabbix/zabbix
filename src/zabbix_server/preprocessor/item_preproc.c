@@ -1561,6 +1561,7 @@ fail:
 		{
 			zabbix_log(LOG_LEVEL_WARNING,
 					"Cannot destroy embedded scripting engine environment: %s", error);
+			zbx_free(error);
 		}
 	}
 
