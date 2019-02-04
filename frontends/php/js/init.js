@@ -83,20 +83,20 @@ jQuery(function($) {
 				data = getMenuPopupTrigger(data, obj);
 				break;
 
-			case 'triggerLog':
-				data = getMenuPopupTriggerLog(data, obj);
-				break;
-
 			case 'triggerMacro':
 				data = getMenuPopupTriggerMacro(data);
 				break;
 
-			case 'dependent_items':
-				data = getMenuPopupDependentItems(data);
-				break;
-
 			case 'dashboard':
 				data = getMenuPopupDashboard(data, obj);
+				break;
+
+			case 'item':
+				data = getMenuPopupItem(data, obj);
+				break;
+
+			case 'item_prototype':
+				data = getMenuPopupItemPrototype(data);
 				break;
 		}
 

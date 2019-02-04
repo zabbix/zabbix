@@ -24,20 +24,18 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for item history menu popup.
 	 *
-	 * @param array $item                Item data.
-	 * @param int   $item['itemid']      Item ID.
-	 * @param int   $item['value_type']  Item value type.
+	 * @param string $itemid
 	 *
 	 * @return array
 	 */
-	public static function getHistory(array $item) {
-		$data = [
+	public static function getAjaxHistory($itemid) {
+		return [
+			'ajax' => true,
 			'type' => 'history',
-			'itemid' => $item['itemid'],
-			'hasLatestGraphs' => in_array($item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT])
+			'data' => [
+				'itemid' => $itemid
+			]
 		];
-
-		return $data;
 	}
 
 	/**
@@ -317,26 +315,6 @@ class CMenuPopupHelper {
 	}
 
 	/**
-	 * Prepare data for trigger log menu popup.
-	 *
-	 * @param string $itemId				item id
-	 * @param string $itemName				item name
-	 * @param array  $triggers				triggers (optional)
-	 * @param string $triggers[n]['id']		trigger id
-	 * @param string $triggers[n]['name']	trigger name
-	 *
-	 * @return array
-	 */
-	public static function getTriggerLog($itemId, $itemName, $triggers) {
-		return [
-			'type' => 'triggerLog',
-			'itemid' => $itemId,
-			'itemName' => $itemName,
-			'triggers' => $triggers
-		];
-	}
-
-	/**
 	 * Prepare data for trigger macro menu popup.
 	 *
 	 * @return array
@@ -349,50 +327,34 @@ class CMenuPopupHelper {
 	}
 
 	/**
-	 * Prepare data for dependent item (or item prototype) popup menu.
+	 * Prepare data for item popup menu.
 	 *
-	 * @param string $page        Page name.
-	 * @param string $itemid      Item id.
-	 * @param string $parent      Name of parent object argument (hostid or parent_discoveryid).
-	 * @param string $parentid    Parent object id (host id for hosts or discoveryid for discovery rules)
-	 * @param string $name        Item name.
+	 * @param string $itemid
 	 *
 	 * @return array
 	 */
-	protected static function getDependent($page, $itemid, $parent, $parentid, $name) {
-		$url = (new CUrl($page))
-					->setArgument('form', 'create')->setArgument('type', ITEM_TYPE_DEPENDENT)
-					->setArgument($parent, $parentid)->setArgument('master_itemid', $itemid)
-					->getUrl();
-
+	public static function getAjaxItem($itemid) {
 		return [
-			'type' => 'dependent_items',
-			'itemid' => $itemid,
-			'item_name' => $name,
-			'add_label' => _('Create dependent item'),
-			'add_url' => $url
+			'ajax' => true,
+			'type' => 'item',
+			'data' => [
+				'itemid' => $itemid
+			]
 		];
 	}
 
 	/**
-	 * Prepare data for dependent item popup menu.
+	 * Prepare data for item prototype popup menu.
 	 *
-	 * @param string $itemid    Item id.
-	 * @param string $hostid    Host id.
-	 * @param string $name      Item name.
+	 * @param string $itemid
 	 */
-	public static function getDependentItem($itemid, $hostid, $name) {
-		return self::getDependent('items.php', $itemid, 'hostid', $hostid, $name);
-	}
-
-	/**
-	 * Prepare data for dependent item prototype popup menu.
-	 *
-	 * @param string $itemid                Item id.
-	 * @param string $parent_discoveryid    Parent discovery rule id.
-	 * @param string $name                  Item name.
-	 */
-	public static function getDependentItemPrototype($itemid, $parent_discoveryid, $name) {
-		return self::getDependent('disc_prototypes.php', $itemid, 'parent_discoveryid', $parent_discoveryid, $name);
+	public static function getAjaxItemPrototype($itemid) {
+		return [
+			'ajax' => true,
+			'type' => 'item_prototype',
+			'data' => [
+				'itemid' => $itemid
+			]
+		];
 	}
 }

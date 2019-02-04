@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in host,trigger,triggerMacro',
+			'type' => 'required|in history,host,item,item_prototype,trigger,triggerMacro',
 			'data' => 'array'
 		];
 
@@ -51,6 +51,27 @@ class CControllerMenuPopup extends CController {
 		$output = [];
 
 		switch ($this->getInput('type')) {
+			case 'history':
+				$items = API::Item()->get([
+					'output' => ['value_type'],
+					'itemids' => $data['itemid'],
+					'webitems' => true
+				]);
+
+				if ($items) {
+					$value_type = $items[0]['value_type'];
+
+					$output['data'] = [
+						'type' => 'history',
+						'itemid' => $data['itemid'],
+						'hasLatestGraphs' => in_array($value_type, [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT])
+					];
+				}
+				else {
+					error(_('No permissions to referred object or it does not exist!'));
+				}
+				break;
+
 			case 'host':
 				$has_goto = !array_key_exists('has_goto', $data) || $data['has_goto'];
 
@@ -70,6 +91,78 @@ class CControllerMenuPopup extends CController {
 					$scripts = API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']];
 
 					$output['data'] = CMenuPopupHelper::getHost($hosts[0], $scripts, (bool) $has_goto);
+				}
+				else {
+					error(_('No permissions to referred object or it does not exist!'));
+				}
+				break;
+
+			case 'item':
+				$items = API::Item()->get([
+					'output' => ['hostid', 'name', 'value_type'],
+					'itemids' => $data['itemid'],
+					'webitems' => true
+				]);
+
+				if ($items) {
+					$item = $items[0];
+					$triggers = [];
+
+					if (in_array($item['value_type'],
+							[ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
+						$db_triggers = API::Trigger()->get([
+							'output' => ['triggerid', 'description', 'recovery_mode'],
+							'selectFunctions' => API_OUTPUT_EXTEND,
+							'itemids' => $data['itemid']
+						]);
+
+						foreach ($db_triggers as $db_trigger) {
+							if ($db_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+								continue;
+							}
+
+							foreach ($db_trigger['functions'] as $function) {
+								if (!str_in_array($function['function'], ['regexp', 'iregexp'])) {
+									continue 2;
+								}
+							}
+
+							$triggers[] = [
+								'triggerid' => $db_trigger['triggerid'],
+								'name' => $db_trigger['description']
+							];
+						}
+					}
+
+					$output['data'] = [
+						'type' => 'item',
+						'itemid' => $data['itemid'],
+						'hostid' => $item['hostid'],
+						'name' => $item['name'],
+						'triggers' => $triggers
+					];
+				}
+				else {
+					error(_('No permissions to referred object or it does not exist!'));
+				}
+				break;
+
+			case 'item_prototype':
+				$item_prototypes = API::ItemPrototype()->get([
+					'output' => ['name'],
+					'selectDiscoveryRule' => ['itemid'],
+					'itemids' => $data['itemid']
+				]);
+
+				if ($item_prototypes) {
+					$item_prototype = $item_prototypes[0];
+
+					$output['data'] = [
+						'type' => 'item_prototype',
+						'itemid' => $data['itemid'],
+						'name' => $item_prototype['name'],
+						'parent_discoveryid' => $item_prototype['discoveryRule']['itemid']
+					];
 				}
 				else {
 					error(_('No permissions to referred object or it does not exist!'));

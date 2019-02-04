@@ -702,18 +702,17 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 /**
  * Get menu popup trigger log section data.
  *
- * @param string options['itemid']               Item ID.
- * @param string options['itemName']             Item name.
- * @param array  options['triggers']             Triggers (optional).
- * @param string options['triggers'][n]['id']    Trigger ID.
- * @param string options['triggers'][n]['name']  Trigger name.
- * @param {object} trigger_elmnt				UI element that was clicked to open overlay dialogue.
+ * @param string options['itemid']
+ * @param string options['name']
+ * @param array  options['triggers']
+ * @param string options['triggers'][n]['triggerid']
+ * @param string options['triggers'][n]['name']
+ * @param {object} trigger_elmnt                      UI element that was clicked to open overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupTriggerLog(options, trigger_elmnt) {
-	var items = [],
-		dependent_items = getMenuPopupDependentItems(options.dependent_items);
+function getMenuPopupItem(options, trigger_elmnt) {
+	var items = [];
 
 	// create
 	items[items.length] = {
@@ -743,7 +742,7 @@ function getMenuPopupTriggerLog(options, trigger_elmnt) {
 
 					return PopUp('popup.triggerwizard', {
 						itemid: options.itemid,
-						triggerid: trigger.id
+						triggerid: trigger.triggerid
 					}, null, trigger_elmnt);
 				}
 			};
@@ -757,30 +756,48 @@ function getMenuPopupTriggerLog(options, trigger_elmnt) {
 
 	items[items.length] = edit_trigger;
 
-	dependent_items = dependent_items.pop();
-	items[items.length] = dependent_items.items.pop();
+	var url = new Curl('items.php');
+
+	url.setArgument('form', 'create');
+	url.setArgument('hostid', options.hostid);
+	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
+	url.setArgument('master_itemid', options.itemid);
+	url.unsetArgument('sid');
+
+	items[items.length] = {
+		label: t('Create dependent item'),
+		url: url.getUrl()
+	};
 
 	return [{
-		label: sprintf(t('Item "%1$s"'), options.itemName),
+		label: options.name,
 		items: items
 	}];
 }
 
 /**
- * Get menu structure for dependent items.
+ * Get menu structure for item prototypess.
  *
- * @param array options['item_name']  Menu label.
- * @param array options['add_label']  Add dependent item menu element label.
- * @param array options['add_url']    Add dependent item menu element url.
+ * @param array options['name']
+ * @param array options['itemid']
+ * @param array options['parent_discoveryid']
  *
  * @return array
  */
-function getMenuPopupDependentItems(options) {
+function getMenuPopupItemPrototype(options) {
+	var url = new Curl('disc_prototypes.php');
+
+	url.setArgument('form', 'create');
+	url.setArgument('parent_discoveryid', options.parent_discoveryid);
+	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
+	url.setArgument('master_itemid', options.itemid);
+	url.unsetArgument('sid');
+
 	return [{
-		label: sprintf(t('Item "%1$s"'), options.item_name),
+		label: options.name,
 		items: [{
-			label: options.add_label,
-			url: options.add_url
+			label: t('Create dependent item'),
+			url: url.getUrl()
 		}]
 	}];
 }
