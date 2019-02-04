@@ -315,7 +315,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				host_source = atoi(row[6]);
 				name_source = atoi(row[7]);
 
-				if (ZBX_DISCOVERY_IP == host_source)
+				if (ZBX_DISCOVERY_IP == host_source || '\0' == *row[3])
 					host = zbx_strdup(host, row[2]);
 				else
 					host = zbx_strdup(host, row[3]);
@@ -334,7 +334,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				if (NULL != (row_name = DBfetch(result_name)))
 				{
 					if (SUCCEED == zbx_db_is_null(row_name[0]))
-						zabbix_log(LOG_LEVEL_WARNING, "wrong discovered host name");
+						zabbix_log(LOG_LEVEL_WARNING, "wrong discovered host name,"
+								" use default settings");
 					else
 						host = zbx_strdup(host, row_name[0]);
 				}
@@ -367,7 +368,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				if (NULL != (row_visible_name = DBfetch(result_visible_name)))
 				{
 					if (SUCCEED == zbx_db_is_null(row_visible_name[0]))
-						zabbix_log(LOG_LEVEL_WARNING, "wrong discovered visible name");
+						zabbix_log(LOG_LEVEL_WARNING, "wrong discovered visible name,"
+								" use default settings");
 					else
 						host_visible = zbx_strdup(host_visible, row_visible_name[0]);
 				}
