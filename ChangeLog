@@ -7,6 +7,7 @@ Bug fixes:
 ..F....... [ZBX-15456] fixed incorrect style property in Monitoring->Problems; removed unused id from filter form (agriscenko)
 ..F....... [ZBX-15412] fixed Name column overlaps the Application column in the Template view (vasilijs)
 ...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
+.D........ [ZBX-15271] added link to documentation in all man pages (kalimulin)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.0alpha3
