@@ -18,6 +18,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+..F....... [ZBX-15577] fixed restricted user access to the host name when calling host_screen (vasilijs)
 A......... [ZBX-13335] fixed low performance with linkage of items and item prototypes to a lot of hosts (Sasha)
 ..F....... [ZBX-15435] fixed "Undefined index" errors in the "Problems" widget with multiple active maintenances which part of these are inaccessible (Sasha)
 .......PS. [ZBX-15417] changed vmware collector to perform datastore configuration refresh only when directly monitoring ESXi version lower than v6.0 (MVekslers)
@@ -2207,6 +2208,7 @@ Changes for 3.0.25
 Changes for 3.0.25rc1
 
 Bug fixes:
+..F....... [ZBX-15577] fixed restricted user access to the host name when calling host_screen (vasilijs)
 A......... [ZBX-15220] fixed displaying of last value for values received in the same second (Sasha)
 ........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
 ...G...PS. [ZBX-11761] added warnings in case of TLS identity mismatch (akozlovs)
