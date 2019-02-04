@@ -350,7 +350,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 
 				if (ZBX_DISCOVERY_IP == name_source)
 					host_visible = zbx_strdup(host_visible, row[2]);
-				else if (ZBX_DISCOVERY_DNS == name_source)
+				else if (ZBX_DISCOVERY_DNS == name_source && '\0' != *row[3])
 					host_visible = zbx_strdup(host_visible, row[3]);
 				else
 					host_visible = zbx_strdup(host_visible, host_unique);
