@@ -76,19 +76,6 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_json_addfloat(json, "pused", *(double *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_PUSED));
 	zbx_json_close(json);
 
-	/* zabbix[vmware,buffer,<mode>] */
-	if (SUCCEED == zbx_vmware_get_statistics(&vmware_stats))
-	{
-		zbx_json_addobject(json, "vmware");
-		zbx_json_adduint64(json, "total", vmware_stats.memory_total);
-		zbx_json_adduint64(json, "free", vmware_stats.memory_total - vmware_stats.memory_used);
-		zbx_json_addfloat(json, "pfree", (double)(vmware_stats.memory_total - vmware_stats.memory_used) /
-				vmware_stats.memory_total * 100);
-		zbx_json_adduint64(json, "used", vmware_stats.memory_used);
-		zbx_json_addfloat(json, "pused", (double)vmware_stats.memory_used / vmware_stats.memory_total * 100);
-		zbx_json_close(json);
-	}
-
 	/* zabbix[wcache,<cache>,<mode>] */
 	DCget_stats_all(&wcache_info);
 	zbx_json_addobject(json, "wcache");
@@ -134,6 +121,19 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	}
 
 	zbx_json_close(json);
+
+	/* zabbix[vmware,buffer,<mode>] */
+	if (SUCCEED == zbx_vmware_get_statistics(&vmware_stats))
+	{
+		zbx_json_addobject(json, "vmware");
+		zbx_json_adduint64(json, "total", vmware_stats.memory_total);
+		zbx_json_adduint64(json, "free", vmware_stats.memory_total - vmware_stats.memory_used);
+		zbx_json_addfloat(json, "pfree", (double)(vmware_stats.memory_total - vmware_stats.memory_used) /
+				vmware_stats.memory_total * 100);
+		zbx_json_adduint64(json, "used", vmware_stats.memory_used);
+		zbx_json_addfloat(json, "pused", (double)vmware_stats.memory_used / vmware_stats.memory_total * 100);
+		zbx_json_close(json);
+	}
 
 	/* zabbix[process,<type>,<mode>,<state>] */
 	zbx_json_addobject(json, "process");
