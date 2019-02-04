@@ -4,6 +4,7 @@ New features:
 A.F.I...S. [ZBXNEXT-4087] implemented preprocessing of LLD rules (Ivo, wiper)
 
 Bug fixes:
+A......... [ZBX-15422] fixed SQL errors when linked template have item prototype with equal key as host item (Sasha)
 ..F....... [ZBX-15456] fixed incorrect style property in Monitoring->Problems; removed unused id from filter form (agriscenko)
 ..F....... [ZBX-15412] fixed Name column overlaps the Application column in the Template view (vasilijs)
 ...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
