@@ -60,7 +60,7 @@ class CHistory extends CApiService {
 	 *                                                         (case-insensitive).
 	 * @param bool   $options['excludeSearch']                 Return results that do not match the criteria given in
 	 *                                                         the search parameter.
-	 * @param bool   $options['searchWildcardsEnabled']        If set to true enables the use of “*” as a wildcard
+	 * @param bool   $options['searchWildcardsEnabled']        If set to true enables the use of "*" as a wildcard
 	 *                                                         character in the search parameter.
 	 * @param array  $options['output']                        Object properties to be returned.
 	 * @param bool   $options['countOutput']                   Return the number of records in the result instead of the
@@ -78,11 +78,12 @@ class CHistory extends CApiService {
 	 *                                                         write permissions to.
 	 * @param bool   $options['preservekeys']                  Use IDs as keys in the resulting array.
 	 *
-	 * @return array|int    Item data as array or false if error.
+	 * @throws Exception
+	 * @return array|int    Data array or number of rows.
 	 */
 	public function get($options = []) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			// filter and search
+			// Filter and search properties.
 			'history' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT]), 'default' => ITEM_VALUE_TYPE_UINT64],
 			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'itemids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -102,25 +103,26 @@ class CHistory extends CApiService {
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 
-			// output
+			// Output properties.
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'value', 'ns']), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 
-			// sort and limit
+			// Sort and limit properties.
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'default' => []],
 			'sortorder' =>				['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]), 'default' => null],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 
-			// flags
+			// Flags properties.
 			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false],
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if ((USER_TYPE_SUPER_ADMIN != self::$userData['type'] && !$options['nopermissions'])
+		if ((self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions'])
 				|| $options['hostids'] !== null) {
 			$items = API::Item()->get([
 				'output' => ['itemid'],
@@ -154,19 +156,17 @@ class CHistory extends CApiService {
 	 */
 	private function getFromSql($options) {
 		$result = [];
+		$table_name = CHistoryManager::getTableName($options['history']);
+
 		$sql_parts = [
 			'select'	=> ['history' => 'h.itemid'],
-			'from'		=> [],
+			'from'		=> [
+				'history' => $table_name.' h'
+			],
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> []
 		];
-
-		if (!$table_name = CHistoryManager::getTableName($options['history'])) {
-			$table_name = 'history';
-		}
-
-		$sql_parts['from']['history'] = $table_name.' h';
 
 		// itemids
 		if ($options['itemids'] !== null) {
@@ -221,11 +221,7 @@ class CHistory extends CApiService {
 	 */
 	private function getFromElasticsearch($options) {
 		$query = [];
-
-		if (!$table_name = CHistoryManager::getTableName($options['history'])) {
-			$table_name = 'history';
-		}
-
+		$table_name = CHistoryManager::getTableName($options['history']);
 		$schema = DB::getSchema($table_name);
 
 		// itemids
@@ -260,12 +256,12 @@ class CHistory extends CApiService {
 		}
 
 		// filter
-		if (is_array($options['filter'])) {
+		if ($options['filter']) {
 			$query = CElasticsearchHelper::addFilter(DB::getSchema($table_name), $query, $options);
 		}
 
 		// search
-		if (is_array($options['search'])) {
+		if ($options['search']) {
 			$query = CElasticsearchHelper::addSearch($schema, $query, $options);
 		}
 
@@ -280,7 +276,7 @@ class CHistory extends CApiService {
 		}
 
 		// limit
-		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
+		if ($options['limit']) {
 			$query['size'] = $options['limit'];
 		}
 
