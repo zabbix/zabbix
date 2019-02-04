@@ -33,9 +33,19 @@ class CRadioButtonList extends CList {
 	private $orientation;
 	private $enabled;
 	private $readonly;
-	private $values;
 	private $modern;
 	private $autofocused;
+
+	/**
+	 * Array of value elements.
+	 *
+	 * string $values[]['name']       Input form element label.
+	 * string $values[]['value']      Input form element value.
+	 * string $values[]['id']         Input form element id attribute.
+	 * string $values[]['on_change']  Javascript handler for onchange event.
+	 * @property array
+	 */
+	protected $values = [];
 
 	public function __construct($name, $value) {
 		parent::__construct();
@@ -50,6 +60,16 @@ class CRadioButtonList extends CList {
 		$this->setId(zbx_formatDomId($name));
 	}
 
+	/**
+	 * Add value.
+	 *
+	 * @param string $name       Input element label.
+	 * @param string $value      Input element value.
+	 * @param string $id         Input element id.
+	 * @param string $on_change  Javascript handler for onchange event.
+	 *
+	 * @return CRadioButtonList
+	 */
 	public function addValue($name, $value, $id = null, $on_change = null) {
 		$this->values[] = [
 			'name' => $name,
@@ -120,11 +140,15 @@ class CRadioButtonList extends CList {
 			}
 
 			if ($this->modern) {
-				parent::addItem([$radio, new CLabel($value['name'], $value['id'])]);
+				parent::addItem((new CListItem([$radio, new CLabel($value['name'], $value['id'])]))->addClass(
+					array_key_exists('class', $value) ? $value['class'] : null
+				));
 			}
 			else {
 				$radio->addClass(ZBX_STYLE_CHECKBOX_RADIO);
-				parent::addItem([$radio, new CLabel([new CSpan(), $value['name']], $value['id'])]);
+				parent::addItem((new CListItem([$radio, new CLabel([new CSpan(), $value['name']], $value['id'])]))
+					->addClass(array_key_exists('class', $value) ? $value['class'] : null)
+				);
 			}
 		}
 
