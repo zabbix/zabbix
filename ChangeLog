@@ -123,6 +123,7 @@ Changes for 4.0.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15456] fixed incorrect style property in Monitoring->Problems; removed unused id from filter form (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.4
