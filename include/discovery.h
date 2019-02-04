@@ -24,6 +24,21 @@
 #include "zbxjson.h"
 #include "comms.h"
 
+#define MAX_DISCOVERED_VALUE_SIZE 128
+
+typedef struct
+{
+	zbx_uint64_t		dcheckid;
+	unsigned short		port;
+	char			dns[INTERFACE_DNS_LEN_MAX];
+	char 			value[MAX_DISCOVERED_VALUE_SIZE];
+	int 			status;
+	time_t			itemtime;
+}
+zbx_discovery_checks_t;
+
+void	zbx_checks_eval_free(zbx_discovery_checks_t *check);
+
 void	discovery_update_host(DB_DHOST *dhost, int status, int now);
 void	discovery_update_service(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost,
 		const char *ip, const char *dns, int port, int status, const char *value, int now);

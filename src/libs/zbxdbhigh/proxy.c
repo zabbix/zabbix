@@ -42,8 +42,6 @@ extern char	*CONFIG_SERVER;
 /* the maximum number of values processed in one batch */
 #define ZBX_HISTORY_VALUES_MAX		256
 
-#define MAX_DISCOVERED_VALUE_SIZE 128
-
 typedef struct
 {
 	zbx_uint64_t		druleid;
@@ -58,17 +56,6 @@ typedef struct
 	zbx_vector_ptr_t	checks_old;
 }
 zbx_discoved_ips_t;
-
-typedef struct
-{
-	zbx_uint64_t		dcheckid;
-	unsigned short		port;
-	char			dns[INTERFACE_DNS_LEN_MAX];
-	char 			value[MAX_DISCOVERED_VALUE_SIZE];
-	int 			status;
-	time_t			itemtime;
-}
-zbx_discovery_checks_t;
 
 extern unsigned int	configured_tls_accept_modes;
 
@@ -3370,14 +3357,10 @@ static void	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips
 
 		DBfree_result(result);
 
-		/*delete this ip items from db*/
-		DBexecute("delete from proxy_dhistory"
-				" where ip='%s'",
-				ip_discovered_ptr->ip);
-
 		/*process old checks first */
 		checks_vector_ptr = (zbx_vector_ptr_t *)&ip_discovered_ptr->checks_old;
 
+		DBbegin();
 		while(NULL != checks_vector_ptr)
 		{
 			for(index_dchecks = 0; index_dchecks < checks_vector_ptr->values_num; index_dchecks++)
@@ -3391,7 +3374,7 @@ static void	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips
 						drule_ptr->druleid, dcheckid, drule_ptr->unique_dcheckid,
 						zbx_date2str(check_ptr->itemtime), zbx_time2str(check_ptr->itemtime),
 						ip_discovered_ptr->ip, check_ptr->dns, check_ptr->port, check_ptr->value);
-				DBbegin();
+
 
 				if (0 == dcheckid)
 				{
@@ -3402,7 +3385,7 @@ static void	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips
 						zabbix_log(LOG_LEVEL_DEBUG, "druleid:" ZBX_FS_UI64
 								" does not exist", drule_ptr->druleid);
 
-						continue;
+						goto out;
 					}
 
 					discovery_update_host(&dhost, check_ptr->status, check_ptr->itemtime);
@@ -3418,19 +3401,23 @@ static void	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips
 								" belong to druleid:" ZBX_FS_UI64,
 								dcheckid, drule_ptr->druleid);
 
-						continue;
+						goto out;
 					}
 
 					discovery_update_service(drule_ptr, dcheckid, &dhost,
 							ip_discovered_ptr->ip, check_ptr->dns, check_ptr->port,
 							check_ptr->status, check_ptr->value, check_ptr->itemtime);
 				}
-
-				DBcommit();
 			}
 			new_check++;
 			checks_vector_ptr = (1 == new_check) ? &ip_discovered_ptr->checks : NULL;
 		}
+		/*delete this ip items from db*/
+		DBexecute("delete from proxy_dhistory"
+				" where ip='%s'",
+				ip_discovered_ptr->ip);
+
+		DBcommit();
 	}
 	else
 	{
@@ -3453,7 +3440,8 @@ static void	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips
 
 		DBcommit();
 	}
-
+out:
+	return;
 }
 
 /******************************************************************************

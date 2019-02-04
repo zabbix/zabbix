@@ -334,8 +334,8 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
  * Parameters: service - service info                                         *
  *                                                                            *
  ******************************************************************************/
-static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, int *host_status, char *ip,
-		const char *dns, int now)
+static void	process_check(DB_DCHECK *dcheck,int *host_status, char *ip,
+		const char *dns, int now, zbx_vector_ptr_t *checks_vector_ptr)
 {
 	const char	*__function_name = "process_check";
 	const char	*start;
@@ -367,6 +367,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 		for (port = first; port <= last; port++)
 		{
 			int	service_status;
+			zbx_discovery_checks_t	*check_ptr=NULL;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __function_name, port);
 
@@ -377,29 +378,20 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 			if (-1 == *host_status || DOBJECT_STATUS_UP == service_status)
 				*host_status = service_status;
 
-			DBbegin();
-
-			if (SUCCEED != DBlock_dcheckid(dcheck->dcheckid, drule->druleid))
+			/* insert discovered checks into the vector */
+			if (FAIL == zbx_vector_ptr_search(checks_vector_ptr, &dcheck->dcheckid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
 			{
-				DBrollback();
-
-				zabbix_log(LOG_LEVEL_DEBUG, "discovery check was deleted during processing, stopping");
-
-				goto out;
+				check_ptr = (zbx_discovery_checks_t *)zbx_malloc(check_ptr,
+									sizeof(zbx_discovery_checks_t));
+				check_ptr->dcheckid = dcheck->dcheckid;
+				check_ptr->itemtime = (time_t)now;
+				check_ptr->port = port;
+				zbx_strlcpy(check_ptr->value, value, MAX_DISCOVERED_VALUE_SIZE);
+				check_ptr->status = service_status;
+				zbx_strlcpy(check_ptr->dns, dns, INTERFACE_DNS_LEN_MAX);
+				zbx_vector_ptr_append( checks_vector_ptr, check_ptr);
 			}
-
-			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-			{
-				discovery_update_service(drule, dcheck->dcheckid, dhost, ip, dns, port, service_status,
-						value, now);
-			}
-			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
-			{
-				proxy_update_service(drule->druleid, dcheck->dcheckid, ip, dns, port, service_status,
-						value, now);
-			}
-
-			DBcommit();
 		}
 
 		if (NULL != comma)
@@ -410,7 +402,6 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 		else
 			break;
 	}
-out:
 	zbx_free(value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -421,8 +412,8 @@ out:
  * Function: process_checks                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
-		char *ip, const char *dns, int unique, int now)
+static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const char *dns, int unique, int now,
+		zbx_vector_ptr_t *checks_vector_ptr)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -465,9 +456,48 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
 		dcheck.ports = row[10];
 		dcheck.snmpv3_contextname = row[11];
 
-		process_check(drule, &dcheck, dhost, host_status, ip, dns, now);
+		process_check(&dcheck, host_status, ip, dns, now, checks_vector_ptr);
 	}
 	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: post_process_checks                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	post_process_checks(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const char *dns, int now,
+		zbx_vector_ptr_t *checks_vector_ptr)
+{
+	zbx_discovery_checks_t	*check_ptr;
+	int i;
+	int ret = SUCCEED;
+
+	/* extract checks from vector*/
+	for(i = 0; i < checks_vector_ptr->values_num; i++)
+	{
+		check_ptr = (zbx_discovery_checks_t *)checks_vector_ptr->values[i];
+
+		if (SUCCEED != DBlock_dcheckid(check_ptr->dcheckid, drule->druleid))
+		{
+			ret = FAIL;
+			break;
+		}
+
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		{
+			discovery_update_service(drule, check_ptr->dcheckid, dhost, ip, dns, check_ptr->port,
+					check_ptr->status, check_ptr->value, now);
+		}
+		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+		{
+			proxy_update_service(drule->druleid, check_ptr->dcheckid, ip, dns, check_ptr->port,
+					check_ptr->status, check_ptr->value, now);
+		}
+	}
+
+	return ret;
+
 }
 
 /******************************************************************************
@@ -479,13 +509,14 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
  ******************************************************************************/
 static void	process_rule(DB_DRULE *drule)
 {
-	const char	*__function_name = "process_rule";
+	const char		*__function_name = "process_rule";
 
-	DB_DHOST	dhost;
-	int		host_status, now;
-	char		ip[INTERFACE_IP_LEN_MAX], *start, *comma, dns[INTERFACE_DNS_LEN_MAX];
-	int		ipaddress[8];
-	zbx_iprange_t	iprange;
+	DB_DHOST		dhost;
+	int			host_status, now;
+	char			ip[INTERFACE_IP_LEN_MAX], *start, *comma, dns[INTERFACE_DNS_LEN_MAX];
+	int			ipaddress[8];
+	zbx_iprange_t		iprange;
+	zbx_vector_ptr_t	checks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __function_name, drule->name, drule->iprange);
 
@@ -495,6 +526,8 @@ static void	process_rule(DB_DRULE *drule)
 			*comma = '\0';
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() range:'%s'", __function_name, start);
+
+		zbx_vector_ptr_create(&checks);
 
 		if (SUCCEED != iprange_parse(&iprange, start))
 		{
@@ -549,12 +582,21 @@ static void	process_rule(DB_DRULE *drule)
 			zbx_alarm_on(CONFIG_TIMEOUT);
 			zbx_gethost_by_ip(ip, dns, sizeof(dns));
 			zbx_alarm_off();
-
 			if (0 != drule->unique_dcheckid)
-				process_checks(drule, &dhost, &host_status, ip, dns, 1, now);
-			process_checks(drule, &dhost, &host_status, ip, dns, 0, now);
+				process_checks(drule, &host_status, ip, dns, 1, now, &checks);
+			process_checks(drule, &host_status, ip, dns, 0, now, &checks);
+
 
 			DBbegin();
+
+			if (SUCCEED != post_process_checks(drule, &dhost, ip, dns, now, &checks))
+			{
+				DBrollback();
+
+				zabbix_log(LOG_LEVEL_DEBUG, "discovery check was deleted during processing, stopping");
+
+				goto out;
+			}
 
 			if (SUCCEED != DBlock_druleid(drule->druleid))
 			{
@@ -575,6 +617,8 @@ static void	process_rule(DB_DRULE *drule)
 		}
 		while (SUCCEED == iprange_next(&iprange, ipaddress));
 next:
+		zbx_vector_ptr_clear_ext(&checks, (zbx_clean_func_t)zbx_checks_eval_free);
+		zbx_vector_ptr_destroy(&checks);
 		if (NULL != comma)
 		{
 			*comma = ',';
