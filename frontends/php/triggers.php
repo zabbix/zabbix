@@ -818,6 +818,7 @@ else {
 			'output' => ['hostid', 'name'],
 			'hostids' => $filter_hostids,
 			'templated_hosts' => true,
+			'editable' => true,
 			'preservekeys' => true
 		]), ['hostid' => 'id']);
 	}
