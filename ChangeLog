@@ -3,9 +3,7 @@ Changes for 4.0.5rc1
 New features:
 
 Bug fixes:
-A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
 ...G...PS. [ZBX-15379] fixed -Wimplicit-fallthrough warnings when compiling with GCC 7 and -Wextra (akozlovs)
-....I..... [ZBX-15211] fixed issue with the autotools version lower than when creating a tarball (MVekslers)
 A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
 ...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
 ........S. [ZBX-15533] fixed cutting and trimming event tags and values (asitals)
