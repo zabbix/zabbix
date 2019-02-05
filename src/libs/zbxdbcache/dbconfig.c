@@ -201,7 +201,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 
 				return ZBX_POLLER_TYPE_PINGER;
 			}
-			/* break; is not missing here */
+			ZBX_FALLTHROUGH;
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
@@ -5699,11 +5699,6 @@ int	init_configuration_cache(char **error)
 
 	CREATE_HASHSET_EXT(config->strpool, 100, __config_strpool_hash, __config_strpool_compare);
 
-	zbx_vector_uint64_create_ext(&config->locked_lld_ruleids,
-			__config_mem_malloc_func,
-			__config_mem_realloc_func,
-			__config_mem_free_func);
-
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	CREATE_HASHSET_EXT(config->psks, 0, __config_psk_hash, __config_psk_compare);
 #endif
@@ -7036,61 +7031,6 @@ void	DCconfig_unlock_all_triggers(void)
 
 	while (NULL != (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 		dc_trigger->locked = 0;
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_lock_lld_rule                                           *
- *                                                                            *
- * Purpose: Lock lld rule to avoid parallel processing of a same lld rule     *
- *          that was causing deadlocks.                                       *
- *                                                                            *
- * Parameters: lld_ruleid - [IN] discovery rule id                            *
- *                                                                            *
- * Return value: Returns FAIL if lock failed and SUCCEED on successful lock.  *
- *                                                                            *
- ******************************************************************************/
-int	DCconfig_lock_lld_rule(zbx_uint64_t lld_ruleid)
-{
-	int	ret = FAIL;
-
-	WRLOCK_CACHE;
-
-	if (FAIL == zbx_vector_uint64_search(&config->locked_lld_ruleids, lld_ruleid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-	{
-		zbx_vector_uint64_append(&config->locked_lld_ruleids, lld_ruleid);
-		ret = SUCCEED;
-	}
-
-	UNLOCK_CACHE;
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_unlock_lld_rule                                         *
- *                                                                            *
- * Purpose: Unlock (make it available for processing) lld rule.               *
- *                                                                            *
- * Parameters: lld_ruleid - [IN] discovery rule id                            *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_unlock_lld_rule(zbx_uint64_t lld_ruleid)
-{
-	int	i;
-
-	WRLOCK_CACHE;
-
-	if (FAIL != (i = zbx_vector_uint64_search(&config->locked_lld_ruleids, lld_ruleid,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-	{
-		zbx_vector_uint64_remove_noorder(&config->locked_lld_ruleids, i);
-	}
-	else
-		THIS_SHOULD_NEVER_HAPPEN;	/* attempt to unlock lld rule that is not locked */
 
 	UNLOCK_CACHE;
 }
@@ -9750,7 +9690,7 @@ static void	dc_status_update(void)
 
 					break;
 				}
-				/* break; is not missing here, item on disabled host counts as disabled */
+				ZBX_FALLTHROUGH;
 			case ITEM_STATUS_DISABLED:
 				config->status->items_disabled++;
 				if (NULL != dc_proxy_host)
@@ -9788,7 +9728,7 @@ static void	dc_status_update(void)
 
 					break;
 				}
-				/* break; is not missing here, trigger with disabled items/hosts counts as disabled */
+				ZBX_FALLTHROUGH;
 			case TRIGGER_STATUS_DISABLED:
 				config->status->triggers_disabled++;
 				break;
@@ -9930,6 +9870,29 @@ double	DCget_required_performance(void)
 	UNLOCK_CACHE;
 
 	return nvps;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_count_stats_all                                            *
+ *                                                                            *
+ * Purpose: retrieves all internal metrics of the configuration cache         *
+ *                                                                            *
+ * Parameters: stats - [OUT] the configuration cache statistics               *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_count_stats_all(zbx_config_cache_info_t *stats)
+{
+	WRLOCK_CACHE;
+
+	dc_status_update();
+
+	stats->hosts = config->status->hosts_monitored;
+	stats->items = config->status->items_active_normal + config->status->items_active_notsupported;
+	stats->items_unsupported = config->status->items_active_notsupported;
+	stats->requiredperformance = config->status->required_performance;
+
+	UNLOCK_CACHE;
 }
 
 static void	proxy_counter_ui64_push(zbx_vector_ptr_t *vector, zbx_uint64_t proxyid, zbx_uint64_t counter)

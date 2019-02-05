@@ -156,8 +156,30 @@ class CElement extends CBaseElement implements IWaitable {
 	 *
 	 * @return CElementQuery
 	 */
-	public function parents($type, $locator = null) {
-		return $this->query('xpath:./ancestor::'.CXPathHelper::fromSelector($type, $locator));
+	public function parents($type = null, $locator = null) {
+		$selector = 'xpath:./ancestor';
+		if ($type !== null) {
+			$selector .= '::'.CXPathHelper::fromSelector($type, $locator);
+		}
+
+		return $this->query($selector);
+	}
+
+	/**
+	 * Get children selection query.
+	 *
+	 * @param mixed  $type     selector type (method) or selector
+	 * @param string $locator  locator part of selector
+	 *
+	 * @return CElementQuery
+	 */
+	public function children($type = null, $locator = null) {
+		$selector = 'xpath:./*';
+		if ($type !== null) {
+			$selector = 'xpath:./'.CXPathHelper::fromSelector($type, $locator);
+		}
+
+		return $this->query($selector);
 	}
 
 	/**
@@ -257,7 +279,6 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function fill($text) {
 		return $this->overwrite($text);
-//		return $this->clear()->type($text);
 	}
 
 	/**
@@ -281,13 +302,22 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Check if element is present.
+	 *
+	 * @return boolean
+	 */
+	public function isPresent() {
+		return !$this->isStalled();
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function getPresentCondition() {
 		$target = $this;
 
 		return function () use ($target) {
-			return !$target->isStalled();
+			return $target->isPresent();
 		};
 	}
 
@@ -303,14 +333,49 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Check if text is present.
+	 *
+	 * @param string $text    text to be present
+	 *
+	 * @return boolean
+	 */
+	public function isTextPresent($text) {
+		return (strpos($this->getText(), $text) !== false);
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function getTextPresentCondition($text) {
 		$target = $this;
 
 		return function () use ($target, $text) {
-			return (strpos($target->getText(), $text) !== false);
+			return $target->isTextPresent($text);
 		};
+	}
+
+	/**
+	 * Check presence of the attribute(s).
+	 *
+	 * @param string|array    $attributes attribute or attributes to be present.
+	 *
+	 * @return boolean
+	 */
+	public function isAttributePresent($attributes) {
+		if (!is_array($attributes)) {
+			$attributes = [$attributes];
+		}
+
+		foreach ($attributes as $key => $value) {
+			if (is_numeric($key) && $this->getAttribute($value) === null) {
+				return false;
+			}
+			elseif ($this->getAttribute($key) !== $value) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -320,17 +385,17 @@ class CElement extends CBaseElement implements IWaitable {
 		$target = $this;
 
 		return function () use ($target, $attributes) {
-			foreach ($attributes as $key => $value) {
-				if (is_numeric($key) && $target->getAttribute($value) === null) {
-					return false;
-				}
-				elseif ($target->getAttribute($key) !== $value) {
-					return false;
-				}
-			}
-
-			return true;
+			return $target->isAttributePresent($attributes);
 		};
+	}
+
+	/**
+	 * Check if element is ready.
+	 *
+	 * @return boolean
+	 */
+	public function isReady() {
+		return $this->isClickable();
 	}
 
 	/**

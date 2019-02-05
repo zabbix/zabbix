@@ -464,7 +464,7 @@ jQuery(function($) {
 							window.setTimeout(function() {
 								values.isWaiting = false;
 
-								var search = $input.val();
+								var search = $input.val().replace(/^\s+/g, '');
 
 								// re-check search after delay
 								if (search !== '' && $input.data('lastSearch') != search) {

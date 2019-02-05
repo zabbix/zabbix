@@ -24,6 +24,7 @@
 #include "comms.h"
 #include "sysinfo.h"
 #include "zbxalgo.h"
+#include "zbxjson.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -539,6 +540,41 @@ typedef struct
 }
 zbx_preproc_item_t;
 
+/* the configuration cache statistics */
+typedef struct
+{
+	zbx_uint64_t	hosts;
+	zbx_uint64_t	items;
+	zbx_uint64_t	items_unsupported;
+	double		requiredperformance;
+}
+zbx_config_cache_info_t;
+
+typedef struct
+{
+	zbx_uint64_t	history_counter;	/* the total number of processed values */
+	zbx_uint64_t	history_float_counter;	/* the number of processed float values */
+	zbx_uint64_t	history_uint_counter;	/* the number of processed uint values */
+	zbx_uint64_t	history_str_counter;	/* the number of processed str values */
+	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
+	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
+	zbx_uint64_t	notsupported_counter;	/* the number of processed not supported items */
+}
+ZBX_DC_STATS;
+
+/* the write cache statistics */
+typedef struct
+{
+	ZBX_DC_STATS	stats;
+	zbx_uint64_t	history_free;
+	zbx_uint64_t	history_total;
+	zbx_uint64_t	index_free;
+	zbx_uint64_t	index_total;
+	zbx_uint64_t	trend_free;
+	zbx_uint64_t	trend_total;
+}
+zbx_wcache_info_t;
+
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
@@ -572,6 +608,7 @@ void	free_database_cache(void);
 #define ZBX_STATS_HISTORY_INDEX_PUSED	20
 #define ZBX_STATS_HISTORY_INDEX_PFREE	21
 void	*DCget_stats(int request);
+void	DCget_stats_all(zbx_wcache_info_t *wcache_info);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
@@ -600,8 +637,6 @@ int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx
 void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zbx_vector_uint64_t *triggerids_out);
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_all_triggers(void);
-int	DCconfig_lock_lld_rule(zbx_uint64_t lld_ruleid);
-void	DCconfig_unlock_lld_rule(zbx_uint64_t lld_ruleid);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
@@ -686,6 +721,7 @@ zbx_uint64_t	DCget_item_unsupported_count(zbx_uint64_t hostid);
 zbx_uint64_t	DCget_trigger_count(void);
 double		DCget_required_performance(void);
 zbx_uint64_t	DCget_host_count(void);
+void		DCget_count_stats_all(zbx_config_cache_info_t *stats);
 
 void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not_monitored,
 		zbx_vector_ptr_t *items_active_normal, zbx_vector_ptr_t *items_active_notsupported,
@@ -873,5 +909,18 @@ void	zbx_dc_maintenance_set_update_flags(void);
 void	zbx_dc_maintenance_reset_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flags(void);
+
+typedef struct
+{
+	char	*lld_macro;
+	char	*path;
+}
+zbx_lld_macro_path_t;
+
+int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro_paths, char **error);
+void	zbx_lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path);
+int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
+		const char *macro, char **value, size_t *value_alloc);
+int	zbx_lld_macro_paths_compare(const void *d1, const void *d2);
 
 #endif

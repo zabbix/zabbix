@@ -20,7 +20,7 @@
 #include "lld.h"
 #include "db.h"
 #include "log.h"
-#include "events.h"
+#include "../events.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
@@ -44,96 +44,6 @@ typedef struct
 	int			evaltype;
 }
 lld_filter_t;
-
-typedef struct
-{
-	char	*lld_macro;
-	char	*path;
-}
-zbx_lld_macro_path_t;
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_macro_paths_compare                                          *
- *                                                                            *
- * Purpose: sorting function to sort LLD macros by unique name                *
- *                                                                            *
- ******************************************************************************/
-static int	lld_macro_paths_compare(const void *d1, const void *d2)
-{
-	const zbx_lld_macro_path_t	*r1 = *(const zbx_lld_macro_path_t **)d1;
-	const zbx_lld_macro_path_t	*r2 = *(const zbx_lld_macro_path_t **)d2;
-
-	return strcmp(r1->lld_macro, r2->lld_macro);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_macro_paths_get                                              *
- *                                                                            *
- * Purpose: retrieve list of LLD macros                                       *
- *                                                                            *
- * Parameters: lld_ruleid      - [IN] LLD id                                  *
- *             lld_macro_paths - [OUT] use json path to extract from jp_row   *
- *             error           - [OUT] in case json path is invalid           *
- *                                                                            *
- ******************************************************************************/
-static int	lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro_paths, char **error)
-{
-	const char		*__function_name = "lld_macro_paths_get";
-
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_lld_macro_path_t	*lld_macro_path;
-	int			ret = SUCCEED;
-	char			err[MAX_STRING_LEN];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	result = DBselect(
-			"select lld_macro,path"
-			" from lld_macro_path"
-			" where itemid=" ZBX_FS_UI64
-			" order by lld_macro",
-			lld_ruleid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		if (SUCCEED != (ret = zbx_json_path_check(row[1], err, sizeof(err))))
-		{
-			*error = zbx_dsprintf(*error, "Cannot process LLD macro \"%s\": %s.\n", row[0], err);
-			break;
-		}
-
-		lld_macro_path = (zbx_lld_macro_path_t *)zbx_malloc(NULL, sizeof(zbx_lld_macro_path_t));
-
-		lld_macro_path->lld_macro = zbx_strdup(NULL, row[0]);
-		lld_macro_path->path = zbx_strdup(NULL, row[1]);
-
-		zbx_vector_ptr_append(lld_macro_paths, lld_macro_path);
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_macro_path_free                                              *
- *                                                                            *
- * Purpose: release resources allocated by lld macro path                     *
- *                                                                            *
- * Parameters: lld_macro_path - [IN] json path to extract from lld_row        *
- *                                                                            *
- ******************************************************************************/
-static void	lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path)
-{
-	zbx_free(lld_macro_path->path);
-	zbx_free(lld_macro_path->lld_macro);
-	zbx_free(lld_macro_path);
-}
 
 /******************************************************************************
  *                                                                            *
@@ -291,43 +201,6 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
 out:
 	DCconfig_clean_items(&item, &errcode, 1);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_lld_macro_value_by_name                                      *
- *                                                                            *
- * Purpose: get value of LLD macro using json path if available or by         *
- *          searching for such key in key value pairs of array entry          *
- *                                                                            *
- * Parameters: jp_row          - [IN] the lld data row                        *
- *             lld_macro_paths - [IN] use json path to extract from jp_row    *
- *             macro           - [IN] LLD macro                               *
- *             value           - [OUT] value extracted from jp_row            *
- *             value_alloc     - [OUT] allocated memory size for value        *
- *                                                                            *
- ******************************************************************************/
-int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
-		const char *macro, char **value, size_t *value_alloc)
-{
-	zbx_lld_macro_path_t	lld_macro_path_local, *lld_macro_path;
-	int			index;
-	struct zbx_json_parse	jp_out;
-	int			ret;
-
-	lld_macro_path_local.lld_macro = (char *)macro;
-
-	if (FAIL != (index = zbx_vector_ptr_bsearch(lld_macro_paths, &lld_macro_path_local, lld_macro_paths_compare)))
-	{
-		lld_macro_path = (zbx_lld_macro_path_t *)lld_macro_paths->values[index];
-
-		if (FAIL != (ret = zbx_json_path_open(jp_row, lld_macro_path->path, &jp_out)))
-			zbx_json_value_dyn(&jp_out, value, value_alloc);
-	}
-	else
-		ret = zbx_json_value_by_name_dyn(jp_row, macro, value, value_alloc);
 
 	return ret;
 }
@@ -623,7 +496,7 @@ static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struc
 		lld_macro_path_local.lld_macro = condition->macro;
 
 		if (FAIL != (index = zbx_vector_ptr_bsearch(lld_macro_paths, &lld_macro_path_local,
-				lld_macro_paths_compare)))
+				zbx_lld_macro_paths_compare)))
 		{
 			lld_macro_path = (zbx_lld_macro_path_t *)lld_macro_paths->values[index];
 
@@ -718,46 +591,35 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  *                                                                            *
  * Purpose: add or update items, triggers and graphs for discovery item       *
  *                                                                            *
- * Parameters: lld_ruleid - [IN] discovery item identificator from database   *
+ * Parameters: lld_ruleid - [IN] discovery item identifier from database      *
  *             value      - [IN] received value from agent                    *
+ *             error      - [OUT] error or informational message. Will be set *
+ *                               to empty string on successful discovery      *
+ *                               without additional information.              *
  *                                                                            *
  ******************************************************************************/
-void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, const zbx_timespec_t *ts)
+int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error)
 {
 	const char		*__function_name = "lld_process_discovery_rule";
 
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		hostid;
-	char			*discovery_key = NULL, *error = NULL, *db_error = NULL, *error_esc, *info = NULL;
-	unsigned char		db_state, state = ITEM_STATE_NOTSUPPORTED;
-	int			lifetime;
+	char			*discovery_key = NULL, *info = NULL;
+	int			lifetime, ret = SUCCEED;
 	zbx_vector_ptr_t	lld_rows, lld_macro_paths;
-	char			*sql = NULL;
-	size_t			sql_alloc = 128, sql_offset = 0;
-	const char		*sql_start = "update items set ", *sql_continue = ",";
 	lld_filter_t		filter;
 	time_t			now;
-	zbx_item_diff_t		lld_rule_diff = {.itemid = lld_ruleid, .flags = ZBX_FLAGS_ITEM_DIFF_UNSET};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
-
-	if (FAIL == DCconfig_lock_lld_rule(lld_ruleid))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process discovery rule \"%s\": another value is being processed",
-				zbx_host_key_string(lld_ruleid));
-		goto out;
-	}
 
 	zbx_vector_ptr_create(&lld_rows);
 	zbx_vector_ptr_create(&lld_macro_paths);
 
 	lld_filter_init(&filter);
 
-	sql = (char *)zbx_malloc(sql, sql_alloc);
-
 	result = DBselect(
-			"select hostid,key_,state,evaltype,formula,error,lifetime"
+			"select hostid,key_,evaltype,formula,lifetime"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			lld_ruleid);
@@ -768,12 +630,9 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 		ZBX_STR2UINT64(hostid, row[0]);
 		discovery_key = zbx_strdup(discovery_key, row[1]);
-		db_state = (unsigned char)atoi(row[2]);
-		filter.evaltype = atoi(row[3]);
-		filter.expression = zbx_strdup(NULL, row[4]);
-		db_error = zbx_strdup(db_error, row[5]);
-
-		lifetime_str = zbx_strdup(NULL, row[6]);
+		filter.evaltype = atoi(row[2]);
+		filter.expression = zbx_strdup(NULL, row[3]);
+		lifetime_str = zbx_strdup(NULL, row[4]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
 				&lifetime_str, MACRO_TYPE_COMMON, NULL, 0);
 
@@ -792,125 +651,71 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	if (NULL == row)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", lld_ruleid);
-		goto clean;
+		goto out;
 	}
 
-	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, &error))
-		goto error;
+	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, error))
+	{
+		ret = FAIL;
+		goto out;
+	}
 
-	if (SUCCEED != lld_macro_paths_get(lld_ruleid, &lld_macro_paths, &error))
-		goto error;
+	if (SUCCEED != zbx_lld_macro_paths_get(lld_ruleid, &lld_macro_paths, error))
+	{
+		ret = FAIL;
+		goto out;
+	}
 
-	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &lld_macro_paths, &info, &error))
-		goto error;
+	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &lld_macro_paths, &info, error))
+	{
+		ret = FAIL;
+		goto out;
+	}
 
-	state = ITEM_STATE_NORMAL;
-	error = zbx_strdup(error, "");
+	*error = zbx_strdup(*error, "");
 
 	now = time(NULL);
 
-	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, &error, lifetime, now))
+	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, lifetime, now))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 				" processing lld rule");
-		goto clean;
+		goto out;
 	}
 
 	lld_item_links_sort(&lld_rows);
 
-	if (SUCCEED != lld_update_triggers(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, &error))
+	if (SUCCEED != lld_update_triggers(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 				" processing lld rule");
-		goto clean;
+		goto out;
 	}
 
-	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, &error))
+	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
 				" processing lld rule");
-		goto clean;
+		goto out;
 	}
 
-	lld_update_hosts(lld_ruleid, &lld_rows, &lld_macro_paths, &error, lifetime, now);
+	lld_update_hosts(lld_ruleid, &lld_rows, &lld_macro_paths, error, lifetime, now);
 
 	/* add informative warning to the error message about lack of data for macros used in filter */
 	if (NULL != info)
-		error = zbx_strdcat(error, info);
-
-error:
-	if (db_state != state)
-	{
-		lld_rule_diff.state = state;
-		lld_rule_diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE;
-
-		if (ITEM_STATE_NORMAL == state)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\" became supported",
-					zbx_host_key_string(lld_ruleid));
-
-			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
-					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\" became not supported: %s",
-					zbx_host_key_string(lld_ruleid), error);
-
-			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts,
-					ITEM_STATE_NOTSUPPORTED, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, error);
-		}
-
-		zbx_process_events(NULL, NULL);
-		zbx_clean_events();
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sstate=%d", sql_start, state);
-		sql_start = sql_continue;
-	}
-
-	if (NULL != error && 0 != strcmp(error, db_error))
-	{
-		error_esc = DBdyn_escape_field("items", "error", error);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%serror='%s'", sql_start, error_esc);
-		sql_start = sql_continue;
-
-		zbx_free(error_esc);
-
-		lld_rule_diff.error = error;
-		lld_rule_diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
-	}
-
-	if (sql_start == sql_continue)
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64, lld_ruleid);
-		DBexecute("%s", sql);
-	}
-
-	if (ZBX_FLAGS_ITEM_DIFF_UNSET != lld_rule_diff.flags)
-	{
-		zbx_vector_ptr_t	diffs;
-
-		zbx_vector_ptr_create(&diffs);
-		zbx_vector_ptr_append(&diffs, &lld_rule_diff);
-		DCconfig_items_apply_changes(&diffs);
-		zbx_vector_ptr_destroy(&diffs);
-	}
-clean:
-	DCconfig_unlock_lld_rule(lld_ruleid);
-
+		*error = zbx_strdcat(*error, info);
+out:
 	zbx_free(info);
-	zbx_free(error);
-	zbx_free(db_error);
 	zbx_free(discovery_key);
-	zbx_free(sql);
 
 	lld_filter_clean(&filter);
 
 	zbx_vector_ptr_clear_ext(&lld_rows, (zbx_clean_func_t)lld_row_free);
 	zbx_vector_ptr_destroy(&lld_rows);
-	zbx_vector_ptr_clear_ext(&lld_macro_paths, (zbx_clean_func_t)lld_macro_path_free);
+	zbx_vector_ptr_clear_ext(&lld_macro_paths, (zbx_clean_func_t)zbx_lld_macro_path_free);
 	zbx_vector_ptr_destroy(&lld_macro_paths);
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
