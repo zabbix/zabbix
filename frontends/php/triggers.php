@@ -616,7 +616,7 @@ else {
 	$filter_groupids_ms = [];
 	$filter_hostids_ms = [];
 
-	if (getRequest('filter_set') || (hasRequest('hostid') && !hasRequest('form_refresh'))) {
+	if (getRequest('filter_set')) {
 		$filter_inherited = getRequest('filter_inherited', -1);
 		$filter_discovered = getRequest('filter_discovered', -1);
 		$filter_dependent = getRequest('filter_dependent', -1);
@@ -696,19 +696,18 @@ else {
 	$sortorder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 	$active_tab = CProfile::get('web.triggers.filter.active', 1);
 
-
 	// Get triggers (build options).
 	$options = [
 		'output' => ['triggerid', $sort],
 		'hostids' => $filter_hostids ? $filter_hostids : null,
 		'groupids' => $filter_groupids ? $filter_groupids_enriched : null,
-		'sortfield' => $sort,
-		'limit' => $config['search_limit'] + 1,
 		'editable' => true,
 		'dependent' => ($filter_dependent != -1) ? $filter_dependent : null,
 		'templated' => ($filter_value != -1) ? false : null,
 		'inherited' => ($filter_inherited != -1) ? $filter_inherited : null,
-		'preservekeys' => true
+		'preservekeys' => true,
+		'sortfield' => $sort,
+		'limit' => $config['search_limit'] + 1
 	];
 
 	if ($filter_discovered != -1) {
@@ -779,15 +778,16 @@ else {
 			'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state',
 				'recovery_mode', 'recovery_expression', 'value', $sort
 			],
-			'triggerids' => array_keys($prefetched_triggers),
 			'selectHosts' => ['hostid', 'host', 'name', 'status'],
 			'selectDependencies' => ['triggerid', 'description'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectTags' => ['tag', 'value'],
+			'triggerids' => array_keys($prefetched_triggers),
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);
 
+		// We must maintain sort order that is applied on prefetched_triggers array.
 		foreach ($triggers as $triggerid => $trigger) {
 			$prefetched_triggers[$triggerid] = $trigger;
 		}
