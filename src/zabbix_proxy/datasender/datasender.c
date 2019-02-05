@@ -247,7 +247,8 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 		while (ZBX_PROXY_DATA_MORE == more && time_diff < SEC_PER_MIN);
 
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), records, time_diff, CONFIG_PROXYDATA_FREQUENCY);
+				get_process_type_string(process_type), records, time_diff,
+				ZBX_PROXY_DATA_MORE != more ? ZBX_TASK_UPDATE_FREQUENCY : 0);
 
 		if (ZBX_PROXY_DATA_MORE != more)
 			zbx_sleep_loop(ZBX_TASK_UPDATE_FREQUENCY);
