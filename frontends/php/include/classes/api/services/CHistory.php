@@ -24,7 +24,7 @@
  */
 class CHistory extends CApiService {
 
-	protected $tableName = 'history';
+	protected $tableName;
 	protected $tableAlias = 'h';
 	protected $sortColumns = ['itemid', 'clock'];
 
@@ -91,11 +91,14 @@ class CHistory extends CApiService {
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'value' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'timestamp' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'severity' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'logeventid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'value' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				'value' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'source' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -103,7 +106,10 @@ class CHistory extends CApiService {
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 
 			// Output properties.
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'value', 'ns']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_MULTIPLE, 'default' => API_OUTPUT_EXTEND, 'rules' => [
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'timestamp', 'source', 'severity', 'value', 'logeventid', 'ns']), 'default' => API_OUTPUT_EXTEND],
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'value', 'ns']), 'default' => API_OUTPUT_EXTEND]
+			]],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 
 			// Sort and limit properties.
@@ -118,6 +124,13 @@ class CHistory extends CApiService {
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		// Unset filter and search fields unrelevant to selected type of history.
+		if ($options['history'] != ITEM_VALUE_TYPE_LOG) {
+			unset($options['filter']['timestamp'], $options['filter']['severity'], $options['filter']['logeventid'],
+				$options['search']['source']
+			);
 		}
 
 		if ((self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions'])
@@ -138,6 +151,8 @@ class CHistory extends CApiService {
 			zbx_value2array($options['itemids']);
 		}
 
+		$this->tableName = CHistoryManager::getTableName($options['history']);
+
 		switch (CHistoryManager::getDataSourceType($options['history'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				return $this->getFromElasticsearch($options);
@@ -154,12 +169,10 @@ class CHistory extends CApiService {
 	 */
 	private function getFromSql($options) {
 		$result = [];
-		$table_name = CHistoryManager::getTableName($options['history']);
-
 		$sql_parts = [
 			'select'	=> ['history' => 'h.itemid'],
 			'from'		=> [
-				'history' => $table_name.' h'
+				'history' => $this->tableName.' h'
 			],
 			'where'		=> [],
 			'group'		=> [],
@@ -192,7 +205,7 @@ class CHistory extends CApiService {
 		}
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$sql_parts = $this->applyQuerySortOptions($table_name, $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 
 		$db_res = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
 
@@ -215,8 +228,7 @@ class CHistory extends CApiService {
 	 */
 	private function getFromElasticsearch($options) {
 		$query = [];
-		$table_name = CHistoryManager::getTableName($options['history']);
-		$schema = DB::getSchema($table_name);
+		$schema = DB::getSchema($this->tableName);
 
 		// itemids
 		if ($options['itemids'] !== null) {
@@ -251,7 +263,7 @@ class CHistory extends CApiService {
 
 		// filter
 		if ($options['filter']) {
-			$query = CElasticsearchHelper::addFilter(DB::getSchema($table_name), $query, $options);
+			$query = CElasticsearchHelper::addFilter(DB::getSchema($this->tableName), $query, $options);
 		}
 
 		// search
