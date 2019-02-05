@@ -3,6 +3,7 @@ Changes for 4.0.5rc1
 New features:
 
 Bug fixes:
+...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
 ........S. [ZBX-15533] fixed cutting and trimming event tags and values (asitals)
 .......P.. [ZBX-15442] fixed reporting idle time in datasender's process state information (asitals)
 ..F....... [ZBX-15424] fixed when multiselect doesn't trim values and recognizes untrimmed values as new ones (vasilijs)
@@ -2216,6 +2217,7 @@ Changes for 3.0.26rc1
 New features:
 
 Bug fixes:
+...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
 ...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
 
 --------------------------------------------------------------------------------
