@@ -71,8 +71,16 @@ jQuery(function($) {
 				data = getMenuPopupHost(data, obj);
 				break;
 
-			case 'map':
-				data = getMenuPopupMap(data, obj);
+			case 'map_element_submap':
+				data = getMenuPopupMapElementSubmap(data);
+				break;
+
+			case 'map_element_group':
+				data = getMenuPopupMapElementGroup(data);
+				break;
+
+			case 'map_element_trigger':
+				data = getMenuPopupMapElementTrigger(data);
 				break;
 
 			case 'refresh':

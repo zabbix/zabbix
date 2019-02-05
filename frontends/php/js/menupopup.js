@@ -73,16 +73,21 @@ function getMenuPopupHistory(options) {
 /**
  * Get menu popup host section data.
  *
- * @param string options['hostid']          Host ID.
- * @param array  options['scripts']         Host scripts (optional).
- * @param string options[]['name']          Script name.
- * @param string options[]['scriptid']      Script ID.
- * @param string options[]['confirmation']  Confirmation text.
- * @param bool   options['showGraphs']      Link to host graphs page.
- * @param bool   options['showScreens']     Link to host screen page.
- * @param bool   options['showTriggers']    Link to Monitoring->Problems page.
- * @param bool   options['hasGoTo']         "Go to" block in popup.
- * @param {object} trigger_elmnt            UI element which triggered opening of overlay dialogue.
+ * @param string options['hostid']           Host ID.
+ * @param array  options['scripts']          Host scripts (optional).
+ * @param string options[]['name']           Script name.
+ * @param string options[]['scriptid']       Script ID.
+ * @param string options[]['confirmation']   Confirmation text.
+ * @param bool   options['showGraphs']       Link to host graphs page.
+ * @param bool   options['showScreens']      Link to host screen page.
+ * @param bool   options['showTriggers']     Link to Monitoring->Problems page.
+ * @param bool   options['hasGoTo']          "Go to" block in popup.
+ * @param int    options['severity_min']     (optional)
+ * @param bool   options['show_suppressed']  (optional)
+ * @param array  options['urls']             (optional)
+ * @param string options['url'][]['label']
+ * @param string options['url'][]['url']
+ * @param {object} trigger_elmnt             UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
@@ -138,6 +143,12 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			var url = new Curl('zabbix.php', false);
 			url.setArgument('action', 'problem.view');
 			url.setArgument('filter_hostids[]', options.hostid);
+			if (typeof options.severity_min !== 'undefined') {
+				url.setArgument('filter_severity', options.severity_min);
+			}
+			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
+				url.setArgument('filter_show_suppressed', '1');
+			}
 			url.setArgument('filter_set', '1');
 			problems.url = url.getUrl();
 		}
@@ -174,225 +185,135 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		});
 	}
 
+	// urls
+	if (typeof options.urls !== 'undefined') {
+		sections.push({
+			label: t('URLs'),
+			items: options.urls
+		});
+	}
+
 	return sections;
 }
 
 /**
- * Get menu popup map section data.
+ * Get menu popup submap map element section data.
  *
- * @param {string} options['hostid']                    Host ID.
- * @param {array}  options['scripts']                   Host scripts (optional).
- * @param {string} options[]['name']                    Script name.
- * @param {string} options[]['scriptid']                Script ID.
- * @param {string} options[]['confirmation']            Confirmation text.
- * @param {object} options['gotos']                     Links section (optional).
- * @param {array}  options['gotos']['latestData']       Link to latest data page.
- * @param {array}  options['gotos']['inventory']        Link to host inventory page.
- * @param {array}  options['gotos']['graphs']           Link to host graph page with url parameters ("name" => "value").
- * @param {array}  options['gotos']['showGraphs']       Display "Graphs" link enabled or disabled.
- * @param {array}  options['gotos']['screens']          Link to host screen page with url parameters ("name" => "value").
- * @param {array}  options['gotos']['showScreens']      Display "Screens" link enabled or disabled.
- * @param {array}  options['gotos']['triggerStatus']    Link to "Problems" page with url parameters ("name" => "value").
- * @param {array}  options['gotos']['showTriggers']     Display "Problems" link enabled or disabled.
- * @param {array}  options['gotos']['submap']           Link to submap page with url parameters ("name" => "value").
- * @param {array}  options['gotos']['events']           Link to events page with url parameters ("name" => "value").
- * @param {array}  options['gotos']['showEvents']       Display "Events" link enabled or disabled.
- * @param {string} options['gotos']['show_suppressed']  Show suppressed problems (optional).
- * @param {array}  options['urls']                      Local and global map link (optional).
- * @param {string} options['url'][]['label']            Link label.
- * @param {string} options['url'][]['url']              Link url.
- * @param {object} trigger_elmnt                        UI element which triggered opening of overlay dialogue.
+ * @param {array}  options['sysmapid']
+ * @param {int}    options['severity_min']     (optional)
+ * @param {array}  options['urls']             (optional)
+ * @param {string} options['url'][]['label']
+ * @param {string} options['url'][]['url']
  *
  * @return array
  */
-function getMenuPopupMap(options, trigger_elmnt) {
-	var sections = [];
+function getMenuPopupMapElementSubmap(options) {
+	var sections = [],
+		submap_url = new Curl('zabbix.php', false);
 
-	// scripts
-	if (typeof options.scripts !== 'undefined') {
+	submap_url.setArgument('action', 'map.view');
+	submap_url.setArgument('sysmapid', options.sysmapid);
+	if (typeof options.severity_min !== 'undefined') {
+		submap_url.setArgument('severity_min', options.severity_min);
+	}
+
+	sections.push({
+		label: t('Go to'),
+		items: [{
+			label: t('Submap'),
+			url: submap_url.getUrl()
+		}]
+	});
+
+	// urls
+	if (typeof options.urls !== 'undefined') {
 		sections.push({
-			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
+			label: t('URLs'),
+			items: options.urls
 		});
 	}
 
-	/*
-	 * Gotos section
-	 */
-	if (typeof options.gotos !== 'undefined') {
-		var gotos = [],
-			show_suppressed = (typeof options.gotos.show_suppressed !== 'undefined' && options.gotos.show_suppressed);
+	return sections;
+}
 
-		// inventory
-		if (typeof options.gotos.inventory !== 'undefined') {
-			var url = new Curl('hostinventories.php', false);
+/**
+ * Get menu popup host group map element section data.
+ *
+ * @param {string} options['groupid']
+ * @param {int}    options['severity_min']     (optional)
+ * @param {bool}   options['show_suppressed']  (optional)
+ * @param {array}  options['urls']             (optional)
+ * @param {string} options['url'][]['label']
+ * @param {string} options['url'][]['url']
+ *
+ * @return array
+ */
+function getMenuPopupMapElementGroup(options) {
+	var sections = [],
+		problems_url = new Curl('zabbix.php', false);
 
-			jQuery.each(options.gotos.inventory, function(name, value) {
-				if (value !== null) {
-					url.setArgument(name, value);
-				}
-			});
+	problems_url.setArgument('action', 'problem.view');
+	problems_url.setArgument('filter_groupids[]', options.groupid);
+	if (typeof options.severity_min !== 'undefined') {
+		problems_url.setArgument('severity_min', options.severity_min);
+	}
+	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
+		problems_url.setArgument('filter_show_suppressed', '1');
+	}
+	problems_url.setArgument('filter_set', '1');
 
-			gotos.push({
-				label: t('Host inventory'),
-				url: url.getUrl()
-			});
-		}
+	sections.push({
+		label: t('Go to'),
+		items: [{
+			label: t('Problems'),
+			url: problems_url.getUrl()
+		}]
+	});
 
-		// latest
-		if (typeof options.gotos.latestData !== 'undefined') {
-			var url = new Curl('latest.php', false);
-			url.setArgument('filter_set', '1');
-
-			jQuery.each(options.gotos.latestData, function(name, value) {
-				if (value !== null) {
-					url.setArgument(name, value);
-				}
-			});
-
-			gotos.push({
-				label: t('Latest data'),
-				url: url.getUrl()
-			});
-		}
-
-		// problems
-		if (typeof options.gotos.triggerStatus !== 'undefined') {
-			var problems = {
-				label: t('Problems')
-			};
-
-			if (!options.gotos.showTriggers) {
-				problems.disabled = true;
-			}
-			else {
-				var url = new Curl('zabbix.php', false);
-				url.setArgument('action', 'problem.view');
-				if (show_suppressed) {
-					url.setArgument('filter_show_suppressed', '1');
-				}
-				url.setArgument('filter_set', '1');
-
-				jQuery.each(options.gotos.triggerStatus, function(name, value) {
-					if (value !== null) {
-						url.setArgument(name, value);
-					}
-				});
-
-				problems.url = url.getUrl();
-			}
-
-			gotos.push(problems);
-		}
-
-		// graphs
-		if (typeof options.gotos.graphs !== 'undefined') {
-			var graphs = {
-				label: t('Graphs')
-			};
-
-			if (!options.gotos.showGraphs) {
-				graphs.disabled = true;
-			}
-			else {
-				var url = new Curl('charts.php', false);
-
-				jQuery.each(options.gotos.graphs, function(name, value) {
-					if (value !== null) {
-						url.setArgument(name, value);
-					}
-				});
-
-				graphs.url = url.getUrl();
-			}
-
-			gotos.push(graphs);
-		}
-
-		// screens
-		if (typeof options.gotos.screens !== 'undefined') {
-			var screens = {
-				label: t('Host screens')
-			};
-
-			if (!options.gotos.showScreens) {
-				screens.disabled = true;
-			}
-			else {
-				var url = new Curl('host_screen.php', false);
-
-				jQuery.each(options.gotos.screens, function(name, value) {
-					if (value !== null) {
-						url.setArgument(name, value);
-					}
-				});
-
-				screens.url = url.getUrl();
-			}
-
-			gotos.push(screens);
-		}
-
-		// submap
-		if (typeof options.gotos.submap !== 'undefined') {
-			var url = new Curl('zabbix.php', false);
-			url.setArgument('action', 'map.view');
-
-			jQuery.each(options.gotos.submap, function(name, value) {
-				if (value !== null) {
-					url.setArgument(name, value);
-				}
-			});
-
-			gotos.push({
-				label: t('Submap'),
-				url: url.getUrl()
-			});
-		}
-		else if (typeof options.navigatetos !== 'undefined'
-			&& typeof options.navigatetos.submap.widget_uniqueid !== 'undefined') {
-
-			var url = new Curl('javascript: navigateToSubmap('+options.navigatetos.submap.sysmapid+', "'+
-				options.navigatetos.submap.widget_uniqueid+'");', false);
-
-			gotos.push({
-				label: t('Submap'),
-				url: url.getUrl()
-			});
-		}
-
-		// events
-		if (typeof options.gotos.events !== 'undefined') {
-			var events = {
-				label: t('Problems')
-			};
-
-			if (!options.gotos.showEvents) {
-				events.disabled = true;
-			}
-			else {
-				var url = new Curl('zabbix.php', false);
-				url.setArgument('action', 'problem.view');
-				if (show_suppressed) {
-					url.setArgument('filter_show_suppressed', '1');
-				}
-				url.setArgument('filter_triggerids[]', options.gotos.events.triggerids);
-				url.setArgument('filter_set', '1');
-				if (typeof options.gotos.events.severity_min !== 'undefined') {
-					url.setArgument('filter_severity', options.gotos.events.severity_min);
-				}
-
-				events.url = url.getUrl();
-			}
-
-			gotos.push(events);
-		}
-
+	// urls
+	if (typeof options.urls !== 'undefined') {
 		sections.push({
-			label: t('Go to'),
-			items: gotos
+			label: t('URLs'),
+			items: options.urls
 		});
 	}
+
+	return sections;
+}
+
+/**
+ * Get menu popup trigger map element section data.
+ *
+ * @param {array}  options['triggerids']
+ * @param {int}    options['severity_min']     (optional)
+ * @param {bool}   options['show_suppressed']  (optional)
+ * @param {array}  options['urls']             (optional)
+ * @param {string} options['url'][]['label']
+ * @param {string} options['url'][]['url']
+ *
+ * @return array
+ */
+function getMenuPopupMapElementTrigger(options) {
+	var sections = [],
+		problems_url = new Curl('zabbix.php', false);
+
+	problems_url.setArgument('action', 'problem.view');
+	problems_url.setArgument('filter_triggerids[]', options.triggerids);
+	if (typeof options.severity_min !== 'undefined') {
+		problems_url.setArgument('filter_severity', options.severity_min);
+	}
+	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
+		problems_url.setArgument('filter_show_suppressed', '1');
+	}
+	problems_url.setArgument('filter_set', '1');
+
+	sections.push({
+		label: t('Go to'),
+		items: [{
+			label: t('Problems'),
+			url: problems_url.getUrl()
+		}]
+	});
 
 	// urls
 	if (typeof options.urls !== 'undefined') {

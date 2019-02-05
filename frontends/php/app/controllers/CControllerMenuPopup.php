@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item,item_prototype,trigger,trigger_macro',
+			'type' => 'required|in history,host,item,item_prototype,map_element,trigger,trigger_macro',
 			'data' => 'array'
 		];
 
@@ -80,7 +80,12 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['hostid']
-	 * @param bool   $data['has_goto']  (optional) Can be used to hide "GO TO" menu section.
+	 * @param bool   $data['has_goto']        (optional) Can be used to hide "GO TO" menu section. Default: true.
+	 * @param int    $data['severity_min']    (optional)
+	 * @param bool   $data['show_suppressed'] (optional)
+	 * @param array  $data['urls']            (optional)
+	 * @param string $data['urls']['name']
+	 * @param string $data['urls']['url']
 	 *
 	 * @return mixed
 	 */
@@ -121,6 +126,12 @@ class CControllerMenuPopup extends CController {
 				$menu_data['showGraphs'] = (bool) $db_host['graphs'];
 				$menu_data['showScreens'] = (bool) $db_host['screens'];
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
+				if (array_key_exists('severity_min', $data)) {
+					$menu_data['severity_min'] = $data['severity_min'];
+				}
+				if (array_key_exists('show_suppressed', $data)) {
+					$menu_data['show_suppressed'] = $data['show_suppressed'];
+				}
 			}
 
 			foreach (array_values($scripts) as $script) {
@@ -129,6 +140,10 @@ class CControllerMenuPopup extends CController {
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation']
 				];
+			}
+
+			if (array_key_exists('urls', $data)) {
+				$menu_data['urls'] = CArrayHelper::renameObjectsKeys($data['urls'], ['name' => 'label']);
 			}
 
 			return $menu_data;
@@ -229,14 +244,121 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
+	 * Prepare data for map element context menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['sysmapid']
+	 * @param string $data['selementid']
+	 * @param array  $data['options']       (optional)
+	 * @param int    $data['severity_min']  (optional)
+	 *
+	 * @return mixed
+	 */
+	private static function getMapElementMenuData(array $data) {
+		$db_maps = API::Map()->get([
+			'output' => ['show_suppressed'],
+			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls'],
+			'sysmapids' => $data['sysmapid'],
+			'expandUrls' => true
+		]);
+
+		if ($db_maps) {
+			$db_map = $db_maps[0];
+			$selement = null;
+
+			foreach ($db_map['selements'] as $db_selement) {
+				if (bccomp($db_selement['selementid'], $data['selementid']) == 0) {
+					$selement = $db_selement;
+					break;
+				}
+			}
+
+			if ($selement !== null) {
+				CArrayHelper::sort($selement['urls'], ['name']);
+
+				switch ($selement['elementtype']) {
+					case SYSMAP_ELEMENT_TYPE_MAP:
+						$menu_data = [
+							'type' => 'map_element_submap',
+							'sysmapid' => $selement['elements'][0]['sysmapid']
+						];
+						if (array_key_exists('severity_min', $data)) {
+							$menu_data['severity_min'] = $data['severity_min'];
+						}
+						if ($selement['urls']) {
+							$menu_data['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
+						}
+						return $menu_data;
+
+					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+						$menu_data = [
+							'type' => 'map_element_group',
+							'groupid' => $selement['elements'][0]['groupid']
+						];
+						if (array_key_exists('severity_min', $data)) {
+							$menu_data['severity_min'] = $data['severity_min'];
+						}
+						if ($db_map['show_suppressed']) {
+							$menu_data['show_suppressed'] = true;
+						}
+						if ($selement['urls']) {
+							$menu_data['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
+						}
+						return $menu_data;
+
+					case SYSMAP_ELEMENT_TYPE_HOST:
+						$host_data = [
+							'hostid' => $selement['elements'][0]['hostid']
+						];
+						if (array_key_exists('severity_min', $data)) {
+							$host_data['severity_min'] = $data['severity_min'];
+						}
+						if ($db_map['show_suppressed']) {
+							$host_data['show_suppressed'] = true;
+						}
+						if ($selement['urls']) {
+							$host_data['urls'] = $selement['urls'];
+						}
+						return self::getHostMenuData($host_data);
+
+					case SYSMAP_ELEMENT_TYPE_TRIGGER:
+						$menu_data = [
+							'type' => 'map_element_trigger',
+							'triggerids' => zbx_objectValues($selement['elements'], 'triggerid')
+						];
+						if (array_key_exists('severity_min', $data)) {
+							$menu_data['severity_min'] = $data['severity_min'];
+						}
+						if ($db_map['show_suppressed']) {
+							$menu_data['show_suppressed'] = true;
+						}
+						if ($selement['urls']) {
+							$menu_data['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
+						}
+						return $menu_data;
+				}
+			}
+		}
+
+		error(_('No permissions to referred object or it does not exist!'));
+
+		return null;
+	}
+
+	/**
 	 * Prepare data for trigger context menu popup.
 	 *
 	 * @param array  $data
 	 * @param string $data['triggerid']
-	 * @param array  $acknowledge               (optional) Acknowledge link parameters.
-	 * @param string $acknowledge['eventid']
-	 * @param string $acknowledge['backurl']
-	 * @param bool   $data['show_description']  (optional) default: true
+	 * @param array  $data['acknowledge']             (optional) Acknowledge link parameters.
+	 * @param string $data['acknowledge']['eventid']
+	 * @param string $data['acknowledge']['backurl']
+	 * @param int    $data['severity_min']            (optional)
+	 * @param bool   $data['show_suppressed']         (optional)
+	 * @param array  $data['urls']                    (optional)
+	 * @param string $data['urls']['name']
+	 * @param string $data['urls']['url']
+	 * @param bool   $data['show_description']        (optional) default: true
 	 *
 	 * @return mixed
 	 */
@@ -369,6 +491,10 @@ class CControllerMenuPopup extends CController {
 
 			case 'item_prototype':
 				$menu_data = self::getItemPrototypeMenuData($data);
+				break;
+
+			case 'map_element':
+				$menu_data = self::getMapElementMenuData($data);
 				break;
 
 			case 'trigger':

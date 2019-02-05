@@ -63,6 +63,32 @@ class CMenuPopupHelper {
 	}
 
 	/**
+	 * Prepare data for Ajax map element menu popup.
+	 *
+	 * @param string $sysmapid
+	 * @param string $selementid
+	 * @param int    $severity_min
+	 *
+	 * @return array
+	 */
+	public static function getAjaxMapElement($sysmapid, $selementid, $severity_min) {
+		$data = [
+			'ajax' => true,
+			'type' => 'map_element',
+			'data' => [
+				'sysmapid' => $sysmapid,
+				'selementid' => $selementid
+			]
+		];
+
+		if ($severity_min != TRIGGER_SEVERITY_NOT_CLASSIFIED) {
+			$data['data']['severity_min'] = $severity_min;
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Prepare data for map menu popup.
 	 *
 	 * @param string $hostId                     Host ID.
