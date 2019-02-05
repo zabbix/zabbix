@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-13 23:36+0200\n"
-"PO-Revision-Date: 2018-12-26 09:44+0300\n"
+"POT-Creation-Date: 2019-01-28 15:53+0200\n"
+"PO-Revision-Date: 2019-01-30 08:53+0300\n"
 "Last-Translator: Daudet <aremy@gab6.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1545810254.000000\n"
+"X-POOTLE-MTIME: 1548831201.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -79,7 +79,7 @@ msgid_plural "%1$s Items"
 msgstr[0] "%1$s Élément"
 msgstr[1] "%1$s Éléments"
 
-#: include/classes/api/services/CItemGeneral.php:2048
+#: include/classes/api/services/CItemGeneral.php:1989
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
@@ -1201,8 +1201,8 @@ msgstr "Aoû"
 msgid "August"
 msgstr "Août"
 
-#: app/views/administration.authentication.edit.php:127
-#: app/views/administration.authentication.edit.php:135
+#: app/views/administration.authentication.edit.php:137
+#: app/views/administration.authentication.edit.php:145
 #: app/views/administration.mediatype.edit.php:87 include/menu.inc.php:263
 #: include/views/configuration.httpconf.edit.php:283
 #: include/views/configuration.httpconf.list.php:92
@@ -1229,7 +1229,7 @@ msgstr "L'authentification a échoué: %1$s."
 msgid "Authentication method"
 msgstr "Méthode d'authentification"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:232
+#: app/controllers/CControllerAuthenticationUpdate.php:238
 msgid "Authentication method changed"
 msgstr "Méthode d'authentification modifiée"
 
@@ -1249,7 +1249,7 @@ msgstr "Phrase d'authentification"
 msgid "Authentication protocol"
 msgstr "Protocole d'authentification"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:231
+#: app/controllers/CControllerAuthenticationUpdate.php:237
 msgid "Authentication settings updated"
 msgstr "Paramètres d'authentification mis à jour"
 
@@ -1347,7 +1347,7 @@ msgstr "Couleur de fond"
 msgid "Background image"
 msgstr "Image de fond"
 
-#: app/views/administration.authentication.edit.php:93
+#: app/views/administration.authentication.edit.php:98
 msgid "Base DN"
 msgstr "DN de base"
 
@@ -1363,11 +1363,11 @@ msgstr "Couleur de base"
 msgid "Basic"
 msgstr "Basique"
 
-#: app/views/administration.authentication.edit.php:103
+#: app/views/administration.authentication.edit.php:110
 msgid "Bind DN"
 msgstr "DN de lien"
 
-#: app/views/administration.authentication.edit.php:113
+#: app/views/administration.authentication.edit.php:121
 msgid "Bind password"
 msgstr "Mot de passe de lien"
 
@@ -1641,7 +1641,7 @@ msgstr "Impossible d'ajouter une maintenance"
 #: include/classes/api/services/CMap.php:1487
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "Impossible d'ajouter un élément de carte sur la carte \"%1$s\" en raison d'une référence circulaire."
 
 #: app/controllers/CControllerMediatypeCreate.php:69
 #: app/controllers/CControllerMediatypeCreate.php:159
@@ -1746,17 +1746,17 @@ msgstr "Impossible d'appeler la méthode \"%1$s.%2$s\" sans paramètres."
 msgid "Cannot clear history"
 msgstr "Impossible de nettoyer l'historique"
 
-#: include/classes/api/services/CDiscoveryRule.php:1587
+#: include/classes/api/services/CDiscoveryRule.php:1536
 msgid "Cannot clone graph prototypes."
 msgstr "Impossible de cloner les prototypes de graphiques."
 
-#: include/classes/api/services/CDiscoveryRule.php:1635
+#: include/classes/api/services/CDiscoveryRule.php:1584
 msgid "Cannot clone host prototypes."
 msgstr "Impossible de cloner des prototypes d'hôtes."
 
-#: include/classes/api/services/CDiscoveryRule.php:1392
-#: include/classes/api/services/CDiscoveryRule.php:1448
-#: include/classes/api/services/CDiscoveryRule.php:1466
+#: include/classes/api/services/CDiscoveryRule.php:1341
+#: include/classes/api/services/CDiscoveryRule.php:1397
+#: include/classes/api/services/CDiscoveryRule.php:1415
 msgid "Cannot clone item prototypes."
 msgstr "Impossible de cloner les prototypes d'éléments."
 
@@ -1924,6 +1924,20 @@ msgstr[1] "Impossible de supprimer les groupes"
 msgid "Cannot delete host"
 msgstr "Impossible de supprimer l'hôte"
 
+#: include/classes/api/services/CHost.php:1189
+#, c-format
+msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
+msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
+msgstr[0] "Impossible de supprimer l'hôte car la maintenance \"%1$s\" doit contenir au moins un hôte ou un groupe d'hôtes."
+msgstr[1] "Impossible de supprimer les hôtes sélectionnés car la maintenance \"%1$s\" doit contenir au moins un hôte ou un groupe d'hôtes."
+
+#: include/classes/api/services/CHostGroup.php:1503
+#, c-format
+msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
+msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
+msgstr[0] "Impossible de supprimer le groupe d'hôtes car la maintenance \"%1$s\" doit contenir au moins un hôte ou un groupe d'hôtes."
+msgstr[1] "Impossible de supprimer les groupes d'hôtes sélectionnés car la maintenance \"%1$s\" doit contenir au moins un hôte ou un groupe d'hôtes."
+
 #: include/classes/api/services/CDiscoveryRule.php:532
 msgid "Cannot delete host prototype."
 msgstr "Impossible de supprimer un prototype d'hôte."
@@ -2037,11 +2051,11 @@ msgstr "Impossible de supprimer le graphique basé sur un modèle."
 msgid "Cannot delete templated host prototype."
 msgstr "Impossible de supprimer un prototype d'hôte provenant d'un modèle."
 
-#: include/classes/api/services/CItemPrototype.php:876
+#: include/classes/api/services/CItemPrototype.php:875
 msgid "Cannot delete templated item prototype."
 msgstr "Impossible de supprimer le prototype d'élément basé sur un modèle."
 
-#: include/classes/api/services/CItem.php:706
+#: include/classes/api/services/CItem.php:704
 msgid "Cannot delete templated item."
 msgstr "Impossible de supprimer un élément provenant d'un modèle."
 
@@ -2057,7 +2071,7 @@ msgstr "Impossible de supprimer le déclencheur d'un modèle \"%1$s:%2$s\"."
 #: include/classes/api/services/CTriggerPrototype.php:541
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr "Impossible de supprimer le prototype de déclencheur basé sur un modèle."
+msgstr "Impossible de supprimer le prototype de déclencheur basé sur un modèle \"%1$s:%2$s\"."
 
 #: include/classes/api/services/CHttpTest.php:557
 #, c-format
@@ -2255,8 +2269,8 @@ msgstr "Impossible de trouver l'hôte \"%1$s\" utilisé dans l'écran \"%2$s\"."
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Impossible de trouver le groupe d'hôtes \"%1$s\" pour le prototype d'hôte \"%2$s\" de la règle de découverte \"%3$s\" sur \"%4$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1255
-#: include/classes/api/services/CDiscoveryRule.php:1419
+#: include/classes/api/services/CDiscoveryRule.php:1204
+#: include/classes/api/services/CDiscoveryRule.php:1368
 #: include/classes/api/services/CItemGeneral.php:116 include/items.inc.php:506
 #: include/items.inc.php:653
 #, c-format
@@ -2356,7 +2370,7 @@ msgstr "Impossible de formater l'arbre. Vérifiez la structure logique des liens
 msgid "Cannot format tree."
 msgstr "Impossible de formater l'arbre."
 
-#: include/classes/api/services/CTemplate.php:805
+#: include/classes/api/services/CTemplate.php:803
 msgid "Cannot have empty visible template name."
 msgstr "Le nom visible du modèle ne peut pas être vide."
 
@@ -2392,8 +2406,8 @@ msgstr "Impossible d'insérer l'expression de déclencheur"
 msgid "Cannot link template"
 msgstr "Impossible de lier le modèle"
 
-#: include/classes/api/services/CTemplate.php:892
-#: include/classes/api/services/CTemplate.php:906
+#: include/classes/api/services/CTemplate.php:890
+#: include/classes/api/services/CTemplate.php:904
 msgid "Cannot link template."
 msgstr "Impossible de lier le modèle."
 
@@ -2405,7 +2419,7 @@ msgstr "Impossible de se déconnecter."
 msgid "Cannot mass update host name."
 msgstr "Impossible de réaliser une mise à jour collective du nom d'hôte."
 
-#: include/classes/api/services/CTemplate.php:1030
+#: include/classes/api/services/CTemplate.php:1028
 msgid "Cannot mass update template name."
 msgstr "Impossible de réaliser une mise à jour collective du nom de modèle."
 
@@ -2413,7 +2427,7 @@ msgstr "Impossible de réaliser une mise à jour collective du nom de modèle."
 msgid "Cannot mass update visible host name."
 msgstr "Impossible de réaliser une mise à jour collective du nom d'hôte visible."
 
-#: include/classes/api/services/CTemplate.php:995
+#: include/classes/api/services/CTemplate.php:993
 msgid "Cannot mass update visible template name."
 msgstr "Impossible de réaliser une mise à jour collective du nom visible de modèle."
 
@@ -2441,8 +2455,8 @@ msgstr "Impossible d'effectuer une mise à jour sur la table \"%1$s\" sans condi
 msgid "Cannot process applications from different hosts or templates."
 msgstr "Impossible de traiter les applications de différents hôtes ou modèles."
 
-#: include/classes/api/services/CItemGeneral.php:2056
-#: include/classes/api/services/CItemGeneral.php:2083
+#: include/classes/api/services/CItemGeneral.php:1997
+#: include/classes/api/services/CItemGeneral.php:2024
 msgid "Cannot read JSON."
 msgstr "Impossible de lire le JSON."
 
@@ -2451,8 +2465,8 @@ msgstr "Impossible de lire le JSON."
 msgid "Cannot read JSON: %1$s."
 msgstr "Impossible de lire le JSON: %1$s."
 
-#: include/classes/api/services/CItemGeneral.php:2043
-#: include/classes/api/services/CItemGeneral.php:2047
+#: include/classes/api/services/CItemGeneral.php:1984
+#: include/classes/api/services/CItemGeneral.php:1988
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
@@ -2543,8 +2557,8 @@ msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "Impossible de configurer la valeur \"templateid\" pour l'écran \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:881
-#: include/classes/api/services/CHost.php:1705
-#: include/classes/api/services/CHost.php:1849
+#: include/classes/api/services/CHost.php:1741
+#: include/classes/api/services/CHost.php:1885
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Impossible de configurer les champs d'inventaire pour un inventaire désactivé."
 
@@ -2561,15 +2575,15 @@ msgstr "Impossible de changer d'hôte pour l'interface."
 msgid "Cannot unblock users"
 msgstr "Impossible de débloquer les utilisateurs"
 
-#: include/classes/api/services/CHostGeneral.php:563
+#: include/classes/api/services/CHostGeneral.php:559
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Impossible de délier et effacer les scénarios web."
 
-#: include/classes/api/services/CHostGeneral.php:624
+#: include/classes/api/services/CHostGeneral.php:620
 msgid "Cannot unlink and clear applications."
 msgstr "Impossible de délier et effacer les applications."
 
-#: include/classes/api/services/CHostGeneral.php:367
+#: include/classes/api/services/CHostGeneral.php:363
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Impossible de délier et effacer les règles de découverte"
 
@@ -2577,12 +2591,12 @@ msgstr "Impossible de délier et effacer les règles de découverte"
 msgid "Cannot unlink template"
 msgstr "Impossible de délier le modèle"
 
-#: include/classes/api/services/CTemplate.php:857
-#: include/classes/api/services/CTemplate.php:880
+#: include/classes/api/services/CTemplate.php:855
+#: include/classes/api/services/CTemplate.php:878
 msgid "Cannot unlink template."
 msgstr "Impossible de délier le modèle."
 
-#: include/classes/api/services/CHostGeneral.php:273
+#: include/classes/api/services/CHostGeneral.php:269
 #, c-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Impossible de délier le déclencheur \"%s\", il a des éléments du modèle qui sont laissés liés à l'hôte."
@@ -2628,7 +2642,7 @@ msgstr "Impossible de mettre à jour \"%1$s\" pour le déclencheur \"%2$s\"."
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "Impossible de mettre à jour \"%1$s\" pour le prototype de déclencheur \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1828
+#: include/classes/api/services/CHost.php:1864
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "Impossible de mettre à jour \"%2$s\" pour un hôte découvert \"%1$s\"."
@@ -2664,7 +2678,7 @@ msgstr "Impossible de mettre à jour la valeur \"templateid\" pour l'écran de m
 msgid "Cannot update a discovered graph."
 msgstr "Impossible de mettre à jour un graphique découvert."
 
-#: include/classes/api/services/CHostGroup.php:780
+#: include/classes/api/services/CHostGroup.php:797
 msgid "Cannot update a discovered host group."
 msgstr "Impossible de mettre à jour un groupe d'hôtes découvert."
 
@@ -2681,7 +2695,7 @@ msgstr "Impossible de mettre à jour l'action"
 msgid "Cannot update application"
 msgstr "Impossible de mettre à jour l'application"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:236
+#: app/controllers/CControllerAuthenticationUpdate.php:242
 msgid "Cannot update authentication"
 msgstr "Impossible de mettre à jour l'authentification"
 
@@ -2736,9 +2750,9 @@ msgstr "Impossible de mettre à jour le prototype de graphique"
 msgid "Cannot update group"
 msgstr "Impossible de mettre à jour le groupe"
 
-#: include/classes/api/services/CHostGroup.php:986
-#: include/classes/api/services/CHostGroup.php:1090
-#: include/classes/api/services/CHostGroup.php:1226
+#: include/classes/api/services/CHostGroup.php:1003
+#: include/classes/api/services/CHostGroup.php:1107
+#: include/classes/api/services/CHostGroup.php:1243
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Impossible de mettre à jour les groupes pour l'hôte découvert \"%1$s\"."
@@ -2852,7 +2866,7 @@ msgid "Cannot update templated applications."
 msgstr "Impossible de mettre à jour une application provenant d'un modèle."
 
 #: include/classes/api/services/CTemplate.php:754
-#: include/classes/api/services/CTemplate.php:1090
+#: include/classes/api/services/CTemplate.php:1088
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Impossible de mettre à jour les modèles sur l'hôte découvert \"%1$s\"."
@@ -2906,8 +2920,8 @@ msgstr "Impossible de valider le test de découverte : requête invalide ou conn
 msgid "Case sensitive"
 msgstr "Sensible à la casse"
 
-#: app/views/administration.authentication.edit.php:52
-#: app/views/administration.authentication.edit.php:108
+#: app/views/administration.authentication.edit.php:53
+#: app/views/administration.authentication.edit.php:115
 msgid "Case sensitive login"
 msgstr "Connexion sensible à la casse"
 
@@ -2926,7 +2940,7 @@ msgstr "Reçoit tous les traps SNMP qui n'ont été reçus par aucun élément s
 #: include/views/js/monitoring.sysmaps.js.php:11
 #: include/views/monitoring.screen.constructor.edit.php:872
 msgid "Centre"
-msgstr ""
+msgstr "Centre"
 
 #: app/views/administration.proxy.edit.php:91
 #: app/views/administration.proxy.edit.php:99
@@ -2953,7 +2967,7 @@ msgctxt "verb"
 msgid "Change"
 msgstr "Changer"
 
-#: app/views/administration.authentication.edit.php:70
+#: app/views/administration.authentication.edit.php:72
 #: app/views/administration.mediatype.edit.php:138
 #: include/views/administration.users.edit.php:128
 msgid "Change password"
@@ -3348,7 +3362,7 @@ msgstr "Configuration des actions"
 msgid "Configuration of applications"
 msgstr "Configuration des applications"
 
-#: app/controllers/CControllerAuthenticationEdit.php:127
+#: app/controllers/CControllerAuthenticationEdit.php:120
 msgid "Configuration of authentication"
 msgstr "Configuration de l'authentification"
 
@@ -4304,7 +4318,7 @@ msgstr "Délai par défaut"
 msgid "Default host inventory mode"
 msgstr "Mode d'inventaire d'hôte par défaut"
 
-#: app/views/administration.authentication.edit.php:41
+#: app/views/administration.authentication.edit.php:42
 msgid "Default login form"
 msgstr "Formulaire de connexion par défaut"
 
@@ -4677,7 +4691,7 @@ msgstr "Supprimer le scénario web ?"
 msgid "Deleted"
 msgstr "Supprimé"
 
-#: include/classes/api/services/CHost.php:1305
+#: include/classes/api/services/CHost.php:1341
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Supprimé : Hôte \"%1$s\"."
@@ -5198,14 +5212,14 @@ msgstr "Dépendances en doublon dans le déclencheur \"%1$s\"."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Dépendances en doublon dans le prototype de déclencheur \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1641
-#: include/classes/api/services/CHost.php:1879
+#: include/classes/api/services/CHost.php:1677
+#: include/classes/api/services/CHost.php:1915
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Hôte en doublon. Un hôte avec le même nom d'hôte \"%s\" existe déjà."
 
-#: include/classes/api/services/CHost.php:1648
-#: include/classes/api/services/CHost.php:1899
+#: include/classes/api/services/CHost.php:1684
+#: include/classes/api/services/CHost.php:1935
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Hôte en doublon. Un hôte avec le même nom visible \"%s\" existe déjà."
@@ -5322,8 +5336,8 @@ msgstr "Valeur effective"
 msgid "Elasticsearch error: %1$s."
 msgstr "Erreur Elasticsearch : %1$s."
 
-#: include/classes/api/managers/CHistoryManager.php:652
-#: include/classes/api/managers/CHistoryManager.php:661
+#: include/classes/api/managers/CHistoryManager.php:713
+#: include/classes/api/managers/CHistoryManager.php:722
 #, c-format
 msgid "Elasticsearch url is not set for type: %1$s."
 msgstr "L'URL Elasticsearch n'est pas spécifié pour le type : %1$s."
@@ -5485,7 +5499,7 @@ msgstr "Activer"
 msgid "Enable HTTP authentication"
 msgstr "Activer l'authentification HTTP"
 
-#: app/views/administration.authentication.edit.php:77
+#: app/views/administration.authentication.edit.php:79
 msgid "Enable LDAP authentication"
 msgstr "Activer l'authentification LDAP"
 
@@ -5970,9 +5984,9 @@ msgstr "Le champ \"%1$s\" ne peut pas être configuré à NULL."
 #: include/classes/api/services/CDRule.php:318
 #: include/classes/api/services/CDRule.php:493
 #: include/classes/api/services/CDRule.php:503
-#: include/classes/api/services/CHostGroup.php:897
+#: include/classes/api/services/CHostGroup.php:914
 #: include/classes/api/services/CHost.php:743
-#: include/classes/api/services/CTemplate.php:784
+#: include/classes/api/services/CTemplate.php:782
 #: include/classes/api/services/CTriggerGeneral.php:236
 #: include/classes/validators/CNewValidator.php:255
 #: include/validate.inc.php:300
@@ -6584,12 +6598,12 @@ msgstr "Grille"
 msgid "Group"
 msgstr "Groupe"
 
-#: include/classes/api/services/CHostGroup.php:551
+#: include/classes/api/services/CHostGroup.php:715
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "Le groupe \"%1$s\" ne peut pas être effacé, car il est utilisé par un prototype d'hôte."
 
-#: include/classes/api/services/CHostGroup.php:600
+#: include/classes/api/services/CHostGroup.php:764
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr "Le groupe \"%1$s\" ne peut pas être effacé, car il est utilisé dans une condition de corrélation."
@@ -6681,7 +6695,7 @@ msgstr "Agent HTTP"
 msgid "HTTP authentication"
 msgstr "Authentification HTTP"
 
-#: app/views/administration.authentication.edit.php:44
+#: app/views/administration.authentication.edit.php:45
 msgid "HTTP login form"
 msgstr "Formulaire de connexion HTTP"
 
@@ -6693,7 +6707,7 @@ msgstr "Formulaire de connexion HTTP"
 msgid "HTTP proxy"
 msgstr "Proxy HTTP"
 
-#: app/views/administration.authentication.edit.php:136
+#: app/views/administration.authentication.edit.php:146
 msgid "HTTP settings"
 msgstr "Paramètres HTTP"
 
@@ -6909,10 +6923,10 @@ msgstr[1] "Hôtes"
 msgid "Host \"%1$s\" already exists."
 msgstr "L'hôte \"%1$s\" existe déjà."
 
-#: include/classes/api/services/CHostGroup.php:1449
+#: include/classes/api/services/CHostGroup.php:1466
 #: include/classes/api/services/CHost.php:806
-#: include/classes/api/services/CHost.php:1629
-#: include/classes/api/services/CHost.php:1805
+#: include/classes/api/services/CHost.php:1665
+#: include/classes/api/services/CHost.php:1841
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "L'hôte \"%1$s\" ne peut pas ne pas avoir de groupe d'hôte."
@@ -6983,17 +6997,17 @@ msgstr[1] "Hôtes désactivés"
 msgid "Host group"
 msgstr "Groupe d'hôtes"
 
-#: include/classes/api/services/CHostGroup.php:731
+#: include/classes/api/services/CHostGroup.php:643
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Le groupe d'hôtes \"%1$s\" existe déjà."
 
-#: include/classes/api/services/CHostGroup.php:584
+#: include/classes/api/services/CHostGroup.php:748
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Le groupe d'hôtes \"%1$s\" ne peut pas être effacé, car il est utilisé dans un script global."
 
-#: include/classes/api/services/CHostGroup.php:537
+#: include/classes/api/services/CHostGroup.php:701
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "Le groupe d'hôtes \"%1$s\" est interne et ne peut pas être effacé."
@@ -7171,25 +7185,25 @@ msgstr "Hôte mis à jour"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "L'hôte avec l'ID \"%1$s\" n'est pas disponible."
 
-#: include/classes/api/services/CTemplate.php:1056
+#: include/classes/api/services/CTemplate.php:1054
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Un hôte ayant le même nom \"%1$s\" existe déjà."
 
-#: include/classes/api/services/CHost.php:1736
-#: include/classes/api/services/CHost.php:1955
+#: include/classes/api/services/CHost.php:1772
+#: include/classes/api/services/CHost.php:1991
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Un hôte ayant le même nom \"%s\" existe déjà."
 
 #: include/classes/api/services/CTemplate.php:460
-#: include/classes/api/services/CTemplate.php:1021
+#: include/classes/api/services/CTemplate.php:1019
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Un hôte ayant le même nom visible \"%1$s\" existe déjà."
 
-#: include/classes/api/services/CHost.php:1742
-#: include/classes/api/services/CHost.php:1962
+#: include/classes/api/services/CHost.php:1778
+#: include/classes/api/services/CHost.php:1998
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Un hôte ayant le même nom visible \"%s\" existe déjà."
@@ -7533,6 +7547,10 @@ msgstr "Hôte inaccessible"
 msgid "Inaccessible item"
 msgstr "Élément inaccessible"
 
+#: include/classes/screens/CScreenProblem.php:393
+msgid "Inaccessible maintenance"
+msgstr "Maintenance inaccessible"
+
 #: app/controllers/CControllerDashboardWidgetEdit.php:103
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:84
 msgid "Inaccessible map"
@@ -7806,13 +7824,13 @@ msgstr "Arguments incorrects passés à la fonction"
 #: include/classes/api/services/CHostPrototype.php:392
 #: include/classes/api/services/CHostPrototype.php:413
 #: include/classes/api/services/CItemGeneral.php:258
-#: include/classes/api/services/CItemGeneral.php:1156
-#: include/classes/api/services/CItemGeneral.php:1174
-#: include/classes/api/services/CItemGeneral.php:1196
-#: include/classes/api/services/CItemGeneral.php:1222
-#: include/classes/api/services/CItemGeneral.php:1235
-#: include/classes/api/services/CItemGeneral.php:1264
-#: include/classes/api/services/CItemGeneral.php:1278
+#: include/classes/api/services/CItemGeneral.php:1247
+#: include/classes/api/services/CItemGeneral.php:1265
+#: include/classes/api/services/CItemGeneral.php:1287
+#: include/classes/api/services/CItemGeneral.php:1313
+#: include/classes/api/services/CItemGeneral.php:1326
+#: include/classes/api/services/CItemGeneral.php:1355
+#: include/classes/api/services/CItemGeneral.php:1369
 #: include/classes/api/services/CMapElement.php:46
 #: include/classes/api/services/CMapElement.php:117
 #: include/classes/api/services/CMapElement.php:129
@@ -7855,8 +7873,8 @@ msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Valeur de calcul de SLA incorrect pour le service \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:826
-#: include/classes/api/services/CHost.php:1617
-#: include/classes/api/services/CHost.php:1873
+#: include/classes/api/services/CHost.php:1653
+#: include/classes/api/services/CHost.php:1909
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Caractères incorrects utilisés pour le nom d'hôte \"%s\"."
@@ -7868,7 +7886,7 @@ msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Caractères incorrects utilisés pour le nom de proxy \"%1$s\"."
 
 #: include/classes/api/services/CTemplate.php:411
-#: include/classes/api/services/CTemplate.php:1064
+#: include/classes/api/services/CTemplate.php:1062
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Caractères incorrects utilisés pour le nom de modèle \"%1$s\"."
@@ -8010,8 +8028,8 @@ msgstr "Index d'image incorrect."
 #: include/classes/api/services/CAction.php:2820
 #: include/classes/api/services/CAction.php:2832
 #: include/classes/api/services/CHost.php:812
-#: include/classes/api/services/CHost.php:1611
-#: include/classes/api/services/CHost.php:1792
+#: include/classes/api/services/CHost.php:1647
+#: include/classes/api/services/CHost.php:1828
 #: include/classes/api/services/CImage.php:485
 #: include/classes/api/services/CProxy.php:618
 #: include/classes/api/services/CProxy.php:682
@@ -8034,8 +8052,8 @@ msgstr "Paramètre DNS de l'interface incorrect \"%s\"."
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Paramètre port de l'interface incorrect \"%s\"."
 
-#: include/classes/api/services/CHost.php:1711
-#: include/classes/api/services/CHost.php:1855
+#: include/classes/api/services/CHost.php:1747
+#: include/classes/api/services/CHost.php:1891
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Champ d'inventaire \"%s\" incorrect."
@@ -8230,8 +8248,8 @@ msgstr "Ordre de tri in correct pour le service \"%1$s\"."
 msgid "Incorrect source value."
 msgstr "Valeur source incorrecte."
 
-#: include/classes/api/services/CHost.php:1683
-#: include/classes/api/services/CHost.php:1823
+#: include/classes/api/services/CHost.php:1719
+#: include/classes/api/services/CHost.php:1859
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "État incorrect pour l'hôte \"%1$s\"."
@@ -8355,7 +8373,7 @@ msgstr "Groupe d'utilisateurs incorrect."
 #: include/classes/api/services/CDRule.php:558
 #: include/classes/api/services/CDRule.php:571
 #: include/classes/api/services/CItemGeneral.php:529
-#: include/classes/api/services/CItemGeneral.php:2027
+#: include/classes/api/services/CItemGeneral.php:1968
 #: include/classes/validators/CNewValidator.php:116
 #: include/classes/validators/CNewValidator.php:129
 #: include/classes/validators/CNewValidator.php:142
@@ -8370,7 +8388,7 @@ msgstr "Groupe d'utilisateurs incorrect."
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Valeur \"%1$s\" incorrecte pour le champ \"%2$s\"."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:132
+#: app/controllers/CControllerAuthenticationUpdate.php:134
 #: include/classes/api/services/CAction.php:1678
 #: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:351
@@ -8433,7 +8451,7 @@ msgstr "Valeur \"%1$s\" incorrecte dans le champ \"%2$s\" pour le type de média
 #: include/validate.inc.php:358
 #, c-format
 msgid "Incorrect value for \"%1$s\" field."
-msgstr ""
+msgstr "Valeur incorrecte pour le champ \"%1$s\"."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:95
 #: app/controllers/CControllerPopupHttpStep.php:103
@@ -8452,7 +8470,7 @@ msgstr ""
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
 #: include/classes/api/services/CDiscoveryRule.php:1134
-#: include/classes/api/services/CDiscoveryRule.php:1358
+#: include/classes/api/services/CDiscoveryRule.php:1307
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:214
@@ -8472,21 +8490,19 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:804
 #: include/classes/api/services/CEvent.php:847
 #: include/classes/api/services/CEvent.php:904
-#: include/classes/api/services/CHostGeneral.php:1023
-#: include/classes/api/services/CHostGeneral.php:1030
 #: include/classes/api/services/CHost.php:770
-#: include/classes/api/services/CHost.php:1515
-#: include/classes/api/services/CHost.php:1521
-#: include/classes/api/services/CHost.php:1536
-#: include/classes/api/services/CHost.php:1542
-#: include/classes/api/services/CHost.php:1547
-#: include/classes/api/services/CHost.php:1553
-#: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1567
-#: include/classes/api/services/CHost.php:1576
-#: include/classes/api/services/CHost.php:1582
-#: include/classes/api/services/CHost.php:1677
-#: include/classes/api/services/CHost.php:1817
+#: include/classes/api/services/CHost.php:1551
+#: include/classes/api/services/CHost.php:1557
+#: include/classes/api/services/CHost.php:1572
+#: include/classes/api/services/CHost.php:1578
+#: include/classes/api/services/CHost.php:1583
+#: include/classes/api/services/CHost.php:1589
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1612
+#: include/classes/api/services/CHost.php:1618
+#: include/classes/api/services/CHost.php:1713
+#: include/classes/api/services/CHost.php:1853
 #: include/classes/api/services/CHttpTest.php:969
 #: include/classes/api/services/CHttpTest.php:984
 #: include/classes/api/services/CHttpTest.php:1080
@@ -8500,31 +8516,27 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:517
 #: include/classes/api/services/CItemGeneral.php:523
 #: include/classes/api/services/CItemGeneral.php:536
-#: include/classes/api/services/CItemGeneral.php:1179
-#: include/classes/api/services/CItemGeneral.php:1185
-#: include/classes/api/services/CItemGeneral.php:1200
-#: include/classes/api/services/CItemGeneral.php:1209
-#: include/classes/api/services/CItemGeneral.php:1227
-#: include/classes/api/services/CItemGeneral.php:1240
-#: include/classes/api/services/CItemGeneral.php:1247
-#: include/classes/api/services/CItemGeneral.php:1253
-#: include/classes/api/services/CItemGeneral.php:1269
-#: include/classes/api/services/CItemGeneral.php:1283
-#: include/classes/api/services/CItemGeneral.php:1509
-#: include/classes/api/services/CItemGeneral.php:1550
-#: include/classes/api/services/CItemGeneral.php:1556
-#: include/classes/api/services/CItemGeneral.php:1573
-#: include/classes/api/services/CItemGeneral.php:1580
-#: include/classes/api/services/CItemGeneral.php:1586
-#: include/classes/api/services/CItemGeneral.php:1671
-#: include/classes/api/services/CItemGeneral.php:1680
-#: include/classes/api/services/CItemGeneral.php:1793
-#: include/classes/api/services/CItemGeneral.php:1800
-#: include/classes/api/services/CItemGeneral.php:1966
-#: include/classes/api/services/CItem.php:774
-#: include/classes/api/services/CItem.php:782
-#: include/classes/api/services/CItemPrototype.php:944
-#: include/classes/api/services/CItemPrototype.php:952
+#: include/classes/api/services/CItemGeneral.php:1270
+#: include/classes/api/services/CItemGeneral.php:1276
+#: include/classes/api/services/CItemGeneral.php:1291
+#: include/classes/api/services/CItemGeneral.php:1300
+#: include/classes/api/services/CItemGeneral.php:1318
+#: include/classes/api/services/CItemGeneral.php:1331
+#: include/classes/api/services/CItemGeneral.php:1338
+#: include/classes/api/services/CItemGeneral.php:1344
+#: include/classes/api/services/CItemGeneral.php:1360
+#: include/classes/api/services/CItemGeneral.php:1374
+#: include/classes/api/services/CItemGeneral.php:1609
+#: include/classes/api/services/CItemGeneral.php:1629
+#: include/classes/api/services/CItemGeneral.php:1636
+#: include/classes/api/services/CItemGeneral.php:1646
+#: include/classes/api/services/CItemGeneral.php:1726
+#: include/classes/api/services/CItemGeneral.php:1740
+#: include/classes/api/services/CItemGeneral.php:1907
+#: include/classes/api/services/CItem.php:772
+#: include/classes/api/services/CItem.php:780
+#: include/classes/api/services/CItemPrototype.php:943
+#: include/classes/api/services/CItemPrototype.php:951
 #: include/classes/api/services/CMaintenance.php:468
 #: include/classes/api/services/CMaintenance.php:637
 #: include/classes/api/services/CMapElement.php:101
@@ -8608,7 +8620,7 @@ msgstr ""
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "Valeur incorrecte pour le champ \"%1$s\" : %2$s."
 
-#: app/controllers/CControllerAuthenticationUpdate.php:124
+#: app/controllers/CControllerAuthenticationUpdate.php:126
 #: app/controllers/CControllerPopupTriggerWizard.php:125
 #: include/validate.inc.php:346
 #, c-format
@@ -8934,11 +8946,11 @@ msgstr "Nombre de paramètres invalide."
 #: app/controllers/CControllerDashboardUpdate.php:125
 #: app/controllers/CControllerDashboardUpdate.php:134
 #: app/controllers/CControllerDashboardUpdate.php:142
-#: include/classes/api/services/CItemGeneral.php:1982
-#: include/classes/api/services/CItemGeneral.php:1989
-#: include/classes/api/services/CItemGeneral.php:1997
-#: include/classes/api/services/CItemGeneral.php:2006
-#: include/classes/api/services/CItemGeneral.php:2013
+#: include/classes/api/services/CItemGeneral.php:1923
+#: include/classes/api/services/CItemGeneral.php:1930
+#: include/classes/api/services/CItemGeneral.php:1938
+#: include/classes/api/services/CItemGeneral.php:1947
+#: include/classes/api/services/CItemGeneral.php:1954
 #: include/classes/api/services/CUser.php:649
 #: include/classes/api/services/CUser.php:660
 #: include/classes/validators/CApiInputValidator.php:230
@@ -9149,7 +9161,7 @@ msgstr "L'élément \"%1$s\" existe déjà sur \"%2$s\", hérité depuis un autr
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
 msgstr "L'élément \"%1$s\" existe déjà sur \"%2$s\"."
 
-#: include/classes/api/services/CItem.php:954
+#: include/classes/api/services/CItem.php:891
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "L'élément \"%1$s\" ne peut pas remplir le champ d'inventair numéro \"%2$d\" manquant. Les choix sont : de 0 (ne pas remplir) à %3$d."
@@ -9159,8 +9171,8 @@ msgstr "L'élément \"%1$s\" ne peut pas remplir le champ d'inventair numéro \"
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "L'élément \"%1$s\" n'existe pas dans le modèle \"%2$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1359
-#: include/classes/api/services/CItemGeneral.php:1510
+#: include/classes/api/services/CDiscoveryRule.php:1308
+#: include/classes/api/services/CItemGeneral.php:1610
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "L’élément \"%1$s\" n'existe pas ou vous n'avez pas accès à cet élément"
@@ -9218,7 +9230,7 @@ msgstr "Élément dans l'état \"non supporté\""
 msgid "Item not selected"
 msgstr "Élément non sélectionné"
 
-#: include/classes/api/services/CItemGeneral.php:1169
+#: include/classes/api/services/CItemGeneral.php:1260
 #, c-format
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr "Des paramètres manquent au prétraitement de l'élément: %1$s"
@@ -9237,7 +9249,7 @@ msgstr "Prototype de l'élément"
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Le prototype d'élément \"%1$s\" existe déjà sur \"%2$s\", hérité d'un autre modèle."
 
-#: include/classes/api/services/CItemGeneral.php:1006
+#: include/classes/api/services/CItemGeneral.php:1040
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", linked to another rule."
 msgstr "Le prototype d’élément \"%1$s\" existe déjà sur \"%2$s\", lié à une autre règle."
@@ -9312,32 +9324,32 @@ msgstr "L'élément ne sera pas rafraîchi. L'intervalle de mise à jour devrait
 msgid "Item with ID \"%1$s\" is not available."
 msgstr "L’élément avec l'ID \"%1$s\" n'est pas disponible."
 
-#: include/classes/api/services/CItemGeneral.php:721
+#: include/classes/api/services/CItemGeneral.php:668
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme règle de découverte."
 
-#: include/classes/api/services/CItemGeneral.php:727
+#: include/classes/api/services/CItemGeneral.php:674
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément créé d'un prototype d'élément."
 
-#: include/classes/api/services/CItemGeneral.php:724
+#: include/classes/api/services/CItemGeneral.php:671
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme prototype d'élément."
 
-#: include/classes/api/services/CItemGeneral.php:718
+#: include/classes/api/services/CItemGeneral.php:665
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément."
 
-#: include/classes/api/services/CItemGeneral.php:730
+#: include/classes/api/services/CItemGeneral.php:677
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément inconnu."
 
-#: include/classes/api/services/CItemGeneral.php:1402
+#: include/classes/api/services/CItemGeneral.php:1493
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\"."
@@ -9527,7 +9539,7 @@ msgstr "LDAP"
 msgid "LDAP authentication"
 msgstr "Authentification LDAP"
 
-#: app/views/administration.authentication.edit.php:83
+#: app/views/administration.authentication.edit.php:86
 msgid "LDAP host"
 msgstr "Hôte LDAP"
 
@@ -9535,11 +9547,11 @@ msgstr "Hôte LDAP"
 msgid "LDAP is not configured"
 msgstr "LDAP n'est pas configuré"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:180
+#: app/controllers/CControllerAuthenticationUpdate.php:182
 msgid "LDAP login successful"
 msgstr "Connexion LDAP réussie"
 
-#: app/views/administration.authentication.edit.php:137
+#: app/views/administration.authentication.edit.php:147
 msgid "LDAP settings"
 msgstr "Paramètres LDAP"
 
@@ -9900,7 +9912,7 @@ msgstr "Format de l'horodatage du journal"
 msgid "Log unmatched SNMP traps"
 msgstr "Enregistrer les traps SNMP non appariés"
 
-#: app/views/administration.authentication.edit.php:115 auditlogs.php:138
+#: app/views/administration.authentication.edit.php:123 auditlogs.php:138
 #: include/func.inc.php:1826 include/func.inc.php:1841
 #: include/menu.inc.php:292 include/views/administration.auditlogs.list.php:44
 #: include/views/administration.users.list.php:89 index_http.php:91
@@ -11188,8 +11200,8 @@ msgstr "Aucune interface trouvée."
 msgid "No interface provided for proxy \"%s\"."
 msgstr "Aucune interface fournie pour le proxy \"%s\"."
 
-#: include/classes/api/services/CHost.php:1690
-#: include/classes/api/services/CHost.php:1866
+#: include/classes/api/services/CHost.php:1726
+#: include/classes/api/services/CHost.php:1902
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "Aucune interface pour l'hôte \"%s\"."
@@ -11287,21 +11299,21 @@ msgstr "Aucune permission pour l'accès au système."
 #: include/classes/api/services/CGraphPrototype.php:717
 #: include/classes/api/services/CHostBase.php:49
 #: include/classes/api/services/CHostGeneral.php:56
-#: include/classes/api/services/CHostGroup.php:532
-#: include/classes/api/services/CHostGroup.php:788
-#: include/classes/api/services/CHostGroup.php:1027
-#: include/classes/api/services/CHostGroup.php:1058
-#: include/classes/api/services/CHostGroup.php:1159
-#: include/classes/api/services/CHostGroup.php:1281
-#: include/classes/api/services/CHostGroup.php:1301
+#: include/classes/api/services/CHostGroup.php:696
+#: include/classes/api/services/CHostGroup.php:805
+#: include/classes/api/services/CHostGroup.php:1044
+#: include/classes/api/services/CHostGroup.php:1075
+#: include/classes/api/services/CHostGroup.php:1176
+#: include/classes/api/services/CHostGroup.php:1298
+#: include/classes/api/services/CHostGroup.php:1318
 #: include/classes/api/services/CHostInterface.php:239
 #: include/classes/api/services/CHostInterface.php:259
 #: include/classes/api/services/CHostInterface.php:394
 #: include/classes/api/services/CHostInterface.php:653
 #: include/classes/api/services/CHost.php:1122
 #: include/classes/api/services/CHost.php:1157
-#: include/classes/api/services/CHost.php:1666
-#: include/classes/api/services/CHost.php:1798
+#: include/classes/api/services/CHost.php:1702
+#: include/classes/api/services/CHost.php:1834
 #: include/classes/api/services/CHostPrototype.php:353
 #: include/classes/api/services/CHostPrototype.php:399
 #: include/classes/api/services/CHostPrototype.php:420
@@ -11321,8 +11333,8 @@ msgstr "Aucune permission pour l'accès au système."
 #: include/classes/api/services/CItemGeneral.php:209
 #: include/classes/api/services/CItemGeneral.php:311
 #: include/classes/api/services/CItemGeneral.php:326
-#: include/classes/api/services/CItem.php:699
-#: include/classes/api/services/CItemPrototype.php:869
+#: include/classes/api/services/CItem.php:697
+#: include/classes/api/services/CItemPrototype.php:868
 #: include/classes/api/services/CMaintenance.php:263
 #: include/classes/api/services/CMaintenance.php:292
 #: include/classes/api/services/CMaintenance.php:305
@@ -11846,7 +11858,7 @@ msgstr "Une fois"
 msgid "One"
 msgstr "Un"
 
-#: include/classes/api/services/CHostGroup.php:1169
+#: include/classes/api/services/CHostGroup.php:1186
 msgid "One of the objects is left without a host group."
 msgstr "Un des objets reste sans groupe d'hôtes."
 
@@ -11859,7 +11871,7 @@ msgstr "Une fois uniquement"
 msgid "One-time downtime"
 msgstr "Temps d'arrêt unique"
 
-#: include/classes/api/services/CHostGroup.php:743
+#: include/classes/api/services/CHostGroup.php:655
 msgid "Only Super Admins can create host groups."
 msgstr "Seuls les super administrateurs peuvent créer des groupes d'hôtes."
 
@@ -11909,7 +11921,7 @@ msgstr "Seuls les administrateurs peuvent configurer le propriétaire du diapora
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Seuls les éléments assignés à des hôtes activés sont comptés"
 
-#: include/classes/api/services/CItemGeneral.php:1289
+#: include/classes/api/services/CItemGeneral.php:1380
 msgid "Only one change step is allowed."
 msgstr "Seule une étape de changement est autorisée."
 
@@ -12627,7 +12639,7 @@ msgstr "Polonais (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Remplit le champ d'inventaire d'hôte"
 
-#: app/views/administration.authentication.edit.php:88
+#: app/views/administration.authentication.edit.php:92
 #: app/views/administration.proxy.edit.php:43 disc_prototypes.php:105
 #: host_discovery.php:105 include/classes/setup/CSetupWizard.php:279
 #: include/forms.inc.php:472 include/views/configuration.action.edit.php:995
@@ -13318,7 +13330,7 @@ msgstr "Commande à distance"
 msgid "Remove"
 msgstr "Supprimer"
 
-#: app/views/administration.authentication.edit.php:47
+#: app/views/administration.authentication.edit.php:48
 msgid "Remove domain name"
 msgstr "Supprimer le nom de domaine"
 
@@ -14085,7 +14097,7 @@ msgstr "Scripts"
 msgid "Search"
 msgstr "Recherche"
 
-#: app/views/administration.authentication.edit.php:98
+#: app/views/administration.authentication.edit.php:104
 msgid "Search attribute"
 msgstr "Attribut recherché"
 
@@ -15328,9 +15340,9 @@ msgstr "Modèle"
 msgid "Template \"%1$s\" already exists."
 msgstr "Le modèle \"%1$s\" existe déjà."
 
-#: include/classes/api/services/CHostGroup.php:1454
+#: include/classes/api/services/CHostGroup.php:1471
 #: include/classes/api/services/CTemplate.php:368
-#: include/classes/api/services/CTemplate.php:988
+#: include/classes/api/services/CTemplate.php:986
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "Le modèle \"%1$s\" ne peut pas ne pas avoir de groupe d'hôte."
@@ -15390,25 +15402,25 @@ msgstr "Modèle mis à jour"
 msgid "Template value"
 msgstr "Valeur du modèle"
 
-#: include/classes/api/services/CTemplate.php:1043
+#: include/classes/api/services/CTemplate.php:1041
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Un modèle avec le même nom \"%1$s\" existe déjà."
 
-#: include/classes/api/services/CHost.php:1757
-#: include/classes/api/services/CHost.php:1980
+#: include/classes/api/services/CHost.php:1793
+#: include/classes/api/services/CHost.php:2016
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Un modèle avec le même nom \"%s\" existe déjà."
 
 #: include/classes/api/services/CTemplate.php:447
-#: include/classes/api/services/CTemplate.php:1008
+#: include/classes/api/services/CTemplate.php:1006
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Un modèle avec le même nom visible \"%1$s\" existe déjà."
 
-#: include/classes/api/services/CHost.php:1763
-#: include/classes/api/services/CHost.php:1988
+#: include/classes/api/services/CHost.php:1799
+#: include/classes/api/services/CHost.php:2024
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Un modèle avec le même nom visible \"%s\" existe déjà."
@@ -15441,7 +15453,7 @@ msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Les modèles \"%1$s\" sont déliés de l'hôte \"%2$s\"."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:147
-#: app/views/administration.authentication.edit.php:140
+#: app/views/administration.authentication.edit.php:150
 #: app/views/popup.testtriggerexpr.php:110
 #: include/views/administration.general.regularexpressions.edit.php:139
 #: include/views/configuration.trigger.prototype.edit.php:239
@@ -15451,7 +15463,7 @@ msgstr "Les modèles \"%1$s\" sont déliés de l'hôte \"%2$s\"."
 msgid "Test"
 msgstr "Test"
 
-#: app/views/administration.authentication.edit.php:114
+#: app/views/administration.authentication.edit.php:122
 msgid "Test authentication"
 msgstr "Tester l'authentification"
 
@@ -16111,7 +16123,7 @@ msgstr "Mardi"
 msgid "Turkish (tr_TR)"
 msgstr "Turc (tr_TR)"
 
-#: include/classes/api/services/CItem.php:1015
+#: include/classes/api/services/CItem.php:952
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Deux éléments (\"%1$s\" et \"%2$s\") ne peuvent pas remplir un champ d'inventaire d'hôte \"%3$s\", cela mènerait à un conflit."
@@ -16431,42 +16443,42 @@ msgstr "Supprimer lien au modèle"
 msgid "Unlink from templates"
 msgstr "Supprimer lien aux modèles"
 
-#: include/classes/api/services/CHostGeneral.php:630
+#: include/classes/api/services/CHostGeneral.php:626
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Déliée : Application \"%1$s\" sur \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:376
+#: include/classes/api/services/CHostGeneral.php:372
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Déliée : Règle de découverte \"%1$s\" sur \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:533
+#: include/classes/api/services/CHostGeneral.php:529
 #, c-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Délié : Graphique \"%1$s\" sur \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:517
+#: include/classes/api/services/CHostGeneral.php:513
 #, c-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "Délié : Prototype de graphique \"%1$s\" sur \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:466
+#: include/classes/api/services/CHostGeneral.php:462
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Délié : Prototype d'hôte \"%1$s\" sur \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:392
+#: include/classes/api/services/CHostGeneral.php:388
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Délié : Élément \"%1$s\" sur \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:411
+#: include/classes/api/services/CHostGeneral.php:407
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Délié : Prototype d'élément \"%1$s\" sur \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:572
+#: include/classes/api/services/CHostGeneral.php:568
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Délié : Scénario web \"%1$s\" sur \"%2$s\"."
@@ -16515,7 +16527,7 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Fonctionne"
 
-#: app/views/administration.authentication.edit.php:139
+#: app/views/administration.authentication.edit.php:149
 #: app/views/administration.mediatype.edit.php:233
 #: app/views/administration.proxy.edit.php:132
 #: app/views/administration.script.edit.php:127
@@ -16623,7 +16635,7 @@ msgstr "Mis à jour : %s"
 msgid "Upload"
 msgstr "Télécharger"
 
-#: include/html.inc.php:542 include/html.inc.php:555
+#: include/html.inc.php:542 include/html.inc.php:545
 msgid "Upper level maps"
 msgstr "Cartes de niveau supérieur"
 
@@ -16844,7 +16856,7 @@ msgstr "Menu utilisateur"
 msgid "User name"
 msgstr "Nom d'utilisateur"
 
-#: app/views/administration.authentication.edit.php:120
+#: app/views/administration.authentication.edit.php:129
 msgid "User password"
 msgstr "Mot de passe de l'utilisateur"
 
@@ -17322,7 +17334,7 @@ msgstr "Taille de l'espace virtuel en octets ou en pourcentage du toutal. Retour
 msgid "Visible name"
 msgstr "Nom visible"
 
-#: include/classes/api/services/CHost.php:1891
+#: include/classes/api/services/CHost.php:1927
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Le nom visible ne peut pas être vide si le nom d'hôte est manquant."
 
@@ -17526,8 +17538,8 @@ msgstr "Écriture"
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Champs incorrects pour une dépendance du service \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1605
-#: include/classes/api/services/CHost.php:1786
+#: include/classes/api/services/CHost.php:1641
+#: include/classes/api/services/CHost.php:1822
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Champs incorrects pour l'hôte \"%1$s\"."
@@ -17617,7 +17629,7 @@ msgstr "XPath XML"
 msgid "XML data"
 msgstr "Données XML"
 
-#: include/classes/api/services/CItemGeneral.php:2043
+#: include/classes/api/services/CItemGeneral.php:1984
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
 msgstr "Le XML est vide"
@@ -17772,8 +17784,8 @@ msgstr "Vous n'avez pas spécifié les cibles pour le script global d'opération
 #: include/classes/api/services/CTemplate.php:388
 #: include/classes/api/services/CTemplate.php:529
 #: include/classes/api/services/CTemplate.php:561
-#: include/classes/api/services/CTemplate.php:980
-#: include/classes/api/services/CTemplate.php:1085
+#: include/classes/api/services/CTemplate.php:978
+#: include/classes/api/services/CTemplate.php:1083
 #: include/classes/api/services/CUserMacro.php:266
 #: include/classes/api/services/CUserMacro.php:350
 #: include/classes/api/services/CUserMacro.php:443
@@ -17857,7 +17869,7 @@ msgstr "Zabbix interne"
 msgid "Zabbix internal authentication"
 msgstr "Authentification Zabbix interne"
 
-#: app/views/administration.authentication.edit.php:43
+#: app/views/administration.authentication.edit.php:44
 msgid "Zabbix login form"
 msgstr "Formulaire de connexion Zabbix"
 
@@ -17963,7 +17975,7 @@ msgid "a number is too large"
 msgstr "un nombre est trop grand"
 
 #: include/classes/api/services/CDRule.php:320
-#: include/classes/api/services/CItemGeneral.php:1210
+#: include/classes/api/services/CItemGeneral.php:1301
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
 msgstr "une valeur numérique est attendue"
@@ -18032,8 +18044,8 @@ msgstr "tous les médias"
 
 #: include/classes/api/services/CDRule.php:463
 #: include/classes/api/services/CDRule.php:470
-#: include/classes/api/services/CItemGeneral.php:1982
-#: include/classes/api/services/CItemGeneral.php:2006
+#: include/classes/api/services/CItemGeneral.php:1923
+#: include/classes/api/services/CItemGeneral.php:1947
 #: include/classes/import/validators/CXmlValidatorGeneral.php:207
 #: include/classes/validators/CApiInputValidator.php:370
 #: include/classes/validators/CApiInputValidator.php:508
@@ -18052,7 +18064,7 @@ msgstr "un tableau ou une chaîne de caractères est attendu"
 msgid "an empty string is expected"
 msgstr "une chaîne vie est attendue"
 
-#: include/classes/api/services/CHost.php:1548
+#: include/classes/api/services/CHost.php:1584
 msgid "an even number of hexadecimal characters is expected"
 msgstr "un nombre pair de caractères hexadécimaux est nécessaire"
 
@@ -18150,17 +18162,17 @@ msgstr "ne peut pas être changé"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:512
 #: include/classes/api/services/CEvent.php:847
-#: include/classes/api/services/CHost.php:1536
-#: include/classes/api/services/CHost.php:1542
+#: include/classes/api/services/CHost.php:1572
+#: include/classes/api/services/CHost.php:1578
 #: include/classes/api/services/CHttpTest.php:984
 #: include/classes/api/services/CItemGeneral.php:485
 #: include/classes/api/services/CItemGeneral.php:512
 #: include/classes/api/services/CItemGeneral.php:518
 #: include/classes/api/services/CItemGeneral.php:524
-#: include/classes/api/services/CItemGeneral.php:1179
-#: include/classes/api/services/CItemGeneral.php:1200
-#: include/classes/api/services/CItemGeneral.php:1227
-#: include/classes/api/services/CItemGeneral.php:1240
+#: include/classes/api/services/CItemGeneral.php:1270
+#: include/classes/api/services/CItemGeneral.php:1291
+#: include/classes/api/services/CItemGeneral.php:1318
+#: include/classes/api/services/CItemGeneral.php:1331
 #: include/classes/api/services/CMapElement.php:122
 #: include/classes/api/services/CMapElement.php:147
 #: include/classes/api/services/CMapElement.php:185
@@ -18193,7 +18205,7 @@ msgstr "ne peut pas être changé"
 msgid "cannot be empty"
 msgstr "ne peut pas être vide"
 
-#: include/classes/api/services/CItemGeneral.php:1998
+#: include/classes/api/services/CItemGeneral.php:1939
 msgid "cannot convert to JSON, result value too long"
 msgstr "impossible de convertir en JSON, la valeur du résultat est trop longue"
 
@@ -18210,10 +18222,7 @@ msgstr "change () - Différence entre valeur précédente et précédente"
 msgid "check expression starting from \"%1$s\""
 msgstr "vérifiez l'expression à partir de \"%1$s\""
 
-#: include/classes/api/services/CHostGeneral.php:1024
-#: include/classes/api/services/CItemGeneral.php:1551
-#: include/classes/api/services/CItemGeneral.php:1557
-#: include/classes/api/services/CItemGeneral.php:1794
+#: include/classes/api/services/CItemGeneral.php:1647
 #: include/classes/import/CConfigurationImport.php:2611
 msgid "circular item dependency is not allowed"
 msgstr "la dépendance d'élément circulaire n'est pas autorisée"
@@ -18347,7 +18356,7 @@ msgstr "impossible de parcourir le JSON"
 msgid "first"
 msgstr "premier"
 
-#: include/classes/api/services/CItemGeneral.php:1248
+#: include/classes/api/services/CItemGeneral.php:1339
 msgid "first parameter is expected"
 msgstr "le premier paramètre est nécessaire"
 
@@ -18406,7 +18415,7 @@ msgstr "l'hôte n'est pas supervisé"
 msgid "host pattern"
 msgstr "modèle d'hôte"
 
-#: include/classes/api/services/CItemGeneral.php:1574
+#: include/classes/api/services/CItemGeneral.php:1630
 msgid "hostid of dependent item and master item should match"
 msgstr "l'hostid de l'élément dépendant et de l'élément principal doivent correspondre"
 
@@ -18604,14 +18613,11 @@ msgstr "max"
 msgid "max() - Maximum value for period T"
 msgstr "max () - Valeur maximale pour la période T"
 
-#: include/classes/api/services/CItemGeneral.php:1672
+#: include/classes/api/services/CItemGeneral.php:1741
 msgid "maximum dependent items count reached"
 msgstr "nombre maximal d'éléments dépendants atteint"
 
-#: include/classes/api/services/CHostGeneral.php:1031
-#: include/classes/api/services/CItemGeneral.php:1587
-#: include/classes/api/services/CItemGeneral.php:1681
-#: include/classes/api/services/CItemGeneral.php:1801
+#: include/classes/api/services/CItemGeneral.php:1727
 #: include/classes/import/CConfigurationImport.php:2565
 #: include/classes/import/CConfigurationImport.php:2626
 msgid "maximum number of dependency levels reached"
@@ -18629,7 +18635,7 @@ msgstr "min"
 msgid "min() - Minimum value for period T"
 msgstr "min () - Valeur minimale pour la période T"
 
-#: include/classes/api/services/CHost.php:1554
+#: include/classes/api/services/CHost.php:1590
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "la longueur minimale est de %1$s caractères"
@@ -18644,7 +18650,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
 
-#: app/views/administration.authentication.edit.php:114
+#: app/views/administration.authentication.edit.php:122
 msgid "must be a valid LDAP user"
 msgstr "doit être un utilisateur LDAP correct"
 
@@ -18705,8 +18711,8 @@ msgstr "nodata () - Aucune donnée reçue pendant la période de temps T (1 - vr
 msgid "none"
 msgstr "aucun"
 
-#: include/classes/api/services/CItemGeneral.php:1989
-#: include/classes/api/services/CItemGeneral.php:2013
+#: include/classes/api/services/CItemGeneral.php:1930
+#: include/classes/api/services/CItemGeneral.php:1954
 msgid "nonempty key and value pair expected"
 msgstr "clé et paire de valeurs non vide attendues"
 
@@ -18861,7 +18867,7 @@ msgstr "droite"
 msgid "root"
 msgstr "racine"
 
-#: include/classes/api/services/CItemGeneral.php:1581
+#: include/classes/api/services/CItemGeneral.php:1637
 msgid "ruleid of dependent item and master item should match"
 msgstr "ruleid de l'élément dépendant et de l'élément maître doit correspondre"
 
@@ -18875,7 +18881,7 @@ msgctxt "adjective"
 msgid "second"
 msgstr "second"
 
-#: include/classes/api/services/CItemGeneral.php:1254
+#: include/classes/api/services/CItemGeneral.php:1345
 msgid "second parameter is expected"
 msgstr "un second paramètre est nécessaire"
 
@@ -18887,17 +18893,17 @@ msgstr "sélectionné"
 msgid "short description"
 msgstr "description courte"
 
-#: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1567
-#: include/classes/api/services/CHost.php:1576
-#: include/classes/api/services/CHost.php:1582
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1612
+#: include/classes/api/services/CHost.php:1618
 #: include/classes/api/services/CHttpTest.php:969
 #: include/classes/api/services/CHttpTest.php:1080
 #: include/classes/api/services/CItemGeneral.php:499
 #: include/classes/api/services/CItemGeneral.php:537
-#: include/classes/api/services/CItemGeneral.php:1269
-#: include/classes/api/services/CItemGeneral.php:1283
-#: include/classes/api/services/CItemGeneral.php:1966
+#: include/classes/api/services/CItemGeneral.php:1360
+#: include/classes/api/services/CItemGeneral.php:1374
+#: include/classes/api/services/CItemGeneral.php:1907
 #: include/classes/api/services/CMaintenance.php:468
 #: include/classes/api/services/CMaintenance.php:637
 #: include/classes/api/services/CProxy.php:661
@@ -19058,9 +19064,9 @@ msgstr "texte \"%1$s\" inattendu"
 
 #: include/classes/api/services/CEvent.php:805
 #: include/classes/api/services/CEvent.php:905
-#: include/classes/api/services/CHost.php:1516
-#: include/classes/api/services/CHost.php:1522
-#: include/classes/api/services/CItemGeneral.php:1186
+#: include/classes/api/services/CHost.php:1552
+#: include/classes/api/services/CHost.php:1558
+#: include/classes/api/services/CItemGeneral.php:1277
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
 #: include/classes/api/services/CTriggerGeneral.php:574
@@ -19146,8 +19152,8 @@ msgid "value is too long"
 msgstr "la valeur est trop longue"
 
 #: include/classes/api/services/CHost.php:771
-#: include/classes/api/services/CHost.php:1678
-#: include/classes/api/services/CHost.php:1818
+#: include/classes/api/services/CHost.php:1714
+#: include/classes/api/services/CHost.php:1854
 #: include/classes/api/services/CMapElement.php:102
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681
