@@ -304,7 +304,9 @@
 		<!-- Build Zabbix with cmocka tests -->
 		<delete dir="tests_results"/>
 		<mkdir dir="tests_results"/>
-		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./bootstrap.sh" failonerror="on">
+			<arg line="tests"/>
+		</exec>
 		<propertyselector property="conf.list" delimiter="," match="cmocka-(.*)" select="\1"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
 		<for list="${conf.list}" param="name" delimiter=",">
@@ -324,7 +326,9 @@
 			<arg line="src"/>
 			<arg line="-zerocounters"/>
 		</exec>
-		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./bootstrap.sh" failonerror="on">
+			<arg line="tests"/>
+		</exec>
 		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql" conf-name="gen-test-coverage-report"/>
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
