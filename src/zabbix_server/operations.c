@@ -31,7 +31,8 @@ typedef enum
 	ZBX_DISCOVERY_DNS,
 	ZBX_DISCOVERY_IP,
 	ZBX_DISCOVERY_VALUE
-}zbx_discovery_type_t;
+}
+zbx_discovery_type_t;
 
 /******************************************************************************
  *                                                                            *
