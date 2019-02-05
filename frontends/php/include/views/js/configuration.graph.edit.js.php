@@ -86,7 +86,7 @@
 		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 	<?php endif ?>
 	<td>
-		<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false)->toString() ?>
+		<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
 	</td>
 	<?php if (!$readonly): ?>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">

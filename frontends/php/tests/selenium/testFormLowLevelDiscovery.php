@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -997,7 +997,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "".'
 					]
 				]
 			],
@@ -1012,7 +1012,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-11,00:00-24:00".'
 					]
 				]
 			],
@@ -1027,7 +1027,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,00:00-25:00".'
 					]
 				]
 			],
@@ -1042,7 +1042,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,24:00-00:00".'
 					]
 				]
 			],
@@ -1785,7 +1785,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'JMX agent'])) {
 				$this->zbxTestClick('check_now');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
-				$this->zbxTestCheckFatalErrors();
 			}
 			else {
 				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
@@ -1826,7 +1825,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 	}
 
-		public static function getCreateFiltersData() {
+		public static function getFiltersTabData() {
 			return [
 				[
 					[
@@ -1887,9 +1886,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 
 	/**
-	 * @dataProvider getCreateFiltersData
+	 * Test creation of a discovery rule with data filling in Filters tab.
+	 *
+	 * @dataProvider getFiltersTabData
 	 */
-	public function testFormLowLevelDiscovery_CreateFiltersMacros($data) {
+	public function testFormLowLevelDiscovery_FiltersTab($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
@@ -1914,13 +1915,12 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestClickWait('add');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created');
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextPresent($data['name']);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
 	}
 
-	public static function getCreateFiltersMacrosValidationData() {
+	public static function getFiltersTabValidationData() {
 		return [
 			[
 				[
@@ -2028,9 +2028,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	}
 
 	/**
-	 * @dataProvider getCreateFiltersMacrosValidationData
+	 * @dataProvider getFiltersTabValidationData
 	 */
-	public function testFormLowLevelDiscovery_FiltersMacrosValidation($data) {
+	public function testFormLowLevelDiscovery_FiltersTabValidation($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
@@ -2056,8 +2056,182 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add discovery rule');
 		$this->zbxTestTextPresentInMessageDetails($data['error_message']);
-		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
+	}
+
+	public function getLLDMacrosTabData() {
+		return [
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Macro with empty path',
+					'key' => 'macro-with-empty-path',
+					'macros' => [
+						['macro' => '{#MACRO}', 'path'=>''],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Macro without #',
+					'key' => 'macro-without-hash',
+					'macros' => [
+						['macro' => '{MACRO}', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Macro with cyrillic symbols',
+					'key' => 'macro-with-cyrillic-symbols',
+					'macros' => [
+						['macro' => '{#МАКРО}', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Macro with special symbols',
+					'key' => 'macro-with-with-special-symbols',
+					'macros' => [
+						['macro' => '{#MACRO!@$%^&*()_+|?}', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'LLD with empty macro',
+					'key' => 'lld-with-empty-macro',
+					'macros' => [
+						['macro' => '', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'LLD with context macro',
+					'key' => 'lld-with-context-macro',
+					'macros' => [
+						['macro' => '{$MACRO:A}', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'LLD with two equal macros',
+					'key' => 'lld-with-two-equal-macros',
+					'macros' => [
+						['macro' => '{#MACRO}', 'path'=>'$.path.a'],
+						['macro' => '{#MACRO}', 'path'=>'$.path.b'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2/lld_macro": value "{#MACRO}" already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'LLD with valid macro and path',
+					'key' => 'lld-with-valid-macro-and-path',
+					'macros' => [
+						['macro' => '{#MACRO1}', 'path'=>'$.path'],
+						['macro' => '{#MACRO2}', 'path'=>"$['а']['!@#$%^&*()_+']"]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test creation of a discovery rule with data filling in Macros tab.
+	 *
+	 * @dataProvider getLLDMacrosTabData
+	 */
+	public function testFormLowLevelDiscovery_LLDMacrosTab($data) {
+		$sql_items = "SELECT * FROM items ORDER BY itemid";
+		$old_hash = CDBHelper::getHash($sql_items);
+
+		$this->page->login()->open('host_discovery.php?hostid='.$this->hostid);
+		$this->query('button:Create discovery rule')->one()->click();
+
+		$form = $this->query('name:itemForm')->asForm()->one();
+		$form->getField('Name')->fill($data['name']);
+		$form->getField('Key')->fill($data['key']);
+		$form->selectTab('LLD macros');
+
+		$macros_table = $form->getField('LLD macros');
+		$button = $macros_table->query('button:Add')->one();
+		$last = count($data['macros']) - 1;
+
+		foreach ($data['macros'] as $i => $lld_macro) {
+			$row = $macros_table->getRows()->get($i);
+			$row->getColumn('LLD macro')->query('tag:input')->one()->fill($lld_macro['macro']);
+			$row->getColumn('JSON Path')->query('tag:input')->one()->fill($lld_macro['path']);
+
+			if ($i !== $last) {
+				$button->click();
+			}
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		// Get global message.
+		$message = CMessageElement::find()->one();
+
+		$expected = $data['expected'];
+		switch ($expected) {
+			case TEST_GOOD:
+				// Check if message is positive.
+				$this->assertTrue($message->isGood());
+				// Check message title.
+				$this->assertEquals('Discovery rule created', $message->getTitle());
+
+				// Check the results in DB.
+				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($data['key'])));
+
+				// Check the results in form.
+				$this->checkLLDMacrosFormFields($data);
+				break;
+			case TEST_BAD:
+				// Check if message is negative.
+				$this->assertTrue($message->isBad());
+				// Check message title.
+				$this->assertEquals('Cannot add discovery rule', $message->getTitle());
+				$this->assertTrue($message->hasLine($data['error_details']));
+
+				// Check that DB hash is not changed.
+				$this->assertEquals($old_hash, CDBHelper::getHash($sql_items));
+				break;
+		}
+	}
+
+	private function checkLLDMacrosFormFields($data) {
+		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['key']));
+		$this->page->open('host_discovery.php?form=update&itemid='.$id);
+		$form = $this->query('name:itemForm')->asForm()->one();
+		$form->selectTab('LLD macros');
+		$table = $form->getField('LLD macros');
+
+		foreach ($data['macros'] as $i => $lld_macro) {
+			$row = $table->getRows()->get($i);
+			$macro = $row->getColumn('LLD macro')->query('tag:input')->one()->getAttribute('value');
+			$this->assertEquals($lld_macro['macro'], $macro);
+
+			$path = $row->getColumn('JSON Path')->query('tag:input')->one()->getAttribute('value');
+			$this->assertEquals($lld_macro['path'], $path);
+		}
 	}
 }

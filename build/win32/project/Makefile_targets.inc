@@ -1,4 +1,4 @@
-all: $(PROGNAME) $(POSTBUILD)
+all: $(PREBUILD) $(PROGNAME) $(POSTBUILD)
 
 clean: $(POSTCLEAN)
 # break this down because del has limit for command-line args length (NMAKE : fatal error U1077: 'del' : return code '0x1')

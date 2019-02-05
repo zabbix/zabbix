@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -419,9 +419,9 @@ jQuery(function ($){
 	 * @param {object} e    jQuery event object.
 	 */
 	function selectionHandlerDragEnd(e) {
-		var left = Math.floor(selection.dom.position().left),
+		var left = Math.floor(Math.max(selection.dom.position().left, selection.min)),
 			from_offset = (left - selection.min) * selection.seconds_per_px,
-			to_offset = (selection.max - selection.dom.width() - left) * selection.seconds_per_px,
+			to_offset = (selection.max - Math.floor(selection.dom.width()) - left) * selection.seconds_per_px,
 			zbx_sbox = e.data.zbx_sbox;
 
 		zbx_sbox.prevent_refresh = false;

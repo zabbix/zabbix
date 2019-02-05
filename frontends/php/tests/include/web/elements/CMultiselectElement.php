@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,12 +67,16 @@ class CMultiselectElement extends CElement {
 	/**
 	 * Add selection by multiple labels.
 	 *
-	 * @param array $label    array of label texts
+	 * @param array $labels    array of label texts
 	 *
 	 * @return $this
 	 */
 	public function selectMultiple($labels) {
 		if ($labels) {
+			if (!is_array($labels)) {
+				$labels = [$labels];
+			}
+
 			$table = $this->edit()->getContent()->asTable();
 
 			foreach ($labels as $label) {
@@ -125,5 +129,17 @@ class CMultiselectElement extends CElement {
 		$this->query('xpath:.//div[@class="multiselect-button"]/button')->one()->click();
 
 		return COverlayDialogElement::find()->all()->last()->waitUntilReady();
+	}
+
+	/**
+	 * Alias for selectMultiple.
+	 * @see self::selectMultiple
+	 *
+	 * @param array $labels    array of label texts
+	 *
+	 * @return $this
+	 */
+	public function fill($labels) {
+		return $this->clear()->selectMultiple($labels);
 	}
 }

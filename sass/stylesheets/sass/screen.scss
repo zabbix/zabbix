@@ -1074,6 +1074,9 @@ output {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
+		&.latest-value {
+			max-width: 300px;
+		}
 	}
 
 	tbody th {
@@ -1643,6 +1646,14 @@ output {
 	color: $dark-yellow;
 }
 
+.suggest-new {
+	border-top: 1px solid $form-border-color;
+
+	span:first-child {
+		font-weight: bold;
+	}
+}
+
 // Forms
 .table-forms-container {
 	margin: 0 0 10px 0;
@@ -2154,6 +2165,10 @@ select {
 		&:active {
 			border-color: $form-border-color;
 		}
+	}
+
+	+ label.label-pos-left span {
+		margin-left: 4px;
 	}
 
 	&:focus + label span {
@@ -2788,10 +2803,15 @@ $icon-widget-btn: (
 }
 
 %btn-disabled {
-	color: $btn-disabled-font-color;
+	color: $btn-disabled-font-color !important;
 	background-color: $btn-disabled-bg-color;
 	border-color: $btn-disabled-border-color;
 	cursor: default;
+
+	&.icon-cal {
+		opacity: 0.3;
+		background-color: transparent;
+	}
 }
 
 %form-disabled {
@@ -4240,8 +4260,8 @@ $form-icon-btn: (
 	stroke-width: 2px;
 }
 .svg-point-highlight {
-	fill: $font-color;
-	fill-opacity: 0.5;
+	fill: $font-color !important;
+	fill-opacity: 0.5 !important;
 }
 
 .svg-graph-preview {
@@ -5274,21 +5294,22 @@ a.overlay-close-btn {
 		cursor: pointer;
 	}
 
-	input[readonly] + div, input:disabled + div {
-		cursor: default;
+	input[readonly],
+	input:disabled {
+		color: $form-disabled-font-color !important;
+
+		+ div {
+			cursor: default;
+		}
+	}
+
+	input:disabled + div {
+		background: $form-disabled-font-color !important;
+		border: 1px solid $form-disabled-font-color;
 	}
 
 	input[type="text"] {
 		padding-left: 25px;
-	}
-
-	&.disabled {
-		opacity: 1;
-
-		div {
-			background: $form-disabled-font-color !important;
-			border: 1px solid $form-disabled-font-color;
-		}
 	}
 }
 
@@ -5622,6 +5643,7 @@ svg {
 .overrides-list {
 	display: table;
 	width: 90%;
+	max-width: 738px;
 	padding-left: 15px;
 
 	.overrides-list-item {
@@ -5725,6 +5747,10 @@ svg {
 			height: 24px;
 		}
 	}
+}
+
+.patternselect {
+	line-height: 14px;
 }
 
 .columns-wrapper {

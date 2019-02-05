@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -641,6 +641,7 @@ if ($data['multiselect'] && $form !== null) {
 		[
 			'title' => _('Select'),
 			'class' => '',
+			'isSubmit' => true,
 			'action' => 'return addSelectedValues('.zbx_jsvalue($form->getId()).', '.
 						zbx_jsvalue($options['reference']).', '.$options['parentid'].'); '.
 						'overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));'
@@ -660,7 +661,10 @@ jQuery(document).ready(function() {
 });';
 
 if ($form) {
-	$form->addItem($table);
+	$form->addItem([
+		$table,
+		(new CInput('submit', 'submit'))->addStyle('display: none;')
+	]);
 	$output['body'] = (new CDiv([$data['messages'], $form]))->toString();
 }
 else {

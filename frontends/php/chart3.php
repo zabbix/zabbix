@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,12 +120,17 @@ elseif ($items = getRequest('items', [])) {
 			access_deny();
 		}
 		$host = reset($dbItems[$item['itemid']]['hosts']);
-		unset($dbItems[$item['itemid']]['hosts']);
 		$graph_items[] = $dbItems[$item['itemid']] + $item + [
 			'host' => $host['host'],
 			'hostname' => $host['name']
 		];
 	}
+
+	foreach ($graph_items as &$graph_item) {
+		unset($graph_item['hosts']);
+	}
+	unset($graph_item);
+
 	$name = getRequest('name', '');
 }
 else {

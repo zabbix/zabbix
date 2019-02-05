@@ -306,15 +306,15 @@ INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VA
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (3,3,4);
 
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (1,0,1,0,0,1,43200,184200,1294760340);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (2,2,2,0,0,1,43200,93780,1294760400);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (3,3,2,0,85,1,85800,300,1294760400);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (4,4,0,1365,0,15,37500,183840,1294760460);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (5,4,1,2730,85,0,84600,1800,1294760520);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (2,2,2,0,0,1,43200,93780,0);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (3,3,2,0,85,1,85800,300,0);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (4,4,0,1365,0,15,37500,183840,0);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (5,4,1,2730,85,0,84600,1800,0);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (6,0,1,0,0,1,43200,184200,1294760340);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (7,2,2,0,0,1,43200,93780,1294760400);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (8,3,2,0,85,1,85800,300,1294760400);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (9,4,0,1365,0,15,37500,183840,1294760460);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (10,4,1,2730,85,0,84600,1800,1294760520);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (7,2,2,0,0,1,43200,93780,0);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (8,3,2,0,85,1,85800,300,0);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (9,4,0,1365,0,15,37500,183840,0);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (10,4,1,2730,85,0,84600,1800,0);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (11,0,1,0,0,1,43200,90000,1534950000);
 
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (1,1,1);
@@ -1550,9 +1550,11 @@ INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90008
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90009, 'Host prototype {#8}', 'Host prototype {#8}', 0, '', 2);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90010, 'Host prototype {#9}', 'Host prototype {#9}', 0, '', 2);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90011, 'Host prototype {#10}', 'Host prototype {#10}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90012, 'Host prototype {#33}', 'Host prototype visible name', 0, '', 2);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90002, 90001);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90003, 90001);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90004, 90001);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90012, 90001);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90005, 90002);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90006, 90002);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90007, 90002);
@@ -1562,6 +1564,8 @@ INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90010, 90003);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (90011, 90003);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1000, 90002, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1001, 90003, '', 5, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1019, 90003, '{#FSNAME}', NULL, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1020, 90012, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1002, 90004, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1003, 90005, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1004, 90006, '', 5, NULL);
@@ -1570,6 +1574,8 @@ INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templatei
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1007, 90009, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1008, 90010, '', 5, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1009, 90011, '', 5, NULL);
+
+INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 90003, 10001);
 
 -- adding test data to the 'alerts' table for testing Reports-> Notifications
 INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype) VALUES (8, 12, 1, 1, 1483275171, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.01.01 12:52:51', 1, 0, '', 1, 0);

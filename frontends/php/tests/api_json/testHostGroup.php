@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -396,6 +396,39 @@ class testHostGroup extends CAPITest {
 					'50011'
 				],
 				'expected_error' => null
+			],
+			// maintenance related
+			[
+				'hostgroup' => [
+					'62002'
+				],
+				'expected_error' => 'Cannot delete host group because maintenance "maintenance_has_only_group" must contain at least one host or host group.'
+			],
+			[
+				'hostgroup' => [
+					'62002',
+					'62003'
+				],
+				'expected_error' => 'Cannot delete selected host groups because maintenance "maintenance_has_only_group" must contain at least one host or host group.'
+			],
+			[
+				'hostgroup' => [
+					'62003'
+				],
+				'expected_error' => null,
+			],
+			[
+				'hostgroup' => [
+					'62004',
+					'62005'
+				],
+				'expected_error' => 'Cannot delete selected host groups because maintenance "maintenance_two_groups" must contain at least one host or host group.'
+			],
+			[
+				'hostgroup' => [
+					'62004'
+				],
+				'expected_error' => null,
 			]
 		];
 	}

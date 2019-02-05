@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ typedef struct
 zbx_expression_t;
 
 /* regular expressions */
-int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **error);
+int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **err_msg_static);
 int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, const char **error);
 void	zbx_regexp_free(zbx_regexp_t *regexp);
 int	zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *regexp);
@@ -56,6 +56,6 @@ int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const c
 int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive,
 		const char *output_template, char **output);
 int	zbx_global_regexp_exists(const char *name, const zbx_vector_ptr_t *regexps);
-void 	zbx_regexp_escape(char **string);
+void	zbx_regexp_escape(char **string);
 
 #endif /* ZABBIX_ZBXREGEXP_H */

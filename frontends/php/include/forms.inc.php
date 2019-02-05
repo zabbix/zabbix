@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,7 +179,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 	$output = [new CTag('h3', true, $label)];
 
 	foreach ($data as $id => $element) {
-		$element['name'] = nbsp(CHtml::encode($element['name']));
+		$element['name'] = CHtml::encode($element['name']);
 
 		// is activated
 		if (str_in_array($id, $subfilter)) {
@@ -192,6 +192,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 				' ',
 				new CSup($element['count'])
 			]))
+				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_SUBFILTER)
 				->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 		}
@@ -220,7 +221,9 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 					$link,
 					' ',
 					new CSup(($subfilter ? '+' : '').$element['count'])
-				]))->addClass(ZBX_STYLE_SUBFILTER);
+				]))
+					->addClass(ZBX_STYLE_NOWRAP)
+					->addClass(ZBX_STYLE_SUBFILTER);
 			}
 		}
 	}
@@ -1131,7 +1134,9 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['key'] = $data['item']['key_'];
 		$data['interfaceid'] = $data['item']['interfaceid'];
 		$data['type'] = $data['item']['type'];
-		$data['snmp_community'] = $data['item']['snmp_community'];
+		if ($data['item']['snmp_community'] !== '') {
+			$data['snmp_community'] = $data['item']['snmp_community'];
+		}
 		$data['snmp_oid'] = $data['item']['snmp_oid'];
 		$data['port'] = $data['item']['port'];
 		$data['value_type'] = $data['item']['value_type'];
@@ -1220,10 +1225,9 @@ function getItemFormData(array $item = [], array $options = []) {
 
 				foreach ($update_interval_parser->getIntervals() as $interval) {
 					if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
-						$interval_parts = explode('/', $interval['interval']);
 						$data['delay_flex'][] = [
-							'delay' => $interval_parts[0],
-							'period' => $interval_parts[1],
+							'delay' => $interval['update_interval'],
+							'period' => $interval['time_period'],
 							'type' => ITEM_DELAY_FLEXIBLE
 						];
 					}
