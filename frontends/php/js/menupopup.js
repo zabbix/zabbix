@@ -28,10 +28,9 @@
  */
 function getMenuPopupHistory(options) {
 	var items = [],
-		url = new Curl('history.php');
+		url = new Curl('history.php', false);
 
 	url.setArgument('itemids[]', options.itemid);
-	url.unsetArgument('sid');
 
 	// latest graphs
 	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
@@ -104,12 +103,12 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		var	host_inventory = {
 				label: t('Host inventory')
 			},
-			host_inventory_url = new Curl('hostinventories.php'),
+			host_inventory_url = new Curl('hostinventories.php', false),
 			// latest
 			latest_data = {
 				label: t('Latest data')
 			},
-			latest_data_url = new Curl('latest.php'),
+			latest_data_url = new Curl('latest.php', false),
 			// problems
 			problems = {
 				label: t('Problems')
@@ -125,24 +124,21 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 		// inventory link
 		host_inventory_url.setArgument('hostid', options.hostid);
-		host_inventory_url.unsetArgument('sid');
 		host_inventory.url = host_inventory_url.getUrl();
 
 		// latest data link
 		latest_data_url.setArgument('hostids[]', options.hostid);
 		latest_data_url.setArgument('filter_set', '1');
-		latest_data_url.unsetArgument('sid');
 		latest_data.url = latest_data_url.getUrl();
 
 		if (!options.showTriggers) {
 			problems.disabled = true;
 		}
 		else {
-			var url = new Curl('zabbix.php');
+			var url = new Curl('zabbix.php', false);
 			url.setArgument('action', 'problem.view');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('filter_set', '1');
-			url.unsetArgument('sid');
 			problems.url = url.getUrl();
 		}
 
@@ -150,10 +146,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			graphs.disabled = true;
 		}
 		else {
-			var graphs_url = new Curl('charts.php');
+			var graphs_url = new Curl('charts.php', false);
 
 			graphs_url.setArgument('hostid', options.hostid);
-			graphs_url.unsetArgument('sid');
 			graphs.url = graphs_url.getUrl();
 		}
 
@@ -161,10 +156,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			screens.disabled = true;
 		}
 		else {
-			var screens_url = new Curl('host_screen.php');
+			var screens_url = new Curl('host_screen.php', false);
 
 			screens_url.setArgument('hostid', options.hostid);
-			screens_url.unsetArgument('sid');
 			screens.url = screens_url.getUrl();
 		}
 
@@ -231,7 +225,7 @@ function getMenuPopupMap(options, trigger_elmnt) {
 
 		// inventory
 		if (typeof options.gotos.inventory !== 'undefined') {
-			var url = new Curl('hostinventories.php');
+			var url = new Curl('hostinventories.php', false);
 
 			jQuery.each(options.gotos.inventory, function(name, value) {
 				if (value !== null) {
@@ -247,7 +241,7 @@ function getMenuPopupMap(options, trigger_elmnt) {
 
 		// latest
 		if (typeof options.gotos.latestData !== 'undefined') {
-			var url = new Curl('latest.php');
+			var url = new Curl('latest.php', false);
 			url.setArgument('filter_set', '1');
 
 			jQuery.each(options.gotos.latestData, function(name, value) {
@@ -272,7 +266,7 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				problems.disabled = true;
 			}
 			else {
-				var url = new Curl('zabbix.php');
+				var url = new Curl('zabbix.php', false);
 				url.setArgument('action', 'problem.view');
 				if (show_suppressed) {
 					url.setArgument('filter_show_suppressed', '1');
@@ -301,7 +295,7 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				graphs.disabled = true;
 			}
 			else {
-				var url = new Curl('charts.php');
+				var url = new Curl('charts.php', false);
 
 				jQuery.each(options.gotos.graphs, function(name, value) {
 					if (value !== null) {
@@ -325,7 +319,7 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				screens.disabled = true;
 			}
 			else {
-				var url = new Curl('host_screen.php');
+				var url = new Curl('host_screen.php', false);
 
 				jQuery.each(options.gotos.screens, function(name, value) {
 					if (value !== null) {
@@ -341,7 +335,7 @@ function getMenuPopupMap(options, trigger_elmnt) {
 
 		// submap
 		if (typeof options.gotos.submap !== 'undefined') {
-			var url = new Curl('zabbix.php');
+			var url = new Curl('zabbix.php', false);
 			url.setArgument('action', 'map.view');
 
 			jQuery.each(options.gotos.submap, function(name, value) {
@@ -359,9 +353,7 @@ function getMenuPopupMap(options, trigger_elmnt) {
 			&& typeof options.navigatetos.submap.widget_uniqueid !== 'undefined') {
 
 			var url = new Curl('javascript: navigateToSubmap('+options.navigatetos.submap.sysmapid+', "'+
-				options.navigatetos.submap.widget_uniqueid+'");');
-
-			url.unsetArgument('sid');
+				options.navigatetos.submap.widget_uniqueid+'");', false);
 
 			gotos.push({
 				label: t('Submap'),
@@ -379,14 +371,13 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				events.disabled = true;
 			}
 			else {
-				var url = new Curl('zabbix.php');
+				var url = new Curl('zabbix.php', false);
 				url.setArgument('action', 'problem.view');
 				if (show_suppressed) {
 					url.setArgument('filter_show_suppressed', '1');
 				}
 				url.setArgument('filter_triggerids[]', options.gotos.events.triggerids);
 				url.setArgument('filter_set', '1');
-				url.unsetArgument('sid');
 				if (typeof options.gotos.events.severity_min !== 'undefined') {
 					url.setArgument('filter_severity', options.gotos.events.severity_min);
 				}
@@ -489,7 +480,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 					obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 				}
 				else {
-					var url = new Curl('zabbix.php');
+					var url = new Curl('zabbix.php', false);
 
 					url.setArgument('action', 'dashboard.widget.rfrate');
 
@@ -609,11 +600,10 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	};
 
 	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
-		var url = new Curl('zabbix.php');
+		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'problem.view');
 		url.setArgument('filter_triggerids[]', options.triggerid);
 		url.setArgument('filter_set', '1');
-		url.unsetArgument('sid');
 
 		events.url = url.getUrl();
 	}
@@ -625,12 +615,11 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 
 	// acknowledge
 	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
-		var url = new Curl('zabbix.php');
+		var url = new Curl('zabbix.php', false);
 
 		url.setArgument('action', 'acknowledge.edit');
 		url.setArgument('eventids[]', options.acknowledge.eventid);
 		url.setArgument('backurl', options.acknowledge.backurl);
-		url.unsetArgument('sid');
 
 		items[items.length] = {
 			label: t('Acknowledge'),
@@ -661,8 +650,10 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 
 	// configuration
 	if (typeof options.configuration !== 'undefined' && options.configuration) {
-		var url = new Curl('triggers.php?form=update&triggerid=' + options.triggerid);
-		url.unsetArgument('sid');
+		var url = new Curl('triggers.php', false);
+
+		url.setArgument('form', 'update');
+		url.setArgument('triggerid', options.triggerid);
 
 		items[items.length] = {
 			label: t('Configuration'),
@@ -688,10 +679,9 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		var items = [];
 
 		jQuery.each(options.items, function(i, item) {
-			var url = new Curl('history.php');
+			var url = new Curl('history.php', false);
 			url.setArgument('action', item.params.action);
 			url.setArgument('itemids[]', item.params.itemid);
-			url.unsetArgument('sid');
 
 			items[items.length] = {
 				label: item.name,
@@ -765,13 +755,12 @@ function getMenuPopupItem(options, trigger_elmnt) {
 
 	items.push(edit_trigger);
 
-	var url = new Curl('items.php');
+	var url = new Curl('items.php', false);
 
 	url.setArgument('form', 'create');
 	url.setArgument('hostid', options.hostid);
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
 	url.setArgument('master_itemid', options.itemid);
-	url.unsetArgument('sid');
 
 	items.push({
 		label: t('Create dependent item'),
@@ -794,13 +783,12 @@ function getMenuPopupItem(options, trigger_elmnt) {
  * @return array
  */
 function getMenuPopupItemPrototype(options) {
-	var url = new Curl('disc_prototypes.php');
+	var url = new Curl('disc_prototypes.php', false);
 
 	url.setArgument('form', 'create');
 	url.setArgument('parent_discoveryid', options.parent_discoveryid);
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
 	url.setArgument('master_itemid', options.itemid);
-	url.unsetArgument('sid');
 
 	return [{
 		label: options.name,
