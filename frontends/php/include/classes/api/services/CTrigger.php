@@ -336,17 +336,17 @@ class CTrigger extends CTriggerGeneral {
 		if ($options['dependent'] !== null) {
 			if ($options['dependent']) {
 				$sqlParts['where'][] = 'EXISTS ('.
-						'SELECT NULL'.
-						' FROM trigger_depends td'.
-						' WHERE td.triggerid_down = t.triggerid'.
-					')';
+					'SELECT NULL'.
+					' FROM trigger_depends td'.
+					' WHERE td.triggerid_down=t.triggerid'.
+				')';
 			}
 			else {
 				$sqlParts['where'][] = 'NOT EXISTS ('.
-						'SELECT NULL'.
-						' FROM trigger_depends td'.
-						' WHERE td.triggerid_down = t.triggerid'.
-					')';
+					'SELECT NULL'.
+					' FROM trigger_depends td'.
+					' WHERE td.triggerid_down=t.triggerid'.
+				')';
 			}
 		}
 
