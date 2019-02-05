@@ -55,17 +55,3 @@ void	zbx_preprocessor_flush(void)
 {
 	dc_flush_history();
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_preprocessor_get_queue_size                                  *
- *                                                                            *
- * Purpose: get queue size (enqueued value count) of preprocessing manager    *
- *                                                                            *
- * Return value: enqueued item count                                          *
- *                                                                            *
- ******************************************************************************/
-zbx_uint64_t	zbx_preprocessor_get_queue_size(void)
-{
-	return 0;
-}

@@ -474,7 +474,7 @@ typedef enum
 	ESCALATION_STATUS_COMPLETED	/* only in server code, never in DB */
 }
 zbx_escalation_status_t;
-const char      *zbx_escalation_status_string(unsigned char status);
+const char	*zbx_escalation_status_string(unsigned char status);
 
 /* alert types */
 typedef enum
@@ -497,8 +497,8 @@ const char	*zbx_item_state_string(unsigned char state);
 /* group statuses */
 typedef enum
 {
-       GROUP_STATUS_ACTIVE = 0,
-       GROUP_STATUS_DISABLED
+	GROUP_STATUS_ACTIVE = 0,
+	GROUP_STATUS_DISABLED
 }
 zbx_group_status_type_t;
 
@@ -912,8 +912,8 @@ typedef enum
 }
 zbx_httptest_auth_t;
 
-#define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
-#define ZBX_TASK_FLAG_FOREGROUND      0x02
+#define ZBX_TASK_FLAG_MULTIPLE_AGENTS	0x01
+#define ZBX_TASK_FLAG_FOREGROUND	0x02
 
 typedef struct
 {

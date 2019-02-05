@@ -43,7 +43,7 @@
 #endif
 
 #ifdef WITH_HOSTNAME_METRIC
-extern ZBX_METRIC      parameter_hostname;
+extern ZBX_METRIC	parameter_hostname;
 #endif
 
 static ZBX_METRIC	*commands = NULL;
