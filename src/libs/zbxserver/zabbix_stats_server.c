@@ -23,6 +23,7 @@
 #include "valuecache.h"
 #include "preproc.h"
 #include "zbxlld.h"
+#include "log.h"
 
 #include "zabbix_stats.h"
 
@@ -42,10 +43,18 @@ void	zbx_get_zabbix_stats_ext(struct zbx_json *json)
 {
 	zbx_vc_stats_t	vc_stats;
 	zbx_uint64_t	queue_size;
+	char		*error = NULL;
 
 	/* zabbix[lld_queue] */
-	if (SUCCEED == zbx_lld_get_queue_size(&queue_size, NULL))
+	if (SUCCEED == zbx_lld_get_queue_size(&queue_size, &error))
+	{
 		zbx_json_adduint64(json, "lld_queue", queue_size);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get LLD queue size: %s", error);
+		zbx_free(error);
+	}
 
 	/* zabbix[preprocessing_queue] */
 	zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
