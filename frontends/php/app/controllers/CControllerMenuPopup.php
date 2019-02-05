@@ -88,9 +88,36 @@ class CControllerMenuPopup extends CController {
 					]);
 
 				if ($hosts) {
+					$host = $hosts[0];
+
 					$scripts = API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']];
 
-					$output['data'] = CMenuPopupHelper::getHost($hosts[0], $scripts, (bool) $has_goto);
+					$output['data'] = [
+						'type' => 'host',
+						'hostid' => $host['hostid'],
+						'hasGoTo' => (bool) $has_goto
+					];
+
+					if ($has_goto) {
+						$output['data']['showGraphs'] = (bool) $host['graphs'];
+						$output['data']['showScreens'] = (bool) $host['screens'];
+						$output['data']['showTriggers'] = ($host['status'] == HOST_STATUS_MONITORED);
+					}
+
+					foreach ($scripts as &$script) {
+						$script['name'] = trimPath($script['name']);
+					}
+					unset($script);
+
+					CArrayHelper::sort($scripts, ['name']);
+
+					foreach (array_values($scripts) as $script) {
+						$output['data']['scripts'][] = [
+							'name' => $script['name'],
+							'scriptid' => $script['scriptid'],
+							'confirmation' => $script['confirmation']
+						];
+					}
 				}
 				else {
 					error(_('No permissions to referred object or it does not exist!'));
@@ -181,6 +208,43 @@ class CControllerMenuPopup extends CController {
 					$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
 					$trigger = $triggers[0];
+					$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
+
+					$hosts = [];
+					$showEvents = true;
+
+					foreach ($trigger['hosts'] as $host) {
+						$hosts[$host['hostid']] = $host['name'];
+
+						if ($host['status'] != HOST_STATUS_MONITORED) {
+							$showEvents = false;
+						}
+					}
+
+					foreach ($trigger['items'] as &$item) {
+						$item['hostname'] = $hosts[$item['hostid']];
+					}
+					unset($item);
+
+					CArrayHelper::sort($trigger['items'], ['name', 'hostname', 'itemid']);
+
+					$hostCount = count($hosts);
+					$items = [];
+
+					foreach ($trigger['items'] as $item) {
+						$items[] = [
+							'name' => ($hostCount > 1)
+								? $hosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded']
+								: $item['name_expanded'],
+							'params' => [
+								'itemid' => $item['itemid'],
+								'action' =>
+									in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+										? HISTORY_GRAPH
+										: HISTORY_VALUES
+							]
+						];
+					}
 
 					$options = [
 						'show_description' => !array_key_exists('show_description', $data) || $data['show_description']
@@ -200,7 +264,33 @@ class CControllerMenuPopup extends CController {
 
 					$acknowledge = array_key_exists('acknowledge', $data) ? $data['acknowledge'] : [];
 
-					$output['data'] = CMenuPopupHelper::getTrigger($trigger, $acknowledge, $options);
+					$output['data'] = [
+						'type' => 'trigger',
+						'triggerid' => $trigger['triggerid'],
+						'items' => $items,
+						'showEvents' => $showEvents,
+						'configuration' =>
+							in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+					];
+
+					if (array_key_exists('show_description', $options) && $options['show_description'] === false) {
+						$output['data']['show_description'] = false;
+					}
+					else if (array_key_exists('description_enabled', $options)
+							&& $options['description_enabled'] === false) {
+						$output['data']['description_enabled'] = false;
+					}
+
+					if ($acknowledge !== null) {
+						$output['data']['acknowledge'] = $acknowledge;
+					}
+
+					if ($trigger['url'] !== '') {
+						$output['data']['url'] = CHtmlUrlValidator::validate($trigger['url'])
+							? $trigger['url']
+							: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($trigger['url'],
+									false, false)).'\');';
+					}
 				}
 				else {
 					error(_('No permissions to referred object or it does not exist!'));
