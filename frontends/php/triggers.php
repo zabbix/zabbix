@@ -749,6 +749,7 @@ else {
 		'sortfield' => $sort,
 		'limit' => $config['search_limit'] + 1,
 		'dependent' => ($filter_dependent != -1) ? $filter_dependent : null,
+		'templated' => ($filter_value != -1) ? false : null,
 		'inherited' => ($filter_inherited != -1) ? $filter_inherited : null
 	];
 
@@ -829,6 +830,7 @@ else {
 			'output' => ['triggerid', 'description', 'status', 'flags'],
 			'selectHosts' => ['hostid', 'name'],
 			'triggerids' => array_keys($dep_triggerids),
+			'templated' => ($filter_value != -1) ? false : null,
 			'preservekeys' => true
 		]);
 
