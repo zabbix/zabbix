@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item,item_prototype,trigger,triggerMacro',
+			'type' => 'required|in history,host,item,item_prototype,trigger,trigger_macro',
 			'data' => 'array'
 		];
 
@@ -45,261 +45,345 @@ class CControllerMenuPopup extends CController {
 		return true;
 	}
 
-	protected function doAction() {
-		$data = $this->hasInput('data') ? $this->getInput('data') : [];
+	/**
+	 * Prepare data for history context menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['itemid']
+	 *
+	 * @return mixed
+	 */
+	private static function getHistoryMenuData(array $data) {
+		$db_items = API::Item()->get([
+			'output' => ['value_type'],
+			'itemids' => $data['itemid'],
+			'webitems' => true
+		]);
 
-		$output = [];
+		if ($db_items) {
+			$db_item = $db_items[0];
 
-		switch ($this->getInput('type')) {
-			case 'history':
-				$items = API::Item()->get([
-					'output' => ['value_type'],
-					'itemids' => $data['itemid'],
-					'webitems' => true
-				]);
+			return [
+				'type' => 'history',
+				'itemid' => $data['itemid'],
+				'hasLatestGraphs' => in_array($db_item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT])
+			];
+		}
 
-				if ($items) {
-					$value_type = $items[0]['value_type'];
+		error(_('No permissions to referred object or it does not exist!'));
 
-					$output['data'] = [
-						'type' => 'history',
-						'itemid' => $data['itemid'],
-						'hasLatestGraphs' => in_array($value_type, [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT])
-					];
-				}
-				else {
-					error(_('No permissions to referred object or it does not exist!'));
-				}
-				break;
+		return null;
+	}
 
-			case 'host':
-				$has_goto = !array_key_exists('has_goto', $data) || $data['has_goto'];
+	/**
+	 * Prepare data for host context menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['hostid']
+	 * @param bool   $data['has_goto']  (optional) Can be used to hide "GO TO" menu section.
+	 *
+	 * @return mixed
+	 */
+	private static function getHostMenuData(array $data) {
+		$has_goto = !array_key_exists('has_goto', $data) || $data['has_goto'];
 
-				$hosts = $has_goto
-					? API::Host()->get([
-						'output' => ['hostid', 'status'],
-						'selectGraphs' => API_OUTPUT_COUNT,
-						'selectScreens' => API_OUTPUT_COUNT,
-						'hostids' => $data['hostid']
-					])
-					: API::Host()->get([
-						'output' => ['hostid'],
-						'hostids' => $data['hostid']
-					]);
+		$db_hosts = $has_goto
+			? API::Host()->get([
+				'output' => ['status'],
+				'selectGraphs' => API_OUTPUT_COUNT,
+				'selectScreens' => API_OUTPUT_COUNT,
+				'hostids' => $data['hostid']
+			])
+			: API::Host()->get([
+				'output' => [],
+				'hostids' => $data['hostid']
+			]);
 
-				if ($hosts) {
-					$host = $hosts[0];
+		if ($db_hosts) {
+			$db_host = $db_hosts[0];
 
-					$scripts = API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']];
+			$scripts = API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']];
 
-					$output['data'] = [
-						'type' => 'host',
-						'hostid' => $host['hostid'],
-						'hasGoTo' => (bool) $has_goto
-					];
+			foreach ($scripts as &$script) {
+				$script['name'] = trimPath($script['name']);
+			}
+			unset($script);
 
-					if ($has_goto) {
-						$output['data']['showGraphs'] = (bool) $host['graphs'];
-						$output['data']['showScreens'] = (bool) $host['screens'];
-						$output['data']['showTriggers'] = ($host['status'] == HOST_STATUS_MONITORED);
-					}
+			CArrayHelper::sort($scripts, ['name']);
 
-					foreach ($scripts as &$script) {
-						$script['name'] = trimPath($script['name']);
-					}
-					unset($script);
+			$menu_data = [
+				'type' => 'host',
+				'hostid' => $data['hostid'],
+				'hasGoTo' => (bool) $has_goto
+			];
 
-					CArrayHelper::sort($scripts, ['name']);
+			if ($has_goto) {
+				$menu_data['showGraphs'] = (bool) $db_host['graphs'];
+				$menu_data['showScreens'] = (bool) $db_host['screens'];
+				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
+			}
 
-					foreach (array_values($scripts) as $script) {
-						$output['data']['scripts'][] = [
-							'name' => $script['name'],
-							'scriptid' => $script['scriptid'],
-							'confirmation' => $script['confirmation']
-						];
-					}
-				}
-				else {
-					error(_('No permissions to referred object or it does not exist!'));
-				}
-				break;
+			foreach (array_values($scripts) as $script) {
+				$menu_data['scripts'][] = [
+					'name' => $script['name'],
+					'scriptid' => $script['scriptid'],
+					'confirmation' => $script['confirmation']
+				];
+			}
 
-			case 'item':
-				$items = API::Item()->get([
-					'output' => ['hostid', 'name', 'value_type'],
-					'itemids' => $data['itemid'],
-					'webitems' => true
-				]);
+			return $menu_data;
+		}
 
-				if ($items) {
-					$item = $items[0];
-					$triggers = [];
+		error(_('No permissions to referred object or it does not exist!'));
 
-					if (in_array($item['value_type'],
-							[ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
-						$db_triggers = API::Trigger()->get([
-							'output' => ['triggerid', 'description', 'recovery_mode'],
-							'selectFunctions' => API_OUTPUT_EXTEND,
-							'itemids' => $data['itemid']
-						]);
+		return null;
+	}
 
-						foreach ($db_triggers as $db_trigger) {
-							if ($db_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-								continue;
-							}
+	/**
+	 * Prepare data for item context menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['itemid']
+	 *
+	 * @return mixed
+	 */
+	private static function getItemMenuData(array $data) {
+		$db_items = API::Item()->get([
+			'output' => ['hostid', 'name', 'value_type'],
+			'itemids' => $data['itemid'],
+			'webitems' => true
+		]);
 
-							foreach ($db_trigger['functions'] as $function) {
-								if (!str_in_array($function['function'], ['regexp', 'iregexp'])) {
-									continue 2;
-								}
-							}
+		if ($db_items) {
+			$db_item = $db_items[0];
+			$triggers = [];
 
-							$triggers[] = [
-								'triggerid' => $db_trigger['triggerid'],
-								'name' => $db_trigger['description']
-							];
-						}
-					}
-
-					$output['data'] = [
-						'type' => 'item',
-						'itemid' => $data['itemid'],
-						'hostid' => $item['hostid'],
-						'name' => $item['name'],
-						'triggers' => $triggers
-					];
-				}
-				else {
-					error(_('No permissions to referred object or it does not exist!'));
-				}
-				break;
-
-			case 'item_prototype':
-				$item_prototypes = API::ItemPrototype()->get([
-					'output' => ['name'],
-					'selectDiscoveryRule' => ['itemid'],
+			if (in_array($db_item['value_type'], [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
+				$db_triggers = API::Trigger()->get([
+					'output' => ['triggerid', 'description', 'recovery_mode'],
+					'selectFunctions' => API_OUTPUT_EXTEND,
 					'itemids' => $data['itemid']
 				]);
 
-				if ($item_prototypes) {
-					$item_prototype = $item_prototypes[0];
+				foreach ($db_triggers as $db_trigger) {
+					if ($db_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+						continue;
+					}
 
-					$output['data'] = [
-						'type' => 'item_prototype',
-						'itemid' => $data['itemid'],
-						'name' => $item_prototype['name'],
-						'parent_discoveryid' => $item_prototype['discoveryRule']['itemid']
-					];
-				}
-				else {
-					error(_('No permissions to referred object or it does not exist!'));
-				}
-				break;
-
-			case 'trigger':
-				$triggers = API::Trigger()->get([
-					'output' => ['triggerid', 'expression', 'url', 'flags', 'comments'],
-					'selectHosts' => ['hostid', 'name', 'status'],
-					'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
-					'triggerids' => $data['triggerid']
-				]);
-
-				if ($triggers) {
-					$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
-
-					$trigger = $triggers[0];
-					$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
-
-					$hosts = [];
-					$showEvents = true;
-
-					foreach ($trigger['hosts'] as $host) {
-						$hosts[$host['hostid']] = $host['name'];
-
-						if ($host['status'] != HOST_STATUS_MONITORED) {
-							$showEvents = false;
+					foreach ($db_trigger['functions'] as $function) {
+						if (!str_in_array($function['function'], ['regexp', 'iregexp'])) {
+							continue 2;
 						}
 					}
 
-					foreach ($trigger['items'] as &$item) {
-						$item['hostname'] = $hosts[$item['hostid']];
-					}
-					unset($item);
-
-					CArrayHelper::sort($trigger['items'], ['name', 'hostname', 'itemid']);
-
-					$hostCount = count($hosts);
-					$items = [];
-
-					foreach ($trigger['items'] as $item) {
-						$items[] = [
-							'name' => ($hostCount > 1)
-								? $hosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded']
-								: $item['name_expanded'],
-							'params' => [
-								'itemid' => $item['itemid'],
-								'action' =>
-									in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
-										? HISTORY_GRAPH
-										: HISTORY_VALUES
-							]
-						];
-					}
-
-					$options = [
-						'show_description' => !array_key_exists('show_description', $data) || $data['show_description']
+					$triggers[] = [
+						'triggerid' => $db_trigger['triggerid'],
+						'name' => $db_trigger['description']
 					];
-
-					if ($options['show_description']) {
-						$rw_triggers = API::Trigger()->get([
-							'output' => [],
-							'triggerids' => $trigger['triggerid'],
-							'editable' => true
-						]);
-
-						$editable = (bool) $rw_triggers;
-						$options['description_enabled'] = ($trigger['comments'] !== ''
-							|| ($editable && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL));
-					}
-
-					$acknowledge = array_key_exists('acknowledge', $data) ? $data['acknowledge'] : [];
-
-					$output['data'] = [
-						'type' => 'trigger',
-						'triggerid' => $trigger['triggerid'],
-						'items' => $items,
-						'showEvents' => $showEvents,
-						'configuration' =>
-							in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
-					];
-
-					if (array_key_exists('show_description', $options) && $options['show_description'] === false) {
-						$output['data']['show_description'] = false;
-					}
-					else if (array_key_exists('description_enabled', $options)
-							&& $options['description_enabled'] === false) {
-						$output['data']['description_enabled'] = false;
-					}
-
-					if ($acknowledge !== null) {
-						$output['data']['acknowledge'] = $acknowledge;
-					}
-
-					if ($trigger['url'] !== '') {
-						$output['data']['url'] = CHtmlUrlValidator::validate($trigger['url'])
-							? $trigger['url']
-							: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($trigger['url'],
-									false, false)).'\');';
-					}
 				}
-				else {
-					error(_('No permissions to referred object or it does not exist!'));
+			}
+
+			return [
+				'type' => 'item',
+				'itemid' => $data['itemid'],
+				'hostid' => $db_item['hostid'],
+				'name' => $db_item['name'],
+				'triggers' => $triggers
+			];
+		}
+
+		error(_('No permissions to referred object or it does not exist!'));
+
+		return null;
+	}
+
+	/**
+	 * Prepare data for item prototype context menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['itemid']
+	 *
+	 * @return mixed
+	 */
+	private static function getItemPrototypeMenuData(array $data) {
+		$db_item_prototypes = API::ItemPrototype()->get([
+			'output' => ['name'],
+			'selectDiscoveryRule' => ['itemid'],
+			'itemids' => $data['itemid']
+		]);
+
+		if ($db_item_prototypes) {
+			$db_item_prototype = $db_item_prototypes[0];
+
+			return [
+				'type' => 'item_prototype',
+				'itemid' => $data['itemid'],
+				'name' => $db_item_prototype['name'],
+				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid']
+			];
+		}
+
+		error(_('No permissions to referred object or it does not exist!'));
+
+		return null;
+	}
+
+	/**
+	 * Prepare data for trigger context menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['triggerid']
+	 * @param array  $acknowledge               (optional) Acknowledge link parameters.
+	 * @param string $acknowledge['eventid']
+	 * @param string $acknowledge['backurl']
+	 * @param bool   $data['show_description']  (optional) default: true
+	 *
+	 * @return mixed
+	 */
+	private static function getTriggerMenuData(array $data) {
+		$db_triggers = API::Trigger()->get([
+			'output' => ['expression', 'url', 'comments'],
+			'selectHosts' => ['hostid', 'name', 'status'],
+			'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+			'triggerids' => $data['triggerid'],
+			'preservekeys' => true
+		]);
+
+		if ($db_triggers) {
+			$db_triggers = CMacrosResolverHelper::resolveTriggerUrls($db_triggers);
+
+			$db_trigger = reset($db_triggers);
+			$db_trigger['items'] = CMacrosResolverHelper::resolveItemNames($db_trigger['items']);
+
+			$hosts = [];
+			$show_events = true;
+
+			foreach ($db_trigger['hosts'] as $host) {
+				$hosts[$host['hostid']] = $host['name'];
+
+				if ($host['status'] != HOST_STATUS_MONITORED) {
+					$show_events = false;
 				}
+			}
+			unset($db_trigger['hosts']);
+
+			foreach ($db_trigger['items'] as &$item) {
+				$item['hostname'] = $hosts[$item['hostid']];
+			}
+			unset($item);
+
+			CArrayHelper::sort($db_trigger['items'], ['name', 'hostname', 'itemid']);
+
+			$with_hostname = count($hosts) > 1;
+			$items = [];
+
+			foreach ($db_trigger['items'] as $item) {
+				$items[] = [
+					'name' => $with_hostname
+						? $$item['hostname'].NAME_DELIMITER.$item['name_expanded']
+						: $item['name_expanded'],
+					'params' => [
+						'itemid' => $item['itemid'],
+						'action' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+							? HISTORY_GRAPH
+							: HISTORY_VALUES
+					]
+				];
+			}
+
+			$options = [
+				'show_description' => !array_key_exists('show_description', $data) || $data['show_description']
+			];
+
+			if ($options['show_description']) {
+				$rw_triggers = API::Trigger()->get([
+					'output' => ['flags'],
+					'triggerids' => $data['triggerid'],
+					'editable' => true
+				]);
+
+				$editable = (bool) $rw_triggers;
+				$options['description_enabled'] = ($db_trigger['comments'] !== ''
+					|| ($rw_triggers && $rw_triggers[0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL));
+			}
+
+			$menu_data = [
+				'type' => 'trigger',
+				'triggerid' => $data['triggerid'],
+				'items' => $items,
+				'showEvents' => $show_events,
+				'configuration' =>
+					in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+			];
+
+			if (!$options['show_description']) {
+				$menu_data['show_description'] = false;
+			}
+			else if (!$options['description_enabled']) {
+				$menu_data['description_enabled'] = false;
+			}
+
+			if (array_key_exists('acknowledge', $data)) {
+				$menu_data['acknowledge'] = $data['acknowledge'];
+			}
+
+			if ($db_trigger['url'] !== '') {
+				$menu_data['url'] = CHtmlUrlValidator::validate($db_trigger['url'])
+					? $db_trigger['url']
+					: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($db_trigger['url'],
+							false, false)).'\');';
+			}
+
+			return $menu_data;
+		}
+
+		error(_('No permissions to referred object or it does not exist!'));
+
+		return null;
+	}
+
+	/**
+	 * Prepare data for trigger macro context menu popup.
+	 *
+	 * @return array
+	 */
+	private static function getTriggerMacroMenuData() {
+		return ['type' => 'trigger_macro'];
+	}
+
+	protected function doAction() {
+		$data = $this->hasInput('data') ? $this->getInput('data') : [];
+
+		switch ($this->getInput('type')) {
+			case 'history':
+				$menu_data = self::getHistoryMenuData($data);
 				break;
 
-			case 'triggerMacro':
-				$output['data'] = ['type' => 'triggerMacro'];
+			case 'host':
+				$menu_data = self::getHostMenuData($data);
 				break;
+
+			case 'item':
+				$menu_data = self::getItemMenuData($data);
+				break;
+
+			case 'item_prototype':
+				$menu_data = self::getItemPrototypeMenuData($data);
+				break;
+
+			case 'trigger':
+				$menu_data = self::getTriggerMenuData($data);
+				break;
+
+			case 'trigger_macro':
+				$menu_data = self::getTriggerMacroMenuData();
+				break;
+		}
+
+		$output = [];
+
+		if ($menu_data !== null) {
+			$output['data'] = $menu_data;
 		}
 
 		if (($messages = getMessages()) !== null) {

@@ -83,7 +83,7 @@ jQuery(function($) {
 				data = getMenuPopupTrigger(data, obj);
 				break;
 
-			case 'triggerMacro':
+			case 'trigger_macro':
 				data = getMenuPopupTriggerMacro(data);
 				break;
 
