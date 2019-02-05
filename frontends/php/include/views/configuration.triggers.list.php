@@ -77,17 +77,14 @@ $filter_column1 = (new CFormList())
 			->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
 			->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
 			->setModern(true)
-	);
-
-if ($data['show_value_column']) {
-	$filter_column1->addRow(_('Value'),
+	)
+	->addRow(_('Value'),
 		(new CRadioButtonList('filter_value', (int) $data['filter_value']))
 			->addValue(_('all'), -1)
 			->addValue(_('Ok'), TRIGGER_VALUE_FALSE)
 			->addValue(_('Problem'), TRIGGER_VALUE_TRUE)
 			->setModern(true)
 	);
-}
 
 $filter_tags = $data['filter_tags'];
 if (!$filter_tags) {

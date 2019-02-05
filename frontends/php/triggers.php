@@ -621,7 +621,6 @@ else {
 		$filter_discovered = getRequest('filter_discovered', -1);
 		$filter_dependent = getRequest('filter_dependent', -1);
 		$filter_name = getRequest('filter_name', '');
-
 		$filter_priority = getRequest('filter_priority', []);
 		$filter_groupids = getRequest('filter_groupids', []);
 		$filter_hostids = getRequest('filter_hostids', []);
@@ -630,26 +629,6 @@ else {
 		$filter_value = getRequest('filter_value', -1);
 		$filter_evaltype = getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR);
 		$filter_tags = getRequest('filter_tags', []);
-
-		if ($filter_groupids) {
-			$filter_groupids = API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => $filter_groupids,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-			$filter_groupids_ms = CArrayHelper::renameObjectsKeys($filter_groupids, ['groupid' => 'id']);
-			$filter_groupids = array_keys($filter_groupids);
-		}
-
-		if ($filter_hostids) {
-			$filter_hostids = array_keys(API::Host()->get([
-				'output' => ['hostid'],
-				'hostids' => $filter_hostids,
-				'templated_hosts' => true,
-				'preservekeys' => true
-			]));
-		}
 	}
 	elseif (getRequest('filter_rst')) {
 		$filter_inherited = -1;
@@ -675,15 +654,6 @@ else {
 		$filter_name = CProfile::get('web.triggers.filter_name', '');
 		$filter_priority = CProfile::getArray('web.triggers.filter_priority', []);
 		$filter_groupids = CProfile::getArray('web.triggers.filter_groupids', []);
-
-		if ($filter_groupids) {
-			$filter_groupids_ms = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => $filter_groupids,
-				'editable' => true
-			]), ['groupid' => 'id']);
-		}
-
 		$filter_hostids = CProfile::getArray('web.triggers.filter_hostids', []);
 		$filter_state = CProfile::get('web.triggers.filter_state', -1);
 		$filter_status = CProfile::get('web.triggers.filter_status', -1);
@@ -701,6 +671,17 @@ else {
 		}
 	}
 
+	if ($filter_groupids) {
+		$filter_groupids = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter_groupids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+		$filter_groupids_ms = CArrayHelper::renameObjectsKeys($filter_groupids, ['groupid' => 'id']);
+		$filter_groupids = array_keys($filter_groupids);
+	}
+
 	// Skip empty tags.
 	$filter_tags = array_filter($filter_tags, function ($v) {
 		return boolval($v['tag']);
@@ -715,24 +696,6 @@ else {
 	$sortorder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 	$active_tab = CProfile::get('web.triggers.filter.active', 1);
 
-	$hosts = API::Host()->get([
-		'output' => ['hostid', 'status', 'name'],
-		'hostids' => $filter_hostids ? $filter_hostids : null,
-		'groupids' => $filter_groupids ? $filter_groupids_enriched : null,
-		'templated_hosts' => true,
-		'preservekeys' => true
-	]);
-
-	$show_info_column = false;
-	$show_value_column = false;
-
-	foreach ($hosts as $host) {
-		if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
-			$show_value_column = true;
-			$show_info_column = true;
-			break;
-		}
-	}
 
 	// Get triggers (build options).
 	$options = [
@@ -759,7 +722,7 @@ else {
 			: ZBX_FLAG_DISCOVERY_NORMAL;
 	}
 
-	if ($show_value_column && $filter_value != -1) {
+	if ($filter_value != -1) {
 		$options['filter']['value'] = $filter_value;
 	}
 
@@ -803,6 +766,18 @@ else {
 	}
 
 	$triggers = API::Trigger()->get($options);
+	$show_info_column = false;
+	$show_value_column = false;
+
+	foreach ($triggers as $trigger) {
+		foreach ($trigger['hosts'] as $trigger_host) {
+			if (in_array($trigger_host['status'], [HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED])) {
+				$show_value_column = true;
+				$show_info_column = true;
+				break 2;
+			}
+		}
+	}
 
 	if ($sort === 'status') {
 		orderTriggersByStatus($triggers, $sortorder);
