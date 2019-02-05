@@ -1714,7 +1714,6 @@ dnl *                 Output configuration results                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-sinclude([conf_tests.m4])
 m4_ifdef([CONF_TESTS],[CONF_TESTS(ZBXCMOCKA)])
 
 AC_OUTPUT([
