@@ -775,6 +775,10 @@ class CSvgGraph extends CSvg {
 			$timeshift = $metric['options']['timeshift'];
 			$paths = [];
 
+			// Metric having very big values of y outside visible area will fail to render.
+			$ymax = pow(2, 16);
+			$ymin = $ymax * -1;
+
 			$path_num = 0;
 			foreach ($this->points[$index] as $clock => $point) {
 				// If missing data function is SVG_GRAPH_MISSING_DATA_NONE, path should be splitted in multiple svg shapes.
@@ -792,6 +796,11 @@ class CSvgGraph extends CSvg {
 					$x = $this->canvas_x + $this->canvas_width
 						- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 					$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
+
+					if (!$in_range) {
+						$y = $point > $max_value ? max($ymin, $y) : min($ymax, $y);
+					}
+
 					$paths[$path_num][] = [$x, $y, convert_units([
 						'value' => $point,
 						'units' => $metric['units']
