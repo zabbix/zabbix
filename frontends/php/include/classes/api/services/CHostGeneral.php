@@ -982,40 +982,48 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param string $id_field
 	 */
 	protected function updateTags(array $hosts, $id_field) {
-		$db_hosts = [];
-		$ins_tags = [];
-		$del_hosttagids = [];
+		$hostids = [];
+		foreach ($hosts as $host) {
+			if (array_key_exists('tags', $host)) {
+				$hostids[] = $host[$id_field];
+			}
+		}
+
+		if (!$hostids) {
+			return;
+		}
 
 		$options = [
 			'output' => ['hosttagid', 'hostid', 'tag', 'value'],
-			'filter' => ['hostid' => zbx_objectValues($hosts, $id_field)]
+			'filter' => ['hostid' => $hostids]
 		];
 
 		$db_tags = DBselect(DB::makeSql('host_tag', $options));
+		$db_hosts = [];
+		$del_hosttagids = [];
 
 		while ($db_tag = DBfetch($db_tags)) {
 			$db_hosts[$db_tag['hostid']]['tags'][] = $db_tag;
 			$del_hosttagids[$db_tag['hosttagid']] = true;
 		}
 
+		$ins_tags = [];
 		foreach ($hosts as $host) {
-			if (array_key_exists('tags', $host)) {
-				foreach ($host['tags'] as $tag) {
-					$tag += ['value' => ''];
+			foreach ($host['tags'] as $tag) {
+				$tag += ['value' => ''];
 
-					if (array_key_exists($host[$id_field], $db_hosts)) {
-						foreach ($db_hosts[$host[$id_field]]['tags'] as $db_tag) {
-							if ($tag['tag'] === $db_tag['tag'] && $tag['value'] === $db_tag['value']) {
-								unset($del_hosttagids[$db_tag['hosttagid']]);
-								$tag = null;
-								break;
-							}
+				if (array_key_exists($host[$id_field], $db_hosts)) {
+					foreach ($db_hosts[$host[$id_field]]['tags'] as $db_tag) {
+						if ($tag['tag'] === $db_tag['tag'] && $tag['value'] === $db_tag['value']) {
+							unset($del_hosttagids[$db_tag['hosttagid']]);
+							$tag = null;
+							break;
 						}
 					}
+				}
 
-					if ($tag !== null) {
-						$ins_tags[] = ['hostid' => $host[$id_field]] + $tag;
-					}
+				if ($tag !== null) {
+					$ins_tags[] = ['hostid' => $host[$id_field]] + $tag;
 				}
 			}
 		}
