@@ -446,6 +446,7 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::deleteIdx('web.items.filter_templated_items');
 	CProfile::deleteIdx('web.items.filter_with_triggers');
 	CProfile::deleteIdx('web.items.filter_ipmi_sensor');
+	CProfile::deleteIdx('web.items.filter_discovery');
 	DBend();
 }
 
