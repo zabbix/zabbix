@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageMaintenance extends CWebTest {
+class testPageMaintenance extends CLegacyWebTest {
 	// Returns all maintenances
 	public static function allMaintenances() {
-		return DBdata('select * from maintenances');
+		return CDBHelper::getDataProvider('select * from maintenances');
 	}
 
 	/**
@@ -47,20 +47,19 @@ class testPageMaintenance extends CWebTest {
 	* @dataProvider allMaintenances
 	*/
 	public function testPageMaintenance_SimpleUpdate($maintenance) {
-		$this->markTestSkipped();
 		$name = $maintenance['name'];
 		$maintenanceid = $maintenance['maintenanceid'];
 
 		$sqlMaintenance = "select * from maintenances where name='$name' order by maintenanceid";
-		$oldHashMaintenance = DBhash($sqlMaintenance);
+		$oldHashMaintenance = CDBHelper::getHash($sqlMaintenance);
 		$sqlHosts = "select * from maintenances_hosts where maintenanceid=$maintenanceid order by maintenance_hostid";
-		$oldHashHosts = DBhash($sqlHosts);
+		$oldHashHosts = CDBHelper::getHash($sqlHosts);
 		$sqlGroups = "select * from maintenances_groups where maintenanceid=$maintenanceid order by maintenance_groupid";
-		$oldHashGroups = DBhash($sqlGroups);
+		$oldHashGroups = CDBHelper::getHash($sqlGroups);
 		$sqlWindows = "select * from maintenances_windows where maintenanceid=$maintenanceid order by maintenance_timeperiodid";
-		$oldHashWindows = DBhash($sqlWindows);
+		$oldHashWindows = CDBHelper::getHash($sqlWindows);
 		$sqlTimeperiods = "select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid) order by timeperiodid";
-		$oldHashTimeperiods = DBhash($sqlTimeperiods);
+		$oldHashTimeperiods = CDBHelper::getHash($sqlTimeperiods);
 
 		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
@@ -72,11 +71,11 @@ class testPageMaintenance extends CWebTest {
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestTextPresent('Maintenance periods');
 
-		$this->assertEquals($oldHashMaintenance, DBhash($sqlMaintenance), "Chuck Norris: Maintenance update changed data in table 'maintenances'");
-		$this->assertEquals($oldHashHosts, DBhash($sqlHosts), "Chuck Norris: Maintenance update changed data in table 'maintenances_hosts'");
-		$this->assertEquals($oldHashGroups, DBhash($sqlGroups), "Chuck Norris: Maintenance update changed data in table 'maintenances_groups'");
-		$this->assertEquals($oldHashWindows, DBhash($sqlWindows), "Chuck Norris: Maintenance update changed data in table 'maintenances_windows'");
-		$this->assertEquals($oldHashTimeperiods, DBhash($sqlTimeperiods), "Chuck Norris: Maintenance update changed data in table 'timeperiods'");
+		$this->assertEquals($oldHashMaintenance, CDBHelper::getHash($sqlMaintenance), "Chuck Norris: Maintenance update changed data in table 'maintenances'");
+		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts), "Chuck Norris: Maintenance update changed data in table 'maintenances_hosts'");
+		$this->assertEquals($oldHashGroups, CDBHelper::getHash($sqlGroups), "Chuck Norris: Maintenance update changed data in table 'maintenances_groups'");
+		$this->assertEquals($oldHashWindows, CDBHelper::getHash($sqlWindows), "Chuck Norris: Maintenance update changed data in table 'maintenances_windows'");
+		$this->assertEquals($oldHashTimeperiods, CDBHelper::getHash($sqlTimeperiods), "Chuck Norris: Maintenance update changed data in table 'timeperiods'");
 	}
 
 	/**
@@ -97,14 +96,14 @@ class testPageMaintenance extends CWebTest {
 		$this->zbxTestTextPresent('Maintenance deleted');
 
 		$sql = "select * from maintenances where maintenanceid=$maintenanceid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = "select * from maintenances_hosts where maintenanceid=$maintenanceid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = "select * from maintenances_groups where maintenanceid=$maintenanceid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = "select * from maintenances_windows where maintenanceid=$maintenanceid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = "select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid)";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 }

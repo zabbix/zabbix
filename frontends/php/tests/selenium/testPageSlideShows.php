@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageSlideShows extends CWebTest {
+class testPageSlideShows extends CLegacyWebTest {
 
 	public static function allSlideShows() {
-		return DBdata("select * from slideshows order by slideshowid");
+		return CDBHelper::getDataProvider("select * from slideshows order by slideshowid");
 	}
 
 	/**
@@ -50,9 +50,9 @@ class testPageSlideShows extends CWebTest {
 		$slideshowid = $slideshow['slideshowid'];
 
 		$sqlSlideShow = "select * from slideshows where name='$name' order by slideshowid";
-		$oldHashSlideShow = DBhash($sqlSlideShow);
+		$oldHashSlideShow = CDBHelper::getHash($sqlSlideShow);
 		$sqlSlide = "select * from slides where slideshowid=$slideshowid order by slideid";
-		$oldHashSlide = DBhash($sqlSlide);
+		$oldHashSlide = CDBHelper::getHash($sqlSlide);
 
 		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
@@ -67,8 +67,8 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestCheckHeader('Slide shows');
 
-		$this->assertEquals($oldHashSlideShow, DBhash($sqlSlideShow), "Chuck Norris: Slide show update changed data in table 'slideshows'");
-		$this->assertEquals($oldHashSlide, DBhash($sqlSlide), "Chuck Norris: Slide show update changed data in table 'slides'");
+		$this->assertEquals($oldHashSlideShow, CDBHelper::getHash($sqlSlideShow), "Chuck Norris: Slide show update changed data in table 'slideshows'");
+		$this->assertEquals($oldHashSlide, CDBHelper::getHash($sqlSlide), "Chuck Norris: Slide show update changed data in table 'slides'");
 	}
 
 	public function testPageSlideShows_Create() {
@@ -103,9 +103,9 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestCheckHeader('Slide shows');
 
 		$sql = "select * from slideshows where slideshowid=$slideshowid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = "select * from slides where slideshowid=$slideshowid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	/**
@@ -119,9 +119,8 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Slide show deleted');
-		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals(0, DBcount('SELECT NULL FROM slideshows'));
-		$this->assertEquals(0, DBcount('SELECT NULL FROM slides'));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM slideshows'));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM slides'));
 	}
 }

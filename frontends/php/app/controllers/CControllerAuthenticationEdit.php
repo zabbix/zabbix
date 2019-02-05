@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,9 +84,6 @@ class CControllerAuthenticationEdit extends CController {
 		];
 
 		if ($this->hasInput('form_refresh')) {
-			// Fill value for unchecked state to prevent defaults values from database to be set.
-			$data += array_fill_keys(['http_case_sensitive', 'ldap_case_sensitive'], 0);
-
 			$this->getInputs($data, [
 				'form_refresh',
 				'change_bind_password',
@@ -108,11 +105,7 @@ class CControllerAuthenticationEdit extends CController {
 				'http_strip_domains'
 			]);
 
-			$data += DB::getDefaults('config');
-
-			if ($data['ldap_configured'] != ZBX_AUTH_LDAP_ENABLED) {
-				$data['change_bind_password'] = 1;
-			}
+			$data += select_config();
 		}
 		else {
 			$data += select_config();

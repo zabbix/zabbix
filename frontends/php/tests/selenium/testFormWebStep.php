@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup httptest
  */
-class testFormWebStep extends CWebTest {
+class testFormWebStep extends CLegacyWebTest {
 
 	public static function steps() {
 		return [
@@ -783,17 +783,6 @@ class testFormWebStep extends CWebTest {
 				$input = $element->findElement(WebDriverBy::xpath('.//input[@data-type="'.$field.'"]'));
 				$input->sendKeys($value);
 
-				// TODO: debug info
-				$this->webDriver->wait(5, self::WAIT_ITERATION)->until(
-					function ($driver) use ($input, $value) {
-						try {
-							return $input->getAttribute('value') === $value;
-						} catch (StaleElementReferenceException $e) {
-							return null;
-						}
-					}
-				);
-
 				// Fire onchange event.
 				$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
 						'event.initEvent("change", false, true);'.
@@ -965,7 +954,6 @@ class testFormWebStep extends CWebTest {
 				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_bg']"));
 				$this->zbxTestClickWait('add');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added');
-				$this->zbxTestCheckFatalErrors();
 				break;
 			case TEST_BAD:
 				if (array_key_exists('error_msg', $data)) {
@@ -977,7 +965,6 @@ class testFormWebStep extends CWebTest {
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
-				$this->zbxTestCheckFatalErrors();
 				break;
 			case TEST_ERROR:
 				$get_text = $this->zbxTestGetText("//div[@class='overlay-dialogue-body']/span");

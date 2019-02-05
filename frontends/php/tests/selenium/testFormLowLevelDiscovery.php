@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
  * @backup items
  */
-class testFormDiscoveryRule extends CWebTest {
+class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 	/**
 	 * The name of the test host created in the test data set.
@@ -220,7 +220,7 @@ class testFormDiscoveryRule extends CWebTest {
 	/**
 	 * @dataProvider layout
 	 */
-	public function testFormDiscoveryRule_CheckLayout($data) {
+	public function testFormLowLevelDiscovery_CheckLayout($data) {
 
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
@@ -348,14 +348,13 @@ class testFormDiscoveryRule extends CWebTest {
 				case INTERFACE_TYPE_ANY :
 				case INTERFACE_TYPE_JMX :
 					$this->zbxTestTextPresent('Host interface');
-					$dbInterfaces = DBdata(
+					$dbInterfaces = CDBHelper::getAll(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType), false
+							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
 					);
-					$dbInterfaces = reset($dbInterfaces);
-					if ($dbInterfaces != null) {
+					if ($dbInterfaces) {
 						foreach ($dbInterfaces as $host_interface) {
 							$this->zbxTestAssertElementPresentXpath('//select[@id="interfaceid"]/optgroup/option[text()="'.
 							$host_interface['ip'].' : '.$host_interface['port'].'"]');
@@ -462,7 +461,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
-			$this->zbxTestAssertElementValue('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
+			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
 
 			$this->zbxTestTextPresent('Port');
 			$this->zbxTestAssertVisibleId('port');
@@ -657,17 +656,20 @@ class testFormDiscoveryRule extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from items where hostid = 40001 and key_ LIKE 'discovery-rule-form%'");
+		return CDBHelper::getDataProvider(
+			'select * from items'.
+			' where hostid = 40001 and key_ LIKE \'discovery-rule-form%\''
+		);
 	}
 
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormDiscoveryRule_SimpleUpdate($data) {
+	public function testFormLowLevelDiscovery_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlDiscovery = 'select itemid, hostid, name, key_, delay from items order by itemid';
-		$oldHashDiscovery = DBhash($sqlDiscovery);
+		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
@@ -678,7 +680,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule updated');
 		$this->zbxTestTextPresent("$name");
 
-		$this->assertEquals($oldHashDiscovery, DBhash($sqlDiscovery));
+		$this->assertEquals($oldHashDiscovery, CDBHelper::getHash($sqlDiscovery));
 	}
 
 	// Returns create data
@@ -995,7 +997,7 @@ class testFormDiscoveryRule extends CWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "".'
 					]
 				]
 			],
@@ -1010,7 +1012,7 @@ class testFormDiscoveryRule extends CWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-11,00:00-24:00".'
 					]
 				]
 			],
@@ -1025,7 +1027,7 @@ class testFormDiscoveryRule extends CWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,00:00-25:00".'
 					]
 				]
 			],
@@ -1040,7 +1042,7 @@ class testFormDiscoveryRule extends CWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,24:00-00:00".'
 					]
 				]
 			],
@@ -1379,6 +1381,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'discovery-snmpv1-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1389,6 +1392,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv2 agent',
 					'name' => 'SNMPv2 agent',
 					'key' => 'discovery-snmpv2-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1399,6 +1403,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'discovery-snmpv3-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1408,7 +1413,20 @@ class testFormDiscoveryRule extends CWebTest {
 					'expected' => TEST_BAD,
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
+					'key' => 'test-item-snmp_oid',
+					'error_msg' => 'Page received incorrect data',
+					'errors' => [
+						'Incorrect value for field "SNMP OID": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'SNMPv1 agent',
+					'name' => 'SNMPv1 agent',
 					'key' => 'test-item-reuse',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
 						'Item with key "test-item-reuse" already exists on "Simple form test host".'
@@ -1421,6 +1439,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'test-item-form1',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
 						'Item with key "test-item-form1" already exists on "Simple form test host".'
@@ -1602,7 +1621,7 @@ class testFormDiscoveryRule extends CWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testFormDiscoveryRule_SimpleCreate($data) {
+	public function testFormLowLevelDiscovery_SimpleCreate($data) {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
@@ -1669,6 +1688,10 @@ class testFormDiscoveryRule extends CWebTest {
 
 		if (isset($data['delay']))	{
 			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
+		}
+
+		if (array_key_exists('snmp_oid', $data))	{
+			$this->zbxTestInputTypeOverwrite('snmp_oid', $data['snmp_oid']);
 		}
 
 		$itemFlexFlag = true;
@@ -1762,7 +1785,6 @@ class testFormDiscoveryRule extends CWebTest {
 					'JMX agent'])) {
 				$this->zbxTestClick('check_now');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
-				$this->zbxTestCheckFatalErrors();
 			}
 			else {
 				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
@@ -1799,11 +1821,11 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rules deleted');
 
 			$sql = "SELECT itemid FROM items WHERE name = '".$name."' and hostid = ".$this->hostid;
-			$this->assertEquals(0, DBcount($sql), 'Discovery rule has not been deleted from DB.');
+			$this->assertEquals(0, CDBHelper::getCount($sql), 'Discovery rule has not been deleted from DB.');
 		}
 	}
 
-		public static function getCreateFiltersData() {
+		public static function getFiltersTabData() {
 			return [
 				[
 					[
@@ -1864,9 +1886,11 @@ class testFormDiscoveryRule extends CWebTest {
 		}
 
 	/**
-	 * @dataProvider getCreateFiltersData
+	 * Test creation of a discovery rule with data filling in Filters tab.
+	 *
+	 * @dataProvider getFiltersTabData
 	 */
-	public function testFormDiscoveryRule_CreateFiltersMacros($data) {
+	public function testFormLowLevelDiscovery_FiltersTab($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
@@ -1891,13 +1915,12 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestClickWait('add');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created');
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextPresent($data['name']);
 
-		$this->assertEquals(1, DBcount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
 	}
 
-	public static function getCreateFiltersMacrosValidationData() {
+	public static function getFiltersTabValidationData() {
 		return [
 			[
 				[
@@ -2005,9 +2028,9 @@ class testFormDiscoveryRule extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getCreateFiltersMacrosValidationData
+	 * @dataProvider getFiltersTabValidationData
 	 */
-	public function testFormDiscoveryRule_FiltersMacrosValidation($data) {
+	public function testFormLowLevelDiscovery_FiltersTabValidation($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
@@ -2033,8 +2056,182 @@ class testFormDiscoveryRule extends CWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add discovery rule');
 		$this->zbxTestTextPresentInMessageDetails($data['error_message']);
-		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals(0, DBcount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
+	}
+
+	public function getLLDMacrosTabData() {
+		return [
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Macro with empty path',
+					'key' => 'macro-with-empty-path',
+					'macros' => [
+						['macro' => '{#MACRO}', 'path'=>''],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Macro without #',
+					'key' => 'macro-without-hash',
+					'macros' => [
+						['macro' => '{MACRO}', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Macro with cyrillic symbols',
+					'key' => 'macro-with-cyrillic-symbols',
+					'macros' => [
+						['macro' => '{#МАКРО}', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Macro with special symbols',
+					'key' => 'macro-with-with-special-symbols',
+					'macros' => [
+						['macro' => '{#MACRO!@$%^&*()_+|?}', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'LLD with empty macro',
+					'key' => 'lld-with-empty-macro',
+					'macros' => [
+						['macro' => '', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'LLD with context macro',
+					'key' => 'lld-with-context-macro',
+					'macros' => [
+						['macro' => '{$MACRO:A}', 'path'=>'$.path'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'LLD with two equal macros',
+					'key' => 'lld-with-two-equal-macros',
+					'macros' => [
+						['macro' => '{#MACRO}', 'path'=>'$.path.a'],
+						['macro' => '{#MACRO}', 'path'=>'$.path.b'],
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2/lld_macro": value "{#MACRO}" already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'LLD with valid macro and path',
+					'key' => 'lld-with-valid-macro-and-path',
+					'macros' => [
+						['macro' => '{#MACRO1}', 'path'=>'$.path'],
+						['macro' => '{#MACRO2}', 'path'=>"$['а']['!@#$%^&*()_+']"]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test creation of a discovery rule with data filling in Macros tab.
+	 *
+	 * @dataProvider getLLDMacrosTabData
+	 */
+	public function testFormLowLevelDiscovery_LLDMacrosTab($data) {
+		$sql_items = "SELECT * FROM items ORDER BY itemid";
+		$old_hash = CDBHelper::getHash($sql_items);
+
+		$this->page->login()->open('host_discovery.php?hostid='.$this->hostid);
+		$this->query('button:Create discovery rule')->one()->click();
+
+		$form = $this->query('name:itemForm')->asForm()->one();
+		$form->getField('Name')->fill($data['name']);
+		$form->getField('Key')->fill($data['key']);
+		$form->selectTab('LLD macros');
+
+		$macros_table = $form->getField('LLD macros');
+		$button = $macros_table->query('button:Add')->one();
+		$last = count($data['macros']) - 1;
+
+		foreach ($data['macros'] as $i => $lld_macro) {
+			$row = $macros_table->getRows()->get($i);
+			$row->getColumn('LLD macro')->query('tag:input')->one()->fill($lld_macro['macro']);
+			$row->getColumn('JSON Path')->query('tag:input')->one()->fill($lld_macro['path']);
+
+			if ($i !== $last) {
+				$button->click();
+			}
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		// Get global message.
+		$message = CMessageElement::find()->one();
+
+		$expected = $data['expected'];
+		switch ($expected) {
+			case TEST_GOOD:
+				// Check if message is positive.
+				$this->assertTrue($message->isGood());
+				// Check message title.
+				$this->assertEquals('Discovery rule created', $message->getTitle());
+
+				// Check the results in DB.
+				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($data['key'])));
+
+				// Check the results in form.
+				$this->checkLLDMacrosFormFields($data);
+				break;
+			case TEST_BAD:
+				// Check if message is negative.
+				$this->assertTrue($message->isBad());
+				// Check message title.
+				$this->assertEquals('Cannot add discovery rule', $message->getTitle());
+				$this->assertTrue($message->hasLine($data['error_details']));
+
+				// Check that DB hash is not changed.
+				$this->assertEquals($old_hash, CDBHelper::getHash($sql_items));
+				break;
+		}
+	}
+
+	private function checkLLDMacrosFormFields($data) {
+		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['key']));
+		$this->page->open('host_discovery.php?form=update&itemid='.$id);
+		$form = $this->query('name:itemForm')->asForm()->one();
+		$form->selectTab('LLD macros');
+		$table = $form->getField('LLD macros');
+
+		foreach ($data['macros'] as $i => $lld_macro) {
+			$row = $table->getRows()->get($i);
+			$macro = $row->getColumn('LLD macro')->query('tag:input')->one()->getAttribute('value');
+			$this->assertEquals($lld_macro['macro'], $macro);
+
+			$path = $row->getColumn('JSON Path')->query('tag:input')->one()->getAttribute('value');
+			$this->assertEquals($lld_macro['path'], $path);
+		}
 	}
 }

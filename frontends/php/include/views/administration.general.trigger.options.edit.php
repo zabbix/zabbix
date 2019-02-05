@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ $widget = (new CWidget())
 	);
 
 $triggerDOFormList = (new CFormList())
-	->addRow(_('Use custom event status colors'), (new CCheckBox('custom_color'))
+	->addRow(_('Use custom event status colours'), (new CCheckBox('custom_color'))
 		->setChecked($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
 		->setAttribute('autofocus', 'autofocus')
 	)

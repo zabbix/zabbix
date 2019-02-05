@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,23 +18,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup items
  */
-class testInheritanceDiscoveryRule extends CWebTest {
+class testInheritanceDiscoveryRule extends CLegacyWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
 	private $template  = 'Inheritance test template';
 
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
 
-	// returns list of discovery rules from a template
+	// Returns list of discovery rules from a template.
 	public static function update() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 			'SELECT itemid'.
 			' FROM items'.
 			' WHERE hostid=15000'.	//	$this->templateid.
@@ -47,18 +47,18 @@ class testInheritanceDiscoveryRule extends CWebTest {
 	 */
 	public function testInheritanceDiscoveryRule_SimpleUpdate($data) {
 		$sqlDiscovery = 'SELECT * FROM items ORDER BY itemid';
-		$oldHashDiscovery = DBhash($sqlDiscovery);
+		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
 
 		$this->zbxTestLogin('host_discovery.php?form=update&itemid='.$data['itemid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
 
-		$this->assertEquals($oldHashDiscovery, DBhash($sqlDiscovery));
+		$this->assertEquals($oldHashDiscovery, CDBHelper::getHash($sqlDiscovery));
 
 	}
 
-	// Returns create data
+	// Returns create data.
 	public static function create() {
 		return [
 			[
@@ -77,6 +77,17 @@ class testInheritanceDiscoveryRule extends CWebTest {
 						'Discovery rule "discovery-rule-inheritance5" already exists on "Template inheritance test host", inherited from another template'
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'testInheritanceDiscoveryRuleWithLLDMacros',
+					'key' => 'discovery-rule-inheritance-with-macros',
+					'macros' => [
+						['macro' => '{#MACRO1}', 'path'=>'$.path.1'],
+						['macro' => '{#MACRO2}', 'path'=>'$.path.1']
+					]
+				]
 			]
 		];
 	}
@@ -90,6 +101,19 @@ class testInheritanceDiscoveryRule extends CWebTest {
 		$this->zbxTestInputType('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
 
+		if (array_key_exists('macros', $data)) {
+			$this->zbxTestTabSwitch('LLD macros');
+			$last = count($data['macros']) - 1;
+
+			foreach ($data['macros'] as $i => $lld_macro) {
+				$this->zbxTestInputType('lld_macro_paths_'.$i.'_lld_macro', $lld_macro['macro'] );
+				$this->zbxTestInputType('lld_macro_paths_'.$i.'_path', $lld_macro['path'] );
+				if ($i !== $last) {
+					$this->zbxTestClick('lld_macro_add');
+				}
+			}
+		}
+
 		$this->zbxTestClickWait('add');
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -99,7 +123,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 
 				$itemId = 0;
 
-				// template
+				// Template DB check.
 				$dbResult = DBselect(
 					'SELECT itemid,name,templateid'.
 					' FROM items'.
@@ -115,7 +139,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 
 				$this->assertNotEquals($itemId, 0);
 
-				// host
+				// Host DB check.
 				$dbResult = DBselect(
 					'SELECT key_,name'.
 					' FROM items'.
@@ -126,6 +150,20 @@ class testInheritanceDiscoveryRule extends CWebTest {
 				if ($dbRow = DBfetch($dbResult)) {
 					$this->assertEquals($dbRow['key_'], $data['key']);
 					$this->assertEquals($dbRow['name'], $data['name']);
+				}
+
+				// Host form check.
+				$this->zbxTestLogin('host_discovery.php?hostid='.$this->hostid);
+				$this->zbxTestClickLinkText($data['name']);
+				$this->zbxTestWaitForPageToLoad();
+				$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@value="'.$data['name'].'"][@readonly]');
+				$this->zbxTestAssertElementPresentXpath('//input[@id="key"][@value="'.$data['key'].'"][@readonly]');
+				if (array_key_exists('macros', $data)) {
+					$this->zbxTestTabSwitch('LLD macros');
+					foreach ($data['macros'] as $i => $lld_macro) {
+						$this->zbxTestAssertElementPresentXpath('//input[@id="lld_macro_paths_'.$i.'_lld_macro"][@value="'.$lld_macro['macro'].'"][@readonly]');
+						$this->zbxTestAssertElementPresentXpath('//input[@id="lld_macro_paths_'.$i.'_path"][@value="'.$lld_macro['path'].'"][@readonly]');
+					}
 				}
 				break;
 

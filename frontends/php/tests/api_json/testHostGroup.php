@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup hstgrp
  */
-class testHostGroup extends CZabbixTest {
+class testHostGroup extends CAPITest {
 
 	public static function hostgroup_create() {
 		return [
@@ -299,7 +299,7 @@ class testHostGroup extends CZabbixTest {
 		else {
 			foreach ($hostgroups as $hostgroup) {
 				if (array_key_exists('name', $hostgroup) && $hostgroup['name'] !== 'Templates'){
-					$this->assertEquals(0, DBcount('SELECT * FROM hstgrp WHERE name='.zbx_dbstr($hostgroup['name'])));
+					$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hstgrp WHERE name='.zbx_dbstr($hostgroup['name'])));
 				}
 			}
 		}
@@ -396,6 +396,39 @@ class testHostGroup extends CZabbixTest {
 					'50011'
 				],
 				'expected_error' => null
+			],
+			// maintenance related
+			[
+				'hostgroup' => [
+					'62002'
+				],
+				'expected_error' => 'Cannot delete host group because maintenance "maintenance_has_only_group" must contain at least one host or host group.'
+			],
+			[
+				'hostgroup' => [
+					'62002',
+					'62003'
+				],
+				'expected_error' => 'Cannot delete selected host groups because maintenance "maintenance_has_only_group" must contain at least one host or host group.'
+			],
+			[
+				'hostgroup' => [
+					'62003'
+				],
+				'expected_error' => null,
+			],
+			[
+				'hostgroup' => [
+					'62004',
+					'62005'
+				],
+				'expected_error' => 'Cannot delete selected host groups because maintenance "maintenance_two_groups" must contain at least one host or host group.'
+			],
+			[
+				'hostgroup' => [
+					'62004'
+				],
+				'expected_error' => null,
 			]
 		];
 	}
@@ -408,7 +441,7 @@ class testHostGroup extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $id) {
-				$this->assertEquals(0, DBcount('select * from hstgrp where groupid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount('select * from hstgrp where groupid='.zbx_dbstr($id)));
 			}
 		}
 	}

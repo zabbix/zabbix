@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,8 +33,8 @@ class CScreenGraph extends CScreenBase {
 			: $this->screenitem['resourceid'];
 		$containerId = 'graph_container_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
 		$graphDims = getGraphDims($resourceId);
-		$graphDims['graphHeight'] = $this->screenitem['height'];
-		$graphDims['width'] = $this->screenitem['width'];
+		$graphDims['graphHeight'] = (int) $this->screenitem['height'];
+		$graphDims['width'] = (int) $this->screenitem['width'];
 		$graph = getGraphByGraphId($resourceId);
 		$graphId = $graph['graphid'];
 		$legend = $graph['show_legend'];
@@ -106,11 +106,11 @@ class CScreenGraph extends CScreenBase {
 			}
 
 			$newGraphItems = getSameGraphItemsForHost($graph['gitems'], $this->hostid, false);
-			foreach ($newGraphItems as $newGraphItem) {
+			foreach ($newGraphItems as $i => $newGraphItem) {
 				unset($newGraphItem['gitemid'], $newGraphItem['graphid']);
 
 				foreach ($newGraphItem as $name => $value) {
-					$this->screenitem['url']->setArgument('items['.$newGraphItem['itemid'].']['.$name.']', $value);
+					$this->screenitem['url']->setArgument('items['.$i.']['.$name.']', $value);
 				}
 			}
 
@@ -186,7 +186,9 @@ class CScreenGraph extends CScreenBase {
 				);
 			}
 
-			$item->setId($containerId);
+			$item
+				->addClass(ZBX_STYLE_GRAPH_WRAPPER)
+				->setId($containerId);
 
 			return $this->getOutput($item);
 		}

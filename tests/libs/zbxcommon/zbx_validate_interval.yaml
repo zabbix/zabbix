@@ -1,0 +1,676 @@
+# simple interval
+test case: "min"
+in:
+  str: '1'
+out:
+  return: 'SUCCEED'
+---
+test case: "max"
+in:
+  str: '86400'
+out:
+  return: 'SUCCEED'
+---
+test case: "more than allowed"
+in:
+  str: '86401'
+out:
+  return: 'FAIL'
+---
+test case: "min seconds"
+in:
+  str: '1s'
+out:
+  return: 'SUCCEED'
+---
+test case: "max seconds"
+in:
+  str: '86400s'
+out:
+  return: 'SUCCEED'
+---
+test case: "more than allowed seconds"
+in:
+  str: '86401s'
+out:
+  return: 'FAIL'
+---
+test case: "min minutes"
+in:
+  str: '1m'
+out:
+  return: 'SUCCEED'
+---
+test case: "max minutes"
+in:
+  str: '1440m'
+out:
+  return: 'SUCCEED'
+---
+test case: "more than allowed minutes"
+in:
+  str: '1441m'
+out:
+  return: 'FAIL'
+---
+test case: "min hours"
+in:
+  str: '1h'
+out:
+  return: 'SUCCEED'
+---
+test case: "max hours"
+in:
+  str: '24h'
+out:
+  return: 'SUCCEED'
+---
+test case: "more than allowed hours"
+in:
+  str: '25h'
+out:
+  return: 'FAIL'
+---
+test case: "min/max days"
+in:
+  str: '1d'
+out:
+  return: 'SUCCEED'
+---
+test case: "more than allowed days"
+in:
+  str: '2d'
+out:
+  return: 'FAIL'
+---
+test case: "weeks not allowed"
+in:
+  str: '1w'
+out:
+  return: 'FAIL'
+---
+test case: "zero alone are not allowed"
+in:
+  str: '0'
+out:
+  return: 'FAIL'
+---
+test case: "zero seconds alone are not allowed"
+in:
+  str: '0s'
+out:
+  return: 'FAIL'
+---
+test case: "simple interval with improper delimiter not allowed"
+in:
+  str: '1/'
+out:
+  return: 'FAIL'
+---
+test case: "invalid update interval"
+in:
+  str: 'x'
+out:
+  return: 'FAIL'
+---
+test case: "simple interval with only delimiter is not allowed"
+in:
+  str: '1;'
+out:
+  return: 'FAIL'
+---
+test case: "simple interval with double delimiter is not allowed"
+in:
+  str: '1;;'
+out:
+  return: 'FAIL'
+---
+# macros in simple interval
+test case: "macro is allowed as simple interval"
+in:
+  str: '{$MACRO}'
+out:
+  return: 'SUCCEED'
+---
+test case: "suffixes are not allowed with macro"
+in:
+  str: '${MACRO}s'
+out:
+  return: 'FAIL'
+---
+test case: "macro with unexpected delimiter is not allowed"
+in:
+  str: '{$MACRO}/'
+out:
+  return: 'FAIL'
+---
+test case: "macro with unexpected delimiter is not allowed"
+in:
+  str: '/{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "macro as units is not allowed"
+in:
+  str: '1{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "only user macro is allowed"
+in:
+  str: '{MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "several macros not allowed"
+in:
+  str: '{$MACRO}{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "simple interval with only delimiter is not allowed"
+in:
+  str: '{$MACRO};'
+out:
+  return: 'FAIL'
+---
+test case: "simple interval macro with double delimiter is not allowed"
+in:
+  str: '{$MACRO};;'
+out:
+  return: 'FAIL'
+---
+# simple interval + flexible
+test case: "one flexible interval is allowed"
+in:
+  str: '1s;2s/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "more than one flexible intervals are allowed"
+in:
+  str: '1s;2s/1-6,00:00-23:00;0/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+# simple interval + flexible and one is invalid
+test case: "invalid simple interval"
+in:
+  str: 'a;2s/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "invalid flexible interval"
+in:
+  str: '1;s/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "invalid flexible"
+in:
+  str: '1;1/c'
+out:
+  return: 'FAIL'
+---
+test case: "flexible interval double semicolon"
+in:
+  str: '1;;0/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "flexible interval double delimiter"
+in:
+  str: '1;0//1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "flexible interval wrong delimiter"
+in:
+  str: '1;0x1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "ends with unexpected semicolon"
+in:
+  str: '1s;2s/1-6,00:00-23:00;'
+out:
+  return: 'FAIL'
+---
+test case: "flexible update interval is missing"
+in:
+  str: '1s;1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "flexible period is missing"
+in:
+  str: '1s;2s'
+out:
+  return: 'FAIL'
+---
+test case: "flexible period is missing but there is delimiter"
+in:
+  str: '1s;2s/'
+out:
+  return: 'FAIL'
+---
+# simple interval + flexible with and macro
+test case: "macro in simple interval"
+in:
+  str: '{$MACRO};2s/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "macro in flexible interval"
+in:
+  str: '{$MACRO};{$MACRO}/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "macro in flexible"
+in:
+  str: '{$MACRO};{$MACRO}/{$MACRO}'
+out:
+  return: 'SUCCEED'
+---
+test case: "macro flexible update interval only"
+in:
+  str: '1;{$MACRO}/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "macro flexible only"
+in:
+  str: '1;1/{$MACRO}'
+out:
+  return: 'SUCCEED'
+---
+test case: "more than one flexible intervals are allowed"
+in:
+  str: '1s;{$MACRO}/{$MACRO};{$MACRO}/{$MACRO}'
+out:
+  return: 'SUCCEED'
+---
+# simple interval + flexible and one is invalid + macro
+test case: "invalid simple interval even if all other is macro"
+in:
+  str: 'a;{$MACRO}/{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "invalid flexible interval even if other are macros"
+in:
+  str: '{$MACRO};s/{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "invalid flexible with all other macro"
+in:
+  str: '{$MACRO};{$MACRO}/c'
+out:
+  return: 'FAIL'
+---
+test case: "suffixes are not allowed in flexible update interval after macro"
+in:
+  str: '1s;{$MACRO}s/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "macro must be whole value in flexible, not just part"
+in:
+  str: '1s;1s/{$MACRO}-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "macro must be whole value in flexible, not just part in the end"
+in:
+  str: '1s;1s/1-6,00:00-{$MACRO}'
+out:
+  return: 'FAIL'
+---
+# simple interval + flexible and one is invalid but with macros
+test case: "invalid simple interval"
+in:
+  str: '{$MACRO}a;2s/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "invalid flexible interval"
+in:
+  str: '1;{$MACRO}s/{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "invalid flexible"
+in:
+  str: '1;1/z{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "flexible interval double delimiter"
+in:
+  str: '1;{$MACRO}//1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "flexible interval wrong delimiter"
+in:
+  str: '1;{$MACRO}x1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "flexible interval double semicolon"
+in:
+  str: '{$MACRO};;0/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+# macro does not affect other field validation
+test case: "invalid in update interval"
+in:
+  str: 'a;{$MACRO}/{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "invalid in flexible update interval"
+in:
+  str: '{$MACRO};s/{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "invalid in flexible interval"
+in:
+  str: '{$MACRO};{$MACRO}/z'
+out:
+  return: 'FAIL'
+---
+# context macro
+test case: "context macro is correctly handled"
+in:
+  str: '1s;{$MACRO:";"}/{$MACRO};{$MACRO:"/"}/{$MACRO:";"}'
+out:
+  return: 'SUCCEED'
+---
+test case: "context macro + real values"
+in:
+  str: '{$MACRO:";"};{$MACRO:";"}/1-6,00:00-23:00;{$MACRO:"/"}/1-6,00:00-23:00;1/{$MACRO:";"}'
+out:
+  return: 'SUCCEED'
+---
+test case: "context macro + last macro is broken"
+in:
+  str: '1s;{$MACRO:";"}/{$MACRO};{$MACRO:"/"}/{$MACRO:";"'
+out:
+  return: 'FAIL'
+---
+test case: "context macro + invalid flexible"
+in:
+  str: '1s;{$MACRO:";"}/b;{$MACRO:"/"}/{$MACRO:";"}'
+out:
+  return: 'FAIL'
+---
+# simple interval + flexible and one is 0
+test case: "simple interval can be 0 in case flexible is non zero"
+in:
+  str: '0;2s/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "simple interval can be 0 in case flexible intervals are non zero"
+in:
+  str: '0;2s/1-6,00:00-23:00;1/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "flexible interval can be 0 in case simple interval is not 0"
+in:
+  str: '1;0/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "simple interval can be 0 in case flexible intervals are non zero"
+in:
+  str: '1;0/1-6,00:00-23:00;0/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+# simple interval + flexible and both are 0
+test case: "simple interval cannot be 0 in case flexible update interval is zero"
+in:
+  str: '0;0/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "simple interval cannot be 0 in case one of flexible intervals is zero"
+in:
+  str: '0;2s/1-6,00:00-23:00;0/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+# simple interval + flexible with 0 and macro
+test case: "flexible interval can be 0 if simple interval is macro"
+in:
+  str: '{$MACRO};0/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "simple interval can be 0 if flexible interval is macro"
+in:
+  str: '0;{$MACRO}/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "simple interval can be 0 if flexible update interval is non zero or macro"
+in:
+  str: '0;2s/1-6,00:00-23:00;{$MACRO}/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "simple interval cannot be 0 if one of flexible intervals is macro while other is 0"
+in:
+  str: '0;0/1-6,00:00-23:00;{$MACRO}/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+# upper limit of interval
+test case: "within limits"
+in:
+  str: '86400;2147483647/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "simple interval is too high"
+in:
+  str: '86401;1/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "flexible interval is too high"
+in:
+  str: '1;9223372036854775807/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "flexible interval overflow"
+in:
+  str: '1;2147483648/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "simple interval too high but flexible is macro"
+in:
+  str: '86401;{$MACRO}/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "flexible interval is too high but simple is macro"
+in:
+  str: '{$MACRO};9223372036854775807/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+# scheduling
+test case: "update interval + scheduling check"
+in:
+  str: '1;wd1-5h9-18'
+out:
+  return: 'SUCCEED'
+---
+test case: "0 update interval + scheduling check"
+in:
+  str: '0;wd1-5h9-18'
+out:
+  return: 'SUCCEED'
+---
+test case: "scheduling check with slash"
+in:
+  str: '0;h9m/30;h10'
+out:
+  return: 'SUCCEED'
+---
+test case: "scheduling check with flexible check"
+in:
+  str: '0;h9m/30;h10;1m/1-6,00:00-23:00;h9m10-40/1;1/1-7,12:00-12:01'
+out:
+  return: 'SUCCEED'
+---
+# scheduling with invalid
+test case: "update interval is invalid + scheduling check"
+in:
+  str: 'a;wd1-5h9-18'
+out:
+  return: 'FAIL'
+---
+test case: "invalid scheduling check"
+in:
+  str: '1;x'
+out:
+  return: 'FAIL'
+---
+test case: "invalid scheduling check"
+in:
+  str: '1;x'
+out:
+  return: 'FAIL'
+---
+test case: "scheduling double semicolon"
+in:
+  str: '1;;0/wd1-5h9-18'
+out:
+  return: 'FAIL'
+---
+test case: "scheduling ends with unexpected semicolon"
+in:
+  str: '1;wd1-5h9-18;'
+out:
+  return: 'FAIL'
+---
+test case: "update interval is missing"
+in:
+  str: 'wd1-5h9-18'
+out:
+  return: 'FAIL'
+---
+test case: "delimiter between scheduling macros"
+in:
+  str: '1;wd1-5h9-18/wd1-5h9-18'
+out:
+  return: 'FAIL'
+---
+# scheduling with macros
+test case: "scheduling check as macro"
+in:
+  str: '0;{$MACRO}'
+out:
+  return: 'SUCCEED'
+---
+test case: "scheduling check macro with macro update interval"
+in:
+  str: '{$MACRO};{$MACRO};{$MACRO}'
+out:
+  return: 'SUCCEED'
+---
+test case: "simple update interval as macro"
+in:
+  str: '{$MACRO};h9m/30'
+out:
+  return: 'SUCCEED'
+---
+test case: "simple update interval as macro and one of scheduling"
+in:
+  str: '{$MACRO};h9m/30;{$MACRO}'
+out:
+  return: 'SUCCEED'
+---
+test case: "macro in update interval does not skip validation of scheduling"
+in:
+  str: '{$MACRO};r'
+out:
+  return: 'FAIL'
+---
+test case: "macro in one of scheduling does not skip validation of scheduling"
+in:
+  str: '1;{$MACRO};w9m/30'
+out:
+  return: 'FAIL'
+---
+test case: "macro in one of flexible does not skip validation of scheduling"
+in:
+  str: '1;{$MACRO}/{$MACRO};w9m/30'
+out:
+  return: 'FAIL'
+---
+test case: "macro in one of scheduling does not skip validation of flexible period"
+in:
+  str: '1;{$MACRO};{$MACRO}/b'
+out:
+  return: 'FAIL'
+---
+test case: "macro in one of scheduling does not skip validation of flexible interval"
+in:
+  str: '1;{$MACRO};b/{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "delimiter between scheduling macros must be present"
+in:
+  str: '{$MACRO};{$MACRO}{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "delimiter between scheduling macros must be present"
+in:
+  str: '{$MACRO};{$MACRO}{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "scheduling higher than upper limit"
+in:
+  str: '86401;h9m/30'
+out:
+  return: 'FAIL'
+---
+test case: "scheduling in limit"
+in:
+  str: '86400;h9m/30'
+out:
+  return: 'SUCCEED'
+---
+test case: "scheduling context macro"
+in:
+  str: '{$MACRO:";"};{$MACRO:";"};{$MACRO:"/"};{$MACRO:";"};{$MACRO:"/"};{$MACRO:"/"};{$MACRO:";"};{$MACRO:";"}'
+out:
+  return: 'SUCCEED'
+---
+test case: "scheduling + flexible context macro"
+in:
+  str: '{$MACRO:";"};{$MACRO:";"};{$MACRO:"/"};{$MACRO:";"};{$MACRO:"/"};{$MACRO:"/"};{$MACRO:";"};{$MACRO:";"};{$MACRO:";"}/1-6,00:00-23:00;{$MACRO:"/"}/1-6,00:00-23:00;1/{$MACRO:";"};{$MACRO:";"}'
+out:
+  return: 'SUCCEED'
+---
+test case: "empty delay"
+in:
+  str: ''
+out:
+  return: 'FAIL'
+...

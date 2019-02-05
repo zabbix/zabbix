@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -193,19 +193,24 @@ out:
 
 static void	elastic_log_error(CURL *handle, CURLcode error, const char *errbuf)
 {
-	long	http_code;
+	char		http_status[MAX_STRING_LEN];
+	long int	http_code;
+	CURLcode	curl_err;
 
 	if (CURLE_HTTP_RETURNED_ERROR == error)
 	{
-		curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code);
+		if (CURLE_OK == (curl_err = curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code)))
+			zbx_snprintf(http_status, sizeof(http_status), "HTTP status code: %ld", http_code);
+		else
+			zbx_strlcpy(http_status, "unknown HTTP status code", sizeof(http_status));
 
 		if (0 != page_r.offset)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot get values from elasticsearch, HTTP error: %ld, message: %s",
-					http_code, page_r.data);
+			zabbix_log(LOG_LEVEL_ERR, "cannot get values from elasticsearch, %s, message: %s", http_status,
+					page_r.data);
 		}
 		else
-			zabbix_log(LOG_LEVEL_ERR, "cannot get values from elasticsearch, HTTP error: %ld", http_code);
+			zabbix_log(LOG_LEVEL_ERR, "cannot get values from elasticsearch, %s", http_status);
 	}
 	else
 	{
@@ -480,11 +485,23 @@ try_again:
 				}
 				else
 				{
+					char		http_status[MAX_STRING_LEN];
 					long int	err;
+					CURLcode	curl_err;
 
-					curl_easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE, &err);
-					zabbix_log(LOG_LEVEL_ERR, "cannot send data to elasticsearch, HTTP error code:"
-							" %ld", err);
+					if (CURLE_OK == (curl_err = curl_easy_getinfo(msg->easy_handle,
+							CURLINFO_RESPONSE_CODE, &err)))
+					{
+						zbx_snprintf(http_status, sizeof(http_status), "HTTP status code: %ld",
+								err);
+					}
+					else
+					{
+						zbx_strlcpy(http_status, "unknown HTTP status code",
+								sizeof(http_status));
+					}
+
+					zabbix_log(LOG_LEVEL_ERR, "cannot send data to elasticsearch, %s", http_status);
 				}
 			}
 			else if (CURLE_OK != msg->data.result)

@@ -178,8 +178,8 @@
 							<?= CJs::encodeJson(_('Interface is used by items that require this type of the interface.')) ?>
 						);
 					},
-					function (event) {
-						hintBox.hideHint(event, this);
+					function () {
+						hintBox.hideHint(this);
 					}
 				);
 		}

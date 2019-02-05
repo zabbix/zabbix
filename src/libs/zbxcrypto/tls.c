@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -485,6 +485,27 @@ static void	zbx_tls_cert_error_msg(unsigned int flags, char **error)
 	}
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_version                                                  *
+ *                                                                            *
+ * Purpose: print tls library version on stdout by application request with   *
+ *          parameter '-V'                                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tls_version(void)
+{
+#if defined(HAVE_POLARSSL)
+	printf("Compiled with %s\n", POLARSSL_VERSION_STRING_FULL);
+#elif defined(HAVE_GNUTLS)
+	printf("Compiled with GnuTLS %s\nRunning with GnuTLS %s\n", GNUTLS_VERSION, gnutls_check_version(NULL));
+#elif defined(HAVE_OPENSSL)
+	printf("This product includes software developed by the OpenSSL Project\n"
+			"for use in the OpenSSL Toolkit (http://www.openssl.org/).\n\n");
+	printf("Compiled with %s\nRunning with %s\n", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
+#endif
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1308,13 +1329,12 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 			psk_len = (size_t)psk_bin_len;
 		}
 		else
-		{
-			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find requested PSK identity \"%s\"",
-						__function_name, psk_identity);
-			}
-		}
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\"", psk_identity);
+	}
+	else if (0 < my_psk_identity_len)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\", available PSK identity"
+				" \"%s\"", psk_identity, my_psk_identity);
 	}
 
 	if (0 < psk_len)
@@ -1463,14 +1483,14 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 		}
 		else
 		{
-			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find requested PSK identity \"%s\"",
-						__function_name, identity);
-			}
-
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\"", identity);
 			goto fail;
 		}
+	}
+	else if (0 < my_psk_identity_len)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\", available PSK identity"
+				" \"%s\"", identity, my_psk_identity);
 	}
 
 	if (0 < psk_len)
@@ -5530,6 +5550,8 @@ int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 	else
 		return FAIL;
 #elif defined(HAVE_OPENSSL)
+	ZBX_UNUSED(s);
+
 	/* SSL_get_psk_identity() is not used here. It works with TLS 1.2, */
 	/* but returns NULL with TLS 1.3 in OpenSSL 1.1.1 */
 	if ('\0' != incoming_connection_psk_id[0])

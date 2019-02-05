@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageTriggerPrototypes extends CWebTest {
+class testPageTriggerPrototypes extends CLegacyWebTest {
 
 	// Returns all trigger protos
 	public static function data() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 				'SELECT i.hostid, i.name AS i_name, i.itemid, h.status, t.triggerid, t.description, d.parent_itemid, di.name AS d_name'.
 				' FROM items i, triggers t, functions f, item_discovery d, items di, hosts h'.
 					' WHERE f.itemid = i.itemid'.
@@ -89,12 +89,12 @@ class testPageTriggerPrototypes extends CWebTest {
 		$this->zbxTestTextPresent('Trigger prototypes deleted');
 
 		$sql = 'SELECT null FROM triggers WHERE triggerid='.$triggerid;
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	// Returns all discovery rules
 	public static function rule() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 				'SELECT i.hostid, i.name AS i_name, i.itemid, h.status, t.triggerid, t.description, d.parent_itemid, di.name AS d_name'.
 				' FROM items i, triggers t, functions f, item_discovery d, items di, hosts h'.
 					' WHERE f.itemid = i.itemid'.
@@ -112,10 +112,10 @@ class testPageTriggerPrototypes extends CWebTest {
 	 */
 	public function testPageTriggerPrototypes_MassDelete($rule) {
 		$druleid = $rule['parent_itemid'];
-		$triggerids = DBdata(
+		$triggerids = CDBHelper::getAll(
 				'SELECT i.itemid'.
 				' FROM item_discovery id, items i'.
-				' WHERE parent_itemid='.$druleid.' AND i.itemid = id.itemid', false
+				' WHERE parent_itemid='.$druleid.' AND i.itemid = id.itemid'
 		);
 		$triggerids = zbx_objectValues($triggerids, 'itemid');
 
@@ -130,7 +130,7 @@ class testPageTriggerPrototypes extends CWebTest {
 		$this->zbxTestCheckHeader('Trigger prototypes');
 		$this->zbxTestTextPresent('Trigger prototypes deleted');
 
-		$sql = 'SELECT null FROM triggers WHERE '.dbConditionInt('triggerids', $triggerids);
-		$this->assertEquals(0, DBcount($sql));
+		$sql = 'SELECT null FROM triggers WHERE '.dbConditionInt('triggerid', $triggerids);
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 }

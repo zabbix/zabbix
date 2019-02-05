@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
-class testConfiguration extends CZabbixTest {
+class testConfiguration extends CAPITest {
 
 	public static function export_fail_data() {
 		return [
@@ -595,7 +595,7 @@ class testConfiguration extends CZabbixTest {
 		);
 
 		$this->assertSame(true, $result['result']);
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public static function import_users() {
@@ -676,7 +676,7 @@ class testConfiguration extends CZabbixTest {
 				$expected_error
 			);
 
-			$this->assertEquals(0, DBcount($sql));
+			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageUserGroups extends CWebTest {
+class testPageUserGroups extends CLegacyWebTest {
 	public static function allGroups() {
-		return DBdata("select * from usrgrp where name<>'Disabled' order by usrgrpid");
+		return CDBHelper::getDataProvider("select * from usrgrp where name<>'Disabled' order by usrgrpid");
 	}
 
 	public function testPageUserGroups_CheckLayout() {
@@ -55,9 +55,9 @@ class testPageUserGroups extends CWebTest {
 		$name = $group['name'];
 
 		$sqlHashGroup = "select * from usrgrp where name='$name' order by usrgrpid";
-		$oldHashGroup = DBhash($sqlHashGroup);
+		$oldHashGroup = CDBHelper::getHash($sqlHashGroup);
 		$sqlHashUsersGroups = "select * from users_groups where usrgrpid=$usrgrpid order by id";
-		$oldHashUsersGroups = DBhash($sqlHashUsersGroups);
+		$oldHashUsersGroups = CDBHelper::getHash($sqlHashUsersGroups);
 
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
@@ -68,8 +68,8 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
 		$this->zbxTestTextPresent($name);
 
-		$this->assertEquals($oldHashGroup, DBhash($sqlHashGroup));
-		$this->assertEquals($oldHashUsersGroups, DBhash($sqlHashUsersGroups));
+		$this->assertEquals($oldHashGroup, CDBHelper::getHash($sqlHashGroup));
+		$this->assertEquals($oldHashUsersGroups, CDBHelper::getHash($sqlHashUsersGroups));
 	}
 
 	/**
@@ -82,7 +82,7 @@ class testPageUserGroups extends CWebTest {
 		$cannotDisable = ('Zabbix administrators' == $name);
 
 		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups = DBhash($sqlHashGroups);
+		$oldHashGroups = CDBHelper::getHash($sqlHashGroups);
 
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
@@ -101,13 +101,13 @@ class testPageUserGroups extends CWebTest {
 
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_DISABLED;
 		if ($cannotDisable) {
-			$this->assertEquals(0, DBcount($sql));
+			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
 		else {
-			$this->assertEquals(1, DBcount($sql));
+			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 
-		$this->assertEquals($oldHashGroups, DBhash($sqlHashGroups));
+		$this->assertEquals($oldHashGroups, CDBHelper::getHash($sqlHashGroups));
 	}
 
 	/**
@@ -118,7 +118,7 @@ class testPageUserGroups extends CWebTest {
 		$name = $group['name'];
 
 		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups = DBhash($sqlHashGroups);
+		$oldHashGroups = CDBHelper::getHash($sqlHashGroups);
 
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
@@ -131,9 +131,9 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestTextPresent('User group enabled');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_ENABLED;
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
-		$this->assertEquals($oldHashGroups, DBhash($sqlHashGroups));
+		$this->assertEquals($oldHashGroups, CDBHelper::getHash($sqlHashGroups));
 	}
 
 	/**
@@ -144,7 +144,7 @@ class testPageUserGroups extends CWebTest {
 		$name = $group['name'];
 
 		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups = DBhash($sqlHashGroups);
+		$oldHashGroups = CDBHelper::getHash($sqlHashGroups);
 
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
@@ -157,9 +157,9 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestTextPresent('Debug mode updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_ENABLED;
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
-		$this->assertEquals($oldHashGroups, DBhash($sqlHashGroups));
+		$this->assertEquals($oldHashGroups, CDBHelper::getHash($sqlHashGroups));
 	}
 
 	/**
@@ -170,7 +170,7 @@ class testPageUserGroups extends CWebTest {
 		$name = $group['name'];
 
 		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups = DBhash($sqlHashGroups);
+		$oldHashGroups = CDBHelper::getHash($sqlHashGroups);
 
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
@@ -183,9 +183,9 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestTextPresent('Debug mode updated');
 
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_DISABLED;
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
-		$this->assertEquals($oldHashGroups, DBhash($sqlHashGroups));
+		$this->assertEquals($oldHashGroups, CDBHelper::getHash($sqlHashGroups));
 	}
 
 	public function testPageUserGroups_FilterByName() {
@@ -212,7 +212,6 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestClickXpath("//label[@for='filter_users_status_1']");
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function testPageUserGroups_FilterReset() {

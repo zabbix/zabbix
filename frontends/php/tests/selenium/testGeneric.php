@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testGeneric extends CWebTest {
+class testGeneric extends CLegacyWebTest {
 
 	public static function provider() {
 		return [
@@ -125,7 +125,6 @@ class testGeneric extends CWebTest {
 	public function testGeneric_Pages($url, $title) {
 		$this->zbxTestLogin($url);
 		$this->zbxTestCheckTitle($title);
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckMandatoryStrings();
 	}
 }

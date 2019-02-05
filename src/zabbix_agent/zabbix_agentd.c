@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -170,8 +170,8 @@ const char	*help_message[] = {
 	"                                 target is not specified",
 	"",
 	"      Log level control targets:",
-	"        process-type             All processes of specified type (e.g.,",
-	"                                 listener)",
+	"        process-type             All processes of specified type (active checks,",
+	"                                 collector, listener)",
 	"        process-type,N           Process type and number (e.g., listener,3)",
 	"        pid                      Process identifier, up to 65535. For larger",
 	"                                 values specify target as \"process-type,N\"",
@@ -1039,15 +1039,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		switch (thread_args->process_type)
 		{
 			case ZBX_PROCESS_TYPE_COLLECTOR:
-				threads[i] = zbx_thread_start(collector_thread, thread_args);
+				zbx_thread_start(collector_thread, thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LISTENER:
 				thread_args->args = &listen_sock;
-				threads[i] = zbx_thread_start(listener_thread, thread_args);
+				zbx_thread_start(listener_thread, thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
 				thread_args->args = &CONFIG_ACTIVE_ARGS[j++];
-				threads[i] = zbx_thread_start(active_checks_thread, thread_args);
+				zbx_thread_start(active_checks_thread, thread_args, &threads[i]);
 				break;
 		}
 #ifndef _WINDOWS

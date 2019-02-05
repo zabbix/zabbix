@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup applications
  */
-class testPageApplications extends CWebTest {
+class testPageApplications extends CLegacyWebTest {
 
 	public static function select_host_group() {
 		return [
@@ -99,7 +99,7 @@ class testPageApplications extends CWebTest {
 
 			// Check items number in frontend
 			foreach ($host_app as $appid => $app_name) {
-				$sql_count_item = DBcount('SELECT NULL FROM items WHERE flags<>2 AND itemid IN'
+				$sql_count_item = CDBHelper::getCount('SELECT NULL FROM items WHERE flags<>2 AND itemid IN'
 						.'(SELECT itemid FROM items_applications WHERE applicationid='.$appid.')');
 				$xpath = '//input[@id="applications_'.$appid.'"]/../..//sup';
 
@@ -129,8 +129,6 @@ class testPageApplications extends CWebTest {
 			}
 			$this->zbxTestTextPresent($group_app);
 		}
-
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function selectApplications($app_names, $host) {
@@ -177,13 +175,12 @@ class testPageApplications extends CWebTest {
 
 		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Items disabled');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB, that selected application items disabled.
 		$sql='SELECT NULL FROM items i INNER JOIN items_applications ia ON ia.itemid=i.itemid WHERE '
 				. dbConditionInt('ia.applicationid', array_keys($result['apps'])) . ' AND i.flags<>2 AND i.status='
 				. ITEM_STATUS_ACTIVE;
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	/**
@@ -197,12 +194,11 @@ class testPageApplications extends CWebTest {
 
 		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Items disabled');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB, that all application items disabled.
 		$sql = 'SELECT NULL FROM items i LEFT JOIN items_applications ia ON ia.itemid=i.itemid '
 				. 'WHERE i.hostid=' . $result['hostid'] . ' AND i.flags=0 AND i.status='.ITEM_STATUS_ACTIVE;
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	/**
@@ -216,13 +212,12 @@ class testPageApplications extends CWebTest {
 
 		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Items enabled');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB, that selected application items enabled.
 		$sql='SELECT NULL FROM items i INNER JOIN items_applications ia ON ia.itemid=i.itemid WHERE '
 				. dbConditionInt('ia.applicationid', array_keys($result['apps'])) . ' AND i.flags<>2 AND i.status='
 				. ITEM_STATUS_DISABLED;
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	/**
@@ -236,12 +231,11 @@ class testPageApplications extends CWebTest {
 
 		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Items enabled');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB, that all application items enabled.
 		$sql = 'SELECT NULL FROM items i LEFT JOIN items_applications ia ON ia.itemid=i.itemid '
 				. 'WHERE i.hostid=' . $result['hostid'] . ' AND i.flags=0 AND i.status='.ITEM_STATUS_DISABLED;
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	/**
@@ -249,19 +243,18 @@ class testPageApplications extends CWebTest {
 	 */
 	public function testPageApplications_DeleteSelected() {
 		$result = $this->selectApplications(['Selenium test application'], 'ЗАББИКС Сервер');
-		$items = DBcount('SELECT NULL FROM items');
+		$items = CDBHelper::getCount('SELECT NULL FROM items');
 
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();
 
 		// Check the result in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Application deleted');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check the result in DB.
-		$this->assertEquals(0, DBcount('SELECT NULL FROM applications WHERE ' . dbConditionInt('applicationid', array_keys($result['apps']))));
-		$this->assertEquals(0, DBcount('SELECT NULL FROM items_applications WHERE ' . dbConditionInt('applicationid', array_keys($result['apps']))));
-		$this->assertEquals($items, DBcount('SELECT NULL FROM items'));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM applications WHERE ' . dbConditionInt('applicationid', array_keys($result['apps']))));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items_applications WHERE ' . dbConditionInt('applicationid', array_keys($result['apps']))));
+		$this->assertEquals($items, CDBHelper::getCount('SELECT NULL FROM items'));
 	}
 
 	/**
@@ -269,7 +262,7 @@ class testPageApplications extends CWebTest {
 	 */
 	public function testPageApplications_CannotDelete() {
 		$sql_hash = 'SELECT * FROM applications ORDER BY applicationid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$result = $this->selectApplications('all', 'ЗАББИКС Сервер');
 
@@ -278,8 +271,7 @@ class testPageApplications extends CWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete applications');
 		$this->zbxTestTextPresent('Cannot delete templated application.');
-		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageDiscoveryRules extends CWebTest {
+class testPageLowLevelDiscovery extends CLegacyWebTest {
 
 	// Returns all Discovery Rules
 	public static function data() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 			'SELECT h.hostid, i.itemid, i.name, h.host, h.status'.
 			' FROM hosts h, items i'.
 			' WHERE i.hostid=h.hostid'.
@@ -36,7 +36,7 @@ class testPageDiscoveryRules extends CWebTest {
 	/**
 	* @dataProvider data
 	*/
-	public function testPageDiscoveryRules_CheckLayout($data) {
+	public function testPageLowLevelDiscovery_CheckLayout($data) {
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckHeader('Discovery rules');
@@ -85,21 +85,26 @@ class testPageDiscoveryRules extends CWebTest {
 	/**
 	 * @dataProvider data
 	 */
-	public function testPageDiscoveryRules_CheckNowAll($data) {
+	public function testPageLowLevelDiscovery_CheckNowAll($data) {
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
 		$this->zbxTestCheckHeader('Discovery rules');
 
 		$this->zbxTestClick('all_items');
 		$this->zbxTestClickButtonText('Check now');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
-		$this->zbxTestCheckFatalErrors();
+		if ($data['status'] == HOST_STATUS_TEMPLATE) {
+			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot send request');
+			$this->zbxTestTextPresentInMessageDetails('Cannot send request: host is not monitored.');
+		}
+		else {
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+		}
 	}
 
 	/**
 	 * @dataProvider data
 	 * @backup-once triggers
 	 */
-	public function testPageDiscoveryRules_SimpleDelete($data) {
+	public function testPageLowLevelDiscovery_SimpleDelete($data) {
 		$itemid = $data['itemid'];
 
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
@@ -114,12 +119,12 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->zbxTestCheckHeader('Discovery rules');
 
 		$sql = "SELECT null FROM items WHERE itemid=$itemid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	// Returns all discovery rules
 	public static function rule() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 			'SELECT distinct h.hostid, h.host from hosts h, items i'.
 			' WHERE h.host LIKE \'%-layout-test%\'' .
 				' AND h.hostid = i.hostid'.
@@ -132,12 +137,12 @@ class testPageDiscoveryRules extends CWebTest {
 	 * @dataProvider rule
 	 * @backup-once triggers
 	 */
-	public function testPageDiscoveryRules_MassDelete($rule) {
-		$hostids = DBdata(
+	public function testPageLowLevelDiscovery_MassDelete($rule) {
+		$hostids = CDBHelper::getAll(
 			'SELECT hostid'.
 			' FROM items'.
 			' WHERE hostid='.$rule['hostid'].
-				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE, false
+				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE
 		);
 		$hostids = zbx_objectValues($hostids, 'hostids');
 
@@ -153,6 +158,6 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->zbxTestCheckHeader('Discovery rules');
 
 		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('hostids', $hostids);
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 }

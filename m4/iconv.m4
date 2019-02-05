@@ -69,7 +69,8 @@ AC_HELP_STRING([--with-iconv@<:@=DIR@:>@], [use iconv from given base install di
 
 	AC_MSG_CHECKING(for ICONV support)
 
-	if test -n "$_iconv_dir_set" -o -f /usr/include/iconv.h; then
+	AC_CHECK_HEADER([iconv.h],[found_iconv=yes])
+	if test -n "$_iconv_dir_set" -o "x$found_iconv" = xyes; then
 		found_iconv="yes"
 	elif test -f /usr/local/include/iconv.h; then
 		ICONV_CFLAGS="-I/usr/local/include"

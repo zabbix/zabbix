@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,16 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup screens
  */
-class testZBX6339 extends CWebTest {
+class testZBX6339 extends CLegacyWebTest {
 
 	// Returns all screens
 	public static function allScreens() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 			'SELECT s.screenid,s.name,h.name as host_name'.
 			' FROM hosts h'.
 				' LEFT JOIN screens s'.

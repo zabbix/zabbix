@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
  * @backup slideshows
  */
-class testFormSlideshow extends CWebTest {
+class testFormSlideshow extends CLegacyWebTest {
 	// Returns layout data
 	public static function formData() {
 		return [
@@ -66,13 +66,12 @@ class testFormSlideshow extends CWebTest {
 
 		// Validate.
 		$this->zbxTestTextPresent($data['name']);
-		$this->assertEquals(1, DBcount('SELECT NULL FROM slideshows WHERE name='.zbx_dbstr($data['name'])));
-		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM slideshows WHERE name='.zbx_dbstr($data['name'])));
 	}
 
 	public function testFormSlideshow_Clone() {
 		// Select slideshow to update.
-		$slideshow = DBfetch(DBSelect('SELECT slideshowid FROM slideshows', 1));
+		$slideshow = CDBHelper::getRow('SELECT slideshowid FROM slideshows');
 		if ($slideshow) {
 			// Log in and navigate to new slideshow form.
 			$this->zbxTestLogin('slideconf.php?form=update&slideshowid='.$slideshow['slideshowid']);
@@ -99,11 +98,9 @@ class testFormSlideshow extends CWebTest {
 
 			// Test results.
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Slide show added');
-			$this->assertEquals(1, DBCount('SELECT null FROM slideshows WHERE name='.zbx_dbstr($get_name)));
-			$this->assertEquals(1, DBCount('SELECT null FROM slideshows WHERE name='.zbx_dbstr($new_name)));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT null FROM slideshows WHERE name='.zbx_dbstr($get_name)));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT null FROM slideshows WHERE name='.zbx_dbstr($new_name)));
 		}
-
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	/**
@@ -111,7 +108,7 @@ class testFormSlideshow extends CWebTest {
 	 */
 	public function testFormSlideshow_Cancel($data) {
 		$sql_hash = 'SELECT * FROM slideshows ORDER BY slideshowid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		// Log in.
 		$this->zbxTestLogin('slideconf.php');
@@ -133,8 +130,7 @@ class testFormSlideshow extends CWebTest {
 		$this->zbxTestClick('cancel');
 
 		// Test if slideshow is there.
-		$this->assertEquals($old_hash, DBhash($sql_hash));
-		$this->zbxTestCheckFatalErrors();
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	/**
@@ -149,7 +145,7 @@ class testFormSlideshow extends CWebTest {
 		$this->zbxTestCheckHeader('Slide shows');
 
 		// Clear input fields.
-		$this->webDriver->findElement(WebDriverBy::xpath('//*[@id="delay"]'))->clear();
+		$this->zbxTestInputClearAndTypeByXpath('//*[@id="delay"]', '');
 
 		// Try to save changes.
 		$this->zbxTestClickXpathWait("//button[@id='add'][@type='submit']");
@@ -167,7 +163,6 @@ class testFormSlideshow extends CWebTest {
 
 		// Validate.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Slide show must contain slides.');
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	/**
@@ -175,7 +170,7 @@ class testFormSlideshow extends CWebTest {
 	 */
 	public function testFormSlideshow_ChangeSlideshowName($data) {
 		// Select slideshow to update.
-		$slideshow = DBfetch(DBSelect('SELECT slideshowid FROM slideshows', 1));
+		$slideshow = CDBHelper::getRow('SELECT slideshowid FROM slideshows');
 		if ($slideshow) {
 			$data['name'] = 'Changed name of ' . $data['name'];
 
@@ -191,16 +186,14 @@ class testFormSlideshow extends CWebTest {
 
 			// Test results.
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Slide show updated');
-			$new_slideshowid = DBfetch(DBSelect('SELECT slideshowid FROM slideshows WHERE name='.zbx_dbstr($data['name'])));
+			$new_slideshowid = CDBHelper::getRow('SELECT slideshowid FROM slideshows WHERE name='.zbx_dbstr($data['name']));
 			$this->assertEquals($slideshow['slideshowid'], $new_slideshowid['slideshowid']);
 		}
-
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function testFormSlideshow_DeleteFromForm() {
 		// Select slideshow to update.
-		$slideshow = DBfetch(DBSelect('SELECT slideshowid FROM slideshows', 1));
+		$slideshow = CDBHelper::getRow('SELECT slideshowid FROM slideshows');
 		if ($slideshow) {
 			// Log in and navigate to new slideshow form.
 			$this->zbxTestLogin('slideconf.php?form=update&slideshowid='.$slideshow['slideshowid']);
@@ -216,9 +209,7 @@ class testFormSlideshow extends CWebTest {
 
 			// Validate.
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Slide show deleted');
-			$this->assertEquals(0, DBCount('SELECT null FROM slideshows WHERE slideshowid='.$slideshow['slideshowid']));
+			$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM slideshows WHERE slideshowid='.$slideshow['slideshowid']));
 		}
-
-		$this->zbxTestCheckFatalErrors();
 	}
 }

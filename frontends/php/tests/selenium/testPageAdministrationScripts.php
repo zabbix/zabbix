@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,24 +18,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageAdministrationScripts extends CWebTest {
+class testPageAdministrationScripts extends CLegacyWebTest {
 
 	private $sqlHashScripts = '';
 	private $oldHashScripts = '';
 
 	private function calculateHash($scriptid) {
 		$this->sqlHashScripts = 'SELECT * FROM scripts WHERE scriptid='.$scriptid;
-		$this->oldHashScripts = DBhash($this->sqlHashScripts);
+		$this->oldHashScripts = CDBHelper::getHash($this->sqlHashScripts);
 	}
 
 	private function verifyHash() {
-		$this->assertEquals($this->oldHashScripts, DBhash($this->sqlHashScripts));
+		$this->assertEquals($this->oldHashScripts, CDBHelper::getHash($this->sqlHashScripts));
 	}
 
 	public static function allScripts() {
-		return DBdata('SELECT scriptid,name FROM scripts');
+		return CDBHelper::getDataProvider('SELECT scriptid,name FROM scripts');
 	}
 
 	public function testPageAdministrationScripts_CheckLayout() {
@@ -57,8 +57,8 @@ class testPageAdministrationScripts extends CWebTest {
 	}
 
 	/**
-	* @dataProvider allScripts
-	*/
+	 * @dataProvider allScripts
+	 */
 	public function testPageAdministrationScripts_SimpleUpdate($script) {
 		$this->calculateHash($script['scriptid']);
 
@@ -83,7 +83,7 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of scripts');
 		$this->zbxTestTextPresent('Scripts deleted');
 
-		$this->assertEquals(0, DBcount('SELECT NULL FROM scripts'));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts'));
 	}
 
 	/**
@@ -98,6 +98,6 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of scripts');
 		$this->zbxTestTextPresent('Script deleted');
 
-		$this->assertEquals(0, DBcount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
  *       dropdown field when "on change" event is fired before "on focus" event is fired.
  * @ignore-browser-errors
  */
-class testFormItemPrototype extends CWebTest {
+class testFormItemPrototype extends CLegacyWebTest {
 
 
 	/**
@@ -939,7 +939,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
 			if (!isset($itemid)) {
-				$this->zbxTestAssertElementValue('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
+				$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
 			}
 
 			$this->zbxTestTextPresent('Port');
@@ -1279,7 +1279,10 @@ class testFormItemPrototype extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from items where hostid = 40001 and key_ LIKE 'item-prototype-form%'");
+		return CDBHelper::getDataProvider(
+			'select * from items'.
+			' where hostid = 40001 and key_ LIKE \'item-prototype-form%\''
+		);
 	}
 
 	/**
@@ -1287,7 +1290,7 @@ class testFormItemPrototype extends CWebTest {
 	 */
 	public function testFormItemPrototype_SimpleUpdate($data) {
 		$sqlItems = "select itemid, hostid, name, key_, delay from items order by itemid";
-		$oldHashItems = DBhash($sqlItems);
+		$oldHashItems = CDBHelper::getHash($sqlItems);
 
 		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=33800');
 		$this->zbxTestClickWait('update');
@@ -1295,7 +1298,7 @@ class testFormItemPrototype extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype updated');
 		$this->zbxTestTextPresent([$data['name'], $this->discoveryRule]);
 
-		$this->assertEquals($oldHashItems, DBhash($sqlItems));
+		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
 	}
 
 	// Returns create data
@@ -1395,7 +1398,7 @@ class testFormItemPrototype extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "".'
 					]
 				]
 			],
@@ -1410,7 +1413,7 @@ class testFormItemPrototype extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-11,00:00-24:00".'
 					]
 				]
 			],
@@ -1425,7 +1428,7 @@ class testFormItemPrototype extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,00:00-25:00".'
 					]
 				]
 			],
@@ -1440,7 +1443,7 @@ class testFormItemPrototype extends CWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,24:00-00:00".'
 					]
 				]
 			],
@@ -1950,6 +1953,7 @@ class testFormItemPrototype extends CWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'item-snmpv1-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1960,6 +1964,7 @@ class testFormItemPrototype extends CWebTest {
 					'type' => 'SNMPv2 agent',
 					'name' => 'SNMPv2 agent',
 					'key' => 'item-snmpv2-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1970,6 +1975,7 @@ class testFormItemPrototype extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'item-snmpv3-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -2328,6 +2334,10 @@ class testFormItemPrototype extends CWebTest {
 
 		if (isset($data['delay']))	{
 			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
+		}
+
+		if (array_key_exists('snmp_oid', $data))	{
+			$this->zbxTestInputTypeOverwrite('snmp_oid', $data['snmp_oid']);
 		}
 
 		$itemFlexFlag = true;
@@ -2782,7 +2792,6 @@ class testFormItemPrototype extends CWebTest {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of item prototypes');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added');
-				$this->zbxTestCheckFatalErrors();
 
 				$dbResultItem = DBselect("SELECT name,key_,itemid FROM items where key_ = '".$data['key']."'");
 				$rowItem = DBfetch($dbResultItem);
@@ -2822,7 +2831,7 @@ class testFormItemPrototype extends CWebTest {
 				$this->zbxTestTextPresent($data['error']);
 
 				$sqlItem = "SELECT * FROM items where key_ = '".$data['key']."'";
-				$this->assertEquals(0, DBcount($sqlItem));
+				$this->assertEquals(0, CDBHelper::getCount($sqlItem));
 				break;
 		}
 	}

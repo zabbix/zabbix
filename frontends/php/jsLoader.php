@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,10 +70,12 @@ $availableJScripts = [
 	// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
+	'class.cclock.js' => '',
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
 	'class.cmessages.js' => '',
+	'class.cnavtree.js' => '',
 	'class.cookie.js' => '',
 	'class.coverride.js' => '',
 	'class.crangecontrol.js' => '',
@@ -83,6 +85,7 @@ $availableJScripts = [
 	'class.ctree.js' => '',
 	'class.curl.js' => '',
 	'class.cverticalaccordion.js' => '',
+	'class.mapWidget.js' => '',
 	'class.svg.canvas.js' => 'vector/',
 	'class.svg.map.js' => 'vector/',
 	'class.cviewswitcher.js' => '',
@@ -97,10 +100,6 @@ $availableJScripts = [
 
 $tranStrings = [
 	'gtlc.js' => [
-		'S_YEAR_SHORT' => _x('y', 'year short'),
-		'S_MONTH_SHORT' => _x('m', 'month short'),
-		'S_DAY_SHORT' => _x('d', 'day short'),
-		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
 	'dashboard.grid.js' => [
@@ -117,18 +116,22 @@ $tranStrings = [
 		'Add a new widget' => _('Add a new widget'),
 		'Release to create a new widget.' => _('Release to create a new widget.'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
-		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
-		'%1$s, selected' => _x('%1$s, selected', 'screen reader'),
-		'Displaying %1$s of %2$s found' => _('Displaying %1$s of %2$s found')
+		'Adjust widget refresh interval' => _('Adjust widget refresh interval')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
-		'Close' => _('Close'),
+		'S_CLOSE' => _('Close'),
 		'Execute' => _('Execute'),
-		'Execution confirmation' => _('Execution confirmation')
+		'Execution confirmation' => _('Execution confirmation'),
+		'S_YEAR_SHORT' => _x('y', 'year short'),
+		'S_MONTH_SHORT' => _x('m', 'month short'),
+		'S_DAY_SHORT' => _x('d', 'day short'),
+		'S_HOUR_SHORT' => _x('h', 'hour short'),
+		'S_MINUTE_SHORT' => _x('m', 'minute short'),
+		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?')
 	],
 	'class.calendar.js' => [
-		'S_Calendar' => _('Calendar'),
+		'S_CALENDAR' => _('Calendar'),
 		'S_JANUARY' => _('January'),
 		'S_FEBRUARY' => _('February'),
 		'S_MARCH' => _('March'),
@@ -168,7 +171,6 @@ $tranStrings = [
 		'S_IMAGE' => _('Image'),
 		'S_DEFAULT' => _('Default'),
 		'S_PLEASE_SELECT_TWO_ELEMENTS' => _('Please select two elements'),
-		'S_DOT' => _('Dot'),
 		'S_TWO_MAP_ELEMENTS_SHOULD_BE_SELECTED' => _('Two map elements should be selected'),
 		'S_DELETE_SELECTED_ELEMENTS_Q' => _('Delete selected elements?'),
 		'S_DELETE_SELECTED_SHAPES_Q' => _('Delete selected shapes?'),
@@ -186,12 +188,11 @@ $tranStrings = [
 		'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q' => _('Delete links between selected elements?'),
 		'S_MACRO_EXPAND_ERROR' => _('Cannot expand macros.'),
 		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
-		'Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).' => _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).')
+		'S_COLOR_IS_NOT_CORRECT' => _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).')
 	],
 	'class.cmessages.js' => [
 		'S_MUTE' => _('Mute'),
 		'S_UNMUTE' => _('Unmute'),
-		'S_MESSAGES' => _('Messages'),
 		'S_CLEAR' => _('Clear'),
 		'S_SNOOZE' => _('Snooze')
 	],
@@ -199,7 +200,7 @@ $tranStrings = [
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
 	],
 	'class.coverride.js' => [
-		'S_COLOUR' => _('colour'),
+		'S_COLOR' => _('colour'),
 		'S_TIME_SHIFT' => _('time shift')
 	],
 	'class.cverticalaccordion.js' => [
@@ -207,7 +208,9 @@ $tranStrings = [
 		'S_EXPAND' => _('Expand')
 	],
 	'main.js' => [
-		'Close' => _('Close')
+		'S_EXPAND' => _('Expand'),
+		'S_COLLAPSE' => _('Collapse'),
+		'S_CLOSE' => _('Close')
 	],
 	'multiselect.js' => [
 		'No matches found' => _('No matches found'),
@@ -227,12 +230,8 @@ $tranStrings = [
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),
-		'Access denied' => _('Access denied'),
-		'Cancel' => _('Cancel'),
 		'Configuration' => _('Configuration'),
 		'Create trigger' => _('Create trigger'),
-		'Dashboard sharing' => _('Dashboard sharing'),
-		'Delete service "%1$s"?' => _('Delete service "%1$s"?'),
 		'Description' => _('Description'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Edit trigger' => _('Edit trigger'),
@@ -255,18 +254,17 @@ $tranStrings = [
 		'Refresh interval multiplier' => _('Refresh interval multiplier'),
 		'Scripts' => _('Scripts'),
 		'Submap' => _('Submap'),
-		'Trigger' => _('Trigger'),
-		'Update' => _('Update'),
+		'S_TRIGGER' => _('Trigger'),
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),
 		'No refresh' => _('No refresh'),
-		'You need permission to perform this action!' => _('You need permission to perform this action!'),
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
 		'1 minute' => _n('%1$s minute', '%1$s minutes', 1),
 		'2 minutes' => _n('%1$s minute', '%1$s minutes', 2),
 		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
-		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15)
+		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15),
+		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
 	],
 	'items.js' => [
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
@@ -284,7 +282,14 @@ $tranStrings = [
 		'Add multiple maps' => _('Add multiple maps')
 	],
 	'colorpicker.js' => [
-		'Close' => _('Close')
+		'S_CLOSE' => _('Close')
+	],
+	'class.csvggraph.js' => [
+		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
+		'S_MINUTE_SHORT' => _x('m', 'minute short')
+	],
+	'common.js' => [
+		'Cancel' => _('Cancel')
 	]
 ];
 

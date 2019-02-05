@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,10 +90,10 @@
 	}
 
 	function removeWidgetInfoBtns($content_header) {
-		if ($content_header.find('[data-hintbox=1]').length) {
-			$content_header.find('[data-hintbox=1]').next('.hint-box').remove();
-			$content_header.find('[data-hintbox=1]').trigger('remove');
-		}
+		$content_header.find('[data-hintbox=1]')
+			.trigger('remove')
+			.next('.hint-box')
+			.remove();
 	}
 
 	/**
@@ -1005,7 +1005,12 @@
 	function startWidgetRefreshTimer($obj, data, widget, rf_rate) {
 		if (rf_rate != 0) {
 			widget['rf_timeoutid'] = setTimeout(function () {
-				if (doAction('timer_refresh', $obj, data, widget) == 0) {
+				// Do not update widget content if there are active popup or hintbox.
+				var active = widget['content_body'].find('[data-expanded="true"]');
+
+				widget['div'][active.length ? 'addClass' : 'removeClass']('dashbrd-grid-widget-no-refresh');
+
+				if (active.length == 0 && doAction('timer_refresh', $obj, data, widget) == 0) {
 					// widget was not updated, update it's content
 					updateWidgetContent($obj, data, widget);
 				}
@@ -1032,6 +1037,11 @@
 
 	function updateWidgetContent($obj, data, widget) {
 		if (++widget['update_attempts'] > 1) {
+			return;
+		}
+		else if (widget['update_paused'] == true) {
+			widget['update_attempts'] = 0;
+			startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
 			return;
 		}
 
@@ -1074,7 +1084,8 @@
 			dataType: 'json',
 			success: function(resp) {
 				stopPreloader(widget);
-				var $content_header = $('h4', widget['content_header']);
+				var $content_header = $('h4', widget['content_header']),
+					debug_visible = $('[name="zbx_debug_info"]', widget['content_body']).is(':visible');
 
 				$content_header.text(resp.header);
 
@@ -1082,7 +1093,6 @@
 					$content_header.attr('aria-label', (resp.aria_label !== '') ? resp.aria_label : null);
 				}
 
-				widget['content_body'].find('[data-hintbox=1]').trigger('remove');
 				widget['content_body'].empty();
 				if (typeof(resp.messages) !== 'undefined') {
 					widget['content_body'].append(resp.messages);
@@ -1090,7 +1100,7 @@
 				widget['content_body'].append(resp.body);
 
 				if (typeof(resp.debug) !== 'undefined') {
-					widget['content_body'].append(resp.debug);
+					$(resp.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
 				}
 				removeWidgetInfoBtns(widget['content_header']);
 
@@ -1100,19 +1110,6 @@
 
 				// Creates new script elements and removes previous ones to force their re-execution.
 				widget['content_script'].empty();
-				if (typeof(resp.script_file) !== 'undefined' && resp.script_file.length) {
-					// NOTE: it is done this way to make sure, this script is executed before script_run function below.
-					if (typeof(resp.script_file) === 'string') {
-						resp.script_file = [resp.script_file];
-					}
-
-					for (var i = 0, l = resp.script_file.length; l > i; i++) {
-						var new_script = $('<script>')
-							.attr('type', 'text/javascript')
-							.attr('src', resp.script_file[i]);
-						widget['content_script'].append(new_script);
-					}
-				}
 				if (typeof(resp.script_inline) !== 'undefined') {
 					// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
 					var new_script = $('<script>')
@@ -1281,6 +1278,7 @@
 
 						widget['header'] = name;
 						widget['fields'] = fields;
+						doAction('afterUpdateWidgetConfig', $obj, data, null);
 						updateWidgetDynamic($obj, data, widget);
 						refreshWidget($obj, data, widget);
 					}
@@ -1673,7 +1671,6 @@
 		var index = widget['div'].data('widget-index');
 
 		// Remove div from the grid.
-		widget['div'].find('[data-hintbox=1]').trigger('remove');
 		widget['div'].remove();
 		data['widgets'].splice(index, 1);
 
@@ -1884,11 +1881,11 @@
 				'max-columns': 12,
 				'rows': 0,
 				'updated': false,
-				'editable': true
+				'editable': true,
+				'edit_mode': false
 			};
 			options = $.extend(default_options, options);
 			options['widget-width'] = 100 / options['max-columns'];
-			options['edit_mode'] = false;
 
 			return this.each(function() {
 				var	$this = $(this),
@@ -1995,6 +1992,7 @@
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
 				'update_attempts': 0,
+				'update_paused': false,
 				'initial_load': true,
 				'ready': false,
 				'fields': {},
@@ -2044,6 +2042,36 @@
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
 						refreshWidget($this, data, widget);
+					}
+				});
+			});
+		},
+
+		// Pause specific widget refresh.
+		pauseWidgetRefresh: function(widgetid) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				$.each(data['widgets'], function(index, widget) {
+					if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
+						widget['update_paused'] = true;
+						return false;
+					}
+				});
+			});
+		},
+
+		// Unpause specific widget refresh.
+		unpauseWidgetRefresh: function(widgetid) {
+			return this.each(function() {
+				var	$this = $(this),
+					data = $this.data('dashboardGrid');
+
+				$.each(data['widgets'], function(index, widget) {
+					if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
+						widget['update_paused'] = false;
+						return false;
 					}
 				});
 			});

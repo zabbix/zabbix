@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ class CScreenSimpleGraph extends CScreenBase {
 		$resourceid = !empty($this->screenitem['real_resourceid']) ? $this->screenitem['real_resourceid'] : $this->screenitem['resourceid'];
 		$containerid = 'graph_container_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
 		$graphDims = getGraphDims();
-		$graphDims['graphHeight'] = $this->screenitem['height'];
-		$graphDims['width'] = $this->screenitem['width'];
+		$graphDims['graphHeight'] = (int) $this->screenitem['height'];
+		$graphDims['width'] = (int) $this->screenitem['width'];
 
 		// get time control
 		$timeControlData = [

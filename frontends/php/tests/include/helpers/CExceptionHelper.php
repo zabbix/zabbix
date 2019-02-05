@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 /**
- * A class that allows changing message of an Exception without recreating it.
+ * Class that allows changing message of an Exception without recreating it.
  */
 class CExceptionHelper extends Exception {
 

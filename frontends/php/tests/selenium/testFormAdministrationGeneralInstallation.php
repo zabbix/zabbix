@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testFormAdministrationGeneralInstallation extends CWebTest {
+class testFormAdministrationGeneralInstallation extends CLegacyWebTest {
 
 	private $failIfNotExistsInstall = [
 		'Welcome',
@@ -75,7 +75,6 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		// welcome page
 
 		$this->zbxTestCheckTitle('Installation', false);
-		$this->zbxTestTextNotPresent($this->failIfExists);
 		$this->zbxTestTextPresent($this->failIfNotExistsInstall);
 
 		$this->zbxTestAssertElementPresentId('cancel');
@@ -87,7 +86,6 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 
 		$this->zbxTestCheckTitle('Installation', false);
 		$this->zbxTestCheckHeader('Check of pre-requisites');
-		$this->zbxTestTextNotPresent($this->failIfExists);
 		$this->zbxTestTextPresent($this->failIfNotExistsInstall);
 		$this->zbxTestTextPresent($this->failIfNotExistsPrereq);
 
@@ -101,7 +99,6 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 
 		$this->zbxTestCheckTitle('Installation', false);
 		$this->zbxTestCheckHeader('Configure DB connection');
-		$this->zbxTestTextNotPresent($this->failIfExists);
 		$this->zbxTestTextPresent($this->failIfNotExistsInstall);
 		$this->zbxTestTextPresent($this->failIfNotExistsDBConf);
 

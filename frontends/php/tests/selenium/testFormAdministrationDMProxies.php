@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 define('PROXY_GOOD', 0);
 define('PROXY_BAD', 1);
@@ -26,7 +26,7 @@ define('PROXY_BAD', 1);
 /**
  * @backup hosts
  */
-class testFormAdministrationDMProxies extends CWebTest {
+class testFormAdministrationDMProxies extends CLegacyWebTest {
 	private $proxy_name = 'proxy_name_1';
 	private $new_proxy_name = 'proxy_name_new';
 	private $cloned_proxy_name = 'proxy_name_new_clone';
@@ -253,15 +253,15 @@ class testFormAdministrationDMProxies extends CWebTest {
 				switch ($mode) {
 					case HOST_STATUS_PROXY_ACTIVE:
 						$sql = "SELECT hostid FROM hosts WHERE host='$name' AND status=$mode";
-						$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Active proxy has not been added into Zabbix DB');
+						$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Active proxy has not been added into Zabbix DB');
 						break;
 
 					case HOST_STATUS_PROXY_PASSIVE:
 						$sql = "SELECT hostid FROM hosts WHERE host='$name' AND status=$mode";
-						$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Active proxy has not been added into Zabbix DB');
+						$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Active proxy has not been added into Zabbix DB');
 
 						$sql = "SELECT h.hostid FROM hosts h, interface i WHERE h.host='$name' AND h.status=$mode and h.hostid=i.hostid and i.port='$port' and i.dns='$dns' and i.ip='$ip' and i.main=".INTERFACE_PRIMARY;
-						$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Interface was not linked correcty to proxy');
+						$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Interface was not linked correcty to proxy');
 						break;
 				}
 				break;
@@ -309,7 +309,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 			' FROM hosts'.
 			' ORDER BY hostid';
 
-		$oldHash = DBhash($sql);
+		$oldHash = CDBHelper::getHash($sql);
 
 		$this->zbxTestInputTypeOverwrite('host', $newname);
 		$this->zbxTestClickButton('proxy.update');
@@ -318,10 +318,10 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent($newname);
 
-		$this->assertEquals($oldHash, DBhash($sql));
+		$this->assertEquals($oldHash, CDBHelper::getHash($sql));
 
 		$sql = "SELECT * FROM hosts WHERE host='$newname' AND status in (".HOST_STATUS_PROXY_ACTIVE.",".HOST_STATUS_PROXY_PASSIVE.")";
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Proxy name has not been updated');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Proxy name has not been updated');
 	}
 
 	public static function dataClone() {
@@ -359,7 +359,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestTextPresent($newname);
 
 		$sql = "SELECT * FROM hosts WHERE host='$newname' AND status in (".HOST_STATUS_PROXY_ACTIVE.",".HOST_STATUS_PROXY_PASSIVE.")";
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Proxy has not been created');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Proxy has not been created');
 	}
 
 	public static function dataDelete() {
@@ -390,6 +390,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestAssertElementNotPresentXpath("//a[text()='".$name."']");
 
 		$sql = "SELECT * FROM hosts WHERE host='$name'";
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Proxy has not been deleted');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Proxy has not been deleted');
 	}
 }

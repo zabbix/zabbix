@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Test tag based permissions
  */
-class testTagBasedPermissions extends CWebTest {
+class testTagBasedPermissions extends CLegacyWebTest {
 	public $user = 'Tag-user';
 
 	/**
@@ -180,13 +180,11 @@ class testTagBasedPermissions extends CWebTest {
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
 		$this->zbxTestTextNotPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText('//h4[text()="Problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found.');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
 		$this->zbxTestTextNotPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check trigger filter on Problem page
 		foreach ($data['trigger_names'] as $name) {
@@ -198,7 +196,6 @@ class testTagBasedPermissions extends CWebTest {
 			$this->zbxTestClickButtonText('Apply');
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
-			$this->zbxTestCheckFatalErrors();
 			//Reset filter
 			$this->zbxTestClickButtonText('Reset');
 		}
@@ -286,13 +283,11 @@ class testTagBasedPermissions extends CWebTest {
 		// Check tag filter in Problem widget
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
 		$this->zbxTestTextPresent($data['trigger_names']);
-		$this->zbxTestCheckFatalErrors();
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
 		$this->zbxTestTextPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$countTriggers.' of '.$countTriggers.' found');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check trigger filter on Problem page
 		foreach ($data['trigger_names'] as $name) {
@@ -304,7 +299,6 @@ class testTagBasedPermissions extends CWebTest {
 			$this->zbxTestClickButtonText('Apply');
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
-			$this->zbxTestCheckFatalErrors();
 			//Reset filter
 			$this->zbxTestClickButtonText('Reset');
 		}
@@ -314,7 +308,6 @@ class testTagBasedPermissions extends CWebTest {
 			$triggerid = DBfetch(DBselect('SELECT triggerid FROM triggers WHERE description='. zbx_dbstr($name)));
 			$this->zbxTestClickXpathWait("//a[contains(@href,'tr_events.php?triggerid=".$triggerid['triggerid']."')]");
 			$this->zbxTestCheckHeader('Event details');
-			$this->zbxTestCheckFatalErrors();
 			// Go back to problem page
 			$this->zbxTestOpen('zabbix.php?action=problem.view');
 		}
@@ -389,13 +382,11 @@ class testTagBasedPermissions extends CWebTest {
 		// Check tag filter in Problem widget
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
 		$this->zbxTestTextPresent($data['trigger_names']);
-		$this->zbxTestCheckFatalErrors();
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
 		$this->zbxTestTextPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$countTriggers.' of '.$countTriggers.' found');
-		$this->zbxTestCheckFatalErrors();
 
 		// Check filter on Problem page
 		foreach ($data['trigger_names'] as $name) {
@@ -407,7 +398,6 @@ class testTagBasedPermissions extends CWebTest {
 			$this->zbxTestClickButtonText('Apply');
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
-			$this->zbxTestCheckFatalErrors();
 			//Reset filter
 			$this->zbxTestClickButtonText('Reset');
 		}
@@ -417,7 +407,6 @@ class testTagBasedPermissions extends CWebTest {
 			$triggerid = DBfetch(DBselect('SELECT triggerid FROM triggers WHERE description='. zbx_dbstr($name)));
 			$this->zbxTestClickXpathWait("//a[contains(@href,'tr_events.php?triggerid=".$triggerid['triggerid']."')]");
 			$this->zbxTestCheckHeader('Event details');
-			$this->zbxTestCheckFatalErrors();
 			// Go back to problem page
 			$this->zbxTestOpen('zabbix.php?action=problem.view');
 		}

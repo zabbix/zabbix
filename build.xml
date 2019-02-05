@@ -14,6 +14,7 @@
 		<property name="dbname" value="${DBNAME}"/>
 		<property name="dbuser" value="${DBUSER}"/>
 	 	<property name="dbpassword" value="${DBPASSWORD}"/>
+	 	<property name="phpunit_error_log" value="${PHPUNIT_ERROR_LOG}"/>
 		<property environment="env"/>
 
 		<!-- Create bootstrap.php -->
@@ -30,6 +31,7 @@
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
+		<replace file="frontends/php/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
 	</target>
 
 	<target name="make-dbschema">

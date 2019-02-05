@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -301,5 +301,14 @@ class CView {
 		else {
 			return ZBX_LAYOUT_NORMAL;
 		}
+	}
+
+	/**
+	 * Update layout mode setting
+	 *
+	 * @param int $layout_mode  Possible values ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_FULLSCREEN|ZBX_LAYOUT_KIOSKMODE.
+	 */
+	public static function setLayoutMode($layout_mode) {
+		CProfile::update('web.layout.mode', $layout_mode, PROFILE_TYPE_INT);
 	}
 }

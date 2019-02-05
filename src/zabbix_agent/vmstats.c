@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,13 @@
 
 #ifdef _AIX
 
+#ifndef XINTFRAC	/* defined in IBM AIX 7.1 libperfstat.h, not defined in AIX 6.1 */
+#include <sys/systemcfg.h>
 #define XINTFRAC	((double)_system_configuration.Xint / _system_configuration.Xfrac)
+	/* Example of XINTFRAC = 125.000000 / 64.000000 = 1.953125. Apparently XINTFRAC is a period (in nanoseconds) */
+	/* of CPU ticks on a machine. For example, 1.953125 could mean there is 1.953125 nanoseconds between ticks */
+	/* and number of ticks in second is 1.0 / (1.953125 * 10^-9) = 512000000. So, tick frequency is 512 MHz. */
+#endif
 
 static int		last_clock = 0;
 /* --- kthr --- */
@@ -39,8 +45,11 @@ static zbx_uint64_t	last_scans = 0;			/* number of page scans by clock */
 /* -- faults -- */
 static zbx_uint64_t	last_devintrs = 0;		/* number of device interrupts */
 static zbx_uint64_t	last_syscall = 0;		/* number of system calls executed */
-static zbx_uint64_t	last_pswitch = 0;		/* number of process switches (change in currently running process) */
+static zbx_uint64_t	last_pswitch = 0;		/* number of process switches (change in currently running */
+							/* process) */
 /* --- cpu ---- */
+/* Raw numbers of ticks are readings from forward-ticking counters. */
+/* Only difference between 2 readings is meaningful. */
 static zbx_uint64_t	last_puser = 0;			/* raw number of physical processor ticks in user mode */
 static zbx_uint64_t	last_psys = 0;			/* raw number of physical processor ticks in system mode */
 static zbx_uint64_t	last_pidle = 0;			/* raw number of physical processor ticks idle */
@@ -49,12 +58,17 @@ static zbx_uint64_t	last_user = 0;			/* raw total number of clock ticks spent in
 static zbx_uint64_t	last_sys = 0;			/* raw total number of clock ticks spent in system mode */
 static zbx_uint64_t	last_idle = 0;			/* raw total number of clock ticks spent idle */
 static zbx_uint64_t	last_wait = 0;			/* raw total number of clock ticks spent waiting for I/O */
-static zbx_uint64_t	last_timebase_last = 0;		/* most recent cpu time base */
-static zbx_uint64_t	last_pool_idle_time = 0;	/* number of clock ticks a processor in the shared pool was idle */
-static zbx_uint64_t	last_idle_donated_purr = 0;	/* number of idle cycles donated by a dedicated partition enabled for donation */
-static zbx_uint64_t	last_busy_donated_purr = 0;	/* number of busy cycles donated by a dedicated partition enabled for donation */
-static zbx_uint64_t	last_idle_stolen_purr = 0;	/* number of idle cycles stolen by the hypervisor from a dedicated partition */
-static zbx_uint64_t	last_busy_stolen_purr = 0;	/* number of busy cycles stolen by the hypervisor from a dedicated partition */
+static zbx_uint64_t	last_timebase_last = 0;		/* most recent processor time base timestamp */
+static zbx_uint64_t	last_pool_idle_time = 0;	/* number of clock ticks a processor in the shared pool was */
+							/* idle */
+static zbx_uint64_t	last_idle_donated_purr = 0;	/* number of idle cycles donated by a dedicated partition */
+							/* enabled for donation */
+static zbx_uint64_t	last_busy_donated_purr = 0;	/* number of busy cycles donated by a dedicated partition */
+							/* enabled for donation */
+static zbx_uint64_t	last_idle_stolen_purr = 0;	/* number of idle cycles stolen by the hypervisor from */
+							/* a dedicated partition */
+static zbx_uint64_t	last_busy_stolen_purr = 0;	/* number of busy cycles stolen by the hypervisor from */
+							/* a dedicated partition */
 /* --- disk --- */
 static zbx_uint64_t	last_xfers = 0;			/* total number of transfers to/from disk */
 static zbx_uint64_t	last_wblks = 0;			/* 512 bytes blocks written to all disks */
@@ -91,9 +105,9 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 
 	now = (int)time(NULL);
 
-	/* retrieve the metrics
+	/* Retrieve metrics from AIX libperfstat APIs.
 	 * Upon successful completion, the number of structures filled is returned.
-	 * If unsuccessful, a value of -1 is returned and the errno global variable is set */
+	 * If unsuccessful, a value of -1 is returned and the errno global variable is set. */
 #ifdef _AIXVERSION_530
 	if (-1 == perfstat_partition_total(NULL, &lparstats, sizeof(lparstats), 1))
 	{
@@ -149,13 +163,15 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		vmstat->cs = (double)(cpustats.pswitch - last_pswitch) / (now - last_clock);
 
 #ifdef _AIXVERSION_530
-		/* --- cpu ---- */
+		/* number of CPU ticks since the last measurement by mode */
 		dpcpu_us = lparstats.puser - last_puser;
 		dpcpu_sy = lparstats.psys  - last_psys;
 		dpcpu_id = lparstats.pidle - last_pidle;
 		dpcpu_wa = lparstats.pwait - last_pwait;
 
-		delta_purr = pcputime = dpcpu_us + dpcpu_sy + dpcpu_id + dpcpu_wa;
+		/* total number of CPU ticks since the last measurement */
+		delta_purr = dpcpu_us + dpcpu_sy + dpcpu_id + dpcpu_wa;
+		pcputime = delta_purr;
 #endif	/* _AIXVERSION_530 */
 		dlcpu_us = cpustats.user - last_user;
 		dlcpu_sy = cpustats.sys  - last_sys;
@@ -191,7 +207,13 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		}
 #endif	/* HAVE_AIXOSLEVEL_530006 */
 
+		/* number of physical processor tics between current and previous measurement */
 		dtimebase = lparstats.timebase_last - last_timebase_last;
+
+		/* 'perfstat_partition_total_t' element 'entitled_proc_capacity' is "number of processor units this */
+		/* partition is entitled to receive". It is expressed as multiplied by 100 and rounded to integer, */
+		/* therefore we divide it by 100 and convert to floating point number to get its real value, as */
+		/* shown by 'lparstat' command. */
 		vmstat->ent = lparstats.entitled_proc_capacity / 100.0;
 
 		if (lparstats.type.b.shared_enabled)
@@ -220,11 +242,13 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		vmstat->cpu_id = dpcpu_id * 100.0 / pcputime;
 		vmstat->cpu_wa = dpcpu_wa * 100.0 / pcputime;
 
+		/* Physical Processor Consumed */
+		/* Interesting values only for "shared" LPARs. */
+		/* For "dedicated" LPARs expect approximately the same value as assigned to the LPAR through HMC. */
+		vmstat->cpu_pc = (double)delta_purr / dtimebase;
+
 		if (lparstats.type.b.shared_enabled)
 		{
-			/* Physical Processor Consumed */
-			vmstat->cpu_pc = (double)delta_purr / dtimebase;
-
 			/* Percentage of Entitlement Consumed */
 			vmstat->cpu_ec = (vmstat->cpu_pc / vmstat->ent) * 100.0;
 
@@ -234,9 +258,13 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 			if (lparstats.type.b.pool_util_authority)
 			{
 				/* Available Pool Processor (app) */
-				vmstat->cpu_app = (lparstats.pool_idle_time - last_pool_idle_time) / (XINTFRAC * dtimebase);
+				vmstat->cpu_app = (lparstats.pool_idle_time - last_pool_idle_time) /
+						(XINTFRAC * dtimebase);
 			}
 		}
+		else
+			vmstat->cpu_ec = 100.0;		/* trivial value for LPAR type "dedicated" */
+
 #else	/* not _AIXVERSION_530 */
 
 		/* Physical Processor Utilization */

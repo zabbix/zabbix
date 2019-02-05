@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -524,7 +524,7 @@ function closeDialogHandler(event) {
 
 				// Close overlay hintbox.
 				case 'hintbox':
-					hintBox.hideHint(null, dialog.element, true);
+					hintBox.hideHint(dialog.element, true);
 					break;
 
 				// Close context menu overlays.

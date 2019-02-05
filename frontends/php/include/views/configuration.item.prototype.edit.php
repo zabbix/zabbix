@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -471,6 +471,7 @@ if (!empty($this->data['interfaces'])) {
 $itemFormList->addRow(
 	(new CLabel(_('SNMP OID'), 'snmp_oid'))->setAsteriskMark(),
 	(new CTextBox('snmp_oid', $this->data['snmp_oid'], $readonly, 512))
+		->setAttribute('placeholder', '[IF-MIB::]ifInOctets.1')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	'row_snmp_oid'

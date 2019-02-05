@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,30 +20,31 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/../../include/defines.inc.php';
-require_once dirname(__FILE__).'/dbfunc.php';
-require_once dirname(__FILE__).'/class.cexceptionhelper.php';
+require_once dirname(__FILE__).'/CTest.php';
 
-class CZabbixTest extends PHPUnit_Framework_TestCase {
+/**
+ * Base class for Zabbix API tests.
+ */
+class CAPITest extends CTest {
 	// API request id.
 	public $request_id = 0;
-
-	// Table that should be backed up at the test suite level.
-	protected static $suite_backup = null;
-	// Table that should be backed up at the test case level.
-	protected $case_backup = null;
-	// Table that should be backed up at the test case level once (for multiple case executions).
-	protected static $case_backup_once = null;
-	// Shared browser instance.
-	protected static $shared_browser = null;
-	// Name of the last executed test.
-	protected static $last_test_case = null;
 	// Debug info.
 	protected $debug = [];
 	// Session id.
 	protected $session = null;
 
+	/**
+	 * Check API response.
+	 *
+	 * @param array $response  response to be checked
+	 * @param mixed $error     expected error:
+	 *
+	 * Possible $error types:
+	 *     null/false - there should not be an error
+	 *     array      - exact match
+	 *     string     - error message should match
+	 *     int        - error code should match
+	 */
 	public function checkResult($response, $error = null) {
 		// Check response data.
 		if ($error === null || $error === false) {
@@ -234,146 +235,25 @@ class CZabbixTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Callback executed before every test case.
-	 *
-	 * @before
+	 * @inheritdoc
 	 */
-	public function onBeforeTestCase() {
-		global $DB, $URL;
-		static $suite = null;
-		$class_name = get_class($this);
-		$case_name = $this->getName(false);
-		$backup = [];
-
-		$URL = PHPUNIT_URL.'api_jsonrpc.php';
-
-		if (!isset($DB['DB'])) {
-			DBconnect($error);
-		}
-
-		$annotations = $this->getAnnotations();
-
-		// Restore data from backup if test case changed
-		if (self::$case_backup_once !== null && self::$last_test_case !== $case_name) {
-			DBrestore_tables(self::$case_backup_once);
-			self::$case_backup_once = null;
-		}
-
-		// Test case level annotations.
-		$method_annotations = $this->getAnnotationsByType($annotations, 'method');
-
-		if ($method_annotations !== null) {
-			// Backup performed before every test case execution.
-			$case_backup = $this->getAnnotationsByType($method_annotations, 'backup');
-
-			if ($case_backup !== null && count($case_backup) === 1) {
-				$backup['case'] = $case_backup[0];
-			}
-
-			if (self::$last_test_case !== $case_name) {
-				// Backup performed once before first test case execution.
-				$case_backup_once = $this->getAnnotationsByType($method_annotations, 'backup-once');
-
-				if ($case_backup_once !== null && count($case_backup_once) === 1) {
-					$backup['case-once'] = $case_backup_once[0];
-				}
-			}
-		}
-
-		// Class name change is used to determine suite change.
-		if ($suite !== $class_name) {
-			// Test suite level annotations.
-			$class_annotations = $this->getAnnotationsByType($annotations, 'class');
-
-			// Backup performed before test suite execution.
-			$suite_backup = $this->getAnnotationsByType($class_annotations, 'backup');
-
-			if ($suite_backup !== null && count($suite_backup) === 1) {
-				$backup['suite'] = $suite_backup[0];
-			}
-		}
-
-		$suite = $class_name;
-		self::$last_test_case = $case_name;
-
-		// Backup is performed only for non-skipped tests.
-		foreach ($backup as $level => $table) {
-			switch ($level) {
-				case 'suite':
-					self::$suite_backup = $table;
-					break;
-
-				case 'case-once':
-					self::$case_backup_once = $table;
-					break;
-
-				case 'case':
-					$this->case_backup = $table;
-					break;
-			}
-
-			DBsave_tables($table);
-		}
-	}
-
-	/**
-	 * Callback executed after every test case.
-	 *
-	 * @after
-	 */
-	public function onAfterTestCase() {
-		if ($this->case_backup !== null) {
-			DBrestore_tables($this->case_backup);
-		}
-
-		DBclose();
-	}
-
-	/**
-	 * Callback executed after every test suite.
-	 *
-	 * @afterClass
-	 */
-	public static function onAfterTestSuite() {
-		if (self::$suite_backup !== null || self::$case_backup_once !== null) {
-			DBconnect($error);
-
-			// Restore suite level backups.
-			if (self::$suite_backup !== null) {
-				DBrestore_tables(self::$suite_backup);
-				self::$suite_backup = null;
-			}
-
-			// Restore case level backups.
-			if (self::$case_backup_once !== null) {
-				DBrestore_tables(self::$case_backup_once);
-				self::$case_backup_once = null;
-			}
-
-			DBclose();
-		}
-	}
-
-	/**
-	 * Get annotations by type name.
-	 * Helper function for method / class annotation processing.
-	 *
-	 * @param array  $annotations    annotations
-	 * @param string $type	         type name
-	 *
-	 * @return array or null
-	 */
-	protected function getAnnotationsByType($annotations, $type) {
-		return (array_key_exists($type, $annotations) && is_array($annotations[$type]))
-				? $annotations[$type]
-				: null;
-	}
-
 	protected function onNotSuccessfulTest($e) {
 		if ($this->debug && $e instanceof Exception) {
 			CExceptionHelper::setMessage($e, $e->getMessage()."\n\nAPI calls:\n".$this->getDebugInfoAsString());
 		}
 
 		parent::onNotSuccessfulTest($e);
+	}
+
+	/**
+	 * Callback executed before every test case.
+	 *
+	 * @before
+	 */
+	public function onBeforeTestCase() {
+		global $URL;
+		parent::onBeforeTestCase();
+
+		$URL = PHPUNIT_URL.'api_jsonrpc.php';
 	}
 }

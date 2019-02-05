@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup globalmacro
  */
-class testFormAdministrationGeneralMacro extends CWebTest {
+class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 	private $macroSize = 20;
 	private $macroMaxLength = 255;
 	private $macroPlaceholder = '{$MACRO}';
@@ -96,11 +96,11 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 			'SELECT * FROM globalmacro'.
 			($conditions ? ' WHERE '.$conditions : '').
 			' ORDER BY globalmacroid';
-		$this->oldHashGlobalMacros = DBhash($this->sqlHashGlobalMacros);
+		$this->oldHashGlobalMacros = CDBHelper::getHash($this->sqlHashGlobalMacros);
 	}
 
 	private function verifyHash() {
-		$this->assertEquals($this->oldHashGlobalMacros, DBhash($this->sqlHashGlobalMacros),
+		$this->assertEquals($this->oldHashGlobalMacros, CDBHelper::getHash($this->sqlHashGlobalMacros),
 				'Chuck Norris: Data in the DB table "globalmacro" has been changed.');
 	}
 
@@ -128,7 +128,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralMacros_CheckLayout() {
-		$countGlobalMacros = DBcount('select globalmacroid from globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('select globalmacroid from globalmacro');
 
 		$this->openGlobalMacros();
 
@@ -178,7 +178,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	public function testFormAdministrationGeneralMacros_SimpleUpdateWithEmptyRow() {
 		$this->calculateHash();
 
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
 
@@ -203,7 +203,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	public function testFormAdministrationGeneralMacros_CreateWrong($macro) {
 		$this->calculateHash();
 
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
 
@@ -228,7 +228,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	public function testFormAdministrationGeneralMacros_CreateWrongEmptyMacro() {
 		$this->calculateHash();
 
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
 
@@ -255,7 +255,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->calculateHash('globalmacroid<='.$row['globalmacroid']);
 
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
 
@@ -272,7 +272,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->verifyHash();
 
-		$count = DBcount(
+		$count = CDBHelper::getCount(
 			'SELECT globalmacroid FROM globalmacro'.
 			' WHERE macro='.zbx_dbstr($this->newMacro).
 				' AND value='.zbx_dbstr($this->newValue)
@@ -285,7 +285,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->calculateHash('globalmacroid<='.$row['globalmacroid']);
 
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
 
@@ -302,7 +302,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->verifyHash();
 
-		$count = DBcount(
+		$count = CDBHelper::getCount(
 			'SELECT globalmacroid FROM globalmacro'.
 			' WHERE macro='.zbx_dbstr($this->newEmptyMacro).
 				' AND value='.zbx_dbstr('')
@@ -313,7 +313,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	public function testFormAdministrationGeneralMacros_CreateDuplicate() {
 		$this->calculateHash();
 
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
 
@@ -401,7 +401,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	public function testFormAdministrationGeneralMacros_Update() {
 		$this->calculateHash('globalmacroid<>'.$this->oldGlobalMacroId);
 
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
 
@@ -420,7 +420,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder($i);
 
-		$count = DBcount(
+		$count = CDBHelper::getCount(
 			'SELECT globalmacroid FROM globalmacro'.
 			' WHERE globalmacroid='.$this->oldGlobalMacroId.
 				' AND macro='.zbx_dbstr($this->updMacro).
@@ -436,7 +436,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	public function testFormAdministrationGeneralMacros_UpdateEmptyValue() {
 		$this->calculateHash('globalmacroid<>'.$this->oldGlobalMacroId);
 
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
 
@@ -455,7 +455,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder($i);
 
-		$count = DBcount(
+		$count = CDBHelper::getCount(
 			'SELECT globalmacroid FROM globalmacro'.
 			' WHERE globalmacroid='.$this->oldGlobalMacroId.
 				' AND macro='.zbx_dbstr($this->updMacro).
@@ -471,7 +471,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	public function testFormAdministrationGeneralMacros_UpdateDuplicate() {
 		$this->calculateHash();
 
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
 
@@ -498,7 +498,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralMacros_DeleteCancel() {
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
 
@@ -512,7 +512,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->zbxTestClick('macros_'.$i.'_remove');
 
 		$this->zbxTestClick('update');
-		$this->webDriver->switchTo()->alert()->dismiss();
+		$this->zbxTestDismissAlert();
 		$this->zbxTestTextNotPresent('Macros updated');
 
 		$this->zbxTestAssertElementNotPresentId('macros_'.$i.'_macro');
@@ -522,12 +522,12 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder($i);
 
-		$count = DBcount('SELECT globalmacroid FROM globalmacro WHERE globalmacroid='.$this->oldGlobalMacroId);
+		$count = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro WHERE globalmacroid='.$this->oldGlobalMacroId);
 		$this->assertEquals(1, $count, 'Chuck Norris: Global macro has been deleted from the DB.');
 	}
 
 	public function testFormAdministrationGeneralMacros_Delete() {
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
 
@@ -545,14 +545,14 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder();
 
-		$count = DBcount('SELECT globalmacroid FROM globalmacro WHERE globalmacroid='.$this->oldGlobalMacroId);
+		$count = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro WHERE globalmacroid='.$this->oldGlobalMacroId);
 		$this->assertEquals(0, $count, 'Chuck Norris: Global macro has not been deleted from the DB.');
 	}
 
 	public function testFormAdministrationGeneralMacros_DeleteNew() {
 		$this->calculateHash();
 
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
 
 		$this->openGlobalMacros();
 

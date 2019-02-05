@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -261,18 +261,5 @@ class CDashboardWidgetMap extends CDiv {
 		$this->build();
 
 		return parent::toString($destroy);
-	}
-
-	/**
-	 * Returns a list of javascript files that are requested to load map widget.
-	 *
-	 * @return array
-	 */
-	public function getScriptFile() {
-		return [
-			'js/vector/class.svg.canvas.js',
-			'js/vector/class.svg.map.js',
-			'js/class.mapWidget.js'
-		];
 	}
 }
