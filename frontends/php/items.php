@@ -1994,7 +1994,7 @@ else {
 	$data['trigger_parent_templates'] = getTriggerParentTemplates($data['itemTriggers'], ZBX_FLAG_DISCOVERY_NORMAL);
 
 	// determine, show or not column of errors
-	if (($data['hostid'] != 0 && array_key_exists('templateid', $host))) {
+	if ($data['hostid'] != 0 && array_key_exists('templateid', $host)) {
 		$data['showInfoColumn'] = false;
 	}
 	else {
