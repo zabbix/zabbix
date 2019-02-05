@@ -792,7 +792,7 @@ class CSvgGraph extends CSvg {
 					$x = $this->canvas_x + $this->canvas_width
 						- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 					$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
-					$paths[$path_num][] = [$x, $y, convert_units([
+					$paths[$path_num][] = [$x, ceil($y), convert_units([
 						'value' => $point,
 						'units' => $metric['units']
 					])];
