@@ -26,4 +26,4 @@ libzbxpoller_proxy_a_SOURCES = \
 
 libzbxpoller_a_CFLAGS = -I@top_srcdir@/src/libs/zbxsysinfo/simple -I@top_srcdir@/src/libs/zbxdbcache @SNMP_CFLAGS@ @SSH2_CFLAGS@
 
-libzbxpoller_server_a_CFLAGS = -I@top_srcdir@/src/libs/zbxdbcache 
+libzbxpoller_server_a_CFLAGS = -I@top_srcdir@/src/libs/zbxdbcache

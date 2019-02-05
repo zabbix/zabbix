@@ -650,7 +650,15 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 
 				// Check results in DB.
 				foreach ($data['preprocessing'] as $key => $options) {
-					$db_type = get_preprocessing_types($type[$key], false, CItem::$supported_preprocessing_types);
+					// The array of allowed types must be synced with CItem::$supported_preprocessing_types.
+					$db_type = get_preprocessing_types($type[$key], false, [ZBX_PREPROC_REGSUB, ZBX_PREPROC_TRIM,
+						ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
+						ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_BOOL2DEC,
+						ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC, ZBX_PREPROC_VALIDATE_RANGE,
+						ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON,
+						ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_VALUE,
+						ZBX_PREPROC_THROTTLE_TIMED_VALUE
+					]);
 					$this->assertEquals($options['type'], $db_type);
 
 					switch ($options['type']) {
@@ -724,7 +732,13 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		// Check preprocessing parameters for each type in form.
 		$db_items_preproc = CDBHelper::getAll('SELECT * FROM item_preproc WHERE itemid='.$preprocessing_itemid);
 		foreach ($db_items_preproc as $item_preproc) {
-			$preprocessing_type = get_preprocessing_types($item_preproc['type'], false, CItem::$supported_preprocessing_types);
+			$preprocessing_type = get_preprocessing_types($item_preproc['type'], false, [ZBX_PREPROC_REGSUB,
+				ZBX_PREPROC_TRIM, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
+				ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_BOOL2DEC,
+				ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX,
+				ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML,
+				ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE
+			]);
 			$this->zbxTestAssertElementNotPresentXpath('//input[@id="preprocessing_'.($item_preproc['step'] - 1).'_type"][@readonly]');
 			$this->zbxTestDropdownAssertSelected('preprocessing['.($item_preproc['step'] - 1).'][type]', $preprocessing_type);
 			switch ($item_preproc['type']) {
