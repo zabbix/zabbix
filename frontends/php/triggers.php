@@ -716,6 +716,14 @@ else {
 		'inherited' => ($filter_inherited != -1) ? $filter_inherited : null
 	];
 
+	$prefetch_options = [
+		'output' => ['triggerid'],
+		'selectHosts' => null,
+		'selectDependencies' => null,
+		'selectDiscoveryRule' => null,
+		'selectTags' => null,
+	] + $options;
+
 	if ($filter_discovered != -1) {
 		$options['filter']['flags'] = ($filter_discovered == 1)
 			? ZBX_FLAG_DISCOVERY_CREATED
@@ -765,10 +773,42 @@ else {
 		]), ['hostid' => 'id']);
 	}
 
-	$triggers = API::Trigger()->get($options);
+	$prefetch_options = [
+		'output' => ['triggerid', $sort],
+		'selectHosts' => null,
+		'selectDependencies' => null,
+		'selectDiscoveryRule' => null,
+		'selectTags' => null,
+		'preservekeys' => true
+	] + $options;
+	$prefetched_triggers = API::Trigger()->get($prefetch_options);
+
+	if ($sort === 'status') {
+		orderTriggersByStatus($prefetched_triggers, $sortorder);
+	}
+	else {
+		order_result($prefetched_triggers, $sort, $sortorder);
+	}
+
+	$url = (new CUrl('triggers.php'))
+		->setArgument('filter_groupids', $filter_groupids)
+		->setArgument('filter_hostids', $filter_hostids);
+
+	$paging = getPagingLine($prefetched_triggers, $sortorder, $url);
+	$prefetched_triggerids = array_keys($prefetched_triggers);
+
+	$triggers = API::Trigger()->get([
+		'triggerids' => $prefetched_triggerids ? $prefetched_triggerids : null,
+		'preservekeys' => true
+	] + $options);
+
+	foreach ($triggers as $trigger) {
+		$prefetched_triggers[$trigger['triggerid']] = $trigger;
+	}
+	$triggers = $prefetched_triggers;
+
 	$show_info_column = false;
 	$show_value_column = false;
-
 	foreach ($triggers as $trigger) {
 		foreach ($trigger['hosts'] as $trigger_host) {
 			if (in_array($trigger_host['status'], [HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED])) {
@@ -779,27 +819,14 @@ else {
 		}
 	}
 
-	if ($sort === 'status') {
-		orderTriggersByStatus($triggers, $sortorder);
-	}
-	else {
-		order_result($triggers, $sort, $sortorder);
-	}
-
-	$url = (new CUrl('triggers.php'))
-		->setArgument('filter_groupids', $filter_groupids)
-		->setArgument('filter_hostids', $filter_hostids);
-
 	$dep_triggerids = [];
-
 	foreach ($triggers as $trigger) {
-		foreach ($trigger['dependencies'] as $depTrigger) {
-			$dep_triggerids[$depTrigger['triggerid']] = true;
+		foreach ($trigger['dependencies'] as $dep_trigger) {
+			$dep_triggerids[$dep_trigger['triggerid']] = true;
 		}
 	}
 
 	$dep_triggers = [];
-
 	if ($dep_triggerids) {
 		$dep_triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'description', 'status', 'flags'],
@@ -892,7 +919,6 @@ else {
 		$single_selected_hostid = reset($filter_hostids);
 	}
 
-	$paging = getPagingLine($triggers, $sortorder, $url);
 	$data = [
 		'config' => $config,
 		'config_priorities' => $config_priorities,
