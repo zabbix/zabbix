@@ -297,31 +297,24 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$trigger = [];
 
 		if ($db_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-
 			if ($db_trigger['templateid'] == 0) {
-
 				if ($db_trigger['description'] !== $description) {
 					$trigger['description'] = $description;
 				}
-
 				if ($db_trigger['expression'] !== $expression) {
 					$trigger['expression'] = $expression;
 				}
-
 				if ($db_trigger['recovery_mode'] != $recovery_mode) {
 					$trigger['recovery_mode'] = $recovery_mode;
 				}
 
 				switch ($recovery_mode) {
 					case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
-
 						if ($db_trigger['recovery_expression'] !== $recovery_expression) {
 							$trigger['recovery_expression'] = $recovery_expression;
 						}
 						// break; is not missing here.
-
 					case ZBX_RECOVERY_MODE_EXPRESSION:
-
 						if ($db_trigger['correlation_mode'] != $correlation_mode) {
 							$trigger['correlation_mode'] = $correlation_mode;
 						}
@@ -337,15 +330,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($db_trigger['type'] != $type) {
 				$trigger['type'] = $type;
 			}
-
 			if ($db_trigger['url'] !== $url) {
 				$trigger['url'] = $url;
 			}
-
 			if ($db_trigger['priority'] != $priority) {
 				$trigger['priority'] = $priority;
 			}
-
 			if ($db_trigger['comments'] !== $comments) {
 				$trigger['comments'] = $comments;
 			}
@@ -402,13 +392,11 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
 	show_messages($result, _('Trigger deleted'), _('Cannot delete trigger'));
 }
 elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])) {
-
 	if (!isset($_REQUEST['dependencies'])) {
 		$_REQUEST['dependencies'] = [];
 	}
 
 	foreach ($_REQUEST['new_dependency'] as $triggerid) {
-
 		if (!uint_in_array($triggerid, $_REQUEST['dependencies'])) {
 			array_push($_REQUEST['dependencies'], $triggerid);
 		}
@@ -435,29 +423,24 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 
 			// Remove empty new tag lines.
 			foreach ($tags as $key => $tag) {
-
 				if ($tag['tag'] === '' && $tag['value'] === '') {
 					unset($tags[$key]);
 				}
 			}
 
 			foreach ($triggerids as $triggerid) {
-
 				if (array_key_exists($triggerid, $triggers)) {
 					$trigger = ['triggerid' => $triggerid];
 
 					if (array_key_exists('priority', $visible)) {
 						$trigger['priority'] = getRequest('priority');
 					}
-
 					if (array_key_exists('dependencies', $visible)) {
 						$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
 					}
-
 					if (array_key_exists('tags', $visible)) {
 						$trigger['tags'] = $tags;
 					}
-
 					if ($triggers[$triggerid]['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
 						$trigger['manual_close'] = getRequest('manual_close');
 					}
@@ -489,7 +472,6 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 	]);
 
 	if ($dbTriggers) {
-
 		foreach ($dbTriggers as $dbTrigger) {
 			$update[] = [
 				'triggerid' => $dbTrigger['triggerid'],
@@ -531,7 +513,6 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' &&
 		else {
 			$hosts_ids = [];
 			$group_ids = getRequest('copy_targetid');
-
 			$db_hosts = DBselect(
 				'SELECT DISTINCT h.hostid'.
 				' FROM hosts h,hosts_groups hg'.
@@ -746,7 +727,6 @@ else {
 	$show_value_column = false;
 
 	foreach ($hosts as $host) {
-
 		if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
 			$show_value_column = true;
 			$show_info_column = true;
@@ -785,7 +765,6 @@ else {
 	if ($filter_name !== '') {
 		$options['search']['description'] = $filter_name;
 	}
-
 	if ($filter_priority) {
 		$options['filter']['priority'] = $filter_priority;
 	}
@@ -802,7 +781,6 @@ else {
 			break;
 
 		default:
-
 			if ($filter_status != -1) {
 				$options['filter']['status'] = $filter_status;
 			}
@@ -839,7 +817,6 @@ else {
 	$dep_triggerids = [];
 
 	foreach ($triggers as $trigger) {
-
 		foreach ($trigger['dependencies'] as $depTrigger) {
 			$dep_triggerids[$depTrigger['triggerid']] = true;
 		}
@@ -884,7 +861,6 @@ else {
 		$filter_tags_fmt = ['tags' => [], 'values' => [], 'operators' => []];
 
 		foreach ($filter_tags as $filter_tag) {
-
 			if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
 				continue;
 			}
