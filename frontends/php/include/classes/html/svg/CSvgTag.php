@@ -45,9 +45,6 @@ class CSvgTag extends CTag {
 	const ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE = 'svg-point-highlight';
 	const ZBX_STYLE_GRAPH_HELPER = 'svg-helper';
 
-	const ZBX_STYLE_GRAPH_LABEL_MAIN = 'svg-graph-label-main';
-	const ZBX_STYLE_GRAPH_LABEL_SUB = 'svg-graph-label-sub';
-
 	/**
 	 * SVG styles array.
 	 */
@@ -75,7 +72,7 @@ class CSvgTag extends CTag {
 	 */
 	public function addItem($value) {
 		if ($value instanceof CSvgTag) {
-			$this->styles += $value->makeStyles();
+			$this->styles = $value->makeStyles() + $this->styles;
 		}
 
 		return parent::addItem($value);
@@ -137,21 +134,6 @@ class CSvgTag extends CTag {
 
 	public function setStrokeOpacity($opacity) {
 		$this->setAttribute('stroke-opacity', $opacity);
-
-		return $this;
-	}
-
-	/**
-	 * Rotate tag.
-	 *
-	 * @param int $degrees    Degrees to rotate.
-	 * @param int $x          X value for transform:rotate().
-	 * @param int $y          Y value for transform:rotate().
-	 *
-	 * @return CSvgTag
-	 */
-	public function rotate($degrees, $x, $y) {
-		$this->setAttribute('transform', 'rotate('.$degrees.' '.$x.','.$y.')');
 
 		return $this;
 	}
