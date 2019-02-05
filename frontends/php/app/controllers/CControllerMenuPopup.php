@@ -84,7 +84,7 @@ class CControllerMenuPopup extends CController {
 	 * @param int    $data['severity_min']    (optional)
 	 * @param bool   $data['show_suppressed'] (optional)
 	 * @param array  $data['urls']            (optional)
-	 * @param string $data['urls']['name']
+	 * @param string $data['urls']['label']
 	 * @param string $data['urls']['url']
 	 *
 	 * @return mixed
@@ -143,7 +143,7 @@ class CControllerMenuPopup extends CController {
 			}
 
 			if (array_key_exists('urls', $data)) {
-				$menu_data['urls'] = CArrayHelper::renameObjectsKeys($data['urls'], ['name' => 'label']);
+				$menu_data['urls'] = $data['urls'];
 			}
 
 			return $menu_data;
@@ -251,6 +251,7 @@ class CControllerMenuPopup extends CController {
 	 * @param string $data['selementid']
 	 * @param array  $data['options']       (optional)
 	 * @param int    $data['severity_min']  (optional)
+	 * @param string $data['hostid']        (optional)
 	 *
 	 * @return mixed
 	 */
@@ -275,6 +276,24 @@ class CControllerMenuPopup extends CController {
 
 			if ($selement !== null) {
 				CArrayHelper::sort($selement['urls'], ['name']);
+				$selement['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
+
+				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+						&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS
+						&& array_key_exists('hostid', $data) && $data['hostid'] != 0) {
+					$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_HOST;
+					$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
+					$selement['elements'][0]['hostid'] = $data['hostid'];
+
+					/*
+					 * Expanding host URL macros again as some hosts were added from hostgroup areas and automatic
+					 * expanding only happens for elements that are defined for map in DB.
+					 */
+					foreach ($selement['urls'] as &$url) {
+						$url['url'] = str_replace('{HOST.ID}', $data['hostid'], $url['url']);
+					}
+					unset($url);
+				}
 
 				switch ($selement['elementtype']) {
 					case SYSMAP_ELEMENT_TYPE_MAP:
@@ -286,7 +305,7 @@ class CControllerMenuPopup extends CController {
 							$menu_data['severity_min'] = $data['severity_min'];
 						}
 						if ($selement['urls']) {
-							$menu_data['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
+							$menu_data['urls'] = $selement['urls'];
 						}
 						return $menu_data;
 
@@ -302,7 +321,7 @@ class CControllerMenuPopup extends CController {
 							$menu_data['show_suppressed'] = true;
 						}
 						if ($selement['urls']) {
-							$menu_data['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
+							$menu_data['urls'] = $selement['urls'];
 						}
 						return $menu_data;
 
@@ -333,7 +352,7 @@ class CControllerMenuPopup extends CController {
 							$menu_data['show_suppressed'] = true;
 						}
 						if ($selement['urls']) {
-							$menu_data['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
+							$menu_data['urls'] = $selement['urls'];
 						}
 						return $menu_data;
 				}

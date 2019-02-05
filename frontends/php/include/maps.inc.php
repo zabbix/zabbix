@@ -72,40 +72,28 @@ function sysmapElementLabel($label = null) {
  * @return array
  */
 function getActionsBySysmap(array $sysmap, array $options = []) {
-//	foreach ($sysmap['selements'] as &$selement) {
-//		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-//			$hostid = $selement['elements'][0]['hostid'];
-
-//			/*
-//			 * Expanding host URL macros again as some hosts were added from hostgroup areas and automatic expanding
-//			 * only happens for elements that are defined for map in DB.
-//			 */
-//			foreach ($selement['urls'] as $urlid => $url) {
-//				$selement['urls'][$urlid]['url'] = str_replace('{HOST.ID}', $hostid, $url['url']);
-//			}
-//		}
-//	}
-//	unset($selement);
-
 	$actions = [];
+	$severity_min = array_key_exists('severity_min', $options)
+		? $options['severity_min']
+		: TRIGGER_SEVERITY_NOT_CLASSIFIED;
 
 	foreach ($sysmap['selements'] as $selementid => $elem) {
 		if ($elem['permission'] < PERM_READ) {
 			continue;
 		}
 
-		//order_result($elem['urls'], 'name');
+		$hostid = ($elem['elementtype_orig'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+				&& $elem['elementsubtype_orig'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
+			? $elem['elements'][0]['hostid']
+			: 0;
 
-		switch ($elem['elementtype']) {
+		switch ($elem['elementtype_orig']) {
 			case SYSMAP_ELEMENT_TYPE_MAP:
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 			case SYSMAP_ELEMENT_TYPE_HOST:
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$map = CMenuPopupHelper::getAjaxMapElement($sysmap['sysmapid'], $elem['selementid'],
-					array_key_exists('severity_min', $options)
-						? $options['severity_min']
-						: TRIGGER_SEVERITY_NOT_CLASSIFIED
-				);
+				$map = CMenuPopupHelper::getAjaxMapElement($sysmap['sysmapid'], $elem['selementid_orig'], $severity_min,
+					$hostid);
 				break;
 		}
 

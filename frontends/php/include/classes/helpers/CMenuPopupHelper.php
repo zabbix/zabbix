@@ -68,10 +68,11 @@ class CMenuPopupHelper {
 	 * @param string $sysmapid
 	 * @param string $selementid
 	 * @param int    $severity_min
+	 * @param string $hostid
 	 *
 	 * @return array
 	 */
-	public static function getAjaxMapElement($sysmapid, $selementid, $severity_min) {
+	public static function getAjaxMapElement($sysmapid, $selementid, $severity_min, $hostid) {
 		$data = [
 			'ajax' => true,
 			'type' => 'map_element',
@@ -84,66 +85,8 @@ class CMenuPopupHelper {
 		if ($severity_min != TRIGGER_SEVERITY_NOT_CLASSIFIED) {
 			$data['data']['severity_min'] = $severity_min;
 		}
-
-		return $data;
-	}
-
-	/**
-	 * Prepare data for map menu popup.
-	 *
-	 * @param string $hostId                     Host ID.
-	 * @param array  $scripts                    Host scripts.
-	 * @param string $scripts[]['name']          Script name.
-	 * @param string $scripts[]['scriptid']      Script ID.
-	 * @param string $scripts[]['confirmation']  Confirmation text.
-	 * @param array  $gotos                      Enable goto links.
-	 * @param array  $gotos['graphs']            Link to host graphs page with url parameters ("name" => "value") (optional).
-	 * @param array  $gotos['screens']           Link to host screen page with url parameters ("name" => "value") (optional).
-	 * @param array  $gotos['triggerStatus']     Link to "Problems" page with url parameters ("name" => "value") (optional).
-	 * @param array  $gotos['submap']            Link to submap page with url parameters ("name" => "value") (optional).
-	 * @param array  $gotos['events']            Link to events page with url parameters ("name" => "value") (optional).
-	 * @param array  $urls                       Local and global map links (optional).
-	 * @param string $urls[]['name']             Link name.
-	 * @param string $urls[]['url']              Link url.
-	 *
-	 * @return array
-	 */
-	public static function getMap($hostId, array $scripts = null, array $gotos = null, array $urls = null) {
-
-		$data = [
-			'type' => 'map'
-		];
-
-
-		if ($scripts) {
-			foreach ($scripts as &$script) {
-				$script['name'] = trimPath($script['name']);
-			}
-			unset($script);
-			CArrayHelper::sort($scripts, ['name']);
-
-			$data['hostid'] = $hostId;
-
-			foreach (array_values($scripts) as $script) {
-				$data['scripts'][] = [
-					'name' => $script['name'],
-					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
-				];
-			}
-		}
-
-		if ($gotos) {
-			$data['gotos'] = $gotos;
-		}
-
-		if ($urls) {
-			foreach ($urls as $url) {
-				$data['urls'][] = [
-					'label' => $url['name'],
-					'url' => $url['url']
-				];
-			}
+		if ($hostid != 0) {
+			$data['data']['hostid'] = $hostid;
 		}
 
 		return $data;
