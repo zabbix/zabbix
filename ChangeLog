@@ -4,6 +4,7 @@ New features:
 A.F.I...S. [ZBXNEXT-4087] implemented preprocessing of LLD rules (Ivo, wiper)
 
 Bug fixes:
+...G...PS. [ZBX-15379] fixed -Wimplicit-fallthrough warnings when compiling with GCC 7 and -Wextra (akozlovs)
 A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
 ...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
 ........S. [ZBX-15533] fixed cutting and trimming event tags and values (asitals)
@@ -132,6 +133,7 @@ Changes for 4.0.5rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-15379] fixed -Wimplicit-fallthrough warnings when compiling with GCC 7 and -Wextra (akozlovs)
 A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
 ...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
 ........S. [ZBX-15533] fixed cutting and trimming event tags and values (asitals)
