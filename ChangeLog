@@ -5,6 +5,7 @@ New features:
 Bug fixes:
 A......... [ZBX-15422] fixed SQL errors when linked template have item prototype with equal key as host item (Sasha)
 ..F....... [ZBX-15456] fixed incorrect style property in Monitoring->Problems; removed unused id from filter form (agriscenko)
+.D........ [ZBX-15271] added link to documentation in all man pages (kalimulin)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.4
