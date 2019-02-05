@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-22 10:34+0200\n"
+"POT-Creation-Date: 2019-01-28 15:53+0200\n"
 "PO-Revision-Date: 2018-12-19 15:44+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -1437,7 +1437,7 @@ msgid "CERT"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:938
+#: include/classes/graph/CSvgGraph.php:968
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -6600,8 +6600,6 @@ msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1413
 #: include/classes/graphdraw/CLineGraphDraw.php:1420
-#: include/classes/html/svg/CSvgGraphXAxis.php:456
-#: include/classes/html/svg/CSvgGraphXAxis.php:463
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr ""
@@ -9855,7 +9853,6 @@ msgid "Low-level discovery rule in \"not supported\" state"
 msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
-#: include/classes/html/svg/CSvgGraphXAxis.php:424
 msgid "M"
 msgstr ""
 
@@ -12234,7 +12231,7 @@ msgid "POP"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:933
+#: include/classes/graph/CSvgGraph.php:963
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -12915,7 +12912,7 @@ msgid "Queue of items to be updated"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:929
+#: include/classes/graph/CSvgGraph.php:959
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:956
 #: include/classes/screens/CScreenProblem.php:1122 include/events.inc.php:345
@@ -18467,9 +18464,6 @@ msgstr ""
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
 #: include/classes/graphdraw/CLineGraphDraw.php:1389
 #: include/classes/graphdraw/CLineGraphDraw.php:1396
-#: include/classes/html/svg/CSvgGraphXAxis.php:424
-#: include/classes/html/svg/CSvgGraphXAxis.php:432
-#: include/classes/html/svg/CSvgGraphXAxis.php:439
 msgid "m-d"
 msgstr ""
 
