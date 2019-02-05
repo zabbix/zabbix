@@ -699,30 +699,17 @@ else {
 
 	// Get triggers (build options).
 	$options = [
-		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state',
-			'recovery_mode', 'recovery_expression', 'value', $sort
-		],
+		'output' => ['triggerid', $sort],
 		'hostids' => $filter_hostids ? $filter_hostids : null,
 		'groupids' => $filter_groupids ? $filter_groupids_enriched : null,
-		'selectHosts' => ['hostid', 'host', 'name', 'status'],
-		'selectDependencies' => ['triggerid', 'description'],
-		'selectDiscoveryRule' => ['itemid', 'name'],
-		'selectTags' => ['tag', 'value'],
-		'editable' => true,
 		'sortfield' => $sort,
 		'limit' => $config['search_limit'] + 1,
+		'editable' => true,
 		'dependent' => ($filter_dependent != -1) ? $filter_dependent : null,
 		'templated' => ($filter_value != -1) ? false : null,
-		'inherited' => ($filter_inherited != -1) ? $filter_inherited : null
+		'inherited' => ($filter_inherited != -1) ? $filter_inherited : null,
+		'preservekeys' => true
 	];
-
-	$prefetch_options = [
-		'output' => ['triggerid'],
-		'selectHosts' => null,
-		'selectDependencies' => null,
-		'selectDiscoveryRule' => null,
-		'selectTags' => null,
-	] + $options;
 
 	if ($filter_discovered != -1) {
 		$options['filter']['flags'] = ($filter_discovered == 1)
@@ -773,16 +760,7 @@ else {
 		]), ['hostid' => 'id']);
 	}
 
-	$prefetch_options = [
-		'output' => ['triggerid', $sort],
-		'selectHosts' => null,
-		'selectDependencies' => null,
-		'selectDiscoveryRule' => null,
-		'selectTags' => null,
-		'preservekeys' => true
-	] + $options;
-	$prefetched_triggers = API::Trigger()->get($prefetch_options);
-
+	$prefetched_triggers = API::Trigger()->get($options);
 	if ($sort === 'status') {
 		orderTriggersByStatus($prefetched_triggers, $sortorder);
 	}
@@ -795,17 +773,26 @@ else {
 		->setArgument('filter_hostids', $filter_hostids);
 
 	$paging = getPagingLine($prefetched_triggers, $sortorder, $url);
-	$prefetched_triggerids = array_keys($prefetched_triggers);
+	$triggers = [];
+	if ($prefetched_triggers) {
+		$triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state',
+				'recovery_mode', 'recovery_expression', 'value', $sort
+			],
+			'triggerids' => array_keys($prefetched_triggers),
+			'selectHosts' => ['hostid', 'host', 'name', 'status'],
+			'selectDependencies' => ['triggerid', 'description'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectTags' => ['tag', 'value'],
+			'preservekeys' => true,
+			'nopermissions' => true
+		]);
 
-	$triggers = API::Trigger()->get([
-		'triggerids' => $prefetched_triggerids ? $prefetched_triggerids : null,
-		'preservekeys' => true
-	] + $options);
-
-	foreach ($triggers as $trigger) {
-		$prefetched_triggers[$trigger['triggerid']] = $trigger;
+		foreach ($triggers as $triggerid => $trigger) {
+			$prefetched_triggers[$triggerid] = $trigger;
+		}
+		$triggers = $prefetched_triggers;
 	}
-	$triggers = $prefetched_triggers;
 
 	$show_info_column = false;
 	$show_value_column = false;
