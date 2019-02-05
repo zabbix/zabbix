@@ -671,6 +671,7 @@ else {
 		}
 	}
 
+	$filter_groupids_enriched =  [];
 	if ($filter_groupids) {
 		$filter_groupids = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
@@ -680,17 +681,25 @@ else {
 		]);
 		$filter_groupids_ms = CArrayHelper::renameObjectsKeys($filter_groupids, ['groupid' => 'id']);
 		$filter_groupids = array_keys($filter_groupids);
+		$filter_groupids_enriched = getSubGroups($filter_groupids);
+	}
+
+	if ($filter_hostids) {
+		$filter_hostids = API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'hostids' => $filter_hostids,
+			'templated_hosts' => true,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+		$filter_hostids_ms = CArrayHelper::renameObjectsKeys($filter_hostids, ['hostid' => 'id']);
+		$filter_hostids = array_keys($filter_hostids_ms);
 	}
 
 	// Skip empty tags.
 	$filter_tags = array_filter($filter_tags, function ($v) {
 		return boolval($v['tag']);
 	});
-	$filter_groupids_enriched =  [];
-
-	if ($filter_groupids) {
-		$filter_groupids_enriched = getSubGroups($filter_groupids);
-	}
 
 	$sort = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
 	$sortorder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
@@ -747,16 +756,6 @@ else {
 	if ($filter_tags) {
 		$options['evaltype'] = $filter_evaltype;
 		$options['tags'] = $filter_tags;
-	}
-
-	if ($filter_hostids) {
-		$filter_hostids_ms = CArrayHelper::renameObjectsKeys(API::Host()->get([
-			'output' => ['hostid', 'name'],
-			'hostids' => $filter_hostids,
-			'templated_hosts' => true,
-			'editable' => true,
-			'preservekeys' => true
-		]), ['hostid' => 'id']);
 	}
 
 	$prefetched_triggers = API::Trigger()->get($options);
