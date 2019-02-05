@@ -756,6 +756,10 @@ class CSvgGraph extends CSvg {
 	 * Calculate paths for metric elements.
 	 */
 	protected function calculatePaths() {
+		// Metric having very big values of y outside visible area will fail to render.
+		$ymax = pow(2, 16);
+		$ymin = $ymax * -1;
+
 		foreach ($this->metrics as $index => $metric) {
 			if (!array_key_exists($index, $this->points)) {
 				continue;
@@ -774,10 +778,6 @@ class CSvgGraph extends CSvg {
 			$value_diff = $max_value - $min_value ? : 1;
 			$timeshift = $metric['options']['timeshift'];
 			$paths = [];
-
-			// Metric having very big values of y outside visible area will fail to render.
-			$ymax = pow(2, 16);
-			$ymin = $ymax * -1;
 
 			$path_num = 0;
 			foreach ($this->points[$index] as $clock => $point) {
