@@ -22,6 +22,7 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 class testHistory extends CAPITest {
+
 	public static function history_get_data() {
 		return [
 			// Test item history of value_type == ITEM_VALUE_TYPE_STR ('history' => 1).
@@ -32,42 +33,6 @@ class testHistory extends CAPITest {
 					'itemids' => ['133760']
 				],
 				'expected_result' => [
-					[
-						'itemid' => '133760',
-						'clock' => '1549350960',
-						'value' => '1',
-						'ns' => '754460948'
-					],
-					[
-						'itemid' => '133760',
-						'clock' => '1549350962',
-						'value' => '1',
-						'ns' => '919404393'
-					],
-					[
-						'itemid' => '133760',
-						'clock' => '1549350965',
-						'value' => '1',
-						'ns' => '512878374'
-					],
-					[
-						'itemid' => '133760',
-						'clock' => '1549350960',
-						'value' => '1',
-						'ns' => '754460948'
-					],
-					[
-						'itemid' => '133760',
-						'clock' => '1549350962',
-						'value' => '1',
-						'ns' => '919404393'
-					],
-					[
-						'itemid' => '133760',
-						'clock' => '1549350965',
-						'value' => '1',
-						'ns' => '512878374'
-					],
 					[
 						'itemid' => '133760',
 						'clock' => '1549350960',
@@ -116,46 +81,6 @@ class testHistory extends CAPITest {
 					[
 						'value' => '5',
 						'severity' => '0'
-					],
-					[
-						'value' => '1',
-						'severity' => '0'
-					],
-					[
-						'value' => '2',
-						'severity' => '0'
-					],
-					[
-						'value' => '3',
-						'severity' => '0'
-					],
-					[
-						'value' => '4',
-						'severity' => '0'
-					],
-					[
-						'value' => '5',
-						'severity' => '0'
-					],
-					[
-						'value' => '1',
-						'severity' => '0'
-					],
-					[
-						'value' => '2',
-						'severity' => '0'
-					],
-					[
-						'value' => '3',
-						'severity' => '0'
-					],
-					[
-						'value' => '4',
-						'severity' => '0'
-					],
-					[
-						'value' => '5',
-						'severity' => '0'
 					]
 				],
 				'expected_error' => false
@@ -177,53 +102,19 @@ class testHistory extends CAPITest {
 					],
 					[
 						'value' => '1.0000',
-						'clock' => '1549350957'
-					],
-					[
-						'value' => '1.0000',
-						'clock' => '1549350957'
-					],
-					[
-						'value' => '1.0000',
 						'clock' => '1549350955'
 					],
 					[
 						'value' => '1.0000',
-						'clock' => '1549350955'
-					]
-				],
-				'expected_error' => false
-			],
-			// Get last 5 values of item of value_type == ITEM_VALUE_TYPE_FLOAT ('history' => 0).
-			[
-				'api_request' => [
-					'output' => ['value', 'clock'],
-					'history' => 0,
-					'itemids' => ['133759'],
-					'sortorder' => 'DESC',
-					'sortfield' => 'clock',
-					'limit' => 5
-				],
-				'expected_result' => [
-					[
-						'value' => '1.0000',
-						'clock' => '1549350957'
+						'clock' => '1549350953'
 					],
 					[
-						'value' => '1.0000',
-						'clock' => '1549350957'
+						'value' => '0.0000',
+						'clock' => '1549350950'
 					],
 					[
-						'value' => '1.0000',
-						'clock' => '1549350957'
-					],
-					[
-						'value' => '1.0000',
-						'clock' => '1549350955'
-					],
-					[
-						'value' => '1.0000',
-						'clock' => '1549350955'
+						'value' => '0.0000',
+						'clock' => '1549350948'
 					]
 				],
 				'expected_error' => false
@@ -243,22 +134,6 @@ class testHistory extends CAPITest {
 						'clock' => '1549350908'
 					],
 					[
-						'value' => '3',
-						'clock' => '1549350908'
-					],
-					[
-						'value' => '3',
-						'clock' => '1549350908'
-					],
-					[
-						'value' => '4',
-						'clock' => '1549350909'
-					],
-					[
-						'value' => '4',
-						'clock' => '1549350909'
-					],
-					[
 						'value' => '4',
 						'clock' => '1549350909'
 					]
@@ -272,7 +147,7 @@ class testHistory extends CAPITest {
 					'history' => 4,
 					'itemids' => ['133762']
 				],
-				'expected_result' => '6',
+				'expected_result' => '3',
 				'expected_error' => false
 			],
 			// Get number of history records filtering records by itemid.
@@ -283,7 +158,7 @@ class testHistory extends CAPITest {
 						'itemid' => ['133758']
 					]
 				],
-				'expected_result' => '42',
+				'expected_result' => '14',
 				'expected_error' => false
 			]
 		];
