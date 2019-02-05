@@ -707,7 +707,6 @@ else {
 
 	// Get triggers (build options).
 	$options = [
-		'output' => ['triggerid', $sort],
 		'hostids' => $filter_hostids ? $filter_hostids : null,
 		'groupids' => $filter_groupids ? $filter_groupids_enriched : null,
 		'editable' => true,
@@ -718,6 +717,13 @@ else {
 		'sortfield' => $sort,
 		'limit' => $config['search_limit'] + 1
 	];
+
+	if ($sort === 'status') {
+		$options['output'] = ['triggerid', 'status', 'state'];
+	}
+	else {
+		$options['output'] = ['triggerid', $sort];
+	}
 
 	if ($filter_discovered != -1) {
 		$options['filter']['flags'] = ($filter_discovered == 1)
