@@ -4,6 +4,7 @@ New features:
 A.F.I...S. [ZBXNEXT-4087] implemented preprocessing of LLD rules (Ivo, wiper)
 
 Bug fixes:
+A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
 ...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
 ........S. [ZBX-15533] fixed cutting and trimming event tags and values (asitals)
 .......P.. [ZBX-15442] fixed reporting idle time in datasender's process state information (asitals)
@@ -131,6 +132,7 @@ Changes for 4.0.5rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
 ...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
 ........S. [ZBX-15533] fixed cutting and trimming event tags and values (asitals)
 .......P.. [ZBX-15442] fixed reporting idle time in datasender's process state information (asitals)
