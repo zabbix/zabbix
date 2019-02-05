@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.2</version>
-    <date>2019-02-04T13:15:35Z</date>
+    <date>2019-02-05T08:12:23Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -3086,7 +3086,7 @@
                     <snmp_oid/>
                     <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     <delay>1m</delay>
-                    <history>1w</history>
+                    <history>0</history>
                     <trends>0</trends>
                     <status>0</status>
                     <value_type>4</value_type>
