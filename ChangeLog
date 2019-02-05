@@ -3,6 +3,13 @@ Changes for 4.0.5rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
+...G...PS. [ZBX-15379] fixed -Wimplicit-fallthrough warnings when compiling with GCC 7 and -Wextra (akozlovs)
+A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
+...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
+........S. [ZBX-15533] fixed cutting and trimming event tags and values (asitals)
+.......P.. [ZBX-15442] fixed reporting idle time in datasender's process state information (asitals)
+..F....... [ZBX-15424] fixed when multiselect doesn't trim values and recognizes untrimmed values as new ones (vasilijs)
 ..F....... [ZBX-14644] fixed maintenance time periods "start_date" field being reset to "1920" instead of DB default value when updating via edit form (Ivo)
 .D........ [ZBX-15271] added link to documentation in all man pages (kalimulin)
 A......... [ZBX-15422] fixed SQL errors when linked template have item prototype with equal key as host item (Sasha)
@@ -2213,6 +2220,7 @@ Changes for 3.0.26rc1
 New features:
 
 Bug fixes:
+...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
 ...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
 
 --------------------------------------------------------------------------------
