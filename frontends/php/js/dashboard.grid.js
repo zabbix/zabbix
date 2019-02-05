@@ -372,7 +372,6 @@
 
 		// Resize action for left/up is mirrored right/down action.
 		if ('mirrored' in axis) {
-			var dbg_original = axis_pos[axis_key];
 			widgets.each(function(box) {
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
 				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
@@ -542,8 +541,6 @@
 				if (collapsed) {
 					affected.each(function(box) {
 						if (box.current_pos[axis_key] > slot && box.current_pos[opposite_axis_key] in collapsed_pos) {
-							var old_value = box.current_pos[axis_key];
-
 							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - scanline[size_key],
 								box.pos[axis_key]
 							);
