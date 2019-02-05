@@ -2178,7 +2178,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		foreach ($data['macros'] as $i => $lld_macro) {
 			$row = $macros_table->getRows()->get($i);
 			$row->getColumn('LLD macro')->query('tag:input')->one()->fill($lld_macro['macro']);
-			$row->getColumn('JSON Path')->query('tag:input')->one()->fill($lld_macro['path']);
+			$row->getColumn('JSONPath')->query('tag:input')->one()->fill($lld_macro['path']);
 
 			if ($i !== $last) {
 				$button->click();
@@ -2230,7 +2230,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$macro = $row->getColumn('LLD macro')->query('tag:input')->one()->getAttribute('value');
 			$this->assertEquals($lld_macro['macro'], $macro);
 
-			$path = $row->getColumn('JSON Path')->query('tag:input')->one()->getAttribute('value');
+			$path = $row->getColumn('JSONPath')->query('tag:input')->one()->getAttribute('value');
 			$this->assertEquals($lld_macro['path'], $path);
 		}
 	}
