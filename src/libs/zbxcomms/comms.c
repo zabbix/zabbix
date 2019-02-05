@@ -971,7 +971,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 #ifdef _WINDOWS
 			/* WSA_FLAG_NO_HANDLE_INHERIT prevents socket inheritance if we call CreateProcess() */
 			/* later on. If it's not available we still try to avoid inheritance by calling  */
-			/* SetHandleInformation() below. WSA_FLAG_OVERLAPPED is not mandatory but stronly */
+			/* SetHandleInformation() below. WSA_FLAG_OVERLAPPED is not mandatory but strongly */
 			/* recommended for every socket */
 			s->sockets[s->num_socks] = WSASocket(current_ai->ai_family, current_ai->ai_socktype,
 					current_ai->ai_protocol, NULL, 0,
@@ -1157,7 +1157,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 #if defined(_WINDOWS)
 		/* WSA_FLAG_NO_HANDLE_INHERIT prevents socket inheritance if we call CreateProcess() */
 		/* later on. If it's not available we still try to avoid inheritance by calling  */
-		/* SetHandleInformation() below. WSA_FLAG_OVERLAPPED is not mandatory but stronly */
+		/* SetHandleInformation() below. WSA_FLAG_OVERLAPPED is not mandatory but strongly */
 		/* recommended for every socket */
 		s->sockets[s->num_socks] = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0,
 				(0 != no_inherit_wsapi ? WSA_FLAG_NO_HANDLE_INHERIT : 0) | WSA_FLAG_OVERLAPPED);
