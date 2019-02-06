@@ -340,32 +340,17 @@ class CElasticsearchHelper {
 	/**
 	 * Add sorting criteria to Elasticsearch query.
 	 *
-	 * @param array $columns    columns that can (are allowed) be used for sorting
-	 * @param array $query      Elasticsearch query
-	 * @param array $options    sorting options
+	 * @param array $query    Elasticsearch query.
+	 * @param array $options  Sorting options.
 	 *
 	 * @return array    Elasticsearch query with added sorting options
 	 */
-	public static function addSort($columns, $query, $options) {
-		$options['sortfield'] = is_array($options['sortfield'])
-				? array_unique($options['sortfield'])
-				: [$options['sortfield']];
-
+	public static function addSort($query, $options) {
 		foreach ($options['sortfield'] as $i => $sortfield) {
-			if (!str_in_array($sortfield, $columns)) {
-				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sortfield));
-			}
-
 			// Add sort field to order.
-			$sortorder = '';
-			if (is_array($options['sortorder']) && array_key_exists($i, $options['sortorder'])) {
-				$sortorder = ($options['sortorder'][$i] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : '';
-			}
-			else {
-				$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : '';
-			}
+			$sortorder = array_key_exists($i, $options['sortorder']) ? $options['sortorder'][$i] : ZBX_SORT_UP;
 
-			if ($sortorder !== '') {
+			if ($sortorder === ZBX_SORT_DOWN) {
 				$query['sort'][$sortfield] = $sortorder;
 			}
 			else {

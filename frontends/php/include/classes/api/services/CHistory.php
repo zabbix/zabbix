@@ -69,7 +69,7 @@ class CHistory extends CApiService {
 	 *                                                         specific API get method description for a list of
 	 *                                                         properties that can be used for sorting. Macros are not
 	 *                                                         expanded before sorting.
-	 * @param string $options['sortorder']                     Order of sorting. If an array is passed, each value will
+	 * @param array  $options['sortorder']                     Order of sorting. If an array is passed, each value will
 	 *                                                         be matched to the corresponding property given in the
 	 *                                                         sortfield parameter.
 	 * @param int    $options['limit']                         Limit the number of records returned.
@@ -111,8 +111,8 @@ class CHistory extends CApiService {
 			]],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
-			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'default' => []],
-			'sortorder' =>				['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]), 'default' => null],
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]), 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
 			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false],
@@ -270,12 +270,12 @@ class CHistory extends CApiService {
 		}
 
 		// sorting
-		if ($this->sortColumns && $options['sortfield']) {
-			$query = CElasticsearchHelper::addSort($this->sortColumns, $query, $options);
+		if ($options['sortfield']) {
+			$query = CElasticsearchHelper::addSort($query, $options);
 		}
 
 		// limit
-		if ($options['limit']) {
+		if ($options['limit'] !== null) {
 			$query['size'] = $options['limit'];
 		}
 
