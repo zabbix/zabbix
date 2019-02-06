@@ -144,10 +144,6 @@ class CHistory extends CApiService {
 			$options['itemids'] = array_keys($items);
 		}
 
-		if ($options['itemids'] !== null) {
-			zbx_value2array($options['itemids']);
-		}
-
 		$this->tableName = CHistoryManager::getTableName($options['history']);
 
 		switch (CHistoryManager::getDataSourceType($options['history'])) {
@@ -231,7 +227,7 @@ class CHistory extends CApiService {
 		if ($options['itemids'] !== null) {
 			$query['query']['bool']['must'][] = [
 				'terms' => [
-					'itemid' => array_values($options['itemids'])
+					'itemid' => $options['itemids']
 				]
 			];
 		}
