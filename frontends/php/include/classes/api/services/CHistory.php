@@ -83,7 +83,7 @@ class CHistory extends CApiService {
 	public function get($options = []) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
-			'history' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT]), 'default' => ITEM_VALUE_TYPE_UINT64],
+			'history' =>				['type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT]), 'default' => ITEM_VALUE_TYPE_UINT64],
 			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'itemids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'time_from' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
