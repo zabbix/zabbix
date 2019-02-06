@@ -1191,7 +1191,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 		foreach ($host_names as $hostId => $host_name) {
 			$host = $hosts[$hostId];
 
-			$name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getAjaxHost($hostId));
+			$name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostId));
 
 			$tableRow = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $item_data) {
@@ -1241,7 +1241,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 
 	if (isset($ithosts[$hostName])) {
 		$column
-			->setMenuPopup(CMenuPopupHelper::getAjaxHistory($item['itemid']))
+			->setMenuPopup(CMenuPopupHelper::getHistory($item['itemid']))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->addClass(ZBX_STYLE_NOWRAP);
 	}

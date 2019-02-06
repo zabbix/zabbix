@@ -36,7 +36,6 @@
 					'class': 'btn-widget-action',
 					'title': t('Adjust widget refresh interval'),
 					'data-menu-popup': JSON.stringify({
-						'ajax': true,
 						'type': 'refresh',
 						'data': {
 							'widgetName': widget['widgetid'],

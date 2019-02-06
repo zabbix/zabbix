@@ -217,7 +217,7 @@ foreach ($data['items'] as $item) {
 	$wizard = (new CSpan(
 		(new CButton(null))
 			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getAjaxItem($item['itemid']))
+			->setMenuPopup(CMenuPopupHelper::getItem($item['itemid']))
 	))->addClass(ZBX_STYLE_REL_CONTAINER);
 
 	$itemTable->addRow([

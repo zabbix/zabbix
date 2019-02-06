@@ -60,7 +60,7 @@ $favourite_icon = get_icon('favourite', [
 
 $refresh_icon = get_icon('screenconf');
 
-$refresh_icon->setMenuPopup(CMenuPopupHelper::getAjaxRefresh(WIDGET_SLIDESHOW, 'x'.$this->data['refreshMultiplier'],
+$refresh_icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SLIDESHOW, 'x'.$this->data['refreshMultiplier'],
 	true, ['elementid' => $this->data['elementId']]
 ));
 

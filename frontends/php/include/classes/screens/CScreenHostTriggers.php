@@ -246,7 +246,7 @@ class CScreenHostTriggers extends CScreenBase {
 			$host = reset($trigger['hosts']);
 			$host = $hosts[$host['hostid']];
 			$host_name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getAjaxHost($host['hostid']));
+				->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
 					&& array_key_exists($host['maintenanceid'], $maintenances)) {

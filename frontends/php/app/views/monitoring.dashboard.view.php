@@ -85,7 +85,7 @@ else {
 						->setId('dashbrd-actions')
 						->setTitle(_('Actions'))
 						->setAttribute('aria-haspopup', true)
-						->setMenuPopup(CMenuPopupHelper::getAjaxDashboard($data['dashboard']['dashboardid']))
+						->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid']))
 					)
 					->addItem(get_icon('fullscreen'))
 			]))->setAttribute('aria-label', _('Content controls'))

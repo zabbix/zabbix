@@ -1030,7 +1030,7 @@ class CScreenProblem extends CScreenBase {
 					? makeTriggerDependencies($dependencies[$trigger['triggerid']])
 					: [];
 				$description[] = (new CLinkAction($problem['name']))
-					->setMenuPopup(CMenuPopupHelper::getAjaxTrigger($trigger['triggerid']));
+					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid']));
 
 				if ($this->data['filter']['details'] == 1) {
 					$description[] = BR();

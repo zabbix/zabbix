@@ -127,32 +127,27 @@ jQuery(function($) {
 			event.target = this;
 		}
 
-		if (typeof data.ajax !== 'undefined' && data.ajax) {
-			var	url = new Curl('zabbix.php'),
-				ajax_data = {
-					data: data.data
-				};
+		var	url = new Curl('zabbix.php'),
+			ajax_data = {
+				data: data.data
+			};
 
-			url.setArgument('action', 'menu.popup');
-			url.setArgument('type', data.type);
+		url.setArgument('action', 'menu.popup');
+		url.setArgument('type', data.type);
 
-			$.ajax({
-				url: url.getUrl(),
-				method: 'POST',
-				data: ajax_data,
-				dataType: 'json',
-				success: function(resp) {
-					showMenuPopup(obj, resp.data, event);
-					return false;
-				},
-				error: function() {
-					return false;
-				}
-			});
-		}
-		else {
-			showMenuPopup(obj, data, event)
-		}
+		$.ajax({
+			url: url.getUrl(),
+			method: 'POST',
+			data: ajax_data,
+			dataType: 'json',
+			success: function(resp) {
+				showMenuPopup(obj, resp.data, event);
+				return false;
+			},
+			error: function() {
+				return false;
+			}
+		});
 
 		return false;
 	});

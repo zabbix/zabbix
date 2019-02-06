@@ -26,9 +26,8 @@ class CMenuPopupHelper {
 	 *
 	 * @param string $dashboardid
 	 */
-	public static function getAjaxDashboard($dashboardid) {
+	public static function getDashboard($dashboardid) {
 		return [
-			'ajax' => true,
 			'type' => 'dashboard',
 			'data' => [
 				'dashboardid' => $dashboardid
@@ -43,9 +42,8 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getAjaxHistory($itemid) {
+	public static function getHistory($itemid) {
 		return [
-			'ajax' => true,
 			'type' => 'history',
 			'data' => [
 				'itemid' => $itemid
@@ -61,9 +59,8 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getAjaxHost($hostid, $has_goto = true) {
+	public static function getHost($hostid, $has_goto = true) {
 		$data = [
-			'ajax' => true,
 			'type' => 'host',
 			'data' => [
 				'hostid' => $hostid
@@ -87,9 +84,8 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getAjaxMapElement($sysmapid, $selementid, $severity_min, $hostid) {
+	public static function getMapElement($sysmapid, $selementid, $severity_min, $hostid) {
 		$data = [
-			'ajax' => true,
 			'type' => 'map_element',
 			'data' => [
 				'sysmapid' => $sysmapid,
@@ -117,9 +113,8 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getAjaxRefresh($widgetName, $currentRate, $multiplier = false, array $params = []) {
+	public static function getRefresh($widgetName, $currentRate, $multiplier = false, array $params = []) {
 		$data = [
-			'ajax' => true,
 			'type' => 'refresh',
 			'data' => [
 				'widgetName' => $widgetName,
@@ -146,9 +141,8 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getAjaxTrigger($triggerid, array $acknowledge = [], $show_description = true) {
+	public static function getTrigger($triggerid, array $acknowledge = [], $show_description = true) {
 		$data = [
-			'ajax' => true,
 			'type' => 'trigger',
 			'data' => [
 				'triggerid' => $triggerid
@@ -171,9 +165,8 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getAjaxTriggerMacro() {
+	public static function getTriggerMacro() {
 		return [
-			'ajax' => true,
 			'type' => 'trigger_macro'
 		];
 	}
@@ -185,9 +178,8 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getAjaxItem($itemid) {
+	public static function getItem($itemid) {
 		return [
-			'ajax' => true,
 			'type' => 'item',
 			'data' => [
 				'itemid' => $itemid
@@ -200,9 +192,8 @@ class CMenuPopupHelper {
 	 *
 	 * @param string $itemid
 	 */
-	public static function getAjaxItemPrototype($itemid) {
+	public static function getItemPrototype($itemid) {
 		return [
-			'ajax' => true,
 			'type' => 'item_prototype',
 			'data' => [
 				'itemid' => $itemid

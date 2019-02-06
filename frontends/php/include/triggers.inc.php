@@ -893,7 +893,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 		// data
 		foreach ($host_names as $hostId => $host_name) {
-			$name = (new CLinkAction($host_name))->setMenuPopup(CMenuPopupHelper::getAjaxHost($hostId));
+			$name = (new CLinkAction($host_name))->setMenuPopup(CMenuPopupHelper::getHost($hostId));
 
 			$columns = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
@@ -986,7 +986,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$column->setMenuPopup(CMenuPopupHelper::getAjaxTrigger($trigger['triggerid'], $acknowledge));
+		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $acknowledge));
 	}
 
 	return $column;
@@ -1188,7 +1188,7 @@ function make_trigger_details($trigger) {
 	}
 
 	foreach ($hosts as $host) {
-		$hostNames[] = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getAjaxHost($host['hostid']));
+		$hostNames[] = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 		$hostNames[] = ', ';
 	}
 	array_pop($hostNames);
@@ -2291,7 +2291,7 @@ function makeTriggersHostsList(array $triggers_hosts) {
 
 		foreach ($hosts as $host) {
 			$host_name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getAjaxHost($host['hostid']));
+				->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 
 			// Add maintenance icon with hint if host is in maintenance.
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
