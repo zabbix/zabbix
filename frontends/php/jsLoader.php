@@ -291,7 +291,6 @@ $tranStrings = [
 		'Cancel' => _('Cancel')
 	],
 	'codeeditor.js' => [
-		'S_CLICK_TO_VIEW_OR_EDIT_CODE' => _('Click to view or edit code'),
 		'S_JAVASCRIPT' => _('JavaScript'),
 		'S_OPEN' => _('Open'),
 		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
