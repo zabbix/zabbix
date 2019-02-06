@@ -648,12 +648,18 @@
 			widget.prev_pos.mirrored.y = true;
 		}
 
+		var boundary = $.extend({}, widget.current_pos);
+
+		if ('max_width' in widget && widget.max_width < boundary.width) {
+			boundary.width = widget.max_width;
+		}
+
 		// Situation when there are changes on both axes should be handled as special case.
 		if (process_order[0] === 'x' && (widget.prev_pos.y != widget.current_pos.y
 				|| widget.prev_pos.height != widget.current_pos.height)) {
 			$.map(data.widgets, function(box) {
 				return (!('affected_axis' in box) && widget.uniqueid !== box.uniqueid
-					&& rectOverlap(widget.current_pos, box.current_pos))
+					&& rectOverlap(boundary, box.current_pos))
 					? box
 					: null;
 			}).each(function(box) {
@@ -698,6 +704,7 @@
 				axis.size_key = 'height';
 				axis.size_min = data.options['widget-min-rows'];
 				axis.size_max = data.options['max-rows'];
+				axis.boundary.width = boundary.width;
 			}
 
 			if (axis_key in widget.prev_pos.mirrored) {
@@ -706,6 +713,10 @@
 
 			fitWigetsIntoBox(data.widgets, widget, axis);
 		});
+
+		if (widget.current_pos.width != axis.boundary.width) {
+			widget.max_width = widget.current_pos.width;
+		}
 	}
 
 	function checkWidgetOverlap(data, widget) {
@@ -923,6 +934,7 @@
 			stop: function(event) {
 				data['pos-action'] = '';
 				delete widget.prev_pos;
+				delete widget.max_width;
 
 				setResizableState('enable', data.widgets, widget.uniqueid);
 				stopWidgetPositioning($obj, $(event.target), data);
