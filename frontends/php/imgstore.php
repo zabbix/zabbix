@@ -70,8 +70,7 @@ if (isset($_REQUEST['css'])) {
 
 		$css .= 'div.sysmap_iconid_'.$image['imageid'].'{'.
 					' height: '.$h.'px;'.
-					' width: '.$w.'px;'.
-					' background: url("imgstore.php?iconid='.$image['imageid'].'&width='.$w.'&height='.$h.'") no-repeat center center;}'."\n";
+					' width: '.$w.'px;}';
 	}
 	echo $css;
 }
@@ -97,7 +96,12 @@ elseif (isset($_REQUEST['iconid'])) {
 		imagefilter($source, IMG_FILTER_BRIGHTNESS, 75);
 	}
 
-	imageOut($source);
+	if ($resize || $unavailable || $iconid <= 0 || !$image['image']) {
+		imageOut($source);
+	}
+	else {
+		echo $image['image'];
+	}
 }
 elseif (isset($_REQUEST['imageid'])) {
 	$imageid = getRequest('imageid', 0);
