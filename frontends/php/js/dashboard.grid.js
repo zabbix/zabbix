@@ -36,10 +36,13 @@
 					'class': 'btn-widget-action',
 					'title': t('Adjust widget refresh interval'),
 					'data-menu-popup': JSON.stringify({
+						'ajax': true,
 						'type': 'refresh',
-						'widgetName': widget['widgetid'],
-						'currentRate': widget['rf_rate'],
-						'multiplier': false
+						'data': {
+							'widgetName': widget['widgetid'],
+							'currentRate': widget['rf_rate'],
+							'multiplier': '0'
+						}
 					}),
 					'attr': {
 						'aria-haspopup': true

@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in dashboard,history,host,item,item_prototype,map_element,trigger,trigger_macro',
+			'type' => 'required|in dashboard,history,host,item,item_prototype,map_element,refresh,trigger,trigger_macro',
 			'data' => 'array'
 		];
 
@@ -398,6 +398,32 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
+	 * Prepare data for refresh menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['widgetName']
+	 * @param string $data['currentRate']
+	 * @param bool   $data['multiplier']   Multiplier or time mode.
+	 * @param array  $data['params']       (optional) URL parameters.
+	 *
+	 * @return mixed
+	 */
+	private static function getMenuDataRefresh(array $data) {
+		$menu_data = [
+			'type' => 'refresh',
+			'widgetName' => $data['widgetName'],
+			'currentRate' => $data['currentRate'],
+			'multiplier' => (bool) $data['multiplier']
+		];
+
+		if (array_key_exists('params', $data)) {
+			$menu_data['params'] = $data['params'];
+		}
+
+		return $menu_data;
+	}
+
+	/**
 	 * Prepare data for trigger context menu popup.
 	 *
 	 * @param array  $data
@@ -550,6 +576,10 @@ class CControllerMenuPopup extends CController {
 
 			case 'map_element':
 				$menu_data = self::getMenuDataMapElement($data);
+				break;
+
+			case 'refresh':
+				$menu_data = self::getMenuDataRefresh($data);
 				break;
 
 			case 'trigger':

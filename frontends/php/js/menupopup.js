@@ -401,7 +401,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 					obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 				}
 				else {
-					var url = new Curl('zabbix.php', false);
+					var url = new Curl('zabbix.php');
 
 					url.setArgument('action', 'dashboard.widget.rfrate');
 
