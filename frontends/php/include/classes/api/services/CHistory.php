@@ -73,7 +73,6 @@ class CHistory extends CApiService {
 	 *                                                         be matched to the corresponding property given in the
 	 *                                                         sortfield parameter.
 	 * @param int    $options['limit']                         Limit the number of records returned.
-	 * @param bool   $options['nopermissions']                 Select values without checking permissions of hosts.
 	 * @param bool   $options['editable']                      If set to true return only objects that the user has
 	 *                                                         write permissions to.
 	 *
@@ -115,7 +114,6 @@ class CHistory extends CApiService {
 			'sortorder' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]), 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
-			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false],
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false]
 		]];
 
@@ -130,13 +128,11 @@ class CHistory extends CApiService {
 			);
 		}
 
-		if ((self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions'])
-				|| $options['hostids'] !== null) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || $options['hostids'] !== null) {
 			$items = API::Item()->get([
 				'output' => ['itemid'],
 				'itemids' => $options['itemids'],
 				'hostids' => $options['hostids'],
-				'nopermissions' => $options['nopermissions'],
 				'editable' => $options['editable'],
 				'webitems' => true,
 				'preservekeys' => true
