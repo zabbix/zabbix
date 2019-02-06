@@ -180,7 +180,7 @@ class CScreenHostTriggers extends CScreenBase {
 			'sort_order' => ZBX_SORT_DOWN
 		];
 
-		$data = CScreenProblem::getData($filter, $config);
+		$data = CScreenProblem::getData($filter, $config, true, true);
 
 		$header = [
 			'hostname' => _('Host'),
@@ -208,7 +208,7 @@ class CScreenHostTriggers extends CScreenBase {
 			min($config['search_limit'], count($data['problems']))
 		);
 		$data['problems'] = array_slice($data['problems'], 0, $filter['limit'], true);
-		$data = CScreenProblem::makeData($data, $filter);
+		$data = CScreenProblem::makeData($data, $filter, true, true);
 
 		$hostids = [];
 		foreach ($data['triggers'] as $trigger) {
