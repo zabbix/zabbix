@@ -1894,17 +1894,19 @@
 					new_widget_placeholder = createNewWidgetPlaceholder();
 
 				if (options['editable']) {
-					new_widget_placeholder.setDefault(function(e) {
-						if (!methods.isEditMode.call($this)) {
-							showEditMode();
-						}
-
-						methods.addNewWidget.call($this, this);
-						return cancelEvent(e);
-					});
-
 					if (options['kioskmode']) {
-						new_widget_placeholder.container = $('<h1>').text(t('Cannot add widgets in kiosk mode'));
+						new_widget_placeholder.label.text(t('Cannot add widgets in kiosk mode'))
+						new_widget_placeholder.container.addClass('disabled');
+					}
+					else {
+						new_widget_placeholder.setDefault(function(e) {
+							if (!methods.isEditMode.call($this)) {
+								showEditMode();
+							}
+
+							methods.addNewWidget.call($this, this);
+							return cancelEvent(e);
+						});
 					}
 				}
 				else {

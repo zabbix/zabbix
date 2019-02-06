@@ -3275,6 +3275,18 @@ $form-icon-btn: (
 			transform: translateX(-50%);
 		}
 	}
+
+	&.disabled {
+		@include opacity(1);
+
+		.dashbrd-grid-widget-new-box {
+			background-color: rgba($ui-bg-color, .7);
+
+			.dashbrd-grid-new-widget-label::before {
+				background: url(../img/icon-sprite.svg) no-repeat -122px -284px;
+			}
+		}
+	}
 }
 
 .dashbrd-grid-widget-set-size {
