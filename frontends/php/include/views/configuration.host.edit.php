@@ -685,12 +685,14 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 /*
  * Tags
  */
-$tags_view = new CView('configuration.tags.tab', [
-	'source' => 'host',
-	'tags' => $data['tags'],
-	'readonly' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-]);
-$divTabs->addTab('tags-tab', _('Tags'), $tags_view->render());
+if ($data['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+	$tags_view = new CView('configuration.tags.tab', [
+		'source' => 'host',
+		'tags' => $data['tags'],
+		'readonly' => false
+	]);
+	$divTabs->addTab('tags-tab', _('Tags'), $tags_view->render());
+}
 
 /*
  * Macros
