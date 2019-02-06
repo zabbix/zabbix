@@ -267,6 +267,8 @@ int	CONFIG_IPMIMANAGER_FORKS	= 0;
 int	CONFIG_ALERTMANAGER_FORKS	= 0;
 int	CONFIG_PREPROCMAN_FORKS		= 0;
 int	CONFIG_PREPROCESSOR_FORKS	= 0;
+int	CONFIG_LLDMANAGER_FORKS		= 0;
+int	CONFIG_LLDWORKER_FORKS		= 0;
 
 char	*opt = NULL;
 
@@ -1075,8 +1077,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 	else
 	{
-		/* wait for the service worker thread to terminate us */
-		zbx_sleep(3);
+		zbx_tcp_close(&listen_sock);
+
+		/* Wait for the service worker thread to terminate us. Listener threads may not exit up to */
+		/* CONFIG_TIMEOUT seconds if they're waiting for external processes to finish / timeout */
+		zbx_sleep(CONFIG_TIMEOUT);
 
 		THIS_SHOULD_NEVER_HAPPEN;
 	}

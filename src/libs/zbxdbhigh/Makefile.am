@@ -13,18 +13,14 @@ libzbxdbhigh_a_SOURCES = \
 	dbschema.c \
 	proxy.c \
 	discovery.c \
-	lld.c lld.h \
-	lld_common.c \
-	lld_item.c \
-	lld_graph.c \
-	lld_trigger.c \
-	lld_host.c \
 	itservices.c \
 	template_item.c \
 	template.h \
 	trigger.c \
 	event.c \
 	export.c \
-	maintenance.c
+	maintenance.c \
+	item.c \
+	lld_macro.c
 
 libzbxdbhigh_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/

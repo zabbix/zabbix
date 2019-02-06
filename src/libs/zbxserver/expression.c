@@ -26,6 +26,7 @@
 #include "valuecache.h"
 #include "macrofunc.h"
 #include "zbxregexp.h"
+#include "dbcache.h"
 #ifdef HAVE_LIBXML2
 #	include <libxml/parser.h>
 #	include <libxml/tree.h>
@@ -159,7 +160,7 @@ void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression)
 				is_uint64_n(expression + token.loc.l + 1, token.loc.r - token.loc.l - 1,
 						&functionid);
 				zbx_vector_uint64_append(functionids, functionid);
-				/* break; is not missing here */
+				ZBX_FALLTHROUGH;
 			case ZBX_TOKEN_USER_MACRO:
 			case ZBX_TOKEN_SIMPLE_MACRO:
 			case ZBX_TOKEN_MACRO:
@@ -6063,3 +6064,4 @@ int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
 	return SUCCEED;
 #endif
 }
+

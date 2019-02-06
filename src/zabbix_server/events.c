@@ -94,13 +94,16 @@ static zbx_tag_t	*duplicate_tag(const zbx_tag_t *tag)
 
 static void	validate_and_add_tag(DB_EVENT* event, zbx_tag_t *tag)
 {
+	zbx_ltrim(tag->tag, ZBX_WHITESPACE);
+	zbx_ltrim(tag->value, ZBX_WHITESPACE);
+
 	if (TAG_NAME_LEN < zbx_strlen_utf8(tag->tag))
 		tag->tag[zbx_strlen_utf8_nchars(tag->tag, TAG_NAME_LEN)] = '\0';
 	if (TAG_VALUE_LEN < zbx_strlen_utf8(tag->value))
 		tag->value[zbx_strlen_utf8_nchars(tag->value, TAG_VALUE_LEN)] = '\0';
 
-	zbx_lrtrim(tag->tag, ZBX_WHITESPACE);
-	zbx_lrtrim(tag->value, ZBX_WHITESPACE);
+	zbx_rtrim(tag->tag, ZBX_WHITESPACE);
+	zbx_rtrim(tag->value, ZBX_WHITESPACE);
 
 	if (SUCCEED == validate_event_tag(event, tag))
 		zbx_vector_ptr_append(&event->tags, tag);
@@ -950,7 +953,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 			{
 				tag = (zbx_tag_t *)event->tags.values[i];
 				if (0 == strcmp(tag->tag, condition->data.tag_pair.newtag))
-					zbx_vector_str_append(&values, DBdyn_escape_string(tag->value));
+					zbx_vector_str_append(&values, zbx_strdup(NULL, tag->value));
 			}
 
 			if (0 == values.values_num)

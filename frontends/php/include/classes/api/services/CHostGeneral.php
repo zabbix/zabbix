@@ -95,10 +95,6 @@ abstract class CHostGeneral extends CHostBase {
 		if (!empty($data['templates_link'])) {
 			$this->checkHostPermissions($allHostIds);
 
-			$this->validateDependentItemsLinkage($allHostIds,
-				zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid')
-			);
-
 			$this->link(zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid'), $allHostIds);
 		}
 
@@ -1034,98 +1030,6 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($ins_tags) {
 			DB::insert('host_tag', $ins_tags);
-		}
-	}
-
-	/**
-	 * Validates dependent items trees intersection between host items and template items.
-	 *
-	 * @param array $hostids        Array of hosts to validate.
-	 * @param array $templateids    Array of added templates.
-	 *
-	 * @throws APIException if intersection of template items and host items creates dependent items tree with
-	 *                      dependent item level more than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
-	 */
-	protected function validateDependentItemsLinkage($hostids, $templateids) {
-		$db_items = API::Item()->get([
-			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
-			'hostids' => array_merge($hostids, $templateids),
-			'webitems' => true,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'preservekeys' => true
-		]);
-
-		$this->validateDependentItemsIntersection($db_items, $hostids);
-
-		$db_itemprototypes = API::ItemPrototype()->get([
-			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
-			'hostids' => array_merge($hostids, $templateids),
-			'preservekeys' => true
-		]);
-
-		$this->validateDependentItemsIntersection($db_itemprototypes, $hostids);
-	}
-
-	/**
-	 * Validate merge of template dependent items and every host dependent items, host dependent item will be overwritten
-	 * by template dependent items.
-	 * Return false if intersection of host dependent items and template dependent items create dependent items
-	 * with dependency level greater than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
-	 *
-	 * @param array $db_items
-	 * @param array $hostids
-	 *
-	 * @throws APIException if intersection of template items and host items creates dependent items tree with
-	 *                      dependent item level more than ZBX_DEPENDENT_ITEM_MAX_LEVELS or master item recursion.
-	 */
-	protected function validateDependentItemsIntersection(array $db_items, array $hostids) {
-		$hosts_items = [];
-		$tmpl_items = [];
-
-		foreach ($db_items as $db_item) {
-			$master_key = ($db_item['type'] == ITEM_TYPE_DEPENDENT
-					&& array_key_exists($db_item['master_itemid'], $db_items))
-				? $db_items[$db_item['master_itemid']]['key_']
-				: '';
-
-			if (in_array($db_item['hostid'], $hostids)) {
-				$hosts_items[$db_item['hostid']][$db_item['key_']] = $master_key;
-			}
-			elseif (!array_key_exists($db_item['key_'], $tmpl_items) || !$tmpl_items[$db_item['key_']]) {
-				$tmpl_items[$db_item['key_']] = $master_key;
-			}
-		}
-
-		foreach ($hosts_items as $hostid => $items) {
-			$linked_items = $items;
-
-			// Merge host items dependency tree with template items dependency tree.
-			$linked_items = array_merge($linked_items, $tmpl_items);
-
-			// Check dependency level for every dependent item.
-			foreach ($linked_items as $linked_item => $linked_master_key) {
-				$master_key = $linked_master_key;
-				$dependency_level = 0;
-				$traversing_path = [];
-
-				while ($master_key && $dependency_level <= ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-					$traversing_path[] = $master_key;
-					$master_key = $linked_items[$master_key];
-					++$dependency_level;
-
-					if (in_array($master_key, $traversing_path)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('circular item dependency is not allowed')
-						));
-					}
-				}
-
-				if ($dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _('maximum number of dependency levels reached')
-					));
-				}
-			}
 		}
 	}
 

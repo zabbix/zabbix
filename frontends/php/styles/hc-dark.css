@@ -680,8 +680,10 @@ output {
     position: relative;
     border-bottom: 1px solid #333;
     line-height: 18px;
-    vertical-align: top;
-    max-width: 300px; }
+    vertical-align: top; }
+    .list-table tbody th.latest-value,
+    .list-table td.latest-value {
+      max-width: 300px; }
   .list-table tbody th {
     text-align: left; }
   .list-table .vertical_rotation_inner {
@@ -1399,6 +1401,8 @@ select {
     background-color: #383838; }
     .checkbox-radio + label span:active {
       border-color: #666; }
+  .checkbox-radio + label.label-pos-left span {
+    margin-left: 4px; }
   .checkbox-radio:focus + label span {
     border-color: #bbb; }
   .checkbox-radio:checked:focus + label span {

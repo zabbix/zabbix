@@ -445,6 +445,14 @@ class C42XmlValidator {
 									'lld_macro' =>				['type' => XML_STRING | XML_REQUIRED],
 									'path' =>					['type' => XML_STRING | XML_REQUIRED]
 								]]
+							]],
+							'preprocessing' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
+								'step' =>					['type' => XML_ARRAY, 'rules' => [
+									'type' =>					['type' => XML_STRING | XML_REQUIRED],
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
+									'error_handler' =>			['type' => XML_STRING | XML_REQUIRED],
+									'error_handler_params' =>	['type' => XML_STRING | XML_REQUIRED]
+								]]
 							]]
 						]]
 					]],
@@ -953,6 +961,14 @@ class C42XmlValidator {
 								'lld_macro_path' =>			['type' => XML_ARRAY, 'rules' => [
 									'lld_macro' =>				['type' => XML_STRING | XML_REQUIRED],
 									'path' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'preprocessing' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
+								'step' =>					['type' => XML_ARRAY, 'rules' => [
+									'type' =>					['type' => XML_STRING | XML_REQUIRED],
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
+									'error_handler' =>			['type' => XML_STRING | XML_REQUIRED],
+									'error_handler_params' =>	['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]
 						]]

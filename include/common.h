@@ -79,6 +79,12 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
 #endif
 
+#if defined(__GNUC__) && __GNUC__ >= 7
+#	define ZBX_FALLTHROUGH	__attribute__ ((fallthrough))
+#else
+#	define ZBX_FALLTHROUGH
+#endif
+
 #define	SUCCEED		0
 #define	FAIL		-1
 #define	NOTSUPPORTED	-2
@@ -468,7 +474,7 @@ typedef enum
 	ESCALATION_STATUS_COMPLETED	/* only in server code, never in DB */
 }
 zbx_escalation_status_t;
-const char      *zbx_escalation_status_string(unsigned char status);
+const char	*zbx_escalation_status_string(unsigned char status);
 
 /* alert types */
 typedef enum
@@ -491,8 +497,8 @@ const char	*zbx_item_state_string(unsigned char state);
 /* group statuses */
 typedef enum
 {
-       GROUP_STATUS_ACTIVE = 0,
-       GROUP_STATUS_DISABLED
+	GROUP_STATUS_ACTIVE = 0,
+	GROUP_STATUS_DISABLED
 }
 zbx_group_status_type_t;
 
@@ -538,7 +544,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_ALERTMANAGER	25
 #define ZBX_PROCESS_TYPE_PREPROCMAN	26
 #define ZBX_PROCESS_TYPE_PREPROCESSOR	27
-#define ZBX_PROCESS_TYPE_COUNT		28	/* number of process types */
+#define ZBX_PROCESS_TYPE_LLDMANAGER	28
+#define ZBX_PROCESS_TYPE_LLDWORKER	29
+#define ZBX_PROCESS_TYPE_COUNT		30	/* number of process types */
 #define ZBX_PROCESS_TYPE_UNKNOWN	255
 const char	*get_process_type_string(unsigned char process_type);
 int		get_process_type_by_name(const char *proc_type_str);
@@ -904,8 +912,8 @@ typedef enum
 }
 zbx_httptest_auth_t;
 
-#define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
-#define ZBX_TASK_FLAG_FOREGROUND      0x02
+#define ZBX_TASK_FLAG_MULTIPLE_AGENTS	0x01
+#define ZBX_TASK_FLAG_FOREGROUND	0x02
 
 typedef struct
 {

@@ -535,6 +535,7 @@ class CConfigurationExport {
 			'output' => $this->dataFields['drule'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'hostids' => array_keys($hosts),
 			'inherited' => false,
 			'preservekeys' => true

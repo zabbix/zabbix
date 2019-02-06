@@ -791,8 +791,6 @@ class CTemplate extends CHostGeneral {
 				'message' => _('Cannot update templates on discovered host "%1$s".')
 			]));
 
-			$this->validateDependentItemsLinkage($hostIds, $templateIds);
-
 			$this->link($templateIds, $hostIds);
 		}
 

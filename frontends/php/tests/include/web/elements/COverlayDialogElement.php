@@ -28,6 +28,7 @@ class COverlayDialogElement extends CElement {
 	 */
 	public function waitUntilReady() {
 		$this->query('class:preloader')->waitUntilNotPresent();
+
 		return $this;
 	}
 

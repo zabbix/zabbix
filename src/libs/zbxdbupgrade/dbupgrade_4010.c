@@ -93,6 +93,13 @@ static int	DBpatch_4010007(void)
 
 static int	DBpatch_4010008(void)
 {
+	const ZBX_FIELD	field = {"db_extension", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4010009(void)
+{
 	const ZBX_TABLE table =
 		{"host_tag", "hosttagid", 0,
 			{
@@ -108,12 +115,12 @@ static int	DBpatch_4010008(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4010009(void)
+static int	DBpatch_4010010(void)
 {
 	return DBcreate_index("host_tag", "host_tag_1", "hostid", 0);
 }
 
-static int	DBpatch_4010010(void)
+static int	DBpatch_4010011(void)
 {
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -136,5 +143,6 @@ DBPATCH_ADD(4010007, 0, 1)
 DBPATCH_ADD(4010008, 0, 1)
 DBPATCH_ADD(4010009, 0, 1)
 DBPATCH_ADD(4010010, 0, 1)
+DBPATCH_ADD(4010011, 0, 1)
 
 DBPATCH_END()
