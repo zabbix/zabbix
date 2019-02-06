@@ -1242,7 +1242,9 @@ abstract class CItemGeneral extends CApiService {
 	 *                                                                  17 - ZBX_PREPROC_ERROR_FIELD_XML;
 	 *                                                                  18 - ZBX_PREPROC_ERROR_FIELD_REGEX;
 	 *                                                                  19 - ZBX_PREPROC_THROTTLE_VALUE;
-	 *                                                                  20 - ZBX_PREPROC_THROTTLE_TIMED_VALUE.
+	 *                                                                  20 - ZBX_PREPROC_THROTTLE_TIMED_VALUE;
+	 *                                                                  21 - ZBX_PREPROC_PROMETHEUS_PATTERN;
+	 *                                                                  22 - ZBX_PREPROC_PROMETHEUS_TO_JSON.
 	 * @param string $item['preprocessing'][]['params']                Additional parameters used by preprocessing
 	 *                                                                 option. Multiple parameters are separated by LF
 	 *                                                                 (\n) character.
@@ -1272,6 +1274,7 @@ abstract class CItemGeneral extends CApiService {
 			$required_fields = ['type', 'params', 'error_handler', 'error_handler_params'];
 			$delta = false;
 			$throttling = false;
+			$prometheus = false;
 
 			foreach ($item['preprocessing'] as $preprocessing) {
 				$missing_keys = array_diff($required_fields, array_keys($preprocessing));
@@ -1482,6 +1485,38 @@ abstract class CItemGeneral extends CApiService {
 						}
 						else {
 							$throttling = true;
+						}
+						break;
+
+					case ZBX_PREPROC_PROMETHEUS_PATTERN:
+					case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+						if ($prometheus) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one prometheus step is allowed.'));
+						}
+						else {
+							$prometheus = true;
+						}
+
+						// Check if 'params' are not empty.
+						if (is_array($preprocessing['params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['params'] === '' || $preprocessing['params'] === null
+								|| $preprocessing['params'] === false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
+							);
+						}
+
+						// ZBX_PREPROC_PROMETHEUS_TO_JSON has only one parameter.
+						if ($preprocessing['type'] == ZBX_PREPROC_PROMETHEUS_PATTERN) {
+							$params = explode("\n", $preprocessing['params']);
+
+							if ($params[0] === '') {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('first parameter is expected')
+								));
+							}
 						}
 						break;
 				}

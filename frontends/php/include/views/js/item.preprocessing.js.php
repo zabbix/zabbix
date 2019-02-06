@@ -207,6 +207,22 @@
 							.show();
 						$(params[1]).hide();
 						break;
+
+					case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':
+						$(params[0])
+							.attr('placeholder', <?= CJs::encodeJson(PROMETHEUS_PATTERN) ?>)
+							.show();
+						$(params[1])
+							.attr('placeholder', <?= CJs::encodeJson(PROMETHEUS_OUTPUT) ?>)
+							.show();
+						break;
+
+					case '<?= ZBX_PREPROC_PROMETHEUS_TO_JSON ?>':
+						$(params[0])
+							.attr('placeholder', <?= CJs::encodeJson(PROMETHEUS_PATTERN) ?>)
+							.show();
+						$(params[1]).hide();
+						break;
 				}
 
 				// Disable "Custom on fail" for some of the preprocessing types.

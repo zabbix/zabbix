@@ -33,3 +33,6 @@ define('DATE_TIME_FORMAT_SHORT', _('m-d H:i'));
 define('DATE_FORMAT', _('Y-m-d'));
 define('TIME_FORMAT_SECONDS', _('H:i:s'));
 define('TIME_FORMAT', _('H:i'));
+
+define('PROMETHEUS_PATTERN', _('<metric name>{<label name>="<label value>", ...} == <value>'));
+define('PROMETHEUS_OUTPUT', _('\value|<label name>'));
