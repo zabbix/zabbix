@@ -1159,8 +1159,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException if error occurred
 	 */
 	function implode_expressions(array &$triggers, array $db_triggers = null, array &$triggers_functions,
-			$inherited = false
-	) {
+			$inherited = false) {
 		$class = get_class($this);
 
 		switch ($class) {
