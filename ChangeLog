@@ -1,10 +1,10 @@
 Changes for 4.2.0alpha4
 
 New features:
+..FGI..PST [ZBXNEXT-401,ZBXNEXT-4907,ZBXNEXT-4955] added monitoring of internal metrics from an external Zabbix instance (vasilijs, viktors)
 A.F.I...S. [ZBXNEXT-4087] implemented preprocessing of LLD rules (Ivo, wiper)
 
 Bug fixes:
-..FGI..PST [ZBXNEXT-401,ZBXNEXT-4907,ZBXNEXT-4955] added monitoring of internal metrics from an external Zabbix instance (vasilijs, viktors)
 ...G...PS. [ZBX-15379] fixed -Wimplicit-fallthrough warnings when compiling with GCC 7 and -Wextra (akozlovs)
 A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
 ...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
