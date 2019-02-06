@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item,item_prototype,map_element,trigger,trigger_macro',
+			'type' => 'required|in dashboard,history,host,item,item_prototype,map_element,trigger,trigger_macro',
 			'data' => 'array'
 		];
 
@@ -46,6 +46,39 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
+	 * Prepare data for dashboard context menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['dashboardid']
+	 *
+	 * @return mixed
+	 */
+	private static function getMenuDataDashboard(array $data) {
+		$db_dashboards = API::Dashboard()->get([
+			'output' => [],
+			'dashboardids' => $data['dashboardid'],
+		]);
+
+		if ($db_dashboards) {
+			$db_dashboard = $db_dashboards[0];
+
+			return [
+				'type' => 'dashboard',
+				'dashboardid' => $data['dashboardid'],
+				'editable' => (bool) API::Dashboard()->get([
+					'output' => [],
+					'dashboardids' => $data['dashboardid'],
+					'editable' => true
+				])
+			];
+		}
+
+		error(_('No permissions to referred object or it does not exist!'));
+
+		return null;
+	}
+
+	/**
 	 * Prepare data for history context menu popup.
 	 *
 	 * @param array  $data
@@ -53,7 +86,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @return mixed
 	 */
-	private static function getHistoryMenuData(array $data) {
+	private static function setMenuDataHistory(array $data) {
 		$db_items = API::Item()->get([
 			'output' => ['value_type'],
 			'itemids' => $data['itemid'],
@@ -89,7 +122,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @return mixed
 	 */
-	private static function getHostMenuData(array $data) {
+	private static function getMenuDataHost(array $data) {
 		$has_goto = !array_key_exists('has_goto', $data) || $data['has_goto'];
 
 		$db_hosts = $has_goto
@@ -162,7 +195,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @return mixed
 	 */
-	private static function getItemMenuData(array $data) {
+	private static function getMenuDataItem(array $data) {
 		$db_items = API::Item()->get([
 			'output' => ['hostid', 'name', 'value_type'],
 			'itemids' => $data['itemid'],
@@ -220,7 +253,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @return mixed
 	 */
-	private static function getItemPrototypeMenuData(array $data) {
+	private static function getMenuDataItemPrototype(array $data) {
 		$db_item_prototypes = API::ItemPrototype()->get([
 			'output' => ['name'],
 			'selectDiscoveryRule' => ['itemid'],
@@ -255,7 +288,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @return mixed
 	 */
-	private static function getMapElementMenuData(array $data) {
+	private static function getMenuDataMapElement(array $data) {
 		$db_maps = API::Map()->get([
 			'output' => ['show_suppressed'],
 			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls'],
@@ -338,7 +371,7 @@ class CControllerMenuPopup extends CController {
 						if ($selement['urls']) {
 							$host_data['urls'] = $selement['urls'];
 						}
-						return self::getHostMenuData($host_data);
+						return self::getMenuDataHost($host_data);
 
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						$menu_data = [
@@ -381,7 +414,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @return mixed
 	 */
-	private static function getTriggerMenuData(array $data) {
+	private static function getMenuDataTrigger(array $data) {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'url', 'comments'],
 			'selectHosts' => ['hostid', 'name', 'status'],
@@ -443,7 +476,6 @@ class CControllerMenuPopup extends CController {
 					'editable' => true
 				]);
 
-				$editable = (bool) $rw_triggers;
 				$options['description_enabled'] = ($db_trigger['comments'] !== ''
 					|| ($rw_triggers && $rw_triggers[0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL));
 			}
@@ -488,7 +520,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @return array
 	 */
-	private static function getTriggerMacroMenuData() {
+	private static function getMenuDataTriggerMacro() {
 		return ['type' => 'trigger_macro'];
 	}
 
@@ -496,32 +528,36 @@ class CControllerMenuPopup extends CController {
 		$data = $this->hasInput('data') ? $this->getInput('data') : [];
 
 		switch ($this->getInput('type')) {
+			case 'dashboard':
+				$menu_data = self::getMenuDataDashboard($data);
+				break;
+
 			case 'history':
-				$menu_data = self::getHistoryMenuData($data);
+				$menu_data = self::setMenuDataHistory($data);
 				break;
 
 			case 'host':
-				$menu_data = self::getHostMenuData($data);
+				$menu_data = self::getMenuDataHost($data);
 				break;
 
 			case 'item':
-				$menu_data = self::getItemMenuData($data);
+				$menu_data = self::getMenuDataItem($data);
 				break;
 
 			case 'item_prototype':
-				$menu_data = self::getItemPrototypeMenuData($data);
+				$menu_data = self::getMenuDataItemPrototype($data);
 				break;
 
 			case 'map_element':
-				$menu_data = self::getMapElementMenuData($data);
+				$menu_data = self::getMenuDataMapElement($data);
 				break;
 
 			case 'trigger':
-				$menu_data = self::getTriggerMenuData($data);
+				$menu_data = self::getMenuDataTrigger($data);
 				break;
 
 			case 'trigger_macro':
-				$menu_data = self::getTriggerMacroMenuData();
+				$menu_data = self::getMenuDataTriggerMacro();
 				break;
 		}
 

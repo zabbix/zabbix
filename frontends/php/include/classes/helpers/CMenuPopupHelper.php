@@ -22,6 +22,21 @@
 class CMenuPopupHelper {
 
 	/**
+	 * Prepare data for dashboard popup menu.
+	 *
+	 * @param string $dashboardid
+	 */
+	public static function getAjaxDashboard($dashboardid) {
+		return [
+			'ajax' => true,
+			'type' => 'dashboard',
+			'data' => [
+				'dashboardid' => $dashboardid
+			]
+		];
+	}
+
+	/**
 	 * Prepare data for item history menu popup.
 	 *
 	 * @param string $itemid

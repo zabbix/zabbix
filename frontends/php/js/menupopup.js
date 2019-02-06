@@ -456,40 +456,69 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 	}];
 }
 
+/**
+ * Get menu popup trigger section data.
+ *
+ * @param {string} options['dashboardid']
+ * @param {bool}   options['editable']
+ * @param {object} trigger_elmnt           UI element which triggered opening of overlay dialogue.
+ *
+ * @return array
+ */
 function getMenuPopupDashboard(options, trigger_elmnt) {
-	jQuery.map(options.items, function(item, key) {
-		switch (key) {
-			case 'sharing':
-				if (!item.disabled) {
-					item.clickCallback = function () {
-						var options = {'dashboardid': item.form_data.dashboardid};
-						PopUp('dashboard.share.edit', options, 'dashboard_share', trigger_elmnt);
+	var	url_create = new Curl('zabbix.php', false),
+		url_clone = new Curl('zabbix.php', false),
+		url_delete = new Curl('zabbix.php', false);
 
-						jQuery(this).closest('.action-menu').menuPopup('close', null);
+	url_create.setArgument('action', 'dashboard.view');
+	url_create.setArgument('new', '1');
+
+	url_clone.setArgument('action', 'dashboard.view');
+	url_clone.setArgument('source_dashboardid', options.dashboardid);
+
+	url_delete.setArgument('action', 'dashboard.delete');
+	url_delete.setArgument('dashboardids', [options.dashboardid]);
+
+	return [{
+		label: t('Actions'),
+		items: [
+			{
+				label: t('Sharing'),
+				clickCallback: function () {
+					var popup_options = {'dashboardid': options.dashboardid};
+					PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
+
+					jQuery(this).closest('.action-menu').menuPopup('close', null);
+				},
+				disabled: !options.editable
+			},
+			{
+				label: t('Create new'),
+				url: url_create.getUrl()
+			},
+			{
+				label: t('Clone'),
+				url: url_clone.getUrl()
+			},
+			{
+				label: t('Delete'),
+				url: 'javascript:void(0)',
+				clickCallback: function () {
+					var	obj = jQuery(this);
+
+					// hide menu
+					obj.closest('.action-menu').hide();
+
+					if (!confirm(t('Delete dashboard?'))) {
+						return false;
 					}
-				}
-				break;
 
-			case 'delete':
-				if (!item.disabled) {
-					item.clickCallback = function () {
-						var	obj = jQuery(this);
-
-						// hide menu
-						obj.closest('.action-menu').hide();
-
-						if (!confirm(item.confirmation)) {
-							return false;
-						}
-
-						redirect(item.redirect, 'post', 'sid', true);
-					}
-				}
-				break;
-		}
-		return item;
-	});
-	return [{label: options.label, items: options.items}];
+					redirect(url_delete.getUrl(), 'post', 'sid', true, true);
+				},
+				disabled: !options.editable
+			}
+		]
+	}];
 }
 
 /**

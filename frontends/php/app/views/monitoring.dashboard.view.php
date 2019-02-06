@@ -66,20 +66,6 @@ else {
 		);
 	}
 
-	$url_create = (new CUrl('zabbix.php'))
-		->setArgument('action', 'dashboard.view')
-		->setArgument('new', '1');
-	$url_clone = (new CUrl('zabbix.php'))
-		->setArgument('action', 'dashboard.view')
-		->setArgument('source_dashboardid', $data['dashboard']['dashboardid']);
-
-	if ($data['dashboard']['editable']) {
-		$url_delete = (new CUrl('zabbix.php'))
-			->setArgument('action', 'dashboard.delete')
-			->setArgument('dashboardids', [$data['dashboard']['dashboardid']])
-			->setArgumentSID();
-	}
-
 	$web_layout_mode = CView::getLayoutMode();
 
 	$widget = (new CWidget())
@@ -90,48 +76,18 @@ else {
 			->addItem($main_filter_form)
 			->addItem((new CTag('nav', true, [
 				(new CList())
-					->addItem((
-						(new CButton('dashbrd-edit', _('Edit dashboard')))
-							->setEnabled($data['dashboard']['editable'])
-							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
-					))
+					->addItem((new CButton('dashbrd-edit', _('Edit dashboard')))
+						->setEnabled($data['dashboard']['editable'])
+						->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
+					)
 					->addItem((new CButton('', '&nbsp;'))
 						->addClass(ZBX_STYLE_BTN_ACTION)
 						->setId('dashbrd-actions')
 						->setTitle(_('Actions'))
 						->setAttribute('aria-haspopup', true)
-						->setMenuPopup([
-							'type' => 'dashboard',
-							'label' => _('Actions'),
-							'items' => [
-								'sharing' => [
-									'label' => _('Sharing'),
-									'form_data' => [
-										'dashboardid' => $data['dashboard']['dashboardid']
-									],
-									'disabled' => !$data['dashboard']['editable']
-								],
-							'create' => [
-								'label' => _('Create new'),
-								'url' => $url_create->getUrl()
-							],
-							'clone' => [
-								'label' => _('Clone'),
-								'url' => $url_clone->getUrl()
-							],
-							'delete' => [
-								'label' => _('Delete'),
-								'confirmation' => _('Delete dashboard?'),
-								'url' => 'javascript:void(0)',
-								'redirect' => $data['dashboard']['editable']
-									? $url_delete->getUrl()
-									: null,
-								'disabled' => !$data['dashboard']['editable']
-							]
-						]
-					])
-				)
-				->addItem(get_icon('fullscreen'))
+						->setMenuPopup(CMenuPopupHelper::getAjaxDashboard($data['dashboard']['dashboardid']))
+					)
+					->addItem(get_icon('fullscreen'))
 			]))->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem((new CListItem([
