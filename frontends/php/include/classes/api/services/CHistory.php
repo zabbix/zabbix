@@ -82,7 +82,7 @@ class CHistory extends CApiService {
 	 */
 	public function get($options = []) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			// Filter and search properties.
+			// filter
 			'history' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT]), 'default' => ITEM_VALUE_TYPE_UINT64],
 			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'itemids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -104,20 +104,17 @@ class CHistory extends CApiService {
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
-
-			// Output properties.
+			// output
 			'output' =>					['type' => API_MULTIPLE, 'default' => API_OUTPUT_EXTEND, 'rules' => [
 											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'timestamp', 'source', 'severity', 'value', 'logeventid', 'ns']), 'default' => API_OUTPUT_EXTEND],
 											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'value', 'ns']), 'default' => API_OUTPUT_EXTEND]
 			]],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-
-			// Sort and limit properties.
+			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'default' => []],
 			'sortorder' =>				['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]), 'default' => null],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
-
-			// Flags properties.
+			// flags
 			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false],
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false]
 		]];
