@@ -707,6 +707,7 @@ else {
 
 	// Get triggers (build options).
 	$options = [
+		'output' => ['triggerid', $sort],
 		'hostids' => $filter_hostids ? $filter_hostids : null,
 		'groupids' => $filter_groupids ? $filter_groupids_enriched : null,
 		'editable' => true,
@@ -719,10 +720,7 @@ else {
 	];
 
 	if ($sort === 'status') {
-		$options['output'] = ['triggerid', 'status', 'state'];
-	}
-	else {
-		$options['output'] = ['triggerid', $sort];
+		$options['output'][] = 'state';
 	}
 
 	if ($filter_discovered != -1) {
