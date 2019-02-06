@@ -129,6 +129,8 @@
 	 * Calculate minimal required height of dashboard container.
 	 *
 	 * @param {object} $obj    Dashboard container DOM element.
+	 *
+	 * @returns {integer}
 	 */
 	function calculateGridMinHeight($obj) {
 		return $(window).height() - $obj.offset().top - parseInt($(document.body).css('margin-bottom'), 10);
@@ -179,10 +181,10 @@
 
 	function setDivPosition($div, data, pos) {
 		$div.css({
-			left: data['options']['widget-width'] * pos['x'] + '%',
-			top: data['options']['widget-height'] * pos['y'] + 'px',
-			width: data['options']['widget-width'] * pos['width'] + '%',
-			height: data['options']['widget-height'] * pos['height'] + 'px'
+			left: (data['options']['widget-width'] * pos['x']) + '%',
+			top: (data['options']['widget-height'] * pos['y']) + 'px',
+			width: (data['options']['widget-width'] * pos['width']) + '%',
+			height: (data['options']['widget-height'] * pos['height']) + 'px'
 		});
 	}
 
@@ -233,7 +235,7 @@
 	/**
 	 * Rearrange widgets on drag operation.
 	 *
-	 * @param {array}  widgets  Array of widgets objects.
+	 * @param {array}  widgets  Array of widget objects.
 	 * @param {object} widget   Moved widget object.
 	 */
 	function realignWidget(widgets, widget) {
@@ -241,9 +243,9 @@
 			var next = [];
 
 			widgets.forEach(function(w) {
-				if (widget.uniqueid != w.uniqueid) {
+				if (widget.uniqueid !== w.uniqueid) {
 					if (rectOverlap(widget.current_pos, w.current_pos)
-						|| (!allow_reorder && 'affected_by_id' in w && w.affected_by_id == widget.uniqueid)
+						|| (!allow_reorder && 'affected_by_id' in w && w.affected_by_id === widget.uniqueid)
 					) {
 						w.current_pos.y = Math.max(w.current_pos.y, widget.current_pos.y + widget.current_pos.height);
 						next.push(w);
@@ -257,7 +259,7 @@
 		}
 
 		widgets.each(function(w) {
-			if (widget.uniqueid != w.uniqueid) {
+			if (widget.uniqueid !== w.uniqueid) {
 				w.current_pos = $.extend({}, w.pos);
 			}
 		});
@@ -290,9 +292,9 @@
 			w_pos.height++;
 
 			$.map(widgets, function(w) {
-				return !('affected' in w) && rectOverlap(w_pos, w.pos) ? w : null;
+				return (!('affected' in w) && rectOverlap(w_pos, w.pos)) ? w : null;
 			}).each(function(w) {
-				if (w.uniqueid != widget.uniqueid) {
+				if (w.uniqueid !== widget.uniqueid) {
 					w.affected = true;
 					w.affected_by_id = affected_by.uniqueid;
 					if (affected_by_draggable) {
@@ -318,7 +320,7 @@
 				w.pos.y -= widget.pos.height;
 
 				widgets.each(function(b) {
-					if (b.uniqueid != w.uniqueid && b.uniqueid != widget.uniqueid && rectOverlap(b.pos, w.pos)) {
+					if (b.uniqueid !== w.uniqueid && b.uniqueid !== widget.uniqueid && rectOverlap(b.pos, w.pos)) {
 						w.pos.y = Math.max(w.pos.y, b.pos.y + b.pos.height);
 					}
 				});
@@ -334,8 +336,8 @@
 	 * @param {object} axis           Resized axis options.
 	 * @param {string} axis.axis_key  Axis key as string: 'x', 'y'.
 	 * @param {string} axis.size_key  Size key as string: 'width', 'height'.
-	 * @param {number} axis.axis_key  Minimum size allowed for one item.
-	 * @param {number} axis.axis_key  Maximum size allowed for one item, also is used as maximum size of dashboard.
+	 * @param {number} axis.size_min  Minimum size allowed for one item.
+	 * @param {number} axis.size_max  Maximum size allowed for one item, also is used as maximum size of dashboard.
 	 */
 	function fitWigetsIntoBox(widgets, widget, axis) {
 		var axis_key = axis.axis_key,
@@ -353,7 +355,7 @@
 			},
 			markAffectedWidgets = function(pos, uid) {
 				$.map(widgets, function(box) {
-					return (!('affected_axis' in box) && box.uniqueid != uid && rectOverlap(pos, box.current_pos))
+					return (!('affected_axis' in box) && box.uniqueid !== uid && rectOverlap(pos, box.current_pos))
 						? box
 						: null;
 				})
@@ -497,7 +499,7 @@
 					box.new_pos[axis_key] = slot;
 
 					$.each(col, function(_, col_box) {
-						if (col_box.uniqueid == box.uniqueid || rectOverlap(col_box.current_pos, box.new_pos)) {
+						if (col_box.uniqueid === box.uniqueid || rectOverlap(col_box.current_pos, box.new_pos)) {
 							if (col_box.current_pos[size_key] > size_min) {
 								var start_pos = axis_boundaries[col_box.uniqueid].min,
 									stop_pos = axis_boundaries[col_box.uniqueid].max,
@@ -596,7 +598,7 @@
 
 				new_pos[size_key] = box.pos[size_key];
 				$.map(affected, function(col_box) {
-					return col_box.uniqueid != box.uniqueid && rectOverlap(col_box.current_pos, new_pos)
+					return col_box.uniqueid !== box.uniqueid && rectOverlap(col_box.current_pos, new_pos)
 						? col_box
 						: null;
 				}).each(function(col_box) {
@@ -633,7 +635,7 @@
 					: ['y', 'x'];
 
 		data.widgets.each(function(box) {
-			if (box.uniqueid != widget.uniqueid) {
+			if (box.uniqueid !== widget.uniqueid) {
 				box.current_pos = $.extend({}, box.pos);
 			}
 		});
@@ -647,10 +649,10 @@
 		}
 
 		// Situation when there are changes on both axes should be handled as special case.
-		if (process_order[0] == 'x' && (widget.prev_pos.y != widget.current_pos.y
+		if (process_order[0] === 'x' && (widget.prev_pos.y != widget.current_pos.y
 				|| widget.prev_pos.height != widget.current_pos.height)) {
 			$.map(data.widgets, function(box) {
-				return (!('affected_axis' in box) && widget.uniqueid != box.uniqueid
+				return (!('affected_axis' in box) && widget.uniqueid !== box.uniqueid
 					&& rectOverlap(widget.current_pos, box.current_pos))
 					? box
 					: null;
@@ -736,7 +738,7 @@
 			realignResize(data, widget);
 
 			data.widgets.each(function(box) {
-				if (widget.uniqueid != box.uniqueid) {
+				if (widget.uniqueid !== box.uniqueid) {
 					setDivPosition(box['div'], data, box['current_pos']);
 				}
 
@@ -775,7 +777,7 @@
 			realignWidget(data['widgets'], widget);
 
 			data['widgets'].forEach(function(w) {
-				if (widget.uniqueid != w.uniqueid) {
+				if (widget.uniqueid !== w.uniqueid) {
 					setDivPosition(w['div'], data, w['current_pos']);
 				}
 
@@ -896,7 +898,7 @@
 			minWidth: getCurrentCellWidth(data),
 			start: function(event) {
 				data['pos-action'] = 'resize';
-				widget.prev_pos = $.extend({mirrored:{}}, widget.pos);
+				widget.prev_pos = $.extend({mirrored: {}}, widget.pos);
 				data.widgets.each(function(box) {
 					delete box.affected_axis;
 				});
@@ -940,7 +942,7 @@
 
 				// Invoke onResizeEnd on every affected widget.
 				data.widgets.each(function(box) {
-					if ('affected_axis' in box || box.uniqueid == widget.uniqueid) {
+					if ('affected_axis' in box || box.uniqueid === widget.uniqueid) {
 						doAction('onResizeEnd', $obj, data, box);
 					}
 				});
@@ -954,7 +956,7 @@
 	 *
 	 * @param {string} state     Enable or disable resizable for widgets. Available values: 'enable', 'disable'.
 	 * @param {array}  widgets   Array of all widgets.
-	 * @param {string} ignoreid  All widget except widget with such id will be affected.
+	 * @param {string} ignoreid  All widgets except widget with such uniqueid will be affected.
 	 */
 	function setResizableState(state, widgets, ignoreid) {
 		widgets.each(function(widget) {
@@ -1006,7 +1008,7 @@
 
 	function startWidgetRefreshTimer($obj, data, widget, rf_rate) {
 		if (rf_rate != 0) {
-			widget['rf_timeoutid'] = setTimeout(function () {
+			widget['rf_timeoutid'] = setTimeout(function() {
 				// Do not update widget content if there are active popup or hintbox.
 				var active = widget['content_body'].find('[data-expanded="true"]');
 
@@ -1210,7 +1212,7 @@
 				pos = findEmptyPosition($obj, data, type);
 			}
 
-			$placeholder = $('<div/>').css({
+			$placeholder = $('<div>').css({
 					position: 'absolute',
 					top: (pos.y * data.options['widget-height']) + 'px',
 					left: (pos.x * data.options['widget-width']) + '%',
@@ -1384,12 +1386,14 @@
 				var message = $inner_box.is('.dashbrd-grid-widget-set-size')
 						? t('Release to create a new widget.')
 						: t('Click and drag to desired size.'),
+					frame_callback,
 					callback = function() {
 						if ($label.children().first().height()) {
 							$label.text($label.height() >= $label.children().first().height() ? message : '');
+							window.cancelAnimationFrame(frame_callback);
 						}
 						else {
-							window.requestAnimationFrame(callback);
+							frame_callback = window.requestAnimationFrame(callback);
 						}
 					};
 
