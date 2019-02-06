@@ -2660,7 +2660,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .overlay-dialogue.modal-code-editor .code-editor {
       position: relative;
       display: flex;
-      height: 548px;
+      height: calc(100vh - 190px);
+      max-height: 548px;
       overflow: hidden; }
       .overlay-dialogue.modal-code-editor .code-editor .line-numbers {
         margin-bottom: 5px;
@@ -2722,9 +2723,11 @@ input.open-modal-code-editor {
   font-family: "Courier New", Courier, monospace;
   border-right: none; }
   input.open-modal-code-editor.editable {
-    color: #9f9f9f !important;
-    background-color: #fff !important; }
-  input.open-modal-code-editor + button {
+    background-color: #fff !important;
+    border-color: #9f9f9f; }
+  input.open-modal-code-editor:-ms-input-placeholder {
+    color: #777 !important; }
+  input.open-modal-code-editor ~ button {
     white-space: nowrap;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0; }

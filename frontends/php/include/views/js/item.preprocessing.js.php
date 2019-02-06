@@ -1,6 +1,5 @@
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-tmpl">
 	<?php
-	$script_maxlength = DB::getFieldLength('item_preproc', 'params');
 	$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
 
 	foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $group) {
@@ -130,7 +129,7 @@
 			.on('change', 'select[name*="type"]', function() {
 				var row = $(this).closest('.preprocessing-step'),
 					type = $(this).val(),
-					params = $(this).closest('.preprocessing-step').find('[name*="params"]'),
+					params = $(this).closest('.preprocessing-step').find('input[type="text"][name*="params"]'),
 					on_fail = $(this).closest('.preprocessing-step').find('[name*="on_fail"]');
 
 				$(params)
@@ -202,8 +201,15 @@
 					case '<?= ZBX_PREPROC_SCRIPT ?>':
 						$(params[0])
 							.attr('placeholder', <?= CJs::encodeJson(_('script')) ?>)
-							.attr('maxlength', <?= $script_maxlength ?>)
-							.addClass('open-modal-code-editor')
+							.attr('maxlength', <?= $data['preprocessing_script_maxlength'] ?>)
+							.attr('title', <?= CJs::encodeJson(_('Click to view or edit code')) ?>)
+							.addClass('open-modal-code-editor editable')
+							.show()
+							.after($('<input>').attr({
+								'type': 'hidden',
+								'id': $(params[0]).attr('id'),
+								'name': $(params[0]).attr('name')
+							}))
 							.codeEditor()
 							.parent()
 								.removeClass()
@@ -217,7 +223,7 @@
 					$(params[0])
 						.codeEditor('destroy')
 						.removeClass()
-						.attr('maxlength', 255)
+						.prop('maxlength', 255)
 						.parent()
 							.removeClass()
 							.addClass('<?= ZBX_STYLE_COLUMN_20 ?>')

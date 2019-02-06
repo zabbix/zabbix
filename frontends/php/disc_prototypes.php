@@ -1255,7 +1255,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_MULTISELECT_ADD),
 		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_MULTISELECT_ADD),
-		'preprocessing_types' => CItemPrototype::$supported_preprocessing_types
+		'preprocessing_types' => CItemPrototype::$supported_preprocessing_types,
+		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];
 
 	foreach ($data['preprocessing'] as &$step) {

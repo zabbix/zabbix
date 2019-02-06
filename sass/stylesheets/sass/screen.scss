@@ -3866,7 +3866,8 @@ $form-icon-btn: (
 		.code-editor {
 			position: relative;
 			display: flex;
-			height: 548px;
+			height: calc(100vh - 190px);
+			max-height: 548px;
 			overflow: hidden;
 
 			.line-numbers {
@@ -3970,11 +3971,15 @@ input.open-modal-code-editor {
 	border-right: none;
 
 	&.editable {
-		color: $form-disabled-font-color !important;
 		background-color: $form-bg-color !important;
+		border-color: $form-disabled-font-color;
 	}
 
-	+ button {
+	&:-ms-input-placeholder {
+		color: $input-placeholder-color !important;
+	}
+
+	~ button {
 		white-space: nowrap;
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;

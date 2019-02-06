@@ -1017,7 +1017,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		'http_authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
 		'http_username' => getRequest('http_username', ''),
 		'http_password' => getRequest('http_password', ''),
-		'preprocessing' => getRequest('preprocessing', [])
+		'preprocessing' => getRequest('preprocessing', []),
+		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];
 
 	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -1512,10 +1513,15 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 
 			case ZBX_PREPROC_SCRIPT:
 				$params[0]
+					->removeId()
+					->setAttribute('value', explode("\n", trim($step_param_0))[0])
 					->setAttribute('placeholder', _('script'))
-					->setAttribute('data-editable', !$readonly)
 					->setAttribute('maxlength', $script_maxlength)
+					->setAttribute('title', _('Click to view or edit code'))
 					->addClass('open-modal-code-editor');
+				if (!$readonly) {
+					$params[0]->addClass('editable');
+				}
 				$params[1]->addStyle('display: none;');
 				break;
 		}
@@ -1595,7 +1601,12 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					(new CDiv($preproc_types_cbbox))
 						->addClass(ZBX_STYLE_COLUMN_35)
 						->addClass('list-numbered-item'),
-					(new CDiv($params[0]))->addClass(ZBX_STYLE_COLUMN_20),
+					(new CDiv([
+						$params[0],
+						($step['type'] == ZBX_PREPROC_SCRIPT)
+							? new CInput('hidden', $params[0]->getName(), trim(implode($step['params'])))
+							: null
+					]))->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv($params[1]))->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv($on_fail))
 						->addClass(ZBX_STYLE_COLUMN_15)

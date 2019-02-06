@@ -42,26 +42,18 @@
 	var methods = {
 		init: function(options) {
 			return this.each(function() {
-				var $input = $(this).attr('type', 'hidden'),
-					editable = $input.attr('data-editable') != '',
-					maxlength = $input.prop('maxlength'),
-					$clone = $('<input>', {
-						type: 'text',
-						value: $input.val(),
-						class: 'open-modal-code-editor',
-						readonly: true,
-						tabindex: -1,
-						placeholder: $input.prop('placeholder') || null
-					}).appendTo($input.parent()),
+				var $input = $(this)
+						.removeAttr('id')
+						.attr('tabindex', -1)
+						.prop('readonly', true),
+					editable = $input.hasClass('editable'),
+					maxlength = $input.attr('maxlength'),
+					$hidden = $input.siblings('input[type=hidden]'),
 					$button = $('<button>')
-						.html(t('S_OPEN'))
+						.text(t('S_OPEN'))
 						.appendTo($input.parent());
 
-				if (editable) {
-					$clone.addClass('editable');
-				}
-
-				$clone.add($button).on('click', function(e) {
+				$input.add($button).on('click', function(e) {
 					e.preventDefault();
 
 					var $code_editor = $('<div>').addClass('code-editor'),
@@ -71,13 +63,13 @@
 							.appendTo($code_editor),
 						$textarea = $('<textarea>', {
 							class: 'code-editor-textarea',
-							text: $input.val(),
+							text: $hidden.val(),
 							maxlength: maxlength,
 							readonly: !editable
 						}).appendTo($code_editor);
 
 					overlayDialogue({
-						'title': 'JavaScript',
+						'title': t('S_JAVASCRIPT'),
 						'class': 'modal-code-editor',
 						'content': $code_editor,
 						'buttons': [
@@ -85,7 +77,10 @@
 								title: t('S_SAVE'),
 								enabled: editable,
 								action: function() {
-									$input.add($clone).val($textarea.val());
+									var new_value = $.trim($textarea.val());
+
+									$input.val(new_value.split("\n")[0]);
+									$hidden.val(new_value);
 								}
 							},
 							{
@@ -118,9 +113,15 @@
 		},
 		destroy: function() {
 			return this.each(function() {
-				$(this)
-					.attr('type', 'text')
-					.siblings('.open-modal-code-editor, button').remove();
+				var $input = $(this),
+					$hidden = $input.siblings('input[type=hidden]');
+
+				$input
+					.off()
+					.removeAttr('tabindex readonly')
+					.attr('id', $hidden.attr('id'))
+					.siblings('button').remove();
+				$hidden.remove();
 			});
 		}
 	};
