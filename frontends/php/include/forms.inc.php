@@ -1387,17 +1387,19 @@ function getItemFormData(array $item = [], array $options = []) {
  * @return CList
  */
 function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, array $types) {
+	$script_maxlength = DB::getFieldLength('item_preproc', 'params');
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
 		->addClass('preprocessing-list')
+		->addClass('list-numbered')
 		->addItem(
 			(new CListItem(
 				(new CDiv([
-					(new CDiv(_('Name')))->addClass(ZBX_STYLE_COLUMN_40),
+					(new CDiv(_('Name')))->addClass(ZBX_STYLE_COLUMN_35),
 					(new CDiv(_('Parameters')))->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv())->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv(_('Custom on fail')))
-						->addClass(ZBX_STYLE_COLUMN_10)
+						->addClass(ZBX_STYLE_COLUMN_15)
 						->addClass(ZBX_STYLE_COLUMN_CENTER),
 					(new CDiv(_('Action')))->addClass(ZBX_STYLE_COLUMN_10)
 				]))->addClass(ZBX_STYLE_COLUMNS)
@@ -1507,6 +1509,15 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				$params[0]->setAttribute('placeholder', _('seconds'));
 				$params[1]->addStyle('display: none;');
 				break;
+
+			case ZBX_PREPROC_SCRIPT:
+				$params[0]
+					->setAttribute('placeholder', _('script'))
+					->setAttribute('data-editable', !$readonly)
+					->setAttribute('maxlength', $script_maxlength)
+					->addClass('open-modal-code-editor');
+				$params[1]->addStyle('display: none;');
+				break;
 		}
 
 		// Create checkbox "Custom on fail" and enable or disable depending on preprocessing type.
@@ -1521,6 +1532,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			case ZBX_PREPROC_ERROR_FIELD_REGEX:
 			case ZBX_PREPROC_THROTTLE_VALUE:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+			case ZBX_PREPROC_SCRIPT:
 				$on_fail->setEnabled(false);
 				break;
 
@@ -1564,7 +1576,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				new CDiv($error_handler->setReadonly($readonly)),
 				new CDiv($error_handler_params->setReadonly($readonly))
 			]))
-				->addClass(ZBX_STYLE_COLUMN_80)
+				->addClass(ZBX_STYLE_COLUMN_75)
 				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 		]))
 			->addClass(ZBX_STYLE_COLUMNS)
@@ -1580,14 +1592,13 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					(new CDiv())
 						->addClass(ZBX_STYLE_DRAG_ICON)
 						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
-					(new CDiv([
-						(new CDiv(($i + 1).':'))->addClass('step-number'),
-						$preproc_types_cbbox
-					]))->addClass(ZBX_STYLE_COLUMN_40),
+					(new CDiv($preproc_types_cbbox))
+						->addClass(ZBX_STYLE_COLUMN_35)
+						->addClass('list-numbered-item'),
 					(new CDiv($params[0]))->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv($params[1]))->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv($on_fail))
-						->addClass(ZBX_STYLE_COLUMN_10)
+						->addClass(ZBX_STYLE_COLUMN_15)
 						->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 						->addClass(ZBX_STYLE_COLUMN_CENTER),
 					(new CDiv((new CButton('preprocessing['.$i.'][remove]', _('Remove')))

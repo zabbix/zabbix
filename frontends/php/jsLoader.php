@@ -63,6 +63,7 @@ $availableJScripts = [
 	'chkbxrange.js' => '',
 	'csvggraphwidget.js' => '',
 	'layout.mode.js' => '',
+	'codeeditor.js' => '',
 	// vendors
 	'prototype.js' => 'vendors/',
 	'jquery.js' => 'vendors/',
@@ -288,6 +289,12 @@ $tranStrings = [
 	],
 	'common.js' => [
 		'Cancel' => _('Cancel')
+	],
+	'codeeditor.js' => [
+		'S_OPEN' => _('Open'),
+		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
+		'S_SAVE' => _('Save'),
+		'S_CANCEL' => _('Cancel')
 	]
 ];
 

@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'multiselect.js', 'items.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'codeeditor.js', 'multiselect.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -661,6 +661,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				case ZBX_PREPROC_ERROR_FIELD_JSON:
 				case ZBX_PREPROC_ERROR_FIELD_XML:
 				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+				case ZBX_PREPROC_SCRIPT:
 					$step['params'] = $step['params'][0];
 					break;
 
@@ -1182,6 +1183,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 							case ZBX_PREPROC_ERROR_FIELD_JSON:
 							case ZBX_PREPROC_ERROR_FIELD_XML:
 							case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+							case ZBX_PREPROC_SCRIPT:
 								$step['params'] = $step['params'][0];
 								break;
 
