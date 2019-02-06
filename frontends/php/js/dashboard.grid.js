@@ -938,7 +938,12 @@
 					});
 				}
 
-				doAction('onResizeEnd', $obj, data, widget);
+				// Invoke onResizeEnd on every affected widget.
+				data.widgets.each(function(box) {
+					if ('affected_axis' in box || box.uniqueid == widget.uniqueid) {
+						doAction('onResizeEnd', $obj, data, box);
+					}
+				});
 			},
 			minHeight: data['options']['widget-min-rows'] * data['options']['widget-height']
 		});
