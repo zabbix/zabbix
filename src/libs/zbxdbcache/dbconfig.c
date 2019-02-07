@@ -5147,6 +5147,10 @@ void	DCsync_configuration(unsigned char mode)
 				config->items_hk.num_data, config->items_hk.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() numitems   : %d (%d slots)", __function_name,
 				config->numitems.num_data, config->numitems.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocitems: %d (%d slots)", __function_name,
+				config->preprocitems.num_data, config->preprocitems.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocops : %d (%d slots)", __function_name,
+				config->preprocops.num_data, config->preprocops.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmpitems  : %d (%d slots)", __function_name,
 				config->snmpitems.num_data, config->snmpitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmiitems  : %d (%d slots)", __function_name,
