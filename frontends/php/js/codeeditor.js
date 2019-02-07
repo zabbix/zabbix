@@ -50,6 +50,7 @@
 					maxlength = $input.attr('maxlength'),
 					$hidden = $input.siblings('input[type=hidden]'),
 					$button = $('<button>')
+						.attr('type', 'button')
 						.text(t('S_OPEN'))
 						.appendTo($input.parent());
 
