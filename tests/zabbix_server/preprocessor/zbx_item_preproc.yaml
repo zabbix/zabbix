@@ -1432,6 +1432,123 @@ out:
   history:
     time: 2017-10-29 03:15:00 +03:00
     data: abc
+---
+test case: float(1.5e0) * 1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1.5e0
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 1
+out:
+  return: SUCCEED
+  value: 1.5
+---
+test case: float(1) * 1.5e0
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 1.5e0
+out:
+  return: SUCCEED
+  value: 1.5
+---
+test case: float(1.5e0) * 1.5e0
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1.5e0
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 1.5e0
+out:
+  return: SUCCEED
+  value: 2.25
+---
+test case: float(1.5e1) * 1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1.5e1
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 1
+out:
+  return: SUCCEED
+  value: 15
+---
+test case: float(1) * 1.5e1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 1.5e1
+out:
+  return: SUCCEED
+  value: 15
+---
+test case: float(1.5e1) * 1.5e1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1.5e1
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 1.5e1
+out:
+  return: SUCCEED
+  value: 225
+---
+test case: float(1.5e10) * 1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1.5e10
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 1
+out:
+  return: SUCCEED
+  value: 15000000000
+---
+test case: float(1) * 1.5e10
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 1.5e10
+out:
+  return: SUCCEED
+  value: 15000000000
+---
+test case: float(1.5e10) * 1.5e10
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1.5e10
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 1.5e10
+out:
+  return: SUCCEED
+  value: 225000000000000000000
 ...
 
 
