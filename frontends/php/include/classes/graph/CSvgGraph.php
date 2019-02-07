@@ -149,6 +149,7 @@ class CSvgGraph extends CSvg {
 		$this->grid_color = '#' . $theme['gridcolor'];
 
 		$this
+			->addClass(ZBX_STYLE_SVG_GRAPH)
 			->setTimePeriod($options['time_period']['time_from'], $options['time_period']['time_to'])
 			->setXAxis($options['x_axis'])
 			->setYAxisLeft($options['left_y_axis'])

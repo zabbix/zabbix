@@ -484,8 +484,8 @@
 			'initial_load': widget['initial_load'] ? 1 : 0,
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
 			'storage': widget['storage'],
-			'content_width': widget['content_body'].width(),
-			'content_height': getContentBodyHeight(widget)
+			'content_width': Math.floor(widget['content_body'].width()),
+			'content_height': Math.floor(widget['content_body'].height())
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -578,22 +578,6 @@
 		});
 
 		widget['initial_load'] = false;
-	}
-
-	function getContentBodyHeight(widget) {
-		var padding = 0;
-
-		if (widget['type'] == 'graph') {
-			padding = 5;
-		}
-		else if (widget['type'] == 'svggraph') {
-			padding = 7;
-		}
-		else {
-			widget['container'].addClass('dashbrd-widget-default');
-		}
-
-		return widget['content_body'].height() - padding;
 	}
 
 	function refreshWidget($obj, data, widget) {
@@ -1088,14 +1072,26 @@
 				$this.append($placeholder.hide());
 				$this.append($empty_placeholder);
 
-				$(window).bind('beforeunload', function() {
-					var	res = confirmExit($this, data);
+				var resize_delay,
+					resize_handler = function () {
+					data.widgets.each(function(widget) {
+						doAction('onResizeEnd', $this, data, widget);
+					});
+				};
 
-					// Return value only if we need confirmation window, return nothing otherwise.
-					if (typeof res !== 'undefined') {
-						return res;
-					}
-				});
+				$(window)
+					.on('beforeunload', function() {
+						var	res = confirmExit($this, data);
+
+						// Return value only if we need confirmation window, return nothing otherwise.
+						if (typeof res !== 'undefined') {
+							return res;
+						}
+					})
+					.on('resize', function () {
+						clearTimeout(resize_delay)
+						resize_delay = setTimeout(resize_handler, 200);
+					});
 			});
 		},
 

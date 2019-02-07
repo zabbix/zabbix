@@ -539,9 +539,8 @@ var timeControl = {
 
 				// url
 				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
-					var graphUrl = new Curl(obj.src);
-					graphUrl.unsetArgument('sid');
-					graphUrl.setArgument('width', obj.objDims.width - 1);
+					var graphUrl = new Curl(obj.src, false);
+					graphUrl.setArgument('width', Math.floor(obj.objDims.width));
 
 					obj.src = graphUrl.getUrl();
 				}
@@ -620,7 +619,7 @@ var timeControl = {
 				id: img.attr('id'),
 				'class': img.attr('class')
 			})
-			.on('load', function() {
+			.one('load', function() {
 				img.replaceWith(clone);
 				window.flickerfreeScreen.setElementProgressState(obj.id, false);
 			});

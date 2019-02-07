@@ -3299,9 +3299,6 @@ $form-icon-btn: (
 	margin: .25rem;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
-}
-
-.dashbrd-widget-default {
 	padding-bottom: 8px;
 }
 
@@ -4258,6 +4255,10 @@ $form-icon-btn: (
 	}
 }
 
+.svg-graph {
+	display: block;
+}
+
 .svg-single-item-graph-legend,
 .svg-single-two-items-graph-legend,
 .svg-graph-legend {
@@ -4268,13 +4269,14 @@ $form-icon-btn: (
 	overflow-y: hidden;
 	white-space: normal;
 	margin: 0 10px;
+	line-height: $svg-legend-line-height;
 
 	div {
 		display: inline-block;
 		margin: 0 4px;
 		font-size: 12px;
-		line-height: $svg-legend-line-height;
-		vertical-align: middle;
+		line-height: 1;
+		vertical-align: bottom;
 		min-width: 120px;
 		overflow: hidden;
 		white-space: nowrap;

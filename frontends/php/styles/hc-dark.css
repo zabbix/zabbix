@@ -2235,9 +2235,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   min-width: 8.33333%;
   margin: .25rem;
   background-color: #000;
-  border: 1px solid #444; }
-
-.dashbrd-widget-default {
+  border: 1px solid #444;
   padding-bottom: 8px; }
 
 .dashbrd-grid-widget-head {
@@ -2917,20 +2915,24 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     top: 0;
     z-index: 999; }
 
+.svg-graph {
+  display: block; }
+
 .svg-single-item-graph-legend,
 .svg-single-two-items-graph-legend,
 .svg-graph-legend {
   overflow-y: hidden;
   white-space: normal;
-  margin: 0 10px; }
+  margin: 0 10px;
+  line-height: 18px; }
   .svg-single-item-graph-legend div,
   .svg-single-two-items-graph-legend div,
   .svg-graph-legend div {
     display: inline-block;
     margin: 0 4px;
     font-size: 12px;
-    line-height: 18px;
-    vertical-align: middle;
+    line-height: 1;
+    vertical-align: bottom;
     min-width: 120px;
     overflow: hidden;
     white-space: nowrap;
