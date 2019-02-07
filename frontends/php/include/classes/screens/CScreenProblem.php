@@ -1243,6 +1243,6 @@ class CScreenProblem extends CScreenBase {
 			->setHint($hint_table, '', true)
 		);
 
-		return new CCol($tooltip);
+		return (new CCol($tooltip))->addClass('latest-value');
 	}
 }

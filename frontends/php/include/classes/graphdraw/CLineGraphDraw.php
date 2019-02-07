@@ -2517,6 +2517,7 @@ class CLineGraphDraw extends CGraphDraw {
 	public function drawDimensions() {
 		set_image_header();
 
+		$this->calculateTopPadding();
 		$this->selectTriggers();
 		$this->calcDimentions();
 
