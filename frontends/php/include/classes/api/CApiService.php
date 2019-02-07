@@ -462,7 +462,7 @@ class CApiService {
 		// count
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
-			$sqlParts['select'] = $pk
+			$sqlParts['select'] = ($pk !== '')
 				? ['COUNT(DISTINCT '.$pkFieldId.') AS rowscount']
 				: ['COUNT(*) AS rowscount'];
 
@@ -476,7 +476,7 @@ class CApiService {
 		// custom output
 		elseif (is_array($options['output'])) {
 			// the pk field must always be included for the API to work properly
-			$sqlParts['select'] = $pk ? [$pkFieldId] : [];
+			$sqlParts['select'] = ($pk !== '') ? [$pkFieldId] : [];
 			foreach ($options['output'] as $field) {
 				if ($this->hasField($field, $tableName)) {
 					$sqlParts['select'][] = $this->fieldId($field, $tableAlias);

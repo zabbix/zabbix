@@ -184,17 +184,17 @@ class CHistory extends CApiService {
 
 		// itemids
 		if ($options['itemids'] !== null) {
-			$sql_parts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids']);
+			$sql_parts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids'], false, true, false);
 		}
 
 		// time_from
 		if ($options['time_from'] !== null) {
-			$sql_parts['where']['clock_from'] = 'h.clock>='.zbx_dbstr($options['time_from']);
+			$sql_parts['where']['clock_from'] = 'h.clock>='.$options['time_from'];
 		}
 
 		// time_till
 		if ($options['time_till'] !== null) {
-			$sql_parts['where']['clock_till'] = 'h.clock<='.zbx_dbstr($options['time_till']);
+			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
 		}
 
 		// filter
