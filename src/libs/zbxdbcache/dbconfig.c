@@ -4355,14 +4355,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
 				zbx_vector_ptr_remove_noorder(&preprocitem->preproc_ops, index);
-
-				if (0 == preprocitem->preproc_ops.values_num)
-				{
-					zbx_vector_ptr_destroy(&preprocitem->preproc_ops);
-					zbx_hashset_remove_direct(&config->preprocitems, preprocitem);
-				}
-				else
-					zbx_vector_ptr_append(&items, preprocitem);
+				zbx_vector_ptr_append(&items, preprocitem);
 			}
 		}
 
@@ -4370,7 +4363,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->preprocops, op);
 	}
 
-	/* sort item  preprocessing operations by step */
+	/* sort item preprocessing operations by step */
 
 	zbx_vector_ptr_sort(&items, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 	zbx_vector_ptr_uniq(&items, ZBX_DEFAULT_PTR_COMPARE_FUNC);
@@ -4378,7 +4371,14 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 	for (i = 0; i < items.values_num; i++)
 	{
 		preprocitem = (ZBX_DC_PREPROCITEM *)items.values[i];
-		zbx_vector_ptr_sort(&preprocitem->preproc_ops, dc_compare_preprocops_by_step);
+
+		if (0 == preprocitem->preproc_ops.values_num)
+		{
+			zbx_vector_ptr_destroy(&preprocitem->preproc_ops);
+			zbx_hashset_remove_direct(&config->preprocitems, preprocitem);
+		}
+		else
+			zbx_vector_ptr_sort(&preprocitem->preproc_ops, dc_compare_preprocops_by_step);
 	}
 
 	zbx_vector_ptr_destroy(&items);
