@@ -53,7 +53,7 @@ $imageFormList = (new CFormList('imageFormList'))
 
 if (isset($this->data['imageid'])) {
 	if ($this->data['imagetype'] == IMAGE_TYPE_BACKGROUND) {
-		$imageFormList->addRow(_('Image'), new CLink(new CImg('imgstore.php?width=200&height=200&iconid='.$this->data['imageid'], 'no image'), 'image.php?imageid='.$this->data['imageid']));
+		$imageFormList->addRow(_('Image'), new CLink(new CImg('imgstore.php?max_width=500&max_height=500&iconid='.$this->data['imageid'], 'no image'), 'image.php?imageid='.$this->data['imageid']));
 	}
 	else {
 		$imageFormList->addRow(_('Image'), new CImg('imgstore.php?iconid='.$this->data['imageid'], 'no image', null));

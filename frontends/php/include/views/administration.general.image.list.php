@@ -58,10 +58,10 @@ else {
 	foreach ($data['images'] as $image) {
 		$img = ($image['imagetype'] == IMAGE_TYPE_BACKGROUND)
 			? new CLink(
-				new CImg('imgstore.php?width=200&height=200&iconid='.$image['imageid'], 'no image'),
+				new CImg('imgstore.php?max_width=350&max_height=350&iconid='.$image['imageid'], 'no image'),
 				'image.php?imageid='.$image['imageid']
 			)
-			: new CImg('imgstore.php?iconid='.$image['imageid'], 'no image');
+			: new CImg('imgstore.php?max_width=250&max_height=2000&iconid='.$image['imageid'], 'no image');
 
 		$imageRow->addItem(
 			(new CDiv())
