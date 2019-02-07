@@ -652,8 +652,10 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
  * Get menu popup trigger log section data.
  *
  * @param string options['itemid']
+ * @param string options['hostid']
  * @param string options['name']
- * @param array  options['triggers']
+ * @param bool   options['show_triggers']             (optional) Show trigger menus.
+ * @param array  options['triggers']                  (optional)
  * @param string options['triggers'][n]['triggerid']
  * @param string options['triggers'][n]['name']
  * @param {object} trigger_elmnt                      UI element that was clicked to open overlay dialogue.
@@ -663,47 +665,49 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 function getMenuPopupItem(options, trigger_elmnt) {
 	var items = [];
 
-	// create
-	items.push({
-		label: t('Create trigger'),
-		clickCallback: function() {
-			jQuery(this).closest('.action-menu').menuPopup('close', null);
+	if (typeof options.show_triggers !== 'undefined' && options.show_triggers) {
+		// create
+		items.push({
+			label: t('Create trigger'),
+			clickCallback: function() {
+				jQuery(this).closest('.action-menu').menuPopup('close', null);
 
-			return PopUp('popup.triggerwizard', {
-				itemid: options.itemid
-			}, null, trigger_elmnt);
-		}
-	});
-
-	var edit_trigger = {
-		label: t('Edit trigger')
-	};
-
-	// edit
-	if (options.triggers.length > 0) {
-		var triggers = [];
-
-		jQuery.each(options.triggers, function(i, trigger) {
-			triggers.push({
-				label: trigger.name,
-				clickCallback: function() {
-					jQuery(this).closest('.action-menu-top').menuPopup('close', null);
-
-					return PopUp('popup.triggerwizard', {
-						itemid: options.itemid,
-						triggerid: trigger.triggerid
-					}, null, trigger_elmnt);
-				}
-			});
+				return PopUp('popup.triggerwizard', {
+					itemid: options.itemid
+				}, null, trigger_elmnt);
+			}
 		});
 
-		edit_trigger.items = triggers;
-	}
-	else {
-		edit_trigger.disabled = true;
-	}
+		var edit_trigger = {
+			label: t('Edit trigger')
+		};
 
-	items.push(edit_trigger);
+		// edit
+		if (options.triggers.length > 0) {
+			var triggers = [];
+
+			jQuery.each(options.triggers, function(i, trigger) {
+				triggers.push({
+					label: trigger.name,
+					clickCallback: function() {
+						jQuery(this).closest('.action-menu-top').menuPopup('close', null);
+
+						return PopUp('popup.triggerwizard', {
+							itemid: options.itemid,
+							triggerid: trigger.triggerid
+						}, null, trigger_elmnt);
+					}
+				});
+			});
+
+			edit_trigger.items = triggers;
+		}
+		else {
+			edit_trigger.disabled = true;
+		}
+
+		items.push(edit_trigger);
+	}
 
 	var url = new Curl('items.php', false);
 

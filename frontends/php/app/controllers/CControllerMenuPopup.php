@@ -204,7 +204,12 @@ class CControllerMenuPopup extends CController {
 
 		if ($db_items) {
 			$db_item = $db_items[0];
-			$triggers = [];
+			$menu_data = [
+				'type' => 'item',
+				'itemid' => $data['itemid'],
+				'hostid' => $db_item['hostid'],
+				'name' => $db_item['name']
+			];
 
 			if (in_array($db_item['value_type'], [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
 				$db_triggers = API::Trigger()->get([
@@ -212,6 +217,9 @@ class CControllerMenuPopup extends CController {
 					'selectFunctions' => API_OUTPUT_EXTEND,
 					'itemids' => $data['itemid']
 				]);
+
+				$menu_data['show_triggers'] = true;
+				$menu_data['triggers'] = [];
 
 				foreach ($db_triggers as $db_trigger) {
 					if ($db_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
@@ -224,20 +232,14 @@ class CControllerMenuPopup extends CController {
 						}
 					}
 
-					$triggers[] = [
+					$menu_data['triggers'][] = [
 						'triggerid' => $db_trigger['triggerid'],
 						'name' => $db_trigger['description']
 					];
 				}
 			}
 
-			return [
-				'type' => 'item',
-				'itemid' => $data['itemid'],
-				'hostid' => $db_item['hostid'],
-				'name' => $db_item['name'],
-				'triggers' => $triggers
-			];
+			return $menu_data;
 		}
 
 		error(_('No permissions to referred object or it does not exist!'));
