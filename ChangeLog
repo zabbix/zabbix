@@ -3,6 +3,7 @@ Changes for 4.0.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15250] fixed selection box height calculation in classic graph (miks)
 ...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
 ...G...PS. [ZBX-15379] fixed -Wimplicit-fallthrough warnings when compiling with GCC 7 and -Wextra (akozlovs)
 A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
