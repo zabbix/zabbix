@@ -2931,7 +2931,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     display: inline-block;
     margin: 0 4px;
     font-size: 12px;
-    line-height: 1;
+    line-height: 1.1;
     vertical-align: bottom;
     min-width: 120px;
     overflow: hidden;
