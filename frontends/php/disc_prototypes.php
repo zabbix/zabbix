@@ -318,6 +318,16 @@ if ($itemPrototypeId) {
 	}
 }
 
+// Convert CR+LF to LF in preprocessing script.
+if (hasRequest('preprocessing')) {
+	foreach ($_REQUEST['preprocessing'] as &$step) {
+		if ($step['type'] == ZBX_PREPROC_SCRIPT) {
+			$step['params'][0] = CRLFtoLF($step['params'][0]);
+		}
+	}
+	unset($step);
+}
+
 /*
  * Actions
  */
@@ -1142,8 +1152,14 @@ if (isset($_REQUEST['form'])) {
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params']
 		]);
 		$itemPrototype = reset($itemPrototype);
+
 		foreach ($itemPrototype['preprocessing'] as &$step) {
-			$step['params'] = explode("\n", $step['params']);
+			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
+				$step['params'] = [$step['params'], ''];
+			}
+			else {
+				$step['params'] = explode("\n", $step['params']);
+			}
 		}
 		unset($step);
 

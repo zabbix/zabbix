@@ -548,6 +548,16 @@ if (!hasRequest('form') && $filterHostId) {
 	}
 }
 
+// Convert CR+LF to LF in preprocessing script.
+if (hasRequest('preprocessing')) {
+	foreach ($_REQUEST['preprocessing'] as &$step) {
+		if ($step['type'] == ZBX_PREPROC_SCRIPT) {
+			$step['params'][0] = CRLFtoLF($step['params'][0]);
+		}
+	}
+	unset($step);
+}
+
 /*
  * Actions
  */
