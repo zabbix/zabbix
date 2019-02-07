@@ -1088,7 +1088,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Only one prometheus step is allowed.'
+				'expected_error' => 'Only one Prometheus step is allowed.'
 			]
 		];
 	}

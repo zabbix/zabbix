@@ -1493,7 +1493,7 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_PROMETHEUS_PATTERN:
 					case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 						if ($prometheus) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one prometheus step is allowed.'));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one Prometheus step is allowed.'));
 						}
 						else {
 							$prometheus = true;
