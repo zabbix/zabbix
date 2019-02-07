@@ -246,7 +246,7 @@ class CElasticsearchHelper {
 	public static function addFilter($schema, $query, $options) {
 		foreach ($options['filter'] as $field => $value) {
 			// Skip missing fields, textual fields (different mapping is needed for exact matching) and empty values.
-			if (!array_key_exists($field, $schema['fields']) || !$value
+			if (!array_key_exists($field, $schema['fields']) || $value === null
 					|| in_array($schema['fields'][$field]['type'], [DB::FIELD_TYPE_TEXT, DB::FIELD_TYPE_CHAR])) {
 				continue;
 			}
@@ -287,37 +287,30 @@ class CElasticsearchHelper {
 				$exclude = 'should';
 			}
 
-			$query["minimum_should_match"] = 1;
+			$query['minimum_should_match'] = 1;
 		}
 
 		foreach ($options['search'] as $field => $value) {
 			// Skip missing fields, non textual fields and empty values.
-			if (!array_key_exists($field, $schema['fields']) || !$value
+			if (!array_key_exists($field, $schema['fields']) || $value === null
 					|| !in_array($schema['fields'][$field]['type'], [DB::FIELD_TYPE_TEXT, DB::FIELD_TYPE_CHAR])) {
 				continue;
 			}
 
-			zbx_value2array($value);
-
 			foreach ($value as $phrase) {
-				// Skip non scalar values.
-				if (!is_scalar($phrase)) {
-					continue;
-				}
-
 				$phrase = str_replace('?', '\\?', $phrase);
 
 				if (!$options['searchWildcardsEnabled']) {
 					$phrase = str_replace('*', '\\*', $phrase);
 					$criteria = [
-						"wildcard" => [
+						'wildcard' => [
 							$field => $start.$phrase.'*'
 						]
 					];
 				}
 				else {
 					$criteria = [
-						"wildcard" => [
+						'wildcard' => [
 							$field => $phrase
 						]
 					];
