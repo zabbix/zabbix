@@ -142,10 +142,8 @@ jQuery(function($) {
 			dataType: 'json',
 			success: function(resp) {
 				showMenuPopup(obj, resp.data, event);
-				return false;
 			},
 			error: function() {
-				return false;
 			}
 		});
 
