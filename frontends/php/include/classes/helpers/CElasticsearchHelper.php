@@ -237,9 +237,9 @@ class CElasticsearchHelper {
 	/**
 	 * Add filters to Elasticsearch query.
 	 *
-	 * @param array $schema     DB schema
-	 * @param array $query      Elasticsearch query
-	 * @param array $options    filtering options
+	 * @param array $schema   DB schema
+	 * @param array $query    Elasticsearch query.
+	 * @param array $options  Filtering options.
 	 *
 	 * @return array    Elasticsearch query with added filtering
 	 */
@@ -251,19 +251,17 @@ class CElasticsearchHelper {
 				continue;
 			}
 
-			zbx_value2array($value);
-
 			if ($options['searchByAny']) {
 				$type = 'should';
-				$query["minimum_should_match"] = 1;
+				$query['minimum_should_match'] = 1;
 			}
 			else {
 				$type = 'must';
 			}
 
 			$query['query']['bool'][$type][] = [
-				"terms" => [
-					$field => array_values($value)
+				'terms' => [
+					$field => $value
 				]
 			];
 		}
