@@ -1825,7 +1825,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 	}
 
-		public static function getCreateFiltersData() {
+		public static function getFiltersTabData() {
 			return [
 				[
 					[
@@ -1886,9 +1886,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 
 	/**
-	 * @dataProvider getCreateFiltersData
+	 * Test creation of a discovery rule with data filling in Filters tab.
+	 *
+	 * @dataProvider getFiltersTabData
 	 */
-	public function testFormLowLevelDiscovery_CreateFiltersMacros($data) {
+	public function testFormLowLevelDiscovery_FiltersTab($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
@@ -1918,7 +1920,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
 	}
 
-	public static function getCreateFiltersMacrosValidationData() {
+	public static function getFiltersTabValidationData() {
 		return [
 			[
 				[
@@ -2026,9 +2028,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	}
 
 	/**
-	 * @dataProvider getCreateFiltersMacrosValidationData
+	 * @dataProvider getFiltersTabValidationData
 	 */
-	public function testFormLowLevelDiscovery_FiltersMacrosValidation($data) {
+	public function testFormLowLevelDiscovery_FiltersTabValidation($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);

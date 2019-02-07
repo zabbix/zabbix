@@ -201,7 +201,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 
 				return ZBX_POLLER_TYPE_PINGER;
 			}
-			/* break; is not missing here */
+			ZBX_FALLTHROUGH;
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
@@ -9722,7 +9722,7 @@ static void	dc_status_update(void)
 
 					break;
 				}
-				/* break; is not missing here, item on disabled host counts as disabled */
+				ZBX_FALLTHROUGH;
 			case ITEM_STATUS_DISABLED:
 				config->status->items_disabled++;
 				if (NULL != dc_proxy_host)
@@ -9760,7 +9760,7 @@ static void	dc_status_update(void)
 
 					break;
 				}
-				/* break; is not missing here, trigger with disabled items/hosts counts as disabled */
+				ZBX_FALLTHROUGH;
 			case TRIGGER_STATUS_DISABLED:
 				config->status->triggers_disabled++;
 				break;
