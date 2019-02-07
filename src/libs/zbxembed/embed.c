@@ -359,6 +359,7 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 	ptr += ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_HEADER);
 	memcpy(ptr, script, len);
 	ptr += len;
+	*ptr++ = '\n';
 	*ptr++ = '}';
 	*ptr = '\0';
 
