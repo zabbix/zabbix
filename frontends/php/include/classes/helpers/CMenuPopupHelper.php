@@ -68,7 +68,7 @@ class CMenuPopupHelper {
 		];
 
 		if ($has_goto === false) {
-			$data['data']['has_goto'] = $has_goto ? '1' : '0';
+			$data['data']['has_goto'] = '0';
 		}
 
 		return $data;
@@ -154,7 +154,7 @@ class CMenuPopupHelper {
 		}
 
 		if ($show_description === false) {
-			$data['data']['show_description'] = $show_description ? '1' : '0';
+			$data['data']['show_description'] = '0';
 		}
 
 		return $data;
