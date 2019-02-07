@@ -24,8 +24,6 @@
 #include "zbxjson.h"
 #include "comms.h"
 
-#define MAX_DISCOVERED_VALUE_SIZE 128
-
 typedef struct
 {
 	zbx_uint64_t		dcheckid;

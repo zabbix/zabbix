@@ -1118,7 +1118,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items/triggers, %d events, %d problems,"
-				" %d sessions, %d alarms, %d audit, %d proxy_dhistory items in " ZBX_FS_DBL " sec, %s]",
+				" %d sessions, %d alarms, %d audit, %d proxy discovery data in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends,
 				d_cleanup, d_events, d_problems, d_sessions, d_services, d_audit, d_proxy_dhistory, sec,
 				sleeptext);
@@ -1130,9 +1130,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_dc_cleanup_data_sessions();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
-				" %d audit items in " ZBX_FS_DBL " sec, %s]",
+				" %d audit items %d proxy discovery data in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
-				d_sessions, d_services, d_audit, sec, sleeptext);
+				d_sessions, d_services, d_audit, d_proxy_dhistory, sec, sleeptext);
 
 		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY)
 			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;

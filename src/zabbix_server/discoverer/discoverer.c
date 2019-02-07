@@ -334,8 +334,8 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
  * Parameters: service - service info                                         *
  *                                                                            *
  ******************************************************************************/
-static void	process_check(DB_DCHECK *dcheck,int *host_status, char *ip,
-		const char *dns, int now, zbx_vector_ptr_t *checks_vector_ptr)
+static void	process_check(DB_DCHECK *dcheck,int *host_status, char *ip, const char *dns, int now,
+		zbx_vector_ptr_t *checks_vector_ptr)
 {
 	const char	*__function_name = "process_check";
 	const char	*start;
@@ -379,19 +379,15 @@ static void	process_check(DB_DCHECK *dcheck,int *host_status, char *ip,
 				*host_status = service_status;
 
 			/* insert discovered checks into the vector */
-			if (FAIL == zbx_vector_ptr_search(checks_vector_ptr, &dcheck->dcheckid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
-			{
-				check_ptr = (zbx_discovery_checks_t *)zbx_malloc(check_ptr,
-									sizeof(zbx_discovery_checks_t));
-				check_ptr->dcheckid = dcheck->dcheckid;
-				check_ptr->itemtime = (time_t)now;
-				check_ptr->port = port;
-				zbx_strlcpy(check_ptr->value, value, MAX_DISCOVERED_VALUE_SIZE);
-				check_ptr->status = service_status;
-				zbx_strlcpy(check_ptr->dns, dns, INTERFACE_DNS_LEN_MAX);
-				zbx_vector_ptr_append( checks_vector_ptr, check_ptr);
-			}
+			check_ptr = (zbx_discovery_checks_t *)zbx_malloc(check_ptr,
+								sizeof(zbx_discovery_checks_t));
+			check_ptr->dcheckid = dcheck->dcheckid;
+			check_ptr->itemtime = (time_t)now;
+			check_ptr->port = port;
+			zbx_strlcpy(check_ptr->value, value, MAX_DISCOVERED_VALUE_SIZE);
+			check_ptr->status = service_status;
+			zbx_strlcpy(check_ptr->dns, dns, INTERFACE_DNS_LEN_MAX);
+			zbx_vector_ptr_append( checks_vector_ptr, check_ptr);
 		}
 
 		if (NULL != comma)
@@ -413,7 +409,7 @@ static void	process_check(DB_DCHECK *dcheck,int *host_status, char *ip,
  *                                                                            *
  ******************************************************************************/
 static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const char *dns, int unique, int now,
-		zbx_vector_ptr_t *checks_vector_ptr)
+		zbx_vector_ptr_t *checks_vector_ptr, zbx_vector_uint64_t *dcheckids_vector_ptr)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -424,7 +420,7 @@ static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const ch
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 			"select dcheckid,type,key_,snmp_community,snmpv3_securityname,snmpv3_securitylevel,"
 				"snmpv3_authpassphrase,snmpv3_privpassphrase,snmpv3_authprotocol,snmpv3_privprotocol,"
-				"ports,snmpv3_contextname,host_source, name_source"
+				"ports,snmpv3_contextname"
 			" from dchecks"
 			" where druleid=" ZBX_FS_UI64,
 			drule->druleid);
@@ -456,9 +452,50 @@ static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const ch
 		dcheck.ports = row[10];
 		dcheck.snmpv3_contextname = row[11];
 
+		zbx_vector_uint64_append(dcheckids_vector_ptr, dcheck.dcheckid);
+
 		process_check(&dcheck, host_status, ip, dns, now, checks_vector_ptr);
 	}
 	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lock_checks                                                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	lock_checks(zbx_vector_uint64_t *dcheckids_vector_ptr)
+{
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t	dcheckid;
+	int		i;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zbx_vector_uint64_sort(dcheckids_vector_ptr, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select dcheckid from dchecks where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dcheckid", dcheckids_vector_ptr->values,
+			dcheckids_vector_ptr->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by dcheckid" ZBX_FOR_UPDATE);
+
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	for (i = 0; NULL != (row = DBfetch(result)); i++)
+	{
+		ZBX_STR2UINT64(dcheckid, row[0]);
+
+		while (dcheckid != dcheckids_vector_ptr->values[i])
+			zbx_vector_uint64_remove(dcheckids_vector_ptr, i);
+	}
+	DBfree_result(result);
+
+	while (i != dcheckids_vector_ptr->values_num)
+		zbx_vector_uint64_remove_noorder(dcheckids_vector_ptr, i);
+
+	return (0 != dcheckids_vector_ptr->values_num ? SUCCEED : FAIL);
 }
 
 /******************************************************************************
@@ -467,22 +504,26 @@ static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const ch
  *                                                                            *
  ******************************************************************************/
 static int	post_process_checks(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const char *dns, int now,
-		zbx_vector_ptr_t *checks_vector_ptr)
+		zbx_vector_ptr_t *checks_vector_ptr, zbx_vector_uint64_t *dcheckids_vector_ptr)
 {
 	zbx_discovery_checks_t	*check_ptr;
-	int i;
-	int ret = SUCCEED;
+	int			i;
+	int			ret = SUCCEED;
+
+	if (SUCCEED != lock_checks(dcheckids_vector_ptr))
+	{
+		ret = FAIL;
+		goto out;
+	}
 
 	/* extract checks from vector*/
 	for(i = 0; i < checks_vector_ptr->values_num; i++)
 	{
 		check_ptr = (zbx_discovery_checks_t *)checks_vector_ptr->values[i];
 
-		if (SUCCEED != DBlock_dcheckid(check_ptr->dcheckid, drule->druleid))
-		{
-			ret = FAIL;
-			break;
-		}
+		if (FAIL == zbx_vector_uint64_bsearch(dcheckids_vector_ptr, check_ptr->dcheckid,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
@@ -496,8 +537,22 @@ static int	post_process_checks(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const
 		}
 	}
 
+out:
 	return ret;
 
+}
+
+static void create_check_vectors(zbx_vector_ptr_t *checks, zbx_vector_uint64_t *dcheckids)
+{
+	zbx_vector_ptr_create(checks);
+	zbx_vector_uint64_create(dcheckids);
+}
+
+static void destroy_check_vectors(zbx_vector_ptr_t *checks, zbx_vector_uint64_t *dcheckids)
+{
+	zbx_vector_ptr_clear_ext(checks, (zbx_clean_func_t)zbx_checks_eval_free);
+	zbx_vector_ptr_destroy(checks);
+	zbx_vector_uint64_destroy(dcheckids);
 }
 
 /******************************************************************************
@@ -517,6 +572,7 @@ static void	process_rule(DB_DRULE *drule)
 	int			ipaddress[8];
 	zbx_iprange_t		iprange;
 	zbx_vector_ptr_t	checks;
+	zbx_vector_uint64_t	dcheckids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __function_name, drule->name, drule->iprange);
 
@@ -526,8 +582,6 @@ static void	process_rule(DB_DRULE *drule)
 			*comma = '\0';
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() range:'%s'", __function_name, start);
-
-		zbx_vector_ptr_create(&checks);
 
 		if (SUCCEED != iprange_parse(&iprange, start))
 		{
@@ -554,6 +608,7 @@ static void	process_rule(DB_DRULE *drule)
 
 		do
 		{
+			create_check_vectors(&checks, &dcheckids);
 #ifdef HAVE_IPV6
 			if (ZBX_IPRANGE_V6 == iprange.type)
 			{
@@ -583,20 +638,11 @@ static void	process_rule(DB_DRULE *drule)
 			zbx_gethost_by_ip(ip, dns, sizeof(dns));
 			zbx_alarm_off();
 			if (0 != drule->unique_dcheckid)
-				process_checks(drule, &host_status, ip, dns, 1, now, &checks);
-			process_checks(drule, &host_status, ip, dns, 0, now, &checks);
+				process_checks(drule, &host_status, ip, dns, 1, now, &checks, &dcheckids);
+			process_checks(drule, &host_status, ip, dns, 0, now, &checks, &dcheckids);
 
 
 			DBbegin();
-
-			if (SUCCEED != post_process_checks(drule, &dhost, ip, dns, now, &checks))
-			{
-				DBrollback();
-
-				zabbix_log(LOG_LEVEL_DEBUG, "discovery check was deleted during processing, stopping");
-
-				goto out;
-			}
 
 			if (SUCCEED != DBlock_druleid(drule->druleid))
 			{
@@ -605,20 +651,34 @@ static void	process_rule(DB_DRULE *drule)
 				zabbix_log(LOG_LEVEL_DEBUG, "discovery rule '%s' was deleted during processing,"
 						" stopping", drule->name);
 
+				destroy_check_vectors(&checks, &dcheckids);
+
 				goto out;
 			}
 
-			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-				discovery_update_host(&dhost, host_status, now);
-			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
-				proxy_update_host(drule->druleid, ip, dns, host_status, now);
+			if (SUCCEED != post_process_checks(drule, &dhost, ip, dns, now, &checks, &dcheckids))
+			{
+				DBrollback();
 
-			DBcommit();
+				zabbix_log(LOG_LEVEL_DEBUG, "discovery check was deleted during processing, stopping");
+
+			}
+			else
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					discovery_update_host(&dhost, host_status, now);
+				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+					proxy_update_host(drule->druleid, ip, dns, host_status, now);
+
+				DBcommit();
+			}
+
+			destroy_check_vectors(&checks, &dcheckids);
+
 		}
 		while (SUCCEED == iprange_next(&iprange, ipaddress));
 next:
-		zbx_vector_ptr_clear_ext(&checks, (zbx_clean_func_t)zbx_checks_eval_free);
-		zbx_vector_ptr_destroy(&checks);
+
 		if (NULL != comma)
 		{
 			*comma = ',';
