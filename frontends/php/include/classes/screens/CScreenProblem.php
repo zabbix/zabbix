@@ -345,7 +345,7 @@ class CScreenProblem extends CScreenBase {
 					}
 
 					if ($resolve_comments || $resolve_urls || $show_latest_values || $details) {
-						$options['output'] = array_merge($options['output'], ['expression']);
+						$options['output'][] = 'expression';
 					}
 
 					if ($show_latest_values || $details) {
@@ -353,11 +353,11 @@ class CScreenProblem extends CScreenBase {
 					}
 
 					if ($resolve_comments) {
-						$options['output'] = array_merge($options['output'], ['comments']);
+						$options['output'][] = 'comments';
 					}
 
 					if ($resolve_urls) {
-						$options['output'] = array_merge($options['output'], ['url']);
+						$options['output'][] = 'url';
 					}
 
 					$data['triggers'] += API::Trigger()->get($options);
