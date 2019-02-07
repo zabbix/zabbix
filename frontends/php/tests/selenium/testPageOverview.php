@@ -729,6 +729,7 @@ class testPageOverview extends CLegacyWebTest {
 		}
 
 		$get_links_text = [];
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//ul[contains(@class, "action-menu")]//a'));
 		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//ul[contains(@class, "action-menu")]//a'));
 		foreach ($elements as $element) {
 			$get_links_text[] = $element->getText();
