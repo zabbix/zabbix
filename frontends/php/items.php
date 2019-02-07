@@ -1345,13 +1345,18 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 			$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
-		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT
-				&& getRequest('master_itemid', $item['master_itemid']) > 0) {
-			$master_item_options = [
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'itemids' => getRequest('master_itemid', $item['master_itemid']),
-				'webitems' => true
-			];
+		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT) {
+			// Unset master item if submitted form has no master_itemid set.
+			if (hasRequest('form_refresh') && !hasRequest('master_itemid')) {
+				$item['master_itemid'] = 0;
+			}
+			else {
+				$master_item_options = [
+					'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+					'itemids' => getRequest('master_itemid', $item['master_itemid']),
+					'webitems' => true
+				];
+			}
 		}
 	}
 	else {
