@@ -68,13 +68,15 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_json_addfloat(json, "requiredperformance", count_stats.requiredperformance);
 
 	/* zabbix[preprocessing_queue] */
-	zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
 
 	/* zabbix[triggers] */
-	zbx_json_adduint64(json, "triggers", DCget_trigger_count());
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		zbx_json_adduint64(json, "triggers", DCget_trigger_count());
 
 	/* zabbix[vcache,...] */
-	if (SUCCEED == zbx_vc_get_statistics(&vc_stats))
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && SUCCEED == zbx_vc_get_statistics(&vc_stats))
 	{
 		zbx_json_addobject(json, "vcache");
 
