@@ -4150,7 +4150,7 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 		if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &rowid)))
 			continue;
 
-		if (FAIL != (index = zbx_vector_ptr_search(&config->hostgroups_name, group, dc_compare_hgroups)))
+		if (FAIL != (index = zbx_vector_ptr_search(&config->hostgroups_name, group, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			zbx_vector_ptr_remove_noorder(&config->hostgroups_name, index);
 
 		if (ZBX_DC_HOSTGROUP_FLAGS_NONE != group->flags)
