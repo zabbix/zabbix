@@ -741,8 +741,12 @@ INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (1
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30004, 30003);
 
 -- testHistory
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (120005, 'API host with history', 'API host with history', 1, '');
-INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers, flags) VALUES (133758, 120005, 'item1', 2, 'item1', 3, '90d', 0, NULL, NULL, '', '', '', '', 0);
+INSERT INTO hstgrp (groupid, name) VALUES (1004, 'history.get/hosts');
+
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (120005, 'history.get.host.1', 'history.get.host.1', 1, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (1017, 120005, 1004);
+INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (1010, 120005, 1, '127.0.0.1', 1, '10050', 1);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133758, 120005, 'item1', 2, 'item1', 3, '90d', 0, NULL, NULL, '', '', '', '');
 INSERT INTO history_uint (itemid, clock, value, ns) VALUES
 (133758, 1549350893, 1, 885479055),
 (133758, 1549350907, 2, 762947342),
@@ -758,7 +762,7 @@ INSERT INTO history_uint (itemid, clock, value, ns) VALUES
 (133758, 1549350926, 8, 410826674),
 (133758, 1549350927, 9, 938887279),
 (133758, 1549350944, 0, 730916425);
-INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers, flags) VALUES (133759, 120005, 'item2', 2, 'item2', 0, '90d', 0, NULL, NULL, '', '', '', '', 0);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133759, 120005, 'item2', 2, 'item2', 0, '90d', 0, NULL, NULL, '', '', '', '');
 INSERT INTO history (itemid, clock, value, ns) VALUES
 (133759, 1549350947, 0.0000, 441606890),
 (133759, 1549350948, 0.0000, 544936503),
@@ -766,21 +770,20 @@ INSERT INTO history (itemid, clock, value, ns) VALUES
 (133759, 1549350953, 1.0000, 154942891),
 (133759, 1549350955, 1.0000, 719111385),
 (133759, 1549350957, 1.0000, 594538048);
-INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers, flags) VALUES (133760, 120005, 'item3', 2, 'item3', 1, '90d', 0, NULL, NULL, '', '', '', '', 0);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133760, 120005, 'item3', 2, 'item3', 1, '90d', 0, NULL, NULL, '', '', '', '');
 INSERT INTO history_str (itemid, clock, value, ns) VALUES
 (133760, 1549350960, '1', 754460948),
 (133760, 1549350962, '1', 919404393),
 (133760, 1549350965, '1', 512878374);
-INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers, flags) VALUES (133761, 120005, 'item4', 2, 'item4', 2, '90d', 0, NULL, NULL, '', '', '', '', 0);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133761, 120005, 'item4', 2, 'item4', 2, '90d', 0, NULL, NULL, '', '', '', '');
 INSERT INTO history_log (itemid, clock, timestamp, source, severity, value, logeventid, ns) VALUES
 (133761, 1549350969, 0, '', 0, '1', 0, 506909535),
 (133761, 1549350973, 0, '', 0, '2', 0, 336068358),
 (133761, 1549350976, 0, '', 0, '3', 0, 2798098),
 (133761, 1549350987, 0, '', 0, '4', 0, 755363307),
 (133761, 1549350992, 0, '', 0, '5', 0, 242736233);
-INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers, flags) VALUES (133762, 120005, 'item5', 2, 'item5', 4, '90d', 0, NULL, NULL, '', '', '', '', 0);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133762, 120005, 'item5', 2, 'item5', 4, '90d', 0, NULL, NULL, '', '', '', '');
 INSERT INTO history_text (itemid, clock, value, ns) VALUES
 (133762, 1549350998, '1', 450920469),
 (133762, 1549350999, '2', 882825407),
 (133762, 1549351001, '3', 242835912);
-
