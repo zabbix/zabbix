@@ -477,11 +477,11 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			$compare = true;
 
 			if (strlen(substr(strrchr($lefty_min, '.'), 1)) > 4) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), _('a number is too small'));
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), _('too many decimal places'));
 				$compare = false;
 			}
 			if (strlen(substr(strrchr($lefty_max, '.'), 1))  > 4) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _('a number is too small'));
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _('too many decimal places'));
 				$compare = false;
 			}
 
