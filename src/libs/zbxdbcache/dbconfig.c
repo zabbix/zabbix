@@ -9904,6 +9904,29 @@ double	DCget_required_performance(void)
 	return nvps;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_count_stats_all                                            *
+ *                                                                            *
+ * Purpose: retrieves all internal metrics of the configuration cache         *
+ *                                                                            *
+ * Parameters: stats - [OUT] the configuration cache statistics               *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_count_stats_all(zbx_config_cache_info_t *stats)
+{
+	WRLOCK_CACHE;
+
+	dc_status_update();
+
+	stats->hosts = config->status->hosts_monitored;
+	stats->items = config->status->items_active_normal + config->status->items_active_notsupported;
+	stats->items_unsupported = config->status->items_active_notsupported;
+	stats->requiredperformance = config->status->required_performance;
+
+	UNLOCK_CACHE;
+}
+
 static void	proxy_counter_ui64_push(zbx_vector_ptr_t *vector, zbx_uint64_t proxyid, zbx_uint64_t counter)
 {
 	zbx_proxy_counter_t	*proxy_counter;

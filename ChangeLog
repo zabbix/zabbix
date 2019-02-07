@@ -1,6 +1,7 @@
 Changes for 4.0.5rc1
 
 New features:
+..FGI..PST [ZBXNEXT-401,ZBXNEXT-4907,ZBXNEXT-4955] added monitoring of internal metrics from an external Zabbix instance (vasilijs, viktors)
 
 Bug fixes:
 ..F....... [ZBX-15242] fixed value trimming and duplicate catching in SVG graph pattern fields (miks)
