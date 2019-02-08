@@ -1466,7 +1466,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		}
 	}
 
-	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 	{
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 

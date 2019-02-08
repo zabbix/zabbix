@@ -1496,11 +1496,13 @@ static int	am_db_flush_alert_updates(zbx_am_t *manager)
 					update->status, update->retries, error_esc, update->alertid);
 
 			zbx_free(error_esc);
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		if (ZBX_DB_DOWN == DBexecute_once("%s", sql))
+		if (16 < sql_offset && ZBX_DB_DOWN == DBexecute_once("%s", sql))
 			goto cleanup;
 	}
 

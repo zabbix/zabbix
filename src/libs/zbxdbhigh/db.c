@@ -1550,7 +1550,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	int	ret = SUCCEED;
 
-	if (ZBX_MAX_SQL_SIZE < *sql_offset)
+	if (ZBX_MAX_OVERFLOW_SQL_SIZE < *sql_offset)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		if (',' == (*sql)[*sql_offset - 1])
@@ -1559,9 +1559,17 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
 #endif
+#if defined(HAVE_ORACLE) && 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
+		/* Oracle fails with ORA-00911 if it encounters ';' w/o PL/SQL block */
+		zbx_rtrim(*sql, ZBX_WHITESPACE ";");
+
+		/* Jump over "begin\n" before execution */
+		if (ZBX_DB_OK > DBexecute("%s", *sql + 6))
+#else
 		DBend_multiple_update(sql, sql_alloc, sql_offset);
 
 		if (ZBX_DB_OK > DBexecute("%s", *sql))
+#endif
 			ret = FAIL;
 		*sql_offset = 0;
 
