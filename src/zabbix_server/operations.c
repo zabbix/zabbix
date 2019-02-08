@@ -358,8 +358,10 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 								" on ds.dcheckid=dc.dcheckid"
 								" and ds.dhostid=" ZBX_FS_UI64
 						" where dc.druleid=" ZBX_FS_UI64
+							" and dc.host_source in (%d,%d,%d,%d)"
 							" and dc.name_source=%d",
-							dhostid, druleid, ZBX_DISCOVERY_VALUE);
+							dhostid, druleid, ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS,
+							ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE, ZBX_DISCOVERY_VALUE);
 				if (NULL != (row3 = DBfetch(result3)))
 				{
 					if (SUCCEED == zbx_db_is_null(row3[0]) || '\0' == *row3[0])
