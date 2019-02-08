@@ -3320,7 +3320,7 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 	checks_vector_ptr = (zbx_vector_ptr_t *)&ip_discovered_ptr->checks;
 
 	/*check status for given ip address*/
-	for(index_dchecks = *start_idx; index_dchecks < checks_vector_ptr->values_num; index_dchecks++)
+	for (index_dchecks = *start_idx; index_dchecks < checks_vector_ptr->values_num; index_dchecks++)
 	{
 		check_ptr = (zbx_discovery_checks_t *)checks_vector_ptr->values[index_dchecks];
 		if (0 == check_ptr->dcheckid)
@@ -3390,9 +3390,9 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 			goto out;
 		}
 
-		while(NULL != checks_vector_ptr)
+		while (NULL != checks_vector_ptr)
 		{
-			for(index_dchecks = current_checks_first_idx; index_dchecks < current_checks_last_idx;
+			for (index_dchecks = current_checks_first_idx; index_dchecks < current_checks_last_idx;
 					index_dchecks++)
 			{
 				check_ptr = (zbx_discovery_checks_t *)checks_vector_ptr->values[index_dchecks];
@@ -3453,7 +3453,7 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 
 		DBbegin();
 
-		for(index_dchecks = *start_idx; index_dchecks < checks_vector_ptr->values_num; index_dchecks++)
+		for (index_dchecks = *start_idx; index_dchecks < checks_vector_ptr->values_num; index_dchecks++)
 		{
 			check_ptr = (zbx_discovery_checks_t *)checks_vector_ptr->values[index_dchecks];
 			DBexecute("insert into proxy_dhistory (clock,druleid,ip,port,value,status,dcheckid,dns)"
@@ -3620,9 +3620,7 @@ json_parse_error:
 		goto json_parse_return;
 	}
 
-
-
-	for(index_rules = 0; index_rules < rules.values_num; index_rules++)
+	for (index_rules = 0; index_rules < rules.values_num; index_rules++)
 	{
 		rule_ptr = (zbx_discovery_rule_t *)rules.values[index_rules];
 		drule.druleid = rule_ptr->druleid;
@@ -3638,7 +3636,7 @@ json_parse_error:
 
 		DBfree_result(result);
 
-		for(index_ip = 0; index_ip < rule_ptr->ips.values_num; index_ip++)
+		for (index_ip = 0; index_ip < rule_ptr->ips.values_num; index_ip++)
 		{
 			int start_idx = 0;
 

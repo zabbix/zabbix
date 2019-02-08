@@ -517,7 +517,7 @@ static int	post_process_checks(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const
 	}
 
 	/* extract checks from vector*/
-	for(i = 0; i < checks_vector_ptr->values_num; i++)
+	for (i = 0; i < checks_vector_ptr->values_num; i++)
 	{
 		check_ptr = (zbx_discovery_checks_t *)checks_vector_ptr->values[i];
 
