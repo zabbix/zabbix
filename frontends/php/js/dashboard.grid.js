@@ -194,13 +194,14 @@
 		}
 	}
 
-	function startWidgetPositioning($div, data) {
+	function startWidgetPositioning($div, data, action) {
+		data['pos-action'] = action;
 		data['cell-width'] = getCurrentCellWidth(data);
 		data['placeholder'].show();
+
 		$('.dashbrd-grid-widget-mask', $div).show();
-
 		$div.addClass('dashbrd-grid-widget-draggable');
-
+		data.new_widget_placeholder.container.hide();
 		resetCurrentPositions(data['widgets']);
 	}
 
@@ -657,20 +658,20 @@
 		// Situation when there are changes on both axes should be handled as special case.
 		if (process_order[0] === 'x' && (widget.prev_pos.y != widget.current_pos.y
 				|| widget.prev_pos.height != widget.current_pos.height)) {
+			// Mark affected_axis as y if affected box is affected by only changing y position or height.
+			var pos = {
+				x: widget.prev_pos.x,
+				y: widget.current_pos.y,
+				width: widget.prev_pos.width,
+				height: widget.current_pos.height
+			}
+
 			$.map(data.widgets, function(box) {
 				return (!('affected_axis' in box) && widget.uniqueid !== box.uniqueid
 					&& rectOverlap(boundary, box.current_pos))
 					? box
 					: null;
 			}).each(function(box) {
-				// Mark affected_axis as y if affected box is affected by only changing y position or height.
-				var pos = {
-					x: widget.prev_pos.x,
-					y: widget.current_pos.y,
-					width: widget.prev_pos.width,
-					height: widget.current_pos.height
-				}
-
 				if (rectOverlap(pos, box.current_pos)) {
 					box.affected_axis = 'y';
 				}
@@ -758,11 +759,6 @@
 
 			if (rows != data['options']['rows']) {
 				resizeDashboardGrid($obj, data, rows);
-				// Force jQuery resizable plugin to refresh parent height.
-				widget['div'].resizable('option', 'containment', false);
-			}
-			else {
-				widget['div'].resizable('option', 'containment', 'parent');
 			}
 		}
 
@@ -806,6 +802,7 @@
 		var	widget = getWidgetByTarget(data['widgets'], $div);
 
 		data['placeholder'].hide();
+		data['pos-action'] = '';
 		$('.dashbrd-grid-widget-mask', $div).hide();
 
 		$div.removeClass('dashbrd-grid-widget-draggable');
@@ -844,17 +841,17 @@
 			scroll: true,
 			scrollSensitivity: data.options['widget-height'],
 			start: function(event, ui) {
-				data['pos-action'] = 'drag';
+				var	widget = getWidgetByTarget(data.widgets, ui.helper);
+
 				data.calculated = {
 					'left-max': $obj.width() - ui.helper.width(),
 					'top-max': data.options['max-rows'] * data.options['widget-height'] - ui.helper.height()
 				};
+
 				setResizableState('disable', data.widgets, '');
-
-				var	widget = getWidgetByTarget(data.widgets, ui.helper);
-
 				dragPrepare(data.widgets, widget, data['options']['max-rows']);
-				startWidgetPositioning(ui.helper, data);
+				startWidgetPositioning(ui.helper, data, 'drag');
+
 				widget.current_pos = $.extend({}, widget.pos);
 			},
 			drag: function(event, ui) {
@@ -867,7 +864,6 @@
 				doWidgetPositioning($obj, ui.helper, data);
 			},
 			stop: function(event, ui) {
-				data['pos-action'] = '';
 				delete data.calculated;
 
 				data.widgets = sortWidgets(data.widgets).each(function(widget) {
@@ -905,21 +901,18 @@
 			handles: handles,
 			autoHide: true,
 			scroll: false,
-			containment: 'parent',
 			minWidth: getCurrentCellWidth(data),
 			start: function(event) {
-				data['pos-action'] = 'resize';
-				widget.prev_pos = $.extend({mirrored: {}}, widget.pos);
 				data.widgets.each(function(box) {
 					delete box.affected_axis;
 				});
 
-				data.new_widget_placeholder.container.hide();
 				setResizableState('disable', data.widgets, widget.uniqueid);
-				startWidgetPositioning($(event.target), data);
+				startWidgetPositioning($(event.target), data, 'resize');
+				widget.prev_pos = $.extend({mirrored: {}}, widget.pos);
 				doWidgetResize($obj, $(event.target), data);
 			},
-			resize: function(event) {
+			resize: function(event, ui) {
 				// Hack for Safari to manually accept parent container height in pixels on widget resize.
 				if (SF) {
 					$.each(data['widgets'], function() {
@@ -929,10 +922,30 @@
 					});
 				}
 
-				doWidgetResize($obj, $(event.target), data);
+				var $div = $(event.target);
+
+				if (ui.position.left < 0) {
+					ui.size.width += ui.position.left;
+					ui.position.left = 0;
+				}
+
+				if (ui.position.top < 0) {
+					ui.size.height += ui.position.top;
+					ui.position.top = 0;
+				}
+
+				$div.css({
+					top: ui.position.top,
+					left: ui.position.left,
+					height: ui.size.height,
+					width: Math.min(ui.size.width,
+						data['cell-width'] * data['options']['max-columns'] - ui.position.left
+					)
+				});
+
+				doWidgetResize($obj, $div, data);
 			},
 			stop: function(event) {
-				data['pos-action'] = '';
 				delete widget.prev_pos;
 				delete widget.max_width;
 
