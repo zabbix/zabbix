@@ -36,8 +36,8 @@ $fields = [
 	'iconid' =>			[T_ZBX_INT, O_OPT, P_SYS, DB_ID,				null],
 	'width' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
 	'height' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
-	'max_width' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
-	'max_height' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
+	'max_width' =>		[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
+	'max_height' =>		[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
 	'unavailable' =>	[T_ZBX_INT, O_OPT, null, IN([0, 1]),		null],
 ];
 check_fields($fields);
@@ -108,19 +108,24 @@ elseif (isset($_REQUEST['iconid'])) {
 	if ($resize || $unavailable || $iconid <= 0 || !$image['image']) {
 		imageOut($source);
 	}
-	elseif ($limit) {
+	else {
 		$img_info = getimagesizefromstring($image['image']);
-		if ($img_info[0] > $max_width || $img_info[1] > $max_height) {
+
+		if ($img_info[ZBX_IMAGE_INFO_TYPE] == IMG_GIF) {
+			set_image_header(IMAGE_FORMAT_GIF);
+		}
+
+		if ($limit && ($img_info[ZBX_IMAGE_INFO_WIDTH] > $max_width
+				|| $img_info[ZBX_IMAGE_INFO_HEIGHT] > $max_height)) {
 			$source = imageFromString($image['image']);
-			$source = imageThumb($source, min($img_info[0], $max_width), min($img_info[1], $max_heigh));
+			$source = imageThumb($source, min($img_info[ZBX_IMAGE_INFO_WIDTH], $max_width),
+				min($img_info[ZBX_IMAGE_INFO_HEIGHT], $max_heigh)
+			);
 			imageOut($source);
 		}
 		else {
 			echo $image['image'];
 		}
-	}
-	else {
-		echo $image['image'];
 	}
 }
 elseif (isset($_REQUEST['imageid'])) {

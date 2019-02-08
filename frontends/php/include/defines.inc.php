@@ -183,9 +183,14 @@ define('VALIDATE_URI_SCHEMES', true);
 define('IMAGE_FORMAT_PNG',	'PNG');
 define('IMAGE_FORMAT_JPEG',	'JPEG');
 define('IMAGE_FORMAT_TEXT',	'JPEG');
+define('IMAGE_FORMAT_GIF',	'GIF');
 
 define('IMAGE_TYPE_ICON',			1);
 define('IMAGE_TYPE_BACKGROUND',		2);
+
+define('ZBX_IMAGE_INFO_WIDTH',	0);
+define('ZBX_IMAGE_INFO_HEIGHT',	1);
+define('ZBX_IMAGE_INFO_TYPE',	2);
 
 define('ITEM_CONVERT_WITH_UNITS',	0); // - do not convert empty units
 define('ITEM_CONVERT_NO_UNITS',		1); // - no units
