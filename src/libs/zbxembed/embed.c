@@ -45,6 +45,7 @@ struct zbx_es_env
 };
 
 #define ZBX_ES_SCRIPT_HEADER	"function(value){"
+#define ZBX_ES_SCRIPT_FOOTER	"\n}"
 
 /******************************************************************************
  *                                                                            *
@@ -358,15 +359,16 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 		goto out;
 	}
 
-	/* wrap the code block into a function: function(value){<code>} */
+	/* wrap the code block into a function: function(value){<code>\n} */
 	len = strlen(script);
-	ptr = func = zbx_malloc(NULL, len + ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_HEADER) + 2);
+	ptr = func = zbx_malloc(NULL, len + ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_HEADER) +
+			ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_FOOTER) + 1);
 	memcpy(ptr, ZBX_ES_SCRIPT_HEADER, ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_HEADER));
 	ptr += ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_HEADER);
 	memcpy(ptr, script, len);
 	ptr += len;
-	*ptr++ = '\n';
-	*ptr++ = '}';
+	memcpy(ptr, ZBX_ES_SCRIPT_FOOTER, ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_FOOTER));
+	ptr += ZBX_CONST_STRLEN(ZBX_ES_SCRIPT_FOOTER);
 	*ptr = '\0';
 
 	duk_push_lstring(es->env->ctx, func, ptr - func);
