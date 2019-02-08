@@ -4150,7 +4150,7 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 		if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &rowid)))
 			continue;
 
-		if (FAIL != (index = zbx_vector_ptr_search(&config->hostgroups_name, group, dc_compare_hgroups)))
+		if (FAIL != (index = zbx_vector_ptr_search(&config->hostgroups_name, group, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			zbx_vector_ptr_remove_noorder(&config->hostgroups_name, index);
 
 		if (ZBX_DC_HOSTGROUP_FLAGS_NONE != group->flags)
@@ -4355,14 +4355,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
 				zbx_vector_ptr_remove_noorder(&preprocitem->preproc_ops, index);
-
-				if (0 == preprocitem->preproc_ops.values_num)
-				{
-					zbx_vector_ptr_destroy(&preprocitem->preproc_ops);
-					zbx_hashset_remove_direct(&config->preprocitems, preprocitem);
-				}
-				else
-					zbx_vector_ptr_append(&items, preprocitem);
+				zbx_vector_ptr_append(&items, preprocitem);
 			}
 		}
 
@@ -4370,7 +4363,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->preprocops, op);
 	}
 
-	/* sort item  preprocessing operations by step */
+	/* sort item preprocessing operations by step */
 
 	zbx_vector_ptr_sort(&items, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 	zbx_vector_ptr_uniq(&items, ZBX_DEFAULT_PTR_COMPARE_FUNC);
@@ -4378,7 +4371,14 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 	for (i = 0; i < items.values_num; i++)
 	{
 		preprocitem = (ZBX_DC_PREPROCITEM *)items.values[i];
-		zbx_vector_ptr_sort(&preprocitem->preproc_ops, dc_compare_preprocops_by_step);
+
+		if (0 == preprocitem->preproc_ops.values_num)
+		{
+			zbx_vector_ptr_destroy(&preprocitem->preproc_ops);
+			zbx_hashset_remove_direct(&config->preprocitems, preprocitem);
+		}
+		else
+			zbx_vector_ptr_sort(&preprocitem->preproc_ops, dc_compare_preprocops_by_step);
 	}
 
 	zbx_vector_ptr_destroy(&items);
@@ -5147,6 +5147,10 @@ void	DCsync_configuration(unsigned char mode)
 				config->items_hk.num_data, config->items_hk.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() numitems   : %d (%d slots)", __function_name,
 				config->numitems.num_data, config->numitems.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocitems: %d (%d slots)", __function_name,
+				config->preprocitems.num_data, config->preprocitems.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocops : %d (%d slots)", __function_name,
+				config->preprocops.num_data, config->preprocops.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmpitems  : %d (%d slots)", __function_name,
 				config->snmpitems.num_data, config->snmpitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmiitems  : %d (%d slots)", __function_name,

@@ -4,6 +4,7 @@ New features:
 ..FGI..PST [ZBXNEXT-401,ZBXNEXT-4907,ZBXNEXT-4955] added monitoring of internal metrics from an external Zabbix instance (vasilijs, viktors)
 
 Bug fixes:
+........S. [ZBX-15611] fixed crash in configuration syncer when there are groups with same name and when removing preprocessing steps from item (vso)
 ..F....... [ZBX-15242] fixed value trimming and duplicate catching in SVG graph pattern fields (miks)
 ..F....... [ZBX-15250] fixed selection box height calculation in classic graph (miks)
 ...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
