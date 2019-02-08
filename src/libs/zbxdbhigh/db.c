@@ -213,12 +213,14 @@ void	DBrollback(void)
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBend(int ret)
+int	DBend(int ret)
 {
 	if (SUCCEED == ret)
-		DBcommit();
-	else
-		DBrollback();
+		return ZBX_DB_OK == DBcommit() ? SUCCEED : FAIL;
+
+	DBrollback();
+
+	return FAIL;
 }
 
 #ifdef HAVE_ORACLE

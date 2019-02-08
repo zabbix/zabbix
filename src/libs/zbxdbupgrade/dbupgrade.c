@@ -739,9 +739,8 @@ static int	DBcreate_dbversion_table(void)
 			ret = FAIL;
 		}
 	}
-	DBend(ret);
 
-	return ret;
+	return DBend(ret);
 }
 
 static int	DBset_version(int version, unsigned char mandatory)
@@ -939,9 +938,7 @@ int	DBcheck_version(void)
 				ret = DBset_version(patches[i].version, patches[i].mandatory);
 			}
 
-			DBend(ret);
-
-			if (SUCCEED != ret)
+			if (SUCCEED != (ret = DBend(ret)))
 				break;
 
 			current++;
