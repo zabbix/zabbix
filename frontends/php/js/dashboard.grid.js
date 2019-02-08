@@ -1412,18 +1412,19 @@
 						? t('Release to create a new widget.')
 						: t('Click and drag to desired size.'),
 					frame_callback,
+					size_detection,
 					callback = function() {
-						if ($label.children().first().height()) {
-							$label.text($label.height() >= $label.children().first().height() ? message : '');
+						if (size_detection.height()) {
+							$label.text($label.height() >= size_detection.height() ? message : '');
 							window.cancelAnimationFrame(frame_callback);
 						}
-						else {
+						else if (size_detection.is(':visible')) {
 							frame_callback = window.requestAnimationFrame(callback);
 						}
 					};
 
 				// Create container to detect text overflow on y axis. Message div container will be removed on repaint.
-				$('<div>').text(message).appendTo($label);
+				size_detection = $('<div>').text(message).appendTo($label);
 
 				callback();
 			};
