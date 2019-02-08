@@ -211,6 +211,12 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 		*error = zbx_strdup(*error, "cannot create context");
 		goto out;
 	}
+
+	/* remove Duktape object */
+	duk_push_global_object(es->env->ctx);
+	duk_del_prop_string(es->env->ctx, -1, "Duktape");
+	duk_pop(es->env->ctx);
+
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
