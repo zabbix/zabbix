@@ -495,7 +495,7 @@ int		DBis_null(const char *field);
 void		DBbegin(void);
 int		DBcommit(void);
 void		DBrollback(void);
-void		DBend(int ret);
+int		DBend(int ret);
 
 const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
