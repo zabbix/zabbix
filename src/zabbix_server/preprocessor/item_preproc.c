@@ -200,8 +200,8 @@ static int	item_preproc_multiplier(unsigned char value_type, zbx_variant_t *valu
 	else if (SUCCEED == item_preproc_multiplier_variant(value_type, value, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot apply multiplier \"%s\" to value \"%s\" of type \"%s\": %s",
-			params, zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
+	*errmsg = zbx_dsprintf(*errmsg, "cannot apply multiplier \"%s\" to value of type \"%s\": %s",
+			params, zbx_variant_type_desc(value), err);
 	zbx_free(err);
 
 	return FAIL;
@@ -372,8 +372,8 @@ static int	item_preproc_delta_value(unsigned char value_type, zbx_variant_t *val
 		return SUCCEED;
 	}
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot calculate delta (simple change) for value \"%s\" of type"
-				" \"%s\": %s", zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
+	*errmsg = zbx_dsprintf(*errmsg, "cannot calculate delta (simple change) for value of type"
+				" \"%s\": %s", zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
 
@@ -408,8 +408,8 @@ static int	item_preproc_delta_speed(unsigned char value_type, zbx_variant_t *val
 		return SUCCEED;
 	}
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot calculate delta (speed per second) for value \"%s\" of type"
-				" \"%s\": %s", zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
+	*errmsg = zbx_dsprintf(*errmsg, "cannot calculate delta (speed per second) for value of type"
+				" \"%s\": %s", zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
 
@@ -511,8 +511,8 @@ static int item_preproc_rtrim(zbx_variant_t *value, const char *params, char **e
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_RTRIM, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot perform right trim of \"%s\" for value \"%s\" of type \"%s\": %s",
-			params, zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform right trim of \"%s\" for value of type \"%s\": %s",
+			params, zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
 
@@ -540,8 +540,8 @@ static int item_preproc_ltrim(zbx_variant_t *value, const char *params, char **e
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_LTRIM, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot perform left trim of \"%s\" for value \"%s\" of type \"%s\": %s",
-			params, zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform left trim of \"%s\" for value of type \"%s\": %s",
+			params, zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
 
@@ -569,8 +569,8 @@ static int item_preproc_lrtrim(zbx_variant_t *value, const char *params, char **
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_TRIM, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot perform trim of \"%s\" for value \"%s\" of type \"%s\": %s",
-			params, zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform trim of \"%s\" for value of type \"%s\": %s",
+			params, zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
 
@@ -662,8 +662,8 @@ static int	item_preproc_bool2dec(zbx_variant_t *value, char **errmsg)
 	if (SUCCEED == item_preproc_2dec(value, ZBX_PREPROC_BOOL2DEC, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot convert value \"%s\" of type \"%s\" from boolean format: %s",
-			zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
+	*errmsg = zbx_dsprintf(*errmsg, "cannot convert value of type \"%s\" from boolean format: %s",
+			zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
 
@@ -690,8 +690,8 @@ static int	item_preproc_oct2dec(zbx_variant_t *value, char **errmsg)
 	if (SUCCEED == item_preproc_2dec(value, ZBX_PREPROC_OCT2DEC, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot convert value \"%s\" of type \"%s\" from octal format: %s",
-			zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
+	*errmsg = zbx_dsprintf(*errmsg, "cannot convert value of type \"%s\" from octal format: %s",
+			zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
 
@@ -718,8 +718,8 @@ static int	item_preproc_hex2dec(zbx_variant_t *value, char **errmsg)
 	if (SUCCEED == item_preproc_2dec(value, ZBX_PREPROC_HEX2DEC, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot convert value \"%s\" of type \"%s\" from hexadecimal format: %s",
-			zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
+	*errmsg = zbx_dsprintf(*errmsg, "cannot convert value of type \"%s\" from hexadecimal format: %s",
+			zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
 
@@ -802,8 +802,8 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
 	if (SUCCEED == item_preproc_regsub_op(value, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot perform regular expression match: %s, type \"%s\", value \"%s\"",
-			err, zbx_variant_type_desc(value), zbx_variant_value_desc(value));
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform regular expression match for value of type \"%s\": %s",
+			zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
 
@@ -1064,8 +1064,20 @@ static int	item_preproc_validate_range(unsigned char value_type, const zbx_varia
 	if ((ZBX_VARIANT_NONE != range_min.type && 0 > zbx_variant_compare(&value_num, &range_min)) ||
 			(ZBX_VARIANT_NONE != range_max.type && 0 > zbx_variant_compare(&range_max, &value_num)))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "range validation error with value '%s'",
-				zbx_variant_value_desc(&value_num));
+		size_t	errmsg_alloc = 0, errmsg_offset = 0;
+
+		zbx_free(*errmsg);
+
+		zbx_strcpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, "value is");
+		if ('\0' != *min)
+		{
+			zbx_snprintf_alloc(errmsg, &errmsg_alloc, &errmsg_offset, " less than %s", min);
+			if ('\0' != *max)
+				zbx_strcpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, " or");
+		}
+		if ('\0' != *max)
+			zbx_snprintf_alloc(errmsg, &errmsg_alloc, &errmsg_offset, " greater than %s", max);
+
 		goto out;
 	}
 
@@ -1114,10 +1126,7 @@ static int	item_preproc_validate_regex(const zbx_variant_t *value, const char *p
 	}
 
 	if (0 != zbx_regexp_match_precompiled(value_str.data.str, regex))
-	{
-		*errmsg = zbx_dsprintf(*errmsg, "regular expression validation error with value '%s'",
-				zbx_variant_value_desc(&value_str));
-	}
+		*errmsg = zbx_dsprintf(*errmsg, "value does not match regular expression: %s", params);
 	else
 		ret = SUCCEED;
 
@@ -1165,8 +1174,7 @@ static int	item_preproc_validate_not_regex(const zbx_variant_t *value, const cha
 
 	if (0 == zbx_regexp_match_precompiled(value_str.data.str, regex))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "regular expression validation error with value '%s'",
-				zbx_variant_value_desc(&value_str));
+		*errmsg = zbx_dsprintf(*errmsg, "value matches regular expression: %s", params);
 	}
 	else
 		ret = SUCCEED;
@@ -1294,7 +1302,7 @@ static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const cha
 	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)params, xpathCtx)))
 	{
 		pErr = xmlGetLastError();
-		*error = zbx_dsprintf(*error, "cannot parse xpath: %s", pErr->message);
+		*error = zbx_dsprintf(*error, "cannot parse xpath \"%s\": %s", params, pErr->message);
 		ret = FAIL;
 		goto out;
 	}
