@@ -893,8 +893,9 @@ class CWidgetHelper {
 						]))->addClass(CMultiSelect::ZBX_STYLE_CLASS)
 					]))->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv([
-						(new CTextArea($field_name.'['.$row_num.'][items]', self::makeStringFromChunks($value['items']),
-								['rows' => 1]))
+						(new CTextArea($field_name.'['.$row_num.'][items]',
+							self::makeStringFromChunks($value['items']), ['rows' => 1])
+						)
 							->setAttribute('placeholder', _('item pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)

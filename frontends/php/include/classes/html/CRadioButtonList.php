@@ -117,7 +117,7 @@ class CRadioButtonList extends CList {
 		}
 
 		if ($this->readonly) {
-			parent::addItem(new CVar($this->name, $this->value, zbx_formatDomId($this->name)));
+			$this->addItem(new CVar($this->name, $this->value, zbx_formatDomId($this->name)));
 		}
 
 		foreach ($this->values as $key => $value) {
@@ -140,13 +140,13 @@ class CRadioButtonList extends CList {
 			}
 
 			if ($this->modern) {
-				parent::addItem((new CListItem([$radio, new CLabel($value['name'], $value['id'])]))->addClass(
+				$this->addItem((new CListItem([$radio, new CLabel($value['name'], $value['id'])]))->addClass(
 					array_key_exists('class', $value) ? $value['class'] : null
 				));
 			}
 			else {
 				$radio->addClass(ZBX_STYLE_CHECKBOX_RADIO);
-				parent::addItem((new CListItem([$radio, new CLabel([new CSpan(), $value['name']], $value['id'])]))
+				$this->addItem((new CListItem([$radio, new CLabel([new CSpan(), $value['name']], $value['id'])]))
 					->addClass(array_key_exists('class', $value) ? $value['class'] : null)
 				);
 			}
