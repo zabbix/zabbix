@@ -638,7 +638,8 @@ static void	process_rule(DB_DRULE *drule)
 			{
 				DBrollback();
 
-				zabbix_log(LOG_LEVEL_DEBUG, "discovery check was deleted during processing, stopping");
+				zabbix_log(LOG_LEVEL_DEBUG, "discovery rule '%s' all checks where deleted during"
+						" processing, stopping", drule->name);
 				zbx_vector_ptr_clear_ext(&services, zbx_ptr_free);
 				goto out;
 			}
