@@ -456,10 +456,10 @@ static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const ch
 
 /******************************************************************************
  *                                                                            *
- * Function: lock_checks                                                      *
+ * Function: db_lock_dcheckids                                                *
  *                                                                            *
  ******************************************************************************/
-static int	lock_checks(zbx_vector_uint64_t *dcheckids)
+static int	db_lock_dcheckids(zbx_vector_uint64_t *dcheckids)
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -504,7 +504,7 @@ static int	post_process_checks(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const
 	int		i;
 	int		ret = SUCCEED;
 
-	if (SUCCEED != lock_checks(dcheckids))
+	if (SUCCEED != db_lock_dcheckids(dcheckids))
 	{
 		ret = FAIL;
 		goto out;
