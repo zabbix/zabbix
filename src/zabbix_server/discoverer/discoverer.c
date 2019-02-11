@@ -648,11 +648,9 @@ static void	process_rule(DB_DRULE *drule)
 
 			zbx_vector_uint64_clear(&dcheckids);
 			zbx_vector_ptr_clear_ext(&services, zbx_ptr_free);
-
 		}
 		while (SUCCEED == iprange_next(&iprange, ipaddress));
 next:
-
 		if (NULL != comma)
 		{
 			*comma = ',';
