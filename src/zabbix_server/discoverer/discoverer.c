@@ -646,7 +646,7 @@ static void	process_rule(DB_DRULE *drule)
 
 			DBcommit();
 
-			zbx_vector_uint64_clear(dcheckids);
+			zbx_vector_uint64_clear(&dcheckids);
 			zbx_vector_ptr_clear_ext(&services, (zbx_clean_func_t)zbx_service_free);
 
 		}
