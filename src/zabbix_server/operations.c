@@ -32,7 +32,7 @@ typedef enum
 	ZBX_DISCOVERY_IP,
 	ZBX_DISCOVERY_VALUE
 }
-zbx_discovery_type_t;
+zbx_dcheck_source_t;
 
 /******************************************************************************
  *                                                                            *
@@ -309,9 +309,9 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 
 			if (0 == hostid)
 			{
-				DB_RESULT	result3;
-				DB_ROW		row3;
-				int		host_source, name_source;
+				DB_RESULT		result3;
+				DB_ROW			row3;
+				zbx_dcheck_source_t	host_source, name_source;
 
 				host_source = atoi(row[6]);
 				name_source = atoi(row[7]);
