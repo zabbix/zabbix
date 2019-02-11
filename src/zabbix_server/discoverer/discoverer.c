@@ -500,10 +500,14 @@ static int	db_lock_dcheckids(zbx_vector_uint64_t *dcheckids)
 static int	process_services(DB_DRULE *drule, DB_DHOST *dhost, const char *ip, const char *dns, int now,
 		const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
-	int	i;
+	const char	*__function_name = "process_services";
 
-	if (SUCCEED != db_lock_dcheckids(dcheckids))
-		return FAIL;
+	int	i, ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != (ret = db_lock_dcheckids(dcheckids)))
+		goto fail;
 
 	for (i = 0; i < services->values_num; i++)
 	{
@@ -523,9 +527,10 @@ static int	process_services(DB_DRULE *drule, DB_DHOST *dhost, const char *ip, co
 					service->status, service->value, now);
 		}
 	}
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return SUCCEED;
-
+	return ret;
 }
 
 /******************************************************************************
