@@ -334,7 +334,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
  * Parameters: service - service info                                         *
  *                                                                            *
  ******************************************************************************/
-static void	process_check(DB_DCHECK *dcheck, int *host_status, char *ip, const char *dns, int now,
+static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, const char *dns, int now,
 		zbx_vector_ptr_t *services)
 {
 	const char	*__function_name = "process_check";
@@ -617,7 +617,6 @@ static void	process_rule(DB_DRULE *drule)
 				process_checks(drule, &host_status, ip, dns, 1, now, &services, &dcheckids);
 			process_checks(drule, &host_status, ip, dns, 0, now, &services, &dcheckids);
 
-
 			DBbegin();
 
 			if (SUCCEED != DBlock_druleid(drule->druleid))
@@ -637,7 +636,6 @@ static void	process_rule(DB_DRULE *drule)
 				zabbix_log(LOG_LEVEL_DEBUG, "discovery check was deleted during processing, stopping");
 				zbx_vector_ptr_clear_ext(&services, zbx_ptr_free);
 				goto out;
-
 			}
 
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
