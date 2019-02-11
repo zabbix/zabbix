@@ -83,7 +83,7 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_create_data_invalid
 	 * @dataProvider discoveryrule_create_data_valid
-	 * @backup items
+	 * @backup-once items
 	 */
 	public function testDiscoveryRule_Create(array $discoveryrules, $expected_error) {
 		$result = $this->call('discoveryrule.create', $discoveryrules, $expected_error);
@@ -154,7 +154,7 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_preprocessing_create_data_invalid
 	 * @dataProvider discoveryrule_preprocessing_create_data_valid
-	 * @backup items
+	 * @backup-once items
 	 */
 	public function testDiscoveryRulePreprocessing_Create(array $discoveryrules, $expected_error) {
 		$result = $this->call('discoveryrule.create', $discoveryrules, $expected_error);
@@ -491,7 +491,7 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_lld_macro_paths_create_data_invalid
 	 * @dataProvider discoveryrule_lld_macro_paths_create_data_valid
-	 * @backup items
+	 * @backup-once items
 	 */
 	public function testDiscoveryRuleLLDMacroPaths_Create(array $discoveryrules, $expected_error) {
 		$result = $this->call('discoveryrule.create', $discoveryrules, $expected_error);
@@ -1294,7 +1294,7 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_preprocessing_update_data_invalid
 	 * @dataProvider discoveryrule_preprocessing_update_data_valid
-	 * @backup items
+	 * @backup-once items
 	 */
 	public function testDiscoveryRulePreprocessing_Update($discoveryrules, $expected_error) {
 		if ($expected_error === null) {
@@ -1715,7 +1715,7 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_lld_macro_paths_update_data_invalid
 	 * @dataProvider discoveryrule_lld_macro_paths_update_data_valid
-	 * @backup items
+	 * @backup-once items
 	 */
 	public function testDiscoveryRuleLLDMacroPaths_Update($discoveryrules, $expected_error) {
 		if ($expected_error === null) {
@@ -1948,7 +1948,7 @@ class testDiscoveryRule extends CAPITest {
 
 	/**
 	 * @dataProvider discoveryrule_preprocessing_delete_data
-	 * @backup items
+	 * @backup-once items
 	 */
 	public function testDiscoveryRulePreprocessing_Delete($discoveryrule, $expected_error) {
 		$result = $this->call('discoveryrule.delete', $discoveryrule, $expected_error);
@@ -1986,7 +1986,7 @@ class testDiscoveryRule extends CAPITest {
 
 	/**
 	 * @dataProvider discoveryrule_lld_macro_paths_delete_data
-	 * @backup items
+	 * @backup-once items
 	 */
 	public function testDiscoveryRuleLLDMacroPaths_Delete($discoveryrule, $expected_error) {
 		$result = $this->call('discoveryrule.delete', $discoveryrule, $expected_error);
@@ -2437,7 +2437,7 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_copy_data_invalid
 	 * @dataProvider discoveryrule_copy_data_valid
-	 * @backup items
+	 * @backup-once items
 	 */
 	public function testDiscoveryRule_Copy($params, $expected_error) {
 		$result = $this->call('discoveryrule.copy', $params, $expected_error);
@@ -2495,7 +2495,7 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_copy_data_invalid
 	 * @dataProvider discoveryrule_copy_data_valid
-	 * @backup items
+	 * @backup-once items
 	 */
 	public function testDiscoveryRuleLLDMacroPaths_Copy($params, $expected_error) {
 		$result = $this->call('discoveryrule.copy', $params, $expected_error);
@@ -2549,7 +2549,7 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_copy_data_invalid
 	 * @dataProvider discoveryrule_copy_data_valid
-	 * @backup items
+	 * @backup-once items
 	 */
 	public function testDiscoveryRulePreprocessing_Copy($params, $expected_error) {
 		$result = $this->call('discoveryrule.copy', $params, $expected_error);

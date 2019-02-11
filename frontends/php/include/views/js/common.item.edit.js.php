@@ -252,7 +252,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		}
 	}
 
-	jQuery(document).ready(function() {
+	jQuery(document).ready(function($) {
 		<?php
 		if (!empty($this->data['authTypeVisibility'])) { ?>
 			var authTypeSwitcher = new CViewSwitcher('authtype', 'change',
@@ -263,7 +263,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				<?php echo zbx_jsvalue($this->data['typeVisibility'], true); ?>,
 				<?php echo zbx_jsvalue($this->data['typeDisable'], true); ?>);
 		<?php } ?>
-		if (jQuery('#http_authtype').length) {
+		if ($('#http_authtype').length) {
 			new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue([
 				HTTPTEST_AUTH_BASIC => ['http_username_row', 'http_password_row'],
 				HTTPTEST_AUTH_NTLM => ['http_username_row', 'http_password_row']
@@ -275,27 +275,27 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>);
 		<?php } ?>
 
-		if (jQuery('#allow_traps').length) {
+		if ($('#allow_traps').length) {
 			new CViewSwitcher('allow_traps', 'change', <?= zbx_jsvalue([
 				HTTPCHECK_ALLOW_TRAPS_ON => ['row_trapper_hosts']
 			], true) ?>);
 		}
 
-		jQuery('#type')
+		$('#type')
 			.change(function() {
 				// update the interface select with each item type change
 				var itemInterfaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>;
-				organizeInterfaces(itemInterfaceTypes[parseInt(jQuery(this).val())]);
+				organizeInterfaces(itemInterfaceTypes[parseInt($(this).val())]);
 
 				setAuthTypeLabel();
 			})
 			.trigger('change');
 
-		jQuery('#authtype').bind('change', function() {
+		$('#authtype').bind('change', function() {
 			setAuthTypeLabel();
 		});
 
-		jQuery('[data-action="parse_url"]').click(function() {
+		$('[data-action="parse_url"]').click(function() {
 			var url_node = $(this).siblings('[name="url"]'),
 				table = $('#query_fields_pairs').data('editableTable'),
 				url = parseUrlString(url_node.val())
@@ -334,7 +334,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			}
 		});
 
-		jQuery('#request_method').change(function() {
+		$('#request_method').change(function() {
 			if ($(this).val() == <?= HTTPCHECK_REQUEST_HEAD ?>) {
 				$(':radio', '#retrieve_mode')
 					.filter('[value=<?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>]').click()
