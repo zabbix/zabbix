@@ -498,7 +498,7 @@ static int	db_lock_dcheckids(zbx_vector_uint64_t *dcheckids)
  *                                                                            *
  ******************************************************************************/
 static int	process_services(DB_DRULE *drule, DB_DHOST *dhost, const char *ip, const char *dns, int now,
-		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
+		const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
 	int	i;
 
