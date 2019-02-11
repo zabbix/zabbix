@@ -705,7 +705,7 @@
 				axis.size_key = 'height';
 				axis.size_min = data.options['widget-min-rows'];
 				axis.size_max = data.options['max-rows'];
-				axis.boundary.width = boundary.width;
+				axis.boundary.width = Math.min(axis.boundary.width, boundary.width);
 			}
 
 			if (axis_key in widget.prev_pos.mirrored) {
@@ -715,7 +715,7 @@
 			fitWigetsIntoBox(data.widgets, widget, axis);
 		});
 
-		if (widget.current_pos.width != axis.boundary.width) {
+		if (widget.current_pos.width != widget.prev_pos.width) {
 			widget.max_width = widget.current_pos.width;
 		}
 	}
