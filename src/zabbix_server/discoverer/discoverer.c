@@ -497,22 +497,17 @@ static int	db_lock_dcheckids(zbx_vector_uint64_t *dcheckids)
  * Function: process_services                                                 *
  *                                                                            *
  ******************************************************************************/
-static int	process_services(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const char *dns, int now,
+static int	process_services(DB_DRULE *drule, DB_DHOST *dhost, const char *ip, const char *dns, int now,
 		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
-	zbx_service_t	*service;
-	int		i;
-	int		ret = SUCCEED;
+	int	i;
 
 	if (SUCCEED != db_lock_dcheckids(dcheckids))
-	{
-		ret = FAIL;
-		goto out;
-	}
+		return FAIL;
 
 	for (i = 0; i < services->values_num; i++)
 	{
-		service = (zbx_service_t *)services->values[i];
+		zbx_service_t	*service = (zbx_service_t *)services->values[i];
 
 		if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid,
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
@@ -530,8 +525,7 @@ static int	process_services(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const ch
 		}
 	}
 
-out:
-	return ret;
+	return SUCCEED;
 
 }
 
