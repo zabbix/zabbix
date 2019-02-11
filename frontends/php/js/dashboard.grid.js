@@ -579,6 +579,7 @@
 		 */
 		if (overlap > 0) {
 			widget.current_pos[size_key] -= overlap;
+			widget.current_pos.overflow = true;
 
 			affected.each(function(box) {
 				box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - overlap, box.pos[axis_key]);
@@ -618,6 +619,7 @@
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
 				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
 			});
+			axis.boundary[axis_key] = size_max - axis.boundary[axis_key] - axis.boundary[size_key];
 		}
 	}
 
@@ -649,11 +651,6 @@
 			widget.prev_pos.mirrored.y = true;
 		}
 
-		var boundary = $.extend({}, widget.current_pos);
-
-		if ('max_width' in widget && widget.max_width < boundary.width) {
-			boundary.width = widget.max_width;
-		}
 
 		// Situation when there are changes on both axes should be handled as special case.
 		if (process_order[0] === 'x' && (widget.prev_pos.y != widget.current_pos.y
@@ -668,7 +665,7 @@
 
 			$.map(data.widgets, function(box) {
 				return (!('affected_axis' in box) && widget.uniqueid !== box.uniqueid
-					&& rectOverlap(boundary, box.current_pos))
+					&& rectOverlap(widget.current_pos, box.current_pos))
 					? box
 					: null;
 			}).each(function(box) {
@@ -705,19 +702,49 @@
 				axis.size_key = 'height';
 				axis.size_min = data.options['widget-min-rows'];
 				axis.size_max = data.options['max-rows'];
-				axis.boundary.width = Math.min(axis.boundary.width, boundary.width);
 			}
 
 			if (axis_key in widget.prev_pos.mirrored) {
 				axis.mirrored = true;
 			}
 
+			var opposite_axis_key = axis_key == 'y' ? 'x' : 'y',
+				opposite_size_key = opposite_axis_key == 'x' ? 'width' : 'height';
+			if (widget.prev_pos.axis_correction && opposite_size_key in widget.prev_pos.axis_correction) {
+				// Use 'corrected' size if it is less than current size.
+				axis.boundary[opposite_size_key] = Math.min(widget.prev_pos.axis_correction[opposite_size_key],
+					axis.boundary[opposite_size_key]);
+
+				if (opposite_axis_key in widget.prev_pos.mirrored && opposite_axis_key in widget.prev_pos.axis_correction) {
+					axis.boundary[opposite_axis_key] = Math.max(widget.prev_pos.axis_correction[opposite_axis_key],
+						axis.boundary[opposite_axis_key]);
+				}
+			}
+
 			fitWigetsIntoBox(data.widgets, widget, axis);
+
+			if ('overflow' in widget.current_pos) {
+				// Store 'corrected' size.
+				widget.prev_pos.axis_correction = 'axis_correction' in widget.prev_pos ? widget.prev_pos.axis_correction : {};
+				widget.prev_pos.axis_correction[axis.size_key] = widget.current_pos[axis.size_key];
+
+				if (axis.mirrored) {
+					widget.prev_pos.axis_correction[axis_key] = widget.current_pos[axis_key];
+				}
+
+				delete widget.current_pos.overflow;
+			}
 		});
 
-		if (widget.current_pos.width != widget.prev_pos.width) {
-			widget.max_width = widget.current_pos.width;
-		}
+		// debug code
+		data.widgets.each(function(b) {
+			if ('affected_axis' in b) {
+				b.div.css('background-color', b.affected_axis == 'x' ? 'rgba(0, 255, 0, 0.3)' : 'rgba(255, 0, 0, 0.3)');
+			}
+			else {
+				b.div.css('background-color', '')
+			}
+		});
 	}
 
 	function checkWidgetOverlap(data, widget) {
