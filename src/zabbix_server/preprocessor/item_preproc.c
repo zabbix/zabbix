@@ -1632,8 +1632,7 @@ int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, 
 			ret = item_preproc_lrtrim(value, op->params, &errmsg);
 			break;
 		case ZBX_PREPROC_REGSUB:
-			/*ret = item_preproc_regsub(value, op->params, &errmsg);*/
-			ret = item_preproc_prometheus_pattern(value, op->params, &errmsg);
+			ret = item_preproc_regsub(value, op->params, &errmsg);
 			break;
 		case ZBX_PREPROC_BOOL2DEC:
 			ret = item_preproc_bool2dec(value, &errmsg);
