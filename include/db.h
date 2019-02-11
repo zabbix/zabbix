@@ -611,7 +611,7 @@ void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts);
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		const char *host_metadata);
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
-char	*DBget_unique_hostname_by_sample(const char *host_name_sample);
+char	*DBget_unique_hostname_by_sample(const char *host_name_sample, int use_visible_name);
 
 const char	*DBsql_id_ins(zbx_uint64_t id);
 const char	*DBsql_id_cmp(zbx_uint64_t id);

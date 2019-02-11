@@ -1016,7 +1016,7 @@ static int	housekeeping_proxy_dhistory(int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	rc = DBexecute("delete from proxy_dhistory where clock<>0 and clock<%d", now - SEC_PER_DAY);
+	rc = DBexecute("delete from proxy_dhistory where clock<%d", now - SEC_PER_DAY);
 
 	if (ZBX_DB_OK <= rc)
 		deleted = rc;
@@ -1110,7 +1110,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old audit log items]", get_process_type_string(process_type));
 		d_audit = housekeeping_audit(now);
 
-		zbx_setproctitle("%s [removing old proxy_dhistory]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [removing old proxy discovery data]", get_process_type_string(process_type));
 		d_proxy_dhistory = housekeeping_proxy_dhistory(now);
 
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
