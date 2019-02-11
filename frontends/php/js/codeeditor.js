@@ -67,7 +67,9 @@
 							text: $hidden.val(),
 							maxlength: maxlength,
 							readonly: !editable
-						}).appendTo($code_editor);
+						})
+							.attr('wrap', 'off')
+							.appendTo($code_editor);
 
 					overlayDialogue({
 						'title': t('S_JAVASCRIPT'),

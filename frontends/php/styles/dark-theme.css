@@ -2718,10 +2718,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
         width: 100%;
         height: 100%;
         resize: none;
-        overflow-wrap: normal;
-        overflow-x: auto;
         white-space: pre;
-        word-break: break-all;
         line-height: 18px;
         font-family: "Courier New", Courier, monospace; }
         .overlay-dialogue.modal-code-editor .code-editor .code-editor-textarea::-webkit-scrollbar {
