@@ -28,7 +28,8 @@ DIST_SUBDIRS = \
 	zbxhttp \
 	zbxipcservice \
 	zbxhistory \
-	zbxcompress
+	zbxcompress \
+	zbxprometheus
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -82,6 +83,7 @@ SUBDIRS = \
 	zbxregexp \
 	zbxipcservice \
 	zbxcompress \
+	zbxprometheus \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)

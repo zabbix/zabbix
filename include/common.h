@@ -1487,6 +1487,8 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_ERROR_FIELD_REGEX		18
 #define ZBX_PREPROC_THROTTLE_VALUE		19
 #define ZBX_PREPROC_THROTTLE_TIMED_VALUE	20
+#define ZBX_PREPROC_PROMETHEUS_PATTERN		21
+#define ZBX_PREPROC_PROMETHEUS_TO_JSON		22
 
 #define ZBX_PREPROC_FAIL_DEFAULT	0
 #define ZBX_PREPROC_FAIL_DISCARD_VALUE	1
