@@ -404,7 +404,7 @@ static void	process_check(DB_DCHECK *dcheck, int *host_status, char *ip, const c
  *                                                                            *
  ******************************************************************************/
 static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const char *dns, int unique, int now,
-		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids_vector_ptr)
+		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -447,7 +447,7 @@ static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const ch
 		dcheck.ports = row[10];
 		dcheck.snmpv3_contextname = row[11];
 
-		zbx_vector_uint64_append(dcheckids_vector_ptr, dcheck.dcheckid);
+		zbx_vector_uint64_append(dcheckids, dcheck.dcheckid);
 
 		process_check(&dcheck, host_status, ip, dns, now, services);
 	}
@@ -459,7 +459,7 @@ static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const ch
  * Function: lock_checks                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	lock_checks(zbx_vector_uint64_t *dcheckids_vector_ptr)
+static int	lock_checks(zbx_vector_uint64_t *dcheckids)
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -468,11 +468,10 @@ static int	lock_checks(zbx_vector_uint64_t *dcheckids_vector_ptr)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zbx_vector_uint64_sort(dcheckids_vector_ptr, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(dcheckids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select dcheckid from dchecks where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dcheckid", dcheckids_vector_ptr->values,
-			dcheckids_vector_ptr->values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dcheckid", dcheckids->values, dcheckids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by dcheckid" ZBX_FOR_UPDATE);
 
 	result = DBselect("%s", sql);
@@ -482,15 +481,15 @@ static int	lock_checks(zbx_vector_uint64_t *dcheckids_vector_ptr)
 	{
 		ZBX_STR2UINT64(dcheckid, row[0]);
 
-		while (dcheckid != dcheckids_vector_ptr->values[i])
-			zbx_vector_uint64_remove(dcheckids_vector_ptr, i);
+		while (dcheckid != dcheckids->values[i])
+			zbx_vector_uint64_remove(dcheckids, i);
 	}
 	DBfree_result(result);
 
-	while (i != dcheckids_vector_ptr->values_num)
-		zbx_vector_uint64_remove_noorder(dcheckids_vector_ptr, i);
+	while (i != dcheckids->values_num)
+		zbx_vector_uint64_remove_noorder(dcheckids, i);
 
-	return (0 != dcheckids_vector_ptr->values_num ? SUCCEED : FAIL);
+	return (0 != dcheckids->values_num ? SUCCEED : FAIL);
 }
 
 /******************************************************************************
@@ -499,13 +498,13 @@ static int	lock_checks(zbx_vector_uint64_t *dcheckids_vector_ptr)
  *                                                                            *
  ******************************************************************************/
 static int	post_process_checks(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const char *dns, int now,
-		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids_vector_ptr)
+		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
 	zbx_service_t	*service;
 	int		i;
 	int		ret = SUCCEED;
 
-	if (SUCCEED != lock_checks(dcheckids_vector_ptr))
+	if (SUCCEED != lock_checks(dcheckids))
 	{
 		ret = FAIL;
 		goto out;
@@ -516,7 +515,7 @@ static int	post_process_checks(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const
 	{
 		service = (zbx_service_t *)services->values[i];
 
-		if (FAIL == zbx_vector_uint64_bsearch(dcheckids_vector_ptr, service->dcheckid,
+		if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid,
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;
 
