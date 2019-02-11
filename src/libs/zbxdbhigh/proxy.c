@@ -3503,7 +3503,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 	zbx_vector_ptr_t	rules;
 	zbx_discovery_rule_t	*rule_ptr;
 	zbx_discoved_ips_t	*ip_discovered_ptr;
-	zbx_service_t		*check_ptr;
+	zbx_service_t		*service;
 	int			index_rules, index_ip;
 	int			res;
 
@@ -3519,7 +3519,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 	{
 		rule_ptr = NULL;
 		ip_discovered_ptr = NULL;
-		check_ptr=NULL;
+		service=NULL;
 
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			goto json_parse_error;
@@ -3577,9 +3577,9 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			ip_discovered_ptr = rule_ptr->ips.values[index_ip];
 		}
 
-		check_ptr = (zbx_service_t *)zbx_malloc(check_ptr, sizeof(zbx_service_t));
-		check_ptr->dcheckid = dcheckid;
-		zbx_vector_ptr_append( &(ip_discovered_ptr->services), check_ptr);
+		service = (zbx_service_t *)zbx_malloc(service, sizeof(zbx_service_t));
+		service->dcheckid = dcheckid;
+		zbx_vector_ptr_append( &(ip_discovered_ptr->services), service);
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 		{
@@ -3590,11 +3590,11 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid port", __function_name, tmp);
 			continue;
 		}
-		check_ptr->port = port;
+		service->port = port;
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
 			*value = '\0';
-		zbx_strlcpy(check_ptr->value, value, value_alloc);
+		zbx_strlcpy(service->value, value, value_alloc);
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)) && '\0' != *dns &&
 				FAIL == zbx_validate_hostname(dns))
@@ -3602,15 +3602,15 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid hostname", __function_name, dns);
 			continue;
 		}
-		zbx_strlcpy(check_ptr->dns, dns, INTERFACE_DNS_LEN_MAX);
+		zbx_strlcpy(service->dns, dns, INTERFACE_DNS_LEN_MAX);
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
 			status = atoi(tmp);
 		else
 			status = 0;
-		check_ptr->status = status;
+		service->status = status;
 
-		check_ptr->itemtime = itemtime;
+		service->itemtime = itemtime;
 
 		continue;
 json_parse_error:
