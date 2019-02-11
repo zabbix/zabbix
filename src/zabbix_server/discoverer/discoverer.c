@@ -370,7 +370,7 @@ static void	process_check(DB_DCHECK *dcheck, int *host_status, char *ip, const c
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __function_name, port);
 
-			service = (zbx_service_t *)zbx_malloc(service, sizeof(zbx_service_t));
+			service = (zbx_service_t *)zbx_malloc(NULL, sizeof(zbx_service_t));
 			service->status = (SUCCEED == discover_service(dcheck, ip, port, &value, &value_alloc) ?
 					DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN);
 			service->dcheckid = dcheck->dcheckid;
@@ -404,7 +404,7 @@ static void	process_check(DB_DCHECK *dcheck, int *host_status, char *ip, const c
  *                                                                            *
  ******************************************************************************/
 static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const char *dns, int unique, int now,
-		zbx_vector_ptr_t *checks_vector_ptr, zbx_vector_uint64_t *dcheckids_vector_ptr)
+		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids_vector_ptr)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -449,7 +449,7 @@ static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const ch
 
 		zbx_vector_uint64_append(dcheckids_vector_ptr, dcheck.dcheckid);
 
-		process_check(&dcheck, host_status, ip, dns, now, checks_vector_ptr);
+		process_check(&dcheck, host_status, ip, dns, now, services);
 	}
 	DBfree_result(result);
 }
@@ -537,16 +537,16 @@ out:
 
 }
 
-static void create_check_vectors(zbx_vector_ptr_t *checks, zbx_vector_uint64_t *dcheckids)
+static void create_check_vectors(zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
-	zbx_vector_ptr_create(checks);
+	zbx_vector_ptr_create(services);
 	zbx_vector_uint64_create(dcheckids);
 }
 
-static void destroy_check_vectors(zbx_vector_ptr_t *checks, zbx_vector_uint64_t *dcheckids)
+static void destroy_check_vectors(zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
-	zbx_vector_ptr_clear_ext(checks, (zbx_clean_func_t)zbx_checks_eval_free);
-	zbx_vector_ptr_destroy(checks);
+	zbx_vector_ptr_clear_ext(services, (zbx_clean_func_t)zbx_checks_eval_free);
+	zbx_vector_ptr_destroy(services);
 	zbx_vector_uint64_destroy(dcheckids);
 }
 
@@ -566,7 +566,7 @@ static void	process_rule(DB_DRULE *drule)
 	char			ip[INTERFACE_IP_LEN_MAX], *start, *comma, dns[INTERFACE_DNS_LEN_MAX];
 	int			ipaddress[8];
 	zbx_iprange_t		iprange;
-	zbx_vector_ptr_t	checks;
+	zbx_vector_ptr_t	services;
 	zbx_vector_uint64_t	dcheckids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __function_name, drule->name, drule->iprange);
@@ -603,7 +603,7 @@ static void	process_rule(DB_DRULE *drule)
 
 		do
 		{
-			create_check_vectors(&checks, &dcheckids);
+			create_check_vectors(&services, &dcheckids);
 #ifdef HAVE_IPV6
 			if (ZBX_IPRANGE_V6 == iprange.type)
 			{
@@ -633,8 +633,8 @@ static void	process_rule(DB_DRULE *drule)
 			zbx_gethost_by_ip(ip, dns, sizeof(dns));
 			zbx_alarm_off();
 			if (0 != drule->unique_dcheckid)
-				process_checks(drule, &host_status, ip, dns, 1, now, &checks, &dcheckids);
-			process_checks(drule, &host_status, ip, dns, 0, now, &checks, &dcheckids);
+				process_checks(drule, &host_status, ip, dns, 1, now, &services, &dcheckids);
+			process_checks(drule, &host_status, ip, dns, 0, now, &services, &dcheckids);
 
 
 			DBbegin();
@@ -646,12 +646,12 @@ static void	process_rule(DB_DRULE *drule)
 				zabbix_log(LOG_LEVEL_DEBUG, "discovery rule '%s' was deleted during processing,"
 						" stopping", drule->name);
 
-				destroy_check_vectors(&checks, &dcheckids);
+				destroy_check_vectors(&services, &dcheckids);
 
 				goto out;
 			}
 
-			if (SUCCEED != post_process_checks(drule, &dhost, ip, dns, now, &checks, &dcheckids))
+			if (SUCCEED != post_process_checks(drule, &dhost, ip, dns, now, &services, &dcheckids))
 			{
 				DBrollback();
 
@@ -668,7 +668,7 @@ static void	process_rule(DB_DRULE *drule)
 				DBcommit();
 			}
 
-			destroy_check_vectors(&checks, &dcheckids);
+			destroy_check_vectors(&services, &dcheckids);
 
 		}
 		while (SUCCEED == iprange_next(&iprange, ipaddress));
