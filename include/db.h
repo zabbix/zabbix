@@ -209,8 +209,18 @@ struct	_DC_TRIGGER;
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
 #ifdef HAVE_ORACLE
-#define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "begin\n")
-#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;")
+
+#define ZBX_PLSQL_BEGIN	"begin\n"
+#define ZBX_PLSQL_END	"end;"
+#define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	\
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_BEGIN)
+#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	\
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_END)
+#if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
+#define	ZBX_SQL_EXEC_FROM	ZBX_CONST_STRLEN(ZBX_PLSQL_BEGIN)
+#else
+#define	ZBX_SQL_EXEC_FROM	0
+#endif
 
 #define	ZBX_SQL_STRCMP		"%s%s%s"
 #define	ZBX_SQL_STRVAL_EQ(str)	'\0' != *str ? "='"  : "",		\
@@ -222,6 +232,8 @@ struct	_DC_TRIGGER;
 #else
 #define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)
 #define	DBend_multiple_update(sql, sql_alloc, sql_offset)
+
+#define	ZBX_SQL_EXEC_FROM	0
 
 #define	ZBX_SQL_STRCMP		"%s'%s'"
 #define	ZBX_SQL_STRVAL_EQ(str)	"=", str

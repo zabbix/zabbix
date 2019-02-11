@@ -3100,6 +3100,8 @@ static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, con
 
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 	{
+		DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
+
 		value_esc = DBdyn_escape_string(item_prototype->key);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 				"update item_discovery"
@@ -3240,7 +3242,11 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 			item = (zbx_lld_item_t *)items->values[i];
 
 			lld_item_prepare_update(item_prototypes, item, &sql, &sql_alloc, &sql_offset);
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+			/* since lld_item_prepare_update() may return without adding any sql */
+			/* to the sql buffer, check if the buffer got non-empty content */
+			if (sql_offset > ZBX_SQL_EXEC_FROM)
+				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
