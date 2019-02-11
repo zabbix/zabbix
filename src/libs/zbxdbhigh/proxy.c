@@ -52,8 +52,8 @@ zbx_discovery_rule_t;
 typedef struct
 {
 	char			ip[INTERFACE_IP_LEN_MAX];
-	zbx_vector_ptr_t	checks;
-	zbx_vector_ptr_t	checks_old;
+	zbx_vector_ptr_t	services;
+	zbx_vector_ptr_t	services_old;
 }
 zbx_discoved_ips_t;
 
@@ -3269,17 +3269,17 @@ int	process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, z
 }
 
 
-void	zbx_checks_eval_free(zbx_discovery_checks_t *check)
+void	zbx_checks_eval_free(zbx_service_t *service)
 {
-	zbx_free(check);
+	zbx_free(service);
 }
 
 void	zbx_ips_eval_free(zbx_discoved_ips_t *ip)
 {
-	zbx_vector_ptr_clear_ext(&ip->checks, (zbx_clean_func_t)zbx_checks_eval_free);
-	zbx_vector_ptr_destroy(&ip->checks);
-	zbx_vector_ptr_clear_ext(&ip->checks_old, (zbx_clean_func_t)zbx_checks_eval_free);
-	zbx_vector_ptr_destroy(&ip->checks_old);
+	zbx_vector_ptr_clear_ext(&ip->services, (zbx_clean_func_t)zbx_checks_eval_free);
+	zbx_vector_ptr_destroy(&ip->services);
+	zbx_vector_ptr_clear_ext(&ip->services_old, (zbx_clean_func_t)zbx_checks_eval_free);
+	zbx_vector_ptr_destroy(&ip->services_old);
 	zbx_free(ip);
 }
 
@@ -3308,22 +3308,22 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 	DB_ROW			row;
 	DB_DHOST		dhost;
 	int 			ip_status = 0;
-	zbx_discovery_checks_t	*check_ptr=NULL;
-	int 			index_dchecks;
+	zbx_service_t		*service=NULL;
+	int			index_dchecks;
 	zbx_uint64_t		dcheckid;
-	zbx_vector_ptr_t	*checks_vector_ptr;
+	zbx_vector_ptr_t	*services;
 	int 			new_check = 0;
 	int			update_host_idx = 0, current_checks_last_idx, current_checks_first_idx;
 	int			ret = SUCCEED;
 
 	memset(&dhost, 0, sizeof(dhost));
-	checks_vector_ptr = (zbx_vector_ptr_t *)&ip_discovered_ptr->checks;
+	services = (zbx_vector_ptr_t *)&ip_discovered_ptr->services;
 
 	/*check status for given ip address*/
-	for (index_dchecks = *start_idx; index_dchecks < checks_vector_ptr->values_num; index_dchecks++)
+	for (index_dchecks = *start_idx; index_dchecks < services->values_num; index_dchecks++)
 	{
-		check_ptr = (zbx_discovery_checks_t *)checks_vector_ptr->values[index_dchecks];
-		if (0 == check_ptr->dcheckid)
+		service = (zbx_service_t *)services->values[index_dchecks];
+		if (0 == service->dcheckid)
 		{
 			ip_status = 1;
 			update_host_idx = index_dchecks;
@@ -3345,35 +3345,34 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 
 			while (NULL != (row = DBfetch(result)))
 			{
-				check_ptr = NULL;
+				service = NULL;
 				ZBX_STR2UINT64(dcheckid, row[0]);
 
 				/*add only current ip to vector*/
 				if (0 == strcmp(ip_discovered_ptr->ip, row[6]))
 				{
-					check_ptr = (zbx_discovery_checks_t *)zbx_malloc(check_ptr,
-							sizeof(zbx_discovery_checks_t));
-					check_ptr->dcheckid = dcheckid;
-					check_ptr->itemtime = (time_t)atoi(row[1]);
-					check_ptr->port = atoi(row[2]);
-					zbx_strlcpy(check_ptr->value, row[3], MAX_DISCOVERED_VALUE_SIZE);
-					check_ptr->status = atoi(row[4]);
-					zbx_strlcpy(check_ptr->dns, row[5], INTERFACE_DNS_LEN_MAX);
-					zbx_vector_ptr_append( &(ip_discovered_ptr->checks_old), check_ptr);
+					service = (zbx_service_t *)zbx_malloc(service, sizeof(zbx_service_t));
+					service->dcheckid = dcheckid;
+					service->itemtime = (time_t)atoi(row[1]);
+					service->port = atoi(row[2]);
+					zbx_strlcpy(service->value, row[3], MAX_DISCOVERED_VALUE_SIZE);
+					service->status = atoi(row[4]);
+					zbx_strlcpy(service->dns, row[5], INTERFACE_DNS_LEN_MAX);
+					zbx_vector_ptr_append(&(ip_discovered_ptr->services_old), service);
 				}
 			}
 
 			DBfree_result(result);
 			/*process old checks first */
-			checks_vector_ptr = (zbx_vector_ptr_t *)&ip_discovered_ptr->checks_old;
-			current_checks_last_idx = checks_vector_ptr->values_num;
+			services = (zbx_vector_ptr_t *)&ip_discovered_ptr->services_old;
+			current_checks_last_idx = services->values_num;
 			current_checks_first_idx = 0;
 		}
 		else
 		{
 			/*process new checks only*/
 			new_check = 1;
-			checks_vector_ptr = (zbx_vector_ptr_t *)&ip_discovered_ptr->checks;
+			services = (zbx_vector_ptr_t *)&ip_discovered_ptr->services;
 			current_checks_last_idx = update_host_idx + 1;
 			current_checks_first_idx = *start_idx;
 		}
@@ -3390,24 +3389,24 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 			goto out;
 		}
 
-		while (NULL != checks_vector_ptr)
+		while (NULL != services)
 		{
 			for (index_dchecks = current_checks_first_idx; index_dchecks < current_checks_last_idx;
 					index_dchecks++)
 			{
-				check_ptr = (zbx_discovery_checks_t *)checks_vector_ptr->values[index_dchecks];
-				dcheckid = check_ptr->dcheckid;
+				service = (zbx_service_t *)services->values[index_dchecks];
+				dcheckid = service->dcheckid;
 
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64
 						" unique_dcheckid:" ZBX_FS_UI64
 						" time:'%s %s' ip:'%s' dns:'%s' port:%hu value:'%s'", __function_name,
 						drule_ptr->druleid, dcheckid, drule_ptr->unique_dcheckid,
-						zbx_date2str(check_ptr->itemtime), zbx_time2str(check_ptr->itemtime),
-						ip_discovered_ptr->ip, check_ptr->dns, check_ptr->port, check_ptr->value);
+						zbx_date2str(service->itemtime), zbx_time2str(service->itemtime),
+						ip_discovered_ptr->ip, service->dns, service->port, service->value);
 
 				if (0 == dcheckid)
 				{
-					discovery_update_host(&dhost, check_ptr->status, check_ptr->itemtime);
+					discovery_update_host(&dhost, service->status, service->itemtime);
 				}
 				else
 				{
@@ -3420,20 +3419,20 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 						continue;
 					}
 					discovery_update_service(drule_ptr, dcheckid, &dhost,
-							ip_discovered_ptr->ip, check_ptr->dns, check_ptr->port,
-							check_ptr->status, check_ptr->value, check_ptr->itemtime);
+							ip_discovered_ptr->ip, service->dns, service->port,
+							service->status, service->value, service->itemtime);
 				}
 			}
 			new_check++;
 			if (1 == new_check)
 			{
-				checks_vector_ptr = &ip_discovered_ptr->checks;
+				services = &ip_discovered_ptr->services;
 				current_checks_last_idx = update_host_idx + 1;
 				current_checks_first_idx = *start_idx;
 			}
 			else
 			{
-				checks_vector_ptr = NULL;
+				services = NULL;
 				*start_idx = current_checks_last_idx;
 			}
 
@@ -3449,24 +3448,24 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 	else
 	{
 		/*save new checks vectors to database*/
-		checks_vector_ptr = &ip_discovered_ptr->checks;
+		services = &ip_discovered_ptr->services;
 
 		DBbegin();
 
-		for (index_dchecks = *start_idx; index_dchecks < checks_vector_ptr->values_num; index_dchecks++)
+		for (index_dchecks = *start_idx; index_dchecks < services->values_num; index_dchecks++)
 		{
-			check_ptr = (zbx_discovery_checks_t *)checks_vector_ptr->values[index_dchecks];
+			service = (zbx_service_t *)services->values[index_dchecks];
 			DBexecute("insert into proxy_dhistory (clock,druleid,ip,port,value,status,dcheckid,dns)"
 					" values (%d," ZBX_FS_UI64 ",'%s',%d,'%s',%d," ZBX_FS_UI64 ",'%s')",
-					(int)check_ptr->itemtime, drule_ptr->druleid, ip_discovered_ptr->ip,
-					check_ptr->port, check_ptr->value, check_ptr->status, check_ptr->dcheckid,
-					check_ptr->dns);
+					(int)service->itemtime, drule_ptr->druleid, ip_discovered_ptr->ip,
+					service->port, service->value, service->status, service->dcheckid,
+					service->dns);
 
 		}
 
 		DBcommit();
 
-		*start_idx = checks_vector_ptr->values_num;
+		*start_idx = services->values_num;
 	}
 out:
 	return ret;
@@ -3504,7 +3503,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 	zbx_vector_ptr_t	rules;
 	zbx_discovery_rule_t	*rule_ptr;
 	zbx_discoved_ips_t	*ip_discovered_ptr;
-	zbx_discovery_checks_t	*check_ptr;
+	zbx_service_t		*check_ptr;
 	int			index_rules, index_ip;
 	int			res;
 
@@ -3569,8 +3568,8 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			ip_discovered_ptr = (zbx_discoved_ips_t *)zbx_malloc(ip_discovered_ptr,
 					sizeof(zbx_discoved_ips_t));
 			zbx_strlcpy(ip_discovered_ptr->ip, ip, INTERFACE_IP_LEN_MAX);
-			zbx_vector_ptr_create(&ip_discovered_ptr->checks);
-			zbx_vector_ptr_create(&ip_discovered_ptr->checks_old);
+			zbx_vector_ptr_create(&ip_discovered_ptr->services);
+			zbx_vector_ptr_create(&ip_discovered_ptr->services_old);
 			zbx_vector_ptr_append( &(rule_ptr->ips), ip_discovered_ptr);
 		}
 		else
@@ -3578,9 +3577,9 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			ip_discovered_ptr = rule_ptr->ips.values[index_ip];
 		}
 
-		check_ptr = (zbx_discovery_checks_t *)zbx_malloc(check_ptr, sizeof(zbx_discovery_checks_t));
+		check_ptr = (zbx_service_t *)zbx_malloc(check_ptr, sizeof(zbx_service_t));
 		check_ptr->dcheckid = dcheckid;
-		zbx_vector_ptr_append( &(ip_discovered_ptr->checks), check_ptr);
+		zbx_vector_ptr_append( &(ip_discovered_ptr->services), check_ptr);
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 		{
@@ -3645,7 +3644,7 @@ json_parse_error:
 			{
 				res = process_discovery_ip_addresses(&drule, ip_discovered_ptr, &start_idx);
 			}
-			while (ip_discovered_ptr->checks.values_num != start_idx && FAIL != res);
+			while (ip_discovered_ptr->services.values_num != start_idx && FAIL != res);
 
 		}
 	}

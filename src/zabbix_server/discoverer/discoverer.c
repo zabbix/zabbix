@@ -335,7 +335,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
  *                                                                            *
  ******************************************************************************/
 static void	process_check(DB_DCHECK *dcheck,int *host_status, char *ip, const char *dns, int now,
-		zbx_vector_ptr_t *checks_vector_ptr)
+		zbx_vector_ptr_t *services)
 {
 	const char	*__function_name = "process_check";
 	const char	*start;
@@ -366,8 +366,8 @@ static void	process_check(DB_DCHECK *dcheck,int *host_status, char *ip, const ch
 
 		for (port = first; port <= last; port++)
 		{
-			int	service_status;
-			zbx_discovery_checks_t	*check_ptr=NULL;
+			int		service_status;
+			zbx_service_t	*service;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __function_name, port);
 
@@ -379,15 +379,14 @@ static void	process_check(DB_DCHECK *dcheck,int *host_status, char *ip, const ch
 				*host_status = service_status;
 
 			/* insert discovered checks into the vector */
-			check_ptr = (zbx_discovery_checks_t *)zbx_malloc(check_ptr,
-								sizeof(zbx_discovery_checks_t));
-			check_ptr->dcheckid = dcheck->dcheckid;
-			check_ptr->itemtime = (time_t)now;
-			check_ptr->port = port;
-			zbx_strlcpy(check_ptr->value, value, MAX_DISCOVERED_VALUE_SIZE);
-			check_ptr->status = service_status;
-			zbx_strlcpy(check_ptr->dns, dns, INTERFACE_DNS_LEN_MAX);
-			zbx_vector_ptr_append( checks_vector_ptr, check_ptr);
+			service = (zbx_service_t *)zbx_malloc(service, sizeof(zbx_service_t));
+			service->dcheckid = dcheck->dcheckid;
+			service->itemtime = (time_t)now;
+			service->port = port;
+			zbx_strlcpy(service->value, value, MAX_DISCOVERED_VALUE_SIZE);
+			service->status = service_status;
+			zbx_strlcpy(service->dns, dns, INTERFACE_DNS_LEN_MAX);
+			zbx_vector_ptr_append(services, service);
 		}
 
 		if (NULL != comma)
@@ -504,11 +503,11 @@ static int	lock_checks(zbx_vector_uint64_t *dcheckids_vector_ptr)
  *                                                                            *
  ******************************************************************************/
 static int	post_process_checks(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const char *dns, int now,
-		zbx_vector_ptr_t *checks_vector_ptr, zbx_vector_uint64_t *dcheckids_vector_ptr)
+		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids_vector_ptr)
 {
-	zbx_discovery_checks_t	*check_ptr;
-	int			i;
-	int			ret = SUCCEED;
+	zbx_service_t	*service;
+	int		i;
+	int		ret = SUCCEED;
 
 	if (SUCCEED != lock_checks(dcheckids_vector_ptr))
 	{
@@ -517,23 +516,23 @@ static int	post_process_checks(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const
 	}
 
 	/* extract checks from vector*/
-	for (i = 0; i < checks_vector_ptr->values_num; i++)
+	for (i = 0; i < services->values_num; i++)
 	{
-		check_ptr = (zbx_discovery_checks_t *)checks_vector_ptr->values[i];
+		service = (zbx_service_t *)services->values[i];
 
-		if (FAIL == zbx_vector_uint64_bsearch(dcheckids_vector_ptr, check_ptr->dcheckid,
+		if (FAIL == zbx_vector_uint64_bsearch(dcheckids_vector_ptr, service->dcheckid,
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
-			discovery_update_service(drule, check_ptr->dcheckid, dhost, ip, dns, check_ptr->port,
-					check_ptr->status, check_ptr->value, now);
+			discovery_update_service(drule, service->dcheckid, dhost, ip, dns, service->port,
+					service->status, service->value, now);
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		{
-			proxy_update_service(drule->druleid, check_ptr->dcheckid, ip, dns, check_ptr->port,
-					check_ptr->status, check_ptr->value, now);
+			proxy_update_service(drule->druleid, service->dcheckid, ip, dns, service->port,
+					service->status, service->value, now);
 		}
 	}
 

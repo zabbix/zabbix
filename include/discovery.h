@@ -29,13 +29,13 @@ typedef struct
 	zbx_uint64_t		dcheckid;
 	unsigned short		port;
 	char			dns[INTERFACE_DNS_LEN_MAX];
-	char 			value[MAX_DISCOVERED_VALUE_SIZE];
-	int 			status;
+	char			value[MAX_DISCOVERED_VALUE_SIZE];
+	int			status;
 	time_t			itemtime;
 }
-zbx_discovery_checks_t;
+zbx_service_t;
 
-void	zbx_checks_eval_free(zbx_discovery_checks_t *check);
+void	zbx_checks_eval_free(zbx_service_t *service);
 
 void	discovery_update_host(DB_DHOST *dhost, int status, int now);
 void	discovery_update_service(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost,
