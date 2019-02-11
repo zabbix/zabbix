@@ -509,8 +509,7 @@ static int	process_services(DB_DRULE *drule, DB_DHOST *dhost, const char *ip, co
 	{
 		zbx_service_t	*service = (zbx_service_t *)services->values[i];
 
-		if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid,
-				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
