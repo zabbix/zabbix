@@ -494,10 +494,10 @@ static int	db_lock_dcheckids(zbx_vector_uint64_t *dcheckids)
 
 /******************************************************************************
  *                                                                            *
- * Function: post_process_checks                                                   *
+ * Function: process_services                                                 *
  *                                                                            *
  ******************************************************************************/
-static int	post_process_checks(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const char *dns, int now,
+static int	process_services(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const char *dns, int now,
 		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
 	zbx_service_t	*service;
@@ -510,7 +510,6 @@ static int	post_process_checks(DB_DRULE *drule, DB_DHOST *dhost, char *ip, const
 		goto out;
 	}
 
-	/* extract checks from vector*/
 	for (i = 0; i < services->values_num; i++)
 	{
 		service = (zbx_service_t *)services->values[i];
@@ -650,7 +649,7 @@ static void	process_rule(DB_DRULE *drule)
 				goto out;
 			}
 
-			if (SUCCEED != post_process_checks(drule, &dhost, ip, dns, now, &services, &dcheckids))
+			if (SUCCEED != process_services(drule, &dhost, ip, dns, now, &services, &dcheckids))
 			{
 				DBrollback();
 
