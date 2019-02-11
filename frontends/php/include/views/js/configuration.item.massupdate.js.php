@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="custom_intervals_row">
 	<tr class="form_row">
 		<td>
-			<ul class="<?= ZBX_STYLE_RADIO_SEGMENTED ?>" id="delay_flex_#{rowNum}_type">
+			<ul class="<?= CRadioButtonList::ZBX_STYLE_CLASS ?>" id="delay_flex_#{rowNum}_type">
 				<li>
 					<input type="radio" id="delay_flex_#{rowNum}_type_0" name="delay_flex[#{rowNum}][type]" value="0" checked="checked">
 					<label for="delay_flex_#{rowNum}_type_0"><?= _('Flexible') ?></label>
