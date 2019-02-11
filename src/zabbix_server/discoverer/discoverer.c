@@ -528,19 +528,6 @@ static int	process_services(DB_DRULE *drule, DB_DHOST *dhost, const char *ip, co
 
 }
 
-static void create_check_vectors(zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
-{
-	zbx_vector_ptr_create(services);
-	zbx_vector_uint64_create(dcheckids);
-}
-
-static void destroy_check_vectors(zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
-{
-	zbx_vector_ptr_clear_ext(services, (zbx_clean_func_t)zbx_checks_eval_free);
-	zbx_vector_ptr_destroy(services);
-	zbx_vector_uint64_destroy(dcheckids);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: process_rule                                                     *
@@ -561,6 +548,9 @@ static void	process_rule(DB_DRULE *drule)
 	zbx_vector_uint64_t	dcheckids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __function_name, drule->name, drule->iprange);
+
+	zbx_vector_ptr_create(&services);
+	zbx_vector_uint64_create(&dcheckids);
 
 	for (start = drule->iprange; '\0' != *start;)
 	{
@@ -594,7 +584,6 @@ static void	process_rule(DB_DRULE *drule)
 
 		do
 		{
-			create_check_vectors(&services, &dcheckids);
 #ifdef HAVE_IPV6
 			if (ZBX_IPRANGE_V6 == iprange.type)
 			{
@@ -636,9 +625,7 @@ static void	process_rule(DB_DRULE *drule)
 
 				zabbix_log(LOG_LEVEL_DEBUG, "discovery rule '%s' was deleted during processing,"
 						" stopping", drule->name);
-
-				destroy_check_vectors(&services, &dcheckids);
-
+				zbx_vector_ptr_clear_ext(&services, (zbx_clean_func_t)zbx_service_free);
 				goto out;
 			}
 
@@ -647,19 +634,20 @@ static void	process_rule(DB_DRULE *drule)
 				DBrollback();
 
 				zabbix_log(LOG_LEVEL_DEBUG, "discovery check was deleted during processing, stopping");
+				zbx_vector_ptr_clear_ext(&services, (zbx_clean_func_t)zbx_service_free);
+				goto out;
 
 			}
-			else
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					discovery_update_host(&dhost, host_status, now);
-				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
-					proxy_update_host(drule->druleid, ip, dns, host_status, now);
 
-				DBcommit();
-			}
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+				discovery_update_host(&dhost, host_status, now);
+			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+				proxy_update_host(drule->druleid, ip, dns, host_status, now);
 
-			destroy_check_vectors(&services, &dcheckids);
+			DBcommit();
+
+			zbx_vector_uint64_clear(dcheckids);
+			zbx_vector_ptr_clear_ext(&services, (zbx_clean_func_t)zbx_service_free);
 
 		}
 		while (SUCCEED == iprange_next(&iprange, ipaddress));
@@ -674,6 +662,9 @@ next:
 			break;
 	}
 out:
+	zbx_vector_ptr_destroy(&services);
+	zbx_vector_uint64_destroy(&dcheckids);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

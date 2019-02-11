@@ -35,7 +35,7 @@ typedef struct
 }
 zbx_service_t;
 
-void	zbx_checks_eval_free(zbx_service_t *service);
+void	zbx_service_free(zbx_service_t *service);
 
 void	discovery_update_host(DB_DHOST *dhost, int status, int now);
 void	discovery_update_service(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost,

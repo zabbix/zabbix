@@ -3269,16 +3269,16 @@ int	process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, z
 }
 
 
-void	zbx_checks_eval_free(zbx_service_t *service)
+void	zbx_service_free(zbx_service_t *service)
 {
 	zbx_free(service);
 }
 
 void	zbx_ips_eval_free(zbx_discoved_ips_t *ip)
 {
-	zbx_vector_ptr_clear_ext(&ip->services, (zbx_clean_func_t)zbx_checks_eval_free);
+	zbx_vector_ptr_clear_ext(&ip->services, (zbx_clean_func_t)zbx_service_free);
 	zbx_vector_ptr_destroy(&ip->services);
-	zbx_vector_ptr_clear_ext(&ip->services_old, (zbx_clean_func_t)zbx_checks_eval_free);
+	zbx_vector_ptr_clear_ext(&ip->services_old, (zbx_clean_func_t)zbx_service_free);
 	zbx_vector_ptr_destroy(&ip->services_old);
 	zbx_free(ip);
 }
