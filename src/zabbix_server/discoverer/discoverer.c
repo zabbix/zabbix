@@ -643,15 +643,15 @@ static void	process_rule(DB_DRULE *drule)
 				goto out;
 			}
 
+			zbx_vector_uint64_clear(&dcheckids);
+			zbx_vector_ptr_clear_ext(&services, zbx_ptr_free);
+
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 				discovery_update_host(&dhost, host_status, now);
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 				proxy_update_host(drule->druleid, ip, dns, host_status, now);
 
 			DBcommit();
-
-			zbx_vector_uint64_clear(&dcheckids);
-			zbx_vector_ptr_clear_ext(&services, zbx_ptr_free);
 		}
 		while (SUCCEED == iprange_next(&iprange, ipaddress));
 next:
