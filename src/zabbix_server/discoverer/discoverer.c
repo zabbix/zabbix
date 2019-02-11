@@ -625,7 +625,7 @@ static void	process_rule(DB_DRULE *drule)
 
 				zabbix_log(LOG_LEVEL_DEBUG, "discovery rule '%s' was deleted during processing,"
 						" stopping", drule->name);
-				zbx_vector_ptr_clear_ext(&services, (zbx_clean_func_t)zbx_service_free);
+				zbx_vector_ptr_clear_ext(&services, zbx_ptr_free);
 				goto out;
 			}
 
@@ -634,7 +634,7 @@ static void	process_rule(DB_DRULE *drule)
 				DBrollback();
 
 				zabbix_log(LOG_LEVEL_DEBUG, "discovery check was deleted during processing, stopping");
-				zbx_vector_ptr_clear_ext(&services, (zbx_clean_func_t)zbx_service_free);
+				zbx_vector_ptr_clear_ext(&services, zbx_ptr_free);
 				goto out;
 
 			}
@@ -647,7 +647,7 @@ static void	process_rule(DB_DRULE *drule)
 			DBcommit();
 
 			zbx_vector_uint64_clear(&dcheckids);
-			zbx_vector_ptr_clear_ext(&services, (zbx_clean_func_t)zbx_service_free);
+			zbx_vector_ptr_clear_ext(&services, zbx_ptr_free);
 
 		}
 		while (SUCCEED == iprange_next(&iprange, ipaddress));
