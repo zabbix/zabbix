@@ -448,7 +448,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('inventory', $data)) {
-			$this->zbxTestTabSwitch('Host inventory');
+			$this->zbxTestTabSwitch('Inventory');
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['inventory'].'"]');
 		}
 
@@ -565,7 +565,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change inventory mode.
 		if (array_key_exists('inventory', $data)) {
-			$this->zbxTestTabSwitch('Host inventory');
+			$this->zbxTestTabSwitch('Inventory');
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['inventory'].'"]');
 		}
 
@@ -836,7 +836,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change inventory mode.
 		if (array_key_exists('inventory', $data)) {
-			$this->zbxTestTabSwitch('Host inventory');
+			$this->zbxTestTabSwitch('Inventory');
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['inventory'].'"]');
 		}
 
@@ -888,7 +888,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('inventory', $data)) {
-			$this->zbxTestTabSwitch('Host inventory');
+			$this->zbxTestTabSwitch('Inventory');
 			$this->zbxTestAssertElementPresentXpath('//label[text()="'.$data['inventory'].'"]/../input[@checked]');
 		}
 	}
