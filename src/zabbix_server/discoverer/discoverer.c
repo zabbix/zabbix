@@ -612,6 +612,7 @@ static void	process_rule(DB_DRULE *drule)
 			zbx_alarm_on(CONFIG_TIMEOUT);
 			zbx_gethost_by_ip(ip, dns, sizeof(dns));
 			zbx_alarm_off();
+
 			if (0 != drule->unique_dcheckid)
 				process_checks(drule, &host_status, ip, dns, 1, now, &services, &dcheckids);
 			process_checks(drule, &host_status, ip, dns, 0, now, &services, &dcheckids);
