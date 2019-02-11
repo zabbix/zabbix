@@ -334,7 +334,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
  * Parameters: service - service info                                         *
  *                                                                            *
  ******************************************************************************/
-static void	process_check(DB_DCHECK *dcheck,int *host_status, char *ip, const char *dns, int now,
+static void	process_check(DB_DCHECK *dcheck, int *host_status, char *ip, const char *dns, int now,
 		zbx_vector_ptr_t *services)
 {
 	const char	*__function_name = "process_check";
@@ -366,27 +366,23 @@ static void	process_check(DB_DCHECK *dcheck,int *host_status, char *ip, const ch
 
 		for (port = first; port <= last; port++)
 		{
-			int		service_status;
 			zbx_service_t	*service;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __function_name, port);
 
-			service_status = (SUCCEED == discover_service(dcheck, ip, port, &value, &value_alloc) ?
-					DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN);
-
-			/* update host status */
-			if (-1 == *host_status || DOBJECT_STATUS_UP == service_status)
-				*host_status = service_status;
-
-			/* insert discovered checks into the vector */
 			service = (zbx_service_t *)zbx_malloc(service, sizeof(zbx_service_t));
+			service->status = (SUCCEED == discover_service(dcheck, ip, port, &value, &value_alloc) ?
+					DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN);
 			service->dcheckid = dcheck->dcheckid;
 			service->itemtime = (time_t)now;
 			service->port = port;
 			zbx_strlcpy(service->value, value, MAX_DISCOVERED_VALUE_SIZE);
-			service->status = service_status;
 			zbx_strlcpy(service->dns, dns, INTERFACE_DNS_LEN_MAX);
 			zbx_vector_ptr_append(services, service);
+
+			/* update host status */
+			if (-1 == *host_status || DOBJECT_STATUS_UP == service->status)
+				*host_status = service->status;
 		}
 
 		if (NULL != comma)
