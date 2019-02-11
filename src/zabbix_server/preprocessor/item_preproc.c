@@ -1186,8 +1186,8 @@ out:
  *                                                                            *
  * Parameters: value  - [IN/OUT] the value to process                         *
  *             params - [IN] the operation parameters                         *
- *             errmsg - [OUT] error message part                              *
- *             error  - [OUT] direct error message                            *
+ *             action - [OUT] the taken on fail action                        *
+ *             error  - [OUT] error message                                   *
  *                                                                            *
  * Return value: FAIL - the specified error field exists                      *
  *               SUCCEED - otherwise                                          *
@@ -1197,27 +1197,26 @@ out:
  *           error.                                                           *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *params, char **errmsg,
+static int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *params, int *action,
 		char **error)
 {
 	zbx_variant_t		value_str;
 	char			err[MAX_STRING_LEN];
-	int			ret = SUCCEED;
+	int			ret;
 	struct zbx_json_parse	jp, jp_out;
 	size_t			data_alloc = 0;
 
 	if (FAIL == zbx_json_path_check(params, err, sizeof(err)))
 	{
-		*errmsg = zbx_strdup(*errmsg, err);
+		*error = zbx_strdup(*error, err);
 		return FAIL;
 	}
 
 	zbx_variant_set_variant(&value_str, value);
 
-	if (FAIL == item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, errmsg))
+	if (FAIL == (ret = item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, error)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		zbx_free(*errmsg);
 		goto out;
 	}
 
@@ -1234,6 +1233,7 @@ static int	item_preproc_get_error_from_json(const zbx_variant_t *value, const ch
 		goto out;
 	}
 
+	*action = ZBX_PREPROC_FAIL_FORCE_ERROR;
 	ret = FAIL;
 out:
 	zbx_variant_clear(&value_str);
@@ -1249,7 +1249,8 @@ out:
  *                                                                            *
  * Parameters: value  - [IN/OUT] the value to process                         *
  *             params - [IN] the operation parameters                         *
- *             errmsg - [OUT] error message                                   *
+ *             action - [OUT] the taken on fail action                        *
+ *             error  - [OUT] the error message                               *
  *                                                                            *
  * Return value: FAIL - the specified error field exists                      *
  *               SUCCEED - otherwise                                          *
@@ -1259,7 +1260,7 @@ out:
  *           error.                                                           *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const char *params, char **errmsg,
+static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const char *params, int *action,
 		char **error)
 {
 #ifndef HAVE_LIBXML2
@@ -1279,10 +1280,9 @@ static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const cha
 
 	zbx_variant_set_variant(&value_str, value);
 
-	if (FAIL == item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, errmsg))
+	if (FAIL == (ret = item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, error)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		zbx_free(*errmsg);
 		goto out;
 	}
 
@@ -1294,7 +1294,7 @@ static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const cha
 	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)params, xpathCtx)))
 	{
 		pErr = xmlGetLastError();
-		*errmsg = zbx_dsprintf(*errmsg, "cannot parse xpath: %s", pErr->message);
+		*error = zbx_dsprintf(*error, "cannot parse xpath: %s", pErr->message);
 		ret = FAIL;
 		goto out;
 	}
@@ -1334,6 +1334,7 @@ static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const cha
 		goto out;
 	}
 
+	*action = ZBX_PREPROC_FAIL_FORCE_ERROR;
 	ret = FAIL;
 out:
 	zbx_variant_clear(&value_str);
@@ -1359,8 +1360,8 @@ out:
  *                                                                            *
  * Parameters: value  - [IN/OUT] the value to process                         *
  *             params - [IN] the operation parameters                         *
- *             errmsg - [OUT] error message part                              *
- *             error  - [OUT] direct error message                            *
+ *             action - [OUT] the taken on fail action                        *
+ *             error  - [OUT] the error message                               *
  *                                                                            *
  * Return value: FAIL - the specified error field exists                      *
  *               SUCCEED - otherwise                                          *
@@ -1370,26 +1371,25 @@ out:
  *           error.                                                           *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const char *params, char **errmsg,
+static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const char *params, int *action,
 		char **error)
 {
 	zbx_variant_t	value_str;
-	int		ret = SUCCEED;
+	int		ret;
 	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
 
 	zbx_variant_set_variant(&value_str, value);
 
-	if (FAIL == item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, errmsg))
+	if (FAIL == (ret = item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, error)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		zbx_free(*errmsg);
 		goto out;
 	}
 
 	zbx_strlcpy(pattern, params, sizeof(pattern));
 	if (NULL == (output = strchr(pattern, '\n')))
 	{
-		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
+		*error = zbx_strdup(*error, "cannot find second parameter");
 		ret = FAIL;
 		goto out;
 	}
@@ -1398,7 +1398,7 @@ static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const c
 
 	if (FAIL == zbx_mregexp_sub(value_str.data.str, pattern, output, error))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression \"%s\"", pattern);
+		*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", pattern);
 		ret = FAIL;
 		goto out;
 	}
@@ -1412,6 +1412,7 @@ static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const c
 			goto out;
 		}
 
+		*action = ZBX_PREPROC_FAIL_FORCE_ERROR;
 		ret = FAIL;
 	}
 out:
@@ -1500,124 +1501,127 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
 
 	return SUCCEED;
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_item_preproc                                                 *
  *                                                                            *
  * Purpose: execute preprocessing operation                                   *
  *                                                                            *
- * Parameters: index         - [IN] the preprocessing step index              *
- *             value_type    - [IN] the item value type                       *
+ * Parameters: value_type    - [IN] the item value type                       *
  *             value         - [IN/OUT] the value to process                  *
  *             ts            - [IN] the value timestamp                       *
  *             op            - [IN] the preprocessing operation to execute    *
  *             history_value - [IN/OUT] last historical data of items with    *
  *                                      delta type preprocessing operation    *
- *             error        - [OUT] error message                             *
+ *             action        - [OUT] the taken 'on fail' action               *
+ *             error         - [OUT] error message                            *
  *                                                                            *
  * Return value: SUCCEED - the preprocessing step finished successfully       *
- *               FAIL - otherwise, errmsg contains the error message          *
+ *               FAIL - otherwise, error contains the error message           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
-		const zbx_preproc_op_t *op, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **error)
+int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
+		const zbx_preproc_op_t *op, zbx_variant_t *history_value, zbx_timespec_t *history_ts, int *action,
+		char **error)
 {
 	int	ret;
-	char	*errmsg = NULL;
+
+	*action = ZBX_PREPROC_FAIL_DEFAULT;
 
 	switch (op->type)
 	{
 		case ZBX_PREPROC_MULTIPLIER:
-			ret = item_preproc_multiplier(value_type, value, op->params, &errmsg);
+			ret = item_preproc_multiplier(value_type, value, op->params, error);
 			break;
 		case ZBX_PREPROC_RTRIM:
-			ret = item_preproc_rtrim(value, op->params, &errmsg);
+			ret = item_preproc_rtrim(value, op->params, error);
 			break;
 		case ZBX_PREPROC_LTRIM:
-			ret = item_preproc_ltrim(value, op->params, &errmsg);
+			ret = item_preproc_ltrim(value, op->params, error);
 			break;
 		case ZBX_PREPROC_TRIM:
-			ret = item_preproc_lrtrim(value, op->params, &errmsg);
+			ret = item_preproc_lrtrim(value, op->params, error);
 			break;
 		case ZBX_PREPROC_REGSUB:
-			ret = item_preproc_regsub(value, op->params, &errmsg);
+			ret = item_preproc_regsub(value, op->params, error);
 			break;
 		case ZBX_PREPROC_BOOL2DEC:
-			ret = item_preproc_bool2dec(value, &errmsg);
+			ret = item_preproc_bool2dec(value, error);
 			break;
 		case ZBX_PREPROC_OCT2DEC:
-			ret = item_preproc_oct2dec(value, &errmsg);
+			ret = item_preproc_oct2dec(value, error);
 			break;
 		case ZBX_PREPROC_HEX2DEC:
-			ret = item_preproc_hex2dec(value, &errmsg);
+			ret = item_preproc_hex2dec(value, error);
 			break;
 		case ZBX_PREPROC_DELTA_VALUE:
-			ret = item_preproc_delta_value(value_type, value, ts, history_value, history_ts, &errmsg);
+			ret = item_preproc_delta_value(value_type, value, ts, history_value, history_ts, error);
 			break;
 		case ZBX_PREPROC_DELTA_SPEED:
-			ret = item_preproc_delta_speed(value_type, value, ts, history_value, history_ts, &errmsg);
+			ret = item_preproc_delta_speed(value_type, value, ts, history_value, history_ts, error);
 			break;
 		case ZBX_PREPROC_XPATH:
-			ret = item_preproc_xpath(value, op->params, &errmsg);
+			ret = item_preproc_xpath(value, op->params, error);
 			break;
 		case ZBX_PREPROC_JSONPATH:
-			ret = item_preproc_jsonpath(value, op->params, &errmsg);
+			ret = item_preproc_jsonpath(value, op->params, error);
 			break;
 		case ZBX_PREPROC_VALIDATE_RANGE:
-			ret = item_preproc_validate_range(value_type, value, op->params, &errmsg);
+			ret = item_preproc_validate_range(value_type, value, op->params, error);
 			break;
 		case ZBX_PREPROC_VALIDATE_REGEX:
-			ret = item_preproc_validate_regex(value, op->params, &errmsg);
+			ret = item_preproc_validate_regex(value, op->params, error);
 			break;
 		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-			ret = item_preproc_validate_not_regex(value, op->params, &errmsg);
+			ret = item_preproc_validate_not_regex(value, op->params, error);
 			break;
 		case ZBX_PREPROC_ERROR_FIELD_JSON:
-			ret = item_preproc_get_error_from_json(value, op->params, &errmsg, error);
+			ret = item_preproc_get_error_from_json(value, op->params, action, error);
 			break;
 		case ZBX_PREPROC_ERROR_FIELD_XML:
-			ret = item_preproc_get_error_from_xml(value, op->params, &errmsg, error);
+			ret = item_preproc_get_error_from_xml(value, op->params, action, error);
 			break;
 		case ZBX_PREPROC_ERROR_FIELD_REGEX:
-			ret = item_preproc_get_error_from_regex(value, op->params, &errmsg, error);
+			ret = item_preproc_get_error_from_regex(value, op->params, action, error);
 			break;
 		case ZBX_PREPROC_THROTTLE_VALUE:
 			ret = item_preproc_throttle_value(value, ts, history_value, history_ts);
 			break;
 		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			ret = item_preproc_throttle_timed_value(value, ts, op->params, history_value, history_ts,
-					&errmsg);
+					error);
 			break;
 		default:
-			errmsg = zbx_dsprintf(NULL, "unknown preprocessing operation");
+			*error = zbx_dsprintf(*error, "unknown preprocessing operation");
 			ret = FAIL;
 	}
 
 	if (SUCCEED == ret)
 		return SUCCEED;
 
-	switch (op->error_handler)
+	if (ZBX_PREPROC_FAIL_DEFAULT == *action)
 	{
-		case ZBX_PREPROC_FAIL_DEFAULT:
-			/* if errmsg is NULL then error was set directly by preprocessing step */
-			if (NULL != errmsg)
-				*error = zbx_dsprintf(*error, "Item preprocessing step #%d failed: %s", index, errmsg);
-			break;
-		case ZBX_PREPROC_FAIL_DISCARD_VALUE:
-			zbx_variant_clear(value);
-			ret = SUCCEED;
-			break;
-		case ZBX_PREPROC_FAIL_SET_VALUE:
-			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_strdup(NULL, op->error_handler_params));
-			ret = SUCCEED;
-			break;
-		case ZBX_PREPROC_FAIL_SET_ERROR:
-			*error = zbx_strdup(*error, op->error_handler_params);
-			break;
-	}
+		*action = op->error_handler;
 
-	zbx_free(errmsg);
+		switch (op->error_handler)
+		{
+			case ZBX_PREPROC_FAIL_DISCARD_VALUE:
+				zbx_variant_clear(value);
+				zbx_free(*error);
+				ret = SUCCEED;
+				break;
+			case ZBX_PREPROC_FAIL_SET_VALUE:
+				zbx_variant_clear(value);
+				zbx_variant_set_str(value, zbx_strdup(NULL, op->error_handler_params));
+				zbx_free(*error);
+				ret = SUCCEED;
+				break;
+			case ZBX_PREPROC_FAIL_SET_ERROR:
+				*error = zbx_strdup(*error, op->error_handler_params);
+				break;
+		}
+	}
 
 	return ret;
 }

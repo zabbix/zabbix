@@ -170,7 +170,7 @@ void	zbx_mock_test_entry(void **state)
 	unsigned char			value_type;
 	zbx_timespec_t			ts, history_ts, expected_history_ts;
 	zbx_preproc_op_t		op;
-	int				returned_ret, expected_ret;
+	int				returned_ret, expected_ret, action;
 	char				*error = NULL;
 
 	ZBX_UNUSED(state);
@@ -191,7 +191,7 @@ void	zbx_mock_test_entry(void **state)
 
 	history_value_copy = history_value;
 
-	returned_ret = zbx_item_preproc(0, value_type, &value, &ts, &op, &history_value, &history_ts, &error);
+	returned_ret = zbx_item_preproc_step(0, value_type, &value, &ts, &op, &history_value, &history_ts, &action, &error);
 
 	if (SUCCEED == is_step_supported(op.type))
 		expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
