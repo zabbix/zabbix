@@ -1590,7 +1590,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
  *           host_name_sample is not modified, allocates new memory!          *
  *                                                                            *
  ******************************************************************************/
-char	*DBget_unique_hostname_by_sample(const char *host_name_sample, int use_visible_name)
+char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *field_name)
 {
 	const char		*__function_name = "DBget_unique_hostname_by_sample";
 
@@ -1601,7 +1601,6 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample, int use_visi
 	zbx_vector_uint64_t	nums;
 	zbx_uint64_t		num = 2;	/* produce alternatives starting from "2" */
 	size_t			sz;
-	char			*field_source;
 
 	assert(host_name_sample && *host_name_sample);
 
@@ -1610,11 +1609,8 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample, int use_visi
 	zbx_vector_uint64_create(&nums);
 	zbx_vector_uint64_reserve(&nums, 8);
 
-	field_source = use_visible_name ? "name" : "host";
-
 	sz = strlen(host_name_sample);
 	host_name_sample_esc = DBdyn_escape_like_pattern(host_name_sample);
-
 
 	result = DBselect(
 			"select %s"
@@ -1622,7 +1618,7 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample, int use_visi
 			" where %s like '%s%%' escape '%c'"
 				" and flags<>%d"
 				" and status in (%d,%d,%d)",
-				field_source, field_source, host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR,
+				field_name, field_name, host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE);
 
