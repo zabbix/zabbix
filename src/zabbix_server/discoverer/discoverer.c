@@ -376,7 +376,7 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, c
 			service->dcheckid = dcheck->dcheckid;
 			service->itemtime = (time_t)now;
 			service->port = port;
-			zbx_strlcpy(service->value, value, MAX_DISCOVERED_VALUE_SIZE);
+			zbx_strlcpy_utf8(service->value, value, MAX_DISCOVERED_VALUE_SIZE);
 			zbx_strlcpy(service->dns, dns, INTERFACE_DNS_LEN_MAX);
 			zbx_vector_ptr_append(services, service);
 
@@ -468,26 +468,28 @@ static int	db_lock_dcheckids(zbx_vector_uint64_t *dcheckids)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zbx_vector_uint64_sort(dcheckids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select dcheckid from dchecks where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dcheckid", dcheckids->values, dcheckids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by dcheckid" ZBX_FOR_UPDATE);
-
-	result = DBselect("%s", sql);
-	zbx_free(sql);
-
-	for (i = 0; NULL != (row = DBfetch(result)); i++)
+	if (0 != dcheckids->values_num)
 	{
-		ZBX_STR2UINT64(dcheckid, row[0]);
+		zbx_vector_uint64_sort(dcheckids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		while (dcheckid != dcheckids->values[i])
-			zbx_vector_uint64_remove(dcheckids, i);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select dcheckid from dchecks where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dcheckid", dcheckids->values, dcheckids->values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by dcheckid" ZBX_FOR_UPDATE);
+		result = DBselect("%s", sql);
+		zbx_free(sql);
+
+		for (i = 0; NULL != (row = DBfetch(result)); i++)
+		{
+			ZBX_STR2UINT64(dcheckid, row[0]);
+
+			while (dcheckid != dcheckids->values[i])
+				zbx_vector_uint64_remove(dcheckids, i);
+		}
+		DBfree_result(result);
+
+		while (i != dcheckids->values_num)
+			zbx_vector_uint64_remove_noorder(dcheckids, i);
 	}
-	DBfree_result(result);
-
-	while (i != dcheckids->values_num)
-		zbx_vector_uint64_remove_noorder(dcheckids, i);
 
 	return (0 != dcheckids->values_num ? SUCCEED : FAIL);
 }

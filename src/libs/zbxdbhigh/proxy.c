@@ -3349,7 +3349,7 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 					service->dcheckid = dcheckid;
 					service->itemtime = (time_t)atoi(row[1]);
 					service->port = atoi(row[2]);
-					zbx_strlcpy(service->value, row[3], MAX_DISCOVERED_VALUE_SIZE);
+					zbx_strlcpy_utf8(service->value, row[3], MAX_DISCOVERED_VALUE_SIZE);
 					service->status = atoi(row[4]);
 					zbx_strlcpy(service->dns, row[5], INTERFACE_DNS_LEN_MAX);
 					zbx_vector_ptr_append(&(ip_discovered_ptr->services_old), service);
@@ -3607,7 +3607,8 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		service = (zbx_service_t *)zbx_malloc(service, sizeof(zbx_service_t));
 		service->dcheckid = dcheckid;
 		service->port = port;
-		zbx_strlcpy(service->value, value, value_alloc);
+		service->status = status;
+		zbx_strlcpy_utf8(service->value, value, value_alloc);
 		zbx_strlcpy(service->dns, dns, INTERFACE_DNS_LEN_MAX);
 		service->itemtime = itemtime;
 		zbx_vector_ptr_append( &(ip_discovered_ptr->services), service);
