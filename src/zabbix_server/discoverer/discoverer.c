@@ -334,8 +334,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
  * Parameters: service - service info                                         *
  *                                                                            *
  ******************************************************************************/
-static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, const char *dns, int now,
-		zbx_vector_ptr_t *services)
+static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, int now, zbx_vector_ptr_t *services)
 {
 	const char	*__function_name = "process_check";
 	const char	*start;
@@ -402,7 +401,7 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, c
  * Function: process_checks                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const char *dns, int unique, int now,
+static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, int unique, int now,
 		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
 	DB_RESULT	result;
@@ -448,7 +447,7 @@ static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, const ch
 
 		zbx_vector_uint64_append(dcheckids, dcheck.dcheckid);
 
-		process_check(&dcheck, host_status, ip, dns, now, services);
+		process_check(&dcheck, host_status, ip, now, services);
 	}
 	DBfree_result(result);
 }
@@ -620,8 +619,8 @@ static void	process_rule(DB_DRULE *drule)
 			zbx_alarm_off();
 
 			if (0 != drule->unique_dcheckid)
-				process_checks(drule, &host_status, ip, dns, 1, now, &services, &dcheckids);
-			process_checks(drule, &host_status, ip, dns, 0, now, &services, &dcheckids);
+				process_checks(drule, &host_status, ip, 1, now, &services, &dcheckids);
+			process_checks(drule, &host_status, ip, 0, now, &services, &dcheckids);
 
 			DBbegin();
 
