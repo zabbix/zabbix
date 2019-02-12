@@ -36,8 +36,6 @@ $fields = [
 	'iconid' =>			[T_ZBX_INT, O_OPT, P_SYS, DB_ID,				null],
 	'width' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
 	'height' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
-	'max_width' =>		[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
-	'max_height' =>		[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
 	'unavailable' =>	[T_ZBX_INT, O_OPT, null, IN([0, 1]),		null],
 ];
 check_fields($fields);
@@ -72,7 +70,8 @@ if (isset($_REQUEST['css'])) {
 
 		$css .= 'div.sysmap_iconid_'.$image['imageid'].'{'.
 					' height: '.$h.'px;'.
-					' width: '.$w.'px;}';
+					' width: '.$w.'px;'.
+					' background: url("imgstore.php?iconid='.$image['imageid'].'&width='.$w.'&height='.$h.'") no-repeat center center;}'."\n";
 	}
 	echo $css;
 }
@@ -98,24 +97,20 @@ elseif (isset($_REQUEST['iconid'])) {
 		imagefilter($source, IMG_FILTER_BRIGHTNESS, 75);
 	}
 
-	$img_info = getimagesizefromstring($image['image']);
-	if (!in_array($img_info[ZBX_IMAGE_INFO_TYPE], [IMG_PNG, IMG_JPEG, IMG_GIF])) {
-		$resize = true;
-	}
+	list(,, $img_type) = getimagesizefromstring($image['image']);
+	$img_types = [
+		IMAGETYPE_GIF => IMAGE_FORMAT_GIF,
+		IMAGETYPE_JPEG => IMAGE_FORMAT_JPEG,
+		IMAGETYPE_PNG => IMAGE_FORMAT_PNG
+	];
 
-	if ($resize || $unavailable || $iconid <= 0 || !$image['image']) {
-		imageOut($source);
+	if (!$resize && $unavailable != 1 && array_key_exists($img_type, $img_types)) {
+		set_image_header($img_types[$img_type]);
+
+		echo $image['image'];
 	}
 	else {
-		switch ($img_info[ZBX_IMAGE_INFO_TYPE]) {
-			case IMG_JPEG:
-				set_image_header(IMAGE_FORMAT_JPEG);
-				break;
-
-			case IMG_GIF:
-				set_image_header(IMAGE_FORMAT_GIF);
-		}
-		echo $image['image'];
+		imageOut($source);
 	}
 }
 elseif (isset($_REQUEST['imageid'])) {
