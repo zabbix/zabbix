@@ -2297,8 +2297,7 @@ function get_status() {
 /**
  * Set image header.
  *
- * @global type $IMAGE_FORMAT_DEFAULT
- * @param integer $format
+ * @param integer $format    One of IMAGE_FORMAT_* constants. If not set global $IMAGE_FORMAT_DEFAULT will be used.
  */
 function set_image_header($format = null) {
 	global $IMAGE_FORMAT_DEFAULT;
