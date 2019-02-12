@@ -101,8 +101,26 @@ typedef struct
 	unsigned char		queue_priority;
 	unsigned char		schedulable;
 	unsigned char		update_triggers;
+	zbx_uint64_t		templateid;
+	zbx_uint64_t		parent_itemid; /* from joined item_discovery table */
 }
 ZBX_DC_ITEM;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	zbx_uint64_t		templateid;
+}
+ZBX_DC_TEMPLATE_ITEM;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	zbx_uint64_t		templateid;
+}
+ZBX_DC_PROTOTYPE_ITEM;
 
 typedef struct
 {
@@ -544,6 +562,23 @@ zbx_dc_trigger_tag_t;
 
 typedef struct
 {
+	zbx_uint64_t	hosttagid;
+	zbx_uint64_t	hostid;
+	const char	*tag;
+	const char	*value;
+}
+zbx_dc_host_tag_t;
+
+typedef struct
+{
+	zbx_uint64_t		hostid;
+	zbx_vector_ptr_t	tags;
+		/* references to zbx_dc_host_tag_t records cached in config-> host_tags hashset */
+}
+zbx_dc_host_tag_index_t;
+
+typedef struct
+{
 	const char	*tag;
 }
 zbx_dc_corr_condition_tag_t;
@@ -702,6 +737,8 @@ typedef struct
 
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
+	zbx_hashset_t		template_items;		/* template items selected from items table */
+	zbx_hashset_t		prototype_items;	/* item prototypes selected from items table */
 	zbx_hashset_t		numitems;
 	zbx_hashset_t		snmpitems;
 	zbx_hashset_t		ipmiitems;
@@ -725,7 +762,10 @@ typedef struct
 	zbx_hashset_t		hosts_p;		/* for searching proxies by 'host' name */
 	zbx_hashset_t		proxies;
 	zbx_hashset_t		host_inventories;
-	zbx_hashset_t		host_inventories_auto;	/* for caching of automatically populated host inventories */
+	zbx_hashset_t		host_inventories_auto;	/* For caching of automatically populated host inventories. */
+	 	 	 	 	 	 	/* Configuration syncer will read host_inventories without  */
+							/* locking cache and therefore it cannot be updated by      */
+							/* by history syncers when new data is received.	    */
 	zbx_hashset_t		ipmihosts;
 	zbx_hashset_t		htmpls;
 	zbx_hashset_t		gmacros;
@@ -741,6 +781,8 @@ typedef struct
 	zbx_hashset_t		actions;
 	zbx_hashset_t		action_conditions;
 	zbx_hashset_t		trigger_tags;
+	zbx_hashset_t		host_tags;
+	zbx_hashset_t		host_tags_index;		/* host tag index by hostid */
 	zbx_hashset_t		correlations;
 	zbx_hashset_t		corr_conditions;
 	zbx_hashset_t		corr_operations;

@@ -74,7 +74,8 @@ class CConfigurationExportBuilder {
 				'httptests' => $this->formatHttpTests($template['httptests']),
 				'macros' => $this->formatMacros($template['macros']),
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
-				'screens' => $this->formatScreens($template['screens'])
+				'screens' => $this->formatScreens($template['screens']),
+				'tags' => $this->formatTags($template['tags'])
 			];
 		}
 	}
@@ -116,7 +117,8 @@ class CConfigurationExportBuilder {
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
 				'httptests' => $this->formatHttpTests($host['httptests']),
 				'macros' => $this->formatMacros($host['macros']),
-				'inventory' => $this->formatHostInventory($host['inventory'])
+				'inventory' => $this->formatHostInventory($host['inventory']),
+				'tags' => $this->formatTags($host['tags'])
 			];
 		}
 	}
@@ -892,7 +894,7 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format trigger tags.
+	 * Format tags.
 	 *
 	 * @param array $tags
 	 *

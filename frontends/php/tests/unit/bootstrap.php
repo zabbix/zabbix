@@ -41,6 +41,7 @@ $autoloader = new CAutoloader([
 	__DIR__.'/../../include/classes/db',
 	__DIR__.'/../../include/classes/api',
 	__DIR__.'/../../include/classes/api/clients',
+	__DIR__.'/../../include/classes/api/helpers',
 	__DIR__.'/../../include/classes/api/wrappers',
 	__DIR__.'/../../include/classes/parsers',
 	__DIR__.'/../../include/classes/parsers/results',

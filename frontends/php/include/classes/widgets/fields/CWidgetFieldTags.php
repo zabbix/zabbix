@@ -58,7 +58,7 @@ class CWidgetFieldTags extends CWidgetField {
 	 */
 	public function getJavascript() {
 		return 'var tags_table = jQuery("#tags_table_'.$this->getName().'");'.
-			'tags_table.dynamicRows({template: "#tag-row"});'.
+			'tags_table.dynamicRows({template: "#tag-row-tmpl"});'.
 			'tags_table.parent().addClass("has-before");';
 	}
 

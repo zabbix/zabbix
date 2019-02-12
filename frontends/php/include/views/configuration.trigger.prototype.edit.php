@@ -485,43 +485,12 @@ $triggersFormList
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'correlation_tag_row'
+	)
+	->addRow(_('Allow manual close'),
+		(new CCheckBox('manual_close'))
+			->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+			->setEnabled(!$data['limited'])
 	);
-
-// tags
-$tags_table = (new CTable())->setId('tbl_tags');
-
-foreach ($data['tags'] as $tag_key => $tag) {
-	$tags_table->addRow([
-		(new CTextBox('tags['.$tag_key.'][tag]', $tag['tag'], false, 255))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('tag')),
-		(new CTextBox('tags['.$tag_key.'][value]', $tag['value'], false, 255))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('value')),
-		(new CCol(
-			(new CButton('tags['.$tag_key.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		))->addClass(ZBX_STYLE_NOWRAP)
-	], 'form_row');
-}
-
-$tags_table->setFooter(new CCol(
-	(new CButton('tag_add', _('Add')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('element-table-add')
-));
-$triggersFormList->addRow(_('Tags'),
-	(new CDiv($tags_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-);
-
-$triggersFormList->addRow(_('Allow manual close'),
-	(new CCheckBox('manual_close'))
-		->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
-		->setEnabled(!$data['limited'])
-);
 
 // append status to form list
 if (empty($data['triggerid']) && empty($data['form_refresh'])) {
@@ -544,6 +513,17 @@ if (!$data['form_refresh']) {
 	$triggersTab->setSelected(0);
 }
 $triggersTab->addTab('triggersTab',	_('Trigger prototype'), $triggersFormList);
+
+/*
+ * Tags tab
+ */
+$tags_view = new CView('configuration.tags.tab', [
+	'source' => 'trigger_prototype',
+	'tags' => $data['tags'],
+	'show_inherited_tags' => $data['show_inherited_tags'],
+	'readonly' => false
+]);
+$triggersTab->addTab('tags-tab', _('Tags'), $tags_view->render());
 
 /*
  * Dependencies tab

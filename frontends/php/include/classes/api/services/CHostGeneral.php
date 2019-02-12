@@ -917,7 +917,9 @@ abstract class CHostGeneral extends CHostBase {
 
 				$applications = zbx_toHash($applications, 'hostid');
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['applications'] = isset($applications[$hostid]) ? $applications[$hostid]['rowscount'] : 0;
+					$result[$hostid]['applications'] = array_key_exists($hostid, $applications)
+						? $applications[$hostid]['rowscount']
+						: 0;
 				}
 			}
 		}
@@ -936,6 +938,126 @@ abstract class CHostGeneral extends CHostBase {
 			$result = $relationMap->mapMany($result, $macros, 'macros', $options['limitSelects']);
 		}
 
+		// adding tags
+		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
+			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
+				$options['selectTags'] = ['tag', 'value'];
+			}
+
+			$tags_options = [
+				'output' => $this->outputExtend($options['selectTags'], ['hostid']),
+				'filter' => ['hostid' => $hostids]
+			];
+			$tags = DBselect(DB::makeSql('host_tag', $tags_options));
+
+			foreach ($result as &$host) {
+				$host['tags'] = [];
+			}
+			unset($host);
+
+			while ($tag = DBfetch($tags)) {
+				$result[$tag['hostid']]['tags'][] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value']
+				];
+			}
+		}
+
 		return $result;
+	}
+
+	/**
+	 * Compares input tags with tags stored in the database and performs tag deleting and inserting.
+	 *
+	 * @param array  $hosts
+	 * @param int    $hosts[]['hostid']
+	 * @param int    $hosts[]['templateid']
+	 * @param array  $hosts[]['tags']
+	 * @param string $hosts[]['tags'][]['tag']
+	 * @param string $hosts[]['tags'][]['value']
+	 * @param string $id_field
+	 */
+	protected function updateTags(array $hosts, $id_field) {
+		$hostids = [];
+		foreach ($hosts as $host) {
+			if (array_key_exists('tags', $host)) {
+				$hostids[] = $host[$id_field];
+			}
+		}
+
+		if (!$hostids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['hosttagid', 'hostid', 'tag', 'value'],
+			'filter' => ['hostid' => $hostids]
+		];
+
+		$db_tags = DBselect(DB::makeSql('host_tag', $options));
+		$db_hosts = [];
+		$del_hosttagids = [];
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$db_hosts[$db_tag['hostid']]['tags'][] = $db_tag;
+			$del_hosttagids[$db_tag['hosttagid']] = true;
+		}
+
+		$ins_tags = [];
+		foreach ($hosts as $host) {
+			foreach ($host['tags'] as $tag) {
+				$tag += ['value' => ''];
+
+				if (array_key_exists($host[$id_field], $db_hosts)) {
+					foreach ($db_hosts[$host[$id_field]]['tags'] as $db_tag) {
+						if ($tag['tag'] === $db_tag['tag'] && $tag['value'] === $db_tag['value']) {
+							unset($del_hosttagids[$db_tag['hosttagid']]);
+							$tag = null;
+							break;
+						}
+					}
+				}
+
+				if ($tag !== null) {
+					$ins_tags[] = ['hostid' => $host[$id_field]] + $tag;
+				}
+			}
+		}
+
+		if ($del_hosttagids) {
+			DB::delete('host_tag', ['hosttagid' => array_keys($del_hosttagids)]);
+		}
+
+		if ($ins_tags) {
+			DB::insert('host_tag', $ins_tags);
+		}
+	}
+
+	/**
+	 * Validates tags.
+	 *
+	 * @param array  $host
+	 * @param int    $host['evaltype']
+	 * @param array  $host['tags']
+	 * @param string $host['tags'][]['tag']
+	 * @param string $host['tags'][]['value']
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateTags(array $host) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'evaltype'	=> ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+			'tags'		=> ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
+				'value'		=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
+			]]
+		]];
+
+		// Keep values only for fields with defined validation rules.
+		$host = array_intersect_key($host, $api_input_rules['fields']);
+
+		if (!CApiInputValidator::validate($api_input_rules, $host, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 }
