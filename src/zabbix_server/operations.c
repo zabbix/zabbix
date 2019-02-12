@@ -318,7 +318,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 						" from dchecks dc"
 							" left join dservices ds"
 								" on ds.dcheckid=dc.dcheckid"
-								" and ds.dhostid=" ZBX_FS_UI64
+									" and ds.dhostid=" ZBX_FS_UI64
 						" where dc.druleid=" ZBX_FS_UI64
 							" and dc.host_source=%d",
 							dhostid, druleid, ZBX_DISCOVERY_VALUE);
@@ -337,8 +337,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				{
 					if (ZBX_DISCOVERY_VALUE == (host_source = atoi(row[6])))
 					{
-						zabbix_log(LOG_LEVEL_WARNING, "cannot select discovery check"
-								" value as host name from database");
+						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve discovery check value"
+								" for host name");
 						host_source = ZBX_DISCOVERY_DNS;
 					}
 				}
@@ -362,7 +362,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 						" from dchecks dc"
 							" left join dservices ds"
 								" on ds.dcheckid=dc.dcheckid"
-								" and ds.dhostid=" ZBX_FS_UI64
+									" and ds.dhostid=" ZBX_FS_UI64
 						" where dc.druleid=" ZBX_FS_UI64
 							" and dc.host_source in (%d,%d,%d,%d)"
 							" and dc.name_source=%d",
@@ -383,8 +383,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				{
 					if (ZBX_DISCOVERY_VALUE == (name_source = atoi(row[7])))
 					{
-						zabbix_log(LOG_LEVEL_WARNING, "cannot select discovery check"
-								" value as host visible name from database");
+						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve discovery check value"
+								" for host visible name");
 						name_source = ZBX_DISCOVERY_UNSPEC;
 					}
 				}
