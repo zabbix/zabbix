@@ -2664,32 +2664,35 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       max-height: 548px;
       overflow: hidden; }
       .overlay-dialogue.modal-code-editor .code-editor .line-numbers {
-        margin-bottom: 5px;
-        padding: 5px 5px 5px 0;
+        counter-reset: line;
         overflow: hidden;
-        counter-reset: line; }
+        padding: 5px 5px 5px 0;
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0; }
         .overlay-dialogue.modal-code-editor .code-editor .line-numbers li {
-          line-height: 18px;
-          text-align: right;
+          color: #cacaca;
           font-family: "Courier New", Courier, monospace;
-          color: #cacaca; }
+          line-height: 18px;
+          text-align: right; }
           .overlay-dialogue.modal-code-editor .code-editor .line-numbers li::before {
             counter-increment: line;
             content: counter(line);
             user-select: none; }
       .overlay-dialogue.modal-code-editor .code-editor .code-editor-textarea {
-        width: 100%;
-        height: 100%;
+        font-family: "Courier New", Courier, monospace;
+        line-height: 18px;
         resize: none;
         white-space: pre;
-        line-height: 18px;
-        font-family: "Courier New", Courier, monospace; }
+        height: 100%;
+        width: 100%; }
         .overlay-dialogue.modal-code-editor .code-editor .code-editor-textarea::-webkit-scrollbar {
           height: 9px; }
     .overlay-dialogue.modal-code-editor .symbols-remaining {
+      color: #cacaca;
       float: left;
-      line-height: 24px;
-      color: #cacaca; }
+      line-height: 24px; }
   .overlay-dialogue .msg-bad,
   .overlay-dialogue .msg-good {
     position: sticky;

@@ -37,10 +37,12 @@
 			$ln.find('li:eq(0)').remove();
 			diff++;
 		}
+
+		$textarea.css('margin-left', $ln.outerWidth());
 	}
 
 	var methods = {
-		init: function(options) {
+		init: function() {
 			return this.each(function() {
 				var $input = $(this)
 						.removeAttr('id')
@@ -108,7 +110,7 @@
 						.on('change contextmenu keydown keyup paste scroll', function() {
 							$counter.find('span').html(maxlength - $(this).val().length);
 							updateLineNumbers($(this));
-							$ln.prop('scrollTop', $textarea.prop('scrollTop'));
+							$ln.css('top', -Math.floor($textarea.prop('scrollTop')));
 						})
 						.trigger('change');
 				});

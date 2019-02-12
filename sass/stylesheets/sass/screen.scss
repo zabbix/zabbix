@@ -3864,6 +3864,8 @@ $form-icon-btn: (
 		min-width: 960px;
 
 		.code-editor {
+			$line-height: 18px;
+
 			position: relative;
 			display: flex;
 			height: calc(100vh - 190px);
@@ -3871,16 +3873,19 @@ $form-icon-btn: (
 			overflow: hidden;
 
 			.line-numbers {
-				margin-bottom: 5px;
-				padding: 5px 5px 5px 0;
-				overflow: hidden;
 				counter-reset: line;
+				overflow: hidden;
+				padding: 5px 5px 5px 0;
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
 
 				li {
-					line-height: 18px;
-					text-align: right;
-					font-family: $font-stack-mono;
 					color: $font-alt-color;
+					font-family: $font-stack-mono;
+					line-height: $line-height;
+					text-align: right;
 
 					&::before {
 						counter-increment: line;
@@ -3891,12 +3896,12 @@ $form-icon-btn: (
 			}
 
 			.code-editor-textarea {
-				width: 100%;
-				height: 100%;
+				font-family: $font-stack-mono;
+				line-height: $line-height;
 				resize: none;
 				white-space: pre;
-				line-height: 18px;
-				font-family: $font-stack-mono;
+				height: 100%;
+				width: 100%;
 
 				&::-webkit-scrollbar {
 					height: 9px;
@@ -3905,9 +3910,9 @@ $form-icon-btn: (
 		}
 
 		.symbols-remaining {
+			color: $font-alt-color;
 			float: left;
 			line-height: 24px;
-			color: $font-alt-color;
 		}
 	}
 
