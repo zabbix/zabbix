@@ -468,28 +468,28 @@ static int	db_lock_dcheckids(zbx_vector_uint64_t *dcheckids)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	if (0 != dcheckids->values_num)
+	if (0 == dcheckids->values_num)
+		return FAIL;
+
+	zbx_vector_uint64_sort(dcheckids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select dcheckid from dchecks where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dcheckid", dcheckids->values, dcheckids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by dcheckid" ZBX_FOR_UPDATE);
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	for (i = 0; NULL != (row = DBfetch(result)); i++)
 	{
-		zbx_vector_uint64_sort(dcheckids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		ZBX_STR2UINT64(dcheckid, row[0]);
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select dcheckid from dchecks where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dcheckid", dcheckids->values, dcheckids->values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by dcheckid" ZBX_FOR_UPDATE);
-		result = DBselect("%s", sql);
-		zbx_free(sql);
-
-		for (i = 0; NULL != (row = DBfetch(result)); i++)
-		{
-			ZBX_STR2UINT64(dcheckid, row[0]);
-
-			while (dcheckid != dcheckids->values[i])
-				zbx_vector_uint64_remove(dcheckids, i);
-		}
-		DBfree_result(result);
-
-		while (i != dcheckids->values_num)
-			zbx_vector_uint64_remove_noorder(dcheckids, i);
+		while (dcheckid != dcheckids->values[i])
+			zbx_vector_uint64_remove(dcheckids, i);
 	}
+	DBfree_result(result);
+
+	while (i != dcheckids->values_num)
+		zbx_vector_uint64_remove_noorder(dcheckids, i);
 
 	return (0 != dcheckids->values_num ? SUCCEED : FAIL);
 }
