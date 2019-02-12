@@ -2730,8 +2730,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
  *                                                                            *
  * Purpose: prepare sql to update LLD item                                    *
  *                                                                            *
- * Parameters: hostid               - [IN] parent host id                     *
- *             item_prototypes      - [IN] item prototypes                    *
+ * Parameters: item_prototype       - [IN] item prototype                     *
  *             item                 - [IN] item to be updated                 *
  *             sql                  - [IN/OUT] sql buffer pointer used for    *
  *                                             update operations              *
@@ -2741,25 +2740,11 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
  *                                             buffer                         *
  *                                                                            *
  ******************************************************************************/
-static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, const zbx_lld_item_t *item, char **sql,
-		size_t *sql_alloc, size_t *sql_offset)
+static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_item_t *item,
+		char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
-	const zbx_lld_item_prototype_t	*item_prototype;
 	char				*value_esc;
 	const char			*d = "";
-	int				index;
-
-	if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED) || 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
-		return;
-
-	if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &item->parent_itemid,
-			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return;
-	}
-
-	item_prototype = item_prototypes->values[index];
 
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update items set ");
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_NAME))
@@ -3098,10 +3083,32 @@ static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, con
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 
+	DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_item_discovery_prepare_update                                *
+ *                                                                            *
+ * Purpose: prepare sql to update key in LLD item discovery                   *
+ *                                                                            *
+ * Parameters: item_prototype       - [IN] item prototype                     *
+ *             item                 - [IN] item to be updated                 *
+ *             sql                  - [IN/OUT] sql buffer pointer used for    *
+ *                                             update operations              *
+ *             sql_alloc            - [IN/OUT] sql buffer already allocated   *
+ *                                             memory                         *
+ *             sql_offset           - [IN/OUT] offset for writing within sql  *
+ *                                             buffer                         *
+ *                                                                            *
+ ******************************************************************************/
+static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *item_prototype,
+		const zbx_lld_item_t *item, char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+	char	*value_esc;
+
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 	{
-		DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
-
 		value_esc = DBdyn_escape_string(item_prototype->key);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 				"update item_discovery"
@@ -3109,8 +3116,11 @@ static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, con
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				value_esc, item->itemid);
 		zbx_free(value_esc);
+
+		DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
 	}
 }
+
 
 /******************************************************************************
  *                                                                            *
@@ -3231,8 +3241,10 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 	if (0 != upd_items)
 	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
+		char				*sql = NULL;
+		size_t				sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
+		zbx_lld_item_prototype_t	*item_prototype;
+		int				index;
 
 		sql = (char*)zbx_malloc(NULL, sql_alloc);
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -3241,12 +3253,23 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		{
 			item = (zbx_lld_item_t *)items->values[i];
 
-			lld_item_prepare_update(item_prototypes, item, &sql, &sql_alloc, &sql_offset);
+			if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED) ||
+					0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
+			{
+				continue;
+			}
 
-			/* since lld_item_prepare_update() may return without adding any sql */
-			/* to the sql buffer, check if the buffer got non-empty content */
-			if (sql_offset > ZBX_SQL_EXEC_FROM)
-				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &item->parent_itemid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			item_prototype = item_prototypes->values[index];
+
+			lld_item_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
+			lld_item_discovery_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
 		}
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
