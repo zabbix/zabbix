@@ -396,6 +396,10 @@
 			return box1.current_pos[axis_key] - box2.current_pos[axis_key];
 		});
 
+		/**
+		 * Compact affected widgets removing empty space between them when possible. Additionaly built overlap array
+		 * which will contain maximal coordinate occupied by widgets on every opposite axis line.
+		 */
 		affected.each(function(box) {
 			var new_pos = axis_pos[axis_key] + axis_pos[size_key],
 				last = box.current_pos[opposite_axis_key] + box.current_pos[opposite_size_key],
@@ -426,7 +430,11 @@
 
 		overlap = new_max - size_max;
 
-		// Compact widget by resizing.
+		/**
+		 * When previous step could not fit affected widgets into visible area resize should be done.
+		 * Resize scan affected widgets line by line collapsing only widgets having size greater than minimal
+		 * allowed 'size_min' and position overlapped by dashboard visible area.
+		 */
 		if (overlap > 0) {
 			// Scanline is virtual box that utilizes whole width/height depending on its direction defined by size_key.
 			var scanline = $.extend({
@@ -483,6 +491,7 @@
 				axis_boundaries[box.uniqueid] = {debug: box.header, min: min, max: max};
 			});
 
+			// Scan affected line by line.
 			while (slot < new_max && overlap > 0) {
 				margins_backup = $.extend({}, margins);
 				collapsed_pos = {};
@@ -575,8 +584,8 @@
 		}
 
 		/**
-		 * When it is impossible to fit affected widgets into required boundary box ensure that wigets at least will
-		 * stay in dashboard boundary box.
+		 * When resize failed to fit affected widgets move them into visible area and decrease size of widget
+		 * which started resize operation, additionaly setting 'overflow' property to widget.
 		 */
 		if (overlap > 0) {
 			widget.current_pos[size_key] -= overlap;
