@@ -12,7 +12,8 @@
 			->toString()
 	?>
 </script>
-<script type="text/x-jquery-tmpl" id="filter-tag-row">
+
+<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
 	<?= (new CRow([
 			(new CTextBox('filter_tags[#{rowNum}][tag]'))
 				->setAttribute('placeholder', _('tag'))
@@ -34,11 +35,12 @@
 			->toString()
 	?>
 </script>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		$(function() {
-			$('#filter-inventory').dynamicRows({ template: '#filter-inventory-row' });
-			$('#filter-tags').dynamicRows({ template: '#filter-tag-row' });
+			$('#filter-inventory').dynamicRows({template: '#filter-inventory-row'});
+			$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
 		});
 
 		$('#filter_show').change(function() {

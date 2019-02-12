@@ -54,6 +54,11 @@ $fields = [
 	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
+	'mass_update_tags'	=>						[T_ZBX_INT, O_OPT, null,
+													IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
+													null
+												],
+	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
 	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
 													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 														ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
@@ -141,6 +146,23 @@ if ($triggerPrototypeIds) {
 	}
 }
 
+$tags = getRequest('tags', []);
+foreach ($tags as $key => $tag) {
+	// remove empty new tag lines
+	if ($tag['tag'] === '' && $tag['value'] === '') {
+		unset($tags[$key]);
+		continue;
+	}
+
+	// remove inherited tags
+	if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+		unset($tags[$key]);
+	}
+	else {
+		unset($tags[$key]['type']);
+	}
+}
+
 /*
  * Actions
  */
@@ -187,16 +209,7 @@ if (hasRequest('clone') && hasRequest('triggerid')) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$tags = getRequest('tags', []);
 	$dependencies = zbx_toObject(getRequest('dependencies', []), 'triggerid');
-
-	// Remove empty new tag lines.
-	foreach ($tags as $key => $tag) {
-		if ($tag['tag'] === '' && $tag['value'] === '') {
-			unset($tags[$key]);
-		}
-	}
-
 	$description = getRequest('description', '');
 	$expression = getRequest('expression', '');
 	$recovery_mode = getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION);
@@ -368,22 +381,31 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 		$triggerids = getRequest('g_triggerid');
 		$triggers_to_update = [];
 
-		$triggers = API::TriggerPrototype()->get([
+		$options = [
 			'output' => ['triggerid', 'templateid'],
 			'triggerids' => $triggerids,
 			'preservekeys' => true
-		]);
+		];
 
-		if ($triggers) {
-			$tags = getRequest('tags', []);
+		if (array_key_exists('tags', $visible)) {
+			$mass_update_tags = getRequest('mass_update_tags', ZBX_ACTION_ADD);
 
-			// Remove empty new tag lines.
-			foreach ($tags as $key => $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					unset($tags[$key]);
-				}
+			if ($mass_update_tags == ZBX_ACTION_ADD || $mass_update_tags == ZBX_ACTION_REMOVE) {
+				$options['selectTags'] = ['tag', 'value'];
 			}
 
+			$unique_tags = [];
+
+			foreach ($tags as $tag) {
+				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+			}
+
+			$tags = array_values($unique_tags);
+		}
+
+		$triggers = API::TriggerPrototype()->get($options);
+
+		if ($triggers) {
 			foreach ($triggerids as $triggerid) {
 				if (array_key_exists($triggerid, $triggers)) {
 					$trigger = ['triggerid' => $triggerid];
@@ -397,7 +419,33 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 					}
 
 					if (array_key_exists('tags', $visible)) {
-						$trigger['tags'] = $tags;
+						if ($tags && $mass_update_tags == ZBX_ACTION_ADD) {
+							$unique_tags = [];
+
+							foreach (array_merge($triggers[$triggerid]['tags'], $tags) as $tag) {
+								$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+							}
+
+							$trigger['tags'] = array_values($unique_tags);
+						}
+						elseif ($mass_update_tags == ZBX_ACTION_REPLACE) {
+							$trigger['tags'] = $tags;
+						}
+						elseif ($tags && $mass_update_tags == ZBX_ACTION_REMOVE) {
+							$diff_tags = [];
+
+							foreach ($triggers[$triggerid]['tags'] as $a) {
+								foreach ($tags as $b) {
+									if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
+										continue 2;
+									}
+								}
+
+								$diff_tags[] = $a;
+							}
+
+							$trigger['tags'] = $diff_tags;
+						}
 					}
 
 					if ($triggers[$triggerid]['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
@@ -419,7 +467,7 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
 }
 elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprototype.massenable', 'triggerprototype.massdisable']) && hasRequest('g_triggerid')) {
-	$status = (getRequest('action') == 'triggerprototype.massenable')
+	$status = (getRequest('action') === 'triggerprototype.massenable')
 		? TRIGGER_STATUS_ENABLED
 		: TRIGGER_STATUS_DISABLED;
 	$update = [];
@@ -456,7 +504,7 @@ elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprot
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massdelete' && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massdelete' && hasRequest('g_triggerid')) {
 	$result = API::TriggerPrototype()->delete(getRequest('g_triggerid'));
 
 	if ($result) {
@@ -504,10 +552,12 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expression_constructor' => getRequest('recovery_expression_constructor', IM_ESTABLISHED),
 		'limited' => false,
 		'templates' => [],
+		'parent_templates' => [],
 		'hostid' => $discoveryRule['hostid'],
 		'expression_action' => $expression_action,
 		'recovery_expression_action' => $recovery_expression_action,
-		'tags' => getRequest('tags', []),
+		'tags' => $tags,
+		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)

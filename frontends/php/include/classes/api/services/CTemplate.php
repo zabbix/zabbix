@@ -72,6 +72,8 @@ class CTemplate extends CHostGeneral {
 			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
+			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
+			'tags'						=> null,
 			'filter'					=> null,
 			'search'					=> '',
 			'searchByAny'				=> null,
@@ -92,6 +94,7 @@ class CTemplate extends CHostGeneral {
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
 			'selectHttpTests'			=> null,
+			'selectTags'				=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -236,6 +239,13 @@ class CTemplate extends CHostGeneral {
 			$sqlParts['where'][] = 'EXISTS (SELECT ht.httptestid FROM httptest ht WHERE ht.hostid=h.hostid)';
 		}
 
+		// tags
+		if ($options['tags'] !== null && $options['tags']) {
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
+				'host_tag', 'hostid'
+			);
+		}
+
 		// filter
 		if (is_array($options['filter'])) {
 			$this->dbFilter('hosts h', $options, $sqlParts);
@@ -306,6 +316,7 @@ class CTemplate extends CHostGeneral {
 			$templates[$key]['groups'] = zbx_toArray($template['groups']);
 		}
 
+		$ins_tags = [];
 		foreach ($templates as $template) {
 			// if visible name is not given or empty it should be set to host name
 			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
@@ -322,6 +333,12 @@ class CTemplate extends CHostGeneral {
 			$templateId = reset($newTemplateIds);
 
 			$templateIds[] = $templateId;
+
+			if (array_key_exists('tags', $template)) {
+				foreach ($template['tags'] as $tag) {
+					$ins_tags[] = ['hostid' => $templateId] + $tag;
+				}
+			}
 
 			foreach ($template['groups'] as $group) {
 				$hostGroupId = get_dbid('hosts_groups', 'hostgroupid');
@@ -350,6 +367,10 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
+		if ($ins_tags) {
+			DB::insert('host_tag', $ins_tags);
+		}
+
 		return ['templateids' => $templateIds];
 	}
 
@@ -357,6 +378,8 @@ class CTemplate extends CHostGeneral {
 	 * Validate create template.
 	 *
 	 * @param array $templates
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array $templates) {
 		$groupIds = [];
@@ -462,6 +485,11 @@ class CTemplate extends CHostGeneral {
 					));
 				}
 			}
+
+			// Validate tags.
+			if (array_key_exists('tags', $template)) {
+				$this->validateTags($template);
+			}
 		}
 	}
 
@@ -508,6 +536,8 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
+		$this->updateTags($templates, 'templateid');
+
 		return ['templateids' => zbx_objectValues($templates, 'templateid')];
 	}
 
@@ -515,6 +545,8 @@ class CTemplate extends CHostGeneral {
 	 * Validate update template.
 	 *
 	 * @param array $templates
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array $templates) {
 		$dbTemplates = $this->get([
@@ -532,6 +564,11 @@ class CTemplate extends CHostGeneral {
 			// Property 'auto_compress' is not supported for templates.
 			if (array_key_exists('auto_compress', $template)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+			}
+
+			// Validate tags.
+			if (array_key_exists('tags', $template)) {
+				$this->validateTags($template);
 			}
 		}
 	}

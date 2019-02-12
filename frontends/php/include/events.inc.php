@@ -683,24 +683,26 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  * Create element with tags.
  *
  * @param array  $list
- * @param string $list[]['eventid'|'triggerid']
+ * @param string $list[][$key]
  * @param array  $list[]['tags']
  * @param string $list[]['tags'][]['tag']
  * @param string $list[]['tags'][]['value']
  * @param bool   $html
- * @param string $key                            Name of tags source ID. Possible values:
- *                                                - 'eventid' - for events and problems (default);
- *                                                - 'triggerid' - for triggers.
- * @param int    $list_tag_count                 Maximum number of tags to display.
- * @param array  $filter_tags                    An array of tag filtering data.
+ * @param string $key                        Name of tag source ID. Possible values:
+ *                                            - 'eventid' - for events and problems (default);
+ *                                            - 'hostid' - for hosts;
+ *                                            - 'templateid' - for templates;
+ *                                            - 'triggerid' - for triggers.
+ * @param int    $list_tag_count             Maximum number of tags to display.
+ * @param array  $filter_tags                An array of tag filtering data.
  * @param string $filter_tags[]['tag']
  * @param int    $filter_tags[]['operator']
  * @param string $filter_tags[]['value']
- * @param int    $tag_name_format                Tag name format. Possible values:
- *                                                - PROBLEMS_TAG_NAME_FULL (default);
- *                                                - PROBLEMS_TAG_NAME_SHORTENED;
- *                                                - PROBLEMS_TAG_NAME_NONE.
- * @param string $tag_priority                   A list of comma-separated tag names.
+ * @param int    $tag_name_format            Tag name format. Possible values:
+ *                                            - PROBLEMS_TAG_NAME_FULL (default);
+ *                                            - PROBLEMS_TAG_NAME_SHORTENED;
+ *                                            - PROBLEMS_TAG_NAME_NONE.
+ * @param string $tag_priority               A list of comma-separated tag names.
  *
  * @return array
  */
@@ -710,6 +712,7 @@ function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count =
 
 	if ($html) {
 		// Convert $filter_tags to a more usable format.
+
 		$f_tags = [];
 
 		foreach ($filter_tags as $tag) {
@@ -726,9 +729,13 @@ function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count =
 	}
 
 	foreach ($list as $element) {
-		CArrayHelper::sort($element['tags'], ['tag', 'value']);
-
 		$tags[$element[$key]] = [];
+
+		if (!$element['tags']) {
+			continue;
+		}
+
+		CArrayHelper::sort($element['tags'], ['tag', 'value']);
 
 		if ($html) {
 			// Show first n tags and "..." with hint box if there are more.
@@ -748,7 +755,9 @@ function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count =
 					$tags[$element[$key]][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
 						->setHint(getTagString($tag));
+
 					$tags_shown++;
+
 					if ($tags_shown >= $list_tag_count) {
 						break;
 					}
@@ -771,7 +780,7 @@ function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count =
 					(new CButton(null))
 						->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
 						->setHint(new CDiv($hint_content), '', true, 'max-width: 500px')
-					))->addClass(ZBX_STYLE_REL_CONTAINER);
+				))->addClass(ZBX_STYLE_REL_CONTAINER);
 			}
 		}
 		else {
