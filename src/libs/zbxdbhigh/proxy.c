@@ -3397,7 +3397,6 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 						drule_ptr->druleid, dcheckid, drule_ptr->unique_dcheckid,
 						zbx_date2str(service->itemtime), zbx_time2str(service->itemtime),
 						ip_discovered_ptr->ip, service->dns, service->port, service->value);
-printf("AKDBG dns:'%s' value: '%s'\n",check_ptr->dns, check_ptr->value);
 				if (0 == dcheckid)
 				{
 					discovery_update_host(&dhost, service->status, service->itemtime);
