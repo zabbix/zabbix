@@ -191,7 +191,7 @@ void	zbx_mock_test_entry(void **state)
 
 	history_value_copy = history_value;
 
-	returned_ret = zbx_item_preproc_step(0, value_type, &value, &ts, &op, &history_value, &history_ts, &action, &error);
+	returned_ret = zbx_item_preproc(value_type, &value, &ts, &op, &history_value, &history_ts, &action, &error);
 
 	if (SUCCEED == is_step_supported(op.type))
 		expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
