@@ -1542,6 +1542,7 @@ void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source);
 int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);
 
 int	zbx_variant_convert(zbx_variant_t *value, int type);
+const char	*zbx_get_variant_type_desc(unsigned char type);
 const char	*zbx_variant_value_desc(const zbx_variant_t *value);
 const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 

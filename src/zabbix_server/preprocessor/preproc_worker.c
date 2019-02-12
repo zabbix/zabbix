@@ -114,7 +114,7 @@ static void	worker_format_result(int step, const zbx_preproc_result_t *result, c
 		char	*value_str;
 
 		worker_format_value(&result->value, &value_str);
-		*out = zbx_dsprintf(NULL, "%2d. Succeeded%s: %s\n", step, actions[result->action], value_str);
+		*out = zbx_dsprintf(NULL, "%2d. Result%s: %s\n", step, actions[result->action], value_str);
 		zbx_free(value_str);
 	}
 	else

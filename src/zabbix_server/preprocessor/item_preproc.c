@@ -33,6 +33,68 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: str_printable_dyn                                               *
+ *                                                                            *
+ * Purpose: converts text to printable string by converting special           *
+ *          characters to escape sequences                                    *
+ *                                                                            *
+ * Parameters: text - [IN] the text to convert                                *
+ *                                                                            *
+ * Return value: The text converted in printable format                       *
+ *                                                                            *
+ ******************************************************************************/
+static char	*str_printable_dyn(const char *text)
+{
+	size_t		out_alloc = 0;
+	const char	*pin;
+	char		*out, *pout;
+
+	for (pin = text; '\0' != *pin; pin++)
+	{
+		switch (*pin)
+		{
+			case '\n':
+			case '\t':
+			case '\r':
+				out_alloc += 2;
+				break;
+			default:
+				out_alloc++;
+				break;
+		}
+	}
+
+	out = zbx_malloc(NULL, ++out_alloc);
+
+	for (pin = text, pout = out; '\0' != *pin; pin++)
+	{
+		switch (*pin)
+		{
+			case '\n':
+				*pout++ = '\\';
+				*pout++ = 'n';
+				break;
+			case '\t':
+				*pout++ = '\\';
+				*pout++ = 't';
+				break;
+			case '\r':
+				*pout++ = '\\';
+				*pout++ = 'r';
+				break;
+			default:
+				*pout++ = *pin;
+				break;
+		}
+	}
+	*pout = '\0';
+
+	return out;
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: item_preproc_numeric_type_hint                                   *
  *                                                                            *
  * Purpose: returns numeric type hint based on item value type                *
@@ -73,7 +135,7 @@ static int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, 
 {
 	if (FAIL == zbx_variant_convert(value, type))
 	{
-		*errmsg = zbx_strdup(*errmsg, "cannot convert value");
+		*errmsg = zbx_dsprintf(*errmsg, "cannot convert value to %s", zbx_get_variant_type_desc(type));
 		return FAIL;
 	}
 
@@ -506,14 +568,16 @@ static int item_preproc_trim(zbx_variant_t *value, unsigned char op_type, const 
  ******************************************************************************/
 static int item_preproc_rtrim(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char	*err = NULL;
+	char	*err = NULL, *characters;
 
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_RTRIM, params, &err))
 		return SUCCEED;
 
+	characters = str_printable_dyn(params);
 	*errmsg = zbx_dsprintf(*errmsg, "cannot perform right trim of \"%s\" for value of type \"%s\": %s",
-			params, zbx_variant_type_desc(value), err);
+			characters, zbx_variant_type_desc(value), err);
 
+	zbx_free(characters);
 	zbx_free(err);
 
 	return FAIL;
@@ -535,14 +599,16 @@ static int item_preproc_rtrim(zbx_variant_t *value, const char *params, char **e
  ******************************************************************************/
 static int item_preproc_ltrim(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char	*err = NULL;
+	char	*err = NULL, *characters;
 
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_LTRIM, params, &err))
 		return SUCCEED;
 
+	characters = str_printable_dyn(params);
 	*errmsg = zbx_dsprintf(*errmsg, "cannot perform left trim of \"%s\" for value of type \"%s\": %s",
-			params, zbx_variant_type_desc(value), err);
+			characters, zbx_variant_type_desc(value), err);
 
+	zbx_free(characters);
 	zbx_free(err);
 
 	return FAIL;
@@ -564,14 +630,16 @@ static int item_preproc_ltrim(zbx_variant_t *value, const char *params, char **e
  ******************************************************************************/
 static int item_preproc_lrtrim(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char	*err = NULL;
+	char	*err = NULL, *characters;
 
 	if (SUCCEED == item_preproc_trim(value, ZBX_PREPROC_TRIM, params, &err))
 		return SUCCEED;
 
+	characters = str_printable_dyn(params);
 	*errmsg = zbx_dsprintf(*errmsg, "cannot perform trim of \"%s\" for value of type \"%s\": %s",
-			params, zbx_variant_type_desc(value), err);
+			characters, zbx_variant_type_desc(value), err);
 
+	zbx_free(characters);
 	zbx_free(err);
 
 	return FAIL;
@@ -797,13 +865,19 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
  ******************************************************************************/
 static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char	*err = NULL;
+	char	*err = NULL, *ptr;
+	int	len;
 
 	if (SUCCEED == item_preproc_regsub_op(value, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot perform regular expression match for value of type \"%s\": %s",
-			zbx_variant_type_desc(value), err);
+	if (NULL == (ptr = strchr(params, '\n')))
+		len = strlen(params);
+	else
+		len = ptr - params;
+
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform regular expression \"%.*s\" match for value of type \"%s\": %s",
+			len, params, zbx_variant_type_desc(value), err);
 
 	zbx_free(err);
 
@@ -1104,35 +1178,44 @@ out:
  *               FAIL - otherwise, errmsg contains the error message          *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_validate_regex(const zbx_variant_t *value, const char *params, char **errmsg)
+static int	item_preproc_validate_regex(const zbx_variant_t *value, const char *params, char **error)
 {
 	zbx_variant_t	value_str;
 	int		ret = FAIL;
 	zbx_regexp_t	*regex;
 	const char	*errptr = NULL;
+	char		*errmsg = NULL;
 
 	zbx_variant_set_variant(&value_str, value);
 
 	if (FAIL == zbx_variant_convert(&value_str, ZBX_VARIANT_STR))
 	{
-		*errmsg = zbx_strdup(*errmsg, "cannot convert value to string");
+		errmsg = zbx_strdup(errmsg, "cannot convert value to string");
 		goto out;
 	}
 
 	if (FAIL == zbx_regexp_compile(params, &regex, &errptr))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression pattern: %s", errptr);
+		errmsg = zbx_dsprintf(errmsg, "invalid regular expression pattern: %s", errptr);
 		goto out;
 	}
 
 	if (0 != zbx_regexp_match_precompiled(value_str.data.str, regex))
-		*errmsg = zbx_dsprintf(*errmsg, "value does not match regular expression: %s", params);
+		errmsg = zbx_strdup(errmsg, "value does not match regular expression");
 	else
 		ret = SUCCEED;
 
 	zbx_regexp_free(regex);
 out:
 	zbx_variant_clear(&value_str);
+
+	if (FAIL == ret)
+	{
+		*error = zbx_dsprintf(*error, "cannot perform regular expression \"%s\" validation"
+				" for value of type \"%s\": %s",
+				params, zbx_variant_type_desc(value), errmsg);
+		zbx_free(errmsg);
+	}
 
 	return ret;
 }
@@ -1151,30 +1234,31 @@ out:
  *               FAIL - otherwise, errmsg contains the error message          *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_validate_not_regex(const zbx_variant_t *value, const char *params, char **errmsg)
+static int	item_preproc_validate_not_regex(const zbx_variant_t *value, const char *params, char **error)
 {
 	zbx_variant_t	value_str;
 	int		ret = FAIL;
 	zbx_regexp_t	*regex;
 	const char	*errptr = NULL;
+	char		*errmsg = NULL;
 
 	zbx_variant_set_variant(&value_str, value);
 
 	if (FAIL == zbx_variant_convert(&value_str, ZBX_VARIANT_STR))
 	{
-		*errmsg = zbx_strdup(*errmsg, "cannot convert value to string");
+		errmsg = zbx_strdup(errmsg, "cannot convert value to string");
 		goto out;
 	}
 
 	if (FAIL == zbx_regexp_compile(params, &regex, &errptr))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression pattern: %s", errptr);
+		errmsg = zbx_dsprintf(errmsg, "invalid regular expression pattern: %s", errptr);
 		goto out;
 	}
 
 	if (0 == zbx_regexp_match_precompiled(value_str.data.str, regex))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "value matches regular expression: %s", params);
+		errmsg = zbx_strdup(errmsg, "value matches regular expression");
 	}
 	else
 		ret = SUCCEED;
@@ -1182,6 +1266,14 @@ static int	item_preproc_validate_not_regex(const zbx_variant_t *value, const cha
 	zbx_regexp_free(regex);
 out:
 	zbx_variant_clear(&value_str);
+
+	if (FAIL == ret)
+	{
+		*error = zbx_dsprintf(*error, "cannot perform regular expression \"%s\" validation"
+				" for value of type \"%s\": %s",
+				params, zbx_variant_type_desc(value), errmsg);
+		zbx_free(errmsg);
+	}
 
 	return ret;
 }
