@@ -1301,7 +1301,12 @@ output {
 
 	.cell {
 		vertical-align: bottom;
-		padding: 20px 0 20px 0;
+		padding: 20px 10px;
+		width: 20%;
+
+		img {
+			max-width: 100%;
+		}
 	}
 }
 

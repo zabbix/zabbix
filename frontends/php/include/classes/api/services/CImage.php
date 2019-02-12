@@ -179,6 +179,9 @@ class CImage extends CApiService {
 			// validate image (size and format)
 			$this->checkImage($image['image']);
 
+			// Converting to PNG all images except PNG, JPEG and GIF
+			$this->image2PNG($image['image']);
+
 			$imageid = get_dbid('images', 'imageid');
 			$values = [
 				'imageid' => $imageid,
@@ -277,6 +280,9 @@ class CImage extends CApiService {
 
 				// validate image
 				$this->checkImage($image['image']);
+
+				// Converting to PNG all images except PNG, JPEG and GIF
+				$this->image2PNG($image['image']);
 
 				switch ($DB['TYPE']) {
 					case ZBX_DB_POSTGRESQL:
@@ -578,5 +584,21 @@ class CImage extends CApiService {
 		}
 
 		return $sqlParts;
+	}
+
+	/**
+	 * Converting to PNG all images except PNG, JPEG and GIF.
+	 *
+	 * @param string $image
+	 */
+	protected function image2PNG(&$image) {
+		$img_info = getimagesizefromstring($image);
+		if (!in_array($img_info[ZBX_IMAGE_INFO_TYPE], [IMG_PNG, IMG_JPEG, IMG_GIF])) {
+			$image_resource = imageFromString($image);
+			ob_start();
+			imagepng($image_resource);
+			$image = ob_get_contents();
+			ob_end_clean();
+		}
 	}
 }

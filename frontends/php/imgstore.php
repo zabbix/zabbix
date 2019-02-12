@@ -49,13 +49,6 @@ if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
 	$height = getRequest('height', 0);
 }
 
-$limit = false;
-if (isset($_REQUEST['max_width']) || isset($_REQUEST['max_height'])) {
-	$limit = true;
-	$max_width = getRequest('max_width', 0);
-	$max_height = getRequest('max_height', 0);
-}
-
 if (isset($_REQUEST['css'])) {
 	$css = 'div.sysmap_iconid_0 {'.
 			' height: 50px;'.
@@ -105,27 +98,24 @@ elseif (isset($_REQUEST['iconid'])) {
 		imagefilter($source, IMG_FILTER_BRIGHTNESS, 75);
 	}
 
+	$img_info = getimagesizefromstring($image['image']);
+	if (!in_array($img_info[ZBX_IMAGE_INFO_TYPE], [IMG_PNG, IMG_JPEG, IMG_GIF])) {
+		$resize = true;
+	}
+
 	if ($resize || $unavailable || $iconid <= 0 || !$image['image']) {
 		imageOut($source);
 	}
 	else {
-		$img_info = getimagesizefromstring($image['image']);
+		switch ($img_info[ZBX_IMAGE_INFO_TYPE]) {
+			case IMG_JPEG:
+				set_image_header(IMAGE_FORMAT_JPEG);
+				break;
 
-		if ($img_info[ZBX_IMAGE_INFO_TYPE] == IMG_GIF) {
-			set_image_header(IMAGE_FORMAT_GIF);
+			case IMG_GIF:
+				set_image_header(IMAGE_FORMAT_GIF);
 		}
-
-		if ($limit && ($img_info[ZBX_IMAGE_INFO_WIDTH] > $max_width
-				|| $img_info[ZBX_IMAGE_INFO_HEIGHT] > $max_height)) {
-			$source = imageFromString($image['image']);
-			$source = imageThumb($source, min($img_info[ZBX_IMAGE_INFO_WIDTH], $max_width),
-				min($img_info[ZBX_IMAGE_INFO_HEIGHT], $max_heigh)
-			);
-			imageOut($source);
-		}
-		else {
-			echo $image['image'];
-		}
+		echo $image['image'];
 	}
 }
 elseif (isset($_REQUEST['imageid'])) {
