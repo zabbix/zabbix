@@ -363,7 +363,9 @@
 				.each(function(box) {
 					var boundary = $.extend({}, box.current_pos);
 
-					boundary[size_key] += pos[axis_key] + pos[size_key] - boundary[axis_key];
+					if (box.uniqueid !== widget.uniqueid) {
+						boundary[size_key] += pos[axis_key] + pos[size_key] - boundary[axis_key];
+					}
 					box.affected_axis = axis_key;
 
 					markAffectedWidgets(boundary);
@@ -380,11 +382,10 @@
 				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
 			});
 			axis_pos[axis_key] = size_max - axis_pos[axis_key] - axis_pos[size_key];
-			axis.boundary[axis_key] = size_max - axis.boundary[axis_key] - axis.boundary[size_key];
 		}
 
 		// Get array containing only widgets affected by resize operation.
-		markAffectedWidgets(axis.boundary, widget.uniqueid);
+		markAffectedWidgets(widget.current_pos, widget.uniqueid);
 		affected = $.map(widgets, function(box) {
 			return ('affected_axis' in box && box.affected_axis === axis_key && box.uniqueid !== widget.uniqueid)
 				? box
@@ -619,7 +620,6 @@
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
 				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
 			});
-			axis.boundary[axis_key] = size_max - axis.boundary[axis_key] - axis.boundary[size_key];
 		}
 	}
 
@@ -632,6 +632,8 @@
 	 */
 	function realignResize(data, widget) {
 		var axis,
+			opposite_axis_key,
+			opposite_size_key,
 			process_order = (widget.prev_pos.x != widget.current_pos.x
 				|| widget.prev_pos.width != widget.current_pos.width)
 					? ['x', 'y']
@@ -651,7 +653,6 @@
 			widget.prev_pos.mirrored.y = true;
 		}
 
-
 		// Situation when there are changes on both axes should be handled as special case.
 		if (process_order[0] === 'x' && (widget.prev_pos.y != widget.current_pos.y
 				|| widget.prev_pos.height != widget.current_pos.height)) {
@@ -661,6 +662,15 @@
 				y: widget.current_pos.y,
 				width: widget.prev_pos.width,
 				height: widget.current_pos.height
+			}
+
+			if ('width' in widget.prev_pos.axis_correction) {
+				// Use 'corrected' size if it is less than current size.
+				pos.width = Math.min(widget.prev_pos.axis_correction.width, pos.width);
+
+				if ('x' in widget.prev_pos.mirrored && 'x' in widget.prev_pos.axis_correction) {
+					pos.x = Math.max(widget.prev_pos.axis_correction.x, pos.x);
+				}
 			}
 
 			$.map(data.widgets, function(box) {
@@ -691,7 +701,6 @@
 				size_key: 'width',
 				size_min: 1,
 				size_max: data.options['max-columns'],
-				boundary: $.extend({}, widget.current_pos),
 				scanline: {
 					width: data.options['max-columns'],
 					height: data.options['max-rows']
@@ -708,16 +717,17 @@
 				axis.mirrored = true;
 			}
 
-			var opposite_axis_key = axis_key == 'y' ? 'x' : 'y',
-				opposite_size_key = opposite_axis_key == 'x' ? 'width' : 'height';
-			if (widget.prev_pos.axis_correction && opposite_size_key in widget.prev_pos.axis_correction) {
+			opposite_axis_key = (axis_key === 'y') ? 'x' : 'y',
+			opposite_size_key = (opposite_axis_key === 'x') ? 'width' : 'height';
+
+			if (opposite_size_key in widget.prev_pos.axis_correction) {
 				// Use 'corrected' size if it is less than current size.
-				axis.boundary[opposite_size_key] = Math.min(widget.prev_pos.axis_correction[opposite_size_key],
-					axis.boundary[opposite_size_key]);
+				widget.current_pos[opposite_size_key] = Math.min(widget.prev_pos.axis_correction[opposite_size_key],
+					widget.current_pos[opposite_size_key]);
 
 				if (opposite_axis_key in widget.prev_pos.mirrored && opposite_axis_key in widget.prev_pos.axis_correction) {
-					axis.boundary[opposite_axis_key] = Math.max(widget.prev_pos.axis_correction[opposite_axis_key],
-						axis.boundary[opposite_axis_key]);
+					widget.current_pos[opposite_axis_key] = Math.max(widget.prev_pos.axis_correction[opposite_axis_key],
+						widget.current_pos[opposite_axis_key]);
 				}
 			}
 
@@ -725,7 +735,6 @@
 
 			if ('overflow' in widget.current_pos) {
 				// Store 'corrected' size.
-				widget.prev_pos.axis_correction = 'axis_correction' in widget.prev_pos ? widget.prev_pos.axis_correction : {};
 				widget.prev_pos.axis_correction[axis.size_key] = widget.current_pos[axis.size_key];
 
 				if (axis.mirrored) {
@@ -733,16 +742,6 @@
 				}
 
 				delete widget.current_pos.overflow;
-			}
-		});
-
-		// debug code
-		data.widgets.each(function(b) {
-			if ('affected_axis' in b) {
-				b.div.css('background-color', b.affected_axis == 'x' ? 'rgba(0, 255, 0, 0.3)' : 'rgba(255, 0, 0, 0.3)');
-			}
-			else {
-				b.div.css('background-color', '')
 			}
 		});
 	}
@@ -937,6 +936,7 @@
 				setResizableState('disable', data.widgets, widget.uniqueid);
 				startWidgetPositioning($(event.target), data, 'resize');
 				widget.prev_pos = $.extend({mirrored: {}}, widget.pos);
+				widget.prev_pos.axis_correction = {};
 				doWidgetResize($obj, $(event.target), data);
 			},
 			resize: function(event, ui) {
@@ -974,7 +974,6 @@
 			},
 			stop: function(event) {
 				delete widget.prev_pos;
-				delete widget.max_width;
 
 				setResizableState('enable', data.widgets, widget.uniqueid);
 				stopWidgetPositioning($obj, $(event.target), data);
