@@ -20,25 +20,24 @@
 #include "common.h"
 #include "zbxprometheus.h"
 
-
 #define SKIP_LEADING_WS_HTAB(s)						\
 	do {								\
 		while (*(s) && (*(s) == ' ' || *(s) == '\t')) (s)++;	\
 	} while(0)
 
-#define CUT_TRAILING_WS_HTAB(s)				\
-	do {						\
-		char *x, *eol = (s) + strlen(s);	\
-		x = eol - 1;				\
-		while (x > (s))				\
-		{					\
-			if (*x == ' ' || *x == '\t')	\
-				eol = x;		\
-			x--;				\
-		}					\
-		*eol = '\0';				\
+#define CUT_TRAILING_WS_HTAB(s)						\
+	do {								\
+		char *eol = (s) + strlen(s);				\
+		while (eol > (s))					\
+		{							\
+			if (*(eol - 1) != ' ' && *(eol - 1) != '\t')	\
+				break;					\
+			eol--;						\
+		}							\
+		*eol = '\0';						\
 	} while(0)
 
+#define ZBX_PROMETH_RE_OVECCOUNT	30
 
 struct zbx_prometh_list_elem
 {
@@ -255,9 +254,29 @@ static void	zbx_prometh_list_copy (zbx_prometh_list_t *dst, zbx_prometh_list_t *
 
 static int	zbx_prometh_compare_regex(char *pattern, char *s)
 {
-	/* TODO */
+	pcre	*zbx_prometh_re;
+	const char	*errmsg;
+	int	erroffset, ovector[ZBX_PROMETH_RE_OVECCOUNT], ret;
 
-	return 0;
+	if (*pattern == '~')
+		++pattern;
+
+	if (*pattern == '\"')
+		++pattern;
+
+	if (pattern[strlen(pattern)-1] == '\"')
+		pattern[strlen(pattern)-1] = '\0';
+
+	if (NULL == (zbx_prometh_re = pcre_compile(pattern, 0, &errmsg, &erroffset, NULL)))
+		return 0;
+
+	ret = pcre_exec(zbx_prometh_re, NULL, s, (int)strlen(s), 0, 0, ovector, ZBX_PROMETH_RE_OVECCOUNT);
+
+	ret = (0 > ret) ? 0 : 1;
+
+	pcre_free(zbx_prometh_re);
+
+	return ret;
 }
 
 static int	zbx_prometh_compare_strings(char *pattern, char *s)
@@ -268,33 +287,53 @@ static int	zbx_prometh_compare_strings(char *pattern, char *s)
 	return 0;
 }
 
+static void zbx_prometh_clear_leading_trailing_ws(char **dst, char *src)
+{
+	size_t len;
+
+	SKIP_LEADING_WS_HTAB(src);
+
+	CUT_TRAILING_WS_HTAB(src);
+
+	len = strlen(src);
+
+	*dst = (char *)zbx_malloc(NULL, (len + 1));
+	zbx_strlcpy(*dst, src, (len + 1));
+	zbx_free(src);
+}
+
 static void	zbx_prometh_get_separated(char *str, char separator,  char **left, char **right)
 {
-	char *p, *s = str;
+	char *p, *s = str, *tmp;
 
-	SKIP_LEADING_WS_HTAB(s);
-
-	p = strchr(s, separator);
+	p = strchr(s, (int)separator);
 
 	if (NULL != p)
 	{
-
-		*left = (char *)zbx_malloc(NULL, (p - s + 1));
-		zbx_strlcpy(*left, s, (p - s + 1));
+		tmp = (char *)zbx_malloc(NULL, (p - s + 1));
+		zbx_strlcpy(tmp, s, (p - s + 1));
+		zbx_prometh_clear_leading_trailing_ws(left, tmp);
 
 		++p;
 
 		if (strlen(p))
 		{
-			*right = (char *)zbx_malloc(NULL, (strlen(p) + 1));
-			zbx_strlcpy(*right, p, (strlen(p) + 1));
+			tmp = (char *)zbx_malloc(NULL, (strlen(p) + 1));
+			zbx_strlcpy(tmp, p, (strlen(p) + 1));
+			zbx_prometh_clear_leading_trailing_ws(right, tmp);
 		}
-
+		else
+		{
+			/* place an empty string */
+			*right = (char *)zbx_malloc(NULL, 1);
+			**right = '\0';
+		}
 	}
 	else
 	{
-		*left = (char *)zbx_malloc(NULL, (strlen(s) + 1));
-		zbx_strlcpy(*left, s, (strlen(s) + 1));
+		tmp = (char *)zbx_malloc(NULL, (strlen(s) + 1));
+		zbx_strlcpy(tmp, s, (strlen(s) + 1));
+		zbx_prometh_clear_leading_trailing_ws(left, tmp);
 		*right = NULL;
 	}
 	zbx_free(str);
@@ -541,7 +580,7 @@ static void	zbx_prometh_parse_filter_substring (zbx_prometh_list_t *pf, char *s)
 			fn.name = l;
 			fn.name_check = zbx_prometh_compare_strings;
 			fn.value = r;
-			fn.value_check = zbx_prometh_compare_strings; /* TODO: or regex !!! */
+			fn.value_check = (*r == '~') ? zbx_prometh_compare_regex : zbx_prometh_compare_strings;
 			zbx_prometh_filter_node_add(pf, &fn);
 		}
 		else
@@ -549,7 +588,8 @@ static void	zbx_prometh_parse_filter_substring (zbx_prometh_list_t *pf, char *s)
 			memset(&fn, 0, sizeof(fn));
 			fn.item = zbx_prometh_item_metric_name;
 			fn.name = r;
-			fn.name_check = zbx_prometh_compare_strings; /* TODO: or regex !!! */
+			fn.value_check =
+				(*r == '~') ? zbx_prometh_compare_regex : zbx_prometh_compare_strings;
 			fn.value = NULL;
 			fn.value_check = NULL;
 			zbx_prometh_filter_node_add(pf, &fn);
@@ -608,6 +648,7 @@ static int zbx_prometh_filter_create (zbx_prometh_list_t *pf, char *str)
 
 		metric_name = (char *)zbx_malloc(NULL, (count + 1));
 		zbx_strlcpy(metric_name, str, (count + 1));
+		/* TODO: prometheus format restrictions! */
 		memset(&fn, 0, sizeof(fn));
 		fn.item = zbx_prometh_item_metric_name;
 		fn.name = metric_name;
@@ -617,20 +658,27 @@ static int zbx_prometh_filter_create (zbx_prometh_list_t *pf, char *str)
 		zbx_prometh_filter_node_add(pf, &fn);
 	}
 
+	SKIP_LEADING_WS_HTAB(p);
+
 	if (*p == '{')
 	{
 		str = ++p;
 		count = 0;
 
-		/* prepare substring */
 		while (*p && *p != '}')
 		{
 			p++;
 			count++;
 		}
 
+		if (*p != '}')
+		{
+			/* ERROR: format */
+		}
+
 		substr = (char *)zbx_malloc(NULL, (count + 1));
 		zbx_strlcpy(substr, str, (count + 1));
+
 		zbx_prometh_parse_filter_substring(pf, substr);
 	}
 
@@ -866,7 +914,7 @@ int	zbx_prometheus_pattern (char *data, char *params, char *value_type, char **o
 		}
 		*p = '\0';
 
-		*err = zbx_dsprintf(*err, "multiple metric result:\n%s\n", metrics);
+		*err = zbx_dsprintf(*err, "multiple metric result:\n%s", metrics);
 	}
 	else
 	{
