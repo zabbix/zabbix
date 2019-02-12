@@ -46,13 +46,8 @@ class C40ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHosts(array $hosts) {
-		$default = [
-			'tag' => DB::getDefault('host_tag', 'tag'),
-			'value' => DB::getDefault('host_tag', 'value')
-		];
-
 		foreach ($hosts as &$host) {
-			$host['tags'] = $default;
+			$host['tags'] = [];
 
 			if (array_key_exists('items', $host)) {
 				$host['items'] = $this->convertItems($host['items']);
