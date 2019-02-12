@@ -1,8 +1,16 @@
 Changes for 4.0.5rc1
 
 New features:
+..FGI..PST [ZBXNEXT-401,ZBXNEXT-4907,ZBXNEXT-4955] added monitoring of internal metrics from an external Zabbix instance (vasilijs, viktors)
 
 Bug fixes:
+.......PS. [ZBX-15593] fixed database upgrade patch to stop upgrade on commit failure (vso)
+........S. [ZBX-15611] fixed crash in configuration syncer when there are groups with same name and when removing preprocessing steps from item (vso)
+..F....... [ZBX-15242] fixed value trimming and duplicate catching in SVG graph pattern fields (miks)
+..F....... [ZBX-15250] fixed selection box height calculation in classic graph (miks)
+...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
+...G...PS. [ZBX-15379] fixed -Wimplicit-fallthrough warnings when compiling with GCC 7 and -Wextra (akozlovs)
+A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
 ...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
 ........S. [ZBX-15533] fixed cutting and trimming event tags and values (asitals)
 .......P.. [ZBX-15442] fixed reporting idle time in datasender's process state information (asitals)
@@ -489,7 +497,7 @@ A.F....... [ZBX-13355] fixed media type a required password field successfully p
 .......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
 A.F.I..... [ZBXNEXT-4540] fixed problems filter with same tags not being joined with OR condition (Ivo, Sasha)
 ..F....... [ZBXNEXT-4576] unified dashboard widget content margins (Andzs, ashubin)
-.......PS. [ZBX-12965] - fixed scheduled check calculation during daylight saving changes (wiper)
+.......PS. [ZBX-12965] fixed scheduled check calculation during daylight saving changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha7
