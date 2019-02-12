@@ -377,7 +377,6 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, c
 			service->itemtime = (time_t)now;
 			service->port = port;
 			zbx_strlcpy_utf8(service->value, value, MAX_DISCOVERED_VALUE_SIZE);
-			zbx_strlcpy(service->dns, dns, INTERFACE_DNS_LEN_MAX);
 			zbx_vector_ptr_append(services, service);
 
 			/* update host status */
