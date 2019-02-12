@@ -3397,7 +3397,7 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 						drule_ptr->druleid, dcheckid, drule_ptr->unique_dcheckid,
 						zbx_date2str(service->itemtime), zbx_time2str(service->itemtime),
 						ip_discovered_ptr->ip, service->dns, service->port, service->value);
-
+printf("AKDBG dns:'%s' value: '%s'\n",check_ptr->dns, check_ptr->value);
 				if (0 == dcheckid)
 				{
 					discovery_update_host(&dhost, service->status, service->itemtime);
@@ -3448,13 +3448,22 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 
 		for (index_dchecks = *start_idx; index_dchecks < services->values_num; index_dchecks++)
 		{
+			char	*ip_esc, *dns_esc, *value_esc;
+
 			service = (zbx_service_t *)services->values[index_dchecks];
+
+			ip_esc = DBdyn_escape_field("proxy_dhistory", "ip", ip_discovered_ptr->ip);
+			dns_esc = DBdyn_escape_field("proxy_dhistory", "dns", service->dns);
+			value_esc = DBdyn_escape_field("proxy_dhistory", "value", service->value);
+
 			DBexecute("insert into proxy_dhistory (clock,druleid,ip,port,value,status,dcheckid,dns)"
 					" values (%d," ZBX_FS_UI64 ",'%s',%d,'%s',%d," ZBX_FS_UI64 ",'%s')",
-					(int)service->itemtime, drule_ptr->druleid, ip_discovered_ptr->ip,
-					service->port, service->value, service->status, service->dcheckid,
-					service->dns);
+					(int)service->itemtime, drule_ptr->druleid, ip_esc, service->port,
+					value_esc, service->status, service->dcheckid, dns_esc);
 
+			zbx_free(value_esc);
+			zbx_free(dns_esc);
+			zbx_free(ip_esc);
 		}
 
 		DBcommit();
@@ -3571,10 +3580,6 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			ip_discovered_ptr = rule_ptr->ips.values[index_ip];
 		}
 
-		service = (zbx_service_t *)zbx_malloc(service, sizeof(zbx_service_t));
-		service->dcheckid = dcheckid;
-		zbx_vector_ptr_append( &(ip_discovered_ptr->services), service);
-
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 		{
 			port = 0;
@@ -3584,11 +3589,9 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid port", __function_name, tmp);
 			continue;
 		}
-		service->port = port;
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
 			*value = '\0';
-		zbx_strlcpy(service->value, value, value_alloc);
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)) && '\0' != *dns &&
 				FAIL == zbx_validate_hostname(dns))
@@ -3596,15 +3599,19 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid hostname", __function_name, dns);
 			continue;
 		}
-		zbx_strlcpy(service->dns, dns, INTERFACE_DNS_LEN_MAX);
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
 			status = atoi(tmp);
 		else
 			status = 0;
-		service->status = status;
 
+		service = (zbx_service_t *)zbx_malloc(service, sizeof(zbx_service_t));
+		service->dcheckid = dcheckid;
+		service->port = port;
+		zbx_strlcpy(service->value, value, value_alloc);
+		zbx_strlcpy(service->dns, dns, INTERFACE_DNS_LEN_MAX);
 		service->itemtime = itemtime;
+		zbx_vector_ptr_append( &(ip_discovered_ptr->services), service);
 
 		continue;
 json_parse_error:
