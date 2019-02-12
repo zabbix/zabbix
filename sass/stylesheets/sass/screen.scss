@@ -3249,7 +3249,6 @@ $form-icon-btn: (
 	.dashbrd-grid-widget-set-size {
 		@include box-shadow(inset 2px 2px 6px $action-shadow-color);
 		background: darken($body-bg-color, 6%);
-		cursor:crosshair;
 	}
 
 	.dashbrd-grid-new-widget-label {

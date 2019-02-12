@@ -1519,11 +1519,10 @@
 					data.new_widget_placeholder.container.hide();
 					data.new_widget_placeholder.setPositioning();
 				}
-				else {
-					data.new_widget_placeholder.container.removeAttr('style');
-				}
 
 				resizeDashboardGrid($obj, data);
+
+				$obj.trigger('mouseenter');
 			}
 		});
 
