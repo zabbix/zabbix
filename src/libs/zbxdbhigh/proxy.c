@@ -3313,6 +3313,8 @@ static int	process_discovery_ip_addresses(DB_DRULE *drule_ptr, zbx_discoved_ips_
 	memset(&dhost, 0, sizeof(dhost));
 	services = (zbx_vector_ptr_t *)&ip_discovered_ptr->services;
 
+	if (0 == services->values_num) return FAIL;
+
 	/*check status for given ip address*/
 	for (index_dchecks = *start_idx; index_dchecks < services->values_num; index_dchecks++)
 	{
@@ -3519,10 +3521,6 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
-		rule_ptr = NULL;
-		ip_discovered_ptr = NULL;
-		service=NULL;
-
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			goto json_parse_error;
 
@@ -3538,7 +3536,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		if (FAIL == (index_rules = zbx_vector_ptr_search(&rules, &druleid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
-			rule_ptr = (zbx_discovery_rule_t *)zbx_malloc(rule_ptr, sizeof(zbx_discovery_rule_t));
+			rule_ptr = (zbx_discovery_rule_t *)zbx_malloc(NULL, sizeof(zbx_discovery_rule_t));
 			rule_ptr->druleid = druleid;
 			zbx_vector_ptr_create(&rule_ptr->ips);
 			zbx_vector_ptr_append(&rules, rule_ptr);
@@ -3567,8 +3565,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		}
 		if (FAIL == (index_ip = zbx_vector_ptr_search(&rule_ptr->ips, ip, ZBX_DEFAULT_STR_COMPARE_FUNC)))
 		{
-			ip_discovered_ptr = (zbx_discoved_ips_t *)zbx_malloc(ip_discovered_ptr,
-					sizeof(zbx_discoved_ips_t));
+			ip_discovered_ptr = (zbx_discoved_ips_t *)zbx_malloc(NULL, sizeof(zbx_discoved_ips_t));
 			zbx_strlcpy(ip_discovered_ptr->ip, ip, INTERFACE_IP_LEN_MAX);
 			zbx_vector_ptr_create(&ip_discovered_ptr->services);
 			zbx_vector_ptr_create(&ip_discovered_ptr->services_old);
@@ -3604,10 +3601,11 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		else
 			status = 0;
 
-		service = (zbx_service_t *)zbx_malloc(service, sizeof(zbx_service_t));
+		service = (zbx_service_t *)zbx_malloc(NULL, sizeof(zbx_service_t));
 		service->dcheckid = dcheckid;
 		service->port = port;
 		service->status = status;
+		value_alloc = MAX_DISCOVERED_VALUE_SIZE < value_alloc ? MAX_DISCOVERED_VALUE_SIZE : value_alloc;
 		zbx_strlcpy_utf8(service->value, value, value_alloc);
 		zbx_strlcpy(service->dns, dns, INTERFACE_DNS_LEN_MAX);
 		service->itemtime = itemtime;
