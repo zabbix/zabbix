@@ -22,7 +22,8 @@
 
 
 
-extern int	zbx_prometheus_pattern (char *data, char *params, char *value_type, char **output, char **err);
-extern int	zbx_prometheus_to_json (char *data, char *params, char **output, char **err);
+extern int	zbx_prometheus_pattern (const char *data, const char *params, const char *value_type,
+						char **output, char **err);
+extern int	zbx_prometheus_to_json (const char *data, const char *params, char **output, char **err);
 
 #endif /* __zbxprometheus_h__ */

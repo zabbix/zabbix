@@ -287,6 +287,40 @@ static int	zbx_prometh_compare_strings(char *pattern, char *s)
 	return 0;
 }
 
+#if 0
+static int	zbx_prometh_check_metric_suffix(char *x, char *y)
+{
+	const char metric_sfx_sum[] = "_sum";
+	const char metric_sfx_count[] = "_count";
+	const char metric_sfx_bucket[] = "_bucket";
+
+	for ( ; *x && *y; ++x, ++y)
+		if (*x != *y)
+			break;
+
+	if ('\0' == *x && '\0' != *y)
+	{
+		if (!strcmp(y, metric_sfx_sum) || !strcmp(y, metric_sfx_count) || !strcmp(y, metric_sfx_bucket))
+		{
+			/* x string matches the first part of y string, y string has a defined suffix */
+
+			return 1;
+		}
+	}
+	else if ('\0' == *y && '\0' != *x)
+	{
+		if (!strcmp(x, metric_sfx_sum) || !strcmp(x, metric_sfx_count) || !strcmp(x, metric_sfx_bucket))
+		{
+			/* y string matches the first part of x string, x string has a defined suffix */
+
+			return 1;
+		}
+	}
+
+	return 0;
+}
+#endif
+
 static void zbx_prometh_clear_leading_trailing_ws(char **dst, char *src)
 {
 	size_t len;
@@ -487,7 +521,7 @@ static void	zbx_prometh_parse_metric(struct zbx_prometh_metric *metric, char *st
 	metric->line_raw = line_raw;
 }
 
-static void	zbx_prometh_data_prepare(zbx_prometh_list_t *in_data, char *str)
+static void	zbx_prometh_data_prepare(zbx_prometh_list_t *in_data, const char *str)
 {
 	zbx_prometh_list_t	metrics;
 	char *p = str;
@@ -511,6 +545,7 @@ static void	zbx_prometh_data_prepare(zbx_prometh_list_t *in_data, char *str)
 		/* allocate new metric structure */
 		new_metric = zbx_prometh_allocate_metric();
 
+		/* fill in new metric structure */
 		zbx_prometh_parse_metric(new_metric, c);
 
 		if (NULL != (last_metric = zbx_prometh_get_last_metric(&metrics)))
@@ -600,7 +635,7 @@ static void	zbx_prometh_parse_filter_substring (zbx_prometh_list_t *pf, char *s)
 	} while (NULL != right);
 }
 
-static int zbx_prometh_filter_create (zbx_prometh_list_t *pf, char *str)
+static int zbx_prometh_filter_create (zbx_prometh_list_t *pf, const char *str)
 {
 	char *p, *metric_value, *metric_name, *substr;
 	struct zbx_prometh_filter_node fn;
@@ -862,7 +897,8 @@ static void	zbx_prometh_free_metrics(zbx_prometh_list_t *l)
 #endif
 }
 
-int	zbx_prometheus_pattern (char *data, char *params, char *value_type, char **output, char **err)
+int	zbx_prometheus_pattern (const char *data, const char *params, const char *value_type,
+					char **output, char **err)
 {
 	int ret, result_count;
 	zbx_prometh_list_t	filter, in_data, results;
@@ -903,7 +939,7 @@ int	zbx_prometheus_pattern (char *data, char *params, char *value_type, char **o
 			struct zbx_prometh_metric *pdata =
 				(struct zbx_prometh_metric *)zbx_prometh_list_peek(relem);
 
-			if (++i == 10)
+			if (++i > 10)
 				break;
 
 			memcpy(p, pdata->line_raw, strlen(pdata->line_raw));
@@ -966,7 +1002,7 @@ int	zbx_prometheus_pattern (char *data, char *params, char *value_type, char **o
 	return SUCCEED;
 }
 
-int zbx_prometheus_to_json (char *data, char *params, char **output, char **err)
+int zbx_prometheus_to_json (const char *data, const char *params, char **output, char **err)
 {
 	int ret, result_count;
 	zbx_prometh_list_t	filter, in_data, results;
