@@ -608,9 +608,7 @@ class CImage extends CApiService {
 		imagesavealpha($image, true);
 		imagepng($image);
 		imagedestroy($image);
-		$image = ob_get_contents();
-		ob_end_clean();
 
-		return $image;
+		return ob_get_clean();
 	}
 }
