@@ -588,7 +588,7 @@ static void	zbx_prometh_parse_filter_substring (zbx_prometh_list_t *pf, char *s)
 			memset(&fn, 0, sizeof(fn));
 			fn.item = zbx_prometh_item_metric_name;
 			fn.name = r;
-			fn.value_check =
+			fn.name_check =
 				(*r == '~') ? zbx_prometh_compare_regex : zbx_prometh_compare_strings;
 			fn.value = NULL;
 			fn.value_check = NULL;
