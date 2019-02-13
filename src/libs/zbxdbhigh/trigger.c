@@ -32,6 +32,7 @@
 #define ZBX_FLAGS_TRIGGER_CREATE_EVENT										\
 		(ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT | ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT)
 
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_process_trigger                                              *
@@ -68,11 +69,11 @@
  ******************************************************************************/
 static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
 {
-	const char	*__function_name = "zbx_process_trigger";
+	const char		*__function_name = "zbx_process_trigger";
 
-	const char	*new_error;
-	int		new_state, new_value, ret = FAIL;
-	zbx_uint64_t	flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET, event_flags = ZBX_FLAGS_TRIGGER_CREATE_NOTHING;
+	const char		*new_error;
+	int			new_state, new_value, ret = FAIL;
+	zbx_uint64_t		flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET, event_flags = ZBX_FLAGS_TRIGGER_CREATE_NOTHING;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " value:%d(%d) new_value:%d",
 			__function_name, trigger->triggerid, trigger->value, trigger->state, trigger->new_value);
@@ -264,7 +265,7 @@ void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_
 {
 	const char	*__function_name = "zbx_process_triggers";
 
-	int		i;
+	int	i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, triggers->values_num);
 
