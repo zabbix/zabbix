@@ -2800,7 +2800,45 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 
 	return ret;
 }
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlock_ids                                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64_t *ids)
+{
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t	dcheckid;
+	int		i;
+	DB_RESULT	result;
+	DB_ROW		row;
 
+	if (0 == ids->values_num)
+		return FAIL;
+
+	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s from %s where", field_name, table_name);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name, ids->values, ids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by %s" ZBX_FOR_UPDATE, field_name);
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	for (i = 0; NULL != (row = DBfetch(result)); i++)
+	{
+		ZBX_STR2UINT64(dcheckid, row[0]);
+
+		while (dcheckid != ids->values[i])
+			zbx_vector_uint64_remove(ids, i);
+	}
+	DBfree_result(result);
+
+	while (i != ids->values_num)
+		zbx_vector_uint64_remove_noorder(ids, i);
+
+	return (0 != ids->values_num ? SUCCEED : FAIL);
+}
 /******************************************************************************
  *                                                                            *
  * Function: zbx_sql_add_host_availability                                    *

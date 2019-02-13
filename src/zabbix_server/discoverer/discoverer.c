@@ -452,45 +452,7 @@ static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, int uniq
 	DBfree_result(result);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: db_lock_dcheckids                                                *
- *                                                                            *
- ******************************************************************************/
-static int	db_lock_dcheckids(zbx_vector_uint64_t *dcheckids)
-{
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t	dcheckid;
-	int		i;
-	DB_RESULT	result;
-	DB_ROW		row;
 
-	if (0 == dcheckids->values_num)
-		return FAIL;
-
-	zbx_vector_uint64_sort(dcheckids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select dcheckid from dchecks where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dcheckid", dcheckids->values, dcheckids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by dcheckid" ZBX_FOR_UPDATE);
-	result = DBselect("%s", sql);
-	zbx_free(sql);
-
-	for (i = 0; NULL != (row = DBfetch(result)); i++)
-	{
-		ZBX_STR2UINT64(dcheckid, row[0]);
-
-		while (dcheckid != dcheckids->values[i])
-			zbx_vector_uint64_remove(dcheckids, i);
-	}
-	DBfree_result(result);
-
-	while (i != dcheckids->values_num)
-		zbx_vector_uint64_remove_noorder(dcheckids, i);
-
-	return (0 != dcheckids->values_num ? SUCCEED : FAIL);
-}
 
 /******************************************************************************
  *                                                                            *
@@ -506,7 +468,7 @@ static int	process_services(DB_DRULE *drule, DB_DHOST *dhost, const char *ip, co
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = db_lock_dcheckids(dcheckids)))
+	if (SUCCEED != (ret = DBlock_ids("dchecks", "dcheckid", dcheckids)))
 		goto fail;
 
 	for (i = 0; i < services->values_num; i++)
