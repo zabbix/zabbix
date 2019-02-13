@@ -474,7 +474,7 @@ class CFrontendSetup {
 			'name' => _('PHP gd GIF support'),
 			'current' => $supported ? _('on') : _('off'),
 			'required' => null,
-			'result' => $supported ? self::CHECK_OK : self::CHECK_FATAL,
+			'result' => $supported ? self::CHECK_OK : self::CHECK_WARNING,
 			'error' => _('PHP gd GIF image support missing.')
 		];
 	}
