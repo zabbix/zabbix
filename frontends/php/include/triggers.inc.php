@@ -2337,13 +2337,19 @@ function makeTriggersHostsList(array $triggers_hosts) {
 			$host_name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host, true));
 
-			// Add maintenance icon with hint if host is in maintenance.
-			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-					&& array_key_exists($host['maintenanceid'], $db_maintenances)) {
-				$maintenance = $db_maintenances[$host['maintenanceid']];
-				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
-					$maintenance['description']
-				);
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				if (array_key_exists($host['maintenanceid'], $db_maintenances)) {
+					$maintenance = $db_maintenances[$host['maintenanceid']];
+					$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+						$maintenance['description']
+					);
+				}
+				else {
+					$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], _('Inaccessible maintenance'),
+						''
+					);
+				}
+
 				$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 			}
 
