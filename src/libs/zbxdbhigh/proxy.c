@@ -3628,7 +3628,6 @@ json_parse_error:
 			do
 			{
 				res = process_discovery_ip_addresses(&drule, ip_discovered_ptr, &start_idx);
-printf("AKDBG rule_ptr->ips.values_num %d,ip_discovered_ptr->services.values_num %d \n",rule_ptr->ips.values_num,ip_discovered_ptr->services.values_num);
 			}
 			while (ip_discovered_ptr->services.values_num != start_idx && FAIL != res);
 
