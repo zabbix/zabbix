@@ -3582,8 +3582,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		service->dcheckid = dcheckid;
 		service->port = port;
 		service->status = status;
-		value_alloc = MAX_DISCOVERED_VALUE_SIZE < value_alloc ? MAX_DISCOVERED_VALUE_SIZE : value_alloc;
-		zbx_strlcpy_utf8(service->value, value, value_alloc);
+		zbx_strlcpy_utf8(service->value, value, MAX_DISCOVERED_VALUE_SIZE);
 		zbx_strlcpy(service->dns, dns, INTERFACE_DNS_LEN_MAX);
 		service->itemtime = itemtime;
 		zbx_vector_ptr_append(&ip_discovered->services, service);
