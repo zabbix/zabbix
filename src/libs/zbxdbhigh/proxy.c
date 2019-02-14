@@ -3489,7 +3489,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 				tmp[MAX_STRING_LEN], *value = NULL, dns[INTERFACE_DNS_LEN_MAX];
 	time_t			itemtime;
 	size_t			value_alloc = MAX_DISCOVERED_VALUE_SIZE;
-	zbx_vector_ptr_t	rules;
+	zbx_vector_ptr_t	drules;
 	zbx_drule_t		*drule;
 	zbx_discoved_ips_t	*ip_discovered;
 	zbx_service_t		*service;
@@ -3498,7 +3498,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 
 	value = (char *)zbx_malloc(value, value_alloc);
 
-	zbx_vector_ptr_create(&rules);
+	zbx_vector_ptr_create(&drules);
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
@@ -3555,15 +3555,15 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		else
 			status = 0;
 
-		if (FAIL == (i = zbx_vector_ptr_search(&rules, &druleid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (FAIL == (i = zbx_vector_ptr_search(&drules, &druleid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			drule = (zbx_drule_t *)zbx_malloc(NULL, sizeof(zbx_drule_t));
 			drule->druleid = druleid;
 			zbx_vector_ptr_create(&drule->ips);
-			zbx_vector_ptr_append(&rules, drule);
+			zbx_vector_ptr_append(&drules, drule);
 		}
 		else
-			drule = rules.values[i];
+			drule = drules.values[i];
 
 		if (FAIL == (i = zbx_vector_ptr_search(&drule->ips, ip, ZBX_DEFAULT_STR_COMPARE_FUNC)))
 		{
@@ -3592,11 +3592,11 @@ json_parse_error:
 		goto json_parse_return;
 	}
 
-	for (i = 0; i < rules.values_num; i++)
+	for (i = 0; i < drules.values_num; i++)
 	{
 		zbx_uint64_t	unique_dcheckid = 0;
 
-		drule = (zbx_drule_t *)rules.values[i];
+		drule = (zbx_drule_t *)drules.values[i];
 
 		result = DBselect(
 				"select dcheckid"
@@ -3628,8 +3628,8 @@ json_parse_error:
 json_parse_return:
 	zbx_free(value);
 
-	zbx_vector_ptr_clear_ext(&rules, (zbx_clean_func_t)zbx_rules_eval_free);
-	zbx_vector_ptr_destroy(&rules);
+	zbx_vector_ptr_clear_ext(&drules, (zbx_clean_func_t)zbx_rules_eval_free);
+	zbx_vector_ptr_destroy(&drules);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
