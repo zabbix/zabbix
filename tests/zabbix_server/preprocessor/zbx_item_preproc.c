@@ -70,6 +70,10 @@ static int	str_to_preproc_type(const char *str)
 		return ZBX_PREPROC_THROTTLE_VALUE;
 	if (0 == strcmp(str, "ZBX_PREPROC_THROTTLE_TIMED_VALUE"))
 		return ZBX_PREPROC_THROTTLE_TIMED_VALUE;
+	if (0 == strcmp(str, "ZBX_PREPROC_PROMETHEUS_PATTERN"))
+		return ZBX_PREPROC_PROMETHEUS_PATTERN;
+	if (0 == strcmp(str, "ZBX_PREPROC_PROMETHEUS_TO_JSON"))
+		return ZBX_PREPROC_PROMETHEUS_TO_JSON;
 
 	fail_msg("unknow preprocessing step type: %s", str);
 	return FAIL;

@@ -1,0 +1,22 @@
+---
+test case: 'Get metric value using params: wmi_os_physical_memory_free_bytes'
+in:
+  data: wmi_os_physical_memory_free_bytes 8.492331008e+09
+  params: wmi_os_physical_memory_free_bytes
+out:
+  result: succeed
+  output: TODO
+---
+test case: 'Get metric value using params: cpu_usage_system{cpu="cpu-total"}'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+out:
+  result: succeed
+  output: TODO
+...
