@@ -513,7 +513,7 @@ class CItem extends CItemGeneral {
 		$data = [];
 		foreach ($items as $item) {
 			unset($item['flags']); // flags cannot be changed
-			$data[] = ['values' => $item, 'where' => ['itemid' => $item['itemid']]];
+			$data[$item['itemid']] = ['values' => $item, 'where' => ['itemid' => $item['itemid']]];
 			$itemids[] = $item['itemid'];
 		}
 		DB::update('items', $data);
