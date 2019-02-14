@@ -149,8 +149,6 @@ finish:
  ******************************************************************************/
 static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 {
-	const char		*__function_name = "tm_process_check_now";
-
 	DB_ROW			row;
 	DB_RESULT		result;
 	int			processed_num;
@@ -159,7 +157,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	zbx_vector_uint64_t	itemids;
 	zbx_uint64_t		itemid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, taskids->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __func__, taskids->values_num);
 
 	zbx_vector_uint64_create(&itemids);
 
@@ -190,7 +188,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&itemids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __func__, processed_num);
 
 	return processed_num;
 }

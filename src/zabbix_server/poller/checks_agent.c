@@ -50,7 +50,6 @@ extern unsigned char	program_type;
  ******************************************************************************/
 int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 {
-	const char	*__function_name = "get_value_agent";
 	zbx_socket_t	s;
 	char		*tls_arg1, *tls_arg2;
 	int		ret = SUCCEED;
@@ -58,7 +57,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__,
 				item->host.host, item->interface.addr, item->key,
 				zbx_tcp_connection_type_name(item->host.tls_connect));
 	}
@@ -148,7 +147,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 
 	zbx_tcp_close(&s);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

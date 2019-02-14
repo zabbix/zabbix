@@ -33,13 +33,11 @@
  ******************************************************************************/
 void	recv_discovery_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
-	const char	*__function_name = "recv_discovery_data";
-
 	int		ret = FAIL;
 	char		*error = NULL;
 	DC_PROXY	proxy;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != get_active_proxy_from_request(jp, &proxy, &error))
 	{
@@ -68,7 +66,7 @@ out:
 
 	zbx_free(error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
 /******************************************************************************
@@ -80,13 +78,11 @@ out:
  ******************************************************************************/
 void	send_discovery_data(zbx_socket_t *sock)
 {
-	const char	*__function_name = "send_discovery_data";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* do not send any reply to server in this case as the server expects discovery data */
 	if (SUCCEED == check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "discovery data request"))
 		zbx_send_proxy_response(sock, FAIL, "Deprecated request", CONFIG_TIMEOUT);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

@@ -343,10 +343,9 @@ static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
  ******************************************************************************/
 static void	DCupdate_trends(zbx_vector_uint64_pair_t *trends_diff)
 {
-	const char	*__function_name = "DCupdate_trends";
-	int		i;
+	int	i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	LOCK_TRENDS;
 
@@ -360,7 +359,7 @@ static void	DCupdate_trends(zbx_vector_uint64_pair_t *trends_diff)
 
 	UNLOCK_TRENDS;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -632,14 +631,13 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
  ******************************************************************************/
 static void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff)
 {
-	const char	*__function_name = "DCflush_trends";
 	int		num, i, clock, inserts_num = 0, itemids_alloc, itemids_num = 0, trends_to = *trends_num;
 	unsigned char	value_type;
 	zbx_uint64_t	*itemids = NULL;
 	ZBX_DC_TREND	*trend = NULL;
 	const char	*table_name;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __function_name, *trends_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __func__, *trends_num);
 
 	clock = trends[0].clock;
 	value_type = trends[0].value_type;
@@ -743,7 +741,7 @@ static void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uin
 	}
 	*trends_num = num;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -835,12 +833,10 @@ static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, in
 static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num, ZBX_DC_TREND **trends,
 		int *trends_num)
 {
-	const char	*__function_name = "DCmass_update_trends";
-
 	zbx_timespec_t	ts;
 	int		trends_alloc = 0, i, hour, seconds;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_timespec(&ts);
 	seconds = ts.sec % SEC_PER_HOUR;
@@ -881,7 +877,7 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 
 	UNLOCK_TRENDS;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1288,14 +1284,13 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 		const zbx_vector_uint64_t *itemids, DC_ITEM *items, const int *errcodes, const ZBX_DC_TREND *trends,
 		int trends_num)
 {
-	const char		*__function_name = "DCexport_history_and_trends";
 	int			i, index;
 	zbx_vector_uint64_t	hostids, item_info_ids;
 	zbx_hashset_t		hosts_info, items_info;
 	DC_ITEM			*item;
 	zbx_item_info_t		item_info;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d trends_num:%d", __function_name, history_num, trends_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d trends_num:%d", __func__, history_num, trends_num);
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&item_info_ids);
@@ -1387,7 +1382,7 @@ clean:
 	zbx_vector_uint64_destroy(&item_info_ids);
 	zbx_vector_uint64_destroy(&hostids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1450,12 +1445,11 @@ static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
  ******************************************************************************/
 static void	DCsync_trends(void)
 {
-	const char		*__function_name = "DCsync_trends";
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_TREND		*trends = NULL, *trend;
 	int			trends_alloc = 0, trends_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __function_name, cache->trends_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __func__, cache->trends_num);
 
 	zabbix_log(LOG_LEVEL_WARNING, "syncing trend data...");
 
@@ -1485,7 +1479,7 @@ static void	DCsync_trends(void)
 
 	zabbix_log(LOG_LEVEL_WARNING, "syncing trend data done");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1504,7 +1498,6 @@ static void	DCsync_trends(void)
 static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 		const zbx_vector_uint64_t *timer_triggerids, zbx_vector_ptr_t *trigger_diff)
 {
-	const char		*__function_name = "recalculate_triggers";
 	int			i, item_num = 0;
 	zbx_uint64_t		*itemids = NULL;
 	zbx_timespec_t		*timespecs = NULL;
@@ -1512,7 +1505,7 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 	zbx_vector_ptr_t	trigger_order;
 	zbx_vector_ptr_t	trigger_items;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 != history_num)
 	{
@@ -1571,7 +1564,7 @@ out:
 	zbx_free(timespecs);
 	zbx_free(itemids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const DC_ITEM *item, ZBX_DC_HISTORY *h)
@@ -2000,12 +1993,10 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
  ******************************************************************************/
 static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
 {
-	const char	*__function_name = "DBmass_update_items";
+	size_t	sql_offset = 0;
+	int	i;
 
-	size_t		sql_offset = 0;
-	int		i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < item_diff->values_num; i++)
 	{
@@ -2034,7 +2025,7 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 		DCconfig_update_inventory_values(inventory_values);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2051,14 +2042,12 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
  ******************************************************************************/
 static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
-	const char	*__function_name = "DCmass_proxy_update_items";
-
 	size_t			sql_offset = 0;
 	int			i;
 	zbx_vector_ptr_t	item_diff;
 	zbx_item_diff_t		*diffs;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&item_diff);
 	zbx_vector_ptr_reserve(&item_diff, history_num);
@@ -2113,7 +2102,7 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 	zbx_vector_ptr_destroy(&item_diff);
 	zbx_free(diffs);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2128,12 +2117,10 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
-	const char	*__function_name = "DBmass_add_history";
-
 	int			i, ret = SUCCEED;
 	zbx_vector_ptr_t	history_values;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&history_values);
 	zbx_vector_ptr_reserve(&history_values, history_num);
@@ -2153,7 +2140,7 @@ static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	zbx_vector_ptr_destroy(&history_values);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
@@ -2393,10 +2380,9 @@ static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int histo
  ******************************************************************************/
 static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
-	const char	*__function_name = "DCmass_proxy_add_history";
-	int		i, h_num = 0, h_meta_num = 0, hlog_num = 0, notsupported_num = 0;
+	int	i, h_num = 0, h_meta_num = 0, hlog_num = 0, notsupported_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -2439,7 +2425,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	if (0 != notsupported_num)
 		dc_add_proxy_history_notsupported(history, history_num);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2464,10 +2450,9 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 		const DC_ITEM *items, const int *errcodes, int history_num, zbx_vector_ptr_t *item_diff,
 		zbx_vector_ptr_t *inventory_values)
 {
-	const char	*__function_name = "DCmass_prepare_history";
-	int		i;
+	int	i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, history_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, history_num);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -2515,7 +2500,7 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 
 	zbx_vector_ptr_sort(inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3067,14 +3052,12 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
  ******************************************************************************/
 static void	sync_history_cache_full(void)
 {
-	const char		*__function_name = "sync_history_cache_full";
-
 	int			values_num = 0, triggers_num = 0, more;
 	zbx_hashset_iter_t	iter;
 	zbx_hc_item_t		*item;
 	zbx_binary_heap_t	tmp_history_queue;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
 	/* History index cache might be full without any space left for queueing items from history index to  */
 	/* history queue. The solution: replace the shared-memory history queue with heap-allocated one. Add  */
@@ -3129,7 +3112,7 @@ static void	sync_history_cache_full(void)
 
 	zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3146,9 +3129,7 @@ static void	sync_history_cache_full(void)
  ******************************************************************************/
 void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more)
 {
-	const char		*__function_name = "zbx_sync_history_cache";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
 	*values_num = 0;
 	*triggers_num = 0;
@@ -3158,7 +3139,7 @@ void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more)
 	else
 		sync_proxy_history(values_num, more);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -4082,11 +4063,10 @@ ZBX_MEM_FUNC_IMPL(__trend, trend_mem)
 
 static int	init_trend_cache(char **error)
 {
-	const char	*__function_name = "init_trend_cache";
-	size_t		sz;
-	int		ret;
+	size_t	sz;
+	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != (ret = zbx_mutex_create(&trends_lock, ZBX_MUTEX_TRENDS, error)))
 		goto out;
@@ -4113,7 +4093,7 @@ static int	init_trend_cache(char **error)
 
 #undef INIT_HASHSET_SIZE
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
@@ -4129,11 +4109,9 @@ out:
  ******************************************************************************/
 int	init_database_cache(char **error)
 {
-	const char	*__function_name = "init_database_cache";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != (ret = zbx_mutex_create(&cache_lock, ZBX_MUTEX_CACHE, error)))
 		goto out;
@@ -4175,7 +4153,7 @@ int	init_database_cache(char **error)
 	if (NULL == sql)
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
@@ -4211,9 +4189,7 @@ static void	DCsync_all(void)
  ******************************************************************************/
 void	free_database_cache(void)
 {
-	const char	*__function_name = "free_database_cache";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	DCsync_all();
 
@@ -4225,7 +4201,7 @@ void	free_database_cache(void)
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		zbx_mutex_destroy(&trends_lock);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -4239,7 +4215,6 @@ void	free_database_cache(void)
  ******************************************************************************/
 zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 {
-	const char	*__function_name = "DCget_nextid";
 	int		i;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -4247,8 +4222,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	ZBX_DC_ID	*id;
 	zbx_uint64_t	min = 0, max = ZBX_DB_MAX_ID, nextid, lastid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' num:%d",
-			__function_name, table_name, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' num:%d", __func__, table_name, num);
 
 	LOCK_CACHE_IDS;
 
@@ -4267,7 +4241,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 			UNLOCK_CACHE_IDS;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
-					__function_name, table_name, nextid, lastid);
+					__func__, table_name, nextid, lastid);
 
 			return nextid;
 		}
@@ -4305,7 +4279,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
-			__function_name, table_name, nextid, lastid);
+			__func__, table_name, nextid, lastid);
 
 	return nextid;
 }
@@ -4320,13 +4294,12 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
  ******************************************************************************/
 void	DCupdate_hosts_availability(void)
 {
-	const char		*__function_name = "DCupdate_hosts_availability";
 	zbx_vector_ptr_t	hosts;
 	char			*sql_buf = NULL;
 	size_t			sql_buf_alloc = 0, sql_buf_offset = 0;
 	int			i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&hosts);
 
@@ -4359,5 +4332,5 @@ out:
 	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
 	zbx_vector_ptr_destroy(&hosts);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

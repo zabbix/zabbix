@@ -840,7 +840,6 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 {
 #define SELECTED_FIELD_COUNT	28
 
-	const char	*__function_name = "DCsync_config";
 	const ZBX_TABLE	*config_table;
 	const char	*selected_fields[] = {"refresh_unsupported", "discovery_groupid", "snmptrap_logging",
 					"severity_name_0", "severity_name_1", "severity_name_2", "severity_name_3",
@@ -857,7 +856,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	*flags = 0;
 
@@ -1000,7 +999,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	if (SUCCEED == ret && SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))	/* table must have */
 		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");	/* only one record */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return SUCCEED;
 
@@ -1009,8 +1008,6 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 
 static void	DCsync_hosts(zbx_dbsync_t *sync)
 {
-	const char	*__function_name = "DCsync_hosts";
-
 	char		**row;
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
@@ -1032,7 +1029,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 	zbx_ptr_pair_t	*psk_owner, psk_owner_local;
 	zbx_hashset_t	psk_owners;
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_create(&psk_owners, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
@@ -1537,20 +1534,18 @@ done:
 	zbx_hashset_destroy(&psk_owners);
 #endif
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_host_inventory";
-
 	ZBX_DC_HOST_INVENTORY	*host_inventory, *host_inventory_auto;
 	zbx_uint64_t		rowid, hostid;
 	int			found, ret, i;
 	char			**row;
 	unsigned char		tag;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -1617,13 +1612,11 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->host_inventories_auto, host_inventory_auto);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCsync_htmpls(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_htmpls";
-
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
@@ -1634,7 +1627,7 @@ static void	DCsync_htmpls(zbx_dbsync_t *sync)
 	zbx_uint64_t		_hostid = 0, hostid, templateid;
 	zbx_vector_ptr_t	sort;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&sort);
 
@@ -1709,13 +1702,11 @@ static void	DCsync_htmpls(zbx_dbsync_t *sync)
 
 	zbx_vector_ptr_destroy(&sort);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCsync_gmacros(zbx_dbsync_t *sync)
 {
-	const char	*__function_name = "DCsync_gmacros";
-
 	char		**row;
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
@@ -1726,7 +1717,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 	zbx_uint64_t	globalmacroid;
 	char		*macro = NULL, *context = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -1800,13 +1791,11 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 	zbx_free(context);
 	zbx_free(macro);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCsync_hmacros(zbx_dbsync_t *sync)
 {
-	const char	*__function_name = "DCsync_hmacros";
-
 	char		**row;
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
@@ -1817,7 +1806,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 	zbx_uint64_t	hostmacroid, hostid;
 	char		*macro = NULL, *context = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -1894,7 +1883,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 	zbx_free(context);
 	zbx_free(macro);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1977,8 +1966,6 @@ static void	dc_interface_snmpaddrs_remove(ZBX_DC_INTERFACE *interface)
 
 static void	DCsync_interfaces(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_interfaces";
-
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
@@ -1994,7 +1981,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 	unsigned char		bulk, reset_snmp_stats;
 	zbx_vector_ptr_t	interfaces;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&interfaces);
 
@@ -2196,7 +2183,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 
 	zbx_vector_ptr_destroy(&interfaces);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2298,8 +2285,6 @@ static void	dc_host_update_agent_stats(ZBX_DC_HOST *host, unsigned char type, in
 
 static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 {
-	const char		*__function_name = "DCsync_items";
-
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
@@ -2333,7 +2318,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 	zbx_vector_ptr_create(&dep_items);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	now = time(NULL);
 
@@ -3046,20 +3031,18 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		zbx_hashset_remove_direct(&config->items, item);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCsync_template_items(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_template_items";
-
 	char			**row;
 	zbx_uint64_t		rowid, itemid;
 	unsigned char		tag;
 	int			ret, found;
 	ZBX_DC_TEMPLATE_ITEM 	*item;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -3084,20 +3067,18 @@ static void	DCsync_template_items(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->template_items, item);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCsync_prototype_items(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_prototype_items";
-
 	char			**row;
 	zbx_uint64_t		rowid, itemid;
 	unsigned char		tag;
 	int			ret, found;
 	ZBX_DC_PROTOTYPE_ITEM 	*item;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -3122,13 +3103,11 @@ static void	DCsync_prototype_items(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->prototype_items, item);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCsync_triggers(zbx_dbsync_t *sync)
 {
-	const char	*__function_name = "DCsync_triggers";
-
 	char		**row;
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
@@ -3138,7 +3117,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 	int		found, ret;
 	zbx_uint64_t	triggerid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -3228,7 +3207,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 		zbx_vector_uint64_destroy(&functionids);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCconfig_sort_triggers_topologically(void);
@@ -3284,8 +3263,6 @@ static void	dc_trigger_deplist_reset(ZBX_DC_TRIGGER_DEPLIST *trigdep)
 
 static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_trigdeps";
-
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
@@ -3296,7 +3273,7 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 	zbx_uint64_t		triggerid_down, triggerid_up;
 	ZBX_DC_TRIGGER		*trigger_up, *trigger_down;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -3361,13 +3338,11 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCsync_functions(zbx_dbsync_t *sync)
 {
-	const char	*__function_name = "DCsync_functions";
-
 	char		**row;
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
@@ -3378,7 +3353,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 	int		found, ret;
 	zbx_uint64_t	itemid, functionid, triggerid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -3438,7 +3413,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->functions, function);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3480,7 +3455,6 @@ static ZBX_DC_REGEXP	*dc_regexp_remove_expression(const char *regexp_name, zbx_u
  ******************************************************************************/
 static void	DCsync_expressions(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_expressions";
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
@@ -3490,7 +3464,7 @@ static void	DCsync_expressions(zbx_dbsync_t *sync)
 	zbx_uint64_t		expressionid;
 	int			found, ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -3560,7 +3534,7 @@ static void	DCsync_expressions(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->expressions, expression);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3580,8 +3554,6 @@ static void	DCsync_expressions(zbx_dbsync_t *sync)
  ******************************************************************************/
 static void	DCsync_actions(zbx_dbsync_t *sync)
 {
-	const char	*__function_name = "DCsync_actions";
-
 	char		**row;
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
@@ -3589,7 +3561,7 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 	zbx_dc_action_t	*action;
 	int		found, ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -3628,7 +3600,7 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->actions, action);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3646,15 +3618,13 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
  ******************************************************************************/
 static void	DCsync_action_ops(zbx_dbsync_t *sync)
 {
-	const char	*__function_name = "DCsync_action_opss";
-
 	char		**row;
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
 	zbx_uint64_t	actionid;
 	zbx_dc_action_t	*action;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
@@ -3666,7 +3636,7 @@ static void	DCsync_action_ops(zbx_dbsync_t *sync)
 		action->opflags = atoi(row[1]);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3706,8 +3676,6 @@ static int	dc_compare_action_conditions_by_type(const void *d1, const void *d2)
  ******************************************************************************/
 static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 {
-	const char			*__function_name = "DCsync_action_conditions";
-
 	char				**row;
 	zbx_uint64_t			rowid;
 	unsigned char			tag;
@@ -3717,7 +3685,7 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 	int				found, i, index, ret;
 	zbx_vector_ptr_t		actions;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&actions);
 
@@ -3792,7 +3760,7 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 
 	zbx_vector_ptr_destroy(&actions);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3812,8 +3780,6 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
  ******************************************************************************/
 static void	DCsync_correlations(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_correlations";
-
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
@@ -3821,7 +3787,7 @@ static void	DCsync_correlations(zbx_dbsync_t *sync)
 	zbx_dc_correlation_t	*correlation;
 	int			found, ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -3864,7 +3830,7 @@ static void	DCsync_correlations(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->correlations, correlation);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -4024,8 +3990,6 @@ static int	dc_compare_corr_conditions_by_type(const void *d1, const void *d2)
  ******************************************************************************/
 static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_corr_conditions";
-
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
@@ -4037,7 +4001,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 	size_t			condition_size;
 	zbx_vector_ptr_t	correlations;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&correlations);
 
@@ -4108,7 +4072,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 
 	zbx_vector_ptr_destroy(&correlations);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -4128,8 +4092,6 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
  ******************************************************************************/
 static void	DCsync_corr_operations(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_corr_operations";
-
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
@@ -4139,7 +4101,7 @@ static void	DCsync_corr_operations(zbx_dbsync_t *sync)
 	int			found, ret, index;
 	unsigned char		type;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -4186,7 +4148,7 @@ static void	DCsync_corr_operations(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->corr_operations, operation);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	dc_compare_hgroups(const void *d1, const void *d2)
@@ -4212,8 +4174,6 @@ static int	dc_compare_hgroups(const void *d1, const void *d2)
  ******************************************************************************/
 static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_hostgroups";
-
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
@@ -4221,7 +4181,7 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 	zbx_dc_hostgroup_t	*group;
 	int			found, ret, index;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -4264,7 +4224,7 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->hostgroups, group);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -4284,8 +4244,6 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
  ******************************************************************************/
 static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_trigger_tags";
-
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
@@ -4294,7 +4252,7 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 	ZBX_DC_TRIGGER		*trigger;
 	zbx_dc_trigger_tag_t	*trigger_tag;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -4350,7 +4308,7 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->trigger_tags, trigger_tag);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -4370,8 +4328,6 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
  ******************************************************************************/
 static void	DCsync_host_tags(zbx_dbsync_t *sync)
 {
-	const char	*__function_name = "DCsync_hmacros";
-
 	char		**row;
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
@@ -4382,7 +4338,7 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 	int		found, index, ret;
 	zbx_uint64_t	hosttagid, hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -4450,7 +4406,7 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->host_tags, host_tag);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -4489,8 +4445,6 @@ static int	dc_compare_preprocops_by_step(const void *d1, const void *d2)
  ******************************************************************************/
 static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 {
-	const char		*__function_name = "DCsync_item_preproc";
-
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
@@ -4500,7 +4454,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 	zbx_dc_preproc_op_t	*op;
 	zbx_vector_ptr_t	items;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&items);
 
@@ -4591,7 +4545,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 
 	zbx_vector_ptr_destroy(&items);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -4609,8 +4563,6 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
  ******************************************************************************/
 static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 {
-	const char		*__function_name = "DCsync_hostgroup_hosts";
-
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
@@ -4620,7 +4572,7 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 	int			ret;
 	zbx_uint64_t		last_groupid = 0, groupid, hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -4657,7 +4609,7 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 		zbx_hashset_remove(&group->hostids, &hostid);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -4863,8 +4815,6 @@ static void	dc_hostgroups_update_cache(void)
  ******************************************************************************/
 void	DCsync_configuration(unsigned char mode)
 {
-	const char	*__function_name = "DCsync_configuration";
-
 	int		i, flags;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec, csec2,
 			hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, isec2, tsec2, dsec2, fsec2, expr_sec2,
@@ -4883,7 +4833,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	zbx_uint64_t	update_flags = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_dbsync_init_env(config);
 
@@ -5245,229 +5195,229 @@ void	DCsync_configuration(unsigned char mode)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, csec, csec2, config_sync.add_num, config_sync.update_num,
+				__func__, csec, csec2, config_sync.add_num, config_sync.update_num,
 				config_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, hsec, hsec2, hosts_sync.add_num, hosts_sync.update_num,
+				__func__, hsec, hsec2, hosts_sync.add_num, hosts_sync.update_num,
 				hosts_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, hisec, hisec2, hi_sync.add_num, hi_sync.update_num,
+				__func__, hisec, hisec2, hi_sync.add_num, hi_sync.update_num,
 				hi_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() templates  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, htsec, htsec2, htmpl_sync.add_num, htmpl_sync.update_num,
+				__func__, htsec, htsec2, htmpl_sync.add_num, htmpl_sync.update_num,
 				htmpl_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() globmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, gmsec, gmsec2, gmacro_sync.add_num, gmacro_sync.update_num,
+				__func__, gmsec, gmsec2, gmacro_sync.add_num, gmacro_sync.update_num,
 				gmacro_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hostmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, hmsec, hmsec2, hmacro_sync.add_num, hmacro_sync.update_num,
+				__func__, hmsec, hmsec2, hmacro_sync.add_num, hmacro_sync.update_num,
 				hmacro_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, ifsec, ifsec2, if_sync.add_num, if_sync.update_num,
+				__func__, ifsec, ifsec2, if_sync.add_num, if_sync.update_num,
 				if_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, isec, isec2, items_sync.add_num, items_sync.update_num,
+				__func__, isec, isec2, items_sync.add_num, items_sync.update_num,
 				items_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() template_items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, isec, isec2, template_items_sync.add_num,
+				__func__, isec, isec2, template_items_sync.add_num,
 				template_items_sync.update_num, template_items_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() prototype_items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, isec, isec2, prototype_items_sync.add_num,
+				__func__, isec, isec2, prototype_items_sync.add_num,
 				prototype_items_sync.update_num, prototype_items_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, tsec, tsec2, triggers_sync.add_num, triggers_sync.update_num,
+				__func__, tsec, tsec2, triggers_sync.add_num, triggers_sync.update_num,
 				triggers_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, dsec, dsec2, tdep_sync.add_num, tdep_sync.update_num,
+				__func__, dsec, dsec2, tdep_sync.add_num, tdep_sync.update_num,
 				tdep_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, trigger_tag_sec, trigger_tag_sec2, trigger_tag_sync.add_num,
+				__func__, trigger_tag_sec, trigger_tag_sec2, trigger_tag_sync.add_num,
 				trigger_tag_sync.update_num, trigger_tag_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() host tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, host_tag_sec, host_tag_sec2, host_tag_sync.add_num,
+				__func__, host_tag_sec, host_tag_sec2, host_tag_sync.add_num,
 				host_tag_sync.update_num, host_tag_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, fsec, fsec2, func_sync.add_num, func_sync.update_num,
+				__func__, fsec, fsec2, func_sync.add_num, func_sync.update_num,
 				func_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, expr_sec, expr_sec2, expr_sync.add_num, expr_sync.update_num,
+				__func__, expr_sec, expr_sec2, expr_sync.add_num, expr_sync.update_num,
 				expr_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() actions    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, action_sec, action_sec2, action_sync.add_num, action_sync.update_num,
+				__func__, action_sec, action_sec2, action_sync.add_num, action_sync.update_num,
 				action_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() operations : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, action_op_sec, action_op_sec2, action_op_sync.add_num,
+				__func__, action_op_sec, action_op_sec2, action_op_sync.add_num,
 				action_op_sync.update_num, action_op_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, action_condition_sec, action_condition_sec2,
+				__func__, action_condition_sec, action_condition_sec2,
 				action_condition_sync.add_num, action_condition_sync.update_num,
 				action_condition_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr       : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, correlation_sec, correlation_sec2, correlation_sync.add_num,
+				__func__, correlation_sec, correlation_sec2, correlation_sync.add_num,
 				correlation_sync.update_num, correlation_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr_cond  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, corr_condition_sec, corr_condition_sec2, corr_condition_sync.add_num,
+				__func__, corr_condition_sec, corr_condition_sec2, corr_condition_sync.add_num,
 				corr_condition_sync.update_num, corr_condition_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr_op    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, corr_operation_sec, corr_operation_sec2, corr_operation_sync.add_num,
+				__func__, corr_operation_sec, corr_operation_sec2, corr_operation_sync.add_num,
 				corr_operation_sync.update_num, corr_operation_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, hgroups_sec, hgroups_sec2, hgroups_sync.add_num,
+				__func__, hgroups_sec, hgroups_sec2, hgroups_sync.add_num,
 				hgroups_sync.update_num, hgroups_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() item pproc : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, itempp_sec, itempp_sec2, itempp_sync.add_num, itempp_sync.update_num,
+				__func__, itempp_sec, itempp_sec2, itempp_sync.add_num, itempp_sync.update_num,
 				itempp_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() maintenance: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__function_name, maintenance_sec, maintenance_sec2, maintenance_sync.add_num,
+				__func__, maintenance_sec, maintenance_sec2, maintenance_sync.add_num,
 				maintenance_sync.update_num, maintenance_sync.remove_num);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec.", __function_name, update_sec);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec.", __func__, update_sec);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __function_name, total);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __function_name, total2);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __func__, total);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __func__, total2);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies    : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies    : %d (%d slots)", __func__,
 				config->proxies.num_data, config->proxies.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : %d (%d slots)", __func__,
 				config->hosts.num_data, config->hosts.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_h    : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_h    : %d (%d slots)", __func__,
 				config->hosts_h.num_data, config->hosts_h.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_p    : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_p    : %d (%d slots)", __func__,
 				config->hosts_p.num_data, config->hosts_p.num_slots);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() psks       : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() psks       : %d (%d slots)", __func__,
 				config->psks.num_data, config->psks.num_slots);
 #endif
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d (%d slots)", __func__,
 				config->ipmihosts.num_data, config->ipmihosts.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: %d (%d slots)", __func__,
 				config->host_inventories.num_data, config->host_inventories.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpls     : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpls     : %d (%d slots)", __func__,
 				config->htmpls.num_data, config->htmpls.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros    : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros    : %d (%d slots)", __func__,
 				config->gmacros.num_data, config->gmacros.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros_m  : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacros_m  : %d (%d slots)", __func__,
 				config->gmacros_m.num_data, config->gmacros_m.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros    : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros    : %d (%d slots)", __func__,
 				config->hmacros.num_data, config->hmacros.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros_hm : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros_hm : %d (%d slots)", __func__,
 				config->hmacros_hm.num_data, config->hmacros_hm.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : %d (%d slots)", __func__,
 				config->interfaces.num_data, config->interfaces.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfac_ht: %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfac_ht: %d (%d slots)", __func__,
 				config->interfaces_ht.num_data, config->interfaces_ht.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpitms: %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpitms: %d (%d slots)", __func__,
 				config->interface_snmpitems.num_data, config->interface_snmpitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpaddr: %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpaddr: %d (%d slots)", __func__,
 				config->interface_snmpaddrs.num_data, config->interface_snmpaddrs.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d (%d slots)", __func__,
 				config->items.num_data, config->items.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() items_hk   : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() items_hk   : %d (%d slots)", __func__,
 				config->items_hk.num_data, config->items_hk.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() numitems   : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() numitems   : %d (%d slots)", __func__,
 				config->numitems.num_data, config->numitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocitems: %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocitems: %d (%d slots)", __func__,
 				config->preprocitems.num_data, config->preprocitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocops : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocops : %d (%d slots)", __func__,
 				config->preprocops.num_data, config->preprocops.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmpitems  : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmpitems  : %d (%d slots)", __func__,
 				config->snmpitems.num_data, config->snmpitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmiitems  : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmiitems  : %d (%d slots)", __func__,
 				config->ipmiitems.num_data, config->ipmiitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() trapitems  : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trapitems  : %d (%d slots)", __func__,
 				config->trapitems.num_data, config->trapitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() dependentitems  : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() dependentitems  : %d (%d slots)", __func__,
 				config->dependentitems.num_data, config->dependentitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __func__,
 				config->logitems.num_data, config->logitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() dbitems    : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() dbitems    : %d (%d slots)", __func__,
 				config->dbitems.num_data, config->dbitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() sshitems   : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() sshitems   : %d (%d slots)", __func__,
 				config->sshitems.num_data, config->sshitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() telnetitems: %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() telnetitems: %d (%d slots)", __func__,
 				config->telnetitems.num_data, config->telnetitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() simpleitems: %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() simpleitems: %d (%d slots)", __func__,
 				config->simpleitems.num_data, config->simpleitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() jmxitems   : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() jmxitems   : %d (%d slots)", __func__,
 				config->jmxitems.num_data, config->jmxitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __func__,
 				config->calcitems.num_data, config->calcitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpitems  : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpitems  : %d (%d slots)", __func__,
 				config->httpitems.num_data, config->httpitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __func__,
 				config->functions.num_data, config->functions.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __func__,
 				config->triggers.num_data, config->triggers.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : %d (%d slots)", __func__,
 				config->trigdeps.num_data, config->trigdeps.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : %d (%d slots)", __func__,
 				config->trigger_tags.num_data, config->trigger_tags.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: %d (%d slots)", __func__,
 				config->expressions.num_data, config->expressions.num_slots);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() actions    : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() actions    : %d (%d slots)", __func__,
 				config->actions.num_data, config->actions.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : %d (%d slots)", __func__,
 				config->action_conditions.num_data, config->action_conditions.num_slots);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr.      : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr.      : %d (%d slots)", __func__,
 				config->correlations.num_data, config->correlations.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. conds: %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. conds: %d (%d slots)", __func__,
 				config->corr_conditions.num_data, config->corr_conditions.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. ops  : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. ops  : %d (%d slots)", __func__,
 				config->corr_operations.num_data, config->corr_operations.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : %d (%d slots)", __func__,
 				config->hostgroups.num_data, config->hostgroups.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() item procs : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() item procs : %d (%d slots)", __func__,
 				config->preprocops.num_data, config->preprocops.num_slots);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() maintenance: %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() maintenance: %d (%d slots)", __func__,
 				config->maintenances.num_data, config->maintenances.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint tags : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint tags : %d (%d slots)", __func__,
 				config->maintenance_tags.num_data, config->maintenance_tags.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint time : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint time : %d (%d slots)", __func__,
 				config->maintenance_periods.num_data, config->maintenance_periods.num_slots);
 
 		for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() queue[%d]   : %d (%d allocated)", __function_name,
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() queue[%d]   : %d (%d allocated)", __func__,
 					i, config->queues[i].elems_num, config->queues[i].elems_alloc);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() pqueue     : %d (%d allocated)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() pqueue     : %d (%d allocated)", __func__,
 				config->pqueue.elems_num, config->pqueue.elems_alloc);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() timer queue: %d (%d allocated)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() timer queue: %d (%d allocated)", __func__,
 				config->timer_queue.elems_num, config->timer_queue.elems_alloc);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() configfree : " ZBX_FS_DBL "%%", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() configfree : " ZBX_FS_DBL "%%", __func__,
 				100 * ((double)config_mem->free_size / config_mem->orig_size));
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() strings    : %d (%d slots)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() strings    : %d (%d slots)", __func__,
 				config->strpool.num_data, config->strpool.num_slots);
 
 		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
@@ -5514,7 +5464,7 @@ out:
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 		DCdump_configuration();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -5841,11 +5791,9 @@ static int	__config_data_session_compare(const void *d1, const void *d2)
  ******************************************************************************/
 int	init_configuration_cache(char **error)
 {
-	const char	*__function_name = "init_configuration_cache";
+	int	i, ret;
 
-	int		i, ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_UI64, __function_name, CONFIG_CONF_CACHE_SIZE);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_UI64, __func__, CONFIG_CONF_CACHE_SIZE);
 
 	if (SUCCEED != (ret = zbx_rwlock_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
 		goto out;
@@ -6015,7 +5963,7 @@ int	init_configuration_cache(char **error)
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
@@ -6031,9 +5979,7 @@ out:
  ******************************************************************************/
 void	free_configuration_cache(void)
 {
-	const char	*__function_name = "free_configuration_cache";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	WRLOCK_CACHE;
 
@@ -6043,7 +5989,7 @@ void	free_configuration_cache(void)
 
 	zbx_rwlock_destroy(&config_lock);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -6902,8 +6848,6 @@ static int	dc_preproc_item_init(zbx_preproc_item_t *item, zbx_uint64_t itemid)
  ******************************************************************************/
 void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 {
-	const char		*__function_name = "DCconfig_get_preprocessable_items";
-
 	const ZBX_DC_PREPROCITEM	*dc_preprocitem;
 	const ZBX_DC_MASTERITEM		*dc_masteritem;
 	const ZBX_DC_ITEM		*dc_item;
@@ -6913,7 +6857,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 	zbx_preproc_op_t		*op;
 	int				i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* no changes */
 	if (0 != *timestamp && *timestamp == config->item_sync_ts)
@@ -6981,7 +6925,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 
 	UNLOCK_CACHE;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() items:%d", __function_name, items->num_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() items:%d", __func__, items->num_data);
 }
 
 void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num)
@@ -7710,12 +7654,10 @@ static int	dc_config_get_queue_nextcheck(zbx_binary_heap_t *queue)
  ******************************************************************************/
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 {
-	const char		*__function_name = "DCconfig_get_poller_nextcheck";
-
 	int			nextcheck;
 	zbx_binary_heap_t	*queue;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __func__, (int)poller_type);
 
 	queue = &config->queues[poller_type];
 
@@ -7725,7 +7667,7 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, nextcheck);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, nextcheck);
 
 	return nextcheck;
 }
@@ -7799,12 +7741,10 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  ******************************************************************************/
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 {
-	const char		*__function_name = "DCconfig_get_poller_items";
-
 	int			now, num = 0, max_items;
 	zbx_binary_heap_t	*queue;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __func__, (int)poller_type);
 
 	now = time(NULL);
 
@@ -7920,7 +7860,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
 	return num;
 }
@@ -7945,12 +7885,10 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
  ******************************************************************************/
 int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *nextcheck)
 {
-	const char		*__function_name = "DCconfig_get_ipmi_poller_items";
-
 	int			num = 0;
 	zbx_binary_heap_t	*queue;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	queue = &config->queues[ZBX_POLLER_TYPE_IPMI];
 
@@ -8010,7 +7948,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
 	return num;
 }
@@ -8029,13 +7967,11 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
  ******************************************************************************/
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids)
 {
-	const char		*__function_name = "DCconfig_get_snmp_interfaceids_by_addr";
-
 	int				count = 0, i;
 	const ZBX_DC_INTERFACE_ADDR	*dc_interface_snmpaddr;
 	ZBX_DC_INTERFACE_ADDR		dc_interface_snmpaddr_local;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __function_name, addr);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __func__, addr);
 
 	dc_interface_snmpaddr_local.addr = addr;
 
@@ -8053,7 +7989,7 @@ int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **inte
 unlock:
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, count);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, count);
 
 	return count;
 }
@@ -8071,8 +8007,6 @@ unlock:
  ******************************************************************************/
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
 {
-	const char			*__function_name = "DCconfig_get_snmp_items_by_interface";
-
 	size_t				items_num = 0, items_alloc = 8;
 	int				i;
 	const ZBX_DC_ITEM		*dc_item;
@@ -8080,7 +8014,7 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 	const ZBX_DC_INTERFACE		*dc_interface;
 	const ZBX_DC_HOST		*dc_host;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64, __function_name, interfaceid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64, __func__, interfaceid);
 
 	RDLOCK_CACHE;
 
@@ -8125,7 +8059,7 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 unlock:
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)items_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)items_num);
 
 	return items_num;
 }
@@ -9158,11 +9092,10 @@ int	DCconfig_get_last_sync_time(void)
  ******************************************************************************/
 int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts)
 {
-	const char		*__function_name = "DCconfig_get_proxypoller_hosts";
 	int			now, num = 0;
 	zbx_binary_heap_t	*queue;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	now = time(NULL);
 
@@ -9190,7 +9123,7 @@ int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts)
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
 	return num;
 }
@@ -9208,12 +9141,10 @@ int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts)
  ******************************************************************************/
 int	DCconfig_get_proxypoller_nextcheck(void)
 {
-	const char		*__function_name = "DCconfig_get_proxypoller_nextcheck";
-
 	int			nextcheck;
 	zbx_binary_heap_t	*queue;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	queue = &config->pqueue;
 
@@ -9234,20 +9165,18 @@ int	DCconfig_get_proxypoller_nextcheck(void)
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, nextcheck);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, nextcheck);
 
 	return nextcheck;
 }
 
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int proxy_conn_err)
 {
-	const char	*__function_name = "DCrequeue_proxy";
-
 	time_t		now;
 	ZBX_DC_HOST	*dc_host;
 	ZBX_DC_PROXY	*dc_proxy;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() update_nextcheck:%d", __function_name, (int)update_nextcheck);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() update_nextcheck:%d", __func__, (int)update_nextcheck);
 
 	now = time(NULL);
 
@@ -9290,7 +9219,7 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
@@ -9421,10 +9350,9 @@ static void	dc_get_user_macro(const zbx_uint64_t *hostids, int hostids_num, cons
 
 void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to)
 {
-	const char	*__function_name = "DCget_user_macro";
-	char		*name = NULL, *context = NULL;
+	char	*name = NULL, *context = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __function_name, macro);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __func__, macro);
 
 	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL))
 		goto out;
@@ -9438,7 +9366,7 @@ void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *
 	zbx_free(context);
 	zbx_free(name);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -10354,9 +10282,7 @@ void	zbx_dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int func
  ******************************************************************************/
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids)
 {
-	const char	*__function_name = "DCget_hostids_by_functionids";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	RDLOCK_CACHE;
 
@@ -10364,7 +10290,7 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __function_name, hostids->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __func__, hostids->values_num);
 }
 
 /******************************************************************************
@@ -10414,9 +10340,7 @@ static void	dc_get_hosts_by_functionids(const zbx_uint64_t *functionids, int fun
  ******************************************************************************/
 void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts)
 {
-	const char	*__function_name = "DCget_hosts_by_functionids";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	RDLOCK_CACHE;
 
@@ -10424,7 +10348,7 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __function_name, hosts->num_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __func__, hosts->num_data);
 }
 
 /******************************************************************************
@@ -10524,13 +10448,12 @@ void	zbx_config_clean(zbx_config_t *cfg)
  ******************************************************************************/
 int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts)
 {
-	const char		*__function_name = "DCreset_hosts_availability";
 	ZBX_DC_HOST		*host;
 	zbx_hashset_iter_t	iter;
 	zbx_host_availability_t	*ha = NULL;
 	int			now;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	now = time(NULL);
 
@@ -10606,7 +10529,7 @@ int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts)
 
 	zbx_vector_ptr_sort(hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __function_name, hosts->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __func__, hosts->values_num);
 
 	return 0 == hosts->values_num ? FAIL : SUCCEED;
 }
@@ -10628,12 +10551,11 @@ int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts)
  ******************************************************************************/
 int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
 {
-	const char		*__function_name = "DCget_hosts_availability";
 	const ZBX_DC_HOST	*host;
 	zbx_hashset_iter_t	iter;
 	zbx_host_availability_t	*ha = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	RDLOCK_CACHE;
 
@@ -10665,7 +10587,7 @@ int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
 
 	zbx_vector_ptr_sort(hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __function_name, hosts->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __func__, hosts->values_num);
 
 	return 0 == hosts->values_num ? FAIL : SUCCEED;
 }
@@ -10682,11 +10604,10 @@ int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
  ******************************************************************************/
 void	DCtouch_hosts_availability(const zbx_vector_uint64_t *hostids)
 {
-	const char	*__function_name = "DCtouch_hosts_availability";
 	ZBX_DC_HOST	*dc_host;
 	int		i, now;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostids:%d", __function_name, hostids->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostids:%d", __func__, hostids->values_num);
 
 	now = time(NULL);
 
@@ -10700,7 +10621,7 @@ void	DCtouch_hosts_availability(const zbx_vector_uint64_t *hostids)
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -10913,11 +10834,10 @@ static void	prepare_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_
  ******************************************************************************/
 void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions, unsigned char opflags)
 {
-	const char			*__function_name = "zbx_dc_get_actions_eval";
 	const zbx_dc_action_t		*dc_action;
 	zbx_hashset_iter_t		iter;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	RDLOCK_CACHE;
 
@@ -10933,7 +10853,7 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_cond
 
 	prepare_actions_eval(actions, uniq_conditions);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() actions:%d", __function_name, actions->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() actions:%d", __func__, actions->values_num);
 }
 
 /******************************************************************************

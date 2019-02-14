@@ -152,13 +152,11 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 		unsigned char graphtype, unsigned char show_legend, unsigned char show_3d, double percent_left,
 		double percent_right, unsigned char ymin_type, unsigned char ymax_type)
 {
-	const char	*__function_name = "lld_graphs_get";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_lld_graph_t	*graph;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
 			"select g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
@@ -230,7 +228,7 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 
 	zbx_vector_ptr_sort(graphs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -244,8 +242,6 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems_proto,
 		zbx_vector_ptr_t *graphs)
 {
-	const char		*__function_name = "lld_gitems_get";
-
 	int			i, index;
 	zbx_lld_graph_t		*graph;
 	zbx_lld_gitem_t		*gitem;
@@ -256,7 +252,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&graphids);
 	zbx_vector_uint64_append(&graphids, parent_graphid);
@@ -329,7 +325,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 
 	zbx_vector_uint64_destroy(&graphids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -348,8 +344,6 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 static void	lld_items_get(const zbx_vector_ptr_t *gitems_proto, zbx_uint64_t ymin_itemid_proto,
 		zbx_uint64_t ymax_itemid_proto, zbx_vector_ptr_t *items)
 {
-	const char		*__function_name = "lld_items_get";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	const zbx_lld_gitem_t	*gitem;
@@ -357,7 +351,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *gitems_proto, zbx_uint64_t ymi
 	zbx_vector_uint64_t	itemids;
 	int			i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&itemids);
 
@@ -409,7 +403,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *gitems_proto, zbx_uint64_t ymi
 
 	zbx_vector_uint64_destroy(&itemids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -514,14 +508,12 @@ static int	lld_item_get(zbx_uint64_t itemid_proto, const zbx_vector_ptr_t *items
 static int	lld_gitems_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *gitems,
 		const zbx_vector_ptr_t *items, const zbx_vector_ptr_t *item_links)
 {
-	const char		*__function_name = "lld_gitems_make";
-
 	int			i, ret = FAIL;
 	const zbx_lld_gitem_t	*gitem_proto;
 	zbx_lld_gitem_t		*gitem;
 	zbx_uint64_t		itemid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < gitems_proto->values_num; i++)
 	{
@@ -606,7 +598,7 @@ static int	lld_gitems_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -622,14 +614,12 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 		const char *name_proto, zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto,
 		const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths)
 {
-	const char			*__function_name = "lld_graph_make";
-
 	zbx_lld_graph_t			*graph = NULL;
 	char				*buffer = NULL;
 	const struct zbx_json_parse	*jp_row = &lld_row->jp_row;
 	zbx_uint64_t			ymin_itemid, ymax_itemid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == ymin_itemid_proto)
 		ymin_itemid = 0;
@@ -694,7 +684,7 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 
 	graph->flags |= ZBX_FLAG_LLD_GRAPH_DISCOVERED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	lld_graphs_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *items,
@@ -763,14 +753,12 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
  ******************************************************************************/
 static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, char **error)
 {
-	const char		*__function_name = "lld_graphs_validate";
-
 	int			i, j;
 	zbx_lld_graph_t		*graph, *graph_b;
 	zbx_vector_uint64_t	graphids;
 	zbx_vector_str_t	names;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&graphids);
 	zbx_vector_str_create(&names);		/* list of graph names */
@@ -908,7 +896,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 	zbx_vector_str_destroy(&names);
 	zbx_vector_uint64_destroy(&graphids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -927,8 +915,6 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		unsigned char show_triggers, unsigned char graphtype, unsigned char show_legend, unsigned char show_3d,
 		double percent_left, double percent_right, unsigned char ymin_type, unsigned char ymax_type)
 {
-	const char		*__function_name = "lld_graphs_save";
-
 	int			ret = SUCCEED, i, j, new_graphs = 0, upd_graphs = 0, new_gitems = 0;
 	zbx_lld_graph_t		*graph;
 	zbx_lld_gitem_t		*gitem;
@@ -940,7 +926,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 	size_t			sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
 	zbx_db_insert_t		db_insert, db_insert_gdiscovery, db_insert_gitems;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&upd_gitems);
 	zbx_vector_uint64_create(&del_gitemids);
@@ -1267,7 +1253,7 @@ out:
 	zbx_vector_uint64_destroy(&del_gitemids);
 	zbx_vector_ptr_destroy(&upd_gitems);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
@@ -1292,8 +1278,6 @@ out:
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error)
 {
-	const char		*__function_name = "lld_update_graphs";
-
 	int			ret = SUCCEED;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1301,7 +1285,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 	zbx_vector_ptr_t	gitems_proto;
 	zbx_vector_ptr_t	items;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&graphs);		/* list of graphs which were created or will be created or */
 						/* updated by the graph prototype */
@@ -1371,7 +1355,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 	zbx_vector_ptr_destroy(&gitems_proto);
 	zbx_vector_ptr_destroy(&graphs);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }

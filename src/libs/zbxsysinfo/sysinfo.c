@@ -1232,15 +1232,13 @@ static int	write_all(int fd, const char *buf, size_t n)
  ******************************************************************************/
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char	*__function_name = "zbx_execute_threaded_metric";
+	int	ret = SYSINFO_RET_OK;
+	pid_t	pid;
+	int	fds[2], n, status;
+	char	buffer[MAX_STRING_LEN], *data;
+	size_t	data_alloc = MAX_STRING_LEN, data_offset = 0;
 
-	int		ret = SYSINFO_RET_OK;
-	pid_t		pid;
-	int		fds[2], n, status;
-	char		buffer[MAX_STRING_LEN], *data;
-	size_t		data_alloc = MAX_STRING_LEN, data_offset = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, request->key);
 
 	if (-1 == pipe(fds))
 	{
@@ -1342,7 +1340,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	zbx_free(data);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __function_name, zbx_sysinfo_ret_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __func__, zbx_sysinfo_ret_string(ret),
 			ISSET_MSG(result) ? result->msg : "");
 	return ret;
 }
@@ -1399,8 +1397,6 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
  ******************************************************************************/
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char			*__function_name = "zbx_execute_threaded_metric";
-
 	ZBX_THREAD_HANDLE		thread;
 	zbx_thread_args_t		thread_args;
 	zbx_metric_thread_args_t	metric_args = {metric_func, request, result, ZBX_MUTEX_THREAD_DENIED |
@@ -1408,7 +1404,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	DWORD				rc;
 	BOOL				terminate_thread = FALSE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, request->key);
 
 	if (NULL == (metric_args.timeout_event = CreateEvent(NULL, TRUE, FALSE, NULL)))
 	{
@@ -1472,13 +1468,13 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	{
 		if (FALSE != TerminateThread(thread, 0))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "%s(): TerminateThread() for %s[%s%s] succeeded", __function_name,
+			zabbix_log(LOG_LEVEL_ERR, "%s(): TerminateThread() for %s[%s%s] succeeded", __func__,
 					request->key, (0 < request->nparam) ? request->params[0] : "",
 					(1 < request->nparam) ? ",..." : "");
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_ERR, "%s(): TerminateThread() for %s[%s%s] failed: %s", __function_name,
+			zabbix_log(LOG_LEVEL_ERR, "%s(): TerminateThread() for %s[%s%s] failed: %s", __func__,
 					request->key, (0 < request->nparam) ? request->params[0] : "",
 					(1 < request->nparam) ? ",..." : "",
 					strerror_from_system(GetLastError()));
@@ -1488,7 +1484,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	CloseHandle(thread);
 	CloseHandle(metric_args.timeout_event);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __func__,
 			zbx_sysinfo_ret_string(metric_args.agent_ret), ISSET_MSG(result) ? result->msg : "");
 
 	return WAIT_OBJECT_0 == rc ? metric_args.agent_ret : SYSINFO_RET_FAIL;

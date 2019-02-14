@@ -1310,8 +1310,6 @@ void	zbx_db_clean_bind_context(zbx_db_bind_context_t *context)
 
 int	zbx_db_statement_execute(int iters)
 {
-	const char	*__function_name = "zbx_db_statement_execute";
-
 	sword	err;
 	ub4	nrows;
 	int	ret;
@@ -1334,7 +1332,7 @@ int	zbx_db_statement_execute(int iters)
 		txn_error = ZBX_DB_FAIL;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "%s():%d", __function_name, ret);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s():%d", __func__, ret);
 
 	return ret;
 }

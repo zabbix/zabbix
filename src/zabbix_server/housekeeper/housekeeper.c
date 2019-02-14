@@ -480,12 +480,10 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
  ******************************************************************************/
 static void	hk_history_delete_queue_prepare_global(zbx_hk_history_rule_t *rule, int now)
 {
-	const char		*__function_name = "hk_history_delete_queue_prepare_global";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&rule->delete_queue);
 	zbx_vector_ptr_reserve(&rule->delete_queue, HK_INITIAL_DELETE_QUEUE_SIZE);
@@ -504,7 +502,7 @@ static void	hk_history_delete_queue_prepare_global(zbx_hk_history_rule_t *rule, 
 
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -525,12 +523,10 @@ static void	hk_history_delete_queue_prepare_global(zbx_hk_history_rule_t *rule, 
  ******************************************************************************/
 static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, int now)
 {
-	const char		*__function_name = "hk_history_delete_queue_prepare_all";
-
 	zbx_hk_history_rule_t	*rule;
 	int			needs_item_scan = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* prepare history item cache (hashset containing itemid:min_clock values) */
 	for (rule = rules; NULL != rule->table; rule++)
@@ -559,7 +555,7 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
 	if (needs_item_scan)
 		hk_history_update(rules, now);	/* scan items and update min_clock using per item settings */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -593,12 +589,10 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
  ******************************************************************************/
 static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 {
-	const char		*__function_name = "hk_drop_partition_for_rule";
-
 	int			keep_from, history_seconds;
 	DB_RESULT		result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
 	history_seconds = *rule->poption;
 
@@ -609,7 +603,7 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 	}
 
 	keep_from = now - history_seconds;
-	zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __function_name, rule->table, keep_from);
+	zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, rule->table, keep_from);
 
 	result = DBselect("SELECT drop_chunks(%d,'%s')", keep_from, rule->table);
 
@@ -618,7 +612,7 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 	else
 		DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return;
 }
@@ -636,12 +630,10 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
  ******************************************************************************/
 static int	housekeeping_history_and_trends(int now)
 {
-	const char		*__function_name = "housekeeping_history_and_trends";
-
 	int			deleted = 0, i, rc;
 	zbx_hk_history_rule_t	*rule;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
 	/* prepare delete queues for all history housekeeping rules */
 	hk_history_delete_queue_prepare_all(hk_history_rules, now);
@@ -681,7 +673,7 @@ static int	housekeeping_history_and_trends(int now)
 		hk_history_delete_queue_clear(rule);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
 
 	return deleted;
 }
@@ -703,14 +695,12 @@ static int	housekeeping_history_and_trends(int now)
  ******************************************************************************/
 static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 {
-	const char	*__function_name = "housekeeping_process_rule";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		keep_from, deleted = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' field_name:'%s' filter:'%s' min_clock:%d now:%d",
-			__function_name, rule->table, rule->field_name, rule->filter, rule->min_clock, now);
+			__func__, rule->table, rule->field_name, rule->filter, rule->min_clock, now);
 
 	/* initialize min_clock with the oldest record timestamp from database */
 	if (0 == rule->min_clock)
@@ -785,7 +775,7 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 		zbx_vector_uint64_destroy(&ids);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
 
 	return deleted;
 }
@@ -925,8 +915,6 @@ static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t i
  ******************************************************************************/
 static int	housekeeping_cleanup(void)
 {
-	const char		*__function_name = "housekeeping_cleanup";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			deleted = 0;
@@ -936,7 +924,7 @@ static int	housekeeping_cleanup(void)
 	zbx_hk_cleanup_table_t *table;
 	zbx_uint64_t		housekeeperid, objectid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&housekeeperids);
 
@@ -1013,18 +1001,16 @@ static int	housekeeping_cleanup(void)
 
 	zbx_vector_uint64_destroy(&housekeeperids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
 
 	return deleted;
 }
 
 static int	housekeeping_sessions(int now)
 {
-	const char	*__function_name = "housekeeping_sessions";
+	int	deleted = 0, rc;
 
-	int		deleted = 0, rc;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
 	if (ZBX_HK_OPTION_ENABLED == cfg.hk.sessions_mode)
 	{
@@ -1039,7 +1025,7 @@ static int	housekeeping_sessions(int now)
 			deleted = rc;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
 
 	return deleted;
 }
@@ -1106,18 +1092,16 @@ static int	housekeeping_events(int now)
 
 static int	housekeeping_problems(int now)
 {
-	const char	*__function_name = "housekeeping_problems";
+	int	deleted = 0, rc;
 
-	int		deleted = 0, rc;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
 	rc = DBexecute("delete from problem where r_clock<>0 and r_clock<%d", now - SEC_PER_DAY);
 
 	if (ZBX_DB_OK <= rc)
 		deleted = rc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
 
 	return deleted;
 }

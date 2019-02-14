@@ -64,11 +64,9 @@ void	DBclose(void)
  ******************************************************************************/
 int	DBconnect(int flag)
 {
-	const char	*__function_name = "DBconnect";
+	int	err;
 
-	int		err;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __function_name, flag);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __func__, flag);
 
 	while (ZBX_DB_OK != (err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
 			CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)))
@@ -93,7 +91,7 @@ int	DBconnect(int flag)
 		connection_failure = 0;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, err);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
 
 	return err;
 }
@@ -413,13 +411,11 @@ DB_RESULT	DBselectN(const char *query, int n)
 
 int	DBget_row_count(const char *table_name)
 {
-	const char	*__function_name = "DBget_row_count";
-
 	int		count = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table_name:'%s'", __function_name, table_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table_name:'%s'", __func__, table_name);
 
 	result = DBselect("select count(*) from %s", table_name);
 
@@ -427,21 +423,19 @@ int	DBget_row_count(const char *table_name)
 		count = atoi(row[0]);
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, count);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, count);
 
 	return count;
 }
 
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 {
-	const char	*__function_name = "DBget_proxy_lastaccess";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*host_esc;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	host_esc = DBdyn_escape_string(hostname);
 	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d,%d)",
@@ -457,7 +451,7 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 		*error = zbx_dsprintf(*error, "Proxy \"%s\" does not exist.", hostname);
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -612,8 +606,6 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
  ******************************************************************************/
 static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 {
-	const char	*__function_name = "DBget_nextid";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	ret1, ret2;
@@ -621,7 +613,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	int		found = FAIL, dbres;
 	const ZBX_TABLE	*table;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __function_name, tablename);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __func__, tablename);
 
 	table = DBget_table(tablename);
 
@@ -630,7 +622,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 		/* avoid eternal loop within failed transaction */
 		if (0 < zbx_db_txn_level() && 0 != zbx_db_txn_error())
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() transaction failed", __function_name);
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() transaction failed", __func__);
 			return 0;
 		}
 
@@ -708,7 +700,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64 " table:'%s' recid:'%s'",
-			__function_name, ret2 - num + 1, table->table, table->recid);
+			__func__, ret2 - num + 1, table->table, table->recid);
 
 	return ret2 - num + 1;
 }
@@ -1102,13 +1094,11 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid)
  ******************************************************************************/
 int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *recipient_userid)
 {
-	const char	*__function_name = "zbx_check_user_permissions";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		user_type = -1, ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == recipient_userid || *userid == *recipient_userid)
 		goto out;
@@ -1121,7 +1111,7 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 
 	if (-1 == user_type)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot check permissions", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot check permissions", __func__);
 		ret = FAIL;
 		goto out;
 	}
@@ -1145,7 +1135,7 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 		DBfree_result(result);
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1230,12 +1220,10 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 
 static int	DBregister_host_active(void)
 {
-	const char	*__function_name = "DBregister_host_active";
-
 	DB_RESULT	result;
 	int		ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
 			"select null"
@@ -1250,7 +1238,7 @@ static int	DBregister_host_active(void)
 
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1401,8 +1389,6 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
 {
-	const char		*__function_name = "DBregister_host_flush";
-
 	zbx_autoreg_host_t	*autoreg_host;
 	zbx_uint64_t		autoreg_hostid;
 	zbx_db_insert_t		db_insert;
@@ -1411,7 +1397,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_timespec_t		ts = {0, 0};
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != DBregister_host_active())
 		goto exit;
@@ -1498,7 +1484,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 	zbx_process_events(NULL, NULL);
 	zbx_clean_events();
 exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts)
@@ -1593,8 +1579,6 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
  ******************************************************************************/
 char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 {
-	const char		*__function_name = "DBget_unique_hostname_by_sample";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			full_match = 0, i;
@@ -1605,7 +1589,7 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 
 	assert(host_name_sample && *host_name_sample);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sample:'%s'", __function_name, host_name_sample);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sample:'%s'", __func__, host_name_sample);
 
 	zbx_vector_uint64_create(&nums);
 	zbx_vector_uint64_reserve(&nums, 8);
@@ -1671,7 +1655,7 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 clean:
 	zbx_vector_uint64_destroy(&nums);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, host_name_temp);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __func__, host_name_temp);
 
 	return host_name_temp;
 }
@@ -2648,14 +2632,12 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
  ******************************************************************************/
 int	zbx_db_get_database_type(void)
 {
-	const char	*__function_name = "zbx_db_get_database_type";
-
 	const char	*result_string;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = ZBX_DB_UNKNOWN;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -2693,7 +2675,7 @@ out:
 			break;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, result_string);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, result_string);
 
 	return ret;
 }
@@ -2716,16 +2698,14 @@ out:
  ******************************************************************************/
 int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id)
 {
-	const char	*__function_name = "DBlock_record";
-
 	DB_RESULT	result;
 	const ZBX_TABLE	*t;
 	int		ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == zbx_db_txn_level())
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __func__);
 
 	t = DBget_table(table);
 
@@ -2746,7 +2726,7 @@ int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx
 
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -2768,18 +2748,16 @@ int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx
  ******************************************************************************/
 int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 {
-	const char	*__function_name = "DBlock_records";
-
 	DB_RESULT	result;
 	const ZBX_TABLE	*t;
 	int		ret;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == zbx_db_txn_level())
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __func__);
 
 	t = DBget_table(table);
 
@@ -2797,7 +2775,7 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -2883,13 +2861,12 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
  ******************************************************************************/
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 {
-	const char	*__function_name = "DBget_user_by_active_session";
 	char		*sessionid_esc;
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __function_name, sessionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, sessionid);
 
 	sessionid_esc = DBdyn_escape_string(sessionid);
 
@@ -2915,7 +2892,7 @@ out:
 	DBfree_result(result);
 	zbx_free(sessionid_esc);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

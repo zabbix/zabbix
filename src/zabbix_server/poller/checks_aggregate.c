@@ -308,8 +308,6 @@ static void	aggregate_quote_groups(char **str, size_t *str_alloc, size_t *str_of
  ******************************************************************************/
 static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups, const char *itemkey, char **error)
 {
-	const char	*__function_name = "aggregate_get_items";
-
 	char			*group, *esc;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -320,7 +318,7 @@ static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups,
 	zbx_vector_uint64_t	groupids;
 	zbx_vector_str_t	group_names;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groups:'%s' itemkey:'%s'", __function_name, groups, itemkey);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groups:'%s' itemkey:'%s'", __func__, groups, itemkey);
 
 	zbx_vector_uint64_create(&groupids);
 	zbx_vector_str_create(&group_names);
@@ -389,7 +387,7 @@ static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups,
 out:
 	zbx_vector_uint64_destroy(&groupids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
@@ -412,7 +410,6 @@ out:
 static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, const char *groups,
 		const char *itemkey, int item_func, const char *param)
 {
-	const char			*__function_name = "evaluate_aggregate";
 	zbx_vector_uint64_t		itemids;
 	history_value_t			value, item_result;
 	zbx_history_record_t		group_value;
@@ -423,7 +420,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	zbx_timespec_t			ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grp_func:%d groups:'%s' itemkey:'%s' item_func:%d param:'%s'",
-			__function_name, grp_func, groups, itemkey, item_func, ZBX_NULL2STR(param));
+			__func__, grp_func, groups, itemkey, item_func, ZBX_NULL2STR(param));
 
 	zbx_timespec(&ts);
 
@@ -523,7 +520,7 @@ clean2:
 clean1:
 	zbx_vector_uint64_destroy(&itemids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -545,14 +542,12 @@ clean1:
  ******************************************************************************/
 int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 {
-	const char	*__function_name = "get_value_aggregate";
-
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
 	const char	*tmp, *groups, *itemkey, *funcp = NULL;
 	int		grp_func, item_func, params_num;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key_orig);
 
 	init_request(&request);
 
@@ -637,7 +632,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 out:
 	free_request(&request);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

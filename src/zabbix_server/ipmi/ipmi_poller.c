@@ -92,7 +92,6 @@ static void	ipmi_poller_send_result(zbx_ipc_socket_t *socket, zbx_uint32_t code,
  ******************************************************************************/
 static void	ipmi_poller_process_value_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
 {
-	const char	*__function_name = "ipmi_poller_process_value_request";
 	zbx_uint64_t	itemid;
 	char		*addr, *username, *password, *sensor, *value = NULL;
 	signed char	authtype;
@@ -100,13 +99,13 @@ static void	ipmi_poller_process_value_request(zbx_ipc_socket_t *socket, zbx_ipc_
 	unsigned short	port;
 	int		errcode, command;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_ipmi_deserialize_request(message->data, &itemid, &addr, &port, &authtype,
 			&privilege, &username, &password, &sensor, &command);
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() itemid:" ZBX_FS_UI64 " addr:%s port:%d authtype:%d privilege:%d username:%s"
-			" sensor:%s", __function_name, itemid, addr, (int)port, (int)authtype, (int)privilege,
+			" sensor:%s", __func__, itemid, addr, (int)port, (int)authtype, (int)privilege,
 			username, sensor);
 
 	errcode = get_value_ipmi(itemid, addr, port, authtype, privilege, username, password, sensor, &value);
@@ -118,7 +117,7 @@ static void	ipmi_poller_process_value_request(zbx_ipc_socket_t *socket, zbx_ipc_
 	zbx_free(password);
 	zbx_free(sensor);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -133,7 +132,6 @@ static void	ipmi_poller_process_value_request(zbx_ipc_socket_t *socket, zbx_ipc_
  ******************************************************************************/
 static void	ipmi_poller_process_command_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
 {
-	const char	*__function_name = "ipmi_poller_process_command_request";
 	zbx_uint64_t	itemid;
 	char		*addr, *username, *password, *sensor, *error = NULL;
 	signed char	authtype;
@@ -141,13 +139,13 @@ static void	ipmi_poller_process_command_request(zbx_ipc_socket_t *socket, zbx_ip
 	unsigned short	port;
 	int		errcode, command;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_ipmi_deserialize_request(message->data, &itemid, &addr, &port, &authtype,
 			&privilege, &username, &password, &sensor, &command);
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() hostid:" ZBX_FS_UI64 " addr:%s port:%d authtype:%d privilege:%d username:%s"
-			" sensor:%s", __function_name, itemid, addr, (int)port, (int)authtype, (int)privilege,
+			" sensor:%s", __func__, itemid, addr, (int)port, (int)authtype, (int)privilege,
 			username, sensor);
 
 	errcode = zbx_set_ipmi_control_value(itemid, addr, port, authtype, privilege, username, password, sensor,
@@ -161,7 +159,7 @@ static void	ipmi_poller_process_command_request(zbx_ipc_socket_t *socket, zbx_ip
 	zbx_free(password);
 	zbx_free(sensor);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 ZBX_THREAD_ENTRY(ipmi_poller_thread, args)

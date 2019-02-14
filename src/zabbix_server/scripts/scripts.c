@@ -34,14 +34,12 @@ extern int	CONFIG_TRAPPER_TIMEOUT;
 static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command, char **result,
 		char *error, size_t max_error_len)
 {
-	const char	*__function_name = "zbx_execute_script_on_agent";
-
 	int		ret;
 	AGENT_RESULT	agent_result;
 	char		*param = NULL, *port = NULL;
 	DC_ITEM		item;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	*error = '\0';
 	memset(&item, 0, sizeof(item));
@@ -95,7 +93,7 @@ fail:
 	zbx_free(port);
 	zbx_free(param);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -103,8 +101,6 @@ fail:
 static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_t *script, char **result,
 		char *error, size_t max_error_len)
 {
-	const char	*__function_name = "zbx_execute_script_on_terminal";
-
 	int		ret = FAIL, i;
 	AGENT_RESULT	agent_result;
 	DC_ITEM		item;
@@ -116,7 +112,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 	assert(ZBX_SCRIPT_TYPE_TELNET == script->type);
 #endif
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	*error = '\0';
 	memset(&item, 0, sizeof(item));
@@ -187,20 +183,18 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 	zbx_free(item.params);
 	zbx_free(item.key);
 fail:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script, zbx_uint64_t *groupid)
 {
-	const char	*__function_name = "DBget_script_by_scriptid";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
 			"select type,execute_on,command,groupid,host_access"
@@ -219,23 +213,20 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 {
-	const char		*__function_name = "check_script_permissions";
-
 	DB_RESULT		result;
 	int			ret = SUCCEED;
 	zbx_vector_uint64_t	groupids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groupid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64,
-			__function_name, groupid, hostid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groupid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64, __func__, groupid, hostid);
 
 	if (0 == groupid)
 		goto exit;
@@ -263,21 +254,19 @@ static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 
 	DBfree_result(result);
 exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 static int	check_user_permissions(zbx_uint64_t userid, const DC_HOST *host, zbx_script_t *script)
 {
-	const char	*__function_name = "check_user_permissions";
-
 	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " scriptid:" ZBX_FS_UI64,
-			__function_name, userid, host->hostid, script->scriptid);
+			__func__, userid, host->hostid, script->scriptid);
 
 	result = DBselect(
 		"select null"
@@ -299,7 +288,7 @@ static int	check_user_permissions(zbx_uint64_t userid, const DC_HOST *host, zbx_
 
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -343,12 +332,10 @@ void	zbx_script_clean(zbx_script_t *script)
 int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, char *error,
 		size_t max_error_len)
 {
-	const char	*__function_name = "zbx_script_prepare";
-
 	int		ret = FAIL;
 	zbx_uint64_t	groupid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	switch (script->type)
 	{
@@ -420,7 +407,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -439,11 +426,9 @@ out:
 int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **result, char *error,
 		size_t max_error_len)
 {
-	const char	*__function_name = "zbx_script_execute";
+	int	ret = FAIL;
 
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	*error = '\0';
 
@@ -492,7 +477,7 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **r
 	if (SUCCEED != ret && NULL != result)
 		*result = zbx_strdup(*result, "");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

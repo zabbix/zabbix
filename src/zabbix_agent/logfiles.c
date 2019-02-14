@@ -62,11 +62,10 @@
  ******************************************************************************/
 static int	split_string(const char *str, const char *del, char **part1, char **part2)
 {
-	const char	*__function_name = "split_string";
-	size_t		str_length, part1_length, part2_length;
-	int		ret = FAIL;
+	size_t	str_length, part1_length, part2_length;
+	int	ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s' del:'%s'", __function_name, str, del);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s' del:'%s'", __func__, str, del);
 
 	str_length = strlen(str);
 
@@ -74,7 +73,7 @@ static int	split_string(const char *str, const char *del, char **part1, char **p
 	/* just *del (e.g., "/" - file system root), but we do not allow part2 (filename) to be empty */
 	if (del < str || del >= (str + str_length - 1))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot proceed: delimiter is out of range", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot proceed: delimiter is out of range", __func__);
 		goto out;
 	}
 
@@ -89,7 +88,7 @@ static int	split_string(const char *str, const char *del, char **part1, char **p
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s part1:'%s' part2:'%s'", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s part1:'%s' part2:'%s'", __func__, zbx_result_string(ret),
 			*part1, *part2);
 
 	return ret;
@@ -122,14 +121,13 @@ out:
  ******************************************************************************/
 static int	split_filename(const char *filename, char **directory, char **filename_regexp, char **err_msg)
 {
-	const char	*__function_name = "split_filename";
 	const char	*separator = NULL;
 	zbx_stat_t	buf;
 	int		ret = FAIL;
 #ifdef _WINDOWS
 	size_t		sz;
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s'", __function_name, ZBX_NULL2STR(filename));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s'", __func__, ZBX_NULL2STR(filename));
 
 	if (NULL == filename || '\0' == *filename)
 	{
@@ -144,8 +142,8 @@ static int	split_filename(const char *filename, char **directory, char **filenam
 		if (PATH_SEPARATOR != *separator)
 			continue;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __function_name, filename);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() %*s", __function_name, separator - filename + 1, "^");
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, filename);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() %*s", __func__, separator - filename + 1, "^");
 
 		/* separator must be relative delimiter of the original filename */
 		if (FAIL == split_string(filename, separator, directory, filename_regexp))
@@ -223,7 +221,7 @@ static int	split_filename(const char *filename, char **directory, char **filenam
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s directory:'%s' filename_regexp:'%s'", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s directory:'%s' filename_regexp:'%s'", __func__,
 			zbx_result_string(ret), *directory, *filename_regexp);
 
 	return ret;
@@ -1155,9 +1153,8 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
 static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *old_files, int num_old,
 		struct st_logfile *new_files, int num_new, int use_ino, char **err_msg)
 {
-	const char	*__function_name = "create_old2new_and_copy_of";
-	int		i, j;
-	char		*old2new, *p;
+	int	i, j;
+	char	*old2new, *p;
 
 	/* set up a two dimensional array of possible mappings from old files to new files */
 	old2new = (char *)zbx_malloc(NULL, (size_t)num_new * (size_t)num_old * sizeof(char));
@@ -1184,7 +1181,7 @@ static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *ol
 					{
 						zabbix_log(LOG_LEVEL_DEBUG, "%s(): the size of log file \"%s\" has been"
 								" updated since modification time change, consider"
-								" it to be the same file", __function_name,
+								" it to be the same file", __func__,
 								old_files[i].filename);
 						old_files[i].retry = 0;
 					}
@@ -1205,7 +1202,7 @@ static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *ol
 
 			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): is_same_file(%s, %s) = %c", __function_name,
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): is_same_file(%s, %s) = %c", __func__,
 						old_files[i].filename, new_files[j].filename, p[j]);
 			}
 		}
@@ -1268,10 +1265,9 @@ static int	find_old2new(const char * const old2new, int num_new, int i_old)
 static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
 		zbx_stat_t *st)
 {
-	const char	*__function_name = "add_logfile";
-	int		i = 0, cmp = 0;
+	int	i = 0, cmp = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:%d size:" ZBX_FS_UI64, __function_name, filename,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:%d size:" ZBX_FS_UI64, __func__, filename,
 			(int)st->st_mtime, (zbx_uint64_t)st->st_size);
 
 	if (*logfiles_alloc == *logfiles_num)
@@ -1281,7 +1277,7 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 				(size_t)*logfiles_alloc * sizeof(struct st_logfile));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logfiles:%p logfiles_alloc:%d",
-				__function_name, (void *)*logfiles, *logfiles_alloc);
+				__func__, (void *)*logfiles, *logfiles_alloc);
 	}
 
 	/************************************************************************************************/
@@ -1313,8 +1309,7 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 			if (0 == cmp)
 			{
 				/* the file already exists, quite impossible branch */
-				zabbix_log(LOG_LEVEL_WARNING, "%s() file '%s' already added", __function_name,
-						filename);
+				zabbix_log(LOG_LEVEL_WARNING, "%s() file '%s' already added", __func__, filename);
 				goto out;
 			}
 
@@ -1349,7 +1344,7 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 
 	++(*logfiles_num);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2122,11 +2117,10 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 		const char *server, unsigned short port, const char *hostname, const char *key,
 		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset)
 {
-	const char	*__function_name = "process_log";
-	int		f, ret = FAIL;
+	int	f, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
-			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0);
+			__func__, filename, *lastlogsize, NULL != mtime ? *mtime : 0);
 
 	if (-1 == (f = open_file_helper(filename, err_msg)))
 		goto out;
@@ -2155,7 +2149,7 @@ out:
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d ret:%s"
-				" processed_bytes:" ZBX_FS_UI64, __function_name, filename, *lastlogsize,
+				" processed_bytes:" ZBX_FS_UI64, __func__, filename, *lastlogsize,
 				NULL != mtime ? *mtime : 0, zbx_result_string(ret),
 				SUCCEED == ret ? *processed_bytes : (zbx_uint64_t)0);
 	}
@@ -2950,14 +2944,13 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		const char *key, int *jumped, float max_delay, double *start_time, zbx_uint64_t *processed_bytes,
 		int rotation_type)
 {
-	const char		*__function_name = "process_logrt";
 	int			i, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
 				from_first_file = 1, last_processed, limit_reached = 0, res;
 	struct st_logfile	*logfiles = NULL;
 	zbx_uint64_t		processed_bytes_sum = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flags:0x%02x filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
-			__function_name, (unsigned int)flags, filename, *lastlogsize, *mtime);
+			__func__, (unsigned int)flags, filename, *lastlogsize, *mtime);
 
 	adjust_mtime_to_clock(mtime);
 
@@ -2970,8 +2963,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			{
 				*skip_old_data = 0;
 
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): no files, setting skip_old_data to 0",
-						__function_name);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): no files, setting skip_old_data to 0", __func__);
 			}
 
 			if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) && 0 == *logfiles_num_old)
@@ -3024,14 +3016,14 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() old file list:", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() old file list:", __func__);
 		if (NULL != *logfiles_old)
 			print_logfile_list(*logfiles_old, *logfiles_num_old);
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() new file list: (mtime:%d lastlogsize:" ZBX_FS_UI64
-				" start_idx:%d)", __function_name, *mtime, *lastlogsize, start_idx);
+				" start_idx:%d)", __func__, *mtime, *lastlogsize, start_idx);
 		if (NULL != logfiles)
 			print_logfile_list(logfiles, logfiles_num);
 		else
@@ -3210,7 +3202,7 @@ out:
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

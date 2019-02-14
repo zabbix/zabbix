@@ -1640,8 +1640,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 #define ZBX_TCP_EXPECT_LENGTH		4
 #define ZBX_TCP_EXPECT_SIZE		5
 
-	const char	*__function_name = "zbx_tcp_recv_ext";
-
 	ssize_t		nbytes;
 	size_t		buf_dyn_bytes = 0, buf_stat_bytes = 0, offset = 0;
 	zbx_uint32_t	expected_len = 16 * ZBX_MEBIBYTE, reserved = 0;
@@ -1803,7 +1801,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 				s->read_bytes = reserved;
 
 				zabbix_log(LOG_LEVEL_TRACE, "%s(): received " ZBX_FS_SIZE_T " bytes with"
-						" compression ratio %.1f", __function_name,
+						" compression ratio %.1f", __func__,
 						(zbx_fs_size_t)(buf_stat_bytes + buf_dyn_bytes),
 						(double)reserved / (buf_stat_bytes + buf_dyn_bytes));
 			}

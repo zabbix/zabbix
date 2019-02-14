@@ -37,12 +37,10 @@ extern int		server_num, process_num;
 
 static int	connect_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 {
-	const char	*__function_name = "connect_to_proxy";
-
 	int		ret = FAIL;
 	const char	*tls_arg1, *tls_arg2;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() address:%s port:%hu timeout:%d conn:%u", __function_name, proxy->addr,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() address:%s port:%hu timeout:%d conn:%u", __func__, proxy->addr,
 			proxy->port, timeout, (unsigned int)proxy->tls_connect);
 
 	switch (proxy->tls_connect)
@@ -81,18 +79,16 @@ static int	connect_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, int timeo
 		ret = NETWORK_ERROR;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const char *data, size_t size)
 {
-	const char	*__function_name = "send_data_to_proxy";
+	int	ret, flags = ZBX_TCP_PROTOCOL;
 
-	int		ret, flags = ZBX_TCP_PROTOCOL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, data);
 
 	if (0 != proxy->auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
@@ -104,17 +100,16 @@ static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const c
 		ret = NETWORK_ERROR;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 static int	recv_data_from_proxy(const DC_PROXY *proxy, zbx_socket_t *sock)
 {
-	const char	*__function_name = "recv_data_from_proxy";
-	int		ret;
+	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == (ret = zbx_tcp_recv(sock)))
 	{
@@ -124,20 +119,18 @@ static int	recv_data_from_proxy(const DC_PROXY *proxy, zbx_socket_t *sock)
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "obtained data from proxy \"%s\": [%s]", proxy->host, sock->buffer);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 static void	disconnect_proxy(zbx_socket_t *sock)
 {
-	const char	*__function_name = "disconnect_proxy";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_tcp_close(sock);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -162,13 +155,11 @@ static void	disconnect_proxy(zbx_socket_t *sock)
  ******************************************************************************/
 static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data, zbx_timespec_t *ts)
 {
-	const char	*__function_name = "get_data_from_proxy";
-
 	zbx_socket_t	s;
 	struct zbx_json	j;
 	int		ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request:'%s'", __function_name, request);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request:'%s'", __func__, request);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
@@ -199,7 +190,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 
 	zbx_json_free(&j);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -617,13 +608,11 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
  ******************************************************************************/
 static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_timespec_t *ts, int *more)
 {
-	const char		*__function_name = "proxy_process_proxy_data";
-
 	struct zbx_json_parse	jp;
 	char			*error = NULL;
 	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	*more = ZBX_PROXY_DATA_DONE;
 
@@ -658,7 +647,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 out:
 	zbx_free(error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -681,13 +670,11 @@ out:
  ******************************************************************************/
 static int	proxy_get_data(DC_PROXY *proxy, int *more)
 {
-	const char	*__function_name = "proxy_get_data";
-
 	char		*answer = NULL;
 	int		ret;
 	zbx_timespec_t	ts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == proxy->version)
 	{
@@ -738,9 +725,9 @@ static int	proxy_get_data(DC_PROXY *proxy, int *more)
 	zbx_free(answer);
 out:
 	if (SUCCEED == ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d", __function_name, zbx_result_string(ret), *more);
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d", __func__, zbx_result_string(ret), *more);
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -762,13 +749,11 @@ out:
  ******************************************************************************/
 static int	proxy_get_tasks(DC_PROXY *proxy)
 {
-	const char	*__function_name = "proxy_get_tasks";
-
 	char		*answer = NULL;
 	int		ret = FAIL, more;
 	zbx_timespec_t	ts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (ZBX_COMPONENT_VERSION(3, 2) >= proxy->version)
 		goto out;
@@ -782,7 +767,7 @@ static int	proxy_get_tasks(DC_PROXY *proxy)
 
 	zbx_free(answer);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -804,13 +789,11 @@ out:
  ******************************************************************************/
 static int	process_proxy(void)
 {
-	const char	*__function_name = "process_proxy";
-
 	DC_PROXY	proxy, proxy_old;
 	int		num, i;
 	time_t		now;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == (num = DCconfig_get_proxypoller_hosts(&proxy, 1)))
 		goto exit;
@@ -885,7 +868,7 @@ error:
 		DCrequeue_proxy(proxy.hostid, update_nextcheck, ret);
 	}
 exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return num;
 }

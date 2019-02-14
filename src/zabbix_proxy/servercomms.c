@@ -118,12 +118,10 @@ void	disconnect_server(zbx_socket_t *sock)
  ******************************************************************************/
 int	get_data_from_server(zbx_socket_t *sock, const char *request, char **error)
 {
-	const char	*__function_name = "get_data_from_server";
-
 	int		ret = FAIL;
 	struct zbx_json	j;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request:'%s'", __function_name, request);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request:'%s'", __func__, request);
 
 	zbx_json_init(&j, 128);
 	zbx_json_addstring(&j, "request", request, ZBX_JSON_TYPE_STRING);
@@ -148,7 +146,7 @@ int	get_data_from_server(zbx_socket_t *sock, const char *request, char **error)
 exit:
 	zbx_json_free(&j);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -165,11 +163,9 @@ exit:
  ******************************************************************************/
 int	put_data_to_server(zbx_socket_t *sock, struct zbx_json *j, char **error)
 {
-	const char	*__function_name = "put_data_to_server";
+	int	ret = FAIL;
 
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)j->buffer_size);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)j->buffer_size);
 
 	if (SUCCEED != zbx_tcp_send_ext(sock, j->buffer, strlen(j->buffer), ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
 	{
@@ -182,7 +178,7 @@ int	put_data_to_server(zbx_socket_t *sock, struct zbx_json *j, char **error)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

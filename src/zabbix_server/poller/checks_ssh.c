@@ -79,7 +79,6 @@ static int	waitsocket(int socket_fd, LIBSSH2_SESSION *session)
 /* example ssh.run["ls /"] */
 static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
-	const char	*__function_name = "ssh_run";
 	zbx_socket_t	s;
 	LIBSSH2_SESSION	*session;
 	LIBSSH2_CHANNEL	*channel;
@@ -89,7 +88,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			*publickey = NULL, *privatekey = NULL, *ssherr, *output;
 	size_t		sz;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
@@ -134,7 +133,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		goto session_close;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() supported authentication methods:'%s'", __function_name, userauthlist);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() supported authentication methods:'%s'", __func__, userauthlist);
 
 	switch (item->authtype)
 	{
@@ -150,8 +149,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 					goto session_close;
 				}
 				else
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() password authentication succeeded",
-							__function_name);
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() password authentication succeeded", __func__);
 			}
 			else if (auth_pw & 2)
 			{
@@ -166,7 +164,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				}
 				else
 					zabbix_log(LOG_LEVEL_DEBUG, "%s() keyboard-interactive authentication succeeded",
-							__function_name);
+							__func__);
 			}
 			else
 			{
@@ -216,7 +214,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				}
 				else
 					zabbix_log(LOG_LEVEL_DEBUG, "%s() authentication by public key succeeded",
-							__function_name);
+							__func__);
 			}
 			else
 			{
@@ -308,12 +306,12 @@ channel_close:
 	if (0 != rc)
 	{
 		libssh2_session_last_error(session, &ssherr, NULL, 0);
-		zabbix_log(LOG_LEVEL_WARNING, "%s() cannot close generic session channel: %s", __function_name, ssherr);
+		zabbix_log(LOG_LEVEL_WARNING, "%s() cannot close generic session channel: %s", __func__, ssherr);
 	}
 	else
 		exitcode = libssh2_channel_get_exit_status(channel);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() exitcode:%d bytecount:%d", __function_name, exitcode, bytecount);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() exitcode:%d bytecount:%d", __func__, exitcode, bytecount);
 
 	libssh2_channel_free(channel);
 	channel = NULL;
@@ -330,7 +328,7 @@ tcp_close:
 close:
 	zbx_free(publickey);
 	zbx_free(privatekey);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

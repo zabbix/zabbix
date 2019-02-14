@@ -671,11 +671,10 @@ static double	evaluate_term1(int *unknown_idx)
 int	evaluate(double *value, const char *expression, char *error, size_t max_error_len,
 		zbx_vector_ptr_t *unknown_msgs)
 {
-	const char	*__function_name = "evaluate";
-	int		unknown_idx = -13;	/* index of message in 'unknown_msgs' vector, set to invalid value */
-						/* to catch errors */
+	int	unknown_idx = -13;	/* index of message in 'unknown_msgs' vector, set to invalid value */
+					/* to catch errors */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, expression);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, expression);
 
 	ptr = expression;
 	level = 0;
@@ -700,7 +699,7 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				zabbix_log(LOG_LEVEL_WARNING, "%s() internal error: " ZBX_UNKNOWN_STR " index:%d"
-						" expression:'%s'", __function_name, unknown_idx, expression);
+						" expression:'%s'", __func__, unknown_idx, expression);
 				zbx_snprintf(error, max_error_len, "Internal error: " ZBX_UNKNOWN_STR " index %d."
 						" Please report this to Zabbix developers.", unknown_idx);
 			}
@@ -720,7 +719,7 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 			THIS_SHOULD_NEVER_HAPPEN;
 			/* do not leave garbage in error buffer, write something helpful */
 			zbx_snprintf(error, max_error_len, "%s(): internal error: no message for unknown result",
-					__function_name);
+					__func__);
 		}
 
 		*value = ZBX_INFINITY;
@@ -728,11 +727,11 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 
 	if (ZBX_INFINITY == *value)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __function_name, error);
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __func__, error);
 		return FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:" ZBX_FS_DBL, __function_name, *value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:" ZBX_FS_DBL, __func__, *value);
 
 	return SUCCEED;
 }

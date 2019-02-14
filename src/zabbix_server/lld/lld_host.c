@@ -203,14 +203,12 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		unsigned char tls_connect, unsigned char tls_accept, const char *tls_issuer,
 		const char *tls_subject, const char *tls_psk_identity, const char *tls_psk)
 {
-	const char	*__function_name = "lld_hosts_get";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_lld_host_t	*host;
 	zbx_uint64_t	db_proxy_hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
 			"select hd.hostid,hd.host,hd.lastcheck,hd.ts_delete,h.host,h.name,h.proxy_hostid,"
@@ -287,7 +285,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -299,8 +297,6 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
  ******************************************************************************/
 static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 {
-	const char		*__function_name = "lld_hosts_validate";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			i, j;
@@ -308,7 +304,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 	zbx_vector_uint64_t	hostids;
 	zbx_vector_str_t	tnames, vnames;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_str_create(&tnames);		/* list of technical host names */
@@ -563,19 +559,17 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 	zbx_vector_str_destroy(&tnames);
 	zbx_vector_uint64_destroy(&hostids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
 		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros)
 {
-	const char	*__function_name = "lld_host_make";
-
 	char		*buffer = NULL;
 	int		i;
 	zbx_lld_host_t	*host = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -646,7 +640,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 	zbx_free(buffer);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)host);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)host);
 
 	return host;
 }
@@ -702,8 +696,6 @@ static void	lld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_
 static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_ptr_t *hosts,
 		const zbx_vector_ptr_t *groups, zbx_vector_uint64_t *del_hostgroupids)
 {
-	const char		*__function_name = "lld_hostgroups_make";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			i, j;
@@ -712,7 +704,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 	zbx_lld_host_t		*host;
 	const zbx_lld_group_t	*group;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -800,7 +792,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 
 	zbx_vector_uint64_destroy(&hostids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -815,13 +807,11 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
  ******************************************************************************/
 static void	lld_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *group_prototypes)
 {
-	const char			*__function_name = "lld_group_prototypes_get";
-
 	DB_RESULT			result;
 	DB_ROW				row;
 	zbx_lld_group_prototype_t	*group_prototype;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
 			"select group_prototypeid,name"
@@ -843,7 +833,7 @@ static void	lld_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_
 
 	zbx_vector_ptr_sort(group_prototypes, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -858,13 +848,11 @@ static void	lld_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_
  ******************************************************************************/
 static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *groups)
 {
-	const char	*__function_name = "lld_groups_get";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_lld_group_t	*group;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
 			"select gd.groupid,gp.group_prototypeid,gd.name,gd.lastcheck,gd.ts_delete,g.name"
@@ -895,7 +883,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *groups)
 
 	zbx_vector_ptr_sort(groups, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -906,13 +894,11 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *groups)
 static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t group_prototypeid,
 		const char *name_proto, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros)
 {
-	const char	*__function_name = "lld_group_make";
-
 	char		*buffer = NULL;
 	int		i;
 	zbx_lld_group_t	*group = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < groups->values_num; i++)
 	{
@@ -994,7 +980,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 out:
 	zbx_free(buffer);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)group);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)group);
 
 	return group;
 }
@@ -1007,11 +993,9 @@ out:
 static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes,
 		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros)
 {
-	const char	*__function_name = "lld_groups_make";
+	int	i;
 
-	int		i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < group_prototypes->values_num; i++)
 	{
@@ -1026,7 +1010,7 @@ static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups, cons
 		zbx_vector_ptr_append(&group->hosts, host);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1073,8 +1057,6 @@ static int	lld_validate_group_name(const char *name)
  ******************************************************************************/
 static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 {
-	const char		*__function_name = "lld_groups_validate";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			i, j;
@@ -1082,7 +1064,7 @@ static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 	zbx_vector_uint64_t	groupids;
 	zbx_vector_str_t	names;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&groupids);
 	zbx_vector_str_create(&names);		/* list of group names */
@@ -1219,7 +1201,7 @@ static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 	zbx_vector_str_destroy(&names);
 	zbx_vector_uint64_destroy(&groupids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1283,8 +1265,6 @@ static void	lld_group_rights_free(zbx_lld_group_rights_t *rights)
  ******************************************************************************/
 static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 {
-	const char		*__function_name = "lld_groups_save_rights";
-
 	int			i, j;
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -1297,7 +1277,7 @@ static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 	zbx_lld_group_rights_t	*rights, rights_local, *parent_rights;
 	zbx_uint64_pair_t	pair;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_str_create(&group_names);
 	zbx_vector_ptr_create(&group_rights);
@@ -1417,7 +1397,7 @@ out:
 	zbx_vector_ptr_destroy(&group_rights);
 	zbx_vector_str_destroy(&group_names);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1432,8 +1412,6 @@ out:
  ******************************************************************************/
 static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes)
 {
-	const char			*__function_name = "lld_groups_save";
-
 	int				i, j, new_groups_num = 0, upd_groups_num = 0;
 	zbx_lld_group_t			*group;
 	const zbx_lld_group_prototype_t	*group_prototype;
@@ -1444,7 +1422,7 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 	zbx_db_insert_t			db_insert, db_insert_gdiscovery;
 	zbx_vector_ptr_t		new_groups;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < groups->values_num; i++)
 	{
@@ -1577,7 +1555,7 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 
 	DBcommit();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1592,13 +1570,11 @@ out:
  ******************************************************************************/
 static void	lld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostmacros)
 {
-	const char		*__function_name = "lld_hostmacros_get";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_lld_hostmacro_t	*hostmacro;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
 			"select hm.macro,hm.value"
@@ -1618,7 +1594,7 @@ static void	lld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostma
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1637,8 +1613,6 @@ static void	lld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostma
 static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_ptr_t *hosts,
 		zbx_vector_uint64_t *del_hostmacroids)
 {
-	const char		*__function_name = "lld_hostmacros_make";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			i, j;
@@ -1647,7 +1621,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 	zbx_lld_host_t		*host;
 	zbx_lld_hostmacro_t	*hostmacro = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -1734,7 +1708,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 
 	zbx_vector_uint64_destroy(&hostids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1750,8 +1724,6 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
  ******************************************************************************/
 static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts)
 {
-	const char		*__function_name = "lld_templates_make";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_uint64_t	templateids, hostids;
@@ -1759,7 +1731,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 	zbx_lld_host_t		*host;
 	int			i, j;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&templateids);
 	zbx_vector_uint64_create(&hostids);
@@ -1852,7 +1824,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_vector_uint64_destroy(&templateids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1873,8 +1845,6 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		const char *tls_psk, const zbx_vector_uint64_t *del_hostgroupids,
 		const zbx_vector_uint64_t *del_hostmacroids)
 {
-	const char		*__function_name = "lld_hosts_save";
-
 	int			i, j, new_hosts = 0, new_host_inventories = 0, upd_hosts = 0, new_hostgroups = 0,
 				new_hostmacros = 0, upd_hostmacros = 0, new_interfaces = 0, upd_interfaces = 0;
 	zbx_lld_host_t		*host;
@@ -1888,7 +1858,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	zbx_db_insert_t		db_insert, db_insert_hdiscovery, db_insert_hinventory, db_insert_hgroups,
 				db_insert_hmacro, db_insert_interface, db_insert_idiscovery;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&upd_host_inventory_hostids);
 	zbx_vector_uint64_create(&del_host_inventory_hostids);
@@ -2363,7 +2333,7 @@ out:
 	zbx_vector_uint64_destroy(&del_host_inventory_hostids);
 	zbx_vector_uint64_destroy(&upd_host_inventory_hostids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2373,13 +2343,11 @@ out:
  ******************************************************************************/
 static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 {
-	const char	*__function_name = "lld_templates_link";
-
 	int		i;
 	zbx_lld_host_t	*host;
 	char		*err;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -2407,7 +2375,7 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2737,8 +2705,6 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
  ******************************************************************************/
 static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_ptr_t *hosts)
 {
-	const char		*__function_name = "lld_interfaces_make";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			i, j;
@@ -2747,7 +2713,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 	zbx_lld_host_t		*host;
 	zbx_lld_interface_t	*new_interface, *interface;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -2825,7 +2791,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 
 	zbx_vector_uint64_destroy(&hostids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2873,8 +2839,6 @@ static int	another_main_interface_exists(const zbx_vector_ptr_t *interfaces, con
  ******************************************************************************/
 static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 {
-	const char		*__function_name = "lld_interfaces_validate";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			i, j;
@@ -2886,7 +2850,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* validate changed types */
 
@@ -3039,7 +3003,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 
 	zbx_free(sql);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3052,8 +3016,6 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
-	const char		*__function_name = "lld_update_hosts";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	hosts, group_prototypes, groups, interfaces, hostmacros;
@@ -3066,7 +3028,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	char			ipmi_authtype, inventory_mode;
 	unsigned char		ipmi_privilege, tls_connect, tls_accept;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
 			"select h.proxy_hostid,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password,"
@@ -3207,5 +3169,5 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	zbx_free(ipmi_password);
 	zbx_free(ipmi_username);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

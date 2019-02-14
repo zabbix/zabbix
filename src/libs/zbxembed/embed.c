@@ -191,10 +191,9 @@ void	zbx_es_destroy(zbx_es_t *es)
  ******************************************************************************/
 int	zbx_es_init_env(zbx_es_t *es, char **error)
 {
-	const char	*__function_name = "zbx_es_init_env";
-	int		ret;
+	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = FAIL;
 
@@ -226,8 +225,7 @@ out:
 		zbx_free(es->env);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
-			ZBX_NULL2EMPTY_STR(*error));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
 }
@@ -247,10 +245,9 @@ out:
  ******************************************************************************/
 int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 {
-	const char	*__function_name = "zbx_es_destroy_env";
-	int		ret;
+	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 != setjmp(es->env->loc))
 	{
@@ -265,8 +262,7 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
-		ZBX_NULL2EMPTY_STR(*error));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
 }
@@ -334,15 +330,13 @@ int	zbx_es_fatal_error(zbx_es_t *es)
  ******************************************************************************/
 int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, char **error)
 {
-	const char	*__function_name = "zbx_es_compile";
-
 	unsigned char	*buffer;
 	duk_size_t	sz;
 	char		*func, *ptr;
 	size_t		len;
 	int		ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	func = NULL;
 	ret = FAIL;
@@ -397,8 +391,7 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 out:
 	zbx_free(func);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
-			ZBX_NULL2EMPTY_STR(*error));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
 }
@@ -429,12 +422,10 @@ out:
 int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,
 	char **error)
 {
-	const char	*__function_name = "zbx_es_execute";
-
 	void	*buffer;
 	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = FAIL;
 
@@ -491,7 +482,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 		else
 			*output = zbx_strdup(NULL, duk_safe_to_string(es->env->ctx, -1));
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __function_name, ZBX_NULL2EMPTY_STR(*output));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, ZBX_NULL2EMPTY_STR(*output));
 		ret = SUCCEED;
 	}
 	else
@@ -500,8 +491,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	duk_pop(es->env->ctx);
 	es->env->rt_error_num = 0;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __function_name, zbx_result_string(ret),
-			ZBX_NULL2EMPTY_STR(*error));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
 }

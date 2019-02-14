@@ -613,15 +613,14 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
 void	__zbx_zbx_setproctitle(const char *fmt, ...)
 {
 #if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	const char	*__function_name = "__zbx_zbx_setproctitle";
-	char		title[MAX_STRING_LEN];
-	va_list		args;
+	char	title[MAX_STRING_LEN];
+	va_list	args;
 
 	va_start(args, fmt);
 	zbx_vsnprintf(title, sizeof(title), fmt, args);
 	va_end(args);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() title:'%s'", __function_name, title);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() title:'%s'", __func__, title);
 #endif
 
 #if defined(HAVE_FUNCTION_SETPROCTITLE)
@@ -2256,11 +2255,10 @@ time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t
  ******************************************************************************/
 int	is_ip4(const char *ip)
 {
-	const char	*__function_name = "is_ip4";
 	const char	*p = ip;
 	int		digits = 0, dots = 0, res = FAIL, octet = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __func__, ip);
 
 	while ('\0' != *p)
 	{
@@ -2289,7 +2287,7 @@ int	is_ip4(const char *ip)
 	if (3 == dots && 1 <= digits && 3 >= digits && 255 >= octet)
 		res = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;
 }
@@ -2310,11 +2308,10 @@ int	is_ip4(const char *ip)
  ******************************************************************************/
 int	is_ip6(const char *ip)
 {
-	const char	*__function_name = "is_ip6";
 	const char	*p = ip, *last_colon;
 	int		xdigits = 0, only_xdigits = 0, colons = 0, dbl_colons = 0, res;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __func__, ip);
 
 	while ('\0' != *p)
 	{
@@ -2356,7 +2353,7 @@ int	is_ip6(const char *ip)
 	else
 		res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;
 }
@@ -2465,8 +2462,6 @@ int	zbx_validate_hostname(const char *hostname)
  ******************************************************************************/
 int	ip_in_list(const char *list, const char *ip)
 {
-	const char	*__function_name = "ip_in_list";
-
 	int		ipaddress[8];
 	zbx_iprange_t	iprange;
 	char		*address = NULL;
@@ -2474,7 +2469,7 @@ int	ip_in_list(const char *list, const char *ip)
 	const char	*ptr;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' ip:'%s'", __function_name, list, ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' ip:'%s'", __func__, list, ip);
 
 	if (SUCCEED != iprange_parse(&iprange, ip))
 		goto out;
@@ -2507,7 +2502,7 @@ int	ip_in_list(const char *list, const char *ip)
 
 	zbx_free(address);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -2528,11 +2523,10 @@ out:
  ******************************************************************************/
 int	int_in_list(char *list, int value)
 {
-	const char	*__function_name = "int_in_list";
-	char		*start = NULL, *end = NULL, c = '\0';
-	int		i1, i2, ret = FAIL;
+	char	*start = NULL, *end = NULL, c = '\0';
+	int	i1, i2, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' value:%d", __function_name, list, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' value:%d", __func__, list, value);
 
 	for (start = list; '\0' != *start;)
 	{
@@ -2571,7 +2565,7 @@ int	int_in_list(char *list, int value)
 	if (NULL != end)
 		*end = c;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

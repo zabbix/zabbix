@@ -818,7 +818,6 @@ static void	DBget_version(int *mandatory, int *optional)
 
 int	DBcheck_version(void)
 {
-	const char		*__function_name = "DBcheck_version";
 	const char		*dbversion_table_name = "dbversion";
 	int			db_mandatory, db_optional, required, ret = FAIL, i;
 	zbx_db_version_t	*dbversion;
@@ -827,7 +826,7 @@ int	DBcheck_version(void)
 #ifndef HAVE_SQLITE3
 	int			total = 0, current = 0, completed, last_completed = -1, optional_num = 0;
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	required = ZBX_FIRST_DB_VERSION;
 
@@ -849,8 +848,7 @@ int	DBcheck_version(void)
 	if (SUCCEED != DBtable_exists(dbversion_table_name))
 	{
 #ifndef HAVE_SQLITE3
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" does not exist",
-				__function_name, dbversion_table_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" does not exist", __func__, dbversion_table_name);
 
 		if (SUCCEED != DBfield_exists("config", "server_check_interval"))
 		{
@@ -964,7 +962,7 @@ int	DBcheck_version(void)
 out:
 	DBclose();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

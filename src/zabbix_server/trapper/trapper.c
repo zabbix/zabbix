@@ -102,11 +102,10 @@ zbx_status_section_t;
  ******************************************************************************/
 static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
-	const char	*__function_name = "recv_agenthistory";
-	char		*info = NULL;
-	int		ret;
+	char	*info = NULL;
+	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != (ret = process_agent_history_data(sock, jp, ts, &info)))
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
@@ -115,7 +114,7 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	zbx_free(info);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -127,11 +126,10 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
  ******************************************************************************/
 static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
-	const char	*__function_name = "recv_senderhistory";
-	char		*info = NULL;
-	int		ret;
+	char	*info = NULL;
+	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != (ret = process_sender_history_data(sock, jp, ts, &info)))
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid sender data from \"%s\": %s", sock->peer, info);
@@ -140,7 +138,7 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 
 	zbx_free(info);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -152,12 +150,11 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
  ******************************************************************************/
 static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
-	const char	*__function_name = "recv_proxyhistory";
 	char		*error = NULL;
 	int		ret = FAIL;
 	DC_PROXY	proxy;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != get_active_proxy_from_request(jp, &proxy, &error))
 	{
@@ -189,7 +186,7 @@ out:
 
 	zbx_free(error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -203,15 +200,13 @@ out:
  ******************************************************************************/
 static void	send_proxyhistory(zbx_socket_t *sock)
 {
-	const char	*__function_name = "send_proxyhistory";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* do not send any reply to server in this case as the server expects history data */
 	if (SUCCEED == check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "history data request"))
 		zbx_send_proxy_response(sock, FAIL, "Deprecated request", CONFIG_TIMEOUT);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -228,13 +223,11 @@ static void	send_proxyhistory(zbx_socket_t *sock)
  ******************************************************************************/
 static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	const char	*__function_name = "recv_proxy_heartbeat";
-
 	char		*error = NULL;
 	int		ret, flags = ZBX_TCP_PROTOCOL;
 	DC_PROXY	proxy;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != (ret = get_active_proxy_from_request(jp, &proxy, &error)))
 	{
@@ -263,7 +256,7 @@ out:
 
 	zbx_free(error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 #define ZBX_GET_QUEUE_UNKNOWN		-1
@@ -369,7 +362,6 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_
  ******************************************************************************/
 static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	const char		*__function_name = "recv_getqueue";
 	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i, limit;
 	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
 	zbx_user_t		user;
@@ -378,7 +370,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	zbx_hashset_t		queue_stats;
 	zbx_queue_stats_t	*stats;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
@@ -496,7 +488,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			break;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json.buffer);
 
 	(void)zbx_tcp_send(sock, json.buffer);
 
@@ -507,7 +499,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -843,13 +835,12 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 #define ZBX_GET_STATUS_PING	0
 #define ZBX_GET_STATUS_FULL	1
 
-	const char		*__function_name = "recv_getstatus";
 	zbx_user_t		user;
 	int			ret = FAIL, request_type = ZBX_GET_STATUS_UNKNOWN;
 	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN];
 	struct zbx_json		json;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user))
@@ -895,7 +886,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json.buffer);
 
 	(void)zbx_tcp_send(sock, json.buffer);
 
@@ -903,7 +894,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 
@@ -927,12 +918,11 @@ out:
  ******************************************************************************/
 static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
-	const char	*__function_name = "send_internal_stats_json";
 	struct zbx_json	json;
 	char		type[MAX_STRING_LEN], error[MAX_STRING_LEN];
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == CONFIG_STATS_ALLOWED_IP ||
 			SUCCEED != zbx_tcp_check_allowed_peers(sock, CONFIG_STATS_ALLOWED_IP))
@@ -999,7 +989,7 @@ out:
 	if (SUCCEED != ret)
 		zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

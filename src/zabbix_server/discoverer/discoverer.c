@@ -103,12 +103,11 @@ static void	proxy_update_host(zbx_uint64_t druleid, const char *ip, const char *
  ******************************************************************************/
 static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **value, size_t *value_alloc)
 {
-	const char	*__function_name = "discover_service";
 	int		ret = SUCCEED;
 	const char	*service = NULL;
 	AGENT_RESULT 	result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	init_result(&result);
 
@@ -320,7 +319,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 	}
 	free_result(&result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -337,12 +336,11 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, int *host_status, char *ip,
 		const char *dns, int now)
 {
-	const char	*__function_name = "process_check";
 	const char	*start;
 	char		*value = NULL;
 	size_t		value_alloc = 128;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	value = (char *)zbx_malloc(value, value_alloc);
 
@@ -368,7 +366,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 		{
 			int	service_status;
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __function_name, port);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __func__, port);
 
 			service_status = (SUCCEED == discover_service(dcheck, ip, port, &value, &value_alloc) ?
 					DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN);
@@ -413,7 +411,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 out:
 	zbx_free(value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -479,22 +477,20 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
  ******************************************************************************/
 static void	process_rule(DB_DRULE *drule)
 {
-	const char	*__function_name = "process_rule";
-
 	DB_DHOST	dhost;
 	int		host_status, now;
 	char		ip[INTERFACE_IP_LEN_MAX], *start, *comma, dns[INTERFACE_DNS_LEN_MAX];
 	int		ipaddress[8];
 	zbx_iprange_t	iprange;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __function_name, drule->name, drule->iprange);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __func__, drule->name, drule->iprange);
 
 	for (start = drule->iprange; '\0' != *start;)
 	{
 		if (NULL != (comma = strchr(start, ',')))
 			*comma = '\0';
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() range:'%s'", __function_name, start);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() range:'%s'", __func__, start);
 
 		if (SUCCEED != iprange_parse(&iprange, start))
 		{
@@ -544,7 +540,7 @@ static void	process_rule(DB_DRULE *drule)
 
 			now = time(NULL);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() ip:'%s'", __function_name, ip);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() ip:'%s'", __func__, ip);
 
 			zbx_alarm_on(CONFIG_TIMEOUT);
 			zbx_gethost_by_ip(ip, dns, sizeof(dns));
@@ -584,7 +580,7 @@ next:
 			break;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -596,15 +592,13 @@ out:
  ******************************************************************************/
 static void	discovery_clean_services(zbx_uint64_t druleid)
 {
-	const char		*__function_name = "discovery_clean_services";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	char			*iprange = NULL;
 	zbx_vector_uint64_t	keep_dhostids, del_dhostids, del_dserviceids;
 	zbx_uint64_t		dhostid, dserviceid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect("select iprange from drules where druleid=" ZBX_FS_UI64, druleid);
 
@@ -696,7 +690,7 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 	zbx_vector_uint64_destroy(&del_dhostids);
 	zbx_vector_uint64_destroy(&keep_dhostids);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	process_discovery(void)

@@ -98,7 +98,6 @@ static const char	*zbx_odbc_rc_str(SQLRETURN rc)
  ******************************************************************************/
 static int	zbx_odbc_diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN rc, char **diag)
 {
-	const char	*__function_name = "zbx_odbc_diag";
 	const char	*rc_str = NULL;
 	char		*buffer = NULL;
 	size_t		alloc = 0, offset = 0;
@@ -121,11 +120,11 @@ static int	zbx_odbc_diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN rc, char **d
 	{
 		if (NULL == (rc_str = zbx_odbc_rc_str(rc)))
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "%s(): [%d (unknown SQLRETURN code)]%s", __function_name,
+			zabbix_log(LOG_LEVEL_TRACE, "%s(): [%d (unknown SQLRETURN code)]%s", __func__,
 					(int)rc, ZBX_NULL2EMPTY_STR(buffer));
 		}
 		else
-			zabbix_log(LOG_LEVEL_TRACE, "%s(): [%s]%s", __function_name, rc_str, ZBX_NULL2EMPTY_STR(buffer));
+			zabbix_log(LOG_LEVEL_TRACE, "%s(): [%s]%s", __func__, rc_str, ZBX_NULL2EMPTY_STR(buffer));
 	}
 	else
 	{
@@ -137,7 +136,7 @@ static int	zbx_odbc_diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN rc, char **d
 		else
 			*diag = zbx_dsprintf(*diag, "[%s]%s", rc_str, ZBX_NULL2EMPTY_STR(buffer));
 
-		zabbix_log(LOG_LEVEL_TRACE, "%s(): %s", __function_name, *diag);
+		zabbix_log(LOG_LEVEL_TRACE, "%s(): %s", __func__, *diag);
 	}
 
 	zbx_free(buffer);
@@ -221,12 +220,11 @@ static void	zbx_log_odbc_connection_info(const char *function, SQLHDBC hdbc)
  ******************************************************************************/
 zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, const char *pass, int timeout, char **error)
 {
-	const char		*__function_name = "zbx_odbc_connect";
 	char			*diag = NULL;
 	zbx_odbc_data_source_t	*data_source = NULL;
 	SQLRETURN		rc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dsn:'%s' user:'%s'", __function_name, dsn, user);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dsn:'%s' user:'%s'", __func__, dsn, user);
 
 	data_source = (zbx_odbc_data_source_t *)zbx_malloc(data_source, sizeof(zbx_odbc_data_source_t));
 
@@ -250,7 +248,7 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, cons
 
 					if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_DBC, data_source->hdbc, rc, &diag))
 					{
-						zbx_log_odbc_connection_info(__function_name, data_source->hdbc);
+						zbx_log_odbc_connection_info(__func__, data_source->hdbc);
 						goto out;
 					}
 
@@ -276,7 +274,7 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, cons
 out:
 	zbx_free(diag);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return data_source;
 }
@@ -319,12 +317,11 @@ void	zbx_odbc_data_source_free(zbx_odbc_data_source_t *data_source)
  ******************************************************************************/
 zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_source, const char *query, char **error)
 {
-	const char		*__function_name = "zbx_odbc_select";
 	char			*diag = NULL;
 	zbx_odbc_query_result_t	*query_result = NULL;
 	SQLRETURN		rc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __function_name, query);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __func__, query);
 
 	query_result = (zbx_odbc_query_result_t *)zbx_malloc(query_result, sizeof(zbx_odbc_query_result_t));
 
@@ -371,7 +368,7 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 out:
 	zbx_free(diag);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return query_result;
 }
@@ -421,13 +418,12 @@ void	zbx_odbc_query_result_free(zbx_odbc_query_result_t *query_result)
  ******************************************************************************/
 static const char	*const *zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 {
-	const char	*__function_name = "zbx_odbc_fetch";
 	char		*diag = NULL;
 	SQLRETURN	rc;
 	SQLSMALLINT	i;
 	const char	*const *row = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SQL_NO_DATA == (rc = SQLFetch(query_result->hstmt)))
 	{
@@ -477,7 +473,7 @@ static const char	*const *zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 out:
 	zbx_free(diag);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return row;
 }
@@ -503,11 +499,10 @@ out:
  ******************************************************************************/
 int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char **string, char **error)
 {
-	const char	*__function_name = "zbx_odbc_query_result_to_string";
 	const char	*const *row;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL != (row = zbx_odbc_fetch(query_result)))
 	{
@@ -523,7 +518,7 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
 	else
 		*error = zbx_strdup(*error, "SQL query returned empty result.");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -549,13 +544,12 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
  ******************************************************************************/
 int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, char **lld_json, char **error)
 {
-	const char		*__function_name = "zbx_odbc_query_result_to_lld_json";
 	const char		*const *row;
 	struct zbx_json		json;
 	zbx_vector_str_t	macros;
 	int			ret = FAIL, i, j;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_str_create(&macros);
 	zbx_vector_str_reserve(&macros, query_result->col_num);
@@ -634,7 +628,7 @@ out:
 	zbx_vector_str_clear_ext(&macros, zbx_str_free);
 	zbx_vector_str_destroy(&macros);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
