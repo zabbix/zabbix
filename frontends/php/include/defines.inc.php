@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.2.0alpha4');
 define('ZABBIX_API_VERSION',	'4.2.0');
 define('ZABBIX_EXPORT_VERSION',	'4.2');
-define('ZABBIX_DB_VERSION',	4010011);
+define('ZABBIX_DB_VERSION',	4010012);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -550,8 +550,9 @@ define('ZBX_PREPROC_ERROR_FIELD_XML',		17);
 define('ZBX_PREPROC_ERROR_FIELD_REGEX',		18);
 define('ZBX_PREPROC_THROTTLE_VALUE',		19);
 define('ZBX_PREPROC_THROTTLE_TIMED_VALUE',	20);
-define('ZBX_PREPROC_PROMETHEUS_PATTERN',	21);
-define('ZBX_PREPROC_PROMETHEUS_TO_JSON',	22);
+define('ZBX_PREPROC_SCRIPT',				21);
+define('ZBX_PREPROC_PROMETHEUS_PATTERN',	22);
+define('ZBX_PREPROC_PROMETHEUS_TO_JSON',	23);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
@@ -1707,11 +1708,13 @@ define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
 // column occupies x% width of column wrapper
 define('ZBX_STYLE_COLUMN_5', 'column-5');
 define('ZBX_STYLE_COLUMN_10', 'column-10');
+define('ZBX_STYLE_COLUMN_15', 'column-15');
 define('ZBX_STYLE_COLUMN_20', 'column-20');
 define('ZBX_STYLE_COLUMN_33', 'column-33'); // column occupies 1/3 width of column wrapper.
+define('ZBX_STYLE_COLUMN_35', 'column-35');
 define('ZBX_STYLE_COLUMN_40', 'column-40');
 define('ZBX_STYLE_COLUMN_50', 'column-50');
-define('ZBX_STYLE_COLUMN_80', 'column-80');
+define('ZBX_STYLE_COLUMN_75', 'column-75');
 define('ZBX_STYLE_COLUMN_90', 'column-90');
 define('ZBX_STYLE_COLUMN_95', 'column-95');
 // column visual options

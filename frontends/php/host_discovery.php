@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'items.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'codeeditor.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -266,6 +266,16 @@ else {
 	}
 }
 
+// Convert CR+LF to LF in preprocessing script.
+if (hasRequest('preprocessing')) {
+	foreach ($_REQUEST['preprocessing'] as &$step) {
+		if ($step['type'] == ZBX_PREPROC_SCRIPT) {
+			$step['params'][0] = CRLFtoLF($step['params'][0]);
+		}
+	}
+	unset($step);
+}
+
 /*
  * Actions
  */
@@ -352,6 +362,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				case ZBX_PREPROC_VALIDATE_NOT_REGEX:
 				case ZBX_PREPROC_ERROR_FIELD_JSON:
 				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+				case ZBX_PREPROC_SCRIPT:
 				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 					$step['params'] = $step['params'][0];
 					break;
@@ -627,7 +638,12 @@ if (isset($_REQUEST['form'])) {
 
 	if (!hasRequest('form_refresh')) {
 		foreach ($data['preprocessing'] as &$step) {
-			$step['params'] = explode("\n", $step['params']);
+			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
+				$step['params'] = [$step['params'], ''];
+			}
+			else {
+				$step['params'] = explode("\n", $step['params']);
+			}
 		}
 		unset($step);
 	}

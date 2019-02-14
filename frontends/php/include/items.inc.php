@@ -1081,14 +1081,12 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 
 	// fetch data for the host JS menu
 	$hosts = API::Host()->get([
-		'output' => ['name', 'hostid', 'status'],
+		'output' => ['name', 'hostid'],
 		'monitored_hosts' => true,
 		'groupids' => $groupids ? $groupids : null,
 		'applicationids' => $applicationids,
 		'with_monitored_items' => true,
-		'preservekeys' => true,
-		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null
+		'preservekeys' => true
 	]);
 
 	$items = [];
@@ -1180,8 +1178,6 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 		}
 	}
 	else {
-		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-
 		$header = [_('Hosts')];
 		foreach ($items as $item_name => $item_data) {
 			foreach ($item_data as $ithosts) {
@@ -1195,8 +1191,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 		foreach ($host_names as $hostId => $host_name) {
 			$host = $hosts[$hostId];
 
-			$name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId], true));
+			$name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostId));
 
 			$tableRow = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $item_data) {
@@ -1246,7 +1241,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 
 	if (isset($ithosts[$hostName])) {
 		$column
-			->setMenuPopup(CMenuPopupHelper::getHistory($item))
+			->setMenuPopup(CMenuPopupHelper::getHistory($item['itemid']))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->addClass(ZBX_STYLE_NOWRAP);
 	}
@@ -1755,6 +1750,10 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 		ZBX_PREPROC_HEX2DEC => [
 			'group' => _('Numeral systems'),
 			'name' => _('Hexadecimal to decimal')
+		],
+		ZBX_PREPROC_SCRIPT => [
+			'group' => _('Custom scripts'),
+			'name' => _('JavaScript')
 		],
 		ZBX_PREPROC_VALIDATE_RANGE => [
 			'group' => _('Validation'),

@@ -1017,7 +1017,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		'http_authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
 		'http_username' => getRequest('http_username', ''),
 		'http_password' => getRequest('http_password', ''),
-		'preprocessing' => getRequest('preprocessing', [])
+		'preprocessing' => getRequest('preprocessing', []),
+		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];
 
 	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -1387,17 +1388,19 @@ function getItemFormData(array $item = [], array $options = []) {
  * @return CList
  */
 function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, array $types) {
+	$script_maxlength = DB::getFieldLength('item_preproc', 'params');
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
 		->addClass('preprocessing-list')
+		->addClass('list-numbered')
 		->addItem(
 			(new CListItem(
 				(new CDiv([
-					(new CDiv(_('Name')))->addClass(ZBX_STYLE_COLUMN_40),
+					(new CDiv(_('Name')))->addClass(ZBX_STYLE_COLUMN_35),
 					(new CDiv(_('Parameters')))->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv())->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv(_('Custom on fail')))
-						->addClass(ZBX_STYLE_COLUMN_10)
+						->addClass(ZBX_STYLE_COLUMN_15)
 						->addClass(ZBX_STYLE_COLUMN_CENTER),
 					(new CDiv(_('Action')))->addClass(ZBX_STYLE_COLUMN_10)
 				]))->addClass(ZBX_STYLE_COLUMNS)
@@ -1508,6 +1511,20 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				$params[1]->addStyle('display: none;');
 				break;
 
+			case ZBX_PREPROC_SCRIPT:
+				$params[0]
+					->removeId()
+					->setAttribute('value', explode("\n", trim($step_param_0))[0])
+					->setAttribute('placeholder', _('script'))
+					->setAttribute('maxlength', $script_maxlength)
+					->setAttribute('title', _('Click to view or edit code'))
+					->addClass('open-modal-code-editor');
+				if (!$readonly) {
+					$params[0]->addClass('editable');
+				}
+				$params[1]->addStyle('display: none;');
+				break;
+
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
 				$params[0]->setAttribute('placeholder', PROMETHEUS_PATTERN);
 				$params[1]->setAttribute('placeholder', PROMETHEUS_OUTPUT);
@@ -1531,6 +1548,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			case ZBX_PREPROC_ERROR_FIELD_REGEX:
 			case ZBX_PREPROC_THROTTLE_VALUE:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+			case ZBX_PREPROC_SCRIPT:
 				$on_fail->setEnabled(false);
 				break;
 
@@ -1574,7 +1592,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				new CDiv($error_handler->setReadonly($readonly)),
 				new CDiv($error_handler_params->setReadonly($readonly))
 			]))
-				->addClass(ZBX_STYLE_COLUMN_80)
+				->addClass(ZBX_STYLE_COLUMN_75)
 				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 		]))
 			->addClass(ZBX_STYLE_COLUMNS)
@@ -1590,14 +1608,18 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					(new CDiv())
 						->addClass(ZBX_STYLE_DRAG_ICON)
 						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
+					(new CDiv($preproc_types_cbbox))
+						->addClass(ZBX_STYLE_COLUMN_35)
+						->addClass('list-numbered-item'),
 					(new CDiv([
-						(new CDiv(($i + 1).':'))->addClass('step-number'),
-						$preproc_types_cbbox
-					]))->addClass(ZBX_STYLE_COLUMN_40),
-					(new CDiv($params[0]))->addClass(ZBX_STYLE_COLUMN_20),
+						$params[0],
+						($step['type'] == ZBX_PREPROC_SCRIPT)
+							? new CInput('hidden', $params[0]->getName(), trim(implode($step['params'])))
+							: null
+					]))->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv($params[1]))->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv($on_fail))
-						->addClass(ZBX_STYLE_COLUMN_10)
+						->addClass(ZBX_STYLE_COLUMN_15)
 						->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 						->addClass(ZBX_STYLE_COLUMN_CENTER),
 					(new CDiv((new CButton('preprocessing['.$i.'][remove]', _('Remove')))

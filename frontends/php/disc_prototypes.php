@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of item prototypes');
 $page['file'] = 'disc_prototypes.php';
-$page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'multiselect.js', 'items.js'];
+$page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'codeeditor.js', 'multiselect.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -318,6 +318,16 @@ if ($itemPrototypeId) {
 	}
 }
 
+// Convert CR+LF to LF in preprocessing script.
+if (hasRequest('preprocessing')) {
+	foreach ($_REQUEST['preprocessing'] as &$step) {
+		if ($step['type'] == ZBX_PREPROC_SCRIPT) {
+			$step['params'][0] = CRLFtoLF($step['params'][0]);
+		}
+	}
+	unset($step);
+}
+
 /*
  * Actions
  */
@@ -457,6 +467,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				case ZBX_PREPROC_ERROR_FIELD_JSON:
 				case ZBX_PREPROC_ERROR_FIELD_XML:
 				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+				case ZBX_PREPROC_SCRIPT:
 				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 					$step['params'] = $step['params'][0];
 					break;
@@ -913,6 +924,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 							case ZBX_PREPROC_ERROR_FIELD_JSON:
 							case ZBX_PREPROC_ERROR_FIELD_XML:
 							case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+							case ZBX_PREPROC_SCRIPT:
 							case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 								$step['params'] = $step['params'][0];
 								break;
@@ -1143,8 +1155,14 @@ if (isset($_REQUEST['form'])) {
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params']
 		]);
 		$itemPrototype = reset($itemPrototype);
+
 		foreach ($itemPrototype['preprocessing'] as &$step) {
-			$step['params'] = explode("\n", $step['params']);
+			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
+				$step['params'] = [$step['params'], ''];
+			}
+			else {
+				$step['params'] = explode("\n", $step['params']);
+			}
 		}
 		unset($step);
 
@@ -1256,7 +1274,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
 		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_ACTION_ADD),
-		'preprocessing_types' => CItemPrototype::$supported_preprocessing_types
+		'preprocessing_types' => CItemPrototype::$supported_preprocessing_types,
+		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];
 
 	foreach ($data['preprocessing'] as &$step) {

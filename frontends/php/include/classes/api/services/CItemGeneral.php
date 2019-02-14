@@ -1245,8 +1245,9 @@ abstract class CItemGeneral extends CApiService {
 	 *                                                                  18 - ZBX_PREPROC_ERROR_FIELD_REGEX;
 	 *                                                                  19 - ZBX_PREPROC_THROTTLE_VALUE;
 	 *                                                                  20 - ZBX_PREPROC_THROTTLE_TIMED_VALUE;
-	 *                                                                  21 - ZBX_PREPROC_PROMETHEUS_PATTERN;
-	 *                                                                  22 - ZBX_PREPROC_PROMETHEUS_TO_JSON.
+	 *                                                                  21 - ZBX_PREPROC_SCRIPT;
+	 *                                                                  22 - ZBX_PREPROC_PROMETHEUS_PATTERN;
+	 *                                                                  23 - ZBX_PREPROC_PROMETHEUS_TO_JSON.
 	 * @param string $item['preprocessing'][]['params']                Additional parameters used by preprocessing
 	 *                                                                 option. Multiple parameters are separated by LF
 	 *                                                                 (\n) character.
@@ -1339,6 +1340,7 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_VALIDATE_NOT_REGEX:
 					case ZBX_PREPROC_ERROR_FIELD_JSON:
 					case ZBX_PREPROC_ERROR_FIELD_XML:
+					case ZBX_PREPROC_SCRIPT:
 						// Check 'params' if not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1532,6 +1534,7 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_ERROR_FIELD_REGEX:
 					case ZBX_PREPROC_THROTTLE_VALUE:
 					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+					case ZBX_PREPROC_SCRIPT:
 						if (is_array($preprocessing['error_handler'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 						}

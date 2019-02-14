@@ -321,7 +321,6 @@ $form_list
 			->setChecked(isset($data['visible']['preprocessing'])),
 		(new CDiv(getItemPreprocessing($form, $data['preprocessing'], false, $data['preprocessing_types'])))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->setId('preprocessing_div')
 	);
 
