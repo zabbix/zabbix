@@ -481,12 +481,11 @@ article, main {
     .filter-breadcrumb li > span {
       display: inline-block;
       height: 18px;
-      padding: 4px 7px 0; }
-      .filter-breadcrumb li > span a {
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        vertical-align: top; }
+      padding: 4px 7px 0;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: top; }
   .filter-breadcrumb > li {
     padding: 1px 0; }
   .filter-breadcrumb > li:first-child {
