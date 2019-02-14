@@ -508,11 +508,12 @@ class CItem extends CItemGeneral {
 	 */
 	protected function updateReal(array $items) {
 		$items = zbx_toArray($items);
+		CArrayHelper::sort($items, ['itemid']);
 
 		$data = [];
 		foreach ($items as $item) {
 			unset($item['flags']); // flags cannot be changed
-			$data[$item['itemid']] = ['values' => $item, 'where' => ['itemid' => $item['itemid']]];
+			$data[] = ['values' => $item, 'where' => ['itemid' => $item['itemid']]];
 		}
 		DB::update('items', $data);
 
