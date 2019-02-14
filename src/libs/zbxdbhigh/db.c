@@ -1578,7 +1578,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
  * Purpose: construct a unique host name by the given sample                  *
  *                                                                            *
  * Parameters: host_name_sample - a host name to start constructing from      *
- *             use_visible_name - if not 0 then proceed host visible name     *
+ *             field_name       - field name to check for host name value     *
  *                                                                            *
  * Return value: unique host name which does not exist in the database        *
  *                                                                            *
@@ -2809,7 +2809,7 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t	dcheckid;
+	zbx_uint64_t	id;
 	int		i;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2827,9 +2827,9 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 
 	for (i = 0; NULL != (row = DBfetch(result)); i++)
 	{
-		ZBX_STR2UINT64(dcheckid, row[0]);
+		ZBX_STR2UINT64(id, row[0]);
 
-		while (dcheckid != ids->values[i])
+		while (id != ids->values[i])
 			zbx_vector_uint64_remove(ids, i);
 	}
 	DBfree_result(result);

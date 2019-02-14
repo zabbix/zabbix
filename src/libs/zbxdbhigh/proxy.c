@@ -3294,8 +3294,7 @@ void	zbx_rules_eval_free(zbx_discovery_rule_t *rule)
  *             ip_discovered_ptr - [IN] vector of ip addresses                *
  *                                                                            *
  ******************************************************************************/
-static int	process_discovery_ip_addresses(DB_DRULE *drule, zbx_discoved_ips_t *ip_discovered,
-		int *start_idx)
+static int	process_discovery_ip_addresses(DB_DRULE *drule, zbx_discoved_ips_t *ip_discovered, int *start_idx)
 {
 	const char		*__function_name = "process_discovery_ip_addresses";
 	DB_RESULT		result;
