@@ -192,11 +192,9 @@ void	zbx_es_destroy(zbx_es_t *es)
 int	zbx_es_init_env(zbx_es_t *es, char **error)
 {
 	const char	*__function_name = "zbx_es_init_env";
-	int		ret;
+	volatile int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	ret = FAIL;
 
 	es->env = zbx_malloc(NULL, sizeof(zbx_es_env_t));
 	memset(es->env, 0, sizeof(zbx_es_env_t));
@@ -338,14 +336,11 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 
 	unsigned char	*buffer;
 	duk_size_t	sz;
-	char		*func, *ptr;
 	size_t		len;
-	int		ret;
+	char		* volatile func = NULL, *ptr;
+	volatile int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	func = NULL;
-	ret = FAIL;
 
 	if (SUCCEED == zbx_es_fatal_error(es))
 	{
@@ -431,12 +426,10 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 {
 	const char	*__function_name = "zbx_es_execute";
 
-	void	*buffer;
-	int	ret;
+	void		*buffer;
+	volatile int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	ret = FAIL;
 
 	if (SUCCEED == zbx_es_fatal_error(es))
 	{
