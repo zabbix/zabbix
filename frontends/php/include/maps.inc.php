@@ -66,177 +66,38 @@ function sysmapElementLabel($label = null) {
  *
  * @param array $sysmap
  * @param array $sysmap['selements']
- * @param int   $sysmap['show_suppressed']  Whether suppressed problems are shown.
  * @param array $options                    Options used to retrieve actions.
  * @param int   $options['severity_min']    Minimal severity used.
  *
  * @return array
  */
 function getActionsBySysmap(array $sysmap, array $options = []) {
-	$sysmap['links'] = zbx_toHash($sysmap['links'], 'linkid');
-
 	$actions = [];
-	$hostids = [];
-	$triggerids = [];
-	$host_groupids = [];
-
-	foreach ($sysmap['selements'] as &$selement) {
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-			$hostid = $selement['elements'][0]['hostid'];
-			$hostids[$hostid] = $hostid;
-
-			/*
-			 * Expanding host URL macros again as some hosts were added from hostgroup areas and automatic expanding
-			 * only happens for elements that are defined for map in DB.
-			 */
-			foreach ($selement['urls'] as $urlid => $url) {
-				$selement['urls'][$urlid]['url'] = str_replace('{HOST.ID}', $hostid, $url['url']);
-			}
-		}
-		elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-			foreach ($selement['elements'] as $element) {
-				$triggerids[$element['triggerid']] = $element['triggerid'];
-			}
-		}
-		elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
-			$groupid = $selement['elements'][0]['groupid'];
-			$host_groupids[$groupid] = $groupid;
-		}
-	}
-	unset($selement);
-
-	$host_scripts = API::Script()->getScriptsByHosts($hostids);
-
-	$hosts = API::Host()->get([
-		'output' => ['hostid', 'status'],
-		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectScreens' => API_OUTPUT_COUNT,
-		'hostids' => $hostids,
-		'preservekeys' => true
-	]);
-
-	$monitored_triggers_hosts = API::Host()->get([
-		'output' => ['hostid'],
-		'hostids' => $hostids,
-		'with_monitored_triggers' => true,
-		'preservekeys' => true
-	]);
-
-	$triggers = API::Trigger()->get([
-		'output' => [],
-		'triggerids' => $triggerids,
-		'preservekeys' => true
-	]);
-
-	$monitored_triggers = API::Trigger()->get([
-		'output' => [],
-		'triggerids' => array_keys($triggers),
-		'monitored' => true,
-		'preservekeys' => true
-	]);
-
-	$host_groups = API::HostGroup()->get([
-		'output' => ['groupid'],
-		'groupids' => $host_groupids,
-		'with_monitored_triggers' => true,
-		'preservekeys' => true
-	]);
+	$severity_min = array_key_exists('severity_min', $options)
+		? $options['severity_min']
+		: TRIGGER_SEVERITY_NOT_CLASSIFIED;
 
 	foreach ($sysmap['selements'] as $selementid => $elem) {
-		$hostid = null;
-		$scripts = null;
-		$gotos = null;
-
 		if ($elem['permission'] < PERM_READ) {
 			continue;
 		}
 
-		switch ($elem['elementtype']) {
-			case SYSMAP_ELEMENT_TYPE_HOST:
-				$hostid = $elem['elements'][0]['hostid'];
-				$host = $hosts[$hostid];
+		$hostid = ($elem['elementtype_orig'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+				&& $elem['elementsubtype_orig'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
+			? $elem['elements'][0]['hostid']
+			: 0;
 
-				if (array_key_exists($hostid, $host_scripts)) {
-					$scripts = $host_scripts[$hostid];
-				}
-
-				$gotos['triggerStatus'] = [
-					'filter_hostids' => [$hostid],
-					'filter_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
-				];
-				$gotos['showTriggers'] = ($host['status'] == HOST_STATUS_MONITORED
-						&& array_key_exists($hostid, $monitored_triggers_hosts));
-
-				$gotos['graphs'] = ['hostid' => $host['hostid']];
-				$gotos['showGraphs'] = (bool) $host['graphs'];
-
-				$gotos['screens'] = ['hostid' => $host['hostid']];
-				$gotos['showScreens'] = (bool) $host['screens'];
-
-				$gotos['inventory'] = ['hostid' => $host['hostid']];
-
-				$gotos['latestData'] = ['hostids' => [$host['hostid']]];
-
-				if ($sysmap['show_suppressed']) {
-					$gotos['show_suppressed'] = true;
-				}
-				break;
-
+		switch ($elem['elementtype_orig']) {
 			case SYSMAP_ELEMENT_TYPE_MAP:
-				$gotos['submap'] = [
-					'sysmapid' => $elem['elements'][0]['sysmapid'],
-					'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null
-				];
-
-				break;
-
-			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$gotos['showEvents'] = false;
-				foreach ($elem['elements'] as $element) {
-					if (array_key_exists($element['triggerid'], $triggers)) {
-						if (array_key_exists($element['triggerid'], $monitored_triggers)) {
-							$gotos['showEvents'] = true;
-						}
-
-						$gotos['events']['triggerids'][] = $element['triggerid'];
-
-						if (array_key_exists('severity_min', $options) && zbx_ctype_digit($options['severity_min'])) {
-							$gotos['events']['severity_min'] = $options['severity_min'];
-						}
-					}
-				}
-
-				if ($sysmap['show_suppressed']) {
-					$gotos['show_suppressed'] = true;
-				}
-				break;
-
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				$gotos['triggerStatus'] = [
-					'filter_groupids' => [$elem['elements'][0]['groupid']],
-					'filter_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
-				];
-
-				// Always show active trigger link for host group map elements.
-				$gotos['showTriggers'] = array_key_exists($elem['elements'][0]['groupid'], $host_groups);
-
-				if ($sysmap['show_suppressed']) {
-					$gotos['show_suppressed'] = true;
-				}
+			case SYSMAP_ELEMENT_TYPE_HOST:
+			case SYSMAP_ELEMENT_TYPE_TRIGGER:
+				$map = CMenuPopupHelper::getMapElement($sysmap['sysmapid'], $elem['selementid_orig'], $severity_min,
+					$hostid);
 				break;
 		}
 
-		order_result($elem['urls'], 'name');
-
-		$map = CMenuPopupHelper::getMap($hostid, $scripts, $gotos, $elem['urls']);
-		if ($map == ['type' => 'map']) {
-			$map = null;
-		}
-		else {
-			$map = CJs::encodeJson($map);
-		}
-
-		$actions[$selementid] = $map;
+		$actions[$selementid] = CJs::encodeJson($map);
 	}
 
 	return $actions;

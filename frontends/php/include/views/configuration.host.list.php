@@ -44,13 +44,56 @@ $widget = (new CWidget())
 					->onClick('redirect("conf.import.php?rules_preset=host")')
 					->removeId()
 			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	]));
+
+$filter_tags = $data['filter']['tags'];
+if (!$filter_tags) {
+	$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+}
+
+$filter_tags_table = (new CTable())
+	->setId('filter-tags')
+	->addRow((new CCol(
+		(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
+			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
+			->addValue(_('Or'), TAG_EVAL_TYPE_OR)
+			->setModern(true)
+		))->setColSpan(4)
+	);
+
+$i = 0;
+foreach ($filter_tags as $tag) {
+	$filter_tags_table->addRow([
+		(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
+			->setAttribute('placeholder', _('tag'))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
+			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
+			->setModern(true),
+		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
+			->setAttribute('placeholder', _('value'))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		(new CCol(
+			(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	], 'form_row');
+
+	$i++;
+}
+$filter_tags_table->addRow(
+	(new CCol(
+		(new CButton('filter_tags_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+	))->setColSpan(3)
+);
 
 // filter
 $filter = new CFilter(new CUrl('hosts.php'));
-
 $filter
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
@@ -78,6 +121,16 @@ $filter
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
+			->addRow(_('DNS'),
+				(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(_('IP'),
+				(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(_('Port'),
+				(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			),
+		(new CFormList())
 			->addRow(_('Monitored by'),
 				(new CRadioButtonList('filter_monitored_by', (int) $data['filter']['monitored_by']))
 					->addValue(_('Any'), ZBX_MONITORED_BY_ANY)
@@ -102,17 +155,8 @@ $filter
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			),
-		(new CFormList())
-			->addRow(_('DNS'),
-				(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
-			->addRow(_('IP'),
-				(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-			->addRow(_('Port'),
-				(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
+			->addRow(_('Tags'), $filter_tags_table)
 	]);
 
 $widget->addItem($filter);
@@ -137,7 +181,8 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder'], 'hosts.php'),
 		_('Availability'),
 		_('Agent encryption'),
-		_('Info')
+		_('Info'),
+		_('Tags')
 	]);
 
 $current_time = time();
@@ -162,8 +207,8 @@ foreach ($data['hosts'] as $host) {
 		$description[] = NAME_DELIMITER;
 	}
 	if ($host['discoveryRule']) {
-		$description[] = (new CLink(
-			$host['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid']
+		$description[] = (new CLink(CHtml::encode($host['discoveryRule']['name']),
+			(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
@@ -219,8 +264,10 @@ foreach ($data['hosts'] as $host) {
 
 		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
 			$caption = [
-				(new CLink(
-					CHtml::encode($template['name']), 'templates.php?form=update&templateid='.$template['templateid']
+				(new CLink(CHtml::encode($template['name']),
+					(new CUrl('templates.php'))
+						->setArgument('form', 'update')
+						->setArgument('templateid', $template['templateid'])
 				))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY)
@@ -241,7 +288,9 @@ foreach ($data['hosts'] as $host) {
 			foreach ($parent_templates as $parent_template) {
 				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])) {
 					$caption[] = (new CLink(CHtml::encode($parent_template['name']),
-						'templates.php?form=update&templateid='.$parent_template['templateid']
+						(new CUrl('templates.php'))
+							->setArgument('form', 'update')
+							->setArgument('templateid', $parent_template['templateid'])
 					))
 						->addClass(ZBX_STYLE_LINK_ALT)
 						->addClass(ZBX_STYLE_GREY);
@@ -345,7 +394,8 @@ foreach ($data['hosts'] as $host) {
 		$status,
 		getHostAvailabilityTable($host),
 		$encryption,
-		makeInformationList($info_icons)
+		makeInformationList($info_icons),
+		$data['tags'][$host['hostid']]
 	]);
 }
 

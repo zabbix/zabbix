@@ -193,9 +193,7 @@ $fields = [
 	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'massupdate_app_action' =>		[T_ZBX_INT, O_OPT, null,
-										IN([ZBX_MULTISELECT_ADD, ZBX_MULTISELECT_REPLACE,
-											ZBX_MULTISELECT_REMOVE
-										]),
+										IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 										null
 									],
 	'del_history' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -1078,8 +1076,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 			if (array_key_exists('applications', $visible)) {
 				$massupdate_app_action = getRequest('massupdate_app_action');
 
-				if ($massupdate_app_action == ZBX_MULTISELECT_ADD
-						|| $massupdate_app_action == ZBX_MULTISELECT_REPLACE) {
+				if ($massupdate_app_action == ZBX_ACTION_ADD || $massupdate_app_action == ZBX_ACTION_REPLACE) {
 					$new_applications = [];
 
 					foreach ($applications as $application) {
@@ -1235,15 +1232,15 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 										);
 
 										switch ($massupdate_app_action) {
-											case ZBX_MULTISELECT_ADD:
+											case ZBX_ACTION_ADD:
 												$upd_applicationids = array_merge($applicationids, $db_applicationids);
 												break;
 
-											case ZBX_MULTISELECT_REPLACE:
+											case ZBX_ACTION_REPLACE:
 												$upd_applicationids = $applicationids;
 												break;
 
-											case ZBX_MULTISELECT_REMOVE:
+											case ZBX_ACTION_REMOVE:
 												$upd_applicationids = array_diff($db_applicationids, $applicationids);
 												break;
 										}
@@ -1251,8 +1248,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 										$item['applications'] = array_keys(array_flip($upd_applicationids));
 									}
 									else {
-										if ($massupdate_app_action == ZBX_MULTISELECT_ADD
-												|| $massupdate_app_action == ZBX_MULTISELECT_REMOVE) {
+										if ($massupdate_app_action == ZBX_ACTION_ADD
+												|| $massupdate_app_action == ZBX_ACTION_REMOVE) {
 											unset($item['applications']);
 										}
 									}
@@ -1578,7 +1575,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'posts' => getRequest('posts', ''),
 		'headers' => getRequest('headers', []),
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_MULTISELECT_ADD),
+		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
 		'preprocessing_types' => CItem::$supported_preprocessing_types,
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];
@@ -1763,7 +1760,7 @@ else {
 		],
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'selectTriggers' => ['triggerid', 'description'],
+		'selectTriggers' => ['triggerid'],
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
@@ -2077,9 +2074,10 @@ else {
 	}
 	$data['itemTriggers'] = API::Trigger()->get([
 		'triggerids' => $itemTriggerIds,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'priority',
+			'status', 'state', 'error', 'templateid', 'flags'
+		],
 		'selectHosts' => ['hostid', 'name', 'host'],
-		'selectFunctions' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	]);
 

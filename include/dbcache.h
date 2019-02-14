@@ -218,6 +218,14 @@ typedef struct
 }
 zbx_tag_t;
 
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	itemid;
+	zbx_tag_t	tag;
+}
+zbx_item_tag_t;
+
 #define ZBX_DC_TRIGGER_PROBLEM_EXPRESSION	0x1	/* this flag shows that trigger value recalculation is  */
 							/* initiated by a time-based function or a new value of */
 							/* an item in problem expression */
@@ -252,6 +260,14 @@ typedef struct _DC_TRIGGER
 	zbx_vector_ptr_t	tags;
 }
 DC_TRIGGER;
+
+/* needed to collect and pass data about items that are involved in generating problem events */
+typedef struct
+{
+	zbx_uint64_t		triggerid;
+	zbx_vector_uint64_t	itemids;
+}
+zbx_trigger_items_t;
 
 typedef struct
 {
@@ -680,6 +696,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 
 void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values);
 int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx);
+int	DCget_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **replace_to, int value_idx);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
 #define ZBX_CONFSTATS_BUFFER_USED	2
@@ -806,6 +823,7 @@ typedef struct
 zbx_hc_item_t;
 
 void	zbx_free_tag(zbx_tag_t *tag);
+void	zbx_free_item_tag(zbx_item_tag_t *host_tag);
 
 int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error);
 void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version);
@@ -922,5 +940,7 @@ void	zbx_lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path);
 int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
 		const char *macro, char **value, size_t *value_alloc);
 int	zbx_lld_macro_paths_compare(const void *d1, const void *d2);
+
+void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num, zbx_vector_ptr_t *host_tags);
 
 #endif

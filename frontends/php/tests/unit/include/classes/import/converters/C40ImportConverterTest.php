@@ -27,6 +27,7 @@ class C40ImportConverterTest extends CImportConverterTest {
 				[
 					'templates' => [
 						[
+							'tags' => [],
 							'items' => [
 								[
 									'preprocessing' => [
@@ -55,6 +56,7 @@ class C40ImportConverterTest extends CImportConverterTest {
 					],
 					'hosts' => [
 						[
+							'tags' => [],
 							'items' => [
 								[
 									'preprocessing' => [
@@ -85,6 +87,7 @@ class C40ImportConverterTest extends CImportConverterTest {
 				[
 					'templates' => [
 						[
+							'tags' => [],
 							'items' => [
 								[
 									'preprocessing' => [
@@ -119,6 +122,7 @@ class C40ImportConverterTest extends CImportConverterTest {
 					],
 					'hosts' => [
 						[
+							'tags' => [],
 							'items' => [
 								[
 									'preprocessing' => [
