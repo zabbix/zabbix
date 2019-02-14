@@ -1314,10 +1314,11 @@
 								setWidgetModeEdit($obj, data, widget);
 							};
 
-						var new_height = (pos['y'] + pos['height']) * data['options']['widget-height'];
-
-						if (new_height > $('.dashbrd-grid-widget-container').height()) {
-							$('.dashbrd-grid-widget-container').height(new_height);
+						if (pos['y'] + pos['height'] > data['options']['rows']) {
+							data['options']['rows'] = Math.max(pos['y'] + pos['height'], data['options']['rows']);
+							$('.dashbrd-grid-widget-container').height(
+								(pos['y'] + pos['height']) *  data['options']['widget-height']
+							);
 						}
 
 						// 5px shift is widget padding.
