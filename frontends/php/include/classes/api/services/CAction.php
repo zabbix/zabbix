@@ -29,6 +29,76 @@ class CAction extends CApiService {
 	protected $sortColumns = ['actionid', 'name', 'status'];
 
 	/**
+	 * Valid condition types for each event source.
+	 *
+	 * @var array
+	 */
+	protected $valid_condition_types = [
+		EVENT_SOURCE_TRIGGERS => [
+			CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER, CONDITION_TYPE_TRIGGER_NAME,
+			CONDITION_TYPE_TRIGGER_SEVERITY, CONDITION_TYPE_TIME_PERIOD, CONDITION_TYPE_TEMPLATE,
+			CONDITION_TYPE_APPLICATION, CONDITION_TYPE_SUPPRESSED, CONDITION_TYPE_EVENT_TAG,
+			CONDITION_TYPE_EVENT_TAG_VALUE
+		],
+		EVENT_SOURCE_DISCOVERY => [
+			CONDITION_TYPE_DHOST_IP, CONDITION_TYPE_DSERVICE_TYPE, CONDITION_TYPE_DSERVICE_PORT, CONDITION_TYPE_DSTATUS,
+			CONDITION_TYPE_DUPTIME, CONDITION_TYPE_DVALUE, CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK,
+			CONDITION_TYPE_PROXY, CONDITION_TYPE_DOBJECT
+		],
+		EVENT_SOURCE_AUTO_REGISTRATION => [
+			CONDITION_TYPE_PROXY, CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_HOST_METADATA
+		],
+		EVENT_SOURCE_INTERNAL => [
+			CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TEMPLATE, CONDITION_TYPE_APPLICATION,
+			CONDITION_TYPE_EVENT_TYPE
+		]
+	];
+
+	/**
+	 * Valid operators for each condition type.
+	 *
+	 * @var array
+	 */
+	protected $valid_condition_type_operators = [
+		CONDITION_TYPE_HOST_GROUP => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+		CONDITION_TYPE_HOST => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+		CONDITION_TYPE_TRIGGER => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE],
+		CONDITION_TYPE_TRIGGER_NAME => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE],
+		CONDITION_TYPE_TRIGGER_SEVERITY => [
+			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_MORE_EQUAL,
+			CONDITION_OPERATOR_LESS_EQUAL
+		],
+		CONDITION_TYPE_TIME_PERIOD => [CONDITION_OPERATOR_IN, CONDITION_OPERATOR_NOT_IN],
+		CONDITION_TYPE_DHOST_IP => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+		CONDITION_TYPE_DSERVICE_TYPE => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+		CONDITION_TYPE_DSERVICE_PORT => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+		CONDITION_TYPE_DSTATUS => [CONDITION_OPERATOR_EQUAL],
+		CONDITION_TYPE_DUPTIME => [CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL],
+		CONDITION_TYPE_DVALUE => [
+			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+			CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
+		],
+		CONDITION_TYPE_TEMPLATE => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+		CONDITION_TYPE_APPLICATION => [
+			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
+		],
+		CONDITION_TYPE_SUPPRESSED => [CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO],
+		CONDITION_TYPE_DRULE => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+		CONDITION_TYPE_DCHECK => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+		CONDITION_TYPE_PROXY => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+		CONDITION_TYPE_DOBJECT => [CONDITION_OPERATOR_EQUAL],
+		CONDITION_TYPE_HOST_NAME => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE],
+		CONDITION_TYPE_EVENT_TYPE => [CONDITION_OPERATOR_EQUAL],
+		CONDITION_TYPE_HOST_METADATA => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE],
+		CONDITION_TYPE_EVENT_TAG => [
+			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
+		],
+		CONDITION_TYPE_EVENT_TAG_VALUE => [
+			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
+		]
+	];
+
+	/**
 	 * Get actions data
 	 *
 	 * @param array $options
@@ -1551,13 +1621,41 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Validate operation, recovery operation, acknowledge operations.
+	 * Validate condition type and operator based on action event source.
 	 *
-	 * @param array $operations		Operation data array.
+	 * @param string $name                           Action name.
+	 * @param int    $eventsource                    Action event source.
+	 * @param array  $conditions                     Conditions data array.
+	 * @param string $conditions[]['conditiontype']  Action condition type.
+	 * @param int    $conditions[]['operator']       Action condition operator.
 	 *
 	 * @return bool
 	 */
-	public function validateOperationsIntegrity($operations) {
+	public function validateFilterConditionsIntegrity($name, $eventsource, array $conditions) {
+		foreach ($conditions as $condition) {
+			if (!in_array($condition['conditiontype'], $this->valid_condition_types[$eventsource])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect filter condition type for action "%1$s".', $name)
+				);
+			}
+
+			if (!in_array($condition['operator'],
+					$this->valid_condition_type_operators[$condition['conditiontype']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect filter condition operator for action "%1$s".', $name)
+				);
+			}
+		}
+	}
+
+	/**
+	 * Validate operation, recovery operation, acknowledge operations.
+	 *
+	 * @param array $operations  Operation data array.
+	 *
+	 * @return bool
+	 */
+	public function validateOperationsIntegrity(array $operations) {
 		$operations = zbx_toArray($operations);
 
 		$all_groupids = [];
@@ -2623,29 +2721,13 @@ class CAction extends CApiService {
 	 * @return array
 	 */
 	protected function getFilterConditionSchema() {
-		$conditionTypes = [
-			CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER, CONDITION_TYPE_TRIGGER_NAME,
-			CONDITION_TYPE_TRIGGER_SEVERITY, CONDITION_TYPE_TIME_PERIOD,
-			CONDITION_TYPE_DHOST_IP, CONDITION_TYPE_DSERVICE_TYPE, CONDITION_TYPE_DSERVICE_PORT,
-			CONDITION_TYPE_DSTATUS, CONDITION_TYPE_DUPTIME, CONDITION_TYPE_DVALUE, CONDITION_TYPE_TEMPLATE,
-			CONDITION_TYPE_EVENT_ACKNOWLEDGED, CONDITION_TYPE_APPLICATION, CONDITION_TYPE_SUPPRESSED,
-			CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK, CONDITION_TYPE_PROXY, CONDITION_TYPE_DOBJECT,
-			CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_EVENT_TYPE, CONDITION_TYPE_HOST_METADATA, CONDITION_TYPE_EVENT_TAG,
-			CONDITION_TYPE_EVENT_TAG_VALUE
-		];
-
-		$operators = [
-			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-			CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_IN, CONDITION_OPERATOR_MORE_EQUAL,
-			CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_NOT_IN, CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO
-		];
-
 		return [
 			'validators' => [
-				'conditiontype' => new CLimitedSetValidator([
-					'values' => $conditionTypes,
-					'messageInvalid' => _('Incorrect filter condition type for action "%1$s".')
-				]) ,
+				'conditiontype' => new CStringValidator([
+					'regex' => '/[\d]+/',
+					'messageEmpty' => _('Empty filter condition type for action "%1$s".'),
+					'messageRegex' => _('Incorrect filter condition type for action "%1$s".')
+				]),
 				'value' => new CStringValidator([
 					'empty' => true
 				]),
@@ -2657,9 +2739,10 @@ class CAction extends CApiService {
 					'messageEmpty' => _('Empty filter condition formula ID for action "%1$s".'),
 					'messageRegex' => _('Incorrect filter condition formula ID for action "%1$s".')
 				]),
-				'operator' => new CLimitedSetValidator([
-					'values' => $operators,
-					'messageInvalid' => _('Incorrect filter condition operator for action "%1$s".')
+				'operator' => new CStringValidator([
+					'regex' => '/[\d]+/',
+					'messageEmpty' => _('Empty filter condition operator for action "%1$s".'),
+					'messageRegex' => _('Incorrect filter condition operator for action "%1$s".')
 				])
 			],
 			'required' => ['conditiontype', 'value'],
@@ -2794,6 +2877,10 @@ class CAction extends CApiService {
 					$this->checkValidator($condition, $filterConditionValidator);
 					$conditionsToValidate[] = $condition;
 				}
+
+				$this->validateFilterConditionsIntegrity($action['name'], $action['eventsource'],
+					$action['filter']['conditions']
+				);
 			}
 
 			if ((!array_key_exists('operations', $action) || !$action['operations'])
@@ -2888,11 +2975,11 @@ class CAction extends CApiService {
 		$duplicates = [];
 
 		foreach ($actions as $action) {
-			$actionName = isset($action['name']) ? $action['name'] : $db_actions[$action['actionid']]['name'];
+			$action_name = isset($action['name']) ? $action['name'] : $db_actions[$action['actionid']]['name'];
 
 			if (!check_db_fields(['actionid' => null], $action)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Incorrect parameters for action update method "%1$s".', $actionName
+					'Incorrect parameters for action update method "%1$s".', $action_name
 				));
 			}
 
@@ -2902,16 +2989,13 @@ class CAction extends CApiService {
 				self::validateStepDuration($action['esc_period']);
 			}
 
-			$this->checkNoParameters(
-				$action,
-				['eventsource'],
-				_('Cannot update "%1$s" for action "%2$s".'),
-				$actionName
+			$this->checkNoParameters($action, ['eventsource'], _('Cannot update "%1$s" for action "%2$s".'),
+				$action_name
 			);
 
 			if ($db_actions[$action['actionid']]['eventsource'] != EVENT_SOURCE_TRIGGERS) {
 				$this->checkNoParameters($action, ['pause_suppressed'], _('Cannot update "%1$s" for action "%2$s".'),
-					$actionName
+					$action_name
 				);
 			}
 			elseif (array_key_exists('pause_suppressed', $action)
@@ -2950,45 +3034,48 @@ class CAction extends CApiService {
 			$db_action = $db_actions[$actionId];
 
 			if (isset($action['name'])) {
-				$actionName = $action['name'];
+				$action_name = $action['name'];
 
 				$actionExists = $this->get([
-					'filter' => ['name' => $actionName],
+					'filter' => ['name' => $action_name],
 					'output' => ['actionid'],
 					'editable' => true,
 					'nopermissions' => true,
 					'preservekeys' => true
 				]);
 				if (($actionExists = reset($actionExists))
-					&& (bccomp($actionExists['actionid'], $actionId) != 0)
-				) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $actionName));
+						&& (bccomp($actionExists['actionid'], $actionId) != 0)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $action_name));
 				}
 			}
 			else {
-				$actionName = $db_action['name'];
+				$action_name = $db_action['name'];
 			}
 
 			if (isset($action['filter'])) {
-				$actionFilter = $action['filter'];
+				$action_filter = $action['filter'];
 
-				$filterValidator->setObjectName($actionName);
-				$filterConditionValidator->setObjectName($actionName);
+				$filterValidator->setObjectName($action_name);
+				$filterConditionValidator->setObjectName($action_name);
 
-				$this->checkValidator($actionFilter, $filterValidator);
+				$this->checkValidator($action_filter, $filterValidator);
 
-				foreach ($actionFilter['conditions'] as $condition) {
+				foreach ($action_filter['conditions'] as $condition) {
 					if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_TAG_VALUE
 							&& !array_key_exists('value2', $condition)) {
 						self::exception(
 							ZBX_API_ERROR_PARAMETERS,
-							_s('No "%2$s" given for a filter condition of action "%1$s".', $actionName, 'value2')
+							_s('No "%2$s" given for a filter condition of action "%1$s".', $action_name, 'value2')
 						);
 					}
 
 					$this->checkValidator($condition, $filterConditionValidator);
 					$conditionsToValidate[] = $condition;
 				}
+
+				$this->validateFilterConditionsIntegrity($action_name, $db_action['eventsource'],
+					$action_filter['conditions']
+				);
 			}
 
 			$operations_defined = array_key_exists('operations', $action)
@@ -3002,7 +3089,7 @@ class CAction extends CApiService {
 				: (bool) $db_action['acknowledgeOperations'];
 
 			if (!$operations_defined && !$rcv_operations_defined && !$ack_operations_defined) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $actionName));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $action_name));
 			}
 
 			if (array_key_exists('operations', $action) && $action['operations']) {
