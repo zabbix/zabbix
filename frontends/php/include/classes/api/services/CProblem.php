@@ -291,6 +291,9 @@ class CProblem extends CApiService {
 
 			$sqlParts['where'][] = '(p.r_eventid IS NULL OR p.r_clock>'.$ok_events_from.')';
 		}
+		else {
+			$sqlParts['where'][] = 'p.r_eventid IS NULL';
+		}
 
 		// time_from
 		if ($options['time_from'] !== null) {
