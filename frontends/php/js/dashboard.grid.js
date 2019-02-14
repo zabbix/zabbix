@@ -1315,9 +1315,9 @@
 							};
 
 						if (pos['y'] + pos['height'] > data['options']['rows']) {
-							data['options']['rows'] = Math.max(pos['y'] + pos['height'], data['options']['rows']);
+							data['options']['rows'] = pos['y'] + pos['height'];
 							$('.dashbrd-grid-widget-container').height(
-								(pos['y'] + pos['height']) *  data['options']['widget-height']
+								data['options']['rows'] *  data['options']['widget-height']
 							);
 						}
 
