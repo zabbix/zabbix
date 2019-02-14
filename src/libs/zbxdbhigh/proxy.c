@@ -3288,7 +3288,7 @@ void	zbx_rules_eval_free(zbx_drule_t *drule)
  *                                                                            *
  * Function: process_discovery_ip                                             *
  *                                                                            *
- * Purpose: process vector of ip addresses and checks                         *
+ * Purpose: process services discovered on IP address                         *
  *                                                                            *
  * Parameters: drule_ptr         - [IN] discovery rule structure              *
  *             ip_discovered_ptr - [IN] vector of ip addresses                *
