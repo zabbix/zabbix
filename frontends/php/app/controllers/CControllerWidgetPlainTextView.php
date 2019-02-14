@@ -46,7 +46,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 
 		if ($fields['itemids']) {
 			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 				'selectHosts' => ['name'],
 				'itemids' => $fields['itemids'],
 				'webitems' => true,
@@ -62,7 +62,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 
 			if ($items && $fields['dynamic'] && $dynamic_hostid) {
 				$items = API::Item()->get([
-					'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+					'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 					'selectHosts' => ['name'],
 					'filter' => [
 						'hostid' => $dynamic_hostid,
@@ -100,6 +100,9 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 
 					if ($items[$history['itemid']]['valuemapid'] != 0) {
 						$history['value'] = applyValueMap($history['value'], $items[$history['itemid']]['valuemapid']);
+					}
+					else if (!$fields['show_as_html']) {
+						$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], false);
 					}
 
 					if (!$fields['show_as_html']) {
