@@ -15,10 +15,9 @@
 	echo (new CListItem([
 		(new CDiv([
 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-			(new CDiv([
-				(new CDiv())->addClass('step-number'),
-				$preproc_types_cbbox
-			]))->addClass(ZBX_STYLE_COLUMN_40),
+			(new CDiv($preproc_types_cbbox))
+				->addClass(ZBX_STYLE_COLUMN_35)
+				->addClass('list-numbered-item'),
 			(new CDiv((new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
 				->setAttribute('placeholder', _('pattern'))
 			))->addClass(ZBX_STYLE_COLUMN_20),
@@ -26,7 +25,7 @@
 				->setAttribute('placeholder', _('output'))
 			))->addClass(ZBX_STYLE_COLUMN_20),
 			(new CDiv(new CCheckBox('preprocessing[#{rowNum}][on_fail]')))
-				->addClass(ZBX_STYLE_COLUMN_10)
+				->addClass(ZBX_STYLE_COLUMN_15)
 				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 				->addClass(ZBX_STYLE_COLUMN_CENTER),
 			(new CDiv((new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
@@ -58,7 +57,7 @@
 						->addStyle('display: none;')
 				)
 			]))
-				->addClass(ZBX_STYLE_COLUMN_80)
+				->addClass(ZBX_STYLE_COLUMN_75)
 				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 		]))
 			->addClass(ZBX_STYLE_COLUMNS)
@@ -71,25 +70,26 @@
 </script>
 <script type="text/javascript">
 	jQuery(function($) {
-		function updateStepNumbers() {
-			$('.preprocessing-list-item .step-number').each(function(i) {
-				$(this).text(++i + ':');
-			});
-		}
+		$('.open-modal-code-editor')
+			.codeEditor()
+			.parent()
+				.removeClass()
+				.addClass('<?= ZBX_STYLE_COLUMN_40 ?>')
+				.next()
+					.hide();
 
 		var preproc_row_tpl = new Template($('#preprocessing-steps-tmpl').html()),
 			preprocessing = $('#preprocessing');
 
 		preprocessing.sortable({
-			disabled: (preprocessing.find('li.sortable').length < 2),
+			disabled: preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').hasClass('<?= ZBX_STYLE_DISABLED ?>'),
 			items: 'li.sortable',
 			axis: 'y',
 			cursor: 'move',
 			containment: 'parent',
 			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
-			opacity: 0.6,
-			update: updateStepNumbers
+			opacity: 0.6
 		});
 
 		preprocessing
@@ -101,14 +101,14 @@
 
 				$('.preprocessing-list-head').show();
 				sortable_count = preprocessing.find('li.sortable').length;
-				updateStepNumbers();
 
 				if (sortable_count == 1) {
 					preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 				else if (sortable_count > 1) {
-					preprocessing.sortable('enable');
-					preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').removeClass('<?= ZBX_STYLE_DISABLED ?>');
+					preprocessing
+						.sortable('enable')
+						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').removeClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 			})
 			.on('click', '.element-table-remove', function() {
@@ -116,27 +116,32 @@
 
 				$(this).closest('li.sortable').remove();
 				sortable_count = preprocessing.find('li.sortable').length;
-				updateStepNumbers();
 
 				if (sortable_count == 0) {
 					$('.preprocessing-list-head').hide();
 				}
 				else if (sortable_count == 1) {
-					preprocessing.sortable('disable');
-					preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
+					preprocessing
+						.sortable('disable')
+						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 			})
 			.on('change', 'select[name*="type"]', function() {
-				var type = $(this).val(),
-					params = $(this).closest('.preprocessing-step').find('[name*="params"]'),
+				var row = $(this).closest('.preprocessing-step'),
+					type = $(this).val(),
+					params = $(this).closest('.preprocessing-step').find('input[type="text"][name*="params"]'),
 					on_fail = $(this).closest('.preprocessing-step').find('[name*="on_fail"]');
+
+				$(params)
+					.val('')
+					.removeAttr('title')
+					.hide();
 
 				switch (type) {
 					case '<?= ZBX_PREPROC_MULTIPLIER ?>':
 						$(params[0])
 							.attr('placeholder', <?= CJs::encodeJson(_('number')) ?>)
 							.show();
-						$(params[1]).hide();
 						break;
 
 					case '<?= ZBX_PREPROC_RTRIM ?>':
@@ -145,7 +150,6 @@
 						$(params[0])
 							.attr('placeholder', <?= CJs::encodeJson(_('list of characters')) ?>)
 							.show();
-						$(params[1]).hide();
 						break;
 
 					case '<?= ZBX_PREPROC_XPATH ?>':
@@ -153,7 +157,6 @@
 						$(params[0])
 							.attr('placeholder', <?= CJs::encodeJson(_('XPath')) ?>)
 							.show();
-						$(params[1]).hide();
 						break;
 
 					case '<?= ZBX_PREPROC_JSONPATH ?>':
@@ -161,7 +164,6 @@
 						$(params[0])
 							.attr('placeholder', <?= CJs::encodeJson(_('$.path.to.node')) ?>)
 							.show();
-						$(params[1]).hide();
 						break;
 
 					case '<?= ZBX_PREPROC_REGSUB ?>':
@@ -172,16 +174,6 @@
 						$(params[1])
 							.attr('placeholder', <?= CJs::encodeJson(_('output')) ?>)
 							.show();
-						break;
-
-					case '<?= ZBX_PREPROC_BOOL2DEC ?>':
-					case '<?= ZBX_PREPROC_OCT2DEC ?>':
-					case '<?= ZBX_PREPROC_HEX2DEC ?>':
-					case '<?= ZBX_PREPROC_DELTA_VALUE ?>':
-					case '<?= ZBX_PREPROC_DELTA_SPEED ?>':
-					case '<?= ZBX_PREPROC_THROTTLE_VALUE ?>':
-						$(params[0]).hide();
-						$(params[1]).hide();
 						break;
 
 					case '<?= ZBX_PREPROC_VALIDATE_RANGE ?>':
@@ -198,15 +190,45 @@
 						$(params[0])
 							.attr('placeholder', <?= CJs::encodeJson(_('pattern')) ?>)
 							.show();
-						$(params[1]).hide();
 						break;
 
 					case '<?= ZBX_PREPROC_THROTTLE_TIMED_VALUE ?>':
 						$(params[0])
 							.attr('placeholder', <?= CJs::encodeJson(_('seconds')) ?>)
 							.show();
-						$(params[1]).hide();
 						break;
+
+					case '<?= ZBX_PREPROC_SCRIPT ?>':
+						$(params[0])
+							.attr('placeholder', <?= CJs::encodeJson(_('script')) ?>)
+							.attr('maxlength', <?= $data['preprocessing_script_maxlength'] ?>)
+							.attr('title', <?= CJs::encodeJson(_('Click to view or edit code')) ?>)
+							.addClass('open-modal-code-editor editable')
+							.show()
+							.after($('<input>').attr({
+								'type': 'hidden',
+								'id': $(params[0]).attr('id'),
+								'name': $(params[0]).attr('name')
+							}))
+							.codeEditor()
+							.parent()
+								.removeClass()
+								.addClass('<?= ZBX_STYLE_COLUMN_40 ?>')
+								.next()
+									.hide();
+						break;
+				}
+
+				if (type != '<?= ZBX_PREPROC_SCRIPT ?>' && row.find('.open-modal-code-editor')) {
+					$(params[0])
+						.codeEditor('destroy')
+						.removeClass()
+						.prop('maxlength', 255)
+						.parent()
+							.removeClass()
+							.addClass('<?= ZBX_STYLE_COLUMN_20 ?>')
+							.next()
+								.show();
 				}
 
 				// Disable "Custom on fail" for some of the preprocessing types.
@@ -219,6 +241,7 @@
 					case '<?= ZBX_PREPROC_ERROR_FIELD_REGEX ?>':
 					case '<?= ZBX_PREPROC_THROTTLE_VALUE ?>':
 					case '<?= ZBX_PREPROC_THROTTLE_TIMED_VALUE ?>':
+					case '<?= ZBX_PREPROC_SCRIPT ?>':
 						on_fail
 							.prop('checked', false)
 							.prop('disabled', true)

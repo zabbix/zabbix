@@ -24,6 +24,7 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "preprocessing.h"
+#include "zbxembed.h"
 
 #include "sysinfo.h"
 #include "preproc_worker.h"
@@ -32,6 +33,8 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+
+zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
@@ -45,16 +48,15 @@ extern int		server_num, process_num;
  ******************************************************************************/
 static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
 {
-	zbx_uint32_t			size = 0;
-	unsigned char			*data = NULL, value_type;
-	zbx_uint64_t			itemid;
-	zbx_variant_t			value;
-	int				i, steps_num;
-	char				*error = NULL;
-	zbx_timespec_t			*ts;
-	zbx_preproc_op_t		*steps;
-	zbx_vector_ptr_t		history_in, history_out;
-	const zbx_preproc_op_history_t	*ophistory;
+	zbx_uint32_t		size = 0;
+	unsigned char		*data = NULL, value_type;
+	zbx_uint64_t		itemid;
+	zbx_variant_t		value;
+	int			i, steps_num;
+	char			*error = NULL;
+	zbx_timespec_t		*ts;
+	zbx_preproc_op_t	*steps;
+	zbx_vector_ptr_t	history_in, history_out;
 
 	zbx_vector_ptr_create(&history_in);
 	zbx_vector_ptr_create(&history_out);
@@ -64,13 +66,14 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 
 	for (i = 0; i < steps_num; i++)
 	{
-		zbx_preproc_op_t	*op = &steps[i];
-		zbx_variant_t		history_value;
-		zbx_timespec_t		history_ts;
+		zbx_preproc_op_history_t	*ophistory;
+		zbx_variant_t			history_value;
+		zbx_timespec_t			history_ts;
 
-		if (NULL != (ophistory = zbx_preproc_history_get_value(&history_in, op->type)))
+		if (NULL != (ophistory = zbx_preproc_history_get_value(&history_in, i)))
 		{
 			history_value = ophistory->value;
+			zbx_variant_set_none(&ophistory->value);
 			history_ts = ophistory->ts;
 		}
 		else
@@ -80,13 +83,18 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 			history_ts.ns = 0;
 		}
 
-		if (SUCCEED != zbx_item_preproc(i + 1, value_type, &value, ts, op, &history_value, &history_ts, &error))
+		if (SUCCEED != zbx_item_preproc(i + 1, value_type, &value, ts, steps + i, &history_value, &history_ts,
+				&error))
+		{
+			zbx_variant_clear(&history_value);
 			break;
+		}
 
 		if (ZBX_VARIANT_NONE != history_value.type)
-			zbx_preproc_history_set_value(&history_out, op->type, &history_value, &history_ts);
-
-		zbx_variant_clear(&history_value);
+		{
+			/* the value is byte copied to history_out vector and doesn't have to be cleared */
+			zbx_preproc_history_add_value(&history_out, i, &history_value, &history_ts);
+		}
 
 		if (ZBX_VARIANT_NONE == value.type)
 			break;
@@ -125,6 +133,8 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
+
+	zbx_es_init(&es_engine);
 
 	zbx_ipc_message_init(&message);
 
@@ -167,6 +177,8 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 		zbx_ipc_message_clean(&message);
 	}
+
+	zbx_es_destroy(&es_engine);
 
 	return 0;
 }

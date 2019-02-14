@@ -1849,6 +1849,20 @@ output {
 	}
 }
 
+.list-numbered {
+	counter-reset: line;
+
+	.list-numbered-item {
+
+		&::before {
+			content: counter(line);
+			counter-increment: line;
+			user-select: none;
+			text-align: right;
+		}
+	}
+}
+
 .radio-segmented {
 	white-space: nowrap;
 
@@ -3846,6 +3860,62 @@ $form-icon-btn: (
 		min-width: 650px;
 	}
 
+	&.modal-code-editor {
+		min-width: 960px;
+
+		.code-editor {
+			$line-height: 18px;
+
+			position: relative;
+			display: flex;
+			height: calc(100vh - 190px);
+			max-height: 548px;
+			overflow: hidden;
+
+			.line-numbers {
+				counter-reset: line;
+				overflow: hidden;
+				padding: 5px 5px 5px 0;
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+
+				li {
+					color: $font-alt-color;
+					font-family: $font-stack-mono;
+					line-height: $line-height;
+					text-align: right;
+
+					&::before {
+						counter-increment: line;
+						content: counter(line);
+						user-select: none;
+					}
+				}
+			}
+
+			.code-editor-textarea {
+				font-family: $font-stack-mono;
+				line-height: $line-height;
+				resize: none;
+				white-space: pre;
+				height: 100%;
+				width: 100%;
+
+				&::-webkit-scrollbar {
+					height: 9px;
+				}
+			}
+		}
+
+		.symbols-remaining {
+			color: $font-alt-color;
+			float: left;
+			line-height: 24px;
+		}
+	}
+
 	.msg-bad,
 	.msg-good {
 		position: sticky;
@@ -3891,6 +3961,30 @@ $form-icon-btn: (
 		overflow-y: auto;
 		margin-left: -10px;
 		@extend %webkit-scrollbar;
+	}
+}
+
+input.open-modal-code-editor {
+	overflow: hidden;
+	cursor: pointer;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	font-family: $font-stack-mono;
+	border-right: none;
+
+	&.editable {
+		background-color: $form-bg-color !important;
+		border-color: $form-disabled-font-color;
+	}
+
+	&:-ms-input-placeholder {
+		color: $input-placeholder-color !important;
+	}
+
+	~ button {
+		white-space: nowrap;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
 	}
 }
 
@@ -5743,11 +5837,12 @@ svg {
 		.list-accordion-item-body {
 			display: none;
 		}
+
 		.patternselect {
 			overflow: hidden;
 			max-height: 24px;
 			line-height: 24px;
-			padding: 0px 5px;
+			padding: 0 5px;
 			height: 24px;
 		}
 	}
@@ -5762,11 +5857,13 @@ svg {
 	$columns: (
 		5: 5%,
 		10: 10%,
+		15: 15%,
 		20: 20%,
 		33: 33.33333%,
+		35: 35%,
 		40: 40%,
 		50: 50%,
-		80: 80%,
+		75: 75%,
 		90: 90%,
 		95: 95%
 	);
@@ -5779,17 +5876,7 @@ svg {
 	}
 
 	/**
-	 * Dynamically generated classes
-	 *
-	 * .column-5
-	 * .column-10
-	 * .column-20
-	 * .column-33
-	 * .column-40
-	 * .column-50
-	 * .column-80
-	 * .column-90
-	 * .column-95
+	 * Dynamically generated classes, e.g. .column-50.
 	 */
 	@each $class, $width in $columns {
 		.column-#{$class} {
@@ -5813,25 +5900,16 @@ svg {
 
 .preprocessing-list {
 	display: table;
-	min-width: 100%;
+	width: 100%;
+	min-width: 730px;
+	max-width: 930px;
 	padding-left: 10px;
-
-	@media screen and (min-width: 1200px) {
-		min-width: 80%;
-	}
-
-	@media screen and (min-width: 1400px) {
-		min-width: 70%;
-	}
-
-	@media screen and (min-width: 1600px) {
-		min-width: 60%;
-	}
 
 	.columns-wrapper {
 		position: relative;
 
 		[class^=column-] {
+			display: flex;
 			box-sizing: border-box;
 			padding: 5px 5px 5px 0;
 
@@ -5841,6 +5919,7 @@ svg {
 
 			input[type=text], select {
 				width: 100%;
+				flex: 1;
 			}
 		}
 	}
@@ -5866,27 +5945,30 @@ svg {
 			margin-left: -20px;
 		}
 
-		.step-number {
-			width: 15px;
-			margin-right: 5px;
-			line-height: 24px;
-			text-align: right;
-		}
-
 		.preprocessing-step {
 
-			> .column-40 {
-				display: flex;
+			.list-numbered-item {
+
+				&::before {
+					content: counter(line) ":";
+					width: 15px;
+					margin-right: 5px;
+					line-height: 24px;
+				}
 			}
 		}
 
 		.on-fail-options {
-			margin: 0 0 5px 20px;
+			margin-bottom: 5px;
 
-			> .column-80 {
+			> .column-75 {
 
 				> div {
 					padding-right: 5px;
+
+					&:first-child {
+						padding-left: 20px;
+					}
 
 					&:last-child {
 						flex: 1;
@@ -5906,6 +5988,10 @@ svg {
 
 	> li:nth-last-of-type(2) > .on-fail-options {
 		margin-bottom: 0;
+	}
+
+	.element-table-add, .element-table-remove {
+		line-height: normal;
 	}
 }
 

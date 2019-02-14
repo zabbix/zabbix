@@ -1751,6 +1751,10 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 			'group' => _('Numeral systems'),
 			'name' => _('Hexadecimal to decimal')
 		],
+		ZBX_PREPROC_SCRIPT => [
+			'group' => _('Custom scripts'),
+			'name' => _('JavaScript')
+		],
 		ZBX_PREPROC_VALIDATE_RANGE => [
 			'group' => _('Validation'),
 			'name' => _('In range')
