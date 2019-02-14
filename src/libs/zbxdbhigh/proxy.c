@@ -3286,7 +3286,7 @@ void	zbx_rules_eval_free(zbx_drule_t *drule)
 
 /******************************************************************************
  *                                                                            *
- * Function: process_discovery_ip_addresses                                   *
+ * Function: process_discovery_ip                                             *
  *                                                                            *
  * Purpose: process vector of ip addresses and checks                         *
  *                                                                            *
@@ -3294,10 +3294,9 @@ void	zbx_rules_eval_free(zbx_drule_t *drule)
  *             ip_discovered_ptr - [IN] vector of ip addresses                *
  *                                                                            *
  ******************************************************************************/
-static int	process_discovery_ip_addresses(zbx_uint64_t druleid, zbx_uint64_t unique_dcheckid,
+static int	process_discovery_ip(zbx_uint64_t druleid, zbx_uint64_t unique_dcheckid,
 		zbx_discovery_ip_t *discovery_ip, int *start_idx)
 {
-	const char		*__function_name = "process_discovery_ip_addresses";
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_DHOST		dhost;
@@ -3617,8 +3616,7 @@ json_parse_error:
 			discovery_ip = (zbx_discovery_ip_t *)drule->ips.values[j];
 			do
 			{
-				res = process_discovery_ip_addresses(drule->druleid, unique_dcheckid, discovery_ip,
-						&start_idx);
+				res = process_discovery_ip(drule->druleid, unique_dcheckid, discovery_ip, &start_idx);
 			}
 			while (discovery_ip->services.values_num != start_idx && FAIL != res);
 
