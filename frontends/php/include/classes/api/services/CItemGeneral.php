@@ -1584,7 +1584,7 @@ abstract class CItemGeneral extends CApiService {
 					'SELECT i.itemid,i.hostid,i.master_itemid'.
 					' FROM items i'.
 					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
-						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL])
 				);
 			}
 			else {
