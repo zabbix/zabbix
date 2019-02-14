@@ -1299,9 +1299,7 @@
 
 					if (widget === null || ('type' in widget) === false) {
 						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
-						var scroll_by = (pos['y'] * data['options']['widget-height'])
-								- $('.dashbrd-grid-widget-container').scrollTop(),
-							widget_data = {
+						var widget_data = {
 								'type': type,
 								'header': name,
 								'pos': pos,
@@ -1316,22 +1314,18 @@
 								setWidgetModeEdit($obj, data, widget);
 							};
 
-						if (scroll_by > 0) {
-							var new_height = (pos['y'] + pos['height']) * data['options']['widget-height'];
+						var new_height = (pos['y'] + pos['height']) * data['options']['widget-height'];
 
-							if (new_height > $('.dashbrd-grid-widget-container').height()) {
-								$('.dashbrd-grid-widget-container').height(new_height);
-							}
+						if (new_height > $('.dashbrd-grid-widget-container').height()) {
+							$('.dashbrd-grid-widget-container').height(new_height);
+						}
 
-							$('html, body')
-								// Estimated scroll speed: 200ms for each 250px.
-								.animate({scrollTop: '+=' + scroll_by + 'px'}, Math.floor(scroll_by / 250) * 200)
-								.promise()
-								.then(add_new_widget);
-						}
-						else {
-							add_new_widget();
-						}
+						// 5px shift is widget padding.
+						$('html, body')
+							.animate({scrollTop: pos['y'] * data['options']['widget-height']
+								+ $('.dashbrd-grid-widget-container').position().top - 5})
+							.promise()
+							.then(add_new_widget);
 					}
 					else {
 						// In case of EDIT widget.
