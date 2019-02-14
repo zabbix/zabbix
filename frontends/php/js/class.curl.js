@@ -177,7 +177,7 @@ Curl.prototype = {
 							array_values[matches[1]] = [];
 						}
 
-						array_values[matches[1]].push(tmp);
+						array_values[matches[1]].push(decodeURIComponent(tmp));
 					}
 					else {
 						this.args[keyval[0]] = decodeURIComponent(tmp);
