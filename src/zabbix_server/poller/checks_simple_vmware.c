@@ -2052,7 +2052,7 @@ int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_vm_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_hv_name";
+	const char		*__function_name = "check_vcenter_vm_datacenter_name";
 
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
@@ -2637,7 +2637,7 @@ int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, const char *userna
 int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_storage_committed";
+	const char	*__function_name = "check_vcenter_vm_storage_uncommitted";
 
 	int		ret;
 

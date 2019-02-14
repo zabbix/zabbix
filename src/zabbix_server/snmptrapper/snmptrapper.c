@@ -619,7 +619,7 @@ static int	get_latest_data(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 {
-	const char	*__function_name = "main_snmptrapper_loop";
+	const char	*__function_name = "snmptrapper_thread";
 	double		sec;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;

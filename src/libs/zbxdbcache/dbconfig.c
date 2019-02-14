@@ -3543,7 +3543,7 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
  ******************************************************************************/
 static void	DCsync_action_ops(zbx_dbsync_t *sync)
 {
-	const char	*__function_name = "DCsync_action_opss";
+	const char	*__function_name = "DCsync_action_ops";
 
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -7870,7 +7870,7 @@ unlock:
  ******************************************************************************/
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
 {
-	const char			*__function_name = "DCconfig_get_snmp_items_by_interface";
+	const char			*__function_name = "DCconfig_get_snmp_items_by_interfaceid";
 
 	size_t				items_num = 0, items_alloc = 8;
 	int				i;
