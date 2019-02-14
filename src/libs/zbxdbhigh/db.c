@@ -2800,6 +2800,7 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 
 	return ret;
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: DBlock_ids                                                       *
@@ -2839,6 +2840,7 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 
 	return (0 != ids->values_num ? SUCCEED : FAIL);
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_sql_add_host_availability                                    *
