@@ -29,12 +29,19 @@ $host_name = (new CLinkAction($data['host']['host']))
 		false
 	));
 
-if ($data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-		&& array_key_exists($data['host']['maintenanceid'], $data['maintenances'])) {
-	$maintenance = $data['maintenances'][$data['host']['maintenanceid']];
-	$maintenance_icon = makeMaintenanceIcon($data['host']['maintenance_type'], $maintenance['name'],
-		$maintenance['description']
-	);
+if ($data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+	if (array_key_exists($data['host']['maintenanceid'], $data['maintenances'])) {
+		$maintenance = $data['maintenances'][$data['host']['maintenanceid']];
+		$maintenance_icon = makeMaintenanceIcon($data['host']['maintenance_type'], $maintenance['name'],
+			$maintenance['description']
+		);
+	}
+	else {
+		$maintenance_icon = makeMaintenanceIcon($data['host']['maintenance_type'], _('Inaccessible maintenance'),
+			''
+		);
+	}
+
 	$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 }
 
