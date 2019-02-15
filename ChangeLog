@@ -139,6 +139,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.5rc1
 
 New features:
+..F....... [ZBXNEXT-5046] added non-destructive resizing and reordering of dashboard widgets (ashubin, gcalenko, miks)
 ..FGI..PST [ZBXNEXT-401,ZBXNEXT-4907,ZBXNEXT-4955] added monitoring of internal metrics from an external Zabbix instance (vasilijs, viktors)
 
 Bug fixes:
