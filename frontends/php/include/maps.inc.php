@@ -87,15 +87,7 @@ function getActionsBySysmap(array $sysmap, array $options = []) {
 			? $elem['elements'][0]['hostid']
 			: 0;
 
-		switch ($elem['elementtype_orig']) {
-			case SYSMAP_ELEMENT_TYPE_MAP:
-			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-			case SYSMAP_ELEMENT_TYPE_HOST:
-			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$map = CMenuPopupHelper::getMapElement($sysmap['sysmapid'], $elem['selementid_orig'], $severity_min,
-					$hostid);
-				break;
-		}
+		$map = CMenuPopupHelper::getMapElement($sysmap['sysmapid'], $elem['selementid_orig'], $severity_min, $hostid);
 
 		$actions[$selementid] = CJs::encodeJson($map);
 	}
