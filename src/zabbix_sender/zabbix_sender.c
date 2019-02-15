@@ -599,6 +599,8 @@ static int	sent_wait(ZBX_THREAD_SENDVAL_ARGS *sendval_args, zbx_thread_args_t *t
 
 	ret = sender_threads_wait(threads, CONFIG_SEND_DEST_COUNT, old_status);
 
+	zbx_free(threads);
+
 	return ret;
 }
 
