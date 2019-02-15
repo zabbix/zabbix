@@ -94,11 +94,8 @@ class CMapHelper {
 			// Populate host group elements of subtype 'SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS' with hosts.
 			$areas = self::populateHostGroupsWithHosts($map, $theme);
 
-			// Propagate map urls to map elements.
-			self::addMapUrlsToMapElements($map);
-
-			// Resolve macros in map element labels and url names/values.
-			$resolve_opt = ['resolve_element_urls' => true, 'resolve_element_label' => true];
+			// Resolve macros in map element labels.
+			$resolve_opt = ['resolve_element_label' => true];
 			$map['selements'] = CMacrosResolverHelper::resolveMacrosInMapElements($map['selements'], $resolve_opt);
 
 			self::resolveMapState($map, $areas, $options);
@@ -123,33 +120,6 @@ class CMapHelper {
 	}
 
 	/**
-	 * Function adds map urls to same map's elements of particular element type.
-	 *
-	 * @param array $sysmap                                    Map data.
-	 * @param array $sysmap[urls]                              Map urls.
-	 * @param array $sysmap[urls][]['elementtype']             Map url's element type.
-	 * @param int   $sysmap['selements']                       Map elements.
-	 * @param int   $sysmap['selements'][]['elementtype']      Type of map element.
-	 * @param int   $sysmap['selements'][]['elementsubtype']   Subtype of map element.
-	 */
-	protected static function addMapUrlsToMapElements(array &$sysmap) {
-		if ($sysmap['urls'] && $sysmap['selements']) {
-			foreach ($sysmap['urls'] as $map_url) {
-				foreach ($sysmap['selements'] as $snum => $selement) {
-					if (($selement['elementtype'] == $map_url['elementtype']
-							&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP
-							)
-							|| ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS
-								&& $map_url['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
-							) {
-						$sysmap['selements'][$snum]['urls'][] = $map_url;
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * Resolve map element (selements and links) state.
 	 *
 	 * @param array $sysmap                   Map data.
@@ -162,13 +132,6 @@ class CMapHelper {
 		$map_info_options = [
 			'severity_min' => array_key_exists('severity_min', $options) ? $options['severity_min'] : null
 		];
-
-		foreach ($sysmap['selements'] as &$selement) {
-			$selement['selementid_orig'] = $selement['selementid'];
-			$selement['elementtype_orig'] = $selement['elementtype'];
-			$selement['elementsubtype_orig'] = $selement['elementsubtype'];
-		}
-		unset($selement);
 
 		$map_info = getSelementsInfo($sysmap, $map_info_options);
 		processAreasCoordinates($sysmap, $areas, $map_info);
@@ -265,7 +228,6 @@ class CMapHelper {
 				$element['highlight'] = '';
 				$element['actions'] = null;
 				$element['label'] = '';
-				// Why not unset 'urls'?
 			}
 
 			if ($sysmap['markelements']) {
@@ -600,6 +562,10 @@ class CMapHelper {
 		// Collect host groups to populate with hosts.
 		$host_groupids = [];
 		foreach ($sysmap['selements'] as &$selement) {
+			$selement['selementid_orig'] = $selement['selementid'];
+			$selement['elementtype_orig'] = $selement['elementtype'];
+			$selement['elementsubtype_orig'] = $selement['elementsubtype'];
+
 			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
 					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
 				if ($selement['permission'] >= PERM_READ) {

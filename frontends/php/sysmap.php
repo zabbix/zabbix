@@ -164,7 +164,7 @@ if (isset($_REQUEST['favobj'])) {
 	}
 }
 
-if (PAGE_TYPE_HTML != $page['type']) {
+if ($page['type'] != PAGE_TYPE_HTML) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;
 }
