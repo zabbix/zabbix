@@ -763,9 +763,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 
 	if ($problem_triggerids) {
 		$problems = API::Problem()->get([
-			'output' => ['objectid', 'severity'],
+			'output' => ['objectid', 'severity', 'suppressed'],
 			'objectids' => $problem_triggerids,
-			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 			'time_from' => $problem_options['time_from']
 		]);
 
@@ -773,13 +772,18 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			if ($triggers[$problem['objectid']]['priority'] < $problem['severity']) {
 				$triggers[$problem['objectid']]['priority'] = $problem['severity'];
 			}
+			$triggers[$problem['objectid']]['suppressed'] =
+				($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+				? ZBX_PROBLEM_SUPPRESSED_FALSE
+				: $problem['suppressed'];
 		}
 
 		$triggerids = zbx_objectValues($problems, 'objectid');
 		$problem_triggers = array_intersect_key($triggers, array_fill_keys($triggerids, ''));
 
 		foreach ($problem_triggers as $triggerid => $trigger) {
-			if ($trigger['priority'] < $problem_options['min_severity']) {
+			if ($trigger['priority'] < $problem_options['min_severity']
+					|| $trigger['suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) {
 				unset($triggers[$triggerid]);
 			}
 		}
