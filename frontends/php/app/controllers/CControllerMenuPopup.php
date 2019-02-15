@@ -390,6 +390,15 @@ class CControllerMenuPopup extends CController {
 							$menu_data['urls'] = $selement['urls'];
 						}
 						return $menu_data;
+
+					case SYSMAP_ELEMENT_TYPE_IMAGE:
+						$menu_data = [
+							'type' => 'map_element_image',
+						];
+						if ($selement['urls']) {
+							$menu_data['urls'] = $selement['urls'];
+						}
+						return $menu_data;
 				}
 			}
 		}
