@@ -3539,6 +3539,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid port", __function_name, tmp);
 			continue;
 		}
+
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
 			*value = '\0';
 
@@ -3548,6 +3549,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid hostname", __function_name, dns);
 			continue;
 		}
+
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
 			status = atoi(tmp);
 		else
@@ -3563,7 +3565,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		else
 			drule = drules.values[i];
 
-		if (FAIL == (i = zbx_vector_ptr_search(&drule->ips, ip, ZBX_DEFAULT_STR_COMPARE_FUNC)))
+		if (FAIL == (i = zbx_vector_str_search(&drule->ips, ip, ZBX_DEFAULT_STR_COMPARE_FUNC)))
 		{
 			drule_ip = (zbx_drule_ip_t *)zbx_malloc(NULL, sizeof(zbx_drule_ip_t));
 			zbx_strlcpy(drule_ip->ip, ip, INTERFACE_IP_LEN_MAX);
@@ -3592,7 +3594,7 @@ json_parse_error:
 
 	for (i = 0; i < drules.values_num; i++)
 	{
-		zbx_uint64_t	unique_dcheckid = 0;
+		zbx_uint64_t	unique_dcheckid;
 
 		drule = (zbx_drule_t *)drules.values[i];
 
@@ -3605,12 +3607,13 @@ json_parse_error:
 
 		if (NULL != (row = DBfetch(result)))
 			ZBX_STR2UINT64(unique_dcheckid, row[0]);
-
+		else
+			unique_dcheckid = 0;
 		DBfree_result(result);
 
 		for (j = 0; j < drule->ips.values_num; j++)
 		{
-			int start_idx = 0;
+			int	start_idx = 0;
 
 			drule_ip = (zbx_drule_ip_t *)drule->ips.values[j];
 			do
