@@ -1163,7 +1163,11 @@ void	zbx_ipc_socket_close(zbx_ipc_socket_t *csocket)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	close(csocket->fd);
+	if (-1 != csocket->fd)
+	{
+		close(csocket->fd);
+		csocket->fd = -1;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
