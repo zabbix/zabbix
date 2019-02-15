@@ -1298,11 +1298,13 @@ output {
 	width: 75%;
 	text-align: center;
 	margin: 0 auto;
+	table-layout: fixed;
 
 	.cell {
 		vertical-align: bottom;
 		padding: 20px 10px;
 		width: 20%;
+		text-align: center;
 
 		img {
 			max-width: 100%;
