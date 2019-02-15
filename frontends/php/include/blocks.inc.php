@@ -563,6 +563,17 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 	$today = strtotime('today');
 	$last_clock = 0;
 
+	// Unset triggers, which missing in problems array.
+	if ($problems) {
+		$objectids = [];
+
+		foreach ($problems as $problem) {
+			$objectids[$problem['objectid']] = true;
+		}
+
+		$triggers = array_intersect_key($triggers, $objectids);
+	}
+
 	$triggers_hosts = getTriggersHostsList($triggers);
 	$triggers_hosts = makeTriggersHostsList($triggers_hosts);
 
