@@ -3312,8 +3312,6 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 	memset(&dhost, 0, sizeof(dhost));
 	services = (zbx_vector_ptr_t *)&drule_ip->services;
 
-	if (0 == services->values_num) return FAIL;
-
 	zbx_vector_uint64_create(&dcheckids);
 
 	/*check status for given ip address*/
@@ -3480,7 +3478,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 	DB_ROW			row;
 	zbx_uint64_t		dcheckid, druleid;
 	struct zbx_json_parse	jp_row;
-	int			status, ret = SUCCEED, i, j, res;
+	int			status, ret = SUCCEED, i, j;
 	unsigned short		port;
 	const char		*p = NULL;
 	char			ip[INTERFACE_IP_LEN_MAX],
@@ -3616,11 +3614,15 @@ json_parse_error:
 			int	start_idx = 0;
 
 			drule_ip = (zbx_drule_ip_t *)drule->ips.values[j];
-			do
+
+			while (start_idx != drule_ip->services.values_num)
 			{
-				res = process_services_for_drule_ip(drule_ip, drule->druleid, unique_dcheckid, &start_idx);
+				if (FAIL == process_services_for_drule_ip(drule_ip, drule->druleid, unique_dcheckid,
+						&start_idx))
+				{
+					break;
+				}
 			}
-			while (drule_ip->services.values_num != start_idx && FAIL != res);
 
 		}
 	}
