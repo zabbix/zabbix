@@ -3303,18 +3303,17 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 	zbx_service_t		*service;
 	zbx_uint64_t		dcheckid;
 	zbx_vector_ptr_t	*services;
-	int			update_host_idx = -1;
+	int			update_host_idx;
 	int			ret = SUCCEED;
 	zbx_vector_uint64_t	dcheckids;
 	int			i;
 	DB_DRULE		drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
 
 	memset(&dhost, 0, sizeof(dhost));
-	services = (zbx_vector_ptr_t *)&drule_ip->services;
+	services = &drule_ip->services;
 
 	zbx_vector_uint64_create(&dcheckids);
 
-	/*check status for given ip address*/
 	for (i = *processed_num; i < services->values_num; i++)
 	{
 		service = (zbx_service_t *)services->values[i];
@@ -3326,11 +3325,8 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 		zbx_vector_uint64_append(&dcheckids, service->dcheckid);
 	}
 
-	if (0 > update_host_idx)
+	if (i == services->values_num)
 	{
-		/*save new checks vectors to database*/
-		services = &drule_ip->services;
-
 		DBbegin();
 
 		for (i = *processed_num; i < services->values_num; i++)
@@ -3451,7 +3447,6 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 			drule.druleid);
 	DBcommit();
 out:
-	zbx_vector_uint64_clear(&dcheckids);
 	zbx_vector_uint64_destroy(&dcheckids);
 
 	return ret;
