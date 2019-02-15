@@ -2724,7 +2724,7 @@ class CAction extends CApiService {
 		return [
 			'validators' => [
 				'conditiontype' => new CStringValidator([
-					'regex' => '/[\d]+/',
+					'regex' => '/\d+/',
 					'messageEmpty' => _('Empty filter condition type for action "%1$s".'),
 					'messageRegex' => _('Incorrect filter condition type for action "%1$s".')
 				]),
@@ -2740,7 +2740,7 @@ class CAction extends CApiService {
 					'messageRegex' => _('Incorrect filter condition formula ID for action "%1$s".')
 				]),
 				'operator' => new CStringValidator([
-					'regex' => '/[\d]+/',
+					'regex' => '/\d+/',
 					'messageEmpty' => _('Empty filter condition operator for action "%1$s".'),
 					'messageRegex' => _('Incorrect filter condition operator for action "%1$s".')
 				])
