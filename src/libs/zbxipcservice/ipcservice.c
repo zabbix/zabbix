@@ -21,6 +21,7 @@ static size_t	ipc_path_root_len = 0;
 #define ZBX_IPC_CLIENT_STATE_NONE	0
 #define ZBX_IPC_CLIENT_STATE_QUEUED	1
 #define ZBX_IPC_CLIENT_STATE_TIMEOUT	2
+#define ZBX_IPC_CLIENT_STATE_ERROR	3
 
 extern unsigned char	program_type;
 
@@ -57,7 +58,7 @@ static void	event_free(struct event *event)
 #endif
 
 static void	ipc_service_client_read_event_cb(evutil_socket_t fd, short what, void *arg);
-static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg);
+static void	ipc_service_client_write_event_cb(evutil_socket_t fd, short what, void *arg);
 
 static const char	*ipc_get_path(void)
 {
@@ -795,7 +796,8 @@ static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
 	client->service = service;
 	client->rx_event = event_new(service->ev, fd, EV_READ | EV_PERSIST, ipc_service_client_read_event_cb,
 			(void *)client);
-	client->tx_event = event_new(service->ev, fd, EV_WRITE | EV_PERSIST, ipc_client_write_event_cb, (void *)client);
+	client->tx_event = event_new(service->ev, fd, EV_WRITE | EV_PERSIST, ipc_service_client_write_event_cb,
+			(void *)client);
 	event_add(client->rx_event, NULL);
 
 	zbx_vector_ptr_append(&service->clients, client);
@@ -828,7 +830,7 @@ static void	ipc_service_remove_client(zbx_ipc_service_t *service, zbx_ipc_client
  *                                                                            *
  * Function: ipc_service_client_read_event_cb                                 *
  *                                                                            *
- * Purpose: client read event libevent callback                               *
+ * Purpose: servoce client read event libevent callback                       *
  *                                                                            *
  ******************************************************************************/
 static void	ipc_service_client_read_event_cb(evutil_socket_t fd, short what, void *arg)
@@ -849,12 +851,12 @@ static void	ipc_service_client_read_event_cb(evutil_socket_t fd, short what, voi
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_client_write_event_cb                                        *
+ * Function: ipc_service_client_write_event_cb                                *
  *                                                                            *
- * Purpose: client write event libevent callback                              *
+ * Purpose: service client write event libevent callback                      *
  *                                                                            *
  ******************************************************************************/
-static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
+static void	ipc_service_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
 {
 	zbx_ipc_client_t	*client = (zbx_ipc_client_t *)arg;
 
@@ -872,6 +874,31 @@ static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
 		event_del(client->tx_event);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: ipc_client_write_event_cb                                        *
+ *                                                                            *
+ * Purpose: client write event libevent callback                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
+{
+	zbx_ipc_client_t	*client = (zbx_ipc_client_t *)arg;
+
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(what);
+
+	if (SUCCEED != ipc_client_write(client))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to IPC client");
+		zbx_ipc_client_close(client);
+		client->state = ZBX_IPC_CLIENT_STATE_ERROR;
+		return;
+	}
+
+	if (0 == client->tx_bytes)
+		event_del(client->tx_event);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -888,7 +915,10 @@ static void	ipc_client_read_event_cb(evutil_socket_t fd, short what, void *arg)
 	ZBX_UNUSED(what);
 
 	if (SUCCEED != ipc_client_read(client))
+	{
 		ipc_client_free_events(client);
+		client->state = ZBX_IPC_CLIENT_STATE_ERROR;
+	}
 }
 /******************************************************************************
  *                                                                            *
@@ -1817,6 +1847,8 @@ int	zbx_ipc_client_open(zbx_ipc_client_t *client, const char *service_name, int 
 			(void *)client);
 	event_add(client->rx_event, NULL);
 
+	client->state = ZBX_IPC_CLIENT_STATE_NONE;
+
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -1825,7 +1857,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipc_client_recv                                              *
+ * Function: zbx_ipc_client_read                                              *
  *                                                                            *
  * Purpose: receives ipc message                                              *
  *                                                                            *
@@ -1838,20 +1870,20 @@ out:
  *                             The message must be freed by caller with       *
  *                             ipc_message_free() function.                   *
  *                                                                            *
- * Return value: ZBX_IPC_RECV_IMMEDIATE - returned immediately without        *
- *                                        waiting for socket events           *
- *                                        (pending events are processed)      *
- *               ZBX_IPC_RECV_WAIT      - returned after receiving socket     *
- *                                        event                               *
- *               ZBX_IPC_RECV_TIMEOUT   - returned after timeout expired      *
+ * Return value: SUCCEED - the message was read successfully or timeout       *
+ *                         occurred                                           *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function must be used only with IPC clients opened with     *
  *           zbx_ipc_client_open() function.                                  *
+ *           After socket has been closed (or connection error has occurred)  *
+ *           calls to zbx_ipc_client_read() will return success with buffered *
+ *           messages, until all buffered messages are retrieved.             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ipc_client_recv(zbx_ipc_client_t *client, int timeout, zbx_ipc_message_t **message)
+int	zbx_ipc_client_read(zbx_ipc_client_t *client, int timeout, zbx_ipc_message_t **message)
 {
-	const char	*__function_name = "zbx_ipc_client_recv";
+	const char	*__function_name = "zbx_ipc_client_read";
 
 	int		ret, flags;
 
@@ -1869,7 +1901,8 @@ int	zbx_ipc_client_recv(zbx_ipc_client_t *client, int timeout, zbx_ipc_message_t
 	else
 		flags = EVLOOP_NONBLOCK;
 
-	event_base_loop(client->ev, flags);
+	if (ZBX_IPC_CLIENT_STATE_ERROR != client->state)
+		event_base_loop(client->ev, flags);
 
 	if (NULL != (*message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&client->rx_queue)))
 	{
@@ -1883,12 +1916,13 @@ int	zbx_ipc_client_recv(zbx_ipc_client_t *client, int timeout, zbx_ipc_message_t
 			zbx_free(data);
 		}
 
-		ret = (EVLOOP_NONBLOCK == flags ? ZBX_IPC_RECV_IMMEDIATE : ZBX_IPC_RECV_WAIT);
+		ret = SUCCEED;
 	}
+
+	if (NULL != *message || ZBX_IPC_CLIENT_STATE_ERROR != client->state)
+		ret = SUCCEED;
 	else
-	{	ret = ZBX_IPC_RECV_TIMEOUT;
-		*message = NULL;
-	}
+		ret = FAIL;
 
 	evtimer_del(client->ev_timer);
 
@@ -1926,13 +1960,16 @@ int	zbx_ipc_client_flush(zbx_ipc_client_t *client, int timeout)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() timeout:%d", __function_name, timeout);
 
-	client->state = ZBX_IPC_CLIENT_STATE_NONE;
-
 	if (0 == client->tx_bytes)
 	{
 		ret = SUCCEED;
 		goto out;
 	}
+
+	if (ZBX_IPC_CLIENT_STATE_ERROR == client->state)
+		goto out;
+
+	client->state = ZBX_IPC_CLIENT_STATE_NONE;
 
 	if (0 != timeout)
 	{
@@ -1946,7 +1983,7 @@ int	zbx_ipc_client_flush(zbx_ipc_client_t *client, int timeout)
 	else
 		flags = EVLOOP_NONBLOCK;
 
-	while (0 != client->tx_bytes && ZBX_IPC_CLIENT_STATE_TIMEOUT != client->state)
+	while (0 != client->tx_bytes && ZBX_IPC_CLIENT_STATE_NONE == client->state)
 	{
 		event_base_loop(client->ev, flags);
 
@@ -1954,7 +1991,12 @@ int	zbx_ipc_client_flush(zbx_ipc_client_t *client, int timeout)
 			goto out;
 	}
 
-	ret = SUCCEED;
+	if (ZBX_IPC_CLIENT_STATE_ERROR != client->state)
+	{
+		ret = SUCCEED;
+		client->state = ZBX_IPC_CLIENT_STATE_NONE;
+	}
+	else	ret = FAIL;
 out:
 	evtimer_del(client->ev_timer);
 
