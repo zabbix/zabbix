@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'multiselect.js', 'items.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'codeeditor.js', 'multiselect.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -546,6 +546,16 @@ if (!hasRequest('form') && $filterHostId) {
 	}
 }
 
+// Convert CR+LF to LF in preprocessing script.
+if (hasRequest('preprocessing')) {
+	foreach ($_REQUEST['preprocessing'] as &$step) {
+		if ($step['type'] == ZBX_PREPROC_SCRIPT) {
+			$step['params'][0] = CRLFtoLF($step['params'][0]);
+		}
+	}
+	unset($step);
+}
+
 /*
  * Actions
  */
@@ -659,6 +669,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				case ZBX_PREPROC_ERROR_FIELD_JSON:
 				case ZBX_PREPROC_ERROR_FIELD_XML:
 				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+				case ZBX_PREPROC_SCRIPT:
 					$step['params'] = $step['params'][0];
 					break;
 
@@ -1179,6 +1190,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 							case ZBX_PREPROC_ERROR_FIELD_JSON:
 							case ZBX_PREPROC_ERROR_FIELD_XML:
 							case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+							case ZBX_PREPROC_SCRIPT:
 								$step['params'] = $step['params'][0];
 								break;
 
@@ -1443,7 +1455,12 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		unset($item['hosts']);
 
 		foreach ($item['preprocessing'] as &$step) {
-			$step['params'] = explode("\n", $step['params']);
+			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
+				$step['params'] = [$step['params'], ''];
+			}
+			else {
+				$step['params'] = explode("\n", $step['params']);
+			}
 		}
 		unset($step);
 
@@ -1559,7 +1576,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'headers' => getRequest('headers', []),
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
-		'preprocessing_types' => CItem::$supported_preprocessing_types
+		'preprocessing_types' => CItem::$supported_preprocessing_types,
+		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];
 
 	foreach ($data['preprocessing'] as &$step) {
@@ -1742,7 +1760,7 @@ else {
 		],
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'selectTriggers' => ['triggerid', 'description'],
+		'selectTriggers' => ['triggerid'],
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
@@ -2056,9 +2074,10 @@ else {
 	}
 	$data['itemTriggers'] = API::Trigger()->get([
 		'triggerids' => $itemTriggerIds,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'priority',
+			'status', 'state', 'error', 'templateid', 'flags'
+		],
 		'selectHosts' => ['hostid', 'name', 'host'],
-		'selectFunctions' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	]);
 

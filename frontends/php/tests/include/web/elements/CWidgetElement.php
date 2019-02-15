@@ -36,7 +36,7 @@ class CWidgetElement extends CElement {
 		$action = $this->query('class:btn-widget-action')->one();
 		$settings = json_decode($action->getAttribute('data-menu-popup'));
 
-		return $settings->currentRate;
+		return $settings->data->currentRate;
 	}
 
 	/**

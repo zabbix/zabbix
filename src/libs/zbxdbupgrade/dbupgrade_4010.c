@@ -127,6 +127,13 @@ static int	DBpatch_4010011(void)
 	return DBadd_foreign_key("host_tag", 1, &field);
 }
 
+static int	DBpatch_4010012(void)
+{
+	const ZBX_FIELD	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("item_preproc", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(4010)
@@ -144,5 +151,6 @@ DBPATCH_ADD(4010008, 0, 1)
 DBPATCH_ADD(4010009, 0, 1)
 DBPATCH_ADD(4010010, 0, 1)
 DBPATCH_ADD(4010011, 0, 1)
+DBPATCH_ADD(4010012, 0, 1)
 
 DBPATCH_END()

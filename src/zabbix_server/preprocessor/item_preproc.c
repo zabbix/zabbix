@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "log.h"
 
 /* LIBXML2 is used */
 #ifdef HAVE_LIBXML2
@@ -28,8 +29,11 @@
 
 #include "zbxregexp.h"
 #include "zbxjson.h"
+#include "zbxembed.h"
 
 #include "item_preproc.h"
+
+extern zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
@@ -338,6 +342,7 @@ static int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, co
 	}
 
 	*history_ts = *ts;
+	zbx_variant_clear(history_value);
 	zbx_variant_set_variant(history_value, &value_num);
 	zbx_variant_clear(&value_num);
 
@@ -1443,8 +1448,7 @@ static int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_
 
 	ret = zbx_variant_compare(value, history_value);
 
-	/* a byte copy of history value is made before and will be cleared at the end, */
-	/* so it can be overwritten without clearing here                              */
+	zbx_variant_clear(history_value);
 	zbx_variant_set_variant(history_value, value);
 
 	if (0 == ret)
@@ -1486,8 +1490,7 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
 
 	ret = zbx_variant_compare(value, history_value);
 
-	/* a byte copy of history value is made before and will be cleared at the end, */
-	/* so it can be overwritten without clearing here                              */
+	zbx_variant_clear(history_value);
 	zbx_variant_set_variant(history_value, value);
 
 	if (ZBX_VARIANT_NONE != history_value->type)
@@ -1500,6 +1503,71 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_script                                              *
+ *                                                                            *
+ * Purpose: executes script passed with params                                *
+ *                                                                            *
+ * Parameters: value    - [IN/OUT] the value to process                       *
+ *             params   - [IN] the script to execute                          *
+ *             bytecode - [IN] precompiled bytecode, can be NULL              *
+ *             errmsg   - [OUT] error message                                 *
+ *                                                                            *
+ * Return value: SUCCEED - the value was calculated successfully              *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_script(zbx_variant_t *value, const char *params, zbx_variant_t *bytecode, char **errmsg)
+{
+	char	*code, *output, *error = NULL;
+	int	size;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	if (SUCCEED != zbx_es_is_env_initialized(&es_engine))
+	{
+		if (SUCCEED != zbx_es_init_env(&es_engine, errmsg))
+			return FAIL;
+	}
+
+	if (ZBX_VARIANT_BIN != bytecode->type)
+	{
+		if (SUCCEED != zbx_es_compile(&es_engine, params, &code, &size, errmsg))
+			goto fail;
+
+		zbx_variant_clear(bytecode);
+		zbx_variant_set_bin(bytecode, zbx_variant_data_bin_create(code, size));
+		zbx_free(code);
+	}
+
+	size = zbx_variant_data_bin_get(bytecode->data.bin, (void **)&code);
+
+	if (SUCCEED == zbx_es_execute(&es_engine, params, code, size, value->data.str, &output, errmsg))
+	{
+		zbx_variant_clear(value);
+
+		if (NULL != output)
+			zbx_variant_set_str(value, output);
+
+		return SUCCEED;
+	}
+fail:
+	if (SUCCEED == zbx_es_fatal_error(&es_engine))
+	{
+		if (SUCCEED != zbx_es_destroy_env(&es_engine, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING,
+					"Cannot destroy embedded scripting engine environment: %s", error);
+			zbx_free(error);
+		}
+	}
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_item_preproc                                                 *
@@ -1587,6 +1655,9 @@ int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, 
 		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			ret = item_preproc_throttle_timed_value(value, ts, op->params, history_value, history_ts,
 					&errmsg);
+			break;
+		case ZBX_PREPROC_SCRIPT:
+			ret = item_preproc_script(value, op->params, history_value, &errmsg);
 			break;
 		default:
 			errmsg = zbx_dsprintf(NULL, "unknown preprocessing operation");

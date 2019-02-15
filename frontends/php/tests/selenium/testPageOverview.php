@@ -721,6 +721,7 @@ class testPageOverview extends CLegacyWebTest {
 		$this->zbxTestDropdownSelectWait('type', $data['type']);
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestClickXpathWait('//tbody//td[contains(@class, "cursor-pointer")]');
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//ul[contains(@class, "action-menu")]//a'));
 
 		// Check context menu links text and url.
 		$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "action-menu")]//h3[text()="History"]');
