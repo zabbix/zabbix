@@ -3565,7 +3565,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		else
 			drule = drules.values[i];
 
-		if (FAIL == (i = zbx_vector_str_search(&drule->ips, ip, ZBX_DEFAULT_STR_COMPARE_FUNC)))
+		if (FAIL == (i = zbx_vector_ptr_search(&drule->ips, ip, ZBX_DEFAULT_STR_COMPARE_FUNC)))
 		{
 			drule_ip = (zbx_drule_ip_t *)zbx_malloc(NULL, sizeof(zbx_drule_ip_t));
 			zbx_strlcpy(drule_ip->ip, ip, INTERFACE_IP_LEN_MAX);
