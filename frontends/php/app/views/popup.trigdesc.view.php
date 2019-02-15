@@ -22,6 +22,7 @@
 $form = (new CForm())
 	->setName('trigger_description')
 	->addVar('triggerid', $data['trigger']['triggerid'])
+	->addVar('eventid', $data['eventid'])
 	->addVar('comments_unresolved', $data['trigger']['comments'])
 	->addItem(array_key_exists('messages', $data) ? $data['messages'] : null)
 	->addItem(
@@ -57,6 +58,7 @@ if ($data['isTriggerEditable']) {
 					'url: "zabbix.php?action=trigdesc.update",'.
 					'data: {'.
 						'"triggerid": '.$data['trigger']['triggerid'].','.
+						'"eventid": '.$data['eventid'].','.
 						'"comments": jQuery("[name=comments]", forms).val(),'.
 						'"sid": jQuery("[name=sid]", forms).val()'.
 					'},'.

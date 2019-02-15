@@ -928,6 +928,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 	$ack = null;
 	$css = null;
 	$desc = null;
+	$eventid = 0;
 	$acknowledge = [];
 
 	if ($trigger) {
@@ -942,18 +943,8 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			if ($event) {
 				$event = reset($event);
 
-				if ($screenid !== null) {
-					$acknowledge = [
-						'eventid' => $event['eventid'],
-						'backurl' => $pageFile.'?screenid='.$screenid
-					];
-				}
-				else {
-					$acknowledge = [
-						'eventid' => $event['eventid'],
-						'backurl' => $pageFile
-					];
-				}
+				$eventid = $event['eventid'];
+				$acknowledge = ['backurl' => ($screenid !== null) ? $pageFile.'?screenid='.$screenid : $pageFile];
 
 				if ($event['acknowledged'] == 1) {
 					$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
@@ -986,7 +977,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $acknowledge));
+		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
 	}
 
 	return $column;

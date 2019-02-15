@@ -685,12 +685,14 @@ class CMacrosResolverGeneral {
 	 *
 	 * @param array $macros
 	 * @param array $macros[<functionid>]
-	 * @param array $macros[<functionid>][<macro>]  an array of the tokens
+	 * @param array $macros[<functionid>][<macro>]  An array of the tokens.
 	 * @param array $macro_values
+	 * @param array $triggers
+	 * @param bool  $events                         Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
 	 *
 	 * @return array
 	 */
-	protected function getItemMacros(array $macros, array $macro_values) {
+	protected function getItemMacros(array $macros, array $macro_values, array $triggers = [], bool $events = false) {
 		if (!$macros) {
 			return $macro_values;
 		}
@@ -706,48 +708,60 @@ class CMacrosResolverGeneral {
 		// False passed to DBfetch to get data without null converted to 0, which is done by default.
 		foreach ($functions as $function) {
 			foreach ($macros[$function['functionid']] as $macro => $tokens) {
-				if ($macro === 'ITEM.VALUE' || $macro === 'ITEM.LASTVALUE') {
-					$history = Manager::History()->getLastValues([$function], 1, ZBX_HISTORY_PERIOD);
-
-					if (array_key_exists($function['itemid'], $history)) {
-						$value = $history[$function['itemid']][0]['value'];
-
-						foreach ($tokens as $token) {
-							if (array_key_exists('function', $token)) {
-								if ($token['function'] !== 'regsub' && $token['function'] !== 'iregsub') {
-									continue;
-								}
-
-								if (count($token['parameters']) != 2) {
-									continue;
-								}
-
-								$ci = ($token['function'] === 'iregsub') ? 'i' : '';
-
-								set_error_handler(function ($errno, $errstr) {});
-								$rc = preg_match('/'.$token['parameters'][0].'/'.$ci, $value, $matches);
-								restore_error_handler();
-
-								if ($rc === false) {
-									continue;
-								}
-
-								$macro_value = $token['parameters'][1];
-								$matched_macros = $this->getMacroPositions($macro_value, ['replacements' => true]);
-
-								foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-									$macro_value = substr_replace($macro_value,
-										array_key_exists($macro[1], $matches) ? $matches[$macro[1]] : '',
-										$pos, strlen($macro)
-									);
-								}
-							}
-							else {
-								$macro_value = formatHistoryValue($value, $function);
-							}
-
-							$macro_values[$function['triggerid']][$token['token']] = $macro_value;
+				switch ($macro) {
+					case 'ITEM.VALUE':
+						if ($events) {
+							$trigger = $triggers[$function['triggerid']];
+							$value = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
+							break;
 						}
+						// break; is not missing here
+
+					case 'ITEM.LASTVALUE':
+						$history = Manager::History()->getLastValues([$function], 1, ZBX_HISTORY_PERIOD);
+
+						$value = array_key_exists($function['itemid'], $history)
+							? $history[$function['itemid']][0]['value']
+							: null;
+						break;
+				}
+
+				if ($value !== null) {
+					foreach ($tokens as $token) {
+						if (array_key_exists('function', $token)) {
+							if ($token['function'] !== 'regsub' && $token['function'] !== 'iregsub') {
+								continue;
+							}
+
+							if (count($token['parameters']) != 2) {
+								continue;
+							}
+
+							$ci = ($token['function'] === 'iregsub') ? 'i' : '';
+
+							set_error_handler(function ($errno, $errstr) {});
+							$rc = preg_match('/'.$token['parameters'][0].'/'.$ci, $value, $matches);
+							restore_error_handler();
+
+							if ($rc === false) {
+								continue;
+							}
+
+							$macro_value = $token['parameters'][1];
+							$matched_macros = $this->getMacroPositions($macro_value, ['replacements' => true]);
+
+							foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+								$macro_value = substr_replace($macro_value,
+									array_key_exists($macro[1], $matches) ? $matches[$macro[1]] : '',
+									$pos, strlen($macro)
+								);
+							}
+						}
+						else {
+							$macro_value = formatHistoryValue($value, $function);
+						}
+
+						$macro_values[$function['triggerid']][$token['token']] = $macro_value;
 					}
 				}
 			}

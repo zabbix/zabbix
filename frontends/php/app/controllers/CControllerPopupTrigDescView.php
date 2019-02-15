@@ -21,6 +21,7 @@
 
 class CControllerPopupTrigDescView extends CController {
 	private $trigger;
+	private $event;
 
 	protected function init() {
 		$this->disableSIDvalidation();
@@ -29,6 +30,7 @@ class CControllerPopupTrigDescView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'triggerid' => 'required|db triggers.triggerid',
+			'eventid' => 'required|db events.objectid',
 			'success' => 'in 1'
 		];
 
@@ -58,7 +60,17 @@ class CControllerPopupTrigDescView extends CController {
 			return false;
 		}
 
+		$events = API::Event()->get([
+			'output' => ['clock', 'ns'],
+			'eventids' => $this->getInput('eventid')
+		]);
+
+		if (!$events) {
+			return false;
+		}
+
 		$this->trigger = $triggers[0];
+		$this->event = $events[0];
 
 		return true;
 	}
@@ -80,9 +92,12 @@ class CControllerPopupTrigDescView extends CController {
 		$data = [
 			'title' => _('Trigger description'),
 			'trigger' => $this->trigger,
+			'eventid' => $this->getInput('eventid'),
 			'isTriggerEditable' => (bool) $rw_triggers,
 			'isCommentExist' => ($this->trigger['comments'] !== ''),
-			'resolved' => CMacrosResolverHelper::resolveTriggerDescription($this->trigger),
+			'resolved' => CMacrosResolverHelper::resolveTriggerDescription($this->trigger + $this->event,
+				['events' => true]
+			),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
