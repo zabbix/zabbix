@@ -2523,7 +2523,7 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
 				$url = (new CUrl('triggers.php'))
-					->setArgument('hostid', $template['hostid'])
+					->setArgument('filter_hostids', [$template['hostid']])
 					->setArgument('filter_set', 1);
 			}
 
