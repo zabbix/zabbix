@@ -418,6 +418,7 @@ abstract class CGraphGeneral extends CApiService {
 	 */
 	protected function validateItemsCreate(array $graphs) {
 		$itemIds = [];
+		$itemid_rules = ['type' => API_ID, 'flags' => API_NOT_EMPTY];
 
 		foreach ($graphs as $graph) {
 			// validate graph name
@@ -449,8 +450,7 @@ abstract class CGraphGeneral extends CApiService {
 
 			// add Y min axis item ID for permission validation
 			if (array_key_exists('ymin_type', $graph) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$api_input_rules = ['type' => API_ID, 'flags' => API_NOT_EMPTY];
-				if (!CApiInputValidator::validate($api_input_rules, $graph['ymin_itemid'], 'ymin_itemid', $error)) {
+				if (!CApiInputValidator::validate($itemid_rules, $graph['ymin_itemid'], 'ymin_itemid', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 				else {
@@ -460,8 +460,7 @@ abstract class CGraphGeneral extends CApiService {
 
 			// add Y max axis item ID for permission validation
 			if (array_key_exists('ymax_type', $graph) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$api_input_rules = ['type' => API_ID, 'flags' => API_NOT_EMPTY];
-				if (!CApiInputValidator::validate($api_input_rules, $graph['ymax_itemid'], 'ymax_itemid', $error)) {
+				if (!CApiInputValidator::validate($itemid_rules, $graph['ymax_itemid'], 'ymax_itemid', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 				else {
@@ -555,6 +554,7 @@ abstract class CGraphGeneral extends CApiService {
 	 */
 	protected function validateItemsUpdate(array $graphs) {
 		$dbFields = ['itemid' => null];
+		$itemid_rules = ['type' => API_ID, 'flags' => API_NOT_EMPTY];
 
 		foreach ($graphs as $graph) {
 			// graph items are optional
@@ -579,8 +579,7 @@ abstract class CGraphGeneral extends CApiService {
 
 			// add Y min axis item ID for permission validation
 			if (array_key_exists('ymin_type', $graph) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$api_input_rules = ['type' => API_ID, 'flags' => API_NOT_EMPTY];
-				if (!CApiInputValidator::validate($api_input_rules, $graph['ymin_itemid'], 'ymin_itemid', $error)) {
+				if (!CApiInputValidator::validate($itemid_rules, $graph['ymin_itemid'], 'ymin_itemid', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 				else {
@@ -590,8 +589,7 @@ abstract class CGraphGeneral extends CApiService {
 
 			// add Y max axis item ID for permission validation
 			if (array_key_exists('ymax_type', $graph) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$api_input_rules = ['type' => API_ID, 'flags' => API_NOT_EMPTY];
-				if (!CApiInputValidator::validate($api_input_rules, $graph['ymax_itemid'], 'ymax_itemid', $error)) {
+				if (!CApiInputValidator::validate($itemid_rules, $graph['ymax_itemid'], 'ymax_itemid', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 				else {
