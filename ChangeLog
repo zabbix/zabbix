@@ -1,6 +1,7 @@
 Changes for 4.2.0alpha4
 
 New features:
+A.F....... [ZBXNEXT-4857] added animated GIF support for Zabbix Maps (ashubin, gcalenko, vasilijs)
 ..F....... [ZBXNEXT-5046] added non-destructive resizing and reordering of dashboard widgets (ashubin, gcalenko, miks)
 A.F.I..PS. [ZBXNEXT-4731] implemented host and template level tags (agriscenko, wiper, yurii)
 ..FGI..PST [ZBXNEXT-401,ZBXNEXT-4907,ZBXNEXT-4955] added monitoring of internal metrics from an external Zabbix instance (vasilijs, viktors)

@@ -183,6 +183,7 @@ define('VALIDATE_URI_SCHEMES', true);
 define('IMAGE_FORMAT_PNG',	'PNG');
 define('IMAGE_FORMAT_JPEG',	'JPEG');
 define('IMAGE_FORMAT_TEXT',	'JPEG');
+define('IMAGE_FORMAT_GIF',	'GIF');
 
 define('IMAGE_TYPE_ICON',			1);
 define('IMAGE_TYPE_BACKGROUND',		2);

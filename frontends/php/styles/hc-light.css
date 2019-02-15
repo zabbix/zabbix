@@ -846,10 +846,15 @@ output {
 .adm-img {
   width: 75%;
   text-align: center;
-  margin: 0 auto; }
+  margin: 0 auto;
+  table-layout: fixed; }
   .adm-img .cell {
     vertical-align: bottom;
-    padding: 20px 0 20px 0; }
+    padding: 20px 10px;
+    width: 20%;
+    text-align: center; }
+    .adm-img .cell img {
+      max-width: 100%; }
 
 .cell-width {
   width: 8px; }
