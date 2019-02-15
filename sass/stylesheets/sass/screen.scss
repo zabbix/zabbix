@@ -659,10 +659,13 @@ article {
 .filter-breadcrumb {
 	display: inline-block;
 	z-index: 3;
+	max-width: calc(100vw - 200px);
 
 	li {
 		line-height: 14px;
 		vertical-align: top;
+		float: none;
+		display: inline-block;
 
 		.status-container {
 			padding-top: 3px;
@@ -688,7 +691,6 @@ article {
 	}
 
 	> li:first-child {
-		float: left;
 		white-space: nowrap;
 	}
 
