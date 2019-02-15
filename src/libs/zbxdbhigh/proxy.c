@@ -3427,9 +3427,9 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 				service->value, service->itemtime);
 	}
 
-	for (i = *processed_num; i < services_num; i++)
+	for (;*processed_num < services_num; (*processed_num)++)
 	{
-		service = (zbx_service_t *)services->values[i];
+		service = (zbx_service_t *)services->values[*processed_num];
 		dcheckid = service->dcheckid;
 
 		if (FAIL == zbx_vector_uint64_bsearch(&dcheckids, dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
@@ -3439,9 +3439,8 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 				service->value, service->itemtime);
 	}
 
-	service = (zbx_service_t *)services->values[i];
+	service = (zbx_service_t *)services->values[(*processed_num)++];
 	discovery_update_host(&dhost, service->status, service->itemtime);
-	*processed_num = i + 1;
 
 	DBcommit();
 out:
