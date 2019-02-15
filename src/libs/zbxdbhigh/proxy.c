@@ -3322,6 +3322,7 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 			update_host_idx = i;
 			break;
 		}
+
 		zbx_vector_uint64_append(&dcheckids, service->dcheckid);
 	}
 
@@ -3357,15 +3358,17 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 	/*insert old checks to vector*/
 	if (0 == *processed_num)
 	{
-		/*insert old checks to vector*/
 		result = DBselect(
 				"select dcheckid,clock,port,value,status,dns,ip"
 				" from proxy_dhistory"
 				" where druleid=" ZBX_FS_UI64,
 				drule.druleid);
 
-		while (NULL != (row = DBfetch(result)))
+		for (i = 0; NULL != (row = DBfetch(result)); i++)
 		{
+			if (SUCCEED == DBis_null(row[0]))
+				continue;
+
 			ZBX_STR2UINT64(dcheckid, row[0]);
 
 			/*add only current ip to vector*/
@@ -3383,20 +3386,24 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 			}
 		}
 		DBfree_result(result);
+
+		if (0 != i)
+		{
+			DBexecute("delete from proxy_dhistory"
+					" where druleid=" ZBX_FS_UI64,
+					drule.druleid);
+		}
+	}
+
+	/* corner case when there is host update but no services */
+	if (0 == dcheckids.values_num)
+	{
+		(*processed_num)++;
+		goto out;
 	}
 
 	DBbegin();
 
-	if (0 == dcheckids.values_num)
-	{
-		/*delete all rule items from db*/
-		DBexecute("delete from proxy_dhistory"
-				" where druleid=" ZBX_FS_UI64,
-				drule.druleid);
-		DBcommit();
-		(*processed_num)++;
-		goto out;
-	}
 	if (SUCCEED != (ret = DBlock_druleid(drule.druleid)))
 	{
 		DBrollback();
@@ -3404,14 +3411,15 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 		goto out;
 	}
 
-	if ( SUCCEED != (ret = DBlock_ids("dchecks", "dcheckid", &dcheckids)))
+	if (SUCCEED != (ret = DBlock_ids("dchecks", "dcheckid", &dcheckids)))
 	{
 		DBrollback();
 		zabbix_log(LOG_LEVEL_DEBUG, "all checks where deleted for discovery rule '%s'"
 				" during processing, stopping", drule.name);
 		goto out;
 	}
-	/*old checks*/
+
+	/* services without host update */
 	services = (zbx_vector_ptr_t *)&drule_ip->services_old;
 	for (i = 0; i < services->values_num; i++)
 	{
@@ -3423,7 +3431,8 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 		discovery_update_service(&drule, dcheckid, &dhost, drule_ip->ip, service->dns,
 				service->port, service->status, service->value, service->itemtime);
 	}
-	/*new checks*/
+
+	/* new checks */
 	services = (zbx_vector_ptr_t *)&drule_ip->services;
 	for (i = *processed_num; i < update_host_idx; i++)
 	{
@@ -3441,10 +3450,6 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 	discovery_update_host(&dhost, service->status, service->itemtime);
 	*processed_num = i + 1;
 
-	/*delete all rule items from db*/
-	DBexecute("delete from proxy_dhistory"
-			" where druleid=" ZBX_FS_UI64,
-			drule.druleid);
 	DBcommit();
 out:
 	zbx_vector_uint64_destroy(&dcheckids);
