@@ -3393,7 +3393,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		}
 	}
 
-	/* corner case when there is host update but no services */
+	/* skip host update records without services */
 	if (0 == dcheckids.values_num)
 	{
 		(*processed_num)++;
