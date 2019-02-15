@@ -3295,7 +3295,7 @@ static void	zbx_drule_free(zbx_drule_t *drule)
  *                                                                            *
  ******************************************************************************/
 static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t druleid,
-		zbx_uint64_t unique_dcheckid, int *start_idx)
+		zbx_uint64_t unique_dcheckid, int *processed_num)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -3315,7 +3315,7 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 	zbx_vector_uint64_create(&dcheckids);
 
 	/*check status for given ip address*/
-	for (i = *start_idx; i < services->values_num; i++)
+	for (i = *processed_num; i < services->values_num; i++)
 	{
 		service = (zbx_service_t *)services->values[i];
 		if (0 == service->dcheckid)
@@ -3333,7 +3333,7 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 
 		DBbegin();
 
-		for (i = *start_idx; i < services->values_num; i++)
+		for (i = *processed_num; i < services->values_num; i++)
 		{
 			char	*ip_esc, *dns_esc, *value_esc;
 
@@ -3354,12 +3354,12 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 
 		DBcommit();
 
-		*start_idx = services->values_num;
+		*processed_num = services->values_num;
 		goto out;
 	}
 
 	/*insert old checks to vector*/
-	if (0 == *start_idx)
+	if (0 == *processed_num)
 	{
 		/*insert old checks to vector*/
 		result = DBselect(
@@ -3398,7 +3398,7 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 				" where druleid=" ZBX_FS_UI64,
 				drule.druleid);
 		DBcommit();
-		(*start_idx)++;
+		(*processed_num)++;
 		goto out;
 	}
 	if (SUCCEED != (ret = DBlock_druleid(drule.druleid)))
@@ -3429,7 +3429,7 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 	}
 	/*new checks*/
 	services = (zbx_vector_ptr_t *)&drule_ip->services;
-	for (i = *start_idx; i < update_host_idx; i++)
+	for (i = *processed_num; i < update_host_idx; i++)
 	{
 		service = (zbx_service_t *)services->values[i];
 		dcheckid = service->dcheckid;
@@ -3443,7 +3443,7 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 	/*update host*/
 	service = (zbx_service_t *)services->values[i];
 	discovery_update_host(&dhost, service->status, service->itemtime);
-	*start_idx = i + 1;
+	*processed_num = i + 1;
 
 	/*delete all rule items from db*/
 	DBexecute("delete from proxy_dhistory"
@@ -3611,19 +3611,18 @@ json_parse_error:
 
 		for (j = 0; j < drule->ips.values_num; j++)
 		{
-			int	start_idx = 0;
+			int	processed_num = 0;
 
 			drule_ip = (zbx_drule_ip_t *)drule->ips.values[j];
 
-			while (start_idx != drule_ip->services.values_num)
+			while (processed_num != drule_ip->services.values_num)
 			{
 				if (FAIL == process_services_for_drule_ip(drule_ip, drule->druleid, unique_dcheckid,
-						&start_idx))
+						&processed_num))
 				{
 					break;
 				}
 			}
-
 		}
 	}
 
