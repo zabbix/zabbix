@@ -3418,25 +3418,23 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	for (i = 0; i < services_old.values_num; i++)
 	{
 		service = (zbx_service_t *)services_old.values[i];
-		dcheckid = service->dcheckid;
 
-		if (FAIL == zbx_vector_uint64_bsearch(&dcheckids, dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (FAIL == zbx_vector_uint64_bsearch(&dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;
 
-		discovery_update_service(&drule, dcheckid, &dhost, ip, service->dns, service->port, service->status,
-				service->value, service->itemtime);
+		discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
+				service->status, service->value, service->itemtime);
 	}
 
 	for (;*processed_num < services_num; (*processed_num)++)
 	{
 		service = (zbx_service_t *)services->values[*processed_num];
-		dcheckid = service->dcheckid;
 
-		if (FAIL == zbx_vector_uint64_bsearch(&dcheckids, dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (FAIL == zbx_vector_uint64_bsearch(&dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;
 
-		discovery_update_service(&drule, dcheckid, &dhost, ip, service->dns, service->port, service->status,
-				service->value, service->itemtime);
+		discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
+				service->status, service->value, service->itemtime);
 	}
 
 	service = (zbx_service_t *)services->values[(*processed_num)++];
