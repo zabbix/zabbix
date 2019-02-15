@@ -1312,13 +1312,17 @@
 								widget = data['widgets'].slice(-1)[0];
 								updateWidgetContent($obj, data, widget);
 								setWidgetModeEdit($obj, data, widget);
+								// Remove height attribute set for scroll animation.
+								$('body').css('height', '');
 							};
 
 						if (pos['y'] + pos['height'] > data['options']['rows']) {
 							data['options']['rows'] = pos['y'] + pos['height'];
-							$('.dashbrd-grid-widget-container').height(
-								data['options']['rows'] *  data['options']['widget-height']
-							);
+							// Body height should be adjusted to animate scrollTop work.
+							$('body').css({
+								height: $('body').height() + pos['height'] *  data['options']['widget-height']
+							});
+							resizeDashboardGrid($obj, data);
 						}
 
 						// 5px shift is widget padding.
