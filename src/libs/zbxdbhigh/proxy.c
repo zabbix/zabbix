@@ -3268,7 +3268,7 @@ int	process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, z
 	return process_client_history_data(sock, jp, ts, sender_item_validator, &rights, info);
 }
 
-void	zbx_ips_eval_free(zbx_drule_ip_t *ip)
+static void	zbx_drule_ip_free(zbx_drule_ip_t *ip)
 {
 	zbx_vector_ptr_clear_ext(&ip->services, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&ip->services);
@@ -3277,9 +3277,9 @@ void	zbx_ips_eval_free(zbx_drule_ip_t *ip)
 	zbx_free(ip);
 }
 
-void	zbx_rules_eval_free(zbx_drule_t *drule)
+static void	zbx_drule_free(zbx_drule_t *drule)
 {
-	zbx_vector_ptr_clear_ext(&drule->ips, (zbx_clean_func_t)zbx_ips_eval_free);
+	zbx_vector_ptr_clear_ext(&drule->ips, (zbx_clean_func_t)zbx_drule_ip_free);
 	zbx_vector_ptr_destroy(&drule->ips);
 	zbx_free(drule);
 }
@@ -3625,7 +3625,7 @@ json_parse_error:
 json_parse_return:
 	zbx_free(value);
 
-	zbx_vector_ptr_clear_ext(&drules, (zbx_clean_func_t)zbx_rules_eval_free);
+	zbx_vector_ptr_clear_ext(&drules, (zbx_clean_func_t)zbx_drule_free);
 	zbx_vector_ptr_destroy(&drules);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
