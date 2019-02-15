@@ -20,6 +20,7 @@
 #include "common.h"
 #include "cfg.h"
 #include "log.h"
+#include "comms.h"
 
 extern unsigned char	program_type;
 
@@ -578,4 +579,55 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
 	}
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_serveractive_hosts                                           *
+ *                                                                            *
+ * Purpose: parse string like IP<:port>,[IPv6]<:port>                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_get_serveractive_hosts(char *active_hosts, add_serveractive_hosts_f cb)
+{
+	char	*l = active_hosts, *r;
+	int	rc = SUCCEED;
+
+	do
+	{
+		char		*host = NULL;
+		unsigned short	port;
+
+		if (NULL != (r = strchr(l, ',')))
+			*r = '\0';
+
+		if (SUCCEED != parse_serveractive_element(l, &host, &port, (unsigned short)ZBX_DEFAULT_SERVER_PORT))
+			goto fail;
+
+		rc = cb(host, port);
+
+		zbx_free(host);
+
+		if (SUCCEED != rc)
+			goto fail;
+
+		if (NULL != r)
+		{
+			*r = ',';
+			l = r + 1;
+		}
+	}
+	while (NULL != r);
+
+	return;
+fail:
+	if (SUCCEED != rc)
+		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" specified more than once", l);
+	else
+		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid", l);
+
+	if (NULL != r)
+		*r = ',';
+
+	exit(EXIT_FAILURE);
 }
