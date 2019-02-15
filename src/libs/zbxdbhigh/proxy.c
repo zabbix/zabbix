@@ -3283,7 +3283,7 @@ static void	zbx_drule_free(zbx_drule_t *drule)
 
 /******************************************************************************
  *                                                                            *
- * Function: process_services_for_drule_ip                                    *
+ * Function: process_services                                                 *
  *                                                                            *
  * Purpose: process services discovered on IP address                         *
  *                                                                            *
@@ -3291,7 +3291,7 @@ static void	zbx_drule_free(zbx_drule_t *drule)
  *             ip_discovered_ptr - [IN] vector of ip addresses                *
  *                                                                            *
  ******************************************************************************/
-static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t druleid,
+static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zbx_uint64_t druleid,
 		zbx_uint64_t unique_dcheckid, int *processed_num)
 {
 	DB_RESULT		result;
@@ -3299,7 +3299,7 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 	DB_DHOST		dhost;
 	zbx_service_t		*service;
 	zbx_uint64_t		dcheckid;
-	zbx_vector_ptr_t	*services, services_old;
+	zbx_vector_ptr_t	services_old;
 	int			update_host_idx;
 	int			ret = SUCCEED;
 	zbx_vector_uint64_t	dcheckids;
@@ -3307,7 +3307,6 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 	DB_DRULE		drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
 
 	memset(&dhost, 0, sizeof(dhost));
-	services = &drule_ip->services;
 
 	zbx_vector_uint64_create(&dcheckids);
 	zbx_vector_ptr_create(&services_old);
@@ -3335,7 +3334,7 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 
 			service = (zbx_service_t *)services->values[i];
 
-			ip_esc = DBdyn_escape_field("proxy_dhistory", "ip", drule_ip->ip);
+			ip_esc = DBdyn_escape_field("proxy_dhistory", "ip", ip);
 			dns_esc = DBdyn_escape_field("proxy_dhistory", "dns", service->dns);
 			value_esc = DBdyn_escape_field("proxy_dhistory", "value", service->value);
 
@@ -3371,7 +3370,7 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 			ZBX_STR2UINT64(dcheckid, row[0]);
 
 			/*add only current ip to vector*/
-			if (0 == strcmp(drule_ip->ip, row[6]))
+			if (0 == strcmp(ip, row[6]))
 			{
 				service = (zbx_service_t *)zbx_malloc(NULL, sizeof(zbx_service_t));
 				service->dcheckid = dcheckid;
@@ -3426,8 +3425,8 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 		if (FAIL == zbx_vector_uint64_bsearch(&dcheckids, dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;
 
-		discovery_update_service(&drule, dcheckid, &dhost, drule_ip->ip, service->dns, service->port,
-				service->status, service->value, service->itemtime);
+		discovery_update_service(&drule, dcheckid, &dhost, ip, service->dns, service->port, service->status,
+				service->value, service->itemtime);
 	}
 
 	for (i = *processed_num; i < update_host_idx; i++)
@@ -3438,8 +3437,8 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 		if (FAIL == zbx_vector_uint64_bsearch(&dcheckids, dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;
 
-		discovery_update_service(&drule, dcheckid, &dhost, drule_ip->ip, service->dns, service->port,
-				service->status, service->value, service->itemtime);
+		discovery_update_service(&drule, dcheckid, &dhost, ip, service->dns, service->port, service->status,
+				service->value, service->itemtime);
 	}
 	/*update host*/
 	service = (zbx_service_t *)services->values[i];
@@ -3614,8 +3613,8 @@ json_parse_error:
 
 			while (processed_num != drule_ip->services.values_num)
 			{
-				if (FAIL == process_services_for_drule_ip(drule_ip, drule->druleid, unique_dcheckid,
-						&processed_num))
+				if (FAIL == process_services(&drule_ip->services, drule_ip->ip, drule->druleid,
+						unique_dcheckid, &processed_num))
 				{
 					break;
 				}
