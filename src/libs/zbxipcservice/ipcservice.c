@@ -520,6 +520,7 @@ static void	ipc_client_clear(zbx_ipc_client_t *client)
 {
 	zbx_ipc_message_t	*message;
 
+	ipc_client_free_events(client);
 	zbx_ipc_socket_close(&client->csocket);
 
 	while (NULL != (message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&client->rx_queue)))
@@ -863,7 +864,6 @@ static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
 	if (SUCCEED != ipc_client_write(client))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to IPC client");
-		ipc_client_free_events(client);
 		zbx_ipc_client_close(client);
 		return;
 	}
@@ -1734,6 +1734,7 @@ void	zbx_ipc_client_close(zbx_ipc_client_t *client)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	ipc_client_free_events(client);
 	zbx_ipc_socket_close(&client->csocket);
 
 	if (NULL != client->service)
