@@ -3300,10 +3300,8 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	zbx_service_t		*service;
 	zbx_uint64_t		dcheckid;
 	zbx_vector_ptr_t	services_old;
-	int			update_host_idx;
-	int			ret = SUCCEED;
+	int			services_num, ret = SUCCEED, i;
 	zbx_vector_uint64_t	dcheckids;
-	int			i;
 	DB_DRULE		drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
 
 	memset(&dhost, 0, sizeof(dhost));
@@ -3317,7 +3315,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 
 		if (0 == service->dcheckid)
 		{
-			update_host_idx = i;
+			services_num = i;
 			break;
 		}
 
@@ -3429,7 +3427,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 				service->value, service->itemtime);
 	}
 
-	for (i = *processed_num; i < update_host_idx; i++)
+	for (i = *processed_num; i < services_num; i++)
 	{
 		service = (zbx_service_t *)services->values[i];
 		dcheckid = service->dcheckid;
@@ -3440,7 +3438,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		discovery_update_service(&drule, dcheckid, &dhost, ip, service->dns, service->port, service->status,
 				service->value, service->itemtime);
 	}
-	/*update host*/
+
 	service = (zbx_service_t *)services->values[i];
 	discovery_update_host(&dhost, service->status, service->itemtime);
 	*processed_num = i + 1;
