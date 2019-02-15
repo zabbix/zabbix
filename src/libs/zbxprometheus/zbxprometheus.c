@@ -334,7 +334,7 @@ static int zbx_prometh_output_metric_json(struct zbx_prometh_metric *m, char **b
 	}
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_PROMETH_JSON_INDENT2 "\"value\": \"%s\",\n"
-				ZBX_PROMETH_JSON_INDENT2 "\"line_raw\": \"%s\",\n",
+				ZBX_PROMETH_JSON_INDENT2 "\"line_raw\": \"%s\"\n",
 				m->value, m->line_raw);
 	offset = zbx_prometh_json_copy_to_outbuf(tmp, buf, offset);
 
@@ -691,7 +691,7 @@ static void	zbx_prometh_data_prepare(zbx_prometh_list_t *in_data, const char *st
 
 		zbx_prometh_list_append_elem(&metrics, (void *)new_metric);
 
-		free(c);
+		zbx_free(c);
 		str = p; /* next metric string */
 	}
 
