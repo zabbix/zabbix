@@ -63,6 +63,7 @@ $availableJScripts = [
 	'chkbxrange.js' => '',
 	'csvggraphwidget.js' => '',
 	'layout.mode.js' => '',
+	'codeeditor.js' => '',
 	// vendors
 	'prototype.js' => 'vendors/',
 	'jquery.js' => 'vendors/',
@@ -227,16 +228,22 @@ $tranStrings = [
 		'%1$s preselected, use down,up arrow keys and enter to select' => _x('%1$s preselected, use down,up arrow keys and enter to select', 'screen reader')
 	],
 	'menupopup.js' => [
+		'Actions' => _('Actions'),
 		'Acknowledge' => _('Acknowledge'),
 		'Configuration' => _('Configuration'),
+		'Clone' => _('Clone'),
+		'Create new' => _('Create new'),
 		'Create trigger' => _('Create trigger'),
+		'Create dependent item' => _('Create dependent item'),
+		'Delete' => _('Delete'),
+		'Delete dashboard?' => _('Delete dashboard?'),
 		'Description' => _('Description'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Edit trigger' => _('Edit trigger'),
 		'Insert expression' => _('Insert expression'),
+		'Sharing' => _('Sharing'),
 		'Trigger status "OK"' => _('Trigger status "OK"'),
 		'Trigger status "Problem"' => _('Trigger status "Problem"'),
-		'Item "%1$s"' => _('Item "%1$s"'),
 		'Go to' => _('Go to'),
 		'Graphs' => _('Graphs'),
 		'History' => _('History'),
@@ -288,6 +295,13 @@ $tranStrings = [
 	],
 	'common.js' => [
 		'Cancel' => _('Cancel')
+	],
+	'codeeditor.js' => [
+		'S_JAVASCRIPT' => _('JavaScript'),
+		'S_OPEN' => _('Open'),
+		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
+		'S_SAVE' => _('Save'),
+		'S_CANCEL' => _('Cancel')
 	]
 ];
 

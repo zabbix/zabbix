@@ -91,6 +91,49 @@ static int	DBpatch_4010007(void)
 	return DBadd_foreign_key("lld_macro_path", 1, &field);
 }
 
+static int	DBpatch_4010008(void)
+{
+	const ZBX_FIELD	field = {"db_extension", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4010009(void)
+{
+	const ZBX_TABLE table =
+		{"host_tag", "hosttagid", 0,
+			{
+				{"hosttagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4010010(void)
+{
+	return DBcreate_index("host_tag", "host_tag_1", "hostid", 0);
+}
+
+static int	DBpatch_4010011(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_tag", 1, &field);
+}
+
+static int	DBpatch_4010012(void)
+{
+	const ZBX_FIELD	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("item_preproc", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(4010)
@@ -104,5 +147,10 @@ DBPATCH_ADD(4010004, 0, 1)
 DBPATCH_ADD(4010005, 0, 1)
 DBPATCH_ADD(4010006, 0, 1)
 DBPATCH_ADD(4010007, 0, 1)
+DBPATCH_ADD(4010008, 0, 1)
+DBPATCH_ADD(4010009, 0, 1)
+DBPATCH_ADD(4010010, 0, 1)
+DBPATCH_ADD(4010011, 0, 1)
+DBPATCH_ADD(4010012, 0, 1)
 
 DBPATCH_END()

@@ -79,4 +79,13 @@ class CLdapAuthValidator extends CValidator {
 
 		return array_key_exists($error, $messages) ? $messages[$error] : '';
 	}
+
+	/**
+	 * Check if connection error.
+	 *
+	 * @return bool
+	 */
+	public function isConnectionError() {
+		return (parent::getError() !== CLdap::ERR_USER_NOT_FOUND);
+	}
 }

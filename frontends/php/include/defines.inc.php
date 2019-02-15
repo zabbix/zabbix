@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.2.0alpha3');
+define('ZABBIX_VERSION',		'4.2.0alpha4');
 define('ZABBIX_API_VERSION',	'4.2.0');
 define('ZABBIX_EXPORT_VERSION',	'4.2');
-define('ZABBIX_DB_VERSION',	4010007);
+define('ZABBIX_DB_VERSION',	4010012);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -192,11 +192,6 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
-
-// Multiselect helper buttons that allow selected objects to be added, replaced or removed.
-define('ZBX_MULTISELECT_ADD',		0);
-define('ZBX_MULTISELECT_REPLACE',	1);
-define('ZBX_MULTISELECT_REMOVE',	2);
 
 // Maximum number of tags to display.
 define('ZBX_TAG_COUNT_DEFAULT', 3);
@@ -555,6 +550,7 @@ define('ZBX_PREPROC_ERROR_FIELD_XML',		17);
 define('ZBX_PREPROC_ERROR_FIELD_REGEX',		18);
 define('ZBX_PREPROC_THROTTLE_VALUE',		19);
 define('ZBX_PREPROC_THROTTLE_TIMED_VALUE',	20);
+define('ZBX_PREPROC_SCRIPT',				21);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
@@ -1312,6 +1308,11 @@ define('ZBX_HOST_INTERFACE_WIDTH',				750);
 // overviews help
 define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
 
+// Helper buttons that allow selected objects to be added, replaced or removed.
+define('ZBX_ACTION_ADD',		0);
+define('ZBX_ACTION_REPLACE',	1);
+define('ZBX_ACTION_REMOVE',		2);
+
 // Maximum width for popups in Actions column for problems.
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
@@ -1705,11 +1706,13 @@ define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
 // column occupies x% width of column wrapper
 define('ZBX_STYLE_COLUMN_5', 'column-5');
 define('ZBX_STYLE_COLUMN_10', 'column-10');
+define('ZBX_STYLE_COLUMN_15', 'column-15');
 define('ZBX_STYLE_COLUMN_20', 'column-20');
 define('ZBX_STYLE_COLUMN_33', 'column-33'); // column occupies 1/3 width of column wrapper.
+define('ZBX_STYLE_COLUMN_35', 'column-35');
 define('ZBX_STYLE_COLUMN_40', 'column-40');
 define('ZBX_STYLE_COLUMN_50', 'column-50');
-define('ZBX_STYLE_COLUMN_80', 'column-80');
+define('ZBX_STYLE_COLUMN_75', 'column-75');
 define('ZBX_STYLE_COLUMN_90', 'column-90');
 define('ZBX_STYLE_COLUMN_95', 'column-95');
 // column visual options
@@ -1717,12 +1720,11 @@ define('ZBX_STYLE_COLUMN_CENTER', 'column-center');
 define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');
 
 // server variables
-define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
+define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
 
-// configuration -> hosts (macro inheritance)
-define('MACRO_TYPE_INHERITED',	0x01);
-define('MACRO_TYPE_HOSTMACRO',	0x02);
-define('MACRO_TYPE_BOTH',		0x03);	// MACRO_TYPE_INHERITED | MACRO_TYPE_HOSTMACRO
+define('ZBX_PROPERTY_INHERITED',	0x01);
+define('ZBX_PROPERTY_OWN',			0x02);
+define('ZBX_PROPERTY_BOTH',			0x03);	// ZBX_PROPERTY_INHERITED | ZBX_PROPERTY_OWN
 
 // if magic quotes on, then get rid of them
 if (get_magic_quotes_gpc()) {

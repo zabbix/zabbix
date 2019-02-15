@@ -47,13 +47,11 @@ class CMapHelper {
 			],
 			'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
-				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls', 'permission'
+				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'permission'
 			],
 			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers',
 				'permission'],
-			'selectUrls' => ['sysmapurlid', 'name', 'url', 'elementtype'],
 			'sysmapids' => $sysmapids,
-			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 		$map = reset($maps);
@@ -164,6 +162,13 @@ class CMapHelper {
 		$map_info_options = [
 			'severity_min' => array_key_exists('severity_min', $options) ? $options['severity_min'] : null
 		];
+
+		foreach ($sysmap['selements'] as &$selement) {
+			$selement['selementid_orig'] = $selement['selementid'];
+			$selement['elementtype_orig'] = $selement['elementtype'];
+			$selement['elementsubtype_orig'] = $selement['elementsubtype'];
+		}
+		unset($selement);
 
 		$map_info = getSelementsInfo($sysmap, $map_info_options);
 		processAreasCoordinates($sysmap, $areas, $map_info);

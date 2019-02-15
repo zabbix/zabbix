@@ -27,6 +27,7 @@ class C40ImportConverterTest extends CImportConverterTest {
 				[
 					'templates' => [
 						[
+							'tags' => [],
 							'items' => [
 								[
 									'preprocessing' => [
@@ -55,6 +56,7 @@ class C40ImportConverterTest extends CImportConverterTest {
 					],
 					'hosts' => [
 						[
+							'tags' => [],
 							'items' => [
 								[
 									'preprocessing' => [
@@ -85,6 +87,7 @@ class C40ImportConverterTest extends CImportConverterTest {
 				[
 					'templates' => [
 						[
+							'tags' => [],
 							'items' => [
 								[
 									'preprocessing' => [
@@ -111,13 +114,15 @@ class C40ImportConverterTest extends CImportConverterTest {
 											]
 										]
 									],
-									'lld_macro_paths' => []
+									'lld_macro_paths' => [],
+									'preprocessing' => []
 								]
 							]
 						]
 					],
 					'hosts' => [
 						[
+							'tags' => [],
 							'items' => [
 								[
 									'preprocessing' => [
@@ -144,7 +149,8 @@ class C40ImportConverterTest extends CImportConverterTest {
 											]
 										]
 									],
-									'lld_macro_paths' => []
+									'lld_macro_paths' => [],
+									'preprocessing' => []
 								]
 							]
 						]

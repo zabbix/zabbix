@@ -36,7 +36,7 @@ class testFormHost extends CLegacyWebTest {
 	public function testFormHost_Layout() {
 		$this->zbxTestLogin('hosts.php?form=1');
 
-		$this->zbxTestTabSwitch('Host inventory');
+		$this->zbxTestTabSwitch('Inventory');
 
 		$inventoryFields = getHostInventories();
 		$inventoryFields = zbx_toHash($inventoryFields, 'db_field');

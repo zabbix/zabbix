@@ -253,15 +253,16 @@ class CConfigurationExport {
 	/**
 	 * Get templates for export from database.
 	 *
-	 * @param array $templateIds
+	 * @param array $templateids
 	 */
-	protected function gatherTemplates(array $templateIds) {
+	protected function gatherTemplates(array $templateids) {
 		$templates = API::Template()->get([
-			'templateids' => $templateIds,
 			'output' => ['host', 'name', 'description'],
-			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
+			'selectMacros' => API_OUTPUT_EXTEND,
+			'selectTags' => ['tag', 'value'],
+			'templateids' => $templateids,
 			'preservekeys' => true
 		]);
 
@@ -305,6 +306,7 @@ class CConfigurationExport {
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
+			'selectTags' => ['tag', 'value'],
 			'hostids' => $hostIds,
 			'preservekeys' => true
 		]);
@@ -533,6 +535,7 @@ class CConfigurationExport {
 			'output' => $this->dataFields['drule'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'hostids' => array_keys($hosts),
 			'inherited' => false,
 			'preservekeys' => true
