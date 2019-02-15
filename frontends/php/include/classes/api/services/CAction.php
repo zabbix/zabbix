@@ -2826,9 +2826,8 @@ class CAction extends CApiService {
 		}
 
 		$dbActionsWithSameName = $this->get([
+			'output' => ['name'],
 			'filter' => ['name' => $duplicates],
-			'output' => API_OUTPUT_EXTEND,
-			'editable' => true,
 			'nopermissions' => true
 		]);
 		if ($dbActionsWithSameName) {
@@ -3037,11 +3036,9 @@ class CAction extends CApiService {
 				$action_name = $action['name'];
 
 				$actionExists = $this->get([
-					'filter' => ['name' => $action_name],
 					'output' => ['actionid'],
-					'editable' => true,
-					'nopermissions' => true,
-					'preservekeys' => true
+					'filter' => ['name' => $action_name],
+					'nopermissions' => true
 				]);
 				if (($actionExists = reset($actionExists))
 						&& (bccomp($actionExists['actionid'], $actionId) != 0)) {
