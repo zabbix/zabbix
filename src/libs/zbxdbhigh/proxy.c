@@ -3317,7 +3317,6 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 	for (i = *processed_num; i < services->values_num; i++)
 	{
 		service = (zbx_service_t *)services->values[i];
-
 		if (0 == service->dcheckid)
 		{
 			update_host_idx = i;
@@ -3358,31 +3357,30 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 	/*insert old checks to vector*/
 	if (0 == *processed_num)
 	{
-		char	*ip_esc;
-
-		ip_esc = DBdyn_escape_field("proxy_dhistory", "ip", drule_ip->ip);
-
+		/*insert old checks to vector*/
 		result = DBselect(
 				"select dcheckid,clock,port,value,status,dns,ip"
 				" from proxy_dhistory"
-				" where druleid=" ZBX_FS_UI64
-					" and ip='%s'",
-				drule.druleid, ip_esc);
-
-		zbx_free(ip_esc);
+				" where druleid=" ZBX_FS_UI64,
+				drule.druleid);
 
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(dcheckid, row[0]);
-			service = (zbx_service_t *)zbx_malloc(NULL, sizeof(zbx_service_t));
-			service->dcheckid = dcheckid;
-			service->itemtime = (time_t)atoi(row[1]);
-			service->port = atoi(row[2]);
-			zbx_strlcpy_utf8(service->value, row[3], MAX_DISCOVERED_VALUE_SIZE);
-			service->status = atoi(row[4]);
-			zbx_strlcpy(service->dns, row[5], INTERFACE_DNS_LEN_MAX);
-			zbx_vector_ptr_append(&drule_ip->services_old, service);
-			zbx_vector_uint64_append(&dcheckids, service->dcheckid);
+
+			/*add only current ip to vector*/
+			if (0 == strcmp(drule_ip->ip, row[6]))
+			{
+				service = (zbx_service_t *)zbx_malloc(NULL, sizeof(zbx_service_t));
+				service->dcheckid = dcheckid;
+				service->itemtime = (time_t)atoi(row[1]);
+				service->port = atoi(row[2]);
+				zbx_strlcpy_utf8(service->value, row[3], MAX_DISCOVERED_VALUE_SIZE);
+				service->status = atoi(row[4]);
+				zbx_strlcpy(service->dns, row[5], INTERFACE_DNS_LEN_MAX);
+				zbx_vector_ptr_append(&drule_ip->services_old, service);
+				zbx_vector_uint64_append(&dcheckids, service->dcheckid);
+			}
 		}
 		DBfree_result(result);
 	}
@@ -3399,7 +3397,6 @@ static int	process_services_for_drule_ip(zbx_drule_ip_t *drule_ip, zbx_uint64_t 
 		(*processed_num)++;
 		goto out;
 	}
-
 	if (SUCCEED != (ret = DBlock_druleid(drule.druleid)))
 	{
 		DBrollback();
