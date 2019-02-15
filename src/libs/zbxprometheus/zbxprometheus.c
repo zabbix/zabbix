@@ -37,7 +37,20 @@
 		*eol = '\0';						\
 	} while(0)
 
-#define ZBX_PROMETH_RE_OVECCOUNT	30
+#define ZBX_PROMETH_RE_OVECCOUNT		30
+
+/* JSON formatting */
+#define ZBX_PROMETH_JSON_INDENT1		"    "
+#define ZBX_PROMETH_JSON_INDENT2		ZBX_PROMETH_JSON_INDENT1 ZBX_PROMETH_JSON_INDENT1
+#define ZBX_PROMETH_JSON_INDENT3		ZBX_PROMETH_JSON_INDENT2 ZBX_PROMETH_JSON_INDENT1
+#define ZBX_PROMETH_JSON_ARR_BEG_FIRST		"[\n"
+#define ZBX_PROMETH_JSON_ARR_BEG_INTERM		"\n],\n[\n"
+#define ZBX_PROMETH_JSON_ARR_END		"\n]\n"
+#define ZBX_PROMETH_JSON_OBJ_BEG		ZBX_PROMETH_JSON_INDENT1 "{\n"
+#define ZBX_PROMETH_JSON_OBJ_SEP		",\n"
+#define ZBX_PROMETH_JSON_OBJ_END		ZBX_PROMETH_JSON_INDENT1 "}"
+#define ZBX_PROMETH_JSON_LABELS_BEG		ZBX_PROMETH_JSON_INDENT2 "\"labels\": {\n"
+#define ZBX_PROMETH_JSON_LABELS_END		"\n" ZBX_PROMETH_JSON_INDENT2 "},\n"
 
 struct zbx_prometh_list_elem
 {
@@ -250,6 +263,95 @@ static void	zbx_prometh_list_copy (zbx_prometh_list_t *dst, zbx_prometh_list_t *
 		zbx_prometh_list_append_elem(dst, p->data);
 		zbx_free(p);
 	}
+}
+
+static int zbx_prometh_json_copy_to_outbuf(char *str, char **buf, int offset)
+{
+	unsigned int size = strlen(str);
+
+	*buf = (char *)zbx_realloc(*buf, (offset+size));
+	memcpy ((*buf)+offset, str, size);
+	offset += size;
+
+	return offset;
+}
+
+static int zbx_prometh_output_beg_array_json(int first, char **buf, int offset)
+{
+	if (first)
+		return zbx_prometh_json_copy_to_outbuf(ZBX_PROMETH_JSON_ARR_BEG_FIRST, buf, offset);
+	else
+		return zbx_prometh_json_copy_to_outbuf(ZBX_PROMETH_JSON_ARR_BEG_INTERM, buf, offset);
+}
+
+static int zbx_prometh_output_metric_json(struct zbx_prometh_metric *m, char **buf, int offset)
+{
+	struct zbx_prometh_list_elem *lelem;
+	char tmp[1024];
+	int first_run = 1, labels_present = 0;
+
+	offset = zbx_prometh_json_copy_to_outbuf(ZBX_PROMETH_JSON_OBJ_BEG, buf, offset);
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_PROMETH_JSON_INDENT2 "\"name\": \"%s\",\n"
+					ZBX_PROMETH_JSON_INDENT2 "\"help\": \"%s\",\n"
+					ZBX_PROMETH_JSON_INDENT2 "\"type\": \"%s\",\n",
+					m->name, m->help, m->type);
+
+	offset = zbx_prometh_json_copy_to_outbuf(tmp, buf, offset);
+
+	lelem = zbx_prometh_list_seek_head(&m->labels);
+
+	if (NULL != lelem)
+	{
+		offset =
+		zbx_prometh_json_copy_to_outbuf(ZBX_PROMETH_JSON_LABELS_BEG, buf, offset);
+		labels_present = 1;
+	}
+
+	while (lelem)
+	{
+		struct zbx_prometh_label *label =
+					(struct zbx_prometh_label *)zbx_prometh_list_peek(lelem);
+
+		if (!first_run)
+		{
+			offset = zbx_prometh_json_copy_to_outbuf(ZBX_PROMETH_JSON_OBJ_SEP, buf, offset);
+		}
+
+		zbx_snprintf(tmp, sizeof(tmp),
+				ZBX_PROMETH_JSON_INDENT3 "\"%s\": %s", label->label_name, label->label_value);
+
+		offset = zbx_prometh_json_copy_to_outbuf(tmp, buf, offset);
+
+		first_run = 0;
+
+		lelem = zbx_prometh_list_seek_next(lelem);
+	}
+
+	if (labels_present)
+	{
+		offset = zbx_prometh_json_copy_to_outbuf(ZBX_PROMETH_JSON_LABELS_END, buf, offset);
+	}
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_PROMETH_JSON_INDENT2 "\"value\": \"%s\",\n"
+				ZBX_PROMETH_JSON_INDENT2 "\"line_raw\": \"%s\",\n",
+				m->value, m->line_raw);
+	offset = zbx_prometh_json_copy_to_outbuf(tmp, buf, offset);
+
+	offset = zbx_prometh_json_copy_to_outbuf(ZBX_PROMETH_JSON_OBJ_END, buf, offset);
+
+	return offset;
+}
+
+static int zbx_prometh_output_close_json(char **buf, int offset)
+{
+	char s[] = {0};
+
+	*buf = (char *)zbx_realloc(*buf, (offset+1));
+	memcpy ((*buf)+offset, s, 1);
+	offset += 1;
+
+	return offset;
 }
 
 static int	zbx_prometh_compare_regex(char *pattern, char *s)
@@ -993,8 +1095,10 @@ int	zbx_prometheus_pattern (const char *data, const char *params, const char *va
 
 	/* free all data */
 	zbx_prometh_free_filter(&filter);
+#if 0 /* temporarily */
 	zbx_prometh_free_metrics(&in_data);
 	zbx_prometh_free_metrics(&results);
+#endif
 
 	if (NULL != *err && strlen(*err))
 		return FAIL;
@@ -1032,15 +1136,43 @@ int zbx_prometheus_to_json (const char *data, const char *params, char **output,
 	}
 	else if (0 < result_count)
 	{
-		/* TODO - output the entire results list */
+		int offset = 0, first_run = 1;
+		struct zbx_prometh_list_elem *relem = zbx_prometh_list_seek_head(&results);
+		char *current_name = NULL;
 
-		*output = zbx_dsprintf(*output, "OUTPUT SOMETHING");
+		while (result_count--)
+		{
+			struct zbx_prometh_metric *m =
+				(struct zbx_prometh_metric *)zbx_prometh_list_peek(relem);
+
+			if (NULL == current_name || strcmp(m->name, current_name))
+			{
+				current_name = m->name;
+				offset = zbx_prometh_output_beg_array_json(first_run, output, offset);
+			}
+			else
+			{
+				offset = zbx_prometh_json_copy_to_outbuf(ZBX_PROMETH_JSON_OBJ_SEP, output, offset);
+			}
+
+			offset = zbx_prometh_output_metric_json(m, output, offset);
+
+			first_run = 0;
+
+			relem = zbx_prometh_list_seek_next(relem);
+		}
+
+		offset = zbx_prometh_json_copy_to_outbuf(ZBX_PROMETH_JSON_ARR_END, output, offset);
+
+		zbx_prometh_output_close_json(output, offset);
 	}
 
 	/* free all data */
 	zbx_prometh_free_filter(&filter);
+#if 0 /* temporarily */
 	zbx_prometh_free_metrics(&in_data);
 	zbx_prometh_free_metrics(&results);
+#endif
 
 	if (NULL != *err && strlen(*err))
 		return FAIL;
