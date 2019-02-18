@@ -10,6 +10,7 @@ A.F.I..PS. [ZBXNEXT-4731] implemented host and template level tags (agriscenko, 
 A.F.I...S. [ZBXNEXT-4087] implemented preprocessing of LLD rules (Ivo, wiper)
 
 Bug fixes:
+.......PS. [ZBXNEXT-4941] changed overflow statements to execute one by one for Oracle for better performance (kalimulin)
 ..F....... [ZBX-15664] fixed "Undefined index" errors on maps with enabled automatic icon mapping (Sasha)
 ....I..... [ZBX-15667] fixed wrong default Zabbix server status for new installation (kalimulin)
 ..F....... [ZBX-15512] fixed performance issues and significant memory consumption on several pages which contains host popup menus (Sasha)
