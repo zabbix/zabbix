@@ -548,30 +548,6 @@ jQuery(function ($) {
 		}
 	}
 
-	/**
-	 * Function converts unix timestamp to human readable time in format Y-m-d H:i:s.
-	 *
-	 * @param {type} time   Unix timestamp to convert.
-	 *
-	 * @returns {string}
-	 */
-	function time2str(time) {
-		var pad = function(v) {
-				var v = '' + v,
-					pad = '00';
-				return pad.substring(0, pad.length - v.length) + v;
-			},
-			dt = new Date(time * 1000),
-			Y = dt.getFullYear(),
-			m = pad(dt.getMonth()+1),
-			d = pad(dt.getDate()),
-			H = pad(dt.getHours()),
-			i = pad(dt.getMinutes()),
-			s = pad(dt.getSeconds());
-
-		return Y+'-'+m+'-'+d+' '+H+':'+i+':'+s;
-	}
-
 	// Function creates hintbox footer.
 	function makeHintBoxFooter(num_displayed, num_total) {
 		return $('<div></div>')
