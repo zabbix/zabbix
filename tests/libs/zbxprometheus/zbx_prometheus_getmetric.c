@@ -17,9 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/* Temporary printf debug output - remove it before final commit */
-#define MY_DEBUG_PRINTF
-
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
@@ -39,14 +36,6 @@ void	zbx_mock_test_entry(void **state)
 	params = zbx_mock_get_parameter_string("in.params");
 	value_type = zbx_mock_get_parameter_string("in.value_type");
 	result = zbx_mock_get_parameter_string("out.result");
-
-#ifdef MY_DEBUG_PRINTF
-	/* Add printfs for the debug in case of failed test */
-	printf("MYDBG_YAML_ data: %s\n", data);
-	printf("MYDBG_YAML_ params: %s\n", params);
-	printf("MYDBG_YAML_ value_type: %s\n", value_type);
-	printf("MYDBG_YAML_ result: %s\n", result);
-#endif
 
 	if (SUCCEED == (ret = zbx_prometheus_pattern(data, params, value_type, &ret_output, &ret_err)))
 	{
