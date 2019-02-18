@@ -3294,12 +3294,16 @@ static void	zbx_drule_free(zbx_drule_t *drule)
 static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zbx_uint64_t druleid,
 		zbx_uint64_t unique_dcheckid, int *processed_num)
 {
+	const char	*__function_name = "process_services";
+
 	DB_DHOST		dhost;
 	zbx_service_t		*service;
-	int			services_num, ret, i;
+	int			services_num, ret = FAIL, i;
 	zbx_vector_uint64_t	dcheckids;
 	zbx_vector_ptr_t	services_old;
 	DB_DRULE		drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	memset(&dhost, 0, sizeof(dhost));
 
@@ -3392,9 +3396,9 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		}
 	}
 
-	/* host update should not be present without services */
 	if (0 == dcheckids.values_num)
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot process host update without services");
 		(*processed_num)++;
 		goto fail;
 	}
@@ -3448,6 +3452,8 @@ fail:
 	zbx_vector_ptr_clear_ext(&services_old, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&services_old);
 	zbx_vector_uint64_destroy(&dcheckids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
