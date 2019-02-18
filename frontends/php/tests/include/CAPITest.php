@@ -26,12 +26,6 @@ require_once dirname(__FILE__).'/CTest.php';
  * Base class for Zabbix API tests.
  */
 class CAPITest extends CTest {
-	// API request id.
-	public $request_id = 0;
-	// Debug info.
-	protected $debug = [];
-	// Session id.
-	protected $session = null;
 
 	/**
 	 * Check API response.
@@ -77,51 +71,7 @@ class CAPITest extends CTest {
 	 * @throws Exception      if API call fails.
 	 */
 	public function callRaw($data) {
-		global $URL;
-
-		if (is_array($data)) {
-			$data = json_encode($data);
-		}
-
-		$debug = [
-			'request' => $data,
-			'response' => null
-		];
-
-		$params = [
-			'http' => [
-				'method' => 'post',
-				'content' => $data,
-				'header' => [
-					'Content-type: application/json-rpc',
-					'Content-Length: '.strlen($data)
-				]
-			]
-		];
-
-		$handle = fopen($URL, 'rb', false, stream_context_create($params));
-		if ($handle) {
-			$response = @stream_get_contents($handle);
-			fclose($handle);
-		}
-		else {
-			$response = false;
-		}
-
-		if ($response !== false) {
-			$debug['response'] = $response;
-			$response = json_decode($response, true);
-			$this->assertTrue(is_array($response));
-		}
-		else {
-			$this->debug[] = $debug;
-			throw new Exception('Problem with '.$URL.', '.$php_errormsg);
-		}
-
-		$this->request_id++;
-		$this->debug[] = $debug;
-
-		return $response;
+		return CAPIHelper::callRaw($data);
 	}
 
 	/**
@@ -134,47 +84,28 @@ class CAPITest extends CTest {
 	 * @return array
 	 */
 	public function call($method, $params, $error = null) {
-		$data = [
-			'jsonrpc' => '2.0',
-			'method' => $method,
-			'params' => $params,
-			'id' => $this->request_id
-		];
-
-		if ($this->session === null) {
+		if (CAPIHelper::getSessionId() === null) {
 			$this->authorize('Admin', 'zabbix');
 		}
 
-		if ($this->session) {
-			$data['auth'] = $this->session;
-		}
-
-		$response = $this->callRaw($data);
+		$response = CAPIHelper::call($method, $params);
 		$this->checkResult($response, $error);
 
 		return $response;
 	}
 
 	/**
-	 * Set session id.
-	 * @param string $session    session id to be used.
-	 */
-	public function setSessionId($session) {
-		$this->session = $session;
-	}
-
-	/**
 	 * Enable authorization/session for the following API calls.
 	 */
 	public function enableAuthorization() {
-		$this->setSessionId(null);
+		CAPIHelper::setSessionId(null);
 	}
 
 	/**
 	 * Disable authorization/session for the following API calls.
 	 */
 	public function disableAuthorization() {
-		$this->setSessionId(false);
+		CAPIHelper::setSessionId(false);
 	}
 
 	/**
@@ -184,62 +115,15 @@ class CAPITest extends CTest {
 	 * @param string $password    password.
 	 */
 	public function authorize($user, $password) {
-		$this->disableAuthorization();
-
-		$result = $this->call('user.login', ['user' => $user, 'password' => $password]);
-		$this->setSessionId($result['result']);
-	}
-
-	/**
-	 * Get debug information.
-	 *
-	 * @param boolean $clear    whether debug info should be cleared after retrieval.
-	 *
-	 * @return array
-	 */
-	public function getDebugInfo($clear = false) {
-		$result = $this->debug;
-		if ($clear) {
-			$this->clearDebugInfo();
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Get debug information as string (@see getDebugInfo).
-	 *
-	 * @param boolean $clear    whether debug info should be cleared after retrieval.
-	 *
-	 * @return string
-	 */
-	public function getDebugInfoAsString($clear = false) {
-		$steps = [];
-		foreach ($this->getDebugInfo($clear) as $call) {
-			$step = "  Request: ".$call['request'];
-			if ($call['response'] !== null) {
-				$step .= "\n\n  Response: ".$call['response'];
-			}
-
-			$steps[] = $step;
-		}
-
-		return implode("\n\n---------------------------\n\n", $steps);
-	}
-
-	/**
-	 * Remove debug info of previous API calls (if any).
-	 */
-	public function clearDebugInfo() {
-		$this->debug = [];
+		CAPIHelper::authorize($user, $password);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
 	protected function onNotSuccessfulTest($e) {
-		if ($this->debug && $e instanceof Exception) {
-			CExceptionHelper::setMessage($e, $e->getMessage()."\n\nAPI calls:\n".$this->getDebugInfoAsString());
+		if ($e instanceof Exception && CAPIHelper::getDebugInfo()) {
+			CExceptionHelper::setMessage($e, $e->getMessage()."\n\nAPI calls:\n".CAPIHelper::getDebugInfoAsString());
 		}
 
 		parent::onNotSuccessfulTest($e);
@@ -253,7 +137,19 @@ class CAPITest extends CTest {
 	public function onBeforeTestCase() {
 		global $URL;
 		parent::onBeforeTestCase();
+		CAPIHelper::reset();
 
 		$URL = PHPUNIT_URL.'api_jsonrpc.php';
+	}
+
+	/**
+	 * Callback executed after every test case.
+	 *
+	 * @after
+	 */
+	public function onAfterTestCase() {
+		parent::onAfterTestCase();
+
+		CAPIHelper::clearDebugInfo();
 	}
 }
