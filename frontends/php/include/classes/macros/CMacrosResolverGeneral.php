@@ -692,12 +692,12 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	protected function getItemMacros(array $macros, array $macro_values, array $triggers = [], bool $events = false) {
+	protected function getItemMacros(array $macros, array $macro_values, array $triggers = [], $events = false) {
 		if (!$macros) {
 			return $macro_values;
 		}
 
-		$functions = DbFetchArray(DBselect(
+		$functions = DBfetchArray(DBselect(
 			'SELECT f.triggerid,f.functionid,i.itemid,i.value_type,i.units,i.valuemapid'.
 			' FROM functions f'.
 				' JOIN items i ON f.itemid=i.itemid'.
@@ -707,8 +707,8 @@ class CMacrosResolverGeneral {
 
 		// False passed to DBfetch to get data without null converted to 0, which is done by default.
 		foreach ($functions as $function) {
-			foreach ($macros[$function['functionid']] as $macro => $tokens) {
-				switch ($macro) {
+			foreach ($macros[$function['functionid']] as $m => $tokens) {
+				switch ($m) {
 					case 'ITEM.VALUE':
 						if ($events) {
 							$trigger = $triggers[$function['triggerid']];

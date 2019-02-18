@@ -310,10 +310,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve macros in trigger name.
 	 *
+	 * @param array  $triggers
 	 * @param string $triggers[$triggerid]['expression']
 	 * @param string $triggers[$triggerid]['description']
 	 * @param array  $options
-	 * @param bool   $options['references_only']			resolve only $1-$9 macros
+	 * @param bool   $options['references_only']           resolve only $1-$9 macros
 	 *
 	 * @return array
 	 */
@@ -436,7 +437,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = $this->transformToPositionTypes($types);
 
 		// Replace macros to value.
-		foreach ($macro_values as $triggerid => $macro) {
+		foreach ($macro_values as $triggerid => $foo) {
 			$trigger = &$triggers[$triggerid];
 
 			$matched_macros = $this->getMacroPositions($trigger['description'], $types);
@@ -566,7 +567,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = $this->transformToPositionTypes($types);
 
 		// Replace macros to value
-		foreach ($macro_values as $triggerid => $macro) {
+		foreach ($macro_values as $triggerid => $foo) {
 			$trigger = &$triggers[$triggerid];
 
 			$matched_macros = $this->getMacroPositions($trigger['comments'], $types);

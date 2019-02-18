@@ -221,7 +221,9 @@ class CMacrosResolverHelper {
 	 * @param string $trigger['comments']
 	 * @param int    $trigger['clock']       (optional)
 	 * @param int    $trigger['ns']          (optional)
-	 * @param bool   $options['events']      Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 * @param array  $options
+	 * @param bool   $options['events']      (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 *                                       Default: false.
 	 *
 	 * @return string
 	 */
@@ -241,7 +243,9 @@ class CMacrosResolverHelper {
 	 * @param string $triggers[$triggerid]['comments']
 	 * @param int    $triggers[$triggerid]['clock']       (optional)
 	 * @param int    $triggers[$triggerid]['ns']          (optional)
-	 * @param bool   $options['events']                   Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 * @param array  $options
+	 * @param bool   $options['events']                   (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns'
+	 *                                                    fields. Default: false.
 	 *
 	 * @return array
 	 */

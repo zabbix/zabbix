@@ -190,7 +190,7 @@ class CScreenHostTriggers extends CScreenBase {
 
 		if (array_key_exists('sortfield', $filter)) {
 			$sort_field = $filter['sortfield'];
-			$sort_order = $filter['sortfield'] !== 'lastchange' ? $filter['sortorder'] : ZBX_SORT_DOWN;
+			$sort_order = ($sort_field !== 'lastchange') ? $filter['sortorder'] : ZBX_SORT_DOWN;
 
 			$header[$sort_field] = [
 				$header[$sort_field],

@@ -225,13 +225,15 @@ class CHistoryManager {
 	 *
 	 * The $item parameter must have the value_type and itemid properties set.
 	 *
-	 * @param array $item
-	 * @param int   $clock
-	 * @param int   $ns
+	 * @param array  $item
+	 * @param string $item['itemid']
+	 * @param int    $item['value_type']
+	 * @param int    $clock
+	 * @param int    $ns
 	 *
-	 * @return string    value at specified time of first value before specified time
+	 * @return string|null  Value at specified time of first value before specified time. null if value is not found.
 	 */
-	public function getValueAt($item, $clock, $ns) {
+	public function getValueAt(array $item, $clock, $ns) {
 		switch (self::getDataSourceType($item['value_type'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				return $this->getValueAtFromElasticsearch($item, $clock, $ns);
@@ -246,7 +248,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getValueAt
 	 */
-	private function getValueAtFromElasticsearch($item, $clock, $ns) {
+	private function getValueAtFromElasticsearch(array $item, $clock, $ns) {
 		$query = [
 			'sort' => [
 				'clock' => ZBX_SORT_DOWN,
@@ -314,7 +316,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getValueAt
 	 */
-	private function getValueAtFromSql($item, $clock, $ns) {
+	private function getValueAtFromSql(array $item, $clock, $ns) {
 		$value = null;
 		$table = self::getTableName($item['value_type']);
 
