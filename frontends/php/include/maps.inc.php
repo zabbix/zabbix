@@ -1707,7 +1707,7 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
  * @return int
  */
 function getIconByMapping($iconMap, $inventory) {
-	if (!empty($inventory['inventory'])) {
+	if ($inventory['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 		$inventories = getHostInventories();
 
 		foreach ($iconMap['mappings'] as $mapping) {
