@@ -3294,14 +3294,11 @@ static void	zbx_drule_free(zbx_drule_t *drule)
 static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zbx_uint64_t druleid,
 		zbx_uint64_t unique_dcheckid, int *processed_num)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
 	DB_DHOST		dhost;
 	zbx_service_t		*service;
-	zbx_uint64_t		dcheckid;
-	zbx_vector_ptr_t	services_old;
 	int			services_num, ret = SUCCEED, i;
 	zbx_vector_uint64_t	dcheckids;
+	zbx_vector_ptr_t	services_old;
 	DB_DRULE		drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
 
 	memset(&dhost, 0, sizeof(dhost));
@@ -3354,6 +3351,10 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	/*insert old checks to vector*/
 	if (0 == *processed_num)
 	{
+		DB_RESULT	result;
+		DB_ROW		row;
+		zbx_uint64_t	dcheckid;
+
 		result = DBselect(
 				"select dcheckid,clock,port,value,status,dns,ip"
 				" from proxy_dhistory"
@@ -3403,15 +3404,16 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	if (SUCCEED != (ret = DBlock_druleid(drule.druleid)))
 	{
 		DBrollback();
-		zabbix_log(LOG_LEVEL_DEBUG, "druleid:" ZBX_FS_UI64 " does not exist", drule.druleid);
+		zabbix_log(LOG_LEVEL_DEBUG, "discovery rule with ID [" ZBX_FS_UI64 "] was deleted during processing,"
+					" stopping", drule.druleid);
 		goto out;
 	}
 
 	if (SUCCEED != (ret = DBlock_ids("dchecks", "dcheckid", &dcheckids)))
 	{
 		DBrollback();
-		zabbix_log(LOG_LEVEL_DEBUG, "all checks were deleted for discovery rule '%s'"
-				" during processing, stopping", drule.name);
+		zabbix_log(LOG_LEVEL_DEBUG, "checks for discovery rule ID [" ZBX_FS_UI64 "] were deleted during"
+				" processing, stopping", drule.druleid);
 		goto out;
 	}
 
