@@ -3315,6 +3315,12 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	{
 		service = (zbx_service_t *)services->values[i];
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64 " unique_dcheckid:"
+				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%hu value:'%s'",
+				__function_name, drule.druleid, service->dcheckid, drule.unique_dcheckid,
+				zbx_date2str(service->itemtime), zbx_time2str(service->itemtime), ip, service->dns,
+				service->port, service->value);
+
 		if (0 == service->dcheckid)
 		{
 			services_num = i;
