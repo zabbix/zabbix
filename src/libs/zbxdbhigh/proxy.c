@@ -3410,7 +3410,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	if (SUCCEED != (ret = DBlock_ids("dchecks", "dcheckid", &dcheckids)))
 	{
 		DBrollback();
-		zabbix_log(LOG_LEVEL_DEBUG, "all checks where deleted for discovery rule '%s'"
+		zabbix_log(LOG_LEVEL_DEBUG, "all checks were deleted for discovery rule '%s'"
 				" during processing, stopping", drule.name);
 		goto out;
 	}
@@ -3584,6 +3584,7 @@ json_parse_error:
 	for (i = 0; i < drules.values_num; i++)
 	{
 		zbx_uint64_t	unique_dcheckid;
+		int		ret2 = SUCCEED;
 
 		drule = (zbx_drule_t *)drules.values[i];
 
@@ -3600,7 +3601,7 @@ json_parse_error:
 			unique_dcheckid = 0;
 		DBfree_result(result);
 
-		for (j = 0; j < drule->ips.values_num; j++)
+		for (j = 0; j < drule->ips.values_num && SUCCEED == ret2; j++)
 		{
 			int	processed_num = 0;
 
@@ -3608,8 +3609,8 @@ json_parse_error:
 
 			while (processed_num != drule_ip->services.values_num)
 			{
-				if (FAIL == process_services(&drule_ip->services, drule_ip->ip, drule->druleid,
-						unique_dcheckid, &processed_num))
+				if (FAIL == (ret2 = process_services(&drule_ip->services, drule_ip->ip, drule->druleid,
+						unique_dcheckid, &processed_num)))
 				{
 					break;
 				}
