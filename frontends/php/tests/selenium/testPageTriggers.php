@@ -67,7 +67,6 @@ class testPageTriggers extends CLegacyWebTest {
 			foreach (['Severity', 'State', 'Status','Tags'] as $label) {
 				$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label.'"]');
 			}
-			$this->zbxTestAssertElementNotPresentXpath('//label[text()="Value"]');
 		}
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Delete');
@@ -423,10 +422,9 @@ class testPageTriggers extends CLegacyWebTest {
 		$last = count($data['tags']) - 1;
 		foreach ($data['tags'] as $i => $tag) {
 			$tag_row = $tag_table->getRow($i+1);
-			// TODO: after update to latest trunk, column will start from 0
-			$tag_row->getColumn(1)->query('tag:input')->one()->fill($tag['name']);
-			$tag_row->getColumn(2)->query('class:radio-segmented')->asSegmentedRadio()->one()->select($tag['type']);
-			$tag_row->getColumn(3)->query('tag:input')->one()->fill($tag['value']);
+			$tag_row->getColumn(0)->query('tag:input')->one()->fill($tag['name']);
+			$tag_row->getColumn(1)->query('class:radio-segmented')->asSegmentedRadio()->one()->select($tag['type']);
+			$tag_row->getColumn(2)->query('tag:input')->one()->fill($tag['value']);
 
 			if ($i !== $last) {
 				$button->click();
