@@ -81,34 +81,16 @@ typedef struct
 }
 zbx_ipc_service_t;
 
-/* IPC client, providing nonblocking connections to IPC service.  */
-/* The IPC client api is used to support read timeouts or to send */
-/* large amount of data without blocking write operations.        */
-struct zbx_ipc_client
+typedef struct
 {
-	zbx_ipc_socket_t	csocket;
-	zbx_ipc_service_t	*service;
+	zbx_ipc_client_t	*client;
 
 	struct event_base	*ev;
 	struct event		*ev_timer;
 
-	zbx_uint32_t		rx_header[2];
-	unsigned char		*rx_data;
-	zbx_uint32_t		rx_bytes;
-	zbx_queue_ptr_t		rx_queue;
-	struct event		*rx_event;
-
-	zbx_uint32_t		tx_header[2];
-	unsigned char		*tx_data;
-	zbx_uint32_t		tx_bytes;
-	zbx_queue_ptr_t		tx_queue;
-	struct event		*tx_event;
-
-	zbx_uint64_t		id;
 	unsigned char		state;
-
-	zbx_uint32_t		refcount;
-};
+}
+zbx_ipc_async_socket_t;
 
 int	zbx_ipc_service_init_env(const char *path, char **error);
 void	zbx_ipc_service_free_env(void);
@@ -117,12 +99,8 @@ int	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client
 		zbx_ipc_message_t **message);
 void	zbx_ipc_service_close(zbx_ipc_service_t *service);
 
-int	zbx_ipc_client_open(zbx_ipc_client_t *client, const char *service_name, int timeout, char **error);
-void	zbx_ipc_client_close(zbx_ipc_client_t *client);
 int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsigned char *data, zbx_uint32_t size);
-int	zbx_ipc_client_flush(zbx_ipc_client_t *client, int timeout);
-int	zbx_ipc_client_check_unsent_data(zbx_ipc_client_t *client);
-int	zbx_ipc_client_recv(zbx_ipc_client_t *client, int timeout, zbx_ipc_message_t **message);
+void	zbx_ipc_client_close(zbx_ipc_client_t *client);
 
 void	zbx_ipc_client_addref(zbx_ipc_client_t *client);
 void	zbx_ipc_client_release(zbx_ipc_client_t *client);
@@ -133,6 +111,15 @@ void	zbx_ipc_socket_close(zbx_ipc_socket_t *csocket);
 int	zbx_ipc_socket_write(zbx_ipc_socket_t *csocket, zbx_uint32_t code, const unsigned char *data,
 		zbx_uint32_t size);
 int	zbx_ipc_socket_read(zbx_ipc_socket_t *csocket, zbx_ipc_message_t *message);
+
+int	zbx_ipc_async_socket_open(zbx_ipc_async_socket_t *asocket, const char *service_name, int timeout, char **error);
+void	zbx_ipc_async_socket_close(zbx_ipc_async_socket_t *asocket);
+int	zbx_ipc_async_socket_send(zbx_ipc_async_socket_t *asocket, zbx_uint32_t code, const unsigned char *data,
+		zbx_uint32_t size);
+int	zbx_ipc_async_socket_recv(zbx_ipc_async_socket_t *asocket, int timeout, zbx_ipc_message_t **message);
+int	zbx_ipc_async_socket_flush(zbx_ipc_async_socket_t *asocket, int timeout);
+int	zbx_ipc_async_socket_check_unsent(zbx_ipc_async_socket_t *asocket);
+
 
 void	zbx_ipc_message_free(zbx_ipc_message_t *message);
 void	zbx_ipc_message_clean(zbx_ipc_message_t *message);
