@@ -5773,6 +5773,7 @@ ul.checkbox-list {
 	3: 33.33333%
 ) {
 	ul.checkbox-list.col-#{$num} > li {
+		display: inline-block;
 		-ms-flex: 0 0 $width;
 		flex: 0 0 $width;
 		max-width: $width;

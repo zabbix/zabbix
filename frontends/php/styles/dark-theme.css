@@ -4036,6 +4036,7 @@ ul.checkbox-list {
     -webkit-box-flex: 0; }
 
 ul.checkbox-list.col-3 > li {
+  display: inline-block;
   -ms-flex: 0 0 33.33333%;
   flex: 0 0 33.33333%;
   max-width: 33.33333%; }
