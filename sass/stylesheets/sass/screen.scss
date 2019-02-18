@@ -5910,6 +5910,30 @@ svg {
 	line-height: 14px;
 }
 
+ul.checkbox-list {
+	line-height: 20px;
+	display: flex;
+	flex-wrap: wrap;
+	> li {
+		ms-flex: 0 0 100%;
+		flex: 0 0 100%;
+		max-width: 100%;
+		-webkit-box-flex: 0;
+	}
+}
+
+@each $num, $width in (
+	3: 33.33333%
+) {
+	ul.checkbox-list.col-#{$num} > li {
+		display: inline-block;
+		-ms-flex: 0 0 $width;
+		flex: 0 0 $width;
+		max-width: $width;
+	}
+}
+
+
 .columns-wrapper {
 
 	$columns: (

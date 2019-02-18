@@ -106,10 +106,10 @@ foreach ($data['applications'] as $application) {
 		[
 			new CLink(
 				_('Items'),
-				'items.php?'.
-					'hostid='.$application['hostid'].
-					'&filter_set=1'.
-					'&filter_application='.urlencode($application['name'])
+				(new CUrl('items.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$application['hostid']])
+					->setArgument('filter_application', $application['name'])
 			),
 			CViewHelper::showNum(count($application['items']))
 		],

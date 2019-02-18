@@ -37,20 +37,18 @@ $widget = (new CWidget())
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
-if (!empty($this->data['hostid'])) {
-	$widget->addItem(get_header_host_table('items', $this->data['hostid']));
+if ($data['hostid'] != 0) {
+	$widget->addItem(get_header_host_table('items', $data['hostid']));
 }
-$widget->addItem($this->data['flicker']);
+$widget->addItem($data['main_filter']);
 
 // create form
 $itemForm = (new CForm())->setName('items');
-if (!empty($this->data['hostid'])) {
-	$itemForm->addVar('hostid', $this->data['hostid']);
+if (!empty($data['hostid'])) {
+	$itemForm->addVar('hostid', $data['hostid']);
 }
 
-$url = (new CUrl('items.php'))
-	->setArgument('hostid', $data['hostid'])
-	->getUrl();
+$url = (new CUrl('items.php'))->getUrl();
 
 // create table
 $itemTable = (new CTableInfo())
@@ -59,7 +57,7 @@ $itemTable = (new CTableInfo())
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Wizard'),
-		empty($this->data['filter_hostid']) ? _('Host') : null,
+		($data['hostid'] == 0) ? _('Host') : null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Triggers'),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
@@ -72,13 +70,9 @@ $itemTable = (new CTableInfo())
 		$data['showInfoColumn'] ? _('Info') : null
 	]);
 
-if (!$this->data['filterSet']) {
-	$itemTable->setNoDataMessage(_('Specify some filter condition to see the items.'));
-}
-
 $current_time = time();
 
-$this->data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['itemTriggers'], [
+$data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['itemTriggers'], [
 	'html' => true,
 	'sources' => ['expression', 'recovery_expression']
 ]);
@@ -147,7 +141,7 @@ foreach ($data['items'] as $item) {
 	$triggerHintTable = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
 
 	foreach ($item['triggers'] as $num => &$trigger) {
-		$trigger = $this->data['itemTriggers'][$trigger['triggerid']];
+		$trigger = $data['itemTriggers'][$trigger['triggerid']];
 
 		$trigger_description = [];
 		$trigger_description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates'],
@@ -181,7 +175,7 @@ foreach ($data['items'] as $item) {
 		}
 
 		$triggerHintTable->addRow([
-			getSeverityCell($trigger['priority'], $this->data['config']),
+			getSeverityCell($trigger['priority'], $data['config']),
 			$trigger_description,
 			$expression,
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
@@ -223,7 +217,7 @@ foreach ($data['items'] as $item) {
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
-		empty($this->data['filter_hostid']) ? $item['host'] : null,
+		($data['hostid'] == 0) ? $item['host'] : null,
 		$description,
 		$triggerInfo,
 		CHtml::encode($item['key_']),
@@ -237,12 +231,12 @@ foreach ($data['items'] as $item) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$data['hostid'].'";');
 
 // append table to form
 $itemForm->addItem([
 	$itemTable,
-	$this->data['paging'],
+	$data['paging'],
 	new CActionButtonList('action', 'group_itemid',
 		[
 			'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
@@ -255,7 +249,7 @@ $itemForm->addItem([
 			'item.massupdateform' => ['name' => _('Mass update')],
 			'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
 		],
-		$this->data['hostid']
+		$data['hostid']
 	)
 ]);
 

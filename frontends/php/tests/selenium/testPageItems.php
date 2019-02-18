@@ -21,19 +21,20 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testPageItems extends CLegacyWebTest {
+
 	public static function data() {
 		return CDBHelper::getDataProvider(
-			'SELECT hostid,status'.
-			' FROM hosts'.
-			' WHERE host LIKE \'%-layout-test%\''
+						'SELECT hostid,status'.
+						' FROM hosts'.
+						' WHERE host LIKE \'%-layout-test%\''
 		);
 	}
 
 	/**
-	* @dataProvider data
-	*/
+	 * @dataProvider data
+	 */
 	public function testPageItems_CheckLayout($data) {
-		$this->zbxTestLogin('items.php?filter_set=1&groupid=0&hostid='.$data['hostid']);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 		$this->zbxTestTextPresent('Displaying');
@@ -41,36 +42,36 @@ class testPageItems extends CLegacyWebTest {
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
 			$this->zbxTestTextPresent('All hosts');
 			$this->zbxTestTextPresent(
-				[
-					'Wizard',
-					'Name',
-					'Triggers',
-					'Key',
-					'Interval',
-					'History',
-					'Trends',
-					'Type',
-					'Applications',
-					'Status',
-					'Info'
-				]
+					[
+						'Wizard',
+						'Name',
+						'Triggers',
+						'Key',
+						'Interval',
+						'History',
+						'Trends',
+						'Type',
+						'Applications',
+						'Status',
+						'Info'
+					]
 			);
 		}
 		elseif ($data['status'] == HOST_STATUS_TEMPLATE) {
 			$this->zbxTestTextPresent('All templates');
 			$this->zbxTestTextPresent(
-				[
-					'Wizard',
-					'Name',
-					'Triggers',
-					'Key',
-					'Interval',
-					'History',
-					'Trends',
-					'Type',
-					'Applications',
-					'Status'
-				]
+					[
+						'Wizard',
+						'Name',
+						'Triggers',
+						'Key',
+						'Interval',
+						'History',
+						'Trends',
+						'Type',
+						'Applications',
+						'Status'
+					]
 			);
 			$this->zbxTestTextNotPresent('Info');
 		}
@@ -85,7 +86,7 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckNowAll($data) {
-		$this->zbxTestLogin('items.php?filter_set=1&groupid=0&hostid='.$data['hostid']);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckHeader('Items');
 
 		$this->zbxTestClick('all_items');
@@ -98,5 +99,123 @@ class testPageItems extends CLegacyWebTest {
 		else {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
 		}
+	}
+
+	public static function getHostAndGroupData() {
+		return [
+			// One host group without host.
+			[
+				[
+					'filter_options' => [
+						'Host groups' => 'Group to check triggers filtering'
+					],
+					'result' => [
+						['Host for triggers filtering' => 'Discovered item one'],
+						['Host for triggers filtering' => 'Inheritance item for triggers filtering'],
+						['Host for triggers filtering' => 'Item for triggers filtering']
+					]
+				]
+			],
+			// Two host group without host.
+			[
+				[
+					'filter_options' => [
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
+						'Key' => 'trap'
+					],
+					'result' => [
+						['Host for triggers filtering' => 'Inheritance item for triggers filtering'],
+						['Host for triggers filtering' => 'Item for triggers filtering'],
+						['Host for trigger tags filtering' => 'Trapper'],
+						['ЗАББИКС Сервер' => 'Utilization of snmp trapper data collector processes, in %'],
+						['ЗАББИКС Сервер' => 'Utilization of trapper data collector processes, in %'],
+					]
+				]
+			],
+			// Two hosts without host group.
+			[
+				[
+					'hosts' => [
+						['group' => 'Zabbix servers', 'host' => 'Host for trigger tags filtering'],
+						['group' => 'Group to check triggers filtering', 'host' => 'Host for triggers filtering']
+					],
+					'filter_options' => [
+						'Key' => 'trap'
+					],
+					'result' => [
+						['Host for triggers filtering' => 'Inheritance item for triggers filtering'],
+						['Host for triggers filtering' => 'Item for triggers filtering'],
+						['Host for trigger tags filtering' => 'Trapper']
+					]
+				]
+			],
+			// Two hosts and two their host groups.
+			[
+				[
+					'filter_options' => [
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
+					],
+					'hosts' => [
+						['group' => 'Zabbix servers', 'host' => 'Host for trigger tags filtering'],
+						['group' => 'Group to check triggers filtering', 'host' => 'Host for triggers filtering']
+					],
+					'result' => [
+						['Host for triggers filtering' => 'Discovered item one'],
+						['Host for triggers filtering' => 'Inheritance item for triggers filtering'],
+						['Host for triggers filtering' => 'Item for triggers filtering'],
+						['Host for trigger tags filtering' => 'Trapper']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getHostAndGroupData
+	 */
+	public function testPageItems_FilterHostAndGroupsFilter($data) {
+		$this->page->login()->open('items.php?filter_set=1&filter_hostids[0]=99062');
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+
+		// Item create button enabled and breadcrumbs exist.
+		$this->assertTrue($this->query('button:Create item')->one()->isEnabled());
+		$this->assertFalse($this->query('class:filter-breadcrumb')->all()->isEmpty());
+		// Clear hosts and host groups in filter fields.
+		$form->getField('Hosts')->asMultiselect()->clear();
+		$form->getField('Host groups')->asMultiselect()->clear();
+
+		$form->fill($data['filter_options']);
+
+		if (array_key_exists('hosts', $data)) {
+			foreach ($data['hosts'] as $host) {
+				$overlay = $form->getField('Hosts')->asMultiselect()->edit();
+				$overlay_form = $this->query('xpath://div[@id="overlay_dialogue"]//form')->waitUntilVisible()->asForm()->one();
+				$group = $overlay_form->query('name:groupid')->asDropdown()->one();
+				if ($group->getText() != $host['group']) {
+					$group->fill($host['group']);
+					$overlay_form->waitUntilReloaded();
+				}
+				$overlay->query('link:'.$host['host'])->one()->click();
+				$overlay->waitUntilNotPresent();
+			}
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		// Item create button disabled and breadcrumbs not exist.
+		$this->assertFalse($this->query('button:Create item (select host first)')->one()->isEnabled());
+		$this->assertTrue($this->query('class:filter-breadcrumb')->all()->isEmpty());
+		// Check results in table.
+		$table = $this->query('name:items')->one()->query('class:list-table')->asTable()->one();
+		foreach ($table->getRows() as $i => $row) {
+			$get_host = $row->getColumn('Name')->query('xpath:./a[not(@class)]')->one()->getText();
+			$get_group = $row->getColumn('Host')->getText();
+			foreach ($data['result'][$i] as $group => $host) {
+				$this->assertEquals($host, $get_host);
+				$this->assertEquals($group, $get_group);
+			}
+		}
+		$this->assertEquals(count($data['result']), $table->getRows()->count());
 	}
 }

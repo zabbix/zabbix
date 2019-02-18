@@ -216,19 +216,16 @@ function getSubGroups(array $groupids, array &$ms_groups = null) {
 	}
 
 	if ($db_groups_names) {
-		$child_groups = API::HostGroup()->get([
+		$db_groups += API::HostGroup()->get([
 			'output' => ['groupid'],
 			'search' => ['name' => $db_groups_names],
 			'searchByAny' => true,
-			'startSearch' => true
+			'startSearch' => true,
+			'preservekeys' => true
 		]);
-
-		foreach ($child_groups as $child_group) {
-			$groupids[] = $child_group['groupid'];
-		}
 	}
 
-	return $groupids;
+	return array_keys($db_groups);
 }
 
 /*
