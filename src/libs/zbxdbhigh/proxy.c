@@ -3624,7 +3624,6 @@ json_parse_error:
 			}
 		}
 	}
-
 json_parse_return:
 	zbx_free(value);
 
