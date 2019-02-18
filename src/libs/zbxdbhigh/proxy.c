@@ -3350,7 +3350,6 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 
 		DBcommit();
 
-		*processed_num = services->values_num;
 		goto fail;
 	}
 
@@ -3399,7 +3398,6 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	if (0 == dcheckids.values_num)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot process host update without services");
-		(*processed_num)++;
 		goto fail;
 	}
 
