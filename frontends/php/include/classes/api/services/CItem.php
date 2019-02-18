@@ -28,6 +28,21 @@ class CItem extends CItemGeneral {
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'];
 
+	/**
+	 * Define a set of supported pre-processing rules.
+	 *
+	 * @var array
+	 *
+	 * 5.6 would allow this to be defined constant.
+	 */
+	public static $supported_preprocessing_types = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_TRIM, ZBX_PREPROC_RTRIM,
+		ZBX_PREPROC_LTRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_DELTA_VALUE,
+		ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC,
+		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
+		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
+		ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT
+	];
+
 	public function __construct() {
 		parent::__construct();
 
@@ -780,8 +795,6 @@ class CItem extends CItemGeneral {
 				_s('Incorrect value for field "%1$s": %2$s.', 'trends', $error)
 			);
 		}
-
-		$this->validateItemPreprocessing($item, $method);
 	}
 
 	/**
@@ -1146,29 +1159,6 @@ class CItem extends CItemGeneral {
 				}
 			}
 			unset($item);
-		}
-
-		if ($options['selectPreprocessing'] !== null && $options['selectPreprocessing'] != API_OUTPUT_COUNT) {
-			$db_item_preproc = API::getApiService()->select('item_preproc', [
-				'output' => $this->outputExtend($options['selectPreprocessing'], ['itemid', 'step']),
-				'filter' => ['itemid' => array_keys($result)],
-			]);
-
-			CArrayHelper::sort($db_item_preproc, ['step']);
-
-			foreach ($result as &$item) {
-				$item['preprocessing'] = [];
-			}
-			unset($item);
-
-			foreach ($db_item_preproc as $step) {
-				$itemid = $step['itemid'];
-				unset($step['item_preprocid'], $step['itemid'], $step['step']);
-
-				if (array_key_exists($itemid, $result)) {
-					$result[$itemid]['preprocessing'][] = $step;
-				}
-			}
 		}
 
 		return $result;

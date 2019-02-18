@@ -1,4 +1,4 @@
-<script type="text/x-jquery-tmpl" id="tag-row">
+<script type="text/x-jquery-tmpl" id="tag-row-tmpl">
 	<?= (new CRow([
 		(new CTextBox('tags[#{rowNum}][tag]'))
 			->setAttribute('placeholder', _('tag'))
@@ -20,6 +20,7 @@
 		->toString()
 	?>
 </script>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		$(function() {
@@ -36,9 +37,7 @@
 				}
 			});
 
-			$('#tags').dynamicRows({
-				template: '#tag-row'
-			});
+			$('#tags').dynamicRows({template: '#tag-row-tmpl'});
 		});
 	});
 </script>

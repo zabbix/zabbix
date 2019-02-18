@@ -27,6 +27,7 @@
 #include "http.h"
 #include "net.h"
 #include "system.h"
+#include "zabbix_stats.h"
 #include "zbxexec.h"
 
 #if !defined(_WINDOWS)
@@ -45,21 +46,21 @@ static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_common[] =
-/*      KEY                     FLAG		FUNCTION        	TEST PARAMETERS */
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"system.localtime",	CF_HAVEPARAMS,	SYSTEM_LOCALTIME,	"utc"},
-	{"system.run",		CF_HAVEPARAMS,	SYSTEM_RUN,	 	"echo test"},
+	{"system.run",		CF_HAVEPARAMS,	SYSTEM_RUN,		"echo test"},
 
-	{"web.page.get",	CF_HAVEPARAMS,	WEB_PAGE_GET,	 	"localhost,,80"},
-	{"web.page.perf",	CF_HAVEPARAMS,	WEB_PAGE_PERF,	 	"localhost,,80"},
+	{"web.page.get",	CF_HAVEPARAMS,	WEB_PAGE_GET,		"localhost,,80"},
+	{"web.page.perf",	CF_HAVEPARAMS,	WEB_PAGE_PERF,		"localhost,,80"},
 	{"web.page.regexp",	CF_HAVEPARAMS,	WEB_PAGE_REGEXP,	"localhost,,80,OK"},
 
-	{"vfs.file.size",	CF_HAVEPARAMS,	VFS_FILE_SIZE, 		VFS_TEST_FILE},
+	{"vfs.file.size",	CF_HAVEPARAMS,	VFS_FILE_SIZE,		VFS_TEST_FILE},
 	{"vfs.file.time",	CF_HAVEPARAMS,	VFS_FILE_TIME,		VFS_TEST_FILE ",modify"},
 	{"vfs.file.exists",	CF_HAVEPARAMS,	VFS_FILE_EXISTS,	VFS_TEST_FILE},
 	{"vfs.file.contents",	CF_HAVEPARAMS,	VFS_FILE_CONTENTS,	VFS_TEST_FILE},
 	{"vfs.file.regexp",	CF_HAVEPARAMS,	VFS_FILE_REGEXP,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
-	{"vfs.file.regmatch",	CF_HAVEPARAMS,	VFS_FILE_REGMATCH, 	VFS_TEST_FILE "," VFS_TEST_REGEXP},
+	{"vfs.file.regmatch",	CF_HAVEPARAMS,	VFS_FILE_REGMATCH,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
 	{"vfs.file.md5sum",	CF_HAVEPARAMS,	VFS_FILE_MD5SUM,	VFS_TEST_FILE},
 	{"vfs.file.cksum",	CF_HAVEPARAMS,	VFS_FILE_CKSUM,		VFS_TEST_FILE},
 
@@ -74,11 +75,13 @@ ZBX_METRIC	parameters_common[] =
 
 	{"system.users.num",	0,		SYSTEM_USERS_NUM,	NULL},
 
-	{"log",			CF_HAVEPARAMS,	ONLY_ACTIVE, 		"logfile"},
-	{"log.count",		CF_HAVEPARAMS,	ONLY_ACTIVE, 		"logfile"},
+	{"log",			CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
+	{"log.count",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
 	{"logrt",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
 	{"logrt.count",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
-	{"eventlog",		CF_HAVEPARAMS,	ONLY_ACTIVE, 		"system"},
+	{"eventlog",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"system"},
+
+	{"zabbix.stats",	CF_HAVEPARAMS,	ZABBIX_STATS,		"127.0.0.1,10051"},
 
 	{NULL}
 };

@@ -1,3 +1,33 @@
+Changes for 4.2.0alpha4
+
+New features:
+A.F....... [ZBXNEXT-4857] added animated GIF support for Zabbix Maps (ashubin, gcalenko, vasilijs)
+..F....... [ZBXNEXT-5046] added non-destructive resizing and reordering of dashboard widgets (ashubin, gcalenko, miks)
+A.F.I..PS. [ZBXNEXT-4731] implemented host and template level tags (agriscenko, wiper, yurii)
+..FGI..PST [ZBXNEXT-401,ZBXNEXT-4907,ZBXNEXT-4955] added monitoring of internal metrics from an external Zabbix instance (vasilijs, viktors)
+A.F.I...S. [ZBXNEXT-4087] implemented preprocessing of LLD rules (Ivo, wiper)
+
+Bug fixes:
+..F....... [ZBX-15512] fixed performance issues and significant memory consumption on several pages which contains host popup menus (Sasha)
+..F....... [ZBX-15512] fixed performance issues in "Problems by severity" widget (talbergs)
+.......PS. [ZBX-15593] fixed database upgrade patch to stop upgrade on commit failure (vso)
+........S. [ZBX-15611] fixed crash in configuration syncer when there are groups with same name and when removing preprocessing steps from item (vso)
+..F....... [ZBX-15242] fixed value trimming and duplicate catching in SVG graph pattern fields (miks)
+..F....... [ZBX-15250] fixed selection box height calculation in classic graph (miks)
+...G...PS. [ZBX-15379] fixed -Wimplicit-fallthrough warnings when compiling with GCC 7 and -Wextra (akozlovs)
+A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
+...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
+........S. [ZBX-15533] fixed cutting and trimming event tags and values (asitals)
+.......P.. [ZBX-15442] fixed reporting idle time in datasender's process state information (asitals)
+..F....... [ZBX-15424] fixed when multiselect doesn't trim values and recognizes untrimmed values as new ones (vasilijs)
+..F....... [ZBX-14644] fixed maintenance time periods "start_date" field being reset to "1920" instead of DB default value when updating via edit form (Ivo)
+A......... [ZBX-15422] fixed SQL errors when linked template have item prototype with equal key as host item (Sasha)
+..F....... [ZBX-15456] fixed incorrect style property in Monitoring->Problems; removed unused id from filter form (agriscenko)
+..F....... [ZBX-15412] fixed Name column overlaps the Application column in the Template view (vasilijs)
+...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
+.D........ [ZBX-15271] added link to documentation in all man pages (kalimulin)
+
+--------------------------------------------------------------------------------
 Changes for 4.2.0alpha3
 
 New features:
@@ -9,6 +39,7 @@ A......... [ZBXNEXT-4933] dropped support of string format for "headers" and "va
 ..F....... [ZBXNEXT-4873] implemented single dot datasets to be drawn as points in line vector graphs (miks)
 
 Bug fixes:
+..F....... [ZBX-15577] fixed restricted user access to the host name when calling host_screen (vasilijs)
 A......... [ZBX-13335] fixed low performance with linkage of items and item prototypes to a lot of hosts (Sasha)
 ..F....... [ZBX-15435] fixed "Undefined index" errors in the "Problems" widget with multiple active maintenances which part of these are inaccessible (Sasha)
 .......PS. [ZBX-15417] changed vmware collector to perform datastore configuration refresh only when directly monitoring ESXi version lower than v6.0 (MVekslers)
@@ -107,6 +138,43 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.5rc1
+
+New features:
+..F....... [ZBXNEXT-5046] added non-destructive resizing and reordering of dashboard widgets (ashubin, gcalenko, miks)
+..FGI..PST [ZBXNEXT-401,ZBXNEXT-4907,ZBXNEXT-4955] added monitoring of internal metrics from an external Zabbix instance (vasilijs, viktors)
+
+Bug fixes:
+..F....... [ZBX-15512] fixed performance issues and significant memory consumption on several pages which contains host popup menus (Sasha)
+..F....... [ZBX-15512] fixed performance issues in "Problems by severity" widget (talbergs)
+.......PS. [ZBX-15593] fixed database upgrade patch to stop upgrade on commit failure (vso)
+........S. [ZBX-15611] fixed crash in configuration syncer when there are groups with same name and when removing preprocessing steps from item (vso)
+..F....... [ZBX-15242] fixed value trimming and duplicate catching in SVG graph pattern fields (miks)
+..F....... [ZBX-15250] fixed selection box height calculation in classic graph (miks)
+...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
+...G...PS. [ZBX-15379] fixed -Wimplicit-fallthrough warnings when compiling with GCC 7 and -Wextra (akozlovs)
+A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
+...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
+........S. [ZBX-15533] fixed cutting and trimming event tags and values (asitals)
+.......P.. [ZBX-15442] fixed reporting idle time in datasender's process state information (asitals)
+..F....... [ZBX-15424] fixed when multiselect doesn't trim values and recognizes untrimmed values as new ones (vasilijs)
+..F....... [ZBX-14644] fixed maintenance time periods "start_date" field being reset to "1920" instead of DB default value when updating via edit form (Ivo)
+.D........ [ZBX-15271] added link to documentation in all man pages (kalimulin)
+A......... [ZBX-15422] fixed SQL errors when linked template have item prototype with equal key as host item (Sasha)
+..F....... [ZBX-15456] fixed incorrect style property in Monitoring->Problems; removed unused id from filter form (agriscenko)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.4
+
+4.0.4rc3 was released as 4.0.4 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.4rc3
+
+Bug fixes:
+..F....... [ZBX-15412] fixed Name column overlaps the Application column in the Template view (vasilijs)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.4rc2
 
 Bug fixes:
@@ -121,6 +189,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+..F....... [ZBX-15577] fixed restricted user access to the host name when calling host_screen (vasilijs)
 A......... [ZBX-13335] fixed low performance with linkage of items and item prototypes to a lot of hosts (Sasha)
 ..F....... [ZBX-15435] fixed "Undefined index" errors in the "Problems" widget with multiple active maintenances which part of these are inaccessible (Sasha)
 .......PS. [ZBX-15417] changed vmware collector to perform datastore configuration refresh only when directly monitoring ESXi version lower than v6.0 (MVekslers)
@@ -571,7 +640,7 @@ A.F....... [ZBX-13355] fixed media type a required password field successfully p
 .......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
 A.F.I..... [ZBXNEXT-4540] fixed problems filter with same tags not being joined with OR condition (Ivo, Sasha)
 ..F....... [ZBXNEXT-4576] unified dashboard widget content margins (Andzs, ashubin)
-.......PS. [ZBX-12965] - fixed scheduled check calculation during daylight saving changes (wiper)
+.......PS. [ZBX-12965] fixed scheduled check calculation during daylight saving changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha7
@@ -2294,6 +2363,15 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.26rc1
+
+New features:
+
+Bug fixes:
+...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
+...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.25
 
 3.0.25rc1 was released as 3.0.25 without any changes
@@ -2302,6 +2380,7 @@ Changes for 3.0.25
 Changes for 3.0.25rc1
 
 Bug fixes:
+..F....... [ZBX-15577] fixed restricted user access to the host name when calling host_screen (vasilijs)
 A......... [ZBX-15220] fixed displaying of last value for values received in the same second (Sasha)
 ........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
 ...G...PS. [ZBX-11761] added warnings in case of TLS identity mismatch (akozlovs)
