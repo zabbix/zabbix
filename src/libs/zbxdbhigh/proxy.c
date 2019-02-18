@@ -3296,7 +3296,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 {
 	DB_DHOST		dhost;
 	zbx_service_t		*service;
-	int			services_num, ret = SUCCEED, i;
+	int			services_num, ret, i;
 	zbx_vector_uint64_t	dcheckids;
 	zbx_vector_ptr_t	services_old;
 	DB_DRULE		drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
@@ -3306,6 +3306,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	zbx_vector_uint64_create(&dcheckids);
 	zbx_vector_ptr_create(&services_old);
 
+	/* find host update */
 	for (i = *processed_num; i < services->values_num; i++)
 	{
 		service = (zbx_service_t *)services->values[i];
@@ -3319,6 +3320,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		zbx_vector_uint64_append(&dcheckids, service->dcheckid);
 	}
 
+	/* stop processing current discovery rule and save proxy history until host update is available */
 	if (i == services->values_num)
 	{
 		DBbegin();
@@ -3345,10 +3347,9 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		DBcommit();
 
 		*processed_num = services->values_num;
-		goto out;
+		goto fail;
 	}
 
-	/*insert old checks to vector*/
 	if (0 == *processed_num)
 	{
 		DB_RESULT	result;
@@ -3368,7 +3369,6 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 
 			ZBX_STR2UINT64(dcheckid, row[0]);
 
-			/*add only current ip to vector*/
 			if (0 == strcmp(ip, row[6]))
 			{
 				service = (zbx_service_t *)zbx_malloc(NULL, sizeof(zbx_service_t));
@@ -3396,25 +3396,25 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	if (0 == dcheckids.values_num)
 	{
 		(*processed_num)++;
-		goto out;
+		goto succeed;
 	}
 
 	DBbegin();
 
-	if (SUCCEED != (ret = DBlock_druleid(drule.druleid)))
+	if (SUCCEED != DBlock_druleid(drule.druleid))
 	{
 		DBrollback();
 		zabbix_log(LOG_LEVEL_DEBUG, "discovery rule with ID [" ZBX_FS_UI64 "] was deleted during processing,"
 					" stopping", drule.druleid);
-		goto out;
+		goto fail;
 	}
 
-	if (SUCCEED != (ret = DBlock_ids("dchecks", "dcheckid", &dcheckids)))
+	if (SUCCEED != DBlock_ids("dchecks", "dcheckid", &dcheckids))
 	{
 		DBrollback();
 		zabbix_log(LOG_LEVEL_DEBUG, "checks for discovery rule ID [" ZBX_FS_UI64 "] were deleted during"
 				" processing, stopping", drule.druleid);
-		goto out;
+		goto fail;
 	}
 
 	for (i = 0; i < services_old.values_num; i++)
@@ -3443,7 +3443,9 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	discovery_update_host(&dhost, service->status, service->itemtime);
 
 	DBcommit();
-out:
+succeed:
+	ret = SUCCEED;
+fail:
 	zbx_vector_ptr_clear_ext(&services_old, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&services_old);
 	zbx_vector_uint64_destroy(&dcheckids);
