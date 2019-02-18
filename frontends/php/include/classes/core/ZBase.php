@@ -196,6 +196,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/mvc',
 			$this->rootDir.'/include/classes/api',
 			$this->rootDir.'/include/classes/api/services',
+			$this->rootDir.'/include/classes/api/helpers',
 			$this->rootDir.'/include/classes/api/managers',
 			$this->rootDir.'/include/classes/api/clients',
 			$this->rootDir.'/include/classes/api/wrappers',

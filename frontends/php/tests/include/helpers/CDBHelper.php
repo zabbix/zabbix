@@ -37,6 +37,13 @@ require_once dirname(__FILE__).'/../../../include/classes/db/PostgresqlDbBackend
 class CDBHelper {
 
 	/**
+	 * Backup stack.
+	 *
+	 * @var array
+	 */
+	static $backups = [];
+
+	/**
 	 * Perform select query and check the result.
 	 *
 	 * @param string  $sql       query to be executed
@@ -146,6 +153,14 @@ class CDBHelper {
 	 * Result: [users,alerts,acknowledges,auditlog,auditlog_details,opmessage_usr,media,profiles,sessions,...]
 	 */
 	public static function getTables(&$tables, $top_table) {
+		if (is_array($top_table)) {
+			foreach ($top_table as $table) {
+				self::getTables($tables, $table);
+			}
+
+			return;
+		}
+
 		if (in_array($top_table, $tables)) {
 			return;
 		}
@@ -185,35 +200,42 @@ class CDBHelper {
 	 * Saves data of the specified table and all dependent tables in temporary storage.
 	 * For example: backupTables('users')
 	 */
-
 	public static function backupTables($top_table) {
 		global $DB;
 
 		$tables = [];
 		static::getTables($tables, $top_table);
+		self::$backups[] = $tables;
+
+		$suffix = '_tmp'.count(self::$backups);
 
 		foreach ($tables as $table) {
+			DBexecute('drop table if exists '.$table.$suffix);
+
 			switch ($DB['TYPE']) {
 				case ZBX_DB_MYSQL:
-					DBexecute("drop table if exists ${table}_tmp");
-					DBexecute("create table ${table}_tmp like $table");
-					DBexecute("insert into ${table}_tmp select * from $table");
+					DBexecute('create table '.$table.$suffix.' like '.$table);
+					DBexecute('insert into '.$table.$suffix.' select * from '.$table);
 					break;
 				default:
-					DBexecute("drop table if exists ${table}_tmp");
-					DBexecute("select * into table ${table}_tmp from $table");
+					DBexecute('select * into table '.$table.$suffix.' from '.$table);
 			}
 		}
 	}
 
 	/**
 	 * Restores data from temporary storage. backupTables() must be called first.
-	 * For example: restoreTables('users')
+	 * For example: restoreTables()
 	 */
-	public static function restoreTables($top_table) {
+	public static function restoreTables() {
 		global $DB;
 
-		$tables = [];
+		if (!self::$backups) {
+			return;
+		}
+
+		$suffix = '_tmp'.count(self::$backups);
+		$tables = array_pop(self::$backups);
 
 		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
 			$result = DBselect('select @@unique_checks,@@foreign_key_checks');
@@ -222,15 +244,13 @@ class CDBHelper {
 			DBexecute('set foreign_key_checks=0');
 		}
 
-		static::getTables($tables, $top_table);
-
 		foreach (array_reverse($tables) as $table) {
-			DBexecute("delete from $table");
+			DBexecute('delete from '.$table);
 		}
 
 		foreach ($tables as $table) {
-			DBexecute("insert into $table select * from ${table}_tmp");
-			DBexecute("drop table ${table}_tmp");
+			DBexecute('insert into '.$table.' select * from '.$table.$suffix);
+			DBexecute('drop table '.$table.$suffix);
 		}
 
 		if ($DB['TYPE'] == ZBX_DB_MYSQL) {

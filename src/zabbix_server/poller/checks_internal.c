@@ -25,6 +25,8 @@
 #include "proxy.h"
 
 #include "../vmware/vmware.h"
+#include "../../libs/zbxserver/zabbix_stats.h"
+#include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 
 extern unsigned char	program_type;
 
@@ -686,6 +688,110 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			goto out;
+		}
+	}
+	else if (0 == strcmp(tmp, "stats"))			/* zabbix[stats,...] */
+	{
+		const char	*ip_str, *port_str, *ip;
+		unsigned short	port_number;
+		struct zbx_json	json;
+
+		if (6 < nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		if (NULL == (ip_str = get_rparam(&request, 1)) || '\0' == *ip_str)
+			ip = "127.0.0.1";
+		else
+			ip = ip_str;
+
+		if (NULL == (port_str = get_rparam(&request, 2)) || '\0' == *port_str)
+		{
+			port_number = ZBX_DEFAULT_SERVER_PORT;
+		}
+		else if (SUCCEED != is_ushort(port_str, &port_number))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			goto out;
+		}
+
+		if (3 >= nparams)
+		{
+			if ((NULL == ip_str || '\0' == *ip_str) && (NULL == port_str || '\0' == *port_str))
+			{
+				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+				/* Adding "data" object to JSON structure to make identical JSONPath expressions */
+				/* work for both data received from internal and external source. */
+				zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
+
+				zbx_get_zabbix_stats(&json);
+
+				zbx_json_close(&json);
+
+				set_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+
+				zbx_json_free(&json);
+			}
+			else if (SUCCEED != zbx_get_remote_zabbix_stats(ip, port_number, result))
+				goto out;
+		}
+		else
+		{
+			tmp1 = get_rparam(&request, 3);
+
+			if (0 == strcmp(tmp1, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
+			{
+				tmp = get_rparam(&request, 4);		/* from */
+				tmp1 = get_rparam(&request, 5);		/* to */
+
+				if ((NULL == ip_str || '\0' == *ip_str) && (NULL == port_str || '\0' == *port_str))
+				{
+					int	from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
+
+					if (NULL != tmp && '\0' != *tmp &&
+							FAIL == is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
+					{
+						SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
+						goto out;
+					}
+
+					if (NULL != tmp1 && '\0' != *tmp1 &&
+							FAIL == is_time_suffix(tmp1, &to, ZBX_LENGTH_UNLIMITED))
+					{
+						SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
+						goto out;
+					}
+
+					if (ZBX_QUEUE_TO_INFINITY != to && from > to)
+					{
+						SET_MSG_RESULT(result, zbx_strdup(NULL, "Parameters represent an"
+								" invalid interval."));
+						goto out;
+					}
+
+					zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+					zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
+							DCget_item_queue(NULL, from, to));
+
+					set_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+
+					zbx_json_free(&json);
+				}
+				else if (SUCCEED != zbx_get_remote_zabbix_stats_queue(ip, port_number, tmp, tmp1,
+						result))
+				{
+					goto out;
+				}
+			}
+			else
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid forth parameter."));
+				goto out;
+			}
 		}
 	}
 	else

@@ -65,7 +65,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testMaintenance');
 		$suite->addTestSuite('testProxy');
 		$suite->addTestSuite('testScripts');
-		$suite->addTestSuite('testTriggres');
+		$suite->addTestSuite('testTriggers');
 		$suite->addTestSuite('testTaskCreate');
 		$suite->addTestSuite('testUserGroup');
 		$suite->addTestSuite('testUserMacro');

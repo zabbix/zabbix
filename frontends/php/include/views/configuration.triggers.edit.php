@@ -23,8 +23,8 @@ require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Triggers'));
 
-// append host summary to widget header
-if (!empty($data['hostid'])) {
+// Append host summary to widget header.
+if ($data['hostid'] != 0) {
 	$widget->addItem(get_header_host_table('triggers', $data['hostid']));
 }
 
@@ -512,51 +512,12 @@ $triggersFormList
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'correlation_tag_row'
+	)
+	->addRow(_('Allow manual close'),
+		(new CCheckBox('manual_close'))
+			->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+			->setEnabled(!$readonly)
 	);
-
-// Append tags to form list.
-$tags_table = (new CTable())->setId('tbl_tags');
-
-foreach ($data['tags'] as $tag_key => $tag) {
-	$tags = [
-		(new CTextBox('tags['.$tag_key.'][tag]', $tag['tag'], $discovered_trigger, 255))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('tag')),
-		(new CTextBox('tags['.$tag_key.'][value]', $tag['value'], $discovered_trigger, 255))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('value'))
-	];
-
-	if (!$discovered_trigger) {
-		$tags[] = (new CCol(
-			(new CButton('tags['.$tag_key.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		))->addClass(ZBX_STYLE_NOWRAP);
-	}
-
-	$tags_table->addRow($tags, 'form_row');
-}
-
-if (!$discovered_trigger) {
-	$tags_table->setFooter(new CCol(
-		(new CButton('tag_add', _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-add')
-	));
-}
-
-$triggersFormList->addRow(_('Tags'),
-	(new CDiv($tags_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-);
-
-$triggersFormList->addRow(_('Allow manual close'),
-	(new CCheckBox('manual_close'))
-		->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
-		->setEnabled(!$readonly)
-);
 
 // Append status to form list.
 if (empty($data['triggerid']) && empty($data['form_refresh'])) {
@@ -581,6 +542,17 @@ if (!$data['form_refresh']) {
 	$triggersTab->setSelected(0);
 }
 $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
+
+/*
+ * Tags tab
+ */
+$tags_view = new CView('configuration.tags.tab', [
+	'source' => 'trigger',
+	'tags' => $data['tags'],
+	'show_inherited_tags' => $data['show_inherited_tags'],
+	'readonly' => $discovered_trigger
+]);
+$triggersTab->addTab('tags-tab', _('Tags'), $tags_view->render());
 
 /*
  * Dependencies tab
@@ -633,7 +605,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 				->addClass(ZBX_STYLE_BTN_LINK)
 	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 

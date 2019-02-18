@@ -63,6 +63,7 @@ zabbix_server_LDADD = \
 	odbc/libzbxodbc.a \
 	scripts/libzbxscripts.a \
 	preprocessor/libpreprocessor.a \
+	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
 	libzbxserver.a \
@@ -95,7 +96,8 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
-	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
+	$(top_srcdir)/src/libs/zbxserver/libzbxserver_server.a
 
 if HAVE_IPMI
 zabbix_server_LDADD += ipmi/libipmi.a

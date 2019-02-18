@@ -176,7 +176,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->zbxTestDropdownSelect('action', $this->actions[$action]);
 		$this->zbxTestDropdownSelect('resourcetype', $this->resourcetypes[$resourcetype]);
 
-		$this->zbxTestClickXpathWait("//form[@id='id']//button[@name='filter_set']");
+		$this->zbxTestClickXpathWait("//form[@name='zbx_filter']//button[@name='filter_set']");
 		$this->zbxTestCheckHeader('Audit log');
 	}
 

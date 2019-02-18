@@ -247,7 +247,7 @@ zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemi
 	{
 		zbx_preproc_op_history_t	*ophistory = (zbx_preproc_op_history_t *)history->values[i];
 
-		*offset++ = PACKED_FIELD(&ophistory->type, sizeof(unsigned char));
+		*offset++ = PACKED_FIELD(&ophistory->index, sizeof(unsigned char));
 		*offset++ = PACKED_FIELD(&ophistory->value.type, sizeof(unsigned char));
 
 		switch (ophistory->value.type)
@@ -262,6 +262,11 @@ zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemi
 
 			case ZBX_VARIANT_STR:
 				*offset++ = PACKED_FIELD(ophistory->value.data.str, 0);
+				break;
+
+			case ZBX_VARIANT_BIN:
+				*offset++ = PACKED_FIELD(ophistory->value.data.bin, sizeof(zbx_uint32_t) +
+						zbx_variant_data_bin_get(ophistory->value.data.bin, NULL));
 				break;
 
 			default:
@@ -349,7 +354,7 @@ zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *v
 	{
 		zbx_preproc_op_history_t	*ophistory = (zbx_preproc_op_history_t *)history->values[i];
 
-		*offset++ = PACKED_FIELD(&ophistory->type, sizeof(unsigned char));
+		*offset++ = PACKED_FIELD(&ophistory->index, sizeof(unsigned char));
 		*offset++ = PACKED_FIELD(&ophistory->value.type, sizeof(unsigned char));
 
 		switch (ophistory->value.type)
@@ -364,6 +369,11 @@ zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *v
 
 			case ZBX_VARIANT_STR:
 				*offset++ = PACKED_FIELD(ophistory->value.data.str, 0);
+				break;
+
+			case ZBX_VARIANT_BIN:
+				*offset++ = PACKED_FIELD(ophistory->value.data.bin, sizeof(zbx_uint32_t) +
+						zbx_variant_data_bin_get(ophistory->value.data.bin, NULL));
 				break;
 
 			default:
@@ -527,7 +537,7 @@ void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, unsigned char *value_typ
 
 			ophistory = zbx_malloc(NULL, sizeof(zbx_preproc_op_history_t));
 
-			offset += zbx_deserialize_char(offset, &ophistory->type);
+			offset += zbx_deserialize_char(offset, &ophistory->index);
 			offset += zbx_deserialize_char(offset, &ophistory->value.type);
 
 			switch (ophistory->value.type)
@@ -540,6 +550,9 @@ void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, unsigned char *value_typ
 					break;
 				case ZBX_VARIANT_STR:
 					offset += zbx_deserialize_str(offset, &ophistory->value.data.str, value_len);
+					break;
+				case ZBX_VARIANT_BIN:
+					offset += zbx_deserialize_bin(offset, &ophistory->value.data.bin, value_len);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
@@ -617,7 +630,7 @@ void	zbx_preprocessor_unpack_result(zbx_variant_t *value, zbx_vector_ptr_t *hist
 
 			ophistory = zbx_malloc(NULL, sizeof(zbx_preproc_op_history_t));
 
-			offset += zbx_deserialize_char(offset, &ophistory->type);
+			offset += zbx_deserialize_char(offset, &ophistory->index);
 			offset += zbx_deserialize_char(offset, &ophistory->value.type);
 
 			switch (ophistory->value.type)
@@ -630,6 +643,9 @@ void	zbx_preprocessor_unpack_result(zbx_variant_t *value, zbx_vector_ptr_t *hist
 					break;
 				case ZBX_VARIANT_STR:
 					offset += zbx_deserialize_str(offset, &ophistory->value.data.str, value_len);
+					break;
+				case ZBX_VARIANT_BIN:
+					offset += zbx_deserialize_bin(offset, &ophistory->value.data.bin, value_len);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;

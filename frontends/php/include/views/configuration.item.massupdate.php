@@ -321,7 +321,6 @@ $form_list
 			->setChecked(isset($data['visible']['preprocessing'])),
 		(new CDiv(getItemPreprocessing($form, $data['preprocessing'], false, $data['preprocessing_types'])))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->setId('preprocessing_div')
 	);
 
@@ -489,14 +488,14 @@ if ($data['displayApplications']) {
 
 	$applications_div = (new CDiv([
 		(new CRadioButtonList('massupdate_app_action', (int) $data['massupdate_app_action']))
-			->addValue(_('Add'), ZBX_MULTISELECT_ADD)
-			->addValue(_('Replace'), ZBX_MULTISELECT_REPLACE)
-			->addValue(_('Remove'), ZBX_MULTISELECT_REMOVE)
+			->addValue(_('Add'), ZBX_ACTION_ADD)
+			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+			->addValue(_('Remove'), ZBX_ACTION_REMOVE)
 			->setModern(true),
 		(new CMultiSelect([
 			'name' => 'applications[]',
 			'object_name' => 'applications',
-			'add_new' => !($data['massupdate_app_action'] == ZBX_MULTISELECT_REMOVE),
+			'add_new' => !($data['massupdate_app_action'] == ZBX_ACTION_REMOVE),
 			'data' => $applications,
 			'popup' => [
 				'parameters' => [

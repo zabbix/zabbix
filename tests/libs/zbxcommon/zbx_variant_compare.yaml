@@ -273,5 +273,146 @@ in:
     value: 0.00002
 out:
   return: less
+---
+test case: binary == binary
+in:
+  value1:
+    type: ZBX_VARIANT_BIN
+    value: a1 b2 c3 d4
+  value2:
+    type: ZBX_VARIANT_BIN
+    value: a1 b2 c3 d4
+out:
+  return: equal
+---
+test case: binary == binary
+in:
+  value1:
+    type: ZBX_VARIANT_BIN
+    value: 
+  value2:
+    type: ZBX_VARIANT_BIN
+    value: 
+out:
+  return: equal
+---
+test case: binary > binary
+in:
+  value1:
+    type: ZBX_VARIANT_BIN
+    value: 00
+  value2:
+    type: ZBX_VARIANT_BIN
+    value: 
+out:
+  return: greater
+---
+test case: binary > binary
+in:
+  value1:
+    type: ZBX_VARIANT_BIN
+    value: 00 00
+  value2:
+    type: ZBX_VARIANT_BIN
+    value: ff
+out:
+  return: greater
+---
+test case: binary < binary
+in:
+  value1:
+    type: ZBX_VARIANT_BIN
+    value: 12 34 56 78 90
+  value2:
+    type: ZBX_VARIANT_BIN
+    value: 12 34 56 78 91
+out:
+  return: less
+---
+test case: binary > none
+in:
+  value1:
+    type: ZBX_VARIANT_BIN
+    value: 12 34 56 78 90
+  value2:
+    type: ZBX_VARIANT_NONE
+out:
+  return: greater
+---
+test case: none < binary
+in:
+  value1:
+    type: ZBX_VARIANT_NONE
+  value2:
+    type: ZBX_VARIANT_BIN
+    value: 12 34 56 78 90
+out:
+  return: less
+---
+test case: binary > string
+in:
+  value1:
+    type: ZBX_VARIANT_BIN
+    value: 12 34 56 78 90
+  value2:
+    type: ZBX_VARIANT_STR
+    value: 12 34 56 78 90
+out:
+  return: greater
+---
+test case: string < binary
+in:
+  value1:
+    type: ZBX_VARIANT_STR
+    value: 12 34 56 78 90
+  value2:
+    type: ZBX_VARIANT_BIN
+    value: 12 34 56 78 90
+out:
+  return: less
+---
+test case: binary > floating
+in:
+  value1:
+    type: ZBX_VARIANT_BIN
+    value: 12 34 56 78 90
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 1234567890
+out:
+  return: greater
+---
+test case: floating < binary
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 1234567890
+  value2:
+    type: ZBX_VARIANT_BIN
+    value: 12 34 56 78 90
+out:
+  return: less
+---
+test case: binary > uint64
+in:
+  value1:
+    type: ZBX_VARIANT_BIN
+    value: 12 34 56 78 90
+  value2:
+    type: ZBX_VARIANT_UI64
+    value: 12345678901234567890
+out:
+  return: greater
+---
+test case: uint64 < binary
+in:
+  value1:
+    type: ZBX_VARIANT_UI64
+    value: 12345678901234567890
+  value2:
+    type: ZBX_VARIANT_BIN
+    value: 12 34 56 78 90
+out:
+  return: less
 ...
 

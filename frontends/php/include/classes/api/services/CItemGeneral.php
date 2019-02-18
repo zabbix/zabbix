@@ -906,7 +906,9 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($hostids_by_key as $key_ => $key_hostids) {
 			$sql_select = ($class === 'CItemPrototype') ? ',id.parent_itemid AS ruleid' : '';
-			$sql_join = ($class === 'CItemPrototype') ? ' JOIN item_discovery id ON i.itemid=id.itemid' : '';
+			// "LEFT JOIN" is needed to check flags on inherited and existing item, item prototype or lld rule.
+			// For example, when linking an item prototype with same key as in an item on target host or template.
+			$sql_join = ($class === 'CItemPrototype') ? ' LEFT JOIN item_discovery id ON i.itemid=id.itemid' : '';
 			$db_items = DBselect(
 				'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid'.$sql_select.
 					' FROM items i'.$sql_join.
@@ -1242,7 +1244,8 @@ abstract class CItemGeneral extends CApiService {
 	 *                                                                  17 - ZBX_PREPROC_ERROR_FIELD_XML;
 	 *                                                                  18 - ZBX_PREPROC_ERROR_FIELD_REGEX;
 	 *                                                                  19 - ZBX_PREPROC_THROTTLE_VALUE;
-	 *                                                                  20 - ZBX_PREPROC_THROTTLE_TIMED_VALUE.
+	 *                                                                  20 - ZBX_PREPROC_THROTTLE_TIMED_VALUE;
+	 *                                                                  21 - ZBX_PREPROC_SCRIPT.
 	 * @param string $item['preprocessing'][]['params']                Additional parameters used by preprocessing
 	 *                                                                 option. Multiple parameters are separated by LF
 	 *                                                                 (\n) character.
@@ -1334,6 +1337,7 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_VALIDATE_NOT_REGEX:
 					case ZBX_PREPROC_ERROR_FIELD_JSON:
 					case ZBX_PREPROC_ERROR_FIELD_XML:
+					case ZBX_PREPROC_SCRIPT:
 						// Check 'params' if not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1495,6 +1499,7 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_ERROR_FIELD_REGEX:
 					case ZBX_PREPROC_THROTTLE_VALUE:
 					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+					case ZBX_PREPROC_SCRIPT:
 						if (is_array($preprocessing['error_handler'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 						}
