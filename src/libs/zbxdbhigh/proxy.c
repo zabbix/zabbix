@@ -3392,11 +3392,11 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		}
 	}
 
-	/* skip host update records without services */
+	/* host update should not be present without services */
 	if (0 == dcheckids.values_num)
 	{
 		(*processed_num)++;
-		goto succeed;
+		goto fail;
 	}
 
 	DBbegin();
@@ -3443,7 +3443,6 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	discovery_update_host(&dhost, service->status, service->itemtime);
 
 	DBcommit();
-succeed:
 	ret = SUCCEED;
 fail:
 	zbx_vector_ptr_clear_ext(&services_old, zbx_ptr_free);
