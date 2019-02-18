@@ -3292,7 +3292,7 @@ static void	zbx_drule_free(zbx_drule_t *drule)
  *                                                                            *
  ******************************************************************************/
 static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zbx_uint64_t druleid,
-		zbx_uint64_t unique_dcheckid, int *processed_num)
+		zbx_uint64_t unique_dcheckid, int *processed_num, int ip_idx)
 {
 	const char	*__function_name = "process_services";
 
@@ -3353,7 +3353,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		goto fail;
 	}
 
-	if (0 == *processed_num)
+	if (0 == *processed_num && 0 == ip_idx)
 	{
 		DB_RESULT	result;
 		DB_ROW		row;
@@ -3617,7 +3617,7 @@ json_parse_error:
 			while (processed_num != drule_ip->services.values_num)
 			{
 				if (FAIL == (ret2 = process_services(&drule_ip->services, drule_ip->ip, drule->druleid,
-						unique_dcheckid, &processed_num)))
+						unique_dcheckid, &processed_num, j)))
 				{
 					break;
 				}
