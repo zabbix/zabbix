@@ -670,7 +670,7 @@ ul.top-nav-icons {
 	}
 }
 
-// Filter Checkboxes
+// FILTER CHECKBOXES
 
 .filter-highlight-row-cb {
 	display: none;
@@ -678,308 +678,122 @@ ul.top-nav-icons {
 
 // SEVERITY STATUSES
 
-td.log-na-bg {
-	padding-left: 42px !important;
-	color: $font-color;
-}
+.na-bg,
+.normal-bg,
+.info-bg,
+.average-bg,
+.warning-bg,
+.high-bg,
+.disaster-bg,
+.log-na-bg,
+.log-info-bg,
+.log-warning-bg,
+.log-high-bg,
+.log-disaster-bg {
+	background-color: rgba(0, 0, 0, 0.0) !important;
 
-td.na-bg {
-	padding-left: 42px !important;
-	color: $font-color;
-	~ td.na-bg {
-		border-left: none;
+	&:before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		min-height: 28px;
+		width: 34px;
+	}
+
+	&:after {
+		background: url(../img/icon-sprite.svg) no-repeat;
+		content: "";
+		position: absolute;
+		left: 6px;
+		top: 5px;
+		width: 22px;
+		height: 18px;
 	}
 }
 
-.na-bg, .log-na-bg {
-	background-color: rgba(0, 0, 0, 0.0) !important;
-}
-
-.na-bg a.link-action {
-	color: $link-color;
-}
-
-.log-na-bg:before {
-	color: darken($alt-blue-grey,45%) !important;
-	background-color: $alt-blue-grey !important;
-}
-
-.na-bg:before, .log-na-bg:before {
-	content: "";
-	width: 34px;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	background-color: #59db8f;
-	min-height: 28px;
-}
-
 .na-bg:after, .log-na-bg:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -106px -443px;
-	width: 22px;
-	height: 18px;
-	top: 5px;
-	left: 6px;
-	position: absolute;
-}
-
-.na-bg.blink-hidden:after{
-	content: none;
-}
-
-td.normal-bg {
-	@extend td.na-bg;
-}
-
-.normal-bg {
-	background-color: rgba(0, 0, 0, 0.0) !important;
-}
-
-.normal-bg a.link-action {
-	color: $link-color;
-}
-
-.normal-bg:before {
-	content: "";
-	width: 34px;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	background-color: $alt-green;
-	min-height: 28px;
+	background-position: -106px -443px;
 }
 
 .normal-bg:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -76px -443px;
-	width: 22px;
-	height: 18px;
-	top: 5px;
-	left: 6px;
-	position: absolute;
-}
-
-.normal-bg.blink-hidden:after{
-	content: none;
-}
-
-td.log-info-bg {
-	@extend td.log-na-bg;
-}
-
-td.info-bg {
-	@extend td.na-bg;
-}
-
-.info-bg, .log-info-bg {
-	background-color: rgba(0, 0, 0, 0.0) !important;
-}
-
-.info-bg a.link-action {
-	color: $link-color;
-}
-
-.log-info-bg:before {
-	color: darken($alt-dark-blue,45%) !important;
-	background-color: $alt-dark-blue !important;
-}
-
-.info-bg:before, .log-info-bg:before {
-	content: "";
-	width: 34px;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	min-height: 28px;
+	background-position: -76px -443px;
 }
 
 .info-bg:after, .log-info-bg:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -136px -443px;
-	width: 22px;
-	height: 18px;
-	top: 5px;
-	left: 6px;
-	position: absolute;
-}
-
-.info-bg.blink-hidden:after{
-	content: none;
-}
-
-td.average-bg {
-	@extend td.na-bg;
-}
-
-.average-bg {
-	background-color: rgba(0, 0, 0, 0.0) !important;
-}
-
-.average-bg a.link-action {
-	color: $link-color;
-}
-
-.average-bg:before {
-	content: "";
-	width: 34px;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	min-height: 28px;
+	background-position: -136px -443px;
 }
 
 .average-bg:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -196px -442px;
-	width: 22px;
-	height: 18px;
-	top: 5px;
-	left: 6px;
-	position: absolute;
-}
-
-.average-bg.blink-hidden:after{
-	content: none;
-}
-
-td.log-warning-bg {
-	@extend td.log-na-bg;
-}
-
-td.warning-bg {
-	@extend td.na-bg;
-}
-
-.warning-bg, .log-warning-bg {
-	background-color: rgba(0, 0, 0, 0.0) !important;
-}
-
-.warning-bg a.link-action {
-	color: $link-color;
-}
-
-.log-warning-bg:before {
-	color: darken($alt-yellow,45%) !important;
-	background-color: $alt-yellow !important;
-}
-
-.warning-bg:before, .log-warning-bg:before {
-	content: "";
-	width: 34px;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	min-height: 28px;
+	background-position: -196px -442px;
 }
 
 .warning-bg:after, .log-warning-bg:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -166px -443px;
-	width: 22px;
-	height: 18px;
-	top: 5px;
-	left: 6px;
-	position: absolute;
-}
-
-.warning-bg.blink-hidden:after{
-	content: none;
-}
-
-td.log-high-bg {
-	@extend td.log-na-bg;
-}
-
-td.high-bg {
-	@extend td.na-bg;
-}
-
-.high-bg, .log-high-bg {
-	background-color: rgba(0, 0, 0, 0.0) !important;
-}
-
-.high-bg a.link-action {
-	color: $link-color;
-}
-
-.log-high-bg:before {
-	color: darken($alt-dark-orange,45%) !important;
-	background-color: $alt-dark-orange !important;
-}
-
-.high-bg:before, .log-high-bg:before {
-	content: "";
-	width: 34px;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	min-height: 28px;
+	background-position: -166px -443px;
 }
 
 .high-bg:after, .log-high-bg:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -226px -443px;
-	width: 22px;
-	height: 18px;
-	top: 5px;
-	left: 6px;
-	position: absolute;
-}
-
-.high-bg.blink-hidden:after{
-	content: none;
-}
-
-td.log-disaster-bg {
-	@extend td.log-na-bg;
-}
-
-td.disaster-bg {
-	@extend td.na-bg;
-}
-
-.disaster-bg, .log-disaster-bg {
-	background-color: rgba(0, 0, 0, 0.0) !important;
-}
-
-.disaster-bg a.link-action {
-	color: $link-color;
-}
-
-.log-disaster-bg:before {
-	color: darken($alt-red,45%) !important;
-	background-color: $alt-red !important;
-}
-
-.disaster-bg:before, .log-disaster-bg:before {
-	content: "";
-	width: 34px;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	min-height: 28px;
+	background-position: -226px -443px;
 }
 
 .disaster-bg:after, .log-disaster-bg:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -256px -443px;
-	width: 22px;
-	height: 18px;
-	top: 5px;
-	left: 6px;
-	position: absolute;
+	background-position: -256px -443px;
 }
 
-.disaster-bg.blink-hidden:after{
-	content: none;
+.na-bg,
+.log-na-bg,
+.normal-bg {
+
+	&:before {
+		background-color: $alt-green;
+	}
+}
+
+.na-bg,
+.normal-bg,
+.info-bg,
+.average-bg,
+.warning-bg,
+.high-bg,
+.disaster-bg {
+
+	&.blink-hidden:after {
+		content: none;
+	}
+
+	a.link-action {
+		color: $link-color;
+	}
+}
+
+@each $class, $color in (
+	na-bg: $alt-blue-grey,
+	info-bg: $alt-dark-blue,
+	warning-bg: $alt-yellow,
+	high-bg: $alt-dark-orange,
+	disaster-bg: $alt-red
+) {
+	.log-#{$class}:before {
+		color: darken($color, 45%) !important;
+		background-color: $color !important;
+	}
+}
+
+td.na-bg,
+td.normal-bg,
+td.info-bg,
+td.average-bg,
+td.warning-bg,
+td.high-bg,
+td.disaster-bg,
+td.log-na-bg,
+td.log-info-bg,
+td.log-warning-bg,
+td.log-high-bg,
+td.log-disaster-bg {
+	padding-left: 42px;
+	color: $font-color;
 }
 
 .notif-body {
