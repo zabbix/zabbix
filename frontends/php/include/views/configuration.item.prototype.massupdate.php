@@ -308,117 +308,17 @@ $form_list
 			->setLabel(_('Password'))
 			->setChecked(array_key_exists('password', $data['visible'])),
 		(new CTextBox('password', $data['password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
+	// Append item pre-processing to form list.
+	->addRow(
+		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
+			->setLabel(_('Preprocessing steps'))
+			->setChecked(array_key_exists('preprocessing', $data['visible'])),
+		(new CDiv(getItemPreprocessing($form, $data['preprocessing'], false, $data['preprocessing_types'])))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->setId('preprocessing_div')
 	);
-
-	// Append item pre-processing.
-$preprocessing = (new CTable())
-	->setId('preprocessing')
-	->setHeader([
-		'',
-		new CColHeader(_('Name')),
-		new CColHeader(_('Parameters')),
-		'',
-		(new CColHeader(_('Action')))->setWidth(50)
-	]);
-
-foreach ($data['preprocessing'] as $i => $step) {
-	// Depeding on preprocessing type, display corresponding params field and placeholders.
-	$params = [];
-
-	// Use numeric box for multiplier, otherwise use text box.
-	if ($step['type'] == ZBX_PREPROC_MULTIPLIER) {
-		$params[] = (new CTextBox('preprocessing['.$i.'][params][0]',
-			array_key_exists('params', $step) ? $step['params'][0] : ''
-		))->setAttribute('placeholder', _('number'));
-	}
-	else {
-		$params[] = new CTextBox('preprocessing['.$i.'][params][0]',
-			array_key_exists('params', $step) ? $step['params'][0] : ''
-		);
-	}
-
-	// Create a secondary param text box, so it can be hidden if necessary.
-	$params[] = (new CTextBox('preprocessing['.$i.'][params][1]',
-		(array_key_exists('params', $step) && array_key_exists(1, $step['params']))
-			? $step['params'][1]
-			: ''
-	))->setAttribute('placeholder', _('output'));
-
-	// Add corresponding placeholders and show or hide text boxes.
-	switch ($step['type']) {
-		case ZBX_PREPROC_MULTIPLIER:
-			$params[1]->addStyle('display: none;');
-			break;
-
-		case ZBX_PREPROC_RTRIM:
-		case ZBX_PREPROC_LTRIM:
-		case ZBX_PREPROC_TRIM:
-			$params[0]->setAttribute('placeholder', _('list of characters'));
-			$params[1]->addStyle('display: none;');
-			break;
-
-		case ZBX_PREPROC_XPATH:
-		case ZBX_PREPROC_JSONPATH:
-			$params[0]->setAttribute('placeholder', _('path'));
-			$params[1]->addStyle('display: none;');
-			break;
-
-		case ZBX_PREPROC_REGSUB:
-			$params[0]->setAttribute('placeholder', _('pattern'));
-			break;
-
-		case ZBX_PREPROC_BOOL2DEC:
-		case ZBX_PREPROC_OCT2DEC:
-		case ZBX_PREPROC_HEX2DEC:
-		case ZBX_PREPROC_DELTA_VALUE:
-		case ZBX_PREPROC_DELTA_SPEED:
-			$params[0]->addStyle('display: none;');
-			$params[1]->addStyle('display: none;');
-			break;
-	}
-
-	$preproc_types_cbbox = new CComboBox('preprocessing['.$i.'][type]', $step['type']);
-
-	foreach (get_preprocessing_types() as $group) {
-		$cb_group = new COptGroup($group['label']);
-
-		foreach ($group['types'] as $type => $label) {
-			$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
-		}
-
-		$preproc_types_cbbox->addItem($cb_group);
-	}
-
-	$preprocessing->addRow(
-		(new CRow([
-			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			$preproc_types_cbbox,
-			$params[0],
-			$params[1],
-			(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		]))->addClass('sortable')
-	);
-}
-
-$preprocessing->addRow(
-	(new CCol(
-		(new CButton('param_add', _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-add')
-	))->setColSpan(5)
-);
-
-$form_list->addRow(
-	(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
-		->setLabel(_('Preprocessing steps'))
-		->setChecked(array_key_exists('preprocessing', $data['visible'])),
-	(new CDiv($preprocessing))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		->setId('preprocessing_div')
-);
 
 // Prepare Update interval for form list.
 $update_interval = (new CTable())
@@ -563,14 +463,14 @@ $form_list
 			->setChecked(array_key_exists('applications', $data['visible'])),
 		(new CDiv([
 			(new CRadioButtonList('massupdate_app_action', (int) $data['massupdate_app_action']))
-				->addValue(_('Add'), ZBX_MULTISELECT_ADD)
-				->addValue(_('Replace'), ZBX_MULTISELECT_REPLACE)
-				->addValue(_('Remove'), ZBX_MULTISELECT_REMOVE)
+				->addValue(_('Add'), ZBX_ACTION_ADD)
+				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
 				->setModern(true),
 			(new CMultiSelect([
 				'name' => 'applications[]',
 				'object_name' => 'applications',
-				'add_new' => !($data['massupdate_app_action'] == ZBX_MULTISELECT_REMOVE),
+				'add_new' => !($data['massupdate_app_action'] == ZBX_ACTION_REMOVE),
 				'data' => $data['applications'],
 				'popup' => [
 					'parameters' => [
@@ -638,14 +538,14 @@ $form_list
 			->setChecked(array_key_exists('applicationPrototypes', $data['visible'])),
 		(new CDiv([
 			(new CRadioButtonList('massupdate_app_prot_action', (int) $data['massupdate_app_prot_action']))
-				->addValue(_('Add'), ZBX_MULTISELECT_ADD)
-				->addValue(_('Replace'), ZBX_MULTISELECT_REPLACE)
-				->addValue(_('Remove'), ZBX_MULTISELECT_REMOVE)
+				->addValue(_('Add'), ZBX_ACTION_ADD)
+				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
 				->setModern(true),
 			(new CMultiSelect([
 				'name' => 'application_prototypes[]',
 				'object_name' => 'application_prototypes',
-				'add_new' => !($data['massupdate_app_prot_action'] == ZBX_MULTISELECT_REMOVE),
+				'add_new' => !($data['massupdate_app_prot_action'] == ZBX_ACTION_REMOVE),
 				'data' => $data['application_prototypes'],
 				'popup' => [
 					'parameters' => [

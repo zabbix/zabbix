@@ -17,6 +17,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 zbx_item_preproc_SOURCES = \

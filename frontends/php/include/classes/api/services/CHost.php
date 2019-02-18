@@ -100,6 +100,8 @@ class CHost extends CHostGeneral {
 			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
+			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
+			'tags'						=> null,
 			'filter'					=> null,
 			'search'					=> null,
 			'searchInventory'			=> null,
@@ -120,9 +122,10 @@ class CHost extends CHostGeneral {
 			'selectScreens'				=> null,
 			'selectInterfaces'			=> null,
 			'selectInventory'			=> null,
-			'selectHttpTests'           => null,
+			'selectHttpTests'			=> null,
 			'selectDiscoveryRule'		=> null,
 			'selectHostDiscovery'		=> null,
+			'selectTags'				=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -382,6 +385,13 @@ class CHost extends CHostGeneral {
 					')';
 		}
 
+		// tags
+		if ($options['tags'] !== null && $options['tags']) {
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
+				'host_tag', 'hostid'
+			);
+		}
+
 		// search
 		if (is_array($options['search'])) {
 			zbx_db_search('hosts h', $options, $sqlParts);
@@ -460,35 +470,40 @@ class CHost extends CHostGeneral {
 	/**
 	 * Add host.
 	 *
-	 * @param array  $hosts									An array with hosts data.
-	 * @param string $hosts[]['host']						Host technical name.
-	 * @param string $hosts[]['name']						Host visible name (optional).
-	 * @param array  $hosts[]['groups']						An array of host group objects with IDs that host will be added to.
-	 * @param int    $hosts[]['status']						Status of the host (optional).
-	 * @param array  $hosts[]['interfaces']					An array of host interfaces data.
-	 * @param int    $hosts[]['interfaces']['type']			Interface type.
-	 * @param int    $hosts[]['interfaces']['main']			Is this the default interface to use.
-	 * @param string $hosts[]['interfaces']['ip']			Interface IP (optional).
-	 * @param int    $hosts[]['interfaces']['port']			Interface port (optional).
-	 * @param int    $hosts[]['interfaces']['useip']		Interface shoud use IP (optional).
-	 * @param string $hosts[]['interfaces']['dns']			Interface shoud use DNS (optional).
-	 * @param int    $hosts[]['interfaces']['bulk']			Use bulk requests for interface (optional).
-	 * @param int    $hosts[]['proxy_hostid']				ID of the proxy that is used to monitor the host (optional).
-	 * @param int    $hosts[]['ipmi_authtype']				IPMI authentication type (optional).
-	 * @param int    $hosts[]['ipmi_privilege']				IPMI privilege (optional).
-	 * @param string $hosts[]['ipmi_username']				IPMI username (optional).
-	 * @param string $hosts[]['ipmi_password']				IPMI password (optional).
-	 * @param array  $hosts[]['inventory']					An array of host inventory data (optional).
-	 * @param array  $hosts[]['macros']						An array of host macros (optional).
-	 * @param string $hosts[]['macros'][]['macro']			Host macro (required if "macros" is set).
-	 * @param array  $hosts[]['templates']					An array of template objects with IDs that will be linked to host (optional).
-	 * @param string $hosts[]['templates'][]['templateid']	Template ID (required if "templates" is set).
-	 * @param string $hosts[]['tls_connect']				Connections to host (optional).
-	 * @param string $hosts[]['tls_accept']					Connections from host (optional).
-	 * @param string $hosts[]['tls_psk_identity']			PSK identity (required if "PSK" type is set).
-	 * @param string $hosts[]['tls_psk']					PSK (required if "PSK" type is set).
-	 * @param string $hosts[]['tls_issuer']					Certificate issuer (optional).
-	 * @param string $hosts[]['tls_subject']				Certificate subject (optional).
+	 * @param array  $hosts                                 An array with hosts data.
+	 * @param string $hosts[]['host']                       Host technical name.
+	 * @param string $hosts[]['name']                       Host visible name (optional).
+	 * @param array  $hosts[]['groups']                     An array of host group objects with IDs that host will be
+	 *                                                      added to.
+	 * @param int    $hosts[]['status']                     Status of the host (optional).
+	 * @param array  $hosts[]['interfaces']                 An array of host interfaces data.
+	 * @param int    $hosts[]['interfaces']['type']         Interface type.
+	 * @param int    $hosts[]['interfaces']['main']         Is this the default interface to use.
+	 * @param string $hosts[]['interfaces']['ip']           Interface IP (optional).
+	 * @param int    $hosts[]['interfaces']['port']         Interface port (optional).
+	 * @param int    $hosts[]['interfaces']['useip']        Interface shoud use IP (optional).
+	 * @param string $hosts[]['interfaces']['dns']          Interface shoud use DNS (optional).
+	 * @param int    $hosts[]['interfaces']['bulk']         Use bulk requests for interface (optional).
+	 * @param int    $hosts[]['proxy_hostid']               ID of the proxy that is used to monitor the host (optional).
+	 * @param int    $hosts[]['ipmi_authtype']              IPMI authentication type (optional).
+	 * @param int    $hosts[]['ipmi_privilege']             IPMI privilege (optional).
+	 * @param string $hosts[]['ipmi_username']              IPMI username (optional).
+	 * @param string $hosts[]['ipmi_password']              IPMI password (optional).
+	 * @param array  $hosts[]['tags']                       An array of tags (optional).
+	 * @param string $hosts[]['tags'][]['tag']              Tag name.
+	 * @param string $hosts[]['tags'][]['value']            Tag value.
+	 * @param array  $hosts[]['inventory']                  An array of host inventory data (optional).
+	 * @param array  $hosts[]['macros']                     An array of host macros (optional).
+	 * @param string $hosts[]['macros'][]['macro']          Host macro (required if "macros" is set).
+	 * @param array  $hosts[]['templates']                  An array of template objects with IDs that will be linked
+	 *                                                      to host (optional).
+	 * @param string $hosts[]['templates'][]['templateid']  Template ID (required if "templates" is set).
+	 * @param string $hosts[]['tls_connect']                Connections to host (optional).
+	 * @param string $hosts[]['tls_accept']                 Connections from host (optional).
+	 * @param string $hosts[]['tls_psk_identity']           PSK identity (required if "PSK" type is set).
+	 * @param string $hosts[]['tls_psk']                    PSK (required if "PSK" type is set).
+	 * @param string $hosts[]['tls_issuer']                 Certificate issuer (optional).
+	 * @param string $hosts[]['tls_subject']                Certificate subject (optional).
 	 *
 	 * @return array
 	 */
@@ -498,7 +513,7 @@ class CHost extends CHostGeneral {
 		$this->validateCreate($hosts);
 
 		$hostids = [];
-
+		$ins_tags = [];
 		foreach ($hosts as $host) {
 			// If visible name is not given or empty it should be set to host name.
 			if (!array_key_exists('name', $host) || !trim($host['name'])) {
@@ -519,6 +534,12 @@ class CHost extends CHostGeneral {
 				];
 			}
 			DB::insert('hosts_groups', $groupsToAdd);
+
+			if (array_key_exists('tags', $host)) {
+				foreach ($host['tags'] as $tag) {
+					$ins_tags[] = ['hostid' => $hostid] + $tag;
+				}
+			}
 
 			$options = [
 				'hosts' => $host
@@ -561,44 +582,51 @@ class CHost extends CHostGeneral {
 			}
 		}
 
+		if ($ins_tags) {
+			DB::insert('host_tag', $ins_tags);
+		}
+
 		return ['hostids' => $hostids];
 	}
 
 	/**
 	 * Update host.
 	 *
-	 * @param array  $hosts											An array with hosts data.
-	 * @param string $hosts[]['hostid']								Host ID.
-	 * @param string $hosts[]['host']								Host technical name (optional).
-	 * @param string $hosts[]['name']								Host visible name (optional).
-	 * @param array  $hosts[]['groups']								An array of host group objects with IDs that host will be replaced to.
-	 * @param int    $hosts[]['status']								Status of the host (optional).
-	 * @param array  $hosts[]['interfaces']							An array of host interfaces data to be replaced.
-	 * @param int    $hosts[]['interfaces']['type']					Interface type.
-	 * @param int    $hosts[]['interfaces']['main']					Is this the default interface to use.
-	 * @param string $hosts[]['interfaces']['ip']					Interface IP (optional).
-	 * @param int    $hosts[]['interfaces']['port']					Interface port (optional).
-	 * @param int    $hosts[]['interfaces']['useip']				Interface shoud use IP (optional).
-	 * @param string $hosts[]['interfaces']['dns']					Interface shoud use DNS (optional).
-	 * @param int    $hosts[]['interfaces']['bulk']					Use bulk requests for interface (optional).
-	 * @param int    $hosts[]['proxy_hostid']						ID of the proxy that is used to monitor the host (optional).
-	 * @param int    $hosts[]['ipmi_authtype']						IPMI authentication type (optional).
-	 * @param int    $hosts[]['ipmi_privilege']						IPMI privilege (optional).
-	 * @param string $hosts[]['ipmi_username']						IPMI username (optional).
-	 * @param string $hosts[]['ipmi_password']						IPMI password (optional).
-	 * @param array  $hosts[]['inventory']							An array of host inventory data (optional).
-	 * @param array  $hosts[]['macros']								An array of host macros (optional).
-	 * @param string $hosts[]['macros'][]['macro']					Host macro (required if "macros" is set).
-	 * @param array  $hosts[]['templates']							An array of template objects with IDs that will be linked to host (optional).
-	 * @param string $hosts[]['templates'][]['templateid']			Template ID (required if "templates" is set).
-	 * @param array  $hosts[]['templates_clear']					Templates to unlink and clear from the host (optional).
-	 * @param string $hosts[]['templates_clear'][]['templateid']	Template ID (required if "templates" is set).
-	 * @param string $hosts[]['tls_connect']						Connections to host (optional).
-	 * @param string $hosts[]['tls_accept']							Connections from host (optional).
-	 * @param string $hosts[]['tls_psk_identity']					PSK identity (required if "PSK" type is set).
-	 * @param string $hosts[]['tls_psk']							PSK (required if "PSK" type is set).
-	 * @param string $hosts[]['tls_issuer']							Certificate issuer (optional).
-	 * @param string $hosts[]['tls_subject']						Certificate subject (optional).
+	 * @param array  $hosts                                       An array with hosts data.
+	 * @param string $hosts[]['hostid']                           Host ID.
+	 * @param string $hosts[]['host']                             Host technical name (optional).
+	 * @param string $hosts[]['name']                             Host visible name (optional).
+	 * @param array  $hosts[]['groups']                           An array of host group objects with IDs that host will be replaced to.
+	 * @param int    $hosts[]['status']                           Status of the host (optional).
+	 * @param array  $hosts[]['interfaces']                       An array of host interfaces data to be replaced.
+	 * @param int    $hosts[]['interfaces']['type']               Interface type.
+	 * @param int    $hosts[]['interfaces']['main']               Is this the default interface to use.
+	 * @param string $hosts[]['interfaces']['ip']                 Interface IP (optional).
+	 * @param int    $hosts[]['interfaces']['port']               Interface port (optional).
+	 * @param int    $hosts[]['interfaces']['useip']              Interface shoud use IP (optional).
+	 * @param string $hosts[]['interfaces']['dns']                Interface shoud use DNS (optional).
+	 * @param int    $hosts[]['interfaces']['bulk']               Use bulk requests for interface (optional).
+	 * @param int    $hosts[]['proxy_hostid']                     ID of the proxy that is used to monitor the host (optional).
+	 * @param int    $hosts[]['ipmi_authtype']                    IPMI authentication type (optional).
+	 * @param int    $hosts[]['ipmi_privilege']                   IPMI privilege (optional).
+	 * @param string $hosts[]['ipmi_username']                    IPMI username (optional).
+	 * @param string $hosts[]['ipmi_password']                    IPMI password (optional).
+	 * @param array  $hosts[]['tags']                             An array of tags (optional).
+	 * @param string $hosts[]['tags'][]['tag']                    Tag name.
+	 * @param string $hosts[]['tags'][]['value']                  Tag value.
+	 * @param array  $hosts[]['inventory']                        An array of host inventory data (optional).
+	 * @param array  $hosts[]['macros']                           An array of host macros (optional).
+	 * @param string $hosts[]['macros'][]['macro']                Host macro (required if "macros" is set).
+	 * @param array  $hosts[]['templates']                        An array of template objects with IDs that will be linked to host (optional).
+	 * @param string $hosts[]['templates'][]['templateid']        Template ID (required if "templates" is set).
+	 * @param array  $hosts[]['templates_clear']                  Templates to unlink and clear from the host (optional).
+	 * @param string $hosts[]['templates_clear'][]['templateid']  Template ID (required if "templates" is set).
+	 * @param string $hosts[]['tls_connect']                      Connections to host (optional).
+	 * @param string $hosts[]['tls_accept']                       Connections from host (optional).
+	 * @param string $hosts[]['tls_psk_identity']                 PSK identity (required if "PSK" type is set).
+	 * @param string $hosts[]['tls_psk']                          PSK (required if "PSK" type is set).
+	 * @param string $hosts[]['tls_issuer']                       Certificate issuer (optional).
+	 * @param string $hosts[]['tls_subject']                      Certificate subject (optional).
 	 *
 	 * @return array
 	 */
@@ -674,6 +702,8 @@ class CHost extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 			}
 		}
+
+		$this->updateTags($hosts, 'hostid');
 
 		return ['hostids' => $hostids];
 	}
@@ -1667,6 +1697,11 @@ class CHost extends CHostGeneral {
 			}
 
 			$groupids = array_merge($groupids, zbx_objectValues($host['groups'], 'groupid'));
+
+			// Validate tags.
+			if (array_key_exists('tags', $host)) {
+				$this->validateTags($host);
+			}
 		}
 		unset($host);
 
@@ -1961,6 +1996,11 @@ class CHost extends CHostGeneral {
 						$host['tls_subject'] = '';
 					}
 				}
+			}
+
+			// Validate tags.
+			if (array_key_exists('tags', $host)) {
+				$this->validateTags($host);
 			}
 		}
 		unset($host);

@@ -28,6 +28,18 @@ class CDiscoveryRule extends CItemGeneral {
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'type', 'status'];
 
+	/**
+	 * Define a set of supported pre-processing rules.
+	 *
+	 * @var array
+	 *
+	 * 5.6 would allow this to be defined constant.
+	 */
+	public static $supported_preprocessing_types = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
+		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+		ZBX_PREPROC_SCRIPT
+	];
+
 	public function __construct() {
 		parent::__construct();
 
@@ -81,6 +93,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectApplicationPrototypes'	=> null,
 			'selectFilter'					=> null,
 			'selectLLDMacroPaths'			=> null,
+			'selectPreprocessing'			=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -647,6 +660,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'hostids' => $data['templateids'],
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'preservekeys' => true
 		]);
 		$json = new CJson();
@@ -924,6 +938,8 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
+
+		$this->createItemPreprocessing($items);
 	}
 
 	protected function updateReal($items) {
@@ -1124,6 +1140,8 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
+
+		$this->updateItemPreprocessing($items);
 	}
 
 	/**
@@ -1281,10 +1299,6 @@ class CDiscoveryRule extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect value for field "%1$s": %2$s.', 'lifetime', $error)
 			);
-		}
-
-		if (array_key_exists('preprocessing', $item)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Item pre-processing is not allowed for discovery rules.'));
 		}
 	}
 
@@ -1506,6 +1520,7 @@ class CDiscoveryRule extends CItemGeneral {
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'preservekeys' => true
 		]);
 		$srcDiscovery = reset($srcDiscovery);

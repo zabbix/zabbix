@@ -2294,12 +2294,21 @@ function get_status() {
 	return $status;
 }
 
-function set_image_header() {
+/**
+ * Set image header.
+ *
+ * @param integer $format    One of IMAGE_FORMAT_* constants. If not set global $IMAGE_FORMAT_DEFAULT will be used.
+ */
+function set_image_header($format = null) {
 	global $IMAGE_FORMAT_DEFAULT;
 
-	switch ($IMAGE_FORMAT_DEFAULT) {
+	switch ($format !== null ? $format : $IMAGE_FORMAT_DEFAULT) {
 		case IMAGE_FORMAT_JPEG:
 			header('Content-type: image/jpeg');
+			break;
+
+		case IMAGE_FORMAT_GIF:
+			header('Content-type: image/gif');
 			break;
 
 		case IMAGE_FORMAT_TEXT:

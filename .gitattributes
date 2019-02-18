@@ -1,14 +1,4 @@
 * text=auto !eol
-bin/win32/dev/zabbix_sender.dll -text svneol=unset#application/x-dosexec
-bin/win32/dev/zabbix_sender.lib -text svneol=unset#application/x-archive
-bin/win32/zabbix_agentd.exe -text svneol=unset#application/x-dosexec
-bin/win32/zabbix_get.exe -text svneol=unset#application/x-dosexec
-bin/win32/zabbix_sender.exe -text svneol=unset#application/x-dosexec
-bin/win64/dev/zabbix_sender.dll -text svneol=unset#application/x-dosexec
-bin/win64/dev/zabbix_sender.lib -text svneol=unset#application/x-archive
-bin/win64/zabbix_agentd.exe -text svneol=unset#application/x-dosexec
-bin/win64/zabbix_get.exe -text svneol=unset#application/x-dosexec
-bin/win64/zabbix_sender.exe -text svneol=unset#application/x-dosexec
 /build-backend.xml -text
 database/elasticsearch/elasticsearch.map -text
 frontends/php/audio/alarm_average.wav -text svneol=unset#audio/x-wav
@@ -39,6 +29,7 @@ frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
 frontends/php/locale/ca/LC_MESSAGES/frontend.po -text
 frontends/php/locale/he/LC_MESSAGES/frontend.po -text
 frontends/php/locale/nb/LC_MESSAGES/frontend.po -text
+frontends/php/tests/api_json/data/data_test.sql eol=lf
 frontends/php/tests/images/image.png -text svneol=unset#image/png
 include/zbxhistory.h -text
 include/zbxipcservice.h -text

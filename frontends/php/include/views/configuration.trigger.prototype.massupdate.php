@@ -19,75 +19,115 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
+require_once dirname(__FILE__).'/js/configuration.trigger.massupdate.js.php';
 
-$triggersWidget = (new CWidget())->setTitle(_('Trigger prototypes'));
+$widget = (new CWidget())->setTitle(_('Trigger prototypes'));
 
-// append host summary to widget header
-$triggersWidget->addItem(get_header_host_table('trigger_prototypes', $data['hostid'], $data['parent_discoveryid']));
+// Append host summary to widget header.
+$widget->addItem(get_header_host_table('trigger_prototypes', $data['hostid'], $data['parent_discoveryid']));
 
-$triggersForm = (new CForm())
+// Create form.
+$form = (new CForm())
 	->setName('triggersForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar('parent_discoveryid', $data['parent_discoveryid']);
 
 foreach ($data['g_triggerid'] as $triggerid) {
-	$triggersForm->addVar('g_triggerid['.$triggerid.']', $triggerid);
+	$form->addVar('g_triggerid['.$triggerid.']', $triggerid);
 }
 
-$triggersFormList = (new CFormList('triggersFormList'))
+/*
+ * Trigger prototype tab
+ */
+$trigger_form_list = (new CFormList('trigger-form-list'))
 	->addRow(
-		(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
+		(new CVisibilityBox('visible[priority]', 'priority-div', _('Original')))
 			->setLabel(_('Severity'))
-			->setChecked(isset($data['visible']['priority']))
+			->setChecked(array_key_exists('priority', $data['visible']))
 			->setAttribute('autofocus', 'autofocus'),
 		(new CDiv(
 			new CSeverity([
 				'name' => 'priority',
-				'value' => $data['priority']
+				'value' => (int) $data['priority']
 			])
-		))->setId('priority_div')
+		))->setId('priority-div')
+	)
+	->addRow(
+		(new CVisibilityBox('visible[manual_close]', 'manual-close-div', _('Original')))
+			->setLabel(_('Allow manual close'))
+			->setChecked(array_key_exists('manual_close', $data['visible'])),
+		(new CDiv(
+			(new CRadioButtonList('manual_close', (int) $data['manual_close']))
+				->addValue(_('No'), ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
+				->addValue(_('Yes'), ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+				->setModern(true)
+		))->setId('manual-close-div')
 	);
 
-// append dependencies to form list
-$dependenciesTable = (new CTable())
-	->setAttribute('style', 'width: 100%;')
+/*
+ * Tags tab
+ */
+$tags_form_list = (new CFormList('tags-form-list'))
+	->addRow(
+		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))
+			->setLabel(_('Tags'))
+			->setChecked(array_key_exists('tags', $data['visible'])),
+		(new CDiv([
+			(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
+				->addValue(_('Add'), ZBX_ACTION_ADD)
+				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
+				->setModern(true)
+				->addStyle('margin-bottom: 10px;'),
+			renderTagTable($data['tags'])
+				->setHeader([_('Name'), _('Value'), _('Action')])
+				->setId('tags-table')
+		]))->setId('tags-div')
+	);
+
+/*
+ * Dependencies tab
+ */
+$dependencies_form_list = new CFormList('dependencies-form-list');
+
+$dependencies_table = (new CTable())
+	->addStyle('width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['dependencies'] as $dependency) {
-	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
+	$dependencies_form_list->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
-	$depTriggerDescription = CHtml::encode(
+	$dependency_description = CHtml::encode(
 		implode(', ', zbx_objectValues($dependency['hosts'], 'name')).NAME_DELIMITER.$dependency['description']
 	);
 
 	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-		$description = (new CLink($depTriggerDescription,
+		$description = (new CLink($dependency_description,
 			'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').'&triggerid='.$dependency['triggerid']
 		))->setAttribute('target', '_blank');
 	}
 	elseif ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$description = (new CLink($depTriggerDescription,
+		$description = (new CLink($dependency_description,
 			'triggers.php?form=update&triggerid='.$dependency['triggerid']
 		))->setAttribute('target', '_blank');
 	}
 
-	$row = new CRow([$description,
-		(new CCol(
-			(new CButton('remove', _('Remove')))
-				->onClick('javascript: removeDependency(\''.$dependency['triggerid'].'\');')
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->removeId()
-		))->addClass(ZBX_STYLE_NOWRAP)
-	]);
-
-	$row->setId('dependency_'.$dependency['triggerid']);
-	$dependenciesTable->addRow($row);
+	$dependencies_table->addRow(
+		(new CRow([
+			$description,
+			(new CCol(
+				(new CButton('remove', _('Remove')))
+					->onClick('javascript: removeDependency(\''.$dependency['triggerid'].'\');')
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId()
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))->setId('dependency_'.$dependency['triggerid'])
+	);
 }
 
-$dependenciesDiv = (new CDiv([
-	$dependenciesTable,
+$dependencies_div = (new CDiv([
+	$dependencies_table,
 	new CHorList([
 		(new CButton('add_dep_trigger', _('Add')))
 			->onClick('return PopUp("popup.generic",'.
@@ -124,73 +164,34 @@ $dependenciesDiv = (new CDiv([
 	])
 ]))
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	->setId('dependencies_div');
+	->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	->setId('dependencies-div');
 
-$triggersFormList->addRow(
-	(new CVisibilityBox('visible[dependencies]', 'dependencies_div', _('Original')))
+$dependencies_form_list->addRow(
+	(new CVisibilityBox('visible[dependencies]', 'dependencies-div', _('Original')))
 		->setLabel(_('Replace dependencies'))
-		->setChecked(isset($data['visible']['dependencies'])),
-	$dependenciesDiv
+		->setChecked(array_key_exists('dependencies', $data['visible'])),
+	$dependencies_div
 );
 
-$tags_table = (new CTable())->setId('tbl_tags');
+// Append tabs to the form.
+$tabs = (new CTabView())
+	->addTab('trigger_tab', _('Trigger prototype'), $trigger_form_list)
+	->addTab('tags_tab', _('Tags'), $tags_form_list)
+	->addTab('dependencies_tab', _('Dependencies'), $dependencies_form_list);
 
-foreach ($data['tags'] as $tag_key => $tag) {
-	$tags_table->addRow([
-		(new CTextBox('tags['.$tag_key.'][tag]', $tag['tag']))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('tag')),
-		(new CTextBox('tags['.$tag_key.'][value]', $tag['value']))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('value')),
-		(new CCol(
-			(new CButton('tags['.$tag_key.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		))->addClass(ZBX_STYLE_NOWRAP)
-	], 'form_row');
+if (!hasRequest('massupdate') && !hasRequest('add_dependency')) {
+	$tabs->setSelected(0);
 }
 
-$tags_table->setFooter(new CCol(
-	(new CButton('tag_add', _('Add')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('element-table-add')
-));
-
-$triggersFormList
-	->addRow(
-		(new CVisibilityBox('visible[tags]', 'tags_div', _('Original')))
-			->setLabel(_('Replace tags'))
-			->setChecked(isset($data['visible']['tags'])),
-		(new CDiv([$tags_table]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-			->setId('tags_div')
-	)
-	->addRow(
-		(new CVisibilityBox('visible[manual_close]', 'manual_close_div', _('Original')))
-			->setLabel(_('Allow manual close'))
-			->setChecked(isset($data['visible']['manual_close'])),
-		(new CDiv(
-			(new CRadioButtonList('manual_close', (int) $data['manual_close']))
-				->addValue(_('No'), ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
-				->addValue(_('Yes'), ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
-				->setModern(true)
-		))->setId('manual_close_div')
-	);
-
-$triggersTab = new CTabView();
-$triggersTab->addTab('triggersTab', _('Mass update'), $triggersFormList);
-
-// append buttons to form
-$triggersTab->setFooter(makeFormFooter(
+// Append buttons to the form.
+$tabs->setFooter(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
 	[new CButtonCancel(url_param('parent_discoveryid'))]
 ));
 
-// append tabs to form
-$triggersForm->addItem($triggersTab);
-$triggersWidget->addItem($triggersForm);
+$form->addItem($tabs);
 
-return $triggersWidget;
+$widget->addItem($form);
+
+return $widget;

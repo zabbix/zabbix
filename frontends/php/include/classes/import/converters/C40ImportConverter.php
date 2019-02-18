@@ -47,6 +47,8 @@ class C40ImportConverter extends CConverter {
 	 */
 	protected function convertHosts(array $hosts) {
 		foreach ($hosts as &$host) {
+			$host['tags'] = [];
+
 			if (array_key_exists('items', $host)) {
 				$host['items'] = $this->convertItems($host['items']);
 			}
@@ -125,7 +127,8 @@ class C40ImportConverter extends CConverter {
 	 */
 	protected function getDiscoveryRuleDefaultFields() {
 		return [
-			'lld_macro_paths' => []
+			'lld_macro_paths' => [],
+			'preprocessing' => []
 		];
 	}
 }
