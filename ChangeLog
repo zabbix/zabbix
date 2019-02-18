@@ -147,6 +147,7 @@ New features:
 ..FGI..PST [ZBXNEXT-401,ZBXNEXT-4907,ZBXNEXT-4955] added monitoring of internal metrics from an external Zabbix instance (vasilijs, viktors)
 
 Bug fixes:
+..F....... [ZBX-15664] fixed "Undefined index" errors on maps with enabled automatic icon mapping (Sasha)
 ....I..... [ZBX-15667] fixed wrong default Zabbix server status for new installation (kalimulin)
 ..F....... [ZBX-15512] fixed performance issues and significant memory consumption on several pages which contains host popup menus (Sasha)
 ..F....... [ZBX-15512] fixed performance issues in "Problems by severity" widget (talbergs)
