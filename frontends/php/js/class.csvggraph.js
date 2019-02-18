@@ -502,8 +502,16 @@ jQuery(function ($) {
 				});
 
 				if (show_hint) {
+					// Calculate time at mouse position.
+					var time = parseInt(data.timeFrom + ((offsetX - data.dimX) * data.spp));
+
 					html = $('<div></div>')
 							.addClass('svg-graph-hintbox')
+							.append(
+								$('<div></div>')
+									.addClass('header')
+									.html(time2str(time))
+							)
 							.append(html)
 							.append(points_total > data.hintMaxRows
 								? makeHintBoxFooter(data.hintMaxRows, points_total)
@@ -538,6 +546,30 @@ jQuery(function ($) {
 		if (html === null && (in_values_area || in_problem_area)) {
 			destroyHintbox(graph);
 		}
+	}
+
+	/**
+	 * Function converts unix timestamp to human readable time in format Y-m-d H:i:s.
+	 *
+	 * @param {type} time   Unix timestamp to convert.
+	 *
+	 * @returns {string}
+	 */
+	function time2str(time) {
+		var pad = function(v) {
+				var v = '' + v,
+					pad = '00';
+				return pad.substring(0, pad.length - v.length) + v;
+			},
+			dt = new Date(time * 1000),
+			Y = dt.getFullYear(),
+			m = pad(dt.getMonth()+1),
+			d = pad(dt.getDate()),
+			H = pad(dt.getHours()),
+			i = pad(dt.getMinutes()),
+			s = pad(dt.getSeconds());
+
+		return Y+'-'+m+'-'+d+' '+H+':'+i+':'+s;
 	}
 
 	// Function creates hintbox footer.
@@ -575,6 +607,7 @@ jQuery(function ($) {
 						hintMaxRows: options.hint_max_rows,
 						isHintBoxFrozen: false,
 						spp: options.spp || null,
+						timeFrom: options.time_from,
 						minPeriod: options.min_period,
 						boxing: false
 					};

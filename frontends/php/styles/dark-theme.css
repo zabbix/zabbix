@@ -3031,6 +3031,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       height: 10px;
       float: left;
       display: block; }
+  .svg-graph-hintbox .header {
+    margin: 0 0 10px 3px; }
 
 .ui-selectable-helper {
   position: absolute;
