@@ -26,12 +26,12 @@
 
 typedef struct
 {
-	zbx_uint64_t		dcheckid;
-	unsigned short		port;
-	char			dns[INTERFACE_DNS_LEN_MAX];
-	char			value[MAX_DISCOVERED_VALUE_SIZE];
-	int			status;
-	time_t			itemtime;
+	zbx_uint64_t	dcheckid;
+	unsigned short	port;
+	char		dns[INTERFACE_DNS_LEN_MAX];
+	char		value[MAX_DISCOVERED_VALUE_SIZE];
+	int		status;
+	time_t		itemtime;
 }
 zbx_service_t;
 
