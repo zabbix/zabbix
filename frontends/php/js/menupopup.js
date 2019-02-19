@@ -149,6 +149,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 				url.setArgument('filter_show_suppressed', '1');
 			}
+			if (typeof options.filter_application !== 'undefined') {
+				url.setArgument('filter_application', options.filter_application);
+			}
 			url.setArgument('filter_set', '1');
 			problems.url = url.getUrl();
 		}
@@ -259,6 +262,9 @@ function getMenuPopupMapElementGroup(options) {
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 		problems_url.setArgument('filter_show_suppressed', '1');
+	}
+	if (typeof options.filter_application !== 'undefined') {
+		problems_url.setArgument('filter_application', options.filter_application);
 	}
 	problems_url.setArgument('filter_set', '1');
 

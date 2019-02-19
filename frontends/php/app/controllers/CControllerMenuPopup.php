@@ -179,6 +179,10 @@ class CControllerMenuPopup extends CController {
 				$menu_data['urls'] = $data['urls'];
 			}
 
+			if (array_key_exists('filter_application', $data)) {
+				$menu_data['filter_application'] = $data['filter_application'];
+			}
+
 			return $menu_data;
 		}
 
@@ -293,7 +297,7 @@ class CControllerMenuPopup extends CController {
 	private static function getMenuDataMapElement(array $data) {
 		$db_maps = API::Map()->get([
 			'output' => ['show_suppressed'],
-			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls'],
+			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls', 'application'],
 			'sysmapids' => $data['sysmapid'],
 			'expandUrls' => true
 		]);
@@ -358,6 +362,9 @@ class CControllerMenuPopup extends CController {
 						if ($selement['urls']) {
 							$menu_data['urls'] = $selement['urls'];
 						}
+						if ($selement['application']) {
+							$menu_data['filter_application'] = $selement['application'];
+						}
 						return $menu_data;
 
 					case SYSMAP_ELEMENT_TYPE_HOST:
@@ -372,6 +379,9 @@ class CControllerMenuPopup extends CController {
 						}
 						if ($selement['urls']) {
 							$host_data['urls'] = $selement['urls'];
+						}
+						if ($selement['application']) {
+							$host_data['filter_application'] = $selement['application'];
 						}
 						return self::getMenuDataHost($host_data);
 
