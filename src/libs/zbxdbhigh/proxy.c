@@ -3417,8 +3417,8 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		goto fail;
 	}
 
-	zbx_vector_uint64_sort(dcheckids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(dcheckids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(&dcheckids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&dcheckids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (SUCCEED != DBlock_ids("dchecks", "dcheckid", &dcheckids))
 	{
