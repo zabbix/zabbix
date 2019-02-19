@@ -333,7 +333,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 					if (SUCCEED == zbx_db_is_null(row3[0]) || '\0' == *row3[0])
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
-								" host name on \"%s:%hu\"", row[2], port);
+								" host name on \"%s\"", row[2]);
 						host_source = ZBX_DISCOVERY_DNS;
 					}
 					else
@@ -344,7 +344,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 					if (ZBX_DISCOVERY_VALUE == (host_source = atoi(row[6])))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
-								" host name on \"%s:%hu\"", row[2], port);
+								" host name on \"%s\"", row[2]);
 						host_source = ZBX_DISCOVERY_DNS;
 					}
 				}
@@ -384,7 +384,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 					if (SUCCEED == zbx_db_is_null(row3[0]) || '\0' == *row3[0])
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
-								" host visible name on \"%s:%hu\"", row[2], port);
+								" host visible name on \"%s\"", row[2]);
 						name_source = ZBX_DISCOVERY_UNSPEC;
 					}
 					else
@@ -395,7 +395,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 					if (ZBX_DISCOVERY_VALUE == (name_source = atoi(row[7])))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
-								" host visible name on \"%s:%hu\"", row[2], port);
+								" host visible name on \"%s\"", row[2]);
 						name_source = ZBX_DISCOVERY_UNSPEC;
 					}
 				}
