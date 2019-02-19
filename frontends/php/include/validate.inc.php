@@ -562,9 +562,7 @@ function validateTimeUnit($value, $min, $max, $allow_zero, &$error, array $optio
 			}
 
 			if ($value < $min || $value > $max) {
-				$error = $allow_zero
-					? _s('must be "%1$s" or between "%2$s" and "%3$s"', 0, $min, $max)
-					: _s('must be between "%1$s" and "%2$s"', $min, $max);
+				$error = _s('value must be one of %1$s', $allow_zero ? '0, '.$min.'-'.$max : $min.'-'.$max);
 
 				return false;
 			}
