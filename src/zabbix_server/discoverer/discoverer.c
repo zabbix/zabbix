@@ -468,6 +468,8 @@ static int	process_services(DB_DRULE *drule, DB_DHOST *dhost, const char *ip, co
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_vector_uint64_sort(dcheckids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	if (SUCCEED != (ret = DBlock_ids("dchecks", "dcheckid", dcheckids)))
 		goto fail;
 
