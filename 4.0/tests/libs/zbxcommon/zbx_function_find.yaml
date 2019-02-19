@@ -1,0 +1,274 @@
+---
+test case: "successfully found simple function #1"
+in:
+  param: 'test()'
+out:
+  return: 'SUCCEED'
+  func_pos: 0
+  par_l: 4
+  par_r: 5
+---
+test case: "successfully found simple function #2"
+in:
+  param: 'test(param0,23, param2)'
+out:
+  return: 'SUCCEED'
+  func_pos: 0
+  par_l: 4
+  par_r: 22
+---
+test case: "function name not found #1"
+in:
+  param: 'test'
+out:
+  error: 'Incorrect function expression: test'
+  return: 'FAIL'
+---
+test case: "function name not found #2"
+in:
+  param: 'test)('
+out:
+  error: 'Incorrect function expression: test)('
+  return: 'FAIL'
+---
+test case: "function name not found #3"
+in:
+  param: '()test'
+out:
+  error: 'Incorrect function expression: test'
+  return: 'FAIL'
+---
+test case: "function name not found #4"
+in:
+  param: '!!!'
+out:
+  error: 'Incorrect function expression: !!!'
+  return: 'FAIL'
+---
+test case: "function name not found #5"
+in:
+  param: '
+'
+out:
+  error: 'Incorrect function expression:  '
+  return: 'FAIL'
+---
+test case: "function name not found #6"
+in:
+  param: ''
+out:
+  error: 'Incorrect function expression: '
+  return: 'FAIL'
+---
+test case: "function parameters not found #1"
+in:
+  param: 'test('
+out:
+  error: "Incorrect function 'test' expression. Check expression part starting from: "
+  return: 'FAIL'
+---
+test case: "function parameters not found #2"
+in:
+  param: 'test(param'
+out:
+  error: "Incorrect function 'test' expression. Check expression part starting from: param"
+  return: 'FAIL'
+---
+test case: "function parameters not found #3"
+in:
+  param: 'test(,param'
+out:
+  error: "Incorrect function 'test' expression. Check expression part starting from: param"
+  return: 'FAIL'
+---
+test case: "function parameters not found #4"
+in:
+  param: 'test(param,'
+out:
+  error: "Incorrect function 'test' expression. Check expression part starting from: param,"
+  return: 'FAIL'
+---
+test case: "function parameters not found #5"
+in:
+  param: 'last(123,"grpsum[\"{$MYGROUP}\",\"ckey3\",last"])'
+out:
+  error: 'Incorrect function ''last'' expression. Check expression part starting from: "grpsum[\"{$MYGROUP}\",\"ckey3\",last"'
+  return: 'FAIL'
+---
+test case: "successfully found function that started after a space #1"
+in:
+  param: ' test()'
+out:
+  return: 'SUCCEED'
+  func_pos: 1
+  par_l: 5
+  par_r: 6
+---
+test case: "successfully found function that started after a space #2"
+in:
+  param: ' test(1,2,3)'
+out:
+  return: 'SUCCEED'
+  func_pos: 1
+  par_l: 5
+  par_r: 11
+---
+test case: "successfully found function that started after a space #3"
+in:
+  param: '  test(1, 2 ,3)'
+out:
+  return: 'SUCCEED'
+  func_pos: 2
+  par_l: 6
+  par_r: 14
+---
+test case: "successfully found the function #1"
+in:
+  param: 'test(()'
+out:
+  return: 'SUCCEED'
+  func_pos: 0
+  par_l: 4
+  par_r: 6
+---
+test case: "successfully found the function #2"
+in:
+  param: 'test(,)'
+out:
+  return: 'SUCCEED'
+  func_pos: 0
+  par_l: 4
+  par_r: 6
+---
+test case: "successfully found the function #3"
+in:
+  param: "test(',')"
+out:
+  return: 'SUCCEED'
+  func_pos: 0
+  par_l: 4
+  par_r: 8
+---
+test case: "successfully found the function #4"
+in:
+  param: 'test()dirt'
+out:
+  return: 'SUCCEED'
+  func_pos: 0
+  par_l: 4
+  par_r: 5
+---
+test case: "function with a complex set of parameters was successfully found #1"
+in:
+  param: 'last(123,"grpsum[{$MYGROUP}]")'
+out:
+  return: 'SUCCEED'
+  func_pos: 0
+  par_l: 4
+  par_r: 29
+---
+test case: "function with a complex set of parameters was successfully found #2"
+in:
+  param: 'last(123,"grpsum[\"{$MYGROUP}\",\"ckey3\",last]")'
+out:
+  return: 'SUCCEED'
+  func_pos: 0
+  par_l: 4
+  par_r: 48
+---
+test case: "function with LLD function"
+in:
+  param: '{{#VALUE}.regsub([0-9]+, \0)}+avg("Zabbix server:trap[\"{{#VALUE}.regsub([0-9]+, \0)}\"]",600) + {{#VALUE}.regsub([0-9], \0)}'
+out:
+  return: 'SUCCEED'
+  func_pos: 30
+  par_l: 33
+  par_r: 93
+---
+test case: "function with LLD function in macro context"
+in:
+  param: '{$MACRO:"{{#VALUE}.regsub([0-9]+, \0)}"}+avg("Zabbix server:trap[\"{{#VALUE}.regsub([0-9]+, \0)}\"]",600) + {{#VALUE}.regsub([0-9], \0)}'
+out:
+  return: 'SUCCEED'
+  func_pos: 41
+  par_l: 44
+  par_r: 104
+---
+test case: "function with LLD function double escaped"
+in:
+  param: avg("Zabbix server:trap[\"{{#VALUE}.regsub(\\"[0-9]+\\", \0)}\"]",600)'
+out:
+  return: 'SUCCEED'
+  func_pos: 0
+  par_l: 3
+  par_r: 69
+---
+test case: "Check that opening of LLD function macro is skipped if no macro"
+in:
+  param: '{{#avg("Zabbix server:trap[{#VALUE}]",600)'
+out:
+  return: 'SUCCEED'
+  func_pos: 3
+  par_l: 6
+  par_r: 41
+---
+test case: "Check that emptynested LLD function macro is skipped if no macro"
+in:
+  param: '{{#}avg("Zabbix server:trap[{#VALUE}]",600)'
+out:
+  return: 'SUCCEED'
+  func_pos: 4
+  par_l: 7
+  par_r: 42
+---
+test case: "Only opening of LLD macro function must fail #1"
+in:
+  param: '{{#'
+out:
+  error: 'Incorrect function expression: {{#'
+  return: 'FAIL'
+---
+test case: "Only opening of LLD macro function must fail #2"
+in:
+  param: '{{'
+out:
+  error: 'Incorrect function expression: {{'
+  return: 'FAIL'
+---
+test case: "Only opening of LLD macro function must fail #3"
+in:
+  param: '{'
+out:
+  error: 'Incorrect function expression: {'
+  return: 'FAIL'
+---
+test case: "Only opening of LLD macro function must fail #4"
+in:
+  param: '{{#}'
+out:
+  error: 'Incorrect function expression: {{#}'
+  return: 'FAIL'
+---
+test case: "Unit suffix support in calculated item formulas #1"
+in:
+  param: '5davg(system.cpu.intr,10m)*10m+1d/1K'
+out:
+  return: 'SUCCEED'
+  func_pos: 2
+  par_l: 5
+  par_r: 25
+---
+test case: "Unit suffix support in calculated item formulas #2"
+in:
+  param: 'm+avg(system.cpu.intr,10m)+1'
+out:
+  error: 'Incorrect function expression: m+avg(system.cpu.intr,10m)+1'
+  return: 'FAIL'
+---
+test case: "Valid expression without function"
+in:
+  param: '100+3*999'
+out:
+  error: 'Incorrect function expression: 100+3*999'
+  return: 'FAIL'
+...

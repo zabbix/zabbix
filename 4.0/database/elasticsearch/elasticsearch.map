@@ -1,0 +1,164 @@
+# uint mapping
+
+{
+   "settings" : {
+      "index" : {
+         "number_of_replicas" : 1,
+         "number_of_shards" : 5
+      }
+   },
+   "mappings" : {
+      "values" : {
+         "properties" : {
+            "itemid" : {
+               "type" : "long"
+            },
+            "clock" : {
+               "format" : "epoch_second",
+               "type" : "date"
+            },
+            "value" : {
+               "type" : "long"
+            }
+         }
+      }
+   }
+}
+
+
+# dbl mapping
+
+{
+   "settings" : {
+      "index" : {
+         "number_of_replicas" : 1,
+         "number_of_shards" : 5
+      }
+   },
+   "mappings" : {
+      "values" : {
+         "properties" : {
+            "itemid" : {
+               "type" : "long"
+            },
+            "clock" : {
+               "format" : "epoch_second",
+               "type" : "date"
+            },
+            "value" : {
+               "type" : "double"
+            }
+         }
+      }
+   }
+}
+
+
+# str mapping
+
+{
+   "settings" : {
+      "index" : {
+         "number_of_replicas" : 1,
+         "number_of_shards" : 5
+      }
+   },
+   "mappings" : {
+      "values" : {
+         "properties" : {
+            "itemid" : {
+               "type" : "long"
+            },
+            "clock" : {
+               "format" : "epoch_second",
+               "type" : "date"
+            },
+            "value" : {
+               "fields" : {
+                  "analyzed" : {
+                     "index" : true,
+                     "type" : "text",
+                     "analyzer" : "standard"
+                  }
+               },
+               "index" : false,
+               "type" : "text"
+            }
+         }
+      }
+   }
+}
+
+
+# text mapping
+
+{
+   "settings" : {
+      "index" : {
+         "number_of_replicas" : 1,
+         "number_of_shards" : 5
+      }
+   },
+   "mappings" : {
+      "values" : {
+         "properties" : {
+            "itemid" : {
+               "type" : "long"
+            },
+            "clock" : {
+               "format" : "epoch_second",
+               "type" : "date"
+            },
+            "value" : {
+               "fields" : {
+                  "analyzed" : {
+                     "index" : true,
+                     "type" : "text",
+                     "analyzer" : "standard"
+                  }
+               },
+               "index" : false,
+               "type" : "text"
+            }
+         }
+      }
+   }
+}
+
+
+# log mapping
+
+{
+   "settings" : {
+      "index" : {
+         "number_of_replicas" : 1,
+         "number_of_shards" : 5
+      }
+   },
+   "mappings" : {
+      "values" : {
+         "properties" : {
+            "itemid" : {
+               "type" : "long"
+            },
+            "clock" : {
+               "format" : "epoch_second",
+               "type" : "date"
+            },
+            "value" : {
+               "fields" : {
+                  "analyzed" : {
+                     "index" : true,
+                     "type" : "text",
+                     "analyzer" : "standard"
+                  }
+               },
+               "index" : false,
+               "type" : "text"
+            }
+         }
+      }
+   }
+}
+
+
