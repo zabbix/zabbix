@@ -1319,12 +1319,12 @@
 							};
 
 						if (pos['y'] + pos['height'] > data['options']['rows']) {
-							data['options']['rows'] = pos['y'] + pos['height'];
+							resizeDashboardGrid($obj, data, pos['y'] + pos['height']);
 							// Body height should be adjusted to animate scrollTop work.
-							$('body').css({
-								height: $('body').height() + pos['height'] *  data['options']['widget-height']
-							});
-							resizeDashboardGrid($obj, data);
+							$('body').css('height', Math.max(
+								$('body').height(),
+								(pos['y'] + pos['height']) * data['options']['widget-height']
+							));
 						}
 
 						// 5px shift is widget padding.
