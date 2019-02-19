@@ -606,7 +606,7 @@ static int	sent_wait(ZBX_THREAD_SENDVAL_ARGS *sendval_args, zbx_thread_args_t *t
 
 /******************************************************************************
  *                                                                            *
- * Function: add_serveractive_hosts_cb                                        *
+ * Function: sender_add_serveractive_hosts_cb                                 *
  *                                                                            *
  * Purpose: create a list of destination addresses                            *
  *                                                                            *
