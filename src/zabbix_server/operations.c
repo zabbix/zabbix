@@ -356,8 +356,6 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				else
 					host = zbx_strdup(NULL, row[3]);
 
-				if (NULL != (row3 = DBfetch(result3)))
-					THIS_SHOULD_NEVER_HAPPEN;
 				DBfree_result(result3);
 
 				/* for host uniqueness purposes */
