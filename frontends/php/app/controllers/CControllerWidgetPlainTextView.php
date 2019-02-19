@@ -78,34 +78,18 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			$error = _('No permissions to referred object or it does not exist!');
 		}
 		else {
+			// macros
 			$items = CMacrosResolverHelper::resolveItemNames($items);
+			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
+
 			$histories = Manager::History()->getLastValues($items, $fields['show_lines']);
 
 			if ($histories) {
 				$histories = call_user_func_array('array_merge', $histories);
 
-				foreach ($histories as &$history) {
-					switch ($items[$history['itemid']]['value_type']) {
-						case ITEM_VALUE_TYPE_FLOAT:
-							sscanf($history['value'], '%f', $history['value']);
-							break;
-						case ITEM_VALUE_TYPE_TEXT:
-						case ITEM_VALUE_TYPE_STR:
-						case ITEM_VALUE_TYPE_LOG:
-							if ($fields['show_as_html']) {
-								$history['value'] = new CJsScript($history['value']);
-							}
-							break;
-					}
-
-					if ($items[$history['itemid']]['valuemapid'] != 0) {
-						$history['value'] = applyValueMap($history['value'], $items[$history['itemid']]['valuemapid']);
-					}
-					else if (!$fields['show_as_html']) {
-						$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], false);
-					}
-
-					if (!$fields['show_as_html']) {
+				if (!$fields['show_as_html']) {
+					foreach ($histories as &$history) {
+						$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], true);
 						$history['value'] = new CPre($history['value']);
 					}
 				}
