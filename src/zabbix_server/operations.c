@@ -312,16 +312,22 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				DB_RESULT		result3;
 				DB_ROW			row3;
 				zbx_dcheck_source_t	host_source, name_source;
+				char			*sql = NULL;
+				size_t			sql_alloc, sql_offset;
 
-				result3 = DBselect(
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"select ds.value"
 						" from dchecks dc"
 							" left join dservices ds"
 								" on ds.dcheckid=dc.dcheckid"
 									" and ds.dhostid=" ZBX_FS_UI64
 						" where dc.druleid=" ZBX_FS_UI64
-							" and dc.host_source=%d",
+							" and dc.host_source=%d"
+						" order by ds.dserviceid",
 							dhostid, druleid, ZBX_DISCOVERY_VALUE);
+
+				result3 = DBselectN(sql, 1);
+
 				if (NULL != (row3 = DBfetch(result3)))
 				{
 					if (SUCCEED == zbx_db_is_null(row3[0]) || '\0' == *row3[0])
@@ -350,6 +356,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				else
 					host = zbx_strdup(NULL, row[3]);
 
+				if (NULL != (row3 = DBfetch(result3)))
+					THIS_SHOULD_NEVER_HAPPEN;
 				DBfree_result(result3);
 
 				/* for host uniqueness purposes */
@@ -357,7 +365,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				host_unique = DBget_unique_hostname_by_sample(host, "host");
 				zbx_free(host);
 
-				result3 = DBselect(
+				sql_offset = 0;
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"select ds.value"
 						" from dchecks dc"
 							" left join dservices ds"
@@ -365,9 +374,13 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 									" and ds.dhostid=" ZBX_FS_UI64
 						" where dc.druleid=" ZBX_FS_UI64
 							" and dc.host_source in (%d,%d,%d,%d)"
-							" and dc.name_source=%d",
+							" and dc.name_source=%d"
+						" order by ds.dserviceid",
 							dhostid, druleid, ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS,
 							ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE, ZBX_DISCOVERY_VALUE);
+
+				result3 = DBselectN(sql, 1);
+
 				if (NULL != (row3 = DBfetch(result3)))
 				{
 					if (SUCCEED == zbx_db_is_null(row3[0]) || '\0' == *row3[0])
@@ -400,6 +413,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 					host_visible = zbx_strdup(NULL, host_unique);
 
 				DBfree_result(result3);
+				zbx_free(sql);
 
 				make_hostname(host_visible);	/* replace not-allowed symbols */
 				host_visible_unique = DBget_unique_hostname_by_sample(host_visible, "name");
