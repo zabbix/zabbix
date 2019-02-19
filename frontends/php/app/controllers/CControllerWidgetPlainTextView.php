@@ -92,8 +92,8 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 						$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], true);
 						$history['value'] = new CPre($history['value']);
 					}
+					unset($history);
 				}
-				unset($history);
 			}
 
 			CArrayHelper::sort($histories, [
