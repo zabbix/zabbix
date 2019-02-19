@@ -72,6 +72,10 @@ class CMultiSelect extends CTag {
 		];
 
 		if (array_key_exists('data', $options)) {
+			foreach ($options['data'] as &$item) {
+				$item['id'] = (string) $item['id'];
+			}
+			unset($item);
 			$params['data'] = zbx_cleanHashes($options['data']);
 		}
 
@@ -94,7 +98,9 @@ class CMultiSelect extends CTag {
 					: []);
 
 				if ($excludeids) {
-					$params['excludeids'] = $excludeids;
+					foreach ($excludeids as $id) {
+						$params['excludeids'][] = (string) $id;
+					}
 				}
 			}
 		}
@@ -201,8 +207,8 @@ class CMultiSelect extends CTag {
 				}
 
 				if (array_key_exists('hostid', $parameters) && $parameters['hostid'] > 0) {
-					$popup_parameters['only_hostid'] = $parameters['hostid'];
-					$autocomplete_parameters['hostid'] = $parameters['hostid'];
+					$popup_parameters['only_hostid'] = (string) $parameters['hostid'];
+					$autocomplete_parameters['hostid'] = (string) $parameters['hostid'];
 				}
 
 				if (array_key_exists('numeric', $parameters) && $parameters['numeric']) {
