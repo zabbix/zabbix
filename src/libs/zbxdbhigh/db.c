@@ -2818,8 +2818,6 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 	if (0 == ids->values_num)
 		return FAIL;
 
-	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s from %s where", field_name, table_name);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name, ids->values, ids->values_num);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by %s" ZBX_FOR_UPDATE, field_name);
