@@ -42,12 +42,12 @@ class CAPITest extends CTest {
 	public function checkResult($response, $error = null) {
 		// Check response data.
 		if ($error === null || $error === false) {
-			$this->assertTrue(array_key_exists('result', $response));
-			$this->assertFalse(array_key_exists('error', $response));
+			$this->assertArrayHasKey('result', $response);
+			$this->assertArrayNotHasKey('error', $response);
 		}
 		else {
-			$this->assertFalse(array_key_exists('result', $response));
-			$this->assertTrue(array_key_exists('error', $response));
+			$this->assertArrayNotHasKey('result', $response);
+			$this->assertArrayHasKey('error', $response);
 
 			if (is_array($error)) {
 				$this->assertSame($error, $response['error']);
@@ -136,10 +136,10 @@ class CAPITest extends CTest {
 	 */
 	public function onBeforeTestCase() {
 		global $URL;
-		parent::onBeforeTestCase();
+		$URL = PHPUNIT_URL.'api_jsonrpc.php';
 		CAPIHelper::reset();
 
-		$URL = PHPUNIT_URL.'api_jsonrpc.php';
+		parent::onBeforeTestCase();
 	}
 
 	/**
