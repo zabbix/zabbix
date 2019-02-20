@@ -3412,8 +3412,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	if (SUCCEED != DBlock_druleid(drule.druleid))
 	{
 		DBrollback();
-		zabbix_log(LOG_LEVEL_DEBUG, "discovery rule with ID [" ZBX_FS_UI64 "] was deleted during processing,"
-					" stopping", drule.druleid);
+		zabbix_log(LOG_LEVEL_DEBUG, "druleid:" ZBX_FS_UI64 " does not exist", drule.druleid);
 		goto fail;
 	}
 
@@ -3423,8 +3422,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	if (SUCCEED != DBlock_ids("dchecks", "dcheckid", &dcheckids))
 	{
 		DBrollback();
-		zabbix_log(LOG_LEVEL_DEBUG, "checks for discovery rule ID [" ZBX_FS_UI64 "] were deleted during"
-				" processing, stopping", drule.druleid);
+		zabbix_log(LOG_LEVEL_DEBUG, "checks are not available for druleid:" ZBX_FS_UI64, drule.druleid);
 		goto fail;
 	}
 
@@ -3448,7 +3446,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 
 		if (FAIL == zbx_vector_uint64_bsearch(&dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " does not exist", service->dcheckid);
+			zabbix_log(LOG_LEVEL_INFORMATION, "dcheckid:" ZBX_FS_UI64 " does not exist", service->dcheckid);
 			continue;
 		}
 
