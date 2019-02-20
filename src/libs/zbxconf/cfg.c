@@ -591,7 +591,6 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
 void	zbx_get_serveractive_hosts(char *active_hosts, add_serveractive_hosts_f cb)
 {
 	char	*l = active_hosts, *r;
-	int	rc = SUCCEED;
 
 	do
 	{
@@ -602,14 +601,20 @@ void	zbx_get_serveractive_hosts(char *active_hosts, add_serveractive_hosts_f cb)
 			*r = '\0';
 
 		if (SUCCEED != parse_serveractive_element(l, &host, &port, (unsigned short)ZBX_DEFAULT_SERVER_PORT))
-			goto fail;
+		{
+			zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid", l);
+			exit(EXIT_FAILURE);
+		}
 
-		rc = cb(host, port);
+		if (SUCCEED != cb(host, port))
+		{
+			zbx_error("error parsing a \"ServerActive\" option: address \"%s\" specified more than once",
+					l);
+			zbx_free(host);
+			exit(EXIT_FAILURE);
+		}
 
 		zbx_free(host);
-
-		if (SUCCEED != rc)
-			goto fail;
 
 		if (NULL != r)
 		{
@@ -618,16 +623,4 @@ void	zbx_get_serveractive_hosts(char *active_hosts, add_serveractive_hosts_f cb)
 		}
 	}
 	while (NULL != r);
-
-	return;
-fail:
-	if (SUCCEED != rc)
-		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" specified more than once", l);
-	else
-		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid", l);
-
-	if (NULL != r)
-		*r = ',';
-
-	exit(EXIT_FAILURE);
 }
