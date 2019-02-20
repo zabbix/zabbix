@@ -208,26 +208,4 @@ char	*zbx_http_get_header(char **headers)
 	return NULL;
 }
 
-void	zbx_http_add_headers(char *headers, struct curl_slist **headers_slist, CURL *easyhandle)
-{
-	char	*line;
-
-	while (NULL != (line = zbx_http_get_header(&headers)))
-	{
-		if (SUCCEED == zbx_strmatch_condition(line, "Cookie:", CONDITION_OPERATOR_LIKE))
-
-		{
-			char *cookie = strchr(line, ':');
-
-			/* this is the proper way to set additional cookies */
-			curl_easy_setopt(easyhandle, CURLOPT_COOKIE, (cookie + sizeof(char)));
-		}
-		else
-		{
-			*headers_slist = curl_slist_append(*headers_slist, line);
-		}
-		zbx_free(line);
-	}
-}
-
 #endif
