@@ -459,7 +459,7 @@ static void	process_checks(const DB_DRULE *drule, int *host_status, char *ip, in
  * Function: process_services                                                 *
  *                                                                            *
  ******************************************************************************/
-static int	process_services(DB_DRULE *drule, DB_DHOST *dhost, const char *ip, const char *dns, int now,
+static int	process_services(const DB_DRULE *drule, DB_DHOST *dhost, const char *ip, const char *dns, int now,
 		const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
 	const char	*__function_name = "process_services";

@@ -74,7 +74,7 @@ static DB_RESULT	discovery_get_dhost_by_ip(zbx_uint64_t druleid, const char *ip)
  * Parameters: host ip address                                                *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char *ip)
+static void	discovery_separate_host(const DB_DRULE *drule, DB_DHOST *dhost, const char *ip)
 {
 	const char	*__function_name = "discovery_separate_host";
 
@@ -132,7 +132,7 @@ static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char
  * Parameters: host ip address                                                *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_register_host(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost,
+static void	discovery_register_host(const DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost,
 		const char *ip, int status, const char *value)
 {
 	const char	*__function_name = "discovery_register_host";
@@ -480,7 +480,7 @@ void	discovery_update_host(DB_DHOST *dhost, int status, int now)
  * Parameters: service - service info                                         *
  *                                                                            *
  ******************************************************************************/
-void	discovery_update_service(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost, const char *ip,
+void	discovery_update_service(const DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost, const char *ip,
 		const char *dns, int port, int status, const char *value, int now)
 {
 	const char	*__function_name = "discovery_update_service";

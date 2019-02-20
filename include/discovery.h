@@ -36,6 +36,6 @@ typedef struct
 zbx_service_t;
 
 void	discovery_update_host(DB_DHOST *dhost, int status, int now);
-void	discovery_update_service(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost,
+void	discovery_update_service(const DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost,
 		const char *ip, const char *dns, int port, int status, const char *value, int now);
 #endif
