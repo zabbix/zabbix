@@ -3446,7 +3446,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 
 		if (FAIL == zbx_vector_uint64_bsearch(&dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "dcheckid:" ZBX_FS_UI64 " does not exist", service->dcheckid);
+			zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " does not exist", service->dcheckid);
 			continue;
 		}
 
