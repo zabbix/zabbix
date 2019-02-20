@@ -481,8 +481,7 @@ class CItemPrototype extends CItemGeneral {
 		$this->createItemPreprocessing($items);
 	}
 
-	protected function updateReal($items) {
-		$items = zbx_toArray($items);
+	protected function updateReal(array $items) {
 		CArrayHelper::sort($items, ['itemid']);
 
 		$data = [];

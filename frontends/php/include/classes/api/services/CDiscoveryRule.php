@@ -908,8 +908,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 	}
 
-	protected function updateReal($items) {
-		$items = zbx_toArray($items);
+	protected function updateReal(array $items) {
 		CArrayHelper::sort($items, ['itemid']);
 
 		$ruleIds = zbx_objectValues($items, 'itemid');
