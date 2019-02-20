@@ -3433,7 +3433,11 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		service = (zbx_service_t *)services_old.values[i];
 
 		if (FAIL == zbx_vector_uint64_bsearch(&dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " either does not exist or does not"
+					" belong to druleid:" ZBX_FS_UI64, service->dcheckid, drule.druleid);
 			continue;
+		}
 
 		discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
 				service->status, service->value, service->itemtime);
@@ -3444,7 +3448,11 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		service = (zbx_service_t *)services->values[*processed_num];
 
 		if (FAIL == zbx_vector_uint64_bsearch(&dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " either does not exist or does not"
+					" belong to druleid:" ZBX_FS_UI64, service->dcheckid, drule.druleid);
 			continue;
+		}
 
 		discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
 				service->status, service->value, service->itemtime);
