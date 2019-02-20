@@ -401,7 +401,7 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, i
  * Function: process_checks                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	process_checks(DB_DRULE *drule, int *host_status, char *ip, int unique, int now,
+static void	process_checks(const DB_DRULE *drule, int *host_status, char *ip, int unique, int now,
 		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
 	DB_RESULT	result;
