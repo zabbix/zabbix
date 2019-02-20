@@ -1534,5 +1534,7 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
-#endif
+void	zbx_trim_integer(char *str);
+void	zbx_trim_float(char *str);
 
+#endif

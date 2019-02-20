@@ -5006,3 +5006,94 @@ void	zbx_strsplit(const char *src, char delimiter, char **left, char **right)
 		memcpy(*right, delimiter_ptr + 1, right_size);
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_trim_number                                                  *
+ *                                                                            *
+ * Purpose: Strip characters from both ends of the number                     *
+ *                                                                            *
+ * Parameters: str             - [IN/OUT] string for processing               *
+ *             strip_plus_sign - [IN] non-zero if "+" should be stripped      *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_trim_number(char *str, int strip_plus_sign)
+{
+	char	*left = str;			/* pointer to the first character */
+	char	*right = strchr(str, '\0') - 1; /* pointer to the last character, not including terminating null-char */
+
+	if (left > right)
+	{
+		/* string is empty before any trimming */
+		return;
+	}
+
+	while (' ' == *left)
+	{
+		left++;
+	}
+
+	while (' ' == *right && left < right)
+	{
+		right--;
+	}
+
+	if ('"' == *left && '"' == *right && left < right)
+	{
+		left++;
+		right--;
+	}
+
+	if (0 != strip_plus_sign && '+' == *left)
+	{
+		left++;
+	}
+
+	if (left > right)
+	{
+		/* string is empty after trimming */
+		*str = '\0';
+		return;
+	}
+
+	if (str < left)
+	{
+		while (left <= right)
+		{
+			*str++ = *left++;
+		}
+		*str = '\0';
+	}
+	else
+	{
+		*(right + 1) = '\0';
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_trim_integer                                                 *
+ *                                                                            *
+ * Purpose: Strip characters from both ends of the number                     *
+ *                                                                            *
+ * Parameters: str - [IN/OUT] string for processing                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_trim_integer(char *str)
+{
+	zbx_trim_number(str, 1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_trim_float                                                   *
+ *                                                                            *
+ * Purpose: Strip characters from both ends of the number                     *
+ *                                                                            *
+ * Parameters: str - [IN/OUT] string for processing                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_trim_float(char *str)
+{
+	zbx_trim_number(str, 0);
+}

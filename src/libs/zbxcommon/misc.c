@@ -2634,9 +2634,6 @@ int	is_double(const char *str)
 {
 	int	len;
 
-	while (' ' == *str)			/* trim left spaces */
-		str++;
-
 	if ('-' == *str || '+' == *str)		/* check leading sign */
 		str++;
 
