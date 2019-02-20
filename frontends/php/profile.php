@@ -155,14 +155,17 @@ elseif (hasRequest('update')) {
 		if (!isset($messages['enabled'])) {
 			$messages['enabled'] = 0;
 		}
-		if (!isset($messages['triggers.recovery'])) {
-			$messages['triggers.recovery'] = 0;
-		}
-		if (!isset($messages['triggers.severities'])) {
-			$messages['triggers.severities'] = [];
-		}
-		if (!array_key_exists('show_suppressed', $messages)) {
-			$messages['show_suppressed'] = ZBX_PROBLEM_SUPPRESSED_FALSE;
+
+		if ($messages['enabled'] != 0) {
+			if (!isset($messages['triggers.recovery'])) {
+				$messages['triggers.recovery'] = 0;
+			}
+			if (!isset($messages['triggers.severities'])) {
+				$messages['triggers.severities'] = [];
+			}
+			if (!array_key_exists('show_suppressed', $messages)) {
+				$messages['show_suppressed'] = ZBX_PROBLEM_SUPPRESSED_FALSE;
+			}
 		}
 
 		DBstart();
