@@ -606,7 +606,7 @@ static int	sent_wait(ZBX_THREAD_SENDVAL_ARGS *sendval_args, zbx_thread_args_t *t
 
 /******************************************************************************
  *                                                                            *
- * Function: sender_add_serveractive_hosts_cb                                 *
+ * Function: sender_add_serveractive_host_cb                                  *
  *                                                                            *
  * Purpose: create a list of destination addresses                            *
  *                                                                            *
@@ -618,7 +618,7 @@ static int	sent_wait(ZBX_THREAD_SENDVAL_ARGS *sendval_args, zbx_thread_args_t *t
  *                FAIL - destination has been already added                   *
  *                                                                            *
  ******************************************************************************/
-static int	sender_add_serveractive_hosts_cb(const char *host, unsigned short port)
+static int	sender_add_serveractive_host_cb(const char *host, unsigned short port)
 {
 	int	i;
 
@@ -700,7 +700,7 @@ static void	zbx_load_config(const char *config_file)
 	if (NULL == ZABBIX_SERVER)
 	{
 		if (NULL != cfg_active_hosts && '\0' != *cfg_active_hosts)
-			zbx_get_serveractive_hosts(cfg_active_hosts, sender_add_serveractive_hosts_cb);
+			zbx_get_serveractive_hosts(cfg_active_hosts, sender_add_serveractive_host_cb);
 	}
 	zbx_free(cfg_active_hosts);
 
@@ -841,7 +841,7 @@ static void	parse_commandline(int argc, char **argv)
 		else
 			port = ZABBIX_SERVER_PORT;
 
-		sender_add_serveractive_hosts_cb(ZABBIX_SERVER, port);
+		sender_add_serveractive_host_cb(ZABBIX_SERVER, port);
 	}
 
 	/* every option may be specified only once */
