@@ -2805,6 +2805,17 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
  *                                                                            *
  * Function: DBlock_ids                                                       *
  *                                                                            *
+ * Purpose: locks a records in a table by field name                          *
+ *                                                                            *
+ * Parameters: table      - [IN] the target table                             *
+ *             field_name - [IN] field name                                   *
+ *             ids        - [IN/OUT] IN - sorted array of IDs to lock         *
+ *                                   OUT - resulting array of locked IDs      *
+ *                                                                            *
+ * Return value: SUCCEED - one or more of the specified records were          *
+ *                         successfully locked                                *
+ *               FAIL    - no one record were locked                          *
+ *                                                                            *
  ******************************************************************************/
 int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64_t *ids)
 {
