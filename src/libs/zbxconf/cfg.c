@@ -588,7 +588,7 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
  * Purpose: parse string like IP<:port>,[IPv6]<:port>                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_serveractive_hosts(char *active_hosts, add_serveractive_hosts_f cb)
+void	zbx_get_serveractive_hosts(char *active_hosts, add_serveractive_host_f cb)
 {
 	char	*l = active_hosts, *r;
 
