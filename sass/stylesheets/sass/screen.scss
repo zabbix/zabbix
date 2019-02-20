@@ -2117,11 +2117,6 @@ select {
 				border-color: $form-border-color !important;
 			}
 		}
-		&:checked[readonly] + label span {
-			&::after {
-				border-color: $form-border-color !important;
-			}
-		}
 	}
 
 	&[type="radio"] {
@@ -2184,10 +2179,6 @@ select {
 		border-color: $form-border-focus-color;
 	}
 
-	&:focus[readonly] + label span {
-		border-color: $form-disabled-border-color;
-	}
-
 	&:checked[disabled] + label span {
 		&::after {
 			border-color: $form-border-color !important;
@@ -2196,11 +2187,6 @@ select {
 	}
 
 	&[disabled] + label span {
-		@include transition(none);
-		@extend %form-disabled;
-	}
-
-	&[readonly] + label span {
 		@include transition(none);
 		@extend %form-disabled;
 	}

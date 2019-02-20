@@ -33,19 +33,11 @@
 
 		<?php if ($this->data['is_profile']): ?>
 			jQuery('#messages_enabled').on('change', function() {
-				jQuery('#messagingTab input[type != checkbox], #messagingTab button, #messagingTab select')
-					.prop('disabled', !this.checked);
-				jQuery('#messagingTab input[type = checkbox]').not('#messages_enabled').prop('readonly', !this.checked);
+				jQuery('#messagingTab input, #messagingTab button, #messagingTab select').prop('disabled', !this.checked);
+				jQuery('#messages_enabled').prop('disabled', false);
 			});
 
 			jQuery('#messages_enabled').trigger('change');
-
-			jQuery(':checkbox').click(function () {
-				if (typeof (jQuery(this).attr('readonly')) !== "undefined") {
-					jQuery(this).blur();
-					return false;
-				}
-			});
 		<?php endif ?>
 	});
 </script>

@@ -1408,8 +1408,6 @@ select {
     transform: translate(-50%, -50%) rotate(-45deg); }
   .checkbox-radio[type="checkbox"]:checked[disabled] + label span::after {
     border-color: #4f4f4f !important; }
-  .checkbox-radio[type="checkbox"]:checked[readonly] + label span::after {
-    border-color: #4f4f4f !important; }
   .checkbox-radio[type="radio"] + label span {
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
@@ -1445,8 +1443,6 @@ select {
     border-color: #768d99; }
   .checkbox-radio:checked:focus + label span {
     border-color: #768d99; }
-  .checkbox-radio:focus[readonly] + label span {
-    border-color: #3d3d3d; }
   .checkbox-radio:checked[disabled] + label span {
     -webkit-transition: none;
     -moz-transition: none;
@@ -1454,10 +1450,6 @@ select {
     .checkbox-radio:checked[disabled] + label span::after {
       border-color: #4f4f4f !important; }
   .checkbox-radio[disabled] + label span {
-    -webkit-transition: none;
-    -moz-transition: none;
-    transition: none; }
-  .checkbox-radio[readonly] + label span {
     -webkit-transition: none;
     -moz-transition: none;
     transition: none; }
@@ -1946,7 +1938,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: 0.3;
     background-color: transparent; }
 
-.multiselect[aria-disabled], .radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span, .checkbox-radio[readonly] + label span {
+.multiselect[aria-disabled], .radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
   color: #525252;
   background-color: #2b2b2b !important;
   border-color: #3d3d3d; }
