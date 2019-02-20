@@ -1039,8 +1039,8 @@ static int	get_housekeeping_period(double time_slept)
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
-	int	now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions, d_services, d_audit, sleeptime;
-	int	d_proxy_dhistory;
+	int	now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions, d_services, d_audit, sleeptime,
+		records;
 	double	sec, time_slept, time_now;
 	char	sleeptext[25];
 
@@ -1110,18 +1110,17 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old audit log items]", get_process_type_string(process_type));
 		d_audit = housekeeping_audit(now);
 
-		zbx_setproctitle("%s [removing old proxy discovery data]", get_process_type_string(process_type));
-		d_proxy_dhistory = housekeeping_proxy_dhistory(now);
+		zbx_setproctitle("%s [removing old records]", get_process_type_string(process_type));
+		records = housekeeping_proxy_dhistory(now);
 
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
 		d_cleanup = housekeeping_cleanup();
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items/triggers, %d events, %d problems,"
-				" %d sessions, %d alarms, %d audit, %d proxy discovery data in " ZBX_FS_DBL " sec, %s]",
-				get_process_type_string(process_type), d_history_and_trends,
-				d_cleanup, d_events, d_problems, d_sessions, d_services, d_audit, d_proxy_dhistory, sec,
-				sleeptext);
+				" %d sessions, %d alarms, %d audit, %d records in " ZBX_FS_DBL " sec, %s]",
+				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
+				d_problems, d_sessions, d_services, d_audit, records, sec, sleeptext);
 
 		zbx_config_clean(&cfg);
 
@@ -1130,9 +1129,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_dc_cleanup_data_sessions();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
-				" %d audit items %d proxy discovery data in " ZBX_FS_DBL " sec, %s]",
+				" %d audit items, %d records in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
-				d_sessions, d_services, d_audit, d_proxy_dhistory, sec, sleeptext);
+				d_sessions, d_services, d_audit, records, sec, sleeptext);
 
 		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY)
 			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
