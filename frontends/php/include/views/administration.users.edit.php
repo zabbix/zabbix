@@ -411,10 +411,7 @@ if ($data['is_profile']) {
 		$triggersTable->addRow([
 			(new CCheckBox('messages[triggers.severities]['.$severity.']'))
 				->setLabel(getSeverityName($severity, $data['config']))
-				->setChecked(
-					array_key_exists($severity, $data['messages']['triggers.severities'])
-					&& $data['messages']['triggers.severities'][$severity] == 1
-				)
+				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
 				->setUncheckedValue(0),
 			[
 				$soundList,
