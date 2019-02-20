@@ -21,7 +21,7 @@
 
 			fields
 				.not(this)
-				.attr('disabled', !this.checked)
+				.prop('disabled', !this.checked)
 				.filter('[name$=_case_sensitive]:not(:disabled)')
 				.prop('checked', true);
 		});

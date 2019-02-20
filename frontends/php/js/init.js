@@ -20,6 +20,16 @@
 
 jQuery(function($) {
 
+	$.propHooks.disabled = {
+		set: function (el, val) {
+			if (el.disabled !== val) {
+				el.disabled = val;
+				val && $(el).trigger('disable');
+				!val && $(el).trigger('enable');
+			}
+		}
+	};
+
 	var $search = $('#search');
 
 	if ($search.length) {
@@ -59,6 +69,28 @@ jQuery(function($) {
 		});
 
 		changeClass(comboBox);
+	});
+
+	function uncheckedHandler($checkbox) {
+		var $hidden = $checkbox.siblings('input[type=hidden][name="'+$checkbox.prop('name')+'"]');
+
+		if ($checkbox.is(':checked') || $checkbox.is(':disabled')) {
+			$hidden.remove();
+		}
+		else if(!$checkbox.is(':disabled') && !$hidden.length) {
+			$('<input>', {'type': 'hidden', 'name': $checkbox.prop('name')})
+				.val($checkbox.attr('unchecked-value'))
+				.insertBefore($checkbox);
+		}
+	}
+
+	$('input[unchecked-value]').each(function() {
+		var $this = $(this);
+
+		uncheckedHandler($this);
+		$this.on('change enable disable', function() {
+			uncheckedHandler($(this));
+		});
 	});
 
 	function showMenuPopup(obj, data, event) {
