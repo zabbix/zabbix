@@ -252,10 +252,10 @@ typedef struct
 	unsigned short		port;
 	ZBX_THREAD_HANDLE	*thread;
 }
-ZBX_SEND_DESTINATIONS;
+zbx_send_destinations_t;
 
-static ZBX_SEND_DESTINATIONS	*CONFIG_SEND_DESTINATIONS = NULL;
-static int			CONFIG_SEND_DEST_COUNT = 0;
+static zbx_send_destinations_t	*destinations = NULL;		/* list of servers to send data to */
+static int			destinations_count = 0;
 
 #if !defined(_WINDOWS)
 static void	send_signal_handler(int sig)
@@ -319,12 +319,12 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num, cons
 
 		if (SUCCEED != new_status && SUCCEED_PARTIAL != new_status)
 		{
-			for (fail_count++, j = 0; j < CONFIG_SEND_DEST_COUNT; j++)
+			for (fail_count++, j = 0; j < destinations_count; j++)
 			{
-				if (CONFIG_SEND_DESTINATIONS[j].thread == &threads[i])
+				if (destinations[j].thread == &threads[i])
 				{
-					zbx_free(CONFIG_SEND_DESTINATIONS[j].host);
-					CONFIG_SEND_DESTINATIONS[j] = CONFIG_SEND_DESTINATIONS[--CONFIG_SEND_DEST_COUNT];
+					zbx_free(destinations[j].host);
+					destinations[j] = destinations[--destinations_count];
 					break;
 				}
 			}
@@ -586,18 +586,18 @@ static int	sent_wait(ZBX_THREAD_SENDVAL_ARGS *sendval_args, zbx_thread_args_t *t
 	int			i, ret;
 	ZBX_THREAD_HANDLE	*threads = NULL;
 
-	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, CONFIG_SEND_DEST_COUNT, sizeof(ZBX_THREAD_HANDLE));
+	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, destinations_count, sizeof(ZBX_THREAD_HANDLE));
 
-	for (i = 0; i < CONFIG_SEND_DEST_COUNT; i++)
+	for (i = 0; i < destinations_count; i++)
 	{
-		sendval_args->server = CONFIG_SEND_DESTINATIONS[i].host;
-		sendval_args->port = CONFIG_SEND_DESTINATIONS[i].port;
-		CONFIG_SEND_DESTINATIONS[i].thread = &threads[i];
+		sendval_args->server = destinations[i].host;
+		sendval_args->port = destinations[i].port;
+		destinations[i].thread = &threads[i];
 
 		zbx_thread_start(send_value, thread_args, &threads[i]);
 	}
 
-	ret = sender_threads_wait(threads, CONFIG_SEND_DEST_COUNT, old_status);
+	ret = sender_threads_wait(threads, destinations_count, old_status);
 
 	zbx_free(threads);
 
@@ -622,18 +622,18 @@ static int	sender_add_serveractive_host_cb(const char *host, unsigned short port
 {
 	int	i;
 
-	for (i = 0; i < CONFIG_SEND_DEST_COUNT; i++)
+	for (i = 0; i < destinations_count; i++)
 	{
-		if (0 == strcmp(CONFIG_SEND_DESTINATIONS[i].host, host) && CONFIG_SEND_DESTINATIONS[i].port == port)
+		if (0 == strcmp(destinations[i].host, host) && destinations[i].port == port)
 			return FAIL;
 	}
 
-	CONFIG_SEND_DEST_COUNT++;
-	CONFIG_SEND_DESTINATIONS = (ZBX_SEND_DESTINATIONS *)zbx_realloc(CONFIG_SEND_DESTINATIONS,
-			sizeof(ZBX_SEND_DESTINATIONS) * CONFIG_SEND_DEST_COUNT);
+	destinations_count++;
+	destinations = (zbx_send_destinations_t *)zbx_realloc(destinations,
+			sizeof(zbx_send_destinations_t) * destinations_count);
 
-	CONFIG_SEND_DESTINATIONS[CONFIG_SEND_DEST_COUNT - 1].host = zbx_strdup(NULL, host);
-	CONFIG_SEND_DESTINATIONS[CONFIG_SEND_DEST_COUNT - 1].port = port;
+	destinations[destinations_count - 1].host = zbx_strdup(NULL, host);
+	destinations[destinations_count - 1].port = port;
 
 	return SUCCEED;
 }
@@ -1136,7 +1136,7 @@ int	main(int argc, char **argv)
 		goto exit;
 	}
 #endif
-	if (0 == CONFIG_SEND_DEST_COUNT)
+	if (0 == destinations_count)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "'ServerActive' parameter required");
 		goto exit;
