@@ -415,7 +415,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 			$('.tree-list', item).not(':empty').each(function(i, item) {
 				levels = 0;
 
-				while ($('.tree-list', item).size()) {
+				while ($('.tree-list', item).length) {
 					item = $('.tree-list', item).not(':empty');
 					levels++;
 				}
@@ -1094,7 +1094,7 @@ jQuery(function($) {
 
 				// Set [data-depth] for list and each sublist.
 				$('.tree-list', $obj).not('.root').each(function() {
-					tree_list_depth = $(this).parents('.tree-list').not('.root').size() + 1;
+					tree_list_depth = $(this).parents('.tree-list').not('.root').length + 1;
 					$(this).attr('data-depth', tree_list_depth);
 				}).promise().done(function() {
 					// Show/hide 'add new items' buttons.
