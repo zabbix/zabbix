@@ -2814,7 +2814,7 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
  *                                                                            *
  * Return value: SUCCEED - one or more of the specified records were          *
  *                         successfully locked                                *
- *               FAIL    - no one record were locked                          *
+ *               FAIL    - no records were locked                             *
  *                                                                            *
  ******************************************************************************/
 int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64_t *ids)
