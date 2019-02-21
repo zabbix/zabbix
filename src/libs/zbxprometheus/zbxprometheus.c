@@ -21,9 +21,15 @@
 #include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "log.h"
+#include "zbxjson.h"
 
 #define ZBX_PROMETHEUS_PARSE_OUTPUT_DEFAULT	0
 #define ZBX_PROMETHEUS_PARSE_OUTPUT_RAW		1
+
+#define ZBX_PROMETHEUS_HINT_HELP	0
+#define ZBX_PROMETHEUS_HINT_TYPE	1
+
+#define ZBX_PROMETHEUS_TYPE_UNTYPED	"untyped"
 
 typedef enum
 {
@@ -74,6 +80,32 @@ typedef struct
 	char			*raw;
 }
 zbx_prometheus_row_t;
+
+/* the prometheus metric HELP, TYPE hints in comments */
+typedef struct
+{
+	char	*metric;
+	char	*type;
+	char	*help;
+}
+zbx_prometheus_hint_t;
+
+/* TYPE, HELP hint hashset support */
+
+static zbx_hash_t	prometheus_hint_hash(const void *d)
+{
+	const zbx_prometheus_hint_t	*hint = (zbx_prometheus_hint_t *)d;
+
+	return ZBX_DEFAULT_STRING_HASH_FUNC(hint->metric);
+}
+
+static int	prometheus_hint_compare(const void *d1, const void *d2)
+{
+	const zbx_prometheus_hint_t	*hint1 = (zbx_prometheus_hint_t *)d1;
+	const zbx_prometheus_hint_t	*hint2 = (zbx_prometheus_hint_t *)d2;
+
+	return strcmp(hint1->metric, hint2->metric);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -967,6 +999,211 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: parse_help                                                       *
+ *                                                                            *
+ * Purpose: parses HELP comment metric and help text                          *
+ *                                                                            *
+ * Parameters: data       - [IN] the prometheus data                          *
+ *             pos        - [IN] the starting position in metric data         *
+ *             loc_metric - [OUT] the metric location in data                 *
+ *             loc_help   - [OUT] the help location in data                   *
+ *                                                                            *
+ * Return value: SUCCEED - the help hint was parsed successfully              *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_help(const char *data, size_t pos, zbx_strloc_t *loc_metric, zbx_strloc_t *loc_help)
+{
+	const char	*ptr;
+
+	if (SUCCEED != parse_metric(data, pos, loc_metric))
+		return FAIL;
+
+	pos = skip_spaces(data, loc_metric->r + 1);
+	loc_help->l = pos;
+	if (NULL == (ptr = strchr(data + pos, '\n')))
+		loc_help->r = strlen(data + pos) + pos - 1;
+	else
+		loc_help->r = ptr - data - 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_type                                                       *
+ *                                                                            *
+ * Purpose: parses TYPE comment metric and the type                           *
+ *                                                                            *
+ * Parameters: data       - [IN] the prometheus data                          *
+ *             pos        - [IN] the starting position in metric data         *
+ *             loc_metric - [OUT] the metric location in data                 *
+ *             loc_type   - [OUT] the type location in data                   *
+ *                                                                            *
+ * Return value: SUCCEED - the type hint was parsed successfully              *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_type(const char *data, size_t pos, zbx_strloc_t *loc_metric, zbx_strloc_t *loc_type)
+{
+	const char	*ptr;
+
+	if (SUCCEED != parse_metric(data, pos, loc_metric))
+		return FAIL;
+
+	pos = skip_spaces(data, loc_metric->r + 1);
+	loc_type->l = pos;
+	ptr = data + pos;
+	while (0 != isalpha(*ptr))
+		ptr++;
+
+	/* invalid metric type */
+	if (pos == (loc_type->r = ptr - data))
+		return FAIL;
+
+	loc_type->r--;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: prometheus_register_hint                                         *
+ *                                                                            *
+ * Purpose: registers TYPE/HELP comment hint to the specified metric          *
+ *                                                                            *
+ * Parameters: hints      - [IN/OUT] the hint registry                        *
+ *             data       - [IN] the prometheus data                          *
+ *             metric     - [IN] the metric                                   *
+ *             loc_hint   - [IN] the hint location in prometheus data         *
+ *             hint_type  - [IN] the hint type                                *
+ *             error      - [OUT] the error message                           *
+ *                                                                            *
+ * Return value: SUCCEED - the hint was registered successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	prometheus_register_hint(zbx_hashset_t *hints, const char *data, char *metric, zbx_strloc_t *loc_hint,
+		int hint_type, char **error)
+{
+	zbx_prometheus_hint_t	*hint, hint_local;
+
+	hint_local.metric = metric;
+
+	if (NULL == (hint = (zbx_prometheus_hint_t *)zbx_hashset_search(hints, &hint_local)))
+	{
+		hint = zbx_hashset_insert(hints, &hint_local, sizeof(hint_local));
+		hint->type = NULL;
+		hint->help = NULL;
+	}
+	else
+		zbx_free(metric);
+
+	if (ZBX_PROMETHEUS_HINT_HELP == hint_type)
+	{
+		if (NULL != hint->help)
+		{
+			*error = zbx_dsprintf(*error, "multiple HELP comments found for metric \"%s\"", hint->metric);
+			return FAIL;
+		}
+		hint->help = str_loc_dup(data, loc_hint);
+	}
+	else /* ZBX_PROMETHEUS_HINT_TYPE */
+	{
+		if (NULL != hint->type)
+		{
+			*error = zbx_dsprintf(*error, "multiple TYPE comments found for metric \"%s\"", hint->metric);
+			return FAIL;
+		}
+		hint->type = str_loc_dup(data, loc_hint);
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: prometheus_parse_hints                                           *
+ *                                                                            *
+ * Purpose: parses revelant TYPE/HELP hints from prometheus data              *
+ *                                                                            *
+ * Parameters: filter     - [IN] the prometheus filter                        *
+ *             data       - [IN] the prometheus data                          *
+ *             hints      - [IN/OUT] the hint registry                        *
+ *             error      - [OUT] the error message                           *
+ *                                                                            *
+ * Return value: SUCCEED - the hints were parsed successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	prometheus_parse_hints(zbx_prometheus_filter_t *filter, const char *data, zbx_hashset_t *hints,
+		char **error)
+{
+	const char		*__function_name = "prometheus_parse_hints";
+	int			ret = FAIL;
+	size_t			pos = 0;
+	zbx_strloc_t		loc_metric, loc_hint;
+	int			row_num = 1, hint_type;
+	const char		*hint_types[] = {"HELP", "TYPE"};
+	char			*errmsg = NULL, *metric;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	for (pos = 0; '\0' != data[pos]; pos = skip_row(data, pos), row_num++)
+	{
+		pos = skip_spaces(data, pos);
+		if ('#' != data[pos])
+			continue;
+
+		pos = skip_spaces(data, pos + 1);
+
+		if (0 == strncmp(data + pos, "HELP", 4))
+		{
+			pos = skip_spaces(data, pos + 4);
+			ret = parse_help(data, pos, &loc_metric, &loc_hint);
+			hint_type = ZBX_PROMETHEUS_HINT_HELP;
+		}
+		else if (0 == strncmp(data + pos, "TYPE", 4))
+		{
+			pos = skip_spaces(data, pos + 4);
+			ret = parse_type(data, pos, &loc_metric, &loc_hint);
+			hint_type = ZBX_PROMETHEUS_HINT_TYPE;
+		}
+		else
+			continue;
+
+		if (SUCCEED != ret)
+		{
+			*error = zbx_dsprintf(*error, "failed to parse %s hint from row %d", hint_types[hint_type],
+					row_num);
+			goto out;
+		}
+
+		metric = str_loc_dup(data, &loc_metric);
+
+		/* skip hints for metrics not matching filter */
+		if (NULL != filter->metric && SUCCEED != condition_match_key_value(filter->metric, NULL, metric))
+		{
+			zbx_free(metric);
+			continue;
+		}
+
+		if (SUCCEED != prometheus_register_hint(hints, data, metric, &loc_hint, hint_type, &errmsg))
+		{
+			*error = zbx_dsprintf(*error, "failed to register hint from row %d: %s", row_num, errmsg);
+			zbx_free(errmsg);
+			goto out;
+		}
+	}
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s hints:%d", __function_name, zbx_result_string(ret),
+			hints->num_data);
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: prometheus_parse_rows                                            *
  *                                                                            *
  * Purpose: parses rows with metrics from prometheus data                     *
@@ -996,7 +1233,7 @@ static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *da
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	for (pos = 0; '\0' != data[pos]; pos = skip_row(data, pos))
+	for (pos = 0; '\0' != data[pos]; pos = skip_row(data, pos), row_num++)
 	{
 		pos = skip_spaces(data, pos);
 		if ('#' == data[pos] || '\n' == data[pos])
@@ -1017,7 +1254,6 @@ static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *da
 		}
 
 		pos = loc.r + 1;
-		row_num++;
 	}
 
 	ret = SUCCEED;
@@ -1027,10 +1263,26 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_prometheus_pattern                                           *
+ *                                                                            *
+ * Purpose: extracts value from prometheus data by the specified filter       *
+ *                                                                            *
+ * Parameters: data        - [IN] the prometheus data                         *
+ *             fitler_data - [IN] the filter in text format                   *
+ *             output      - [IN] the output template                         *
+ *             value       - [OUT] the extracted value                        *
+ *             error       - [OUT] the error message                          *
+ *                                                                            *
+ * Return value: SUCCEED - the value was extracted successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char *output, char **value,
 		char **error)
 {
-	const char	*__function_name = "zbx_prometheus_pattern";
+	const char		*__function_name = "zbx_prometheus_pattern";
 
 	zbx_prometheus_filter_t	filter;
 	char			*errmsg = NULL;
@@ -1040,14 +1292,14 @@ int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_ptr_create(&rows);
-
 	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
 	{
 		*error = zbx_dsprintf(*error, "Cannot parse filter: %s", errmsg);
 		zbx_free(errmsg);
 		goto out;
 	}
+
+	zbx_vector_ptr_create(&rows);
 
 	if (FAIL == prometheus_parse_rows(&filter, data, ZBX_PROMETHEUS_PARSE_OUTPUT_DEFAULT, &rows, &errmsg))
 	{
@@ -1103,10 +1355,115 @@ out:
 	return ret;
 }
 
-int	zbx_prometheus_to_json(const char *data, const char *filter, char **value, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_prometheus_to_json                                           *
+ *                                                                            *
+ * Purpose: converts filtered prometheus data to json to be used with LLD     *
+ *                                                                            *
+ * Parameters: data        - [IN] the prometheus data                         *
+ *             fitler_data - [IN] the filter in text format                   *
+ *             value       - [OUT] the converted data                         *
+ *             error       - [OUT] the error message                          *
+ *                                                                            *
+ * Return value: SUCCEED - the data was converted successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **value, char **error)
 {
-	*error = zbx_strdup(*error, "Not implemented");
-	return FAIL;
+	const char		*__function_name = "zbx_prometheus_to_json";
+	zbx_prometheus_filter_t	filter;
+	char			*errmsg = NULL;
+	int			ret = FAIL, i, j;
+	zbx_vector_ptr_t	rows;
+	zbx_hashset_t		hints;
+	zbx_prometheus_hint_t	*hint, hint_local;
+	zbx_hashset_iter_t	iter;
+	struct zbx_json		json;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
+	{
+		*error = zbx_dsprintf(*error, "Cannot parse filter: %s", errmsg);
+		zbx_free(errmsg);
+		goto out;
+	}
+
+	zbx_vector_ptr_create(&rows);
+	zbx_hashset_create(&hints, 100, prometheus_hint_hash, prometheus_hint_compare);
+	zbx_json_initarray(&json, rows.values_num * 100);
+
+	if (FAIL == prometheus_parse_rows(&filter, data, ZBX_PROMETHEUS_PARSE_OUTPUT_RAW, &rows, &errmsg))
+	{
+		*error = zbx_dsprintf(*error, "Cannot parse rows: %s", errmsg);
+		zbx_free(errmsg);
+		goto cleanup;
+	}
+
+	if (FAIL == prometheus_parse_hints(&filter, data, &hints, &errmsg))
+	{
+		*error = zbx_dsprintf(*error, "Cannot parse hints: %s", errmsg);
+		zbx_free(errmsg);
+		goto cleanup;
+	}
+
+	for (i = 0; i < rows.values_num; i++)
+	{
+		zbx_prometheus_row_t	*row = (zbx_prometheus_row_t *)rows.values[i];
+		char			*hint_type;
+
+		zbx_json_addobject(&json, NULL);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, row->metric, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, row->value, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_LINE_RAW, row->raw, ZBX_JSON_TYPE_STRING);
+
+		if (0 != row->labels.values_num)
+		{
+			zbx_json_addobject(&json, ZBX_PROTO_TAG_LABELS);
+
+			for (j = 0; j < row->labels.values_num; j++)
+			{
+				zbx_prometheus_label_t	*label = (zbx_prometheus_label_t *)row->labels.values[j];
+				zbx_json_addstring(&json, label->name, label->value, ZBX_JSON_TYPE_STRING);
+			}
+
+			zbx_json_close(&json);
+		}
+
+		hint_local.metric = row->metric;
+		hint = (zbx_prometheus_hint_t *)zbx_hashset_search(&hints, &hint_local);
+
+		hint_type = (NULL != hint && NULL != hint->type ? hint->type : ZBX_PROMETHEUS_TYPE_UNTYPED);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_TYPE, hint_type, ZBX_JSON_TYPE_STRING);
+
+		if (NULL != hint && NULL != hint->help)
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_HELP, hint->help, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&json);
+	}
+
+	*value = zbx_strdup(NULL, json.buffer);
+	ret = SUCCEED;
+cleanup:
+	zbx_json_free(&json);
+
+	zbx_hashset_iter_reset(&hints, &iter);
+	while (NULL != (hint = (zbx_prometheus_hint_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_free(hint->metric);
+		zbx_free(hint->help);
+		zbx_free(hint->type);
+	}
+	zbx_hashset_destroy(&hints);
+
+	zbx_vector_ptr_clear_ext(&rows, (zbx_clean_func_t)prometheus_row_free);
+	zbx_vector_ptr_destroy(&rows);
+	prometheus_filter_clear(&filter);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	return ret;
 }
 
 #ifdef HAVE_TESTS

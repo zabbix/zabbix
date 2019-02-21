@@ -103,7 +103,7 @@ test case: Empty
 in: 
   filter: ""
 out:
-  return: FAIL
+  return: SUCCEED
 ---
 test case: sensor == Nan
 in: 
