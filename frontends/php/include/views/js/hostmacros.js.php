@@ -40,7 +40,7 @@
 				$('#macros_' + macroNum + '_type')
 					.val($('#macros_' + macroNum + '_type').val() | <?= MACRO_TYPE_HOSTMACRO ?>);
 				$('#macros_' + macroNum + '_value')
-					.removeAttr('readonly')
+					.prop('readonly', false)
 					.focus();
 				$('#macros_' + macroNum + '_change')
 					.text(<?= CJs::encodeJson(_('Remove')) ?>);
