@@ -72,10 +72,6 @@ class CMultiSelect extends CTag {
 		];
 
 		if (array_key_exists('data', $options)) {
-			foreach ($options['data'] as &$item) {
-				$item['id'] = (string) $item['id'];
-			}
-			unset($item);
 			$params['data'] = zbx_cleanHashes($options['data']);
 		}
 
@@ -98,9 +94,7 @@ class CMultiSelect extends CTag {
 					: []);
 
 				if ($excludeids) {
-					foreach ($excludeids as $id) {
-						$params['excludeids'][] = (string) $id;
-					}
+					$params['excludeids'] = $excludeids;
 				}
 			}
 		}
