@@ -585,7 +585,7 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
  *                                                                            *
  * Function: zbx_get_serveractive_hosts                                       *
  *                                                                            *
- * Purpose: parse string like IP<:port>,[IPv6]<:port>                         *
+ * Purpose: parse "ServerActive' parameter value and set destination servers  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_get_serveractive_hosts(char *active_hosts, add_serveractive_host_f cb)
