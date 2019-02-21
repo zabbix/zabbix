@@ -135,12 +135,18 @@ class testPageItems extends CLegacyWebTest {
 			// Two hosts without host group.
 			[
 				[
-					'hosts' => [
-						['group' => 'Zabbix servers', 'host' => 'Host for trigger tags filtering'],
-						['group' => 'Group to check triggers filtering', 'host' => 'Host for triggers filtering']
-					],
 					'filter_options' => [
-						'Key' => 'trap'
+						'Key' => 'trap',
+						'Hosts' => [
+							[
+								'values' => ['Host for trigger tags filtering'],
+								'context' => 'Zabbix servers'
+							],
+							[
+								'values' => ['Host for triggers filtering'],
+								'context' => 'Group to check triggers filtering'
+							]
+						]
 					],
 					'result' => [
 						['Host for triggers filtering' => 'Inheritance item for triggers filtering'],
@@ -154,10 +160,16 @@ class testPageItems extends CLegacyWebTest {
 				[
 					'filter_options' => [
 						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-					],
-					'hosts' => [
-						['group' => 'Zabbix servers', 'host' => 'Host for trigger tags filtering'],
-						['group' => 'Group to check triggers filtering', 'host' => 'Host for triggers filtering']
+						'Hosts' => [
+							[
+								'values' => ['Host for trigger tags filtering'],
+								'context' => 'Zabbix servers'
+							],
+							[
+								'values' => ['Host for triggers filtering'],
+								'context' => 'Group to check triggers filtering'
+							]
+						]
 					],
 					'result' => [
 						['Host for triggers filtering' => 'Discovered item one'],
@@ -180,26 +192,12 @@ class testPageItems extends CLegacyWebTest {
 		// Item create button enabled and breadcrumbs exist.
 		$this->assertTrue($this->query('button:Create item')->one()->isEnabled());
 		$this->assertFalse($this->query('class:filter-breadcrumb')->all()->isEmpty());
-		// Clear hosts and host groups in filter fields.
-		$form->getField('Hosts')->asMultiselect()->clear();
-		$form->getField('Host groups')->asMultiselect()->clear();
-
-		$form->fill($data['filter_options']);
-
-		if (array_key_exists('hosts', $data)) {
-			foreach ($data['hosts'] as $host) {
-				$overlay = $form->getField('Hosts')->asMultiselect()->edit();
-				$overlay_form = $this->query('xpath://div[@id="overlay_dialogue"]//form')->waitUntilVisible()->asForm()->one();
-				$group = $overlay_form->query('name:groupid')->asDropdown()->one();
-				if ($group->getText() != $host['group']) {
-					$group->fill($host['group']);
-					$overlay_form->waitUntilReloaded();
-				}
-				$overlay->query('link:'.$host['host'])->one()->click();
-				$overlay->waitUntilNotPresent();
-			}
+		// Clear hosts in filter fields.
+		if (!array_key_exists('Hosts', $data['filter_options'])) {
+			$form->getField('Hosts')->asMultiselect()->clear();
 		}
 
+		$form->fill($data['filter_options']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
