@@ -134,6 +134,54 @@ static int	DBpatch_4010012(void)
 	return DBmodify_field_type("item_preproc", &field, NULL);
 }
 
+static int	DBpatch_4010013(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.items.filter_groupids'"
+				" where idx='web.items.filter_groupid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+
+static int	DBpatch_4010014(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.items.filter_hostids'"
+				" where idx='web.items.filter_hostid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4010015(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.items.filter_inherited'"
+				" where idx='web.items.filter_templated_items'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4010016(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.triggers.filter_priority' and value_int='-1'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4010)
@@ -152,5 +200,9 @@ DBPATCH_ADD(4010009, 0, 1)
 DBPATCH_ADD(4010010, 0, 1)
 DBPATCH_ADD(4010011, 0, 1)
 DBPATCH_ADD(4010012, 0, 1)
+DBPATCH_ADD(4010013, 0, 1)
+DBPATCH_ADD(4010014, 0, 1)
+DBPATCH_ADD(4010015, 0, 1)
+DBPATCH_ADD(4010016, 0, 1)
 
 DBPATCH_END()

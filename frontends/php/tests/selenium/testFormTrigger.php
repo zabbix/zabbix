@@ -769,13 +769,11 @@ class testFormTrigger extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormTrigger_SimpleCreate($data) {
-
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Triggers']");
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 		$this->zbxTestCheckTitle('Configuration of triggers');

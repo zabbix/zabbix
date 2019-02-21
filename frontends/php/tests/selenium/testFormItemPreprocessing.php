@@ -618,7 +618,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		$db_hostid = CDBHelper::getRow('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($this->host));
 		$hostid = $db_hostid['hostid'];
 
-		$this->zbxTestLogin('items.php?filter_set=1&hostid='.$hostid);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.$hostid);
 		$this->zbxTestContentControlButtonClickTextWait('Create item');
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
@@ -706,7 +706,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		$db_hostid = CDBHelper::getRow('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($this->host));
 		$hostid = $db_hostid['hostid'];
 
-		$this->zbxTestLogin('items.php?filter_set=1&hostid='.$original_hostid);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.$original_hostid);
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 

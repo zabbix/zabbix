@@ -80,6 +80,7 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpGd();
 		$result[] = $this->checkPhpGdPng();
 		$result[] = $this->checkPhpGdJpeg();
+		$result[] = $this->checkPhpGdGif();
 		$result[] = $this->checkPhpGdFreeType();
 		$result[] = $this->checkPhpLibxml();
 		$result[] = $this->checkPhpXmlWriter();
@@ -458,6 +459,23 @@ class CFrontendSetup {
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
 			'error' => _('PHP gd JPEG image support missing.')
+		];
+	}
+
+	/**
+	 * Checks for PHP GD GIF support.
+	 *
+	 * @return array
+	 */
+	public function checkPhpGdGif() {
+		$supported = (is_callable('imagetypes') && imagetypes() & IMG_GIF);
+
+		return [
+			'name' => _('PHP gd GIF support'),
+			'current' => $supported ? _('on') : _('off'),
+			'required' => null,
+			'result' => $supported ? self::CHECK_OK : self::CHECK_WARNING,
+			'error' => _('PHP gd GIF image support missing.')
 		];
 	}
 

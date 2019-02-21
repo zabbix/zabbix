@@ -375,7 +375,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		// items
 		$items = new CSpan([
-			new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$db_host['hostid']),
+			new CLink(_('Items'),
+				(new CUrl('items.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$db_host['hostid']])
+			),
 			CViewHelper::showNum($db_host['items'])
 		]);
 		if ($current_element == 'items') {
@@ -385,7 +389,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		// triggers
 		$triggers = new CSpan([
-			new CLink(_('Triggers'), 'triggers.php?hostid='.$db_host['hostid']),
+			new CLink(_('Triggers'),
+				(new CUrl('triggers.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$db_host['hostid']])
+			),
 			CViewHelper::showNum($db_host['triggers'])
 		]);
 		if ($current_element == 'triggers') {
