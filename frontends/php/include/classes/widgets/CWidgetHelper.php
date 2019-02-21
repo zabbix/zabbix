@@ -1092,9 +1092,9 @@ class CWidgetHelper {
 					'jQuery("#ds_" + row_num + "_width").rangeControl("enable");'.
 					'jQuery("#ds_" + row_num + "_fill").rangeControl("enable");'.
 					'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_0").removeAttr("disabled");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_1").removeAttr("disabled");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_2").removeAttr("disabled");'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", false);'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);'.
 				'}'.
 			'};',
 

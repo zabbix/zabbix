@@ -605,7 +605,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 					.attr('disabled', 'disabled');
 			}
 			else {
-				$(':radio', '#retrieve_mode').removeAttr('disabled');
+				$(':radio', '#retrieve_mode').prop('disabled', false);
 			}
 		});
 	});

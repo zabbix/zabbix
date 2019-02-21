@@ -131,7 +131,7 @@ jQuery(function ($){
 			zoomout: data.can_zoomout
 		}, function (elm, state) {
 			if (state === true) {
-				element[elm].removeAttr('disabled');
+				element[elm].prop('disabled', false);
 			}
 			else if (state === false) {
 				element[elm].attr('disabled', true);

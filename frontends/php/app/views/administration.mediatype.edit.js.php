@@ -190,7 +190,7 @@
 			$(this).hide();
 			$('#passwd')
 				.show()
-				.removeAttr('disabled')
+				.prop('disabled', false)
 				.focus();
 		});
 	});

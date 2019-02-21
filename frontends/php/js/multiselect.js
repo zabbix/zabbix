@@ -189,7 +189,7 @@ jQuery(function($) {
 					var $input = makeMultiSelectInput($obj);
 					$obj.removeAttr('aria-disabled');
 					$('.multiselect-list', $obj).removeClass('disabled');
-					$('.multiselect-button > button', $wrapper).removeAttr('disabled');
+					$('.multiselect-button > button', $wrapper).prop('disabled', false);
 					$obj.append($input);
 					makeSuggsetionsBlock($obj);
 
