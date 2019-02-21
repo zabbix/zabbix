@@ -1526,12 +1526,16 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				break;
 
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
-				$params[0]->setAttribute('placeholder', PROMETHEUS_PATTERN);
-				$params[1]->setAttribute('placeholder', PROMETHEUS_OUTPUT);
+				$params[0]->setAttribute('placeholder',
+					_('<metric name>{<label name>="<label value>", ...} == <value>')
+				);
+				$params[1]->setAttribute('placeholder', _('\value|<label name>'));
 				break;
 
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-				$params[0]->setAttribute('placeholder', PROMETHEUS_PATTERN);
+				$params[0]->setAttribute('placeholder',
+					_('<metric name>{<label name>="<label value>", ...} == <value>')
+				);
 				$params[1]->addStyle('display: none;');
 				break;
 		}

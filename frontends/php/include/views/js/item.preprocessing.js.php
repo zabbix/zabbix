@@ -220,16 +220,20 @@
 
 					case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':
 						$(params[0])
-							.attr('placeholder', <?= CJs::encodeJson(PROMETHEUS_PATTERN) ?>)
+							.attr('placeholder', <?= CJs::encodeJson(
+								_('<metric name>{<label name>="<label value>", ...} == <value>')
+							) ?>)
 							.show();
 						$(params[1])
-							.attr('placeholder', <?= CJs::encodeJson(PROMETHEUS_OUTPUT) ?>)
+							.attr('placeholder', <?= CJs::encodeJson(_('\value|<label name>')) ?>)
 							.show();
 						break;
 
 					case '<?= ZBX_PREPROC_PROMETHEUS_TO_JSON ?>':
 						$(params[0])
-							.attr('placeholder', <?= CJs::encodeJson(PROMETHEUS_PATTERN) ?>)
+							.attr('placeholder', <?= CJs::encodeJson(
+								_('<metric name>{<label name>="<label value>", ...} == <value>')
+							) ?>)
 							.show();
 						$(params[1]).hide();
 						break;
