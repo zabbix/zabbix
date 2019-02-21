@@ -2286,7 +2286,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					default:
 						// Inventories:
 						if (array_key_exists('{'.$matched_macro['macro'].'}', $supported_inventory_macros) && $host
-								&& $host['inventory']) {
+								&& $host['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 							$matched_macro['value']
 								= $host['inventory'][$supported_inventory_macros['{'.$matched_macro['macro'].'}']];
 						}

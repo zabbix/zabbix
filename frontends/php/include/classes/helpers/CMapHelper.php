@@ -584,12 +584,15 @@ class CMapHelper {
 		if ($host_groupids) {
 			$host_groups = API::HostGroup()->get([
 				'output' => [],
-				'groupids' => $host_groupids,
 				'selectHosts' => ['hostid', 'name'],
+				'groupids' => $host_groupids,
 				'preservekeys' => true
 			]);
 
-			$new_selementid = (count($sysmap['selements']) > 0) ? (int) max(array_keys($sysmap['selements'])) : 0;
+			$new_selementid = (count($sysmap['selements']) > 0)
+				? (int) max(zbx_objectValues($sysmap['selements'], 'selementid'))
+				: 0;
+
 			$new_linkid = (count($sysmap['links']) > 0) ? (int) max(array_keys($sysmap['links'])) : 0;
 
 			foreach ($sysmap['selements'] as $selement_key => &$selement) {
@@ -648,7 +651,7 @@ class CMapHelper {
 				foreach ($host_group['hosts'] as $host) {
 					$new_selementid++;
 
-					$area['selementids'][$new_selementid] = $new_selementid;
+					$area['selementids'][] = $new_selementid;
 					$sysmap['selements'][$new_selementid] = [
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'elementsubtype' => SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP,

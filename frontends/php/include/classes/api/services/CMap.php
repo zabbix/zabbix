@@ -2360,7 +2360,7 @@ class CMap extends CMapElement {
 				if (!is_null($options['expandUrls'])) {
 					$resolve_opt = ['resolve_element_urls' => true];
 					$selements = CMacrosResolverHelper::resolveMacrosInMapElements($selements, $resolve_opt);
-			}
+				}
 			}
 
 			if ($this->outputIsRequested('permission', $options['selectSelements']) && $selements) {
