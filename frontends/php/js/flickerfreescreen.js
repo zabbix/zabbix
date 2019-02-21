@@ -369,7 +369,7 @@
 							usemap: domImg.attr('usemap'),
 							alt: domImg.attr('alt')
 						})
-						.error(function() {
+						.on('error', function() {
 							screen.error++;
 							window.flickerfreeScreen.calculateReRefresh(id);
 						})
