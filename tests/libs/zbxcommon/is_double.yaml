@@ -203,23 +203,23 @@ in:
 out:
   return: SUCCEED
 ---
-test case: succeed "1. "
+test case: fail "1. "
 in:
   num: "1. "
 out:
-  return: SUCCEED
+  return: FAIL
 ---
-test case: succeed "-1. "
+test case: fail "-1. "
 in:
   num: "-1. "
 out:
-  return: SUCCEED
+  return: FAIL
 ---
-test case: succeed " .1"
+test case: fail " .1"
 in:
   num: " .1"
 out:
-  return: SUCCEED
+  return: FAIL
 ---
 test case: fail "- .1"
 in:
@@ -227,17 +227,17 @@ in:
 out:
   return: FAIL
 ---
-test case: succeed " -0.1"
+test case: fail " -0.1"
 in:
   num: " -0.1"
 out:
-  return: SUCCEED
+  return: FAIL
 ---
-test case: succeed "-0.1 "
+test case: fail "-0.1 "
 in:
   num: "-0.1 "
 out:
-  return: SUCCEED
+  return: FAIL
 ---
 test case: fail "-0.1 K"
 in:
@@ -257,17 +257,17 @@ in:
 out:
   return: FAIL
 ---
-test case: succeed "1 "
+test case: fail "1 "
 in:
   num: "1 "
 out:
-  return: SUCCEED
+  return: FAIL
 ---
-test case: succeed " 1"
+test case: fail " 1"
 in:
   num: " 1"
 out:
-  return: SUCCEED
+  return: FAIL
 
 ---
 test case: fail ..1
@@ -564,17 +564,17 @@ in:
 out:
   return: FAIL
 ---
-test case: succseed "1.e-2 "
+test case: fail "1.e-2 "
 in:
   num: "1.e-2 "
 out:
-  return: SUCCEED
+  return: FAIL
 ---
-test case: succseed " 1.e-2 "
+test case: fail " 1.e-2 "
 in:
   num: " 1.e-2 "
 out:
-  return: SUCCEED
+  return: FAIL
 ---
 test case: fail "1.e-2 K"
 in:
@@ -636,8 +636,8 @@ in:
 out:
   return: FAIL
 ---
-test case: succeed " 1.0e-2"
+test case: fail " 1.0e-2"
 in:
   num: " 1.0e-2"
 out:
-  return: SUCCEED
+  return: FAIL
