@@ -310,10 +310,10 @@
 				var url = new Curl(screen.data.options.refresh);
 				url.setArgument('curtime', new CDate().getTime());
 
-				jQuery.ajax( {
+				jQuery.ajax({
 					'url': url.getUrl()
 				})
-				.error(function() {
+				.fail(function() {
 					screen.error++;
 					window.flickerfreeScreen.calculateReRefresh(id);
 				})
@@ -438,7 +438,7 @@
 				url.setArgument('_', (new Date).getTime().toString(34));
 
 				return $.get(url.getUrl(), {'onlyHeight': 1}, 'json')
-					.success(function(response, status, xhr) {
+					.done(function(response, status, xhr) {
 						cb(xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'))
 					});
 			}
