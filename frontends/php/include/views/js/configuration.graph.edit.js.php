@@ -353,7 +353,7 @@
 
 	jQuery(function($) {
 		$('#tabs').on('tabsactivate', function(event, ui) {
-			if (ui.newPanel.selector === '#previewTab') {
+			if (ui.newPanel.attr('id') === 'previewTab') {
 				var preview_chart = $('#previewChart'),
 					name = 'chart3.php',
 					src = '&name=' + encodeURIComponent($('#name').val()) +
