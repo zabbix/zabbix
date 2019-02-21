@@ -62,7 +62,6 @@ Cscreen.prototype = {
 
 		jQuery('.screenitem').droppable({
 			accept: '.draggable',
-			hoverClass: 'ui-sortable-placeholder',
 			drop: this.on_drop,
 			tolerance: 'pointer'
 		});
