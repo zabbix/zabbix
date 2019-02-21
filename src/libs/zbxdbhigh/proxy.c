@@ -3368,7 +3368,8 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		result = DBselect(
 				"select dcheckid,clock,port,value,status,dns,ip"
 				" from proxy_dhistory"
-				" where druleid=" ZBX_FS_UI64,
+				" where druleid=" ZBX_FS_UI64
+				" order by id",
 				drule.druleid);
 
 		for (i = 0; NULL != (row = DBfetch(result)); i++)
