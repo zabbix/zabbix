@@ -1962,13 +1962,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			// Map extracted macros to map elements.
 			if (array_key_exists('macros', $matched)) {
 				// Check if inventory or interface details was requested.
-				if (!$query_interfaces && array_key_exists('interface', $matched['macros'])
-						&& $matched['macros']['interface']) {
+				if (array_key_exists('interface', $matched['macros']) && $matched['macros']['interface']) {
 					$query_interfaces = true;
 				}
 
-				if (!$query_inventories && array_key_exists('inventory', $matched['macros'])
-						&& $matched['macros']['inventory']) {
+				if (array_key_exists('inventory', $matched['macros']) && $matched['macros']['inventory']) {
 					$query_inventories = true;
 				}
 
@@ -1993,13 +1991,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				// Check if inventory or interface details was requested.
-				if (!$query_interfaces && array_key_exists('interface', $matched['macros_n'])
-						&& $matched['macros_n']['interface']) {
+				if (array_key_exists('interface', $matched['macros_n']) && $matched['macros_n']['interface']) {
 					$query_interfaces = true;
 				}
 
-				if (!$query_inventories && array_key_exists('inventory', $matched['macros_n'])
-						&& $matched['macros_n']['inventory']) {
+				if (array_key_exists('inventory', $matched['macros_n']) && $matched['macros_n']['inventory']) {
 					$query_inventories = true;
 				}
 			}
@@ -2331,7 +2327,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					// Resolve functional macros like: {sampleHostName:log[{HOST.HOST}.log].last(0)}, if no host provided.
 					$sel['label'] = $this->resolveMapLabelMacros($sel['label']);
 				}
-
 			}
 
 			// Replace macros in selement URLs.

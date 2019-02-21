@@ -151,6 +151,7 @@ if (isset($_REQUEST['favobj'])) {
 			if ($values) {
 				// Resolve macros in map element labels.
 				$values = CMacrosResolverHelper::resolveMacrosInMapElements($values, ['resolve_element_label' => true]);
+
 				foreach ($values as $num => $value) {
 					$return[$num] = $value['label'];
 				}
@@ -227,6 +228,7 @@ $data['sysmap']['shapes'] = zbx_toHash($data['sysmap']['shapes'], 'sysmap_shapei
 $data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');
 
 $data['sysmap'] = CMapHelper::setElementInheritedLabels($data['sysmap']);
+
 foreach ($data['sysmap']['selements'] as &$selement) {
 	if ($selement['inherited_label'] !== null) {
 		$label = $selement['label'];
@@ -242,6 +244,7 @@ unset($selement);
 // Extend $selement adding resolved label as property named 'expanded'.
 $resolve_opt = ['resolve_element_label' => true];
 $selements_resolved = CMacrosResolverHelper::resolveMacrosInMapElements($data['sysmap']['selements'], $resolve_opt);
+
 foreach ($data['sysmap']['selements'] as $selementid => &$selement) {
 	$selement['expanded'] = $selements_resolved[$selementid]['label'];
 }
@@ -283,6 +286,7 @@ $images = API::Image()->get([
 	'filter' => ['imagetype' => IMAGE_TYPE_ICON],
 	'select_image' => true
 ]);
+
 foreach ($images as $image) {
 	$image['image'] = base64_decode($image['image']);
 	$ico = imagecreatefromstring($image['image']);
@@ -299,6 +303,7 @@ foreach ($images as $image) {
 		$data['defaultIconName'] = $image['name'];
 	}
 }
+
 if ($data['iconList']) {
 	CArrayHelper::sort($data['iconList'], ['name']);
 	$data['iconList'] = array_values($data['iconList']);
