@@ -846,10 +846,15 @@ output {
 .adm-img {
   width: 75%;
   text-align: center;
-  margin: 0 auto; }
+  margin: 0 auto;
+  table-layout: fixed; }
   .adm-img .cell {
     vertical-align: bottom;
-    padding: 20px 0 20px 0; }
+    padding: 20px 10px;
+    width: 20%;
+    text-align: center; }
+    .adm-img .cell img {
+      max-width: 100%; }
 
 .cell-width {
   width: 8px; }
@@ -2194,21 +2199,58 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   position: absolute;
   z-index: 999; }
 
-.dashbrd-grid-empty-placeholder {
+.dashbrd-grid-new-widget-placeholder {
+  box-sizing: border-box;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background-color: #000;
-  border: 1px solid #444;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: calc(100% / 6 - .65rem);
   height: 200px;
-  margin: .25rem; }
-  .dashbrd-grid-empty-placeholder h1 {
-    padding: 10px;
+  padding: .25rem;
+  width: calc(100% / 6 - .65rem);
+  z-index: 999;
+  color: #cacaca;
+  cursor: pointer; }
+  .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box,
+  .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position,
+  .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-size {
+    -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+    border: 1px dashed #666;
+    background-color: rgba(0, 0, 0, 0.7);
+    flex: 1;
+    position: relative;
+    overflow: hidden; }
+  .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-size {
+    -webkit-box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.5);
+    box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.5);
+    background: #020202; }
+  .dashbrd-grid-new-widget-placeholder .dashbrd-grid-new-widget-label {
+    position: absolute;
+    left: 0;
+    top: calc(50% - 14px);
+    right: 0;
+    bottom: 0;
+    padding: 38px 5px 5px;
     text-align: center; }
+    .dashbrd-grid-new-widget-placeholder .dashbrd-grid-new-widget-label::before {
+      background: url(../img/icon-sprite.svg) no-repeat -157px -888px;
+      content: ' ';
+      height: 28px;
+      width: 36px;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%); }
+  .dashbrd-grid-new-widget-placeholder.disabled {
+    opacity: 1;
+    filter: alpha(opacity=100); }
+    .dashbrd-grid-new-widget-placeholder.disabled .dashbrd-grid-widget-new-box {
+      background-color: rgba(0, 0, 0, 0.7); }
+      .dashbrd-grid-new-widget-placeholder.disabled .dashbrd-grid-widget-new-box .dashbrd-grid-new-widget-label::before {
+        background: url(../img/icon-sprite.svg) no-repeat -122px -284px; }
+
+.dashbrd-grid-widget-set-size .dashbrd-grid-new-widget-label::before {
+  background: url(../img/icon-sprite.svg) no-repeat -345px -888px; }
 
 .dashbrd-grid-widget-mask {
   position: absolute;
@@ -4051,6 +4093,22 @@ svg {
 .patternselect {
   line-height: 14px; }
 
+ul.checkbox-list {
+  line-height: 20px;
+  display: flex;
+  flex-wrap: wrap; }
+  ul.checkbox-list > li {
+    ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+    -webkit-box-flex: 0; }
+
+ul.checkbox-list.col-3 > li {
+  display: inline-block;
+  -ms-flex: 0 0 33.33333%;
+  flex: 0 0 33.33333%;
+  max-width: 33.33333%; }
+
 .columns-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -4629,6 +4687,22 @@ svg {
 
 .inline-sr-only {
   font-size: 0; }
+
+.dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box,
+.dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position,
+.dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-size {
+  box-shadow: none;
+  border-color: #fff;
+  background-color: transparent; }
+.dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-size {
+  border: 2px dashed #fff;
+  box-shadow: none;
+  background: #020202; }
+.dashbrd-grid-new-widget-placeholder .dashbrd-grid-new-widget-label::before {
+  background: url(../img/icon-sprite.svg) no-repeat -269px -888px; }
+
+.dashbrd-grid-widget-set-size .dashbrd-grid-new-widget-label::before {
+  background: url(../img/icon-sprite.svg) no-repeat -457px -888px; }
 
 .icon-maint {
   margin: 0 18px 0 0; }

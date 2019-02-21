@@ -29,6 +29,19 @@
 #define ZBX_DB_WAIT_DOWN	10
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
+#ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
+#	ifdef HAVE_ORACLE
+		/* Do not use "overflowing" (multi-statement) queries for Oracle. */
+		/* Zabbix benefits from cursor_sharing=force Oracle parameter */
+		/* which doesn't apply to PL/SQL blocks. */
+#		define ZBX_MAX_OVERFLOW_SQL_SIZE	0
+#	else
+#		define ZBX_MAX_OVERFLOW_SQL_SIZE	ZBX_MAX_SQL_SIZE
+#	endif
+#elif 0 != ZBX_MAX_OVERFLOW_SQL_SIZE && \
+		(1024 > ZBX_MAX_OVERFLOW_SQL_SIZE || ZBX_MAX_OVERFLOW_SQL_SIZE > ZBX_MAX_SQL_SIZE)
+#error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
+#endif
 
 typedef char	**DB_ROW;
 typedef struct zbx_db_result	*DB_RESULT;

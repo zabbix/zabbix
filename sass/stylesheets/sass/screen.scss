@@ -1298,10 +1298,17 @@ output {
 	width: 75%;
 	text-align: center;
 	margin: 0 auto;
+	table-layout: fixed;
 
 	.cell {
 		vertical-align: bottom;
-		padding: 20px 0 20px 0;
+		padding: 20px 10px;
+		width: 20%;
+		text-align: center;
+
+		img {
+			max-width: 100%;
+		}
 	}
 }
 
@@ -3243,22 +3250,73 @@ $form-icon-btn: (
 	z-index: 999;
 }
 
-.dashbrd-grid-empty-placeholder {
+.dashbrd-grid-new-widget-placeholder {
+	box-sizing: border-box;
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: calc(100% / 6 - .65rem);
 	height: 200px;
-	margin: .25rem;
+	padding: .25rem;
+	width: calc(100% / 6 - .65rem);
+	z-index: 999;
+	color: $font-alt-color;
+	cursor:pointer;
 
-	h1 {
-		padding: 10px;
+	.dashbrd-grid-widget-new-box,
+	.dashbrd-grid-widget-set-position,
+	.dashbrd-grid-widget-set-size {
+		@include box-shadow(2px 2px 6px $action-shadow-color);
+		border: 1px dashed $form-border-color;
+		background-color: rgba($ui-bg-color, .7);
+		flex: 1;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.dashbrd-grid-widget-set-size {
+		@include box-shadow(inset 2px 2px 6px $action-shadow-color);
+		background: darken($body-bg-color, 6%);
+	}
+
+	.dashbrd-grid-new-widget-label {
+		$icon-height: 28px;
+
+		position: absolute;
+		left: 0;
+		top: calc(50% - #{$icon-height / 2});
+		right: 0;
+		bottom: 0;
+		padding: ($icon-height + 10px) 5px 5px;
 		text-align: center;
+
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -157px -888px;
+			content: ' ';
+			height: $icon-height;
+			width: 36px;
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+	}
+
+	&.disabled {
+		@include opacity(1);
+
+		.dashbrd-grid-widget-new-box {
+			background-color: rgba($ui-bg-color, .7);
+
+			.dashbrd-grid-new-widget-label::before {
+				background: url(../img/icon-sprite.svg) no-repeat -122px -284px;
+			}
+		}
+	}
+}
+
+.dashbrd-grid-widget-set-size {
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -345px -888px;
+		}
 	}
 }
 
@@ -5851,6 +5909,30 @@ svg {
 .patternselect {
 	line-height: 14px;
 }
+
+ul.checkbox-list {
+	line-height: 20px;
+	display: flex;
+	flex-wrap: wrap;
+	> li {
+		ms-flex: 0 0 100%;
+		flex: 0 0 100%;
+		max-width: 100%;
+		-webkit-box-flex: 0;
+	}
+}
+
+@each $num, $width in (
+	3: 33.33333%
+) {
+	ul.checkbox-list.col-#{$num} > li {
+		display: inline-block;
+		-ms-flex: 0 0 $width;
+		flex: 0 0 $width;
+		max-width: $width;
+	}
+}
+
 
 .columns-wrapper {
 
