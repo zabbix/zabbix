@@ -9,7 +9,9 @@ SERVER_tests = \
 	zbx_interval_preproc \
 	zbx_validate_interval \
 	is_double_suffix \
-	is_double
+	is_double \
+	zbx_trim_float \
+	zbx_trim_integer
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -223,5 +225,33 @@ is_double_LDADD += @SERVER_LIBS@
 is_double_LDFLAGS = @SERVER_LDFLAGS@
 
 is_double_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_trim_float_SOURCES = \
+	zbx_trim_float.c \
+	$(COMMON_SRC_FILES)
+
+zbx_trim_float_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_trim_float_LDADD += @SERVER_LIBS@
+
+zbx_trim_float_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_trim_float_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_trim_integer_SOURCES = \
+	zbx_trim_integer.c \
+	$(COMMON_SRC_FILES)
+
+zbx_trim_integer_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_trim_integer_LDADD += @SERVER_LIBS@
+
+zbx_trim_integer_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_trim_integer_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

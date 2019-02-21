@@ -399,6 +399,8 @@ tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommon/zbx_function_get_param_dyn
 tests/libs/zbxcommon/zbx_interval_preproc
 tests/libs/zbxcommon/zbx_token_find
+tests/libs/zbxcommon/zbx_trim_float
+tests/libs/zbxcommon/zbx_trim_integer
 tests/libs/zbxcommon/zbx_validate_interval
 tests/libs/zbxcommshigh/.deps
 tests/libs/zbxcommshigh/Makefile
