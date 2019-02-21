@@ -452,8 +452,6 @@ static void	process_checks(const DB_DRULE *drule, int *host_status, char *ip, in
 	DBfree_result(result);
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: process_services                                                 *
