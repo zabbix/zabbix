@@ -2656,9 +2656,6 @@ int	is_double(const char *str)
 			str++;
 	}
 
-	while (' ' == *str)			/* trim right spaces */
-		str++;
-
 	return '\0' == *str ? SUCCEED : FAIL;
 }
 
