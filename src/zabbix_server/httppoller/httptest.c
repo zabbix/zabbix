@@ -539,6 +539,7 @@ static int	add_http_headers(CURL *easyhandle, char *headers, struct curl_slist *
 				if (NULL != error)
 					*error = zbx_strdup(*error, curl_easy_strerror(err));
 
+				zbx_free(line);
 				goto out;
 			}
 		}
@@ -558,6 +559,8 @@ static int	add_http_headers(CURL *easyhandle, char *headers, struct curl_slist *
 
 out:
 	return ret;
+#undef COOKIE_HEADER_STR
+#undef COOKIE_HEADER_STR_LEN
 }
 #endif
 
