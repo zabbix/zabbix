@@ -2005,7 +2005,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			// If macros are found, put elementid to list of artifacts to fetch API.
-			if (array_key_exists($selid, $macros)) {
+			if (array_key_exists($selid, $macros) && $macros[$selid]) {
 				if (array_key_exists('elementid', $sel)) {
 					$artifacts_to_resolve[$sel['elementtype']][$sel['elementid']] = $sel['elementid'];
 				}
@@ -2094,7 +2094,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Find value for each extracted macro.
 		foreach ($selements as $selid => &$sel) {
-			if (!array_key_exists($selid, $macros)) {
+			if (!array_key_exists($selid, $macros) || !$macros[$selid]) {
 				// Resolve functional macros like: {sampleHostName:log[{HOST.HOST}.log].last(0)}, if no host provided.
 				$sel['label'] = $this->resolveMapLabelMacros($sel['label']);
 
