@@ -67,6 +67,7 @@ zabbix_server_LDADD = \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
 	libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
