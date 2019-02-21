@@ -400,7 +400,7 @@
 
 				preview_chart.attr('class', 'preloader');
 
-				$('<img />').attr('src', name + '?period=3600' + src).load(function() {
+				$('<img />').attr('src', name + '?period=3600' + src).on('load', function() {
 					preview_chart
 						.removeAttr('class')
 						.append($(this));
