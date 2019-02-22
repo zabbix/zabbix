@@ -452,6 +452,8 @@ tests/libs/zbxprometheus/.deps
 tests/libs/zbxprometheus/Makefile
 tests/libs/zbxprometheus/Makefile.in
 tests/libs/zbxprometheus/prometheus_filter_init
+tests/libs/zbxprometheus/zbx_prometheus_pattern
+tests/libs/zbxprometheus/zbx_prometheus_to_json
 tests/libs/zbxsysinfo/.deps
 tests/libs/zbxsysinfo/Makefile
 tests/libs/zbxsysinfo/Makefile.in
