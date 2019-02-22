@@ -81,8 +81,8 @@ static void	worker_format_value(const zbx_variant_t *value, char **value_str)
 	}
 	else
 	{
-		*value_str = zbx_strdup(NULL, value_desc);
-		len = strlen(*value_str);
+		*value_str = zbx_malloc(NULL, (len = strlen(value_desc)) + 1);
+		memcpy(*value_str, value_desc, len);
 	}
 
 	/* replace control characters */
