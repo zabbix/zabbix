@@ -581,7 +581,7 @@ out:
  *                FAIL - destination has been already added                   *
  *                                                                            *
  ******************************************************************************/
-static int	sent_wait(ZBX_THREAD_SENDVAL_ARGS *sendval_args, zbx_thread_args_t *thread_args, int old_status)
+static int	sent_wait(zbx_thread_args_t *thread_args, int old_status)
 {
 	int			i, ret;
 	ZBX_THREAD_HANDLE	*threads = NULL;
@@ -590,8 +590,8 @@ static int	sent_wait(ZBX_THREAD_SENDVAL_ARGS *sendval_args, zbx_thread_args_t *t
 
 	for (i = 0; i < destinations_count; i++)
 	{
-		sendval_args->server = destinations[i].host;
-		sendval_args->port = destinations[i].port;
+		((ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)thread_args)->args)->server = destinations[i].host;
+		((ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)thread_args)->args)->port = destinations[i].port;
 		destinations[i].thread = &threads[i];
 
 		zbx_thread_start(send_value, thread_args, &threads[i]);
@@ -1334,7 +1334,7 @@ int	main(int argc, char **argv)
 
 				last_send = zbx_time();
 
-				ret = sent_wait(&sendval_args, &thread_args, ret);
+				ret = sent_wait(&thread_args, ret);
 
 				buffer_count = 0;
 				zbx_json_clean(&sendval_args.json);
@@ -1347,7 +1347,7 @@ int	main(int argc, char **argv)
 		if (FAIL != ret && 0 != buffer_count)
 		{
 			zbx_json_close(&sendval_args.json);
-			ret = sent_wait(&sendval_args, &thread_args, ret);
+			ret = sent_wait(&thread_args, ret);
 		}
 
 		if (in != stdin)
@@ -1389,7 +1389,7 @@ int	main(int argc, char **argv)
 
 			succeed_count++;
 
-			ret = sent_wait(&sendval_args, &thread_args, ret);
+			ret = sent_wait(&thread_args, ret);
 		}
 		while (0); /* try block simulation */
 	}
