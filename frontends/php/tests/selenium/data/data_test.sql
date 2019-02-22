@@ -2144,3 +2144,45 @@ INSERT INTO triggers (triggerid, description, expression, status, value, priorit
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100070, 99097, 100069, 'last', '');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (100069, 100068);
 
+-- host/template level tags tests
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (311, 40001, 'action', 'simple');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (312, 40001, 'tag', 'HOST');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (313, 40001, 'test', 'test_tag');
+
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99092, 'Host with tags for cloning', 'Host with tags for cloning', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99944, 99092, 4);
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (307, 99092, 'action', 'clone');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (310, 99092, 'tag', 'host');
+
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99109, 'Host with tags for updating', 'Host with tags for updating', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99961, 99109, 4);
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (308, 99109, 'action', 'update');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (309, 99109, 'tag', 'host');
+
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (319, 40000, 'action', 'simple');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (321, 40000, 'test', 'test_tag');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (408, 40000, 'tag', 'TEMPLATE');
+
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99127, 'Template with tags for cloning', 'Template with tags for cloning', 3, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99979, 99127, 4);
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (315, 99127, 'action', 'clone');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (316, 99127, 'tag', 'template');
+
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99128, 'Template with tags for updating', 'Template with tags for updating', 3, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99980, 99128, 4);
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (317, 99128, 'action', 'update');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (318, 99128, 'tag', 'template');
+
+INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (452, 14003, 'test', 'test_tag');
+INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (453, 14003, 'action', 'simple');
+INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (454, 14003, 'tag', 'TRIGGER');
+
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100113, '{100114}=0', 'Trigger with tags for cloning', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100114, 30004, 100113, 'last', '0');
+INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (186, 100113, 'action', 'clone');
+INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (187, 100113, 'tag', 'trigger');
+
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100112, '{100113}=0', 'Trigger with tags for updating', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100113, 30004, 100112, 'last', '0');
+INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (184, 100112, 'action', 'update');
+INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (185, 100112, 'tag', 'trigger');

@@ -568,4 +568,140 @@ class testPageTriggers extends CLegacyWebTest {
 		}
 		$this->assertEquals(count($data['result']), $table->getRows()->count());
 	}
+
+	public static function getFilterByTagsData() {
+		return [
+			// "And" and "And/Or" checks.
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+							['name'=>'tag', 'operator' => 'Contains', 'value'=>'trigger'],
+							['name'=>'test', 'operator' => 'Contains', 'value'=>'test_tag']
+					],
+					'expected_triggers' => [
+						['testFormTrigger4']
+					],
+					'expected_result_count' => 1
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+							['name'=>'tag', 'operator' => 'Contains', 'value'=>'trigger'],
+							['name'=>'test', 'operator' => 'Contains', 'value'=>'test_tag']
+					],
+					'expected_triggers' => [
+						['testFormTrigger4'],
+						['Trigger with tags for cloning'],
+						['Trigger with tags for updating'],
+					],
+					'expected_result_count' => 3
+				]
+			],
+			// "Contains" and "Equals" checks.
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+							['name'=>'tag', 'operator' => 'Contains', 'value'=>'TRIGGER'],
+					],
+					'expected_triggers' => [
+						['testFormTrigger4'],
+						['Trigger with tags for cloning'],
+						['Trigger with tags for updating']
+					],
+					'expected_result_count' => 3
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+							['name'=>'tag', 'operator' => 'Equals', 'value'=>'TRIGGER'],
+					],
+					'expected_triggers' => [
+						['testFormTrigger4']
+					],
+					'expected_result_count' => 1
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+							['name'=>'action', 'operator' => 'Contains', 'value'=>''],
+					],
+					'expected_triggers' => [
+						['testFormTrigger4'],
+						['Trigger with tags for cloning'],
+						['Trigger with tags for updating']
+					],
+					'expected_result_count' => 3
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+							['name'=>'action', 'operator' => 'Equals', 'value'=>''],
+					],
+					'expected_triggers' => [],
+					'expected_result_count' => 0
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test filtering triggers by tags
+	 *
+	 * @dataProvider getFilterByTagsData
+	 *
+	 */
+	public function testPageTriggers_FilterByTags($data) {
+		$hostid_for_filtering = 40001;
+
+		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]='.$hostid_for_filtering);
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		// Reset filter from possible previous scenario.
+		$form->query('button:Reset')->one()->click();
+
+		$tags_filter = $form->getFieldContainer('Tags')->asTable();
+		$tags_filter->query('id:filter_evaltype')->asSegmentedRadio()->one()->select($data['evaluation_type']);
+
+		$button = $tags_filter ->query('button:Add')->one();
+		$last = count($data['tags']) - 1;
+
+		foreach ($data['tags'] as $i => $tag){
+			$row = $tags_filter->getRows()->get($i+1);;
+			$row->query('id:filter_tags_'.$i.'_tag')->one()->type($tag['name']);
+			$row->query('id:filter_tags_'.$i.'_operator')->asSegmentedRadio()->one()->select($tag['operator']);
+			$row->query('id:filter_tags_'.$i.'_value')->one()->type($tag['value']);
+			if ($i !== $last) {
+				$button->click();
+			}
+		}
+		$form->submit();
+		// Check filtered result.
+		$triggers_table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
+		$display_text = $this->query('xpath://div[@class="table-stats"]')->waitUntilVisible()->one()->getText();
+		$this->assertEquals($display_text, 'Displaying '.$data['expected_result_count'].' of '.$data['expected_result_count'].' found');
+
+		if($data['expected_result_count'] === 0){
+				$text = $triggers_table->getRows()->get(0)->getText();
+				$this->assertEquals('No data found.', $text);
+		}
+		else{
+			foreach ($triggers_table->getRows()->asArray() as $i => $row) {
+				$filtered_trigger_names[] =[
+					$triggers_table->getRows()->get($i)->getColumn('Name')->getText()
+				];
+			}
+			$this->assertEquals($data['expected_triggers'], $filtered_trigger_names);
+		}
+		// Reset filter due to not influence further tests.
+		$form->query('button:Reset')->one()->click();
+	}
 }
