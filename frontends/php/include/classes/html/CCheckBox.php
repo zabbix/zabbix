@@ -113,7 +113,7 @@ class CCheckBox extends CInput {
 	/**
 	 * Allow to set value for not checked checkbox.
 	 *
-	 * @param string $value    Value for unchecked state.
+	 * @param string $value  Value for unchecked state.
 	 *
 	 * @return CCheckBox
 	 */

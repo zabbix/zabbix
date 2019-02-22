@@ -21,9 +21,7 @@
 
 			fields
 				.not(this)
-				.prop('disabled', !this.checked)
-				.filter('[name$=_case_sensitive]:not(:disabled)')
-				.prop('checked', true);
+				.prop('disabled', !this.checked);
 		});
 
 		form.find('button#change_bind_password').click(function () {

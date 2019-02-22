@@ -151,10 +151,8 @@ elseif (hasRequest('update')) {
 			$user['lang'] = getRequest('lang');
 		}
 
-		$messages = getRequest('messages', []);
-
 		DBstart();
-		$result = updateMessageSettings($messages);
+		$result = updateMessageSettings(getRequest('messages', []));
 
 		$result = $result && (bool) API::User()->update($user);
 

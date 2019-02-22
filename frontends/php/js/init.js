@@ -24,8 +24,7 @@ jQuery(function($) {
 		set: function (el, val) {
 			if (el.disabled !== val) {
 				el.disabled = val;
-				val && $(el).trigger('disable');
-				!val && $(el).trigger('enable');
+				$(el).trigger(val ? 'disable' : 'enable');
 			}
 		}
 	};
@@ -72,12 +71,12 @@ jQuery(function($) {
 	});
 
 	function uncheckedHandler($checkbox) {
-		var $hidden = $checkbox.siblings('input[type=hidden][name="'+$checkbox.prop('name')+'"]');
+		var $hidden = $checkbox.prev('input[type=hidden][name="' + $checkbox.prop('name') + '"]');
 
 		if ($checkbox.is(':checked') || $checkbox.is(':disabled')) {
 			$hidden.remove();
 		}
-		else if(!$checkbox.is(':disabled') && !$hidden.length) {
+		else if (!$hidden.length) {
 			$('<input>', {'type': 'hidden', 'name': $checkbox.prop('name')})
 				.val($checkbox.attr('unchecked-value'))
 				.insertBefore($checkbox);
