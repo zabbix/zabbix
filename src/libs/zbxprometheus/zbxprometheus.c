@@ -23,8 +23,8 @@
 #include "log.h"
 #include "zbxjson.h"
 
-#define ZBX_PROMETHEUS_PARSE_OUTPUT_DEFAULT	0
-#define ZBX_PROMETHEUS_PARSE_OUTPUT_RAW		1
+/* Defines maximum row length to be written in error message in the case of parsing failure */
+#define ZBX_PROMEHTEUS_ERROR_MAX_ROW_LENGTH	50
 
 #define ZBX_PROMETHEUS_HINT_HELP	0
 #define ZBX_PROMETHEUS_HINT_TYPE	1
@@ -432,7 +432,7 @@ static int	parse_metric_value(const char *data, size_t pos, zbx_strloc_t *loc)
 	const char	*ptr = data + pos;
 	int		digit = 0;
 
-	if ('\0' == *ptr)
+	if ('\0' == *ptr || '\n' == *ptr)
 		return FAIL;
 
 	loc->l = pos;
@@ -613,7 +613,7 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
 
 		if (FAIL == parse_condition(data, pos, &loc_key, &loc_op, &loc_value))
 		{
-			*error = zbx_dsprintf(*error, "cannot parse label condition pair at %s", data + pos);
+			*error = zbx_dsprintf(*error, "cannot parse label condition at \"%s\"", data + pos);
 			return FAIL;
 		}
 
@@ -622,7 +622,7 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
 		{
 			if (NULL != filter->metric)
 			{
-				*error = zbx_strdup(*error, "duplicate metric name specified");
+				*error = zbx_strdup(*error, "duplicate metric condition specified");
 				return FAIL;
 			}
 
@@ -647,7 +647,7 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
 
 		if ('\0' == data[pos])
 		{
-			*error = zbx_strdup(*error, "label list was not properly terminated");
+			*error = zbx_strdup(*error, "missing label condition list terminating character \"}\"");
 			return FAIL;
 		}
 	}
@@ -706,7 +706,7 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 
 		if (SUCCEED != parse_metric_op(data, pos, &loc_op))
 		{
-			*error = zbx_dsprintf(*error, "cannot parse metric comparison operator at %s", data + pos);
+			*error = zbx_dsprintf(*error, "cannot parse metric comparison operator at \"%s\"", data + pos);
 			goto out;
 		}
 
@@ -715,14 +715,14 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 
 		if (SUCCEED != parse_metric_value(data, pos, &loc_value))
 		{
-			*error = zbx_dsprintf(*error, "cannot parse metric comparison value at %s", data + pos);
+			*error = zbx_dsprintf(*error, "cannot parse metric comparison value at \"%s\"", data + pos);
 			goto out;
 		}
 
 		pos = skip_spaces(data, loc_value.r + 1);
 		if ('\0' != data[pos])
 		{
-			*error = zbx_dsprintf(*error, "unexpected data after metric comparison value at %s",
+			*error = zbx_dsprintf(*error, "unexpected data after metric comparison value at \"%s\"",
 					data + pos);
 			goto out;
 		}
@@ -843,7 +843,7 @@ static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vect
 		op = str_loc_op(data, &loc_op);
 		if (ZBX_PROMETHEUS_CONDITION_OP_EQUAL != op)
 		{
-			*error = zbx_strdup(*error, "invalid label syntax");
+			*error = zbx_strdup(*error, "invalid label assignment operator");
 			return FAIL;
 		}
 
@@ -861,7 +861,7 @@ static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vect
 
 		if ('\0' == data[pos])
 		{
-			*error = zbx_strdup(*error, "label list was not properly terminated");
+			*error = zbx_strdup(*error, "missing label list terminating character \"}\"");
 			return FAIL;
 		}
 	}
@@ -908,7 +908,7 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 
 	if (SUCCEED != parse_metric(data, pos, &loc))
 	{
-		*error = zbx_strdup(*error, "failed to parse metric name");
+		*error = zbx_strdup(*error, "cannot parse metric name");
 		goto out;
 	}
 
@@ -923,6 +923,7 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 	/* parse labels and check against the filter */
 
 	pos = loc.r + 1;
+
 	if ('{' == data[pos])
 	{
 		if (SUCCEED != prometheus_metric_parse_labels(data, pos, &row->labels, &loc, error))
@@ -950,13 +951,21 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 
 		pos = loc.r + 1;
 	}
+	else
+	{
+		if (' ' != data[pos])
+		{
+			*error = zbx_dsprintf(*error, "invalid character \"%c\" following metric name", data[pos]);
+			goto out;
+		}
+	}
 
 	/* parse value and check against the filter */
 
 	pos = skip_spaces(data, pos);
 	if (FAIL == parse_metric_value(data, pos, &loc))
 	{
-		*error = zbx_strdup(*error, "failed to parse metric value");
+		*error = zbx_strdup(*error, "cannot parse metric value");
 		goto out;
 	}
 	row->value = str_loc_dup(data, &loc);
@@ -1123,83 +1132,69 @@ static int	prometheus_register_hint(zbx_hashset_t *hints, const char *data, char
 
 /******************************************************************************
  *                                                                            *
- * Function: prometheus_parse_hints                                           *
+ * Function: prometheus_parse_hint                                            *
  *                                                                            *
- * Purpose: parses revelant TYPE/HELP hints from prometheus data              *
+ * Purpose: parses TYPE/HELP comment hint and registers it                    *
  *                                                                            *
  * Parameters: filter     - [IN] the prometheus filter                        *
  *             data       - [IN] the prometheus data                          *
+ *             pso        - [IN] the position of comments in prometheus data  *
  *             hints      - [IN/OUT] the hint registry                        *
  *             error      - [OUT] the error message                           *
  *                                                                            *
- * Return value: SUCCEED - the hints were parsed successfully                 *
+ * Return value: SUCCEED - the hint was registered successfully               *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	prometheus_parse_hints(zbx_prometheus_filter_t *filter, const char *data, zbx_hashset_t *hints,
-		char **error)
+static int	prometheus_parse_hint(zbx_prometheus_filter_t *filter, const char *data, size_t pos,
+		zbx_hashset_t *hints, zbx_strloc_t *loc, char **error)
 {
-	const char		*__function_name = "prometheus_parse_hints";
-	int			ret = FAIL;
-	size_t			pos = 0;
-	zbx_strloc_t		loc_metric, loc_hint;
-	int			row_num = 1, hint_type;
-	const char		*hint_types[] = {"HELP", "TYPE"};
-	char			*errmsg = NULL, *metric;
+	int		ret, hint_type;
+	zbx_strloc_t	loc_metric, loc_hint;
+	char		*metric;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	loc->l = pos;
+	pos = skip_spaces(data, pos + 1);
 
-	for (pos = 0; '\0' != data[pos]; pos = skip_row(data, pos), row_num++)
+	if (0 == strncmp(data + pos, "HELP", 4))
 	{
-		pos = skip_spaces(data, pos);
-		if ('#' != data[pos])
-			continue;
-
-		pos = skip_spaces(data, pos + 1);
-
-		if (0 == strncmp(data + pos, "HELP", 4))
-		{
-			pos = skip_spaces(data, pos + 4);
-			ret = parse_help(data, pos, &loc_metric, &loc_hint);
-			hint_type = ZBX_PROMETHEUS_HINT_HELP;
-		}
-		else if (0 == strncmp(data + pos, "TYPE", 4))
-		{
-			pos = skip_spaces(data, pos + 4);
-			ret = parse_type(data, pos, &loc_metric, &loc_hint);
-			hint_type = ZBX_PROMETHEUS_HINT_TYPE;
-		}
-		else
-			continue;
-
-		if (SUCCEED != ret)
-		{
-			*error = zbx_dsprintf(*error, "failed to parse %s hint from row %d", hint_types[hint_type],
-					row_num);
-			goto out;
-		}
-
-		metric = str_loc_dup(data, &loc_metric);
-
-		/* skip hints for metrics not matching filter */
-		if (NULL != filter->metric && SUCCEED != condition_match_key_value(filter->metric, NULL, metric))
-		{
-			zbx_free(metric);
-			continue;
-		}
-
-		if (SUCCEED != prometheus_register_hint(hints, data, metric, &loc_hint, hint_type, &errmsg))
-		{
-			*error = zbx_dsprintf(*error, "failed to register hint from row %d: %s", row_num, errmsg);
-			zbx_free(errmsg);
-			goto out;
-		}
+		pos = skip_spaces(data, pos + 4);
+		ret = parse_help(data, pos, &loc_metric, &loc_hint);
+		hint_type = ZBX_PROMETHEUS_HINT_HELP;
 	}
-	ret = SUCCEED;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s hints:%d", __function_name, zbx_result_string(ret),
-			hints->num_data);
-	return ret;
+	else if (0 == strncmp(data + pos, "TYPE", 4))
+	{
+		pos = skip_spaces(data, pos + 4);
+		ret = parse_type(data, pos, &loc_metric, &loc_hint);
+		hint_type = ZBX_PROMETHEUS_HINT_TYPE;
+	}
+	else
+	{
+		/* skip the comment */
+		const char	*ptr;
+
+		ptr = strchr(data + pos, '\n');
+		loc->r = ptr - data - 1;
+		return SUCCEED;
+	}
+
+	if (SUCCEED != ret)
+	{
+		*error = zbx_strdup(*error, "cannot parse comment");
+		return FAIL;
+	}
+
+	loc->r = loc_hint.r;
+	metric = str_loc_dup(data, &loc_metric);
+
+	/* skip hints of metrics not matching filter */
+	if (NULL != filter->metric && SUCCEED != condition_match_key_value(filter->metric, NULL, metric))
+	{
+		zbx_free(metric);
+		return SUCCEED;
+	}
+
+	return prometheus_register_hint(hints, data, metric, &loc_hint, hint_type, error);
 }
 
 /******************************************************************************
@@ -1210,18 +1205,16 @@ out:
  *                                                                            *
  * Parameters: filter  - [IN] the prometheus filter                           *
  *             data    - [IN] the metric data                                 *
- *             output  - [IN] the flag specifying if raw row value must be    *
- *                            included, see ZBX_PROMETHEUS_PARSE_OUTPUT_*     *
- *                            defines.                                        *
  *             rows    - [OUT] the parsed rows                                *
+ *             hints   - [OUT] the TYPE/HELP hint registry (optional)         *
  *             error   - [OUT] the error message                              *
  *                                                                            *
  * Return value: SUCCEED - the rows were parsed successfully                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *data, int output,
-		zbx_vector_ptr_t *rows, char **error)
+static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *data, zbx_vector_ptr_t *rows,
+		zbx_hashset_t *hints, char **error)
 {
 	const char	*__function_name = "prometheus_parse_rows";
 
@@ -1236,19 +1229,28 @@ static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *da
 	for (pos = 0; '\0' != data[pos]; pos = skip_row(data, pos), row_num++)
 	{
 		pos = skip_spaces(data, pos);
-		if ('#' == data[pos] || '\n' == data[pos])
+
+		/* skip empty strings */
+		if ('\n' == data[pos])
 			continue;
 
-		if (SUCCEED != prometheus_parse_row(filter, data, pos, &row, &loc, &errmsg))
+		if ('#' == data[pos])
 		{
-			*error = zbx_dsprintf(*error, "failed to parse row %d: %s", row_num, errmsg);
-			zbx_free(errmsg);
-			goto out;
+			if (NULL != hints)
+			{
+				if (SUCCEED != prometheus_parse_hint(filter, data, pos, hints, &loc, &errmsg))
+					goto out;
+				pos = loc.r + 1;
+			}
+			continue;
 		}
+
+		if (SUCCEED != prometheus_parse_row(filter, data, pos, &row, &loc, &errmsg))
+			goto out;
 
 		if (NULL != row)
 		{
-			if (ZBX_PROMETHEUS_PARSE_OUTPUT_RAW == output)
+			if (NULL != hints)
 				row->raw = str_loc_dup(data, &loc);
 			zbx_vector_ptr_append(rows, row);
 		}
@@ -1258,9 +1260,88 @@ static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *da
 
 	ret = SUCCEED;
 out:
+	if (SUCCEED != ret)
+	{
+		const char	*ptr, *suffix = "";
+		int		len;
+
+		if (NULL != (ptr = strchr(data + pos, '\n')))
+			len = ptr - data - pos;
+		else
+			len = strlen(data + pos);
+
+		if (ZBX_PROMEHTEUS_ERROR_MAX_ROW_LENGTH < len)
+		{
+			len = ZBX_PROMEHTEUS_ERROR_MAX_ROW_LENGTH;
+			suffix = "...";
+		}
+		*error = zbx_dsprintf(*error, "data parsing error at row %d \"%.*s%s\": %s", row_num, len, data + pos,
+				suffix, errmsg);
+		zbx_free(errmsg);
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s rows:%d", __function_name, zbx_result_string(ret),
 			rows->values_num);
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: prometheus_extract_value                                         *
+ *                                                                            *
+ * Purpose: extracts value from filtered rows according to output template    *
+ *                                                                            *
+ * Parameters: filter  - [IN] the prometheus filter                           *
+ *             output      - [IN] the output template                         *
+ *             value       - [OUT] the extracted value                        *
+ *             error       - [OUT] the error message                          *
+ *                                                                            *
+ * Return value: SUCCEED - the value was extracted successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	prometheus_extract_value(zbx_vector_ptr_t *rows, const char *output, char **value, char **error)
+{
+	zbx_prometheus_row_t	*row;
+
+	if (0 == rows->values_num)
+	{
+		*error = zbx_strdup(*error, "no metric matches the filter");
+		return FAIL;
+	}
+
+	if (1 < rows->values_num)
+	{
+		*error = zbx_strdup(*error, "multiple metrics match the filter");
+		return FAIL;
+	}
+
+	row = (zbx_prometheus_row_t *)rows->values[0];
+
+	if ('\0' != *output)
+	{
+		int			i;
+		zbx_prometheus_label_t	*label;
+
+		for (i = 0; i < row->labels.values_num; i++)
+		{
+			label = (zbx_prometheus_label_t *)row->labels.values[i];
+
+			if (0 == strcmp(label->name, output))
+				break;
+		}
+
+		if (i == row->labels.values_num)
+		{
+			*error = zbx_strdup(*error, "no label matches the specified output");
+			return FAIL;
+		}
+		*value = zbx_strdup(NULL, label->value);
+	}
+	else
+		*value = zbx_strdup(NULL, row->value);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1288,62 +1369,27 @@ int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char
 	char			*errmsg = NULL;
 	int			ret = FAIL;
 	zbx_vector_ptr_t	rows;
-	zbx_prometheus_row_t	*row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
 	{
-		*error = zbx_dsprintf(*error, "Cannot parse filter: %s", errmsg);
+		*error = zbx_dsprintf(*error, "filter error: %s", errmsg);
 		zbx_free(errmsg);
 		goto out;
 	}
 
 	zbx_vector_ptr_create(&rows);
 
-	if (FAIL == prometheus_parse_rows(&filter, data, ZBX_PROMETHEUS_PARSE_OUTPUT_DEFAULT, &rows, &errmsg))
+	if (FAIL == prometheus_parse_rows(&filter, data, &rows, NULL, error))
+		goto cleanup;
+
+	if (FAIL == prometheus_extract_value(&rows, output, value, &errmsg))
 	{
-		*error = zbx_dsprintf(*error, "Cannot parse rows: %s", errmsg);
+		*error = zbx_dsprintf(*error, "data extraction error: %s", errmsg);
 		zbx_free(errmsg);
 		goto cleanup;
 	}
-
-	if (0 == rows.values_num)
-	{
-		*error = zbx_strdup(*error, "No row matches the specified filter");
-		goto cleanup;
-	}
-
-	if (1 < rows.values_num)
-	{
-		*error = zbx_strdup(*error, "Multiple rows match the specified filter");
-		goto cleanup;
-	}
-
-	row = (zbx_prometheus_row_t *)rows.values[0];
-
-	if ('\0' != *output)
-	{
-		int			i;
-		zbx_prometheus_label_t	*label;
-
-		for (i = 0; i < row->labels.values_num; i++)
-		{
-			label = (zbx_prometheus_label_t *)row->labels.values[i];
-
-			if (0 == strcmp(label->name, output))
-				break;
-		}
-
-		if (i == row->labels.values_num)
-		{
-			*error = zbx_strdup(*error, "No label matches the specified output");
-			goto cleanup;
-		}
-		*value = zbx_strdup(NULL, label->value);
-	}
-	else
-		*value = zbx_strdup(NULL, row->value);
 
 	ret = SUCCEED;
 cleanup:
@@ -1386,7 +1432,7 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 
 	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
 	{
-		*error = zbx_dsprintf(*error, "Cannot parse filter: %s", errmsg);
+		*error = zbx_dsprintf(*error, "filter error: %s", errmsg);
 		zbx_free(errmsg);
 		goto out;
 	}
@@ -1395,19 +1441,8 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 	zbx_hashset_create(&hints, 100, prometheus_hint_hash, prometheus_hint_compare);
 	zbx_json_initarray(&json, rows.values_num * 100);
 
-	if (FAIL == prometheus_parse_rows(&filter, data, ZBX_PROMETHEUS_PARSE_OUTPUT_RAW, &rows, &errmsg))
-	{
-		*error = zbx_dsprintf(*error, "Cannot parse rows: %s", errmsg);
-		zbx_free(errmsg);
+	if (FAIL == prometheus_parse_rows(&filter, data, &rows, &hints, error))
 		goto cleanup;
-	}
-
-	if (FAIL == prometheus_parse_hints(&filter, data, &hints, &errmsg))
-	{
-		*error = zbx_dsprintf(*error, "Cannot parse hints: %s", errmsg);
-		zbx_free(errmsg);
-		goto cleanup;
-	}
 
 	for (i = 0; i < rows.values_num; i++)
 	{
