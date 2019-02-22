@@ -46,13 +46,13 @@ extern int		server_num, process_num;
  * Parameters: socket - [IN] the connections socket                           *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_poller_register(zbx_ipc_socket_t *socket)
+static void	ipmi_poller_register(zbx_ipc_async_socket_t *socket)
 {
 	pid_t	ppid;
 
 	ppid = getppid();
 
-	zbx_ipc_socket_write(socket, ZBX_IPC_IPMI_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
+	zbx_ipc_async_socket_send(socket, ZBX_IPC_IPMI_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
 }
 
 /******************************************************************************
@@ -67,7 +67,7 @@ static void	ipmi_poller_register(zbx_ipc_socket_t *socket)
  *             value   - [IN] the resulting value/error message               *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_poller_send_result(zbx_ipc_socket_t *socket, zbx_uint32_t code, int errcode, const char *value)
+static void	ipmi_poller_send_result(zbx_ipc_async_socket_t *socket, zbx_uint32_t code, int errcode, const char *value)
 {
 	unsigned char	*data;
 	zbx_uint32_t	data_len;
@@ -75,7 +75,7 @@ static void	ipmi_poller_send_result(zbx_ipc_socket_t *socket, zbx_uint32_t code,
 
 	zbx_timespec(&ts);
 	data_len = zbx_ipmi_serialize_result(&data, &ts, errcode, value);
-	zbx_ipc_socket_write(socket, code, data, data_len);
+	zbx_ipc_async_socket_send(socket, code, data, data_len);
 
 	zbx_free(data);
 }
@@ -90,7 +90,7 @@ static void	ipmi_poller_send_result(zbx_ipc_socket_t *socket, zbx_uint32_t code,
  *             message - [IN] the value request message                       *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_poller_process_value_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
+static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zbx_ipc_message_t *message)
 {
 	const char	*__function_name = "ipmi_poller_process_value_request";
 	zbx_uint64_t	itemid;
@@ -131,7 +131,7 @@ static void	ipmi_poller_process_value_request(zbx_ipc_socket_t *socket, zbx_ipc_
  *             message - [IN] the command request message                     *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_poller_process_command_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
+static void	ipmi_poller_process_command_request(zbx_ipc_async_socket_t *socket, zbx_ipc_message_t *message)
 {
 	const char	*__function_name = "ipmi_poller_process_command_request";
 	zbx_uint64_t	itemid;
@@ -167,8 +167,7 @@ static void	ipmi_poller_process_command_request(zbx_ipc_socket_t *socket, zbx_ip
 ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 {
 	char			*error = NULL;
-	zbx_ipc_socket_t	ipmi_socket;
-	zbx_ipc_message_t	message;
+	zbx_ipc_async_socket_t	ipmi_socket;
 	int			polled_num = 0;
 	double			time_stat, time_idle = 0, time_now, time_read;
 
@@ -185,9 +184,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_ipc_message_init(&message);
-
-	if (FAIL == zbx_ipc_socket_open(&ipmi_socket, ZBX_IPC_SERVICE_IPMI, 10, &error))
+	if (FAIL == zbx_ipc_async_socket_open(&ipmi_socket, ZBX_IPC_SERVICE_IPMI, 10, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to IPMI service: %s", error);
 		zbx_free(error);
@@ -206,6 +203,8 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 
 	for (;;)
 	{
+		zbx_ipc_message_t	*message = NULL;
+
 		time_now = zbx_time();
 
 		if (STAT_INTERVAL < time_now - time_stat)
@@ -221,10 +220,18 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-		if (SUCCEED != zbx_ipc_socket_read(&ipmi_socket, &message))
+		while (NULL == message)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot read IPMI service request");
-			exit(EXIT_FAILURE);
+			const int ipmi_timeout = 1;
+			const int ipc_timeout = 1;
+
+			zbx_perform_all_openipmi_ops(ipmi_timeout);
+
+			if (SUCCEED != zbx_ipc_async_socket_recv(&ipmi_socket, ipc_timeout, &message))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot read IPMI service request");
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
@@ -233,24 +240,25 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 		time_idle += time_read - time_now;
 		zbx_update_env(time_read);
 
-		switch (message.code)
+		switch (message->code)
 		{
 			case ZBX_IPC_IPMI_VALUE_REQUEST:
-				ipmi_poller_process_value_request(&ipmi_socket, &message);
+				ipmi_poller_process_value_request(&ipmi_socket, message);
 				polled_num++;
 				break;
 			case ZBX_IPC_IPMI_COMMAND_REQUEST:
-				ipmi_poller_process_command_request(&ipmi_socket, &message);
+				ipmi_poller_process_command_request(&ipmi_socket, message);
 				break;
 			case ZBX_IPC_IPMI_CLEANUP_REQUEST:
 				zbx_delete_inactive_ipmi_hosts(time(NULL));
 				break;
 		}
 
-		zbx_ipc_message_clean(&message);
+		zbx_ipc_message_free(message);
+		message = NULL;
 	}
 
-	zbx_ipc_socket_close(&ipmi_socket);
+	zbx_ipc_async_socket_close(&ipmi_socket);
 
 	zbx_free_ipmi_handler();
 

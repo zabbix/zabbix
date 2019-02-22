@@ -771,6 +771,48 @@ static int	zbx_perform_openipmi_ops(zbx_ipmi_host_t *h, const char *func_name)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_perform_all_openipmi_ops                                     *
+ *                                                                            *
+ * Purpose: Pass control to OpenIPMI library to process all internal events.  *
+ *                                                                            *
+ * Parameters: timeout - [IN] timeout (in seconds) for processing single      *
+ *                            operation; processing multiple operations may   *
+ *                            take more time                                  *
+ *                                                                            *
+ *****************************************************************************/
+void	zbx_perform_all_openipmi_ops(int timeout)
+{
+	struct timeval	tv;
+
+	tv.tv_sec = timeout;
+	tv.tv_usec = 0;
+
+	for (;;)
+	{
+		double	start_time;
+		int	res;
+
+		start_time = zbx_time();
+
+		res = os_hnd->perform_one_op(os_hnd, &tv);
+
+		/* perform_one_op() returns 0 on success, errno on failure (timeout means success) */
+		if (0 != res)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "IPMI error: %s", zbx_strerror(res));
+			break;
+		}
+
+		/* if duration is less than timeout, there may be more operations to be processed */
+		if (zbx_time() - start_time >= timeout)
+		{
+			break;
+		}
+	}
+}
+
 static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 {
 	const char	*__function_name = "zbx_read_ipmi_sensor";
