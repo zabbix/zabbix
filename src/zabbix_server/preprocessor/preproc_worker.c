@@ -63,7 +63,7 @@ static void	worker_format_value(const zbx_variant_t *value, char **value_str)
 
 	value_desc = zbx_variant_value_desc(value);
 
-	if (zbx_strlen_utf8(value_desc) > ZBX_PREPROC_VALUE_PREVIEW_LEN)
+	if (ZBX_PREPROC_VALUE_PREVIEW_LEN < zbx_strlen_utf8(value_desc))
 	{
 		char	*ptr;
 
