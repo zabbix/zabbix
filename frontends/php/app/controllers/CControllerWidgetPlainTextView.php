@@ -80,7 +80,6 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		else {
 			// macros
 			$items = CMacrosResolverHelper::resolveItemNames($items);
-			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
 			$histories = Manager::History()->getLastValues($items, $fields['show_lines']);
 
