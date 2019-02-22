@@ -363,6 +363,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				case ZBX_PREPROC_ERROR_FIELD_JSON:
 				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 				case ZBX_PREPROC_SCRIPT:
+				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 					$step['params'] = $step['params'][0];
 					break;
 
