@@ -248,8 +248,14 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
 		ret = zbx_item_preproc(value_type, value, ts, op, &history_value, &history_ts, &action, error);
 
 		/* store result history */
-		zbx_variant_set_variant(&results[i].value, value);
 		results[i].action = action;
+
+		/* value is stored to report previous step results a step fails, */
+		/* which means it can be omitted for the last step               */
+		if (i != steps_num - 1)
+			zbx_variant_set_variant(&results[i].value, value);
+		else
+			zbx_variant_set_none(&results[i].value);
 
 		if (SUCCEED != ret)
 			break;
