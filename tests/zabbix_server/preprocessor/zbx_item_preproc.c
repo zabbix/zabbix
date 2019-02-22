@@ -26,6 +26,7 @@
 #include "zbxjson.h"
 #include "dbcache.h"
 #include "zbxembed.h"
+#include "log.h"
 
 #include "../../../src/zabbix_server/preprocessor/item_preproc.h"
 
@@ -197,6 +198,8 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	returned_ret = zbx_item_preproc(0, value_type, &value, &ts, &op, &history_value, &history_ts, &error);
+	if (SUCCEED != returned_ret)
+		zabbix_log(LOG_LEVEL_DEBUG, "Preprocessing error: %s", error);
 
 	if (SUCCEED == is_step_supported(op.type))
 		expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));

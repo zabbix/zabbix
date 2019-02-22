@@ -1563,9 +1563,7 @@ in:
       cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
   step:
     type: ZBX_PREPROC_PROMETHEUS_PATTERN
-    params: |-
-      cpu_usage_system{cpu="cpu-total",host=~".*"}
-      \value
+    params: "cpu_usage_system{cpu=\"cpu-total\",host=~\".*\"}\n"
 out:
   return: SUCCEED
   value: 1.1940298507220641
@@ -1578,9 +1576,7 @@ in:
     data: metric_without_timestamp_and_labels 12.47
   step:
     type: ZBX_PREPROC_PROMETHEUS_PATTERN
-    params: |-
-      metric_without_timestamp_and_labels
-      \value
+    params: "metric_without_timestamp_and_labels\n"
 out:
   return: SUCCEED
   value: 12.47
@@ -1598,9 +1594,7 @@ in:
       cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
   step:
     type: ZBX_PREPROC_PROMETHEUS_PATTERN
-    params: |-
-      {cpu="cpu0",__name__="cpu_usage_system"}
-      \value
+    params: "{cpu=\"cpu0\",__name__=\"cpu_usage_system\"}\n"
 out:
   return: SUCCEED
   value: 1.1940298507220641
@@ -1617,9 +1611,7 @@ in:
       http_requests_total{method="post",code="400"}    3 1395066363000
   step:
     type: ZBX_PREPROC_PROMETHEUS_PATTERN
-    params: |-
-      http_requests_total{code="200"}
-      \value
+    params: "http_requests_total{code=\"200\"}\n"
 out:
   return: SUCCEED
   value: 1027
@@ -1635,9 +1627,7 @@ in:
       cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
   step:
     type: ZBX_PREPROC_PROMETHEUS_PATTERN
-    params: |-
-      ""
-      \value
+    params: "\n"
 out:
   return: SUCCEED
   value: 1.1340298507220641
@@ -1653,7 +1643,7 @@ in:
       cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
   step:
     type: ZBX_PREPROC_PROMETHEUS_PATTERN
-    params: cpu_usage_system
+    params: "cpu_usage_system\n"
 out:
   return: SUCCEED
   value: 1.1340298507220641
@@ -1671,12 +1661,10 @@ in:
       cpu_usage_system{cpu="cpu1",host="host3"} 1.1340298507220641
   step:
     type: ZBX_PREPROC_PROMETHEUS_PATTERN
-    params: |-
-      cpu_usage_system{cpu="cpu0"} == 1.1940298507220641
-      host
+    params: "cpu_usage_system{cpu=\"cpu0\"} == 1.1940298507220641\nhost"
 out:
   return: SUCCEED
-  value: '"host2"'
+  value: host2
 ---
 test case: prometheus_getmetric8
 in:
@@ -1684,8 +1672,8 @@ in:
     value_type: ITEM_VALUE_TYPE_STR
     time: 2017-10-29 03:15:00 +03:00
     data: >
-      AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789{AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxY
-      yZz_0123456789="anything"} 123123123
+      AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789{
+      AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789="anything"} 123123123
   step:
     type: ZBX_PREPROC_PROMETHEUS_PATTERN
     params: |-
@@ -1693,7 +1681,7 @@ in:
       AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789
 out:
   return: SUCCEED
-  value: '"anything"'
+  value: anything
 ---
 test case: prometheus_getmetric9
 in:
@@ -1713,7 +1701,7 @@ in:
       host
 out:
   return: SUCCEED
-  value: '"host2"'
+  value: host2
 ---
 test case: prometheus_getmetric10
 in:
@@ -1730,10 +1718,10 @@ in:
     type: ZBX_PREPROC_PROMETHEUS_PATTERN
     params: |-
       cpu_usage_system{cpu="cpu1"}
-      \value
+      host
 out:
   return: SUCCEED
-  value: '"host,3"'
+  value: host,3
 ---
 test case: prometheus_getmetric11
 in:

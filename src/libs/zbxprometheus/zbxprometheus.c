@@ -951,14 +951,6 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 
 		pos = loc.r + 1;
 	}
-	else
-	{
-		if (' ' != data[pos])
-		{
-			*error = zbx_dsprintf(*error, "invalid character \"%c\" following metric name", data[pos]);
-			goto out;
-		}
-	}
 
 	/* parse value and check against the filter */
 
