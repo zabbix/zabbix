@@ -1585,38 +1585,31 @@ fail:
  ******************************************************************************/
 static int	item_preproc_prometheus_pattern(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
-		*out = NULL,
-		*err = NULL,
-		*sep,
-		value_type[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output, *value_out = NULL,
+		*err = NULL;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
 	zbx_strlcpy(pattern, params, sizeof(pattern));
 
-	if (NULL == (sep = strchr(pattern, '\n')))
+	if (NULL == (output = strchr(pattern, '\n')))
 	{
-		/* default value */
-		zbx_strlcpy(value_type, "\\value", sizeof(value_type));
-	}
-	else
-	{
-		*sep++ = '\0';
-
-		zbx_strlcpy(value_type, sep, sizeof(value_type));
+		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
+		return FAIL;
 	}
 
-	if (FAIL == zbx_prometheus_pattern(value->data.str, pattern, value_type, &out, &err))
+	*output++ = '\0';
+
+	if (FAIL == zbx_prometheus_pattern(value->data.str, pattern, output, &value_out, &err))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "cannot output Prometheus data: %s", err);
+		*errmsg = zbx_dsprintf(*errmsg, "cannot apply Prometheus pattern: %s", err);
 		zbx_free(err);
 		return FAIL;
 	}
 
 	zbx_variant_clear(value);
-	zbx_variant_set_str(value, out);
+	zbx_variant_set_str(value, value_out);
 
 	return SUCCEED;
 }
@@ -1637,16 +1630,12 @@ static int	item_preproc_prometheus_pattern(zbx_variant_t *value, const char *par
  ******************************************************************************/
 static int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
-		*out = NULL,
-		*err = NULL;
+	char	*value_out = NULL, *err = NULL;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
-	zbx_strlcpy(pattern, params, sizeof(pattern));
-
-	if (FAIL == zbx_prometheus_to_json(value->data.str, pattern, &out, &err))
+	if (FAIL == zbx_prometheus_to_json(value->data.str, params, &value_out, &err))
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "cannot convert Prometheus data to JSON: %s", err);
 		zbx_free(err);
@@ -1654,7 +1643,7 @@ static int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *par
 	}
 
 	zbx_variant_clear(value);
-	zbx_variant_set_str(value, out);
+	zbx_variant_set_str(value, value_out);
 
 	return SUCCEED;
 }
