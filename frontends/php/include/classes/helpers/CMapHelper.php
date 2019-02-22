@@ -487,15 +487,16 @@ class CMapHelper {
 	}
 
 	/**
-	 * Set labels inherited from map configuration data.
+	 * Set labels inherited from map configuration data and swap inherited label and original.
 	 *
 	 * @param array $map
 	 *
-	 * @return array map with inherited labels set for elements.
+	 * @return array Map with inherited selement labels set into 'label' property and original label moved to
+	 *               'inherited_label' if inherited label found.
 	 */
 	public static function setElementInheritedLabels(array $map) {
 		foreach ($map['selements'] as &$selement) {
-			$selement['inherited_label'] = null;
+			$inherited_label = null;
 			$selement['label_type'] = $map['label_type'];
 
 			if ($map['label_format'] != SYSMAP_LABEL_ADVANCED_OFF) {
@@ -503,46 +504,51 @@ class CMapHelper {
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 						$selement['label_type'] = $map['label_type_hostgroup'];
 						if ($map['label_type_hostgroup'] == MAP_LABEL_TYPE_CUSTOM) {
-							$selement['inherited_label'] = $map['label_string_hostgroup'];
+							$inherited_label = $map['label_string_hostgroup'];
 						}
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_HOST:
 						$selement['label_type'] = $map['label_type_host'];
 						if ($map['label_type_host'] == MAP_LABEL_TYPE_CUSTOM) {
-							$selement['inherited_label'] = $map['label_string_host'];
+							$inherited_label = $map['label_string_host'];
 						}
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						$selement['label_type'] = $map['label_type_trigger'];
 						if ($map['label_type_trigger'] == MAP_LABEL_TYPE_CUSTOM) {
-							$selement['inherited_label'] = $map['label_string_trigger'];
+							$inherited_label = $map['label_string_trigger'];
 						}
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_MAP:
 						$selement['label_type'] = $map['label_type_map'];
 						if ($map['label_type_map'] == MAP_LABEL_TYPE_CUSTOM) {
-							$selement['inherited_label'] = $map['label_string_map'];
+							$inherited_label = $map['label_string_map'];
 						}
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_IMAGE:
 						$selement['label_type'] = $map['label_type_image'];
 						if ($map['label_type_image'] == MAP_LABEL_TYPE_CUSTOM) {
-							$selement['inherited_label'] = $map['label_string_image'];
+							$inherited_label = $map['label_string_image'];
 						}
 						break;
 				}
 			}
 
 			if ($selement['label_type'] == MAP_LABEL_TYPE_NOTHING) {
-				$selement['inherited_label'] = '';
+				$inherited_label = '';
 			}
 			elseif ($selement['label_type'] == MAP_LABEL_TYPE_IP
 					&& $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-				$selement['inherited_label'] = '{HOST.IP}';
+				$inherited_label = '{HOST.IP}';
+			}
+
+			if ($inherited_label !== null) {
+				$selement['inherited_label'] = $selement['label'];
+				$selement['label'] = $inherited_label;
 			}
 		}
 		unset($selement);

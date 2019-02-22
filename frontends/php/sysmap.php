@@ -227,27 +227,23 @@ $data['sysmap']['selements'] = zbx_toHash($data['sysmap']['selements'], 'selemen
 $data['sysmap']['shapes'] = zbx_toHash($data['sysmap']['shapes'], 'sysmap_shapeid');
 $data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');
 
+// Apply inherited label options.
 $data['sysmap'] = CMapHelper::setElementInheritedLabels($data['sysmap']);
-
-foreach ($data['sysmap']['selements'] as &$selement) {
-	if ($selement['inherited_label'] !== null) {
-		$label = $selement['label'];
-		$selement['label'] = $selement['inherited_label'];
-	}
-
-	if ($selement['inherited_label'] !== null) {
-		$selement['label'] = $label;
-	}
-}
-unset($selement);
 
 // Extend $selement adding resolved label as property named 'expanded'.
 $resolve_opt = ['resolve_element_label' => true];
 $selements_resolved = CMacrosResolverHelper::resolveMacrosInMapElements($data['sysmap']['selements'], $resolve_opt);
 
+// Set extended and restore original labels.
 foreach ($data['sysmap']['selements'] as $selementid => &$selement) {
 	$selement['expanded'] = $selements_resolved[$selementid]['label'];
+
+	if (array_key_exists('inherited_label', $selement)) {
+		$selement['label'] = $selement['inherited_label'];
+		unset($selement['inherited_label']);
+	}
 }
+unset($selement);
 
 // get links
 foreach ($data['sysmap']['links'] as &$link) {
