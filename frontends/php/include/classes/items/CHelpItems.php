@@ -1021,11 +1021,11 @@ class CHelpItems {
 			],
 			ITEM_TYPE_DB_MONITOR => [
 				[
-					'key' => 'db.odbc.select[<unique short description>,<dsn>]',
+					'key' => 'db.odbc.select[<unique short description>,dsn]',
 					'description' => _('Return first column of the first row of the SQL query result.')
 				],
 				[
-					'key' => 'db.odbc.discovery[<unique short description>,<dsn>]',
+					'key' => 'db.odbc.discovery[<unique short description>,dsn]',
 					'description' => _('Transform SQL query result into a JSON object for low-level discovery.')
 				]
 			],
