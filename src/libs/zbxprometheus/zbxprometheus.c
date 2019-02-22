@@ -221,7 +221,7 @@ static zbx_prometheus_condition_op_t	str_loc_op(const char *data, const zbx_strl
  ******************************************************************************/
 static size_t	skip_spaces(const char *data, size_t pos)
 {
-	while (' ' == data[pos])
+	while (' ' == data[pos] || '\t' == data[pos])
 		pos++;
 
 	return pos;
@@ -685,7 +685,7 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 		filter->metric = prometheus_condition_create(NULL, str_loc_dup(data, &loc),
 				ZBX_PROMETHEUS_CONDITION_OP_EQUAL);
 
-		pos = loc.r + 1;
+		pos = skip_spaces(data, loc.r + 1);
 	}
 
 	if ('{' == data[pos])
@@ -922,7 +922,7 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 
 	/* parse labels and check against the filter */
 
-	pos = loc.r + 1;
+	pos = skip_spaces(data, loc.r + 1);
 
 	if ('{' == data[pos])
 	{
