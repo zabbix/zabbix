@@ -2092,7 +2092,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($selements as $selid => &$sel) {
 			if (!array_key_exists($selid, $macros) || !$macros[$selid]) {
 				// Resolve functional macros like: {sampleHostName:log[{HOST.HOST}.log].last(0)}, if no host provided.
-				$sel['label'] = $this->resolveMapLabelMacros($sel['label']);
+				if ($options['resolve_element_label']) {
+					$sel['label'] = $this->resolveMapLabelMacros($sel['label']);
+				}
 
 				// Continue since there is nothing more to resolve.
 				continue;
