@@ -1184,24 +1184,24 @@ static int	item_preproc_validate_regex(const zbx_variant_t *value, const char *p
 	int		ret = FAIL;
 	zbx_regexp_t	*regex;
 	const char	*errptr = NULL;
-	char		*errmsg = NULL;
+	char		*errmsg;
 
 	zbx_variant_set_variant(&value_str, value);
 
 	if (FAIL == zbx_variant_convert(&value_str, ZBX_VARIANT_STR))
 	{
-		errmsg = zbx_strdup(errmsg, "cannot convert value to string");
+		errmsg = zbx_strdup(NULL, "cannot convert value to string");
 		goto out;
 	}
 
 	if (FAIL == zbx_regexp_compile(params, &regex, &errptr))
 	{
-		errmsg = zbx_dsprintf(errmsg, "invalid regular expression pattern: %s", errptr);
+		errmsg = zbx_dsprintf(NULL, "invalid regular expression pattern: %s", errptr);
 		goto out;
 	}
 
 	if (0 != zbx_regexp_match_precompiled(value_str.data.str, regex))
-		errmsg = zbx_strdup(errmsg, "value does not match regular expression");
+		errmsg = zbx_strdup(NULL, "value does not match regular expression");
 	else
 		ret = SUCCEED;
 
@@ -1240,25 +1240,25 @@ static int	item_preproc_validate_not_regex(const zbx_variant_t *value, const cha
 	int		ret = FAIL;
 	zbx_regexp_t	*regex;
 	const char	*errptr = NULL;
-	char		*errmsg = NULL;
+	char		*errmsg;
 
 	zbx_variant_set_variant(&value_str, value);
 
 	if (FAIL == zbx_variant_convert(&value_str, ZBX_VARIANT_STR))
 	{
-		errmsg = zbx_strdup(errmsg, "cannot convert value to string");
+		errmsg = zbx_strdup(NULL, "cannot convert value to string");
 		goto out;
 	}
 
 	if (FAIL == zbx_regexp_compile(params, &regex, &errptr))
 	{
-		errmsg = zbx_dsprintf(errmsg, "invalid regular expression pattern: %s", errptr);
+		errmsg = zbx_dsprintf(NULL, "invalid regular expression pattern: %s", errptr);
 		goto out;
 	}
 
 	if (0 == zbx_regexp_match_precompiled(value_str.data.str, regex))
 	{
-		errmsg = zbx_strdup(errmsg, "value matches regular expression");
+		errmsg = zbx_strdup(NULL, "value matches regular expression");
 	}
 	else
 		ret = SUCCEED;
