@@ -65,19 +65,11 @@ static void	worker_format_value(const zbx_variant_t *value, char **value_str)
 
 	if (ZBX_PREPROC_VALUE_PREVIEW_LEN < zbx_strlen_utf8(value_desc))
 	{
-		char	*ptr;
-
 		/* truncate value and append '...' */
-		len = zbx_db_strlen_n(value_desc, ZBX_PREPROC_VALUE_PREVIEW_LEN - 3);
-		*value_str = zbx_malloc(NULL, len + 4);
+		len = zbx_db_strlen_n(value_desc, ZBX_PREPROC_VALUE_PREVIEW_LEN - ZBX_CONST_STRLEN("..."));
+		*value_str = zbx_malloc(NULL, len + ZBX_CONST_STRLEN("...") + 1);
 		memcpy(*value_str, value_desc, len);
-
-		ptr = *value_str + len;
-
-		for (i = 0; i < 3; i++)
-			*ptr++ = '.';
-
-		*ptr = '\0';
+		memcpy(*value_str + len, "...", ZBX_CONST_STRLEN("...") + 1);
 	}
 	else
 	{
