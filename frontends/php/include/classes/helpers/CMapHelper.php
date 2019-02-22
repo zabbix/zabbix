@@ -698,7 +698,7 @@ class CMapHelper {
 					foreach ($area['selementids'] as $selement_id) {
 						$new_linkid++;
 						$link['linkid'] = -$new_linkid;
-						$link[$id_number] = -$selement_id;
+						$link[$id_number] = $selement_id;
 						$sysmap['links'][$new_linkid] = $link;
 					}
 				}

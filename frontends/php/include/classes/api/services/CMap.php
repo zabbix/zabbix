@@ -2468,8 +2468,7 @@ class CMap extends CMapElement {
 			}
 			unset($selement);
 
-			$selements = $this->unsetExtraFields(
-				$selements,
+			$selements = $this->unsetExtraFields($selements,
 				['sysmapid', 'selementid', 'elementtype', 'elementsubtype'],
 				$options['selectSelements']
 			);
