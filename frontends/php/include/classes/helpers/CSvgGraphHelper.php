@@ -317,22 +317,20 @@ class CSvgGraphHelper {
 			}
 		}
 
-		// Filter out only items of selected metrics.
-		if ($problem_options['itemids'] !== null) {
-			$options['objectids'] = array_keys(API::Trigger()->get([
-				'output' => [],
-				'hostids' => array_key_exists('hostids', $options) ? $options['hostids'] : null,
-				'itemids' => $problem_options['itemids'],
-				'preservekeys' => true
-			]));
+		$options['objectids'] = array_keys(API::Trigger()->get([
+			'output' => [],
+			'hostids' => array_key_exists('hostids', $options) ? $options['hostids'] : null,
+			'itemids' => array_key_exists('itemids', $problem_options) ? $problem_options['itemids'] : null,
+			'monitored' => true,
+			'preservekeys' => true
+		]));
 
-			// Return if no triggers found.
-			if (!$options['objectids']) {
-				return [];
-			}
-
-			unset($options['hostids']);
+		// Return if no triggers found.
+		if (!$options['objectids']) {
+			return [];
 		}
+
+		unset($options['hostids']);
 
 		// Add severity filter.
 		$filter_severities = implode(',', $problem_options['severities']);
