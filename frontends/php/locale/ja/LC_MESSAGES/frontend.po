@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-02-18 16:37+0200\n"
-"PO-Revision-Date: 2019-02-15 06:29+0300\n"
+"PO-Revision-Date: 2019-02-19 09:07+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1550204945.000000\n"
+"X-POOTLE-MTIME: 1550560059.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -181,7 +181,7 @@ msgstr[0] "%1$s秒"
 #: jsLoader.php:304
 #, c-format
 msgid "%1$s symbols remaining"
-msgstr ""
+msgstr "%1$s文字入力可"
 
 #: app/views/monitoring.widget.problems.view.php:241
 #, c-format
@@ -2852,7 +2852,7 @@ msgstr "テンプレートのアプリケーションを更新できません。
 
 #: templates.php:398
 msgid "Cannot update templates"
-msgstr ""
+msgstr "テンプレートを更新できません"
 
 #: include/classes/api/services/CTemplate.php:791
 #: include/classes/api/services/CTemplate.php:1125
@@ -3144,11 +3144,11 @@ msgstr "リンク削除時にクリア"
 
 #: jsLoader.php:119
 msgid "Click and drag to desired size."
-msgstr ""
+msgstr "希望のサイズにクリックしてドラッグします。"
 
 #: include/forms.inc.php:1520 include/views/js/item.preprocessing.js.php:205
 msgid "Click to view or edit code"
-msgstr ""
+msgstr "クリックしてコードの表示か編集"
 
 #: include/classes/widgets/CWidgetConfig.php:34 include/screens.inc.php:28
 msgid "Clock"
@@ -4059,7 +4059,7 @@ msgstr "カスタムスクリプト"
 
 #: include/items.inc.php:1755
 msgid "Custom scripts"
-msgstr ""
+msgstr "カスタムスクリプト"
 
 #: include/views/administration.general.triggerSeverity.edit.php:87
 msgid "Custom severity names affect all locales and require manual translation!"
@@ -8729,7 +8729,7 @@ msgstr "サービス情報の取得。引数がstateやstartupなら整数値を
 
 #: include/views/configuration.triggers.list.php:136
 msgid "Inherited"
-msgstr ""
+msgstr "継承したもの"
 
 #: include/views/hostmacros.php:180
 msgid "Inherited and host macros"
@@ -8741,11 +8741,11 @@ msgstr "継承したマクロとテンプレートマクロ"
 
 #: include/views/configuration.tags.tab.php:118
 msgid "Inherited and trigger tags"
-msgstr ""
+msgstr "継承したタグとトリガータグ"
 
 #: include/forms.inc.php:463 include/forms.inc.php:648
 msgid "Inherited items"
-msgstr ""
+msgstr "継承したアイテム"
 
 #: app/views/popup.triggerexpr.php:180
 msgid "Insert"
@@ -9541,7 +9541,7 @@ msgstr "日本語 (ja_JP)"
 
 #: include/items.inc.php:1756 jsLoader.php:302
 msgid "JavaScript"
-msgstr ""
+msgstr "JavaScript"
 
 #: include/func.inc.php:242
 msgid "Jul"
@@ -11642,7 +11642,7 @@ msgstr "未分類"
 
 #: include/forms.inc.php:464 include/forms.inc.php:645
 msgid "Not inherited items"
-msgstr ""
+msgstr "継承していないアイテム"
 
 #: include/items.inc.php:161 include/items.inc.php:186
 msgid "Not supported"
@@ -12080,7 +12080,7 @@ msgstr "有効なホストとアイテムのトリガーのみカウント"
 
 #: jsLoader.php:303
 msgid "Open"
-msgstr ""
+msgstr "編集"
 
 #: include/httptest.inc.php:418
 msgid "Opera"
@@ -12368,11 +12368,11 @@ msgstr "PHP gd FreeTypeがサポートされていません。"
 
 #: include/classes/setup/CFrontendSetup.php:478
 msgid "PHP gd GIF image support missing."
-msgstr ""
+msgstr "PHP gd GIFイメージがサポートされていません。"
 
 #: include/classes/setup/CFrontendSetup.php:474
 msgid "PHP gd GIF support"
-msgstr ""
+msgstr "PHP gd GIFのサポート"
 
 #: include/classes/setup/CFrontendSetup.php:461
 msgid "PHP gd JPEG image support missing."
@@ -12573,7 +12573,7 @@ msgstr "親サービス"
 
 #: include/views/configuration.tags.tab.php:37
 msgid "Parent templates"
-msgstr ""
+msgstr "親テンプレート"
 
 #: include/views/configuration.trigger.prototype.edit.php:56
 #: include/views/configuration.triggers.edit.php:67
@@ -13387,7 +13387,7 @@ msgstr "通常アイテム"
 
 #: jsLoader.php:118
 msgid "Release to create a new widget."
-msgstr ""
+msgstr "離して新しいウィジェットを作成します。"
 
 #: include/views/general.login.php:67
 msgid "Remember me for 30 days"
@@ -13771,7 +13771,7 @@ msgstr "ICMP pingの応答時間を秒で返却。例： 0.02"
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:987
 msgid "Returns a JSON object containing Zabbix server or Proxy internal metrics."
-msgstr ""
+msgstr "Zabbixサーバーまたはプロキシの内部メトリクスを含むJSONオブジェクトを返す。"
 
 #: include/classes/items/CHelpItems.php:939
 msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
@@ -14093,7 +14093,7 @@ msgstr "土曜"
 
 #: jsLoader.php:305
 msgid "Save"
-msgstr ""
+msgstr "保存"
 
 #: app/views/monitoring.dashboard.view.php:99
 msgid "Save changes"
@@ -15671,7 +15671,7 @@ msgstr "テンプレート\"%1$s\"とホスト\"%2$s\"のリンクを削除し�
 
 #: templates.php:392
 msgid "Templates updated"
-msgstr ""
+msgstr "テンプレートを更新しました"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:147
 #: app/views/administration.authentication.edit.php:150
@@ -16290,7 +16290,7 @@ msgstr "トリガーのステータス \"障害\""
 
 #: include/views/configuration.tags.tab.php:117
 msgid "Trigger tags"
-msgstr ""
+msgstr "トリガータグ"
 
 #: triggers.php:390 triggers.php:508
 msgid "Trigger updated"
@@ -17736,7 +17736,7 @@ msgstr "データ収集あり"
 
 #: include/views/configuration.triggers.list.php:150
 msgid "With dependencies"
-msgstr ""
+msgstr "依存関係がある"
 
 #: include/views/common.filter.trigger.php:48
 msgid "With last event unacknowledged"
@@ -19147,7 +19147,7 @@ msgstr "s"
 
 #: include/forms.inc.php:1518 include/views/js/item.preprocessing.js.php:203
 msgid "script"
-msgstr ""
+msgstr "スクリプト"
 
 #: include/forms.inc.php:2368 include/maintenances.inc.php:112
 msgctxt "adjective"
