@@ -26,7 +26,7 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*data, *params, *value_type, *output, *err, *result;
+	const char	*data, *params, *value_type, *output, *result;
 	char		*ret_err = NULL, *ret_output = NULL;
 	int		ret;
 
@@ -50,7 +50,5 @@ void	zbx_mock_test_entry(void **state)
 		/* Check if the test case was expected to fail and got appropriate error description */
 		zbx_mock_assert_result_eq("Invalid zbx_prometheus_pattern() return value", FAIL, ret);
 		zbx_mock_assert_str_eq("Invalid zbx_prometheus_pattern() returned result", result, "fail");
-		err = zbx_mock_get_parameter_string("out.error");
-		zbx_mock_assert_str_eq("Invalid zbx_prometheus_pattern() returned error description", err, ret_err);
 	}
 }

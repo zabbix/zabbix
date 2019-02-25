@@ -5,16 +5,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_physical_memory_free_bytes",
-            "help": "(null)",
-            "type": "(null)",
-            "value": "8.492331008e+09",
-            "line_raw": "wmi_os_physical_memory_free_bytes 8.492331008e+09"
-        }
-    ]
+  output: '[{"name":"wmi_os_physical_memory_free_bytes","type":"untyped","value":"8.492331008e+09","line_raw":"wmi_os_physical_memory_free_bytes 8.492331008e+09"}]'
 ---
 test case: 'Get metric using params: cpu_usage_system{cpu="cpu-total"}'
 in:
@@ -27,19 +18,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"}]'
 ---
 test case: 'Get metric using params: wmi_logical_disk_free_bytes{volume="{#VOLUME}"}'
 in:
@@ -52,19 +31,7 @@ in:
   params: 'wmi_logical_disk_free_bytes{volume="{#VOLUME}"}'
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_logical_disk_free_bytes",
-            "help": "Free space in bytes (LogicalDisk.PercentFreeSpace)",
-            "type": "gauge",
-            "labels": {
-                "volume": "{#VOLUME}"
-            },
-            "value": "3.5180249088e+11",
-            "wmi_logical_disk_free_bytes{volume="{#VOLUME}"} 3.5180249088e+11"
-        }
-    ]
+  output: '[{"name":"wmi_logical_disk_free_bytes","help":"Free space in bytes (LogicalDisk.PercentFreeSpace)","type":"gauge","labels":{"volume":"{#VOLUME}"},"value":"3.5180249088e+11","wmi_logical_disk_free_bytes{volume="{#VOLUME}"} 3.5180249088e+11"}]'
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu="cpu-total",host=~".*"}'
 in:
@@ -77,20 +44,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=~".*"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"}]'
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu="cpu-total",host=~"*",\value=~".*"}'
 in:
@@ -103,20 +57,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=~"*",\value=~".*"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"}]'
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu="cpu-total",host=~"*"}'
 in:
@@ -129,20 +70,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=~"*"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"}]'
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu="cpu-total"}'
 in:
@@ -155,20 +83,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"}]'
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu=~"cpu-tot.+"}'
 in:
@@ -181,20 +96,7 @@ in:
   params: cpu_usage_system{cpu=~"cpu-tot.+"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"}]'
 ---
 test case: 'Get metric value using params: {__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
 in:
@@ -207,20 +109,7 @@ in:
   params: '{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"}]'
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu=~".*"}'
 in:
@@ -233,42 +122,7 @@ in:
   params: cpu_usage_system{cpu=~".*"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"
-        },
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu0",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641"
-        },
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu1",
-                "host": "host1"
-            },
-            "value": "1.1340298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"},{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu0","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641"},{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu1","host":"host1"},"value":"1.1340298507220641","line_raw":"cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641"}]'
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu=~"cpu-tot.+"}'
 in:
@@ -281,20 +135,7 @@ in:
   params: cpu_usage_system{cpu=~"cpu-tot.+"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"}]'
 ---
 test case: 'Get metric for http_requests_total{code="400"}    3 1395066363000'
 in:
@@ -306,20 +147,7 @@ in:
   params: http_requests_total{code="400"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "http_requests_total",
-            "help": "The total number of HTTP requests.",
-            "type": "counter",
-            "labels": {
-                "method": "post",
-                "code": "400"
-            },
-            "value": "3",
-            "line_raw": "http_requests_total{method="post",code="400"}    3 1395066363000"
-        }
-    ]
+  output: '[{"name":"http_requests_total","help":"The total number of HTTP requests.","type":"counter","labels":{"method":"post","code":"400"},"value":"3","line_raw":"http_requests_total{method="post",code="400"}    3 1395066363000"}]'
 ---
 test case: 'Escaping in label values'
 in:
@@ -327,20 +155,7 @@ in:
   params: msdos_file_access_time_seconds{error="Cannot find file:\n\"FILE.TXT\""} == 1.458255915e9
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "msdos_file_access_time_seconds",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "path": "C:\\DIR\\FILE.TXT",
-                "error": "Cannot find file:\n\"FILE.TXT\""
-            },
-            "value": "1.458255915e9",
-            "line_raw": "msdos_file_access_time_seconds{path="C:\\DIR\\FILE.TXT",error="Cannot find file:\n\"FILE.TXT\""} 1.458255915e9"
-        }
-    ]
+  output: '[{"name":"msdos_file_access_time_seconds","type":"untyped","labels":{"path":"C:\\DIR\\FILE.TXT","error":"Cannot find file:\n\"FILE.TXT\""},"value":"1.458255915e9","line_raw":"msdos_file_access_time_seconds{path="C:\\DIR\\FILE.TXT",error="Cannot find file:\n\"FILE.TXT\""} 1.458255915e9"}]'
 ---
 test case: 'Minimalistic line'
 in:
@@ -348,16 +163,7 @@ in:
   params: metric_without_timestamp_and_labels
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "metric_without_timestamp_and_labels",
-            "help": "(null)",
-            "type": "(null)",
-            "value": "12.47",
-            "line_raw": "metric_without_timestamp_and_labels 12.47"
-        }
-    ]
+  output: '[{"name":"metric_without_timestamp_and_labels","type":"untyped","value":"12.47","line_raw":"metric_without_timestamp_and_labels 12.47"}]'
 ---
 test case: 'A weird metric from before the epoch'
 in:
@@ -365,19 +171,7 @@ in:
   params: something_weird
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "something_weird",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "problem": "division by zero"
-            },
-            "value": "+Inf",
-            "line_raw": "something_weird{problem="division by zero"} +Inf -3982045"
-        }
-    ]
+  output: '[{"name":"something_weird","type":"untyped","labels":{"problem":"division by zero"},"value":"+Inf","line_raw":"something_weird{problem="division by zero"} +Inf -3982045"}]'
 ---
 test case: 'A histogram, which has a pretty complex representation in the text format'
 in:
@@ -395,19 +189,7 @@ in:
   params: http_request_duration_seconds_bucket{le="+Inf"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "http_request_duration_seconds_bucket",
-            "help": "A histogram of the request duration.",
-            "type": "histogram",
-            "labels": {
-                "le": "+Inf"
-            },
-            "value": "144320",
-            "line_raw": "http_request_duration_seconds_bucket{le="+Inf"} 144320"
-        }
-    ]
+  output: '[{"name":"http_request_duration_seconds_bucket","help":"A histogram of the request duration.","type":"histogram","labels":{"le":"+Inf"},"value":"144320","line_raw":"http_request_duration_seconds_bucket{le="+Inf"} 144320"}]'
 ---
 test case: 'A summary, which has a complex representation'
 in:
@@ -424,16 +206,7 @@ in:
   params: rpc_duration_seconds_sum
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "rpc_duration_seconds",
-            "help": "A summary of the RPC duration in seconds.",
-            "type": "histogram",
-            "value": "1.7560473e+07",
-            "line_raw": "rpc_duration_seconds_sum 1.7560473e+07"
-        }
-    ]
+  output: '[{"name":"rpc_duration_seconds","help":"A summary of the RPC duration in seconds.","type":"histogram","value":"1.7560473e+07","line_raw":"rpc_duration_seconds_sum 1.7560473e+07"}]'
 ---
 test case: 'Empty metric'
 in:
@@ -441,7 +214,6 @@ in:
   params: wmi_os_timezone
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Empty params'
 in:
@@ -449,19 +221,7 @@ in:
   params: ""
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_timezone",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "timezone": "MSK"
-            },
-            "value": "1",
-            "line_raw": "wmi_os_timezone{timezone="MSK"} 1"
-        }
-    ]
+  output: '[{"name":"wmi_os_timezone","type":"untyped","labels":{"timezone":"MSK"},"value":"1","line_raw":"wmi_os_timezone{timezone="MSK"} 1"}]'
 ---
 test case: 'Empty metric and empty params'
 in:
@@ -469,7 +229,6 @@ in:
   params: ""
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Only spaces in metric'
 in:
@@ -477,7 +236,6 @@ in:
   params: wmi_os_timezone
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Only spaces in params'
 in:
@@ -485,19 +243,7 @@ in:
   params: '           '
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_timezone",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "timezone": "MSK"
-            },
-            "value": "1",
-            "line_raw": "wmi_os_timezone{timezone="MSK"} 1"
-        }
-    ]
+  output: '[{"name":"wmi_os_timezone","type":"untyped","labels":{"timezone":"MSK"},"value":"1","line_raw":"wmi_os_timezone{timezone="MSK"} 1"}]'
 ---
 test case: 'Only spaces in params (multiline metric)'
 in:
@@ -512,73 +258,7 @@ in:
   params: '       '
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "rpc_duration_seconds",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "quantile": "0.01"
-            },
-            "value": "3102",
-            "line_raw": "rpc_duration_seconds{quantile="0.01"} 3102"
-        },
-        {
-            "name": "rpc_duration_seconds",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "quantile": "0.05"
-            },
-            "value": "3272",
-            "line_raw": "rpc_duration_seconds{quantile="0.05"} 3272"
-        },
-        {
-            "name": "rpc_duration_seconds",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "quantile": "0.5"
-            },
-            "value": "4773",
-            "line_raw": "rpc_duration_seconds{quantile="0.5"} 4773"
-        },
-        {
-            "name": "rpc_duration_seconds",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "quantile": "0.9"
-            },
-            "value": "9001",
-            "line_raw": "rpc_duration_seconds{quantile="0.9"} 9001"
-        },
-        {
-            "name": "rpc_duration_seconds",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "quantile": "0.99"
-            },
-            "value": "76656",
-            "line_raw": "rpc_duration_seconds{quantile="0.99"} 76656"
-        },
-        {
-            "name": "rpc_duration_seconds_sum",
-            "help": "(null)",
-            "type": "(null)",
-            "value": "1.7560473e+07",
-            "line_raw": "rpc_duration_seconds_sum 1.7560473e+07"
-        },
-        {
-            "name": "rpc_duration_seconds_count",
-            "help": "(null)",
-            "type": "(null)",
-            "value": "2693",
-            "line_raw": "rpc_duration_seconds_count 2693"
-        }
-    ]
+  output: '[{"name":"rpc_duration_seconds","type":"untyped","labels":{"quantile":"0.01"},"value":"3102","line_raw":"rpc_duration_seconds{quantile="0.01"} 3102"},{"name":"rpc_duration_seconds","type":"untyped","labels":{"quantile":"0.05"},"value":"3272","line_raw":"rpc_duration_seconds{quantile="0.05"} 3272"},{"name":"rpc_duration_seconds","type":"untyped","labels":{"quantile":"0.5"},"value":"4773","line_raw":"rpc_duration_seconds{quantile="0.5"} 4773"},{"name":"rpc_duration_seconds","type":"untyped","labels":{"quantile":"0.9"},"value":"9001","line_raw":"rpc_duration_seconds{quantile="0.9"} 9001"},{"name":"rpc_duration_seconds","type":"untyped","labels":{"quantile":"0.99"},"value":"76656","line_raw":"rpc_duration_seconds{quantile="0.99"} 76656"},{"name":"rpc_duration_seconds_sum","type":"untyped","value":"1.7560473e+07","line_raw":"rpc_duration_seconds_sum 1.7560473e+07"},{"name":"rpc_duration_seconds_count","type":"untyped","value":"2693","line_raw":"rpc_duration_seconds_count 2693"}]'
 ---
 test case: 'Only spaces in metric and in params'
 in:
@@ -586,7 +266,6 @@ in:
   params: '           '
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Empty multiline metric'
 in:
@@ -594,7 +273,6 @@ in:
   params: wmi_os_timezone
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Metric without value'
 in:
@@ -602,7 +280,6 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: fail
-  error: value not found
 ---
 test case: 'Metric with missing label value: wmi_os_timezone{timezone=} 1'
 in:
@@ -613,19 +290,7 @@ in:
   params: wmi_os_timezone
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_timezone",
-            "help": "OperatingSystem.LocalDateTime",
-            "type": "gauge",
-            "labels": {
-                "timezone": ""
-            },
-            "value": "1",
-            "line_raw": "wmi_os_timezone{timezone=} 1"
-        }
-    ]
+  output: '[{"name":"wmi_os_timezone","help":"OperatingSystem.LocalDateTime","type":"gauge","labels":{"timezone":""},"value":"1","line_raw":"wmi_os_timezone{timezone=} 1"}]'
 ---
 test case: 'Metric with missing label value: wmi_os_timezone{timezone} 1'
 in:
@@ -636,19 +301,7 @@ in:
   params: wmi_os_timezone
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_timezone",
-            "help": "OperatingSystem.LocalDateTime",
-            "type": "gauge",
-            "labels": {
-                "timezone": ""
-            },
-            "value": "1",
-            "line_raw": "wmi_os_timezone{timezone} 1"
-        }
-    ]
+  output: '[{"name":"wmi_os_timezone","help":"OperatingSystem.LocalDateTime","type":"gauge","labels":{"timezone":""},"value":"1","line_raw":"wmi_os_timezone{timezone} 1"}]'
 ---
 test case: 'Incorrect metric data'
 in:
@@ -656,7 +309,6 @@ in:
   params: wmi_os_timezone
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Incorrect metric data (a space within)'
 in:
@@ -664,7 +316,6 @@ in:
   params: wmi_os_timezone
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Metric name with invalid characters included'
 in:
@@ -672,16 +323,7 @@ in:
   params: wmi_os_physical_^&;memory_free_bytes
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_physical_^&;memory_free_bytes",
-            "help": "(null)",
-            "type": "(null)",
-            "value": "8.492331008e+09",
-            "line_raw": "wmi_os_physical_^&;memory_free_bytes 8.492331008e+09"
-        }
-    ]
+  output: '[{"name":"wmi_os_physical_^&;memory_free_bytes","type":"untyped","value":"8.492331008e+09","line_raw":"wmi_os_physical_^&;memory_free_bytes 8.492331008e+09"}]'
 ---
 test case: 'Incorrect metric data with valid HELP/TYPE'
 in:
@@ -692,7 +334,6 @@ in:
   params: wmi_os_timezone
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Metric with a hash symbol only'
 in:
@@ -700,7 +341,6 @@ in:
   params: wmi_os_timezone
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Metric with an empty space only'
 in:
@@ -708,7 +348,6 @@ in:
   params: wmi_os_timezone
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Metric with UTF-8 3 byte character only'
 in:
@@ -716,7 +355,6 @@ in:
   params: wmi_os_timezone
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Metric with UTF-8 3 byte character in label value'
 in:
@@ -728,20 +366,7 @@ in:
   params: http_requests_total == 3
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "http_requests_total",
-            "help": "The total number of HTTP requests.",
-            "type": "counter",
-            "labels": {
-                "method": "post",
-                "code": "-⃠"
-            },
-            "value": "3",
-            "line_raw": "http_requests_total{method="post",code="-⃠"} 3 1395066363000"
-        }
-    ]
+  output: '[{"name":"http_requests_total","help":"The total number of HTTP requests.","type":"counter","labels":{"method":"post","code":"-⃠"},"value":"3","line_raw":"http_requests_total{method="post",code="-⃠"} 3 1395066363000"}]'
 ---
 test case: 'Metric with missing "{"'
 in:
@@ -749,7 +374,6 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Metric with missing "}"'
 in:
@@ -757,7 +381,6 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Metric with missing "'
 in:
@@ -765,7 +388,6 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Metric with missing ","'
 in:
@@ -773,7 +395,6 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Metric with missing "," but empty params'
 in:
@@ -794,39 +415,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"
-        },
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu0"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu0"} 1.1940298507220641"
-        },
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu1"
-            },
-            "value": "1.1340298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu1"} 1.1340298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"},{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu0"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu0"} 1.1940298507220641"},{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu1"},"value":"1.1340298507220641","line_raw":"cpu_usage_system{cpu="cpu1"} 1.1340298507220641"}]'
 ---
 test case: 'Double equal sign (==) instead of single equal sign (=) in label value assignment #2'
 in:
@@ -839,7 +428,6 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Double equal sign (==) instead of single equal sign (=) in label value assignment #3'
 in:
@@ -847,7 +435,6 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Label value and params holds new line character'
 in:
@@ -855,19 +442,7 @@ in:
   params: "cpu_usage_system{cpu=\"cpu\ntotal\"}"
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "cpu": "cpu\ntotal"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu=\"cpu\ntotal\"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","type":"untyped","labels":{"cpu":"cpu\ntotal"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu\ntotal\"} 1.1940298507220641"}]'
 ---
 test case: 'Metric name and params holds new line character'
 in:
@@ -875,7 +450,6 @@ in:
   params: "cpu_usa\nge_system{cpu=\"cputotal\"}"
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Double equal sign (==) instead of single equal sign (=) for label value in params'
 in:
@@ -888,7 +462,6 @@ in:
   params: cpu_usage_system{cpu=="cpu-total"}
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Single equal sign (=) instead of double equal sign (==) for metric value in params'
 in:
@@ -901,19 +474,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"} = 1.1940298507220641
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"}]'
 ---
 test case: 'More than one metric (2) corresponds to the given params'
 in:
@@ -942,31 +503,7 @@ in:
   params: wmi_service_state{name="dhcp"} == 1
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_service_state",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "name": "dhcp",
-                "state": "running"
-            },
-            "value": "1",
-            "line_raw": "wmi_service_state{name="dhcp",state="running"} 1"
-        },
-        {
-            "name": "wmi_service_state",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "name": "dhcp",
-                "state": "stopped"
-            },
-            "value": "1",
-            "line_raw": "wmi_service_state{name="dhcp",state="stopped"} 1"
-        }
-    ]
+  output: '[{"name":"wmi_service_state","type":"untyped","labels":{"name":"dhcp","state":"running"},"value":"1","line_raw":"wmi_service_state{name="dhcp",state="running"} 1"},{"name":"wmi_service_state","type":"untyped","labels":{"name":"dhcp","state":"stopped"},"value":"1","line_raw":"wmi_service_state{name="dhcp",state="stopped"} 1"}]'
 ---
 test case: 'Metric with "Nan" value'
 in:
@@ -974,16 +511,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_physical_memory_free_bytes",
-            "help": "(null)",
-            "type": "(null)",
-            "value": "Nan",
-            "line_raw": "wmi_os_physical_memory_free_bytes Nan"
-        }
-    ]
+  output: '[{"name":"wmi_os_physical_memory_free_bytes","type":"untyped","value":"Nan","line_raw":"wmi_os_physical_memory_free_bytes Nan"}]'
 ---
 test case: 'Metric with "+Inf" value'
 in:
@@ -991,16 +519,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_physical_memory_free_bytes",
-            "help": "(null)",
-            "type": "(null)",
-            "value": "+Inf",
-            "line_raw": "wmi_os_physical_memory_free_bytes +Inf"
-        }
-    ]
+  output: '[{"name":"wmi_os_physical_memory_free_bytes","type":"untyped","value":"+Inf","line_raw":"wmi_os_physical_memory_free_bytes +Inf"}]'
 ---
 test case: 'Metric with "-Inf" value'
 in:
@@ -1008,16 +527,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_physical_memory_free_bytes",
-            "help": "(null)",
-            "type": "(null)",
-            "value": "-Inf",
-            "line_raw": "wmi_os_physical_memory_free_bytes -Inf"
-        }
-    ]
+  output: '[{"name":"wmi_os_physical_memory_free_bytes","type":"untyped","value":"-Inf","line_raw":"wmi_os_physical_memory_free_bytes -Inf"}]'
 ---
 test case: 'Metric with "NAN" value'
 in:
@@ -1025,16 +535,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_physical_memory_free_bytes",
-            "help": "(null)",
-            "type": "(null)",
-            "value": "NAN",
-            "line_raw": "wmi_os_physical_memory_free_bytes NAN"
-        }
-    ]
+  output: '[{"name":"wmi_os_physical_memory_free_bytes","type":"untyped","value":"NAN","line_raw":"wmi_os_physical_memory_free_bytes NAN"}]'
 ---
 test case: 'Metric with timestamp'
 in:
@@ -1042,16 +543,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_physical_memory_free_bytes",
-            "help": "(null)",
-            "type": "(null)",
-            "value": "8.492331008e+09",
-            "line_raw": "wmi_os_physical_memory_free_bytes 8.492331008e+09 25"
-        }
-    ]
+  output: '[{"name":"wmi_os_physical_memory_free_bytes","type":"untyped","value":"8.492331008e+09","line_raw":"wmi_os_physical_memory_free_bytes 8.492331008e+09 25"}]'
 ---
 test case: 'Metric with additional value after timestamp'
 in:
@@ -1064,19 +556,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total"} 1.1940298507220641 25 66"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total"} 1.1940298507220641 25 66"}]'
 ---
 test case: 'Metric with negative timestamp'
 in:
@@ -1084,20 +564,7 @@ in:
   params: http_requests_total
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "http_requests_total",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "method": "post",
-                "code": "200"
-            },
-            "value": "1027",
-            "line_raw": "http_requests_total{method="post",code="200"} 1027 -123"
-        }
-    ]
+  output: '[{"name":"http_requests_total","type":"untyped","labels":{"method":"post","code":"200"},"value":"1027","line_raw":"http_requests_total{method="post",code="200"} 1027 -123"}]'
 ---
 test case: 'Metric with negative value'
 in:
@@ -1105,20 +572,7 @@ in:
   params: http_requests_total
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "http_requests_total",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "method": "post",
-                "code": "200"
-            },
-            "value": "-1027",
-            "line_raw": "http_requests_total{method="post",code="200"} -1027"
-        }
-    ]
+  output: '[{"name":"http_requests_total","type":"untyped","labels":{"method":"post","code":"200"},"value":"-1027","line_raw":"http_requests_total{method="post",code="200"} -1027"}]'
 ---
 test case: 'Multilne metric with negative value'
 in:
@@ -1131,20 +585,7 @@ in:
   params: '{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "-654",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} -654"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"-654","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} -654"}]'
 ---
 test case: 'The __name__ identifier is specified as last in params #1'
 in:
@@ -1157,20 +598,7 @@ in:
   params: '{cpu="cpu-total",__name__="cpu_usage_system"}'
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"}]'
 ---
 test case: 'The __name__ identifier is specified as last in params #2'
 in:
@@ -1183,20 +611,7 @@ in:
   params: '{cpu=~"cpu-tot.+",__name__=~"cpu_usage_syst.+"}'
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"}]'
 ---
 test case: 'Params set to cpu_usage_system{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
 in:
@@ -1209,20 +624,7 @@ in:
   params: 'cpu_usage_system{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"}]'
 ---
 test case: 'Params set to cpu_usage_system{__name__=~"cpu_age_syst.+",cpu=~"cpu-tot.+"}'
 in:
@@ -1235,7 +637,6 @@ in:
   params: 'cpu_usage_system{__name__=~"cpu_age_syst.+",cpu=~"cpu-tot.+"}'
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Metric with multiple HELP lines'
 in:
@@ -1249,19 +650,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"}]'
 ---
 test case: 'Metric with multiple TYPE:untyped lines'
 in:
@@ -1275,19 +664,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "untyped",
-            "labels": {
-                "cpu": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"untyped","labels":{"cpu":"cpu-total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"}]'
 ---
 test case: 'Metric with wrong TYPE'
 in:
@@ -1300,19 +677,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "something",
-            "labels": {
-                "cpu": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"something","labels":{"cpu":"cpu-total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"}]'
 ---
 test case: 'Metric with only one argument for TYPE'
 in:
@@ -1325,19 +690,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "",
-            "labels": {
-                "cpu": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"","labels":{"cpu":"cpu-total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"}]'
 ---
 test case: 'Metric with no arguments for TYPE'
 in:
@@ -1350,19 +703,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "(null)",
-            "labels": {
-                "cpu": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"untyped","labels":{"cpu":"cpu-total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"}]'
 ---
 test case: 'Metric with multiple spaces before value'
 in:
@@ -1370,16 +711,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_physical_memory_free_bytes",
-            "help": "(null)",
-            "type": "(null)",
-            "value": "8.492331008e+09",
-            "line_raw": "wmi_os_physical_memory_free_bytes            8.492331008e+09"
-        }
-    ]
+  output: '[{"name":"wmi_os_physical_memory_free_bytes","type":"untyped","value":"8.492331008e+09","line_raw":"wmi_os_physical_memory_free_bytes            8.492331008e+09"}]'
 ---
 test case: 'Metric with no description after HELP'
 in:
@@ -1391,19 +723,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "cpu": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","type":"untyped","labels":{"cpu":"cpu-total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"}]'
 ---
 test case: 'Metric with invalid characters in label name'
 in:
@@ -1411,19 +731,7 @@ in:
   params: cpu_usage_system{cp%^&u="cpu-total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "cp%^&u": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cp%^&u="cpu-total"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","type":"untyped","labels":{"cp%^&u":"cpu-total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cp%^&u="cpu-total"} 1.1940298507220641"}]'
 ---
 test case: 'Metric name consists of all valid characters'
 in:
@@ -1431,16 +739,7 @@ in:
   params: AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789",
-            "help": "(null)",
-            "type": "(null)",
-            "value": "1",
-            "line_raw": "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789 1"
-        }
-    ]
+  output: '[{"name":"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789","type":"untyped","value":"1","line_raw":"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789 1"}]'
 ---
 test case: 'Label name consists of all valid characters'
 in:
@@ -1448,19 +747,7 @@ in:
   params: cpu_usage_system == 1
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789": "test"
-            },
-            "value": "1",
-            "line_raw": "cpu_usage_system{AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789="test"} 1"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","type":"untyped","labels":{"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789":"test"},"value":"1","line_raw":"cpu_usage_system{AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789="test"} 1"}]'
 ---
 test case: 'Params with regular expression but without prefix "~"'
 in:
@@ -1473,7 +760,6 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=".*"}
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Wrong regular expression in params'
 in:
@@ -1486,7 +772,6 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=~"[0-9"}
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Incorrect identifier __cpu__ set in params #1'
 in:
@@ -1499,7 +784,6 @@ in:
   params: '{__name__="cpu_usage_system",__cpu__="cpu-total"}'
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Incorrect identifier __cpu__ set in params #2'
 in:
@@ -1512,7 +796,6 @@ in:
   params: '{__name__=~"cpu_usage_syst.+",__cpu__=~"cpu-tot.+"}'
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Incorrect float in metric value #1'
 in:
@@ -1520,19 +803,7 @@ in:
   params: wmi_logical_disk_free_bytes
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_logical_disk_free_bytes",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "volume": "D:"
-            },
-            "value": "2.627731456e+383",
-            "line_raw": "wmi_logical_disk_free_bytes{volume="D:"} 2.627731456e+383"
-        }
-    ]
+  output: '[{"name":"wmi_logical_disk_free_bytes","type":"untyped","labels":{"volume":"D:"},"value":"2.627731456e+383","line_raw":"wmi_logical_disk_free_bytes{volume="D:"} 2.627731456e+383"}]'
 ---
 test case: 'Incorrect float in metric value #2'
 in:
@@ -1540,19 +811,7 @@ in:
   params: wmi_logical_disk_free_bytes
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_logical_disk_free_bytes",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "volume": "D:"
-            },
-            "value": "8.49233.1008e+09",
-            "line_raw": "wmi_logical_disk_free_bytes{volume="D:"} 8.49233.1008e+09"
-        }
-    ]
+  output: '[{"name":"wmi_logical_disk_free_bytes","type":"untyped","labels":{"volume":"D:"},"value":"8.49233.1008e+09","line_raw":"wmi_logical_disk_free_bytes{volume="D:"} 8.49233.1008e+09"}]'
 ---
 test case: 'Params set to "{}"'
 in:
@@ -1565,7 +824,6 @@ in:
   params: '{}'
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Params set to "a{}"'
 in:
@@ -1578,7 +836,6 @@ in:
   params: a{}
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Metric data contains "{}" only'
 in:
@@ -1586,7 +843,6 @@ in:
   params: metric
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Negative value in params for metric value'
 in:
@@ -1597,19 +853,7 @@ in:
   params: wmi_os_timezone{timezone="MSK"} == -1
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_timezone",
-            "help": "OperatingSystem.LocalDateTime",
-            "type": "gauge",
-            "labels": {
-                "timezone": "MSK"
-            },
-            "value": "-1",
-            "line_raw": "wmi_os_timezone{timezone="MSK"} -1"
-        }
-    ]
+  output: '[{"name":"wmi_os_timezone","help":"OperatingSystem.LocalDateTime","type":"gauge","labels":{"timezone":"MSK"},"value":"-1","line_raw":"wmi_os_timezone{timezone="MSK"} -1"}]'
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu="cpu-total",host=~".*",\value="1.1940298507220641"}'
 in:
@@ -1622,20 +866,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=~".*",\value="1.1940298507220641"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641"}]'
 ---
 test case: 'Get metric value using regular expression for date (mm/dd/yyyy) #1'
 in:
@@ -1645,33 +876,7 @@ in:
   params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "random_date",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "year": "2019",
-                "month": "february",
-                "day": "02/12/2019"
-            },
-            "value": "1",
-            "line_raw": "random_date{year="2019",month="february",day="02/12/2019"} 1"
-        },
-        {
-            "name": "random_date",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "year": "2019",
-                "month": "march",
-                "day": "03/07/2019"
-            },
-            "value": "2",
-            "line_raw": "random_date{year="2019",month="march",day="03/07/2019"} 2"
-        }
-    ]
+  output: '[{"name":"random_date","type":"untyped","labels":{"year":"2019","month":"february","day":"02/12/2019"},"value":"1","line_raw":"random_date{year="2019",month="february",day="02/12/2019"} 1"},{"name":"random_date","type":"untyped","labels":{"year":"2019","month":"march","day":"03/07/2019"},"value":"2","line_raw":"random_date{year="2019",month="march",day="03/07/2019"} 2"}]'
 ---
 test case: 'Get metric value using regular expression for date (mm/dd/yyyy) #2'
 in:
@@ -1681,21 +886,7 @@ in:
   params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$"} == 2
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "random_date",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "year": "2019",
-                "month": "march",
-                "day": "03/07/2019"
-            },
-            "value": "2",
-            "line_raw": "random_date{year="2019",month="march",day="03/07/2019"} 2"
-        }
-    ]
+  output: '[{"name":"random_date","type":"untyped","labels":{"year":"2019","month":"march","day":"03/07/2019"},"value":"2","line_raw":"random_date{year="2019",month="march",day="03/07/2019"} 2"}]'
 ---
 test case: 'Get metric value using regular expression for date (mm/dd/yyyy) #3'
 in:
@@ -1705,7 +896,6 @@ in:
   params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$"} == 2
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Missing "==" in params'
 in:
@@ -1716,7 +906,6 @@ in:
   params: wmi_os_timezone 1
 out:
   result: fail
-  error: no metrics
 ---
 test case: 'Get metric value using regular expression for email address'
 in:
@@ -1727,31 +916,7 @@ in:
   params: some_user{country="lv",addr=~"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "some_user",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "country": "lv",
-                "addr": "user1@domain.com"
-            },
-            "value": "some_name",
-            "line_raw": "some_user{country="lv",addr="user1@domain.com"} some_name"
-        },
-        {
-            "name": "some_user",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "country": "lv",
-                "addr": "user2@domain.com"
-            },
-            "value": "some_other_name",
-            "line_raw": "some_user{country="lv",addr="user2@domain.org"} some_other_name"
-        }
-    ]
+  output: '[{"name":"some_user","type":"untyped","labels":{"country":"lv","addr":"user1@domain.com"},"value":"some_name","line_raw":"some_user{country="lv",addr="user1@domain.com"} some_name"},{"name":"some_user","type":"untyped","labels":{"country":"lv","addr":"user2@domain.com"},"value":"some_other_name","line_raw":"some_user{country="lv",addr="user2@domain.org"} some_other_name"}]'
 ---
 test case: 'Label value and params hold "{"'
 in:
@@ -1759,19 +924,7 @@ in:
   params: cpu_usage_system{cpu="cpu{total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "cpu": "cpu{total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu{total"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","type":"untyped","labels":{"cpu":"cpu{total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu{total"} 1.1940298507220641"}]'
 ---
 test case: 'Label value and params hold "{}"'
 in:
@@ -1779,19 +932,7 @@ in:
   params: cpu_usage_system{cpu="cpu{}total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "cpu": "cpu{}total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu{}total"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","type":"untyped","labels":{"cpu":"cpu{}total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu{}total"} 1.1940298507220641"}]'
 ---
 test case: 'Label value and params hold "}"'
 in:
@@ -1799,19 +940,7 @@ in:
   params: cpu_usage_system{cpu="cpu}total"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "cpu": "cpu}total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu}total"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","type":"untyped","labels":{"cpu":"cpu}total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu}total"} 1.1940298507220641"}]'
 ---
 test case: 'Label value and params hold ","'
 in:
@@ -1819,19 +948,7 @@ in:
   params: important_metric{important_number="42,0"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "important_metric",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "important_number": "42,0"
-            },
-            "value": "42",
-            "line_raw": "important_metric{important_number="42,0"} 42"
-        }
-    ]
+  output: '[{"name":"important_metric","type":"untyped","labels":{"important_number":"42,0"},"value":"42","line_raw":"important_metric{important_number="42,0"} 42"}]'
 ---
 test case: 'Metric with five values'
 in:
@@ -1839,19 +956,7 @@ in:
   params: cpu_usage_system{cpu="cputotal"} == 1.1940298507220641
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "cpu": "cputotal"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cputotal"} 1.1940298507220641 2.23443 333 four five"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","type":"untyped","labels":{"cpu":"cputotal"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cputotal"} 1.1940298507220641 2.23443 333 four five"}]'
 ---
 test case: 'Different metrics under one header #1'
 in:
@@ -1865,20 +970,7 @@ in:
   params: cpu_usage_system{cpu="cpu1",host=~".*"}
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu1",
-                "host": "host3"
-            },
-            "value": "1.1340298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu1",host="host3"} 1.1340298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu1","host":"host3"},"value":"1.1340298507220641","line_raw":"cpu_usage_system{cpu="cpu1",host="host3"} 1.1340298507220641"}]'
 ---
 test case: 'Different metrics under one header #2'
 in:
@@ -1892,33 +984,7 @@ in:
   params: '{host="host2"}'
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu0",
-                "host": "host2"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641"
-        }
-    ],
-    [
-        {
-            "name": "wmi_os_timezone",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "timezone": "MSK",
-                "host": "host2"
-            },
-            "value": "1",
-            "line_raw": "wmi_os_timezone{timezone="MSK",host="host2"} 1"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu0","host":"host2"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641"}],[{"name":"wmi_os_timezone","type":"untyped","labels":{"timezone":"MSK","host":"host2"},"value":"1","line_raw":"wmi_os_timezone{timezone="MSK",host="host2"} 1"}]'
 ---
 test case: 'Different metrics under one header #3'
 in:
@@ -1933,33 +999,7 @@ in:
   params: '{host="host2"}'
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu0",
-                "host": "host2"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641"
-        }
-    ],
-    [
-        {
-            "name": "wmi_os_timezone",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "timezone": "MSK",
-                "host": "host2"
-            },
-            "value": "1",
-            "line_raw": "wmi_os_timezone{timezone="MSK",host="host2"} 1"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu0","host":"host2"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641"}],[{"name":"wmi_os_timezone","type":"untyped","labels":{"timezone":"MSK","host":"host2"},"value":"1","line_raw":"wmi_os_timezone{timezone="MSK",host="host2"} 1"}]'
 ---
 test case: 'Metrics of different type #1'
 in:
@@ -1976,20 +1016,7 @@ in:
   params: http_requests_total == 3
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "http_requests_total",
-            "help": "The total number of HTTP requests.",
-            "type": "counter",
-            "labels": {
-                "method": "post",
-                "code": "400"
-            },
-            "value": "3",
-            "line_raw": "http_requests_total{method="post",code="400"}    3 1395066363000"
-        }
-    ]
+  output: '[{"name":"http_requests_total","help":"The total number of HTTP requests.","type":"counter","labels":{"method":"post","code":"400"},"value":"3","line_raw":"http_requests_total{method="post",code="400"}    3 1395066363000"}]'
 ---
 test case: 'Metrics of different type #2'
 in:
@@ -2006,33 +1033,7 @@ in:
   params: '{__name__=~".*",\value="1027"}'
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu1",
-                "host": "host1"
-            },
-            "value": "1027",
-            "line_raw": "cpu_usage_system{cpu="cpu1",host="host1"} 1027"
-        }
-    ],
-    [
-        {
-            "name": "http_requests_total",
-            "help": "The total number of HTTP requests.",
-            "type": "counter",
-            "labels": {
-                "method": "post",
-                "code": "200"
-            },
-            "value": "1027",
-            "line_raw": "http_requests_total{method="post",code="200"} 1027 1395066363000"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu1","host":"host1"},"value":"1027","line_raw":"cpu_usage_system{cpu="cpu1",host="host1"} 1027"}],[{"name":"http_requests_total","help":"The total number of HTTP requests.","type":"counter","labels":{"method":"post","code":"200"},"value":"1027","line_raw":"http_requests_total{method="post",code="200"} 1027 1395066363000"}]'
 ---
 test case: 'Metrics of different type #3'
 in:
@@ -2049,46 +1050,7 @@ in:
   params: '{prio="normal"}'
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total",
-                "host": "host1",
-                "prio": "normal"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total",host="host1",prio="normal"} 1.1940298507220641"
-        },
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu1",
-                "host": "host1",
-                "prio": "normal"
-            },
-            "value": "1027",
-            "line_raw": "cpu_usage_system{cpu="cpu1",host="host1",prio="normal"} 1027"
-        }
-    ],
-    [
-        {
-            "name": "http_requests_total",
-            "help": "The total number of HTTP requests.",
-            "type": "counter",
-            "labels": {
-                "method": "post",
-                "code": "400"
-            },
-            "value": "3",
-            "line_raw": "http_requests_total{method="post",code="400",prio="normal"}    3 1395066363000"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total","host":"host1","prio":"normal"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total",host="host1",prio="normal"} 1.1940298507220641"},{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu1","host":"host1","prio":"normal"},"value":"1027","line_raw":"cpu_usage_system{cpu="cpu1",host="host1",prio="normal"} 1027"}],[{"name":"http_requests_total","help":"The total number of HTTP requests.","type":"counter","labels":{"method":"post","code":"400"},"value":"3","line_raw":"http_requests_total{method="post",code="400",prio="normal"}    3 1395066363000"}]'
 ---
 test case: 'Get metric value using params: cpu_usage_system'
 in:
@@ -2101,39 +1063,7 @@ in:
   params: cpu_usage_system
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"
-        },
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu0"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu0"} 1.1940298507220641"
-        },
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu1"
-            },
-            "value": "1.1340298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu1"} 1.1340298507220641"
-        }
-    ]
+  output: '[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu-total"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"},{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu0"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu0"} 1.1940298507220641"},{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu1"},"value":"1.1340298507220641","line_raw":"cpu_usage_system{cpu="cpu1"} 1.1340298507220641"}]'
 ---
 test case: 'Different metrics #1'
 in:
@@ -2147,33 +1077,7 @@ in:
   params: '{host="host2"}'
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_timezone",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "timezone": "MSK",
-                "host": "host2"
-            },
-            "value": "1",
-            "line_raw": "wmi_os_timezone{timezone="MSK",host="host2"} 1"
-        }
-    ],
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu0",
-                "host": "host2"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"wmi_os_timezone","type":"untyped","labels":{"timezone":"MSK","host":"host2"},"value":"1","line_raw":"wmi_os_timezone{timezone="MSK",host="host2"} 1"}],[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu0","host":"host2"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641"}]'
 ---
 test case: 'Different metrics #2'
 in:
@@ -2188,31 +1092,5 @@ in:
   params: '{host="host2"}'
 out:
   result: succeed
-  output: |
-    [
-        {
-            "name": "wmi_os_timezone",
-            "help": "(null)",
-            "type": "(null)",
-            "labels": {
-                "timezone": "MSK",
-                "host": "host2"
-            },
-            "value": "1",
-            "line_raw": "wmi_os_timezone{timezone="MSK",host="host2"} 1"
-        }
-    ],
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu0",
-                "host": "host2"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641"
-        }
-    ]
+  output: '[{"name":"wmi_os_timezone","type":"untyped","labels":{"timezone":"MSK","host":"host2"},"value":"1","line_raw":"wmi_os_timezone{timezone="MSK",host="host2"} 1"}],[{"name":"cpu_usage_system","help":"Telegraf collected metric","type":"gauge","labels":{"cpu":"cpu0","host":"host2"},"value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641"}]'
 ...
