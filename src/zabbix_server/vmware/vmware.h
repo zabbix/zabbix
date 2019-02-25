@@ -168,6 +168,15 @@ typedef struct
 }
 zbx_vmware_cluster_t;
 
+/* the vmware eventlog state */
+typedef struct
+{
+	zbx_uint64_t	last_key;	/* lastlogsize when vmware.eventlog[] item was polled last time */
+	unsigned char	skip_all;	/* skip old event log records */
+
+}
+zbx_vmware_eventlog_state_t;
+
 /* the vmware event data */
 typedef struct
 {
@@ -193,39 +202,39 @@ zbx_vmware_data_t;
 /* the vmware service data */
 typedef struct
 {
-	char			*url;
-	char			*username;
-	char			*password;
+	char				*url;
+	char				*username;
+	char				*password;
 
 	/* the service type - vCenter or vSphere */
-	unsigned char		type;
+	unsigned char			type;
 
 	/* the service state - see ZBX_VMWARE_STATE_* defines */
-	int			state;
+	int				state;
 
-	int			lastcheck;
-	int			lastperfcheck;
+	int				lastcheck;
+	int				lastperfcheck;
 
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
-	int			lastaccess;
+	int				lastaccess;
 
 	/* the vmware service instance version */
-	char			*version;
+	char				*version;
 
 	/* the vmware service instance fullname */
-	char			*fullname;
+	char				*fullname;
 
 	/* the performance counters */
-	zbx_hashset_t		counters;
+	zbx_hashset_t			counters;
 
 	/* list of entities to monitor with performance counters */
-	zbx_hashset_t		entities;
+	zbx_hashset_t			entities;
 
 	/* the service data object that is swapped with a new one during service update */
-	zbx_vmware_data_t	*data;
+	zbx_vmware_data_t		*data;
 
-	/* lastlogsize when vmware.eventlog[] item was polled last time */
-	zbx_uint64_t		eventlog_last_key;
+	/* lastlogsize when vmware.eventlog[] item was polled last time and skip all flag*/
+	zbx_vmware_eventlog_state_t	eventlog;
 }
 zbx_vmware_service_t;
 
