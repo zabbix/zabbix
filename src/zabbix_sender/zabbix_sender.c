@@ -309,7 +309,7 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num, cons
 {
 	int		i, j, new_status, sp_count = 0, fail_count = 0;
 #if defined(_WINDOWS)
-	/* wait for threads to finish first. although listener threads will never end */
+	/* wait for threads to finish */
 	WaitForMultipleObjectsEx(threads_num, threads, TRUE, INFINITE, FALSE);
 #endif
 	for (i = 0; i < threads_num; i++)
