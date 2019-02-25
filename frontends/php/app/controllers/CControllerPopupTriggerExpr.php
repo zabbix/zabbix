@@ -149,8 +149,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'mask' => [
 				'C' => _('Mask'),
 				'T' => T_ZBX_STR,
-				'A' => true,
-				'A' => false
+				'A' => true
 			],
 			'shift' => [
 				'C' => _('Time shift'),
