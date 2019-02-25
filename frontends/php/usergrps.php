@@ -83,54 +83,46 @@ $fields = [
 check_fields($fields);
 
 $form = getRequest('form');
-$form_refresh = getRequest('form_refresh', false);
-$action = getRequest('action');
-$usrgrpid = getRequest('usrgrpid');
-$users_status = hasRequest('users_status') ? GROUP_STATUS_ENABLED : GROUP_STATUS_DISABLED;
-$debug_mode = getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED);
 
 /*
  * Permissions
  */
-if ($usrgrpid !== null) {
+if (hasRequest('usrgrpid')) {
 	$db_user_group = API::UserGroup()->get([
 		'output' => ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode'],
 		'selectTagFilters' => ['groupid', 'tag', 'value'],
-		'usrgrpids' => $usrgrpid,
+		'usrgrpids' => getRequest('usrgrpid')
 	]);
 
 	if (!$db_user_group) {
 		access_deny();
 	}
 }
-elseif ($action !== null) {
-	if (!is_array(getRequest('group_groupid'))) {
-		access_deny();
-	}
-	else {
+elseif (hasRequest('action')) {
+	if (hasRequest('group_groupid') && is_array(getRequest('group_groupid'))) {
 		$db_user_group_count = API::UserGroup()->get([
-			'output' => ['usrgrpid'],
-			'usrgrpids' => getRequest('group_groupid'),
-			'countOutput' => true
+			'countOutput' => true,
+			'usrgrpids' => getRequest('group_groupid')
 		]);
 
 		if ($db_user_group_count != count(getRequest('group_groupid'))) {
 			access_deny();
 		}
 	}
+	else {
+		access_deny();
+	}
 }
 
 /*
  * Actions
  */
-$action_result = false;
-
 if (hasRequest('add') || hasRequest('update')) {
 	$user_group = [
 		'name' => getRequest('gname'),
-		'users_status' => $users_status,
+		'users_status' => getRequest('users_status', GROUP_STATUS_DISABLED),
 		'gui_access' => getRequest('gui_access'),
-		'debug_mode' => $debug_mode,
+		'debug_mode' => getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED),
 		'userids' => getRequest('userids', []),
 		'tag_filters' => getRequest('tag_filters', []),
 		'rights' => []
@@ -148,105 +140,99 @@ if (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if (hasRequest('add')) {
-		$action_result = (bool) API::UserGroup()->create($user_group);
-		$message_success = _('Group added');
-		$message_failed = _('Cannot add group');
+		$result = (bool) API::UserGroup()->create($user_group);
+		show_messages($result, _('Group added'), _('Cannot add group'));
 	}
 	else {
-		$user_group['usrgrpid'] = $usrgrpid;
-		$action_result = (bool) API::UserGroup()->update($user_group);
-		$message_success = _('Group updated');
-		$message_failed = _('Cannot update group');
+		$user_group['usrgrpid'] = getRequest('usrgrpid');
+		$result = (bool) API::UserGroup()->update($user_group);
+		show_messages($result, _('Group updated'), _('Cannot update group'));
 	}
 
-	if ($action_result) {
+	if ($result) {
+		uncheckTableRows();
 		$form = null;
 	}
-	show_messages($action_result, $message_success, $message_failed);
 }
 elseif (hasRequest('delete')) {
-	$action_result = (bool) API::UserGroup()->delete([$usrgrpid]);
+	$result = (bool) API::UserGroup()->delete([getRequest('usrgrpid')]);
+	show_messages($result, _('Group deleted'), _('Cannot delete group'));
 
-	if ($action_result) {
+	if ($result) {
+		uncheckTableRows();
 		$form = null;
-		$usrgrpid = null;
 	}
-	show_messages($action_result, _('Group deleted'), _('Cannot delete group'));
 }
-else {
+elseif (hasRequest('action')) {
+	$action = getRequest('action');
+	$result = false;
+
 	switch ($action) {
 		case 'usergroup.massdelete':
 			if (hasRequest('group_groupid')) {
-				$action_result = (bool) API::UserGroup()->delete(getRequest('group_groupid'));
+				$result = (bool) API::UserGroup()->delete(getRequest('group_groupid'));
+				show_messages($result, _('Group deleted'), _('Cannot delete group'));
 			}
-			show_messages($action_result, _('Group deleted'), _('Cannot delete group'));
 			break;
 
 		case 'usergroup.set_gui_access':
-			$usrgrpids = getRequest('group_groupid', $usrgrpid);
-			zbx_value2array($usrgrpids);
+			$user_groups = [];
 
-			$usrgrps = [];
-			foreach ($usrgrpids as $id) {
-				$usrgrps[] = [
-					'usrgrpid' => $id,
+			foreach ((array) getRequest('group_groupid', getRequest('usrgrpid')) as $usrgrpid) {
+				$user_groups[] = [
+					'usrgrpid' => $usrgrpid,
 					'gui_access' => getRequest('set_gui_access')
 				];
 			}
 
-			$action_result = (bool) API::UserGroup()->update($usrgrps);
-			show_messages($action_result, _('Frontend access updated'), _('Cannot update frontend access'));
+			$result = (bool) API::UserGroup()->update($user_groups);
+			show_messages($result, _('Frontend access updated'), _('Cannot update frontend access'));
 			break;
 
 		case 'usergroup.massenabledebug':
 		case 'usergroup.massdisabledebug':
-			$usrgrpids = getRequest('group_groupid', $usrgrpid);
-			zbx_value2array($usrgrpids);
+			$user_groups = [];
 
-			$usrgrps = [];
-
-			foreach ($usrgrpids as $id) {
-				$usrgrps[] = [
-					'usrgrpid' => $id,
+			foreach ((array) getRequest('group_groupid', getRequest('usrgrpid')) as $usrgrpid) {
+				$user_groups[] = [
+					'usrgrpid' => $usrgrpid,
 					'debug_mode' => ($action === 'usergroup.massenabledebug')
 						? GROUP_DEBUG_MODE_ENABLED
 						: GROUP_DEBUG_MODE_DISABLED
 				];
 			}
 
-			$action_result = (bool) API::UserGroup()->update($usrgrps);
-			show_messages($action_result, _('Debug mode updated'), _('Cannot update debug mode'));
+			$result = (bool) API::UserGroup()->update($user_groups);
+			show_messages($result, _('Debug mode updated'), _('Cannot update debug mode'));
 			break;
 
 		case 'usergroup.massenable':
 		case 'usergroup.massdisable':
-			$usrgrpids = getRequest('group_groupid', $usrgrpid);
-			zbx_value2array($usrgrpids);
+			$user_groups = [];
 
-			$usrgrps = [];
-			foreach ($usrgrpids as $id) {
-				$usrgrps[] = [
-					'usrgrpid' => $id,
+			foreach ((array) getRequest('group_groupid', getRequest('usrgrpid')) as $usrgrpid) {
+				$user_groups[] = [
+					'usrgrpid' => $usrgrpid,
 					'users_status' => ($action === 'usergroup.massenable')
 						? GROUP_STATUS_ENABLED
 						: GROUP_STATUS_DISABLED
 				];
 			}
 
-			$action_result = (bool) API::UserGroup()->update($usrgrps);
+			$result = (bool) API::UserGroup()->update($user_groups);
 			$message_success = ($action === 'usergroup.massenable')
-				? _n('User group enabled', 'User groups enabled', count($usrgrps))
-				: _n('User group disabled', 'User groups disabled', count($usrgrps));
+				? _n('User group enabled', 'User groups enabled', count($user_groups))
+				: _n('User group disabled', 'User groups disabled', count($user_groups));
 			$message_failed = ($action === 'usergroup.massenable')
-				? _n('Cannot enable user group', 'Cannot enable user groups', count($usrgrps))
-				: _n('Cannot disable user group', 'Cannot disable user groups', count($usrgrps));
-			show_messages($action_result, $message_success, $message_failed);
+				? _n('Cannot enable user group', 'Cannot enable user groups', count($user_groups))
+				: _n('Cannot disable user group', 'Cannot disable user groups', count($user_groups));
+			show_messages($result, $message_success, $message_failed);
 			break;
 	}
-}
 
-if ($action_result) {
-	uncheckTableRows();
+	if ($result) {
+		uncheckTableRows();
+	}
 }
 
 /*
@@ -254,13 +240,16 @@ if ($action_result) {
  */
 if ($form !== null) {
 	$data = [
-		'usrgrpid' => $usrgrpid ?: 0,
+		'usrgrpid' => getRequest('usrgrpid', 0),
 		'form' => $form,
 		'name' => getRequest('gname', ''),
-		'users_status' => $form_refresh ? $users_status : GROUP_STATUS_ENABLED,
+		'users_status' => hasRequest('form_refresh')
+			? getRequest('users_status', GROUP_STATUS_DISABLED)
+			: GROUP_STATUS_ENABLED,
 		'gui_access' => getRequest('gui_access', GROUP_GUI_ACCESS_SYSTEM),
-		'debug_mode' => $debug_mode,
-		'form_refresh' => $form_refresh ?: 0,
+		'debug_mode' => getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED),
+		'users_ms' => [],
+		'form_refresh' => getRequest('form_refresh', 0),
 		'new_permission' => getRequest('new_permission', PERM_NONE),
 		'subgroups' => getRequest('subgroups', 0),
 		'tag' => getRequest('tag', ''),
@@ -270,48 +259,57 @@ if ($form !== null) {
 
 	$options = [
 		'output' => ['alias', 'name', 'surname'],
+		'usrgrpids' => null,
+		'userids' => null,
 		'preservekeys' => true
 	];
 
-	$users = [];
-
-	if ($usrgrpid) {
+	if ($data['usrgrpid'] != 0) {
 		// User group exists, but there might be no permissions set yet.
 		$db_user_group = reset($db_user_group);
 		$data['name'] = getRequest('gname', $db_user_group['name']);
-		$data['users_status'] = $form_refresh ? $users_status : $db_user_group['users_status'];
+		$data['users_status'] = hasRequest('form_refresh')
+			? getRequest('users_status', GROUP_STATUS_DISABLED)
+			: $db_user_group['users_status'];
 		$data['gui_access'] = getRequest('gui_access', $db_user_group['gui_access']);
-		$data['debug_mode'] = $form_refresh ? $debug_mode : $db_user_group['debug_mode'];
+		$data['debug_mode'] = hasRequest('form_refresh')
+			? getRequest('debug_mode', GROUP_DEBUG_MODE_DISABLED)
+			: $db_user_group['debug_mode'];
 
-		if (!$form_refresh) {
+		if (hasRequest('form_refresh')) {
+			$options['userids'] = getRequest('userids', []);
+		}
+		else {
 			$options['usrgrpids'] = $data['usrgrpid'];
 		}
 	}
-
-	if ($form_refresh) {
-		$options['userids'] = getRequest('userids');
+	else {
+		$options['userids'] = getRequest('userids', []);
 	}
 
-	$users = API::User()->get($options);
+	if ($options['usrgrpids'] !== null || $options['userids'] !== []) {
+		$users = API::User()->get($options);
 
-	$data['users_ms'] = [];
-
-	// Prepare data for multiselect. Skip silently deleted users.
-	foreach ($users as $user) {
-		$data['users_ms'][] = [
-			'id' => $user['userid'],
-			'name' => getUserFullname($user)
-		];
+		// Prepare data for multiselect. Skip silently deleted users.
+		foreach ($users as $user) {
+			$data['users_ms'][] = [
+				'id' => $user['userid'],
+				'name' => getUserFullname($user)
+			];
+		}
+		CArrayHelper::sort($data['users_ms'], ['name']);
 	}
-	CArrayHelper::sort($data['users_ms'], ['name']);
 
-	if ($form_refresh) {
+	if (hasRequest('form_refresh')) {
 		$data['groups_rights'] = getRequest('groups_rights', []);
 		$data['tag_filters'] = getRequest('tag_filters', []);
 	}
 	else {
-		$data['tag_filters'] = $usrgrpid ? $db_user_group['tag_filters'] : [];
-		$data['groups_rights'] = collapseHostGroupRights(getHostGroupsRights($usrgrpid ? [$data['usrgrpid']] : []));
+		$data['tag_filters'] = ($data['usrgrpid'] != 0) ? $db_user_group['tag_filters'] : [];
+		$data['groups_rights'] = collapseHostGroupRights(getHostGroupsRights(($data['usrgrpid'] != 0)
+			? [$data['usrgrpid']]
+			: []
+		));
 	}
 
 	$permission_groupids = getRequest('groupids', []);
@@ -409,11 +407,11 @@ if ($form !== null) {
 	$view = new CView('administration.usergroups.edit', $data);
 }
 else {
-	$sort_field = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
-	$sort_order = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
-	CProfile::update('web.'.$page['file'].'.sort', $sort_field, PROFILE_TYPE_STR);
-	CProfile::update('web.'.$page['file'].'.sortorder', $sort_field, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	// filter
 	if (hasRequest('filter_set')) {
@@ -433,8 +431,8 @@ else {
 	$config = select_config();
 
 	$data = [
-		'sort' => $sort_field,
-		'sortorder' => $sort_field,
+		'sort' => $sortField,
+		'sortorder' => $sortOrder,
 		'filter' => $filter,
 		'config' => $config,
 		'profileIdx' => 'web.usergroup.filter',
@@ -444,14 +442,14 @@ else {
 			'selectUsers' => API_OUTPUT_EXTEND,
 			'search' => ['name' => ($filter['name'] !== '') ? $filter['name'] : null],
 			'filter' => ['users_status' => ($filter['users_status'] != -1) ? $filter['users_status'] : null],
-			'sortfield' => $sort_field,
+			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1
 		])
 	];
 
 	// sorting & paging
-	order_result($data['usergroups'], $sort_field, $sort_field);
-	$data['paging'] = getPagingLine($data['usergroups'], $sort_field, new CUrl('usergrps.php'));
+	order_result($data['usergroups'], $sortField, $sortOrder);
+	$data['paging'] = getPagingLine($data['usergroups'], $sortOrder, new CUrl('usergrps.php'));
 
 	// render view
 	$view = new CView('administration.usergroups.list', $data);
