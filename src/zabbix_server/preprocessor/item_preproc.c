@@ -33,7 +33,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: str_printable_dyn                                               *
+ * Function: str_printable_dyn                                                *
  *                                                                            *
  * Purpose: converts text to printable string by converting special           *
  *          characters to escape sequences                                    *
@@ -91,7 +91,6 @@ static char	*str_printable_dyn(const char *text)
 
 	return out;
 }
-
 
 /******************************************************************************
  *                                                                            *
