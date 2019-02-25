@@ -130,9 +130,10 @@ static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t
 		const char *errmsg, char **error)
 {
 	char			*value_str, *err_step;
-	int			err_max = ITEM_ERROR_LEN, i, len;
+	int			i;
 	size_t			error_alloc = 512, error_offset = 0;
 	zbx_vector_str_t	results_str;
+	zbx_db_mock_field_t	field;
 
 	zbx_vector_str_create(&results_str);
 
@@ -142,28 +143,29 @@ static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t
 	zbx_snprintf_alloc(error, &error_alloc, &error_offset, "Preprocessing failed for: %s\n", value_str);
 	zbx_free(value_str);
 
-	err_max -= zbx_strlen_utf8(*error);
-	/* reserve space for '...\n' in the case results from the first steps have to be truncated */
-	err_max -= 4;
+	if (SUCCEED != zbx_db_mock_field_init(&field, ZBX_TYPE_CHAR, ITEM_ERROR_LEN))
+		THIS_SHOULD_NEVER_HAPPEN;
+
+	zbx_db_mock_field_append(&field, *error);
+	zbx_db_mock_field_append(&field, "...\n");
 
 	/* format the last (failed) step */
 	worker_format_result(results_num, &results[results_num - 1], errmsg, &err_step);
-	err_max -= zbx_strlen_utf8(err_step);
 	zbx_vector_str_append(&results_str, err_step);
+	zbx_db_mock_field_append(&field, err_step);
 
 	/* format the first steps */
 	for (i = results_num - 2; i >= 0; i--)
 	{
 		worker_format_result(i + 1, &results[i], NULL, &err_step);
-		len = zbx_strlen_utf8(err_step);
 
-		if (0 > err_max - len)
+		if (SUCCEED != zbx_db_mock_field_append(&field, err_step))
 		{
 			zbx_free(err_step);
 			break;
 		}
+
 		zbx_vector_str_append(&results_str, err_step);
-		err_max -= len;
 	}
 
 	/* add steps to error message */
