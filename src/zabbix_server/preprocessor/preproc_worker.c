@@ -170,7 +170,7 @@ static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t
 
 	/* add steps to error message */
 
-	if (results_str.values_num < results_num - 1)
+	if (results_str.values_num < results_num)
 		zbx_strcpy_alloc(error, &error_alloc, &error_offset, "...\n");
 
 	for (i = results_str.values_num - 1; i >= 0; i--)
@@ -295,7 +295,6 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 
 	zbx_preprocessor_unpack_task(&itemid, &value_type, &ts, &value, &history_in, &steps, &steps_num,
 			message->data);
-
 
 	zbx_variant_set_variant(&value_start, &value);
 	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * steps_num);
