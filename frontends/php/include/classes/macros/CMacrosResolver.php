@@ -1727,7 +1727,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				// Do function type (last, min, max, avg) related actions.
 				if ($function === 'last') {
 					$value = $item['lastclock']
-							? formatHistoryValue($item['lastvalue'], $item) : UNRESOLVED_MACRO_STRING;
+						? formatHistoryValue($item['lastvalue'], $item)
+						: UNRESOLVED_MACRO_STRING;
 				}
 				else {
 					$value = getItemFunctionalValue($item, $function,
@@ -1872,11 +1873,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			]
 		];
 
-		$artifacts_to_resolve = [
+		$selements_to_resolve = [
 			SYSMAP_ELEMENT_TYPE_HOST => [],
 			SYSMAP_ELEMENT_TYPE_MAP => [],
-			SYSMAP_ELEMENT_TYPE_TRIGGER => [],
-			SYSMAP_ELEMENT_TYPE_HOST_GROUP => []
+			SYSMAP_ELEMENT_TYPE_TRIGGER => []
 		];
 
 		$elementid_field_by_type = [
@@ -2000,23 +2000,28 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
-			// If macros are found, put elementid to list of artifacts to fetch API.
-			if (array_key_exists($selid, $macros) && $macros[$selid]) {
+			/**
+			 * If macros are found, put elementid to list of elements to fetch API.
+			 * Since only supported host-group macro is {HOSTGROUP.ID}, it's useless to collect host group id-s in order
+			 * to fetch additional details from database.
+			 */
+			if ($sel['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP
+					&& array_key_exists($selid, $macros) && $macros[$selid]) {
 				if (array_key_exists('elementid', $sel)) {
-					$artifacts_to_resolve[$sel['elementtype']][$sel['elementid']] = $sel['elementid'];
+					$selements_to_resolve[$sel['elementtype']][$sel['elementid']] = $sel['elementid'];
 				}
 				elseif (($element = reset($sel['elements'])) !== false) {
 					$elementid = $element[$elementid_field_by_type[$sel['elementtype']]];
-					$artifacts_to_resolve[$sel['elementtype']][$elementid] = $elementid;
+					$selements_to_resolve[$sel['elementtype']][$elementid] = $elementid;
 				}
 			}
 		}
 
 		// Get details about resolvable triggers.
-		if ($artifacts_to_resolve[SYSMAP_ELEMENT_TYPE_TRIGGER]) {
+		if ($selements_to_resolve[SYSMAP_ELEMENT_TYPE_TRIGGER]) {
 			$triggers = API::Trigger()->get([
 				'output' => ['expression'],
-				'triggerids' => $artifacts_to_resolve[SYSMAP_ELEMENT_TYPE_TRIGGER],
+				'triggerids' => $selements_to_resolve[SYSMAP_ELEMENT_TYPE_TRIGGER],
 				'selectHosts' => ['hostid'],
 				'selectFunctions' => ['functionid', 'itemid'],
 				'selectItems' => ['itemid', 'hostid'],
@@ -2026,7 +2031,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			foreach ($triggers as $trigger) {
 				foreach ($trigger['hosts'] as $host) {
-					$artifacts_to_resolve[SYSMAP_ELEMENT_TYPE_HOST][$host['hostid']] = $host['hostid'];
+					$selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST][$host['hostid']] = $host['hostid'];
 				}
 				foreach ($trigger['items'] as $item) {
 					$hosts_by_itemids[$item['itemid']] = $item['hostid'];
@@ -2038,20 +2043,20 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		// Query details about resolvable maps.
-		if ($artifacts_to_resolve[SYSMAP_ELEMENT_TYPE_MAP]) {
+		if ($selements_to_resolve[SYSMAP_ELEMENT_TYPE_MAP]) {
 			$maps = API::Map()->get([
 				'output' => ['sysmapid', 'name'],
-				'sysmapids' => $artifacts_to_resolve[SYSMAP_ELEMENT_TYPE_MAP],
+				'sysmapids' => $selements_to_resolve[SYSMAP_ELEMENT_TYPE_MAP],
 				'nopermissions' => true,
 				'preservekeys' => true
 			]);
 		}
 
 		// Query details about resolvable hosts.
-		if ($artifacts_to_resolve[SYSMAP_ELEMENT_TYPE_HOST]) {
+		if ($selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST]) {
 			$hosts = API::Host()->get([
 				'output' => ['host', 'name', 'description'],
-				'hostids' => $artifacts_to_resolve[SYSMAP_ELEMENT_TYPE_HOST],
+				'hostids' => $selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST],
 				'selectInterfaces' => $query_interfaces ? ['main', 'type', 'useip', 'ip', 'dns'] : null,
 				'selectInventory' => $query_inventories ? API_OUTPUT_EXTEND : null,
 				'nopermissions' => true,
@@ -2310,6 +2315,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 				}
 
+				// Replace macros by resolved values in selement label.
 				$macros_position = $this->getMacroPositions($sel['label'], $types);
 				foreach (array_reverse($macros_position, true) as $pos => $macro) {
 					$value = array_key_exists('value', $matched_macros[$macro])
@@ -2318,17 +2324,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$sel['label'] = substr_replace($sel['label'], $value, $pos, strlen($macro));
 				}
 
-				// Resolve functional macros like: {{HOST.HOST}:log[{HOST.HOST}.log].last(0)}.
-				if ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
-						|| $sel['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-					$sel['label'] = ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-						? $this->resolveMapLabelMacros($sel['label'], $hosts_by_nr)
-						: $this->resolveMapLabelMacros($sel['label'], [$host]);
-				}
-				else {
-					// Resolve functional macros like: {sampleHostName:log[{HOST.HOST}.log].last(0)}, if no host provided.
-					$sel['label'] = $this->resolveMapLabelMacros($sel['label']);
-				}
+				// Resolve functional macros. Macros used in functional macros are already replaced at this point.
+				$sel['label'] = $this->resolveMapLabelMacros($sel['label']);
 			}
 
 			// Replace macros in selement URLs.
