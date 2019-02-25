@@ -31,6 +31,8 @@
 
 #define ZBX_PROMETHEUS_TYPE_UNTYPED	"untyped"
 
+#define ZBX_PROMETHEUS_ERROR_ROW_NUM	10
+
 typedef enum
 {
 	ZBX_PROMETHEUS_CONDITION_OP_EQUAL,
@@ -1255,8 +1257,7 @@ static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *da
 
 		if (NULL != row)
 		{
-			if (NULL != hints)
-				row->raw = str_loc_dup(data, &loc);
+			row->raw = str_loc_dup(data, &loc);
 			zbx_vector_ptr_append(rows, row);
 		}
 
@@ -1311,13 +1312,34 @@ static int	prometheus_extract_value(zbx_vector_ptr_t *rows, const char *output, 
 
 	if (0 == rows->values_num)
 	{
-		*error = zbx_strdup(*error, "no metric matches the filter");
+		*error = zbx_strdup(*error, "no matching metrics found");
 		return FAIL;
 	}
 
 	if (1 < rows->values_num)
 	{
-		*error = zbx_strdup(*error, "multiple metrics match the filter");
+		int	i, rows_num = ZBX_PROMETHEUS_ERROR_ROW_NUM;
+		size_t	error_alloc, error_offset = 0;
+
+		error_alloc = (NULL == *error ? 0 : strlen(*error) + 1);
+
+		zbx_strcpy_alloc(error, &error_alloc, &error_offset, "multiple matching metrics found:\n\n");
+
+		if (rows->values_num < rows_num)
+			rows_num = rows->values_num;
+
+		for (i = 0; i < rows_num; i++)
+		{
+			row = (zbx_prometheus_row_t *)rows->values[i];
+			zbx_strcpy_alloc(error, &error_alloc, &error_offset, row->raw);
+			zbx_chrcpy_alloc(error, &error_alloc, &error_offset, '\n');
+		}
+
+		if (rows->values_num > rows_num)
+			zbx_strcpy_alloc(error, &error_alloc, &error_offset, "...");
+		else
+			(*error)[error_offset - 1] = '\0';
+
 		return FAIL;
 	}
 
