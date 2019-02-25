@@ -298,7 +298,7 @@ ZBX_THREAD_SENDVAL_ARGS;
  * Return value:  SUCCEED - success with all values at all destinations       *
  *                FAIL - an error occurred                                    *
  *                SUCCEED_PARTIAL - data sending was completed successfully   *
- *                to at least one destinations or processing of at least one  *
+ *                to at least one destination or processing of at least one   *
  *                value at least at one destination failed                    *
  *                                                                            *
  * Comments: SUCCEED_PARTIAL status should be sticky in the sense that        *
