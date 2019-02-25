@@ -216,7 +216,7 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
 		zbx_preproc_op_t *steps, int steps_num, zbx_vector_ptr_t *history_in, zbx_vector_ptr_t *history_out,
 		zbx_preproc_result_t *results, int *results_num, char **error)
 {
-	int	i, ret = SUCCEED, action;
+	int	i, ret = SUCCEED;
 
 	for (i = 0; i < steps_num; i++)
 	{
@@ -237,11 +237,10 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
 			history_ts.ns = 0;
 		}
 
-		ret = zbx_item_preproc(value_type, value, ts, op, &history_value, &history_ts, &action, error);
+		ret = zbx_item_preproc(value_type, value, ts, op, &history_value, &history_ts, &results[i].action,
+				error);
 
 		/* store result history */
-		results[i].action = action;
-
 		/* value is stored to report previous step results a step fails, */
 		/* which means it can be omitted for the last step               */
 		if (i != steps_num - 1)
