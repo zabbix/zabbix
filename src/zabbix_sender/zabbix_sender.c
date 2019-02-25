@@ -689,9 +689,6 @@ static void	zbx_load_config(const char *config_file)
 		{NULL}
 	};
 
-	if (NULL == config_file)
-		return;
-
 	/* do not complain about unknown parameters in agent configuration file */
 	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT);
 
@@ -1120,7 +1117,8 @@ int	main(int argc, char **argv)
 
 	parse_commandline(argc, argv);
 
-	zbx_load_config(CONFIG_FILE);
+	if (NULL != CONFIG_FILE)
+		zbx_load_config(CONFIG_FILE);
 
 	if (SUCCEED != zabbix_open_log(LOG_TYPE_UNDEFINED, CONFIG_LOG_LEVEL, NULL, &error))
 	{
