@@ -123,7 +123,7 @@ static void	worker_format_result(int step, const zbx_preproc_result_t *result, c
  *             results      - [IN] the preprocessing step results             *
  *             results_num  - [IN] the number of executed steps               *
  *             errmsg       - [IN] the error message of last executed step    *
- *             out          - [OUT] the formatted error message               *
+ *             error        - [OUT] the formatted error message               *
  *                                                                            *
  ******************************************************************************/
 static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t *results, int results_num,
@@ -282,7 +282,7 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_uint64_t			itemid;
 	zbx_variant_t			value, value_start;
 	int				i, steps_num, results_num;
-	char				*error = NULL, *errmsg = NULL;
+	char				*errmsg = NULL, *error = NULL;
 	zbx_timespec_t			*ts;
 	zbx_preproc_op_t		*steps;
 	zbx_vector_ptr_t		history_in, history_out;
@@ -299,16 +299,17 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * steps_num);
 
 	if (FAIL == worker_item_preproc_execute(value_type, &value, ts, steps, steps_num, &history_in, &history_out,
-			results, &results_num, &error) && 0 != results_num)
+			results, &results_num, &errmsg) && 0 != results_num)
 	{
 		int action = results[results_num - 1].action;
 
 		if (ZBX_PREPROC_FAIL_SET_ERROR != action && ZBX_PREPROC_FAIL_FORCE_ERROR != action)
 		{
-			worker_format_error(&value_start, results, results_num, error, &errmsg);
-			zbx_free(error);
-			error = errmsg;
+			worker_format_error(&value_start, results, results_num, errmsg, &error);
+			zbx_free(errmsg);
 		}
+		else
+			error = errmsg;
 	}
 
 	size = zbx_preprocessor_pack_result(&data, &value, &history_out, error);
