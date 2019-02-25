@@ -677,9 +677,13 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
  ******************************************************************************/
 static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *data, char **error)
 {
+	const char	*__function_name = "prometheus_filter_init";
+
 	int		ret = FAIL;
 	size_t		pos = 0;
 	zbx_strloc_t	loc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	memset(filter, 0, sizeof(zbx_prometheus_filter_t));
 	zbx_vector_ptr_create(&filter->labels);
@@ -737,7 +741,12 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 	ret = SUCCEED;
 out:
 	if (FAIL == ret)
+	{
 		prometheus_filter_clear(filter);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() Prometheus pattern error: %s", __function_name, *error);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
 }
@@ -1276,8 +1285,8 @@ out:
 		zbx_free(errmsg);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s rows:%d", __function_name, zbx_result_string(ret),
-			rows->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s rows:%d hints:%d", __function_name, zbx_result_string(ret),
+			rows->values_num, (NULL == hints ? 0 : hints->num_data));
 	return ret;
 }
 
@@ -1370,7 +1379,7 @@ int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char
 
 	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
 	{
-		*error = zbx_dsprintf(*error, "filter error: %s", errmsg);
+		*error = zbx_dsprintf(*error, "pattern error: %s", errmsg);
 		zbx_free(errmsg);
 		goto out;
 	}
@@ -1387,6 +1396,7 @@ int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char
 		goto cleanup;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): output:%s", __function_name, *value);
 	ret = SUCCEED;
 cleanup:
 	zbx_vector_ptr_clear_ext(&rows, (zbx_clean_func_t)prometheus_row_free);
@@ -1428,7 +1438,7 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 
 	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
 	{
-		*error = zbx_dsprintf(*error, "filter error: %s", errmsg);
+		*error = zbx_dsprintf(*error, "pattern error: %s", errmsg);
 		zbx_free(errmsg);
 		goto out;
 	}
@@ -1476,6 +1486,7 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 	}
 
 	*value = zbx_strdup(NULL, json.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): output:%s", __function_name, *value);
 	ret = SUCCEED;
 cleanup:
 	zbx_json_free(&json);
