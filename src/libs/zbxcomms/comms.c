@@ -1853,7 +1853,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 	}
 	else
 	{
-		s->read_bytes = buf_stat_bytes + buf_dyn_bytes;
+		s->read_bytes = 0;
 		s->buffer[s->read_bytes] = '\0';
 	}
 out:
