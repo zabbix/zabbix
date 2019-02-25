@@ -39,7 +39,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 						'Key' => 'lld-empty-both-parameters',
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_1' => '', 'parameter_2' => ''],
+						['type' => 'Regular expression']
 					],
 					'error_details' => 'Incorrect value for field "params": first parameter is expected.'
 				]
@@ -48,11 +48,11 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' =>[
-						'Name' => 'LLD empty regular expression',
+						'Name' => 'LLD empty pattern of regular expression',
 						'Key' => 'lld-empty-first-parameter',
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_1' => '', 'parameter_2' => 'test output'],
+						['type' => 'Regular expression', 'parameter_2' => 'test output']
 					],
 					'error_details' => 'Incorrect value for field "params": first parameter is expected.'
 				]
@@ -61,11 +61,11 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' =>[
-						'Name' => 'LLD empty regular expression',
+						'Name' => 'LLD empty output of regular expression',
 						'Key' => 'lld-empty-second-parameter',
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => ''],
+						['type' => 'Regular expression', 'parameter_1' => 'expression'],
 					],
 					'error_details' => 'Incorrect value for field "params": second parameter is expected.'
 				]
@@ -76,10 +76,10 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' =>[
 						'Name' => 'LLD JSONPath empty',
-						'Key' => 'lld-empty-jsonpath',
+						'Key' => 'lld-empty-jsonpath'
 					],
 					'preprocessing' => [
-						['type' => 'JSONPath', 'parameter_1' => ''],
+						['type' => 'JSONPath']
 					],
 					'error_details' => 'Incorrect value for field "params": cannot be empty.'
 				]
@@ -93,7 +93,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 						'Key' => 'lld-does-not-match-regular-expression-empty',
 					],
 					'preprocessing' => [
-						['type' => 'Does not match regular expression', 'parameter_1' => '']
+						['type' => 'Does not match regular expression']
 					],
 					'error_details' => 'Incorrect value for field "params": cannot be empty.'
 				]
@@ -104,10 +104,10 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' =>[
 						'Name' => 'LLD error JSON empty',
-						'Key' => 'lld-error-json-empty',
+						'Key' => 'lld-error-json-empty'
 					],
 					'preprocessing' => [
-						['type' => 'Check for error in JSON', 'parameter_1' => '']
+						['type' => 'Check for error in JSON']
 					],
 					'error_details' => 'Incorrect value for field "params": cannot be empty.'
 				]
@@ -118,7 +118,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' =>[
 						'Name' => 'LLD two equal discard unchanged with heartbeat',
-						'Key' => 'lld-two-equal-discard-uncahnged-with-heartbeat',
+						'Key' => 'lld-two-equal-discard-uncahnged-with-heartbeat'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
@@ -132,7 +132,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' =>[
 						'Name' => 'LLD two different discard unchanged with heartbeat',
-						'Key' => 'lld-two-different-discard-uncahnged-with-heartbeat',
+						'Key' => 'lld-two-different-discard-uncahnged-with-heartbeat'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
@@ -146,10 +146,10 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' =>[
 						'Name' => 'LLD Discard unchanged with heartbeat empty',
-						'Key' => 'lld-discard-uncahnged-with-heartbeat-empty',
+						'Key' => 'lld-discard-uncahnged-with-heartbeat-empty'
 					],
 					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '']
+						['type' => 'Discard unchanged with heartbeat']
 					],
 					'error_details' => 'Invalid parameter "params": cannot be empty.'
 				]
@@ -159,7 +159,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' =>[
 						'Name' => 'LLD Discard unchanged with heartbeat symbols',
-						'Key' => 'lld-discard-uncahnged-with-heartbeat-symbols',
+						'Key' => 'lld-discard-uncahnged-with-heartbeat-symbols'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '3g!@#$%^&*()-=']
@@ -172,7 +172,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' =>[
 						'Name' => 'LLD Discardunchanged with heartbeat letters string',
-						'Key' => 'lld-discard-uncahnged-with-heartbeat-letters-string',
+						'Key' => 'lld-discard-uncahnged-with-heartbeat-letters-string'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => 'abc']
@@ -224,7 +224,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' =>[
 						'Name' => 'LLD Discard unchanged with heartbeat zero',
-						'Key' => 'lld-discard-uncahnged-with-heartbeat-zero',
+						'Key' => 'lld-discard-uncahnged-with-heartbeat-zero'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '0']
@@ -237,7 +237,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' =>[
 						'Name' => 'LLD Discard unchanged with heartbeat maximum',
-						'Key' => 'lld-uncahnged-with-heartbeat-max',
+						'Key' => 'lld-uncahnged-with-heartbeat-max'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '788400001']
@@ -245,12 +245,13 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'error_details' => 'Invalid parameter "params": value must be one of 1-788400000.'
 				]
 			],
+			// Successful creation of LLD with preprocessing steps.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>[
 						'Name' => 'LLD all preprocessing steps',
-						'Key' => 'lld-all-preprocessing-steps',
+						'Key' => 'lld-all-preprocessing-steps'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => '\1'],
@@ -266,7 +267,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' =>[
 						'Name' => 'LLD double preprocessing steps',
-						'Key' => 'lld-double-preprocessing-steps',
+						'Key' => 'lld-double-preprocessing-steps'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => 'expression1', 'parameter_2' => '\1'],
@@ -285,7 +286,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' =>[
 						'Name' => 'LLD symbols preprocessing steps',
-						'Key' => 'lld-symbols-preprocessing-steps',
+						'Key' => 'lld-symbols-preprocessing-steps'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '1a!@#$%^&*()-=', 'parameter_2' => '2b!@#$%^&*()-='],
@@ -300,7 +301,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' =>[
 						'Name' => 'LLD user macrospreprocessing steps',
-						'Key' => 'lld-macros-preprocessing-steps',
+						'Key' => 'lld-macros-preprocessing-steps'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '{$PATTERN}', 'parameter_2' => '{$OUTPUT}'],
@@ -320,20 +321,18 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormLowLevelDiscoveryPreprocessing_Create($data) {
-		$sql_items = "SELECT * FROM items ORDER BY itemid";
+		$sql_items = 'SELECT * FROM items ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_items);
 
 		$this->page->login()->open('host_discovery.php?hostid='.self::HOST_ID);
 		$this->query('button:Create discovery rule')->one()->click();
 
 		$form = $this->query('name:itemForm')->asForm()->one();
-		foreach ($data['fields'] as $field => $value) {
-			$form->getField($field)->fill($value);
-		}
+		$form->fill($data['fields']);
 		$form->selectTab('Preprocessing');
 
 		foreach ($data['preprocessing'] as $step_count => $options) {
-			$this->selectTypeAndfillParameters($step_count, $options);
+			$this->selectTypeAndFillParameters($step_count, $options);
 		}
 
 		$form->submit();
@@ -360,21 +359,17 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					$type = $this->query('id:preprocessing_'.$step.'_type')->asDropdown()->one()->getText();
 					$this->assertEquals($options['type'], $type);
 
-					if (array_key_exists('parameter_1', $options) && array_key_exists('parameter_2', $options)) {
-
+					if (array_key_exists('parameter_1', $options)) {
 						$parameter_1 = $this->query('id:preprocessing_'.$step.'_params_0')->one()->getValue();
 						$this->assertEquals($options['parameter_1'], $parameter_1);
-
+					}
+					if (array_key_exists('parameter_2', $options)) {
 						$parameter_2 = $this->query('id:preprocessing_'.$step.'_params_1')->one()->getValue();
 						$this->assertEquals($options['parameter_2'], $parameter_2);
-
-					}
-					elseif (array_key_exists('parameter_1', $options) && !array_key_exists('parameter_2', $options)) {
-						$parameter_1 = $this->query('id:preprocessing_'.$step.'_params_0')->one()->getValue();
-						$this->assertEquals($options['parameter_1'], $parameter_1);
 					}
 				}
-			break;
+				break;
+
 			case TEST_BAD:
 				// Check if message is negative.
 				$this->assertTrue($message->isBad());
@@ -392,8 +387,10 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 		return [
 			[
 				[
-					'Name' => 'LLD Preprocessing Discard on fail',
-					'Key' => 'lld-preprocessing-steps-discard-on-fail',
+					'lld_fields' => [
+						'Name' => 'LLD Preprocessing Discard on fail',
+						'Key' => 'lld-preprocessing-steps-discard-on-fail'.microtime(true)
+					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => '\1'],
 						['type' => 'JSONPath', 'parameter_1' => '$.data.test'],
@@ -410,21 +407,21 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 	 * @dataProvider getCustomOnFailData
 	 */
 	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFailDiscard($data) {
-		$this->exectueCustomOnFail('discard_value', $data);
+		$this->exectueCustomOnFail('Discard value', $data, ZBX_PREPROC_FAIL_DISCARD_VALUE);
 	}
 
 	/**
 	 * @dataProvider getCustomOnFailData
 	 */
 	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFailSetValue($data) {
-		$this->exectueCustomOnFail('set_value', $data);
+		$this->exectueCustomOnFail('Set value to', $data, ZBX_PREPROC_FAIL_SET_VALUE);
 	}
 
 	/**
 	 * @dataProvider getCustomOnFailData
 	 */
 	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFailSetError($data) {
-		$this->exectueCustomOnFail('set_error', $data);
+		$this->exectueCustomOnFail('Set error to', $data, ZBX_PREPROC_FAIL_SET_ERROR);
 	}
 
 	/**
@@ -432,44 +429,36 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 	 *
 	 * @param array $data test case data from data provider
 	 */
-	private function exectueCustomOnFail($action, $data) {
-		$custom_value = 'test_value';
-		$custom_error = 'Test error message';
+	private function exectueCustomOnFail($action, $data, $error_handler) {
+		$error_handler_params = 'handler parameter';
 
 		$this->page->login()->open('host_discovery.php?hostid='.self::HOST_ID);
 		$this->query('button:Create discovery rule')->one()->click();
 
 		$form = $this->query('name:itemForm')->asForm()->one();
-		$lld_key = $data['Key'].microtime(true);
-		$form->getField('Name')->fill($data['Name']);
-		$form->getField('Key')->fill($lld_key);
+		$form->fill($data['lld_fields']);
 
 		$form->selectTab('Preprocessing');
 
 		foreach ($data['preprocessing'] as $step_count => $options) {
-			$this->selectTypeAndfillParameters($step_count, $options);
+			$this->selectTypeAndFillParameters($step_count, $options);
+			$checkbox = $this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox();
 
 			switch ($options['type']) {
 				case 'Regular expression':
 				case 'JSONPath':
 				case 'Does not match regular expression':
-					$checkbox = $this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox();
 					$this->assertTrue($checkbox->isEnabled());
 					$checkbox->check();
-					switch ($action) {
-						case 'set_value':
-							$this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one()->select('Set value to');
-							$this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->type($custom_value);
-							break;
-						case 'set_error':
-							$this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one()->select('Set error to');
-							$this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->type($custom_error);
-							break;
+					// Set value or error and type parameter.
+					if ($action === 'Set value to' or $action === 'Set error to') {
+						$this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one()->select($action);
+						$this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->type($error_handler_params);
 					}
 					break;
+
 				case 'Check for error in JSON':
 				case 'Discard unchanged with heartbeat':
-					$checkbox = $this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox();
 					$this->assertFalse($checkbox->isEnabled());
 					break;
 			}
@@ -477,60 +466,49 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 
 		$form->submit();
 		$this->page->waitUntilReady();
-		// Get global message.
-		$message = CMessageElement::find()->one();
 
-		// Check if message is positive.
+		// Check message title and if message is positive.
+		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->isGood());
-		// Check message title.
 		$this->assertEquals('Discovery rule created', $message->getTitle());
 
-		// Get item row from DB.
-		$db_item = CDBHelper::getRow('SELECT name,key_,itemid FROM items where key_ = '.zbx_dbstr($lld_key));
-		$this->assertEquals($db_item['name'], $data['Name']);
+		// Get item data from DB.
+		$db_item = CDBHelper::getRow('SELECT name,key_,itemid FROM items where key_ = '.zbx_dbstr($data['lld_fields']['Key']));
+		$this->assertEquals($db_item['name'], $data['lld_fields']['Name']);
 		$itemid = $db_item['itemid'];
 
-		// Check saved preprocessing.
+		// Check saved pre-processing.
 		$this->page->open('host_discovery.php?form=update&itemid='.$itemid);
 		$form->selectTab('Preprocessing');
 		foreach ($data['preprocessing'] as $step_count => $options) {
-			// Get preprocessing from DB.
-			$row_preproc = CDBHelper::getRow('SELECT * FROM item_preproc WHERE step='.($step_count + 1).' AND itemid = '.$itemid);
+			// Get preprocessing step from DB.
+			$db_preproc_step = CDBHelper::getRow('SELECT * FROM item_preproc WHERE step='.($step_count + 1).' AND itemid = '.$itemid);
+
+			$checkbox = $this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox();
+
 			switch ($options['type']) {
 				case 'Regular expression':
 				case 'JSONPath':
 				case 'Does not match regular expression':
 					// Check preprocessing in frontend.
-					$checkbox = $this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox();
 					$this->assertTrue($checkbox->isSelected());
-					$custom_setting=$this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one()->getText();
-					if ($action === 'discard_value') {
-						$this->assertEquals($custom_setting, 'Discard value');
-						// Check preprocessing in DB, where "Discard value" type is equal 1.
-						$this->assertEquals(1, $row_preproc['error_handler']);
-					}
-					elseif ($action === 'set_value') {
-						$this->assertEquals($custom_setting, 'Set value to');
-						$value_text=$this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->getValue();
-						$this->assertEquals($value_text, $custom_value);
-						// Check preprocessing in DB, where "Set value" type is equal 2.
-						$this->assertEquals(2, $row_preproc['error_handler']);
-						$this->assertEquals($custom_value, $row_preproc['error_handler_params']);
-					}
-					elseif ($action === 'set_error') {
-						$this->assertEquals($custom_setting, 'Set error to');
-						$value_text=$this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->getValue();
-						$this->assertEquals($value_text, $custom_error);
-						// Check preprocessing in DB, where "Set error message" type is equal 3.
-						$this->assertEquals(3, $row_preproc['error_handler']);
-						$this->assertEquals($custom_error, $row_preproc['error_handler_params']);
+					$this->assertTrue($checkbox->isEnabled());
+
+					$selected_element = $this->query('id:preprocessing_'.$step_count.'_error_handler')
+							->asSegmentedRadio()->one()->getText();
+					$this->assertEquals($action, $selected_element);
+
+					// Check pre-processing error handler type in DB.
+					$this->assertEquals($error_handler, $db_preproc_step['error_handler']);
+					if ($action === 'Set value to' or $action === 'Set error to') {
+						$get_prarameter_text = $this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->getValue();
+						$this->assertEquals($error_handler_params, $get_prarameter_text);
 					}
 					break;
 				case 'Check for error in JSON':
 				case 'Discard unchanged with heartbeat':
-					// Check preprocessing in DB.
-					$this->assertEquals(0, $row_preproc['error_handler']);
-					$checkbox = $this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox();
+					// Check pre-processing error handler type in DB.
+					$this->assertEquals(ZBX_PREPROC_FAIL_DEFAULT, $db_preproc_step['error_handler']);
 					$this->assertFalse($checkbox->isEnabled());
 					$this->assertFalse($checkbox->isSelected());
 					break;
@@ -540,6 +518,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 
 	public static function getCustomOnFailValidationData() {
 		return [
+			// 'Set value to' validation.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -588,6 +567,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					]
 				]
 			],
+			// 'Set error to' validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -654,16 +634,16 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 		$this->query('button:Create discovery rule')->one()->click();
 
 		$form = $this->query('name:itemForm')->asForm()->one();
-		foreach ($data['fields'] as $field => $value) {
-			$form->getField($field)->fill($value);
-		}
+		$form->fill($data['fields']);
+
 		$form->selectTab('Preprocessing');
 
 		foreach ($preprocessing as $step_count => $options) {
-			$this->selectTypeAndfillParameters($step_count, $options);
+			$this->selectTypeAndFillParameters($step_count, $options);
 			$this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox()->check();
 			foreach ($data['custom_on_fail'] as $error_type) {
-				$this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one()->select($error_type['option']);
+				$this->query('id:preprocessing_'.$step_count.'_error_handler')
+						->asSegmentedRadio()->one()->select($error_type['option']);
 				$this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->type($error_type['input']);
 			}
 		}
@@ -697,16 +677,15 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 	/**
 	 * Add new preprocessing, select preprocessing type and parameters if exist.
 	 */
-	private function selectTypeAndfillParameters($step, $options) {
-			$this->query('id:param_add')->one()->click();
-			$this->query('id:preprocessing_'.$step.'_type')->asDropdown()->one()->select($options['type']);
+	private function selectTypeAndFillParameters($step, $options) {
+		$this->query('id:param_add')->one()->click();
+		$this->query('id:preprocessing_'.$step.'_type')->asDropdown()->one()->select($options['type']);
 
-			if (array_key_exists('parameter_1', $options) && array_key_exists('parameter_2', $options)) {
-				$this->query('id:preprocessing_'.$step.'_params_0')->one()->type($options['parameter_1']);
-				$this->query('id:preprocessing_'.$step.'_params_1')->one()->type($options['parameter_2']);
-			}
-			elseif (array_key_exists('parameter_1', $options) && !array_key_exists('parameter_2', $options)) {
-				$this->query('id:preprocessing_'.$step.'_params_0')->one()->type($options['parameter_1']);
-			}
+		if (array_key_exists('parameter_1', $options)) {
+			$this->query('id:preprocessing_'.$step.'_params_0')->one()->type($options['parameter_1']);
 		}
+		if (array_key_exists('parameter_2', $options)) {
+			$this->query('id:preprocessing_'.$step.'_params_1')->one()->type($options['parameter_2']);
+		}
+	}
 }
