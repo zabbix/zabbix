@@ -66,7 +66,7 @@ $data = [
 	'backurl' => getRequest('backurl', '')
 ];
 
-if (!CHtmlUrlValidator::validate($data['backurl'], false, false, true)) {
+if (!CHtmlUrlValidator::validate($data['backurl'], ['allow_user_macro' => false, 'validate_uri_schemes' => true])) {
 	$data['backurl'] = 'zabbix.php?action=dashboard.view';
 }
 

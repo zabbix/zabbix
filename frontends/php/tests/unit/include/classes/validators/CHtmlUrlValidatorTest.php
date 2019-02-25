@@ -24,40 +24,42 @@ class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
 	// Expected results are defined assuming that VALIDATE_URI_SCHEMES is enabled (set to be true).
 	public function providerValidateURL() {
 		return [
-			['http://zabbix.com',				true, false, true],
-			['https://zabbix.com',				true, false, true],
-			['zabbix.php?a=1',					true, false, true],
-			['adm.images.php?a=1',				true, false, true],
-			['chart_bar.php?a=1&b=2',			true, false, true],
-			['mailto:example@example.com',		true, false, true],
-			['file://localhost/path',			true, false, true],
-			['ftp://user@host:21',				true, false, true],
-			['tel:1-111-111-1111',				true, false, true],
-			['ssh://username@hostname:/path ',	true, false, true],
-			['{$USER_URL_MACRO}',				true, false, true],
-			['{$USER_URL_MACRO}?a=1',			true, false, true],
-			['http://{$USER_URL_MACRO}?a=1',	true, false, true],
-			['http://{$USER_URL_MACRO}',		true, false, true],
-			['ftp://user@host:21',				true, false, true],
-			['{$USER_URL_MACRO}',				false, false, false],
-			['protocol://{$INVALID!MACRO}',		true, false, false],
-			['',								true, false, false],
-			['javascript:alert(]',				true, false, false],
-			['/chart_bar.php?a=1&b=2',			true, false, false],
-			['ftp://user@host:port',			true, false, false],
-			['vbscript:msgbox(]',				true, false, false],
-			['../././not_so_zabbix',			true, false, false],
-			['jav&#x09;ascript:alert(1];', 		true, false, false],
-			['{INVENTORY.URL.A}',				false, true, true],
-			['{INVENTORY.URL.A}',				false, false, false],
-			['http://localhost?host={HOST.NAME}', false, false, true]
+			['http://zabbix.com',				[], true],
+			['https://zabbix.com',				[], true],
+			['zabbix.php?a=1',					[], true],
+			['adm.images.php?a=1',				[], true],
+			['chart_bar.php?a=1&b=2',			[], true],
+			['mailto:example@example.com',		[], true],
+			['file://localhost/path',			[], true],
+			['ftp://user@host:21',				[], true],
+			['tel:1-111-111-1111',				[], true],
+			['ssh://username@hostname:/path ',	[], true],
+			['{$USER_URL_MACRO}',				[], true],
+			['{$USER_URL_MACRO}?a=1',			[], true],
+			['http://{$USER_URL_MACRO}?a=1',	[], true],
+			['http://{$USER_URL_MACRO}',		[], true],
+			['ftp://user@host:21',				[], true],
+			['{$USER_URL_MACRO}',				['allow_user_macro' => false], false],
+			['protocol://{$INVALID!MACRO}',		[], false],
+			['',								[], false],
+			['javascript:alert(]',				[], false],
+			['/chart_bar.php?a=1&b=2',			[], false],
+			['ftp://user@host:port',			[], false],
+			['vbscript:msgbox(]',				[], false],
+			['../././not_so_zabbix',			[], false],
+			['jav&#x09;ascript:alert(1];', 		[], false],
+			['{INVENTORY.URL.A}',				['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST], true],
+			['{INVENTORY.URL.A1}',				['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER], true],
+			['{INVENTORY.URL.A}',				['allow_inventory_macro' => INVENTORY_URL_MACRO_NONE], false],
+			['{INVENTORY.URL.A}',				['allow_user_macro' => false], false],
+			['http://localhost?host={HOST.NAME}', ['allow_user_macro' => false], true]
 		];
 	}
 
 	/**
 	 * @dataProvider providerValidateURL
 	 */
-	public function test_validateURL($url, $allow_user_macro, $allow_inventory_macro, $expected) {
-		$this->assertEquals(CHtmlUrlValidator::validate($url, $allow_user_macro, $allow_inventory_macro), $expected);
+	public function test_validateURL($url, $options, $expected) {
+		$this->assertEquals(CHtmlUrlValidator::validate($url, $options), $expected);
 	}
 }
