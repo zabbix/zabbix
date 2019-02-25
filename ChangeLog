@@ -199,7 +199,7 @@ Bug fixes:
 .......PS. [ZBX-15142] fixed time format for vmware performance counters query (MVekslers)
 ...G...... [ZBX-15010] fixed regexp compilation error for patterns with referenced subpatterns (vjaceslavs)
 ..F....... [ZBX-14724] fixed breadcrumb jumping in IE browser (ashubin)
-A......... [ZBX-15083] fixed API so that macros {TRIGGER.ID} works in map element URLs (vasilijs)
+A......... [ZBX-15083] fixed API so that macro {TRIGGER.ID} works in map element URLs (vasilijs)
 .......PS. [ZBX-15127] fixed possible crash when communication problem occurred in the middle of vmware update (MVekslers)
 A......... [ZBX-14396] fixed excessive memory usage during template full clone (gcalenko, Sasha)
 .D.G...PS. [ZBX-14848] clarified process type names for log level increase/decrease in help messages and man pages (kalimulin)
