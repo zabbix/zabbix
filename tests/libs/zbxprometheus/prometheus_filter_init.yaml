@@ -28,7 +28,7 @@ out:
       pattern: intel
       op: =
 ---
-test case: '{__name__="cpu", type="intel", cores="4"}'
+test case: '{__name__="cpu", type="intel", cores=~"4"}'
 in: 
   filter: '{__name__="cpu", type="intel", cores=~"4"}'
 out:
@@ -224,5 +224,17 @@ in:
   filter: sensor == 1e1 1
 out:
   return: FAIL
+---
+test case: '{type="intel"cores="4"}'
+in: 
+  filter: '{type="intel"cores=~"4"}'
+out:
+  return: FAIL
+---
+test case: '{}'
+in: 
+  filter: '{}'
+out:
+  return: SUCCEED
 ...
 
