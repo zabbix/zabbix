@@ -975,7 +975,7 @@
 				$div.css({
 					top: ui.position.top,
 					left: ui.position.left,
-					height: ui.size.height,
+					height: Math.min(ui.size.height, data.options['widget-max-rows'] * data.options['widget-height']),
 					width: Math.min(ui.size.width,
 						data['cell-width'] * data['options']['max-columns'] - ui.position.left
 					)
