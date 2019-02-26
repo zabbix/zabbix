@@ -1,3 +1,12 @@
+Changes for 4.2.0beta2
+
+New features:
+..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
+
+Bug fixes:
+..F....... [ZBX-15686] fixed wrong number of selected triggers when navigate to inherited template (talbergs)
+
+--------------------------------------------------------------------------------
 Changes for 4.2.0beta1
 
 New features:
@@ -141,6 +150,19 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.6rc1
+
+New features:
+..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.5
+
+4.0.5rc1 was released as 4.0.5 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.5rc1
@@ -344,7 +366,7 @@ Bug fixes:
 .......PS. [ZBX-15142] fixed time format for vmware performance counters query (MVekslers)
 ...G...... [ZBX-15010] fixed regexp compilation error for patterns with referenced subpatterns (vjaceslavs)
 ..F....... [ZBX-14724] fixed breadcrumb jumping in IE browser (ashubin)
-A......... [ZBX-15083] fixed API so that macros {TRIGGER.ID} works in map element URLs (vasilijs)
+A......... [ZBX-15083] fixed API so that macro {TRIGGER.ID} works in map element URLs (vasilijs)
 .......PS. [ZBX-15127] fixed possible crash when communication problem occurred in the middle of vmware update (MVekslers)
 A......... [ZBX-14396] fixed excessive memory usage during template full clone (gcalenko, Sasha)
 .D.G...PS. [ZBX-14848] clarified process type names for log level increase/decrease in help messages and man pages (kalimulin)
