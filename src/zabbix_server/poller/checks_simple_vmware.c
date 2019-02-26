@@ -693,7 +693,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (2 < request->nparam)
+	if (2 < request->nparam || 0 == request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -701,7 +701,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 
 	url = get_rparam(request, 0);
 
-	if (NULL == (skip = get_rparam(request, 2)) || '\0' == *skip || 0 == strcmp(skip, "all"))
+	if (NULL == (skip = get_rparam(request, 1)) || '\0' == *skip || 0 == strcmp(skip, "all"))
 	{
 		skip_all = 0;
 	}
