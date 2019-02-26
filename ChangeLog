@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+..F....... [ZBX-15688] fixed wrong host group and host selection in trigger dependencies window (talbergs)
 ..F....... [ZBX-15686] fixed wrong number of selected triggers when navigate to inherited template (talbergs)
 
 --------------------------------------------------------------------------------
