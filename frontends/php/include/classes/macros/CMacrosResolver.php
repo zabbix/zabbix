@@ -2149,9 +2149,25 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						// Must be here for correct counting.
 						$hosts_by_nr = [0 => null];
 
-						// Get all function ids from expression and link host data against position in expression.
-						preg_match_all('/\{([0-9]+)\}/', $trigger['expression'], $matches);
-						foreach ($matches[1] as $i => $functionid) {
+						/**
+						 * Get all function ids from expression and link host data against position in expression.
+						 *
+						 * Warning: although 'usermacros' and 'macros' are not used, they still are mandatory here to
+						 * ensure correct result parsing 'functionids'.
+						 *
+						 * For example, having a trigger like: '{host:item.change()}=1 or {$MACRO: "{1234} ..."}' gives
+						 * incorrect result of 'functionids' without requesting to parse macros and user macros as well.
+						 */
+						$matched_functionids = $this->extractMacros([$trigger['expression']], [
+							'macros' => [
+								'trigger' => ['{TRIGGER.VALUE}']
+							],
+							'functionids' => true,
+							'usermacros' => true
+						]);
+
+						foreach (array_keys($matched_functionids['functionids']) as $functionid) {
+							$functionid = substr($functionid, 1, -1); // strip curly braces
 							$itemid = $itemids_by_functionids[$functionid];
 							$hostid = $hosts_by_itemids[$itemid];
 
