@@ -113,12 +113,13 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['hostid']
-	 * @param bool   $data['has_goto']        (optional) Can be used to hide "GO TO" menu section. Default: true.
-	 * @param int    $data['severity_min']    (optional)
-	 * @param bool   $data['show_suppressed'] (optional)
-	 * @param array  $data['urls']            (optional)
+	 * @param bool   $data['has_goto']           (optional) Can be used to hide "GO TO" menu section. Default: true.
+	 * @param int    $data['severity_min']       (optional)
+	 * @param bool   $data['show_suppressed']    (optional)
+	 * @param array  $data['urls']               (optional)
 	 * @param string $data['urls']['label']
 	 * @param string $data['urls']['url']
+	 * @param string $data['filter_application'] (optional) Application name for filter by application.
 	 *
 	 * @return mixed
 	 */

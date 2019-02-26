@@ -73,21 +73,22 @@ function getMenuPopupHistory(options) {
 /**
  * Get menu popup host section data.
  *
- * @param string options['hostid']           Host ID.
- * @param array  options['scripts']          Host scripts (optional).
- * @param string options[]['name']           Script name.
- * @param string options[]['scriptid']       Script ID.
- * @param string options[]['confirmation']   Confirmation text.
- * @param bool   options['showGraphs']       Link to host graphs page.
- * @param bool   options['showScreens']      Link to host screen page.
- * @param bool   options['showTriggers']     Link to Monitoring->Problems page.
- * @param bool   options['hasGoTo']          "Go to" block in popup.
- * @param int    options['severity_min']     (optional)
- * @param bool   options['show_suppressed']  (optional)
- * @param array  options['urls']             (optional)
- * @param string options['url'][]['label']
- * @param string options['url'][]['url']
- * @param {object} trigger_elmnt             UI element which triggered opening of overlay dialogue.
+ * @param {string} options['hostid']             Host ID.
+ * @param {array}  options['scripts']            Host scripts (optional).
+ * @param {string} options[]['name']             Script name.
+ * @param {string} options[]['scriptid']         Script ID.
+ * @param {string} options[]['confirmation']     Confirmation text.
+ * @param {bool}   options['showGraphs']         Link to host graphs page.
+ * @param {bool}   options['showScreens']        Link to host screen page.
+ * @param {bool}   options['showTriggers']       Link to Monitoring->Problems page.
+ * @param {bool}   options['hasGoTo']            "Go to" block in popup.
+ * @param {int}    options['severity_min']       (optional)
+ * @param {bool}   options['show_suppressed']    (optional)
+ * @param {array}  options['urls']               (optional)
+ * @param {string} options['url'][]['label']
+ * @param {string} options['url'][]['url']
+ * @param {string} options['filter_application'] (optional) Application name for filter by application.
+ * @param {object} trigger_elmnt                 UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
@@ -243,11 +244,12 @@ function getMenuPopupMapElementSubmap(options) {
  * Get menu popup host group map element section data.
  *
  * @param {string} options['groupid']
- * @param {int}    options['severity_min']     (optional)
- * @param {bool}   options['show_suppressed']  (optional)
- * @param {array}  options['urls']             (optional)
+ * @param {int}    options['severity_min']       (optional)
+ * @param {bool}   options['show_suppressed']    (optional)
+ * @param {array}  options['urls']               (optional)
  * @param {string} options['url'][]['label']
  * @param {string} options['url'][]['url']
+ * @param {string} options['filter_application'] (optional) Application name for filter by application.
  *
  * @return array
  */
