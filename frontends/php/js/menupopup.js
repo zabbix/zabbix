@@ -327,6 +327,27 @@ function getMenuPopupMapElementTrigger(options) {
 }
 
 /**
+ * Get menu popup image map element section data.
+ *
+ * @param {array}  options['urls']             (optional)
+ * @param {string} options['url'][]['label']
+ * @param {string} options['url'][]['url']
+ *
+ * @return array
+ */
+function getMenuPopupMapElementImage(options) {
+	// urls
+	if (typeof options.urls !== 'undefined') {
+		return [{
+			label: t('URLs'),
+			items: options.urls
+		}];
+	}
+
+	return [];
+}
+
+/**
  * Get menu popup refresh section data.
  *
  * @param {string}   options['widgetName']   Widget name.
