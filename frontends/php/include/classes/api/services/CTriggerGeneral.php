@@ -866,8 +866,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $triggers[]['tags'][]['value']     [IN]
 	 * @param int    $triggers[]['correlation_mode']    [IN] (optional)
 	 * @param string $triggers[]['correlation_tag']     [IN] (optional)
-	 * @param bool   $inherited                         [IN] (optional)   If set to true, trigger will be created for
-	 *                                                       non-editable host/template.
+	 * @param bool   $inherited                         [IN] (optional)  If set to true, trigger will be created for
+	 *                                                                   non-editable host/template.
 	 *
 	 * @throws APIException
 	 */
@@ -976,6 +976,9 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $db_triggers[<tnum>]['tags'][]['value']         [IN]
 	 * @param int    $db_triggers[<tnum>]['correlation_mode']        [IN]
 	 * @param string $db_triggers[<tnum>]['correlation_tag']         [IN]
+	 * @param bool   $inherited                                      [IN] (optional)  If set to true, trigger will be
+	 *                                                                                created for non-editable
+	 *                                                                                host/template.
 	 *
 	 * @throws APIException
 	 */
@@ -1153,8 +1156,9 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string     $triggers_functions[<tnum>][]['itemid']     [OUT]
 	 * @param string     $triggers_functions[<tnum>][]['name']       [OUT]
 	 * @param string     $triggers_functions[<tnum>][]['parameter']  [OUT]
-	 * @param bool       $inherited                                  [IN] (optional)   If set to true, triggers will be
-	 *                                                                    created for non-editable hosts/templates.
+	 * @param bool       $inherited                                  [IN] (optional)  If set to true, triggers will be
+	 *                                                                                created for non-editable
+	 *                                                                                hosts/templates.
 	 *
 	 * @throws APIException if error occurred
 	 */
