@@ -2930,11 +2930,8 @@ out:
  *             field_type - [IN] the field type in database schema            *
  *             field_len  - [IN] the field size in database schema            *
  *                                                                            *
- * Return value: SUCCEED - the mock field was initialized successfully        *
- *               FAIL    - otherwise                                          *
- *                                                                            *
  ******************************************************************************/
-int	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len)
+void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len)
 {
 	switch (field_type)
 	{
@@ -2943,19 +2940,19 @@ int	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field
 			field->chars_num = field_len;
 			field->bytes_num = 4000;
 #elif defined(HAVE_IBM_DB2)
-			field->chars_num = 0;
+			field->chars_num = -1;
 			field->bytes_num = field_len;
 #else
 			field->chars_num = field_len;
-			field->bytes_num = 0;
+			field->bytes_num = -1;
 #endif
-			return SUCCEED;
+			return;
 	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
 
 	field->chars_num = 0;
 	field->bytes_num = 0;
-
-	return FAIL;
 }
 
 /******************************************************************************
@@ -2976,7 +2973,7 @@ int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text)
 {
 	int	bytes_num, chars_num;
 
-	if (0 != field->bytes_num)
+	if (-1 != field->bytes_num)
 	{
 		bytes_num = strlen(text);
 		if (bytes_num > field->bytes_num)
@@ -2985,7 +2982,7 @@ int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text)
 	else
 		bytes_num = 0;
 
-	if (0 != field->chars_num)
+	if (-1 != field->chars_num)
 	{
 		chars_num = zbx_strlen_utf8(text);
 		if (chars_num > field->chars_num)

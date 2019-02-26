@@ -66,7 +66,7 @@ static void	worker_format_value(const zbx_variant_t *value, char **value_str)
 	if (ZBX_PREPROC_VALUE_PREVIEW_LEN < zbx_strlen_utf8(value_desc))
 	{
 		/* truncate value and append '...' */
-		len = zbx_db_strlen_n(value_desc, ZBX_PREPROC_VALUE_PREVIEW_LEN - ZBX_CONST_STRLEN("..."));
+		len = zbx_strlen_utf8_nchars(value_desc, ZBX_PREPROC_VALUE_PREVIEW_LEN - ZBX_CONST_STRLEN("..."));
 		*value_str = zbx_malloc(NULL, len + ZBX_CONST_STRLEN("...") + 1);
 		memcpy(*value_str, value_desc, len);
 		memcpy(*value_str + len, "...", ZBX_CONST_STRLEN("...") + 1);
@@ -143,8 +143,7 @@ static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t
 	zbx_snprintf_alloc(error, &error_alloc, &error_offset, "Preprocessing failed for: %s\n", value_str);
 	zbx_free(value_str);
 
-	if (SUCCEED != zbx_db_mock_field_init(&field, ZBX_TYPE_CHAR, ITEM_ERROR_LEN))
-		THIS_SHOULD_NEVER_HAPPEN;
+	zbx_db_mock_field_init(&field, ZBX_TYPE_CHAR, ITEM_ERROR_LEN);
 
 	zbx_db_mock_field_append(&field, *error);
 	zbx_db_mock_field_append(&field, "...\n");
@@ -152,20 +151,22 @@ static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t
 	/* format the last (failed) step */
 	worker_format_result(results_num, &results[results_num - 1], errmsg, &err_step);
 	zbx_vector_str_append(&results_str, err_step);
-	zbx_db_mock_field_append(&field, err_step);
 
-	/* format the first steps */
-	for (i = results_num - 2; i >= 0; i--)
+	if (SUCCEED == zbx_db_mock_field_append(&field, err_step))
 	{
-		worker_format_result(i + 1, &results[i], NULL, &err_step);
-
-		if (SUCCEED != zbx_db_mock_field_append(&field, err_step))
+		/* format the first steps */
+		for (i = results_num - 2; i >= 0; i--)
 		{
-			zbx_free(err_step);
-			break;
-		}
+			worker_format_result(i + 1, &results[i], NULL, &err_step);
 
-		zbx_vector_str_append(&results_str, err_step);
+			if (SUCCEED != zbx_db_mock_field_append(&field, err_step))
+			{
+				zbx_free(err_step);
+				break;
+			}
+
+			zbx_vector_str_append(&results_str, err_step);
+		}
 	}
 
 	/* add steps to error message */
@@ -186,8 +187,6 @@ static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t
 			*ptr++ = '.';
 		*ptr = '\0';
 	}
-
-	zbx_rtrim(*error, ZBX_WHITESPACE);
 
 	zbx_vector_str_clear_ext(&results_str, zbx_str_free);
 	zbx_vector_str_destroy(&results_str);
