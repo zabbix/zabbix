@@ -1892,6 +1892,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$hosts_by_itemids = [];
 		$query_interfaces = false;
 		$query_inventories = false;
+		$query_trigger_hosts = false;
 		$triggers = [];
 		$maps = [];
 		$hosts = [];
@@ -1998,6 +1999,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				if (array_key_exists('inventory', $matched['macros_n']) && $matched['macros_n']['inventory']) {
 					$query_inventories = true;
 				}
+
+				if ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER && $matched['macros_n']['host']) {
+					$query_trigger_hosts = true;
+				}
 			}
 
 			/**
@@ -2022,7 +2027,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$triggers = API::Trigger()->get([
 				'output' => ['expression'],
 				'triggerids' => $selements_to_resolve[SYSMAP_ELEMENT_TYPE_TRIGGER],
-				'selectHosts' => ['hostid'],
+				'selectHosts' => $query_trigger_hosts ? ['hostid'] : null,
 				'selectFunctions' => ['functionid', 'itemid'],
 				'selectItems' => ['itemid', 'hostid'],
 				'nopermissions' => true,
@@ -2030,8 +2035,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			]);
 
 			foreach ($triggers as $trigger) {
-				foreach ($trigger['hosts'] as $host) {
-					$selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST][$host['hostid']] = $host['hostid'];
+				if ($query_trigger_hosts) {
+					foreach ($trigger['hosts'] as $host) {
+						$selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST][$host['hostid']] = $host['hostid'];
+					}
 				}
 				foreach ($trigger['items'] as $item) {
 					$hosts_by_itemids[$item['itemid']] = $item['hostid'];
