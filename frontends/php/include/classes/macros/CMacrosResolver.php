@@ -2143,13 +2143,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					$trigger = $triggers[$elementid];
+					if (array_key_exists($elementid, $triggers)) {
+						$trigger = $triggers[$elementid];
 
-					// Must be here for correct counting.
-					$hosts_by_nr = [0 => null];
+						// Must be here for correct counting.
+						$hosts_by_nr = [0 => null];
 
-					// Get all function ids from expression and link host data against position in expression.
-					if ($trigger) {
+						// Get all function ids from expression and link host data against position in expression.
 						preg_match_all('/\{([0-9]+)\}/', $trigger['expression'], $matches);
 						foreach ($matches[1] as $i => $functionid) {
 							$itemid = $itemids_by_functionids[$functionid];
@@ -2159,11 +2159,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								$hosts_by_nr[count($hosts_by_nr)] = $hosts[$hostid];
 							}
 						}
-					}
 
-					// Add host reference for macro without numeric index.
-					if (array_key_exists(1, $hosts_by_nr)) {
-						$hosts_by_nr[0] = $hosts_by_nr[1];
+						// Add host reference for macro without numeric index.
+						if (array_key_exists(1, $hosts_by_nr)) {
+							$hosts_by_nr[0] = $hosts_by_nr[1];
+						}
 					}
 					break;
 
