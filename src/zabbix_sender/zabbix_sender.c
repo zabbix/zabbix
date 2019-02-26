@@ -241,7 +241,7 @@ static int	REAL_TIME = 0;
 
 static char		*CONFIG_SOURCE_IP = NULL;
 static char		*ZABBIX_SERVER = NULL;
-static unsigned short	ZABBIX_SERVER_PORT = 0;
+static char		*ZABBIX_SERVER_PORT = NULL;
 static char		*ZABBIX_HOSTNAME = NULL;
 static char		*ZABBIX_KEY = NULL;
 static char		*ZABBIX_KEY_VALUE = NULL;
@@ -753,7 +753,8 @@ static void	parse_commandline(int argc, char **argv)
 					ZABBIX_SERVER = zbx_strdup(ZABBIX_SERVER, zbx_optarg);
 				break;
 			case 'p':
-				ZABBIX_SERVER_PORT = (unsigned short)atoi(zbx_optarg);
+				if (NULL == ZABBIX_SERVER_PORT)
+					ZABBIX_SERVER_PORT = zbx_strdup(ZABBIX_SERVER_PORT, zbx_optarg);
 				break;
 			case 's':
 				if (NULL == ZABBIX_HOSTNAME)
@@ -837,10 +838,16 @@ static void	parse_commandline(int argc, char **argv)
 	{
 		unsigned short	port;
 
-		if (0 == ZABBIX_SERVER_PORT)
-			port = (unsigned short)ZBX_DEFAULT_SERVER_PORT;
+		if (NULL != ZABBIX_SERVER_PORT)
+		{
+			if (SUCCEED != is_ushort(ZABBIX_SERVER_PORT, &port))
+			{
+				zbx_error("option \"-p\" used with invalid port number [%s]", ZABBIX_SERVER_PORT);
+				exit(EXIT_FAILURE);
+			}
+		}
 		else
-			port = ZABBIX_SERVER_PORT;
+			port = (unsigned short)ZBX_DEFAULT_SERVER_PORT;
 
 		sender_add_serveractive_host_cb(ZABBIX_SERVER, port);
 	}
