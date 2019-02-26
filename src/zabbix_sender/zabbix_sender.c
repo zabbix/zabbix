@@ -190,7 +190,6 @@ char	*CONFIG_TLS_CA_FILE		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
 char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
 char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
-static char		*CONFIG_SOURCE_IP = NULL;
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
@@ -240,6 +239,7 @@ static char	*INPUT_FILE = NULL;
 static int	WITH_TIMESTAMPS = 0;
 static int	REAL_TIME = 0;
 
+static char		*CONFIG_SOURCE_IP = NULL;
 static char		*ZABBIX_SERVER = NULL;
 static unsigned short	ZABBIX_SERVER_PORT = 0;
 static char		*ZABBIX_HOSTNAME = NULL;
@@ -270,14 +270,14 @@ static void	send_signal_handler(int sig)
 
 typedef struct
 {
-	char			*source_ip;
-	char			*server;
-	unsigned short		port;
-	struct zbx_json		json;
+	char		*source_ip;
+	char		*server;
+	unsigned short	port;
+	struct zbx_json	json;
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	ZBX_THREAD_SENDVAL_TLS_ARGS	tls_vars;
 #endif
-	int			sync_timestamp;
+	int		sync_timestamp;
 }
 ZBX_THREAD_SENDVAL_ARGS;
 
