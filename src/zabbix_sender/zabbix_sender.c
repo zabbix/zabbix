@@ -569,19 +569,23 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: sent_wait                                                        *
+ * Function: perform_data_sending                                             *
  *                                                                            *
- * Purpose: send data to all destinations each in a separate thread           *
+ * Purpose: Send data to all destinations each in a separate thread and wait  *
+ *          till threads have completed their task.                           *
  *                                                                            *
  * Parameters:                                                                *
- *      host - [IN] IP or hostname                                            *
- *      port - [IN] port number                                               *
+ *      thread_args - [IN] arguments for thread function                      *
+ *      old_status  - [IN] previous status                                    *
  *                                                                            *
- * Return value:  SUCCEED - destination added successfully                    *
- *                FAIL - destination has been already added                   *
+ * Return value:  SUCCEED - success with all values at all destinations       *
+ *                FAIL - an error occurred                                    *
+ *                SUCCEED_PARTIAL - data sending was completed successfully   *
+ *                to at least one destination or processing of at least one   *
+ *                value at least at one destination failed                    *
  *                                                                            *
  ******************************************************************************/
-static int	sent_wait(zbx_thread_args_t *thread_args, int old_status)
+static int	perform_data_sending(zbx_thread_args_t *thread_args, int old_status)
 {
 	int			i, ret;
 	ZBX_THREAD_HANDLE	*threads = NULL;
@@ -1332,7 +1336,7 @@ int	main(int argc, char **argv)
 
 				last_send = zbx_time();
 
-				ret = sent_wait(&thread_args, ret);
+				ret = perform_data_sending(&thread_args, ret);
 
 				buffer_count = 0;
 				zbx_json_clean(&sendval_args.json);
@@ -1345,7 +1349,7 @@ int	main(int argc, char **argv)
 		if (FAIL != ret && 0 != buffer_count)
 		{
 			zbx_json_close(&sendval_args.json);
-			ret = sent_wait(&thread_args, ret);
+			ret = perform_data_sending(&thread_args, ret);
 		}
 
 		if (in != stdin)
@@ -1387,7 +1391,7 @@ int	main(int argc, char **argv)
 
 			succeed_count++;
 
-			ret = sent_wait(&thread_args, ret);
+			ret = perform_data_sending(&thread_args, ret);
 		}
 		while (0); /* try block simulation */
 	}
