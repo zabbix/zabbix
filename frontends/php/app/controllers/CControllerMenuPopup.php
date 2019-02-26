@@ -363,7 +363,7 @@ class CControllerMenuPopup extends CController {
 						if ($selement['urls']) {
 							$menu_data['urls'] = $selement['urls'];
 						}
-						if ($selement['application']) {
+						if ($selement['application'] !== '') {
 							$menu_data['filter_application'] = $selement['application'];
 						}
 						return $menu_data;
@@ -381,7 +381,7 @@ class CControllerMenuPopup extends CController {
 						if ($selement['urls']) {
 							$host_data['urls'] = $selement['urls'];
 						}
-						if ($selement['application']) {
+						if ($selement['application'] !== '') {
 							$host_data['filter_application'] = $selement['application'];
 						}
 						return self::getMenuDataHost($host_data);
