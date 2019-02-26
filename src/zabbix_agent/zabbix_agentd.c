@@ -1147,6 +1147,10 @@ void	zbx_on_exit(void)
 #if defined(PS_OVERWRITE_ARGV)
 	setproctitle_free_env();
 #endif
+#ifdef _WINDOWS
+	while (0 == WSACleanup())
+		;
+#endif
 
 	exit(EXIT_SUCCESS);
 }
@@ -1173,6 +1177,17 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 
 	import_symbols();
+
+#ifdef _WINDOWS
+	WSADATA		sockInfo;
+
+	if (ZBX_TASK_SHOW_USAGE != t.task && ZBX_TASK_SHOW_VERSION != t.task && ZBX_TASK_SHOW_HELP != t.task &&
+			0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
+	{
+		zbx_error("Cannot initialize Winsock DLL: %s", strerror_from_system(ret));
+		exit(EXIT_FAILURE);
+	}
+#endif
 
 	/* this is needed to set default hostname in zbx_load_config() */
 	init_metrics();
@@ -1208,6 +1223,10 @@ int	main(int argc, char **argv)
 			zbx_free_config();
 
 			ret = zbx_exec_service_task(argv[0], &t);
+
+			while (0 == WSACleanup())
+				;
+
 			free_metrics();
 			exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
@@ -1243,6 +1262,9 @@ int	main(int argc, char **argv)
 				test_parameters();
 #ifdef _WINDOWS
 			free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
+
+			while (0 == WSACleanup())
+				;
 #endif
 #ifndef _WINDOWS
 			zbx_unload_modules();
