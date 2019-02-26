@@ -983,8 +983,12 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 			goto out;
 	}
 
-	/* row was successfully parsed and matched all filter conditions */
 	pos = loc.r + 1;
+
+	if (' ' != data[pos] && '\t' != data[pos] && '\n' != data[pos] && '\0' != data[pos])
+		return FAIL;
+
+	/* row was successfully parsed and matched all filter conditions */
 	ret = SUCCEED;
 out:
 	if (FAIL == ret)
@@ -1003,11 +1007,11 @@ out:
 	{
 		/* find the row location */
 
-		pos = skip_row(data, loc.r + 1);
-		if ('\0' == data[pos])
-			loc_row->r = pos - 1;
-		else
-			loc_row->r = pos - 2;
+		pos = skip_row(data, pos);
+		if ('\n' == data[--pos])
+			pos--;
+
+		loc_row->r = pos;
 	}
 
 	return ret;
