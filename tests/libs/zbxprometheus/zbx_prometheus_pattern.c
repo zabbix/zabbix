@@ -23,32 +23,31 @@
 #include "zbxmockutil.h"
 
 #include "zbxprometheus.h"
+#include "log.h"
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*data, *params, *value_type, *output, *result;
+	const char	*data, *params, *value_type;
 	char		*ret_err = NULL, *ret_output = NULL;
-	int		ret;
+	int		ret, expected_ret;
 
 	ZBX_UNUSED(state);
 
 	data = zbx_mock_get_parameter_string("in.data");
 	params = zbx_mock_get_parameter_string("in.params");
 	value_type = zbx_mock_get_parameter_string("in.value_type");
-	result = zbx_mock_get_parameter_string("out.result");
 
-	if (SUCCEED == (ret = zbx_prometheus_pattern(data, params, value_type, &ret_output, &ret_err)))
+	if (SUCCEED != (ret = zbx_prometheus_pattern(data, params, value_type, &ret_output, &ret_err)))
+		zabbix_log(LOG_LEVEL_DEBUG, "Error: %s", ret_err);
+
+	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
+	zbx_mock_assert_result_eq("Invalid zbx_prometheus_pattern() return value", expected_ret, ret);
+
+	if (SUCCEED == ret)
 	{
-		/* Check result and output */
-		zbx_mock_assert_result_eq("Invalid zbx_prometheus_pattern() return value", SUCCEED, ret);
-		zbx_mock_assert_str_eq("Invalid zbx_prometheus_pattern() returned result", result, "succeed");
+		const char *output;
+
 		output = zbx_mock_get_parameter_string("out.output");
 		zbx_mock_assert_str_eq("Invalid zbx_prometheus_pattern() returned wrong output", output, ret_output);
-	}
-	else
-	{
-		/* Check if the test case was expected to fail and got appropriate error description */
-		zbx_mock_assert_result_eq("Invalid zbx_prometheus_pattern() return value", FAIL, ret);
-		zbx_mock_assert_str_eq("Invalid zbx_prometheus_pattern() returned result", result, "fail");
 	}
 }

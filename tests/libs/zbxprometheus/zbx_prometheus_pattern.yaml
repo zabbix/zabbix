@@ -5,7 +5,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 8.492331008e+09
 ---
 test case: 'Get metric value using params: "cpu_usage_system{cpu="cpu-total"}"'
@@ -19,7 +19,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Get metric value using params: "wmi_logical_disk_free_bytes{volume="{#VOLUME}"}"'
@@ -33,7 +33,7 @@ in:
   params: 'wmi_logical_disk_free_bytes{volume="{#VOLUME}"}'
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 3.5180249088e+11
 ---
 test case: 'Get label value (volume) using params: "wmi_logical_disk_free_bytes{volume="{#VOLUME}"}"'
@@ -47,7 +47,7 @@ in:
   params: 'wmi_logical_disk_free_bytes{volume="{#VOLUME}"}'
   value_type: volume
 out:
-  result: succeed
+  result: SUCCEED
   output: '{#VOLUME}'
 ---
 test case: 'Get metric value using params: "cpu_usage_system{cpu="cpu-total",host=~".*"}"'
@@ -61,21 +61,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=~".*"}
   value_type: ""
 out:
-  result: succeed
-  output: 1.1940298507220641
----
-test case: 'Get metric value using params: "cpu_usage_system{cpu="cpu-total",host=~".*","\value"=~".*"}"'
-in:
-  data: |
-    # HELP cpu_usage_system Telegraf collected metric
-    # TYPE cpu_usage_system gauge
-    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
-    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
-    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
-  params: cpu_usage_system{cpu="cpu-total",host=~".*","\value"=~".*"}
-  value_type: ""
-out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Get metric value using params: "cpu_usage_system{cpu="cpu-total",host=~".*"}"'
@@ -89,7 +75,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=~".*"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Get metric value using params: "cpu_usage_system{cpu="cpu-total"}"'
@@ -103,7 +89,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Get metric value using params: "cpu_usage_system{cpu=~"cpu-tot.+"}"'
@@ -117,7 +103,7 @@ in:
   params: cpu_usage_system{cpu=~"cpu-tot.+"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Get metric value using params: "{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}"'
@@ -131,7 +117,7 @@ in:
   params: '{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Get metric value using params: "cpu_usage_system{cpu=~".*"}"'
@@ -145,7 +131,7 @@ in:
   params: cpu_usage_system{cpu=~".*"}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Get metric value using params: "cpu_usage_system{cpu=~"cpu-tot.+"}"'
 in:
@@ -158,7 +144,7 @@ in:
   params: cpu_usage_system{cpu=~"cpu-tot.+"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Get label value (state) using params: "wmi_service_state{name="dhcp"} == 1"'
@@ -188,7 +174,7 @@ in:
   params: wmi_service_state{name="dhcp"} == 1
   value_type: state
 out:
-  result: succeed
+  result: SUCCEED
   output: 'running'
 ---
 test case: 'Get label value (timezone) using params: "wmi_os_timezone{timezone=~".*"} == 1"'
@@ -200,7 +186,7 @@ in:
   params: wmi_os_timezone{timezone=~".*"} == 1
   value_type: timezone
 out:
-  result: succeed
+  result: SUCCEED
   output: 'MSK'
 ---
 test case: 'Multiple spaces in metric before the value'
@@ -213,7 +199,7 @@ in:
   params: http_requests_total{code="400"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 3
 ---
 test case: 'Escaping in label values'
@@ -222,7 +208,7 @@ in:
   params: msdos_file_access_time_seconds{error="Cannot find file:\n\"FILE.TXT\""} == 1.458255915e9
   value_type: path
 out:
-  result: succeed
+  result: SUCCEED
   output: 'C:\DIR\FILE.TXT'
 ---
 test case: 'Minimalistic line'
@@ -231,7 +217,7 @@ in:
   params: metric_without_timestamp_and_labels
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 12.47
 ---
 test case: 'A weird metric from before the epoch'
@@ -240,7 +226,7 @@ in:
   params: something_weird
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: +Inf
 ---
 test case: 'A histogram, which has a pretty complex representation in the text format'
@@ -259,7 +245,7 @@ in:
   params: http_request_duration_seconds_bucket{le="+Inf"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 144320
 ---
 test case: 'A summary, which has a complex representation'
@@ -277,7 +263,7 @@ in:
   params: rpc_duration_seconds_sum
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.7560473e+07
 ---
 test case: 'Invalid metric (expected "fail"): empty metric'
@@ -286,7 +272,7 @@ in:
   params: wmi_os_timezone
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Empty params'
 in:
@@ -294,7 +280,7 @@ in:
   params: ""
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1
 ---
 test case: 'Empty params but value_type is set'
@@ -303,7 +289,7 @@ in:
   params: ""
   value_type: timezone
 out:
-  result: succeed
+  result: SUCCEED
   output: 'MSK'
 ---
 test case: 'Empty params but value_type is set (multiline metric)'
@@ -316,7 +302,7 @@ in:
   params: ""
   value_type: state
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): empty metric and empty params'
 in:
@@ -324,7 +310,7 @@ in:
   params: ""
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): metric consists of spaces only #1'
 in:
@@ -332,7 +318,7 @@ in:
   params: wmi_os_timezone
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Params hold multiple spaces only'
 in:
@@ -340,7 +326,7 @@ in:
   params: '           '
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1
 ---
 test case: 'Params hold multiple spaces only (multiline metric)'
@@ -356,7 +342,7 @@ in:
   params: '       '
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): metric consists of spaces only #2'
 in:
@@ -364,7 +350,7 @@ in:
   params: '           '
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Empty multiline metric'
 in:
@@ -372,7 +358,7 @@ in:
   params: wmi_os_timezone
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Empty value_type'
 in:
@@ -380,7 +366,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 8.492331008e+09
 ---
 test case: 'Invalid metric (expected "fail"): metric without value'
@@ -389,7 +375,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): label value is missing but equal sign remains "wmi_os_timezone{timezone=} 1"'
 in:
@@ -400,7 +386,7 @@ in:
   params: wmi_os_timezone
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): label value is missing "wmi_os_timezone{timezone} 1"'
 in:
@@ -411,7 +397,7 @@ in:
   params: wmi_os_timezone
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): label value is missing and value_type is set to that label "wmi_os_timezone{timezone} 1"'
 in:
@@ -422,7 +408,7 @@ in:
   params: wmi_os_timezone == 1
   value_type: timezone
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): label value is missing, value_type is set to that label; params: "wmi_os_timezone{timezone=~".*"} == 1"'
 in:
@@ -433,7 +419,7 @@ in:
   params: wmi_os_timezone{timezone=~".*"} == 1
   value_type: timezone
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): wrong metric data'
 in:
@@ -441,7 +427,7 @@ in:
   params: wmi_os_timezone
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): wrong metric data (a space within)'
 in:
@@ -449,7 +435,7 @@ in:
   params: wmi_os_timezone
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): metric name with unsupported characters included'
 in:
@@ -457,7 +443,7 @@ in:
   params: wmi_os_physical_^&;memory_free_bytes
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): wrong metric data with valid HELP/TYPE'
 in:
@@ -468,7 +454,7 @@ in:
   params: wmi_os_timezone
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): metric consists of hash symbol only'
 in:
@@ -476,7 +462,7 @@ in:
   params: wmi_os_timezone
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): metric consists of empty space only'
 in:
@@ -484,7 +470,7 @@ in:
   params: wmi_os_timezone
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): metric consists of 3 byte UTF-8 character only'
 in:
@@ -492,7 +478,7 @@ in:
   params: wmi_os_timezone
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Metric with 3 byte UTF-8 byte character included in label value'
 in:
@@ -504,7 +490,7 @@ in:
   params: http_requests_total == 3
   value_type: code
 out:
-  result: succeed
+  result: SUCCEED
   output: '-⃠'
 ---
 test case: 'Invalid metric (expected "fail"): metric with missing "{"'
@@ -513,7 +499,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): metric with missing "}"'
 in:
@@ -521,7 +507,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): metric with missing "'
 in:
@@ -529,25 +515,23 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
-test case: 'Invalid metric (expected "succeed"): metric with missing ","'
+test case: 'Invalid metric (expected "fail"): metric with missing ","'
 in:
   data: cpu_usage_system{cpu="cpu-total"host="host1"} 1.1940298507220641
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: succeed
-  output: 1.1940298507220641
+  result: FAIL
 ---
-test case: 'Invalid metric (expected "succeed"): metric with missing "," and params set to empty'
+test case: 'Invalid metric (expected "fail"): metric with missing "," and params set to empty'
 in:
   data: cpu_usage_system{cpu="cpu-total"host="host1"} 1.1940298507220641
   params: ""
   value_type: ""
 out:
-  result: succeed
-  output: 1.1940298507220641
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): double equal sign (==) instead of single equal sign (=) in label value assignment (multiline metric)'
 in:
@@ -560,7 +544,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): double equal sign (==) instead of single equal sign (=) in label value assignment (desired metric)'
 in:
@@ -573,7 +557,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): double equal sign (==) instead of single equal sign (=) in label value assignment'
 in:
@@ -581,7 +565,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Label value and params holds new line character'
 in:
@@ -589,7 +573,7 @@ in:
   params: "cpu_usage_system{cpu=\"cpu\ntotal\"}"
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Invalid metric (expected "fail"): metric name holds new line character'
@@ -598,7 +582,7 @@ in:
   params: 'cpu_usage_system{cpu="cputotal"}'
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid params (expected "fail"): params hold new line character'
 in:
@@ -606,7 +590,7 @@ in:
   params: "cpu_usa\nge_system{cpu=\"cputotal\"}"
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): metric name and params hold new line character'
 in:
@@ -614,7 +598,7 @@ in:
   params: "cpu_usa\nge_system{cpu=\"cputotal\"}"
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid params (expected "fail"): double equal sign (==) instead of single equal sign (=) in label value assignment'
 in:
@@ -627,7 +611,7 @@ in:
   params: cpu_usage_system{cpu=="cpu-total"}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid params (expected "fail"): single equal sign (=) instead of double equal sign (==) in metric value assignment #1'
 in:
@@ -640,7 +624,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"} = 1.1940298507220641
   value_type: cpu
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid params (expected "fail"): single equal sign (=) instead of double equal sign (==) in metric value assignment #2'
 in:
@@ -653,7 +637,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"} = 1.1940298507220641
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'More than one metric (2) corresponds to the given params'
 in:
@@ -682,7 +666,7 @@ in:
   params: wmi_service_state{name="dhcp"} == 1
   value_type: state
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'All metrics (8) correspond to the given params'
 in:
@@ -698,7 +682,7 @@ in:
   params: wmi_service_state{name="dhcp"} == 1
   value_type: state
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'All metrics (16) correspond to the given params'
 in:
@@ -722,7 +706,7 @@ in:
   params: wmi_service_state{name="dhcp"} == 1
   value_type: state
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Multiple metrics (16 of 18) correspond to the given params'
 in:
@@ -748,7 +732,7 @@ in:
   params: wmi_service_state == 1
   value_type: state
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Metric with "Nan" value'
 in:
@@ -756,7 +740,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: Nan
 ---
 test case: 'Metric with "+Inf" value'
@@ -765,7 +749,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: +Inf
 ---
 test case: 'Metric with "-Inf" value'
@@ -774,16 +758,16 @@ in:
   params: wmi_os_physical_memory_free_bytes
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: -Inf
 ---
-test case: 'Metric with "NAN" value'
+test case: 'Invalid metric (expected "fail"): metric with "NAN" value'
 in:
   data: wmi_os_physical_memory_free_bytes NAN
   params: wmi_os_physical_memory_free_bytes
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Metric with timestamp'
 in:
@@ -791,7 +775,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 8.492331008e+09
 ---
 test case: 'Invalid metric (expected "succeed"): additional value after timestamp'
@@ -805,7 +789,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Metric with negative timestamp'
@@ -814,7 +798,7 @@ in:
   params: http_requests_total
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1027
 ---
 test case: 'Metric with negative value'
@@ -823,7 +807,7 @@ in:
   params: http_requests_total
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: -1027
 ---
 test case: 'Multilne metric with negative value (multiline metric)'
@@ -837,7 +821,7 @@ in:
   params: '{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: -654
 ---
 test case: 'The __name__ identifier is specified as last in params #1'
@@ -851,7 +835,7 @@ in:
   params: '{cpu="cpu-total",__name__="cpu_usage_system"}'
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'The __name__ identifier is specified as last in params #2'
@@ -865,7 +849,7 @@ in:
   params: '{cpu=~"cpu-tot.+",__name__=~"cpu_usage_syst.+"}'
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Label name set in value_type is not present in the metrics'
@@ -879,7 +863,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: something
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Get metric value using params: "cpu_usage_system{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}"'
 in:
@@ -892,7 +876,7 @@ in:
   params: 'cpu_usage_system{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Get metric value using params: "cpu_usage_system{__name__=~"cpu_age_syst.+",cpu=~"cpu-tot.+"}"'
 in:
@@ -905,7 +889,7 @@ in:
   params: 'cpu_usage_system{__name__=~"cpu_age_syst.+",cpu=~"cpu-tot.+"}'
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Random characters in value_type'
 in:
@@ -916,7 +900,7 @@ in:
   params: wmi_logical_disk_free_bytes
   value_type: \\&{},.13%},.
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "succeed"): multiple HELP lines'
 in:
@@ -930,7 +914,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Invalid metric (expected "succeed"): multiple TYPE:untyped lines'
@@ -945,7 +929,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Invalid metric (expected "succeed"): unsupported TYPE'
@@ -959,7 +943,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Invalid metric (expected "succeed"): only one argument for TYPE'
@@ -973,7 +957,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Invalid metric (expected "succeed"): empty TYPE'
@@ -987,7 +971,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Multiple spaces before metric value'
@@ -996,7 +980,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 8.492331008e+09
 ---
 test case: 'Invalid metric (expected "succeed"): empty HELP'
@@ -1009,7 +993,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Invalid metric (expected "fail"): unsupported characters in label name'
@@ -1018,7 +1002,7 @@ in:
   params: cpu_usage_system{cp%^&u="cpu-total"}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Get metric value using params: "wmi_os_timezone"'
 in:
@@ -1029,7 +1013,7 @@ in:
   params: wmi_os_timezone
   value_type: timezone
 out:
-  result: succeed
+  result: SUCCEED
   output: 'MSK'
 ---
 test case: 'Metric name consists of all supported characters'
@@ -1038,7 +1022,7 @@ in:
   params: AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1
 ---
 test case: 'Label name consists of all supported characters'
@@ -1047,7 +1031,7 @@ in:
   params: cpu_usage_system == 1
   value_type: AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789
 out:
-  result: succeed
+  result: SUCCEED
   output: 'test'
 ---
 test case: 'Invalid params (expected "fail"): regular expression but without prefix "~"'
@@ -1061,7 +1045,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=".*"}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid params (expected "fail"): wrong regular expression'
 in:
@@ -1074,7 +1058,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=~"[0-9"}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid params (expected "fail"): unsupported identifier __cpu__ #1'
 in:
@@ -1087,7 +1071,7 @@ in:
   params: '{__name__="cpu_usage_system",__cpu__="cpu-total"}'
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid params (expected "fail"): unsupported identifier __cpu__ #2'
 in:
@@ -1100,16 +1084,15 @@ in:
   params: '{__name__=~"cpu_usage_syst.+",__cpu__=~"cpu-tot.+"}'
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
-test case: 'Incorrect float in metric value'
+test case: 'Invalid metric (expected "fail"): incorrect float'
 in:
   data: wmi_logical_disk_free_bytes{volume="D:"} 8.49233.1008e+09
   params: wmi_logical_disk_free_bytes
   value_type: ""
 out:
-  result: succeed
-  output: 8.49233
+  result: FAIL
 ---
 test case: 'Invalid params (expected "fail"): "{}"'
 in:
@@ -1122,7 +1105,7 @@ in:
   params: '{}'
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid params (expected "fail"): "a{}"'
 in:
@@ -1135,7 +1118,7 @@ in:
   params: a{}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid metric (expected "fail"): "{}"'
 in:
@@ -1143,7 +1126,7 @@ in:
   params: metric
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Get metric value using params: "wmi_os_timezone{timezone="MSK"} == -1"'
 in:
@@ -1154,46 +1137,18 @@ in:
   params: wmi_os_timezone{timezone="MSK"} == -1
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: -1
----
-test case: 'Get metric value using params: "cpu_usage_system{cpu="cpu-total",host=~".*","\value"="1.1940298507220641"}"'
-in:
-  data: |
-    # HELP cpu_usage_system Telegraf collected metric
-    # TYPE cpu_usage_system gauge
-    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
-    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
-    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
-  params: cpu_usage_system{cpu="cpu-total",host=~".*","\value"="1.1940298507220641"}
-  value_type: ""
-out:
-  result: succeed
-  output: 1.1940298507220641
----
-test case: 'Get label value using params: "cpu_usage_system{cpu="cpu-total",host=~".*","\value"="1.1940298507220641"}"'
-in:
-  data: |
-    # HELP cpu_usage_system Telegraf collected metric
-    # TYPE cpu_usage_system gauge
-    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
-    cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641
-    cpu_usage_system{cpu="cpu1",host="host3"} 1.1340298507220641
-  params: cpu_usage_system{cpu="cpu-total",host=~".*","\value"="1.1940298507220641"}
-  value_type: host
-out:
-  result: succeed
-  output: 'host1'
 ---
 test case: 'Get label value using regular expression for date #1'
 in:
   data: |
     random_date{year="2019",month="february",day="02/12/2019"} 1
     random_date{year="2019",month="march",day="03/07/2019"} 2
-  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$"} == 1
+  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"} == 1
   value_type: month
 out:
-  result: succeed
+  result: SUCCEED
   output: 'february'
 ---
 test case: 'Get label value using regular expression for date #2'
@@ -1201,10 +1156,10 @@ in:
   data: |
     random_date{year="2019",month="february",day="02/12/2019"} 1
     random_date{year="2019",month="march",day="03/07/2019"} 2
-  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$"} == 2
+  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"} == 2
   value_type: month
 out:
-  result: succeed
+  result: SUCCEED
   output: 'march'
 ---
 test case: 'Get label value using regular expression for date #3'
@@ -1212,10 +1167,10 @@ in:
   data: |
     random_date{year="2019",month="february",day="02/12/2019"} 1
     random_date{year="2019",month="march",day="03/07/2019"} 2
-  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$"} == 2
+  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"} == 2
   value_type: day
 out:
-  result: succeed
+  result: SUCCEED
   output: '03/07/2019'
 ---
 test case: 'Get label value using regular expression for date #4'
@@ -1223,20 +1178,20 @@ in:
   data: |
     random_date{year="2019",month="february",day="02/12/2019"} 1
     random_date{year="2019",month="march",day="03-07-2019"} 2
-  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$"} == 2
+  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"} == 2
   value_type: day
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Get label value using regular expression for date #5'
 in:
   data: |
     random_date{year="2019",month="february",day="02/12/2019"} 1
     random_date{year="2019",month="march",day="03/07/2019"} 2
-  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$"}
+  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"}
   value_type: day
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid params (expected "fail"): double equal sign (==) is missing'
 in:
@@ -1247,53 +1202,53 @@ in:
   params: wmi_os_timezone 1
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Get label value using regular expression for email address #1'
 in:
   data: |
-    some_user{country="lv",addr="user1@domain.com"} some_name
-    some_user{country="lv",addr="user2@domain.org"} some_other_name
-    some_user{country="lv",addr="no_valid_addr"} some_other_name
-  params: some_user{country="lv",addr=~"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"} == some_name
+    some_user{country="lv",addr="user1@domain.com"} 1
+    some_user{country="lv",addr="user2@domain.org"} 2
+    some_user{country="lv",addr="no_valid_addr"} 2
+  params: some_user{country="lv",addr=~"[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}"} == 1
   value_type: addr
 out:
-  result: succeed
+  result: SUCCEED
   output: 'user1@domain.com'
 ---
 test case: 'Get label value using regular expression for email address #2'
 in:
   data: |
-    some_user{country="lv",addr="user1@domain.com"} some_name
-    some_user{country="lv",addr="user2@domain.org"} some_other_name
-    some_user{country="lv",addr="no_valid_addr"} some_other_name
-  params: some_user{country="lv",addr=~"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"} == some_other_name
+    some_user{country="lv",addr="user1@domain.com"} 1
+    some_user{country="lv",addr="user2@domain.org"} 2
+    some_user{country="lv",addr="no_valid_addr"} 2
+  params: some_user{country="lv",addr=~"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"} == 2
   value_type: addr
 out:
-  result: succeed
+  result: SUCCEED
   output: 'user2@domain.org'
 ---
 test case: 'Get label value using regular expression for email address #3'
 in:
   data: |
-    some_user{country="lv",addr="user1@domain.com"} some_name
-    some_user{country="lv",addr="user2@domain.org"} some_other_name
-    some_user{country="lv",addr="no_valid_addr"} another_name
-  params: some_user{country="lv",addr=~"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"} == another_name
+    some_user{country="lv",addr="user1@domain.com"} 1
+    some_user{country="lv",addr="user2@domain.org"} 2
+    some_user{country="lv",addr="no_valid_addr"} 3
+  params: some_user{country="lv",addr=~"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"} == 3
   value_type: addr
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Get metric value using regular expression for email address'
 in:
   data: |
-    some_user{country="lv",addr="user1@domain.com"} some_name
-    some_user{country="lv",addr="user2@domain.org"} some_other_name
-    some_user{country="lv",addr="no_valid_addr"} another_name
-  params: some_user{country="lv",addr=~"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"}
+    some_user{country="lv",addr="user1@domain.com"} 1
+    some_user{country="lv",addr="user2@domain.org"} 2
+    some_user{country="lv",addr="no_valid_addr"} 3
+  params: some_user{country="lv",addr=~"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"}
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Label value holds "{"'
 in:
@@ -1301,7 +1256,7 @@ in:
   params: cpu_usage_system{cpu="cpu{total"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Label value holds "{}"'
@@ -1310,7 +1265,7 @@ in:
   params: cpu_usage_system{cpu="cpu{}total"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Label value holds "}"'
@@ -1319,7 +1274,7 @@ in:
   params: cpu_usage_system{cpu="cpu}total"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Label value holds ","'
@@ -1328,7 +1283,7 @@ in:
   params: important_metric{important_number="42,0"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 42
 ---
 test case: 'Get label value (cpu) using params: "cpu_usage_system{cpu="cpu{total"} == 1.1940298507220641"'
@@ -1337,7 +1292,7 @@ in:
   params: cpu_usage_system{cpu="cpu{total"} == 1.1940298507220641
   value_type: cpu
 out:
-  result: succeed
+  result: SUCCEED
   output: 'cpu{total'
 ---
 test case: 'Get label value (cpu) using params: "cpu_usage_system{cpu="cpu}total"} == 1.1940298507220641"'
@@ -1346,7 +1301,7 @@ in:
   params: cpu_usage_system{cpu="cpu}total"} == 1.1940298507220641
   value_type: cpu
 out:
-  result: succeed
+  result: SUCCEED
   output: 'cpu}total'
 ---
 test case: 'Metric with five values'
@@ -1355,7 +1310,7 @@ in:
   params: cpu_usage_system{cpu="cputotal"} == 1.1940298507220641
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Different metrics under one HELP/TYPE header #1'
@@ -1370,7 +1325,7 @@ in:
   params: cpu_usage_system{cpu="cpu1",host=~".*"}
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1340298507220641
 ---
 test case: 'Different metrics under one HELP/TYPE header #2'
@@ -1385,7 +1340,7 @@ in:
   params: wmi_os_timezone
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1
 ---
 test case: 'Metrics of different type #1'
@@ -1403,7 +1358,7 @@ in:
   params: http_requests_total == 3
   value_type: code
 out:
-  result: succeed
+  result: SUCCEED
   output: 400
 ---
 test case: 'Metrics of different type #2'
@@ -1421,7 +1376,7 @@ in:
   params: '{cpu="cpu0"}'
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Metrics of different type #3'
@@ -1439,7 +1394,7 @@ in:
   params: '{host="host1"}'
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Get metric value using params: "cpu_usage_system { cpu = "cpu-total" , host = "host1",perf="100" }"'
 in:
@@ -1452,33 +1407,34 @@ in:
   params: cpu_usage_system { cpu = "cpu-total" , host = "host1",perf="100" }
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
-test case: 'Invalid metric (expected "fail"): no spaces around double equal sign (==)'
+test case: 'Invalid params (expected "fail"): no spaces around double equal sign (==)'
 in:
   data: |
     # HELP http_requests_total The total number of HTTP requests.
     # TYPE http_requests_total counter
-    http_requests_total{method="post",code="200"} 1027 1395066363000
-    http_requests_total{method="post",code="400"}    3 1395066363000
+    http_requests_total{method="post2",code="200"} 1027 1395066363000
+    http_requests_total{method="post1",code="400"}    3 1395066363000
   params: http_requests_total{code="400"}==3
   value_type: "method"
 out:
-  result: fail
+  result: SUCCEED
+  output: post1
 ---
 test case: 'Get metric value using params: "http_requests_total{code="400"} == 3"'
 in:
   data: |
     # HELP http_requests_total The total number of HTTP requests.
     # TYPE http_requests_total counter
-    http_requests_total{method="post",code="200"} 1027 1395066363000
-    http_requests_total{method="post",code="400"}    3 1395066363000
+    http_requests_total{method="post1",code="200"} 1027 1395066363000
+    http_requests_total{method="post2",code="400"}    3 1395066363000
   params: http_requests_total{code="400"} == 3
   value_type: "method"
 out:
-  result: succeed
-  output: 1.3
+  result: SUCCEED
+  output: post2
 ---
 test case: 'Invalid metric (expected "fail"): metric with string value'
 in:
@@ -1486,7 +1442,7 @@ in:
   params: wmi_os_physical_memory_free_bytes
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid params (expected "fail"): metric with string value'
 in:
@@ -1497,7 +1453,7 @@ in:
   params: wmi_os_timezone{timezone="MSK"} == some_value
   value_type: "timezone"
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Invalid params (expected "fail"): __name__ identifier is specified twice'
 in:
@@ -1510,7 +1466,7 @@ in:
   params: '{__name__=~".*",cpu="cpu-total",__name__="cpu_usage_system"}'
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ---
 test case: 'Get metric value using params: "{cpu=~".*",cpu=~"cpu-tot.+",perf="100"}"'
 in:
@@ -1523,7 +1479,7 @@ in:
   params: '{cpu=~".*",cpu=~"cpu-tot.+",perf="100"}'
   value_type: ""
 out:
-  result: succeed
+  result: SUCCEED
   output: 1.1940298507220641
 ---
 test case: 'Get metric value using params: "{cpu=~"z.+",cpu=~"cpu-tot.+",perf="100"}"'
@@ -1537,8 +1493,7 @@ in:
   params: '{cpu=~"z.+",cpu=~"cpu-tot.+",perf="100"}'
   value_type: ""
 out:
-  result: succeed
-  output: 1.1940298507220641
+  result: FAIL
 ---
 test case: 'Get metric value using params: "{cpu=~"z.+",cpu=~"y.+",perf="100"}"'
 in:
@@ -1551,5 +1506,5 @@ in:
   params: '{cpu=~"z.+",cpu=~"y.+",perf="100"}'
   value_type: ""
 out:
-  result: fail
+  result: FAIL
 ...

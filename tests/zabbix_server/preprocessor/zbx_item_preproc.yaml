@@ -1739,9 +1739,11 @@ in:
     params: |-
       cpu_usage_system{cpu="cpu-total"}
       gpu
+    error_handler: ZBX_PREPROC_FAIL_SET_ERROR
+    error_handler_params: custom error
 out:
   return: FAIL
-  error: 'Item preprocessing step #0 failed: cannot output Prometheus data: label name not found'
+  error: custom error
 ---
 test case: prometheus_getmetric12
 in:
@@ -1759,9 +1761,11 @@ in:
     params: |-
       cpu_usage_system{cpu="cpu"}
       \value
+    error_handler: ZBX_PREPROC_FAIL_SET_ERROR
+    error_handler_params: custom error
 out:
   return: FAIL
-  error: 'Item preprocessing step #0 failed: cannot output Prometheus data: metric not found'
+  error: custom error
 ---
 test case: prometheus_getmetric13
 in:
@@ -1792,20 +1796,11 @@ in:
     params: |-
       wmi_service_state == 1
       \value
+    error_handler: ZBX_PREPROC_FAIL_SET_ERROR
+    error_handler_params: custom error
 out:
   return: FAIL
-  error: |
-    Item preprocessing step #0 failed: cannot output Prometheus data: multiple metric result:
-    wmi_service_state{name="dhcp",state="continue pending"} 1
-    wmi_service_state{name="dhcp",state="pause pending"} 1
-    wmi_service_state{name="dhcp",state="paused"} 1
-    wmi_service_state{name="dhcp",state="running"} 1
-    wmi_service_state{name="dhcp",state="start pending"} 1
-    wmi_service_state{name="dhcp",state="stop pending"} 1
-    wmi_service_state{name="dhcp",state="stopped"} 1
-    wmi_service_state{name="dhcp",state="unknown"} 1
-    wmi_service_state{name="dhcp",state="continue pending"} 1
-    wmi_service_state{name="dhcp",state="pause pending"} 1
+  error: custom error
 ---
 test case: prometheus_to_json1
 in:
@@ -1823,89 +1818,9 @@ in:
     params: cpu_usage_system
 out:
   return: SUCCEED
-  value: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu-total"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu-total"} 1.1940298507220641"
-        },
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu0"
-            },
-            "value": "1.1940298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu0"} 1.1940298507220641"
-        },
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu1"
-            },
-            "value": "1.1340298507220641",
-            "line_raw": "cpu_usage_system{cpu="cpu1"} 1.1340298507220641"
-        }
-    ]
+  value: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\"} 1.1940298507220641","labels":{"cpu":"cpu-total"},"type":"gauge","help":"Telegraf collected metric"},{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu0\"} 1.1940298507220641","labels":{"cpu":"cpu0"},"type":"gauge","help":"Telegraf collected metric"},{"name":"cpu_usage_system","value":"1.1340298507220641","line_raw":"cpu_usage_system{cpu=\"cpu1\"} 1.1340298507220641","labels":{"cpu":"cpu1"},"type":"gauge","help":"Telegraf collected metric"}]'
 ---
 test case: prometheus_to_json2
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_STR
-    time: 2017-10-29 03:15:00 +03:00
-    data: |
-      # HELP cpu_usage_system Telegraf collected metric
-      # TYPE cpu_usage_system gauge
-      cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
-      cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
-      cpu_usage_system{cpu="cpu1",host="host1"} 1027
-      # HELP http_requests_total The total number of HTTP requests.
-      # TYPE http_requests_total counter
-      http_requests_total{method="post",code="200"} 1027 1395066363000
-      http_requests_total{method="post",code="400"}    3 1395066363000
-  step:
-    type: ZBX_PREPROC_PROMETHEUS_TO_JSON
-    params: '{__name__=~".*",\value="1027"}'
-out:
-  return: SUCCEED
-  value: |
-    [
-        {
-            "name": "cpu_usage_system",
-            "help": "Telegraf collected metric",
-            "type": "gauge",
-            "labels": {
-                "cpu": "cpu1",
-                "host": "host1"
-            },
-            "value": "1027",
-            "line_raw": "cpu_usage_system{cpu="cpu1",host="host1"} 1027"
-        }
-    ],
-    [
-        {
-            "name": "http_requests_total",
-            "help": "The total number of HTTP requests.",
-            "type": "counter",
-            "labels": {
-                "method": "post",
-                "code": "200"
-            },
-            "value": "1027",
-            "line_raw": "http_requests_total{method="post",code="200"} 1027 1395066363000"
-        }
-    ]
----
-test case: prometheus_to_json3
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
@@ -1919,17 +1834,48 @@ in:
     params: wmi_os_timezone
 out:
   return: SUCCEED
-  value: |
-    [
-        {
-            "name": "wmi_os_timezone",
-            "help": "OperatingSystem.LocalDateTime",
-            "type": "gauge",
-            "labels": {
-                "timezone": "MSK"
-            },
-            "value": "1",
-            "line_raw": "wmi_os_timezone{timezone="MSK"} 1"
-        }
-    ]
+  value: '[{"name":"wmi_os_timezone","value":"1","line_raw":"wmi_os_timezone{timezone=\"MSK\"} 1","labels":{"timezone":"MSK"},"type":"gauge","help":"OperatingSystem.LocalDateTime"}]'
+---
+test case: prometheus_to_json3
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      random_date{year="2019",month="february",day="02/12/2019"} 1
+      random_date{year="2019",month="march",day="03/07/2019"} 2
+  step:
+    type: ZBX_PREPROC_PROMETHEUS_TO_JSON
+    params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"}
+out:
+  return: SUCCEED
+  value: '[{"name":"random_date","value":"1","line_raw":"random_date{year=\"2019\",month=\"february\",day=\"02/12/2019\"} 1","labels":{"year":"2019","month":"february","day":"02/12/2019"},"type":"untyped"},{"name":"random_date","value":"2","line_raw":"random_date{year=\"2019\",month=\"march\",day=\"03/07/2019\"} 2","labels":{"year":"2019","month":"march","day":"03/07/2019"},"type":"untyped"}]'
+---
+test case: prometheus_to_json4
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: metric_without_timestamp_and_labels 12.47
+  step:
+    type: ZBX_PREPROC_PROMETHEUS_TO_JSON
+    params: metric_without_timestamp_and_labels
+out:
+  return: SUCCEED
+  value: '[{"name":"metric_without_timestamp_and_labels","value":"12.47","line_raw":"metric_without_timestamp_and_labels 12.47","type":"untyped"}]'
+---
+test case: prometheus_to_json5
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: wmi_os_timezone{timezone} 1
+  step:
+    type: ZBX_PREPROC_PROMETHEUS_TO_JSON
+    params: wmi_os_timezone
+    error_handler: ZBX_PREPROC_FAIL_SET_ERROR
+    error_handler_params: custom error
+out:
+  return: FAIL
+  error: custom error
 ...
