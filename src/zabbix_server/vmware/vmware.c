@@ -1115,6 +1115,38 @@ static zbx_vmware_event_t	*vmware_event_shared_dup(const zbx_vmware_event_t *src
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_event_merge                                               *
+ *                                                                            *
+ * Purpose: merge not pooled vmware event objects with new collected vmware   *
+ *          event objects                                                     *
+ *                                                                            *
+ * Parameters: service - [IN] the vmware service                              *
+ *             events  - [IN/OUT] array of new vmware event                   *
+ *                                                                            *
+ ******************************************************************************/
+void	vmware_event_merge(const zbx_vmware_service_t *service, zbx_vector_ptr_t *events)
+{
+	int	i;
+
+	if (((const zbx_vmware_event_t *)service->data->events.values[0])->key <= service->eventlog_last_key)
+		return;
+
+	for (i = 0; i < service->data->events.values_num; i++)
+	{
+		zbx_vmware_event_t *event = NULL;
+		const zbx_vmware_event_t *shared_event;
+
+		shared_event = (const zbx_vmware_event_t *)service->data->events.values[i];
+		event = (zbx_vmware_event_t *)zbx_malloc(event, sizeof(zbx_vmware_event_t));
+		event->key = shared_event->key;
+		event->message = zbx_strdup(NULL, shared_event->message);
+		event->timestamp = shared_event->timestamp;
+		zbx_vector_ptr_append(events, event);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_datastore_shared_dup                                      *
  *                                                                            *
  * Purpose: copies vmware hypervisor datastore object into shared memory      *
@@ -3378,7 +3410,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	char		*event_session = NULL;
 	int		ret = FAIL;
 	xmlDoc		*doc = NULL;
-
+	zbx_uint64_t	eventlog_last_key;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3388,6 +3420,11 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (SUCCEED != vmware_service_reset_event_history_collector(easyhandle, event_session, error))
 		goto end_session;
 
+	if (((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog_last_key)
+		eventlog_last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
+	else
+		eventlog_last_key = service->eventlog_last_key;
+
 	do
 	{
 		zbx_xml_free_doc(doc);
@@ -3396,7 +3433,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		if (SUCCEED != vmware_service_read_previous_events(easyhandle, event_session, &doc, error))
 			goto end_session;
 	}
-	while (0 < vmware_service_parse_event_data(events, service->eventlog_last_key, doc));
+	while (0 < vmware_service_parse_event_data(events, eventlog_last_key, doc));
 
 	ret = SUCCEED;
 end_session:
@@ -4099,6 +4136,7 @@ out:
 	service->state &= ~(ZBX_VMWARE_STATE_MASK | ZBX_VMWARE_STATE_UPDATING);
 	service->state |= (SUCCEED == ret) ? ZBX_VMWARE_STATE_READY : ZBX_VMWARE_STATE_FAILED;
 
+	vmware_event_merge(service, &data->events);
 	vmware_data_shared_free(service->data);
 	service->data = vmware_data_shared_dup(data);
 
