@@ -314,7 +314,7 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num, cons
 #endif
 	for (i = 0; i < threads_num; i++)
 	{
-		if (0 < threads[i] && SUCCEED_PARTIAL == (new_status = zbx_thread_wait(threads[i])))
+		if (SUCCEED_PARTIAL == (new_status = zbx_thread_wait(threads[i])))
 				sp_count++;
 
 		if (SUCCEED != new_status && SUCCEED_PARTIAL != new_status)
