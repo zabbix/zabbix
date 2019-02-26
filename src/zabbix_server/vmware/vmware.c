@@ -3251,23 +3251,23 @@ out:
  *                                                                            *
  * Purpose: read event data by id from xml and put to array of events         *
  *                                                                            *
- * Parameters: events    - [IN/OUT] the array of parsed events                *
- *             key       - [IN] the key of parsed event                       *
- *             xdoc      - [IN] xml document with eventlog records            *
- *             returnval - [IN] name of xml tag with event value              *
+ * Parameters: events  - [IN/OUT] the array of parsed events                  *
+ *             key     - [IN] the key of parsed event                         *
+ *             xdoc    - [IN] xml document with eventlog records              *
+ *             xml_tag - [IN] name of xml tag with event value                *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  ******************************************************************************/
 static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_uint64_t key, xmlDoc *xdoc,
-		const char * returnval)
+		const char * xml_tag)
 {
 	zbx_vmware_event_t	*event = NULL;
 	char			*message, *time_str, xpath[MAX_STRING_LEN];
 	int			timestamp = 0;
 
 	zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("%s", "key") "[.='" ZBX_FS_UI64 "']/.."
-			ZBX_XPATH_LN("fullFormattedMessage"), returnval, key);
+			ZBX_XPATH_LN("fullFormattedMessage"), xml_tag, key);
 
 	if (NULL == (message = zbx_xml_read_doc_value(xdoc, xpath)))
 	{
@@ -3279,7 +3279,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_uint64_t 
 	zbx_replace_invalid_utf8(message);
 
 	zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("%s", "key") "[.='" ZBX_FS_UI64 "']/.."
-			ZBX_XPATH_LN("createdTime"), returnval, key);
+			ZBX_XPATH_LN("createdTime"), xml_tag, key);
 
 	if (NULL == (time_str = zbx_xml_read_doc_value(xdoc, xpath)))
 	{
