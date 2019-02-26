@@ -469,7 +469,7 @@ class testPageTriggers extends CLegacyWebTest {
 					'filter_options' => [
 						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
 						'Severity' => 'Average',
-						'Name' => 'tag',
+						'Name' => 'tag'
 					],
 					'result' => [
 						['ЗАББИКС Сервер' => 'Test trigger to check tag filter on problem page'],
@@ -481,12 +481,18 @@ class testPageTriggers extends CLegacyWebTest {
 			// Two hosts without host group.
 			[
 				[
-					'hosts' => [
-						['group' => 'Zabbix servers', 'host' => 'Host for trigger tags filtering'],
-						['group' => 'Group to check triggers filtering', 'host' => 'Host for triggers filtering']
-					],
 					'filter_options' => [
-						'Severity' => 'Average'
+						'Severity' => 'Average',
+						'Hosts' => [
+							[
+								'values' => ['Host for trigger tags filtering'],
+								'context' => 'Zabbix servers'
+							],
+							[
+								'values' => ['Host for triggers filtering'],
+								'context' => 'Group to check triggers filtering'
+							]
+						]
 					],
 					'result' => [
 						['Host for trigger tags filtering' => 'Third trigger for tag filtering'],
@@ -499,10 +505,16 @@ class testPageTriggers extends CLegacyWebTest {
 				[
 					'filter_options' => [
 						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-					],
-					'hosts' => [
-						['group' => 'Zabbix servers', 'host' => 'Host for trigger tags filtering'],
-						['group' => 'Group to check triggers filtering', 'host' => 'Host for triggers filtering']
+						'Hosts' => [
+							[
+								'values' => ['Host for trigger tags filtering'],
+								'context' => 'Zabbix servers'
+							],
+							[
+								'values' => ['Host for triggers filtering'],
+								'context' => 'Group to check triggers filtering'
+							]
+						]
 					],
 					'result' => [
 						['Host for triggers filtering' => 'Dependent trigger ONE'],
@@ -530,26 +542,12 @@ class testPageTriggers extends CLegacyWebTest {
 		// Trigger create button enabled and breadcrumbs exist.
 		$this->assertTrue($this->query('button:Create trigger')->one()->isEnabled());
 		$this->assertFalse($this->query('class:filter-breadcrumb')->all()->isEmpty());
-		// Clear hosts and host groups in filter fields.
-		$form->getField('Hosts')->asMultiselect()->clear();
-		$form->getField('Host groups')->asMultiselect()->clear();
-
-		$form->fill($data['filter_options']);
-
-		if (array_key_exists('hosts', $data)) {
-			foreach ($data['hosts'] as $host) {
-				$overlay = $form->getField('Hosts')->asMultiselect()->edit();
-				$overlay_form = $this->query('xpath://div[@id="overlay_dialogue"]//form')->waitUntilVisible()->asForm()->one();
-				$group = $overlay_form->query('name:groupid')->asDropdown()->one();
-				if ($group->getText() != $host['group']) {
-					$group->fill($host['group']);
-					$overlay_form->waitUntilReloaded();
-				}
-				$overlay->query('link:'.$host['host'])->one()->click();
-				$overlay->waitUntilNotPresent();
-			}
+		// Clear hosts in filter fields.
+		if (!array_key_exists('Hosts', $data['filter_options'])) {
+			$form->getField('Hosts')->asMultiselect()->clear();
 		}
 
+		$form->fill($data['filter_options']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
