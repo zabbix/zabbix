@@ -1163,6 +1163,12 @@ static int	prometheus_parse_hint(zbx_prometheus_filter_t *filter, const char *da
 	loc->l = pos;
 	pos = skip_spaces(data, pos + 1);
 
+	if ('\0' == data[pos])
+	{
+		loc->r = pos  - 1;
+		return SUCCEED;
+	}
+
 	if (0 == strncmp(data + pos, "HELP", 4))
 	{
 		pos = skip_spaces(data, pos + 4);
