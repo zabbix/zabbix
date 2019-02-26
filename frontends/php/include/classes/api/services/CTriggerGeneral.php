@@ -195,7 +195,7 @@ abstract class CTriggerGeneral extends CApiService {
 				'filter' => ['triggerid' => $db_trigger['triggerid']]
 			]);
 
-			$this->updateReal([$trigger], [$db_trigger]);
+			$this->updateReal([$trigger], [$db_trigger], true);
 		}
 		else {
 			$_db_triggers = $this->get([
@@ -979,7 +979,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function updateReal(array $triggers, array $db_triggers) {
+	protected function updateReal(array $triggers, array $db_triggers, $inherited = false) {
 		if (!$triggers) {
 			return;
 		}
@@ -1006,7 +1006,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$new_tags = [];
 		$del_triggertagids = [];
 		$save_triggers = $triggers;
-		$this->implode_expressions($triggers, $db_triggers, $triggers_functions);
+		$this->implode_expressions($triggers, $db_triggers, $triggers_functions, $inherited);
 
 		if ($class === 'CTrigger') {
 			// The list of the triggers with changed priority.
