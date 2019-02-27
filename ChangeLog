@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+A......... [ZBX-15488] fixed permission check for inherited triggers (miks)
 ..F....... [ZBX-15646] fixed web-server 'Request-URI Too Long' error in trigger description dialog (miks)
 
 --------------------------------------------------------------------------------
