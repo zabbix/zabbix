@@ -603,14 +603,14 @@ void	zbx_get_serveractive_hosts(char *active_hosts, add_serveractive_host_f cb)
 
 		if (SUCCEED != parse_serveractive_element(l, &host, &port, (unsigned short)ZBX_DEFAULT_SERVER_PORT))
 		{
-			zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid", l);
+			zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" is invalid", l);
 			exit(EXIT_FAILURE);
 		}
 
 		if (SUCCEED != cb(host, port))
 		{
-			zbx_error("error parsing a \"ServerActive\" option: address \"%s\" specified more than once",
-					l);
+			zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than"
+					" once", l);
 			zbx_free(host);
 			exit(EXIT_FAILURE);
 		}
