@@ -233,7 +233,7 @@ typedef struct
 	/* the service data object that is swapped with a new one during service update */
 	zbx_vmware_data_t		*data;
 
-	/* lastlogsize when vmware.eventlog[] item was polled last time and skip all flag*/
+	/* lastlogsize when vmware.eventlog[] item was polled last time and skip old flag*/
 	zbx_vmware_eventlog_state_t	eventlog;
 }
 zbx_vmware_service_t;
