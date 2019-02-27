@@ -1,6 +1,7 @@
 Changes for 4.2.0beta2
 
 New features:
+.......PS. [ZBXNEXT-5037] added 'skip' parameter for vmware.eventlog key (MVekslers)
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
@@ -158,6 +159,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.6rc1
 
 New features:
+.......PS. [ZBXNEXT-5037] added 'skip' parameter for vmware.eventlog key (MVekslers)
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
