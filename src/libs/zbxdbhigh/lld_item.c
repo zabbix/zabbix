@@ -85,17 +85,6 @@ typedef struct
 }
 zbx_lld_item_prototype_t;
 
-#define	ZBX_DEPENDENT_ITEM_MAX_COUNT	999
-#define	ZBX_DEPENDENT_ITEM_MAX_LEVELS	3
-
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		master_itemid;
-	unsigned char		item_flags;
-}
-zbx_item_dependence_t;
-
 typedef struct
 {
 	zbx_uint64_t		itemid;
