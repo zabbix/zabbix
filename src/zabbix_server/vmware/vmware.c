@@ -3500,14 +3500,13 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 
 	if (NULL == (value = zbx_xml_read_doc_value(doc, ZBX_XPATH_PROP_NAME("latestEvent")ZBX_XPATH_LN("key"))))
 	{
-		*error = zbx_strdup(*error, "Cannot find last event key.");
+		*error = zbx_strdup(*error, "Cannot find last event key");
 		goto out;
 	}
 
-
 	if (SUCCEED != is_uint64(value, &key))
 	{
-		*error = zbx_dsprintf(*error, "Cannot convert eventlog key from %s.", value);
+		*error = zbx_dsprintf(*error, "Cannot convert eventlog key from %s", value);
 		goto out;
 	}
 
@@ -3515,7 +3514,7 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 
 	if (SUCCEED != vmware_service_put_event_data(events, key, doc, "val"))
 	{
-		*error = zbx_dsprintf(*error, "Cannot retrieve last eventlog data for key "ZBX_FS_UI64".", key);
+		*error = zbx_dsprintf(*error, "Cannot retrieve last eventlog data for key "ZBX_FS_UI64, key);
 		goto out;
 	}
 
