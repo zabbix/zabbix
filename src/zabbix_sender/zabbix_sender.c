@@ -1025,11 +1025,10 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #if defined(_WINDOWS)
-	WSADATA		sockInfo;
-
-	if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
+	if (SUCCEED != zbx_socket_start(&error))
 	{
-		zbx_error("Cannot initialize Winsock DLL: %s", strerror_from_system(ret));
+		zbx_error(error);
+		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 #endif

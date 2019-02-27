@@ -293,6 +293,9 @@ int	main(int argc, char **argv)
 	int		i, ret = SUCCEED;
 	char		*host = NULL, *key = NULL, *source_ip = NULL, ch;
 	unsigned short	opt_count[256] = {0}, port = ZBX_DEFAULT_AGENT_PORT;
+#if defined(_WINDOWS)
+	char		*error = NULL;
+#endif
 
 #if !defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
@@ -384,11 +387,10 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(_WINDOWS)
-	WSADATA		sockInfo;
-
-	if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
+	if (SUCCEED != zbx_socket_start(&error))
 	{
-		zbx_error("Cannot initialize Winsock DLL: %s", strerror_from_system(ret));
+		zbx_error(error);
+		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 #endif

@@ -1179,12 +1179,11 @@ int	main(int argc, char **argv)
 	import_symbols();
 
 #ifdef _WINDOWS
-	WSADATA		sockInfo;
-
 	if (ZBX_TASK_SHOW_USAGE != t.task && ZBX_TASK_SHOW_VERSION != t.task && ZBX_TASK_SHOW_HELP != t.task &&
-			0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
+			SUCCEED != zbx_socket_start(&error))
 	{
-		zbx_error("Cannot initialize Winsock DLL: %s", strerror_from_system(ret));
+		zbx_error(error);
+		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 #endif

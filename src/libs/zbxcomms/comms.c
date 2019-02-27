@@ -191,6 +191,35 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_socket_start                                                 *
+ *                                                                            *
+ * Purpose: Initialize Windows Sockets APIs                                   *
+ *                                                                            *
+ * Parameters: error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL - an error occurred                          *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+#ifdef _WINDOWS
+int	zbx_socket_start(char **error)
+{
+	WSADATA	sockInfo;
+	int	ret;
+
+	if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
+	{
+		*error = zbx_dsprintf(*error, "WSAStartup() failed: %s", strerror_from_system(ret));
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_socket_clean                                                 *
  *                                                                            *
  * Purpose: initialize socket                                                 *
