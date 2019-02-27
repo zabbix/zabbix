@@ -124,6 +124,8 @@ int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 		goto out;
 	}
 
+	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() command:'%s' len:" ZBX_FS_SIZE_T " cmd_result:'%.20s'",
 			__function_name, command, (zbx_fs_size_t)strlen(cmd_result), cmd_result);
 
