@@ -179,6 +179,13 @@ class CImage extends CApiService {
 			// validate image (size and format)
 			$this->checkImage($image['image']);
 
+			list(,, $img_type) = getimagesizefromstring($image['image']);
+
+			if (!in_array($img_type, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+				// Converting to PNG all images except PNG, JPEG and GIF
+				$image['image'] = $this->convertToPng($image['image']);
+			}
+
 			$imageid = get_dbid('images', 'imageid');
 			$values = [
 				'imageid' => $imageid,
@@ -277,6 +284,13 @@ class CImage extends CApiService {
 
 				// validate image
 				$this->checkImage($image['image']);
+
+				list(,, $img_type) = getimagesizefromstring($image['image']);
+
+				if (!in_array($img_type, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+					// Converting to PNG all images except PNG, JPEG and GIF
+					$image['image'] = $this->convertToPng($image['image']);
+				}
 
 				switch ($DB['TYPE']) {
 					case ZBX_DB_POSTGRESQL:
@@ -578,5 +592,23 @@ class CImage extends CApiService {
 		}
 
 		return $sqlParts;
+	}
+
+	/**
+	 * Convert image body to PNG.
+	 *
+	 * @param string $image  Base64 encoded body of image.
+	 * @return string
+	 */
+	protected function convertToPng($image) {
+		$image = imagecreatefromstring($image);
+
+		ob_start();
+		imagealphablending($image, false);
+		imagesavealpha($image, true);
+		imagepng($image);
+		imagedestroy($image);
+
+		return ob_get_clean();
 	}
 }

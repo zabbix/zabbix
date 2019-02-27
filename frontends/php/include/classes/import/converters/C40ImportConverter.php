@@ -47,6 +47,8 @@ class C40ImportConverter extends CConverter {
 	 */
 	protected function convertHosts(array $hosts) {
 		foreach ($hosts as &$host) {
+			$host['tags'] = [];
+
 			if (array_key_exists('items', $host)) {
 				$host['items'] = $this->convertItems($host['items']);
 			}

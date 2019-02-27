@@ -36,7 +36,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * 5.6 would allow this to be defined constant.
 	 */
 	public static $supported_preprocessing_types = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
-		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE
+		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE,
+		ZBX_PREPROC_SCRIPT
 	];
 
 	public function __construct() {

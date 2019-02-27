@@ -74,7 +74,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					]
 				],
 				'templates' => [],
-				'macros' =>	[],
+				'macros' => [],
 				'interfaces' => [
 					[
 						'type' => '1',
@@ -94,7 +94,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'ipmi_username' => '',
 				'ipmi_password' => '',
 				'name' => 'empty-host',
-				'inventory_mode' => -1
+				'inventory_mode' => -1,
+				'tags' => []
 			],
 			[
 				'inventory' => [
@@ -184,15 +185,15 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					]
 				],
 				'macros' => [
-						[
-							'macro' => '{$MACRO}',
-							'value' => '2'
-						],
-						[
-							'macro' => '{$SNMP_COMMUNITY}',
-							'value' => '1'
-						]
+					[
+						'macro' => '{$MACRO}',
+						'value' => '2'
 					],
+					[
+						'macro' => '{$SNMP_COMMUNITY}',
+						'value' => '1'
+					]
+				],
 				'interfaces' => [
 					[
 						'type' => '1',
@@ -240,7 +241,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'ipmi_username' => 'impi username',
 				'ipmi_password' => 'impi password',
 				'name' => 'export-host',
-				'inventory_mode' => '0'
+				'inventory_mode' => '0',
+				'tags' => []
 			]
 		]);
 	}
@@ -259,7 +261,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'templates' => [],
 				'host' => 'empty-template',
 				'name' => 'empty-template',
-				'description' => ''
+				'description' => '',
+				'tags' => []
 			],
 			[
 				'groups' =>	[
@@ -287,7 +290,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				],
 				'host' => 'export-template',
 				'name' => 'export-template',
-				'description' => ''
+				'description' => '',
+				'tags' => []
 			]
 		]);
 	}
@@ -2026,7 +2030,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'name' => 'Linux servers'
 						]
 					],
-					'templates' => []
+					'templates' => [],
+					'tags' => []
 				]
 			],
 			$adapter->getHosts()
@@ -2051,7 +2056,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'name' => 'Templates'
 						]
 					],
-					'templates' => []
+					'templates' => [],
+					'tags' => []
 				],
 				[
 					'macros' => [],
@@ -2061,7 +2067,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'name' => 'Templates'
 						]
 					],
-					'templates' => []
+					'templates' => [],
+					'tags' => []
 				]
 			],
 			$adapter->getTemplates()

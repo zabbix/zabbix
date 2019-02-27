@@ -426,8 +426,8 @@ class CEvent extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = self::getTagsWhereCondition($options['tags'], $options['evaltype'], 'event_tag',
-				'et', 'e', 'eventid'
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'e',
+				'event_tag', 'eventid'
 			);
 		}
 
@@ -491,73 +491,6 @@ class CEvent extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Returns SQL condition for tag filters.
-	 *
-	 * @param array  $tags
-	 * @param string $tags[]['tag']
-	 * @param int    $tags[]['operator']
-	 * @param string $tags[]['value']
-	 * @param int    $evaltype
-	 * @param string $table
-	 * @param string $alias
-	 * @param string $parent_alias
-	 * @param string $field
-	 *
-	 * @return array
-	 */
-	public static function getTagsWhereCondition(array $tags, $evaltype, $table, $alias, $parent_alias, $field) {
-		$values_by_tag = [];
-
-		foreach ($tags as $tag) {
-			$operator = array_key_exists('operator', $tag) ? $tag['operator'] : TAG_OPERATOR_LIKE;
-			$value = array_key_exists('value', $tag) ? $tag['value'] : '';
-
-			if (!array_key_exists($tag['tag'], $values_by_tag) || is_array($values_by_tag[$tag['tag']])) {
-				if ($operator == TAG_OPERATOR_EQUAL) {
-					$values_by_tag[$tag['tag']][] = $alias.'.value='.zbx_dbstr($value);
-				}
-				elseif ($value !== '') {
-					$value = str_replace('!', '!!', $value);
-					$value = str_replace('%', '!%', $value);
-					$value = str_replace('_', '!_', $value);
-					$value = '%'.mb_strtoupper($value).'%';
-
-					$values_by_tag[$tag['tag']][] = 'UPPER('.$alias.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
-				}
-				// ($value === '') - all other conditions can be omitted
-				else {
-					$values_by_tag[$tag['tag']] = false;
-				}
-			}
-		}
-
-		$sql_where = [];
-
-		foreach ($values_by_tag as $tag => $values) {
-			if (!is_array($values) || count($values) == 0) {
-				$values = '';
-			}
-			elseif (count($values) == 1) {
-				$values = ' AND '.$values[0];
-			}
-			else {
-				$values = $values ? ' AND ('.implode(' OR ', $values).')' : '';
-			}
-
-			$sql_where[] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM '.$table.' '.$alias.
-				' WHERE '.$parent_alias.'.'.$field.'='.$alias.'.'.$field.
-					' AND '.$alias.'.tag='.zbx_dbstr($tag).$values.
-			')';
-		}
-
-		$sql_where = implode(($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ', $sql_where);
-
-		return (count($values_by_tag) > 1 && $evaltype == TAG_EVAL_TYPE_OR) ? '('.$sql_where.')' : $sql_where;
 	}
 
 	/**
@@ -1242,7 +1175,7 @@ class CEvent extends CApiService {
 	 * @param array $sqlParts
 	 * @param int   $value
 	 *
-	 * @return string
+	 * @return array
 	 */
 	protected static function addTagFilterSqlParts(array $usrgrpids, array $sqlParts, $value) {
 		$tag_filters = self::getTagFilters($usrgrpids);

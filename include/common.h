@@ -313,15 +313,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define ITEM_SNMPV3_PRIVPROTOCOL_DES		0
 #define ITEM_SNMPV3_PRIVPROTOCOL_AES		1
 
-/* item multiplier types */
-#define ITEM_MULTIPLIER_DO_NOT_USE		0
-#define ITEM_MULTIPLIER_USE			1
-
-/* item delta types */
-#define ITEM_STORE_AS_IS			0
-#define ITEM_STORE_SPEED_PER_SECOND		1
-#define ITEM_STORE_SIMPLE_CHANGE		2
-
 /* condition evaluation types */
 #define CONDITION_EVAL_TYPE_AND_OR		0
 #define CONDITION_EVAL_TYPE_AND			1
@@ -1487,6 +1478,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_ERROR_FIELD_REGEX		18
 #define ZBX_PREPROC_THROTTLE_VALUE		19
 #define ZBX_PREPROC_THROTTLE_TIMED_VALUE	20
+#define ZBX_PREPROC_SCRIPT			21
 
 #define ZBX_PREPROC_FAIL_DEFAULT	0
 #define ZBX_PREPROC_FAIL_DISCARD_VALUE	1
@@ -1509,11 +1501,18 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
 
+typedef void * zbx_variant_data_bin_t;
+
 typedef union
 {
-	zbx_uint64_t	ui64;
-	double		dbl;
-	char		*str;
+	zbx_uint64_t		ui64;
+	double			dbl;
+
+	/* null terminated string */
+	char			*str;
+
+	/* length prefixed (4 bytes) binary data */
+	zbx_variant_data_bin_t	*bin;
 }
 zbx_variant_data_t;
 
@@ -1528,12 +1527,14 @@ zbx_variant_t;
 #define ZBX_VARIANT_STR		1
 #define ZBX_VARIANT_DBL		2
 #define ZBX_VARIANT_UI64	3
+#define ZBX_VARIANT_BIN		4
 
 void	zbx_variant_clear(zbx_variant_t *value);
 void	zbx_variant_set_none(zbx_variant_t *value);
 void	zbx_variant_set_str(zbx_variant_t *value, char *text);
 void	zbx_variant_set_dbl(zbx_variant_t *value, double dbl);
 void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t ui64);
+void	zbx_variant_set_bin(zbx_variant_t *value, zbx_variant_data_bin_t *value_bin);
 void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source);
 int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);
 
@@ -1543,6 +1544,10 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 
 int	zbx_validate_value_dbl(double value);
 int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2);
+
+zbx_variant_data_bin_t	*zbx_variant_data_bin_copy(const zbx_variant_data_bin_t *bin);
+zbx_variant_data_bin_t	*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size);
+zbx_uint32_t	zbx_variant_data_bin_get(const zbx_variant_data_bin_t *bin, void **data);
 
 void	zbx_update_env(double time_now);
 

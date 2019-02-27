@@ -1,14 +1,4 @@
 * text=auto !eol
-bin/win32/dev/zabbix_sender.dll -text svneol=unset#application/x-dosexec
-bin/win32/dev/zabbix_sender.lib -text svneol=unset#application/x-archive
-bin/win32/zabbix_agentd.exe -text svneol=unset#application/x-dosexec
-bin/win32/zabbix_get.exe -text svneol=unset#application/x-dosexec
-bin/win32/zabbix_sender.exe -text svneol=unset#application/x-dosexec
-bin/win64/dev/zabbix_sender.dll -text svneol=unset#application/x-dosexec
-bin/win64/dev/zabbix_sender.lib -text svneol=unset#application/x-archive
-bin/win64/zabbix_agentd.exe -text svneol=unset#application/x-dosexec
-bin/win64/zabbix_get.exe -text svneol=unset#application/x-dosexec
-bin/win64/zabbix_sender.exe -text svneol=unset#application/x-dosexec
 /build-backend.xml -text
 database/elasticsearch/elasticsearch.map -text
 frontends/php/audio/alarm_average.wav -text svneol=unset#audio/x-wav

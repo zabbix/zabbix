@@ -23,11 +23,7 @@
 $overviewFormList = new CFormList();
 
 $host_name = (new CLinkAction($data['host']['host']))
-	->setMenuPopup(CMenuPopupHelper::getHost(
-		$data['host'],
-		$data['hostScripts'][$data['host']['hostid']],
-		false
-	));
+	->setMenuPopup(CMenuPopupHelper::getHost($data['host']['hostid'], false));
 
 if ($data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
 		&& array_key_exists($data['host']['maintenanceid'], $data['maintenances'])) {
@@ -148,8 +144,17 @@ if ($data['rwHost']) {
 	$applicationsLink = new CLink(_('Applications'),
 		'applications.php?hostid='.$data['host']['hostid'].url_param('groupid')
 	);
-	$itemsLink = new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$data['host']['hostid'].url_param('groupid'));
-	$triggersLink = new CLink(_('Triggers'), 'triggers.php?hostid='.$data['host']['hostid'].url_param('groupid'));
+
+	$itemsLink = new CLink(_('Items'),
+		(new CUrl('items.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$data['host']['hostid']])
+	);
+	$triggersLink = new CLink(_('Triggers'),
+		(new CUrl('triggers.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$data['host']['hostid']])
+	);
 	$graphsLink = new CLink(_('Graphs'), 'graphs.php?hostid='.$data['host']['hostid'].url_param('groupid'));
 	$discoveryLink = new CLink(_('Discovery'),
 		'host_discovery.php?hostid='.$data['host']['hostid'].url_param('groupid')

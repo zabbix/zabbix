@@ -19,10 +19,10 @@
 **/
 
 
-class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
+class CApiTagHelperTest extends PHPUnit_Framework_TestCase {
 
 	public static function provider() {
-		$sql_args = [2 => 'event_tag', 'et', 'e', 'eventid'];
+		$sql_args = [2 => 'e', 'event_tag', 'eventid'];
 
 		return [
 			[
@@ -32,7 +32,7 @@ class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
 					],
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
-				'EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag\' AND UPPER(et.value) LIKE \'%VALUE%\' ESCAPE \'!\')'
+				'EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag\' AND UPPER(event_tag.value) LIKE \'%VALUE%\' ESCAPE \'!\')'
 			],
 			[
 				[
@@ -41,7 +41,7 @@ class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
 					],
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
-				'EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag\')'
+				'EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag\')'
 			],
 			[
 				[
@@ -57,9 +57,9 @@ class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
 					],
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
-				'EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag1\' AND (UPPER(et.value) LIKE \'%VALUE1%\' ESCAPE \'!\' OR UPPER(et.value) LIKE \'%VALUE2%\' ESCAPE \'!\' OR et.value=\'Value3\'))'.
-				' AND EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag2\' AND (et.value=\'Value4\' OR UPPER(et.value) LIKE \'%VALUE5%\' ESCAPE \'!\'))'.
-				' AND EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag3\')'
+				'EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag1\' AND (UPPER(event_tag.value) LIKE \'%VALUE1%\' ESCAPE \'!\' OR UPPER(event_tag.value) LIKE \'%VALUE2%\' ESCAPE \'!\' OR event_tag.value=\'Value3\'))'.
+				' AND EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag2\' AND (event_tag.value=\'Value4\' OR UPPER(event_tag.value) LIKE \'%VALUE5%\' ESCAPE \'!\'))'.
+				' AND EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag3\')'
 			],
 			[
 				[
@@ -75,9 +75,9 @@ class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
 					],
 					TAG_EVAL_TYPE_OR
 				] + $sql_args,
-				'(EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag1\' AND (UPPER(et.value) LIKE \'%VALUE1%\' ESCAPE \'!\' OR UPPER(et.value) LIKE \'%VALUE2%\' ESCAPE \'!\' OR et.value=\'Value3\'))'.
-				' OR EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag2\' AND (et.value=\'Value4\' OR UPPER(et.value) LIKE \'%VALUE5%\' ESCAPE \'!\'))'.
-				' OR EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag3\'))'
+				'(EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag1\' AND (UPPER(event_tag.value) LIKE \'%VALUE1%\' ESCAPE \'!\' OR UPPER(event_tag.value) LIKE \'%VALUE2%\' ESCAPE \'!\' OR event_tag.value=\'Value3\'))'.
+				' OR EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag2\' AND (event_tag.value=\'Value4\' OR UPPER(event_tag.value) LIKE \'%VALUE5%\' ESCAPE \'!\'))'.
+				' OR EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag3\'))'
 			],
 			[
 				[
@@ -86,7 +86,7 @@ class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
 					],
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
-				'EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag\' AND et.value=\'\')'
+				'EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag\' AND event_tag.value=\'\')'
 			],
 			[
 				[
@@ -95,7 +95,7 @@ class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
 					],
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
-				'EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag\' AND et.value=\'\')'
+				'EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag\' AND event_tag.value=\'\')'
 			],
 			[
 				[
@@ -104,7 +104,7 @@ class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
 					],
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
-				'EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag\' AND et.value=\'Value\')'
+				'EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag\' AND event_tag.value=\'Value\')'
 			],
 			[
 				[
@@ -114,7 +114,7 @@ class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
 					],
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
-				'EXISTS (SELECT NULL FROM event_tag et WHERE e.eventid=et.eventid AND et.tag=\'Tag\')'
+				'EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag\')'
 			],
 		];
 	}
@@ -128,6 +128,6 @@ class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
 		// zbx_dbstr() for ORACLE does not use DB specific functions
 		$DB['TYPE'] = ZBX_DB_ORACLE;
 
-		$this->assertSame($expected, call_user_func_array(['CEvent', 'getTagsWhereCondition'], $params));
+		$this->assertSame($expected, call_user_func_array(['CApiTagHelper', 'addWhereCondition'], $params));
 	}
 }

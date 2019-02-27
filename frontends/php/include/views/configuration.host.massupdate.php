@@ -29,7 +29,7 @@ $hostView = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'host.massupdate')
 	->addVar('tls_accept', $data['tls_accept'])
-	->setAttribute('id', 'hostForm');
+	->setId('hostForm');
 foreach ($data['hosts'] as $hostid) {
 	$hostView->addVar('hosts['.$hostid.']', $hostid);
 }
@@ -37,129 +37,50 @@ foreach ($data['hosts'] as $hostid) {
 // create form list
 $hostFormList = new CFormList('hostFormList');
 
-// replace host groups
-$hostgroups_to_replace = isset($_REQUEST['groups'])
+// update host groups
+$groups_to_update = $data['groups']
 	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
-		'groupids' => $_REQUEST['groups'],
+		'groupids' => $data['groups'],
 		'editable' => true
 	]), ['groupid' => 'id'])
 	: [];
 
-$replaceGroups = (new CDiv(
-	(new CMultiSelect([
-		'name' => 'groups[]',
-		'object_name' => 'hostGroup',
-		'data' => $hostgroups_to_replace,
-		'popup' => [
-			'parameters' => [
-				'srctbl' => 'host_groups',
-				'srcfld1' => 'groupid',
-				'dstfrm' => $hostView->getName(),
-				'dstfld1' => 'groups_',
-				'editable' => true
-			]
-		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-))->setId('replaceGroups');
-
 $hostFormList->addRow(
-	(new CVisibilityBox('visible[groups]', 'replaceGroups', _('Original')))
-		->setLabel(_('Replace host groups'))
-		->setChecked(isset($data['visible']['groups']))
+	(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
+		->setLabel(_('Host groups'))
+		->setChecked(array_key_exists('groups', $data['visible']))
 		->setAttribute('autofocus', 'autofocus'),
-	$replaceGroups
-);
-
-// add new or existing host groups
-$hostgroups_to_add = [];
-if (isset($_REQUEST['new_groups'])) {
-	$groupids = [];
-
-	foreach ($_REQUEST['new_groups'] as $newHostGroup) {
-		if (is_array($newHostGroup) && isset($newHostGroup['new'])) {
-			$hostgroups_to_add[] = [
-				'id' => $newHostGroup['new'],
-				'name' => $newHostGroup['new'].' ('._x('new', 'new element in multiselect').')',
-				'isNew' => true
-			];
-		}
-		else {
-			$groupids[] = $newHostGroup;
-		}
-	}
-
-	$hostgroups_to_add = array_merge($hostgroups_to_add, $groupids
-		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $groupids
-		]), ['groupid' => 'id'])
-		: []);
-}
-
-$hostFormList->addRow(
-	(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
-		->setLabel((CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
-			? _('Add new or existing host groups')
-			: _('New host group')
-		)
-		->setChecked(isset($data['visible']['new_groups'])),
-	(new CDiv(
+	(new CDiv([
+		(new CRadioButtonList('mass_update_groups', ZBX_ACTION_ADD))
+			->addValue(_('Add'), ZBX_ACTION_ADD)
+			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+			->addValue(_('Remove'), ZBX_ACTION_REMOVE)
+			->setModern(true)
+			->addStyle('margin-bottom: 5px;'),
 		(new CMultiSelect([
-			'name' => 'new_groups[]',
+			'name' => 'groups[]',
 			'object_name' => 'hostGroup',
 			'add_new' => (CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
-			'data' => $hostgroups_to_add,
+			'data' => $groups_to_update,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $hostView->getName(),
-					'dstfld1' => 'new_groups_',
+					'dstfld1' => 'groups_',
 					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	))->setId('newGroups')
-);
-
-// Get list of host groups to remove if unsuccessful submit.
-$host_groups_to_remove = getRequest('remove_groups')
-	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => getRequest('remove_groups'),
-		'editable' => true
-	]), ['groupid' => 'id'])
-	: [];
-
-// Remove host groups control.
-$hostFormList->addRow(
-	(new CVisibilityBox('visible[remove_groups]', 'remove_groups', _('Original')))
-		->setLabel(_('Remove host groups'))
-		->setChecked(array_key_exists('remove_groups', $data['visible'])),
-	(new CDiv(
-		(new CMultiSelect([
-			'name' => 'remove_groups[]',
-			'object_name' => 'hostGroup',
-			'data' => $host_groups_to_remove,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $hostView->getName(),
-					'dstfld1' => 'remove_groups_',
-					'editable' => true
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	))->setId('remove_groups')
+	]))->setId('groups-div')
 );
 
 // append description to form list
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[description]', 'description', _('Original')))
 		->setLabel(_('Description'))
-		->setChecked(isset($data['visible']['description'])),
+		->setChecked(array_key_exists('description', $data['visible'])),
 	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
@@ -172,7 +93,7 @@ foreach ($data['proxies'] as $proxie) {
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[proxy_hostid]', 'proxy_hostid', _('Original')))
 		->setLabel(_('Monitored by proxy'))
-		->setChecked(isset($data['visible']['proxy_hostid'])),
+		->setChecked(array_key_exists('proxy_hostid', $data['visible'])),
 	$proxyComboBox
 );
 
@@ -180,7 +101,7 @@ $hostFormList->addRow(
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[status]', 'status', _('Original')))
 		->setLabel(_('Status'))
-		->setChecked(isset($data['visible']['status'])),
+		->setChecked(array_key_exists('status', $data['visible'])),
 	new CComboBox('status', $data['status'], null, [
 		HOST_STATUS_MONITORED => _('Enabled'),
 		HOST_STATUS_NOT_MONITORED => _('Disabled')
@@ -189,13 +110,13 @@ $hostFormList->addRow(
 
 $templatesFormList = new CFormList('templatesFormList');
 
-// append templates table to from list
+// append templates table to form list
 $newTemplateTable = (new CTable())
 	->addRow([
 		(new CMultiSelect([
 			'name' => 'templates[]',
 			'object_name' => 'templates',
-			'data' => $data['linkedTemplates'],
+			'data' => $data['templates'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'templates',
@@ -223,7 +144,7 @@ $newTemplateTable = (new CTable())
 $templatesFormList->addRow(
 	(new CVisibilityBox('visible[templates]', 'templateDiv', _('Original')))
 		->setLabel(_('Link templates'))
-		->setChecked(isset($data['visible']['templates'])),
+		->setChecked(array_key_exists('templates', $data['visible'])),
 	(new CDiv($newTemplateTable))
 		->setId('templateDiv')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -235,29 +156,29 @@ $ipmiFormList = new CFormList('ipmiFormList');
 // append ipmi to form list
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_authtype]', 'ipmi_authtype', _('Original')))
-		->setLabel(_('IPMI authentication algorithm'))
-		->setChecked(isset($data['visible']['ipmi_authtype'])),
+		->setLabel(_('Authentication algorithm'))
+		->setChecked(array_key_exists('ipmi_authtype', $data['visible'])),
 	new CComboBox('ipmi_authtype', $data['ipmi_authtype'], null, ipmiAuthTypes())
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_privilege]', 'ipmi_privilege', _('Original')))
-		->setLabel(_('IPMI privilege level'))
-		->setChecked(isset($data['visible']['ipmi_privilege'])),
+		->setLabel(_('Privilege level'))
+		->setChecked(array_key_exists('ipmi_privilege', $data['visible'])),
 	new CComboBox('ipmi_privilege', $data['ipmi_privilege'], null, ipmiPrivileges())
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_username]', 'ipmi_username', _('Original')))
-		->setLabel(_('IPMI username'))
-		->setChecked(isset($data['visible']['ipmi_username'])),
+		->setLabel(_('Username'))
+		->setChecked(array_key_exists('ipmi_username', $data['visible'])),
 	(new CTextBox('ipmi_username', $data['ipmi_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_password]', 'ipmi_password', _('Original')))
-		->setLabel(_('IPMI password'))
-		->setChecked(isset($data['visible']['ipmi_password'])),
+		->setLabel(_('Password'))
+		->setChecked(array_key_exists('ipmi_password', $data['visible'])),
 	(new CTextBox('ipmi_password', $data['ipmi_password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
@@ -267,7 +188,7 @@ $inventoryFormList = new CFormList('inventoryFormList');
 $inventoryFormList->addRow(
 	(new CVisibilityBox('visible[inventory_mode]', 'inventory_mode_div', _('Original')))
 		->setLabel(_('Inventory mode'))
-		->setChecked(isset($data['visible']['inventory_mode'])),
+		->setChecked(array_key_exists('inventory_mode', $data['visible'])),
 	(new CDiv(
 		(new CRadioButtonList('inventory_mode', (int) $data['inventory_mode']))
 			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
@@ -277,9 +198,29 @@ $inventoryFormList->addRow(
 	))->setId('inventory_mode_div')
 );
 
+$tags_form_list = new CFormList('tagsFormList');
+
+// append tags table to form list
+$tags_form_list->addRow(
+	(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))
+		->setLabel(_('Tags'))
+		->setChecked(array_key_exists('tags', $data['visible'])),
+	(new CDiv([
+		(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
+			->addValue(_('Add'), ZBX_ACTION_ADD)
+			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+			->addValue(_('Remove'), ZBX_ACTION_REMOVE)
+			->setModern(true)
+			->addStyle('margin-bottom: 10px;'),
+		renderTagTable($data['tags'])
+			->setHeader([_('Name'), _('Value'), _('Action')])
+			->setId('tags-table')
+	]))->setId('tags-div')
+);
+
 $hostInventoryTable = DB::getSchema('host_inventory');
 foreach ($data['inventories'] as $field => $fieldInfo) {
-	if (!isset($data['host_inventory'][$field])) {
+	if (!array_key_exists($field, $data['host_inventory'])) {
 		$data['host_inventory'][$field] = '';
 	}
 
@@ -288,27 +229,15 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}
 	else {
-		$field_length = $hostInventoryTable['fields'][$field]['length'];
-
-		if ($field_length < 39) {
-			$width = ZBX_TEXTAREA_SMALL_WIDTH;
-		}
-		elseif ($field_length < 64) {
-			$width = ZBX_TEXTAREA_STANDARD_WIDTH;
-		}
-		else {
-			$width = ZBX_TEXTAREA_BIG_WIDTH;
-		}
-
 		$fieldInput = (new CTextBox('host_inventory['.$field.']', $data['host_inventory'][$field]))
-			->setWidth($width)
-			->setAttribute('maxlength', $field_length);
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('maxlength', $hostInventoryTable['fields'][$field]['length']);
 	}
 
 	$inventoryFormList->addRow(
 		(new CVisibilityBox('visible['.$field.']', 'host_inventory['.$field.']', _('Original')))
 			->setLabel($fieldInfo['title'])
-			->setChecked(isset($data['visible'][$field])),
+			->setChecked(array_key_exists($field, $data['visible'])),
 		$fieldInput, null, 'formrow-inventory'
 	);
 }
@@ -331,11 +260,17 @@ $encryption_table = (new CTable())
 			->addItem((new CCheckBox('tls_in_psk'))->setLabel(_('PSK')))
 			->addItem((new CCheckBox('tls_in_cert'))->setLabel(_('Certificate')))
 	])
-	->addRow([_('PSK identity'),
-		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	->addRow([
+		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
+		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAriaRequired()
 	])
-	->addRow([_('PSK'),
-		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	->addRow([
+		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
+		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAriaRequired()
 	])
 	->addRow([_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
@@ -347,7 +282,7 @@ $encryption_table = (new CTable())
 $encryption_form_list->addRow(
 	(new CVisibilityBox('visible[encryption]', 'encryption_div', _('Original')))
 		->setLabel(_('Connections'))
-		->setChecked(isset($data['visible']['encryption'])),
+		->setChecked(array_key_exists('encryption', $data['visible'])),
 	(new CDiv($encryption_table))
 		->setId('encryption_div')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -359,12 +294,14 @@ $hostTab = (new CTabView())
 	->addTab('hostTab', _('Host'), $hostFormList)
 	->addTab('templatesTab', _('Templates'), $templatesFormList)
 	->addTab('ipmiTab', _('IPMI'), $ipmiFormList)
-	->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
+	->addTab('tagsTab', _('Tags'), $tags_form_list)
+	->addTab('inventoryTab', _('Inventory'), $inventoryFormList)
+	->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
+
 // reset the tab when opening the form for the first time
 if (!hasRequest('masssave') && !hasRequest('inventory_mode')) {
 	$hostTab->setSelected(0);
 }
-$hostTab->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
 // append buttons to form
 $hostTab->setFooter(makeFormFooter(

@@ -502,8 +502,16 @@ jQuery(function ($) {
 				});
 
 				if (show_hint) {
+					// Calculate time at mouse position.
+					var time = parseInt(data.timeFrom + ((offsetX - data.dimX) * data.spp));
+
 					html = $('<div></div>')
 							.addClass('svg-graph-hintbox')
+							.append(
+								$('<div></div>')
+									.addClass('header')
+									.html(time2str(time))
+							)
 							.append(html)
 							.append(points_total > data.hintMaxRows
 								? makeHintBoxFooter(data.hintMaxRows, points_total)
@@ -575,6 +583,7 @@ jQuery(function ($) {
 						hintMaxRows: options.hint_max_rows,
 						isHintBoxFrozen: false,
 						spp: options.spp || null,
+						timeFrom: options.time_from,
 						minPeriod: options.min_period,
 						boxing: false
 					};

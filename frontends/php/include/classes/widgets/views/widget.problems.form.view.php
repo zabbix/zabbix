@@ -75,7 +75,7 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::
 // Tags filter list.
 $form_list->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
 $scripts[] = $fields['tags']->getJavascript();
-$jq_templates['tag-row'] = CWidgetHelper::getTagsTemplate($fields['tags']);
+$jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 // Show tags.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_tags']), CWidgetHelper::getRadioButtonList($fields['show_tags']));

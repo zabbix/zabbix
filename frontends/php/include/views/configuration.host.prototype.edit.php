@@ -369,7 +369,7 @@ $inventoryFormList = (new CFormList('inventorylist'))
 			->setModern(true)
 	);
 
-$divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
+$divTabs->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
 
 // Encryption form list.
 $encryption_form_list = (new CFormList('encryption'))
