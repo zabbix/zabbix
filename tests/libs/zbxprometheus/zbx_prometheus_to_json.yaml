@@ -217,7 +217,8 @@ in:
   data: ""
   params: wmi_os_timezone
 out:
-  result: FAIL
+  result: SUCCEED
+  output: '[]'
 ---
 test case: 'Empty params'
 in:
@@ -232,7 +233,8 @@ in:
   data: ""
   params: ""
 out:
-  result: FAIL
+  result: SUCCEED
+  output: '[]'
 ---
 test case: 'Only spaces in metric'
 in:
@@ -276,7 +278,8 @@ in:
   data: "\n\n\n\n"
   params: wmi_os_timezone
 out:
-  result: FAIL
+  result: SUCCEED
+  output: '[]'
 ---
 test case: 'Metric without value'
 in:
@@ -344,7 +347,8 @@ in:
   data: '#'
   params: wmi_os_timezone
 out:
-  result: FAIL
+  result: SUCCEED
+  output: '[]'
 ---
 test case: 'Metric with an empty space only'
 in:
