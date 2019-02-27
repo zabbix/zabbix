@@ -1120,7 +1120,7 @@ static zbx_vmware_event_t	*vmware_event_shared_dup(const zbx_vmware_event_t *src
  * Purpose: make copy of not pooled vmware events                             *
  *                                                                            *
  * Parameters: service - [IN/OUT] the vmware service with old vmware event    *
- *             events  - [IN/OUT] array of copied vmware events               *
+ *             events  - [OUT] array of copied vmware events                  *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_event_backup(zbx_vmware_service_t *service, zbx_vector_ptr_t *events)
@@ -1146,20 +1146,20 @@ static void	vmware_event_backup(zbx_vmware_service_t *service, zbx_vector_ptr_t 
  * Purpose: merge not pooled vmware event objects with new collected vmware   *
  *          event objects and destroy old vector only (not data)              *
  *                                                                            *
- * Parameters: service - [IN/OUT] the vmware service with new vmware event    *
- *             events  - [IN/OUT] array of old vmware event                   *
+ * Parameters: events     - [IN/OUT] array of new vmware event                *
+ *             old_events - [IN/OUT] array of old vmware event                *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_event_merge_destroy(zbx_vmware_service_t *service, zbx_vector_ptr_t *events)
+static void	vmware_event_merge_destroy(zbx_vector_ptr_t *events, zbx_vector_ptr_t *old_events)
 {
 	int	i;
 
-	zbx_vector_ptr_reserve(&service->data->events, events->values_num + service->data->events.values_alloc);
+	zbx_vector_ptr_reserve(events, old_events->values_num + events->values_alloc);
 
-	for (i = 0; i < events->values_num; i++)
-		zbx_vector_ptr_append(&service->data->events, events->values[i]);
+	for (i = 0; i < old_events->values_num; i++)
+		zbx_vector_ptr_append(events, old_events->values[i]);
 
-	zbx_vector_ptr_destroy(events);
+	zbx_vector_ptr_destroy(old_events);
 }
 
 /******************************************************************************
@@ -4292,7 +4292,7 @@ out:
 	service->eventlog.skip_old = skip_old;
 
 	if (0 != events.values_num)
-		vmware_event_merge_destroy(service, &events);
+		vmware_event_merge_destroy(&service->data->events, &events);
 
 	service->lastcheck = time(NULL);
 
