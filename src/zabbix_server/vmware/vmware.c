@@ -1115,34 +1115,51 @@ static zbx_vmware_event_t	*vmware_event_shared_dup(const zbx_vmware_event_t *src
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_event_merge                                               *
+ * Function: vmware_event_backup                                              *
  *                                                                            *
- * Purpose: merge not pooled vmware event objects with new collected vmware   *
- *          event objects                                                     *
+ * Purpose: make copy of not pooled vmware events                             *
  *                                                                            *
- * Parameters: service - [IN] the vmware service                              *
- *             events  - [IN/OUT] array of new vmware event                   *
+ * Parameters: service - [IN/OUT] the vmware service with old vmware event    *
+ *             events  - [IN/OUT] array of copied vmware events               *
  *                                                                            *
  ******************************************************************************/
-void	vmware_event_merge(const zbx_vmware_service_t *service, zbx_vector_ptr_t *events)
+static void	vmware_event_backup(zbx_vmware_service_t *service, zbx_vector_ptr_t *events)
 {
 	int	i;
 
-	if (((const zbx_vmware_event_t *)service->data->events.values[0])->key <= service->eventlog_last_key)
-		return;
+	VMWARE_VECTOR_CREATE(events, ptr);
 
-	for (i = 0; i < service->data->events.values_num; i++)
+	if (0 != service->data->events.values_num &&
+			((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog_last_key)
 	{
-		zbx_vmware_event_t *event = NULL;
-		const zbx_vmware_event_t *shared_event;
+		for (i = 0; i < service->data->events.values_num; i++)
+			zbx_vector_ptr_append(events, service->data->events.values[i]);
 
-		shared_event = (const zbx_vmware_event_t *)service->data->events.values[i];
-		event = (zbx_vmware_event_t *)zbx_malloc(event, sizeof(zbx_vmware_event_t));
-		event->key = shared_event->key;
-		event->message = zbx_strdup(NULL, shared_event->message);
-		event->timestamp = shared_event->timestamp;
-		zbx_vector_ptr_append(events, event);
+		zbx_vector_ptr_clear(&service->data->events);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_event_merge_destroy                                       *
+ *                                                                            *
+ * Purpose: merge not pooled vmware event objects with new collected vmware   *
+ *          event objects and destroy old vector only (not data)              *
+ *                                                                            *
+ * Parameters: service - [IN/OUT] the vmware service with new vmware event    *
+ *             events  - [IN/OUT] array of old vmware event                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_event_merge_destroy(zbx_vmware_service_t *service, zbx_vector_ptr_t *events)
+{
+	int	i;
+
+	zbx_vector_ptr_reserve(&service->data->events, events->values_num + service->data->events.values_alloc);
+
+	for (i = 0; i < events->values_num; i++)
+		zbx_vector_ptr_append(&service->data->events, events->values[i]);
+
+	zbx_vector_ptr_destroy(events);
 }
 
 /******************************************************************************
@@ -4039,6 +4056,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	struct curl_slist	*headers = NULL;
 	zbx_vmware_data_t	*data;
 	zbx_vector_str_t	hvs;
+	zbx_vector_ptr_t	events;
 	int			i, ret = FAIL;
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
 
@@ -4136,9 +4154,12 @@ out:
 	service->state &= ~(ZBX_VMWARE_STATE_MASK | ZBX_VMWARE_STATE_UPDATING);
 	service->state |= (SUCCEED == ret) ? ZBX_VMWARE_STATE_READY : ZBX_VMWARE_STATE_FAILED;
 
-	vmware_event_merge(service, &data->events);
+	vmware_event_backup(service, &events);
 	vmware_data_shared_free(service->data);
 	service->data = vmware_data_shared_dup(data);
+
+	if (0 != events.values_num)
+		vmware_event_merge_destroy(service, &events);
 
 	service->lastcheck = time(NULL);
 
