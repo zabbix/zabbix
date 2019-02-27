@@ -388,7 +388,7 @@
 						bulkItem.append(jQuery('<input>', {
 							id: 'interfaces_' + hostInterfaceId + '_bulk',
 							type: 'checkbox',
-							class: 'checkbox-radio',
+							class: '<?= ZBX_STYLE_CHECKBOX_RADIO ?>',
 							name: 'interfaces[' + hostInterfaceId + '][bulk]',
 							value: 1,
 							checked: true
