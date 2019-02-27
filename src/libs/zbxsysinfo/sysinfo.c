@@ -1320,7 +1320,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	close(fds[0]);
 
-	while (0 >= waitpid(pid, &status, 0))
+	while (-1 == waitpid(pid, &status, 0))
 	{
 		if (EINTR != errno)
 		{
