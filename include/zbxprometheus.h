@@ -20,10 +20,8 @@
 #ifndef __zbxprometheus_h__
 #define __zbxprometheus_h__
 
-
-
-extern int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char *output,
+int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char *output,
 						char **value, char **err);
-extern int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **value, char **err);
+int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **value, char **err);
 
 #endif /* __zbxprometheus_h__ */
