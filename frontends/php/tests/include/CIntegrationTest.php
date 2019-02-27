@@ -43,9 +43,9 @@ class CIntegrationTest extends CAPITest {
 	const COMPONENT_AGENT	= 'agentd';
 
 	// Zabbix component port constants.
-	const AGENT_PORT_SUFFIX = 0;
-	const SERVER_PORT_SUFFIX = 1;
-	const PROXY_PORT_SUFFIX = 2;
+	const AGENT_PORT_SUFFIX = '50';
+	const SERVER_PORT_SUFFIX = '51';
+	const PROXY_PORT_SUFFIX = '52';
 
 	/**
 	 * Components required by test suite.
@@ -458,7 +458,7 @@ class CIntegrationTest extends CAPITest {
 
 		$path = PHPUNIT_CONFIG_SOURCE_DIR.'zabbix_'.$component.'.conf';
 		if (!file_exists($path) || ($config = @file_get_contents($path)) === false) {
-			throw new Exception('There is no configuration file for component "'.$component.'".');
+			throw new Exception('There is no configuration file for component "'.$component.'": '.$path.'.');
 		}
 
 		if (array_key_exists($component, $values) && $values[$component] && is_array($values[$component])) {
@@ -475,7 +475,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		if (file_put_contents(PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf', $config) === false) {
-			throw new Exception('Failed to create configuration file for component "'.$component.'".');
+			throw new Exception('Failed to create configuration file for component "'.$component.'": '.PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf.');
 		}
 	}
 

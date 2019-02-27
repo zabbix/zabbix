@@ -85,7 +85,7 @@ class CAPITest extends CTest {
 	 */
 	public function call($method, $params, $error = null) {
 		if (CAPIHelper::getSessionId() === null) {
-			$this->authorize('Admin', 'zabbix');
+			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
 		}
 
 		$response = CAPIHelper::call($method, $params);
