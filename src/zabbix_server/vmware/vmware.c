@@ -4193,7 +4193,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		/* May not be present */
 		if (SUCCEED != vmware_service_get_last_event_data(service, easyhandle, &data->events, &error))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Unable retrieve lastevent value: %s.", data->error);
+			zabbix_log(LOG_LEVEL_DEBUG, "Unable retrieve lastevent value: %s.", error);
 			zbx_free(error);
 		}
 		else
