@@ -210,7 +210,7 @@ int	zbx_socket_start(char **error)
 
 	if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
 	{
-		*error = zbx_dsprintf(*error, "WSAStartup() failed: %s", strerror_from_system(ret));
+		*error = zbx_dsprintf(*error, "Cannot initialize Winsock DLL: %s", strerror_from_system(ret));
 		return FAIL;
 	}
 
