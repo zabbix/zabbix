@@ -687,7 +687,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	const char		*__function_name = "check_vcenter_eventlog";
 
 	const char		*url, *skip;
-	unsigned char		skip_all;
+	unsigned char		skip_old;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 
@@ -703,11 +703,11 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 
 	if (NULL == (skip = get_rparam(request, 1)) || '\0' == *skip || 0 == strcmp(skip, "all"))
 	{
-		skip_all = 0;
+		skip_old = 0;
 	}
 	else if (0 == strcmp(skip, "skip"))
 	{
-		skip_all = 1;
+		skip_old = 1;
 	}
 	else
 	{
@@ -723,7 +723,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key)
 	{
 		service->eventlog.last_key = request->lastlogsize;
-		service->eventlog.skip_all = skip_all;
+		service->eventlog.skip_old = skip_old;
 	}
 	else if (request->lastlogsize < service->eventlog.last_key)
 	{

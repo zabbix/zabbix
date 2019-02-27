@@ -4122,7 +4122,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	zbx_vector_str_t	hvs;
 	int			i, ret = FAIL;
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
-	unsigned char		skip_all = service->eventlog.skip_all;
+	unsigned char		skip_old = service->eventlog.skip_old;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
 
@@ -4180,21 +4180,24 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	}
 
 	/* skip collection of event data if we don't know where we stopped last time or item can't accept values */
-	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != service->eventlog.last_key && 0 == service->eventlog.skip_all &&
+	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != service->eventlog.last_key && 0 == service->eventlog.skip_old &&
 			SUCCEED != vmware_service_get_event_data(service, easyhandle, &data->events, &data->error))
 	{
 		goto clean;
 	}
 
-	if (0 != service->eventlog.skip_all)
+	if (0 != service->eventlog.skip_old)
 	{
-		/* May not be present */
-		if (SUCCEED == vmware_service_get_last_event_data(service, easyhandle, &data->events, &data->error))
-			skip_all = 0;
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "Unable retrieve lastevent value: %s.", data->error);
+		char	*error = NULL;
 
-		zbx_free(data->error);
+		/* May not be present */
+		if (SUCCEED != vmware_service_get_last_event_data(service, easyhandle, &data->events, &error))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Unable retrieve lastevent value: %s.", data->error);
+			zbx_free(error);
+		}
+		else
+			skip_old = 0;
 	}
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
@@ -4231,7 +4234,7 @@ out:
 
 	vmware_data_shared_free(service->data);
 	service->data = vmware_data_shared_dup(data);
-	service->eventlog.skip_all = skip_all;
+	service->eventlog.skip_old = skip_old;
 
 	service->lastcheck = time(NULL);
 
@@ -4877,7 +4880,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->state = ZBX_VMWARE_STATE_NEW;
 	service->lastaccess = now;
 	service->eventlog.last_key = ZBX_VMWARE_EVENT_KEY_UNINITIALIZED;
-	service->eventlog.skip_all = 0;
+	service->eventlog.skip_old = 0;
 
 	zbx_hashset_create_ext(&service->entities, 100, vmware_perf_entity_hash_func,  vmware_perf_entity_compare_func,
 			NULL, __vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);

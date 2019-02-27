@@ -172,7 +172,7 @@ zbx_vmware_cluster_t;
 typedef struct
 {
 	zbx_uint64_t	last_key;	/* lastlogsize when vmware.eventlog[] item was polled last time */
-	unsigned char	skip_all;	/* skip old event log records */
+	unsigned char	skip_old;	/* skip old event log records */
 
 }
 zbx_vmware_eventlog_state_t;
