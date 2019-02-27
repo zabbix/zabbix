@@ -437,7 +437,7 @@ class CPageFilter {
 
 		CArrayHelper::sort($this->data['groups'], ['name']);
 
-		// select remembered selection
+		// Select remembered selection.
 		if ($groupId === null && $this->_profileIds['groupid'] > 0) {
 			// set group only if host is in group or hostid is not set
 			$host = null;
@@ -445,8 +445,16 @@ class CPageFilter {
 
 			if ($hostId) {
 				// Get child groups for "profileIds['groupid']".
-				$profileids = [$this->_profileIds['groupid']];
-				$parent = $this->data['groups'][$this->_profileIds['groupid']]['name'].'/';
+				if (array_key_exists($this->_profileIds['groupid'], $this->data['groups'])) {
+					$profileids = [$this->_profileIds['groupid']];
+					$parent = $this->data['groups'][$this->_profileIds['groupid']]['name'].'/';
+				}
+				else {
+					$group = reset($this->data['groups']);
+					$profileids = [$group['groupid']];
+					$parent = $this->data['groups'][$group['groupid']]['name'].'/';
+				}
+
 				foreach ($this->data['groups'] as $group) {
 					if (strpos($group['name'], $parent) === 0) {
 						$profileids[] = $group['groupid'];
