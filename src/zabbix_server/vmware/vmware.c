@@ -3504,7 +3504,7 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 		goto out;
 	}
 
-	if (SUCCEED != is_uint64(value, &key))
+	if (SUCCEED == is_uint64(value, &key))
 	{
 		*error = zbx_dsprintf(*error, "Cannot convert eventlog key from %s", value);
 		goto out;
