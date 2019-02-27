@@ -3245,90 +3245,6 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: vmware_service_put_event_data                                    *
- *                                                                            *
- * Purpose: read event data by id from xml and put to array of events         *
- *                                                                            *
- * Parameters: events  - [IN/OUT] the array of parsed events                  *
- *             key     - [IN] the key of parsed event                         *
- *             xdoc    - [IN] xml document with eventlog records              *
- *             xml_tag - [IN] name of xml tag with event value                *
- *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
- ******************************************************************************/
-static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_uint64_t key, xmlDoc *xdoc,
-		const char * xml_tag)
-{
-	zbx_vmware_event_t	*event = NULL;
-	char			*message, *time_str, xpath[MAX_STRING_LEN];
-	int			timestamp = 0;
-
-	zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("%s", "key") "[.='" ZBX_FS_UI64 "']/.."
-			ZBX_XPATH_LN("fullFormattedMessage"), xml_tag, key);
-
-	if (NULL == (message = zbx_xml_read_doc_value(xdoc, xpath)))
-	{
-		zabbix_log(LOG_LEVEL_TRACE, "skipping event key '" ZBX_FS_UI64 "', fullFormattedMessage"
-				" is missing", key);
-		return FAIL;
-	}
-
-	zbx_replace_invalid_utf8(message);
-
-	zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("%s", "key") "[.='" ZBX_FS_UI64 "']/.."
-			ZBX_XPATH_LN("createdTime"), xml_tag, key);
-
-	if (NULL == (time_str = zbx_xml_read_doc_value(xdoc, xpath)))
-	{
-		zabbix_log(LOG_LEVEL_TRACE, "createdTime is missing for event key '" ZBX_FS_UI64 "'",
-				key);
-	}
-	else
-	{
-		int	year, mon, mday, hour, min, sec, t;
-
-		/* 2013-06-04T14:19:23.406298Z */
-		if (6 != sscanf(time_str, "%d-%d-%dT%d:%d:%d.%*s", &year, &mon, &mday, &hour, &min, &sec))
-		{
-			zabbix_log(LOG_LEVEL_TRACE, "unexpected format of createdTime '%s' for event"
-					" key '" ZBX_FS_UI64 "'", time_str, key);
-		}
-		else if (SUCCEED != zbx_utc_time(year, mon, mday, hour, min, sec, &t))
-		{
-			zabbix_log(LOG_LEVEL_TRACE, "cannot convert createdTime '%s' for event key '"
-					ZBX_FS_UI64 "'", time_str, key);
-		}
-		else
-			timestamp = t;
-
-		zbx_free(time_str);
-	}
-
-	event = (zbx_vmware_event_t *)zbx_malloc(event, sizeof(zbx_vmware_event_t));
-	event->key = key;
-	event->message = message;
-	event->timestamp = timestamp;
-	zbx_vector_ptr_append(events, event);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vmware_service_parse_event_data                                  *
- *                                                                            *
- * Purpose: parse multiple events data                                        *
- *                                                                            *
- * Parameters: events   - [IN/OUT] the array of parsed events                 *
- *             last_key - [IN] the key of last parsed event                   *
- *             xdoc     - [IN] xml document with eventlog records             *
- *                                                                            *
- * Return value: The count of events successfully parsed                      *
- *                                                                            *
- ******************************************************************************/
 static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_t last_key, xmlDoc *xdoc)
 {
 	const char		*__function_name = "vmware_service_parse_event_data";
@@ -3376,8 +3292,57 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 		/* so inside a "scrollable view" latest events should come first too */
 		for (i = ids.values_num - 1; i >= 0; i--)
 		{
-			if (SUCCEED == vmware_service_put_event_data(events, ids.values[i], xdoc, "returnval"))
-				parsed_num++;
+			zbx_vmware_event_t	*event = NULL;
+			char			*message, *time_str, xpath[MAX_STRING_LEN];
+			int			timestamp = 0;
+
+			zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("returnval", "key") "[.='" ZBX_FS_UI64 "']/.."
+					ZBX_XPATH_LN("fullFormattedMessage"), ids.values[i]);
+
+			if (NULL == (message = zbx_xml_read_doc_value(xdoc, xpath)))
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "skipping event key '" ZBX_FS_UI64 "', fullFormattedMessage"
+						" is missing", ids.values[i]);
+				continue;
+			}
+
+			zbx_replace_invalid_utf8(message);
+
+			zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("returnval", "key") "[.='" ZBX_FS_UI64 "']/.."
+					ZBX_XPATH_LN("createdTime"), ids.values[i]);
+
+			if (NULL == (time_str = zbx_xml_read_doc_value(xdoc, xpath)))
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "createdTime is missing for event key '" ZBX_FS_UI64 "'",
+						ids.values[i]);
+			}
+			else
+			{
+				int	year, mon, mday, hour, min, sec, t;
+
+				/* 2013-06-04T14:19:23.406298Z */
+				if (6 != sscanf(time_str, "%d-%d-%dT%d:%d:%d.%*s", &year, &mon, &mday, &hour, &min, &sec))
+				{
+					zabbix_log(LOG_LEVEL_TRACE, "unexpected format of createdTime '%s' for event"
+							" key '" ZBX_FS_UI64 "'", time_str, ids.values[i]);
+				}
+				else if (SUCCEED != zbx_utc_time(year, mon, mday, hour, min, sec, &t))
+				{
+					zabbix_log(LOG_LEVEL_TRACE, "cannot convert createdTime '%s' for event key '"
+							ZBX_FS_UI64 "'", time_str, ids.values[i]);
+				}
+				else
+					timestamp = t;
+
+				zbx_free(time_str);
+			}
+
+			event = (zbx_vmware_event_t *)zbx_malloc(event, sizeof(zbx_vmware_event_t));
+			event->key = ids.values[i];
+			event->message = message;
+			event->timestamp = timestamp;
+			zbx_vector_ptr_append(events, event);
+			parsed_num++;
 		}
 	}
 
@@ -3431,7 +3396,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		if (SUCCEED != vmware_service_read_previous_events(easyhandle, event_session, &doc, error))
 			goto end_session;
 	}
-	while (0 < vmware_service_parse_event_data(events, service->eventlog.last_key, doc));
+	while (0 < vmware_service_parse_event_data(events, service->eventlog_last_key, doc));
 
 	ret = SUCCEED;
 end_session:
@@ -3444,88 +3409,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vmware_service_get_last_event_data                               *
- *                                                                            *
- * Purpose: retrieves data only last event                                    *
- *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             events       - [OUT] a pointer to the output variable          *
- *             error        - [OUT] the error message in the case of failure  *
- *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
- *                                                                            *
- ******************************************************************************/
-static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_ptr_t *events, char **error)
-{
-#	define ZBX_POST_VMWARE_LASTEVENT 								\
-		ZBX_POST_VSPHERE_HEADER									\
-		"<ns0:RetrievePropertiesEx>"								\
-			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"				\
-			"<ns0:specSet>"									\
-				"<ns0:propSet>"								\
-					"<ns0:type>EventManager</ns0:type>"				\
-					"<ns0:all>false</ns0:all>"					\
-					"<ns0:pathSet>latestEvent</ns0:pathSet>"			\
-				"</ns0:propSet>"							\
-				"<ns0:objectSet>"							\
-					"<ns0:obj type=\"EventManager\">%s</ns0:obj>"			\
-				"</ns0:objectSet>"							\
-			"</ns0:specSet>"								\
-			"<ns0:options/>"								\
-		"</ns0:RetrievePropertiesEx>"								\
-		ZBX_POST_VSPHERE_FOOTER
-
-	const char	*__function_name = "vmware_service_get_last_event_data";
-
-	char		tmp[MAX_STRING_LEN], *value;
-	int		ret = FAIL;
-	xmlDoc		*doc = NULL;
-	zbx_uint64_t	key;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_LASTEVENT,
-			vmware_service_objects[service->type].property_collector,
-			vmware_service_objects[service->type].event_manager);
-
-	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &doc, error))
-		goto out;
-
-	if (NULL == (value = zbx_xml_read_doc_value(doc, ZBX_XPATH_PROP_NAME("latestEvent")ZBX_XPATH_LN("key"))))
-	{
-		*error = zbx_strdup(*error, "Cannot find last event key");
-		goto out;
-	}
-
-	if (SUCCEED == is_uint64(value, &key))
-	{
-		*error = zbx_dsprintf(*error, "Cannot convert eventlog key from %s", value);
-		goto out;
-	}
-
-	zbx_free(value);
-
-	if (SUCCEED != vmware_service_put_event_data(events, key, doc, "val"))
-	{
-		*error = zbx_dsprintf(*error, "Cannot retrieve last eventlog data for key "ZBX_FS_UI64, key);
-		goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	zbx_xml_free_doc(doc);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-
-#	undef ZBX_POST_VMWARE_LASTEVENT
 }
 
 /******************************************************************************
@@ -4121,7 +4004,6 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	zbx_vector_str_t	hvs;
 	int			i, ret = FAIL;
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
-	unsigned char		skip_old = service->eventlog.skip_old;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
 
@@ -4179,24 +4061,10 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	}
 
 	/* skip collection of event data if we don't know where we stopped last time or item can't accept values */
-	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != service->eventlog.last_key && 0 == service->eventlog.skip_old &&
+	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != service->eventlog_last_key &&
 			SUCCEED != vmware_service_get_event_data(service, easyhandle, &data->events, &data->error))
 	{
 		goto clean;
-	}
-
-	if (0 != service->eventlog.skip_old)
-	{
-		char	*error = NULL;
-
-		/* May not be present */
-		if (SUCCEED != vmware_service_get_last_event_data(service, easyhandle, &data->events, &error))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Unable retrieve lastevent value: %s.", error);
-			zbx_free(error);
-		}
-		else
-			skip_old = 0;
 	}
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
@@ -4233,7 +4101,6 @@ out:
 
 	vmware_data_shared_free(service->data);
 	service->data = vmware_data_shared_dup(data);
-	service->eventlog.skip_old = skip_old;
 
 	service->lastcheck = time(NULL);
 
@@ -4878,8 +4745,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->type = ZBX_VMWARE_TYPE_UNKNOWN;
 	service->state = ZBX_VMWARE_STATE_NEW;
 	service->lastaccess = now;
-	service->eventlog.last_key = ZBX_VMWARE_EVENT_KEY_UNINITIALIZED;
-	service->eventlog.skip_old = 0;
+	service->eventlog_last_key = ZBX_VMWARE_EVENT_KEY_UNINITIALIZED;
 
 	zbx_hashset_create_ext(&service->entities, 100, vmware_perf_entity_hash_func,  vmware_perf_entity_compare_func,
 			NULL, __vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
