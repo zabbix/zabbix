@@ -868,17 +868,17 @@ static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vect
 		zbx_vector_ptr_append(labels, label);
 
 		pos = skip_spaces(data, loc_value.r + 1);
-		if (',' == data[pos])
-		{
-			pos = skip_spaces(data, pos + 1);
-			continue;
-		}
 
-		if ('\0' == data[pos])
+		if (',' != data[pos])
 		{
+			if ('}' == data[pos])
+				break;
+
 			*error = zbx_strdup(*error, "missing label list terminating character \"}\"");
 			return FAIL;
 		}
+
+		pos = skip_spaces(data, pos + 1);
 	}
 
 	loc->r = pos;
@@ -965,6 +965,12 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 		}
 
 		pos = loc.r + 1;
+	}
+	else if (pos == loc.r + 1 && '=' != data[pos])
+	{
+		/* if no labels are defined metric name must be followed by whitespace or equality */
+		*error = zbx_strdup(*error, "cannot parse text following metric name");
+		goto out;
 	}
 
 	/* parse value and check against the filter */
