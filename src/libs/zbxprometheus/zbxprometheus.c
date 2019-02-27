@@ -966,7 +966,7 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 
 		pos = loc.r + 1;
 	}
-	else if (pos == loc.r + 1 && '=' != data[pos])
+	else if (pos == loc.r + 1)
 	{
 		/* if no labels are defined metric name must be followed by whitespace or equality */
 		*error = zbx_strdup(*error, "cannot parse text following metric name");
