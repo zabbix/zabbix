@@ -383,6 +383,16 @@ int	main(int argc, char **argv)
 		}
 	}
 
+#if defined(_WINDOWS)
+	WSADATA		sockInfo;
+
+	if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
+	{
+		zbx_error("Cannot initialize Winsock DLL: %s", strerror_from_system(ret));
+		exit(EXIT_FAILURE);
+	}
+#endif
+
 	if (NULL == host || NULL == key)
 	{
 		usage();
@@ -463,5 +473,10 @@ out:
 #endif
 	}
 #endif
+#if defined(_WINDOWS)
+	while (0 == WSACleanup())
+		;
+#endif
+
 	return SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }

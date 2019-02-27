@@ -1024,7 +1024,15 @@ int	main(int argc, char **argv)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+#if defined(_WINDOWS)
+	WSADATA		sockInfo;
 
+	if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
+	{
+		zbx_error("Cannot initialize Winsock DLL: %s", strerror_from_system(ret));
+		exit(EXIT_FAILURE);
+	}
+#endif
 #if !defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
 	{
@@ -1315,7 +1323,10 @@ exit:
 	}
 #endif
 	zabbix_close_log();
-
+#if defined(_WINDOWS)
+	while (0 == WSACleanup())
+		;
+#endif
 	if (FAIL == ret)
 		ret = EXIT_FAILURE;
 
