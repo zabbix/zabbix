@@ -1160,7 +1160,11 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 	static int	no_inherit_wsapi = -1;
 
 	if (-1 == no_inherit_wsapi)
-		no_inherit_wsapi = IsWindows7SP1OrGreater() || (IsWindowsServer() && IsWindows7OrGreater());
+	{
+		/* Both Windows 7 and Windows 2008 R2 are 0x0601 */
+		no_inherit_wsapi = zbx_is_win_ver_or_greater((_WIN32_WINNT_WIN7 >> 8) & 0xff,
+				_WIN32_WINNT_WIN7 & 0xff, 1) == SUCCEED;
+	}
 #endif
 
 	ZBX_SOCKET_START();
@@ -1188,7 +1192,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 			goto out;
 		}
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 		/* WSA_FLAG_NO_HANDLE_INHERIT prevents socket inheritance if we call CreateProcess() */
 		/* later on. If it's not available we still try to avoid inheritance by calling  */
 		/* SetHandleInformation() below. WSA_FLAG_OVERLAPPED is not mandatory but strongly */
@@ -1196,16 +1200,15 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 		s->sockets[s->num_socks] = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0,
 				(0 != no_inherit_wsapi ? WSA_FLAG_NO_HANDLE_INHERIT : 0) | WSA_FLAG_OVERLAPPED);
 		if (ZBX_SOCKET_ERROR == s->sockets[s->num_socks])
+		{
+			zbx_set_socket_strerror("WSASocket() for [[%s]:%hu] failed: %s",
+					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
 #else
 		if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
-#endif
 		{
-#ifdef _WINDOWS
-			zbx_set_socket_strerror("WSASocket() for [[%s]:%hu] failed: %s",
-#else
 			zbx_set_socket_strerror("socket() for [[%s]:%hu] failed: %s",
-#endif
 					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
+#endif
 			goto out;
 		}
 
