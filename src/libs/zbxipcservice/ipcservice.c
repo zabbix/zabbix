@@ -896,7 +896,8 @@ static void	ipc_async_socket_write_event_cb(evutil_socket_t fd, short what, void
 	if (SUCCEED != ipc_client_write(asocket->client))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to IPC client");
-		zbx_ipc_client_close(asocket->client);
+		ipc_client_free_events(asocket->client);
+		zbx_ipc_socket_close(&asocket->client->csocket);
 		asocket->state = ZBX_IPC_ASYNC_SOCKET_STATE_ERROR;
 		return;
 	}
@@ -2038,7 +2039,6 @@ int	zbx_ipc_async_socket_flush(zbx_ipc_async_socket_t *asocket, int timeout)
 		ret = SUCCEED;
 		asocket->state = ZBX_IPC_CLIENT_STATE_NONE;
 	}
-	else	ret = FAIL;
 out:
 	evtimer_del(asocket->ev_timer);
 
