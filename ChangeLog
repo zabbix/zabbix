@@ -7,7 +7,7 @@ New features:
 Bug fixes:
 ..F....... [ZBX-15625] removed links leading to media type edit form for non-superadmins in Reports->Notifications page (Ivo)
 .D.G...PS. [ZBX-8344] improved leading and trailing spaces trimming (akozlovs)
-.......PS. [ZBX-15703] fixed case with 0 bytes received in socket (akozlovs)
+.......PS. [ZBX-15703] fixed use of uninitialized variable when receiving 0 bytes on listening socket (akozlovs)
 ..F....... [ZBX-15539] fixed validation of master item in item update form (miks)
 ..F....... [ZBX-15532] fixed undefined index error on problems page when trigger expression contains web items (gcalenko, Sasha)
 A......... [ZBX-15488] fixed permission check for inherited triggers (miks)
