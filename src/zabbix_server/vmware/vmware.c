@@ -1134,6 +1134,8 @@ static void	vmware_event_backup(zbx_vmware_service_t *service, zbx_vector_ptr_t 
 
 	if (((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog.last_key)
 	{
+		zbx_vector_ptr_reserve(events, service->data->events.values_num);
+
 		for (i = 0; i < service->data->events.values_num; i++)
 			zbx_vector_ptr_append(events, service->data->events.values[i]);
 
