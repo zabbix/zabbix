@@ -1803,20 +1803,19 @@ int	zbx_ipc_client_connected(zbx_ipc_client_t *client)
 int	zbx_ipc_async_socket_open(zbx_ipc_async_socket_t *asocket, const char *service_name, int timeout, char **error)
 {
 	const char		*__function_name = "zbx_ipc_async_socket_open";
-	const char		*socket_path;
 	int			ret = FAIL, flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (NULL == (socket_path = ipc_make_path(service_name, error)))
-		goto out;
 
 	memset(asocket, 0, sizeof(zbx_ipc_async_socket_t));
 	asocket->client = (zbx_ipc_client_t *)zbx_malloc(NULL, sizeof(zbx_ipc_client_t));
 	memset(asocket->client, 0, sizeof(zbx_ipc_client_t));
 
 	if (SUCCEED != zbx_ipc_socket_open(&asocket->client->csocket, service_name, timeout, error))
+	{
+		zbx_free(asocket->client);
 		goto out;
+	}
 
 	if (-1 == (flags = fcntl(asocket->client->csocket.fd, F_GETFL, 0)))
 	{
