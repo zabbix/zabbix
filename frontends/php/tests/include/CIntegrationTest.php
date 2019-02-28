@@ -30,12 +30,13 @@ require_once dirname(__FILE__).'/helpers/CLogHelper.php';
 class CIntegrationTest extends CAPITest {
 
 	// Default iteration count for wait operations.
-	const WAIT_ITERATIONS			= 20;
+	const WAIT_ITERATIONS			= 60;
 
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY		= 1; // Wait iteration delay.
-	const COMPONENT_STARTUP_DELAY	= 5; // Component start delay.
-	const CACHE_RELOAD_DELAY		= 2; // Configuration cache reload delay.
+	const COMPONENT_STARTUP_DELAY	= 10; // Component start delay.
+	const CACHE_RELOAD_DELAY		= 5; // Configuration cache reload delay.
+	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
 
 	// Zabbix component constants.
 	const COMPONENT_SERVER	= 'server';
@@ -589,6 +590,8 @@ class CIntegrationTest extends CAPITest {
 		$this->assertEquals(count($values), $result['processed'],
 				'Processed value count doesn\'t match sent value count.'
 		);
+
+		sleep(self::DATA_PROCESSING_DELAY);
 
 		return $result;
 	}
