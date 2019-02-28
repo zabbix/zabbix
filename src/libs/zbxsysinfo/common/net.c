@@ -25,6 +25,7 @@
 #include "cfg.h"
 
 #include "net.h"
+#include "zbxalgo.h"
 
 #ifdef _WINDOWS
 #	include <windns.h>
@@ -263,6 +264,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	answer_t	answer;
 #endif	/* _WINDOWS */
+	zbx_vector_str_t	answers;
 
 	*buffer = '\0';
 
@@ -357,6 +359,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	}
 
 	pDnsRecord = pQueryResults;
+	zbx_vector_str_create(&answers);
 
 	while (NULL != pDnsRecord)
 	{
@@ -469,6 +472,9 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
 
 		pDnsRecord = pDnsRecord->pNext;
+		zbx_vector_str_append(&answers, zbx_strdup(NULL, buffer));
+		offset = 0;
+		*buffer = '\0';
 	}
 #else	/* not _WINDOWS */
 #if defined(HAVE_RES_NINIT) && !defined(_AIX)
@@ -573,6 +579,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	num_query = ntohs(answer.h.qdcount);
 
 	msg_ptr = answer.buffer + HFIXEDSZ;
+	zbx_vector_str_create(&answers);
 
 	/* skipping query records */
 	for (; 0 < num_query && msg_ptr < msg_end; num_query--)
@@ -583,7 +590,8 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto clean;
 		}
 
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s", name);
@@ -792,8 +800,17 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		}
 
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
+
+		zbx_vector_str_append(&answers, zbx_strdup(NULL, buffer));
+		offset = 0;
+		*buffer = '\0';
 	}
 #endif	/* _WINDOWS */
+
+	zbx_vector_str_sort(&answers, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+	for (i = 0; i < answers.values_num; i++)
+		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s", answers.values[i]);
 
 	if (0 != offset)
 		buffer[--offset] = '\0';
@@ -801,11 +818,14 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	ret = SYSINFO_RET_OK;
 
-#ifdef _WINDOWS
 clean:
+#ifdef _WINDOWS
 	if (DNS_RCODE_NOERROR == res)
 		DnsRecordListFree(pQueryResults, DnsFreeRecordList);
 #endif
+	zbx_vector_str_clear_ext(&answers, zbx_str_free);
+	zbx_vector_str_destroy(&answers);
+
 	return ret;
 
 #else	/* both HAVE_RES_QUERY and _WINDOWS not defined */
