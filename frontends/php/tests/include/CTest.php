@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 
 require_once dirname(__FILE__).'/helpers/CDBHelper.php';
+require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
 require_once dirname(__FILE__).'/helpers/CExceptionHelper.php';
 
 /**
@@ -49,6 +50,8 @@ class CTest extends PHPUnit_Framework_TestCase {
 	protected $annotations = null;
 	// Test case warnings.
 	protected static $warnings = [];
+	// Skip test suite execution.
+	protected static $skip_suite = false;
 
 	/**
 	 * Overriden constructor for collecting data on data sets from dataProvider annotations.
@@ -77,9 +80,35 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 * @return array or null
 	 */
 	protected function getAnnotationsByType($annotations, $type) {
-		return (array_key_exists($type, $annotations) && is_array($annotations[$type]))
-				? $annotations[$type]
-				: null;
+		if ($annotations === null || !array_key_exists($type, $annotations) || !is_array($annotations[$type])) {
+			return null;
+		}
+
+		return $annotations[$type];
+	}
+
+	/**
+	 * Get annotation tokens by annotation name.
+	 * Helper function for method / class annotation processing.
+	 *
+	 * @param array  $annotations    annotations
+	 * @param string $name	         annotation name
+	 *
+	 * @return array
+	 */
+	protected function getAnnotationTokensByName($annotations, $name) {
+		if ($annotations === null || !array_key_exists($name, $annotations) || !is_array($annotations[$name])) {
+			return [];
+		}
+
+		$result = [];
+		foreach ($annotations[$name] as $annotation) {
+			foreach (explode(',', $annotation) as $token) {
+				$result[] = trim($token);
+			}
+		}
+
+		return $result;
 	}
 
 	/**
@@ -90,12 +119,14 @@ class CTest extends PHPUnit_Framework_TestCase {
 		$class_annotations = $this->getAnnotationsByType($this->annotations, 'class');
 
 		// Backup performed before test suite execution.
-		$suite_backup = $this->getAnnotationsByType($class_annotations, 'backup');
+		$suite_backup = $this->getAnnotationTokensByName($class_annotations, 'backup');
 
-		if ($suite_backup !== null && count($suite_backup) === 1) {
-			self::$suite_backup = $suite_backup[0];
+		if ($suite_backup) {
+			self::$suite_backup = $suite_backup;
 			CDBHelper::backupTables(self::$suite_backup);
 		}
+
+		self::$skip_suite = false;
 	}
 
 	/**
@@ -122,7 +153,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 		// Restore data from backup if test case changed
 		if (self::$case_backup_once !== null && self::$last_test_case !== $case_name) {
-			CDBHelper::restoreTables(self::$case_backup_once);
+			CDBHelper::restoreTables();
 			self::$case_backup_once = null;
 		}
 
@@ -131,19 +162,19 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 		if ($method_annotations !== null) {
 			// Backup performed before every test case execution.
-			$case_backup = $this->getAnnotationsByType($method_annotations, 'backup');
+			$case_backup = $this->getAnnotationTokensByName($method_annotations, 'backup');
 
-			if ($case_backup !== null && count($case_backup) === 1) {
-				$this->case_backup = $case_backup[0];
+			if ($case_backup) {
+				$this->case_backup = $case_backup;
 				CDBHelper::backupTables($this->case_backup);
 			}
 
 			if (self::$last_test_case !== $case_name) {
 				if (array_key_exists($case_name, self::$test_data_sets)) {
 					// Check for data data set limit.
-					$limit = $this->getAnnotationsByType($method_annotations, 'data-limit');
+					$limit = $this->getAnnotationTokensByName($method_annotations, 'data-limit');
 
-					if ($limit !== null && count($limit) === 1 && is_numeric($limit[0]) && $limit[0] >= 1
+					if (count($limit) === 1 && is_numeric($limit[0]) && $limit[0] >= 1
 							&& count(self::$test_data_sets[$case_name]) > $limit[0]) {
 						$sets = self::$test_data_sets[$case_name];
 						shuffle($sets);
@@ -152,10 +183,10 @@ class CTest extends PHPUnit_Framework_TestCase {
 				}
 
 				// Backup performed once before first test case execution.
-				$case_backup_once = $this->getAnnotationsByType($method_annotations, 'backup-once');
+				$case_backup_once = $this->getAnnotationTokensByName($method_annotations, 'backup-once');
 
-				if ($case_backup_once !== null && count($case_backup_once) === 1) {
-					self::$case_backup_once = $case_backup_once[0];
+				if ($case_backup_once) {
+					self::$case_backup_once = $case_backup_once;
 					CDBHelper::backupTables(self::$case_backup_once);
 				}
 			}
@@ -163,16 +194,20 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 		// Class name change is used to determine suite change.
 		if ($suite !== $class_name) {
+			$suite = $class_name;
 			$this->onBeforeTestSuite();
 		}
 
-		$suite = $class_name;
 		self::$last_test_case = $case_name;
 
 		// Mark excessive test cases as skipped.
 		if (array_key_exists($case_name, self::$test_data_sets)
 				&& !in_array($this->data_key, self::$test_data_sets[$case_name])) {
 			self::markTestSkipped('Test case skipped by data provider limit check.');
+		}
+
+		if (self::$skip_suite) {
+			self::markTestSkipped();
 		}
 	}
 
@@ -183,7 +218,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function onAfterTestCase() {
 		if ($this->case_backup !== null) {
-			CDBHelper::restoreTables($this->case_backup);
+			CDBHelper::restoreTables();
 		}
 
 		DBclose();
@@ -208,16 +243,16 @@ class CTest extends PHPUnit_Framework_TestCase {
 		if (self::$suite_backup !== null || self::$case_backup_once !== null) {
 			DBconnect($error);
 
-			// Restore suite level backups.
-			if (self::$suite_backup !== null) {
-				CDBHelper::restoreTables(self::$suite_backup);
-				self::$suite_backup = null;
-			}
-
 			// Restore case level backups.
 			if (self::$case_backup_once !== null) {
-				CDBHelper::restoreTables(self::$case_backup_once);
+				CDBHelper::restoreTables();
 				self::$case_backup_once = null;
+			}
+
+			// Restore suite level backups.
+			if (self::$suite_backup !== null) {
+				CDBHelper::restoreTables();
+				self::$suite_backup = null;
 			}
 
 			DBclose();
@@ -233,5 +268,12 @@ class CTest extends PHPUnit_Framework_TestCase {
 		if (defined('PHPUNIT_REPORT_WARNINGS') && PHPUNIT_REPORT_WARNINGS && !in_array($warning, self::$warnings)) {
 			self::$warnings[] = $warning;
 		}
+	}
+
+	/**
+	 * Mark test suite skipped.
+	 */
+	public static function markTestSuiteSkipped() {
+		self::$skip_suite = true;
 	}
 }

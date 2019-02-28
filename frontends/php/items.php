@@ -1625,7 +1625,7 @@ else {
 		],
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'selectTriggers' => ['triggerid', 'description'],
+		'selectTriggers' => ['triggerid'],
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
@@ -1939,9 +1939,10 @@ else {
 	}
 	$data['itemTriggers'] = API::Trigger()->get([
 		'triggerids' => $itemTriggerIds,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'priority',
+			'status', 'state', 'error', 'templateid', 'flags'
+		],
 		'selectHosts' => ['hostid', 'name', 'host'],
-		'selectFunctions' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	]);
 

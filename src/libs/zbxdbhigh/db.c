@@ -213,12 +213,14 @@ void	DBrollback(void)
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBend(int ret)
+int	DBend(int ret)
 {
 	if (SUCCEED == ret)
-		DBcommit();
-	else
-		DBrollback();
+		return ZBX_DB_OK == DBcommit() ? SUCCEED : FAIL;
+
+	DBrollback();
+
+	return FAIL;
 }
 
 #ifdef HAVE_ORACLE
@@ -1550,7 +1552,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	int	ret = SUCCEED;
 
-	if (ZBX_MAX_SQL_SIZE < *sql_offset)
+	if (ZBX_MAX_OVERFLOW_SQL_SIZE < *sql_offset)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		if (',' == (*sql)[*sql_offset - 1])
@@ -1559,10 +1561,22 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
 #endif
-		DBend_multiple_update(sql, sql_alloc, sql_offset);
+#if defined(HAVE_ORACLE) && 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
+		/* make sure we are not called twice without */
+		/* putting a new sql into the buffer first */
+		if (*sql_offset <= ZBX_SQL_EXEC_FROM)
+			THIS_SHOULD_NEVER_HAPPEN;
 
-		if (ZBX_DB_OK > DBexecute("%s", *sql))
+		/* Oracle fails with ORA-00911 if it encounters ';' w/o PL/SQL block */
+		zbx_rtrim(*sql, ZBX_WHITESPACE ";");
+#else
+		DBend_multiple_update(sql, sql_alloc, sql_offset);
+#endif
+		/* For Oracle with max_overflow_sql_size == 0, jump over "begin\n" */
+		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */
+		if (ZBX_DB_OK > DBexecute("%s", *sql + ZBX_SQL_EXEC_FROM))
 			ret = FAIL;
+
 		*sql_offset = 0;
 
 		DBbegin_multiple_update(sql, sql_alloc, sql_offset);

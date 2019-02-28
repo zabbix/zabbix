@@ -905,7 +905,9 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($hostids_by_key as $key_ => $key_hostids) {
 			$sql_select = ($class === 'CItemPrototype') ? ',id.parent_itemid AS ruleid' : '';
-			$sql_join = ($class === 'CItemPrototype') ? ' JOIN item_discovery id ON i.itemid=id.itemid' : '';
+			// "LEFT JOIN" is needed to check flags on inherited and existing item, item prototype or lld rule.
+			// For example, when linking an item prototype with same key as in an item on target host or template.
+			$sql_join = ($class === 'CItemPrototype') ? ' LEFT JOIN item_discovery id ON i.itemid=id.itemid' : '';
 			$db_items = DBselect(
 				'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid'.$sql_select.
 					' FROM items i'.$sql_join.

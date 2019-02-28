@@ -20,6 +20,30 @@
 
 jQuery.noConflict();
 
+/**
+ * jQuery based publish/subscribe handler.
+ *
+ * - $.subscribe(event_name, callback)
+ * - $.unsubscribe(event_name, callback)
+ * - $.publish(event_name, data_object)
+ *
+ */
+(function($) {
+	var pubsub = $({});
+
+	$.subscribe = function() {
+		pubsub.on.apply(pubsub, arguments);
+	};
+
+	$.unsubscribe = function() {
+		pubsub.off.apply(pubsub, arguments);
+	};
+
+	$.publish = function() {
+		pubsub.trigger.apply(pubsub, arguments);
+	};
+}(jQuery));
+
 var overlays_stack = [];
 
 function isset(key, obj) {
@@ -933,6 +957,25 @@ function basename(path, suffix) {
  */
 function appendZero(val) {
 	return val < 10 ? '0' + val : val;
+}
+
+/**
+ * Function converts unix timestamp to human readable time in format 'Y-m-d H:i:s'.
+ *
+ * @param {type} time   Unix timestamp to convert.
+ *
+ * @returns {string}
+ */
+function time2str(time) {
+	var dt = new Date(time * 1000),
+		Y = dt.getFullYear(),
+		m = appendZero(dt.getMonth()+1),
+		d = appendZero(dt.getDate()),
+		H = appendZero(dt.getHours()),
+		i = appendZero(dt.getMinutes()),
+		s = appendZero(dt.getSeconds());
+
+	return Y + '-' + m + '-' + d + ' ' + H + ':' + i + ':' + s;
 }
 
 /**
