@@ -3499,11 +3499,14 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 				eventlog_last_key) < (unsigned int)soap_count)
 		{
 			soap_count = ((const zbx_vmware_event_t *)events->values[events->values_num - 1])->key -
-					eventlog_last_key;
+					eventlog_last_key - 1;
 		}
 
-		if (SUCCEED != vmware_service_read_previous_events(easyhandle, event_session, soap_count, &doc, error))
+		if (0 < soap_count && SUCCEED != vmware_service_read_previous_events(easyhandle, event_session,
+				soap_count, &doc, error))
+		{
 			goto end_session;
+		}
 	}
 	while (0 < vmware_service_parse_event_data(events, eventlog_last_key, doc));
 
