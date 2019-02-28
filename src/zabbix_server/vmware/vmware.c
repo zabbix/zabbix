@@ -1129,8 +1129,10 @@ static void	vmware_event_backup(zbx_vmware_service_t *service, zbx_vector_ptr_t 
 
 	VMWARE_VECTOR_CREATE(events, ptr);
 
-	if (0 != service->data->events.values_num &&
-			((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog.last_key)
+	if (NULL == service->data || 0 == service->data->events.values_num)
+		return;
+
+	if (((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog.last_key)
 	{
 		for (i = 0; i < service->data->events.values_num; i++)
 			zbx_vector_ptr_append(events, service->data->events.values[i]);
@@ -3332,8 +3334,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_uint64_t 
 
 	if (NULL == (time_str = zbx_xml_read_doc_value(xdoc, xpath)))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "createdTime is missing for event key '" ZBX_FS_UI64 "'",
-				key);
+		zabbix_log(LOG_LEVEL_TRACE, "createdTime is missing for event key '" ZBX_FS_UI64 "'", key);
 	}
 	else
 	{
@@ -3472,8 +3473,11 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (SUCCEED != vmware_service_reset_event_history_collector(easyhandle, event_session, error))
 		goto end_session;
 
-	if (((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog.last_key)
+	if (NULL != service->data && 0 != service->data->events.values_num &&
+			((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog.last_key)
+	{
 		eventlog_last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
+	}
 	else
 		eventlog_last_key = service->eventlog.last_key;
 
