@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Zabbix" default="build" basedir=".">
 	<target name="init-common">
-		<!-- Delete build directories from the previous run -->
+		<!-- Cleanup from the previous run -->
 		<delete dir="build/logs" failonerror="off"/>
-		<!-- Create the different build directories -->
 		<mkdir dir="build/logs"/>
+		<mkdir dir="runtime"/>
 	</target>
 
 	<target name="create-configs" depends="init-common">
@@ -15,6 +15,7 @@
 		<property name="dbuser" value="${DBUSER}"/>
 	 	<property name="dbpassword" value="${DBPASSWORD}"/>
 	 	<property name="phpunit_error_log" value="${PHPUNIT_ERROR_LOG}"/>
+	 	<property name="phpunit_port_prefix" value="${PHPUNIT_PORT_PREFIX}"/>
 		<property environment="env"/>
 
 		<!-- Create bootstrap.php -->
@@ -23,6 +24,11 @@
 		<replace file="frontends/php/tests/bootstrap.php" token="{BASEDIR}" value="${basedir}"/>
 		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_DIR}" value="${env.SCREENSHOT_DIR}"/>
 		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_URL}" value="${env.SCREENSHOT_URL}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{BINARY_DIR}" value="${basedir}/sbin/"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{CONFIG_SOURCE_DIR}" value="${basedir}/conf/"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{CONFIG_DIR}" value="${basedir}/etc/"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{COMPONENT_DIR}" value="${basedir}/runtime/"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{PORT_PREFIX}" value="${phpunit_port_prefix}"/>
 
 		<!-- Create PHP config file -->
 		<copy overwrite="true" file="frontends/php/tests/templates/zabbix.conf.php" tofile="frontends/php/conf/zabbix.conf.php"/>
@@ -36,15 +42,38 @@
 
 	<target name="make-dbschema">
 		<!-- Create database schema -->
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
-		<exec executable="./configure" failonerror="on"></exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-s"/>
 			<arg line="dbschema"/>
 		</exec>
 	</target>
 
-	<target name="init-postgresql" depends="create-configs,make-dbschema">
+	<target name="make-binaries-postgresql">
+		<!-- Binaries for integration tests -->
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+			<arg line="--enable-server"/>
+			<arg line="--enable-proxy"/>
+			<arg line="--enable-agent"/>
+			<arg line="--with-postgresql"/>
+			<arg line="--prefix=${basedir}"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="dbschema"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="install"/>
+		</exec>
+	</target>
+
+	<target name="init-postgresql" depends="">
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
@@ -88,7 +117,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-postgresql" depends="init-postgresql">
+	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,init-postgresql">
 		<exec executable="psql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
@@ -99,7 +128,7 @@
 		</exec>
 	</target>
 
-	<target name="init-api-postgresql" depends="init-postgresql">
+	<target name="init-api-postgresql" depends="create-configs,make-dbschema,init-postgresql">
 		<exec executable="psql" input="frontends/php/tests/api_json/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
@@ -110,7 +139,39 @@
 		</exec>
 	</target>
 
-	<target name="init-mysql" depends="create-configs,make-dbschema">
+	<target name="init-integration-postgresql" depends="create-configs,make-binaries-postgresql,init-postgresql">
+		<exec executable="psql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
+			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-U '${dbuser}'"/>
+			<arg line="-1"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="${dbname}"/>
+		</exec>
+	</target>
+
+	<target name="make-binaries-mysql">
+		<!-- Binaries for integration tests -->
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+			<arg line="--enable-server"/>
+			<arg line="--enable-proxy"/>
+			<arg line="--enable-agent"/>
+			<arg line="--with-mysql"/>
+			<arg line="--prefix=${basedir}"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="dbschema"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="install"/>
+		</exec>
+	</target>
+
+	<target name="init-mysql" depends="">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
@@ -144,7 +205,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-mysql" depends="init-mysql">
+	<target name="init-frontend-mysql" depends="create-configs,make-dbschema,init-mysql">
 		<exec executable="mysql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
@@ -153,8 +214,17 @@
 		</exec>
 	</target>
 
-	<target name="init-api-mysql" depends="init-mysql">
+	<target name="init-api-mysql" depends="create-configs,make-dbschema,init-mysql">
 		<exec executable="mysql" input="frontends/php/tests/api_json/data/data_test.sql" failonerror="on">
+			<arg line="--host=${dbhost}"/>
+			<arg line="--user=${dbuser}"/>
+			<arg line="--password=${dbpassword}"/>
+			<arg line="${dbname}"/>
+		</exec>
+	</target>
+
+	<target name="init-integration-mysql" depends="create-configs,make-binaries-mysql,init-mysql">
+		<exec executable="mysql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
@@ -181,12 +251,20 @@
 		</exec>
 	</target>
 
+	<target name="test-integration">
+		<exec executable="phpunit" dir="frontends/php/tests" failonerror="off">
+			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=bootstrap.php integration/IntegrationTests.php"/>
+		</exec>
+	</target>
+
 	<target name="build-phpunit" depends="test-phpunit"/>
 	<target name="build-mysql" depends="init-frontend-mysql,test-frontend"/>
 	<target name="build-postgresql" depends="init-frontend-postgresql,test-frontend"/>
 	<target name="build-api-mysql" depends="init-api-mysql,test-api"/>
 	<target name="build-api-postgresql" depends="init-api-postgresql,test-api"/>
+	<target name="build-integration-mysql" depends="init-integration-mysql,test-integration"/>
+	<target name="build-integration-postgresql" depends="init-integration-postgresql,test-integration"/>
 
 	<!-- Default target -->
-	<target name="build" depends="build-phpunit,build-mysql,build-postgresql"/>
+	<target name="build" depends="build-phpunit,build-mysql,build-postgresql,build-integration-mysql,build-integration-postgresql"/>
 </project>
