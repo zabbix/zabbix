@@ -168,6 +168,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+.D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
 ..F....... [ZBX-15625] removed links leading to media type edit form for non-superadmins in Reports->Notifications page (Ivo)
 .......PS. [ZBX-15703] fixed case with 0 bytes received in socket (akozlovs)
 ..F....... [ZBX-15537] fixed visual bug when filter tab was overlapped by sub navigation (gcalenko)
@@ -2415,6 +2416,7 @@ Changes for 3.0.26rc1
 New features:
 
 Bug fixes:
+.D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
 ...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
 ...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
 
