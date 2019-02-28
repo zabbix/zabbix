@@ -333,7 +333,8 @@ class testDataCollection extends CIntegrationTest {
 				'UnreachablePeriod'	=> 5,
 				'UnavailableDelay'	=> 5,
 				'UnreachableDelay'	=> 1,
-				'Hostname'			=> 'proxy'
+				'Hostname'			=> 'proxy',
+				'ServerPort'		=> self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
 			]
 		]);
 	}
