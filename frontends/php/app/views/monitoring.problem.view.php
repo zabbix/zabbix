@@ -268,7 +268,7 @@ if ($data['action'] == 'problem.view') {
 				->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
 				->setModern(true)
 		)
-		->addItem((new CDiv())->setWidth(ZBX_STYLE_FORM_INPUT_MARGIN))
+		->addItem((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
 		->addItem(_('Tag name'))
 		->addItem((new CRadioButtonList('filter_tag_name_format', (int) $data['filter']['tag_name_format']))
 				->addValue(_('Full'), PROBLEMS_TAG_NAME_FULL)

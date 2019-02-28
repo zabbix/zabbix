@@ -1466,7 +1466,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		}
 	}
 
-	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 	{
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1606,9 +1606,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	zbx_vector_ptr_destroy(&tables_proxy);
 
-	DBend(ret);
-
-	if (SUCCEED != ret)
+	if (SUCCEED != (ret = DBend(ret)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to update local proxy configuration copy: %s",
 				(NULL == error ? "database error" : error));
