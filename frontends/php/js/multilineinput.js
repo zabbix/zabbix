@@ -149,6 +149,8 @@
 			]
 		}, e.data.$button);
 
+		$textarea[0].setSelectionRange(0, 0);
+
 		$textarea
 			.on('change contextmenu keydown keyup paste scroll', function() {
 				var value = $(this).val();
@@ -158,7 +160,7 @@
 				}
 			})
 			.trigger('change')
-			.focus()[0].setSelectionRange(0, 0);
+			.focus();
 	}
 
 	/**
