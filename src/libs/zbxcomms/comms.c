@@ -1850,6 +1850,11 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header. Message ignored.", s->peer);
 		nbytes = ZBX_PROTO_ERROR;
 	}
+	else
+	{
+		s->read_bytes = 0;
+		s->buffer[s->read_bytes] = '\0';
+	}
 out:
 	if (0 != timeout)
 		zbx_socket_timeout_cleanup(s);
