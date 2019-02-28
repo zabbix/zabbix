@@ -968,14 +968,17 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key, ZBX_NULL2STR(value));
 
-	/* Do not sent data from buffer if host/key are the same as previous unless buffer is full already */
+	/* do not sent data from buffer if host/key are the same as previous unless buffer is full already */
 	if (0 < buffer.count)
 	{
 		el = &buffer.data[buffer.count - 1];
-		if (CONFIG_BUFFER_SIZE <= buffer.count ||
-			((ZBX_METRIC_FLAG_PERSISTENT & flags) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount) ||
-							0 != strcmp(el->host, host) || 0 != strcmp(el->key, key))
+
+		if ((0 != (flags & ZBX_METRIC_FLAG_PERSISTENT) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount) ||
+				CONFIG_BUFFER_SIZE <= buffer.count ||
+				0 != strcmp(el->key, key) || 0 != strcmp(el->host, host))
+		{
 			send_buffer(server, port);
+		}
 	}
 
 	if (0 != (ZBX_METRIC_FLAG_PERSISTENT & flags) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
@@ -1990,7 +1993,6 @@ static void	process_active_checks(char *server, unsigned short port)
 		}
 
 		send_buffer(server, port);
-
 		metric->nextcheck = (int)time(NULL) + metric->refresh;
 	}
 
