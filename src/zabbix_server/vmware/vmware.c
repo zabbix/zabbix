@@ -3235,7 +3235,7 @@ static int	vmware_service_read_previous_events(CURL *easyhandle, const char *eve
 	int		ret = FAIL;
 	char		tmp[MAX_STRING_LEN], *event_session_esc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() soap_count: %d", __function_name, soap_count);
 
 	event_session_esc = xml_escape_dyn(event_session);
 
@@ -3464,7 +3464,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	const char	*__function_name = "vmware_service_get_event_data";
 
 	char		*event_session = NULL;
-	int		ret = FAIL, soap_count = 10; /* 10 - initial value of eventlog records number in one response */
+	int		ret = FAIL, soap_count = 5; /* 10 - initial value of eventlog records number in one response */
 	xmlDoc		*doc = NULL;
 	zbx_uint64_t	eventlog_last_key;
 
