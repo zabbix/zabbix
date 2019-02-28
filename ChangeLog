@@ -166,6 +166,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+.D.G...PS. [ZBX-8344] improved leading and trailing spaces trimming (akozlovs)
 .......PS. [ZBX-15703] fixed case with 0 bytes received in socket (akozlovs)
 ..F....... [ZBX-15537] fixed visual bug when filter tab was overlapped by sub navigation (gcalenko)
 ..F....... [ZBX-15539] fixed validation of master item in item update form (miks)
