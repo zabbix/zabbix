@@ -58,12 +58,12 @@ $availableJScripts = [
 	'dom.js' => '',
 	'servercheck.js' => '',
 	'flickerfreescreen.js' => '',
+	'multilineinput.js' => '',
 	'multiselect.js' => '',
 	'colorpicker.js' => '',
 	'chkbxrange.js' => '',
 	'csvggraphwidget.js' => '',
 	'layout.mode.js' => '',
-	'codeeditor.js' => '',
 	// vendors
 	'prototype.js' => 'vendors/',
 	'jquery.js' => 'vendors/',
@@ -213,6 +213,14 @@ $tranStrings = [
 		'S_COLLAPSE' => _('Collapse'),
 		'S_CLOSE' => _('Close')
 	],
+	'multilineinput.js' => [
+		'Click to view or edit code' => _('Click to view or edit code'),
+		'S_JAVASCRIPT' => _('JavaScript'),
+		'S_OPEN' => _('Open'),
+		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
+		'S_SAVE' => _('Save'),
+		'S_CANCEL' => _('Cancel')
+	],
 	'multiselect.js' => [
 		'No matches found' => _('No matches found'),
 		'More matches found...' => _('More matches found...'),
@@ -298,13 +306,6 @@ $tranStrings = [
 	'common.js' => [
 		'Cancel' => _('Cancel')
 	],
-	'codeeditor.js' => [
-		'S_JAVASCRIPT' => _('JavaScript'),
-		'S_OPEN' => _('Open'),
-		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
-		'S_SAVE' => _('Save'),
-		'S_CANCEL' => _('Cancel')
-	]
 ];
 
 if (empty($_GET['files'])) {

@@ -17,17 +17,16 @@
 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
 			(new CDiv($preproc_types_cbbox))
 				->addClass(ZBX_STYLE_COLUMN_35)
-				->addClass('list-numbered-item'),
-			(new CDiv((new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
-				->setAttribute('placeholder', _('pattern'))
-			))->addClass(ZBX_STYLE_COLUMN_20),
-			(new CDiv((new CTextBox('preprocessing[#{rowNum}][params][1]', ''))
-				->setAttribute('placeholder', _('output'))
-			))->addClass(ZBX_STYLE_COLUMN_20),
+				->addClass('list-numbered-item')
+				->addClass('preprocessing-step-name'),
+			(new CDiv())
+				->addClass(ZBX_STYLE_COLUMN_40)
+				->addClass('preprocessing-step-parameters'),
 			(new CDiv(new CCheckBox('preprocessing[#{rowNum}][on_fail]')))
 				->addClass(ZBX_STYLE_COLUMN_15)
 				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
-				->addClass(ZBX_STYLE_COLUMN_CENTER),
+				->addClass(ZBX_STYLE_COLUMN_CENTER)
+				->addClass('preprocessing-step-on-fail'),
 			(new CDiv((new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
@@ -35,6 +34,7 @@
 			))
 				->addClass(ZBX_STYLE_COLUMN_10)
 				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
+				->addClass('preprocessing-step-action')
 		]))
 			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass('preprocessing-step'),
@@ -66,20 +66,117 @@
 	]))
 		->addClass('preprocessing-list-item')
 		->addClass('sortable')
+		->setAttribute('data-step', '#{rowNum}');
 	?>
 </script>
+
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-single-tmpl">
+	<?php
+		echo (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
+			->setAttribute('placeholder', '#{placeholder}')
+			->addClass('parameter-0');
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-double-tmpl">
+	<?php
+		echo (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
+				->setAttribute('placeholder', '#{placeholder_0}')
+				->addClass('parameter-0').
+			(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))
+				->setAttribute('placeholder', '#{placeholder_1}')
+				->addClass('parameter-1');
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-multiline-tmpl">
+	<?php
+		echo (new CMultilineInput('preprocessing[#{rowNum}][params][0]', '', [
+			'add_post_js' => false
+		]));
+	?>
+</script>
+
 <script type="text/javascript">
 	jQuery(function($) {
-		$('.open-modal-code-editor')
-			.codeEditor()
-			.parent()
-				.removeClass()
-				.addClass('<?= ZBX_STYLE_COLUMN_40 ?>')
-				.next()
-					.hide();
 
-		var preproc_row_tpl = new Template($('#preprocessing-steps-tmpl').html()),
-			preprocessing = $('#preprocessing');
+		function makeParameterInput(index, type) {
+			var preproc_param_single_tmpl = new Template($('#preprocessing-steps-parameters-single-tmpl').html()),
+				preproc_param_double_tmpl = new Template($('#preprocessing-steps-parameters-double-tmpl').html()),
+				preproc_param_multiline_tmpl = new Template($('#preprocessing-steps-parameters-multiline-tmpl').html());
+
+			switch (type) {
+				case '<?= ZBX_PREPROC_MULTIPLIER ?>':
+					return $(preproc_param_single_tmpl.evaluate({
+						rowNum: index,
+						placeholder: <?= CJs::encodeJson(_('number')) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_RTRIM ?>':
+				case '<?= ZBX_PREPROC_LTRIM ?>':
+				case '<?= ZBX_PREPROC_TRIM ?>':
+					return $(preproc_param_single_tmpl.evaluate({
+						rowNum: index,
+						placeholder: <?= CJs::encodeJson(_('list of characters')) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_XPATH ?>':
+				case '<?= ZBX_PREPROC_ERROR_FIELD_XML ?>':
+					return $(preproc_param_single_tmpl.evaluate({
+						rowNum: index,
+						placeholder: <?= CJs::encodeJson(_('XPath')) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_JSONPATH ?>':
+				case '<?= ZBX_PREPROC_ERROR_FIELD_JSON ?>':
+					return $(preproc_param_single_tmpl.evaluate({
+						rowNum: index,
+						placeholder: <?= CJs::encodeJson(_('$.path.to.node')) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_REGSUB ?>':
+				case '<?= ZBX_PREPROC_ERROR_FIELD_REGEX ?>':
+					return $(preproc_param_double_tmpl.evaluate({
+						rowNum: index,
+						placeholder_0: <?= CJs::encodeJson(_('pattern')) ?>,
+						placeholder_1: <?= CJs::encodeJson(_('output')) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_VALIDATE_RANGE ?>':
+					return $(preproc_param_double_tmpl.evaluate({
+						rowNum: index,
+						placeholder_0: <?= CJs::encodeJson(_('min')) ?>,
+						placeholder_1: <?= CJs::encodeJson(_('max')) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_VALIDATE_REGEX ?>':
+				case '<?= ZBX_PREPROC_VALIDATE_NOT_REGEX ?>':
+					return $(preproc_param_single_tmpl.evaluate({
+						rowNum: index,
+						placeholder: <?= CJs::encodeJson(_('pattern')) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_THROTTLE_TIMED_VALUE ?>':
+					return $(preproc_param_single_tmpl.evaluate({
+						rowNum: index,
+						placeholder: <?= CJs::encodeJson(_('seconds')) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_SCRIPT ?>':
+					return $(preproc_param_multiline_tmpl.evaluate({rowNum: index})).multilineInput({
+						modal_title: '<?= _('JavaScript') ?>',
+						title: '<?= _('Click to view or edit code') ?>',
+						placeholder: '<?= _('script') ?>',
+						maxlength: <?= $data['preprocessing_script_maxlength'] ?>
+					});
+
+				default:
+					return '';
+			}
+		}
+
+		var preprocessing = $('#preprocessing'),
+			step_index = preprocessing.find('li.sortable').length;
 
 		preprocessing.sortable({
 			disabled: preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').hasClass('<?= ZBX_STYLE_DISABLED ?>'),
@@ -94,13 +191,16 @@
 
 		preprocessing
 			.on('click', '.element-table-add', function() {
-				var sortable_count,
-					row = $(this).closest('.preprocessing-list-foot');
+				var preproc_row_tmpl = new Template($('#preprocessing-steps-tmpl').html()),
+					$row = $(preproc_row_tmpl.evaluate({rowNum: step_index})),
+					type = $('select[name*="type"]', $row).val();
 
-				row.before(preproc_row_tpl.evaluate({rowNum: preprocessing.find('li.sortable').length}));
+				$('.preprocessing-step-parameters', $row).html(makeParameterInput(step_index, type));
+				$(this).closest('.preprocessing-list-foot').before($row);
 
 				$('.preprocessing-list-head').show();
-				sortable_count = preprocessing.find('li.sortable').length;
+
+				var sortable_count = preprocessing.find('li.sortable').length;
 
 				if (sortable_count == 1) {
 					preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
@@ -110,12 +210,13 @@
 						.sortable('enable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').removeClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
+
+				step_index++;
 			})
 			.on('click', '.element-table-remove', function() {
-				var sortable_count;
-
 				$(this).closest('li.sortable').remove();
-				sortable_count = preprocessing.find('li.sortable').length;
+
+				var sortable_count = preprocessing.find('li.sortable').length;
 
 				if (sortable_count == 0) {
 					$('.preprocessing-list-head').hide();
@@ -127,109 +228,11 @@
 				}
 			})
 			.on('change', 'select[name*="type"]', function() {
-				var row = $(this).closest('.preprocessing-step'),
+				var $row = $(this).closest('.preprocessing-list-item'),
 					type = $(this).val(),
-					params = $(this).closest('.preprocessing-step').find('input[type="text"][name*="params"]'),
-					on_fail = $(this).closest('.preprocessing-step').find('[name*="on_fail"]');
+					on_fail = $row.find('[name*="on_fail"]');
 
-				$(params)
-					.val('')
-					.removeAttr('title')
-					.hide();
-
-				switch (type) {
-					case '<?= ZBX_PREPROC_MULTIPLIER ?>':
-						$(params[0])
-							.attr('placeholder', <?= CJs::encodeJson(_('number')) ?>)
-							.show();
-						break;
-
-					case '<?= ZBX_PREPROC_RTRIM ?>':
-					case '<?= ZBX_PREPROC_LTRIM ?>':
-					case '<?= ZBX_PREPROC_TRIM ?>':
-						$(params[0])
-							.attr('placeholder', <?= CJs::encodeJson(_('list of characters')) ?>)
-							.show();
-						break;
-
-					case '<?= ZBX_PREPROC_XPATH ?>':
-					case '<?= ZBX_PREPROC_ERROR_FIELD_XML ?>':
-						$(params[0])
-							.attr('placeholder', <?= CJs::encodeJson(_('XPath')) ?>)
-							.show();
-						break;
-
-					case '<?= ZBX_PREPROC_JSONPATH ?>':
-					case '<?= ZBX_PREPROC_ERROR_FIELD_JSON ?>':
-						$(params[0])
-							.attr('placeholder', <?= CJs::encodeJson(_('$.path.to.node')) ?>)
-							.show();
-						break;
-
-					case '<?= ZBX_PREPROC_REGSUB ?>':
-					case '<?= ZBX_PREPROC_ERROR_FIELD_REGEX ?>':
-						$(params[0])
-							.attr('placeholder', <?= CJs::encodeJson(_('pattern')) ?>)
-							.show();
-						$(params[1])
-							.attr('placeholder', <?= CJs::encodeJson(_('output')) ?>)
-							.show();
-						break;
-
-					case '<?= ZBX_PREPROC_VALIDATE_RANGE ?>':
-						$(params[0])
-							.attr('placeholder', <?= CJs::encodeJson(_('min')) ?>)
-							.show();
-						$(params[1])
-							.attr('placeholder', <?= CJs::encodeJson(_('max')) ?>)
-							.show();
-						break;
-
-					case '<?= ZBX_PREPROC_VALIDATE_REGEX ?>':
-					case '<?= ZBX_PREPROC_VALIDATE_NOT_REGEX ?>':
-						$(params[0])
-							.attr('placeholder', <?= CJs::encodeJson(_('pattern')) ?>)
-							.show();
-						break;
-
-					case '<?= ZBX_PREPROC_THROTTLE_TIMED_VALUE ?>':
-						$(params[0])
-							.attr('placeholder', <?= CJs::encodeJson(_('seconds')) ?>)
-							.show();
-						break;
-
-					case '<?= ZBX_PREPROC_SCRIPT ?>':
-						$(params[0])
-							.attr('placeholder', <?= CJs::encodeJson(_('script')) ?>)
-							.attr('maxlength', <?= $data['preprocessing_script_maxlength'] ?>)
-							.attr('title', <?= CJs::encodeJson(_('Click to view or edit code')) ?>)
-							.addClass('open-modal-code-editor editable')
-							.show()
-							.after($('<input>').attr({
-								'type': 'hidden',
-								'id': $(params[0]).attr('id'),
-								'name': $(params[0]).attr('name')
-							}))
-							.codeEditor()
-							.parent()
-								.removeClass()
-								.addClass('<?= ZBX_STYLE_COLUMN_40 ?>')
-								.next()
-									.hide();
-						break;
-				}
-
-				if (type != '<?= ZBX_PREPROC_SCRIPT ?>' && row.find('.open-modal-code-editor')) {
-					$(params[0])
-						.codeEditor('destroy')
-						.removeClass()
-						.prop('maxlength', 255)
-						.parent()
-							.removeClass()
-							.addClass('<?= ZBX_STYLE_COLUMN_20 ?>')
-							.next()
-								.show();
-				}
+				$('.preprocessing-step-parameters', $row).html(makeParameterInput($row.data('step'), type));
 
 				// Disable "Custom on fail" for some of the preprocessing types.
 				switch (type) {

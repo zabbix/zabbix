@@ -3918,62 +3918,6 @@ $form-icon-btn: (
 		min-width: 650px;
 	}
 
-	&.modal-code-editor {
-		min-width: 960px;
-
-		.code-editor {
-			$line-height: 18px;
-
-			position: relative;
-			display: flex;
-			height: calc(100vh - 190px);
-			max-height: 548px;
-			overflow: hidden;
-
-			.line-numbers {
-				counter-reset: line;
-				overflow: hidden;
-				padding: 5px 5px 5px 0;
-				position: absolute;
-				left: 0;
-				top: 0;
-				bottom: 0;
-
-				li {
-					color: $font-alt-color;
-					font-family: $font-stack-mono;
-					line-height: $line-height;
-					text-align: right;
-
-					&::before {
-						counter-increment: line;
-						content: counter(line);
-						user-select: none;
-					}
-				}
-			}
-
-			.code-editor-textarea {
-				font-family: $font-stack-mono;
-				line-height: $line-height;
-				resize: none;
-				white-space: pre;
-				height: 100%;
-				width: 100%;
-
-				&::-webkit-scrollbar {
-					height: 9px;
-				}
-			}
-		}
-
-		.symbols-remaining {
-			color: $font-alt-color;
-			float: left;
-			line-height: 24px;
-		}
-	}
-
 	.msg-bad,
 	.msg-good {
 		position: sticky;
@@ -4022,13 +3966,19 @@ $form-icon-btn: (
 	}
 }
 
-input.open-modal-code-editor {
-	overflow: hidden;
-	cursor: pointer;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	font-family: $font-stack-mono;
-	border-right: none;
+// Multiline input control
+.multilineinput-control {
+	display: flex;
+	width: 100%;
+
+	input[type=text] {
+		overflow: hidden;
+		cursor: pointer;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		font-family: $font-stack-mono;
+		border-right: none;
+	}
 
 	&.editable {
 		background-color: $form-bg-color !important;
@@ -4039,10 +3989,66 @@ input.open-modal-code-editor {
 		color: $input-placeholder-color !important;
 	}
 
-	~ button {
+	button {
 		white-space: nowrap;
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
+	}
+}
+
+.multilineinput-modal {
+	$line-height: 18px;
+
+	min-width: 960px;
+
+	.multilineinput-container {
+		position: relative;
+		display: flex;
+		height: calc(100vh - 190px);
+		max-height: 548px;
+		overflow: hidden;
+	}
+
+	.multilineinput-line-numbers {
+		counter-reset: line;
+		overflow: hidden;
+		padding: 5px 5px 5px 0;
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+
+		li {
+			color: $font-alt-color;
+			font-family: $font-stack-mono;
+			line-height: $line-height;
+			text-align: right;
+
+			&::before {
+				counter-increment: line;
+				content: counter(line);
+				user-select: none;
+			}
+		}
+	}
+
+	.multilineinput-textarea {
+		font-family: $font-stack-mono;
+		line-height: $line-height;
+		resize: none;
+		white-space: pre;
+		height: 100%;
+		width: 100%;
+
+		&::-webkit-scrollbar {
+			height: 9px;
+		}
+	}
+
+	.multilineinput-symbols-remaining {
+		color: $font-alt-color;
+		float: left;
+		line-height: 24px;
 	}
 }
 
@@ -5981,11 +5987,14 @@ ul.checkbox-list {
 }
 
 .preprocessing-list {
-	display: table;
-	width: 100%;
+	display: block;
 	min-width: 730px;
 	max-width: 930px;
 	padding-left: 10px;
+
+	> li {
+		display: block;
+	}
 
 	.columns-wrapper {
 		position: relative;
@@ -6057,6 +6066,13 @@ ul.checkbox-list {
 					}
 				}
 			}
+		}
+	}
+
+	.preprocessing-step-parameters {
+
+		.parameter-1 {
+			margin-left: 5px;
 		}
 	}
 

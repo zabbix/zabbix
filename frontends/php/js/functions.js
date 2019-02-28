@@ -515,6 +515,7 @@ function getOverlayDialogueId() {
  * @param {object} params                                   Modal window params.
  * @param {string} params.title                             Modal window title.
  * @param {object} params.content                           Window content.
+ * @param {object} params.footer                           	Window footer content.
  * @param {object} params.controls                          Window controls.
  * @param {array}  params.buttons                           Window buttons.
  * @param {string} params.debug                             Debug HTML displayed in modal window.
@@ -550,7 +551,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	}
 
 	if (typeof params.script_inline !== 'undefined') {
-		jQuery(overlay_dialogue_footer).append(jQuery('<script>').text(params.script_inline));
+		overlay_dialogue_footer.append(jQuery('<script>').text(params.script_inline));
 	}
 
 	headerid = 'dashbrd-widget-head-title-'+params.dialogueid;
@@ -595,6 +596,10 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		body_mutation_observer = new body_mutation_observer(function(mutation) {
 			center_overlay_dialog();
 		});
+
+	if (typeof params.footer !== 'undefined') {
+		overlay_dialogue_footer.append(params.footer);
+	}
 
 	jQuery.each(params.buttons, function(index, obj) {
 		var button = jQuery('<button>', {
