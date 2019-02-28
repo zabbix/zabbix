@@ -201,7 +201,8 @@ ZABBIX.apps.map = (function($) {
 			this.formContainer = $('<div></div>', {
 					id: 'map-window',
 					class: 'overlay-dialogue',
-					style: 'display:none; top: 50px; left: 500px'})
+					style: 'display: none; top: 0; left: 0;'
+				})
 				.appendTo('body')
 				.draggable({
 					containment: [0, 0, 3200, 3200]
@@ -2785,6 +2786,8 @@ ZABBIX.apps.map = (function($) {
 				this.formContainer.draggable('option', 'handle', '#formDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
+				// Element must first be visible so that outerWidth() and outerHeight() are correct.
+				this.formContainer.positionOverlayDialogue();
 				this.active = true;
 			},
 
@@ -3223,6 +3226,8 @@ ZABBIX.apps.map = (function($) {
 				this.formContainer.draggable('option', 'handle', '#massDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
+				// Element must first be visible so that outerWidth() and outerHeight() are correct.
+				this.formContainer.positionOverlayDialogue();
 				this.updateList();
 			},
 
@@ -3354,6 +3359,8 @@ ZABBIX.apps.map = (function($) {
 				this.formContainer.draggable('option', 'handle', '#shapeDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
+				// Element must first be visible so that outerWidth() and outerHeight() are correct.
+				this.formContainer.positionOverlayDialogue();
 				this.active = true;
 			},
 
@@ -3482,6 +3489,8 @@ ZABBIX.apps.map = (function($) {
 				this.formContainer.draggable('option', 'handle', '#massShapeDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
+				// Element must first be visible so that outerWidth() and outerHeight() are correct.
+				this.formContainer.positionOverlayDialogue();
 				this.active = true;
 			},
 
@@ -3931,3 +3940,94 @@ ZABBIX.apps.map = (function($) {
 		}
 	};
 }(jQuery));
+
+jQuery(function ($) {
+	/*
+	 * Reposition the overlay dialogue window. The previous position is remembered using offset(). Each time overlay
+	 * dialogue is opened, it could have different content (shape form, element form etc) and different size, so the
+	 * new top and left position must be calculated. If the overlay dialogue is opened for the first time, position it
+	 * on the right side of the window and align it vertically. This makes the map more visible on wider screens.
+	 */
+	$.fn.positionOverlayDialogue = function () {
+		// A small gap in pixels at the top and left so it looks visually more pleasant.
+		var margin = 10;
+
+		if (this.offset().top > 0 && this.offset().left > 0) {
+			// If previous position of the overlay dialogue is known, try to reposition it so it is inside the viewport.
+
+			if (this.offset().left + this.outerWidth() > $(window).width()) {
+				// Overlay dialogue is outside the horizontal viewport. Calculate new left position.
+				var offset = this.offset().left + this.outerWidth() - $(window).width() + margin,
+					position = this.offset().left - offset;
+
+				if (position > 0) {
+					// The new position is OK, and overlay dialgue will fit the window.
+					this.css({left: position + 'px'});
+				}
+				else {
+					/*
+					 * The new position outside the horizontal viewport, set starting position on the left side of the
+					 * window with small offset.
+					 */
+					this.css({left: margin + 'px'});
+				}
+			}
+			else {
+				// Overlay dialogue fits inside the viewport just like before in the same place.
+				this.css({left: this.offset().left + 'px'});
+			}
+
+			if (this.offset().top + this.outerHeight() > $(window).height()) {
+				// Overlay dialogue is outside the vertical viewport. Calculate new top position.
+				var offset = this.offset().top + this.outerHeight() - $(window).height() + margin,
+					position = this.offset().top - offset;
+
+				if (position > 0) {
+					// The new position is OK, and overlay dialgue will fit the window.
+					this.css({top: position + 'px'});
+				}
+				else {
+					/*
+					 * The new position outside the vertical viewport, set starting position on the top side of the
+					 * window with small offset.
+					 */
+					this.css({top: margin + 'px'});
+				}
+			}
+			else {
+				// Overlay dialogue fits inside the viewport just like before in the same place.
+				this.css({top: this.offset().top + 'px'});
+			}
+		}
+		else {
+			/*
+			 * Previous position is not known, so this is the first time it has been opened. Make sure the overlay
+			 * dialogue does not go too far on the left and top side.
+			 */
+			if (this.outerWidth() > $(window).width()) {
+				/*
+				 * In case the overlay dialogue is too big to fit the viewport horizontally, set starting position on
+				 * the left side of the window with small offset.
+				 */
+				this.css({left: margin + 'px'});
+			}
+			else {
+				// Overlay dialogue fits inside viewport, so position it to the right side with a small offset.
+				this.css({left: $(window).width() - this.outerWidth() - margin + 'px'});
+			}
+
+			if (this.outerHeight() > $(window).height()) {
+				// In case the overlay dialogue is too big to fit the viewport, set a static position.
+				this.css({top: margin + 'px'});
+			}
+			else {
+				// Overlay dialogue fits inside viewport, align it vertically in the middle.
+				this.css('top',
+					Math.max(0, (($(window).height() - this.outerHeight()) / 2) + $(window).scrollTop()) + 'px'
+				);
+			}
+		}
+
+		return this;
+	};
+});
