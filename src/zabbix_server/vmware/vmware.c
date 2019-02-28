@@ -3283,8 +3283,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_uint64_t 
 
 	if (NULL == (time_str = zbx_xml_read_doc_value(xdoc, xpath)))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "createdTime is missing for event key '" ZBX_FS_UI64 "'",
-				key);
+		zabbix_log(LOG_LEVEL_TRACE, "createdTime is missing for event key '" ZBX_FS_UI64 "'", key);
 	}
 	else
 	{
