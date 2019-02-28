@@ -3212,21 +3212,22 @@ out:
  * Parameters: easyhandle     - [IN] the CURL handle                          *
  *             event_session  - [IN] event session (EventHistoryCollector)    *
  *                                   identifier                               *
- *             xdoc           - [OUT] the result as xml document               *
+ *             soap_count     - [IN] max count of events in response          *
+ *             xdoc           - [OUT] the result as xml document              *
  *             error          - [OUT] the error message in the case of failure*
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_read_previous_events(CURL *easyhandle, const char *event_session, xmlDoc **xdoc,
-		char **error)
+static int	vmware_service_read_previous_events(CURL *easyhandle, const char *event_session, int soap_count,
+		xmlDoc **xdoc, char **error)
 {
 #	define ZBX_POST_VMWARE_READ_PREVIOUS_EVENTS					\
 		ZBX_POST_VSPHERE_HEADER							\
 		"<ns0:ReadPreviousEvents>"						\
 			"<ns0:_this type=\"EventHistoryCollector\">%s</ns0:_this>"	\
-			"<ns0:maxCount>10</ns0:maxCount>"				\
+			"<ns0:maxCount>%d</ns0:maxCount>"				\
 		"</ns0:ReadPreviousEvents>"						\
 		ZBX_POST_VSPHERE_FOOTER
 
@@ -3238,7 +3239,7 @@ static int	vmware_service_read_previous_events(CURL *easyhandle, const char *eve
 
 	event_session_esc = xml_escape_dyn(event_session);
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_READ_PREVIOUS_EVENTS, event_session_esc);
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_READ_PREVIOUS_EVENTS, event_session_esc, soap_count);
 
 	zbx_free(event_session_esc);
 
@@ -3463,7 +3464,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	const char	*__function_name = "vmware_service_get_event_data";
 
 	char		*event_session = NULL;
-	int		ret = FAIL;
+	int		ret = FAIL, soap_count = 10; /* 10 - initial value of eventlog records number in one response */
 	xmlDoc		*doc = NULL;
 	zbx_uint64_t	eventlog_last_key;
 
@@ -3488,7 +3489,12 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		zbx_xml_free_doc(doc);
 		doc = NULL;
 
-		if (SUCCEED != vmware_service_read_previous_events(easyhandle, event_session, &doc, error))
+		if ((ZBX_MAXQUERYMETRICS_UNLIMITED / 2) >= soap_count)
+			soap_count = soap_count * 2;
+		else if (ZBX_MAXQUERYMETRICS_UNLIMITED != soap_count)
+			soap_count = ZBX_MAXQUERYMETRICS_UNLIMITED;
+
+		if (SUCCEED != vmware_service_read_previous_events(easyhandle, event_session, soap_count, &doc, error))
 			goto end_session;
 	}
 	while (0 < vmware_service_parse_event_data(events, eventlog_last_key, doc));
