@@ -20,7 +20,6 @@
 #include "common.h"
 #include "log.h"
 #include "threads.h"
-#include "zbxjson.h"
 
 #if !defined(_WINDOWS)
 /******************************************************************************
