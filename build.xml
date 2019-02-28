@@ -73,7 +73,7 @@
 		</exec>
 	</target>
 
-	<target name="init-postgresql" depends="">
+	<target name="init-server-postgresql" depends="">
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
@@ -117,7 +117,35 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,init-postgresql">
+	<target name="init-proxy-postgresql" depends="">
+		<!-- Create PostgreSQL database -->
+		<exec executable="psql" failonerror="on">
+			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-U '${dbuser}'"/>
+			<arg line="-1"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="-c 'drop database if exists ${dbname}_proxy'"/>
+		</exec>
+		<exec executable="psql" failonerror="on">
+			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-U '${dbuser}'"/>
+			<arg line="-1"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="-c 'create database ${dbname}_proxy'"/>
+		</exec>
+		<exec executable="psql" input="database/postgresql/schema.sql" failonerror="on">
+			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-U '${dbuser}'"/>
+			<arg line="-1"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="${dbname}_proxy"/>
+		</exec>
+	</target>
+
+	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
 		<exec executable="psql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
@@ -128,7 +156,7 @@
 		</exec>
 	</target>
 
-	<target name="init-api-postgresql" depends="create-configs,make-dbschema,init-postgresql">
+	<target name="init-api-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
 		<exec executable="psql" input="frontends/php/tests/api_json/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
@@ -139,7 +167,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-postgresql" depends="create-configs,make-binaries-postgresql,init-postgresql">
+	<target name="init-integration-postgresql" depends="create-configs,make-binaries-postgresql,init-server-postgresql,init-proxy-postgresql">
 		<exec executable="psql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
@@ -171,7 +199,7 @@
 		</exec>
 	</target>
 
-	<target name="init-mysql" depends="">
+	<target name="init-server-mysql" depends="">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
@@ -205,7 +233,29 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-mysql" depends="create-configs,make-dbschema,init-mysql">
+	<target name="init-proxy-mysql" depends="">
+		<!-- Create MySQL database -->
+		<exec executable="mysql" failonerror="on">
+			<arg line="--host=${dbhost}"/>
+			<arg line="--user=${dbuser}"/>
+			<arg line="--password=${dbpassword}"/>
+			<arg line="--execute='drop database if exists ${dbname}_proxy'"/>
+		</exec>
+		<exec executable="mysql" failonerror="on">
+			<arg line="--host=${dbhost}"/>
+			<arg line="--user=${dbuser}"/>
+			<arg line="--password=${dbpassword}"/>
+			<arg line="--execute='create database ${dbname}_proxy character set utf8 collate utf8_bin'"/>
+		</exec>
+		<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
+			<arg line="--host=${dbhost}"/>
+			<arg line="--user=${dbuser}"/>
+			<arg line="--password=${dbpassword}"/>
+			<arg line="${dbname}_proxy"/>
+		</exec>
+	</target>
+
+	<target name="init-frontend-mysql" depends="create-configs,make-dbschema,init-server-mysql">
 		<exec executable="mysql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
@@ -214,7 +264,7 @@
 		</exec>
 	</target>
 
-	<target name="init-api-mysql" depends="create-configs,make-dbschema,init-mysql">
+	<target name="init-api-mysql" depends="create-configs,make-dbschema,init-server-mysql">
 		<exec executable="mysql" input="frontends/php/tests/api_json/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
@@ -223,7 +273,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-mysql" depends="create-configs,make-binaries-mysql,init-mysql">
+	<target name="init-integration-mysql" depends="create-configs,make-binaries-mysql,init-server-mysql,init-proxy-mysql">
 		<exec executable="mysql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
