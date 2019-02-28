@@ -1428,11 +1428,17 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		}
 
 		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT) {
-			$master_item_options = [
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'itemids' => getRequest('master_itemid', $item['master_itemid']),
-				'webitems' => true
-			];
+			// Unset master item if submitted form has no master_itemid set.
+			if (hasRequest('form_refresh') && !hasRequest('master_itemid')) {
+				$item['master_itemid'] = 0;
+			}
+			else {
+				$master_item_options = [
+					'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+					'itemids' => getRequest('master_itemid', $item['master_itemid']),
+					'webitems' => true
+				];
+			}
 		}
 	}
 	else {
