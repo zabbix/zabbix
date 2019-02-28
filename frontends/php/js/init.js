@@ -61,6 +61,60 @@ jQuery(function($) {
 		changeClass(comboBox);
 	});
 
+	function showMenuPopup(obj, data, event) {
+		switch (data.type) {
+			case 'history':
+				data = getMenuPopupHistory(data);
+				break;
+
+			case 'host':
+				data = getMenuPopupHost(data, obj);
+				break;
+
+			case 'map_element_submap':
+				data = getMenuPopupMapElementSubmap(data);
+				break;
+
+			case 'map_element_group':
+				data = getMenuPopupMapElementGroup(data);
+				break;
+
+			case 'map_element_trigger':
+				data = getMenuPopupMapElementTrigger(data);
+				break;
+
+			case 'map_element_image':
+				data = getMenuPopupMapElementImage(data);
+				break;
+
+			case 'refresh':
+				data = getMenuPopupRefresh(data, obj);
+				break;
+
+			case 'trigger':
+				data = getMenuPopupTrigger(data, obj);
+				break;
+
+			case 'trigger_macro':
+				data = getMenuPopupTriggerMacro(data);
+				break;
+
+			case 'dashboard':
+				data = getMenuPopupDashboard(data, obj);
+				break;
+
+			case 'item':
+				data = getMenuPopupItem(data, obj);
+				break;
+
+			case 'item_prototype':
+				data = getMenuPopupItemPrototype(data);
+				break;
+		}
+
+		obj.menuPopup(data, event);
+	}
+
 	/**
 	 * Build menu popup for given elements.
 	 */
@@ -77,45 +131,25 @@ jQuery(function($) {
 			event.target = this;
 		}
 
-		switch (data.type) {
-			case 'history':
-				data = getMenuPopupHistory(data);
-				break;
+		var	url = new Curl('zabbix.php'),
+			ajax_data = {
+				data: data.data
+			};
 
-			case 'host':
-				data = getMenuPopupHost(data, obj);
-				break;
+		url.setArgument('action', 'menu.popup');
+		url.setArgument('type', data.type);
 
-			case 'map':
-				data = getMenuPopupMap(data, obj);
-				break;
-
-			case 'refresh':
-				data = getMenuPopupRefresh(data, obj);
-				break;
-
-			case 'trigger':
-				data = getMenuPopupTrigger(data, obj);
-				break;
-
-			case 'triggerLog':
-				data = getMenuPopupTriggerLog(data, obj);
-				break;
-
-			case 'triggerMacro':
-				data = getMenuPopupTriggerMacro(data);
-				break;
-
-			case 'dependent_items':
-				data = getMenuPopupDependentItems(data);
-				break;
-
-			case 'dashboard':
-				data = getMenuPopupDashboard(data, obj);
-				break;
-		}
-
-		obj.menuPopup(data, event);
+		$.ajax({
+			url: url.getUrl(),
+			method: 'POST',
+			data: ajax_data,
+			dataType: 'json',
+			success: function(resp) {
+				showMenuPopup(obj, resp.data, event);
+			},
+			error: function() {
+			}
+		});
 
 		return false;
 	});
