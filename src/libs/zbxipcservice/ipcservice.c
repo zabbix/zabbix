@@ -835,7 +835,7 @@ static void	ipc_service_remove_client(zbx_ipc_service_t *service, zbx_ipc_client
  *                                                                            *
  * Function: ipc_client_read_event_cb                                         *
  *                                                                            *
- * Purpose: servoce client read event libevent callback                       *
+ * Purpose: service client read event libevent callback                       *
  *                                                                            *
  ******************************************************************************/
 static void	ipc_client_read_event_cb(evutil_socket_t fd, short what, void *arg)
