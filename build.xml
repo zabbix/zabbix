@@ -125,7 +125,7 @@
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="-c 'drop database if exists ${dbname}-proxy'"/>
+			<arg line="-c 'drop database if exists ${dbname}_proxy'"/>
 		</exec>
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
@@ -133,7 +133,7 @@
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="-c 'create database ${dbname}-proxy'"/>
+			<arg line="-c 'create database ${dbname}_proxy'"/>
 		</exec>
 		<exec executable="psql" input="database/postgresql/schema.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
@@ -141,7 +141,7 @@
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="${dbname}-proxy"/>
+			<arg line="${dbname}_proxy"/>
 		</exec>
 	</target>
 
@@ -239,19 +239,19 @@
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
-			<arg line="--execute='drop database if exists ${dbname}-proxy'"/>
+			<arg line="--execute='drop database if exists ${dbname}_proxy'"/>
 		</exec>
 		<exec executable="mysql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
-			<arg line="--execute='create database ${dbname}-proxy character set utf8 collate utf8_bin'"/>
+			<arg line="--execute='create database ${dbname}_proxy character set utf8 collate utf8_bin'"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
-			<arg line="${dbname}-proxy"/>
+			<arg line="${dbname}_proxy"/>
 		</exec>
 	</target>
 

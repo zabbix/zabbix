@@ -441,7 +441,7 @@ class CIntegrationTest extends CAPITest {
 			]
 		];
 
-		$configuration[self::COMPONENT_PROXY]['DBName'] .= '-proxy';
+		$configuration[self::COMPONENT_PROXY]['DBName'] .= '_proxy';
 
 		return $configuration;
 	}
