@@ -20,12 +20,48 @@
 #include "common.h"
 #include "zbxalgo.h"
 
+zbx_variant_data_bin_t	*zbx_variant_data_bin_copy(const zbx_variant_data_bin_t *bin)
+{
+	zbx_uint32_t		size;
+	zbx_variant_data_bin_t	*value_bin;
+
+	memcpy(&size, bin, sizeof(size));
+	value_bin = zbx_malloc(NULL, size + sizeof(size));
+	memcpy(value_bin, bin, size + sizeof(size));
+
+	return value_bin;
+}
+
+zbx_variant_data_bin_t	*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size)
+{
+	zbx_variant_data_bin_t	*value_bin;
+
+	value_bin = zbx_malloc(NULL, size + sizeof(size));
+	memcpy(value_bin, &size, sizeof(size));
+	memcpy((unsigned char *)value_bin + sizeof(size), data, size);
+
+	return value_bin;
+}
+
+zbx_uint32_t	zbx_variant_data_bin_get(const zbx_variant_data_bin_t *bin, void **data)
+{
+	zbx_uint32_t	size;
+
+	memcpy(&size, bin, sizeof(zbx_uint32_t));
+	if (NULL != data)
+		*data = ((char *)bin) + sizeof(size);
+	return size;
+}
+
 void	zbx_variant_clear(zbx_variant_t *value)
 {
 	switch (value->type)
 	{
 		case ZBX_VARIANT_STR:
 			zbx_free(value->data.str);
+			break;
+		case ZBX_VARIANT_BIN:
+			zbx_free(value->data.bin);
 			break;
 	}
 
@@ -55,6 +91,12 @@ void	zbx_variant_set_none(zbx_variant_t *value)
 	value->type = ZBX_VARIANT_NONE;
 }
 
+void	zbx_variant_set_bin(zbx_variant_t *value, zbx_variant_data_bin_t *value_bin)
+{
+	value->data.bin = value_bin;
+	value->type = ZBX_VARIANT_BIN;
+}
+
 void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source)
 {
 	switch (source->type)
@@ -67,6 +109,9 @@ void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source)
 			break;
 		case ZBX_VARIANT_DBL:
 			zbx_variant_set_dbl(value, source->data.dbl);
+			break;
+		case ZBX_VARIANT_BIN:
+			zbx_variant_set_bin(value, zbx_variant_data_bin_copy(source->data.bin));
 			break;
 		case ZBX_VARIANT_NONE:
 			value->type = ZBX_VARIANT_NONE;
@@ -214,6 +259,8 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 {
 	static char	buffer[ZBX_MAX_UINT64_LEN + 1];
+	int		i, len;
+	zbx_uint32_t	size;
 
 	switch (value->type)
 	{
@@ -228,6 +275,20 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 			return value->data.str;
 		case ZBX_VARIANT_NONE:
 			return "";
+		case ZBX_VARIANT_BIN:
+			memcpy(&size, value->data.bin, sizeof(size));
+			if (0 != (len = MIN(sizeof(buffer) / 3, size)))
+			{
+				const unsigned char	*ptr = (const unsigned char *)value->data.bin + sizeof(size);
+
+				for (i = 0; i < len; i++)
+					zbx_snprintf(buffer + i * 3, sizeof(buffer) - i * 3, "%02x ", ptr[i]);
+
+				buffer[i * 3 - 1] = '\0';
+			}
+			else
+				buffer[0] = '\0';
+			return buffer;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_UNKNOWN_STR;
@@ -246,6 +307,8 @@ const char	*zbx_get_variant_type_desc(unsigned char type)
 			return "string";
 		case ZBX_VARIANT_NONE:
 			return "none";
+		case ZBX_VARIANT_BIN:
+			return "binary";
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_UNKNOWN_STR;
@@ -287,6 +350,31 @@ static int	variant_compare_empty(const zbx_variant_t *value1, const zbx_variant_
 	}
 
 	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: variant_compare_bin                                              *
+ *                                                                            *
+ * Purpose: compares two variant values when at least one contains binary data*
+ *                                                                            *
+ ******************************************************************************/
+static int	variant_compare_bin(const zbx_variant_t *value1, const zbx_variant_t *value2)
+{
+	if (ZBX_VARIANT_BIN == value1->type)
+	{
+		zbx_uint32_t	size1, size2;
+
+		if (ZBX_VARIANT_BIN != value2->type)
+			return 1;
+
+		memcpy(&size1, value1->data.bin, sizeof(size1));
+		memcpy(&size2, value2->data.bin, sizeof(size2));
+		ZBX_RETURN_IF_NOT_EQUAL(size1, size2);
+		return memcmp(value1->data.bin, value2->data.bin, size1 + sizeof(size1));
+	}
+
+	return -1;
 }
 
 /******************************************************************************
@@ -379,6 +467,8 @@ static int	variant_compare_ui64(const zbx_variant_t *value1, const zbx_variant_t
  * Comments: The following priority is applied:                               *
  *           1) value of none type is always less than other types, two       *
  *              none types are equal                                          *
+ *           1) value of binary type is always greater than other types, two  *
+ *              binary types are compared by length and then by contents      *
  *           2) if any of value is of string type, the other is converted to  *
  *              string and both are compared                                  *
  *           3) if any of value is of floating type, the other is converted   *
@@ -390,6 +480,9 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 {
 	if (ZBX_VARIANT_NONE == value1->type || ZBX_VARIANT_NONE == value2->type)
 		return variant_compare_empty(value1, value2);
+
+	if (ZBX_VARIANT_BIN == value1->type || ZBX_VARIANT_BIN == value2->type)
+		return variant_compare_bin(value1, value2);
 
 	if (ZBX_VARIANT_STR == value1->type || ZBX_VARIANT_STR == value2->type)
 		return variant_compare_str(value1, value2);

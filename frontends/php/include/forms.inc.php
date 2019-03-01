@@ -232,8 +232,8 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 }
 
 function getItemFilterForm(&$items) {
-	$filter_groupId				= $_REQUEST['filter_groupid'];
-	$filter_hostId				= $_REQUEST['filter_hostid'];
+	$filter_groupids			= $_REQUEST['filter_groupids'];
+	$filter_hostids				= $_REQUEST['filter_hostids'];
 	$filter_application			= $_REQUEST['filter_application'];
 	$filter_name				= $_REQUEST['filter_name'];
 	$filter_type				= $_REQUEST['filter_type'];
@@ -319,25 +319,25 @@ function getItemFilterForm(&$items) {
 	zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($fTypeVisibility, true).');');
 
 	// row 1
-	$group_filter = !empty($filter_groupId)
+	$group_filter = !empty($filter_groupids)
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
-			'groupids' => $filter_groupId
+			'groupids' => $filter_groupids,
+			'editable' => true
 		]), ['groupid' => 'id'])
 		: [];
 
-	$filterColumn1->addRow((new CLabel(_('Host group'), 'filter_groupid_ms')),
+	$filterColumn1->addRow((new CLabel(_('Host groups'), 'filter_groupid_ms')),
 		(new CMultiSelect([
-			'name' => 'filter_groupid',
+			'name' => 'filter_groupids[]',
 			'object_name' => 'hostGroup',
-			'multiple' => false,
 			'data' => $group_filter,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $filter->getName(),
-					'dstfld1' => 'filter_groupid',
+					'dstfld1' => 'filter_groupids_',
 					'editable' => true
 				]
 			]
@@ -364,26 +364,26 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 2
-	$host_filter = !empty($filter_hostId)
+	$host_filter = !empty($filter_hostids)
 		? CArrayHelper::renameObjectsKeys(API::Host()->get([
 			'output' => ['hostid', 'name'],
-			'hostids' => $filter_hostId,
-			'templated_hosts' => true
+			'hostids' => $filter_hostids,
+			'templated_hosts' => true,
+			'editable' => true
 		]), ['hostid' => 'id'])
 		: [];
 
-	$filterColumn1->addRow((new CLabel(_('Host'), 'filter_hostid_ms')),
+	$filterColumn1->addRow((new CLabel(_('Hosts'), 'filter_hostid_ms')),
 		(new CMultiSelect([
-			'name' => 'filter_hostid',
+			'name' => 'filter_hostids[]',
 			'object_name' => 'hosts',
-			'multiple' => false,
 			'data' => $host_filter,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_templates',
 					'srcfld1' => 'hostid',
 					'dstfrm' => $filter->getName(),
-					'dstfld1' => 'filter_hostid',
+					'dstfld1' => 'filter_hostids_',
 					'editable' => true,
 					'templated_hosts' => true
 				]
@@ -418,8 +418,8 @@ function getItemFilterForm(&$items) {
 						'dstfld1' => 'filter_application',
 						'with_applications' => '1'
 					]).
-					',(jQuery("input[name=\'filter_hostid\']").length > 0)'.
-						' ? {hostid: jQuery("input[name=\'filter_hostid\']").val()}'.
+					',(jQuery("input[name=\'filter_hostids\']").length > 0)'.
+						' ? {hostid: jQuery("input[name=\'filter_hostids\']").val()}'.
 						' : {}'.
 					'), null, this);'
 				)
@@ -460,8 +460,8 @@ function getItemFilterForm(&$items) {
 	$filterColumn4->addRow(_('Template'),
 		new CComboBox('filter_templated_items', $filter_templated_items, null, [
 			-1 => _('all'),
-			1 => _('Templated items'),
-			0 => _('Not Templated items'),
+			1 => _('Inherited items'),
+			0 => _('Not inherited items'),
 		])
 	);
 
@@ -511,7 +511,7 @@ function getItemFilterForm(&$items) {
 	// generate array with values for subfilters of selected items
 	foreach ($items as $item) {
 		// hosts
-		if (zbx_empty($filter_hostId)) {
+		if ($filter_hostids) {
 			$host = reset($item['hosts']);
 
 			if (!isset($item_params['hosts'][$host['hostid']])) {
@@ -642,10 +642,10 @@ function getItemFilterForm(&$items) {
 		// template
 		if ($filter_templated_items == -1) {
 			if ($item['templateid'] == 0 && !isset($item_params['templated_items'][0])) {
-				$item_params['templated_items'][0] = ['name' => _('Not Templated items'), 'count' => 0];
+				$item_params['templated_items'][0] = ['name' => _('Not inherited items'), 'count' => 0];
 			}
 			elseif ($item['templateid'] > 0 && !isset($item_params['templated_items'][1])) {
-				$item_params['templated_items'][1] = ['name' => _('Templated items'), 'count' => 0];
+				$item_params['templated_items'][1] = ['name' => _('Inherited items'), 'count' => 0];
 			}
 			$show_item = true;
 			foreach ($item['subfilters'] as $name => $value) {
@@ -823,9 +823,9 @@ function getItemFilterForm(&$items) {
 	}
 
 	// output
-	if (zbx_empty($filter_hostId) && count($item_params['hosts']) > 1) {
+	if ($filter_hostids && count($item_params['hosts']) > 1) {
 		$hosts_output = prepareSubfilterOutput(_('Hosts'), $item_params['hosts'], $subfilter_hosts, 'subfilter_hosts');
-		$table_subfilter->addRow($hosts_output);
+		$table_subfilter->addRow([$hosts_output]);
 	}
 
 	if (!empty($item_params['applications']) && count($item_params['applications']) > 1) {
@@ -1017,7 +1017,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		'http_authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
 		'http_username' => getRequest('http_username', ''),
 		'http_password' => getRequest('http_password', ''),
-		'preprocessing' => getRequest('preprocessing', [])
+		'preprocessing' => getRequest('preprocessing', []),
+		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];
 
 	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -1387,17 +1388,19 @@ function getItemFormData(array $item = [], array $options = []) {
  * @return CList
  */
 function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, array $types) {
+	$script_maxlength = DB::getFieldLength('item_preproc', 'params');
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
 		->addClass('preprocessing-list')
+		->addClass('list-numbered')
 		->addItem(
 			(new CListItem(
 				(new CDiv([
-					(new CDiv(_('Name')))->addClass(ZBX_STYLE_COLUMN_40),
+					(new CDiv(_('Name')))->addClass(ZBX_STYLE_COLUMN_35),
 					(new CDiv(_('Parameters')))->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv())->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv(_('Custom on fail')))
-						->addClass(ZBX_STYLE_COLUMN_10)
+						->addClass(ZBX_STYLE_COLUMN_15)
 						->addClass(ZBX_STYLE_COLUMN_CENTER),
 					(new CDiv(_('Action')))->addClass(ZBX_STYLE_COLUMN_10)
 				]))->addClass(ZBX_STYLE_COLUMNS)
@@ -1507,6 +1510,20 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				$params[0]->setAttribute('placeholder', _('seconds'));
 				$params[1]->addStyle('display: none;');
 				break;
+
+			case ZBX_PREPROC_SCRIPT:
+				$params[0]
+					->removeId()
+					->setAttribute('value', explode("\n", trim($step_param_0))[0])
+					->setAttribute('placeholder', _('script'))
+					->setAttribute('maxlength', $script_maxlength)
+					->setAttribute('title', _('Click to view or edit code'))
+					->addClass('open-modal-code-editor');
+				if (!$readonly) {
+					$params[0]->addClass('editable');
+				}
+				$params[1]->addStyle('display: none;');
+				break;
 		}
 
 		// Create checkbox "Custom on fail" and enable or disable depending on preprocessing type.
@@ -1521,6 +1538,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			case ZBX_PREPROC_ERROR_FIELD_REGEX:
 			case ZBX_PREPROC_THROTTLE_VALUE:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+			case ZBX_PREPROC_SCRIPT:
 				$on_fail->setEnabled(false);
 				break;
 
@@ -1564,7 +1582,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				new CDiv($error_handler->setReadonly($readonly)),
 				new CDiv($error_handler_params->setReadonly($readonly))
 			]))
-				->addClass(ZBX_STYLE_COLUMN_80)
+				->addClass(ZBX_STYLE_COLUMN_75)
 				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 		]))
 			->addClass(ZBX_STYLE_COLUMNS)
@@ -1580,14 +1598,18 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					(new CDiv())
 						->addClass(ZBX_STYLE_DRAG_ICON)
 						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
+					(new CDiv($preproc_types_cbbox))
+						->addClass(ZBX_STYLE_COLUMN_35)
+						->addClass('list-numbered-item'),
 					(new CDiv([
-						(new CDiv(($i + 1).':'))->addClass('step-number'),
-						$preproc_types_cbbox
-					]))->addClass(ZBX_STYLE_COLUMN_40),
-					(new CDiv($params[0]))->addClass(ZBX_STYLE_COLUMN_20),
+						$params[0],
+						($step['type'] == ZBX_PREPROC_SCRIPT)
+							? new CInput('hidden', $params[0]->getName(), trim(implode($step['params'])))
+							: null
+					]))->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv($params[1]))->addClass(ZBX_STYLE_COLUMN_20),
 					(new CDiv($on_fail))
-						->addClass(ZBX_STYLE_COLUMN_10)
+						->addClass(ZBX_STYLE_COLUMN_15)
 						->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 						->addClass(ZBX_STYLE_COLUMN_CENTER),
 					(new CDiv((new CButton('preprocessing['.$i.'][remove]', _('Remove')))
@@ -1692,7 +1714,6 @@ function getCopyElementsFormData($elementsField, $title = null) {
 function getTriggerMassupdateFormData() {
 	$data = [
 		'visible' => getRequest('visible', []),
-		'priority' => getRequest('priority', ''),
 		'dependencies' => getRequest('dependencies', []),
 		'tags' => getRequest('tags', []),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
@@ -1743,31 +1764,31 @@ function getTriggerMassupdateFormData() {
 /**
  * Generate data for the trigger configuration form.
  *
- * @param array $data											Trigger data array.
- * @param string $data['form']									Form action.
- * @param string $data['form_refresh']							Form refresh.
- * @param null|string $data['parent_discoveryid']					Parent discovery.
- * @param array $data['dependencies']							Trigger dependencies.
- * @param array $data['db_dependencies']						DB trigger dependencies.
- * @param string $data['triggerid']								Trigger ID.
- * @param string $data['expression']							Trigger expression.
- * @param string $data['recovery_expression']					Trigger recovery expression.
- * @param string $data['expr_temp']								Trigger temporary expression.
- * @param string $data['recovery_expr_temp']					Trigger temporary recovery expression.
- * @param string $data['recovery_mode']							Trigger recovery mode.
- * @param string $data['description']							Trigger description.
- * @param int $data['type']										Trigger problem event generation mode.
- * @param string $data['priority']								Trigger severity.
- * @param int $data['status']									Trigger status.
- * @param string $data['comments']								Trigger description.
- * @param string $data['url']									Trigger URL.
- * @param string $data['expression_constructor']				Trigger expression constructor mode.
- * @param string $data['recovery_expression_constructor']		Trigger recovery expression constructor mode.
- * @param bool $data['limited']									Templated trigger.
- * @param array $data['templates']								Trigger templates.
- * @param string $data['hostid']								Host ID.
- * @param string $data['expression_action']						Trigger expression action.
- * @param string $data['recovery_expression_action']			Trigger recovery expression action.
+ * @param array       $data                                     Trigger data array.
+ * @param string      $data['form']                             Form action.
+ * @param string      $data['form_refresh']                     Form refresh.
+ * @param null|string $data['parent_discoveryid']               Parent discovery ID.
+ * @param array       $data['dependencies']                     Trigger dependencies.
+ * @param array       $data['db_dependencies']                  DB trigger dependencies.
+ * @param string      $data['triggerid']                        Trigger ID.
+ * @param string      $data['expression']                       Trigger expression.
+ * @param string      $data['recovery_expression']              Trigger recovery expression.
+ * @param string      $data['expr_temp']                        Trigger temporary expression.
+ * @param string      $data['recovery_expr_temp']               Trigger temporary recovery expression.
+ * @param string      $data['recovery_mode']                    Trigger recovery mode.
+ * @param string      $data['description']                      Trigger description.
+ * @param int         $data['type']                             Trigger problem event generation mode.
+ * @param string      $data['priority']                         Trigger severity.
+ * @param int         $data['status']                           Trigger status.
+ * @param string      $data['comments']                         Trigger description.
+ * @param string      $data['url']                              Trigger URL.
+ * @param string      $data['expression_constructor']           Trigger expression constructor mode.
+ * @param string      $data['recovery_expression_constructor']  Trigger recovery expression constructor mode.
+ * @param bool        $data['limited']                          Templated trigger.
+ * @param array       $data['templates']                        Trigger templates.
+ * @param string      $data['hostid']                           Host ID.
+ * @param string      $data['expression_action']                Trigger expression action.
+ * @param string      $data['recovery_expression_action']       Trigger recovery expression action.
  *
  * @return array
  */
@@ -1784,8 +1805,12 @@ function getTriggerFormData(array $data) {
 			$options['selectTags'] = ['tag', 'value'];
 		}
 
+		if ($data['show_inherited_tags']) {
+			$options['selectItems'] = ['itemid', 'templateid', 'flags'];
+		}
+
 		if ($data['parent_discoveryid'] === null) {
-			$options['selectDiscoveryRule'] = ['itemid', 'name'];
+			$options['selectDiscoveryRule'] = ['itemid', 'name', 'templateid'];
 			$triggers = API::Trigger()->get($options);
 			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
@@ -1802,13 +1827,84 @@ function getTriggerFormData(array $data) {
 
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $trigger['tags'];
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 		}
 
 		// Get templates.
 		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
 			getTriggerParentTemplates([$trigger], $flag), $flag
 		);
+
+		if ($data['show_inherited_tags']) {
+			if ($data['parent_discoveryid'] === null) {
+				if ($trigger['discoveryRule']) {
+					$item_parent_templates = getItemParentTemplates([$trigger['discoveryRule']],
+						ZBX_FLAG_DISCOVERY_RULE
+					)['templates'];
+				}
+				else {
+					$item_parent_templates = getItemParentTemplates($trigger['items'],
+						ZBX_FLAG_DISCOVERY_NORMAL
+					)['templates'];
+				}
+			}
+			else {
+				$items = [];
+				$item_prototypes = [];
+
+				foreach ($trigger['items'] as $item) {
+					if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+						$items[] = $item;
+					}
+					else {
+						$item_prototypes[] = $item;
+					}
+				}
+
+				$item_parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates']
+					+ getItemParentTemplates($item_prototypes, ZBX_FLAG_DISCOVERY_PROTOTYPE)['templates'];
+			}
+			unset($item_parent_templates[0]);
+
+			$db_templates = $item_parent_templates
+				? API::Template()->get([
+					'output' => ['templateid'],
+					'selectTags' => ['tag', 'value'],
+					'templateids' => array_keys($item_parent_templates),
+					'preservekeys' => true
+				])
+				: [];
+
+			$inherited_tags = [];
+
+			foreach ($item_parent_templates as $templateid => $template) {
+				if (array_key_exists($templateid, $db_templates)) {
+					foreach ($db_templates[$templateid]['tags'] as $tag) {
+						if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+							$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
+								'parent_templates' => [$templateid => $template],
+								'type' => ZBX_PROPERTY_INHERITED
+							];
+						}
+						else {
+							$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
+								$templateid => $template
+							];
+						}
+					}
+				}
+			}
+
+			foreach ($data['tags'] as $tag) {
+				if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+					$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				}
+				else {
+					$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+				}
+			}
+
+			$data['tags'] = array_values($inherited_tags);
+		}
 
 		$data['limited'] = ($trigger['templateid'] != 0);
 
@@ -1818,6 +1914,14 @@ function getTriggerFormData(array $data) {
 			$host = reset($hosts);
 			$data['hostid'] = $host['hostid'];
 		}
+	}
+
+	// tags
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
+	else {
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 
 	if ($data['hostid'] && (!array_key_exists('groupid', $data) || !$data['groupid'])) {
@@ -1991,12 +2095,9 @@ function getTriggerFormData(array $data) {
 
 	order_result($data['db_dependencies'], 'description');
 
-	if (!$data['tags']) {
-		$data['tags'][] = ['tag' => '', 'value' => ''];
-	}
-
 	return $data;
 }
+
 /**
  * Get "Maintenance period" form.
  *
@@ -2370,4 +2471,56 @@ function getTimeperiodForm(array $data) {
 	);
 
 	return $form;
+}
+
+/**
+ * Renders tag table row.
+ *
+ * @param int|string $index
+ * @param string     $tag       (optional)
+ * @param string     $value     (optional)
+ * @param bool       $readonly  (optional)
+ *
+ * @return CRow
+ */
+function renderTagTableRow($index, $tag = '', $value = '', $readonly = false) {
+	return (new CRow([
+		(new CTextBox('tags['.$index.'][tag]', $tag, $readonly))
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+			->setAttribute('placeholder', _('tag')),
+		(new CTextBox('tags['.$index.'][value]', $value, $readonly))
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+			->setAttribute('placeholder', _('value')),
+		new CCol(
+			(new CButton('tags['.$index.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+				->setEnabled(!$readonly)
+		)
+	]))->addClass('form_row');
+}
+
+/**
+ * Renders tag table.
+ *
+ * @param array  $tags
+ * @param array  $tags[]['tag']
+ * @param array  $tags[]['value']
+ * @param bool   $readonly         (optional)
+ *
+ * @return CTable
+ */
+function renderTagTable(array $tags, $readonly = false) {
+	$table = new CTable();
+
+	foreach ($tags as $index => $tag) {
+		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'], $readonly));
+	}
+
+	return $table->setFooter(new CCol(
+		(new CButton('tag_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+			->setEnabled(!$readonly)
+	));
 }

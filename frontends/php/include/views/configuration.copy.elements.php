@@ -108,7 +108,7 @@ $triggersTab = (new CTabView())
 // append buttons to form
 $triggersTab->setFooter(makeFormFooter(
 	new CSubmit('copy', _('Copy')),
-	[new CButtonCancel(url_param('groupid').url_param('hostid'))]
+	[new CButtonCancel()]
 ));
 
 $triggersForm->addItem($triggersTab);

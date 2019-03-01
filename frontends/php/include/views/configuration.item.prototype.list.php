@@ -72,7 +72,9 @@ foreach ($data['items'] as $item) {
 		else {
 			$link = ($item['master_item']['source'] === 'itemprototypes')
 				? (new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				: (new CUrl('items.php'))->setArgument('hostid', $item['hostid']);
+				: (new CUrl('items.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$item['hostid']]);
 
 			$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
 				$link
@@ -137,9 +139,7 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
-	$item_menu = CMenuPopupHelper::getDependentItemPrototype($item['itemid'], $data['parent_discoveryid'],
-		$item['name']
-	);
+	$item_menu = CMenuPopupHelper::getItemPrototype($item['itemid'], $data['parent_discoveryid']);
 
 	$wizard = (new CSpan(
 		(new CButton(null))->addClass(ZBX_STYLE_ICON_WZRD_ACTION)->setMenuPopup($item_menu)

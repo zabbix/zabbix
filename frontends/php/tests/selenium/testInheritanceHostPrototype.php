@@ -91,7 +91,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		//Check layout at Host Inventory tab.
-		$this->zbxTestTabSwitch('Host inventory');
+		$this->zbxTestTabSwitch('Inventory');
 		for ($i = 0; $i < 3; $i++) {
 			$this->zbxTestAssertElementPresentXpath('//input[@id="inventory_mode_'.$i.'"][@disabled]');
 		}
@@ -340,7 +340,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		// Host inventory tab.
-		$this->zbxTestTabSwitch('Host inventory');
+		$this->zbxTestTabSwitch('Inventory');
 		if (array_key_exists('host_inventory', $data)) {
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['host_inventory'].'"]');
 		}
@@ -460,7 +460,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		// Change inventory mode.
 		if (array_key_exists('inventory', $data)) {
-			$this->zbxTestTabSwitch('Host inventory');
+			$this->zbxTestTabSwitch('Inventory');
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['inventory'].'"]');
 		}
 
@@ -494,7 +494,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 				$this->zbxTestAssertAttribute('//*[@name="group_prototypes[0][name]"]', 'value' , $data['group_prototype']);
 				$this->zbxTestTabSwitch('Templates');
 				$this->zbxTestAssertElementText('//div[@id="templateTab"]//a', $data['template']);
-				$this->zbxTestTabSwitch('Host inventory');
+				$this->zbxTestTabSwitch('Inventory');
 				$this->zbxTestAssertAttribute('//label[text()="'.$data['inventory'].'"]/../input', 'checked');
 			}
 		}

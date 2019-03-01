@@ -410,8 +410,8 @@ else {
 
 	$linkedTemplates = API::Template()->get([
 		'output' => ['templateid', 'name'],
-		'templateids' => $templateids,
-		'selectParentTemplates' => ['hostid', 'name']
+		'selectParentTemplates' => ['templateid', 'name'],
+		'templateids' => $templateids
 	]);
 	$data['linkedTemplates'] = zbx_toHash($linkedTemplates, 'templateid');
 

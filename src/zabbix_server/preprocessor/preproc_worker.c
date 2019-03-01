@@ -24,6 +24,7 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "preprocessing.h"
+#include "zbxembed.h"
 
 #include "sysinfo.h"
 #include "preproc_worker.h"
@@ -42,6 +43,8 @@ typedef struct
 zbx_preproc_result_t;
 
 #define ZBX_PREPROC_VALUE_PREVIEW_LEN		100
+
+zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
@@ -227,11 +230,12 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
 		zbx_preproc_op_t		*op = &steps[i];
 		zbx_variant_t			history_value;
 		zbx_timespec_t			history_ts;
-		const zbx_preproc_op_history_t	*ophistory;
+		zbx_preproc_op_history_t	*ophistory;
 
-		if (NULL != (ophistory = zbx_preproc_history_get_value(history_in, op->type)))
+		if (NULL != (ophistory = zbx_preproc_history_get_value(history_in, i)))
 		{
 			history_value = ophistory->value;
+			zbx_variant_set_none(&ophistory->value);
 			history_ts = ophistory->ts;
 		}
 		else
@@ -253,12 +257,16 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
 			zbx_variant_set_none(&results[i].value);
 
 		if (SUCCEED != ret)
+		{
+			zbx_variant_clear(&history_value);
 			break;
+		}
 
 		if (ZBX_VARIANT_NONE != history_value.type)
-			zbx_preproc_history_set_value(history_out, op->type, &history_value, &history_ts);
-
-		zbx_variant_clear(&history_value);
+		{
+			/* the value is byte copied to history_out vector and doesn't have to be cleared */
+			zbx_preproc_history_add_value(history_out, i, &history_value, &history_ts);
+		}
 
 		if (ZBX_VARIANT_NONE == value->type)
 			break;
@@ -355,11 +363,13 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
+	zbx_es_init(&es_engine);
+
 	zbx_ipc_message_init(&message);
 
 	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_PREPROCESSING, 10, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to preprocessing service: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannozbx_item_preproct connect to preprocessing service: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -396,6 +406,8 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 		zbx_ipc_message_clean(&message);
 	}
+
+	zbx_es_destroy(&es_engine);
 
 	return 0;
 }

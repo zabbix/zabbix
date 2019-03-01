@@ -679,9 +679,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 
 	// fetch hosts
 	$hosts = API::Host()->get([
-		'output' => ['hostid', 'status'],
-		'selectGraphs' => ($style == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
-		'selectScreens' => ($style == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+		'output' => ['hostid'],
 		'groupids' => $groupids ? $groupids : null,
 		'preservekeys' => true
 	] + $host_options);
@@ -689,10 +687,8 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 	$hostids = array_keys($hosts);
 
 	$trigger_options = [
-		'output' => ['triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags',
-			'comments'],
-		'selectHosts' => ['hostid', 'name', 'status'],
-		'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments'],
+		'selectHosts' => ['hostid', 'name'],
 		'hostids' => $hostids,
 		'monitored' => true,
 		'skipDependent' => true,
@@ -713,20 +709,6 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 	}
 
 	$triggers = getTriggersWithActualSeverity($trigger_options, $problem_options);
-
-	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
-
-	$rw_triggers = API::Trigger()->get([
-		'output' => [],
-		'triggerids' => array_keys($triggers),
-		'editable' => true,
-		'preservekeys' => true
-	]);
-
-	foreach ($triggers as $triggerid => &$trigger) {
-		$trigger['editable'] = array_key_exists($triggerid, $rw_triggers);
-	}
-	unset($trigger);
 
 	return [$hosts, $triggers];
 }
@@ -853,13 +835,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				'triggerid' => $trigger['triggerid'],
 				'value' => $trigger['value'],
 				'lastchange' => $trigger['lastchange'],
-				'priority' => $trigger['priority'],
-				'flags' => $trigger['flags'],
-				'url' => $trigger['url'],
-				'hosts' => $trigger['hosts'],
-				'items' => $trigger['items'],
-				'description_enabled' => ($trigger['comments'] !== ''
-					|| ($trigger['editable'] && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL))
+				'priority' => $trigger['priority']
 			];
 			$trcounter[$host['name']][$trigger_name]++;
 		}
@@ -916,11 +892,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$triggerTable->setHeader($header);
 
 		// data
-		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-
 		foreach ($host_names as $hostId => $host_name) {
-			$name = (new CLinkAction($host_name))
-				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true));
+			$name = (new CLinkAction($host_name))->setMenuPopup(CMenuPopupHelper::getHost($hostId));
 
 			$columns = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
@@ -1013,8 +986,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$options = ['description_enabled' => $trigger['description_enabled']];
-		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge, $options));
+		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $acknowledge));
 	}
 
 	return $column;
@@ -1208,20 +1180,15 @@ function make_trigger_details($trigger) {
 
 	$hosts = API::Host()->get([
 		'output' => ['name', 'hostid', 'status'],
-		'hostids' => $hostIds,
-		'selectScreens' => API_OUTPUT_COUNT,
-		'selectGraphs' => API_OUTPUT_COUNT
+		'hostids' => $hostIds
 	]);
 
 	if (count($hosts) > 1) {
 		order_result($hosts, 'name', ZBX_SORT_UP);
 	}
 
-	$scripts = API::Script()->getScriptsByHosts($hostIds);
-
 	foreach ($hosts as $host) {
-		$hostNames[] = (new CLinkAction($host['name']))
-			->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
+		$hostNames[] = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 		$hostNames[] = ', ';
 	}
 	array_pop($hostNames);
@@ -2259,9 +2226,7 @@ function getTriggersHostsList(array $triggers) {
 
 	$db_hosts = $hostids
 		? API::Host()->get([
-			'output' => ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
-			'selectGraphs' => API_OUTPUT_COUNT,
-			'selectScreens' => API_OUTPUT_COUNT,
+			'output' => ['hostid', 'name', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
 			'hostids' => array_keys($hostids),
 			'preservekeys' => true
 		])
@@ -2290,18 +2255,14 @@ function getTriggersHostsList(array $triggers) {
  * @param array  $triggers_hosts
  * @param string $triggers_hosts[<triggerid>][]['hostid']
  * @param string $triggers_hosts[<triggerid>][]['name']
- * @param int    $triggers_hosts[<triggerid>][]['status']
  * @param string $triggers_hosts[<triggerid>][]['maintenanceid']
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_status']
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_type']
- * @param int    $triggers_hosts[<triggerid>][]['graphs']              The number of graphs.
- * @param int    $triggers_hosts[<triggerid>][]['screens']             The number of screens.
  *
  * @return array
  */
 function makeTriggersHostsList(array $triggers_hosts) {
 	$db_maintenances = [];
-	$scripts_by_hosts = [];
 
 	$hostids = [];
 	$maintenanceids = [];
@@ -2323,19 +2284,14 @@ function makeTriggersHostsList(array $triggers_hosts) {
 				'preservekeys' => true
 			]);
 		}
-
-		$scripts_by_hosts = API::Script()->getScriptsByHosts(array_keys($hostids));
 	}
 
 	foreach ($triggers_hosts as &$hosts) {
 		$trigger_hosts = [];
 
 		foreach ($hosts as $host) {
-			$scripts_by_host = array_key_exists($host['hostid'], $scripts_by_hosts)
-				? $scripts_by_hosts[$host['hostid']]
-				: [];
 			$host_name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host, true));
+				->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 
 			// Add maintenance icon with hint if host is in maintenance.
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
@@ -2523,7 +2479,7 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
 				$url = (new CUrl('triggers.php'))
-					->setArgument('hostid', $template['hostid'])
+					->setArgument('filter_hostids', [$template['hostid']])
 					->setArgument('filter_set', 1);
 			}
 

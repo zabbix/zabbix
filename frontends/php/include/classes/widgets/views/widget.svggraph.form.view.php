@@ -237,7 +237,7 @@ $tab_problems = (new CFormList())
 
 $scripts[] = 'jQuery("#problemhosts").autoGrowTextarea({maxHeight: 100});';
 $scripts[] = $fields['tags']->getJavascript();
-$jq_templates['tag-row'] = CWidgetHelper::getTagsTemplate($fields['tags']);
+$jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 // Create 'Overrides' tab.
 $tab_overrides = (new CFormList())
