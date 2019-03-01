@@ -3823,6 +3823,10 @@ tr.cursor-move td * {
 .flickerfreescreen {
   position: relative; }
 
+.flickerfreescreen.graph {
+  -ms-overflow-style: none;
+  overflow: auto; }
+
 .graph-wrapper {
   display: inline; }
 

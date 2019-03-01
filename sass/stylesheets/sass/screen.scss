@@ -5527,6 +5527,11 @@ tr.cursor-move {
 	position: relative;
 }
 
+.flickerfreescreen.graph {
+	-ms-overflow-style: none;
+	overflow: auto;
+}
+
 .graph-wrapper {
 	display: inline;
 }

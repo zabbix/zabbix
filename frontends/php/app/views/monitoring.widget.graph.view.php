@@ -33,7 +33,7 @@ else {
 			->setId($data['graph']['containerid'])
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK)
 		)
-		->addClass('flickerfreescreen')
+		->addClass('flickerfreescreen graph')
 		->setAttribute('data-timestamp', $data['graph']['timestamp'])
 		->setId('flickerfreescreen_'.$data['graph']['dataid']);
 
