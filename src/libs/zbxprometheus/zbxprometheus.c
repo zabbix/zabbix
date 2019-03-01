@@ -187,24 +187,20 @@ static char	*str_loc_unquote_dyn(const char *src, const zbx_strloc_t *loc)
  * Purpose: compares substring at the specified location with the specified   *
  *          text                                                              *
  *                                                                            *
- * Parameters: src  - [IN] the source string                                  *
- *             loc  - [IN] the substring location                             *
- *             text - [IN] the text to compare with                           *
+ * Parameters: src      - [IN] the source string                              *
+ *             loc      - [IN] the substring location                         *
+ *             text     - [IN] the text to compare with                       *
+ *             text_len - [IN] the text length                                *
  *                                                                            *
  * Return value: -1 - the substring is less than the specified text           *
  *                0 - the substring is equal to the specified text            *
  *                1 - the substring is greater than the specified text        *
  *                                                                            *
  ******************************************************************************/
-static int	str_loc_cmp(const char *src, const zbx_strloc_t *loc, const char *text)
+static int	str_loc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len)
 {
-	size_t	len_text, len_loc;
-
-	len_loc = loc->r - loc->l + 1;
-	len_text = strlen(text);
-
-	ZBX_RETURN_IF_NOT_EQUAL(len_loc, len_text);
-	return memcmp(src + loc->l, text, len_text);
+	ZBX_RETURN_IF_NOT_EQUAL(loc->r - loc->l + 1, text_len);
+	return memcmp(src + loc->l, text, text_len);
 }
 
 /******************************************************************************
@@ -649,7 +645,7 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
 			return FAIL;
 		}
 
-		if (0 == str_loc_cmp(data, &loc_key, "__name__"))
+		if (0 == str_loc_cmp(data, &loc_key, "__name__", ZBX_CONST_STRLEN("__name__")))
 		{
 			if (NULL != filter->metric)
 			{
