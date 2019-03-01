@@ -94,6 +94,9 @@ class CMapHelper {
 			// Populate host group elements of subtype 'SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS' with hosts.
 			$areas = self::populateHostGroupsWithHosts($map, $theme);
 
+			// Apply inherited label options.
+			self::applyMapElementLabelProperties($map);
+
 			// Resolve macros in map element labels.
 			$resolve_opt = ['resolve_element_label' => true];
 			$map['selements'] = CMacrosResolverHelper::resolveMacrosInMapElements($map['selements'], $resolve_opt);
@@ -120,6 +123,81 @@ class CMapHelper {
 	}
 
 	/**
+	 * Function applies element labels inherited from map properties.
+	 *
+	 * @param array  $sysmap                             Map data.
+	 * @param array  $sysmap[selements]                  Array of map elements.
+	 * @param int    $sysmap[selements][][elementtype]   Map element type.
+	 * @param int    $sysmap[label_format]               Map label format property.
+	 * @param int    $sysmap[label_type]                 Map label type property.
+	 * @param int    $sysmap[label_type_hostgroup]       Map host group element label type.
+	 * @param string $sysmap[label_string_hostgroup]     Map host group element custom label.
+	 * @param int    $sysmap[label_type_host]            Map host element label type.
+	 * @param string $sysmap[label_string_host]          Map host element custom label.
+	 * @param int    $sysmap[label_type_trigger]         Map trigger element label type.
+	 * @param string $sysmap[label_string_trigger]       Map trigger element custom label.
+	 * @param int    $sysmap[label_type_map]             Map submap element label type.
+	 * @param string $sysmap[label_string_map]           Map submap element custom label.
+	 * @param int    $sysmap[label_type_image]           Map image element label type.
+	 * @param string $sysmap[label_string_image]         Map image element custom label.
+	 */
+	public static function applyMapElementLabelProperties(array &$sysmap) {
+		// Define which $sysmap property holds value for each type of element.
+		$label_properties = [
+			SYSMAP_ELEMENT_TYPE_HOST_GROUP => [
+				'field_label_type' => 'label_type_hostgroup',
+				'field_custom_label' => 'label_string_hostgroup'
+			],
+			SYSMAP_ELEMENT_TYPE_HOST => [
+				'field_label_type' => 'label_type_host',
+				'field_custom_label' => 'label_string_host'
+			],
+			SYSMAP_ELEMENT_TYPE_TRIGGER => [
+				'field_label_type' => 'label_type_trigger',
+				'field_custom_label' => 'label_string_trigger'
+			],
+			SYSMAP_ELEMENT_TYPE_MAP => [
+				'field_label_type' => 'label_type_map',
+				'field_custom_label' => 'label_string_map'
+			],
+			SYSMAP_ELEMENT_TYPE_IMAGE => [
+				'field_label_type' => 'label_type_image',
+				'field_custom_label' => 'label_string_image'
+			]
+		];
+
+		// Apply properties to each sysmap elemenet.
+		foreach ($sysmap['selements'] as &$selement) {
+			if ($selement['permission'] < PERM_READ) {
+				continue;
+			}
+
+			$prop = $label_properties[$selement['elementtype']];
+			$elmnt_label_type = ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_ON)
+				? $sysmap[$prop['field_label_type']]
+				: $sysmap['label_type'];
+			$inherited_label = null;
+
+			if ($elmnt_label_type == MAP_LABEL_TYPE_NOTHING) {
+				$inherited_label = '';
+			}
+			elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST && $elmnt_label_type == MAP_LABEL_TYPE_IP) {
+				$inherited_label = '{HOST.IP}';
+			}
+			elseif ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_ON
+					&& $sysmap[$prop['field_label_type']] == MAP_LABEL_TYPE_CUSTOM) {
+				$inherited_label = $sysmap[$prop['field_custom_label']];
+			}
+
+			$selement['label_type'] = $elmnt_label_type;
+			if ($inherited_label !== null) {
+				$selement['label'] = $inherited_label;
+			}
+		}
+		unset($selement);
+	}
+
+	/**
 	 * Resolve map element (selements and links) state.
 	 *
 	 * @param array $sysmap                   Map data.
@@ -135,6 +213,7 @@ class CMapHelper {
 
 		$map_info = getSelementsInfo($sysmap, $map_info_options);
 		processAreasCoordinates($sysmap, $areas, $map_info);
+
 		// Adding element names and removing inaccessible triggers from readable elements.
 		addElementNames($sysmap['selements']);
 
@@ -149,7 +228,7 @@ class CMapHelper {
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					// Move the trigger with problem and highiest priority to the beginning of the trigger list.
+					// Move the trigger with problem and highest priority to the beginning of the trigger list.
 					if (array_key_exists('triggerid', $map_info[$id])) {
 						$trigger_pos = 0;
 
@@ -184,15 +263,12 @@ class CMapHelper {
 		$status_other = [];
 
 		foreach ($sysmap['selements'] as $id => &$element) {
-			$icon = null;
-
-			if (array_key_exists($id, $map_info) && array_key_exists('iconid', $map_info[$id])) {
-				$icon = $map_info[$id]['iconid'];
-			}
+			$element['icon'] = (array_key_exists($id, $map_info) && array_key_exists('iconid', $map_info[$id]))
+				? $map_info[$id]['iconid']
+				: null;
 
 			unset($element['width'], $element['height']);
 
-			$element['icon'] = $icon;
 			if ($element['permission'] >= PERM_READ) {
 				$label = str_replace(['.', ','], ' ', $element['label']);
 
@@ -484,76 +560,6 @@ class CMapHelper {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Set labels inherited from map configuration data and swap inherited label and original.
-	 *
-	 * @param array $map
-	 *
-	 * @return array Map with inherited selement labels set into 'label' property and original label moved to
-	 *               'inherited_label' if inherited label found.
-	 */
-	public static function setElementInheritedLabels(array $map) {
-		foreach ($map['selements'] as &$selement) {
-			$inherited_label = null;
-			$selement['label_type'] = $map['label_type'];
-
-			if ($map['label_format'] != SYSMAP_LABEL_ADVANCED_OFF) {
-				switch ($selement['elementtype']) {
-					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$selement['label_type'] = $map['label_type_hostgroup'];
-						if ($map['label_type_hostgroup'] == MAP_LABEL_TYPE_CUSTOM) {
-							$inherited_label = $map['label_string_hostgroup'];
-						}
-						break;
-
-					case SYSMAP_ELEMENT_TYPE_HOST:
-						$selement['label_type'] = $map['label_type_host'];
-						if ($map['label_type_host'] == MAP_LABEL_TYPE_CUSTOM) {
-							$inherited_label = $map['label_string_host'];
-						}
-						break;
-
-					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$selement['label_type'] = $map['label_type_trigger'];
-						if ($map['label_type_trigger'] == MAP_LABEL_TYPE_CUSTOM) {
-							$inherited_label = $map['label_string_trigger'];
-						}
-						break;
-
-					case SYSMAP_ELEMENT_TYPE_MAP:
-						$selement['label_type'] = $map['label_type_map'];
-						if ($map['label_type_map'] == MAP_LABEL_TYPE_CUSTOM) {
-							$inherited_label = $map['label_string_map'];
-						}
-						break;
-
-					case SYSMAP_ELEMENT_TYPE_IMAGE:
-						$selement['label_type'] = $map['label_type_image'];
-						if ($map['label_type_image'] == MAP_LABEL_TYPE_CUSTOM) {
-							$inherited_label = $map['label_string_image'];
-						}
-						break;
-				}
-			}
-
-			if ($selement['label_type'] == MAP_LABEL_TYPE_NOTHING) {
-				$inherited_label = '';
-			}
-			elseif ($selement['label_type'] == MAP_LABEL_TYPE_IP
-					&& $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-				$inherited_label = '{HOST.IP}';
-			}
-
-			if ($inherited_label !== null) {
-				$selement['inherited_label'] = $selement['label'];
-				$selement['label'] = $inherited_label;
-			}
-		}
-		unset($selement);
-
-		return $map;
 	}
 
 	/**

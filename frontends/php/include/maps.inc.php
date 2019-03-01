@@ -1121,7 +1121,10 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 	}
 
 	if ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_OFF) {
-		$hlabel = $hglabel = $tlabel = $mlabel = ($sysmap['label_type'] == MAP_LABEL_TYPE_NAME);
+		$hlabel = ($sysmap['label_type'] == MAP_LABEL_TYPE_NAME);
+		$hglabel = ($sysmap['label_type'] == MAP_LABEL_TYPE_NAME);
+		$tlabel = ($sysmap['label_type'] == MAP_LABEL_TYPE_NAME);
+		$mlabel = ($sysmap['label_type'] == MAP_LABEL_TYPE_NAME);
 	}
 	else {
 		$hlabel = ($sysmap['label_type_host'] == MAP_LABEL_TYPE_NAME);
@@ -1651,168 +1654,73 @@ function getMapLabels($map, $map_info) {
 
 	$selements = $map['selements'];
 
-	// set label type and custom label text for all selements
-	foreach ($selements as $selementId => $selement) {
-		if ($selement['permission'] < PERM_READ) {
-			continue;
-		}
-
-		$selements[$selementId]['label_type'] = $map['label_type'];
-
-		if ($map['label_format'] == SYSMAP_LABEL_ADVANCED_OFF) {
-			continue;
-		}
-
-		switch ($selement['elementtype']) {
-			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				$selements[$selementId]['label_type'] = $map['label_type_hostgroup'];
-				if ($map['label_type_hostgroup'] == MAP_LABEL_TYPE_CUSTOM) {
-					$selements[$selementId]['label'] = $map['label_string_hostgroup'];
-				}
-				break;
-
-			case SYSMAP_ELEMENT_TYPE_HOST:
-				$selements[$selementId]['label_type'] = $map['label_type_host'];
-				if ($map['label_type_host'] == MAP_LABEL_TYPE_CUSTOM) {
-					$selements[$selementId]['label'] = $map['label_string_host'];
-				}
-				break;
-
-			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$selements[$selementId]['label_type'] = $map['label_type_trigger'];
-				if ($map['label_type_trigger'] == MAP_LABEL_TYPE_CUSTOM) {
-					$selements[$selementId]['label'] = $map['label_string_trigger'];
-				}
-				break;
-
-			case SYSMAP_ELEMENT_TYPE_MAP:
-				$selements[$selementId]['label_type'] = $map['label_type_map'];
-				if ($map['label_type_map'] == MAP_LABEL_TYPE_CUSTOM) {
-					$selements[$selementId]['label'] = $map['label_string_map'];
-				}
-				break;
-
-			case SYSMAP_ELEMENT_TYPE_IMAGE:
-				$selements[$selementId]['label_type'] = $map['label_type_image'];
-				if ($map['label_type_image'] == MAP_LABEL_TYPE_CUSTOM) {
-					$selements[$selementId]['label'] = $map['label_string_image'];
-				}
-				break;
-		}
-	}
-
-	$labelLines = [];
-	$statusLines = [];
-
-	foreach ($selements as $selementId => $selement) {
-		if ($selement['permission'] < PERM_READ) {
-			continue;
-		}
-
-		$labelLines[$selementId] = [];
-		$statusLines[$selementId] = [];
-
-		$msgs = explode("\n", $selement['label']);
-		foreach ($msgs as $msg) {
-			$labelLines[$selementId][] = ['content' => $msg];
-		}
-
-		$elementInfo = $map_info[$selementId];
-
-		foreach (['problem', 'unack', 'maintenance', 'ok', 'status'] as $caption) {
-			if (!isset($elementInfo['info'][$caption]) || zbx_empty($elementInfo['info'][$caption]['msg'])) {
-				continue;
-			}
-
-			$msgs = explode("\n", $elementInfo['info'][$caption]['msg']);
-
-			foreach ($msgs as $msg) {
-				$statusLines[$selementId][] = [
-					'content' => $msg,
-					'attributes' => [
-						'fill' => '#' . $elementInfo['info'][$caption]['color']
-					]
-				];
-			}
-		}
-	}
-
-	$elementsHostIds = [];
-	foreach ($selements as $selement) {
-		if ($selement['permission'] < PERM_READ) {
-			continue;
-		}
-
-		if ($selement['label_type'] != MAP_LABEL_TYPE_IP) {
-			continue;
-		}
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-			$elementsHostIds[] = $selement['elements'][0]['hostid'];
-		}
-	}
-
-	if (!empty($elementsHostIds)) {
-		$mapHosts = API::Host()->get([
-			'output' => ['hostid'],
-			'selectInterfaces' => API_OUTPUT_EXTEND,
-			'hostids' => $elementsHostIds
-		]);
-		$mapHosts = zbx_toHash($mapHosts, 'hostid');
-	}
-
+	// Collect labels for each map element and apply appropriate values.
 	$labels = [];
 	foreach ($selements as $selementId => $selement) {
 		if ($selement['permission'] < PERM_READ) {
 			continue;
 		}
-
-		if (empty($selement) || $selement['label_type'] == MAP_LABEL_TYPE_NOTHING) {
+		elseif ($selement['label_type'] == MAP_LABEL_TYPE_NOTHING) {
 			$labels[$selementId] = [];
 			continue;
 		}
 
-		$elementInfo = $map_info[$selementId];
+		$label_lines = [];
+		$msgs = explode("\n", $selement['label']);
+		foreach ($msgs as $msg) {
+			$label_lines[] = ['content' => $msg];
+		}
+
+		$status_lines = [];
+		$element_info = $map_info[$selementId];
+		if (array_key_exists('info', $element_info)) {
+			foreach (['problem', 'unack', 'maintenance', 'ok', 'status'] as $caption) {
+				if (array_key_exists($caption, $element_info['info'])
+						&& $element_info['info'][$caption]['msg'] !== '') {
+					$msgs = explode("\n", $element_info['info'][$caption]['msg']);
+					foreach ($msgs as $msg) {
+						$status_lines[] = [
+							'content' => $msg,
+							'attributes' => [
+								'fill' => '#'.$element_info['info'][$caption]['color']
+							]
+						];
+					}
+				}
+			}
+		}
 
 		$hl_color = null;
 		$st_color = null;
-
-		if (!isset($_REQUEST['noselements']) && ($map['highlight'] % 2) == SYSMAP_HIGHLIGHT_ON) {
-			if ($elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_ON) {
+		if (($map['highlight'] % 2) == SYSMAP_HIGHLIGHT_ON) {
+			if ($element_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON) {
 				$hl_color = true;
 			}
-			if ($elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_MAINTENANCE) {
-				$st_color = true;
-			}
-			if ($elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_DISABLED) {
+			if ($element_info['icon_type'] == SYSMAP_ELEMENT_ICON_MAINTENANCE
+					|| $element_info['icon_type'] == SYSMAP_ELEMENT_ICON_DISABLED) {
 				$st_color = true;
 			}
 		}
 
 		if (in_array($selement['elementtype'], [SYSMAP_ELEMENT_TYPE_HOST_GROUP, SYSMAP_ELEMENT_TYPE_MAP])
-				&& !is_null($hl_color)) {
+				&& $hl_color !== null) {
 			$st_color = null;
 		}
-		elseif (!is_null($st_color)) {
+		elseif ($st_color !== null) {
 			$hl_color = null;
 		}
 
-		$label = [];
-
 		if ($selement['label_type'] == MAP_LABEL_TYPE_IP && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-			$interface = reset($mapHosts[$selement['elements'][0]['hostid']]['interfaces']);
-
-			$label[] = ['content' => $interface['ip']];
-			$label = array_merge($label, $statusLines[$selementId]);
+			$label = array_merge([['content' => $selement['label']]], $status_lines);
 		}
 		elseif ($selement['label_type'] == MAP_LABEL_TYPE_STATUS) {
-			$label = $statusLines[$selementId];
+			$label = $status_lines;
 		}
 		elseif ($selement['label_type'] == MAP_LABEL_TYPE_NAME) {
-			$label[] = ['content' => $elementInfo['name']];
-			$label = array_merge($label, $statusLines[$selementId]);
+			$label = array_merge([['content' => $element_info['name']]], $status_lines);
 		}
 		else {
-			$label = array_merge($labelLines[$selementId], $statusLines[$selementId]);
+			$label = array_merge($label_lines, $status_lines);
 		}
 
 		$labels[$selementId] = $label;
