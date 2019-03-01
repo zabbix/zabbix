@@ -202,8 +202,4 @@ int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
 					host, hostlen, serv, servlen, flags)
 #endif
 
-#ifdef _WINDOWS
-int	zbx_socket_start(char **error);
-#endif
-
 #endif
