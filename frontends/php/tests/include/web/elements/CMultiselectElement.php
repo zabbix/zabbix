@@ -85,6 +85,8 @@ class CMultiselectElement extends CElement {
 			foreach ($labels as $label) {
 				$table->findRow('Name', $label)->select();
 			}
+			$overlay->getFooter()->query('button:Select')->one()->click();
+			$overlay->waitUntilNotPresent();
 		}
 
 		return $this;
