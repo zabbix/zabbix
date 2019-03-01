@@ -1997,6 +1997,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				if (array_key_exists('inventory', $matched['macros_n']) && $matched['macros_n']['inventory']) {
+					$query_trigger_hosts = true;
 					$query_inventories = true;
 				}
 
@@ -2417,6 +2418,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'{INVENTORY.HW.DATE.PURCHASE}' => 'date_hw_purchase',
 			'{INVENTORY.INSTALLER.NAME}' => 'installer_name',
 			'{INVENTORY.LOCATION}' => 'location',
+			'{PROFILE.LOCATION}' => 'location', // deprecated
 			'{INVENTORY.LOCATION.LAT}' => 'location_lat',
 			'{INVENTORY.LOCATION.LON}' => 'location_lon',
 			'{INVENTORY.MACADDRESS.A}' => 'macaddress_a',
