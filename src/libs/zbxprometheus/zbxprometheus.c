@@ -611,15 +611,12 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
 
 	while ('}' != data[pos])
 	{
-		zbx_prometheus_condition_op_t	op;
-
 		if (FAIL == parse_condition(data, pos, &loc_key, &loc_op, &loc_value))
 		{
 			*error = zbx_dsprintf(*error, "cannot parse label condition at \"%s\"", data + pos);
 			return FAIL;
 		}
 
-		op = str_loc_op(data, &loc_op);
 		if (0 == strncmp(data + loc_key.l, "__name__", loc_key.r - loc_key.l + 1))
 		{
 			if (NULL != filter->metric)
@@ -629,14 +626,14 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
 			}
 
 			filter->metric = prometheus_condition_create(NULL,
-					str_loc_unquote_dyn(data, &loc_value), op);
+					str_loc_unquote_dyn(data, &loc_value), str_loc_op(data, &loc_op));
 		}
 		else
 		{
 			zbx_prometheus_condition_t	*condition;
 
 			condition = prometheus_condition_create(str_loc_dup(data, &loc_key),
-					str_loc_unquote_dyn(data, &loc_value), op);
+					str_loc_unquote_dyn(data, &loc_value), str_loc_op(data, &loc_op));
 			zbx_vector_ptr_append(&filter->labels, condition);
 		}
 
