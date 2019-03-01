@@ -1961,14 +1961,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			// Map extracted macros to map elements.
 			if (array_key_exists('macros', $matched_macros)) {
 				// Check if inventory or interface details was requested.
-				if (array_key_exists('interface', $matched_macros['macros'])
-						&& $matched_macros['macros']['interface']) {
-					$query_interfaces = true;
-				}
+				if ($selement_type == SYSMAP_ELEMENT_TYPE_HOST) {
+					if ($matched_macros['macros']['interface']) {
+						$query_interfaces = true;
+					}
 
-				if (array_key_exists('inventory', $matched_macros['macros'])
-						&& $matched_macros['macros']['inventory']) {
-					$query_inventories = true;
+					if ($matched_macros['macros']['inventory']) {
+						$query_inventories = true;
+					}
 				}
 
 				foreach ($matched_macros['macros'] as $macros) {
@@ -1992,20 +1992,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				// Check if inventory or interface details was requested.
-				if (array_key_exists('interface', $matched_macros['macros_n'])
-						&& $matched_macros['macros_n']['interface']) {
-					$query_interfaces = true;
-				}
+				if ($selement_type == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+					if ($matched_macros['macros_n']['interface']) {
+						$query_interfaces = true;
+					}
 
-				if (array_key_exists('inventory', $matched_macros['macros_n'])
-						&& $matched_macros['macros_n']['inventory']) {
-					$query_trigger_hosts = true;
-					$query_inventories = true;
-				}
+					if ($matched_macros['macros_n']['inventory']) {
+						$query_trigger_hosts = true;
+						$query_inventories = true;
+					}
 
-				if ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER
-						&& $matched_macros['macros_n']['host']) {
-					$query_trigger_hosts = true;
+					if ($matched_macros['macros_n']['host']) {
+						$query_trigger_hosts = true;
+					}
 				}
 			}
 
