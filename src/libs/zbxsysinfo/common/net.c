@@ -124,6 +124,8 @@ static const char	*decode_type(int q_type)
 	{
 		case T_A:
 			return "A";	/* address */
+		case T_AAAA:
+			return "AAAA";	/* v6 address */
 		case T_NS:
 			return "NS";	/* name server */
 		case T_MD:
@@ -177,6 +179,31 @@ static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char 
 }
 #endif	/* !defined(_WINDOWS) */
 
+/* Replace zbx_inet_ntop with inet_ntop in case of drop Windows XP/W2k3 support */
+#if defined(_WINDOWS)
+const char *zbx_inet_ntop(int af, const void *src, char *dst, size_t size)
+{
+	struct sockaddr_storage ss;
+	unsigned long s = size;
+
+	memset(&ss, '\0', sizeof(ss));
+	ss.ss_family = af;
+
+	switch(af)
+	{
+		case AF_INET:
+			((struct sockaddr_in *)&ss)->sin_addr = *(struct in_addr *)src;
+			break;
+		case AF_INET6:
+			((struct sockaddr_in6 *)&ss)->sin6_addr = *(struct in6_addr *)src;
+			break;
+		default:
+			return NULL;
+	}
+
+	return (0 == WSAAddressToStringA((struct sockaddr *)&ss, sizeof(ss), NULL, dst, &s))? dst : NULL;
+}
+#endif
 #endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
 
 static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_answer)
@@ -184,19 +211,34 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
 	size_t			offset = 0;
-	int			res, type, retrans, retry, use_tcp, i, ret = SYSINFO_RET_FAIL;
-	char			*ip, zone[MAX_STRING_LEN], buffer[MAX_STRING_LEN], *zone_str, *param;
+	int			res, type, retrans, retry, use_tcp, i, ret = SYSINFO_RET_FAIL, ip_type = AF_INET;
+	char			*ip, zone[MAX_STRING_LEN], buffer[MAX_STRING_LEN], *zone_str, *param,
+				tmp[MAX_STRING_LEN];
 	struct in_addr		inaddr;
+	struct in6_addr		in6addr;
 #ifndef _WINDOWS
 #if defined(HAVE_RES_NINIT) && !defined(_AIX)
 	/* It seems that on some AIX systems with no updates installed res_ninit() can */
 	/* corrupt stack (see ZBX-14559). Use res_init() on AIX. */
 	struct __res_state	res_state_local;
 #else	/* thread-unsafe resolver API */
-	int			saved_nscount = 0, saved_retrans, saved_retry;
+	int			saved_retrans, saved_retry, saved_nscount = 0;
 	unsigned long		saved_options;
 	struct sockaddr_in	saved_ns;
+#	if defined(HAVE_RES_U_EXT)		/* thread-unsafe resolver API /Linux/ */
+	int			save_nssocks, saved_nscount6;
+#	endif
 #endif
+
+#if defined(HAVE_RES_EXT_EXT)		/* AIX */
+	union res_sockaddr_union	saved_ns6;
+#elif defined(HAVE_RES_U_EXT_EXT)	/* BSD */
+	struct sockaddr_in6		saved_ns6;
+#else
+	struct sockaddr_in6		*saved_ns6;
+#endif
+	struct sockaddr_in6	sockaddrin6;
+	struct addrinfo		hint, *hres = NULL;
 #endif
 	typedef struct
 	{
@@ -209,6 +251,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	{
 		{"ANY",		T_ANY},
 		{"A",		T_A},
+		{"AAAA",	T_AAAA},
 		{"NS",		T_NS},
 		{"MD",		T_MD},
 		{"MF",		T_MF},
@@ -233,7 +276,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #ifdef _WINDOWS
 	PDNS_RECORD	pQueryResults, pDnsRecord;
 	wchar_t		*wzone;
-	char		tmp2[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
+	char		tmp2[MAX_STRING_LEN];
 	DWORD		options;
 #else
 	char		*name;
@@ -275,6 +318,17 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	ip = get_rparam(request, 0);
 	zone_str = get_rparam(request, 1);
 
+#ifndef _WINDOWS
+	memset(&hint, '\0', sizeof(hint));
+	hint.ai_family = PF_UNSPEC;
+	hint.ai_flags = AI_NUMERICHOST;
+
+	if (NULL != ip && '\0' != *ip && 0 == getaddrinfo(ip, NULL, &hint, &hres) && AF_INET6 == hres->ai_family)
+		ip_type = hres->ai_family;
+
+	if (NULL != hres)
+		freeaddrinfo(hres);
+#endif
 	if (NULL == zone_str || '\0' == *zone_str)
 		strscpy(zone, "zabbix.com");
 	else
@@ -380,6 +434,11 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 				inaddr.s_addr = pDnsRecord->Data.A.IpAddress;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
 						inet_ntoa(inaddr));
+				break;
+			case T_AAAA:
+				memcpy(&in6addr.s6_addr, &(pDnsRecord->Data.AAAA.Ip6Address), sizeof(in6addr.s6_addr));
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
+						zbx_inet_ntop(AF_INET6, &in6addr, tmp, sizeof(tmp)));
 				break;
 			case T_NS:
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
@@ -492,7 +551,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL != ip && '\0' != *ip)
+	if (NULL != ip && '\0' != *ip && AF_INET == ip_type)
 	{
 		if (0 == inet_aton(ip, &inaddr))
 		{
@@ -515,8 +574,63 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		_res.nscount = 1;
 #endif
 	}
+	else if (NULL != ip && '\0' != *ip && AF_INET6 == ip_type)
+	{
+		if (0 == inet_pton(ip_type, ip, &in6addr))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid IPv6 address."));
+			return SYSINFO_RET_FAIL;
+		}
 
-#if defined(HAVE_RES_NINIT) && !defined(_AIX)
+		memset(&sockaddrin6, '\0', sizeof(sockaddrin6));
+#if defined(HAVE_RES_SIN6_LEN)
+		sockaddrin6.sin6_len = sizeof(sockaddrin6);
+#endif
+		sockaddrin6.sin6_family = AF_INET6;
+		sockaddrin6.sin6_addr = in6addr;
+		sockaddrin6.sin6_port = htons(ZBX_DEFAULT_DNS_PORT);
+#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
+		memset(&res_state_local.nsaddr_list[0], '\0', sizeof(res_state_local.nsaddr_list[0]));
+#		ifdef HAVE_RES_U_EXT			/* Linux */
+		saved_ns6 = res_state_local._u._ext.nsaddrs[0];
+		res_state_local._u._ext.nsaddrs[0] = &sockaddrin6;
+		res_state_local._u._ext.nssocks[0] = -1;
+		res_state_local._u._ext.nscount6 = 1;	/* CentOS */
+#		elif HAVE_RES_U_EXT_EXT			/* BSD */
+		if (NULL != res_state_local._u._ext.ext)
+			memcpy(res_state_local._u._ext.ext, &sockaddrin6, sizeof(sockaddrin6));
+
+		res_state_local.nsaddr_list[0].sin_port = htons(ZBX_DEFAULT_DNS_PORT);
+#		endif
+		res_state_local.nscount = 1;
+#else
+		memcpy(&saved_ns, &(_res.nsaddr_list[0]), sizeof(struct sockaddr_in));
+		saved_nscount = _res.nscount;
+#		if defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT) || defined(HAVE_RES_EXT_EXT)
+		memset(&_res.nsaddr_list[0], '\0', sizeof(_res.nsaddr_list[0]));
+		_res.nscount = 1;
+#		endif
+#		if defined(HAVE_RES_U_EXT)		/* thread-unsafe resolver API /Linux/ */
+		saved_nscount6 = _res._u._ext.nscount6;
+		saved_ns6 = _res._u._ext.nsaddrs[0];
+		save_nssocks = _res._u._ext.nssocks[0];
+		_res._u._ext.nsaddrs[0] = &sockaddrin6;
+		_res._u._ext.nssocks[0] = -1;
+		_res._u._ext.nscount6 = 1;
+#		elif defined(HAVE_RES_U_EXT_EXT)	/* thread-unsafe resolver API /BSD/ */
+		memcpy(&saved_ns6, _res._u._ext.ext, sizeof(saved_ns6));
+		_res.nsaddr_list[0].sin_port = htons(ZBX_DEFAULT_DNS_PORT);
+
+		if (NULL != _res._u._ext.ext)
+			memcpy(_res._u._ext.ext, &sockaddrin6, sizeof(sockaddrin6));
+#		elif defined(HAVE_RES_EXT_EXT)		/* thread-unsafe resolver API /AIX/ */
+		memcpy(&saved_ns6, &(_res._ext.ext.nsaddrs[0]), sizeof(saved_ns6));
+		memcpy(&_res._ext.ext.nsaddrs[0], &sockaddrin6, sizeof(sockaddrin6));
+#		endif /* #if defined(HAVE_RES_U_EXT) */
+#endif /* #if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT)) */
+	}
+
+#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
 	if (0 != use_tcp)
 		res_state_local.options |= RES_USEVC;
 
@@ -524,6 +638,11 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	res_state_local.retry = retry;
 
 	res = res_nsend(&res_state_local, buf, res, answer.buffer, sizeof(answer.buffer));
+
+#	ifdef HAVE_RES_U_EXT	/* Linux */
+	if (NULL != ip && '\0' != *ip && AF_INET6 == ip_type)
+		res_state_local._u._ext.nsaddrs[0] = saved_ns6;
+#	endif
 #	ifdef HAVE_RES_NDESTROY
 	res_ndestroy(&res_state_local);
 #	else
@@ -548,10 +667,23 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	if (NULL != ip && '\0' != *ip)
 	{
+		if (AF_INET6 == ip_type)
+		{
+#			if defined(HAVE_RES_U_EXT)		/* Linux */
+			_res._u._ext.nsaddrs[0] = saved_ns6;
+			_res._u._ext.nssocks[0] = save_nssocks;
+			_res._u._ext.nscount6 = saved_nscount6;
+#			elif defined(HAVE_RES_U_EXT_EXT)	/* BSD */
+			if (NULL != _res._u._ext.ext)
+				memcpy(_res._u._ext.ext, &saved_ns6, sizeof(saved_ns6));
+#			elif defined(HAVE_RES_EXT_EXT)		/* AIX */
+			memcpy(&_res._ext.ext.nsaddrs[0], &saved_ns6, sizeof(saved_ns6));
+#			endif
+		}
+
 		memcpy(&(_res.nsaddr_list[0]), &saved_ns, sizeof(struct sockaddr_in));
 		_res.nscount = saved_nscount;
 	}
-
 #endif
 	hp = (HEADER *)answer.buffer;
 
@@ -602,7 +734,24 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 					case C_IN:
 					case C_HS:
 						memcpy(&inaddr, msg_ptr, INADDRSZ);
-						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", inet_ntoa(inaddr));
+						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
+								inet_ntoa(inaddr));
+						break;
+					default:
+						;
+				}
+
+				msg_ptr += q_len;
+
+				break;
+			case T_AAAA:
+				switch (q_class)
+				{
+					case C_IN:
+					case C_HS:
+						memcpy(&in6addr, msg_ptr, IN6ADDRSZ);
+						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
+								inet_ntop(AF_INET6, &in6addr, tmp, sizeof(tmp)));
 						break;
 					default:
 						;
