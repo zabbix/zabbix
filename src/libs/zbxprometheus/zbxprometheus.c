@@ -690,6 +690,8 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 	memset(filter, 0, sizeof(zbx_prometheus_filter_t));
 	zbx_vector_ptr_create(&filter->labels);
 
+	pos = skip_spaces(data, pos);
+
 	if (SUCCEED == parse_metric(data, pos, &loc))
 	{
 		filter->metric = prometheus_condition_create(NULL, str_loc_dup(data, &loc),
