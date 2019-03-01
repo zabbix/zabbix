@@ -1946,7 +1946,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			// Collect strings to test for macros.
 			$texts = $options['resolve_element_label'] ? [$sel['label']] : [];
-			if ($options['resolve_element_urls'] && array_key_exists('urls', $sel)) {
+			if ($options['resolve_element_urls']) {
 				foreach ($sel['urls'] as $url) {
 					$texts[] = $url['name'];
 					$texts[] = $url['url'];
