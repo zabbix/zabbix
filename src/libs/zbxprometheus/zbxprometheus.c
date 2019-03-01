@@ -182,6 +182,54 @@ static char	*str_loc_unquote_dyn(const char *src, const zbx_strloc_t *loc)
 
 /******************************************************************************
  *                                                                            *
+ * Function: str_loc_unescape_hint_dyn                                        *
+ *                                                                            *
+ * Purpose: unescapes HELP hint                                               *
+ *                                                                            *
+ * Parameters: src - [IN] the source string                                   *
+ *             loc - [IN] the substring location                              *
+ *                                                                            *
+ * Return value: The unescaped and copied HELP string.                        *
+ *                                                                            *
+ ******************************************************************************/
+static char	*str_loc_unescape_hint_dyn(const char *src, const zbx_strloc_t *loc)
+{
+	char		*str, *pout;
+	const char	*pin;
+	size_t		len;
+
+	len = loc->r - loc->l + 1;
+	str = zbx_malloc(NULL, len + 1);
+
+	for (pout = str, pin = src + loc->l; pin <= src + loc->r; pin++)
+	{
+		if ('\\' == *pin)
+		{
+			pin++;
+			switch (*pin)
+			{
+				case '\\':
+					*pout++ = '\\';
+					break;
+				case 'n':
+					*pout++ = '\n';
+					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
+					*pout++ = '?';
+			}
+		}
+		else
+			*pout++ = *pin;
+	}
+
+	*pout++  ='\0';
+
+	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: str_loc_cmp                                                      *
  *                                                                            *
  * Purpose: compares substring at the specified location with the specified   *
@@ -1070,10 +1118,18 @@ static int	parse_help(const char *data, size_t pos, zbx_strloc_t *loc_metric, zb
 
 	pos = skip_spaces(data, loc_metric->r + 1);
 	loc_help->l = pos;
-	if (NULL == (ptr = strchr(data + pos, '\n')))
-		loc_help->r = strlen(data + pos) + pos - 1;
-	else
-		loc_help->r = ptr - data - 1;
+
+	for (ptr = data + pos; '\0' != *ptr && '\n' != *ptr;)
+	{
+		if ('\\' == *ptr++)
+		{
+			if ('\\' != *ptr && 'n' != *ptr)
+				return FAIL;
+			ptr++;
+		}
+	}
+
+	loc_help->r = ptr - data - 1;
 
 	return SUCCEED;
 }
@@ -1155,7 +1211,7 @@ static int	prometheus_register_hint(zbx_hashset_t *hints, const char *data, char
 			*error = zbx_dsprintf(*error, "multiple HELP comments found for metric \"%s\"", hint->metric);
 			return FAIL;
 		}
-		hint->help = str_loc_dup(data, loc_hint);
+		hint->help = str_loc_unescape_hint_dyn(data, loc_hint);
 	}
 	else /* ZBX_PROMETHEUS_HINT_TYPE */
 	{
