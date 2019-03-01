@@ -25,9 +25,9 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = isset($_REQUEST['parent_discoveryid']) ? _('Configuration of graph prototypes') : _('Configuration of graphs');
+$page['title'] = hasRequest('parent_discoveryid') ? _('Configuration of graph prototypes') : _('Configuration of graphs');
 $page['file'] = 'graphs.php';
-$page['scripts'] = ['colorpicker.js'];
+$page['scripts'] = ['colorpicker.js', 'multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -58,8 +58,7 @@ $fields = [
 	'show_work_period' =>	[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	'group_graphid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
-	'copy_targetid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
-	'copy_groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy}) && isset({copy_type}) && {copy_type} == 0'],
+	'copy_targetids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete"'),	null],
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
@@ -311,7 +310,7 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 }
 elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('copy')
 		&& hasRequest('group_graphid')) {
-	if (getRequest('copy_targetid') != 0 && hasRequest('copy_type')) {
+	if (hasRequest('copy_targetids') && getRequest('copy_targetids') > 0 && hasRequest('copy_type')) {
 		$result = true;
 
 		$options = [
@@ -322,11 +321,11 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && h
 
 		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$options['hostids'] = getRequest('copy_targetid');
+			$options['hostids'] = getRequest('copy_targetids');
 		}
 		// host groups
 		else {
-			$groupids = getRequest('copy_targetid');
+			$groupids = getRequest('copy_targetids');
 			zbx_value2array($groupids);
 
 			$dbGroups = API::HostGroup()->get([
@@ -395,10 +394,11 @@ if (empty($_REQUEST['parent_discoveryid'])) {
 	$hostId = $pageFilter->hostid;
 }
 
-if (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasRequest('group_graphid')) {
-	// render view
+if (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('group_graphid')) {
 	$data = getCopyElementsFormData('group_graphid', _('Graphs'));
 	$data['action'] = 'graph.masscopyto';
+
+	// render view
 	$graphView = new CView('configuration.copy.elements', $data);
 	$graphView->render();
 	$graphView->show();

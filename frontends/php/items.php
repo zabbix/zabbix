@@ -120,8 +120,7 @@ $fields = [
 		'(isset({add}) || isset({update})) && isset({value_type}) && {value_type} == 2'],
 	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'group_itemid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_targetid' =>		    [T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_groupid' =>		    [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
+	'copy_targetids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_application' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'visible' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'applications' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
@@ -1205,15 +1204,15 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
 		&& hasRequest('group_itemid')) {
-	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
+	if (hasRequest('copy_targetids') && getRequest('copy_targetids') > 0 && hasRequest('copy_type')) {
 		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hosts_ids = getRequest('copy_targetid');
+			$hosts_ids = getRequest('copy_targetids');
 		}
 		// host groups
 		else {
 			$hosts_ids = [];
-			$group_ids = getRequest('copy_targetid');
+			$group_ids = getRequest('copy_targetids');
 
 			$db_hosts = DBselect(
 				'SELECT DISTINCT h.hostid'.
@@ -1588,12 +1587,13 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	$itemView->show();
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('group_itemid')) {
-	// render view
 	$data = getCopyElementsFormData('group_itemid', _('Items'));
 	$data['action'] = 'item.masscopyto';
-	$graphView = new CView('configuration.copy.elements', $data);
-	$graphView->render();
-	$graphView->show();
+
+	// render view
+	$itemView = new CView('configuration.copy.elements', $data);
+	$itemView->render();
+	$itemView->show();
 }
 // list of items
 else {

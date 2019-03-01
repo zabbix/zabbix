@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of triggers');
 $page['file'] = 'triggers.php';
+$page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -57,8 +58,7 @@ $fields = [
 	'dependencies' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0',	'isset({add_dependency})'],
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'copy_targetid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'copy_groupid' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
+	'copy_targetids' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,			null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,			null],
 	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
@@ -495,15 +495,15 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 }
 elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('copy')
 		&& hasRequest('g_triggerid')) {
-	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
+	if (hasRequest('copy_targetids') && getRequest('copy_targetids') > 0 && hasRequest('copy_type')) {
 		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hosts_ids = getRequest('copy_targetid');
+			$hosts_ids = getRequest('copy_targetids');
 		}
 		// host groups
 		else {
 			$hosts_ids = [];
-			$group_ids = getRequest('copy_targetid');
+			$group_ids = getRequest('copy_targetids');
 
 			$db_hosts = DBselect(
 				'SELECT DISTINCT h.hostid'.
@@ -595,9 +595,11 @@ elseif (isset($_REQUEST['form'])) {
 	$triggersView->render();
 	$triggersView->show();
 }
-elseif (hasRequest('action') && getRequest('action') == 'trigger.masscopyto' && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('g_triggerid')) {
 	$data = getCopyElementsFormData('g_triggerid', _('Triggers'));
 	$data['action'] = 'trigger.masscopyto';
+
+	// render view
 	$triggersView = new CView('configuration.copy.elements', $data);
 	$triggersView->render();
 	$triggersView->show();

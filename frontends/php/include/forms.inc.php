@@ -1366,18 +1366,22 @@ function getItemFormData(array $item = [], array $options = []) {
 	return $data;
 }
 
-function getCopyElementsFormData($elementsField, $title = null) {
+/**
+ * Prepares data to copy items/triggers/graphs.
+ *
+ * @param string      $elements_field
+ * @param null|string $title
+ *
+ * @return array|null
+ */
+function getCopyElementsFormData($elements_field, $title = null) {
 	$data = [
 		'title' => $title,
-		'elements_field' => $elementsField,
-		'elements' => getRequest($elementsField, []),
+		'elements_field' => $elements_field,
+		'elements' => getRequest($elements_field, []),
 		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_HOST_GROUP),
-		'copy_groupid' => getRequest('copy_groupid', 0),
-		'copy_targetid' => getRequest('copy_targetid', []),
-		'hostid' => getRequest('hostid', 0),
-		'groups' => [],
-		'hosts' => [],
-		'templates' => []
+		'copy_targetids' => getRequest('copy_targetids', []),
+		'hostid' => getRequest('hostid', 0)
 	];
 
 	// validate elements
@@ -1387,46 +1391,36 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		return null;
 	}
 
-	if ($data['copy_type'] == COPY_TYPE_TO_HOST_GROUP) {
-		// get groups
-		$data['groups'] = API::HostGroup()->get([
-			'output' => ['groupid', 'name']
-		]);
-		order_result($data['groups'], 'name');
-	}
-	else {
-		// hosts or templates
-		$params = ['output' => ['name', 'groupid']];
+	if ($data['copy_targetids']) {
+		switch ($data['copy_type']) {
+			case COPY_TYPE_TO_HOST:
+				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
+					'output' => ['hostid', 'name'],
+					'hostids' => $data['copy_targetids'],
+					'editable' => true
+				]), ['hostid' => 'id']);
+				break;
 
-		if ($data['copy_type'] == COPY_TYPE_TO_HOST) {
-			$params['real_hosts'] = true;
-		}
-		else {
-			$params['templated_hosts'] = true;
-		}
+			case COPY_TYPE_TO_TEMPLATE:
+				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::Template()->get([
+					'output' => ['templateid', 'name'],
+					'templateids' => $data['copy_targetids'],
+					'editable' => true
+				]), ['templateid' => 'id']);
+				break;
 
-		$data['groups'] = API::HostGroup()->get($params);
-		order_result($data['groups'], 'name');
+			case COPY_TYPE_TO_HOST_GROUP:
+				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+					'output' => ['groupid', 'name'],
+					'groupids' => $data['copy_targetids'],
+					'editable' => true
+				]), ['groupid' => 'id']);
+				break;
 
-		$groupIds = zbx_objectValues($data['groups'], 'groupid');
+			default:
+				error(_('Page received incorrect data'));
 
-		if (!in_array($data['copy_groupid'], $groupIds) || $data['copy_groupid'] == 0) {
-			$data['copy_groupid'] = reset($groupIds);
-		}
-
-		if ($data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
-			$data['templates'] = API::Template()->get([
-				'output' => ['name', 'templateid'],
-				'groupids' => $data['copy_groupid']
-			]);
-			order_result($data['templates'], 'name');
-		}
-		elseif ($data['copy_type'] == COPY_TYPE_TO_HOST) {
-			$data['hosts'] = API::Host()->get([
-				'output' => ['name', 'hostid'],
-				'groupids' => $data['copy_groupid']
-			]);
-			order_result($data['hosts'], 'name');
+				return null;
 		}
 	}
 
