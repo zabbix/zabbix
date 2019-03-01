@@ -287,6 +287,12 @@ in:
   filter: '{vendor="intel",,}'
 out:
   return: FAIL
+---
+test case: '{vendor="intel \x"}'
+in: 
+  filter: '{vendor="intel \x"}'
+out:
+  return: FAIL
 ...
 
 

@@ -374,8 +374,13 @@ static int	parse_label_value(const char *data, size_t pos, zbx_strloc_t *loc)
 	while ('"' != *(++ptr))
 	{
 		if ('\\' == *ptr)
+		{
 			ptr++;
 
+			if ('\\' != *ptr && 'n' != *ptr && '"' != *ptr)
+				return FAIL;
+			continue;
+		}
 		if ('\0' == *ptr)
 			return FAIL;
 	}
