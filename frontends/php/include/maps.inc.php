@@ -240,7 +240,6 @@ function addElementNames(array &$selements) {
 					if (array_key_exists($element['triggerid'], $triggers)) {
 						$trigger = $triggers[$element['triggerid']];
 						$element['elementName'] = $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description'];
-						$element['elementExpressionTrigger'] = $trigger['expression'];
 						$element['priority'] = $trigger['priority'];
 					}
 					else {

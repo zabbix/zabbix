@@ -222,7 +222,7 @@ switch ($data['method']) {
 		$result = [];
 
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'expression', 'priority'],
+			'output' => ['triggerid', 'priority'],
 			'triggerids' => $data['triggerids'],
 			'limit' => $config['search_limit']
 		]);
