@@ -16,51 +16,28 @@
 		(new CDiv([
 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
 			(new CDiv($preproc_types_cbbox))
-				->addClass(ZBX_STYLE_COLUMN_35)
 				->addClass('list-numbered-item')
-				->addClass('preprocessing-step-name'),
-			(new CDiv())
-				->addClass(ZBX_STYLE_COLUMN_40)
-				->addClass('preprocessing-step-parameters'),
-			(new CDiv(new CCheckBox('preprocessing[#{rowNum}][on_fail]')))
-				->addClass(ZBX_STYLE_COLUMN_15)
-				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
-				->addClass(ZBX_STYLE_COLUMN_CENTER)
-				->addClass('preprocessing-step-on-fail'),
+				->addClass('step-name'),
+			(new CDiv())->addClass('step-parameters'),
+			(new CDiv(new CCheckBox('preprocessing[#{rowNum}][on_fail]')))->addClass('step-on-fail'),
 			(new CDiv((new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 				->removeId()
-			))
-				->addClass(ZBX_STYLE_COLUMN_10)
-				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
-				->addClass('preprocessing-step-action')
-		]))
-			->addClass(ZBX_STYLE_COLUMNS)
-			->addClass('preprocessing-step'),
+			))->addClass('step-action')
+		]))->addClass('preprocessing-step'),
 		(new CDiv([
-			(new CDiv([
-				new CDiv(new CLabel(_('Custom on fail'))),
-				new CDiv(
-					(new CRadioButtonList('preprocessing[#{rowNum}][error_handler]',
-						ZBX_PREPROC_FAIL_DISCARD_VALUE
-					))
-						->addValue(_('Discard value'), ZBX_PREPROC_FAIL_DISCARD_VALUE)
-						->addValue(_('Set value to'), ZBX_PREPROC_FAIL_SET_VALUE)
-						->addValue(_('Set error to'), ZBX_PREPROC_FAIL_SET_ERROR)
-						->setModern(true)
-						->setEnabled(false)
-				),
-				new CDiv(
-					(new CTextBox('preprocessing[#{rowNum}][error_handler_params]'))
-						->setEnabled(false)
-						->addStyle('display: none;')
-				)
-			]))
-				->addClass(ZBX_STYLE_COLUMN_75)
-				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
+			new CLabel(_('Custom on fail')),
+			(new CRadioButtonList('preprocessing[#{rowNum}][error_handler]', ZBX_PREPROC_FAIL_DISCARD_VALUE))
+				->addValue(_('Discard value'), ZBX_PREPROC_FAIL_DISCARD_VALUE)
+				->addValue(_('Set value to'), ZBX_PREPROC_FAIL_SET_VALUE)
+				->addValue(_('Set error to'), ZBX_PREPROC_FAIL_SET_ERROR)
+				->setModern(true)
+				->setEnabled(false),
+			(new CTextBox('preprocessing[#{rowNum}][error_handler_params]'))
+				->setEnabled(false)
+				->addStyle('display: none;')
 		]))
-			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass('on-fail-options')
 			->addStyle('display: none;')
 	]))
@@ -110,7 +87,7 @@
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
 						placeholder: <?= CJs::encodeJson(_('number')) ?>
-					}));
+					})).css('width', <?= ZBX_TEXTAREA_NUMERIC_BIG_WIDTH ?>);
 
 				case '<?= ZBX_PREPROC_RTRIM ?>':
 				case '<?= ZBX_PREPROC_LTRIM ?>':
@@ -118,7 +95,7 @@
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
 						placeholder: <?= CJs::encodeJson(_('list of characters')) ?>
-					}));
+					})).css('width', <?= ZBX_TEXTAREA_SMALL_WIDTH ?>);
 
 				case '<?= ZBX_PREPROC_XPATH ?>':
 				case '<?= ZBX_PREPROC_ERROR_FIELD_XML ?>':
@@ -160,7 +137,7 @@
 					return $(preproc_param_single_tmpl.evaluate({
 						rowNum: index,
 						placeholder: <?= CJs::encodeJson(_('seconds')) ?>
-					}));
+					})).css('width', <?= ZBX_TEXTAREA_NUMERIC_BIG_WIDTH ?>);
 
 				case '<?= ZBX_PREPROC_SCRIPT ?>':
 					return $(preproc_param_multiline_tmpl.evaluate({rowNum: index})).multilineInput({
@@ -195,7 +172,7 @@
 					$row = $(preproc_row_tmpl.evaluate({rowNum: step_index})),
 					type = $('select[name*="type"]', $row).val();
 
-				$('.preprocessing-step-parameters', $row).html(makeParameterInput(step_index, type));
+				$('.step-parameters', $row).html(makeParameterInput(step_index, type));
 				$(this).closest('.preprocessing-list-foot').before($row);
 
 				$('.preprocessing-list-head').show();
@@ -232,7 +209,7 @@
 					type = $(this).val(),
 					on_fail = $row.find('[name*="on_fail"]');
 
-				$('.preprocessing-step-parameters', $row).html(makeParameterInput($row.data('step'), type));
+				$('.step-parameters', $row).html(makeParameterInput($row.data('step'), type));
 
 				// Disable "Custom on fail" for some of the preprocessing types.
 				switch (type) {

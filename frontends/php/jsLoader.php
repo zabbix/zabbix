@@ -214,8 +214,6 @@ $tranStrings = [
 		'S_CLOSE' => _('Close')
 	],
 	'multilineinput.js' => [
-		'Click to view or edit code' => _('Click to view or edit code'),
-		'S_JAVASCRIPT' => _('JavaScript'),
 		'S_OPEN' => _('Open'),
 		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
 		'S_SAVE' => _('Save'),

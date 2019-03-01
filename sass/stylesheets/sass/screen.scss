@@ -5987,109 +5987,126 @@ ul.checkbox-list {
 }
 
 .preprocessing-list {
+	$name-width: 240px;
+	$on-fail-width: 100px;
+	$action-width: 120px;
+
 	display: block;
-	min-width: 730px;
 	max-width: 930px;
-	padding-left: 10px;
+	min-width: 730px;
 
 	> li {
 		display: block;
+		position: relative;
 	}
 
-	.columns-wrapper {
-		position: relative;
+	.drag-icon {
+		position: absolute;
+		left: 0;
+		top: 5px;
+	}
 
-		[class^=column-] {
-			display: flex;
-			box-sizing: border-box;
-			padding: 5px 5px 5px 0;
+	.list-numbered-item:before {
+		content: counter(line) ":";
+		flex: 0 0 15px;
+		max-width: 15px;
+		line-height: 24px;
+		padding-right: 5px;
+	}
 
-			&:last-child {
-				padding-right: 0;
-			}
+	input[type=text],
+	select {
+		width: 100%;
+	}
 
-			input[type=text], select {
-				width: 100%;
-				flex: 1;
-			}
+	input[type=text],
+	.btn-link {
+
+		&:not(:last-of-type) {
+			margin-right: 5px;
+		}
+	}
+
+	.preprocessing-list-head,
+	.preprocessing-list-foot,
+	.preprocessing-step,
+	.on-fail-options,
+	.step-name,
+	.step-parameters,
+	.step-on-fail,
+	.step-action {
+		display: flex;
+		align-items: center;
+		box-sizing: border-box;
+	}
+
+	.step-name,
+	.step-parameters,
+	.step-on-fail,
+	.step-action,
+	.on-fail-options > label,
+	.on-fail-options > .radio-segmented {
+		padding: 5px 5px 5px 0;
+	}
+
+	.step-name {
+		flex: 0 0 $name-width;
+		max-width: $name-width;
+	}
+
+	.step-parameters {
+		flex: 1;
+	}
+
+	.step-on-fail {
+		flex: 0 0 $on-fail-width;
+		max-width: $on-fail-width;
+		justify-content: center;
+		text-align: center;
+	}
+
+	.step-action {
+		flex: 0 0 $action-width;
+		max-width: $action-width;
+		padding-right: 0;
+	}
+
+	.on-fail-options {
+		padding-right: $on-fail-width + $action-width + 5px;
+		margin-bottom: 5px;
+
+		& > label {
+			padding-left: 30px;
+		}
+
+		input[type=text] {
+			flex: 1;
 		}
 	}
 
 	.preprocessing-list-head {
-		line-height: 24px;
+		color: $font-alt-color;
+		line-height: 14px;
 
-		[class^=column-] {
-			padding: 0 5px 0 0;
-			color: $font-alt-color;
-
-			&:first-child {
-				padding-left: 20px;
-			}
+		.step-name {
+			padding-left: 30px;
 		}
 	}
 
 	.preprocessing-list-item {
 
-		.drag-icon {
-			position: absolute;
-			top: 5px;
-			margin-left: -20px;
-		}
-
-		.preprocessing-step {
-
-			.list-numbered-item {
-
-				&::before {
-					content: counter(line) ":";
-					width: 15px;
-					margin-right: 5px;
-					line-height: 24px;
-				}
-			}
-		}
-
-		.on-fail-options {
-			margin-bottom: 5px;
-
-			> .column-75 {
-
-				> div {
-					padding-right: 5px;
-
-					&:first-child {
-						padding-left: 20px;
-					}
-
-					&:last-child {
-						flex: 1;
-					}
-				}
-			}
-		}
-	}
-
-	.preprocessing-step-parameters {
-
-		.parameter-1 {
-			margin-left: 5px;
+		.step-name {
+			padding-left: 10px;
 		}
 	}
 
 	.preprocessing-list-foot {
-		line-height: 24px;
+		justify-content: space-between;
+		line-height: 34px;
 
-		> div {
-			margin-left: -10px;
+		.step-action:last-child {
+			justify-self: flex-end;
 		}
-	}
-
-	> li:nth-last-of-type(2) > .on-fail-options {
-		margin-bottom: 0;
-	}
-
-	.element-table-add, .element-table-remove {
-		line-height: normal;
 	}
 }
 

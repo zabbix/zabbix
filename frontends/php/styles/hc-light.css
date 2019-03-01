@@ -4175,56 +4175,78 @@ ul.checkbox-list.col-3 > li {
 
 .preprocessing-list {
   display: block;
-  min-width: 730px;
   max-width: 930px;
-  padding-left: 10px; }
+  min-width: 730px; }
   .preprocessing-list > li {
-    display: block; }
-  .preprocessing-list .columns-wrapper {
+    display: block;
     position: relative; }
-    .preprocessing-list .columns-wrapper [class^=column-] {
-      display: flex;
-      box-sizing: border-box;
-      padding: 5px 5px 5px 0; }
-      .preprocessing-list .columns-wrapper [class^=column-]:last-child {
-        padding-right: 0; }
-      .preprocessing-list .columns-wrapper [class^=column-] input[type=text], .preprocessing-list .columns-wrapper [class^=column-] select {
-        width: 100%;
-        flex: 1; }
-  .preprocessing-list .preprocessing-list-head {
-    line-height: 24px; }
-    .preprocessing-list .preprocessing-list-head [class^=column-] {
-      padding: 0 5px 0 0;
-      color: #333; }
-      .preprocessing-list .preprocessing-list-head [class^=column-]:first-child {
-        padding-left: 20px; }
-  .preprocessing-list .preprocessing-list-item .drag-icon {
+  .preprocessing-list .drag-icon {
     position: absolute;
-    top: 5px;
-    margin-left: -20px; }
-  .preprocessing-list .preprocessing-list-item .preprocessing-step .list-numbered-item::before {
+    left: 0;
+    top: 5px; }
+  .preprocessing-list .list-numbered-item:before {
     content: counter(line) ":";
-    width: 15px;
-    margin-right: 5px;
-    line-height: 24px; }
-  .preprocessing-list .preprocessing-list-item .on-fail-options {
+    flex: 0 0 15px;
+    max-width: 15px;
+    line-height: 24px;
+    padding-right: 5px; }
+  .preprocessing-list input[type=text],
+  .preprocessing-list select {
+    width: 100%; }
+  .preprocessing-list input[type=text]:not(:last-of-type),
+  .preprocessing-list .btn-link:not(:last-of-type) {
+    margin-right: 5px; }
+  .preprocessing-list .preprocessing-list-head,
+  .preprocessing-list .preprocessing-list-foot,
+  .preprocessing-list .preprocessing-step,
+  .preprocessing-list .on-fail-options,
+  .preprocessing-list .step-name,
+  .preprocessing-list .step-parameters,
+  .preprocessing-list .step-on-fail,
+  .preprocessing-list .step-action {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box; }
+  .preprocessing-list .step-name,
+  .preprocessing-list .step-parameters,
+  .preprocessing-list .step-on-fail,
+  .preprocessing-list .step-action,
+  .preprocessing-list .on-fail-options > label,
+  .preprocessing-list .on-fail-options > .radio-segmented {
+    padding: 5px 5px 5px 0; }
+  .preprocessing-list .step-name {
+    flex: 0 0 240px;
+    max-width: 240px; }
+  .preprocessing-list .step-parameters {
+    flex: 1; }
+  .preprocessing-list .step-on-fail {
+    flex: 0 0 100px;
+    max-width: 100px;
+    justify-content: center;
+    text-align: center; }
+  .preprocessing-list .step-action {
+    flex: 0 0 120px;
+    max-width: 120px;
+    padding-right: 0; }
+  .preprocessing-list .on-fail-options {
+    padding-right: 225px;
     margin-bottom: 5px; }
-    .preprocessing-list .preprocessing-list-item .on-fail-options > .column-75 > div {
-      padding-right: 5px; }
-      .preprocessing-list .preprocessing-list-item .on-fail-options > .column-75 > div:first-child {
-        padding-left: 20px; }
-      .preprocessing-list .preprocessing-list-item .on-fail-options > .column-75 > div:last-child {
-        flex: 1; }
-  .preprocessing-list .preprocessing-step-parameters .parameter-1 {
-    margin-left: 5px; }
+    .preprocessing-list .on-fail-options > label {
+      padding-left: 30px; }
+    .preprocessing-list .on-fail-options input[type=text] {
+      flex: 1; }
+  .preprocessing-list .preprocessing-list-head {
+    color: #333;
+    line-height: 14px; }
+    .preprocessing-list .preprocessing-list-head .step-name {
+      padding-left: 30px; }
+  .preprocessing-list .preprocessing-list-item .step-name {
+    padding-left: 10px; }
   .preprocessing-list .preprocessing-list-foot {
-    line-height: 24px; }
-    .preprocessing-list .preprocessing-list-foot > div {
-      margin-left: -10px; }
-  .preprocessing-list > li:nth-last-of-type(2) > .on-fail-options {
-    margin-bottom: 0; }
-  .preprocessing-list .element-table-add, .preprocessing-list .element-table-remove {
-    line-height: normal; }
+    justify-content: space-between;
+    line-height: 34px; }
+    .preprocessing-list .preprocessing-list-foot .step-action:last-child {
+      justify-self: flex-end; }
 
 @keyframes fadein {
   from {

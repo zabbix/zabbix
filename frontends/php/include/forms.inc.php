@@ -1394,17 +1394,12 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		->addClass('preprocessing-list')
 		->addClass('list-numbered')
 		->addItem(
-			(new CListItem(
-				(new CDiv([
-					(new CDiv(_('Name')))->addClass(ZBX_STYLE_COLUMN_35),
-					(new CDiv(_('Parameters')))->addClass(ZBX_STYLE_COLUMN_20),
-					(new CDiv())->addClass(ZBX_STYLE_COLUMN_20),
-					(new CDiv(_('Custom on fail')))
-						->addClass(ZBX_STYLE_COLUMN_15)
-						->addClass(ZBX_STYLE_COLUMN_CENTER),
-					(new CDiv(_('Action')))->addClass(ZBX_STYLE_COLUMN_10)
-				]))->addClass(ZBX_STYLE_COLUMNS)
-			))
+			(new CListItem([
+				(new CDiv(_('Name')))->addClass('step-name'),
+				(new CDiv(_('Parameters')))->addClass('step-parameters'),
+				(new CDiv(_('Custom on fail')))->addClass('step-on-fail'),
+				(new CDiv(_('Action')))->addClass('step-action')
+			]))
 				->addClass('preprocessing-list-head')
 				->addStyle(!$preprocessing ? 'display: none;' : null)
 		);
@@ -1458,13 +1453,17 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		// Add corresponding placeholders and show or hide text boxes.
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
-				$params = $step_param_0->setAttribute('placeholder', _('number'));
+				$params = $step_param_0
+					->setAttribute('placeholder', _('number'))
+					->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH);
 				break;
 
 			case ZBX_PREPROC_RTRIM:
 			case ZBX_PREPROC_LTRIM:
 			case ZBX_PREPROC_TRIM:
-				$params = $step_param_0->setAttribute('placeholder', _('list of characters'));
+				$params = $step_param_0
+					->setAttribute('placeholder', _('list of characters'))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 				break;
 
 			case ZBX_PREPROC_XPATH:
@@ -1498,7 +1497,9 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				break;
 
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-				$params = $step_param_0->setAttribute('placeholder', _('seconds'));
+				$params = $step_param_0
+					->setAttribute('placeholder', _('seconds'))
+					->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH);
 				break;
 
 			case ZBX_PREPROC_SCRIPT:
@@ -1563,16 +1564,10 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		}
 
 		$on_fail_options = (new CDiv([
-			(new CDiv([
-				new CDiv(new CLabel(_('Custom on fail'))),
-				new CDiv($error_handler->setReadonly($readonly)),
-				new CDiv($error_handler_params->setReadonly($readonly))
-			]))
-				->addClass(ZBX_STYLE_COLUMN_75)
-				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
-		]))
-			->addClass(ZBX_STYLE_COLUMNS)
-			->addClass('on-fail-options');
+			new CLabel(_('Custom on fail')),
+			$error_handler->setReadonly($readonly),
+			$error_handler_params->setReadonly($readonly)
+		]))->addClass('on-fail-options');
 
 		if ($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT) {
 			$on_fail_options->addStyle('display: none;');
@@ -1585,29 +1580,17 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 						->addClass(ZBX_STYLE_DRAG_ICON)
 						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
 					(new CDiv($preproc_types_cbbox))
-						->addClass(ZBX_STYLE_COLUMN_35)
 						->addClass('list-numbered-item')
-						->addClass('preprocessing-step-name'),
-					(new CDiv($params))
-						->addClass(ZBX_STYLE_COLUMN_40)
-						->addClass('preprocessing-step-parameters'),
-					(new CDiv($on_fail))
-						->addClass(ZBX_STYLE_COLUMN_15)
-						->addClass(ZBX_STYLE_COLUMN_MIDDLE)
-						->addClass(ZBX_STYLE_COLUMN_CENTER)
-						->addClass('preprocessing-step-on-fail'),
+						->addClass('step-name'),
+					(new CDiv($params))->addClass('step-parameters'),
+					(new CDiv($on_fail))->addClass('step-on-fail'),
 					(new CDiv((new CButton('preprocessing['.$i.'][remove]', _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-remove')
 						->setEnabled(!$readonly)
 						->removeId()
-					))
-						->addClass(ZBX_STYLE_COLUMN_10)
-						->addClass(ZBX_STYLE_COLUMN_MIDDLE)
-						->addClass('preprocessing-step-action'),
-				]))
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass('preprocessing-step'),
+					))->addClass('step-action'),
+				]))->addClass('preprocessing-step'),
 				$on_fail_options
 			]))
 				->addClass('preprocessing-list-item')
@@ -1619,12 +1602,14 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 	}
 
 	$preprocessing_list->addItem(
-		(new CListItem(new CDiv(
-			(new CButton('param_add', _('Add')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-add')
-				->setEnabled(!$readonly)
-		)))->addClass('preprocessing-list-foot')
+		(new CListItem(
+			(new CDiv(
+				(new CButton('param_add', _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-add')
+					->setEnabled(!$readonly)
+			))->addClass('step-action')
+		))->addClass('preprocessing-list-foot')
 	);
 
 	return $preprocessing_list;
