@@ -510,9 +510,6 @@ static int	parse_metric_value(const char *data, size_t pos, zbx_strloc_t *loc)
 	const char	*ptr = data + pos;
 	int		len;
 
-	if ('\0' == *ptr || '\n' == *ptr)
-		return FAIL;
-
 	loc->l = pos;
 
 	if (0 == strncmp(ptr, "Nan", 3))
