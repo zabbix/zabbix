@@ -494,6 +494,12 @@ class CDRule extends CApiService {
 					continue;
 				}
 
+				if (!in_array($dcheck['type'], [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can have the "%1$s" parameter.', $field)
+					);
+				}
+
 				if (!in_array($dcheck[$field], $values)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value for field "%1$s": %2$s.', $field, $dcheck[$field])
