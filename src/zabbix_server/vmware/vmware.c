@@ -106,6 +106,7 @@ static zbx_vmware_t	*vmware = NULL;
 
 #define ZBX_VPXD_STATS_MAXQUERYMETRICS	64
 #define ZBX_MAXQUERYMETRICS_UNLIMITED	1000
+#define ZBX_MAXQUERY_EVENTLOG		40
 
 ZBX_VECTOR_IMPL(str_uint64_pair, zbx_str_uint64_pair_t)
 
@@ -1127,7 +1128,7 @@ static void	vmware_event_backup(zbx_vmware_service_t *service, zbx_vector_ptr_t 
 {
 	int	i;
 
-	VMWARE_VECTOR_CREATE(events, ptr);
+	zbx_vector_ptr_create(events);
 
 	if (NULL == service->data || 0 == service->data->events.values_num)
 		return;
@@ -3489,10 +3490,10 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		zbx_xml_free_doc(doc);
 		doc = NULL;
 
-		if ((ZBX_MAXQUERYMETRICS_UNLIMITED / 2) >= soap_count)
+		if ((ZBX_MAXQUERY_EVENTLOG / 2) >= soap_count)
 			soap_count = soap_count * 2;
-		else if (ZBX_MAXQUERYMETRICS_UNLIMITED != soap_count)
-			soap_count = ZBX_MAXQUERYMETRICS_UNLIMITED;
+		else if (ZBX_MAXQUERY_EVENTLOG != soap_count)
+			soap_count = ZBX_MAXQUERY_EVENTLOG;
 
 		if (0 != events->values_num &&
 				(((const zbx_vmware_event_t *)events->values[events->values_num - 1])->key -
