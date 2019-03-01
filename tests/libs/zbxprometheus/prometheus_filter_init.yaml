@@ -293,6 +293,19 @@ in:
   filter: '{vendor="intel \x"}'
 out:
   return: FAIL
+---
+test case: 'cpu{__="intel"}'
+in: 
+  filter: 'cpu{__="intel"}'
+out:
+  return: SUCCEED
+  metric:
+    pattern: cpu
+    op: =
+  labels:
+    - key: __
+      pattern: intel
+      op: =
 ...
 
 
