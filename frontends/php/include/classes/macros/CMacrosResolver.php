@@ -1896,7 +1896,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$triggers = [];
 		$maps = [];
 		$hosts = [];
-		$macros = [];
+		$macros_by_selementid = [];
 
 		foreach ($types_by_selement_type as $selement_type => &$types) {
 			$supported_label_macros[$selement_type] = [];
@@ -1958,23 +1958,25 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			// Extract macros from collected strings.
-			$matched = $this->extractMacros($texts, $types_by_selement_type[$selement_type]);
+			$matched_macros = $this->extractMacros($texts, $types_by_selement_type[$selement_type]);
 
 			// Map extracted macros to map elements.
-			if (array_key_exists('macros', $matched)) {
+			if (array_key_exists('macros', $matched_macros)) {
 				// Check if inventory or interface details was requested.
-				if (array_key_exists('interface', $matched['macros']) && $matched['macros']['interface']) {
+				if (array_key_exists('interface', $matched_macros['macros'])
+						&& $matched_macros['macros']['interface']) {
 					$query_interfaces = true;
 				}
 
-				if (array_key_exists('inventory', $matched['macros']) && $matched['macros']['inventory']) {
+				if (array_key_exists('inventory', $matched_macros['macros'])
+						&& $matched_macros['macros']['inventory']) {
 					$query_inventories = true;
 				}
 
-				foreach ($matched['macros'] as $matched_macros) {
-					foreach ($matched_macros as $matched_macro) {
-						$macros[$selid][$matched_macro] = [
-							'macro' => substr($matched_macro, 1, -1), // strip curly braces
+				foreach ($matched_macros['macros'] as $macros) {
+					foreach ($macros as $macro) {
+						$macros_by_selementid[$selid][$macro] = [
+							'macro' => substr($macro, 1, -1), // strip curly braces
 							'f_num' => 0
 						];
 					}
@@ -1982,26 +1984,29 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			// Do the same with indexed macros.
-			if (array_key_exists('macros_n', $matched)) {
-				if (!array_key_exists($selid, $macros)) {
-					$macros[$selid] = [];
+			if (array_key_exists('macros_n', $matched_macros)) {
+				if (!array_key_exists($selid, $macros_by_selementid)) {
+					$macros_by_selementid[$selid] = [];
 				}
 
-				foreach ($matched['macros_n'] as $matched_macros) {
-					$macros[$selid] += $matched_macros;
+				foreach ($matched_macros['macros_n'] as $macro) {
+					$macros_by_selementid[$selid] += $macro;
 				}
 
 				// Check if inventory or interface details was requested.
-				if (array_key_exists('interface', $matched['macros_n']) && $matched['macros_n']['interface']) {
+				if (array_key_exists('interface', $matched_macros['macros_n'])
+						&& $matched_macros['macros_n']['interface']) {
 					$query_interfaces = true;
 				}
 
-				if (array_key_exists('inventory', $matched['macros_n']) && $matched['macros_n']['inventory']) {
+				if (array_key_exists('inventory', $matched_macros['macros_n'])
+						&& $matched_macros['macros_n']['inventory']) {
 					$query_trigger_hosts = true;
 					$query_inventories = true;
 				}
 
-				if ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER && $matched['macros_n']['host']) {
+				if ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER
+						&& $matched_macros['macros_n']['host']) {
 					$query_trigger_hosts = true;
 				}
 			}
@@ -2012,7 +2017,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			 * to fetch additional details from database.
 			 */
 			if ($sel['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP
-					&& array_key_exists($selid, $macros) && $macros[$selid]) {
+					&& array_key_exists($selid, $macros_by_selementid) && $macros_by_selementid[$selid]) {
 				if (array_key_exists('elementid', $sel)) {
 					$selements_to_resolve[$sel['elementtype']][$sel['elementid']] = $sel['elementid'];
 				}
@@ -2103,7 +2108,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Find value for each extracted macro.
 		foreach ($selements as $selid => &$sel) {
-			if (!array_key_exists($selid, $macros) || !$macros[$selid]) {
+			if (!array_key_exists($selid, $macros_by_selementid) || !$macros_by_selementid[$selid]) {
 				// Resolve functional macros like: {sampleHostName:log[{HOST.HOST}.log].last(0)}, if no host provided.
 				if ($options['resolve_element_label']) {
 					$sel['label'] = $this->resolveMapLabelMacros($sel['label']);
@@ -2129,7 +2134,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				continue;
 			}
 
-			$matched_macros = $macros[$selid];
+			$matched_macros = $macros_by_selementid[$selid];
 			$hosts_by_nr = [];
 			$trigger = null;
 			$host = null;
