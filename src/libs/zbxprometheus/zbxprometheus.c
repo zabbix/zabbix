@@ -609,53 +609,49 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
 	loc->l = pos;
 	pos = skip_spaces(data, pos + 1);
 
-	if ('}' != data[pos])
+	while ('}' != data[pos])
 	{
-		while (1)
+		zbx_prometheus_condition_op_t	op;
+
+		if (FAIL == parse_condition(data, pos, &loc_key, &loc_op, &loc_value))
 		{
-			zbx_prometheus_condition_op_t	op;
-
-			if (FAIL == parse_condition(data, pos, &loc_key, &loc_op, &loc_value))
-			{
-				*error = zbx_dsprintf(*error, "cannot parse label condition at \"%s\"", data + pos);
-				return FAIL;
-			}
-
-			op = str_loc_op(data, &loc_op);
-			if (0 == strncmp(data + loc_key.l, "__name__", loc_key.r - loc_key.l + 1))
-			{
-				if (NULL != filter->metric)
-				{
-					*error = zbx_strdup(*error, "duplicate metric condition specified");
-					return FAIL;
-				}
-
-				filter->metric = prometheus_condition_create(NULL,
-						str_loc_unquote_dyn(data, &loc_value), op);
-			}
-			else
-			{
-				zbx_prometheus_condition_t	*condition;
-
-				condition = prometheus_condition_create(str_loc_dup(data, &loc_key),
-						str_loc_unquote_dyn(data, &loc_value), op);
-				zbx_vector_ptr_append(&filter->labels, condition);
-			}
-
-			pos = skip_spaces(data, loc_value.r + 1);
-
-			if (',' != data[pos])
-			{
-				if ('}' == data[pos])
-					break;
-
-				*error = zbx_strdup(*error, "missing label condition list terminating character \"}\"");
-				return FAIL;
-			}
-
-			pos = skip_spaces(data, pos + 1);
-
+			*error = zbx_dsprintf(*error, "cannot parse label condition at \"%s\"", data + pos);
+			return FAIL;
 		}
+
+		op = str_loc_op(data, &loc_op);
+		if (0 == strncmp(data + loc_key.l, "__name__", loc_key.r - loc_key.l + 1))
+		{
+			if (NULL != filter->metric)
+			{
+				*error = zbx_strdup(*error, "duplicate metric condition specified");
+				return FAIL;
+			}
+
+			filter->metric = prometheus_condition_create(NULL,
+					str_loc_unquote_dyn(data, &loc_value), op);
+		}
+		else
+		{
+			zbx_prometheus_condition_t	*condition;
+
+			condition = prometheus_condition_create(str_loc_dup(data, &loc_key),
+					str_loc_unquote_dyn(data, &loc_value), op);
+			zbx_vector_ptr_append(&filter->labels, condition);
+		}
+
+		pos = skip_spaces(data, loc_value.r + 1);
+
+		if (',' != data[pos])
+		{
+			if ('}' == data[pos])
+				break;
+
+			*error = zbx_strdup(*error, "missing label condition list terminating character \"}\"");
+			return FAIL;
+		}
+
+		pos = skip_spaces(data, pos + 1);
 	}
 
 	loc->r = pos;
