@@ -177,55 +177,43 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 	}
 
 	public function testInheritanceDiscoveryRule_PreprocessingInheritanceFromTemplate() {
-		$lld_name = 'Templated LLD with Preprocessing steps';
-		$lld_key = 'templated-lld-with-preprocessing-steps';
-		$custom_errors = ['Discard value', 'Set value to', 'Set error to'];
-		$custom_error_value_text = 'Custom_text';
+		$fields = [
+			'Name' => 'Templated LLD with Preprocessing steps',
+			'Key' => 'templated-lld-with-preprocessing-steps'
+		];
 
 		$preprocessing = [
-			['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => '\1'],
-			['type' => 'JSONPath', 'parameter_1' => '$.data.test'],
-			['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern'],
-			['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path'],
-			['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '30']
+			['type' => 'Regular expression',				'parameter_1' => 'expression',	'custom_error' => 'Discard value',	'parameter_2' => '\1',],
+			['type' => 'JSONPath',							'parameter_1' => '$.data.test',	'custom_error' => 'Set value to',	'text' => 'Custom_text'],
+			['type' => 'Does not match regular expression',	'parameter_1' => 'Pattern',		'custom_error' => 'Set error to',	'text' => 'Custom_text'],
+			['type' => 'Check for error in JSON',			'parameter_1' => '$.new.path'],
+			['type' => 'Discard unchanged with heartbeat',	'parameter_1' => '30']
 		];
 
 		// Create discovery rule on template.
 		$this->page->login()->open('host_discovery.php?hostid='.$this->templateid);
-		$this->query('button:Create discovery rule')->one()->click();
-
-		$form = $this->query('name:itemForm')->asForm()->one();
-		$form->getField('Name')->fill($lld_name);
-		$form->getField('Key')->fill($lld_key);
-
+		$this->query('button:Create discovery rule')->waitUntilPresent()->one()->click();
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->fill($fields);
 		$form->selectTab('Preprocessing');
 
 		foreach ($preprocessing as $step_count => $options) {
 			$this->query('id:param_add')->one()->click();
 			$this->query('id:preprocessing_'.$step_count.'_type')->asDropdown()->one()->select($options['type']);
 
-			if (array_key_exists('parameter_1', $options) && array_key_exists('parameter_2', $options)) {
+			if (array_key_exists('parameter_1', $options)){
 				$this->query('id:preprocessing_'.$step_count.'_params_0')->one()->type($options['parameter_1']);
+			}
+			if (array_key_exists('parameter_2', $options)) {
 				$this->query('id:preprocessing_'.$step_count.'_params_1')->one()->type($options['parameter_2']);
 			}
-			elseif (array_key_exists('parameter_1', $options) && !array_key_exists('parameter_2', $options)) {
-				$this->query('id:preprocessing_'.$step_count.'_params_0')->one()->type($options['parameter_1']);
-			}
 
-			switch ($options['type']) {
-				case 'Regular expression':
-					$this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox()->check();
-					$this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one()->select($custom_errors[$step_count]);
-					break;
-				case 'JSONPath':
-				case 'Does not match regular expression':
-					$this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox()->check();
-					$this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one()->select($custom_errors[$step_count]);
-					$this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->type($custom_error_value_text.$step_count);
-					break;
-				case 'Check for error in JSON':
-				case 'Discard unchanged with heartbeat':
-					default;
+			if (in_array($options['type'], ['Regular expression', 'JSONPath', 'Does not match regular expression'])) {
+				$this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox()->check();
+				$this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one()->select($options['custom_error']);
+				if ($options['type'] != 'Regular expression') {
+					$this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->type($options['text'].$step_count);
+				}
 			}
 		}
 		$form->submit();
@@ -237,52 +225,41 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 
 		// Check discovery rules preprocessing steps on host.
 		$this->page->login()->open('host_discovery.php?hostid='.$this->hostid);
-		$this->query('link:'.$lld_name)->one()->click();
-		$this->page->waitUntilReady();
-		$form = $this->query('name:itemForm')->asForm()->one();
+		$this->query('link:'.$fields['Name'])->one()->click();
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Preprocessing');
 		foreach ($preprocessing as $step_count => $options) {
 			$type_field = $this->query('id:preprocessing_'.$step_count.'_type_name')->one();
-			$type=$type_field->getValue();
-			$this->assertEquals($options['type'], $type);
+			$this->assertEquals($options['type'], $type_field->getValue());
 			$this->assertNotNull($type_field->getAttribute('readonly'));
 
-			if (array_key_exists('parameter_1', $options) && array_key_exists('parameter_2', $options)) {
+			if (array_key_exists('parameter_1', $options)) {
 
 				$parameter_1_field = $this->query('id:preprocessing_'.$step_count.'_params_0')->one();
-				$parameter_1 = $parameter_1_field->getValue();
-				$this->assertEquals($options['parameter_1'], $parameter_1);
+				$this->assertEquals($options['parameter_1'], $parameter_1_field->getValue());
 				$this->assertNotNull($parameter_1_field->getAttribute('readonly'));
-
+			}
+			elseif (array_key_exists('parameter_2', $options)) {
 				$parameter_2_field = $this->query('id:preprocessing_'.$step_count.'_params_1')->one();
-				$parameter_2 = $parameter_2_field->getValue();
-				$this->assertEquals($options['parameter_2'], $parameter_2);
+				$this->assertEquals($options['parameter_2'], $parameter_2_field->getValue());
 				$this->assertNotNull($parameter_2_field->getAttribute('readonly'));
+			}
 
-			}
-			elseif (array_key_exists('parameter_1', $options) && !array_key_exists('parameter_2', $options)) {
-				$parameter_1_field = $this->query('id:preprocessing_'.$step_count.'_params_0')->one();
-				$parameter_1 = $parameter_1_field->getValue();
-				$this->assertEquals($options['parameter_1'], $parameter_1);
-				$this->assertNotNull($parameter_1_field->getAttribute('readonly'));
-			}
 			$custom_checkbox = $this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox();
 			$this->assertNotNull($custom_checkbox->getAttribute('disabled'));
+
 			switch ($options['type']) {
 				case 'Regular expression':
-					$this->assertTrue($custom_checkbox->isSelected());
-					$custom_radio = $this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one();
-					$this->assertFalse($custom_radio->isEnabled());
-					$this->assertEquals($custom_errors[$step_count], $custom_radio->getText());
-					break;
 				case 'JSONPath':
 				case 'Does not match regular expression':
 					$this->assertTrue($custom_checkbox->isSelected());
 					$custom_radio = $this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one();
 					$this->assertFalse($custom_radio->isEnabled());
-					$this->assertEquals($custom_errors[$step_count], $custom_radio->getText());
-					$custom_text = $this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->getValue();
-					$this->assertEquals($custom_error_value_text.$step_count, $custom_text);
+					$this->assertEquals($options['custom_error'], $custom_radio->getText());
+					if ($options['type'] != 'Regular expression') {
+						$custom_text = $this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->getValue();
+						$this->assertEquals($options['text'].$step_count, $custom_text);
+					}
 					break;
 				case 'Check for error in JSON':
 				case 'Discard unchanged with heartbeat':
