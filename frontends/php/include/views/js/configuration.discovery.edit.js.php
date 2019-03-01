@@ -469,12 +469,6 @@
 						jQuery('#snmp_oid').val(itemObj.val());
 					}
 					else if (name === 'host_source' || name === 'name_source') {
-						if (jQuery('#' + name + '_' + dcheckId).is(':checked')) {
-							var def = (name === 'host_source') ? 'chk_dns' : 'chk_host';
-							jQuery('#' + name + '_' + dcheckId).prop('checked', false);
-							jQuery('#' + name + '_' + def).prop('checked', true);
-						}
-						// continue
 						return true;
 					}
 					else {
