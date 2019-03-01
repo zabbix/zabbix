@@ -43,7 +43,7 @@ class CHtmlUrlValidator {
 	 *
 	 * @return bool
 	 */
-	public static function validate($url, array $options) {
+	public static function validate($url, array $options = []) {
 		$options += [
 			'allow_user_macro' => true,
 			'allow_inventory_macro' => INVENTORY_URL_MACRO_NONE,
