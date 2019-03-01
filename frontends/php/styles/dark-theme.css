@@ -2764,8 +2764,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     cursor: pointer;
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-family: "Courier New", Courier, monospace;
     border-right: none; }
+    .multilineinput-control input[type=text].monospace-font {
+      font-family: "Courier New", Courier, monospace; }
   .multilineinput-control.editable {
     background-color: #383838 !important;
     border-color: #525252; }
@@ -2802,12 +2803,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
         content: counter(line);
         user-select: none; }
   .multilineinput-modal .multilineinput-textarea {
-    font-family: "Courier New", Courier, monospace;
     line-height: 18px;
     resize: none;
     white-space: pre;
     height: 100%;
     width: 100%; }
+    .multilineinput-modal .multilineinput-textarea.monospace-font {
+      font-family: "Courier New", Courier, monospace; }
     .multilineinput-modal .multilineinput-textarea::-webkit-scrollbar {
       height: 9px; }
   .multilineinput-modal .multilineinput-symbols-remaining {

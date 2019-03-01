@@ -48,7 +48,8 @@ class CMultilineInput extends CDiv {
 			'maxlength' => 65535,
 			'readonly' => false,
 			'disabled' => false,
-			'line_numbers' => true
+			'line_numbers' => true,
+			'monospace_font' => true
 		];
 	}
 

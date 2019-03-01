@@ -31,7 +31,8 @@
 				'maxlength': 65535,
 				'readonly': false,
 				'disabled': false,
-				'line_numbers': true
+				'line_numbers': true,
+				'monospace_font': true
 			}, options);
 
 			this.$hidden = $('<input>', {type: 'hidden', name: this.data('name')});
@@ -41,6 +42,7 @@
 				title: this.options.title,
 				tabindex: -1
 			})
+				.toggleClass('monospace-font', this.options.monospace_font)
 				.prop('readonly', this.options.readonly ? true : null)
 				.on('click', this, openModal);
 			this.$button = $('<button>', {type: 'button'})
@@ -97,7 +99,9 @@
 				text: e.data.$hidden.val(),
 				maxlength: e.data.options.maxlength,
 				readonly: e.data.options.readonly ? true : null
-			}).attr('wrap', 'off'),
+			})
+				.attr('wrap', 'off')
+				.toggleClass('monospace-font', e.data.options.monospace_font),
 			$line_numbers = $('<ul>', {class: 'multilineinput-line-numbers'}).append('<li>'),
 			$footer = $('<div>', {class: 'multilineinput-symbols-remaining'})
 				.html(sprintf(t('S_N_SYMBOLS_REMAINING'), '<span>0</span>'));

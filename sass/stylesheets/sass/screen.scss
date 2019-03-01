@@ -3976,8 +3976,11 @@ $form-icon-btn: (
 		cursor: pointer;
 		white-space: nowrap;
 		text-overflow: ellipsis;
-		font-family: $font-stack-mono;
 		border-right: none;
+
+		&.monospace-font {
+			font-family: $font-stack-mono;
+		}
 	}
 
 	&.editable {
@@ -4033,12 +4036,15 @@ $form-icon-btn: (
 	}
 
 	.multilineinput-textarea {
-		font-family: $font-stack-mono;
 		line-height: $line-height;
 		resize: none;
 		white-space: pre;
 		height: 100%;
 		width: 100%;
+
+		&.monospace-font {
+			font-family: $font-stack-mono;
+		}
 
 		&::-webkit-scrollbar {
 			height: 9px;
