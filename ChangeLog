@@ -1,10 +1,18 @@
 Changes for 4.2.0beta2
 
 New features:
+........S. [ZBXNEXT-5016] extended preprocessing error messages to include intermediate step results (wiper)
+...G...... [ZBXNEXT-4898] added support IPv6 for 'net.dns' and 'net.dns.record' (MVekslers)
 .......PS. [ZBXNEXT-5037] added 'skip' parameter for vmware.eventlog key (MVekslers)
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+...G...... [ZBX-15607] fixed possibility of zombie processes occurring when signaling agent during metric execution (akozlovs)
+..F....... [ZBX-15625] removed links leading to media type edit form for non-superadmins in Reports->Notifications page (Ivo)
+.D.G...PS. [ZBX-8344] remove trimming of leading and trailing whitespaces for data received from agent (akozlovs)
+.......PS. [ZBX-15703] fixed use of uninitialized variable when receiving 0 bytes on listening socket (akozlovs)
+..F....... [ZBX-15539] fixed validation of master item in item update form (miks)
+..F....... [ZBX-15532] fixed undefined index error on problems page when trigger expression contains web items (gcalenko, Sasha)
 A......... [ZBX-15488] fixed permission check for inherited triggers (miks)
 ..F....... [ZBX-15646] fixed web-server 'Request-URI Too Long' error in trigger description dialog (miks)
 ..F....... [ZBX-15688] fixed wrong host group and host selection in trigger dependencies window (talbergs)
@@ -159,10 +167,18 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.6rc1
 
 New features:
+...G...... [ZBXNEXT-4898] added support IPv6 for 'net.dns' and 'net.dns.record' (MVekslers)
 .......PS. [ZBXNEXT-5037] added 'skip' parameter for vmware.eventlog key (MVekslers)
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+...G...... [ZBX-15607] fixed possibility of zombie processes occurring when signaling agent during metric execution (akozlovs)
+.D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
+..F....... [ZBX-15625] removed links leading to media type edit form for non-superadmins in Reports->Notifications page (Ivo)
+.......PS. [ZBX-15703] fixed use of uninitialized variable when receiving 0 bytes on listening socket (akozlovs)
+..F....... [ZBX-15537] fixed visual bug when filter tab was overlapped by sub navigation (gcalenko)
+..F....... [ZBX-15539] fixed validation of master item in item update form (miks)
+..F....... [ZBX-15532] fixed undefined index error on problems page when trigger expression contains web items (gcalenko, Sasha)
 A......... [ZBX-15488] fixed permission check for inherited triggers (miks)
 ..F....... [ZBX-15646] fixed web-server 'Request-URI Too Long' error in trigger description dialog (miks)
 
@@ -2405,6 +2421,7 @@ Changes for 3.0.26rc1
 New features:
 
 Bug fixes:
+.D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
 ...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
 ...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
 

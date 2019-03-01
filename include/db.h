@@ -784,4 +784,17 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
 void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff);
 
+/* mock field to estimate how much data can be stored in characters, bytes or both, */
+/* depending on database backend                                                    */
+
+typedef struct
+{
+	int	bytes_num;
+	int	chars_num;
+}
+zbx_db_mock_field_t;
+
+void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len);
+int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
+
 #endif
