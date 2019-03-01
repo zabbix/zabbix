@@ -766,8 +766,7 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 	/* parse metric value condition */
 	if ('\0' != data[pos])
 	{
-		zbx_strloc_t			loc_op, loc_value;
-		zbx_prometheus_condition_op_t	op;
+		zbx_strloc_t	loc_op, loc_value;
 
 		if (SUCCEED != parse_metric_op(data, pos, &loc_op))
 		{
@@ -775,7 +774,6 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 			goto out;
 		}
 
-		op = str_loc_op(data, &loc_op);
 		pos = skip_spaces(data, loc_op.r + 1);
 
 		if (SUCCEED != parse_metric_value(data, pos, &loc_value))
@@ -792,7 +790,8 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 			goto out;
 		}
 
-		filter->value = prometheus_condition_create(NULL, str_loc_dup(data, &loc_value), op);
+		filter->value = prometheus_condition_create(NULL, str_loc_dup(data, &loc_value),
+				ZBX_PROMETHEUS_CONDITION_OP_EQUAL_VALUE);
 	}
 
 	ret = SUCCEED;
