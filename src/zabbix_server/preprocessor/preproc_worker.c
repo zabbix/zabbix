@@ -110,7 +110,10 @@ static void	worker_format_result(int step, const zbx_preproc_result_t *result, c
 		zbx_free(value_str);
 	}
 	else
+	{
 		*out = zbx_dsprintf(NULL, "%d. Failed%s: %s\n", step, actions[result->action], error);
+		zbx_rtrim(*out, ZBX_WHITESPACE);
+	}
 }
 
 /******************************************************************************
