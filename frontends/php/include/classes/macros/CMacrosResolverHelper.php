@@ -534,8 +534,8 @@ class CMacrosResolverHelper {
 	 * @param string       $selements[]['urls'][]['url']        Map element url value.
 	 * @param int | array  $selements[]['elementid']            Element id linked to map element.
 	 * @param array        $options
-	 * @param bool         $options[resolve_element_urls]       Resolve macros in map element url name and value.
-	 * @param bool         $options[resolve_element_label]      Resolve macros in map element label.
+	 * @param bool         $options['resolve_element_urls']     Resolve macros in map element url name and value.
+	 * @param bool         $options['resolve_element_label']    Resolve macros in map element label.
 	 *
 	 * @return array
 	 */

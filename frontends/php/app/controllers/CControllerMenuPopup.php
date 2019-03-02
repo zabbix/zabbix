@@ -289,8 +289,7 @@ class CControllerMenuPopup extends CController {
 	private static function prepareMapElementUrls(array $selement, array $map_urls) {
 		// Remove unused selement url data.
 		foreach ($selement['urls'] as &$url) {
-			unset($url['sysmapelementurlid']);
-			unset($url['selementid']);
+			unset($url['sysmapelementurlid'], $url['selementid']);
 		}
 		unset($url);
 
@@ -302,9 +301,7 @@ class CControllerMenuPopup extends CController {
 			}
 		}
 
-		$resolve_opt = ['resolve_element_urls' => true];
-		$selements_resolved = CMacrosResolverHelper::resolveMacrosInMapElements([$selement], $resolve_opt);
-		$selement = $selements_resolved[0];
+		$selement = CMacrosResolverHelper::resolveMacrosInMapElements([$selement], ['resolve_element_urls' => true])[0];
 
 		// Unset URLs with empty name or value.
 		foreach ($selement['urls'] as $url_nr => $url) {
