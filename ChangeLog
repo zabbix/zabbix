@@ -9,6 +9,7 @@ New features:
 
 Bug fixes:
 ...G...... [ZBX-15607] fixed possibility of zombie processes occurring when signaling agent during metric execution (akozlovs)
+.D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
 ..F....... [ZBX-15625] removed links leading to media type edit form for non-superadmins in Reports->Notifications page (Ivo)
 .D.G...PS. [ZBX-8344] remove trimming of leading and trailing whitespaces for data received from agent (akozlovs)
 .......PS. [ZBX-15703] fixed use of uninitialized variable when receiving 0 bytes on listening socket (akozlovs)
