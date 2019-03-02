@@ -49,6 +49,8 @@ class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
 			['../././not_so_zabbix',			[], false],
 			['jav&#x09;ascript:alert(1];', 		[], false],
 			['{INVENTORY.URL.A}',				['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST], true],
+			['{INVENTORY.URL.A1}',				['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST], false],
+			['{INVENTORY.URL.A0}',				['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER], false],
 			['{INVENTORY.URL.A1}',				['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER], true],
 			['{INVENTORY.URL.A}',				['allow_inventory_macro' => INVENTORY_URL_MACRO_NONE], false],
 			['{INVENTORY.URL.A}',				['allow_user_macro' => false], false],
