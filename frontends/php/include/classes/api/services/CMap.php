@@ -954,6 +954,7 @@ class CMap extends CMapElement {
 						);
 					}
 
+					$url_validate_options = ['allow_user_macro' => false];
 					if ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_HOST;
 					}
@@ -963,7 +964,6 @@ class CMap extends CMapElement {
 					else {
 						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_NONE;
 					}
-					$url_validate_options += ['allow_user_macro' => false];
 
 					if (!CHtmlUrlValidator::validate($url['url'], $url_validate_options)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
@@ -1425,6 +1425,7 @@ class CMap extends CMapElement {
 						);
 					}
 
+					$url_validate_options = ['allow_user_macro' => false];
 					if ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_HOST;
 					}
@@ -1434,7 +1435,6 @@ class CMap extends CMapElement {
 					else {
 						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_NONE;
 					}
-					$url_validate_options += ['allow_user_macro' => false];
 
 					if (!CHtmlUrlValidator::validate($url['url'], $url_validate_options)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));

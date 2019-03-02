@@ -58,6 +58,7 @@ abstract class CMapElement extends CApiService {
 			}
 
 			if (array_key_exists('urls', $selement)) {
+				$url_validate_options = ['allow_user_macro' => false];
 				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 					$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_HOST;
 				}
@@ -67,7 +68,6 @@ abstract class CMapElement extends CApiService {
 				else {
 					$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_NONE;
 				}
-				$url_validate_options += ['allow_user_macro' => false];
 
 				foreach ($selement['urls'] as $url_data) {
 					if (!CHtmlUrlValidator::validate($url_data['url'], $url_validate_options)) {
