@@ -546,7 +546,7 @@ static int	parse_metric_value(const char *data, size_t pos, zbx_strloc_t *loc)
 	loc->l = pos;
 
 	len = ZBX_CONST_STRLEN("nan");
-	if (str_copy_lowercase(buffer, sizeof(buffer), ptr, len) == len && 0 == memcmp(buffer, "nan", len))
+	if (len == str_copy_lowercase(buffer, sizeof(buffer), ptr, len) && 0 == memcmp(buffer, "nan", len))
 	{
 		loc->r = pos + 2;
 		return SUCCEED;
@@ -556,7 +556,7 @@ static int	parse_metric_value(const char *data, size_t pos, zbx_strloc_t *loc)
 		ptr++;
 
 	len = ZBX_CONST_STRLEN("inf");
-	if (str_copy_lowercase(buffer, sizeof(buffer), ptr, len) == len && 0 == memcmp(buffer, "inf", len))
+	if (len == str_copy_lowercase(buffer, sizeof(buffer), ptr, len) && 0 == memcmp(buffer, "inf", len))
 	{
 		loc->r = ptr - data + 2;
 		return SUCCEED;

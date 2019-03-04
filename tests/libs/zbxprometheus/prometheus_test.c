@@ -72,9 +72,7 @@ int	zbx_prometheus_filter_parse(const char *data, zbx_prometheus_condition_test_
 	*value = prometheus_condition_dup(filter.value);
 
 	for (i = 0; i < filter.labels.values_num; i++)
-	{
 		zbx_vector_ptr_append(labels, prometheus_condition_dup(filter.labels.values[i]));
-	}
 
 	prometheus_filter_clear(&filter);
 
