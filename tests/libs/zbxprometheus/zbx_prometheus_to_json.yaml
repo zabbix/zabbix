@@ -1102,4 +1102,12 @@ in:
 out:
   result: SUCCEED
   output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system 1.1940298507220641","type":"gauge","help":"Telegraf \\/ collected metric"}]'
+---
+test case: 'Test HELP hint trailing whitespace removal'
+in:
+  data: "# HELP cpu_usage_system Telegraf collected metric \n# TYPE cpu_usage_system gauge\ncpu_usage_system 1.1940298507220641\n"
+  params: '{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
+out:
+  result: SUCCEED
+  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system 1.1940298507220641","type":"gauge","help":"Telegraf collected metric"}]'
 ...

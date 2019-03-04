@@ -1217,10 +1217,11 @@ static int	parse_type(const char *data, size_t pos, zbx_strloc_t *loc_metric, zb
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	prometheus_register_hint(zbx_hashset_t *hints, const char *data, char *metric, zbx_strloc_t *loc_hint,
-		int hint_type, char **error)
+static int	prometheus_register_hint(zbx_hashset_t *hints, const char *data, char *metric,
+		const zbx_strloc_t *loc_hint, int hint_type, char **error)
 {
 	zbx_prometheus_hint_t	*hint, hint_local;
+	zbx_strloc_t		loc = *loc_hint;
 
 	hint_local.metric = metric;
 
@@ -1233,6 +1234,9 @@ static int	prometheus_register_hint(zbx_hashset_t *hints, const char *data, char
 	else
 		zbx_free(metric);
 
+	while ((' ' == data[loc.r] || '\t' == data[loc.r]) && loc.r > loc.l)
+		loc.r--;
+
 	if (ZBX_PROMETHEUS_HINT_HELP == hint_type)
 	{
 		if (NULL != hint->help)
@@ -1240,7 +1244,7 @@ static int	prometheus_register_hint(zbx_hashset_t *hints, const char *data, char
 			*error = zbx_dsprintf(*error, "multiple HELP comments found for metric \"%s\"", hint->metric);
 			return FAIL;
 		}
-		hint->help = str_loc_unescape_hint_dyn(data, loc_hint);
+		hint->help = str_loc_unescape_hint_dyn(data, &loc);
 	}
 	else /* ZBX_PROMETHEUS_HINT_TYPE */
 	{
@@ -1249,7 +1253,7 @@ static int	prometheus_register_hint(zbx_hashset_t *hints, const char *data, char
 			*error = zbx_dsprintf(*error, "multiple TYPE comments found for metric \"%s\"", hint->metric);
 			return FAIL;
 		}
-		hint->type = str_loc_dup(data, loc_hint);
+		hint->type = str_loc_dup(data, &loc);
 	}
 
 	return SUCCEED;
