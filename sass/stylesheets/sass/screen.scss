@@ -3978,6 +3978,12 @@ $form-icon-btn: (
 		text-overflow: ellipsis;
 		border-right: none;
 
+		&[readonly] {
+			background: $form-bg-color !important;
+			border-color: $form-border-color;
+			color: $form-font-color !important;
+		}
+
 		&.monospace-font {
 			font-family: $font-stack-mono;
 		}

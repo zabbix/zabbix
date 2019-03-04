@@ -141,8 +141,8 @@
 
 				case '<?= ZBX_PREPROC_SCRIPT ?>':
 					return $(preproc_param_multiline_tmpl.evaluate({rowNum: index})).multilineInput({
-						modal_title: '<?= _('JavaScript') ?>',
-						title: '<?= _('Click to view or edit code') ?>',
+						title: '<?= _('JavaScript') ?>',
+						hint: '<?= _('Click to view or edit code') ?>',
 						placeholder: '<?= _('script') ?>',
 						maxlength: <?= $data['preprocessing_script_maxlength'] ?>
 					});

@@ -24,26 +24,26 @@
 	var methods = {
 		init: function(options) {
 			this.options = $.extend({
-				'modal_title': '',
-				'title': '',
-				'value': '',
-				'placeholder': '',
-				'maxlength': 65535,
-				'readonly': false,
-				'disabled': false,
-				'line_numbers': true,
-				'monospace_font': true
+				title: '',
+				hint: '',
+				value: '',
+				placeholder: '',
+				maxlength: 65535,
+				readonly: false,
+				disabled: false,
+				line_numbers: true,
+				monospace_font: true
 			}, options);
 
 			this.$hidden = $('<input>', {type: 'hidden', name: this.data('name')});
 			this.$input = $('<input>', {
 				type: 'text',
 				placeholder: options.placeholder,
-				title: this.options.title,
+				title: this.options.hint,
 				tabindex: -1
 			})
 				.toggleClass('monospace-font', this.options.monospace_font)
-				.prop('readonly', this.options.readonly ? true : null)
+				.prop('readonly', this.options.disabled ? null : true)
 				.on('click', this, openModal);
 			this.$button = $('<button>', {type: 'button'})
 				.text(t('S_OPEN'))
@@ -130,7 +130,7 @@
 		}
 
 		overlayDialogue({
-			'title': e.data.options.modal_title,
+			'title': e.data.options.title,
 			'class': 'multilineinput-modal',
 			'content': $('<div>', {class: 'multilineinput-container'}).append(
 				e.data.options.line_numbers ? $line_numbers : '', $textarea
@@ -138,7 +138,7 @@
 			'footer': $footer,
 			'buttons': [
 				{
-					title: t('S_SAVE'),
+					title: t('S_APPLY'),
 					action: function() {
 						var value = $.trim($textarea.val());
 						e.data.$input.val(value.split("\n")[0]);
@@ -173,10 +173,8 @@
 	$.fn.multilineInput = function(method) {
 		if (methods[method]) {
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Invalid method "' +  method + '".');
 		}
+
+		return methods.init.apply(this, arguments);
 	};
 })(jQuery);

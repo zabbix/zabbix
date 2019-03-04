@@ -2741,6 +2741,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     white-space: nowrap;
     text-overflow: ellipsis;
     border-right: none; }
+    .multilineinput-control input[type=text][readonly] {
+      background: #fff !important;
+      border-color: #acbbc2;
+      color: #1f2c33 !important; }
     .multilineinput-control input[type=text].monospace-font {
       font-family: "Courier New", Courier, monospace; }
   .multilineinput-control.editable {

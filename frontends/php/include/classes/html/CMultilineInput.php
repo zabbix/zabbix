@@ -42,8 +42,8 @@ class CMultilineInput extends CDiv {
 		$this->name = $name;
 		$this->value = $value;
 		$this->options = $options + [
-			'modal_title' => '',
 			'title' => '',
+			'hint' => '',
 			'placeholder' => '',
 			'maxlength' => 65535,
 			'readonly' => false,
@@ -61,28 +61,18 @@ class CMultilineInput extends CDiv {
 
 	public function setOption($key, $value) {
 		$this->options[$key] = $value;
-	}
-
-	public function setMaxlength($maxlength) {
-		$this->options['maxlength'] = $maxlength;
 
 		return $this;
 	}
 
-	public function setReadonly($readonly) {
-		$this->options['readonly'] = $readonly;
+	public function setEnabled() {
+		$this->options['disabled'] = false;
 
 		return $this;
 	}
 
-	public function setEnabled($enabled) {
-		$this->options['disabled'] = !$enabled;
-
-		return $this;
-	}
-
-	public function setDisabled($disabled) {
-		$this->options['disabled'] = $disabled;
+	public function setDisabled() {
+		$this->options['disabled'] = true;
 
 		return $this;
 	}

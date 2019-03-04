@@ -1504,8 +1504,8 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 
 			case ZBX_PREPROC_SCRIPT:
 				$params = new CMultilineInput($step_param_0->getName(), $step_param_0_value, [
-					'modal_title' => _('JavaScript'),
-					'title' => _('Click to view or edit code'),
+					'title' => _('JavaScript'),
+					'hint' => _('Click to view or edit code'),
 					'placeholder' => _('script'),
 					'maxlength' => $script_maxlength,
 					'readonly' => $readonly

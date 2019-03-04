@@ -216,7 +216,7 @@ $tranStrings = [
 	'multilineinput.js' => [
 		'S_OPEN' => _('Open'),
 		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
-		'S_SAVE' => _('Save'),
+		'S_APPLY' => _('Apply'),
 		'S_CANCEL' => _('Cancel')
 	],
 	'multiselect.js' => [
