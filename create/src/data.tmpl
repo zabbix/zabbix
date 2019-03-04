@@ -43,14 +43,14 @@ FIELDS|druleid|proxy_hostid|name         |iprange        |delay|status|
 ROW   |2      |NULL        |Local network|192.168.0.1-254|1h   |1     |
 
 TABLE |dchecks
-FIELDS|dcheckid|druleid|type|key_        |snmp_community|ports|snmpv3_securityname|snmpv3_securitylevel|snmpv3_authpassphrase|snmpv3_privpassphrase|uniq|snmpv3_authprotocol|snmpv3_privprotocol|snmpv3_contextname|
-ROW   |2       |2      |9   |system.uname|              |10050|                   |0                   |                     |                     |0   |0                  |0                  |                  |
+FIELDS|dcheckid|druleid|type|key_        |snmp_community|ports|snmpv3_securityname|snmpv3_securitylevel|snmpv3_authpassphrase|snmpv3_privpassphrase|uniq|snmpv3_authprotocol|snmpv3_privprotocol|snmpv3_contextname|host_source|name_source|
+ROW   |2       |2      |9   |system.uname|              |10050|                   |0                   |                     |                     |0   |0                  |0                  |                  |1          |0          |
 
 TABLE |media_type
-FIELDS|mediatypeid|type|description|smtp_server     |smtp_helo  |smtp_email        |exec_path|gsm_modem |username          |passwd|status|smtp_port|smtp_security|smtp_verify_peer|smtp_verify_host|smtp_authentication|exec_params|maxsessions|maxattempts|attempt_interval|content_type
-ROW   |1          |0   |Email      |mail.example.com|example.com|zabbix@example.com|         |          |                  |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |1
-ROW   |2          |3   |Jabber     |                |           |                  |         |          |jabber@example.com|zabbix|0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |0
-ROW   |3          |2   |SMS        |                |           |                  |         |/dev/ttyS0|                  |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |0
+FIELDS|mediatypeid|type|description|smtp_server     |smtp_helo  |smtp_email        |exec_path|gsm_modem |username          |passwd|status|smtp_port|smtp_security|smtp_verify_peer|smtp_verify_host|smtp_authentication|exec_params|maxsessions|maxattempts|attempt_interval|content_type|
+ROW   |1          |0   |Email      |mail.example.com|example.com|zabbix@example.com|         |          |                  |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |1           |
+ROW   |2          |3   |Jabber     |                |           |                  |         |          |jabber@example.com|zabbix|0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |0           |
+ROW   |3          |2   |SMS        |                |           |                  |         |/dev/ttyS0|                  |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |0           |
 
 TABLE |usrgrp
 FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|
@@ -147,14 +147,15 @@ ROW   |4       |Windows service names for discovery         |SysmonLog  |
 ROW   |5       |Windows service startup states for discovery|automatic  |
 
 TABLE |expressions
-FIELDS|expressionid|regexpid|expression                                                                                                                                                           |expression_type|exp_delimiter|case_sensitive|
+FIELDS|expressionid|regexpid|expression                                                                                                                                                  |expression_type|exp_delimiter|case_sensitive|
 ROW   |1           |1       |^(btrfs&pipe;ext2&pipe;ext3&pipe;ext4&pipe;reiser&pipe;xfs&pipe;ffs&pipe;ufs&pipe;jfs&pipe;jfs2&pipe;vxfs&pipe;hfs&pipe;refs&pipe;ntfs&pipe;fat32&pipe;zfs)$|3              |,            |0             |
-ROW   |3           |3       |^(Physical memory&pipe;Virtual memory&pipe;Memory buffers&pipe;Cached memory&pipe;Swap space)$                                                                       |4              |,            |1             |
-ROW   |5           |4       |^(MMCSS&pipe;gupdate&pipe;SysmonLog&pipe;clr_optimization_v2.0.50727_32&pipe;clr_optimization_v4.0.30319_32)$                                                        |4              |,            |1             |
-ROW   |6           |5       |^(automatic&pipe;automatic delayed)$                                                                                                                                 |3              |,            |1             |
-ROW   |7           |2       |^Software Loopback Interface                                                                                                                                         |4              |,            |1             |
-ROW   |8           |2       |^(In)?[Ll]oop[Bb]ack[0-9._]*$                                                                                                                                        |4              |,            |1             |
-ROW   |9           |2       |^NULL[0-9.]*$                                                                                                                                                        |4              |,            |1             |
-ROW   |10          |2       |^[Ll]o[0-9.]*$                                                                                                                                                       |4              |,            |1             |
-ROW   |11          |2       |^[Ss]ystem$                                                                                                                                                          |4              |,            |1             |
-ROW   |12          |2       |^Nu[0-9.]*$                                                                                                                                                          |4              |,            |1             |
+ROW   |3           |3       |^(Physical memory&pipe;Virtual memory&pipe;Memory buffers&pipe;Cached memory&pipe;Swap space)$                                                              |4              |,            |1             |
+ROW   |5           |4       |^(MMCSS&pipe;gupdate&pipe;SysmonLog&pipe;clr_optimization_v2.0.50727_32&pipe;clr_optimization_v4.0.30319_32)$                                               |4              |,            |1             |
+ROW   |6           |5       |^(automatic&pipe;automatic delayed)$                                                                                                                        |3              |,            |1             |
+ROW   |7           |2       |^Software Loopback Interface                                                                                                                                |4              |,            |1             |
+ROW   |8           |2       |^(In)?[Ll]oop[Bb]ack[0-9._]*$                                                                                                                               |4              |,            |1             |
+ROW   |9           |2       |^NULL[0-9.]*$                                                                                                                                               |4              |,            |1             |
+ROW   |10          |2       |^[Ll]o[0-9.]*$                                                                                                                                              |4              |,            |1             |
+ROW   |11          |2       |^[Ss]ystem$                                                                                                                                                 |4              |,            |1             |
+ROW   |12          |2       |^Nu[0-9.]*$                                                                                                                                                 |4              |,            |1             |
+
