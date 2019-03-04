@@ -231,33 +231,27 @@ static int zbx_is_win_ver_or_greater(zbx_uint32_t major, zbx_uint32_t minor, zbx
  *                                                                            *
  * Purpose: Initialize Windows Sockets APIs                                   *
  *                                                                            *
+ * Parameters: error - [OUT] the error message                                *
+ *                                                                            *
  * Return value: SUCCEED or FAIL - an error occurred                          *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 #ifdef _WINDOWS
-
-#define ZBX_SOCKET_START()	if (FAIL == socket_started) socket_started = zbx_socket_start()
-
-int	socket_started = FAIL;	/* winXX threads require socket_started not to be static */
-
-static int	zbx_socket_start()
+int	zbx_socket_start(char **error)
 {
 	WSADATA	sockInfo;
 	int	ret;
 
 	if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "WSAStartup() failed: %s", strerror_from_system(ret));
+		*error = zbx_dsprintf(*error, "Cannot initialize Winsock DLL: %s", strerror_from_system(ret));
 		return FAIL;
 	}
 
 	return SUCCEED;
 }
-
-#else
-#	define ZBX_SOCKET_START()
 #endif
 
 /******************************************************************************
@@ -501,8 +495,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		return FAIL;
 	}
 #endif
-	ZBX_SOCKET_START();
-
 	zbx_socket_clean(s);
 
 	zbx_snprintf(service, sizeof(service), "%hu", port);
@@ -611,8 +603,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		return FAIL;
 	}
 #endif
-	ZBX_SOCKET_START();
-
 	zbx_socket_clean(s);
 
 	if (NULL == (hp = gethostbyname(ip)))
@@ -971,8 +961,6 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 	}
 #endif
 
-	ZBX_SOCKET_START();
-
 	zbx_socket_clean(s);
 
 	memset(&hints, 0, sizeof(hints));
@@ -1168,8 +1156,6 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 				_WIN32_WINNT_WIN7 & 0xff, 1) == SUCCEED;
 	}
 #endif
-
-	ZBX_SOCKET_START();
 
 	zbx_socket_clean(s);
 
@@ -1889,6 +1875,11 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header. Message ignored.", s->peer);
 		nbytes = ZBX_PROTO_ERROR;
+	}
+	else
+	{
+		s->read_bytes = 0;
+		s->buffer[s->read_bytes] = '\0';
 	}
 out:
 	if (0 != timeout)
