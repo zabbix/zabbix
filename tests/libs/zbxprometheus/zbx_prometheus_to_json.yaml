@@ -1110,4 +1110,12 @@ in:
 out:
   result: SUCCEED
   output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system 1.1940298507220641","type":"gauge","help":"Telegraf collected metric"}]'
+---
+test case: 'Test HELP hint unescaping'
+in:
+  data: "alertmanager_alerts{instance=\"demo.robustperception.io:9093\",job=\"alertmanager\",state=\"active\"} 4\nalertmanager_alerts{instance=\"demo.robustperception.io:9093\",job=\"alertmanager\",state=\"active\"} 5\n # test alertmanager_alerts test"
+  params: ''
+out:
+  result: SUCCEED
+  output: '[{"name":"alertmanager_alerts","value":"4","line_raw":"alertmanager_alerts{instance=\"demo.robustperception.io:9093\",job=\"alertmanager\",state=\"active\"} 4","labels":{"instance":"demo.robustperception.io:9093","job":"alertmanager","state":"active"},"type":"untyped"},{"name":"alertmanager_alerts","value":"5","line_raw":"alertmanager_alerts{instance=\"demo.robustperception.io:9093\",job=\"alertmanager\",state=\"active\"} 5","labels":{"instance":"demo.robustperception.io:9093","job":"alertmanager","state":"active"},"type":"untyped"}]'
 ...

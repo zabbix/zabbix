@@ -45,6 +45,6 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED == ret)
 	{
 		output = zbx_mock_get_parameter_string("out.output");
-		zbx_mock_assert_str_eq("Invalid zbx_prometheus_to_json() returned wrong output", output, ret_output);
+		zbx_mock_assert_str_eq("Invalid zbx_prometheus_to_json() output", output, ret_output);
 	}
 }

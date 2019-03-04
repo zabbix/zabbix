@@ -1308,8 +1308,11 @@ static int	prometheus_parse_hint(zbx_prometheus_filter_t *filter, const char *da
 		/* skip the comment */
 		const char	*ptr;
 
-		ptr = strchr(data + pos, '\n');
-		loc->r = ptr - data - 1;
+		if (NULL != (ptr = strchr(data + pos, '\n')))
+			loc->r = ptr - data - 1;
+		else
+			loc->r = strlen(data + pos) + pos;
+
 		return SUCCEED;
 	}
 
