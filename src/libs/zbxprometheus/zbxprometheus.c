@@ -1053,18 +1053,26 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 			}
 		}
 
-		pos = loc.r + 1;
+		pos = skip_spaces(data, loc.r + 1);
 	}
-	else if (pos == loc.r + 1)
+
+	/* check if there was a whitespace before metric value */
+	if (pos == loc.r + 1)
 	{
-		/* if no labels are defined metric name must be followed by whitespace or equality */
-		*error = zbx_strdup(*error, "cannot parse text following metric name");
+		const char	*ptr;
+		int		len;
+
+		if (NULL == (ptr = strchr(data + pos, '\n')))
+			len = strlen(data + pos);
+		else
+			len = ptr - data + pos;
+
+		*error = zbx_dsprintf(*error, "cannot parse text at: %.*s", len, data + pos);
 		goto out;
 	}
 
 	/* parse value and check against the filter */
 
-	pos = skip_spaces(data, pos);
 	if (FAIL == parse_metric_value(data, pos, &loc))
 	{
 		*error = zbx_strdup(*error, "cannot parse metric value");

@@ -181,4 +181,16 @@ out:
     - name: vendor
       value: "intel\n"
   next: ""
+---
+test case: cpu$ 1
+in: 
+  data: 'cpu$ 1'
+out:
+  return: FAIL
+---
+test case: cpu{vendor="intel"}1
+in: 
+  data: 'cpu{vendor="intel"}1'
+out:
+  return: FAIL
 ...
