@@ -1592,6 +1592,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
  * Purpose: construct a unique host name by the given sample                  *
  *                                                                            *
  * Parameters: host_name_sample - a host name to start constructing from      *
+ *             field_name       - field name for host or host visible name    *
  *                                                                            *
  * Return value: unique host name which does not exist in the database        *
  *                                                                            *
@@ -1603,7 +1604,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
  *           host_name_sample is not modified, allocates new memory!          *
  *                                                                            *
  ******************************************************************************/
-char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
+char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *field_name)
 {
 	const char		*__function_name = "DBget_unique_hostname_by_sample";
 
@@ -1626,12 +1627,12 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 	host_name_sample_esc = DBdyn_escape_like_pattern(host_name_sample);
 
 	result = DBselect(
-			"select host"
+			"select %s"
 			" from hosts"
-			" where host like '%s%%' escape '%c'"
+			" where %s like '%s%%' escape '%c'"
 				" and flags<>%d"
 				" and status in (%d,%d,%d)",
-			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR,
+				field_name, field_name, host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE);
 
@@ -2812,6 +2813,55 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlock_ids                                                       *
+ *                                                                            *
+ * Purpose: locks a records in a table by field name                          *
+ *                                                                            *
+ * Parameters: table      - [IN] the target table                             *
+ *             field_name - [IN] field name                                   *
+ *             ids        - [IN/OUT] IN - sorted array of IDs to lock         *
+ *                                   OUT - resulting array of locked IDs      *
+ *                                                                            *
+ * Return value: SUCCEED - one or more of the specified records were          *
+ *                         successfully locked                                *
+ *               FAIL    - no records were locked                             *
+ *                                                                            *
+ ******************************************************************************/
+int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64_t *ids)
+{
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t	id;
+	int		i;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (0 == ids->values_num)
+		return FAIL;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s from %s where", field_name, table_name);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name, ids->values, ids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by %s" ZBX_FOR_UPDATE, field_name);
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	for (i = 0; NULL != (row = DBfetch(result)); i++)
+	{
+		ZBX_STR2UINT64(id, row[0]);
+
+		while (id != ids->values[i])
+			zbx_vector_uint64_remove(ids, i);
+	}
+	DBfree_result(result);
+
+	while (i != ids->values_num)
+		zbx_vector_uint64_remove_noorder(ids, i);
+
+	return (0 != ids->values_num ? SUCCEED : FAIL);
 }
 
 /******************************************************************************

@@ -1,6 +1,7 @@
 Changes for 4.2.0beta2
 
 New features:
+A.F....PS. [ZBXNEXT-158] added ability to use discovery returned string as hostname and visible name (akozlovs, vasilijs)
 ....I..... [ZBXNEXT-5013] removed adaptive chunking from TimescaleDB script (kalimulin)
 ........S. [ZBXNEXT-5016] extended preprocessing error messages to include intermediate step results (wiper)
 ...G...... [ZBXNEXT-4898] added support IPv6 for 'net.dns' and 'net.dns.record' (MVekslers)
