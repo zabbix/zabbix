@@ -55,10 +55,12 @@ class CHtmlUrlValidator {
 		}
 
 		if ($options['allow_inventory_macro'] != INVENTORY_URL_MACRO_NONE) {
-			$pattern = ($options['allow_inventory_macro'] == INVENTORY_URL_MACRO_TRIGGER)
-				? '/^{INVENTORY\.URL\.[A-C]\d?}/'
-				: '/^{INVENTORY\.URL\.[A-C]}/';
-			if (preg_match($pattern, $url)) {
+			$allowed_macros = ['{INVENTORY.URL.A}', '{INVENTORY.URL.B}', '{INVENTORY.URL.C}'];
+			$parser_options = ['allow_reference' => ($options['allow_inventory_macro'] == INVENTORY_URL_MACRO_TRIGGER)];
+			$macro_parser = new CMacroParser($allowed_macros, $parser_options);
+
+			// Macros allowed only at the beginning of $url.
+			if ($macro_parser->parse($url, 0) != CParser::PARSE_FAIL) {
 				return true;
 			}
 		}
