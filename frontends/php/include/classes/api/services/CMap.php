@@ -1824,7 +1824,7 @@ class CMap extends CMapElement {
 			'selectLines' => ['sysmap_shapeid', 'x1', 'y1', 'x2', 'y2', 'line_type', 'line_width', 'line_color',
 				'zindex'
 			],
-			'selectUrls' => ['sysmapid', 'sysmapurlid', 'name', 'url'],
+			'selectUrls' => ['sysmapid', 'sysmapurlid', 'name', 'url', 'elementtype'],
 			'selectUsers' => ['sysmapuserid', 'sysmapid', 'userid', 'permission'],
 			'selectUserGroups' => ['sysmapusrgrpid', 'sysmapid', 'usrgrpid', 'permission'],
 			'editable' => true,
