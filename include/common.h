@@ -1456,7 +1456,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 #define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
 #define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
-#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFF)
+#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFFFF)
 
 #define ZBX_PREPROC_MULTIPLIER			1
 #define ZBX_PREPROC_RTRIM			2
