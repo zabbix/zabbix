@@ -375,7 +375,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		// items
 		$items = new CSpan([
-			new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$db_host['hostid']),
+			new CLink(_('Items'),
+				(new CUrl('items.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$db_host['hostid']])
+			),
 			CViewHelper::showNum($db_host['items'])
 		]);
 		if ($current_element == 'items') {
@@ -385,7 +389,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		// triggers
 		$triggers = new CSpan([
-			new CLink(_('Triggers'), 'triggers.php?hostid='.$db_host['hostid']),
+			new CLink(_('Triggers'),
+				(new CUrl('triggers.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$db_host['hostid']])
+			),
 			CViewHelper::showNum($db_host['triggers'])
 		]);
 		if ($current_element == 'triggers') {
@@ -540,19 +548,19 @@ function get_header_sysmap_table($sysmapid, $name, $severity_min) {
 		$parent_maps = (new CList())
 			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _('Upper level maps'))
-			->addClass(ZBX_STYLE_OBJECT_GROUP);
+			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+			->addClass(ZBX_STYLE_OBJECT_GROUP)
+			->addItem((new CSpan())->addItem(_('Upper level maps').':'));
 
 		foreach ($parent_sysmaps as $parent_sysmap) {
-			$parent_maps->addItem(
+			$parent_maps->addItem((new CSpan())->addItem(
 				new CLink($parent_sysmap['name'], (new CUrl('zabbix.php'))
 					->setArgument('action', 'map.view')
 					->setArgument('sysmapid', $parent_sysmap['sysmapid'])
 					->setArgument('severity_min', $severity_min)
-				)
+				))
 			);
 		}
-
-		$list->addItem(_('Upper level maps').':');
 
 		return new CHorList([$list, $parent_maps]);
 	}

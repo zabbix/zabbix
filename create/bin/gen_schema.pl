@@ -623,9 +623,26 @@ sub process_row
 	print "INSERT INTO $table_name VALUES $values;${eol}\n";
 }
 
+sub timescaledb
+{
+	for ("history", "history_uint", "history_log", "history_text", 
+			"history_str", "trends", "trends_uint")
+	{
+		print<<EOF
+SELECT create_hypertable('$_', 'clock', chunk_time_interval => 86400, migrate_data => true);
+EOF
+		;
+	}
+	print<<EOF
+UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
+EOF
+	;
+	exit;
+}
+
 sub usage
 {
-	print "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite3]\n";
+	print "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite3|timescaledb]\n";
 	print "The script generates Zabbix SQL schemas and C code for different database engines.\n";
 	exit;
 }
@@ -688,13 +705,14 @@ sub main
 	$fkeys_prefix = "";
 	$fkeys_suffix = "";
 
-	if ($format eq 'c')		{ %output = %c; }
-	elsif ($format eq 'ibm_db2')	{ %output = %ibm_db2; }
-	elsif ($format eq 'mysql')	{ %output = %mysql; }
-	elsif ($format eq 'oracle')	{ %output = %oracle; }
-	elsif ($format eq 'postgresql')	{ %output = %postgresql; }
-	elsif ($format eq 'sqlite3')	{ %output = %sqlite3; }
-	else				{ usage(); }
+	if ($format eq 'c')			{ %output = %c; }
+	elsif ($format eq 'ibm_db2')		{ %output = %ibm_db2; }
+	elsif ($format eq 'mysql')		{ %output = %mysql; }
+	elsif ($format eq 'oracle')		{ %output = %oracle; }
+	elsif ($format eq 'postgresql')		{ %output = %postgresql; }
+	elsif ($format eq 'sqlite3')		{ %output = %sqlite3; }
+	elsif ($format eq 'timescaledb')	{ timescaledb(); }
+	else					{ usage(); }
 
 	process();
 

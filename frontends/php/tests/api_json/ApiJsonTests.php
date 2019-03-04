@@ -30,9 +30,11 @@ require_once dirname(__FILE__).'/testDRule.php';
 require_once dirname(__FILE__).'/testHost.php';
 require_once dirname(__FILE__).'/testHostGroup.php';
 require_once dirname(__FILE__).'/testIconMap.php';
+require_once dirname(__FILE__).'/testItem.php';
 require_once dirname(__FILE__).'/testMaintenance.php';
 require_once dirname(__FILE__).'/testProxy.php';
 require_once dirname(__FILE__).'/testScripts.php';
+require_once dirname(__FILE__).'/testTriggers.php';
 require_once dirname(__FILE__).'/testTaskCreate.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
 require_once dirname(__FILE__).'/testUserMacro.php';
@@ -41,6 +43,7 @@ require_once dirname(__FILE__).'/testValuemap.php';
 require_once dirname(__FILE__).'/testWebScenario.php';
 require_once dirname(__FILE__).'/testMap.php';
 require_once dirname(__FILE__).'/testDiscoveryRule.php';
+require_once dirname(__FILE__).'/testDependentItems.php';
 
 class ApiJsonTests {
 	public static function suite() {
@@ -52,14 +55,17 @@ class ApiJsonTests {
 		$suite->addTestSuite('testAction');
 		$suite->addTestSuite('testApplication');
 		$suite->addTestSuite('testConfiguration');
+		$suite->addTestSuite('testDependentItems');
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
 		$suite->addTestSuite('testHost');
 		$suite->addTestSuite('testHostGroup');
 		$suite->addTestSuite('testIconMap');
+		$suite->addTestSuite('testItem');
 		$suite->addTestSuite('testMaintenance');
 		$suite->addTestSuite('testProxy');
 		$suite->addTestSuite('testScripts');
+		$suite->addTestSuite('testTriggers');
 		$suite->addTestSuite('testTaskCreate');
 		$suite->addTestSuite('testUserGroup');
 		$suite->addTestSuite('testUserMacro');

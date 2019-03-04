@@ -26,7 +26,7 @@ if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
 }
 
 $divTabs = new CTabView();
-if (!isset($_REQUEST['form_refresh'])) {
+if (!hasRequest('form_refresh')) {
 	$divTabs->setSelected(0);
 }
 
@@ -69,7 +69,7 @@ if ($data['show_inherited_macros']) {
 }
 $macros = array_values(order_macros($macros, 'macro'));
 
-$clear_templates = array_intersect($clear_templates, array_keys($this->data['original_templates']));
+$clear_templates = array_intersect($clear_templates, array_keys($data['original_templates']));
 $clear_templates = array_diff($clear_templates, array_keys($templateIds));
 natcasesort($templateIds);
 $frmHost->addVar('clear_templates', $clear_templates);
@@ -342,8 +342,8 @@ $tmplList = new CFormList();
 $disableids = [];
 
 $linkedTemplateTable = (new CTable())
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Name'), _('Action')]);
+	->setHeader([_('Name'), _('Action')])
+	->addStyle('width: 100%;');
 
 foreach ($data['linkedTemplates'] as $template) {
 	$tmplList->addItem((new CVar('templates[]', $template['templateid']))->removeId());
@@ -419,11 +419,19 @@ $tmplList->addRow((new CLabel(_('Link new templates'), 'add_templates__ms')),
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 // } TEMPLATES
 
+// tags
+$tags_view = new CView('configuration.tags.tab', [
+	'source' => 'template',
+	'tags' => $data['tags'],
+	'readonly' => false
+]);
+$divTabs->addTab('tags-tab', _('Tags'), $tags_view->render());
+
 // macros
 if (!$macros) {
 	$macro = ['macro' => '', 'value' => ''];
 	if ($data['show_inherited_macros']) {
-		$macro['type'] = MACRO_TYPE_HOSTMACRO;
+		$macro['type'] = ZBX_PROPERTY_OWN;
 	}
 	$macros[] = $macro;
 }
@@ -435,7 +443,6 @@ $macrosView = new CView('hostmacros', [
 	'readonly' => false
 ]);
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
-
 
 // Footer
 if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {

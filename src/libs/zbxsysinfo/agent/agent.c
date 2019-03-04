@@ -30,7 +30,7 @@ ZBX_METRIC	parameters_agent[] =
 /*	KEY			FLAG		FUNCTION	TEST PARAMETERS */
 {
 	{"agent.hostname",	0,		AGENT_HOSTNAME,	NULL},
-	{"agent.ping",		0,		AGENT_PING, 	NULL},
+	{"agent.ping",		0,		AGENT_PING,	NULL},
 	{"agent.version",	0,		AGENT_VERSION,	NULL},
 	{NULL}
 };

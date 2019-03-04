@@ -376,8 +376,8 @@ static void	discovery_update_service_status(DB_DHOST *dhost, const DB_DSERVICE *
 
 				discovery_update_dhost(dhost);
 				zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, &ts,
-						DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0,
-						NULL);
+						DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL,
+						0, NULL, 0, NULL);
 			}
 		}
 		else if (0 != strcmp(dservice->value, value))

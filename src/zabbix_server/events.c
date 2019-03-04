@@ -59,6 +59,8 @@ static zbx_correlation_rules_t	correlation_rules;
  *                                                                            *
  * Function: validate_event_tag                                               *
  *                                                                            *
+ * Purpose: Check that tag name is not empty and that tag is not duplicate.   *
+ *                                                                            *
  ******************************************************************************/
 static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
 {
@@ -77,6 +79,83 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
 	}
 
 	return SUCCEED;
+}
+
+static zbx_tag_t	*duplicate_tag(const zbx_tag_t *tag)
+{
+	zbx_tag_t	*t;
+
+	t = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+	t->tag = zbx_strdup(NULL, tag->tag);
+	t->value = zbx_strdup(NULL, tag->value);
+
+	return t;
+}
+
+static void	validate_and_add_tag(DB_EVENT* event, zbx_tag_t *tag)
+{
+	zbx_ltrim(tag->tag, ZBX_WHITESPACE);
+	zbx_ltrim(tag->value, ZBX_WHITESPACE);
+
+	if (TAG_NAME_LEN < zbx_strlen_utf8(tag->tag))
+		tag->tag[zbx_strlen_utf8_nchars(tag->tag, TAG_NAME_LEN)] = '\0';
+	if (TAG_VALUE_LEN < zbx_strlen_utf8(tag->value))
+		tag->value[zbx_strlen_utf8_nchars(tag->value, TAG_VALUE_LEN)] = '\0';
+
+	zbx_rtrim(tag->tag, ZBX_WHITESPACE);
+	zbx_rtrim(tag->value, ZBX_WHITESPACE);
+
+	if (SUCCEED == validate_event_tag(event, tag))
+		zbx_vector_ptr_append(&event->tags, tag);
+	else
+		zbx_free_tag(tag);
+}
+
+static void	substitute_trigger_tag_macro(const DB_EVENT* event, char **str)
+{
+	substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+			NULL, str, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+}
+
+static void	process_trigger_tag(DB_EVENT* event, const zbx_tag_t *tag)
+{
+	zbx_tag_t	*t;
+
+	t = duplicate_tag(tag);
+	substitute_trigger_tag_macro(event, &t->tag);
+	substitute_trigger_tag_macro(event, &t->value);
+	validate_and_add_tag(event, t);
+}
+
+static void	substitute_item_tag_macro(const DB_EVENT* event, const DC_ITEM *dc_item, char **str)
+{
+	substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, dc_item, NULL,
+			NULL, str, MACRO_TYPE_ITEM_TAG, NULL, 0);
+}
+
+static void	process_item_tag(DB_EVENT* event, const zbx_item_tag_t *item_tag)
+{
+	zbx_tag_t	*t;
+	DC_ITEM		dc_item; /* used to pass data into substitute_simple_macros() function */
+
+	t = duplicate_tag(&item_tag->tag);
+
+	dc_item.host.hostid = item_tag->hostid;
+	dc_item.itemid = item_tag->itemid;
+
+	substitute_item_tag_macro(event, &dc_item, &t->tag);
+	substitute_item_tag_macro(event, &dc_item, &t->value);
+	validate_and_add_tag(event, t);
+}
+
+static void	get_item_tags_by_expression(const char *expression, zbx_vector_ptr_t *item_tags)
+{
+	zbx_vector_uint64_t	functionids;
+
+	zbx_vector_uint64_create(&functionids);
+	get_functionids(&functionids, expression);
+	zbx_dc_get_item_tags_by_functionids(functionids.values, functionids.values_num, item_tags);
+	zbx_vector_uint64_destroy(&functionids);
 }
 
 /******************************************************************************
@@ -112,7 +191,8 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *error)
 {
-	int	i;
+	int			i;
+	zbx_vector_ptr_t	item_tags;
 
 	if (events_num == events_alloc)
 	{
@@ -160,34 +240,19 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		if (NULL != trigger_tags)
 		{
 			for (i = 0; i < trigger_tags->values_num; i++)
-			{
-				const zbx_tag_t	*trigger_tag = (const zbx_tag_t *)trigger_tags->values[i];
-				zbx_tag_t	*tag;
-
-				tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
-				tag->tag = zbx_strdup(NULL, trigger_tag->tag);
-				tag->value = zbx_strdup(NULL, trigger_tag->value);
-
-				substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-						NULL, &tag->tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
-
-				substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-						NULL, &tag->value, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
-
-				if (TAG_NAME_LEN < zbx_strlen_utf8(tag->tag))
-					tag->tag[zbx_strlen_utf8_nchars(tag->tag, TAG_NAME_LEN)] = '\0';
-				if (TAG_VALUE_LEN < zbx_strlen_utf8(tag->value))
-					tag->value[zbx_strlen_utf8_nchars(tag->value, TAG_VALUE_LEN)] = '\0';
-
-				zbx_lrtrim(tag->tag, ZBX_WHITESPACE);
-				zbx_lrtrim(tag->value, ZBX_WHITESPACE);
-
-				if (SUCCEED == validate_event_tag(&events[events_num], tag))
-					zbx_vector_ptr_append(&events[events_num].tags, tag);
-				else
-					zbx_free_tag(tag);
-			}
+				process_trigger_tag(&events[events_num], (const zbx_tag_t *)trigger_tags->values[i]);
 		}
+
+		zbx_vector_ptr_create(&item_tags);
+		get_item_tags_by_expression(trigger_expression, &item_tags);
+
+		for (i = 0; i < item_tags.values_num; i++)
+		{
+			process_item_tag(&events[events_num], (const zbx_item_tag_t *)item_tags.values[i]);
+			zbx_free_item_tag(item_tags.values[i]);
+		}
+
+		zbx_vector_ptr_destroy(&item_tags);
 	}
 	else if (EVENT_SOURCE_INTERNAL == source && NULL != error)
 		events[events_num].name = zbx_strdup(NULL, error);
@@ -225,8 +290,7 @@ static int	close_trigger_event(zbx_uint64_t eventid, zbx_uint64_t objectid, cons
 
 	index = zbx_add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, objectid, ts, TRIGGER_VALUE_OK,
 			trigger_description, trigger_expression, trigger_recovery_expression, trigger_priority,
-			trigger_type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "", TRIGGER_VALUE_PROBLEM,
-			NULL);
+			trigger_type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "", TRIGGER_VALUE_PROBLEM, NULL);
 
 	recovery_local.eventid = eventid;
 	recovery_local.objectid = objectid;
@@ -889,7 +953,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 			{
 				tag = (zbx_tag_t *)event->tags.values[i];
 				if (0 == strcmp(tag->tag, condition->data.tag_pair.newtag))
-					zbx_vector_str_append(&values, DBdyn_escape_string(tag->value));
+					zbx_vector_str_append(&values, zbx_strdup(NULL, tag->value));
 			}
 
 			if (0 == values.values_num)

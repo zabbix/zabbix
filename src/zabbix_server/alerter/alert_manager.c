@@ -601,7 +601,7 @@ static zbx_am_alertpool_t	*am_pop_alertpool(zbx_am_mediatype_t *mediatype)
 
 /******************************************************************************
  *                                                                            *
- * Function: am_remove_alertpool                                              *
+ * Function: am_release_alertpool                                             *
  *                                                                            *
  * Purpose: removes alert pool                                                *
  *                                                                            *
@@ -877,7 +877,7 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
  * Parameters: manager - [IN] the manager                                     *
  *             client  - [IN] the connected alerter                           *
  *                                                                            *
- * Return value: The IPMI poller                                              *
+ * Return value: The alerter                                                  *
  *                                                                            *
  ******************************************************************************/
 static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_client_t *client)
@@ -1473,13 +1473,23 @@ static int	am_db_flush_alert_updates(zbx_am_t *manager)
 	if (ZBX_DB_DOWN == zbx_db_begin())
 		goto cleanup;
 
-	for (i = 0; i < updates.values_num; i += 100)
+#if defined(HAVE_ORACLE) && 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
+#	define ZBX_SQL_UPDATE_BATCH_SIZE	1
+#	define ZBX_SQL_DELIMITER
+#else
+#	define ZBX_SQL_UPDATE_BATCH_SIZE	100
+#	define ZBX_SQL_DELIMITER		";\n"
+#endif
+
+	for (i = 0; i < updates.values_num; i += ZBX_SQL_UPDATE_BATCH_SIZE)
 	{
 		sql_offset = 0;
 
-		limit = MIN(i + 100, updates.values_num);
+		limit = MIN(i + ZBX_SQL_UPDATE_BATCH_SIZE, updates.values_num);
 
+#if !defined(HAVE_ORACLE) || 0 != ZBX_MAX_OVERFLOW_SQL_SIZE
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+#endif
 
 		for (j = i; j < limit; j++)
 		{
@@ -1492,15 +1502,17 @@ static int	am_db_flush_alert_updates(zbx_am_t *manager)
 					" set status=%d,"
 						"retries=%d,"
 						"error='%s'"
-					" where alertid=" ZBX_FS_UI64 ";\n",
+					" where alertid=" ZBX_FS_UI64 ZBX_SQL_DELIMITER,
 					update->status, update->retries, error_esc, update->alertid);
 
 			zbx_free(error_esc);
 		}
 
+#if !defined(HAVE_ORACLE) || 0 != ZBX_MAX_OVERFLOW_SQL_SIZE
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+#endif
 
-		if (ZBX_DB_DOWN == DBexecute_once("%s", sql))
+		if (16 < sql_offset && ZBX_DB_DOWN == DBexecute_once("%s", sql))
 			goto cleanup;
 	}
 

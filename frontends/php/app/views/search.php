@@ -57,11 +57,17 @@ foreach ($data['hosts'] as $hostid => $host) {
 		: [_('Applications'), $app_count];
 
 	$items_link = $host['editable']
-		? [new CLink(_('Items'), 'items.php?filter_set=1&'.$link), $item_count]
+		? [new CLink(_('Items'), (new CUrl('items.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$hostid])
+		), $item_count]
 		: [_('Items'), $item_count];
 
 	$triggers_link = $host['editable']
-		? [new CLink(_('Triggers'), 'triggers.php?'.$link), $trigger_count]
+		? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$hostid])
+		), $trigger_count]
 		: [_('Triggers'), $trigger_count];
 
 	$graphs_link = $host['editable']
@@ -197,11 +203,17 @@ if ($data['admin']) {
 			: [_('Applications'), $app_count];
 
 		$items_link = $template['editable']
-			? [new CLink(_('Items'), 'items.php?filter_set=1&'.$link), $item_count]
+			? [new CLink(_('Items'), (new CUrl('items.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$templateid])
+			), $item_count]
 			: [_('Items'), $item_count];
 
 		$triggers_link = $template['editable']
-			? [new CLink(_('Triggers'), 'triggers.php?'.$link), $trigger_count]
+			? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$templateid])
+			), $trigger_count]
 			: [_('Triggers'), $trigger_count];
 
 		$graphs_link = $template['editable']

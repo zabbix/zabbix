@@ -24,6 +24,20 @@
 
 #include "common.h"
 
+static unsigned int	hex2num(char c)
+{
+	int	res;
+
+	if (c >= 'a')
+		res = c - 'a' + 10;	/* a-f */
+	else if (c >= 'A')
+		res = c - 'A' + 10;	/* A-F */
+	else
+		res = c - '0';		/* 0-9 */
+
+	return (unsigned int)res;
+}
+
 static void	mock_read_variant(const char *path, zbx_variant_t *variant)
 {
 	zbx_mock_handle_t	hvalue;
@@ -62,6 +76,26 @@ static void	mock_read_variant(const char *path, zbx_variant_t *variant)
 			fail_msg("Cannot convert value %s to uint64", value);
 
 		zbx_variant_set_ui64(variant, value_ui64);
+		return;
+	}
+
+	if (0 == strcmp(type, "ZBX_VARIANT_BIN"))
+	{
+		zbx_uint32_t		i, size;
+		char			*data;
+		const char		*ptr = value;
+
+		size = (strlen(value) + 1) / 3;
+		data = (0 != size ? zbx_malloc(NULL, size) : NULL);
+
+		for (i = 0; i < size; i++)
+		{
+			data[i] = hex2num(*ptr++) << 4;
+			data[i] |= hex2num(*ptr++);
+			ptr++;
+		}
+		zbx_variant_set_bin(variant, zbx_variant_data_bin_create(data, size));
+		zbx_free(data);
 		return;
 	}
 

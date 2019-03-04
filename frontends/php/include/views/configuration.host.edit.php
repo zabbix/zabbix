@@ -53,7 +53,7 @@ $hostList = new CFormList('hostlist');
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$hostList->addRow(_('Discovered by'),
 		new CLink($data['discoveryRule']['name'],
-			'host_prototypes.php?parent_discoveryid='.$data['discoveryRule']['itemid']
+			(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
 		)
 	);
 }
@@ -619,13 +619,22 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 // templates for discovered hosts
 else {
 	$linkedTemplateTable = (new CTable())
-		->setAttribute('style', 'width: 100%;')
-		->setHeader([_('Name')]);
+		->setHeader([_('Name')])
+		->addStyle('width: 100%;');
 
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
-		$template_link = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
-			->setTarget('_blank');
+
+		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+			$template_link = (new CLink($template['name'],
+				(new CUrl('templates.php'))
+					->setArgument('form','update')
+					->setArgument('templateid', $template['templateid'])
+			))->setTarget('_blank');
+		}
+		else {
+			$template_link = new CSpan($template['name']);
+		}
 
 		$linkedTemplateTable->addRow($template_link, null, 'conditions_'.$template['templateid']);
 	}
@@ -633,7 +642,7 @@ else {
 	$tmplList->addRow(_('Linked templates'),
 		(new CDiv($linkedTemplateTable))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 }
 
@@ -672,6 +681,18 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		)
 );
+
+/*
+ * Tags
+ */
+if ($data['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+	$tags_view = new CView('configuration.tags.tab', [
+		'source' => 'host',
+		'tags' => $data['tags'],
+		'readonly' => false
+	]);
+	$divTabs->addTab('tags-tab', _('Tags'), $tags_view->render());
+}
 
 /*
  * Macros
@@ -713,11 +734,9 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}
 	else {
-		$field_length = $hostInventoryTable['fields'][$field_name]['length'];
-
 		$input = (new CTextBox('host_inventory['.$field_name.']', $data['host_inventory'][$field_name]))
-			->setWidth(($field_length < 39) ? ZBX_TEXTAREA_SMALL_WIDTH : ZBX_TEXTAREA_BIG_WIDTH)
-			->setAttribute('maxlength', $field_length);
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('maxlength', $hostInventoryTable['fields'][$field_name]['length']);
 	}
 
 	if ($data['inventory_mode'] == HOST_INVENTORY_DISABLED) {
@@ -750,7 +769,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	$inventoryFormList->addRow($inventoryInfo['title'], [$input, $inventory_item]);
 }
 
-$divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
+$divTabs->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
 
 // Encryption form list.
 $encryption_form_list = (new CFormList('encryption'))
@@ -781,22 +800,22 @@ $encryption_form_list = (new CFormList('encryption'))
 	->addRow(
 		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 128))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow(
 		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
 		(new CTextBox('tls_psk', $data['tls_psk'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 512))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	)
 	->addRow(_x('Subject', 'encryption certificate'),
 		(new CTextBox('tls_subject', $data['tls_subject'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	);
 
 $divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);

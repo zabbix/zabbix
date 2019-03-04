@@ -79,6 +79,12 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
 #endif
 
+#if defined(__GNUC__) && __GNUC__ >= 7
+#	define ZBX_FALLTHROUGH	__attribute__ ((fallthrough))
+#else
+#	define ZBX_FALLTHROUGH
+#endif
+
 #define	SUCCEED		0
 #define	FAIL		-1
 #define	NOTSUPPORTED	-2
@@ -307,15 +313,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define ITEM_SNMPV3_PRIVPROTOCOL_DES		0
 #define ITEM_SNMPV3_PRIVPROTOCOL_AES		1
 
-/* item multiplier types */
-#define ITEM_MULTIPLIER_DO_NOT_USE		0
-#define ITEM_MULTIPLIER_USE			1
-
-/* item delta types */
-#define ITEM_STORE_AS_IS			0
-#define ITEM_STORE_SPEED_PER_SECOND		1
-#define ITEM_STORE_SIMPLE_CHANGE		2
-
 /* condition evaluation types */
 #define CONDITION_EVAL_TYPE_AND_OR		0
 #define CONDITION_EVAL_TYPE_AND			1
@@ -468,7 +465,7 @@ typedef enum
 	ESCALATION_STATUS_COMPLETED	/* only in server code, never in DB */
 }
 zbx_escalation_status_t;
-const char      *zbx_escalation_status_string(unsigned char status);
+const char	*zbx_escalation_status_string(unsigned char status);
 
 /* alert types */
 typedef enum
@@ -491,8 +488,8 @@ const char	*zbx_item_state_string(unsigned char state);
 /* group statuses */
 typedef enum
 {
-       GROUP_STATUS_ACTIVE = 0,
-       GROUP_STATUS_DISABLED
+	GROUP_STATUS_ACTIVE = 0,
+	GROUP_STATUS_DISABLED
 }
 zbx_group_status_type_t;
 
@@ -538,7 +535,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_ALERTMANAGER	25
 #define ZBX_PROCESS_TYPE_PREPROCMAN	26
 #define ZBX_PROCESS_TYPE_PREPROCESSOR	27
-#define ZBX_PROCESS_TYPE_COUNT		28	/* number of process types */
+#define ZBX_PROCESS_TYPE_LLDMANAGER	28
+#define ZBX_PROCESS_TYPE_LLDWORKER	29
+#define ZBX_PROCESS_TYPE_COUNT		30	/* number of process types */
 #define ZBX_PROCESS_TYPE_UNKNOWN	255
 const char	*get_process_type_string(unsigned char process_type);
 int		get_process_type_by_name(const char *proc_type_str);
@@ -904,8 +903,8 @@ typedef enum
 }
 zbx_httptest_auth_t;
 
-#define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
-#define ZBX_TASK_FLAG_FOREGROUND      0x02
+#define ZBX_TASK_FLAG_MULTIPLE_AGENTS	0x01
+#define ZBX_TASK_FLAG_FOREGROUND	0x02
 
 typedef struct
 {
@@ -1479,11 +1478,16 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_ERROR_FIELD_REGEX		18
 #define ZBX_PREPROC_THROTTLE_VALUE		19
 #define ZBX_PREPROC_THROTTLE_TIMED_VALUE	20
+#define ZBX_PREPROC_SCRIPT			21
 
+/* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0
 #define ZBX_PREPROC_FAIL_DISCARD_VALUE	1
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
+
+/* internal on fail actions */
+#define ZBX_PREPROC_FAIL_FORCE_ERROR	4
 
 #define ZBX_HTTPFIELD_HEADER		0
 #define ZBX_HTTPFIELD_VARIABLE		1
@@ -1501,11 +1505,18 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
 
+typedef void * zbx_variant_data_bin_t;
+
 typedef union
 {
-	zbx_uint64_t	ui64;
-	double		dbl;
-	char		*str;
+	zbx_uint64_t		ui64;
+	double			dbl;
+
+	/* null terminated string */
+	char			*str;
+
+	/* length prefixed (4 bytes) binary data */
+	zbx_variant_data_bin_t	*bin;
 }
 zbx_variant_data_t;
 
@@ -1520,21 +1531,28 @@ zbx_variant_t;
 #define ZBX_VARIANT_STR		1
 #define ZBX_VARIANT_DBL		2
 #define ZBX_VARIANT_UI64	3
+#define ZBX_VARIANT_BIN		4
 
 void	zbx_variant_clear(zbx_variant_t *value);
 void	zbx_variant_set_none(zbx_variant_t *value);
 void	zbx_variant_set_str(zbx_variant_t *value, char *text);
 void	zbx_variant_set_dbl(zbx_variant_t *value, double dbl);
 void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t ui64);
+void	zbx_variant_set_bin(zbx_variant_t *value, zbx_variant_data_bin_t *value_bin);
 void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source);
 int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);
 
 int	zbx_variant_convert(zbx_variant_t *value, int type);
+const char	*zbx_get_variant_type_desc(unsigned char type);
 const char	*zbx_variant_value_desc(const zbx_variant_t *value);
 const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 
 int	zbx_validate_value_dbl(double value);
 int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2);
+
+zbx_variant_data_bin_t	*zbx_variant_data_bin_copy(const zbx_variant_data_bin_t *bin);
+zbx_variant_data_bin_t	*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size);
+zbx_uint32_t	zbx_variant_data_bin_get(const zbx_variant_data_bin_t *bin, void **data);
 
 void	zbx_update_env(double time_now);
 

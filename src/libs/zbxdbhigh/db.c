@@ -213,12 +213,14 @@ void	DBrollback(void)
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBend(int ret)
+int	DBend(int ret)
 {
 	if (SUCCEED == ret)
-		DBcommit();
-	else
-		DBrollback();
+		return ZBX_DB_OK == DBcommit() ? SUCCEED : FAIL;
+
+	DBrollback();
+
+	return FAIL;
 }
 
 #ifdef HAVE_ORACLE
@@ -1550,7 +1552,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	int	ret = SUCCEED;
 
-	if (ZBX_MAX_SQL_SIZE < *sql_offset)
+	if (ZBX_MAX_OVERFLOW_SQL_SIZE < *sql_offset)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		if (',' == (*sql)[*sql_offset - 1])
@@ -1559,10 +1561,22 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
 #endif
-		DBend_multiple_update(sql, sql_alloc, sql_offset);
+#if defined(HAVE_ORACLE) && 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
+		/* make sure we are not called twice without */
+		/* putting a new sql into the buffer first */
+		if (*sql_offset <= ZBX_SQL_EXEC_FROM)
+			THIS_SHOULD_NEVER_HAPPEN;
 
-		if (ZBX_DB_OK > DBexecute("%s", *sql))
+		/* Oracle fails with ORA-00911 if it encounters ';' w/o PL/SQL block */
+		zbx_rtrim(*sql, ZBX_WHITESPACE ";");
+#else
+		DBend_multiple_update(sql, sql_alloc, sql_offset);
+#endif
+		/* For Oracle with max_overflow_sql_size == 0, jump over "begin\n" */
+		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */
+		if (ZBX_DB_OK > DBexecute("%s", *sql + ZBX_SQL_EXEC_FROM))
 			ret = FAIL;
+
 		*sql_offset = 0;
 
 		DBbegin_multiple_update(sql, sql_alloc, sql_offset);
@@ -2966,4 +2980,81 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_mock_field_init                                           *
+ *                                                                            *
+ * Purpose: initializes mock field                                            *
+ *                                                                            *
+ * Parameters: field      - [OUT] the field data                              *
+ *             field_type - [IN] the field type in database schema            *
+ *             field_len  - [IN] the field size in database schema            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len)
+{
+	switch (field_type)
+	{
+		case ZBX_TYPE_CHAR:
+#if defined(HAVE_ORACLE)
+			field->chars_num = field_len;
+			field->bytes_num = 4000;
+#elif defined(HAVE_IBM_DB2)
+			field->chars_num = -1;
+			field->bytes_num = field_len;
+#else
+			field->chars_num = field_len;
+			field->bytes_num = -1;
+#endif
+			return;
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+
+	field->chars_num = 0;
+	field->bytes_num = 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_mock_field_append                                         *
+ *                                                                            *
+ * Purpose: 'appends' text to the field, if successful the character/byte     *
+ *           limits are updated                                               *
+ *                                                                            *
+ * Parameters: field - [IN/OUT] the mock field                                *
+ *             text  - [IN] the text to append                                *
+ *                                                                            *
+ * Return value: SUCCEED - the field had enough space to append the text      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text)
+{
+	int	bytes_num, chars_num;
+
+	if (-1 != field->bytes_num)
+	{
+		bytes_num = strlen(text);
+		if (bytes_num > field->bytes_num)
+			return FAIL;
+	}
+	else
+		bytes_num = 0;
+
+	if (-1 != field->chars_num)
+	{
+		chars_num = zbx_strlen_utf8(text);
+		if (chars_num > field->chars_num)
+			return FAIL;
+	}
+	else
+		chars_num = 0;
+
+	field->bytes_num -= bytes_num;
+	field->chars_num -= chars_num;
+
+	return SUCCEED;
 }

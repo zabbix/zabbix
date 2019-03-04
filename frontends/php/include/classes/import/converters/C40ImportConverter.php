@@ -47,6 +47,8 @@ class C40ImportConverter extends CConverter {
 	 */
 	protected function convertHosts(array $hosts) {
 		foreach ($hosts as &$host) {
+			$host['tags'] = [];
+
 			if (array_key_exists('items', $host)) {
 				$host['items'] = $this->convertItems($host['items']);
 			}
@@ -69,7 +71,9 @@ class C40ImportConverter extends CConverter {
 	 */
 	protected function convertItems(array $items) {
 		foreach ($items as &$item) {
-			$item['preprocessing'] = $this->convertItemPreprocessingSteps($item['preprocessing']);
+			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->convertItemPreprocessingSteps($item['preprocessing']);
+			}
 		}
 		unset($item);
 
@@ -108,8 +112,8 @@ class C40ImportConverter extends CConverter {
 			'error_handler_params' => DB::getDefault('item_preproc', 'error_handler_params')
 		];
 
-		foreach ($preprocessing_steps as $preprocessing_step) {
-			$preprocessing_step['step'] += $default;
+		foreach ($preprocessing_steps as &$preprocessing_step) {
+			$preprocessing_step += $default;
 		}
 		unset($preprocessing_step);
 
@@ -123,7 +127,8 @@ class C40ImportConverter extends CConverter {
 	 */
 	protected function getDiscoveryRuleDefaultFields() {
 		return [
-			'lld_macro_paths' => []
+			'lld_macro_paths' => [],
+			'preprocessing' => []
 		];
 	}
 }

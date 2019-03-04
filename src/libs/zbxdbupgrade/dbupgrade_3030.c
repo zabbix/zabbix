@@ -199,10 +199,12 @@ static void	DBpatch_3030018_add_numeric_preproc_steps(zbx_db_insert_t *db_insert
 
 	switch (delta)
 	{
-		case ITEM_STORE_SPEED_PER_SECOND:
+		/* ITEM_STORE_SPEED_PER_SECOND */
+		case 1:
 			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_DELTA_SPEED, "");
 			break;
-		case ITEM_STORE_SIMPLE_CHANGE:
+		/* ITEM_STORE_SIMPLE_CHANGE */
+		case 2:
 			zbx_db_insert_add_values(db_insert, __UINT64_C(0), itemid, step++, ZBX_PREPROC_DELTA_VALUE, "");
 			break;
 	}

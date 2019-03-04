@@ -36,7 +36,7 @@ class testFormHost extends CLegacyWebTest {
 	public function testFormHost_Layout() {
 		$this->zbxTestLogin('hosts.php?form=1');
 
-		$this->zbxTestTabSwitch('Host inventory');
+		$this->zbxTestTabSwitch('Inventory');
 
 		$inventoryFields = getHostInventories();
 		$inventoryFields = zbx_toHash($inventoryFields, 'db_field');
@@ -305,10 +305,10 @@ class testFormHost extends CLegacyWebTest {
 
 		// this should be a separate test
 		// should check that items, triggers, graphs and applications are not linked to the template anymore
-		$this->zbxTestDoubleClickXpath("//a[contains(@href,'items.php?filter_set=1&hostid=".$hostid."')]", 'filter_application');
+		$this->zbxTestDoubleClickXpath("//a[contains(@href,'items.php?filter_set=1&filter_hostids%5B0%5D=".$hostid."')]", 'filter_application');
 		$this->zbxTestTextNotPresent($template.':');
 		// using "host navigation bar" at the top of entity list
-		$this->zbxTestHrefClickWait('triggers.php?hostid='.$hostid);
+		$this->zbxTestHrefClickWait('triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
 		$this->zbxTestHrefClickWait('graphs.php?hostid='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
@@ -365,10 +365,10 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
-		$this->zbxTestDoubleClickXpath("//a[contains(@href,'items.php?filter_set=1&hostid=".$hostid."')]", 'filter_application');
+		$this->zbxTestDoubleClickXpath("//a[contains(@href,'items.php?filter_set=1&filter_hostids%5B0%5D=".$hostid."')]", 'filter_application');
 		$this->zbxTestTextNotPresent($template.':');
 
-		$this->zbxTestHrefClickWait('triggers.php?hostid='.$hostid);
+		$this->zbxTestHrefClickWait('triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
 		$this->zbxTestHrefClickWait('graphs.php?hostid='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');

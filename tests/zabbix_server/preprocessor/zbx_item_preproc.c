@@ -25,8 +25,11 @@
 #include "common.h"
 #include "zbxjson.h"
 #include "dbcache.h"
+#include "zbxembed.h"
 
 #include "../../../src/zabbix_server/preprocessor/item_preproc.h"
+
+zbx_es_t	es_engine;
 
 static int	str_to_preproc_type(const char *str)
 {
@@ -166,11 +169,11 @@ static int	is_step_supported(int type)
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_variant_t			value, history_value, history_value_copy;
+	zbx_variant_t			value, history_value;
 	unsigned char			value_type;
 	zbx_timespec_t			ts, history_ts, expected_history_ts;
 	zbx_preproc_op_t		op;
-	int				returned_ret, expected_ret;
+	int				returned_ret, expected_ret, action;
 	char				*error = NULL;
 
 	ZBX_UNUSED(state);
@@ -189,9 +192,7 @@ void	zbx_mock_test_entry(void **state)
 		history_ts.ns = 0;
 	}
 
-	history_value_copy = history_value;
-
-	returned_ret = zbx_item_preproc(0, value_type, &value, &ts, &op, &history_value, &history_ts, &error);
+	returned_ret = zbx_item_preproc(value_type, &value, &ts, &op, &history_value, &history_ts, &action, &error);
 
 	if (SUCCEED == is_step_supported(op.type))
 		expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
@@ -240,7 +241,6 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_variant_clear(&value);
 	zbx_variant_clear(&history_value);
-	zbx_variant_clear(&history_value_copy);
 	zbx_free(error);
 
 }

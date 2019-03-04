@@ -95,10 +95,6 @@ abstract class CHostGeneral extends CHostBase {
 		if (!empty($data['templates_link'])) {
 			$this->checkHostPermissions($allHostIds);
 
-			$this->validateDependentItemsLinkage($allHostIds,
-				zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid')
-			);
-
 			$this->link(zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid'), $allHostIds);
 		}
 
@@ -921,7 +917,9 @@ abstract class CHostGeneral extends CHostBase {
 
 				$applications = zbx_toHash($applications, 'hostid');
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['applications'] = isset($applications[$hostid]) ? $applications[$hostid]['rowscount'] : 0;
+					$result[$hostid]['applications'] = array_key_exists($hostid, $applications)
+						? $applications[$hostid]['rowscount']
+						: 0;
 				}
 			}
 		}
@@ -940,98 +938,126 @@ abstract class CHostGeneral extends CHostBase {
 			$result = $relationMap->mapMany($result, $macros, 'macros', $options['limitSelects']);
 		}
 
+		// adding tags
+		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
+			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
+				$options['selectTags'] = ['tag', 'value'];
+			}
+
+			$tags_options = [
+				'output' => $this->outputExtend($options['selectTags'], ['hostid']),
+				'filter' => ['hostid' => $hostids]
+			];
+			$tags = DBselect(DB::makeSql('host_tag', $tags_options));
+
+			foreach ($result as &$host) {
+				$host['tags'] = [];
+			}
+			unset($host);
+
+			while ($tag = DBfetch($tags)) {
+				$result[$tag['hostid']]['tags'][] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value']
+				];
+			}
+		}
+
 		return $result;
 	}
 
 	/**
-	 * Validates dependent items trees intersection between host items and template items.
+	 * Compares input tags with tags stored in the database and performs tag deleting and inserting.
 	 *
-	 * @param array $hostids        Array of hosts to validate.
-	 * @param array $templateids    Array of added templates.
-	 *
-	 * @throws APIException if intersection of template items and host items creates dependent items tree with
-	 *                      dependent item level more than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
+	 * @param array  $hosts
+	 * @param int    $hosts[]['hostid']
+	 * @param int    $hosts[]['templateid']
+	 * @param array  $hosts[]['tags']
+	 * @param string $hosts[]['tags'][]['tag']
+	 * @param string $hosts[]['tags'][]['value']
+	 * @param string $id_field
 	 */
-	protected function validateDependentItemsLinkage($hostids, $templateids) {
-		$db_items = API::Item()->get([
-			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
-			'hostids' => array_merge($hostids, $templateids),
-			'webitems' => true,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'preservekeys' => true
-		]);
-
-		$this->validateDependentItemsIntersection($db_items, $hostids);
-
-		$db_itemprototypes = API::ItemPrototype()->get([
-			'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
-			'hostids' => array_merge($hostids, $templateids),
-			'preservekeys' => true
-		]);
-
-		$this->validateDependentItemsIntersection($db_itemprototypes, $hostids);
-	}
-
-	/**
-	 * Validate merge of template dependent items and every host dependent items, host dependent item will be overwritten
-	 * by template dependent items.
-	 * Return false if intersection of host dependent items and template dependent items create dependent items
-	 * with dependency level greater than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
-	 *
-	 * @param array $db_items
-	 * @param array $hostids
-	 *
-	 * @throws APIException if intersection of template items and host items creates dependent items tree with
-	 *                      dependent item level more than ZBX_DEPENDENT_ITEM_MAX_LEVELS or master item recursion.
-	 */
-	protected function validateDependentItemsIntersection(array $db_items, array $hostids) {
-		$hosts_items = [];
-		$tmpl_items = [];
-
-		foreach ($db_items as $db_item) {
-			$master_key = ($db_item['type'] == ITEM_TYPE_DEPENDENT
-					&& array_key_exists($db_item['master_itemid'], $db_items))
-				? $db_items[$db_item['master_itemid']]['key_']
-				: '';
-
-			if (in_array($db_item['hostid'], $hostids)) {
-				$hosts_items[$db_item['hostid']][$db_item['key_']] = $master_key;
-			}
-			elseif (!array_key_exists($db_item['key_'], $tmpl_items) || !$tmpl_items[$db_item['key_']]) {
-				$tmpl_items[$db_item['key_']] = $master_key;
+	protected function updateTags(array $hosts, $id_field) {
+		$hostids = [];
+		foreach ($hosts as $host) {
+			if (array_key_exists('tags', $host)) {
+				$hostids[] = $host[$id_field];
 			}
 		}
 
-		foreach ($hosts_items as $hostid => $items) {
-			$linked_items = $items;
+		if (!$hostids) {
+			return;
+		}
 
-			// Merge host items dependency tree with template items dependency tree.
-			$linked_items = array_merge($linked_items, $tmpl_items);
+		$options = [
+			'output' => ['hosttagid', 'hostid', 'tag', 'value'],
+			'filter' => ['hostid' => $hostids]
+		];
 
-			// Check dependency level for every dependent item.
-			foreach ($linked_items as $linked_item => $linked_master_key) {
-				$master_key = $linked_master_key;
-				$dependency_level = 0;
-				$traversing_path = [];
+		$db_tags = DBselect(DB::makeSql('host_tag', $options));
+		$db_hosts = [];
+		$del_hosttagids = [];
 
-				while ($master_key && $dependency_level <= ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-					$traversing_path[] = $master_key;
-					$master_key = $linked_items[$master_key];
-					++$dependency_level;
+		while ($db_tag = DBfetch($db_tags)) {
+			$db_hosts[$db_tag['hostid']]['tags'][] = $db_tag;
+			$del_hosttagids[$db_tag['hosttagid']] = true;
+		}
 
-					if (in_array($master_key, $traversing_path)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('circular item dependency is not allowed')
-						));
+		$ins_tags = [];
+		foreach ($hosts as $host) {
+			foreach ($host['tags'] as $tag) {
+				$tag += ['value' => ''];
+
+				if (array_key_exists($host[$id_field], $db_hosts)) {
+					foreach ($db_hosts[$host[$id_field]]['tags'] as $db_tag) {
+						if ($tag['tag'] === $db_tag['tag'] && $tag['value'] === $db_tag['value']) {
+							unset($del_hosttagids[$db_tag['hosttagid']]);
+							$tag = null;
+							break;
+						}
 					}
 				}
 
-				if ($dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _('maximum number of dependency levels reached')
-					));
+				if ($tag !== null) {
+					$ins_tags[] = ['hostid' => $host[$id_field]] + $tag;
 				}
 			}
+		}
+
+		if ($del_hosttagids) {
+			DB::delete('host_tag', ['hosttagid' => array_keys($del_hosttagids)]);
+		}
+
+		if ($ins_tags) {
+			DB::insert('host_tag', $ins_tags);
+		}
+	}
+
+	/**
+	 * Validates tags.
+	 *
+	 * @param array  $host
+	 * @param int    $host['evaltype']
+	 * @param array  $host['tags']
+	 * @param string $host['tags'][]['tag']
+	 * @param string $host['tags'][]['value']
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateTags(array $host) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'evaltype'	=> ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+			'tags'		=> ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
+				'value'		=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
+			]]
+		]];
+
+		// Keep values only for fields with defined validation rules.
+		$host = array_intersect_key($host, $api_input_rules['fields']);
+
+		if (!CApiInputValidator::validate($api_input_rules, $host, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 }

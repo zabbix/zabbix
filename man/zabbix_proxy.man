@@ -1,4 +1,39 @@
-.TH ZABBIX_PROXY 8 "2018\-10\-11" Zabbix
+.\" Start URL macro. Copied from an-ext.tmac for portability
+.de UR
+.  ds m1 \\$1\"
+.  nh
+.  if \\n(mH \{\
+.    \" Start diversion in a new environment.
+.    do ev URL-div
+.    do di URL-div
+.  \}
+..
+.\" End URL macro. Copied from an-ext.tmac for portability
+.de UE
+.  ie \\n(mH \{\
+.    br
+.    di
+.    ev
+.
+.    \" Has there been one or more input lines for the link text?
+.    ie \\n(dn \{\
+.      do HTML-NS "<a href=""\\*(m1"">"
+.      \" Yes, strip off final newline of diversion and emit it.
+.      do chop URL-div
+.      do URL-div
+\c
+.      do HTML-NS </a>
+.    \}
+.    el \
+.      do HTML-NS "<a href=""\\*(m1"">\\*(m1</a>"
+\&\\$*\"
+.  \}
+.  el \
+\\*(la\\*(m1\\*(ra\\$*\"
+.
+.  hy \\n(HY
+..
+.TH ZABBIX_PROXY 8 "2019\-01\-29" Zabbix
 .SH NAME
 zabbix_proxy \- Zabbix proxy daemon
 .SH SYNOPSIS
@@ -81,6 +116,10 @@ Output version information and exit.
 .I /usr/local/etc/zabbix_proxy.conf
 Default location of Zabbix proxy configuration file (if not modified during compile time).
 .SH "SEE ALSO"
+.UR https://www.zabbix.com/manuals
+Documentation
+.UE
+.PP
 .BR zabbix_agentd (8),
 .BR zabbix_get (8),
 .BR zabbix_sender (8),

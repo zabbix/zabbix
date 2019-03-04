@@ -660,10 +660,13 @@ article {
 .filter-breadcrumb {
 	display: inline-block;
 	z-index: 3;
+	max-width: calc(100vw - 200px);
 
 	li {
 		line-height: 14px;
 		vertical-align: top;
+		float: none;
+		display: inline-block;
 
 		.status-container {
 			padding-top: 3px;
@@ -675,6 +678,7 @@ article {
 			padding: 4px 7px 0;
 
 			a {
+				display: inline-block;
 				max-width: 200px;
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -688,7 +692,6 @@ article {
 	}
 
 	> li:first-child {
-		float: left;
 		white-space: nowrap;
 	}
 
@@ -1075,7 +1078,9 @@ output {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
-		max-width: 300px;
+		&.latest-value {
+			max-width: 300px;
+		}
 	}
 
 	tbody th {
@@ -1296,10 +1301,17 @@ output {
 	width: 75%;
 	text-align: center;
 	margin: 0 auto;
+	table-layout: fixed;
 
 	.cell {
 		vertical-align: bottom;
-		padding: 20px 0 20px 0;
+		padding: 20px 10px;
+		width: 20%;
+		text-align: center;
+
+		img {
+			max-width: 100%;
+		}
 	}
 }
 
@@ -1847,6 +1859,20 @@ output {
 	}
 }
 
+.list-numbered {
+	counter-reset: line;
+
+	.list-numbered-item {
+
+		&::before {
+			content: counter(line);
+			counter-increment: line;
+			user-select: none;
+			text-align: right;
+		}
+	}
+}
+
 .radio-segmented {
 	white-space: nowrap;
 
@@ -2167,6 +2193,10 @@ select {
 		&:active {
 			border-color: $form-border-color;
 		}
+	}
+
+	+ label.label-pos-left span {
+		margin-left: 4px;
 	}
 
 	&:focus + label span {
@@ -3223,22 +3253,73 @@ $form-icon-btn: (
 	z-index: 999;
 }
 
-.dashbrd-grid-empty-placeholder {
+.dashbrd-grid-new-widget-placeholder {
+	box-sizing: border-box;
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: calc(100% / 6 - .65rem);
 	height: 200px;
-	margin: .25rem;
+	padding: .25rem;
+	width: calc(100% / 6 - .65rem);
+	z-index: 999;
+	color: $font-alt-color;
+	cursor:pointer;
 
-	h1 {
-		padding: 10px;
+	.dashbrd-grid-widget-new-box,
+	.dashbrd-grid-widget-set-position,
+	.dashbrd-grid-widget-set-size {
+		@include box-shadow(2px 2px 6px $action-shadow-color);
+		border: 1px dashed $form-border-color;
+		background-color: rgba($ui-bg-color, .7);
+		flex: 1;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.dashbrd-grid-widget-set-size {
+		@include box-shadow(inset 2px 2px 6px $action-shadow-color);
+		background: darken($body-bg-color, 6%);
+	}
+
+	.dashbrd-grid-new-widget-label {
+		$icon-height: 28px;
+
+		position: absolute;
+		left: 0;
+		top: calc(50% - #{$icon-height / 2});
+		right: 0;
+		bottom: 0;
+		padding: ($icon-height + 10px) 5px 5px;
 		text-align: center;
+
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -157px -888px;
+			content: ' ';
+			height: $icon-height;
+			width: 36px;
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+	}
+
+	&.disabled {
+		@include opacity(1);
+
+		.dashbrd-grid-widget-new-box {
+			background-color: rgba($ui-bg-color, .7);
+
+			.dashbrd-grid-new-widget-label::before {
+				background: url(../img/icon-sprite.svg) no-repeat -122px -284px;
+			}
+		}
+	}
+}
+
+.dashbrd-grid-widget-set-size {
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -345px -888px;
+		}
 	}
 }
 
@@ -3840,6 +3921,62 @@ $form-icon-btn: (
 		min-width: 650px;
 	}
 
+	&.modal-code-editor {
+		min-width: 960px;
+
+		.code-editor {
+			$line-height: 18px;
+
+			position: relative;
+			display: flex;
+			height: calc(100vh - 190px);
+			max-height: 548px;
+			overflow: hidden;
+
+			.line-numbers {
+				counter-reset: line;
+				overflow: hidden;
+				padding: 5px 5px 5px 0;
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+
+				li {
+					color: $font-alt-color;
+					font-family: $font-stack-mono;
+					line-height: $line-height;
+					text-align: right;
+
+					&::before {
+						counter-increment: line;
+						content: counter(line);
+						user-select: none;
+					}
+				}
+			}
+
+			.code-editor-textarea {
+				font-family: $font-stack-mono;
+				line-height: $line-height;
+				resize: none;
+				white-space: pre;
+				height: 100%;
+				width: 100%;
+
+				&::-webkit-scrollbar {
+					height: 9px;
+				}
+			}
+		}
+
+		.symbols-remaining {
+			color: $font-alt-color;
+			float: left;
+			line-height: 24px;
+		}
+	}
+
 	.msg-bad,
 	.msg-good {
 		position: sticky;
@@ -3885,6 +4022,30 @@ $form-icon-btn: (
 		overflow-y: auto;
 		margin-left: -10px;
 		@extend %webkit-scrollbar;
+	}
+}
+
+input.open-modal-code-editor {
+	overflow: hidden;
+	cursor: pointer;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	font-family: $font-stack-mono;
+	border-right: none;
+
+	&.editable {
+		background-color: $form-bg-color !important;
+		border-color: $form-disabled-font-color;
+	}
+
+	&:-ms-input-placeholder {
+		color: $input-placeholder-color !important;
+	}
+
+	~ button {
+		white-space: nowrap;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
 	}
 }
 
@@ -4355,6 +4516,10 @@ $form-icon-btn: (
 			float: left;
 			display: block;
 		}
+	}
+
+	.header {
+		margin: 0 0 10px 3px;
 	}
 }
 
@@ -5737,11 +5902,12 @@ svg {
 		.list-accordion-item-body {
 			display: none;
 		}
+
 		.patternselect {
 			overflow: hidden;
 			max-height: 24px;
 			line-height: 24px;
-			padding: 0px 5px;
+			padding: 0 5px;
 			height: 24px;
 		}
 	}
@@ -5751,16 +5917,42 @@ svg {
 	line-height: 14px;
 }
 
+ul.checkbox-list {
+	line-height: 20px;
+	display: flex;
+	flex-wrap: wrap;
+	> li {
+		ms-flex: 0 0 100%;
+		flex: 0 0 100%;
+		max-width: 100%;
+		-webkit-box-flex: 0;
+	}
+}
+
+@each $num, $width in (
+	3: 33.33333%
+) {
+	ul.checkbox-list.col-#{$num} > li {
+		display: inline-block;
+		-ms-flex: 0 0 $width;
+		flex: 0 0 $width;
+		max-width: $width;
+	}
+}
+
+
 .columns-wrapper {
 
 	$columns: (
 		5: 5%,
 		10: 10%,
+		15: 15%,
 		20: 20%,
 		33: 33.33333%,
+		35: 35%,
 		40: 40%,
 		50: 50%,
-		80: 80%,
+		75: 75%,
 		90: 90%,
 		95: 95%
 	);
@@ -5773,17 +5965,7 @@ svg {
 	}
 
 	/**
-	 * Dynamically generated classes
-	 *
-	 * .column-5
-	 * .column-10
-	 * .column-20
-	 * .column-33
-	 * .column-40
-	 * .column-50
-	 * .column-80
-	 * .column-90
-	 * .column-95
+	 * Dynamically generated classes, e.g. .column-50.
 	 */
 	@each $class, $width in $columns {
 		.column-#{$class} {
@@ -5807,25 +5989,16 @@ svg {
 
 .preprocessing-list {
 	display: table;
-	min-width: 100%;
+	width: 100%;
+	min-width: 730px;
+	max-width: 930px;
 	padding-left: 10px;
-
-	@media screen and (min-width: 1200px) {
-		min-width: 80%;
-	}
-
-	@media screen and (min-width: 1400px) {
-		min-width: 70%;
-	}
-
-	@media screen and (min-width: 1600px) {
-		min-width: 60%;
-	}
 
 	.columns-wrapper {
 		position: relative;
 
 		[class^=column-] {
+			display: flex;
 			box-sizing: border-box;
 			padding: 5px 5px 5px 0;
 
@@ -5835,6 +6008,7 @@ svg {
 
 			input[type=text], select {
 				width: 100%;
+				flex: 1;
 			}
 		}
 	}
@@ -5860,27 +6034,30 @@ svg {
 			margin-left: -20px;
 		}
 
-		.step-number {
-			width: 15px;
-			margin-right: 5px;
-			line-height: 24px;
-			text-align: right;
-		}
-
 		.preprocessing-step {
 
-			> .column-40 {
-				display: flex;
+			.list-numbered-item {
+
+				&::before {
+					content: counter(line) ":";
+					width: 15px;
+					margin-right: 5px;
+					line-height: 24px;
+				}
 			}
 		}
 
 		.on-fail-options {
-			margin: 0 0 5px 20px;
+			margin-bottom: 5px;
 
-			> .column-80 {
+			> .column-75 {
 
 				> div {
 					padding-right: 5px;
+
+					&:first-child {
+						padding-left: 20px;
+					}
 
 					&:last-child {
 						flex: 1;
@@ -5900,6 +6077,10 @@ svg {
 
 	> li:nth-last-of-type(2) > .on-fail-options {
 		margin-bottom: 0;
+	}
+
+	.element-table-add, .element-table-remove {
+		line-height: normal;
 	}
 }
 

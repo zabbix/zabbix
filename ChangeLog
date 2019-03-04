@@ -1,6 +1,65 @@
+Changes for 4.2.0beta2
+
+New features:
+....I..... [ZBXNEXT-5013] removed adaptive chunking from TimescaleDB script (kalimulin)
+........S. [ZBXNEXT-5016] extended preprocessing error messages to include intermediate step results (wiper)
+...G...... [ZBXNEXT-4898] added support IPv6 for 'net.dns' and 'net.dns.record' (MVekslers)
+.......PS. [ZBXNEXT-5037] added 'skip' parameter for vmware.eventlog key (MVekslers)
+..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
+
+Bug fixes:
+...G...... [ZBX-15607] fixed possibility of zombie processes occurring when signaling agent during metric execution (akozlovs)
+.D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
+..F....... [ZBX-15625] removed links leading to media type edit form for non-superadmins in Reports->Notifications page (Ivo)
+.D.G...PS. [ZBX-8344] remove trimming of leading and trailing whitespaces for data received from agent (akozlovs)
+.......PS. [ZBX-15703] fixed use of uninitialized variable when receiving 0 bytes on listening socket (akozlovs)
+..F....... [ZBX-15539] fixed validation of master item in item update form (miks)
+..F....... [ZBX-15532] fixed undefined index error on problems page when trigger expression contains web items (gcalenko, Sasha)
+A......... [ZBX-15488] fixed permission check for inherited triggers (miks)
+..F....... [ZBX-15646] fixed web-server 'Request-URI Too Long' error in trigger description dialog (miks)
+..F....... [ZBX-15688] fixed wrong host group and host selection in trigger dependencies window (talbergs)
+..F....... [ZBX-15686] fixed wrong number of selected triggers when navigate to inherited template (talbergs)
+
+--------------------------------------------------------------------------------
+Changes for 4.2.0beta1
+
+New features:
+A.F....... [ZBXNEXT-221] implemented hosts and hostgroups multiselect in items and triggers table filter (talbergs)
+A.F.....S. [ZBXNEXT-4944] added javascript item preprocessing step (agriscenko, wiper)
+A.F....... [ZBXNEXT-4857] added animated GIF support for Zabbix Maps (ashubin, gcalenko, vasilijs)
+..F....... [ZBXNEXT-5046] added non-destructive resizing and reordering of dashboard widgets (ashubin, gcalenko, miks)
+A.F.I..PS. [ZBXNEXT-4731] implemented host and template level tags (agriscenko, wiper, yurii)
+..FGI..PST [ZBXNEXT-401,ZBXNEXT-4907,ZBXNEXT-4955] added monitoring of internal metrics from an external Zabbix instance (vasilijs, viktors)
+A.F.I...S. [ZBXNEXT-4087] implemented preprocessing of LLD rules (Ivo, wiper)
+
+Bug fixes:
+.......PS. [ZBXNEXT-4941] changed overflow statements to execute one by one for Oracle for better performance (kalimulin)
+..F....... [ZBX-15664] fixed "Undefined index" errors on maps with enabled automatic icon mapping (Sasha)
+....I..... [ZBX-15667] fixed wrong default Zabbix server status for new installation (kalimulin)
+..F....... [ZBX-15512] fixed performance issues and significant memory consumption on several pages which contains host popup menus (Sasha)
+..F....... [ZBX-15512] fixed performance issues in "Problems by severity" widget (talbergs)
+.......PS. [ZBX-15593] fixed database upgrade patch to stop upgrade on commit failure (vso)
+........S. [ZBX-15611] fixed crash in configuration syncer when there are groups with same name and when removing preprocessing steps from item (vso)
+..F....... [ZBX-15242] fixed value trimming and duplicate catching in SVG graph pattern fields (miks)
+..F....... [ZBX-15250] fixed selection box height calculation in classic graph (miks)
+...G...PS. [ZBX-15379] fixed -Wimplicit-fallthrough warnings when compiling with GCC 7 and -Wextra (akozlovs)
+A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
+...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
+........S. [ZBX-15533] fixed cutting and trimming event tags and values (asitals)
+.......P.. [ZBX-15442] fixed reporting idle time in datasender's process state information (asitals)
+..F....... [ZBX-15424] fixed when multiselect doesn't trim values and recognizes untrimmed values as new ones (vasilijs)
+..F....... [ZBX-14644] fixed maintenance time periods "start_date" field being reset to "1920" instead of DB default value when updating via edit form (Ivo)
+A......... [ZBX-15422] fixed SQL errors when linked template have item prototype with equal key as host item (Sasha)
+..F....... [ZBX-15456] fixed incorrect style property in Monitoring->Problems; removed unused id from filter form (agriscenko)
+..F....... [ZBX-15412] fixed Name column overlaps the Application column in the Template view (vasilijs)
+...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
+.D........ [ZBX-15271] added link to documentation in all man pages (kalimulin)
+
+--------------------------------------------------------------------------------
 Changes for 4.2.0alpha3
 
 New features:
+....I...S. [ZBXNEXT-4868] added TimescaleDB support (kalimulin)
 A.F.I...S. [ZBXNEXT-4877] implemented support for custom JSON path in LLD macros (Ivo, vso)
 ..F....... [ZBXNEXT-1190] implemented item prototype mass update and combined adding, updating and removing of applications in single control in item mass update form (Ivo)
 A......... [ZBXNEXT-4933] dropped support of "elementid" in map.create() and map.update() methods (Sasha)
@@ -8,7 +67,22 @@ A......... [ZBXNEXT-4933] dropped support of string format for "headers" and "va
 ..F....... [ZBXNEXT-4873] implemented single dot datasets to be drawn as points in line vector graphs (miks)
 
 Bug fixes:
+..F....... [ZBX-15577] fixed restricted user access to the host name when calling host_screen (vasilijs)
+A......... [ZBX-13335] fixed low performance with linkage of items and item prototypes to a lot of hosts (Sasha)
+..F....... [ZBX-15435] fixed "Undefined index" errors in the "Problems" widget with multiple active maintenances which part of these are inaccessible (Sasha)
+.......PS. [ZBX-15417] changed vmware collector to perform datastore configuration refresh only when directly monitoring ESXi version lower than v6.0 (MVekslers)
+A......... [ZBX-14896] fixed low performance of the SQL statement when link template to many hosts (Sasha)
+A......... [ZBX-15220] fixed displaying of last value for values received in the same second (Sasha)
+........S. [ZBX-15451] fixed event correlation when "Event tag pair" condition is used and tag contains special characters (asitals)
+........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
+........S. [ZBX-15331] updated LLD item creation/updating error messages (asitals)
+..F....... [ZBX-15465] removed html non-breaking space from visiblity checkbox labels (miks)
+..F....... [ZBX-15307] fixed upper level maps positioning in Monitoring Map screen (talbergs)
+...G...PS. [ZBX-15428] improved regular expression performance by studying compiled pattern (vso)
+...G...PS. [ZBX-11761] added warnings in case of TLS identity mismatch (akozlovs)
+A......... [ZBX-15373] fixed removal of trigger when deleting discovered item; fixed removal of dependent child items when removing master item (vmurzins)
 A......... [ZBX-14613] fixed hostgroup.delete and host.delete API methods to validate maintenance constraint (talbergs)
+..F....... [ZBX-14863] fixed authentication settings form of LDAP anonymous binding (gcalenko)
 ..F....... [ZBX-15374] fixed SQL and PHP errors on chart3.php page (Sasha)
 ...G...... [ZBX-15301] fixed monotonous lag behind in Windows "system.localtime" (MVekslers)
 ..F....... [ZBX-15377] fixed error messages for arrays in GET parameters (Sasha)
@@ -23,7 +97,7 @@ A......... [ZBX-15355] fixed undefined index in configuration.import API call (S
 A......... [ZBX-14926] fixed empty "inventory" property being returned by API if inventory mode is disabled (agriscenko)
 A......... [ZBX-15354] fixed undefined index in API calls without "auth" parameter (Sasha)
 ...G...PS. [ZBX-15399] fixed IPv4 connections not being accepted when IPv6 mask is used (akozlovs)
-A......... [ZBX-14331] fixed error allowed to change interface type which is already used by items (gcalenko)
+A......... [ZBX-14331] fixed error allowing users to change type of a host interface that already has items attached (gcalenko)
 ........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
 ..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
 ..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
@@ -49,7 +123,7 @@ Bug fixes:
 .......PS. [ZBX-15224] fixed failed query errors when receiving non UTF-8 history values (vso)
 ...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
 ........S. [ZBX-15279] fixed handling of LLD processing errors that should have resulted in not supported LLD rule state (wiper)
-..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
+..F....... [ZBX-14604] fixed displaying of the graph name on screens (miks)
 ..F....... [ZBXNEXT-4588] renamed 'display options' tab to 'displaying options'; fixed multiple layout issues, footnote in hint-box, field value handling, calculation of mouse position, multiple issues related with Y axis and problem styling (miks)
 ..F....... [ZBX-15159] fixed existing context menu closing when new one is opened (miks)
 ..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
@@ -92,13 +166,98 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.6rc1
+
+New features:
+...G...... [ZBXNEXT-4898] added support IPv6 for 'net.dns' and 'net.dns.record' (MVekslers)
+.......PS. [ZBXNEXT-5037] added 'skip' parameter for vmware.eventlog key (MVekslers)
+..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
+
+Bug fixes:
+...G...... [ZBX-15607] fixed possibility of zombie processes occurring when signaling agent during metric execution (akozlovs)
+.D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
+..F....... [ZBX-15625] removed links leading to media type edit form for non-superadmins in Reports->Notifications page (Ivo)
+.......PS. [ZBX-15703] fixed use of uninitialized variable when receiving 0 bytes on listening socket (akozlovs)
+..F....... [ZBX-15537] fixed visual bug when filter tab was overlapped by sub navigation (gcalenko)
+..F....... [ZBX-15539] fixed validation of master item in item update form (miks)
+..F....... [ZBX-15532] fixed undefined index error on problems page when trigger expression contains web items (gcalenko, Sasha)
+A......... [ZBX-15488] fixed permission check for inherited triggers (miks)
+..F....... [ZBX-15646] fixed web-server 'Request-URI Too Long' error in trigger description dialog (miks)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.5
+
+4.0.5rc1 was released as 4.0.5 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.5rc1
+
+New features:
+..F....... [ZBXNEXT-5046] added non-destructive resizing and reordering of dashboard widgets (ashubin, gcalenko, miks)
+..FGI..PST [ZBXNEXT-401,ZBXNEXT-4907,ZBXNEXT-4955] added monitoring of internal metrics from an external Zabbix instance (vasilijs, viktors)
+
+Bug fixes:
+.......PS. [ZBXNEXT-4941] changed overflow statements to execute one by one for Oracle for better performance (kalimulin)
+..F....... [ZBX-15664] fixed "Undefined index" errors on maps with enabled automatic icon mapping (Sasha)
+....I..... [ZBX-15667] fixed wrong default Zabbix server status for new installation (kalimulin)
+..F....... [ZBX-15512] fixed performance issues and significant memory consumption on several pages which contains host popup menus (Sasha)
+..F....... [ZBX-15512] fixed performance issues in "Problems by severity" widget (talbergs)
+.......PS. [ZBX-15593] fixed database upgrade patch to stop upgrade on commit failure (vso)
+........S. [ZBX-15611] fixed crash in configuration syncer when there are groups with same name and when removing preprocessing steps from item (vso)
+..F....... [ZBX-15242] fixed value trimming and duplicate catching in SVG graph pattern fields (miks)
+..F....... [ZBX-15250] fixed selection box height calculation in classic graph (miks)
+...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
+...G...PS. [ZBX-15379] fixed -Wimplicit-fallthrough warnings when compiling with GCC 7 and -Wextra (akozlovs)
+A.F....... [ZBX-15179] fixed when message about blocking user login is displayed only on next login attempt (gcalenko, vasilijs)
+...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
+........S. [ZBX-15533] fixed cutting and trimming event tags and values (asitals)
+.......P.. [ZBX-15442] fixed reporting idle time in datasender's process state information (asitals)
+..F....... [ZBX-15424] fixed when multiselect doesn't trim values and recognizes untrimmed values as new ones (vasilijs)
+..F....... [ZBX-14644] fixed maintenance time periods "start_date" field being reset to "1920" instead of DB default value when updating via edit form (Ivo)
+.D........ [ZBX-15271] added link to documentation in all man pages (kalimulin)
+A......... [ZBX-15422] fixed SQL errors when linked template have item prototype with equal key as host item (Sasha)
+..F....... [ZBX-15456] fixed incorrect style property in Monitoring->Problems; removed unused id from filter form (agriscenko)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.4
+
+4.0.4rc3 was released as 4.0.4 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.4rc3
+
+Bug fixes:
+..F....... [ZBX-15412] fixed Name column overlaps the Application column in the Template view (vasilijs)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.4rc2
+
+Bug fixes:
+..F....... [ZBXNEXT-4872] reverted SVG graph timeline changes to previous state (miks)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.4rc1
 
 New features:
+..F....... [ZBXNEXT-4872] reworked SVG graph x-axis timeline (miks)
 ..F....... [ZBXNEXT-4873] implemented single dot datasets to be drawn as points in line vector graphs (miks)
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+..F....... [ZBX-15577] fixed restricted user access to the host name when calling host_screen (vasilijs)
+A......... [ZBX-13335] fixed low performance with linkage of items and item prototypes to a lot of hosts (Sasha)
+..F....... [ZBX-15435] fixed "Undefined index" errors in the "Problems" widget with multiple active maintenances which part of these are inaccessible (Sasha)
+.......PS. [ZBX-15417] changed vmware collector to perform datastore configuration refresh only when directly monitoring ESXi version lower than v6.0 (MVekslers)
+A......... [ZBX-14896] fixed low performance of the SQL statement when link template to many hosts (Sasha)
+A......... [ZBX-15220] fixed displaying of last value for values received in the same second (Sasha)
+........S. [ZBX-15451] fixed event correlation when "Event tag pair" condition is used and tag contains special characters (asitals)
+........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
+........S. [ZBX-15331] updated LLD item creation/updating error messages (asitals)
+..F....... [ZBX-15465] removed html non-breaking space from visiblity checkbox labels (miks)
+..F....... [ZBX-15307] fixed upper level maps positioning in Monitoring Map screen (talbergs)
+...G...PS. [ZBX-15428] improved regular expression performance by studying compiled pattern (vso)
+...G...PS. [ZBX-11761] added warnings in case of TLS identity mismatch (akozlovs)
+A......... [ZBX-15373] fixed removal of trigger when deleting discovered item; fixed removal of dependent child items when removing master item (vmurzins)
 A......... [ZBX-14613] fixed hostgroup.delete and host.delete API methods to validate maintenance constraint (talbergs)
 ..F....... [ZBX-14863] fixed authentication settings form of LDAP anonymous binding (gcalenko)
 ..F....... [ZBX-15374] fixed SQL and PHP errors on chart3.php page (Sasha)
@@ -115,7 +274,7 @@ A......... [ZBX-15355] fixed undefined index in configuration.import API call (S
 A......... [ZBX-14926] fixed empty "inventory" property being returned by API if inventory mode is disabled (agriscenko)
 A......... [ZBX-15354] fixed undefined index in API calls without "auth" parameter (Sasha)
 ...G...PS. [ZBX-15399] fixed IPv4 connections not being accepted when IPv6 mask is used (akozlovs)
-A......... [ZBX-14331] fixed error allowed to change interface type which is already used by items (gcalenko)
+A......... [ZBX-14331] fixed error allowing users to change type of a host interface that already has items attached (gcalenko)
 ..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
 ..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
 ........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
@@ -127,7 +286,7 @@ A......... [ZBX-14980] fixed problem with filter by itemids and hostids in histo
 ...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
 ........S. [ZBX-15279] fixed handling of LLD processing errors that should have resulted in not supported LLD rule state (wiper)
 ........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
-..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
+..F....... [ZBX-14604] fixed displaying of the graph name on screens (miks)
 ..F....... [ZBXNEXT-4588] renamed 'display options' tab to 'displaying options'; fixed multiple layout issues, footnote in hint-box, field value handling, calculation of mouse position, multiple issues related with Y axis and problem styling (miks)
 ..F....... [ZBX-15159] fixed existing context menu closing when new one is opened (miks)
 ..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
@@ -232,7 +391,7 @@ Bug fixes:
 .......PS. [ZBX-15142] fixed time format for vmware performance counters query (MVekslers)
 ...G...... [ZBX-15010] fixed regexp compilation error for patterns with referenced subpatterns (vjaceslavs)
 ..F....... [ZBX-14724] fixed breadcrumb jumping in IE browser (ashubin)
-A......... [ZBX-15083] fixed API so that macros {TRIGGER.ID} works in map element URLs (vasilijs)
+A......... [ZBX-15083] fixed API so that macro {TRIGGER.ID} works in map element URLs (vasilijs)
 .......PS. [ZBX-15127] fixed possible crash when communication problem occurred in the middle of vmware update (MVekslers)
 A......... [ZBX-14396] fixed excessive memory usage during template full clone (gcalenko, Sasha)
 .D.G...PS. [ZBX-14848] clarified process type names for log level increase/decrease in help messages and man pages (kalimulin)
@@ -536,7 +695,7 @@ A.F....... [ZBX-13355] fixed media type a required password field successfully p
 .......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
 A.F.I..... [ZBXNEXT-4540] fixed problems filter with same tags not being joined with OR condition (Ivo, Sasha)
 ..F....... [ZBXNEXT-4576] unified dashboard widget content margins (Andzs, ashubin)
-.......PS. [ZBX-12965] - fixed scheduled check calculation during daylight saving changes (wiper)
+.......PS. [ZBX-12965] fixed scheduled check calculation during daylight saving changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha7
@@ -2259,19 +2418,37 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 3.0.25rc1
+Changes for 3.0.26rc1
 
 New features:
 
 Bug fixes:
+.......PS. [ZBX-14858] fixed processing of unlimited vmware maxQueryMetrics value (MVekslers)
+.D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
+...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
+...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.25
+
+3.0.25rc1 was released as 3.0.25 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.0.25rc1
+
+Bug fixes:
+..F....... [ZBX-15577] fixed restricted user access to the host name when calling host_screen (vasilijs)
+A......... [ZBX-15220] fixed displaying of last value for values received in the same second (Sasha)
+........S. [ZBX-15460] reset agent availability when host status changes, e.g., when host gets disabled (asitals)
+...G...PS. [ZBX-11761] added warnings in case of TLS identity mismatch (akozlovs)
 A......... [ZBX-15355] fixed undefined index in configuration.import API call (Sasha)
 A......... [ZBX-15354] fixed undefined index in API calls without "auth" parameter (Sasha)
-A......... [ZBX-14331] fixed error allowed to change interface type which is already used by items (gcalenko)
+A......... [ZBX-14331] fixed error allowing users to change type of a host interface that already has items attached (gcalenko)
 ........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
 A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
 A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
 ...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
-..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
+..F....... [ZBX-14604] fixed displaying of the graph name on screens (miks)
 ..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
 ...G...... [ZBX-12801] excluded zabbix_sender.dll from MS Windows builds with TLS (viktors)
 ...G...... [ZBX-15260] improved misleading warning message when agent fails to find log file during processing logrt[] item (asitals)

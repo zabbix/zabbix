@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'items.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'codeeditor.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -207,6 +207,7 @@ $fields = [
 											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
 									_('Password')
 								],
+	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"discoveryrule.massdelete","discoveryrule.massdisable",'.
@@ -237,11 +238,12 @@ unset($_REQUEST[$paramsFieldName]);
  */
 if (getRequest('itemid', false)) {
 	$item = API::DiscoveryRule()->get([
+		'itemids' => getRequest('itemid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => ['status', 'flags'],
 		'selectFilter' => ['formula', 'evaltype', 'conditions'],
 		'selectLLDMacroPaths' => ['lld_macro', 'path'],
-		'itemids' => getRequest('itemid'),
+		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 		'editable' => true
 	]);
 	$item = reset($item);
@@ -262,6 +264,16 @@ else {
 	if (!$host) {
 		access_deny();
 	}
+}
+
+// Convert CR+LF to LF in preprocessing script.
+if (hasRequest('preprocessing')) {
+	foreach ($_REQUEST['preprocessing'] as &$step) {
+		if ($step['type'] == ZBX_PREPROC_SCRIPT) {
+			$step['params'][0] = CRLFtoLF($step['params'][0]);
+		}
+	}
+	unset($step);
 }
 
 /*
@@ -295,7 +307,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
-	if (!in_array($type, [ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP]) && hasRequest('delay_flex')) {
+	if (!in_array($type, [ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP])
+			&& hasRequest('delay_flex')) {
 		$intervals = [];
 		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
 		$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
@@ -341,6 +354,33 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($result) {
+		$preprocessing = getRequest('preprocessing', []);
+
+		foreach ($preprocessing as &$step) {
+			switch ($step['type']) {
+				case ZBX_PREPROC_JSONPATH:
+				case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+				case ZBX_PREPROC_ERROR_FIELD_JSON:
+				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+				case ZBX_PREPROC_SCRIPT:
+					$step['params'] = $step['params'][0];
+					break;
+
+				case ZBX_PREPROC_REGSUB:
+					$step['params'] = implode("\n", $step['params']);
+					break;
+
+				default:
+					$step['params'] = '';
+			}
+
+			$step += [
+				'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+				'error_handler_params' => ''
+			];
+		}
+		unset($step);
+
 		$newItem = [
 			'itemid' => getRequest('itemid'),
 			'interfaceid' => getRequest('interfaceid'),
@@ -500,12 +540,20 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($newItem['lld_macro_paths']);
 			}
 
+			if ($item['preprocessing'] !== $preprocessing) {
+				$newItem['preprocessing'] = $preprocessing;
+			}
+
 			$result = API::DiscoveryRule()->update($newItem);
 			$result = DBend($result);
 		}
 		else {
 			if (!$newItem['lld_macro_paths']) {
 				unset($newItem['lld_macro_paths']);
+			}
+
+			if ($preprocessing) {
+				$newItem['preprocessing'] = $preprocessing;
 			}
 
 			$result = API::DiscoveryRule()->create([$newItem]);
@@ -585,6 +633,19 @@ if (isset($_REQUEST['form'])) {
 	$data['conditions'] = getRequest('conditions', []);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['host'] = $host;
+	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;
+
+	if (!hasRequest('form_refresh')) {
+		foreach ($data['preprocessing'] as &$step) {
+			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
+				$step['params'] = [$step['params'], ''];
+			}
+			else {
+				$step['params'] = explode("\n", $step['params']);
+			}
+		}
+		unset($step);
+	}
 
 	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {

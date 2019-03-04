@@ -43,7 +43,7 @@
 #endif
 
 #ifdef WITH_HOSTNAME_METRIC
-extern ZBX_METRIC      parameter_hostname;
+extern ZBX_METRIC	parameter_hostname;
 #endif
 
 static ZBX_METRIC	*commands = NULL;
@@ -1319,7 +1319,16 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	zbx_alarm_off();
 
 	close(fds[0]);
-	waitpid(pid, &status, 0);
+
+	while (-1 == waitpid(pid, &status, 0))
+	{
+		if (EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			ret = SYSINFO_RET_FAIL;
+			break;
+		}
+	}
 
 	if (SYSINFO_RET_OK == ret)
 	{
