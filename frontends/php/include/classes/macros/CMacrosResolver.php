@@ -2033,7 +2033,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'selectHosts' => $query_trigger_hosts ? ['hostid'] : null,
 				'selectFunctions' => ['functionid', 'itemid'],
 				'selectItems' => ['itemid', 'hostid'],
-				'nopermissions' => true,
 				'preservekeys' => true
 			]);
 
@@ -2059,7 +2058,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'hostids' => $selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST],
 				'selectInterfaces' => $query_interfaces ? ['main', 'type', 'useip', 'ip', 'dns'] : null,
 				'selectInventory' => $query_inventories ? API_OUTPUT_EXTEND : null,
-				'nopermissions' => true,
 				'preservekeys' => true
 			]);
 
