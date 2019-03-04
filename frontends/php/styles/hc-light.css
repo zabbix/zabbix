@@ -2210,7 +2210,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-widget-content {
   flex: 1;
-  overflow-y: auto; }
+  overflow: auto; }
   .dashbrd-grid-widget-content .list-table {
     border: none; }
     .dashbrd-grid-widget-content .list-table tbody tr:last-child th, .dashbrd-grid-widget-content .list-table tbody tr:last-child td {
@@ -3821,11 +3821,8 @@ tr.cursor-move td * {
   text-transform: uppercase; }
 
 .flickerfreescreen {
-  position: relative; }
-
-.flickerfreescreen.graph {
-  -ms-overflow-style: none;
-  overflow: auto; }
+  position: relative;
+  overflow: hidden; }
 
 .graph-wrapper {
   display: inline; }

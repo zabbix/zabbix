@@ -3248,7 +3248,7 @@ $form-icon-btn: (
 
 .dashbrd-grid-widget-content {
 	flex: 1;
-	overflow-y: auto;
+	overflow: auto;
 	@extend %webkit-scrollbar;
 
 	.list-table {
@@ -5525,11 +5525,7 @@ tr.cursor-move {
 
 .flickerfreescreen {
 	position: relative;
-}
-
-.flickerfreescreen.graph {
-	-ms-overflow-style: none;
-	overflow: auto;
+	overflow: hidden;
 }
 
 .graph-wrapper {
