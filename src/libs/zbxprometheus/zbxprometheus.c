@@ -1275,7 +1275,7 @@ static int	prometheus_parse_hint(zbx_prometheus_filter_t *filter, const char *da
 
 	if ('\0' == data[pos])
 	{
-		loc->r = pos  - 1;
+		loc->r = pos - 1;
 		return SUCCEED;
 	}
 
