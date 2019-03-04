@@ -4258,9 +4258,11 @@ ul.checkbox-list.col-3 > li {
   .preprocessing-list .preprocessing-list-item .step-name {
     padding-left: 10px; }
   .preprocessing-list .preprocessing-list-foot {
-    justify-content: space-between;
-    line-height: 34px; }
-    .preprocessing-list .preprocessing-list-foot .step-action:last-child {
+    justify-content: space-between; }
+    .preprocessing-list .preprocessing-list-foot .step-action {
+      height: 24px; }
+    .preprocessing-list .preprocessing-list-foot .step-action + .step-action:last-child {
+      margin-left: auto;
       justify-self: flex-end; }
 
 @keyframes fadein {

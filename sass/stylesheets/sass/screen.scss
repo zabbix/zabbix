@@ -6108,9 +6108,13 @@ ul.checkbox-list {
 
 	.preprocessing-list-foot {
 		justify-content: space-between;
-		line-height: 34px;
 
-		.step-action:last-child {
+		.step-action {
+			height: 24px;
+		}
+
+		.step-action + .step-action:last-child {
+			margin-left: auto;
 			justify-self: flex-end;
 		}
 	}
