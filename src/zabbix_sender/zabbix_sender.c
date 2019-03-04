@@ -25,6 +25,7 @@
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
+#include "mutexs.h"
 #include "../libs/zbxcrypto/tls.h"
 
 #ifndef _WINDOWS
@@ -1158,6 +1159,14 @@ int	main(int argc, char **argv)
 	if (NULL != CONFIG_FILE)
 		zbx_load_config(CONFIG_FILE);
 
+#ifndef _WINDOWS
+	if (SUCCEED != zbx_locks_create(&error))
+	{
+		zbx_error("cannot create locks: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+#endif
 	if (SUCCEED != zabbix_open_log(LOG_TYPE_UNDEFINED, CONFIG_LOG_LEVEL, NULL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
@@ -1454,6 +1463,9 @@ exit:
 #endif
 	zabbix_close_log();
 
+#ifndef _WINDOWS
+	zbx_locks_disable();
+#endif
 	if (FAIL == ret)
 		ret = EXIT_FAILURE;
 
