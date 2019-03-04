@@ -307,18 +307,22 @@ ZBX_THREAD_SENDVAL_ARGS;
  ******************************************************************************/
 static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num, const int old_status)
 {
-	int		i, j, new_status, sp_count = 0, fail_count = 0;
+	int		i, sp_count = 0, fail_count = 0;
 #if defined(_WINDOWS)
 	/* wait for threads to finish */
 	WaitForMultipleObjectsEx(threads_num, threads, TRUE, INFINITE, FALSE);
 #endif
 	for (i = 0; i < threads_num; i++)
 	{
+		int	new_status;
+
 		if (SUCCEED_PARTIAL == (new_status = zbx_thread_wait(threads[i])))
 				sp_count++;
 
 		if (SUCCEED != new_status && SUCCEED_PARTIAL != new_status)
 		{
+			int	j;
+
 			for (fail_count++, j = 0; j < destinations_count; j++)
 			{
 				if (destinations[j].thread == &threads[i])
@@ -578,7 +582,7 @@ out:
  * Function: perform_data_sending                                             *
  *                                                                            *
  * Purpose: Send data to all destinations each in a separate thread and wait  *
- *          till threads have completed their task.                           *
+ *          till threads have completed their task                            *
  *                                                                            *
  * Parameters:                                                                *
  *      sendval_args - [IN] arguments for thread function                     *
