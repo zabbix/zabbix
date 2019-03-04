@@ -215,6 +215,8 @@ static int zbx_is_win_ver_or_greater(zbx_uint32_t major, zbx_uint32_t minor, zbx
 {
 	OSVERSIONINFOEXW vi = { sizeof(vi), major, minor, 0, 0, { 0 }, servpack, 0 };
 
+	/* no need to test for an error, check VersionHelpers.h and usage examples */
+
 	return VerifyVersionInfoW(&vi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR,
 			VerSetConditionMask(VerSetConditionMask(VerSetConditionMask(0,
 			VER_MAJORVERSION, VER_GREATER_EQUAL),
