@@ -240,12 +240,12 @@ static char	*INPUT_FILE = NULL;
 static int	WITH_TIMESTAMPS = 0;
 static int	REAL_TIME = 0;
 
-static char		*CONFIG_SOURCE_IP = NULL;
-static char		*ZABBIX_SERVER = NULL;
-static char		*ZABBIX_SERVER_PORT = NULL;
-static char		*ZABBIX_HOSTNAME = NULL;
-static char		*ZABBIX_KEY = NULL;
-static char		*ZABBIX_KEY_VALUE = NULL;
+static char	*CONFIG_SOURCE_IP = NULL;
+static char	*ZABBIX_SERVER = NULL;
+static char	*ZABBIX_SERVER_PORT = NULL;
+static char	*ZABBIX_HOSTNAME = NULL;
+static char	*ZABBIX_KEY = NULL;
+static char	*ZABBIX_KEY_VALUE = NULL;
 
 typedef struct
 {
