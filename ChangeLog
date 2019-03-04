@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+..F....... [ZBX-15622] fixed trigger expression test dialog not being usable with long trigger expressions (talbergs)
 ..F....... [ZBX-13332] fixed issue for large post data in web scenario steps (talbergs)
 ...G...... [ZBX-15607] fixed possibility of zombie processes occurring when signaling agent during metric execution (akozlovs)
 .D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
