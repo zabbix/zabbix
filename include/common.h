@@ -857,7 +857,7 @@ do														\
 }														\
 while (0)
 
-#define MIN_ZABBIX_PORT 1024u
+#define MIN_ZABBIX_PORT 0u
 #define MAX_ZABBIX_PORT 65535u
 
 extern const char	*progname;

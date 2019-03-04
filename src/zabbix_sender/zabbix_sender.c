@@ -871,7 +871,8 @@ static void	parse_commandline(int argc, char **argv)
 		{
 			if (SUCCEED != is_ushort(ZABBIX_SERVER_PORT, &port))
 			{
-				zbx_error("option \"-p\" used with invalid port number [%s]", ZABBIX_SERVER_PORT);
+				zbx_error("option \"-p\" used with invalid port number [%s], allowed [%d:%d]",
+						ZABBIX_SERVER_PORT, (int)MIN_ZABBIX_PORT, (int)MAX_ZABBIX_PORT);
 				exit(EXIT_FAILURE);
 			}
 		}
