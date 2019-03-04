@@ -1706,7 +1706,7 @@ class testUsers extends CAPITest {
 			'jsonrpc' => '2.0',
 			'method' => 'user.logout',
 			'params' => [],
-			'auth' => $this->session,
+			'auth' => CAPIHelper::getSessionId(),
 			'id' => '1'
 		];
 		$this->checkResult($this->callRaw($logout));
@@ -1719,7 +1719,7 @@ class testUsers extends CAPITest {
 					'userid' => '9',
 					'alias' => 'check authentication',
 				],
-			'auth' => $this->session,
+			'auth' => CAPIHelper::getSessionId(),
 			'id' => '1'
 		];
 		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
