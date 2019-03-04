@@ -564,14 +564,14 @@ class CMapHelper {
 	/**
 	 * Replace host groups of subtype = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP by hosts that belongs to group.
 	 *
-	 * @param array $sysmap                   Map data.
-	 * @param array $theme                    Theme used to create missing elements (like hostgroup frame).
+	 * @param array $sysmap  Map data.
+	 * @param array $theme   Theme used to create missing elements (like hostgroup frame).
 	 *
-	 * @return array     Array representing areas with area coordinates and selementids.
+	 * @return array         Array representing areas with area coordinates and selementids.
 	 */
 	protected static function populateHostGroupsWithHosts(array &$sysmap, array $theme) {
 		// Collect host groups to populate with hosts.
-		$host_groupids = [];
+		$groupids = [];
 		foreach ($sysmap['selements'] as &$selement) {
 			$selement['selementid_orig'] = $selement['selementid'];
 			$selement['elementtype_orig'] = $selement['elementtype'];
@@ -580,7 +580,7 @@ class CMapHelper {
 			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
 					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
 				if ($selement['permission'] >= PERM_READ) {
-					$host_groupids[$selement['elements'][0]['groupid']] = $selement['elements'][0]['groupid'];
+					$groupids[$selement['elements'][0]['groupid']] = true;
 				}
 				else {
 					// If user has no access to whole host group, always show it as a SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP.
@@ -592,11 +592,11 @@ class CMapHelper {
 
 		$areas = [];
 
-		if ($host_groupids) {
-			$host_groups = API::HostGroup()->get([
+		if ($groupids) {
+			$groups = API::HostGroup()->get([
 				'output' => [],
 				'selectHosts' => ['hostid', 'name'],
-				'groupids' => $host_groupids,
+				'groupids' => array_keys($groupids),
 				'preservekeys' => true
 			]);
 
@@ -613,16 +613,16 @@ class CMapHelper {
 				}
 
 				$groupid = $selement['elements'][0]['groupid'];
-				$host_group = $host_groups[$groupid];
+				$group = $groups[$groupid];
 				$original_selement = $selement;
 
 				// Jump to the next host group if current host group doesn't contain accessible hosts.
-				if (!$host_group['hosts']) {
+				if (!$group['hosts']) {
 					continue;
 				}
 
 				// Sort hosts by name.
-				CArrayHelper::sort($host_group['hosts'], ['field' => 'name', 'order' => ZBX_SORT_UP]);
+				CArrayHelper::sort($group['hosts'], ['field' => 'name', 'order' => ZBX_SORT_UP]);
 
 				// Define area in which to locate hosts.
 				if ($selement['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM) {
@@ -635,7 +635,7 @@ class CMapHelper {
 					];
 
 					$sysmap['shapes'][] = [
-						'sysmap_shapeid' => 'e-' . $selement['selementid'],
+						'sysmap_shapeid' => 'e-'.$selement['selementid'],
 						'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
 						'x' => $selement['x'],
 						'y' => $selement['y'],
@@ -659,7 +659,7 @@ class CMapHelper {
 				}
 
 				// Add selected hosts as map selements.
-				foreach ($host_group['hosts'] as $host) {
+				foreach ($group['hosts'] as $host) {
 					$new_selementid++;
 
 					$area['selementids'][] = $new_selementid;
