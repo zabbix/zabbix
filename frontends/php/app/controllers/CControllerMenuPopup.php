@@ -308,6 +308,10 @@ class CControllerMenuPopup extends CController {
 			if ($url['name'] === '' || $url['url'] === '') {
 				unset($selement['urls'][$url_nr]);
 			}
+			elseif (CHtmlUrlValidator::validate($url['url']) === false) {
+				$selement['urls'][$url_nr]['url'] = 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.',
+					zbx_jsvalue($url['url'], false, false)).'\');';
+			}
 		}
 
 		CArrayHelper::sort($selement['urls'], ['name']);
