@@ -31,7 +31,7 @@ class CPrometheusPatternParser extends CParser {
 
 	private $user_macro_parser;
 	private $lld_macro_parser;
-	private $trim = " \t\n\r";
+	private $trim = " \t";
 
 	public function __construct($options = []) {
 		if (array_key_exists('usermacros', $options)) {

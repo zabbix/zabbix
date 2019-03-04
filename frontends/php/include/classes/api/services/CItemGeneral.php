@@ -1274,6 +1274,11 @@ abstract class CItemGeneral extends CApiService {
 				]
 			]);
 
+			$prometheus_pattern_parser = new CPrometheusPatternParser(['usermacros' => true,
+				'lldmacros' => !($this instanceof CItem)
+			]);
+			$prometheus_output_parser = new CPrometheusOutputParser();
+
 			$required_fields = ['type', 'params', 'error_handler', 'error_handler_params'];
 			$delta = false;
 			$throttling = false;
@@ -1521,6 +1526,26 @@ abstract class CItemGeneral extends CApiService {
 									'params', _('first parameter is expected')
 								));
 							}
+
+							if ($prometheus_pattern_parser->parse($params[0]) != CParser::PARSE_SUCCESS) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('invalid Prometheus pattern')
+								));
+							}
+
+							if ($params[1] !== ''
+									&& $prometheus_output_parser->parse($params[1]) != CParser::PARSE_SUCCESS) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('invalid Prometheus output')
+								));
+							}
+						}
+
+						if ($prometheus_pattern_parser->parse($preprocessing['params']) != CParser::PARSE_SUCCESS
+								&& $preprocessing['type'] == ZBX_PREPROC_PROMETHEUS_TO_JSON) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'params', _('invalid Prometheus pattern')
+							));
 						}
 						break;
 				}

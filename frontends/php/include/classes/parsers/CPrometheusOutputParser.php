@@ -33,7 +33,7 @@ class CPrometheusOutputParser extends CParser {
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
-		$trim = " \t\n\r";
+		$trim = " \t";
 		$p = $pos;
 
 		while (isset($source[$p]) && strpos($trim, $source[$p]) !== false) {
