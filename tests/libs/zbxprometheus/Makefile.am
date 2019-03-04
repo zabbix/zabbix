@@ -1,5 +1,5 @@
 if SERVER
-SERVER_tests = prometheus_filter_init zbx_prometheus_pattern zbx_prometheus_to_json
+SERVER_tests = prometheus_filter_init zbx_prometheus_pattern zbx_prometheus_to_json prometheus_parse_row
 
 noinst_PROGRAMS = $(SERVER_tests)
 
@@ -48,5 +48,14 @@ zbx_prometheus_to_json_CFLAGS = \
 	
 zbx_prometheus_to_json_LDADD = $(PROMETHEUS_LIBS) @SERVER_LIBS@	
 zbx_prometheus_to_json_LDFLAGS = @SERVER_LDFLAGS@
+
+prometheus_parse_row_SOURCES = \
+	prometheus_parse_row.c
+
+prometheus_parse_row_CFLAGS = \
+	-I@top_srcdir@/tests
+	
+prometheus_parse_row_LDADD = $(PROMETHEUS_LIBS) @SERVER_LIBS@	
+prometheus_parse_row_LDFLAGS = @SERVER_LDFLAGS@
 
 endif

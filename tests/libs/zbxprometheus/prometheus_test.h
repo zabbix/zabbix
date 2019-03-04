@@ -32,6 +32,9 @@ zbx_prometheus_condition_test_t;
 int	zbx_prometheus_filter_parse(const char *data, zbx_prometheus_condition_test_t **metric,
 		zbx_vector_ptr_t *labels, zbx_prometheus_condition_test_t **value, char **error);
 
+int	zbx_prometheus_row_parse(const char *data, char **metric, zbx_vector_ptr_pair_t *labels, char **value,
+		zbx_strloc_t *loc, char **error);
+
 void	zbx_prometheus_condition_test_free(zbx_prometheus_condition_test_t *condition);
 
 #endif

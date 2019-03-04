@@ -79,6 +79,44 @@ int	zbx_prometheus_filter_parse(const char *data, zbx_prometheus_condition_test_
 	return SUCCEED;
 }
 
+int	zbx_prometheus_row_parse(const char *data, char **metric, zbx_vector_ptr_pair_t *labels, char **value,
+		zbx_strloc_t *loc, char **error)
+{
+	zbx_prometheus_filter_t	filter;
+	int			i;
+	zbx_prometheus_row_t	*prow;
+
+	if (FAIL == prometheus_filter_init(&filter, "", error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to parse prometheus filter: %s", *error);
+		return FAIL;
+	}
+
+	if (FAIL == prometheus_parse_row(&filter, data, 0, &prow, loc, error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to parse prometheus row: %s", *error);
+		return FAIL;
+	}
+
+	*metric = prow->metric;
+	prow->metric = NULL;
+	*value = prow->value;
+	prow->value = NULL;
+
+	for (i = 0; i < prow->labels.values_num; i++)
+	{
+		zbx_prometheus_label_t	*label = (zbx_prometheus_label_t *)prow->labels.values[i];
+		zbx_ptr_pair_t		pair = {label->name, label->value};
+
+		zbx_vector_ptr_pair_append_ptr(labels, &pair);
+	}
+
+	zbx_vector_ptr_clear_ext(&prow->labels, zbx_ptr_free);
+	prometheus_row_free(prow);
+
+	return SUCCEED;
+}
+
 void	zbx_prometheus_condition_test_free(zbx_prometheus_condition_test_t *condition)
 {
 	zbx_free(condition->key);
