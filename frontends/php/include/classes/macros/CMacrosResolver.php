@@ -1892,6 +1892,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$hosts_by_itemids = [];
 		$query_interfaces = false;
 		$query_inventories = false;
+		$query_trigger_hosts = false;
 		$triggers = [];
 		$maps = [];
 		$hosts = [];
@@ -1994,6 +1995,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 				// Check if inventory or interface details was requested.
 				if ($selement_type == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+					$query_trigger_hosts = true;
+
 					if ($matched_macros['macros_n']['interface']) {
 						$query_interfaces = true;
 					}
@@ -2043,7 +2046,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			foreach ($triggers as $trigger) {
 				foreach ($trigger['items'] as $item) {
 					$hosts_by_itemids[$item['itemid']] = $item['hostid'];
-					$selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST][$item['hostid']] = $item['hostid'];
+
+					if ($query_trigger_hosts) {
+						$selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST][$item['hostid']] = $item['hostid'];
+					}
 				}
 				foreach ($trigger['functions'] as $fn) {
 					$itemids_by_functionids[$fn['functionid']] = $fn['itemid'];
