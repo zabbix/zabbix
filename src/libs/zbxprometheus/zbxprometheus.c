@@ -493,6 +493,38 @@ static int	parse_metric_op(const char *data, size_t pos, zbx_strloc_t *loc)
 
 /******************************************************************************
  *                                                                            *
+ * Function: str_copy_lowercase                                               *
+ *                                                                            *
+ * Purpose: copies lowercase converted string to a buffer                     *
+ *                                                                            *
+ * Parameters: dst  - [OUT] the output buffer                                 *
+ *             size - [IN] the output buffer size                             *
+ *             src  - [IN] the source string to copy                          *
+ *             len  - [IN] the length of the source string                    *
+ *                                                                            *
+ * Return value: The number of bytes copied.                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	str_copy_lowercase(char *dst, int size, const char *src, int len)
+{
+	int	i;
+
+	if (0 == size)
+		return 0;
+
+	if (size > len + 1)
+		size = len + 1;
+
+	for (i = 0; i < size - 1 && '\0' != *src; i++)
+		*dst++ = tolower(*src++);
+
+	*dst = '\0';
+
+	return i;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: parse_metric_value                                               *
  *                                                                            *
  * Purpose: parses metric value                                               *
@@ -509,10 +541,12 @@ static int	parse_metric_value(const char *data, size_t pos, zbx_strloc_t *loc)
 {
 	const char	*ptr = data + pos;
 	int		len;
+	char		buffer[4];
 
 	loc->l = pos;
 
-	if (0 == strncmp(ptr, "Nan", 3))
+	len = ZBX_CONST_STRLEN("nan");
+	if (str_copy_lowercase(buffer, sizeof(buffer), ptr, len) == len && 0 == memcmp(buffer, "nan", len))
 	{
 		loc->r = pos + 2;
 		return SUCCEED;
@@ -521,7 +555,8 @@ static int	parse_metric_value(const char *data, size_t pos, zbx_strloc_t *loc)
 	if ('-' == *ptr || '+' == *ptr)
 		ptr++;
 
-	if (0 == strncmp(ptr, "Inf", 3))
+	len = ZBX_CONST_STRLEN("inf");
+	if (str_copy_lowercase(buffer, sizeof(buffer), ptr, len) == len && 0 == memcmp(buffer, "inf", len))
 	{
 		loc->r = ptr - data + 2;
 		return SUCCEED;

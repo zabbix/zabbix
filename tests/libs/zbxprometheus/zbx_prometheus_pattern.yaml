@@ -767,7 +767,8 @@ in:
   params: wmi_os_physical_memory_free_bytes
   value_type: ""
 out:
-  result: FAIL
+  output: NAN
+  result: SUCCEED
 ---
 test case: 'Metric with timestamp'
 in:

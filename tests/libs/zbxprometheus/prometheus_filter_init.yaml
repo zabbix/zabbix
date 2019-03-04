@@ -306,6 +306,102 @@ out:
     - key: __
       pattern: intel
       op: =
+---
+test case: sensor == NAN
+in: 
+  filter: sensor == NAN
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: NAN
+    op: ==
+---
+test case: sensor == nan
+in: 
+  filter: sensor == nan
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: nan
+    op: ==
+---
+test case: sensor == NaN
+in: 
+  filter: sensor == NaN
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: NaN
+    op: ==
+---
+test case: sensor == nAn
+in: 
+  filter: sensor == nAn
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: nAn
+    op: ==
+---
+test case: sensor == +INF
+in: 
+  filter: sensor == +INF
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: +INF
+    op: ==
+---
+test case: sensor == -inf
+in: 
+  filter: sensor == -inf
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: -inf
+    op: ==
+---
+test case: sensor == InF
+in: 
+  filter: sensor == InF
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: InF
+    op: ==
+---
+test case: sensor == iNf
+in: 
+  filter: sensor == iNf
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: iNf
+    op: ==
 ...
 
 

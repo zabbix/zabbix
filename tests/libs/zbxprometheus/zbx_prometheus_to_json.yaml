@@ -540,7 +540,8 @@ in:
   data: wmi_os_physical_memory_free_bytes NAN
   params: wmi_os_physical_memory_free_bytes
 out:
-  result: FAIL
+  result: SUCCEED
+  output: '[{"name":"wmi_os_physical_memory_free_bytes","value":"NAN","line_raw":"wmi_os_physical_memory_free_bytes NAN","type":"untyped"}]'
 ---
 test case: 'Metric with timestamp'
 in:
