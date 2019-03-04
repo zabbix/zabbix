@@ -68,7 +68,6 @@ class CMapHelper {
 				'label_location' => MAP_LABEL_LOC_BOTTOM,
 				'selements' => [],
 				'links' => [],
-				'urls' => [],
 				'shapes' => [[
 					'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
 					'x' => 0,
