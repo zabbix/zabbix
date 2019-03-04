@@ -14,16 +14,12 @@ noinst_LIBRARIES = libzbxproxy.a
 libzbxproxy_a_SOURCES = \
 	servercomms.c servercomms.h \
 	events.c \
-	preprocessing.c
+	proxy_lld.c
 
 libzbxproxy_a_CFLAGS = \
 	-DZABBIX_DAEMON
 
 zabbix_proxy_SOURCES = proxy.c
-
-if PROXY_IPCSERVICE
-LIBIPCSERVICE = $(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a
-endif
 
 zabbix_proxy_LDADD = \
 	heart/libzbxheart.a \
@@ -43,6 +39,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/zabbix_server/selfmon/libzbxselfmon.a \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
+	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
@@ -56,7 +53,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	${LIBIPCSERVICE} \
+	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
@@ -73,6 +70,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
+	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
 	libzbxproxy.a
 
 zabbix_proxy_LDADD += $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a

@@ -339,7 +339,7 @@ FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|snmpv3_contextname|t_varchar(255)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|jmx_endpoint	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|master_itemid	|t_id		|	|NULL		|0			|5|items	|itemid
+FIELD		|master_itemid	|t_id		|	|NULL		|ZBX_PROXY		|5|items	|itemid
 FIELD		|timeout	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY
 FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|query_fields	|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
@@ -1469,7 +1469,7 @@ INDEX		|1		|correlationid
 TABLE|corr_condition_tag|corr_conditionid|ZBX_DATA
 FIELD		|corr_conditionid|t_id		|	|NOT NULL	|0			|1|corr_condition
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
-
+item_preproc
 TABLE|corr_condition_group|corr_conditionid|ZBX_DATA
 FIELD		|corr_conditionid|t_id		|	|NOT NULL	|0			|1|corr_condition
 FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
@@ -1508,12 +1508,12 @@ FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
 
 TABLE|item_preproc|item_preprocid|ZBX_TEMPLATE
 FIELD		|item_preprocid	|t_id		|	|NOT NULL	|0
-FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
-FIELD		|step		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|params		|t_shorttext	|''	|NOT NULL	|0
-FIELD		|error_handler	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|error_handler_params|t_varchar(255)|''	|NOT NULL	|0
+FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_PROXY			|1|items
+FIELD		|step		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|params		|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|error_handler	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|error_handler_params|t_varchar(255)|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|itemid,step
 
 TABLE|task_remote_command|taskid|0

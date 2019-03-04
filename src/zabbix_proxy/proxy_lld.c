@@ -17,18 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_INTERNAL_H
-#define ZABBIX_CHECKS_INTERNAL_H
-
 #include "common.h"
-#include "dbcache.h"
 #include "sysinfo.h"
-#include "preproc.h"
 
-extern int	CONFIG_SERVER_STARTUP_TIME;
-
-int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result);
-
-int	zbx_get_value_internal_ext(const char *query, const AGENT_REQUEST *request, AGENT_RESULT *result);
-
-#endif
+void	zbx_lld_process_agent_result(zbx_uint64_t itemid, AGENT_RESULT *result, zbx_timespec_t *ts, char *error)
+{
+	ZBX_UNUSED(itemid);
+	ZBX_UNUSED(result);
+	ZBX_UNUSED(ts);
+	ZBX_UNUSED(error);
+}
