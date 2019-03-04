@@ -1591,10 +1591,11 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 
 	zbx_vector_ptr_create(&rows);
 	zbx_hashset_create(&hints, 100, prometheus_hint_hash, prometheus_hint_compare);
-	zbx_json_initarray(&json, rows.values_num * 100);
 
 	if (FAIL == prometheus_parse_rows(&filter, data, &rows, &hints, error))
 		goto cleanup;
+
+	zbx_json_initarray(&json, rows.values_num * 100);
 
 	for (i = 0; i < rows.values_num; i++)
 	{
@@ -1632,11 +1633,10 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 	}
 
 	*value = zbx_strdup(NULL, json.buffer);
+	zbx_json_free(&json);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): output:%s", __function_name, *value);
 	ret = SUCCEED;
 cleanup:
-	zbx_json_free(&json);
-
 	zbx_hashset_iter_reset(&hints, &iter);
 	while (NULL != (hint = (zbx_prometheus_hint_t *)zbx_hashset_iter_next(&iter)))
 	{
