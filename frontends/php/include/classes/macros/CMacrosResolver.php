@@ -1774,8 +1774,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'urls' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}']
 			],
 			'map' => [
-				'label' => ['{MAP.ID}'],
-				'urls' => ['{MAP.ID}']
+				'label' => ['{MAP.ID}', '{MAP.NAME}'],
+				'urls' => ['{MAP.ID}', '{MAP.NAME}']
 			],
 			'trigger' => [
 				'label' => ['{TRIGGER.ID}'],
@@ -1875,11 +1875,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$selements_to_resolve = [
 			SYSMAP_ELEMENT_TYPE_HOST => [],
+			SYSMAP_ELEMENT_TYPE_MAP => [],
 			SYSMAP_ELEMENT_TYPE_TRIGGER => []
 		];
 
 		$elementid_field_by_type = [
 			SYSMAP_ELEMENT_TYPE_HOST => 'hostid',
+			SYSMAP_ELEMENT_TYPE_MAP => 'sysmapid',
 			SYSMAP_ELEMENT_TYPE_TRIGGER => 'triggerid',
 			SYSMAP_ELEMENT_TYPE_HOST_GROUP => 'groupid'
 		];
@@ -2007,8 +2009,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			 * Since only supported host-group macro is {HOSTGROUP.ID}, it's useless to collect host group id-s in order
 			 * to fetch additional details from database.
 			 */
-			if ($sel['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP && $sel['elementtype'] != SYSMAP_ELEMENT_TYPE_MAP
-					&& array_key_exists($selid, $macros_by_selementid) && $macros_by_selementid[$selid]) {
+			if ($sel['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP && array_key_exists($selid, $macros_by_selementid)
+					&& $macros_by_selementid[$selid]) {
 				if (array_key_exists('elementid', $sel)) {
 					$selements_to_resolve[$sel['elementtype']][$sel['elementid']] = $sel['elementid'];
 				}
@@ -2017,6 +2019,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$selements_to_resolve[$sel['elementtype']][$elementid] = $elementid;
 				}
 			}
+		}
+
+		// Query details about resolvable maps.
+		if ($selements_to_resolve[SYSMAP_ELEMENT_TYPE_MAP]) {
+			$maps = API::Map()->get([
+				'output' => ['sysmapid', 'name'],
+				'sysmapids' => $selements_to_resolve[SYSMAP_ELEMENT_TYPE_MAP],
+				'preservekeys' => true
+			]);
 		}
 
 		// Get details about resolvable triggers.
@@ -2101,7 +2112,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			if (array_key_exists('elementid', $sel)) {
 				$elementid = $sel['elementid'];
 			}
-			elseif ($sel['elementtype'] != SYSMAP_ELEMENT_TYPE_MAP && ($element = reset($sel['elements'])) !== false) {
+			elseif (($element = reset($sel['elements'])) !== false) {
 				$elementid = $element[$elementid_field_by_type[$sel['elementtype']]];
 			}
 			else {
@@ -2164,9 +2175,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_MAP:
-					$map = [
-						'sysmapid' => $elementid
-					];
+					$map = $maps[$elementid];
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_HOST:
@@ -2211,6 +2220,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					case 'MAP.ID':
 						if ($map) {
 							$matched_macro['value'] = $map['sysmapid'];
+						}
+						break;
+
+					case 'MAP.NAME':
+						if ($map) {
+							$matched_macro['value'] = $map['name'];
 						}
 						break;
 
