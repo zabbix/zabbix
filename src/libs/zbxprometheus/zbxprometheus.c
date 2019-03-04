@@ -1083,7 +1083,7 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 	if (' ' != data[pos] && '\t' != data[pos] && '\n' != data[pos] && '\0' != data[pos])
 	{
 		*error = zbx_dsprintf(*error, "invalid character '%c' following metric value", data[pos]);
-		return FAIL;
+		goto out;
 	}
 
 	/* row was successfully parsed and matched all filter conditions */
