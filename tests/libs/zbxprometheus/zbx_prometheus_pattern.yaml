@@ -1578,6 +1578,17 @@ out:
   result: SUCCEED
   output: yellow
 ---
+test case: 'Apply INF metric filter on matching inf value (4)'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} NaN
+    apache{state="green"} 0
+  params: apache == -INF
+  value_type: state
+out:
+  result: FAIL
+---
 test case: 'Apply INF metric filter on matching nan value'
 in:
   data: |

@@ -926,37 +926,19 @@ static int	condition_match_key_value(const zbx_prometheus_condition_t *condition
  ******************************************************************************/
 static int	condition_match_metric_value(const char *pattern, const char *value)
 {
-	char	buffer[4];
-	size_t	len;
+	char	buffer[5];
 
-	if ('+' == *pattern)
-		pattern++;
-
-	if ('+' == *value)
-		value++;
-
-	len = strlen(value);
-
-	if (0 == strcmp(pattern, "nan"))
+	if (SUCCEED != is_double(pattern))
 	{
-		if (ZBX_CONST_STRLEN("nan") != len)
-			return FAIL;
+		if ('+' == *pattern)
+			pattern++;
 
-		memcpy(buffer, value, ZBX_CONST_STRLEN("nan") + 1);
+		if ('+' == *value)
+			value++;
+
+		zbx_strlcpy(buffer, value, sizeof(buffer));
 		zbx_strlower(buffer);
-
-		return (0 == strcmp(buffer, "nan") ? SUCCEED : FAIL);
-	}
-
-	if (0 == strcmp(pattern, "inf"))
-	{
-		if (ZBX_CONST_STRLEN("inf") != len)
-			return FAIL;
-
-		memcpy(buffer, value, ZBX_CONST_STRLEN("inf") + 1);
-		zbx_strlower(buffer);
-
-		return (0 == strcmp(buffer, "inf") ? SUCCEED : FAIL);
+		return (0 == strcmp(pattern, buffer) ? SUCCEED : FAIL);
 	}
 
 	if (ZBX_DOUBLE_EPSILON <= fabs(atof(pattern) - atof(value)))
