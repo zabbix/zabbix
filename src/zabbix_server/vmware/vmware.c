@@ -1156,29 +1156,6 @@ static void	vmware_event_backup(zbx_vmware_service_t *service, zbx_vector_ptr_t 
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_event_merge_destroy                                       *
- *                                                                            *
- * Purpose: merge not pooled vmware event objects with new collected vmware   *
- *          event objects and destroy old vector only (not data)              *
- *                                                                            *
- * Parameters: events     - [IN/OUT] array of new vmware event                *
- *             old_events - [IN/OUT] array of old vmware event                *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_event_merge_destroy(zbx_vector_ptr_t *events, zbx_vector_ptr_t *old_events)
-{
-	int	i;
-
-	zbx_vector_ptr_reserve(events, old_events->values_num + events->values_alloc);
-
-	for (i = 0; i < old_events->values_num; i++)
-		zbx_vector_ptr_append(events, old_events->values[i]);
-
-	zbx_vector_ptr_destroy(old_events);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vmware_datastore_shared_dup                                      *
  *                                                                            *
  * Purpose: copies vmware hypervisor datastore object into shared memory      *
@@ -4369,7 +4346,7 @@ out:
 	service->eventlog.skip_old = skip_old;
 
 	if (0 != events.values_num)
-		vmware_event_merge_destroy(&service->data->events, &events);
+		zbx_vector_ptr_append_array(&service->data->events, events.values, events.values_num);
 
 	service->lastcheck = time(NULL);
 
@@ -4378,6 +4355,7 @@ out:
 	zbx_vmware_unlock();
 
 	vmware_data_free(data);
+	zbx_vector_ptr_destroy(&events);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s \tprocessed:" ZBX_FS_SIZE_T " bytes of data", __function_name,
 			zbx_result_string(ret), (zbx_fs_size_t)page.alloc);
