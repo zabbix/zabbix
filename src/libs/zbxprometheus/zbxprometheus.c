@@ -926,8 +926,8 @@ static int	condition_match_key_value(const zbx_prometheus_condition_t *condition
  ******************************************************************************/
 static int	condition_match_metric_value(const char *pattern, const char *value)
 {
-	char		buffer[8];
-	size_t		len;
+	char	buffer[4];
+	size_t	len;
 
 	if ('+' == *pattern)
 		pattern++;
