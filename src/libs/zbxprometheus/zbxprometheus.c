@@ -1699,6 +1699,33 @@ out:
 	return ret;
 }
 
+int	zbx_prometheus_validate_filter(const char *pattern, char **error)
+{
+	zbx_prometheus_filter_t	filter;
+
+	if (FAIL == prometheus_filter_init(&filter, pattern, error))
+		return FAIL;
+
+	prometheus_filter_clear(&filter);
+	return SUCCEED;
+}
+
+int	zbx_prometheus_validate_label(const char *label)
+{
+	zbx_strloc_t	loc;
+	size_t		pos;
+
+	if (SUCCEED != parse_label(label, 0, &loc))
+		return FAIL;
+
+	pos = skip_spaces(label, loc.r + 1);
+	if ('\0' != label[pos])
+		return FAIL;
+
+	return SUCCEED;
+}
+
+
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxprometheus/prometheus_test.c"
 #endif

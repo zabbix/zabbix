@@ -23,6 +23,7 @@
 #include "zbxalgo.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
+#include "zbxprometheus.h"
 
 typedef struct
 {
@@ -1346,7 +1347,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 {
 	int		ret = SUCCEED;
 	zbx_token_t	token;
-	char		err[MAX_STRING_LEN];
+	char		err[MAX_STRING_LEN], *errmsg = NULL;
 	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2;
 	const char*	regexp_err = NULL;
 	zbx_uint64_t	value_ui64;
@@ -1453,6 +1454,41 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 				ret = FAIL;
 			}
 			break;
+		case ZBX_PREPROC_PROMETHEUS_PATTERN:
+			zbx_strlcpy(param1, pp->params, sizeof(param1));
+			if (NULL == (param2 = strchr(param1, '\n')))
+			{
+				zbx_snprintf(err, sizeof(err), "cannot find second parameter: %s", pp->params);
+				ret = FAIL;
+				break;
+			}
+			*param2++ = '\0';
+
+			if (FAIL == zbx_prometheus_validate_filter(param1, &errmsg))
+			{
+				zbx_snprintf(err, sizeof(err), "invalid pattern: %s", param1);
+				zbx_free(errmsg);
+				ret = FAIL;
+				break;
+			}
+
+			if (FAIL == zbx_prometheus_validate_label(param2))
+			{
+				zbx_snprintf(err, sizeof(err), "invalid label name: %s", param2);
+				ret = FAIL;
+				break;
+			}
+
+			break;
+		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+			if (FAIL == zbx_prometheus_validate_filter(pp->params, &errmsg))
+			{
+				zbx_snprintf(err, sizeof(err), "invalid pattern: %s", pp->params);
+				zbx_free(errmsg);
+				ret = FAIL;
+				break;
+			}
+
 	}
 
 	if (SUCCEED != ret)
