@@ -45,7 +45,6 @@ class CSvgGraphHelper {
 	public static function get(array $options = [], $width, $height) {
 		$metrics = [];
 		$errors = [];
-		$problems = [];
 
 		// Find which metrics will be shown in graph and calculate time periods and display options.
 		self::getMetrics($metrics, $options['data_sets']);
@@ -320,17 +319,17 @@ class CSvgGraphHelper {
 		$options['objectids'] = array_keys(API::Trigger()->get([
 			'output' => [],
 			'hostids' => array_key_exists('hostids', $options) ? $options['hostids'] : null,
-			'itemids' => array_key_exists('itemids', $problem_options) ? $problem_options['itemids'] : null,
+			'itemids' => $problem_options['itemids'],
 			'monitored' => true,
 			'preservekeys' => true
 		]));
+
+		unset($options['hostids']);
 
 		// Return if no triggers found.
 		if (!$options['objectids']) {
 			return [];
 		}
-
-		unset($options['hostids']);
 
 		// Add severity filter.
 		$filter_severities = implode(',', $problem_options['severities']);
