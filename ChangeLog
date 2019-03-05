@@ -3,6 +3,7 @@ Changes for 4.2.0rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15332] fixed dashboard svg graph update on timeselector interval change (gcalenko)
 ...G...... [ZBX-15728] fixed agent startup problem in Win 2008 R2 w/o SP1, removed dependency on version helper API (kalimulin)
 
 --------------------------------------------------------------------------------
