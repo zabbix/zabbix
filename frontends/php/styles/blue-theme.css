@@ -380,7 +380,7 @@ ul.top-nav-icons {
 
 .header-title {
   border-bottom: 1px solid #dfe4e7;
-  margin-top: -10px;
+  margin: -10px 0 10px;
   padding: 10px 0 6px;
   width: 100%; }
   .header-title .cell:first-child {
@@ -472,10 +472,14 @@ article, main {
 
 .filter-breadcrumb {
   display: inline-block;
-  z-index: 3; }
+  padding-top: 0;
+  z-index: 3;
+  max-width: calc(100vw - 200px); }
   .filter-breadcrumb li {
     line-height: 14px;
-    vertical-align: top; }
+    vertical-align: top;
+    float: none;
+    display: inline-block; }
     .filter-breadcrumb li .status-container {
       padding-top: 3px; }
     .filter-breadcrumb li > span {
@@ -483,6 +487,7 @@ article, main {
       height: 18px;
       padding: 4px 7px 0; }
       .filter-breadcrumb li > span a {
+        display: inline-block;
         max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -490,7 +495,6 @@ article, main {
   .filter-breadcrumb > li {
     padding: 1px 0; }
   .filter-breadcrumb > li:first-child {
-    float: left;
     white-space: nowrap; }
   .filter-breadcrumb + .filter-space {
     margin-top: -29px; }
@@ -3044,6 +3048,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       height: 10px;
       float: left;
       display: block; }
+  .svg-graph-hintbox .header {
+    margin: 0 0 10px 3px; }
 
 .ui-selectable-helper {
   position: absolute;
