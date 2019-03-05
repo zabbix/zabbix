@@ -200,6 +200,9 @@
 	};
 
 	jQuery(document).ready(function($) {
+		// Disable page refresh on time range change.
+		timeControl.refreshPage = false;
+
 		// Turn on edit dashboard.
 		$('#dashbrd-edit').click(showEditMode);
 
