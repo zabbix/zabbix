@@ -211,7 +211,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 			if (in_array($options['type'], ['Regular expression', 'JSONPath', 'Does not match regular expression'])) {
 				$this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox()->check();
 				$this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one()->select($options['custom_error']);
-				if ($options['type'] != 'Regular expression') {
+				if ($options['custom_error'] !== 'Discard value') {
 					$this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->type($options['text'].$step_count);
 				}
 			}
@@ -234,12 +234,11 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 			$this->assertNotNull($type_field->getAttribute('readonly'));
 
 			if (array_key_exists('parameter_1', $options)) {
-
 				$parameter_1_field = $this->query('id:preprocessing_'.$step_count.'_params_0')->one();
 				$this->assertEquals($options['parameter_1'], $parameter_1_field->getValue());
 				$this->assertNotNull($parameter_1_field->getAttribute('readonly'));
 			}
-			elseif (array_key_exists('parameter_2', $options)) {
+			if (array_key_exists('parameter_2', $options)) {
 				$parameter_2_field = $this->query('id:preprocessing_'.$step_count.'_params_1')->one();
 				$this->assertEquals($options['parameter_2'], $parameter_2_field->getValue());
 				$this->assertNotNull($parameter_2_field->getAttribute('readonly'));
@@ -256,7 +255,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 					$custom_radio = $this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one();
 					$this->assertFalse($custom_radio->isEnabled());
 					$this->assertEquals($options['custom_error'], $custom_radio->getText());
-					if ($options['type'] != 'Regular expression') {
+					if ($options['custom_error'] !== 'Discard value') {
 						$custom_text = $this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->getValue();
 						$this->assertEquals($options['text'].$step_count, $custom_text);
 					}
