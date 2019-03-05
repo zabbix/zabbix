@@ -83,6 +83,10 @@ jQuery(function($) {
 				data = getMenuPopupMapElementTrigger(data);
 				break;
 
+			case 'map_element_image':
+				data = getMenuPopupMapElementImage(data);
+				break;
+
 			case 'refresh':
 				data = getMenuPopupRefresh(data, obj);
 				break;

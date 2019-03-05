@@ -64,7 +64,13 @@ if ($data['isTriggerEditable']) {
 					'},'.
 					'success: function(r) {'.
 						'if (typeof r.errors === "undefined") {'.
+							/**
+							 * Before reloadPopup call:
+							 * - add input[name=success][value=1] to tell "popup.trigdesc.view" display success message;
+							 * - remove [name=comments] and [name=comments_unresolved] to avoid unneeded data transfer.
+							 */
 							'jQuery(forms).append(jQuery("<input>", {type: "hidden", "name": "success"}).val(1));'.
+							'jQuery("[name=comments], [name=comments_unresolved]", jQuery(forms)).remove();'.
 							'reloadPopup(forms[0], "popup.trigdesc.view");'.
 						'}'.
 						'else {'.
