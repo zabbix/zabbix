@@ -5,7 +5,11 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_os_physical_memory_free_bytes","value":"8.492331008e+09","line_raw":"wmi_os_physical_memory_free_bytes 8.492331008e+09","type":"untyped"}]'
+  metrics:
+    - name: wmi_os_physical_memory_free_bytes
+      value: 8.492331008e+09
+      line_raw: wmi_os_physical_memory_free_bytes 8.492331008e+09
+      type: untyped
 ---
 test case: 'Get metric using params: cpu_usage_system{cpu="cpu-total"}'
 in:
@@ -18,7 +22,15 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\"} 1.1940298507220641","labels":{"cpu":"cpu-total"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Get metric using params: wmi_logical_disk_free_bytes{volume="{#VOLUME}"}'
 in:
@@ -31,7 +43,15 @@ in:
   params: 'wmi_logical_disk_free_bytes{volume="{#VOLUME}"}'
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_logical_disk_free_bytes","value":"3.5180249088e+11","line_raw":"wmi_logical_disk_free_bytes{volume=\"{#VOLUME}\"} 3.5180249088e+11","labels":{"volume":"{#VOLUME}"},"type":"gauge","help":"Free space in bytes (LogicalDisk.PercentFreeSpace)"}]'
+  metrics:
+    - name: wmi_logical_disk_free_bytes
+      value: 3.5180249088e+11
+      line_raw: 'wmi_logical_disk_free_bytes{volume="{#VOLUME}"} 3.5180249088e+11'
+      labels:
+        - name: volume
+          value: '{#VOLUME}'
+      type: gauge
+      help: Free space in bytes (LogicalDisk.PercentFreeSpace)
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu="cpu-total",host=~".*"}'
 in:
@@ -44,7 +64,17 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=~".*"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\",host=\"host1\"} 1.1940298507220641","labels":{"cpu":"cpu-total","host":"host1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu="cpu-total",host=~".*"}'
 in:
@@ -57,7 +87,17 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=~".*"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\",host=\"host1\"} 1.1940298507220641","labels":{"cpu":"cpu-total","host":"host1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu="cpu-total"}'
 in:
@@ -70,7 +110,17 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\",host=\"host1\"} 1.1940298507220641","labels":{"cpu":"cpu-total","host":"host1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu=~"cpu-tot.+"}'
 in:
@@ -83,7 +133,17 @@ in:
   params: cpu_usage_system{cpu=~"cpu-tot.+"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\",host=\"host1\"} 1.1940298507220641","labels":{"cpu":"cpu-total","host":"host1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Get metric value using params: {__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
 in:
@@ -96,7 +156,17 @@ in:
   params: '{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\",host=\"host1\"} 1.1940298507220641","labels":{"cpu":"cpu-total","host":"host1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu=~".*"}'
 in:
@@ -109,7 +179,37 @@ in:
   params: cpu_usage_system{cpu=~".*"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\",host=\"host1\"} 1.1940298507220641","labels":{"cpu":"cpu-total","host":"host1"},"type":"gauge","help":"Telegraf collected metric"},{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu0\",host=\"host1\"} 1.1940298507220641","labels":{"cpu":"cpu0","host":"host1"},"type":"gauge","help":"Telegraf collected metric"},{"name":"cpu_usage_system","value":"1.1340298507220641","line_raw":"cpu_usage_system{cpu=\"cpu1\",host=\"host1\"} 1.1340298507220641","labels":{"cpu":"cpu1","host":"host1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu0
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
+    - name: cpu_usage_system
+      value: 1.1340298507220641
+      line_raw: cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+      labels:
+        - name: cpu
+          value: cpu1
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Get metric value using params: cpu_usage_system{cpu=~"cpu-tot.+"}'
 in:
@@ -122,7 +222,17 @@ in:
   params: cpu_usage_system{cpu=~"cpu-tot.+"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\",host=\"host1\"} 1.1940298507220641","labels":{"cpu":"cpu-total","host":"host1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Get metric for http_requests_total{code="400"}    3 1395066363000'
 in:
@@ -134,7 +244,17 @@ in:
   params: http_requests_total{code="400"}
 out:
   result: SUCCEED
-  output: '[{"name":"http_requests_total","value":"3","line_raw":"http_requests_total{method=\"post\",code=\"400\"}    3 1395066363000","labels":{"method":"post","code":"400"},"type":"counter","help":"The total number of HTTP requests."}]'
+  metrics:
+    - name: http_requests_total
+      value: 3
+      line_raw: http_requests_total{method="post",code="400"}    3 1395066363000
+      labels:
+        - name: method
+          value: post
+        - name: code
+          value: 400
+      type: counter
+      help: The total number of HTTP requests.
 ---
 test case: 'Escaping in label values'
 in:
@@ -142,7 +262,16 @@ in:
   params: msdos_file_access_time_seconds{error="Cannot find file:\n\"FILE.TXT\""} == 1.458255915e9
 out:
   result: SUCCEED
-  output: '[{"name":"msdos_file_access_time_seconds","value":"1.458255915e9","line_raw":"msdos_file_access_time_seconds{path=\"C:\\\\DIR\\\\FILE.TXT\",error=\"Cannot find file:\\n\\\"FILE.TXT\\\"\"} 1.458255915e9","labels":{"path":"C:\\DIR\\FILE.TXT","error":"Cannot find file:\n\"FILE.TXT\""},"type":"untyped"}]'
+  metrics:
+    - name: msdos_file_access_time_seconds
+      value: 1.458255915e9
+      line_raw: msdos_file_access_time_seconds{path="C:\\DIR\\FILE.TXT",error="Cannot find file:\n\"FILE.TXT\""} 1.458255915e9
+      labels:
+        - name: path
+          value: C:\DIR\FILE.TXT
+        - name: error
+          value: "Cannot find file:\n\"FILE.TXT\""
+      type: untyped
 ---
 test case: 'Minimalistic line'
 in:
@@ -150,7 +279,11 @@ in:
   params: metric_without_timestamp_and_labels
 out:
   result: SUCCEED
-  output: '[{"name":"metric_without_timestamp_and_labels","value":"12.47","line_raw":"metric_without_timestamp_and_labels 12.47","type":"untyped"}]'
+  metrics:
+    - name: metric_without_timestamp_and_labels
+      value: 12.47
+      line_raw: metric_without_timestamp_and_labels 12.47
+      type: untyped
 ---
 test case: 'A weird metric from before the epoch'
 in:
@@ -158,7 +291,14 @@ in:
   params: something_weird
 out:
   result: SUCCEED
-  output: '[{"name":"something_weird","value":"+Inf","line_raw":"something_weird{problem=\"division by zero\"} +Inf -3982045","labels":{"problem":"division by zero"},"type":"untyped"}]'
+  metrics:
+    - name: something_weird
+      value: +Inf
+      line_raw: something_weird{problem="division by zero"} +Inf -3982045
+      labels:
+        - name: problem
+          value: division by zero
+      type: untyped
 ---
 test case: 'A histogram, which has a pretty complex representation in the text format'
 in:
@@ -176,7 +316,14 @@ in:
   params: http_request_duration_seconds_bucket{le="+Inf"}
 out:
   result: SUCCEED
-  output: '[{"name":"http_request_duration_seconds_bucket","value":"144320","line_raw":"http_request_duration_seconds_bucket{le=\"+Inf\"} 144320","labels":{"le":"+Inf"},"type":"untyped"}]'
+  metrics:
+    - name: http_request_duration_seconds_bucket
+      value: 144320
+      line_raw: http_request_duration_seconds_bucket{le="+Inf"} 144320
+      labels:
+        - name: le
+          value: +Inf
+      type: untyped
 ---
 test case: 'A summary, which has a complex representation #1'
 in:
@@ -193,7 +340,11 @@ in:
   params: rpc_duration_seconds_sum
 out:
   result: SUCCEED
-  output: '[{"name":"rpc_duration_seconds_sum","value":"1.7560473e+07","line_raw":"rpc_duration_seconds_sum 1.7560473e+07","type":"untyped"}]'
+  metrics:
+    - name: rpc_duration_seconds_sum
+      value: 1.7560473e+07
+      line_raw: rpc_duration_seconds_sum 1.7560473e+07
+      type: untyped
 ---
 test case: 'A summary, which has a complex representation #2'
 in:
@@ -210,7 +361,15 @@ in:
   params: rpc_duration_seconds == 3272
 out:
   result: SUCCEED
-  output: '[{"name":"rpc_duration_seconds","value":"3272","line_raw":"rpc_duration_seconds{quantile=\"0.05\"} 3272","labels":{"quantile":"0.05"},"type":"summary","help":"A summary of the RPC duration in seconds."}]'
+  metrics:
+    - name: rpc_duration_seconds
+      value: 3272
+      line_raw: rpc_duration_seconds{quantile="0.05"} 3272
+      labels:
+        - name: quantile
+          value: 0.05
+      type: summary
+      help: A summary of the RPC duration in seconds.
 ---
 test case: 'Empty metric'
 in:
@@ -218,7 +377,7 @@ in:
   params: wmi_os_timezone
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Empty params'
 in:
@@ -226,7 +385,14 @@ in:
   params: ""
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_os_timezone","value":"1","line_raw":"wmi_os_timezone{timezone=\"MSK\"} 1","labels":{"timezone":"MSK"},"type":"untyped"}]'
+  metrics:
+    - name: wmi_os_timezone
+      value: 1
+      line_raw: wmi_os_timezone{timezone="MSK"} 1
+      labels:
+        - name: timezone
+          value: MSK
+      type: untyped
 ---
 test case: 'Empty metric and empty params'
 in:
@@ -234,7 +400,7 @@ in:
   params: ""
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Only spaces in metric'
 in:
@@ -249,7 +415,14 @@ in:
   params: '           '
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_os_timezone","value":"1","line_raw":"wmi_os_timezone{timezone=\"MSK\"} 1","labels":{"timezone":"MSK"},"type":"untyped"}]'
+  metrics:
+    - name: wmi_os_timezone
+      value: 1
+      line_raw: wmi_os_timezone{timezone="MSK"} 1
+      labels:
+        - name: timezone
+          value: MSK
+      type: untyped
 ---
 test case: 'Only spaces in params (multiline metric)'
 in:
@@ -264,7 +437,50 @@ in:
   params: '       '
 out:
   result: SUCCEED
-  output: '[{"name":"rpc_duration_seconds","value":"3102","line_raw":"rpc_duration_seconds{quantile=\"0.01\"} 3102","labels":{"quantile":"0.01"},"type":"untyped"},{"name":"rpc_duration_seconds","value":"3272","line_raw":"rpc_duration_seconds{quantile=\"0.05\"} 3272","labels":{"quantile":"0.05"},"type":"untyped"},{"name":"rpc_duration_seconds","value":"4773","line_raw":"rpc_duration_seconds{quantile=\"0.5\"} 4773","labels":{"quantile":"0.5"},"type":"untyped"},{"name":"rpc_duration_seconds","value":"9001","line_raw":"rpc_duration_seconds{quantile=\"0.9\"} 9001","labels":{"quantile":"0.9"},"type":"untyped"},{"name":"rpc_duration_seconds","value":"76656","line_raw":"rpc_duration_seconds{quantile=\"0.99\"} 76656","labels":{"quantile":"0.99"},"type":"untyped"},{"name":"rpc_duration_seconds_sum","value":"1.7560473e+07","line_raw":"rpc_duration_seconds_sum 1.7560473e+07","type":"untyped"},{"name":"rpc_duration_seconds_count","value":"2693","line_raw":"rpc_duration_seconds_count 2693","type":"untyped"}]'
+  metrics:
+    - name: rpc_duration_seconds
+      value: 3102
+      line_raw: rpc_duration_seconds{quantile="0.01"} 3102
+      labels:
+        - name: quantile
+          value: 0.01
+      type: untyped
+    - name: rpc_duration_seconds
+      value: 3272
+      line_raw: rpc_duration_seconds{quantile="0.05"} 3272
+      labels:
+        - name: quantile
+          value: 0.05
+      type: untyped
+    - name: rpc_duration_seconds
+      value: 4773
+      line_raw: rpc_duration_seconds{quantile="0.5"} 4773
+      labels:
+        - name: quantile
+          value: 0.5
+      type: untyped
+    - name: rpc_duration_seconds
+      value: 9001
+      line_raw: rpc_duration_seconds{quantile="0.9"} 9001
+      labels:
+        - name: quantile
+          value: 0.9
+      type: untyped
+    - name: rpc_duration_seconds
+      value: 76656
+      line_raw: rpc_duration_seconds{quantile="0.99"} 76656
+      labels:
+        - name: quantile
+          value: 0.99
+      type: untyped
+    - name: rpc_duration_seconds_sum
+      value: 1.7560473e+07
+      line_raw: rpc_duration_seconds_sum 1.7560473e+07
+      type: untyped
+    - name: rpc_duration_seconds_count
+      value: 2693
+      line_raw: rpc_duration_seconds_count 2693
+      type: untyped
 ---
 test case: 'Only spaces in metric and in params'
 in:
@@ -279,7 +495,7 @@ in:
   params: wmi_os_timezone
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Metric without value'
 in:
@@ -314,7 +530,7 @@ in:
   params: wmi_os_timezone
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Incorrect metric data (a space within)'
 in:
@@ -322,7 +538,7 @@ in:
   params: wmi_os_timezone
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Metric name with invalid characters included'
 in:
@@ -340,7 +556,7 @@ in:
   params: wmi_os_timezone
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Metric with a hash symbol only'
 in:
@@ -348,7 +564,7 @@ in:
   params: wmi_os_timezone
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Metric with an empty space only'
 in:
@@ -374,7 +590,17 @@ in:
   params: http_requests_total == 3
 out:
   result: SUCCEED
-  output: '[{"name":"http_requests_total","value":"3","line_raw":"http_requests_total{method=\"post\",code=\"-⃠\"} 3 1395066363000","labels":{"method":"post","code":"-⃠"},"type":"counter","help":"The total number of HTTP requests."}]'
+  metrics:
+    - name: http_requests_total
+      value: 3
+      line_raw: http_requests_total{method="post",code="-⃠"} 3 1395066363000
+      labels:
+        - name: method
+          value: post
+        - name: code
+          value: -⃠
+      type: counter
+      help: The total number of HTTP requests.
 ---
 test case: 'Metric with missing "{"'
 in:
@@ -382,7 +608,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Metric with missing "}"'
 in:
@@ -449,7 +675,14 @@ in:
   params: "cpu_usage_system{cpu=\"cpu\ntotal\"}"
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu\ntotal\"} 1.1940298507220641","labels":{"cpu":"cpu\ntotal"},"type":"untyped"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: "cpu_usage_system{cpu=\"cpu\ntotal\"} 1.1940298507220641"
+      labels:
+        - name: cpu
+          value: "cpu\ntotal"
+      type: untyped
 ---
 test case: 'Metric name and params holds new line character'
 in:
@@ -509,7 +742,25 @@ in:
   params: wmi_service_state{name="dhcp"} == 1
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_service_state","value":"1","line_raw":"wmi_service_state{name=\"dhcp\",state=\"running\"} 1","labels":{"name":"dhcp","state":"running"},"type":"untyped"},{"name":"wmi_service_state","value":"1","line_raw":"wmi_service_state{name=\"dhcp\",state=\"stopped\"} 1","labels":{"name":"dhcp","state":"stopped"},"type":"untyped"}]'
+  metrics:
+    - name: wmi_service_state
+      value: 1
+      line_raw: wmi_service_state{name="dhcp",state="running"} 1
+      labels:
+        - name: name
+          value: dhcp
+        - name: state
+          value: running
+      type: untyped
+    - name: wmi_service_state
+      value: 1
+      line_raw: wmi_service_state{name="dhcp",state="stopped"} 1
+      labels:
+        - name: name
+          value: dhcp
+        - name: state
+          value: stopped
+      type: untyped
 ---
 test case: 'Metric with "Nan" value'
 in:
@@ -517,7 +768,11 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_os_physical_memory_free_bytes","value":"Nan","line_raw":"wmi_os_physical_memory_free_bytes Nan","type":"untyped"}]'
+  metrics:
+    - name: wmi_os_physical_memory_free_bytes
+      value: Nan
+      line_raw: wmi_os_physical_memory_free_bytes Nan
+      type: untyped
 ---
 test case: 'Metric with "+Inf" value'
 in:
@@ -525,7 +780,11 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_os_physical_memory_free_bytes","value":"+Inf","line_raw":"wmi_os_physical_memory_free_bytes +Inf","type":"untyped"}]'
+  metrics:
+    - name: wmi_os_physical_memory_free_bytes
+      value: +Inf
+      line_raw: wmi_os_physical_memory_free_bytes +Inf
+      type: untyped
 ---
 test case: 'Metric with "-Inf" value'
 in:
@@ -533,7 +792,11 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_os_physical_memory_free_bytes","value":"-Inf","line_raw":"wmi_os_physical_memory_free_bytes -Inf","type":"untyped"}]'
+  metrics:
+    - name: wmi_os_physical_memory_free_bytes
+      value: -Inf
+      line_raw: wmi_os_physical_memory_free_bytes -Inf
+      type: untyped
 ---
 test case: 'Metric with "NAN" value'
 in:
@@ -541,7 +804,11 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_os_physical_memory_free_bytes","value":"NAN","line_raw":"wmi_os_physical_memory_free_bytes NAN","type":"untyped"}]'
+  metrics:
+    - name: wmi_os_physical_memory_free_bytes
+      value: NAN
+      line_raw: wmi_os_physical_memory_free_bytes NAN
+      type: untyped
 ---
 test case: 'Metric with timestamp'
 in:
@@ -549,7 +816,11 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_os_physical_memory_free_bytes","value":"8.492331008e+09","line_raw":"wmi_os_physical_memory_free_bytes 8.492331008e+09 25","type":"untyped"}]'
+  metrics:
+    - name: wmi_os_physical_memory_free_bytes
+      value: 8.492331008e+09
+      line_raw: wmi_os_physical_memory_free_bytes 8.492331008e+09 25
+      type: untyped
 ---
 test case: 'Metric with additional value after timestamp'
 in:
@@ -562,7 +833,15 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\"} 1.1940298507220641 25 66","labels":{"cpu":"cpu-total"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total"} 1.1940298507220641 25 66
+      labels:
+        - name: cpu
+          value: cpu-total
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Metric with negative timestamp'
 in:
@@ -570,7 +849,16 @@ in:
   params: http_requests_total
 out:
   result: SUCCEED
-  output: '[{"name":"http_requests_total","value":"1027","line_raw":"http_requests_total{method=\"post\",code=\"200\"} 1027 -123","labels":{"method":"post","code":"200"},"type":"untyped"}]'
+  metrics:
+    - name: http_requests_total
+      value: 1027
+      line_raw: http_requests_total{method="post",code="200"} 1027 -123
+      labels:
+        - name: method
+          value: post
+        - name: code
+          value: 200
+      type: untyped
 ---
 test case: 'Metric with negative value'
 in:
@@ -578,7 +866,16 @@ in:
   params: http_requests_total
 out:
   result: SUCCEED
-  output: '[{"name":"http_requests_total","value":"-1027","line_raw":"http_requests_total{method=\"post\",code=\"200\"} -1027","labels":{"method":"post","code":"200"},"type":"untyped"}]'
+  metrics:
+    - name: http_requests_total
+      value: -1027
+      line_raw: http_requests_total{method="post",code="200"} -1027
+      labels:
+        - name: method
+          value: post
+        - name: code
+          value: 200
+      type: untyped
 ---
 test case: 'Multilne metric with negative value'
 in:
@@ -591,7 +888,17 @@ in:
   params: '{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"-654","line_raw":"cpu_usage_system{cpu=\"cpu-total\",host=\"host1\"} -654","labels":{"cpu":"cpu-total","host":"host1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: -654
+      line_raw: cpu_usage_system{cpu="cpu-total",host="host1"} -654
+      labels:
+        - name: cpu
+          value: cpu-total
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'The __name__ identifier is specified as last in params #1'
 in:
@@ -604,7 +911,17 @@ in:
   params: '{cpu="cpu-total",__name__="cpu_usage_system"}'
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\",host=\"host1\"} 1.1940298507220641","labels":{"cpu":"cpu-total","host":"host1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'The __name__ identifier is specified as last in params #2'
 in:
@@ -617,7 +934,17 @@ in:
   params: '{cpu=~"cpu-tot.+",__name__=~"cpu_usage_syst.+"}'
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\",host=\"host1\"} 1.1940298507220641","labels":{"cpu":"cpu-total","host":"host1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Params set to cpu_usage_system{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
 in:
@@ -680,7 +1007,15 @@ in:
   params: cpu_usage_system{cpu="cpu-total"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\"} 1.1940298507220641","labels":{"cpu":"cpu-total"},"type":"something","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+      type: something
+      help: Telegraf collected metric
 ---
 test case: 'Metric with only one argument for TYPE'
 in:
@@ -712,7 +1047,11 @@ in:
   params: wmi_os_physical_memory_free_bytes
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_os_physical_memory_free_bytes","value":"8.492331008e+09","line_raw":"wmi_os_physical_memory_free_bytes            8.492331008e+09","type":"untyped"}]'
+  metrics:
+    - name: wmi_os_physical_memory_free_bytes
+      value: 8.492331008e+09
+      line_raw: wmi_os_physical_memory_free_bytes            8.492331008e+09
+      type: untyped
 ---
 test case: 'Metric with no description after HELP'
 in:
@@ -738,7 +1077,11 @@ in:
   params: AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789
 out:
   result: SUCCEED
-  output: '[{"name":"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789","value":"1","line_raw":"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789 1","type":"untyped"}]'
+  metrics:
+    - name: AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789
+      value: 1
+      line_raw: AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789 1
+      type: untyped
 ---
 test case: 'Label name consists of all valid characters'
 in:
@@ -746,7 +1089,14 @@ in:
   params: cpu_usage_system == 1
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1","line_raw":"cpu_usage_system{AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789=\"test\"} 1","labels":{"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789":"test"},"type":"untyped"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1
+      line_raw: cpu_usage_system{AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789="test"} 1
+      labels:
+        - name: AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789
+          value: test
+      type: untyped
 ---
 test case: 'Params with regular expression but without prefix "~"'
 in:
@@ -759,7 +1109,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=".*"}
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Wrong regular expression in params'
 in:
@@ -772,7 +1122,7 @@ in:
   params: cpu_usage_system{cpu="cpu-total",host=~"[0-9"}
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Incorrect identifier __cpu__ set in params #1'
 in:
@@ -785,7 +1135,7 @@ in:
   params: '{__name__="cpu_usage_system",__cpu__="cpu-total"}'
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Incorrect identifier __cpu__ set in params #2'
 in:
@@ -798,7 +1148,7 @@ in:
   params: '{__name__=~"cpu_usage_syst.+",__cpu__=~"cpu-tot.+"}'
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Incorrect float in metric value'
 in:
@@ -818,7 +1168,31 @@ in:
   params: '{}'
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cputotal\"} 1.1940298507220641","labels":{"cpu":"cputotal"},"type":"gauge","help":"Telegraf collected metric"},{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu0\"} 1.1940298507220641","labels":{"cpu":"cpu0"},"type":"gauge","help":"Telegraf collected metric"},{"name":"cpu_usage_system","value":"1.1340298507220641","line_raw":"cpu_usage_system{cpu=\"cpu1\"} 1.1340298507220641","labels":{"cpu":"cpu1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cputotal"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cputotal
+      type: gauge
+      help: Telegraf collected metric
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu0
+      type: gauge
+      help: Telegraf collected metric
+    - name: cpu_usage_system
+      value: 1.1340298507220641
+      line_raw: cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+      labels:
+        - name: cpu
+          value: cpu1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Params set to "a{}"'
 in:
@@ -831,7 +1205,31 @@ in:
   params: a{}
 out:
   result: SUCCEED
-  output: '[{"name":"a","value":"1.1940298507220641","line_raw":"a{cpu=\"cputotal\"} 1.1940298507220641","labels":{"cpu":"cputotal"},"type":"gauge","help":"Telegraf collected metric"},{"name":"a","value":"1.1940298507220641","line_raw":"a{cpu=\"cpu0\"} 1.1940298507220641","labels":{"cpu":"cpu0"},"type":"gauge","help":"Telegraf collected metric"},{"name":"a","value":"1.1340298507220641","line_raw":"a{cpu=\"cpu1\"} 1.1340298507220641","labels":{"cpu":"cpu1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: a
+      value: 1.1940298507220641
+      line_raw: a{cpu="cputotal"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cputotal
+      type: gauge
+      help: Telegraf collected metric
+    - name: a
+      value: 1.1940298507220641
+      line_raw: a{cpu="cpu0"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu0
+      type: gauge
+      help: Telegraf collected metric
+    - name: a
+      value: 1.1340298507220641
+      line_raw: a{cpu="cpu1"} 1.1340298507220641
+      labels:
+        - name: cpu
+          value: cpu1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Metric data contains "{}" only'
 in:
@@ -849,7 +1247,15 @@ in:
   params: wmi_os_timezone{timezone="MSK"} == -1
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_os_timezone","value":"-1","line_raw":"wmi_os_timezone{timezone=\"MSK\"} -1","labels":{"timezone":"MSK"},"type":"gauge","help":"OperatingSystem.LocalDateTime"}]'
+  metrics:
+    - name: wmi_os_timezone
+      value: -1
+      line_raw: wmi_os_timezone{timezone="MSK"} -1
+      labels:
+        - name: timezone
+          value: MSK
+      type: gauge
+      help: OperatingSystem.LocalDateTime
 ---
 test case: 'Get metric value using regular expression for date (mm/dd/yyyy) #1'
 in:
@@ -859,7 +1265,29 @@ in:
   params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"}
 out:
   result: SUCCEED
-  output: '[{"name":"random_date","value":"1","line_raw":"random_date{year=\"2019\",month=\"february\",day=\"02/12/2019\"} 1","labels":{"year":"2019","month":"february","day":"02/12/2019"},"type":"untyped"},{"name":"random_date","value":"2","line_raw":"random_date{year=\"2019\",month=\"march\",day=\"03/07/2019\"} 2","labels":{"year":"2019","month":"march","day":"03/07/2019"},"type":"untyped"}]'
+  metrics:
+    - name: random_date
+      value: 1
+      line_raw: random_date{year="2019",month="february",day="02/12/2019"} 1
+      labels:
+        - name: year
+          value: 2019
+        - name: month
+          value: february
+        - name: day
+          value: 02/12/2019
+      type: untyped
+    - name: random_date
+      value: 2
+      line_raw: random_date{year="2019",month="march",day="03/07/2019"} 2
+      labels:
+        - name: year
+          value: 2019
+        - name: month
+          value: march
+        - name: day
+          value: 03/07/2019
+      type: untyped
 ---
 test case: 'Get metric value using regular expression for date (mm/dd/yyyy) #2'
 in:
@@ -869,7 +1297,18 @@ in:
   params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"} == 2
 out:
   result: SUCCEED
-  output: '[{"name":"random_date","value":"2","line_raw":"random_date{year=\"2019\",month=\"march\",day=\"03/07/2019\"} 2","labels":{"year":"2019","month":"march","day":"03/07/2019"},"type":"untyped"}]'
+  metrics:
+    - name: random_date
+      value: 2
+      line_raw: random_date{year="2019",month="march",day="03/07/2019"} 2
+      labels:
+        - name: year
+          value: 2019
+        - name: month
+          value: march
+        - name: day
+          value: 03/07/2019
+      type: untyped
 ---
 test case: 'Get metric value using regular expression for date (mm/dd/yyyy) #3'
 in:
@@ -879,7 +1318,7 @@ in:
   params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"} == 2
 out:
   result: SUCCEED
-  output: '[]'
+  output_raw: '[]'
 ---
 test case: 'Missing "==" in params'
 in:
@@ -900,7 +1339,25 @@ in:
   params: some_user{country="lv",addr=~"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"}
 out:
   result: SUCCEED
-  output: '[{"name":"some_user","value":"1","line_raw":"some_user{country=\"lv\",addr=\"user1@domain.com\"} 1","labels":{"country":"lv","addr":"user1@domain.com"},"type":"untyped"},{"name":"some_user","value":"2","line_raw":"some_user{country=\"lv\",addr=\"user2@domain.org\"} 2","labels":{"country":"lv","addr":"user2@domain.org"},"type":"untyped"}]'
+  metrics:
+    - name: some_user
+      value: 1
+      line_raw: some_user{country="lv",addr="user1@domain.com"} 1
+      labels:
+        - name: country
+          value: lv
+        - name: addr
+          value: user1@domain.com
+      type: untyped
+    - name: some_user
+      value: 2
+      line_raw: some_user{country="lv",addr="user2@domain.org"} 2
+      labels:
+        - name: country
+          value: lv
+        - name: addr
+          value: user2@domain.org
+      type: untyped
 ---
 test case: 'Label value and params hold "{"'
 in:
@@ -908,7 +1365,14 @@ in:
   params: cpu_usage_system{cpu="cpu{total"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu{total\"} 1.1940298507220641","labels":{"cpu":"cpu{total"},"type":"untyped"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu{total"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu{total
+      type: untyped
 ---
 test case: 'Label value and params hold "{}"'
 in:
@@ -916,7 +1380,14 @@ in:
   params: cpu_usage_system{cpu="cpu{}total"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu{}total\"} 1.1940298507220641","labels":{"cpu":"cpu{}total"},"type":"untyped"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu{}total"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu{}total
+      type: untyped
 ---
 test case: 'Label value and params hold "}"'
 in:
@@ -924,7 +1395,14 @@ in:
   params: cpu_usage_system{cpu="cpu}total"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu}total\"} 1.1940298507220641","labels":{"cpu":"cpu}total"},"type":"untyped"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu}total"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu}total
+      type: untyped
 ---
 test case: 'Label value and params hold ","'
 in:
@@ -932,7 +1410,14 @@ in:
   params: important_metric{important_number="42,0"}
 out:
   result: SUCCEED
-  output: '[{"name":"important_metric","value":"42","line_raw":"important_metric{important_number=\"42,0\"} 42","labels":{"important_number":"42,0"},"type":"untyped"}]'
+  metrics:
+    - name: important_metric
+      value: 42
+      line_raw: important_metric{important_number="42,0"} 42
+      labels:
+        - name: important_number
+          value: 42,0
+      type: untyped
 ---
 test case: 'Metric with five values'
 in:
@@ -940,7 +1425,14 @@ in:
   params: cpu_usage_system{cpu="cputotal"} == 1.1940298507220641
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cputotal\"} 1.1940298507220641 2.23443 333 four five","labels":{"cpu":"cputotal"},"type":"untyped"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cputotal"} 1.1940298507220641 2.23443 333 four five
+      labels:
+        - name: cpu
+          value: cputotal
+      type: untyped
 ---
 test case: 'Different metrics under one header #1'
 in:
@@ -954,7 +1446,17 @@ in:
   params: cpu_usage_system{cpu="cpu1",host=~".*"}
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1340298507220641","line_raw":"cpu_usage_system{cpu=\"cpu1\",host=\"host3\"} 1.1340298507220641","labels":{"cpu":"cpu1","host":"host3"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1340298507220641
+      line_raw: cpu_usage_system{cpu="cpu1",host="host3"} 1.1340298507220641
+      labels:
+        - name: cpu
+          value: cpu1
+        - name: host
+          value: host3
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Different metrics under one header #2'
 in:
@@ -968,7 +1470,26 @@ in:
   params: '{host="host2"}'
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu0\",host=\"host2\"} 1.1940298507220641","labels":{"cpu":"cpu0","host":"host2"},"type":"gauge","help":"Telegraf collected metric"},{"name":"wmi_os_timezone","value":"1","line_raw":"wmi_os_timezone{timezone=\"MSK\",host=\"host2\"} 1","labels":{"timezone":"MSK","host":"host2"},"type":"untyped"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu0
+        - name: host
+          value: host2
+      type: gauge
+      help: Telegraf collected metric
+    - name: wmi_os_timezone
+      value: 1
+      line_raw: wmi_os_timezone{timezone="MSK",host="host2"} 1
+      labels:
+        - name: timezone
+          value: MSK
+        - name: host
+          value: host2
+      type: untyped
 ---
 test case: 'Different metrics under one header #3'
 in:
@@ -983,7 +1504,26 @@ in:
   params: '{host="host2"}'
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu0\",host=\"host2\"} 1.1940298507220641","labels":{"cpu":"cpu0","host":"host2"},"type":"gauge","help":"Telegraf collected metric"},{"name":"wmi_os_timezone","value":"1","line_raw":"wmi_os_timezone{timezone=\"MSK\",host=\"host2\"} 1","labels":{"timezone":"MSK","host":"host2"},"type":"untyped"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu0
+        - name: host
+          value: host2
+      type: gauge
+      help: Telegraf collected metric
+    - name: wmi_os_timezone
+      value: 1
+      line_raw: wmi_os_timezone{timezone="MSK",host="host2"} 1
+      labels:
+        - name: timezone
+          value: MSK
+        - name: host
+          value: host2
+      type: untyped
 ---
 test case: 'Metrics of different type #1'
 in:
@@ -1000,7 +1540,17 @@ in:
   params: http_requests_total == 3
 out:
   result: SUCCEED
-  output: '[{"name":"http_requests_total","value":"3","line_raw":"http_requests_total{method=\"post\",code=\"400\"}    3 1395066363000","labels":{"method":"post","code":"400"},"type":"counter","help":"The total number of HTTP requests."}]'
+  metrics:
+    - name: http_requests_total
+      value: 3
+      line_raw: http_requests_total{method="post",code="400"}    3 1395066363000
+      labels:
+        - name: method
+          value: post
+        - name: code
+          value: 400
+      type: counter
+      help: The total number of HTTP requests.
 ---
 test case: 'Metrics of different type #2'
 in:
@@ -1017,7 +1567,27 @@ in:
   params: '{__name__=~".*"} == 1027'
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1027","line_raw":"cpu_usage_system{cpu=\"cpu1\",host=\"host1\"} 1027","labels":{"cpu":"cpu1","host":"host1"},"type":"gauge","help":"Telegraf collected metric"},{"name":"http_requests_total","value":"1027","line_raw":"http_requests_total{method=\"post\",code=\"200\"} 1027 1395066363000","labels":{"method":"post","code":"200"},"type":"counter","help":"The total number of HTTP requests."}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1027
+      line_raw: cpu_usage_system{cpu="cpu1",host="host1"} 1027
+      labels:
+        - name: cpu
+          value: cpu1
+        - name: host
+          value: host1
+      type: gauge
+      help: Telegraf collected metric
+    - name: http_requests_total
+      value: 1027
+      line_raw: http_requests_total{method="post",code="200"} 1027 1395066363000
+      labels:
+        - name: method
+          value: post
+        - name: code
+          value: 200
+      type: counter
+      help: The total number of HTTP requests.
 ---
 test case: 'Metrics of different type #3'
 in:
@@ -1034,7 +1604,43 @@ in:
   params: '{prio="normal"}'
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\",host=\"host1\",prio=\"normal\"} 1.1940298507220641","labels":{"cpu":"cpu-total","host":"host1","prio":"normal"},"type":"gauge","help":"Telegraf collected metric"},{"name":"cpu_usage_system","value":"1027","line_raw":"cpu_usage_system{cpu=\"cpu1\",host=\"host1\",prio=\"normal\"} 1027","labels":{"cpu":"cpu1","host":"host1","prio":"normal"},"type":"gauge","help":"Telegraf collected metric"},{"name":"http_requests_total","value":"3","line_raw":"http_requests_total{method=\"post\",code=\"400\",prio=\"normal\"}    3 1395066363000","labels":{"method":"post","code":"400","prio":"normal"},"type":"counter","help":"The total number of HTTP requests."}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total",host="host1",prio="normal"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+        - name: host
+          value: host1
+        - name: prio
+          value: normal
+      type: gauge
+      help: Telegraf collected metric
+    - name: cpu_usage_system
+      value: 1027
+      line_raw: cpu_usage_system{cpu="cpu1",host="host1",prio="normal"} 1027
+      labels:
+        - name: cpu
+          value: cpu1
+        - name: host
+          value: host1
+        - name: prio
+          value: normal
+      type: gauge
+      help: Telegraf collected metric
+    - name: http_requests_total
+      value: 3
+      line_raw: http_requests_total{method="post",code="400",prio="normal"}    3 1395066363000
+      labels:
+        - name: method
+          value: post
+        - name: code
+          value: 400
+        - name: prio
+          value: normal
+      type: counter
+      help: The total number of HTTP requests.
 ---
 test case: 'Get metric value using params: cpu_usage_system'
 in:
@@ -1047,7 +1653,31 @@ in:
   params: cpu_usage_system
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu-total\"} 1.1940298507220641","labels":{"cpu":"cpu-total"},"type":"gauge","help":"Telegraf collected metric"},{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu0\"} 1.1940298507220641","labels":{"cpu":"cpu0"},"type":"gauge","help":"Telegraf collected metric"},{"name":"cpu_usage_system","value":"1.1340298507220641","line_raw":"cpu_usage_system{cpu=\"cpu1\"} 1.1340298507220641","labels":{"cpu":"cpu1"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu-total
+      type: gauge
+      help: Telegraf collected metric
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu0
+      type: gauge
+      help: Telegraf collected metric
+    - name: cpu_usage_system
+      value: 1.1340298507220641
+      line_raw: cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+      labels:
+        - name: cpu
+          value: cpu1
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Different metrics #1'
 in:
@@ -1061,7 +1691,26 @@ in:
   params: '{host="host2"}'
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_os_timezone","value":"1","line_raw":"wmi_os_timezone{timezone=\"MSK\",host=\"host2\"} 1","labels":{"timezone":"MSK","host":"host2"},"type":"untyped"},{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu0\",host=\"host2\"} 1.1940298507220641","labels":{"cpu":"cpu0","host":"host2"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: wmi_os_timezone
+      value: 1
+      line_raw: wmi_os_timezone{timezone="MSK",host="host2"} 1
+      labels:
+        - name: timezone
+          value: MSK
+        - name: host
+          value: host2
+      type: untyped
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu0
+        - name: host
+          value: host2
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Different metrics #2'
 in:
@@ -1076,7 +1725,26 @@ in:
   params: '{host="host2"}'
 out:
   result: SUCCEED
-  output: '[{"name":"wmi_os_timezone","value":"1","line_raw":"wmi_os_timezone{timezone=\"MSK\",host=\"host2\"} 1","labels":{"timezone":"MSK","host":"host2"},"type":"untyped"},{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system{cpu=\"cpu0\",host=\"host2\"} 1.1940298507220641","labels":{"cpu":"cpu0","host":"host2"},"type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: wmi_os_timezone
+      value: 1
+      line_raw: wmi_os_timezone{timezone="MSK",host="host2"} 1
+      labels:
+        - name: timezone
+          value: MSK
+        - name: host
+          value: host2
+      type: untyped
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system{cpu="cpu0",host="host2"} 1.1940298507220641
+      labels:
+        - name: cpu
+          value: cpu0
+        - name: host
+          value: host2
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Invalid HELP hint'
 in:
@@ -1101,7 +1769,12 @@ in:
   params: '{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system 1.1940298507220641","type":"gauge","help":"Telegraf \\/ collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system 1.1940298507220641
+      type: gauge
+      help: Telegraf \/ collected metric
 ---
 test case: 'Test HELP hint trailing whitespace removal'
 in:
@@ -1109,7 +1782,12 @@ in:
   params: '{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
 out:
   result: SUCCEED
-  output: '[{"name":"cpu_usage_system","value":"1.1940298507220641","line_raw":"cpu_usage_system 1.1940298507220641","type":"gauge","help":"Telegraf collected metric"}]'
+  metrics:
+    - name: cpu_usage_system
+      value: 1.1940298507220641
+      line_raw: cpu_usage_system 1.1940298507220641
+      type: gauge
+      help: Telegraf collected metric
 ---
 test case: 'Test HELP hint unescaping'
 in:
@@ -1117,5 +1795,27 @@ in:
   params: ''
 out:
   result: SUCCEED
-  output: '[{"name":"alertmanager_alerts","value":"4","line_raw":"alertmanager_alerts{instance=\"demo.robustperception.io:9093\",job=\"alertmanager\",state=\"active\"} 4","labels":{"instance":"demo.robustperception.io:9093","job":"alertmanager","state":"active"},"type":"untyped"},{"name":"alertmanager_alerts","value":"5","line_raw":"alertmanager_alerts{instance=\"demo.robustperception.io:9093\",job=\"alertmanager\",state=\"active\"} 5","labels":{"instance":"demo.robustperception.io:9093","job":"alertmanager","state":"active"},"type":"untyped"}]'
+  metrics:
+    - name: alertmanager_alerts
+      value: 4
+      line_raw: alertmanager_alerts{instance="demo.robustperception.io:9093",job="alertmanager",state="active"} 4
+      labels:
+        - name: instance
+          value: demo.robustperception.io:9093
+        - name: job
+          value: alertmanager
+        - name: state
+          value: active
+      type: untyped
+    - name: alertmanager_alerts
+      value: 5
+      line_raw: alertmanager_alerts{instance="demo.robustperception.io:9093",job="alertmanager",state="active"} 5
+      labels:
+        - name: instance
+          value: demo.robustperception.io:9093
+        - name: job
+          value: alertmanager
+        - name: state
+          value: active
+      type: untyped
 ...
