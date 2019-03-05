@@ -924,9 +924,8 @@ static int	condition_match_key_value(const zbx_prometheus_condition_t *condition
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	condition_match_metric_value(const zbx_prometheus_condition_t *condition, const char *value)
+static int	condition_match_metric_value(const char *pattern, const char *value)
 {
-	const char	*pattern = condition->pattern;
 	char		buffer[8];
 	size_t		len;
 
@@ -938,7 +937,7 @@ static int	condition_match_metric_value(const zbx_prometheus_condition_t *condit
 
 	len = strlen(value);
 
-	if (0 == strcmp(condition->pattern, "nan"))
+	if (0 == strcmp(pattern, "nan"))
 	{
 		if (ZBX_CONST_STRLEN("nan") != len)
 			return FAIL;
@@ -949,7 +948,7 @@ static int	condition_match_metric_value(const zbx_prometheus_condition_t *condit
 		return (0 == strcmp(buffer, "nan") ? SUCCEED : FAIL);
 	}
 
-	if (0 == strcmp(condition->pattern, "inf"))
+	if (0 == strcmp(pattern, "inf"))
 	{
 		if (ZBX_CONST_STRLEN("inf") != len)
 			return FAIL;
@@ -1139,7 +1138,7 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 
 	if (NULL != filter->value)
 	{
-		if (SUCCEED != (match = condition_match_metric_value(filter->value, row->value)))
+		if (SUCCEED != (match = condition_match_metric_value(filter->value->pattern, row->value)))
 			goto out;
 	}
 
