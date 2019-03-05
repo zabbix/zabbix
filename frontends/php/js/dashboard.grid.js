@@ -238,36 +238,36 @@
 	/**
 	 * Rearrange widgets on drag operation.
 	 *
-	 * @param {array}  widgets  Array of widget objects.
-	 * @param {object} widget   Moved widget object.
+	 * @param {array}  widgets   Array of widget objects.
+	 * @param {object} widget    Moved widget object.
+	 * @param {number} max_rows
+	 *
+	 * @returns {boolean}
 	 */
 	function realignWidget(widgets, widget, max_rows) {
 		var overflow = false,
 			realign = function(widgets, widget, allow_reorder) {
-			var next = [];
+				var next = [];
 
-			widgets.forEach(function(w) {
-				if (widget.uniqueid !== w.uniqueid) {
-					if (rectOverlap(widget.current_pos, w.current_pos)
-						|| (!allow_reorder && 'affected_by_id' in w && w.affected_by_id === widget.uniqueid)
-					) {
-						w.current_pos.y = Math.max(w.current_pos.y, widget.current_pos.y + widget.current_pos.height);
-						next.push(w);
-						overflow = overflow || (w.current_pos.y + w.current_pos.height) > max_rows;
+				widgets.forEach(function(w) {
+					if (widget.uniqueid !== w.uniqueid && !overflow) {
+						if (rectOverlap(widget.current_pos, w.current_pos)
+								|| (!allow_reorder && 'affected_by_id' in w && w.affected_by_id === widget.uniqueid)) {
+							w.current_pos.y = Math.max(w.current_pos.y,
+								widget.current_pos.y + widget.current_pos.height
+							);
+							next.push(w);
+							overflow = (overflow || (w.current_pos.y + w.current_pos.height) > max_rows);
+						}
 					}
-				}
+				});
 
-				if (overflow) {
-					return;
-				}
-			});
-
-			next.forEach(function(widget) {
-				if (!overflow) {
-					realign(widgets, widget, false);
-				}
-			});
-		}
+				next.forEach(function(widget) {
+					if (!overflow) {
+						realign(widgets, widget, false);
+					}
+				});
+			};
 
 		widgets.each(function(w) {
 			if (widget.uniqueid !== w.uniqueid && !overflow) {
@@ -783,7 +783,7 @@
 	/**
 	 * User action handler for resize of widget.
 	 *
-	 * @param {object} $obj  Dasboard DOM element.
+	 * @param {object} $obj  Dashboard DOM element.
 	 * @param {object} $div  Widget DOM element.
 	 * @param {object} data  Dashboard data object.
 	 */
@@ -830,7 +830,7 @@
 			overflow = realignWidget(data['widgets'], widget, data.options['max-rows']);
 
 			if (overflow) {
-				// restore last non overflow position.
+				// restore last non-overflow position
 				data.widgets.each(function(w) {
 					w.current_pos = $.extend({}, data.undo_pos[w.uniqueid]);
 				});
@@ -862,7 +862,7 @@
 	}
 
 	function stopWidgetPositioning($obj, $div, data) {
-		var	widget = getWidgetByTarget(data['widgets'], $div);
+		var widget = getWidgetByTarget(data['widgets'], $div);
 
 		data['placeholder'].hide();
 		data['pos-action'] = '';

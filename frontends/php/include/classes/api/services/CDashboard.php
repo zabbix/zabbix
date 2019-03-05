@@ -34,6 +34,8 @@ class CDashboard extends CApiService {
 	/**
 	 * @param array $options
 	 *
+	 * @throws APIException if the input is invalid.
+	 *
 	 * @return array|int
 	 */
 	public function get(array $options = []) {
@@ -134,9 +136,8 @@ class CDashboard extends CApiService {
 			if ($options['countOutput']) {
 				return $row['rowscount'];
 			}
-			else {
-				$db_dashboards[$row['dashboardid']] = $row;
-			}
+
+			$db_dashboards[$row['dashboardid']] = $row;
 		}
 
 		if ($db_dashboards) {
@@ -576,9 +577,9 @@ class CDashboard extends CApiService {
 	}
 
 	/**
-	 * Rweturns widget field name by field type.
+	 * Returns widget field name by field type.
 	 *
-	 * @return string
+	 * @return array
 	 */
 	private static function getFieldNamesByType() {
 		return [
