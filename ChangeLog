@@ -3,6 +3,7 @@ Changes for 4.2.0rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15648] removed unused WIDGET_HAT_EVENTACTIONMCMDS and WIDGET_HAT_EVENTACTIONMSGS constants (agriscenko)
 A.F....... [ZBX-15386] fixed Trigger overview not showing OK triggers (vasilijs)
 A.F....... [ZBX-14538] fixed error message when value of lifetime or history/trends storage period is out of range (agriscenko)
 A.F....... [ZBX-15614] fixed validation of y axis item on classic graph create and update (agriscenko)
