@@ -511,7 +511,7 @@ ul.top-nav-icons {
 
 .header-title {
 	border-bottom: 1px solid $ui-border-color;
-	margin-top: -10px;
+	margin: -10px 0 10px;
 	padding: 10px 0 6px;
 	width: 100%;
 
@@ -658,11 +658,15 @@ article {
 // Breadcrumbs inline with filter block
 .filter-breadcrumb {
 	display: inline-block;
+	padding-top: 0;
 	z-index: 3;
+	max-width: calc(100vw - 200px);
 
 	li {
 		line-height: 14px;
 		vertical-align: top;
+		float: none;
+		display: inline-block;
 
 		.status-container {
 			padding-top: 3px;
@@ -674,6 +678,7 @@ article {
 			padding: 4px 7px 0;
 
 			a {
+				display: inline-block;
 				max-width: 200px;
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -687,7 +692,6 @@ article {
 	}
 
 	> li:first-child {
-		float: left;
 		white-space: nowrap;
 	}
 
@@ -4408,6 +4412,10 @@ $form-icon-btn: (
 			float: left;
 			display: block;
 		}
+	}
+
+	.header {
+		margin: 0 0 10px 3px;
 	}
 }
 
