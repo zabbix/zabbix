@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+..F....... [ZBX-15719] fixed undefined index in trigger expression popup (Ivo)
 ..F....... [ZBX-15332] fixed dashboard svg graph update on timeselector interval change (gcalenko)
 ...G...... [ZBX-15728] fixed agent startup problem in Win 2008 R2 w/o SP1, removed dependency on version helper API (kalimulin)
 ..F....... [ZBX-15622] fixed trigger expression test dialog not being usable with long trigger expressions (talbergs)
