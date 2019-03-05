@@ -3,6 +3,7 @@ Changes for 4.2.0rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15226] fixed missing visual gap under page title (gcalenko)
 ..F....... [ZBX-15560] fixed incorrect URL argument formatting when parameters are non-indexed arrays (Ivo)
 ..F....... [ZBX-15719] fixed undefined index in trigger expression popup (Ivo)
 ..F....... [ZBX-15332] fixed dashboard svg graph update on timeselector interval change (gcalenko)
