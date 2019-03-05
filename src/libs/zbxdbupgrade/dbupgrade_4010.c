@@ -223,6 +223,34 @@ static int	DBpatch_4010023(void)
 	return DBcreate_index("proxy_dhistory", "proxy_dhistory_2", "druleid", 0);
 }
 
+static int	DBpatch_4010024(void)
+{
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='proxy_history'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("insert into ids values ('proxy_history','history_lastid',"
+			"(select max(id) from proxy_history))"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4010025(void)
+{
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update hosts set status=1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4010)
@@ -252,5 +280,7 @@ DBPATCH_ADD(4010020, 0, 1)
 DBPATCH_ADD(4010021, 0, 1)
 DBPATCH_ADD(4010022, 0, 1)
 DBPATCH_ADD(4010023, 0, 1)
+DBPATCH_ADD(4010024, 0, 1)
+DBPATCH_ADD(4010025, 0, 1)
 
 DBPATCH_END()
