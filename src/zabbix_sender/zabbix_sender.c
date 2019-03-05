@@ -661,7 +661,7 @@ static int	sender_add_serveractive_host_cb(const char *host, unsigned short port
 #if defined(_WINDOWS)
 	if (MAXIMUM_WAIT_OBJECTS < destinations_count)
 	{
-		zbx_error("error parsing the \"ServerActive\" parameter: maximum destinations limit of %d has been"
+		zbx_error("error parsing the \"ServerActive\" parameter: maximum destination limit of %d has been"
 				" exceeded", MAXIMUM_WAIT_OBJECTS);
 		exit(EXIT_FAILURE);
 	}
