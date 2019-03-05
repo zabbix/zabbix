@@ -3,6 +3,7 @@ Changes for 4.2.0rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-14538] fixed error message when value of lifetime or history/trends storage period is out of range (agriscenko)
 A.F....... [ZBX-15614] fixed validation of y axis item on classic graph create and update (agriscenko)
 ..F....... [ZBX-15226] fixed missing visual gap under page title (gcalenko)
 ..F....... [ZBX-15560] fixed incorrect URL argument formatting when parameters are non-indexed arrays (Ivo)
