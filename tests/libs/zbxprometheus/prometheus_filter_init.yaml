@@ -114,7 +114,7 @@ out:
     pattern: sensor
     op: =
   value:
-    pattern: Nan
+    pattern: nan
     op: ==
 ---
 test case: sensor == +Nan
@@ -132,7 +132,7 @@ out:
     pattern: sensor
     op: =
   value:
-    pattern: +Inf
+    pattern: +inf
     op: ==
 ---
 test case: sensor == -.1
@@ -316,7 +316,7 @@ out:
     pattern: sensor
     op: =
   value:
-    pattern: NAN
+    pattern: nan
     op: ==
 ---
 test case: sensor == nan
@@ -340,7 +340,7 @@ out:
     pattern: sensor
     op: =
   value:
-    pattern: NaN
+    pattern: nan
     op: ==
 ---
 test case: sensor == nAn
@@ -352,7 +352,7 @@ out:
     pattern: sensor
     op: =
   value:
-    pattern: nAn
+    pattern: nan
     op: ==
 ---
 test case: sensor == +INF
@@ -364,7 +364,7 @@ out:
     pattern: sensor
     op: =
   value:
-    pattern: +INF
+    pattern: +inf
     op: ==
 ---
 test case: sensor == -inf
@@ -388,7 +388,7 @@ out:
     pattern: sensor
     op: =
   value:
-    pattern: InF
+    pattern: inf
     op: ==
 ---
 test case: sensor == iNf
@@ -400,7 +400,7 @@ out:
     pattern: sensor
     op: =
   value:
-    pattern: iNf
+    pattern: inf
     op: ==
 ...
 

@@ -1508,4 +1508,203 @@ in:
   value_type: ""
 out:
   result: FAIL
+---
+test case: 'Apply INF metric filter on multiple inf values'
+in:
+  data: |
+    apache{state="red"} Inf
+    apache{state="yellow"} 0
+    apache{state="green"} inf
+  params: apache == INF
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Apply INF metric filter on multiple inf values (2)'
+in:
+  data: |
+    apache{state="red"} Inf
+    apache{state="yellow"} 0
+    apache{state="green"} +inf
+  params: apache == INF
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Apply INF metric filter on multiple nan values '
+in:
+  data: |
+    apache{state="red"} NaN
+    apache{state="yellow"} 0
+    apache{state="green"} nan
+  params: apache == NAN
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Apply INF metric filter on matching inf value'
+in:
+  data: |
+    apache{state="red"} Inf
+    apache{state="yellow"} 0
+    apache{state="green"} 0
+  params: apache == INF
+  value_type: state
+out:
+  result: SUCCEED
+  output: red
+---
+test case: 'Apply INF metric filter on matching inf value (2)'
+in:
+  data: |
+    apache{state="red"} Inf
+    apache{state="yellow"} 0
+    apache{state="green"} 0
+  params: apache == +INF
+  value_type: state
+out:
+  result: SUCCEED
+  output: red
+---
+test case: 'Apply INF metric filter on matching inf value (3)'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} -Inf
+    apache{state="green"} 0
+  params: apache == -INF
+  value_type: state
+out:
+  result: SUCCEED
+  output: yellow
+---
+test case: 'Apply INF metric filter on matching nan value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} NaN
+  params: apache == NAN
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply 1 metric filter on 1.0 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} 1.0
+  params: apache == 1
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply 10 metric filter on 1e1 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} 1e1
+  params: apache == 10
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply 125 metric filter on 1.25e2 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} 1.25e2
+  params: apache == 125
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply 00.0100 metric filter on 1e-2 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} 1e-2
+  params: apache == 00.0100
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply 125 metric filter on multiple matching values'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 1.25e2
+    apache{state="green"} 12500e-2
+  params: apache == 125
+  value_type: state
+out:
+  result: FAIL
+---
+test case: 'Apply 1 metric filter on +1 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} +1
+  params: apache == 1
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply +1 metric filter on +1 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} +1
+  params: apache == +1
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply +1 metric filter on 1 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} 1
+  params: apache == +1
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply +1 metric filter on -1 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} -1
+  params: apache == +1
+  value_type: state
+out:
+  result: FAIL
+---
+test case: 'Apply -1 metric filter on +1 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} +1
+  params: apache == -1
+  value_type: state
+out:
+  result: FAIL
 ...
+

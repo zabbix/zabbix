@@ -827,6 +827,7 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 
 		filter->value = prometheus_condition_create(NULL, str_loc_dup(data, &loc_value),
 				ZBX_PROMETHEUS_CONDITION_OP_EQUAL_VALUE);
+		zbx_strlower(filter->value->pattern);
 	}
 
 	ret = SUCCEED;
@@ -905,6 +906,62 @@ static int	condition_match_key_value(const zbx_prometheus_condition_t *condition
 		default:
 			return FAIL;
 	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: condition_match_metric_value                                     *
+ *                                                                            *
+ * Purpose: matches metric value against filter condition                     *
+ *                                                                            *
+ * Parameters: condition - [IN] the condition                                 *
+ *             key       - [IN] the key (optional, can be NULL)               *
+ *             value     - [IN] the value                                     *
+ *                                                                            *
+ * Return value: SUCCEED - the key,value pair matches condition               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	condition_match_metric_value(const zbx_prometheus_condition_t *condition, const char *value)
+{
+	const char	*pattern = condition->pattern;
+	char		buffer[8];
+	size_t		len;
+
+	if ('+' == *pattern)
+		pattern++;
+
+	if ('+' == *value)
+		value++;
+
+	len = strlen(value);
+
+	if (0 == strcmp(condition->pattern, "nan"))
+	{
+		if (ZBX_CONST_STRLEN("nan") != len)
+			return FAIL;
+
+		memcpy(buffer, value, ZBX_CONST_STRLEN("nan") + 1);
+		zbx_strlower(buffer);
+
+		return (0 == strcmp(buffer, "nan") ? SUCCEED : FAIL);
+	}
+
+	if (0 == strcmp(condition->pattern, "inf"))
+	{
+		if (ZBX_CONST_STRLEN("inf") != len)
+			return FAIL;
+
+		memcpy(buffer, value, ZBX_CONST_STRLEN("inf") + 1);
+		zbx_strlower(buffer);
+
+		return (0 == strcmp(buffer, "inf") ? SUCCEED : FAIL);
+	}
+
+	if (ZBX_DOUBLE_EPSILON <= fabs(atof(pattern) - atof(value)))
+		return FAIL;
 
 	return SUCCEED;
 }
@@ -1082,7 +1139,7 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 
 	if (NULL != filter->value)
 	{
-		if (SUCCEED != (match = condition_match_key_value(filter->value, NULL, row->value)))
+		if (SUCCEED != (match = condition_match_metric_value(filter->value, row->value)))
 			goto out;
 	}
 
