@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-17 01:44+0200\n"
+"POT-Creation-Date: 2019-03-03 01:43+0200\n"
 "PO-Revision-Date: 2019-02-14 21:41+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -316,9 +316,9 @@ msgstr[0] ""
 #: include/actions.inc.php:155 include/actions.inc.php:335
 #: include/blocks.inc.php:558
 #: include/classes/screens/CScreenHostTriggers.php:240
-#: include/classes/screens/CScreenProblem.php:885
-#: include/classes/screens/CScreenProblem.php:908
-#: include/classes/screens/CScreenProblem.php:1119 include/events.inc.php:250
+#: include/classes/screens/CScreenProblem.php:875
+#: include/classes/screens/CScreenProblem.php:898
+#: include/classes/screens/CScreenProblem.php:1109 include/events.inc.php:250
 #: include/events.inc.php:462 include/views/configuration.action.edit.php:1217
 msgid "Ack"
 msgstr "Ack"
@@ -468,10 +468,10 @@ msgstr "Aksi diperbarui"
 #: app/views/monitoring.dashboard.view.php:86
 #: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:559
 #: include/classes/screens/CScreenHostTriggers.php:240
-#: include/classes/screens/CScreenProblem.php:886
-#: include/classes/screens/CScreenProblem.php:909
-#: include/classes/screens/CScreenProblem.php:1120
-#: include/classes/screens/CScreenProblem.php:1160 include/events.inc.php:251
+#: include/classes/screens/CScreenProblem.php:876
+#: include/classes/screens/CScreenProblem.php:899
+#: include/classes/screens/CScreenProblem.php:1110
+#: include/classes/screens/CScreenProblem.php:1150 include/events.inc.php:251
 #: include/menu.inc.php:215 include/views/configuration.action.edit.php:24
 #: include/views/configuration.action.list.php:23
 #: include/views/monitoring.screen.list.php:81
@@ -1440,8 +1440,8 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:93
 #: include/classes/graph/CSvgGraph.php:968
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:983
-#: include/classes/screens/CScreenProblem.php:1142 include/events.inc.php:340
+#: include/classes/screens/CScreenProblem.php:973
+#: include/classes/screens/CScreenProblem.php:1132 include/events.inc.php:340
 #: include/events.inc.php:542
 msgid "CLOSING"
 msgstr ""
@@ -1554,7 +1554,7 @@ msgstr ""
 msgid "Cannot add correlation condition"
 msgstr ""
 
-#: include/classes/api/services/CTrigger.php:932
+#: include/classes/api/services/CTrigger.php:944
 #: include/classes/api/services/CTriggerPrototype.php:791
 msgid "Cannot add dependency from a host to a template."
 msgstr "Tidak dapat menambah dependency dari host ke template."
@@ -1790,12 +1790,12 @@ msgstr ""
 msgid "Cannot create another database connection."
 msgstr "Tidak dapat membuat koneksi database lainnya."
 
-#: include/classes/api/services/CTrigger.php:966
+#: include/classes/api/services/CTrigger.php:978
 #: include/classes/api/services/CTriggerPrototype.php:822
 msgid "Cannot create circular dependencies."
 msgstr "Tidak dapat membuat dependensi melingkar."
 
-#: include/classes/api/services/CTrigger.php:938
+#: include/classes/api/services/CTrigger.php:950
 msgid "Cannot create dependency on trigger itself."
 msgstr "Tidak dapat membuat dependensi pada trigger itu sendiri."
 
@@ -1856,7 +1856,7 @@ msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
 msgstr[0] ""
 
-#: include/classes/api/services/CTrigger.php:836
+#: include/classes/api/services/CTrigger.php:848
 #: include/classes/api/services/CTriggerPrototype.php:588
 msgid "Cannot delete dependency"
 msgstr "Tidak dapat menghapus dependency"
@@ -2487,12 +2487,12 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:498
+#: include/classes/api/services/CTriggerGeneral.php:499
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:503
+#: include/classes/api/services/CTriggerGeneral.php:504
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr ""
@@ -2573,22 +2573,22 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:650
+#: include/classes/api/services/CTriggerGeneral.php:651
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:656
+#: include/classes/api/services/CTriggerGeneral.php:657
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:649
+#: include/classes/api/services/CTriggerGeneral.php:650
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:655
+#: include/classes/api/services/CTriggerGeneral.php:656
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr ""
@@ -2603,9 +2603,9 @@ msgstr ""
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:706
-#: include/classes/api/services/CTrigger.php:680
-#: include/classes/api/services/CTrigger.php:798
+#: include/classes/api/services/CTriggerGeneral.php:707
+#: include/classes/api/services/CTrigger.php:684
+#: include/classes/api/services/CTrigger.php:808
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr ""
@@ -2823,7 +2823,7 @@ msgstr ""
 msgid "Cannot update trigger"
 msgstr "Tidak dapat perbarui trigger"
 
-#: include/classes/api/services/CTriggerGeneral.php:1600
+#: include/classes/api/services/CTriggerGeneral.php:1612
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr ""
@@ -2833,7 +2833,7 @@ msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1456
+#: include/classes/api/services/CTriggerGeneral.php:1468
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr ""
@@ -5142,7 +5142,7 @@ msgstr ""
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
 msgstr ""
 
-#: include/classes/api/services/CTrigger.php:1108
+#: include/classes/api/services/CTrigger.php:1120
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Duplikasi dependensi pada trigger \"%1$s\"."
@@ -5194,9 +5194,9 @@ msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:557
-#: include/classes/screens/CScreenProblem.php:884
-#: include/classes/screens/CScreenProblem.php:907
-#: include/classes/screens/CScreenProblem.php:1118 include/events.inc.php:249
+#: include/classes/screens/CScreenProblem.php:874
+#: include/classes/screens/CScreenProblem.php:897
+#: include/classes/screens/CScreenProblem.php:1108 include/events.inc.php:249
 #: include/events.inc.php:461 include/views/configuration.action.edit.php:439
 msgid "Duration"
 msgstr "Durasi"
@@ -5219,7 +5219,7 @@ msgstr ""
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Setiap URL haru memiliki nama yang unik. Pastikan hanya ada satu URL bernama"
 
-#: app/views/popup.trigdesc.view.php:98
+#: app/views/popup.trigdesc.view.php:104
 #: include/views/administration.users.edit.php:309
 #: include/views/configuration.action.edit.php:510
 #: include/views/configuration.action.edit.php:531
@@ -5382,8 +5382,8 @@ msgstr ""
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
 #: include/classes/api/services/CTemplate.php:549
-#: include/classes/api/services/CTrigger.php:658
-#: include/classes/api/services/CTrigger.php:776
+#: include/classes/api/services/CTrigger.php:659
+#: include/classes/api/services/CTrigger.php:783
 #: include/classes/api/services/CUserMacro.php:600
 msgid "Empty input parameter."
 msgstr "Masukan parameter kosong."
@@ -5927,7 +5927,7 @@ msgstr ""
 #: include/classes/api/services/CHostGroup.php:914
 #: include/classes/api/services/CHost.php:743
 #: include/classes/api/services/CTemplate.php:782
-#: include/classes/api/services/CTriggerGeneral.php:236
+#: include/classes/api/services/CTriggerGeneral.php:237
 #: include/classes/validators/CNewValidator.php:255
 #: include/validate.inc.php:300
 #, c-format
@@ -6303,7 +6303,7 @@ msgid "Gradient line"
 msgstr "Garis gradasi"
 
 #: charts.php:100 include/audit.inc.php:30
-#: include/classes/screens/CScreenProblem.php:1221
+#: include/classes/screens/CScreenProblem.php:1211
 #: include/classes/widgets/CWidgetConfig.php:46
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
@@ -6750,7 +6750,7 @@ msgstr ""
 
 #: app/views/monitoring.acknowledge.edit.php:34
 #: app/views/monitoring.problem.view.php:93 history.php:27
-#: include/classes/screens/CScreenProblem.php:1226
+#: include/classes/screens/CScreenProblem.php:1216
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:438 include/forms.inc.php:872
@@ -6816,9 +6816,9 @@ msgstr "Luruskan horisontal"
 #: include/classes/screens/CScreenHostTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:186
 #: include/classes/screens/CScreenHttpTest.php:115
-#: include/classes/screens/CScreenProblem.php:880
-#: include/classes/screens/CScreenProblem.php:904
-#: include/classes/screens/CScreenProblem.php:1116
+#: include/classes/screens/CScreenProblem.php:870
+#: include/classes/screens/CScreenProblem.php:894
+#: include/classes/screens/CScreenProblem.php:1106
 #: include/classes/screens/CScreenTriggersInfo.php:40
 #: include/classes/setup/CSetupWizard.php:274
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
@@ -8006,7 +8006,7 @@ msgstr ""
 msgid "Incorrect item for axis value."
 msgstr "Kesalahan item untuk nilai axis."
 
-#: include/classes/api/services/CTriggerGeneral.php:1370
+#: include/classes/api/services/CTriggerGeneral.php:1382
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Kesalahan item key \"%1$s\" disediakan untuk ekspresi trigger pada \"%2$s\"."
@@ -8220,13 +8220,13 @@ msgstr "Kesalahan ekspresi trigger"
 msgid "Incorrect trigger expression."
 msgstr "Kesalahan ekspresi trigger."
 
-#: include/classes/api/services/CTriggerGeneral.php:1162
+#: include/classes/api/services/CTriggerGeneral.php:1172
 #: include/triggers.inc.php:633
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Kesalahan ekspresi trigger. Host \"%1$s\" tidak ada atau Anda tidak memiliki akses ke host tersebut."
 
-#: include/classes/api/services/CTriggerGeneral.php:1163
+#: include/classes/api/services/CTriggerGeneral.php:1173
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya menjadi miliki template dan host secara bersamaan."
 
@@ -8238,12 +8238,12 @@ msgstr "Kesalahan ekspresi trigger. Elemen ekspresi trigger tidak seharusnya men
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "Kesalahan fungsi trigger \"%1$s\" disediakan dalam ekspresi."
 
-#: include/classes/api/services/CTriggerGeneral.php:1169
+#: include/classes/api/services/CTriggerGeneral.php:1179
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1170
+#: include/classes/api/services/CTriggerGeneral.php:1180
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
 msgstr ""
 
@@ -8509,23 +8509,23 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:791
 #: include/classes/api/services/CScreen.php:423
 #: include/classes/api/services/CScreen.php:429
-#: include/classes/api/services/CTriggerGeneral.php:241
-#: include/classes/api/services/CTriggerGeneral.php:247
-#: include/classes/api/services/CTriggerGeneral.php:257
-#: include/classes/api/services/CTriggerGeneral.php:540
-#: include/classes/api/services/CTriggerGeneral.php:548
-#: include/classes/api/services/CTriggerGeneral.php:566
-#: include/classes/api/services/CTriggerGeneral.php:573
-#: include/classes/api/services/CTriggerGeneral.php:580
-#: include/classes/api/services/CTriggerGeneral.php:586
-#: include/classes/api/services/CTriggerGeneral.php:594
-#: include/classes/api/services/CTriggerGeneral.php:776
-#: include/classes/api/services/CTriggerGeneral.php:785
-#: include/classes/api/services/CTriggerGeneral.php:793
-#: include/classes/api/services/CTriggerGeneral.php:803
-#: include/classes/api/services/CTriggerGeneral.php:811
-#: include/classes/api/services/CTriggerGeneral.php:817
-#: include/classes/api/services/CTriggerGeneral.php:825
+#: include/classes/api/services/CTriggerGeneral.php:242
+#: include/classes/api/services/CTriggerGeneral.php:248
+#: include/classes/api/services/CTriggerGeneral.php:258
+#: include/classes/api/services/CTriggerGeneral.php:541
+#: include/classes/api/services/CTriggerGeneral.php:549
+#: include/classes/api/services/CTriggerGeneral.php:567
+#: include/classes/api/services/CTriggerGeneral.php:574
+#: include/classes/api/services/CTriggerGeneral.php:581
+#: include/classes/api/services/CTriggerGeneral.php:587
+#: include/classes/api/services/CTriggerGeneral.php:595
+#: include/classes/api/services/CTriggerGeneral.php:777
+#: include/classes/api/services/CTriggerGeneral.php:786
+#: include/classes/api/services/CTriggerGeneral.php:794
+#: include/classes/api/services/CTriggerGeneral.php:804
+#: include/classes/api/services/CTriggerGeneral.php:812
+#: include/classes/api/services/CTriggerGeneral.php:818
+#: include/classes/api/services/CTriggerGeneral.php:826
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:532
 #: include/classes/graphdraw/CLineGraphDraw.php:113
@@ -8581,8 +8581,8 @@ msgstr "Indonesian (id_ID)"
 #: include/actions.inc.php:1904 include/actions.inc.php:1988
 #: include/blocks.inc.php:553 include/classes/screens/CScreenActions.php:132
 #: include/classes/screens/CScreenHostTriggers.php:240
-#: include/classes/screens/CScreenProblem.php:879
-#: include/classes/screens/CScreenProblem.php:903
+#: include/classes/screens/CScreenProblem.php:869
+#: include/classes/screens/CScreenProblem.php:893
 #: include/views/administration.auditacts.list.php:62
 #: include/views/configuration.application.list.php:65
 #: include/views/configuration.host.discovery.list.php:60
@@ -8695,14 +8695,14 @@ msgstr ""
 
 #: include/classes/api/services/CGraphGeneral.php:495
 #: include/classes/api/services/CGraphGeneral.php:629
-#: include/classes/api/services/CTriggerGeneral.php:299
-#: include/classes/api/services/CTriggerGeneral.php:444
-#: include/classes/api/services/CTriggerGeneral.php:507
-#: include/classes/api/services/CTriggerGeneral.php:660
-#: include/classes/api/services/CTriggerGeneral.php:888
-#: include/classes/api/services/CTriggerGeneral.php:996
-#: include/classes/api/services/CTriggerGeneral.php:1175
-#: include/classes/api/services/CTriggerGeneral.php:1535
+#: include/classes/api/services/CTriggerGeneral.php:300
+#: include/classes/api/services/CTriggerGeneral.php:445
+#: include/classes/api/services/CTriggerGeneral.php:508
+#: include/classes/api/services/CTriggerGeneral.php:661
+#: include/classes/api/services/CTriggerGeneral.php:891
+#: include/classes/api/services/CTriggerGeneral.php:1002
+#: include/classes/api/services/CTriggerGeneral.php:1185
+#: include/classes/api/services/CTriggerGeneral.php:1547
 #: include/classes/core/CJsonRpc.php:205
 #: include/classes/import/validators/CXmlValidatorGeneral.php:147
 #: include/classes/widgets/fields/CWidgetField.php:100
@@ -9296,7 +9296,7 @@ msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\"."
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.template.list.php:188
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:147
-#: include/views/inventory.host.view.php:158 items.php:1592 queue.php:109
+#: include/views/inventory.host.view.php:158 items.php:1598 queue.php:109
 #: search.php:134 search.php:164 search.php:193 search.php:407 search.php:435
 #: search.php:464
 msgid "Items"
@@ -9607,7 +9607,7 @@ msgid "Latest data"
 msgstr "Data terbaru"
 
 #: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:556
-#: include/classes/screens/CScreenProblem.php:906 jsLoader.php:254
+#: include/classes/screens/CScreenProblem.php:896 jsLoader.php:254
 msgid "Latest values"
 msgstr ""
 
@@ -10167,7 +10167,7 @@ msgstr "Tandai yang dipilih"
 msgid "Mask"
 msgstr ""
 
-#: include/classes/screens/CScreenProblem.php:1103
+#: include/classes/screens/CScreenProblem.php:1093
 #: include/views/configuration.host.list.php:360
 #: include/views/configuration.item.list.php:255
 #: include/views/configuration.item.massupdate.php:717
@@ -10355,7 +10355,7 @@ msgstr "Habis waktu pesan"
 msgid "Message/Command"
 msgstr ""
 
-#: include/classes/screens/CScreenProblem.php:1153
+#: include/classes/screens/CScreenProblem.php:1143
 msgid "Messages"
 msgstr "Pesan"
 
@@ -10831,8 +10831,8 @@ msgstr ""
 #: include/actions.inc.php:33 include/blocks.inc.php:441
 #: include/blocks.inc.php:632
 #: include/classes/screens/CScreenHostTriggers.php:298
-#: include/classes/screens/CScreenProblem.php:1072
-#: include/classes/screens/CScreenProblem.php:1175 include/events.inc.php:176
+#: include/classes/screens/CScreenProblem.php:1062
+#: include/classes/screens/CScreenProblem.php:1165 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
 #: include/triggers.inc.php:1235 include/triggers.inc.php:1240
 #: include/views/administration.users.list.php:111
@@ -11298,11 +11298,11 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
 #: include/classes/api/services/CTemplateScreen.php:756
-#: include/classes/api/services/CTriggerGeneral.php:722
+#: include/classes/api/services/CTriggerGeneral.php:723
 #: include/classes/api/services/CTrigger.php:633
-#: include/classes/api/services/CTrigger.php:673
-#: include/classes/api/services/CTrigger.php:709
-#: include/classes/api/services/CTrigger.php:791
+#: include/classes/api/services/CTrigger.php:677
+#: include/classes/api/services/CTrigger.php:713
+#: include/classes/api/services/CTrigger.php:801
 #: include/classes/api/services/CTriggerPrototype.php:533
 #: include/classes/api/services/CTriggerPrototype.php:711
 #: include/classes/api/services/CTriggerPrototype.php:729
@@ -11318,7 +11318,7 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: include/classes/helpers/CMapHelper.php:80
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1794 items.php:1381 items.php:1564
+#: include/func.inc.php:1794 items.php:1387 items.php:1570
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Tidak ada izin untuk objek yang dirujuk atau objek tidak ada!"
 
@@ -11443,7 +11443,7 @@ msgstr "Bukan pemberitahuan"
 msgid "Not Templated items"
 msgstr "Bukan item yang dibuat template"
 
-#: include/classes/api/services/CTrigger.php:1011
+#: include/classes/api/services/CTrigger.php:1023
 #: include/classes/api/services/CTriggerPrototype.php:870
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
@@ -12252,8 +12252,8 @@ msgstr "POP"
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
 #: include/classes/graph/CSvgGraph.php:963
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:983
-#: include/classes/screens/CScreenProblem.php:1142 include/events.inc.php:340
+#: include/classes/screens/CScreenProblem.php:973
+#: include/classes/screens/CScreenProblem.php:1132 include/events.inc.php:340
 #: include/events.inc.php:542 include/maps.inc.php:291
 #: include/maps.inc.php:375 include/maps.inc.php:468 include/maps.inc.php:567
 #: include/triggers.inc.php:232 include/views/monitoring.overview.items.php:32
@@ -12713,10 +12713,10 @@ msgstr "Tingkatan hak"
 
 #: app/views/monitoring.problem.view.php:163
 #: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:555
-#: include/classes/screens/CScreenProblem.php:882
-#: include/classes/screens/CScreenProblem.php:905
-#: include/classes/screens/CScreenProblem.php:1039
-#: include/classes/screens/CScreenProblem.php:1117
+#: include/classes/screens/CScreenProblem.php:872
+#: include/classes/screens/CScreenProblem.php:895
+#: include/classes/screens/CScreenProblem.php:1029
+#: include/classes/screens/CScreenProblem.php:1107
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:58
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:58
 #: include/classes/widgets/forms/CWidgetFormProblems.php:75
@@ -12933,8 +12933,8 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:79
 #: include/classes/graph/CSvgGraph.php:959
 #: include/classes/screens/CScreenEvents.php:121
-#: include/classes/screens/CScreenProblem.php:969
-#: include/classes/screens/CScreenProblem.php:1130 include/events.inc.php:345
+#: include/classes/screens/CScreenProblem.php:959
+#: include/classes/screens/CScreenProblem.php:1120 include/events.inc.php:345
 #: include/events.inc.php:528
 msgid "RESOLVED"
 msgstr ""
@@ -13023,7 +13023,7 @@ msgstr "Penerima (ascending)"
 msgid "Recipient (descending)"
 msgstr "Penerima (descending)"
 
-#: include/classes/screens/CScreenProblem.php:1040
+#: include/classes/screens/CScreenProblem.php:1030
 #: include/views/administration.users.edit.php:374
 #: include/views/configuration.item.list.php:176
 #: include/views/configuration.trigger.prototype.list.php:130
@@ -13051,9 +13051,9 @@ msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:51
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:877
-#: include/classes/screens/CScreenProblem.php:900
-#: include/classes/screens/CScreenProblem.php:1114 include/events.inc.php:246
+#: include/classes/screens/CScreenProblem.php:867
+#: include/classes/screens/CScreenProblem.php:890
+#: include/classes/screens/CScreenProblem.php:1104 include/events.inc.php:246
 #: include/events.inc.php:459
 msgid "Recovery time"
 msgstr ""
@@ -13417,27 +13417,27 @@ msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:133
 #: include/classes/screens/CScreenHostTriggers.php:266
-#: include/classes/screens/CScreenProblem.php:1000
+#: include/classes/screens/CScreenProblem.php:990
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:136
 #: include/classes/screens/CScreenHostTriggers.php:269
-#: include/classes/screens/CScreenProblem.php:1003
+#: include/classes/screens/CScreenProblem.php:993
 msgid "Resolved by correlation rule."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:142
 #: include/classes/screens/CScreenHostTriggers.php:275
-#: include/classes/screens/CScreenProblem.php:1009
+#: include/classes/screens/CScreenProblem.php:999
 #, c-format
 msgid "Resolved by user \"%1$s\"."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:143
 #: include/classes/screens/CScreenHostTriggers.php:276
-#: include/classes/screens/CScreenProblem.php:1010
+#: include/classes/screens/CScreenProblem.php:1000
 msgid "Resolved by user."
 msgstr ""
 
@@ -14391,9 +14391,9 @@ msgstr ""
 #: app/views/popup.triggerwizard.php:144
 #: include/classes/screens/CScreenEvents.php:33
 #: include/classes/screens/CScreenHistory.php:259
-#: include/classes/screens/CScreenProblem.php:874
-#: include/classes/screens/CScreenProblem.php:896
-#: include/classes/screens/CScreenProblem.php:1112
+#: include/classes/screens/CScreenProblem.php:864
+#: include/classes/screens/CScreenProblem.php:886
+#: include/classes/screens/CScreenProblem.php:1102
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:67
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:67
 #: include/classes/widgets/forms/CWidgetFormProblems.php:84
@@ -14424,7 +14424,7 @@ msgid "Severity changed"
 msgstr ""
 
 #: include/actions.inc.php:1823
-#: include/classes/screens/CScreenProblem.php:1156
+#: include/classes/screens/CScreenProblem.php:1146
 msgid "Severity changes"
 msgstr ""
 
@@ -14874,9 +14874,9 @@ msgstr ""
 #: include/classes/screens/CScreenActions.php:131
 #: include/classes/screens/CScreenHttpTestDetails.php:86
 #: include/classes/screens/CScreenHttpTest.php:119
-#: include/classes/screens/CScreenProblem.php:878
-#: include/classes/screens/CScreenProblem.php:902
-#: include/classes/screens/CScreenProblem.php:1115
+#: include/classes/screens/CScreenProblem.php:868
+#: include/classes/screens/CScreenProblem.php:892
+#: include/classes/screens/CScreenProblem.php:1105
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:247 include/events.inc.php:460
@@ -15176,7 +15176,7 @@ msgstr "Tabel \"%1$s\" tidak memiliki field dengan nama \"%2$s\"."
 msgid "Tag"
 msgstr "Label"
 
-#: include/classes/api/services/CTriggerGeneral.php:267
+#: include/classes/api/services/CTriggerGeneral.php:268
 #, c-format
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
 msgstr ""
@@ -15206,9 +15206,9 @@ msgstr ""
 
 #: app/views/monitoring.problem.view.php:283
 #: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:560
-#: include/classes/screens/CScreenProblem.php:856
-#: include/classes/screens/CScreenProblem.php:910
-#: include/classes/screens/CScreenProblem.php:1121
+#: include/classes/screens/CScreenProblem.php:846
+#: include/classes/screens/CScreenProblem.php:900
+#: include/classes/screens/CScreenProblem.php:1111
 #: include/classes/widgets/forms/CWidgetFormProblems.php:93
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
 #: include/events.inc.php:235 include/events.inc.php:463
@@ -15589,8 +15589,8 @@ msgstr "Hingga"
 #: include/actions.inc.php:2038 include/blocks.inc.php:535
 #: include/classes/screens/CScreenActions.php:126
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:833
-#: include/classes/screens/CScreenProblem.php:1113
+#: include/classes/screens/CScreenProblem.php:823
+#: include/classes/screens/CScreenProblem.php:1103
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
 #: include/classes/widgets/forms/CWidgetFormProblems.php:194
@@ -15675,7 +15675,7 @@ msgstr "Ke"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Untuk mengatur interface host pilih satu tipe item untuk semua item"
 
-#: include/classes/screens/CScreenProblem.php:731 include/func.inc.php:2681
+#: include/classes/screens/CScreenProblem.php:721 include/func.inc.php:2681
 #: srv_status.php:39
 msgid "Today"
 msgstr "Hari ini"
@@ -15794,12 +15794,12 @@ msgstr "Tren"
 msgid "Trigger"
 msgstr "Trigger"
 
-#: include/classes/api/services/CTriggerGeneral.php:290
+#: include/classes/api/services/CTriggerGeneral.php:291
 #, c-format
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Trigger \"%1$s\" sudah ada pada \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1527
+#: include/classes/api/services/CTriggerGeneral.php:1539
 #, c-format
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr ""
@@ -15813,7 +15813,7 @@ msgstr "Trigger \"%1$s\" tergantung pada trigger \"%2$s\", yang tidak ada."
 msgid "Trigger added"
 msgstr "Trigger ditambah"
 
-#: include/classes/api/services/CTrigger.php:1054
+#: include/classes/api/services/CTrigger.php:1066
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
@@ -15863,7 +15863,7 @@ msgstr ""
 msgid "Trigger event and alert data storage period \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:454
+#: include/classes/api/services/CTriggerGeneral.php:455
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "Ekspresi trigger harus mengandung setidaknya satu host:key referensi."
 
@@ -15904,17 +15904,17 @@ msgstr "Rangkuman trigger"
 msgid "Trigger prototype"
 msgstr "Prototipe trigger"
 
-#: include/classes/api/services/CTriggerGeneral.php:295
+#: include/classes/api/services/CTriggerGeneral.php:296
 #, c-format
 msgid "Trigger prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1531
+#: include/classes/api/services/CTriggerGeneral.php:1543
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1450
+#: include/classes/api/services/CTriggerGeneral.php:1462
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr ""
@@ -15924,7 +15924,7 @@ msgstr ""
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1445
+#: include/classes/api/services/CTriggerGeneral.php:1457
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr ""
@@ -15964,7 +15964,7 @@ msgstr ""
 msgid "Trigger prototypes updated"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:466
+#: include/classes/api/services/CTriggerGeneral.php:467
 msgid "Trigger recovery expression must contain at least one host:key reference."
 msgstr ""
 
@@ -16880,7 +16880,7 @@ msgid "VMware datastore capacity statistics in bytes or in percentage from total
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:691
-msgid "VMware event log, <url> - VMware service URL"
+msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:747
@@ -17500,13 +17500,13 @@ msgstr "Field yang salah untuk service \"%1$s\"."
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "Field yang salah untuk waktu untuk service \"%1$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:502
-#: include/classes/api/services/CTriggerGeneral.php:654
+#: include/classes/api/services/CTriggerGeneral.php:503
+#: include/classes/api/services/CTriggerGeneral.php:655
 msgid "Wrong fields for trigger prototype."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:497
-#: include/classes/api/services/CTriggerGeneral.php:648
+#: include/classes/api/services/CTriggerGeneral.php:498
+#: include/classes/api/services/CTriggerGeneral.php:649
 msgid "Wrong fields for trigger."
 msgstr "Field yang salah untuk trigger."
 
@@ -17514,8 +17514,8 @@ msgstr "Field yang salah untuk trigger."
 #: include/classes/api/services/CMap.php:958
 #: include/classes/api/services/CMap.php:1418
 #: include/classes/api/services/CScreenItem.php:967
-#: include/classes/api/services/CTriggerGeneral.php:522
-#: include/classes/api/services/CTriggerGeneral.php:675
+#: include/classes/api/services/CTriggerGeneral.php:523
+#: include/classes/api/services/CTriggerGeneral.php:676
 msgid "Wrong value for url field."
 msgstr ""
 
@@ -17633,8 +17633,8 @@ msgstr "Tahunan"
 #: include/actions.inc.php:32 include/blocks.inc.php:441
 #: include/blocks.inc.php:632
 #: include/classes/screens/CScreenHostTriggers.php:298
-#: include/classes/screens/CScreenProblem.php:1072
-#: include/classes/screens/CScreenProblem.php:1175 include/events.inc.php:176
+#: include/classes/screens/CScreenProblem.php:1062
+#: include/classes/screens/CScreenProblem.php:1165 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
 #: include/triggers.inc.php:1234 include/triggers.inc.php:1239
 #: include/views/administration.general.valuemapping.list.php:65
@@ -17648,7 +17648,7 @@ msgstr "Tahunan"
 msgid "Yes"
 msgstr "Ya"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2675
+#: include/classes/screens/CScreenProblem.php:729 include/func.inc.php:2675
 msgid "Yesterday"
 msgstr ""
 
@@ -17865,8 +17865,8 @@ msgstr "[Nilai yang salah untuk bulan: \"%s\" ]"
 msgid "a boolean is expected"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:241
-#: include/classes/api/services/CTriggerGeneral.php:257
+#: include/classes/api/services/CTriggerGeneral.php:242
+#: include/classes/api/services/CTriggerGeneral.php:258
 #: include/classes/api/services/CUser.php:649
 #: include/classes/import/validators/CXmlValidatorGeneral.php:193
 #: include/classes/validators/CApiInputValidator.php:230
@@ -17952,7 +17952,7 @@ msgstr "agen"
 #: include/views/configuration.triggers.list.php:57
 #: include/views/js/configuration.graph.edit.js.php:55 report2.php:238
 #: report2.php:257 report2.php:289 report2.php:322 report2.php:364
-#: report2.php:383 report4.php:87 report4.php:287
+#: report2.php:383 report4.php:87 report4.php:289
 msgid "all"
 msgstr "semua"
 
@@ -18103,11 +18103,11 @@ msgstr ""
 #: include/classes/api/services/CMediatype.php:721
 #: include/classes/api/services/CProxy.php:578
 #: include/classes/api/services/CProxy.php:584
-#: include/classes/api/services/CTriggerGeneral.php:247
-#: include/classes/api/services/CTriggerGeneral.php:548
-#: include/classes/api/services/CTriggerGeneral.php:580
-#: include/classes/api/services/CTriggerGeneral.php:793
-#: include/classes/api/services/CTriggerGeneral.php:811
+#: include/classes/api/services/CTriggerGeneral.php:248
+#: include/classes/api/services/CTriggerGeneral.php:549
+#: include/classes/api/services/CTriggerGeneral.php:581
+#: include/classes/api/services/CTriggerGeneral.php:794
+#: include/classes/api/services/CTriggerGeneral.php:812
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:532
 #: include/classes/api/services/CUser.php:660
@@ -18826,10 +18826,10 @@ msgstr "penjelasan singkat"
 #: include/classes/api/services/CMaintenance.php:675
 #: include/classes/api/services/CProxy.php:661
 #: include/classes/api/services/CProxy.php:784
-#: include/classes/api/services/CTriggerGeneral.php:540
-#: include/classes/api/services/CTriggerGeneral.php:566
-#: include/classes/api/services/CTriggerGeneral.php:785
-#: include/classes/api/services/CTriggerGeneral.php:803
+#: include/classes/api/services/CTriggerGeneral.php:541
+#: include/classes/api/services/CTriggerGeneral.php:567
+#: include/classes/api/services/CTriggerGeneral.php:786
+#: include/classes/api/services/CTriggerGeneral.php:804
 msgid "should be empty"
 msgstr ""
 
@@ -18935,11 +18935,11 @@ msgstr "trigger"
 msgid "trigger does not allow manual closing"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1457
+#: include/classes/api/services/CTriggerGeneral.php:1469
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1602
+#: include/classes/api/services/CTriggerGeneral.php:1614
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr ""
 
@@ -18987,12 +18987,12 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1279
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
-#: include/classes/api/services/CTriggerGeneral.php:574
-#: include/classes/api/services/CTriggerGeneral.php:587
-#: include/classes/api/services/CTriggerGeneral.php:595
-#: include/classes/api/services/CTriggerGeneral.php:777
-#: include/classes/api/services/CTriggerGeneral.php:818
-#: include/classes/api/services/CTriggerGeneral.php:826
+#: include/classes/api/services/CTriggerGeneral.php:575
+#: include/classes/api/services/CTriggerGeneral.php:588
+#: include/classes/api/services/CTriggerGeneral.php:596
+#: include/classes/api/services/CTriggerGeneral.php:778
+#: include/classes/api/services/CTriggerGeneral.php:819
+#: include/classes/api/services/CTriggerGeneral.php:827
 #, c-format
 msgid "unexpected value \"%1$s\""
 msgstr ""
