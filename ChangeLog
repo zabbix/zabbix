@@ -3,6 +3,7 @@ Changes for 4.2.0rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15300] fixed widgets extra space at the bottom (ashubin, vasilijs)
 ...G...... [ZBX-8091] added alphabetic ordering of net.dns.record respond (akozlovs)
 ..F....... [ZBX-15707] fixed check box design when drag and drop an interface into SNMP (vasilijs)
 ..F....... [ZBX-15535] fixed validation of min/max value range in graph widget; fixed translation string in graph widget (miks)
@@ -197,6 +198,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+..F....... [ZBX-15300] fixed widgets extra space at the bottom (ashubin, vasilijs)
 ...G...... [ZBX-8091] added alphabetic ordering of net.dns.record respond (akozlovs)
 ..F....... [ZBX-15707] fixed check box design when drag and drop an interface into SNMP (vasilijs)
 ..F....... [ZBX-15535] fixed validation of min/max value range in graph widget; fixed translation string in graph widget (miks)
