@@ -385,7 +385,7 @@ ul.top-nav-icons {
 
 .header-title {
   border-bottom: 1px solid #9f9f9f;
-  margin-top: -10px;
+  margin: -10px 0 10px;
   padding: 10px 0 6px;
   width: 100%; }
   .header-title .cell:first-child {
@@ -477,6 +477,7 @@ article, main {
 
 .filter-breadcrumb {
   display: inline-block;
+  padding-top: 0;
   z-index: 3;
   max-width: calc(100vw - 200px); }
   .filter-breadcrumb li {
