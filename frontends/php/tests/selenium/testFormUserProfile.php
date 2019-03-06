@@ -363,37 +363,37 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '0',
-				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '1s',
-				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '29',
-				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '25h',
-				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '2d',
-				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '86401',
-				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
