@@ -1488,7 +1488,6 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 				ret = FAIL;
 				break;
 			}
-
 	}
 
 	if (SUCCEED != ret)
