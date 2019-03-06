@@ -30,17 +30,23 @@ require_once dirname(__FILE__).'/helpers/CLogHelper.php';
 class CIntegrationTest extends CAPITest {
 
 	// Default iteration count for wait operations.
-	const WAIT_ITERATIONS			= 20;
+	const WAIT_ITERATIONS			= 60;
 
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY		= 1; // Wait iteration delay.
-	const COMPONENT_STARTUP_DELAY	= 5; // Component start delay.
-	const CACHE_RELOAD_DELAY		= 2; // Configuration cache reload delay.
+	const COMPONENT_STARTUP_DELAY	= 10; // Component start delay.
+	const CACHE_RELOAD_DELAY		= 5; // Configuration cache reload delay.
+	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
 
 	// Zabbix component constants.
 	const COMPONENT_SERVER	= 'server';
 	const COMPONENT_PROXY	= 'proxy';
 	const COMPONENT_AGENT	= 'agentd';
+
+	// Zabbix component port constants.
+	const AGENT_PORT_SUFFIX = '50';
+	const SERVER_PORT_SUFFIX = '51';
+	const PROXY_PORT_SUFFIX = '52';
 
 	/**
 	 * Components required by test suite.
@@ -82,7 +88,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @var array
 	 */
-	private $case_configuration = [];
+	private static $case_configuration = [];
 
 	/**
 	 * Process annotations defined on suite / case level.
@@ -178,12 +184,30 @@ class CIntegrationTest extends CAPITest {
 			);
 		}
 
+		try {
+			if ($this->prepareData() === false) {
+				throw new Exception('Failed to prepare data for test suite.');
+			}
+		} catch (Exception $exception) {
+			self::markTestSuiteSkipped();
+			throw $exception;
+		}
+
 		self::setHostStatus(self::$suite_hosts, HOST_STATUS_MONITORED);
 
 		foreach (self::$suite_components as $component) {
 			self::prepareComponentConfiguration($component, self::$suite_configuration);
-			$this->startComponent($component);
+			self::startComponent($component);
 		}
+	}
+
+	/**
+	 * Prepare data for test suite.
+	 */
+	public function prepareData() {
+		// Code is not missing here.
+
+		return true;
 	}
 
 	/**
@@ -197,14 +221,14 @@ class CIntegrationTest extends CAPITest {
 		$result = $this->processAnnotations('method');
 		$this->case_components = array_diff($result['components'], self::$suite_components);
 		$this->case_hosts = array_diff($result['hosts'], self::$suite_hosts);
-		$this->case_configuration = self::$suite_configuration;
+		self::$case_configuration = self::$suite_configuration;
 
 		foreach ([self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_AGENT] as $component) {
 			if (!array_key_exists($component, $result['configuration'])) {
 				continue;
 			}
 
-			$this->case_configuration[$component] = array_merge($this->case_configuration[$component],
+			self::$case_configuration[$component] = array_merge(self::$case_configuration[$component],
 					$result['configuration'][$component]
 			);
 		}
@@ -212,17 +236,17 @@ class CIntegrationTest extends CAPITest {
 		self::setHostStatus($this->case_hosts, HOST_STATUS_MONITORED);
 
 		foreach (self::$suite_components as $component) {
-			if ($this->case_configuration[$component] === self::$suite_configuration[$component]) {
+			if (self::$case_configuration[$component] === self::$suite_configuration[$component]) {
 				continue;
 			}
 
-			self::prepareComponentConfiguration($component, $this->case_configuration);
-			$this->restartComponent($component);
+			self::prepareComponentConfiguration($component, self::$case_configuration);
+			self::restartComponent($component);
 		}
 
 		foreach ($this->case_components as $component) {
-			self::prepareComponentConfiguration($component, $this->case_configuration);
-			$this->startComponent($component);
+			self::prepareComponentConfiguration($component, self::$case_configuration);
+			self::startComponent($component);
 		}
 	}
 
@@ -242,15 +266,17 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		foreach (self::$suite_components as $component) {
-			if ($this->case_configuration[$component] === self::$suite_configuration[$component]) {
+			if (array_key_exists($component, self::$case_configuration)
+					&& self::$case_configuration[$component] === self::$suite_configuration[$component]) {
 				continue;
 			}
 
 			self::prepareComponentConfiguration($component, self::$suite_configuration);
-			$this->restartComponent($component);
+			self::restartComponent($component);
 		}
 
 		self::setHostStatus($this->case_hosts, HOST_STATUS_NOT_MONITORED);
+		self::$case_configuration = [];
 
 		parent::onAfterTestCase();
 	}
@@ -299,7 +325,7 @@ class CIntegrationTest extends CAPITest {
 		self::validateComponent($component);
 
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
-			$pid = @file_get_contents('/tmp/zabbix_'.$component.'.pid');
+			$pid = @file_get_contents(self::getPidPath($component));
 			if ($pid && is_numeric($pid) && posix_kill($pid, 0)) {
 				sleep(self::COMPONENT_STARTUP_DELAY);
 
@@ -323,14 +349,14 @@ class CIntegrationTest extends CAPITest {
 		self::validateComponent($component);
 
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
-			if (!file_exists('/tmp/zabbix_'.$component.'.pid')) {
+			if (!file_exists(self::getPidPath($component))) {
 				return;
 			}
 
 			sleep(self::WAIT_ITERATION_DELAY);
 		}
 
-		throw new Exception('Failed to wait for component "'.$component.'" to start.');
+		throw new Exception('Failed to wait for component "'.$component.'" to stop.');
 	}
 
 	/**
@@ -396,12 +422,26 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$configuration = [
-			self::COMPONENT_SERVER => $db,
-			self::COMPONENT_PROXY => $db,
-			self::COMPONENT_AGENT => []
+			self::COMPONENT_SERVER => array_merge($db, [
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.log',
+				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
+				'SocketDir' => PHPUNIT_COMPONENT_DIR,
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX
+			]),
+			self::COMPONENT_PROXY => array_merge($db, [
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy.log',
+				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy.pid',
+				'SocketDir' => PHPUNIT_COMPONENT_DIR,
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
+			]),
+			self::COMPONENT_AGENT => [
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.log',
+				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX
+			]
 		];
 
-		$configuration[self::COMPONENT_PROXY]['DBName'] .= '-proxy';
+		$configuration[self::COMPONENT_PROXY]['DBName'] .= '_proxy';
 
 		return $configuration;
 	}
@@ -419,7 +459,7 @@ class CIntegrationTest extends CAPITest {
 
 		$path = PHPUNIT_CONFIG_SOURCE_DIR.'zabbix_'.$component.'.conf';
 		if (!file_exists($path) || ($config = @file_get_contents($path)) === false) {
-			throw new Exception('There is no configuration file for component "'.$component.'".');
+			throw new Exception('There is no configuration file for component "'.$component.'": '.$path.'.');
 		}
 
 		if (array_key_exists($component, $values) && $values[$component] && is_array($values[$component])) {
@@ -436,7 +476,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		if (file_put_contents(PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf', $config) === false) {
-			throw new Exception('Failed to create configuration file for component "'.$component.'".');
+			throw new Exception('Failed to create configuration file for component "'.$component.'": '.PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf.');
 		}
 	}
 
@@ -455,7 +495,7 @@ class CIntegrationTest extends CAPITest {
 			throw new Exception('There is no configuration file for component "'.$component.'".');
 		}
 
-		$this->clearLog($component);
+		self::clearLog($component);
 		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['-c', $config]);
 		self::waitForStartup($component);
 	}
@@ -469,7 +509,11 @@ class CIntegrationTest extends CAPITest {
 	 */
 	protected static function stopComponent($component) {
 		self::validateComponent($component);
-		self::executeCommand('pkill zabbix_'.$component);
+
+		$pid = @file_get_contents(self::getPidPath($component));
+		if ($pid && is_numeric($pid)) {
+			posix_kill($pid, SIGTERM);
+		}
 		self::waitForShutdown($component);
 	}
 
@@ -499,7 +543,7 @@ class CIntegrationTest extends CAPITest {
 			throw new Exception('There is no client available for Zabbix Agent.');
 		}
 
-		return new CZabbixClient('localhost', $this->getConfigurationValue($component, 'ListenPort', 10051),
+		return new CZabbixClient('localhost', self::getConfigurationValue($component, 'ListenPort', 10051),
 				ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT
 		);
 	}
@@ -546,6 +590,8 @@ class CIntegrationTest extends CAPITest {
 		$this->assertEquals(count($values), $result['processed'],
 				'Processed value count doesn\'t match sent value count.'
 		);
+
+		sleep(self::DATA_PROCESSING_DELAY);
 
 		return $result;
 	}
@@ -715,10 +761,23 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return string
 	 */
-	protected function getLogPath($component) {
+	protected static function getLogPath($component) {
 		self::validateComponent($component);
 
-		return $this->getConfigurationValue($component, 'LogFile', '/tmp/zabbix_'.$component.'.log');
+		return self::getConfigurationValue($component, 'LogFile', '/tmp/zabbix_'.$component.'.log');
+	}
+
+	/**
+	 * Get path of the pid file for component.
+	 *
+	 * @param string $component    name of the component
+	 *
+	 * @return string
+	 */
+	protected static function getPidPath($component) {
+		self::validateComponent($component);
+
+		return self::getConfigurationValue($component, 'PidFile', '/tmp/zabbix_'.$component.'.log');
 	}
 
 	/**
@@ -730,10 +789,11 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return mixed
 	 */
-	protected function getConfigurationValue($component, $key, $default = null) {
-		if (array_key_exists($component, $this->case_configuration)
-				&& array_key_exists($key, $this->case_configuration[$component])) {
-			return $this->case_configuration[$component][$key];
+	protected static function getConfigurationValue($component, $key, $default = null) {
+		$configuration = (self::$case_configuration) ? self::$case_configuration : self::$suite_configuration;
+
+		if (array_key_exists($component, $configuration) && array_key_exists($key, $configuration[$component])) {
+			return $configuration[$component][$key];
 		}
 
 		return $default;
@@ -744,8 +804,8 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @param string $component    name of the component
 	 */
-	protected function clearLog($component) {
-		CLogHelper::clearLog($this->getLogPath($component));
+	protected static function clearLog($component) {
+		CLogHelper::clearLog(self::getLogPath($component));
 	}
 
 	/**
@@ -757,8 +817,8 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return boolean
 	 */
-	protected function isLogLinePresent($component, $lines, $incremental = true) {
-		return CLogHelper::isLogLinePresent($this->getLogPath($component), $lines, $incremental);
+	protected static function isLogLinePresent($component, $lines, $incremental = true) {
+		return CLogHelper::isLogLinePresent(self::getLogPath($component), $lines, $incremental);
 	}
 
 	/**
@@ -789,7 +849,7 @@ class CIntegrationTest extends CAPITest {
 			sleep($delay);
 		}
 
-		if (count($lines) > 1) {
+		if (is_array($lines)) {
 			$quoted = [];
 			foreach ($lines as $line) {
 				$quoted[] = '"'.$line.'"';
@@ -798,7 +858,7 @@ class CIntegrationTest extends CAPITest {
 			$description = 'any of the lines ['.implode(', ', $quoted).']';
 		}
 		else {
-			$description = 'line '.$quoted[0];
+			$description = 'line "'.$lines.'"';
 		}
 
 		throw new Exception('Failed to wait for '.$description.' to be present in '.$component.' log file.');
