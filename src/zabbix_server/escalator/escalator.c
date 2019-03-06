@@ -1384,8 +1384,6 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 		char		*tmp;
 		zbx_uint64_t	operationid;
 
-		operations = 1;
-
 		ZBX_STR2UINT64(operationid, row[0]);
 
 		tmp = zbx_strdup(NULL, row[2]);
@@ -1449,20 +1447,17 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource || EVENT_SOURCE_INTERNAL == action->eventsource)
 	{
-		if (0 == operations)
-		{
-			result = DBselect(
-					"select null"
-					" from operations"
-					" where actionid=" ZBX_FS_UI64
-						" and esc_step_from>%d"
-						" and recovery=%d",
-					action->actionid, escalation->esc_step, ZBX_OPERATION_MODE_NORMAL);
+		result = DBselect(
+				"select null"
+				" from operations"
+				" where actionid=" ZBX_FS_UI64
+					" and (esc_step_from>%d or esc_step_to=0)"
+					" and recovery=%d limit 1",
+				action->actionid, escalation->esc_step, ZBX_OPERATION_MODE_NORMAL);
 
-			if (NULL != DBfetch(result))
-				operations = 1;
-			DBfree_result(result);
-		}
+		if (NULL != DBfetch(result))
+			operations = 1;
+		DBfree_result(result);
 
 		if (1 == operations)
 		{
@@ -1966,7 +1961,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	if (0 != escalation->esc_step)
+	if (0 != escalation->esc_step && ESCALATION_STATUS_SLEEP != escalation->status)
 	{
 		char	*message;
 
