@@ -18,30 +18,6 @@
 **/
 
 
-/**
- * jQuery based publish/subscribe handler.
- *
- * - $.subscribe(event_name, callback)
- * - $.unsubscribe(event_name, callback)
- * - $.publish(event_name, data_object)
- *
- */
-(function($) {
-	var pubsub = $({});
-
-	$.subscribe = function() {
-		pubsub.on.apply(pubsub, arguments);
-	};
-
-	$.unsubscribe = function() {
-		pubsub.off.apply(pubsub, arguments);
-	};
-
-	$.publish = function() {
-		pubsub.trigger.apply(pubsub, arguments);
-	};
-}(jQuery));
-
 // Time range selector.
 jQuery(function ($){
 	var container = $('.filter-space').first(),

@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.0.4rc1])
+AC_INIT([Zabbix],[4.0.6rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -310,6 +310,131 @@ AC_TRY_LINK(
 	res_ndestroy(&res_state_local);
 ],
 AC_DEFINE(HAVE_RES_NDESTROY,1,[Define to 1 if 'res_ndestroy' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for _res._u._ext.nsaddrs[])
+AC_TRY_LINK(
+[
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
+#endif
+#ifdef HAVE_RESOLV_H
+#	include <resolv.h>
+#endif
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
+],
+[
+	struct sockaddr_in6	*sockaddrin6;
+
+	sockaddrin6 = _res._u._ext.nsaddrs[0];
+],
+AC_DEFINE(HAVE_RES_U_EXT,1,[Define to 1 if '_res._u._ext.nsaddrs[]' exists. /Linux/])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for _res._u._ext.ext)
+AC_TRY_LINK(
+[
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
+#endif
+#ifdef HAVE_RESOLV_H
+#	include <resolv.h>
+#endif
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
+],
+[
+	struct __res_state_ext	*ext;
+
+	ext = _res._u._ext.ext;
+],
+AC_DEFINE(HAVE_RES_U_EXT_EXT,1,[Define to 1 if '_res._u._ext.ext' exists. /BSD/])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for _res._ext.ext.nsaddrs[])
+AC_TRY_LINK(
+[
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
+#endif
+#ifdef HAVE_RESOLV_H
+#	include <resolv.h>
+#endif
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
+],
+[
+	union res_sockaddr_union	*na;
+
+	na = &_res._ext.ext.nsaddrs[0];
+],
+AC_DEFINE(HAVE_RES_EXT_EXT,1,[Define to 1 if '_res._ext.ext.nsaddrs[]' exists. /AIX/])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for struct sockaddr_in6.sin6_len)
+AC_TRY_LINK(
+[
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
+#endif
+#ifdef HAVE_RESOLV_H
+#	include <resolv.h>
+#endif
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
+],
+[
+	struct sockaddr_in6	sin6;
+	unsigned int		len;
+
+	len = sin6.sin6_len;
+],
+AC_DEFINE(HAVE_RES_SIN6_LEN,1,[Define to 1 if 'sockaddr_in6.sin6_len' exists. /BSD/])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 

@@ -1243,7 +1243,7 @@ class CWidgetHelper {
 	 * @return array  Returns array of unique patterns.
 	 */
 	public static function splitPatternIntoParts($patterns) {
-		$patterns = is_array($patterns) ? $patterns : str_split(str_replace("\r", '', $patterns), 255);
+		$patterns = is_array($patterns) ? $patterns : str_split(str_replace("\r", '', trim($patterns)), 255);
 		return array_filter($patterns, 'strlen');
 	}
 }
