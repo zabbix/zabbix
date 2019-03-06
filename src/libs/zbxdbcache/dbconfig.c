@@ -2246,21 +2246,23 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 {
 	ZBX_DC_MASTERITEM	*masteritem;
 	int			index;
+	zbx_uint64_pair_t	pair;
 
 	if (NULL == (masteritem = (ZBX_DC_MASTERITEM *)zbx_hashset_search(&config->masteritems, &master_itemid)))
 		return;
 
-	if (FAIL == (index = zbx_vector_uint64_search(&masteritem->dep_itemids, dep_itemid,
+	pair.first = dep_itemid;
+	if (FAIL == (index = zbx_vector_uint64_pair_search(&masteritem->dep_itemids, pair,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 	{
 		return;
 	}
 
-	zbx_vector_uint64_remove_noorder(&masteritem->dep_itemids, index);
+	zbx_vector_uint64_pair_remove_noorder(&masteritem->dep_itemids, index);
 
 	if (0 == masteritem->dep_itemids.values_num)
 	{
-		zbx_vector_uint64_destroy(&masteritem->dep_itemids);
+		zbx_vector_uint64_pair_destroy(&masteritem->dep_itemids);
 		zbx_hashset_remove_direct(&config->masteritems, masteritem);
 	}
 }
@@ -2817,6 +2819,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 	for (i = 0; i < dep_items.values_num; i++)
 	{
+		zbx_uint64_pair_t	pair = {depitem->itemid, 0};
+
 		depitem = (ZBX_DC_DEPENDENTITEM *)dep_items.values[i];
 		itemid = depitem->itemid;
 		dc_masteritem_remove_depitem(depitem->last_master_itemid, itemid);
@@ -2829,11 +2833,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			master_local.itemid = depitem->master_itemid;
 			master = (ZBX_DC_MASTERITEM *)zbx_hashset_insert(&config->masteritems, &master_local, sizeof(master_local));
 
-			zbx_vector_uint64_create_ext(&master->dep_itemids, __config_mem_malloc_func,
+			zbx_vector_uint64_pair_create_ext(&master->dep_itemids, __config_mem_malloc_func,
 					__config_mem_realloc_func, __config_mem_free_func);
 		}
 
-		zbx_vector_uint64_append(&master->dep_itemids, itemid);
+		zbx_vector_uint64_pair_append(&master->dep_itemids, pair);
 	}
 
 	zbx_vector_ptr_destroy(&dep_items);
@@ -6959,9 +6963,12 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 		}
 
 		item->dep_itemids_num = dc_masteritem->dep_itemids.values_num;
-		item->dep_itemids = (zbx_uint64_t *)zbx_malloc(NULL, sizeof(zbx_uint64_t) * item->dep_itemids_num);
+
+		item->dep_itemids = (zbx_uint64_pair_t *)zbx_malloc(NULL,
+				sizeof(zbx_uint64_pair_t) * item->dep_itemids_num);
+
 		memcpy(item->dep_itemids, dc_masteritem->dep_itemids.values,
-				sizeof(zbx_uint64_t) * item->dep_itemids_num);
+				sizeof(zbx_uint64_pair_t) * item->dep_itemids_num);
 	}
 
 	zbx_hashset_iter_reset(&config->items, &iter);

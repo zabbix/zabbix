@@ -239,8 +239,8 @@ ZBX_DC_CALCITEM;
 
 typedef struct
 {
-	zbx_uint64_t		itemid;
-	zbx_vector_uint64_t	dep_itemids;
+	zbx_uint64_t			itemid;
+	zbx_vector_uint64_pair_t	dep_itemids;
 }
 ZBX_DC_MASTERITEM;
 
