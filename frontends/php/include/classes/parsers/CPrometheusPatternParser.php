@@ -32,6 +32,7 @@ class CPrometheusPatternParser extends CParser {
 	private $user_macro_parser;
 	private $lld_macro_parser;
 	private $trim = " \t";
+	private $metric_name_exists;
 
 	public function __construct($options = []) {
 		if (array_key_exists('usermacros', $options)) {
@@ -60,6 +61,7 @@ class CPrometheusPatternParser extends CParser {
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
+		$this->metric_name_exists = false;
 		$p = $pos;
 
 		while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
@@ -67,6 +69,8 @@ class CPrometheusPatternParser extends CParser {
 		}
 
 		if ($this->parseMetric($source, $p) === true) {
+			$this->metric_name_exists = true;
+
 			while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
 				$p++;
 			}
@@ -191,6 +195,14 @@ class CPrometheusPatternParser extends CParser {
 		// Parse label name.
 		if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*/', substr($source, $p), $matches)) {
 			return false;
+		}
+
+		if ($matches[0] === '__name__') {
+			if ($this->metric_name_exists) {
+				return false;
+			}
+
+			$this->metric_name_exists = true;
 		}
 
 		$p += strlen($matches[0]);

@@ -189,6 +189,13 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'{__name__=~"value1"}', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{__name__=~"value1"}'
+				]
+			],
+			[
 				'{label1="\"v"}', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -435,6 +442,21 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '{label1="value1"}'
 				]
 			],
+			// metric and __name__ are duplicates
+			[
+				'metric{__name__=~"value1"}', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'metric'
+				]
+			],
+			[
+				'metric{label1=~"value1",__name__=~"value2"}', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'metric'
+				]
+			],
 			// Functional macros are not supported.
 			[
 				'{#LLD}  {label1="value1"}  ==  {{#LLD}.regsub("^([0-9]+)", "{#LLD}: \1")}', 0, ['lldmacros' => true],
@@ -593,6 +615,21 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'{label1==="value1"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			// duplicate __name__
+			[
+				'{__name__=~"value1",__name__=~"value2"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{  label1  = "value1"  ,  __name__ =  "value2",  label3 =~ ".*", __name__=~ "value4" } ', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
