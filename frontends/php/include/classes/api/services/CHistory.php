@@ -104,10 +104,16 @@ class CHistory extends CApiService {
 					'logeventid' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 					'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 				]],
-											['if' => ['field' => 'history', 'in' => implode(',', $common_value_types)], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
 					'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 					'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 					'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				]],
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
+					'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+					'value' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 				]]
 			]],
 			'search' =>					['type' => API_MULTIPLE, 'default' => null, 'rules' => [

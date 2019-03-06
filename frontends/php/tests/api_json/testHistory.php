@@ -160,6 +160,30 @@ class testHistory extends CAPITest {
 				],
 				'expected_result' => '14',
 				'expected_error' => false
+			],
+			// Get number of history records of filtering by particular value.
+			[
+				'api_request' => [
+					'countOutput' => true,
+					'history' => 3,
+					'filter' => [
+						'value' => '5'
+					]
+				],
+				'expected_result' => '5',
+				'expected_error' => false
+			],
+			// Get number of history records of searching by particular value.
+			[
+				'api_request' => [
+					'countOutput' => true,
+					'history' => 1,
+					'search' => [
+						'value' => '1'
+					]
+				],
+				'expected_result' => '3',
+				'expected_error' => false
 			]
 		];
 	}
