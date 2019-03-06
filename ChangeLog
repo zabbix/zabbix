@@ -3,6 +3,7 @@ Changes for 4.2.0rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
 ..F....... [ZBX-15483] fixed undefined index in Item Prototype update (vasilijs)
 ..F....... [ZBX-15270] fixed graph widget configuration form cross browser issues (agriscenko)
 ..F....... [ZBX-15300] fixed widgets extra space at the bottom (ashubin, vasilijs)
@@ -200,6 +201,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+.......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
 ..F....... [ZBX-15483] fixed undefined index in Item Prototype update (vasilijs)
 ..F....... [ZBX-15270] fixed graph widget configuration form cross browser issues (agriscenko)
 ..F....... [ZBX-15300] fixed widgets extra space at the bottom (ashubin, vasilijs)
@@ -2466,6 +2468,7 @@ Changes for 3.0.26rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
 .......PS. [ZBX-14858] fixed processing of unlimited vmware maxQueryMetrics value (MVekslers)
 .D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
 ...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
