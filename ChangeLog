@@ -3,6 +3,7 @@ Changes for 4.2.0rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15483] fixed undefined index in Item Prototype update (vasilijs)
 ..F....... [ZBX-15270] fixed graph widget configuration form cross browser issues (agriscenko)
 ..F....... [ZBX-15300] fixed widgets extra space at the bottom (ashubin, vasilijs)
 ...G...... [ZBX-8091] added alphabetic ordering of net.dns.record respond (akozlovs)
@@ -199,6 +200,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+..F....... [ZBX-15483] fixed undefined index in Item Prototype update (vasilijs)
 ..F....... [ZBX-15270] fixed graph widget configuration form cross browser issues (agriscenko)
 ..F....... [ZBX-15300] fixed widgets extra space at the bottom (ashubin, vasilijs)
 ...G...... [ZBX-8091] added alphabetic ordering of net.dns.record respond (akozlovs)
