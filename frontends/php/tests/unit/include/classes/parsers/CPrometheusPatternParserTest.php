@@ -77,10 +77,17 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'metric==Nan', 0, [],
+				'metric==inf', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => 'metric==Nan'
+					'match' => 'metric==inf'
+				]
+			],
+			[
+				'metric==NaN', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'metric==NaN'
 				]
 			],
 			[
@@ -416,27 +423,6 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'{label1="value1"}===', 0, [],
-				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{label1="value1"}'
-				]
-			],
-			[
-				'{label1="value1"}==+inf', 0, [],
-				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{label1="value1"}'
-				]
-			],
-			[
-				'{label1="value1"}==-inf', 0, [],
-				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{label1="value1"}'
-				]
-			],
-			[
-				'{label1="value1"}==nan', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{label1="value1"}'

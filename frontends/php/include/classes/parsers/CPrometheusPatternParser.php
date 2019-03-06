@@ -329,12 +329,12 @@ class CPrometheusPatternParser extends CParser {
 
 			return true;
 		}
-		elseif (substr($source, $pos, 4) === '+Inf' || substr($source, $pos, 4) === '-Inf') {
+		elseif (strtolower(substr($source, $pos, 4)) === '+inf' || strtolower(substr($source, $pos, 4)) === '-inf') {
 			$pos += 4;
 
 			return true;
 		}
-		elseif (substr($source, $pos, 3) === 'Nan') {
+		elseif (strtolower(substr($source, $pos, 3)) === 'nan' || strtolower(substr($source, $pos, 3)) === 'inf') {
 			$pos += 3;
 
 			return true;
