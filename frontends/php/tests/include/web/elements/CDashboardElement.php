@@ -31,7 +31,7 @@ class CDashboardElement extends CElement {
 	 * @inheritdoc
 	 */
 	public static function find() {
-		return (new CElementQuery('class:dashbrd-grid-widget-container'))->asDashboard();
+		return (new CElementQuery('class:dashbrd-grid-container'))->asDashboard();
 	}
 
 	/**
@@ -49,7 +49,7 @@ class CDashboardElement extends CElement {
 	 * @return boolean
 	 */
 	public function isEmpty() {
-		return ($this->query('xpath:.//div[@class="dashbrd-grid-empty-placeholder"]')->one(false) !== null);
+		return ($this->query('xpath:.//div[@class="dashbrd-grid-new-widget-placeholder"]')->one(false) !== null);
 	}
 
 	/**
