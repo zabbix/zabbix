@@ -1771,7 +1771,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$supported_macros = [
 			'host' => [
 				'label' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
-				'urls' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}']
+				'urls' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}']
 			],
 			'map' => [
 				'label' => ['{MAP.ID}', '{MAP.NAME}'],
