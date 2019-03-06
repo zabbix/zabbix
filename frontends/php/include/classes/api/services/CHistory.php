@@ -115,10 +115,10 @@ class CHistory extends CApiService {
 					'source' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 					'value' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 				]],
-											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_TEXT])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
 					'value' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 				]],
-											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => []]
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => []]
 			]],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
