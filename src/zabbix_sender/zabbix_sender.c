@@ -1227,7 +1227,7 @@ int	main(int argc, char **argv)
 	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
 	{
 		/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
-		zbx_tls_pass_vars(sendval_args->tls_vars);
+		zbx_tls_pass_vars(&sendval_args->tls_vars);
 	}
 #endif
 	zbx_json_init(&sendval_args->json, ZBX_JSON_STAT_BUF_LEN);
