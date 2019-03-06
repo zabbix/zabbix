@@ -554,20 +554,23 @@ function validateTimeUnit($value, $min, $max, $allow_zero, &$error, array $optio
 	$simple_interval_parser = new CSimpleIntervalParser($options);
 
 	if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {
-		if ($value[0] != '{') {
+		if ($value[0] !== '{') {
 			$value = timeUnitToSeconds($value);
 
 			if ($allow_zero && $value == 0) {
 				return true;
 			}
-			elseif ($min > $value || $value > $max) {
-				$error = _s('must be between "%1$s" and "%2$s"', $min, $max);
+
+			if ($value < $min || $value > $max) {
+				$error = _s('value must be one of %1$s', $allow_zero ? '0, '.$min.'-'.$max : $min.'-'.$max);
+
 				return false;
 			}
 		}
 	}
 	else {
 		$error = _('a time unit is expected');
+
 		return false;
 	}
 

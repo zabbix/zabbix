@@ -76,8 +76,7 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
  * Display
  */
 if ($hostId > 0) {
-	// host scripts
-	$data['hostScripts'] = API::Script()->getScriptsByHosts([$hostId]);
+	$data = [];
 
 	// inventory info
 	$data['tableTitles'] = getHostInventories();
@@ -86,11 +85,10 @@ if ($hostId > 0) {
 
 	// overview tab
 	$data['host'] = API::Host()->get([
-		'output' => ['hostid', 'host', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type', 'description'],
+		'output' => ['hostid', 'host', 'name', 'maintenance_status', 'maintenanceid', 'maintenance_type', 'description'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
-		'selectScreens' => API_OUTPUT_COUNT,
 		'selectInventory' => $inventoryFields,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectApplications' => API_OUTPUT_COUNT,
