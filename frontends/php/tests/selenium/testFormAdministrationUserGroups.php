@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -132,7 +132,6 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 				$this->zbxTestCheckHeader('User groups');
 				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add group']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group added');
-				$this->zbxTestCheckFatalErrors();
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
 				$this->assertEquals(1, CDBHelper::getCount($sql));
 
@@ -146,7 +145,6 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
 				$this->zbxTestTextPresent($data['error']);
-				$this->zbxTestCheckFatalErrors();
 				break;
 		}
 	}
@@ -241,7 +239,6 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 				$this->zbxTestCheckHeader('User groups');
 				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot update group']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
-				$this->zbxTestCheckFatalErrors();
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
 				$this->assertEquals(1, CDBHelper::getCount($sql));
 
@@ -255,7 +252,6 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
 				$this->zbxTestTextPresent($data['error']);
-				$this->zbxTestCheckFatalErrors();
 				break;
 		}
 	}
@@ -317,14 +313,12 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 				$this->zbxTestCheckHeader('User groups');
 				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot delete group']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group deleted');
-				$this->zbxTestCheckFatalErrors();
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
 				$this->assertEquals(0, CDBHelper::getCount($sql));
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete group');
 				$this->zbxTestTextPresent($data['error']);
-				$this->zbxTestCheckFatalErrors();
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
 				$this->assertEquals(1, CDBHelper::getCount($sql));
 				break;

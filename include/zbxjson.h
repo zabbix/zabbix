@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,6 +99,9 @@
 #define ZBX_PROTO_TAG_MAX		"max"
 #define ZBX_PROTO_TAG_SESSION		"session"
 #define ZBX_PROTO_TAG_ID		"id"
+#define ZBX_PROTO_TAG_PARAMS		"params"
+#define ZBX_PROTO_TAG_FROM		"from"
+#define ZBX_PROTO_TAG_TO		"to"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -126,6 +129,9 @@
 
 #define ZBX_PROTO_VALUE_GET_STATUS_PING		"ping"
 #define ZBX_PROTO_VALUE_GET_STATUS_FULL		"full"
+
+#define ZBX_PROTO_VALUE_ZABBIX_STATS		"zabbix.stats"
+#define ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE	"queue"
 
 typedef enum
 {

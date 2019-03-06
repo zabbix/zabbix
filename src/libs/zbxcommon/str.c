@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #endif
 
 static const char	copyright_message[] =
-	"Copyright (C) 2018 Zabbix SIA\n"
+	"Copyright (C) 2019 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
@@ -421,19 +421,39 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
  ******************************************************************************/
 void	del_zeros(char *s)
 {
-	int     i;
+	int	trim = 0;
+	size_t	len = 0;
 
-	if(strchr(s,'.')!=NULL)
+	while ('\0' != s[len])
 	{
-		for(i = (int)strlen(s)-1;;i--)
+		if ('e' == s[len] || 'E' == s[len])
 		{
-			if(s[i]=='0')
+			/* don't touch numbers that are written in scientific notation */
+			return;
+		}
+
+		if ('.' == s[len])
+		{
+			/* number has decimal part */
+			trim = 1;
+		}
+
+		len++;
+	}
+
+	if (1 == trim)
+	{
+		size_t	i;
+
+		for (i = len - 1; ; i--)
+		{
+			if ('0' == s[i])
 			{
-				s[i]=0;
+				s[i] = '\0';
 			}
-			else if(s[i]=='.')
+			else if ('.' == s[i])
 			{
-				s[i]=0;
+				s[i] = '\0';
 				break;
 			}
 			else
@@ -3828,7 +3848,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 			case '9':
 				if (SUCCEED == (ret = zbx_token_parse_objectid(expression, ptr, token)))
 					break;
-				/* break; is not missing here */
+				ZBX_FALLTHROUGH;
 			default:
 				if (SUCCEED != (ret = zbx_token_parse_macro(expression, ptr, token)))
 					ret = zbx_token_parse_simple_macro(expression, ptr, token);
@@ -3875,6 +3895,10 @@ static size_t	zbx_no_function(const char *expr)
 				NULL != strchr("()" ZBX_WHITESPACE, ptr[len]))
 		{
 			ptr += len;	/* skip to the position after and/or/not operator */
+		}
+		else if (ptr > expr && 0 != isdigit(*(ptr - 1)) && NULL != strchr(ZBX_UNIT_SYMBOLS, *ptr))
+		{
+			ptr++;	/* skip unit suffix symbol if it's preceded by a digit */
 		}
 		else
 			break;

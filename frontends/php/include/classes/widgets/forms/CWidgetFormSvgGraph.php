@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,11 +27,10 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->data = self::convertDottedKeys($this->data);
 
 		// API doesn't guarantee fields to be retrieved in same order as stored.
-		if (array_key_exists('or', $this->data)) {
-			ksort($this->data['or']);
-		}
-		if (array_key_exists('ds', $this->data)) {
-			ksort($this->data['ds']);
+		foreach (['or', 'ds'] as $field) {
+			if (array_key_exists($field, $this->data)) {
+				ksort($this->data[$field]);
+			}
 		}
 
 		/**
@@ -158,7 +157,8 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		]))
 			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
 			->setAction('jQuery("#lefty_static_units")'.
-							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))');
+							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))'
+			);
 
 		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_lefty_units->setFlags(CWidgetField::FLAG_DISABLED);
@@ -230,7 +230,8 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		]))
 			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
 			->setAction('jQuery("#righty_static_units")'.
-							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))');
+							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))'
+			);
 
 		if ($field_righty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_righty_units->setFlags(CWidgetField::FLAG_DISABLED);
@@ -473,10 +474,21 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			$lefty_max = $this->fields['lefty_max']->getValue();
 			$lefty_min = ($lefty_min !== '') ? convertFunctionValue($lefty_min, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
 			$lefty_max = ($lefty_max !== '') ? convertFunctionValue($lefty_max, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
+			$compare = true;
 
-			if ($lefty_min !== '' && $lefty_max !== '' && bccomp($lefty_min, $lefty_max) >= 0) {
+			if (strlen(substr(strrchr($lefty_min, '.'), 1)) > 4) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), _('too many decimal places'));
+				$compare = false;
+			}
+			if (strlen(substr(strrchr($lefty_max, '.'), 1))  > 4) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _('too many decimal places'));
+				$compare = false;
+			}
+
+			if ($compare && $lefty_min !== '' && $lefty_max !== ''
+					&& bccomp($lefty_min, $lefty_max, 4) >= 0) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'),
-					_('Y axis MAX value must be greater than Y axis MIN value.')
+					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
 			}
 		}
@@ -486,10 +498,21 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			$righty_max = $this->fields['righty_max']->getValue();
 			$righty_min = ($righty_min != '') ? convertFunctionValue($righty_min, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
 			$righty_max = ($righty_max != '') ? convertFunctionValue($righty_max, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
+			$compare = true;
 
-			if ($righty_min !== '' && $righty_max !== '' && bccomp($righty_min, $righty_max) >= 0) {
+			if (strlen(substr(strrchr($righty_min, '.'), 1)) > 4) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), _('too many decimal places'));
+				$compare = false;
+			}
+			if (strlen(substr(strrchr($righty_max, '.'), 1))  > 4) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _('too many decimal places'));
+				$compare = false;
+			}
+
+			if ($compare && $righty_min !== '' && $righty_max !== ''
+					&& bccomp($righty_min, $righty_max, 4) >= 0) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'),
-					_('Y axis MAX value must be greater than Y axis MIN value.')
+					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
 			}
 		}

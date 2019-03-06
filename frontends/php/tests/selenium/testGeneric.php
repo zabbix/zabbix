@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,7 +125,6 @@ class testGeneric extends CLegacyWebTest {
 	public function testGeneric_Pages($url, $title) {
 		$this->zbxTestLogin($url);
 		$this->zbxTestCheckTitle($title);
-		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckMandatoryStrings();
 	}
 }

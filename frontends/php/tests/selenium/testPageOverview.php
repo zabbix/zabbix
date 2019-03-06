@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -721,6 +721,7 @@ class testPageOverview extends CLegacyWebTest {
 		$this->zbxTestDropdownSelectWait('type', $data['type']);
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestClickXpathWait('//tbody//td[contains(@class, "cursor-pointer")]');
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//ul[contains(@class, "action-menu")]//a'));
 
 		// Check context menu links text and url.
 		$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "action-menu")]//h3[text()="History"]');
@@ -770,7 +771,6 @@ class testPageOverview extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
 			$this->zbxTestAssertElementPresentXpath("//header");
 			$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
-			$this->zbxTestCheckFatalErrors();
 		}
 		catch (Exception $e) {
 			// Reset fullscreen/kiosk mode.

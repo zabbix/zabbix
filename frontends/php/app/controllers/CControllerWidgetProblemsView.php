@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'show_suppressed' => $fields['show_suppressed'],
 			'unacknowledged' => $fields['unacknowledged'],
 			'show_latest_values' => $fields['show_latest_values']
-		], $config);
+		], $config, true, true);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);
 
@@ -70,7 +70,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'show' => $fields['show'],
 			'details' => 0,
 			'show_latest_values' => $fields['show_latest_values']
-		], true);
+		], true, true);
 
 		if ($fields['show_tags']) {
 			$data['tags'] = makeTags($data['problems'], true, 'eventid', $fields['show_tags'], $fields['tags'],

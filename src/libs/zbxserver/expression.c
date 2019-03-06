@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -159,7 +159,7 @@ void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression)
 				is_uint64_n(expression + token.loc.l + 1, token.loc.r - token.loc.l - 1,
 						&functionid);
 				zbx_vector_uint64_append(functionids, functionid);
-				/* break; is not missing here */
+				ZBX_FALLTHROUGH;
 			case ZBX_TOKEN_USER_MACRO:
 			case ZBX_TOKEN_SIMPLE_MACRO:
 			case ZBX_TOKEN_MACRO:

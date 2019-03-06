@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -686,13 +686,14 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 {
 	const char		*__function_name = "check_vcenter_eventlog";
 
-	char			*url;
+	const char		*url, *skip;
+	unsigned char		skip_old;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (1 != request->nparam)
+	if (2 < request->nparam || 0 == request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -700,16 +701,31 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 
 	url = get_rparam(request, 0);
 
+	if (NULL == (skip = get_rparam(request, 1)) || '\0' == *skip || 0 == strcmp(skip, "all"))
+	{
+		skip_old = 0;
+	}
+	else if (0 == strcmp(skip, "skip"))
+	{
+		skip_old = 1;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
 		goto unlock;
 
-	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog_last_key)
+	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key)
 	{
-		service->eventlog_last_key = request->lastlogsize;
+		service->eventlog.last_key = request->lastlogsize;
+		service->eventlog.skip_old = skip_old;
 	}
-	else if (request->lastlogsize < service->eventlog_last_key)
+	else if (request->lastlogsize < service->eventlog.last_key)
 	{
 		/* this may happen if there are multiple vmware.eventlog items for the same service URL or item has  */
 		/* been polled, but values got stuck in history cache and item's lastlogsize hasn't been updated yet */
@@ -719,7 +735,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	else if (0 < service->data->events.values_num)
 	{
 		vmware_get_events(&service->data->events, request->lastlogsize, item, add_results);
-		service->eventlog_last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
+		service->eventlog.last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
 	}
 
 	ret = SYSINFO_RET_OK;

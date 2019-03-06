@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2018 Zabbix SIA
+ ** Copyright (C) 2001-2019 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -397,7 +397,7 @@
 							}
 						});
 
-					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
+					var async = flickerfreeScreen.getImageSboxHeight(url, function(height) {
 							zbx_sbox.height = parseInt(height, 10);
 							// 'src' should be added only here to trigger load event after new height is received.
 							img.data('zbx_sbox', zbx_sbox)

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,30 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-/**
- * jQuery based publish/subscribe handler.
- *
- * - $.subscribe(event_name, callback)
- * - $.unsubscribe(event_name, callback)
- * - $.publish(event_name, data_object)
- *
- */
-(function($) {
-	var pubsub = $({});
-
-	$.subscribe = function() {
-		pubsub.on.apply(pubsub, arguments);
-	};
-
-	$.unsubscribe = function() {
-		pubsub.off.apply(pubsub, arguments);
-	};
-
-	$.publish = function() {
-		pubsub.trigger.apply(pubsub, arguments);
-	};
-}(jQuery));
 
 // Time range selector.
 jQuery(function ($){

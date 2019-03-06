@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -156,6 +156,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			$graph_options = zbx_array_merge($svg_data['data'], [
 				'sbox' => ($graph_data['dashboard_time'] && !$edit_mode),
 				'show_problems' => ($fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW),
+				'time_from' => $graph_data['time_period']['time_from'],
 				'hint_max_rows' => ZBX_WIDGET_ROWS
 			]);
 

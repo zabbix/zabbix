@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -209,23 +209,37 @@ struct	_DC_TRIGGER;
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
 #ifdef HAVE_ORACLE
-#define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "begin\n")
-#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;")
+#	define ZBX_PLSQL_BEGIN	"begin\n"
+#	define ZBX_PLSQL_END	"end;"
+#	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)			\
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_BEGIN)
+#	define	DBend_multiple_update(sql, sql_alloc, sql_offset)			\
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_END)
+#	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
+#		define	ZBX_SQL_EXEC_FROM	ZBX_CONST_STRLEN(ZBX_PLSQL_BEGIN)
+#	else
+#		define	ZBX_SQL_EXEC_FROM	0
+#	endif
 
-#define	ZBX_SQL_STRCMP		"%s%s%s"
-#define	ZBX_SQL_STRVAL_EQ(str)	'\0' != *str ? "='"  : "",		\
-				'\0' != *str ? str   : " is null",	\
-				'\0' != *str ? "'"   : ""
-#define	ZBX_SQL_STRVAL_NE(str)	'\0' != *str ? "<>'" : "",		\
-				'\0' != *str ? str   : " is not null",	\
-				'\0' != *str ? "'"   : ""
+#	define	ZBX_SQL_STRCMP		"%s%s%s"
+#	define	ZBX_SQL_STRVAL_EQ(str)				\
+			'\0' != *str ? "='"  : "",		\
+			'\0' != *str ? str   : " is null",	\
+			'\0' != *str ? "'"   : ""
+#	define	ZBX_SQL_STRVAL_NE(str)				\
+			'\0' != *str ? "<>'" : "",		\
+			'\0' != *str ? str   : " is not null",	\
+			'\0' != *str ? "'"   : ""
+
 #else
-#define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)
-#define	DBend_multiple_update(sql, sql_alloc, sql_offset)
+#	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
+#	define	DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 
-#define	ZBX_SQL_STRCMP		"%s'%s'"
-#define	ZBX_SQL_STRVAL_EQ(str)	"=", str
-#define	ZBX_SQL_STRVAL_NE(str)	"<>", str
+#	define	ZBX_SQL_EXEC_FROM	0
+
+#	define	ZBX_SQL_STRCMP		"%s'%s'"
+#	define	ZBX_SQL_STRVAL_EQ(str)	"=", str
+#	define	ZBX_SQL_STRVAL_NE(str)	"<>", str
 #endif
 
 #define ZBX_SQL_NULLCMP(f1, f2)	"((" f1 " is null and " f2 " is null) or " f1 "=" f2 ")"
@@ -495,7 +509,7 @@ int		DBis_null(const char *field);
 void		DBbegin(void);
 int		DBcommit(void);
 void		DBrollback(void);
-void		DBend(int ret);
+int		DBend(int ret);
 
 const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
