@@ -421,19 +421,39 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
  ******************************************************************************/
 void	del_zeros(char *s)
 {
-	int     i;
+	int	trim = 0;
+	size_t	len = 0;
 
-	if(strchr(s,'.')!=NULL)
+	while ('\0' != s[len])
 	{
-		for(i = (int)strlen(s)-1;;i--)
+		if ('e' == s[len] || 'E' == s[len])
 		{
-			if(s[i]=='0')
+			/* don't touch numbers that are written in scientific notation */
+			return;
+		}
+
+		if ('.' == s[len])
+		{
+			/* number has decimal part */
+			trim = 1;
+		}
+
+		len++;
+	}
+
+	if (1 == trim)
+	{
+		size_t	i;
+
+		for (i = len - 1; ; i--)
+		{
+			if ('0' == s[i])
 			{
-				s[i]=0;
+				s[i] = '\0';
 			}
-			else if(s[i]=='.')
+			else if ('.' == s[i])
 			{
-				s[i]=0;
+				s[i] = '\0';
 				break;
 			}
 			else
@@ -3828,7 +3848,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 			case '9':
 				if (SUCCEED == (ret = zbx_token_parse_objectid(expression, ptr, token)))
 					break;
-				/* break; is not missing here */
+				ZBX_FALLTHROUGH;
 			default:
 				if (SUCCEED != (ret = zbx_token_parse_macro(expression, ptr, token)))
 					ret = zbx_token_parse_simple_macro(expression, ptr, token);

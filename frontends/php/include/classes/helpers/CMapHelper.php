@@ -47,14 +47,11 @@ class CMapHelper {
 			],
 			'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
-				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls', 'permission'
+				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'permission'
 			],
 			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers',
 				'permission'],
-			'selectUrls' => ['sysmapurlid', 'name', 'url'],
 			'sysmapids' => $sysmapids,
-			'expandUrls' => true,
-			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 		$map = reset($maps);
@@ -128,6 +125,10 @@ class CMapHelper {
 		];
 
 		foreach ($sysmap['selements'] as &$selement) {
+			$selement['selementid_orig'] = $selement['selementid'];
+			$selement['elementtype_orig'] = $selement['elementtype'];
+			$selement['elementsubtype_orig'] = $selement['elementsubtype'];
+
 			// If user has no access to whole host group, always show it as a SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP.
 			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP && $selement['permission'] < PERM_READ
 					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
