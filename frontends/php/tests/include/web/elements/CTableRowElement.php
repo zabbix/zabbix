@@ -73,11 +73,9 @@ class CTableRowElement extends CElement {
 			if ($column === false) {
 				return null;
 			}
-
-			$column++;
 		}
 
-		return $this->query('xpath:./td['.$column.']')->one();
+		return $this->query('xpath:./td['.((int)$column + 1).']')->one();
 	}
 
 	/**

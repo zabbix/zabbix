@@ -110,7 +110,6 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
 
 $applications = [];
 $items = [];
-$hostScripts = [];
 $child_groups = [];
 
 // multiselect host groups
@@ -159,7 +158,6 @@ if ($filterSet) {
 		'output' => ['name', 'hostid', 'status'],
 		'hostids' => $filter['hostids'],
 		'groupids' => $groupids,
-		'selectGraphs' => API_OUTPUT_COUNT,
 		'with_monitored_items' => true,
 		'preservekeys' => true
 	]);
@@ -283,21 +281,6 @@ if ($items) {
 			array_push($sortFields, 'name', 'applicationid');
 			CArrayHelper::sort($applications, $sortFields);
 		}
-
-		// get host scripts
-		$hostScripts = API::Script()->getScriptsByHosts($hostIds);
-
-		// get templates screen count
-		$screens = API::TemplateScreen()->get([
-			'hostids' => $hostIds,
-			'countOutput' => true,
-			'groupCount' => true
-		]);
-		$screens = zbx_toHash($screens, 'hostid');
-		foreach ($hosts as &$host) {
-			$host['screens'] = isset($screens[$host['hostid']]);
-		}
-		unset($host);
 	}
 }
 
@@ -631,8 +614,7 @@ foreach ($applications as $appid => $dbApp) {
 
 	$open_state = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
-	$hostName = (new CLinkAction($host['name']))
-		->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+	$hostName = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($dbApp['hostid']));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);
 	}
@@ -775,8 +757,7 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	$open_state = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
-	$hostName = (new CLinkAction($host['name']))
-		->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+	$hostName = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostId));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);
 	}

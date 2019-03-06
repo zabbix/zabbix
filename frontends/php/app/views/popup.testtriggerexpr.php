@@ -83,7 +83,13 @@ if ($allowed_testing && $test) {
 	}
 }
 
-$result_table->setFooter([$data['outline'], (new CCol($result))->addClass($style)]);
+$result_table->setFooter([
+	(new CCol($data['outline']))
+		->setAttribute('title', $data['outline'])
+		->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+		->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+	(new CCol($result))->addClass($style)
+]);
 
 $form_list->addRow(_('Result'),
 	(new CDiv($result_table))
