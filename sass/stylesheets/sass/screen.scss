@@ -3217,7 +3217,7 @@ $form-icon-btn: (
 }
 
 // Dashboard
-.dashbrd-grid-widget-container {
+.dashbrd-grid-container {
 	position: relative;
 	margin: -4px;
 }
@@ -3317,7 +3317,7 @@ $form-icon-btn: (
 
 .dashbrd-grid-widget-content {
 	flex: 1;
-	overflow-y: auto;
+	overflow: auto;
 	@extend %webkit-scrollbar;
 
 	.list-table {
@@ -3359,7 +3359,7 @@ $form-icon-btn: (
 	position: absolute;
 }
 
-.dashbrd-grid-widget-padding {
+.dashbrd-grid-widget-container {
 	display: flex;
 	flex-grow: 1;
 	flex-direction: column;
@@ -3717,19 +3717,6 @@ $form-icon-btn: (
 
 	&:link {
 		border: none;
-	}
-
-	&:focus {
-
-		&:after {
-			content: "";
-			background: rgba($blue, .35);
-			height: 2px;
-			position: absolute;
-			left: 0;
-			right: 0;
-			bottom: -2px;
-		}
 	}
 }
 
@@ -4336,6 +4323,10 @@ $form-icon-btn: (
 	}
 }
 
+.svg-graph {
+	display: block;
+}
+
 .svg-single-item-graph-legend,
 .svg-single-two-items-graph-legend,
 .svg-graph-legend {
@@ -4346,13 +4337,14 @@ $form-icon-btn: (
 	overflow-y: hidden;
 	white-space: normal;
 	margin: 0 10px;
+	line-height: $svg-legend-line-height;
 
 	div {
 		display: inline-block;
 		margin: 0 4px;
 		font-size: 12px;
-		line-height: $svg-legend-line-height;
-		vertical-align: middle;
+		line-height: 1.1;
+		vertical-align: bottom;
 		min-width: 120px;
 		overflow: hidden;
 		white-space: nowrap;
@@ -5605,6 +5597,7 @@ tr.cursor-move {
 
 .flickerfreescreen {
 	position: relative;
+	overflow: hidden;
 }
 
 .graph-wrapper {
