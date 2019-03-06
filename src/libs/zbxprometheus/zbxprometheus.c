@@ -1715,6 +1715,9 @@ int	zbx_prometheus_validate_label(const char *label)
 	zbx_strloc_t	loc;
 	size_t		pos;
 
+	if ('\0' == *label)
+		return SUCCEED;
+
 	if (SUCCEED != parse_label(label, 0, &loc))
 		return FAIL;
 
