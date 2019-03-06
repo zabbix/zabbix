@@ -3886,6 +3886,7 @@ $form-icon-btn: (
 
 	.msg-bad,
 	.msg-good {
+		position: -webkit-sticky;
 		position: sticky;
 		top: 0;
 		z-index: 1000;
@@ -6336,15 +6337,16 @@ $range-input-width: 31px;
 		margin-left: -$range-thumb-size/2;
 		width: $range-thumb-size;
 		height: $range-thumb-size;
-		border-radius: $range-thumb-size/2;
-		box-shadow: 0 0 1px white;
+		border-radius: 50%;
 		background: $range-thumb-color;
 	}
 
 	&.range-control-focus {
 		.range-control-thumb {
+			margin-top: -$range-thumb-size/1.5;
+			margin-left: -$range-thumb-size/1.5;
 			background: $range-thumb-color-focus;
-			box-shadow: 0 0 0 2px lighten($btn-bg-color, 10%);
+			border: 2px solid lighten($btn-bg-color, 10%);
 		}
 
 		.range-control-progress {
