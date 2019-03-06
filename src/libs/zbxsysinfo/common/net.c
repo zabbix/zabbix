@@ -474,6 +474,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		pDnsRecord = pDnsRecord->pNext;
 		zbx_vector_str_append(&answers, zbx_strdup(NULL, buffer));
 		offset = 0;
+		*buffer = '\0';
 	}
 #else	/* not _WINDOWS */
 #if defined(HAVE_RES_NINIT) && !defined(_AIX)
@@ -802,6 +803,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 		zbx_vector_str_append(&answers, zbx_strdup(NULL, buffer));
 		offset = 0;
+		*buffer = '\0';
 	}
 #endif	/* _WINDOWS */
 
