@@ -857,9 +857,6 @@ do														\
 }														\
 while (0)
 
-#define MIN_ZABBIX_PORT 0u
-#define MAX_ZABBIX_PORT 65535u
-
 extern const char	*progname;
 extern const char	title_message[];
 extern const char	syslog_app_name[];

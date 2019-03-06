@@ -753,6 +753,11 @@ static void	zbx_load_config(const char *config_file)
 
 static void	parse_commandline(int argc, char **argv)
 {
+/* Minimum and maximum port numbers Zabbix sender can connect to. */
+/* Do not forget to modify port number validation below if MAX_ZABBIX_PORT is ever changed. */
+#define MIN_ZABBIX_PORT 1u
+#define MAX_ZABBIX_PORT 65535u
+
 	int		i, fatal = 0;
 	char		ch;
 	unsigned int	opt_mask = 0;
@@ -873,10 +878,11 @@ static void	parse_commandline(int argc, char **argv)
 
 		if (NULL != ZABBIX_SERVER_PORT)
 		{
-			if (SUCCEED != is_ushort(ZABBIX_SERVER_PORT, &port))
+			if (SUCCEED != is_ushort(ZABBIX_SERVER_PORT, &port) || MIN_ZABBIX_PORT > port)
 			{
-				zbx_error("option \"-p\" used with invalid port number [%s], allowed [%d:%d]",
-						ZABBIX_SERVER_PORT, (int)MIN_ZABBIX_PORT, (int)MAX_ZABBIX_PORT);
+				zbx_error("option \"-p\" used with invalid port number \"%s\", valid port numbers are"
+						" %d-%d", ZABBIX_SERVER_PORT, (int)MIN_ZABBIX_PORT,
+						(int)MAX_ZABBIX_PORT);
 				exit(EXIT_FAILURE);
 			}
 		}
