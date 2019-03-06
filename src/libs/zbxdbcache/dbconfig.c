@@ -2575,7 +2575,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			else
 				depitem->last_master_itemid = 0;
 
-			depitem->item_flags = item->flags;
+			depitem->flags = item->flags;
 			ZBX_STR2UINT64(depitem->master_itemid, row[38]);
 
 			if (depitem->last_master_itemid != depitem->master_itemid)
@@ -2825,7 +2825,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		depitem = (ZBX_DC_DEPENDENTITEM *)dep_items.values[i];
 		dc_masteritem_remove_depitem(depitem->last_master_itemid, depitem->itemid);
 		pair.first = depitem->itemid;
-		pair.second = depitem->item_flags;
+		pair.second = depitem->flags;
 
 		/* append item to dependent item vector of master item */
 		if (NULL == (master = (ZBX_DC_MASTERITEM *)zbx_hashset_search(&config->masteritems, &depitem->master_itemid)))

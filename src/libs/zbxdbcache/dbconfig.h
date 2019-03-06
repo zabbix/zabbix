@@ -173,7 +173,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	master_itemid;
 	zbx_uint64_t	last_master_itemid;
-	unsigned char	item_flags;
+	unsigned char	flags;
 }
 ZBX_DC_DEPENDENTITEM;
 
