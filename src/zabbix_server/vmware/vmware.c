@@ -1126,36 +1126,6 @@ static zbx_vmware_event_t	*vmware_event_shared_dup(const zbx_vmware_event_t *src
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_event_backup                                              *
- *                                                                            *
- * Purpose: make copy of not pooled vmware events                             *
- *                                                                            *
- * Parameters: service - [IN/OUT] the vmware service with old vmware event    *
- *             events  - [OUT] array of copied vmware events                  *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_event_backup(zbx_vmware_service_t *service, zbx_vector_ptr_t *events)
-{
-	int	i;
-
-	zbx_vector_ptr_create(events);
-
-	if (NULL == service->data || 0 == service->data->events.values_num)
-		return;
-
-	if (((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog.last_key)
-	{
-		zbx_vector_ptr_reserve(events, service->data->events.values_num);
-
-		for (i = 0; i < service->data->events.values_num; i++)
-			zbx_vector_ptr_append(events, service->data->events.values[i]);
-
-		zbx_vector_ptr_clear(&service->data->events);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vmware_datastore_shared_dup                                      *
  *                                                                            *
  * Purpose: copies vmware hypervisor datastore object into shared memory      *
@@ -4334,13 +4304,20 @@ clean:
 	zbx_vector_str_clear_ext(&hvs, zbx_str_free);
 	zbx_vector_str_destroy(&hvs);
 out:
+	zbx_vector_ptr_create(&events);
 	zbx_vmware_lock();
 
 	/* remove UPDATING flag and set READY or FAILED flag */
 	service->state &= ~(ZBX_VMWARE_STATE_MASK | ZBX_VMWARE_STATE_UPDATING);
 	service->state |= (SUCCEED == ret) ? ZBX_VMWARE_STATE_READY : ZBX_VMWARE_STATE_FAILED;
 
-	vmware_event_backup(service, &events);
+	if (NULL != service->data && 0 != service->data->events.values_num &&
+			((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog.last_key)
+	{
+		zbx_vector_ptr_append_array(&events, service->data->events.values, service->data->events.values_num);
+		zbx_vector_ptr_clear(&service->data->events);
+	}
+
 	vmware_data_shared_free(service->data);
 	service->data = vmware_data_shared_dup(data);
 	service->eventlog.skip_old = skip_old;
