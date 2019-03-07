@@ -839,7 +839,7 @@ function redirect(uri, method, needle, invert_needle, add_sid) {
 
 			if ((is_needle && !invert_needle) || (!is_needle && invert_needle)) {
 				if (Array.isArray(args[key])) {
-					for (var i = 0; i < args[key].length; i++) {
+					for (var i = 0, l = args[key].length; i < l; i++) {
 						action += '&' + key + '[]=' + args[key][i];
 					}
 				}
