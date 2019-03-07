@@ -856,7 +856,7 @@ function redirect(uri, method, needle, invert_needle, add_sid) {
 
 			if (Array.isArray(args[key])) {
 				hInput.setAttribute('name', key + '[]');
-				for (var i = 0; i < args[key].length; i++) {
+				for (var i = 0, l = args[key].length; i < l; i++) {
 					hInput.setAttribute('value', args[key][i]);
 				}
 			}
