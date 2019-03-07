@@ -2399,7 +2399,7 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
  *             result  - [IN] the item result                                 *
  *                                                                            *
  * Comments: Values gathered by server are sent to the preprocessing manager, *
- *           while values received from proxy are already preprocessed and    *                                                                           *
+ *           while values received from proxy are already preprocessed and    *
  *           must be either directly stored to history cache or sent to lld   *
  *           manager.                                                         *
  *                                                                            *
