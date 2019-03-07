@@ -198,14 +198,21 @@ ZABBIX.apps.map = (function($) {
 			}
 
 			// create container for forms
-			this.formContainer = $('<div></div>', {
+			this.formContainer = $('<div>', {
 					id: 'map-window',
 					class: 'overlay-dialogue',
 					style: 'display: none; top: 0; left: 0;'
 				})
 				.appendTo('body')
 				.draggable({
-					containment: [0, 0, 3200, 3200]
+					containment: [0, 0, 3200, 3200],
+					start: function(){
+						$(this).data("scroll", {top: window.pageYOffset, left: window.pageXOffset});
+					},
+					drag: function(event, ui){
+						ui.position.top -= parseInt($(this).data("scroll").top);
+						ui.position.left -= parseInt($(this).data("scroll").left);
+					}
 				});
 
 			this.updateImage();
@@ -3952,79 +3959,25 @@ jQuery(function ($) {
 	 * or too wide.
 	 */
 	$.fn.positionOverlayDialogue = function () {
-		/**
-		 * Calculates the position of window by given parameters and places it there using css().
-		 *
-		 * @param {obj}     obj         Form object.
-		 * @param {string}  position    Position defined as string: 'left' or 'top'.
-		 * @param {number}  min_margin  Minimum gap from sides in pixels.
-		 */
-		function positionOverlayDialogue(obj, position, min_margin) {
-			switch (position) {
-				case 'left':
-					var offset = obj.offset().left,
-						dim = obj.outerWidth(),
-						win_dim = $(window).width(),
-						scroll = $(window).scrollLeft(),
-						margin = $(ZABBIX.apps.map.object.map.container).width() + 20;
-					break;
+		var $map = $('#map-area'),
+			map_margin = 10,
+			obj_pos = this.offset(),
+			obj_size = {width: this.outerWidth(), height: this.outerHeight()},
+			scroll_pos = {left: $(window).scrollLeft(), top: $(window).scrollTop()};
 
-				case 'top':
-					var offset = obj.offset().top,
-						dim = obj.outerHeight(),
-						win_dim = $(window).height(),
-						scroll = $(window).scrollTop(),
-						margin = 160;
-			}
-
-			if (offset > 0) {
-				if (offset - scroll + dim > win_dim) {
-					var new_offset = offset - scroll + dim - win_dim + min_margin,
-						new_position = offset - new_offset;
-
-					if (new_position + dim > win_dim) {
-						obj.css(position, scroll + min_margin);
-					}
-					else if (new_position > 0) {
-						obj.css(position, new_position);
-					}
-					else {
-						obj.css(position, min_margin);
-					}
-				}
-				else if (scroll > offset) {
-					obj.css(position, scroll + min_margin);
-				}
-				else {
-					obj.css(position, offset);
-				}
-			}
-			else {
-				if (dim > win_dim) {
-					obj.css(position, min_margin + scroll);
-				}
-				else if (dim + margin > win_dim) {
-					if (scroll > margin) {
-						obj.css(position, scroll + min_margin);
-					}
-					else {
-						obj.css(position, win_dim - dim - min_margin + scroll);
-					}
-				}
-				else {
-					if (scroll > margin) {
-						obj.css(position, min_margin + scroll);
-					}
-					else {
-						obj.css(position, margin);
-					}
-				}
-			}
+		if (obj_pos.left == 0 && obj_pos.top == 0) {
+			obj_pos = {left: $map.offset().left + $map.width(), top: $map.offset().top - map_margin};
 		}
 
-		positionOverlayDialogue(this, 'left', 10);
-		positionOverlayDialogue(this, 'top', 10);
-
-		return this;
+		return this.css({
+			left: Math.min(
+				obj_pos.left + scroll_pos.left,
+				$(window).width() - obj_size.width + scroll_pos.left
+			),
+			top: Math.min(
+				Math.max(obj_pos.top, scroll_pos.top),
+				$(window).height() - obj_size.height + scroll_pos.top
+			)
+		});
 	};
 });
