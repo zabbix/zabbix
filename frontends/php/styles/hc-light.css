@@ -2733,7 +2733,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       border-color: #888;
       color: #000 !important; }
     .multilineinput-control input[type=text].monospace-font {
-      font-family: "Courier New", Courier, monospace; }
+      font-family: "Courier New", Courier, monospace;
+      padding-top: 1px; }
   .multilineinput-control.editable {
     background-color: #fff !important;
     border-color: #9f9f9f; }

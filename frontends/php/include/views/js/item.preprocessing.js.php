@@ -49,20 +49,14 @@
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-single-tmpl">
 	<?php
-		echo (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
-			->setAttribute('placeholder', '#{placeholder}')
-			->addClass('parameter-0');
+		echo (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', '#{placeholder}');
 	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-double-tmpl">
 	<?php
-		echo (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
-				->setAttribute('placeholder', '#{placeholder_0}')
-				->addClass('parameter-0').
-			(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))
-				->setAttribute('placeholder', '#{placeholder_1}')
-				->addClass('parameter-1');
+		echo (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', '#{placeholder_0}').
+			(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))->setAttribute('placeholder', '#{placeholder_1}');
 	?>
 </script>
 

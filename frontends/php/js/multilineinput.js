@@ -21,63 +21,6 @@
 (function($) {
 	'use strict';
 
-	var methods = {
-		init: function(options) {
-			this.options = $.extend({
-				title: '',
-				hint: '',
-				value: '',
-				placeholder: '',
-				maxlength: 65535,
-				readonly: false,
-				disabled: false,
-				line_numbers: true,
-				monospace_font: true
-			}, options);
-
-			this.$hidden = $('<input>', {type: 'hidden', name: this.data('name')});
-			this.$input = $('<input>', {
-				type: 'text',
-				placeholder: options.placeholder,
-				title: this.options.hint,
-				tabindex: -1
-			})
-				.toggleClass('monospace-font', this.options.monospace_font)
-				.prop('readonly', this.options.disabled ? null : true)
-				.on('click', this, openModal);
-			this.$button = $('<button>', {type: 'button'})
-				.text(t('S_OPEN'))
-				.on('click', this, openModal);
-
-			this.on('disable enable', this, setDisabled);
-
-			methods.value.call(this, this.options.value || '');
-
-			return this
-				.append(this.$hidden, this.$input, this.$button)
-				.trigger(this.options.disabled ? 'disable' : 'enable');
-		},
-		open: function() {
-			this.$button.trigger('click');
-
-			return this;
-		},
-		value: function(value) {
-			if (typeof value === 'undefined') {
-				return this.$hidden.val();
-			}
-			else {
-				value = $.trim(value);
-				this.$hidden.val(value);
-				this.$input.val(value.split("\n")[0]);
-				this.trigger('change');
-
-				return this;
-			}
-		},
-		destroy: function() {}
-	};
-
 	function setDisabled(e) {
 		var disabled = (e.type === 'disable');
 
@@ -143,7 +86,8 @@
 						var value = $.trim($textarea.val());
 						e.data.$input.val(value.split("\n")[0]);
 						e.data.$hidden.val(value);
-					}
+					},
+					enabled: !e.data.options.readonly
 				},
 				{
 					title: t('S_CANCEL'),
@@ -166,6 +110,63 @@
 			.trigger('change')
 			.focus();
 	}
+
+	var methods = {
+		init: function(options) {
+			this.options = $.extend({
+				title: '',
+				hint: '',
+				value: '',
+				placeholder: '',
+				maxlength: 255,
+				readonly: false,
+				disabled: false,
+				line_numbers: true,
+				monospace_font: true
+			}, options);
+
+			this.$hidden = $('<input>', {type: 'hidden', name: this.data('name')});
+			this.$input = $('<input>', {
+				type: 'text',
+				placeholder: options.placeholder,
+				title: this.options.hint,
+				tabindex: -1
+			})
+				.toggleClass('monospace-font', this.options.monospace_font)
+				.prop('readonly', this.options.disabled ? null : true)
+				.on('click', this, openModal);
+			this.$button = $('<button>', {type: 'button'})
+				.text(t('S_OPEN'))
+				.on('click', this, openModal);
+
+			this.on('disable enable', this, setDisabled);
+
+			methods.value.call(this, this.options.value);
+
+			return this
+				.append(this.$hidden, this.$input, this.$button)
+				.trigger(this.options.disabled ? 'disable' : 'enable');
+		},
+		/**
+		 * @param {string|undefined}  value  Set field value. Without parameter - get field value
+		 *
+		 * @returns {string|object}
+		 */
+		value: function(value) {
+			if (typeof value === 'undefined') {
+				return this.$hidden.val();
+			}
+			else {
+				value = $.trim(value);
+				this.$hidden.val(value);
+				this.$input.val(value.split("\n")[0]);
+				this.trigger('change');
+
+				return this;
+			}
+		},
+		destroy: function() {}
+	};
 
 	/**
 	 * Multiline input helper.

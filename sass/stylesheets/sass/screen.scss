@@ -3966,7 +3966,7 @@ $form-icon-btn: (
 	}
 }
 
-// Multiline input control
+// Multiline input control.
 .multilineinput-control {
 	display: flex;
 	width: 100%;
@@ -3986,6 +3986,7 @@ $form-icon-btn: (
 
 		&.monospace-font {
 			font-family: $font-stack-mono;
+			padding-top: 1px;
 		}
 	}
 

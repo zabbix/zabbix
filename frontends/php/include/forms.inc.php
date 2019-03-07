@@ -1437,7 +1437,6 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		// Create a primary param text box, so it can be hidden if necessary.
 		$step_param_0_value = array_key_exists('params', $step) ? $step['params'][0] : '';
 		$step_param_0 = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0_value))
-			->addClass('parameter-0')
 			->setTitle($step_param_0_value)
 			->setReadonly($readonly);
 
@@ -1446,7 +1445,6 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			? $step['params'][1]
 			: '';
 		$step_param_1 = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1_value))
-			->addClass('parameter-1')
 			->setTitle($step_param_1_value)
 			->setReadonly($readonly);
 

@@ -25,12 +25,34 @@ class CMultilineInput extends CDiv {
 	 */
 	const ZBX_STYLE_CLASS = 'multilineinput-control';
 
+	/**
+	 * @var string
+	 */
 	private $name;
 
+	/**
+	 * @var string
+	 */
 	private $value;
 
+	/**
+	 * @var array
+	 */
 	private $options;
 
+	/**
+	 * @param string  $name
+	 * @param string  $value
+	 * @param array   $options
+	 * @param string  $options['title']           Modal dialog title.
+	 * @param string  $options['hint']            Hint message fro input element.
+	 * @param string  $options['placeholder']     Placeholder for empty value.
+	 * @param int     $options['maxlength']       Max characters length (default: 255).
+	 * @param bool    $options['line_numbers']    Show line numbers (default: true).
+	 * @param bool    $options['monospace_font']  Monospace font type (default: true).
+	 * @param bool    $options['readonly']        Readonly component (default: false).
+	 * @param bool    $options['disabled']        Is disabled (default: false).
+	 */
 	public function __construct($name = 'multilineinput', $value = '', array $options = []) {
 		parent::__construct();
 
@@ -41,45 +63,59 @@ class CMultilineInput extends CDiv {
 
 		$this->name = $name;
 		$this->value = $value;
-		$this->options = $options + [
-			'title' => '',
-			'hint' => '',
-			'placeholder' => '',
-			'maxlength' => 65535,
-			'readonly' => false,
-			'disabled' => false,
-			'line_numbers' => true,
-			'monospace_font' => true
-		];
+		$this->options = $options;
 	}
 
+	/**
+	 * @param string $value
+	 *
+	 * @return CMultilineInput
+	 */
 	public function setValue($value) {
 		$this->value = $value;
 
 		return $this;
 	}
 
+	/**
+	 * @param string $key
+	 * @param any $value
+	 *
+	 * @return CMultilineInput
+	 */
 	public function setOption($key, $value) {
 		$this->options[$key] = $value;
 
 		return $this;
 	}
 
+	/**
+	 * @return CMultilineInput
+	 */
 	public function setEnabled() {
 		$this->options['disabled'] = false;
 
 		return $this;
 	}
 
+	/**
+	 * @return CMultilineInput
+	 */
 	public function setDisabled() {
 		$this->options['disabled'] = true;
 
 		return $this;
 	}
 
+	/**
+	 * Get content of all Javascript code.
+	 *
+	 * @return string  Javascript code.
+	 */
 	public function getPostJS() {
-		return 'jQuery("#'.$this->getId().'").multilineInput('.CJs::encodeJson(
-			['name' => $this->name, 'value' => $this->value] + $this->options).');';
+		return 'jQuery("#'.$this->getId().'").multilineInput('.CJs::encodeJson([
+			'value' => $this->value
+		] + $this->options).');';
 	}
 
 	public function toString($destroy = true) {
