@@ -1961,7 +1961,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	if (0 != escalation->esc_step && ESCALATION_STATUS_SLEEP != escalation->status)
+	if (0 != escalation->esc_step)
 	{
 		char	*message;
 
