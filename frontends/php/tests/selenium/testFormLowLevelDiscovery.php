@@ -691,8 +691,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "Name": cannot be empty.',
-							'Incorrect value for field "Key": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.',
+						'Incorrect value for field "Key": cannot be empty.'
 					]
 				]
 			],
@@ -702,7 +702,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'name' => 'discoveryRuleError',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "Key": cannot be empty.'
+						'Incorrect value for field "Key": cannot be empty.'
 					]
 				]
 			],
@@ -712,7 +712,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'discovery-rule-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.'
 					]
 				]
 			],
@@ -800,7 +800,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => 1,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -813,7 +813,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => 3599,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -826,7 +826,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '59m',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -839,7 +839,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '1304w',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -852,7 +852,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '9126d',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -865,7 +865,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '219001h',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -878,7 +878,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '13140001m',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -891,7 +891,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => 788400001,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],

@@ -132,7 +132,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			if ($initial_load) {
 				$script_inline .=
 					'jQuery.subscribe("timeselector.rangeupdate", function(e, data) {'.
-						'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'refreshWidget\', "'.$uniqueid.'");'.
+						'jQuery(".dashbrd-grid-container").dashboardGrid(\'refreshWidget\', "'.$uniqueid.'");'.
 					'});';
 			}
 		}
@@ -156,11 +156,12 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			$graph_options = zbx_array_merge($svg_data['data'], [
 				'sbox' => ($graph_data['dashboard_time'] && !$edit_mode),
 				'show_problems' => ($fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW),
+				'time_from' => $graph_data['time_period']['time_from'],
 				'hint_max_rows' => ZBX_WIDGET_ROWS
 			]);
 
 			$script_inline .=
-				'var widget = jQuery(".dashbrd-grid-widget-container")'.
+				'var widget = jQuery(".dashbrd-grid-container")'.
 						'.dashboardGrid(\'getWidgetsBy\', \'uniqueid\', "'.$uniqueid.'");'.
 				'jQuery(\'svg\', widget[0]["content_body"]).svggraph('.CJs::encodeJson($graph_options).', widget[0]);';
 		}
@@ -168,7 +169,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		if ($initial_load) {
 			// Register widget auto-refresh when resizing widget.
 			$script_inline .=
-				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd",'.
+				'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onResizeEnd",'.
 					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
 						'parameters: ["onResizeEnd"],'.
 						'grid: {widget: 1},'.
@@ -177,7 +178,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 			// Disable SBox when switch to edit mode.
 			$script_inline .=
-				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onEditStart",'.
+				'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onEditStart",'.
 					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
 						'parameters: ["onEditStart"],'.
 						'grid: {widget: 1},'.
