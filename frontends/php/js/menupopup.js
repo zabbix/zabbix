@@ -606,12 +606,15 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 
 		if (typeof options.description_enabled === 'undefined' || options.description_enabled !== false) {
 			trigger_descr.clickCallback = function() {
+				var	popup_options = {triggerid: options.triggerid};
+
+				if (typeof options.eventid !== 'undefined') {
+					popup_options.eventid = options.eventid;
+				}
+
 				jQuery(this).closest('.action-menu').menuPopup('close', null);
 
-				return PopUp('popup.trigdesc.view', {
-					triggerid: options.triggerid,
-					eventid: options.eventid
-				}, null, trigger_elmnt);
+				return PopUp('popup.trigdesc.view', popup_options, null, trigger_elmnt);
 			}
 		}
 		else {

@@ -22,7 +22,6 @@
 $form = (new CForm())
 	->setName('trigger_description')
 	->addVar('triggerid', $data['trigger']['triggerid'])
-	->addVar('eventid', $data['eventid'])
 	->addVar('comments_unresolved', $data['trigger']['comments'])
 	->addItem(array_key_exists('messages', $data) ? $data['messages'] : null)
 	->addItem(
@@ -34,6 +33,10 @@ $form = (new CForm())
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
 		));
+
+if (array_key_exists('eventid', $data)) {
+	$form->addVar('eventid', $data['eventid']);
+}
 
 $script_inline = '';
 
@@ -58,7 +61,7 @@ if ($data['isTriggerEditable']) {
 					'url: "zabbix.php?action=trigdesc.update",'.
 					'data: {'.
 						'"triggerid": '.$data['trigger']['triggerid'].','.
-						'"eventid": '.$data['eventid'].','.
+						(array_key_exists('eventid', $data) ? '"eventid": '.$data['eventid'].',' : '').
 						'"comments": jQuery("[name=comments]", forms).val(),'.
 						'"sid": jQuery("[name=sid]", forms).val()'.
 					'},'.
