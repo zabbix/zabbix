@@ -225,14 +225,27 @@ static int	DBpatch_4010023(void)
 
 static int	DBpatch_4010024(void)
 {
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	nextid;
+
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='proxy_history'"))
 		return FAIL;
 
-	if (ZBX_DB_OK > DBexecute("insert into ids values ('proxy_history','history_lastid',"
-			"(select max(id) from proxy_history))"))
+	result = DBselect("select max(id) from proxy_history");
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_DBROW2UINT64(nextid, row[0]);
+	else
+		nextid = 0;
+
+	DBfree_result(result);
+
+	if (0 != nextid && ZBX_DB_OK > DBexecute("insert into ids values ('proxy_history','history_lastid'," ZBX_FS_UI64
+			")", nextid))
 	{
 		return FAIL;
 	}
