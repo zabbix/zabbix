@@ -152,11 +152,11 @@
 			}
 		}
 
-		var preprocessing = $('#preprocessing'),
-			step_index = preprocessing.find('li.sortable').length;
+		var $preprocessing = $('#preprocessing'),
+			step_index = $preprocessing.find('li.sortable').length;
 
-		preprocessing.sortable({
-			disabled: preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').hasClass('<?= ZBX_STYLE_DISABLED ?>'),
+		$preprocessing.sortable({
+			disabled: $preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').hasClass('<?= ZBX_STYLE_DISABLED ?>'),
 			items: 'li.sortable',
 			axis: 'y',
 			cursor: 'move',
@@ -166,7 +166,7 @@
 			opacity: 0.6
 		});
 
-		preprocessing
+		$preprocessing
 			.on('click', '.element-table-add', function() {
 				var preproc_row_tmpl = new Template($('#preprocessing-steps-tmpl').html()),
 					$row = $(preproc_row_tmpl.evaluate({rowNum: step_index})),
@@ -177,13 +177,13 @@
 
 				$('.preprocessing-list-head').show();
 
-				var sortable_count = preprocessing.find('li.sortable').length;
+				var sortable_count = $preprocessing.find('li.sortable').length;
 
 				if (sortable_count == 1) {
-					preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
+					$preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 				else if (sortable_count > 1) {
-					preprocessing
+					$preprocessing
 						.sortable('enable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').removeClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
@@ -193,13 +193,13 @@
 			.on('click', '.element-table-remove', function() {
 				$(this).closest('li.sortable').remove();
 
-				var sortable_count = preprocessing.find('li.sortable').length;
+				var sortable_count = $preprocessing.find('li.sortable').length;
 
 				if (sortable_count == 0) {
 					$('.preprocessing-list-head').hide();
 				}
 				else if (sortable_count == 1) {
-					preprocessing
+					$preprocessing
 						.sortable('disable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
@@ -207,7 +207,7 @@
 			.on('change', 'select[name*="type"]', function() {
 				var $row = $(this).closest('.preprocessing-list-item'),
 					type = $(this).val(),
-					on_fail = $row.find('[name*="on_fail"]');
+					$on_fail = $row.find('[name*="on_fail"]');
 
 				$('.step-parameters', $row).html(makeParameterInput($row.data('step'), type));
 
@@ -222,14 +222,14 @@
 					case '<?= ZBX_PREPROC_THROTTLE_VALUE ?>':
 					case '<?= ZBX_PREPROC_THROTTLE_TIMED_VALUE ?>':
 					case '<?= ZBX_PREPROC_SCRIPT ?>':
-						on_fail
+						$on_fail
 							.prop('checked', false)
 							.prop('disabled', true)
 							.trigger('change');
 						break;
 
 					default:
-						on_fail.prop('disabled', false);
+						$on_fail.prop('disabled', false);
 						break;
 				}
 			})
@@ -237,34 +237,34 @@
 				$(this).attr('title', $(this).val());
 			})
 			.on('change', 'input[name*="on_fail"]', function() {
-				var on_fail_options = $(this).closest('.preprocessing-list-item').find('.on-fail-options');
+				var $on_fail_options = $(this).closest('.preprocessing-list-item').find('.on-fail-options');
 
 				if ($(this).is(':checked')) {
-					on_fail_options.find('input').prop('disabled', false);
-					on_fail_options.show();
+					$on_fail_options.find('input').prop('disabled', false);
+					$on_fail_options.show();
 				}
 				else {
-					on_fail_options.find('input').prop('disabled', true);
-					on_fail_options.hide();
+					$on_fail_options.find('input').prop('disabled', true);
+					$on_fail_options.hide();
 				}
 			})
 			.on('change', 'input[name*="error_handler]"]', function() {
 				var error_handler = $(this).val(),
-					error_handler_params = $(this).closest('.on-fail-options').find('[name*="error_handler_params"]');
+					$error_handler_params = $(this).closest('.on-fail-options').find('[name*="error_handler_params"]');
 
 				if (error_handler == '<?= ZBX_PREPROC_FAIL_DISCARD_VALUE ?>') {
-					error_handler_params
+					$error_handler_params
 						.prop('disabled', true)
 						.hide();
 				}
 				else if (error_handler == '<?= ZBX_PREPROC_FAIL_SET_VALUE ?>') {
-					error_handler_params
+					$error_handler_params
 						.prop('disabled', false)
 						.attr('placeholder', <?= CJs::encodeJson(_('value')) ?>)
 						.show();
 				}
 				else if (error_handler == '<?= ZBX_PREPROC_FAIL_SET_ERROR ?>') {
-					error_handler_params
+					$error_handler_params
 						.prop('disabled', false)
 						.attr('placeholder', <?= CJs::encodeJson(_('error message')) ?>)
 						.show();
