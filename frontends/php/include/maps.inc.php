@@ -1689,26 +1689,6 @@ function getMapLabels($map, $map_info) {
 			}
 		}
 
-		$hl_color = null;
-		$st_color = null;
-		if (($map['highlight'] % 2) == SYSMAP_HIGHLIGHT_ON) {
-			if ($element_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON) {
-				$hl_color = true;
-			}
-			if ($element_info['icon_type'] == SYSMAP_ELEMENT_ICON_MAINTENANCE
-					|| $element_info['icon_type'] == SYSMAP_ELEMENT_ICON_DISABLED) {
-				$st_color = true;
-			}
-		}
-
-		if (in_array($selement['elementtype'], [SYSMAP_ELEMENT_TYPE_HOST_GROUP, SYSMAP_ELEMENT_TYPE_MAP])
-				&& $hl_color !== null) {
-			$st_color = null;
-		}
-		elseif ($st_color !== null) {
-			$hl_color = null;
-		}
-
 		if ($selement['label_type'] == MAP_LABEL_TYPE_IP && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 			$label = array_merge([['content' => $selement['label']]], $status_lines);
 		}
