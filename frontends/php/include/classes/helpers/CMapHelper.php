@@ -94,7 +94,7 @@ class CMapHelper {
 			$areas = self::populateHostGroupsWithHosts($map, $theme);
 
 			// Apply inherited label options.
-			self::applyMapElementLabelProperties($map);
+			$map = self::applyMapElementLabelProperties($map);
 
 			// Resolve macros in map element labels.
 			$resolve_opt = ['resolve_element_label' => true];
@@ -139,8 +139,10 @@ class CMapHelper {
 	 * @param string $sysmap[label_string_map]           Map submap element custom label.
 	 * @param int    $sysmap[label_type_image]           Map image element label type.
 	 * @param string $sysmap[label_string_image]         Map image element custom label.
+	 *
+	 * @return array
 	 */
-	public static function applyMapElementLabelProperties(array &$sysmap) {
+	public static function applyMapElementLabelProperties(array $sysmap) {
 		// Define which $sysmap property holds value for each type of element.
 		$label_properties = [
 			SYSMAP_ELEMENT_TYPE_HOST_GROUP => [
@@ -167,10 +169,6 @@ class CMapHelper {
 
 		// Apply properties to each sysmap elemenet.
 		foreach ($sysmap['selements'] as &$selement) {
-			if ($selement['permission'] < PERM_READ) {
-				continue;
-			}
-
 			$prop = $label_properties[$selement['elementtype']];
 			$elmnt_label_type = ($sysmap['label_format'] == SYSMAP_LABEL_ADVANCED_ON)
 				? $sysmap[$prop['field_label_type']]
@@ -194,6 +192,8 @@ class CMapHelper {
 			}
 		}
 		unset($selement);
+
+		return $sysmap;
 	}
 
 	/**

@@ -1647,10 +1647,6 @@ function get_parent_sysmaps($sysmapid) {
  * @return array
  */
 function getMapLabels($map, $map_info) {
-	if ($map['label_type'] == MAP_LABEL_TYPE_NOTHING && $map['label_format'] == SYSMAP_LABEL_ADVANCED_OFF) {
-		return;
-	}
-
 	$selements = $map['selements'];
 
 	// Collect labels for each map element and apply appropriate values.

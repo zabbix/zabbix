@@ -211,7 +211,7 @@ $data = [
 ];
 
 // Apply inherited element label properties.
-CMapHelper::applyMapElementLabelProperties($data['sysmap']);
+$data['sysmap'] = CMapHelper::applyMapElementLabelProperties($data['sysmap']);
 
 // get selements
 addElementNames($data['sysmap']['selements']);
