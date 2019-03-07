@@ -1,0 +1,127 @@
+.\" Start URL macro. Copied from an-ext.tmac for portability
+.de UR
+.  ds m1 \\$1\"
+.  nh
+.  if \\n(mH \{\
+.    \" Start diversion in a new environment.
+.    do ev URL-div
+.    do di URL-div
+.  \}
+..
+.\" End URL macro. Copied from an-ext.tmac for portability
+.de UE
+.  ie \\n(mH \{\
+.    br
+.    di
+.    ev
+.
+.    \" Has there been one or more input lines for the link text?
+.    ie \\n(dn \{\
+.      do HTML-NS "<a href=""\\*(m1"">"
+.      \" Yes, strip off final newline of diversion and emit it.
+.      do chop URL-div
+.      do URL-div
+\c
+.      do HTML-NS </a>
+.    \}
+.    el \
+.      do HTML-NS "<a href=""\\*(m1"">\\*(m1</a>"
+\&\\$*\"
+.  \}
+.  el \
+\\*(la\\*(m1\\*(ra\\$*\"
+.
+.  hy \\n(HY
+..
+.TH ZABBIX_SERVER 8 "2019\-01\-29" Zabbix
+.SH NAME
+zabbix_server \- Zabbix server daemon
+.SH SYNOPSIS
+.B zabbix_server
+.RB [ \-c
+.IR config\-file ]
+.br
+.B zabbix_server
+.RB [ \-c
+.IR config\-file ]
+.B \-R
+.I runtime\-option
+.br
+.B zabbix_server \-h
+.br
+.B zabbix_server \-V
+.SH DESCRIPTION
+.B zabbix_server
+is the core daemon of Zabbix software.
+.SH OPTIONS
+.IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
+Use the alternate \fIconfig\-file\fR instead of the default one.
+.IP "\fB\-f\fR, \fB\-\-foreground\fR"
+Run Zabbix server in foreground.
+.IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIruntime\-option\fR"
+Perform administrative functions according to \fIruntime\-option\fR.
+.SS
+.RS 4
+Runtime control options
+.RS 4
+.TP 4
+.B config_cache_reload
+Reload configuration cache.
+Ignored if cache is being currently loaded.
+Default configuration file (unless \fB\-c\fR option is specified) will be used to find PID file and signal will be sent to process, listed in PID file.
+.RE
+.RS 4
+.TP 4
+.B housekeeper_execute
+Execute the housekeeper.
+Ignored if housekeeper is being currently executed.
+.RE
+.RS 4
+.TP 4
+\fBlog_level_increase\fR[=\fItarget\fR]
+Increase log level, affects all processes if target is not specified
+.RE
+.RS 4
+.TP 4
+\fBlog_level_decrease\fR[=\fItarget\fR]
+Decrease log level, affects all processes if target is not specified
+.RE
+.RE
+.SS
+.RS 4
+Log level control targets
+.RS 4
+.TP 4
+.I process\-type
+All processes of specified type (alerter, alert\ manager, configuration\ syncer, discoverer, escalator, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, lld\ manager, lld\ worker, poller, preprocessing\ manager, preprocessing\ worker, proxy\ poller, self\-monitoring, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector)
+.RE
+.RS 4
+.TP 4
+.I process\-type,N
+Process type and number (e.g., poller,3)
+.RE
+.RS 4
+.TP 4
+.I pid
+Process identifier, up to 65535. For larger values specify target as "process\-type,N"
+.RE
+.RE
+.IP "\fB\-h\fR, \fB\-\-help\fR"
+Display this help and exit.
+.IP "\fB\-V\fR, \fB\-\-version\fR"
+Output version information and exit.
+.SH FILES
+.TP
+.I /usr/local/etc/zabbix_server.conf
+Default location of Zabbix server configuration file (if not modified during compile time).
+.SH "SEE ALSO"
+.UR https://www.zabbix.com/manuals
+Documentation
+.UE
+.PP
+.BR zabbix_agentd (8),
+.BR zabbix_get (8),
+.BR zabbix_proxy (8),
+.BR zabbix_sender (8)
+.SH AUTHOR
+Alexei Vladishev <alex@zabbix.com>

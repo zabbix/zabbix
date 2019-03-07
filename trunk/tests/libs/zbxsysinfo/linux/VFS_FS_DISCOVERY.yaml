@@ -1,0 +1,39 @@
+---
+test case: parse file /proc/mounts
+out:
+  json: '[{"{#FSNAME}":"/sys","{#FSTYPE}":"sysfs"},{"{#FSNAME}":"/proc","{#FSTYPE}":"proc"},{"{#FSNAME}":"/dev","{#FSTYPE}":"devtmpfs"},{"{#FSNAME}":"/dev/pts","{#FSTYPE}":"devpts"},{"{#FSNAME}":"/run","{#FSTYPE}":"tmpfs"}]'
+files:
+  /proc/mounts: |
+    sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
+    proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+    udev /dev devtmpfs rw,nosuid,relatime,size=3017164k,nr_inodes=754291,mode=755 0 0
+    devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000 0 0
+    tmpfs /run tmpfs rw,nosuid,noexec,relatime,size=607540k,mode=755 0 0
+---
+test case: ignore invalid entries in /proc/mounts
+out:
+  json: '[{"{#FSNAME}":"/sys","{#FSTYPE}":"sysfs"},{"{#FSNAME}":"/dev/pts","{#FSTYPE}":"devpts"}]'
+files:
+  /proc/mounts: |
+    sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
+    proc/procprocrw,nosuid,nodev,noexec,relatime0 0
+    udev_/dev_devtmpfs_rw,nosuid,relatime,size=3017164k,nr_inodes=754291,mode=755_0 0
+    devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000 0 0
+    tmpfs*/run*tmpfs*rw,nosuid,noexec,relatime,size=607540k,mode=755*0 0
+---
+# input file has incorrect delimiter - colon instead of white-space
+test case: invalid /proc/mounts content
+out:
+  json: '[]'
+files:
+  /proc/mounts: |
+    sysfs:/sys:sysfs:rw,nosuid,nodev,noexec,relatime:0:0
+    proc:/proc:proc:rw,nosuid,nodev,noexec,relatime:0:0
+    udev:/dev:devtmpfs:rw,nosuid,relatime,size=3017164k,nr_inodes=754291,mode=755:0:0
+    devpts:/dev/pts:devpts:rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000:0:0
+    tmpfs:/run:tmpfs:rw,nosuid,noexec,relatime,size=607540k,mode=755:0:0
+---
+test case: missing /proc/mounts file
+out:
+  error: 'Cannot open /proc/mounts: [2] No such file or directory'
+...
