@@ -3970,14 +3970,8 @@ jQuery(function ($) {
 		}
 
 		return this.css({
-			left: Math.min(
-				obj_pos.left + scroll_pos.left,
-				$(window).width() - obj_size.width + scroll_pos.left
-			),
-			top: Math.min(
-				Math.max(obj_pos.top, scroll_pos.top),
-				$(window).height() - obj_size.height + scroll_pos.top
-			)
+			left: Math.max(0, Math.min(obj_pos.left, $(window).width() - obj_size.width)) + scroll_pos.left,
+			top: Math.max(scroll_pos.top, Math.min(obj_pos.top, $(window).height() - obj_size.height + scroll_pos.top))
 		});
 	};
 });
