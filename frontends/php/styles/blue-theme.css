@@ -2192,7 +2192,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 9px 5px;
   width: 100%; }
 
-.dashbrd-grid-widget-container {
+.dashbrd-grid-container {
   position: relative;
   margin: -4px; }
 
@@ -2273,7 +2273,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-widget-content {
   flex: 1;
-  overflow-y: auto; }
+  overflow: auto; }
   .dashbrd-grid-widget-content .list-table {
     border: none; }
     .dashbrd-grid-widget-content .list-table tbody tr:last-child th, .dashbrd-grid-widget-content .list-table tbody tr:last-child td {
@@ -2291,7 +2291,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: flex;
   position: absolute; }
 
-.dashbrd-grid-widget-padding {
+.dashbrd-grid-widget-container {
   display: flex;
   flex-grow: 1;
   flex-direction: column;
@@ -2564,14 +2564,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: block; }
   .dashbrd-widget-graph-link:link {
     border: none; }
-  .dashbrd-widget-graph-link:focus:after {
-    content: "";
-    background: rgba(30, 135, 227, 0.35);
-    height: 2px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -2px; }
 
 .action-menu {
   position: absolute;
@@ -2702,6 +2694,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     min-width: 650px; }
   .overlay-dialogue .msg-bad,
   .overlay-dialogue .msg-good {
+    position: -webkit-sticky;
     position: sticky;
     top: 0;
     z-index: 1000; }
@@ -2986,20 +2979,24 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     top: 0;
     z-index: 999; }
 
+.svg-graph {
+  display: block; }
+
 .svg-single-item-graph-legend,
 .svg-single-two-items-graph-legend,
 .svg-graph-legend {
   overflow-y: hidden;
   white-space: normal;
-  margin: 0 10px; }
+  margin: 0 10px;
+  line-height: 18px; }
   .svg-single-item-graph-legend div,
   .svg-single-two-items-graph-legend div,
   .svg-graph-legend div {
     display: inline-block;
     margin: 0 4px;
     font-size: 12px;
-    line-height: 18px;
-    vertical-align: middle;
+    line-height: 1.1;
+    vertical-align: bottom;
     min-width: 120px;
     overflow: hidden;
     white-space: nowrap;
@@ -3890,7 +3887,8 @@ tr.cursor-move td * {
   text-transform: uppercase; }
 
 .flickerfreescreen {
-  position: relative; }
+  position: relative;
+  overflow: hidden; }
 
 .graph-wrapper {
   display: inline; }
@@ -4503,12 +4501,13 @@ svg {
     margin-left: -5px;
     width: 10px;
     height: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 1px white;
+    border-radius: 50%;
     background: #0275b8; }
   .range-control.range-control-focus .range-control-thumb {
+    margin-top: -6.66667px;
+    margin-left: -6.66667px;
     background: #0275b8;
-    box-shadow: 0 0 0 2px #0395ea; }
+    border: 2px solid #0395ea; }
   .range-control.range-control-focus .range-control-progress {
     background: #0275b8; }
   .range-control.disabled {
