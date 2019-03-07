@@ -1995,14 +1995,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 				// Check if inventory or interface details was requested.
 				if ($selement_type == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-					$query_trigger_hosts = true;
-
 					if ($matched_macros['macros_n']['interface']) {
+						$query_trigger_hosts = true;
 						$query_interfaces = true;
 					}
 
 					if ($matched_macros['macros_n']['inventory']) {
+						$query_trigger_hosts = true;
 						$query_inventories = true;
+					}
+
+					if ($matched_macros['macros_n']['host']) {
+						$query_trigger_hosts = true;
 					}
 				}
 			}
