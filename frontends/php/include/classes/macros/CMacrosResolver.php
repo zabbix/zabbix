@@ -2185,11 +2185,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_MAP:
-					$map = $maps[$elementid];
+					if (array_key_exists($elementid, $maps)) {
+						$map = $maps[$elementid];
+					}
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_HOST:
-					$host = $hosts[$elementid];
+					if (array_key_exists($elementid, $hosts)) {
+						$host = $hosts[$elementid];
+					}
 					break;
 			}
 
