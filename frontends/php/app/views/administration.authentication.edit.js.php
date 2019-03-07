@@ -20,7 +20,7 @@
 				: form.find('[name^=ldap_],button[name=change_bind_password]');
 
 			fields
-				.not(this)
+				.not('[name=http_auth_enabled],[name=ldap_configured]')
 				.prop('disabled', !this.checked);
 		});
 
