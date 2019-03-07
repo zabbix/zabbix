@@ -612,11 +612,15 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
 
 		sendval_args[i].server = destinations[i].host;
 		sendval_args[i].port = destinations[i].port;
-		sendval_args[i].json = sendval_args[0].json;
+
+		if (0 != i)
+		{
+			sendval_args[i].json = sendval_args[0].json;
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-		sendval_args[i].tls_vars = sendval_args[0].tls_vars;
+			sendval_args[i].tls_vars = sendval_args[0].tls_vars;
 #endif
-		sendval_args[i].sync_timestamp = sendval_args[0].sync_timestamp;
+			sendval_args[i].sync_timestamp = sendval_args[0].sync_timestamp;
+		}
 
 		destinations[i].thread = &threads[i];
 
