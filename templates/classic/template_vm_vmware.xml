@@ -601,7 +601,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.cpu.num[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>1h</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -660,7 +660,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.cpu.ready[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>5m</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -778,7 +778,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.datacenter.name[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>1h</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -1309,7 +1309,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.memory.size[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>1h</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1699,7 +1699,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.net.if.in[{$URL},{HOST.HOST},{#IFNAME},bps]</key>
-                            <delay>1m</delay>
+                            <delay>30m</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -1759,7 +1759,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.net.if.in[{$URL},{HOST.HOST},{#IFNAME},pps]</key>
-                            <delay>1m</delay>
+                            <delay>30m</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -1819,7 +1819,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.net.if.out[{$URL},{HOST.HOST},{#IFNAME},bps]</key>
-                            <delay>1m</delay>
+                            <delay>30m</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -1879,7 +1879,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.net.if.out[{$URL},{HOST.HOST},{#IFNAME},pps]</key>
-                            <delay>1m</delay>
+                            <delay>30m</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -1994,7 +1994,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.vfs.dev.read[{$URL},{HOST.HOST},{#DISKNAME},bps]</key>
-                            <delay>1m</delay>
+                            <delay>30m</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -2054,7 +2054,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.vfs.dev.read[{$URL},{HOST.HOST},{#DISKNAME},ops]</key>
-                            <delay>1m</delay>
+                            <delay>5m</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -2114,7 +2114,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.vfs.dev.write[{$URL},{HOST.HOST},{#DISKNAME},bps]</key>
-                            <delay>1m</delay>
+                            <delay>30m</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -2174,7 +2174,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.vfs.dev.write[{$URL},{HOST.HOST},{#DISKNAME},ops]</key>
-                            <delay>1m</delay>
+                            <delay>5m</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -2706,7 +2706,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.datacenter.name[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>1h</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -3429,7 +3429,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.network.in[{$URL},{HOST.HOST},bps]</key>
-                    <delay>1m</delay>
+                    <delay>30m</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3488,7 +3488,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.network.out[{$URL},{HOST.HOST},bps]</key>
-                    <delay>1m</delay>
+                    <delay>30m</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3880,7 +3880,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.hv.datastore.read[{$URL},{HOST.HOST},{#DATASTORE},latency]</key>
-                            <delay>1m</delay>
+                            <delay>5m</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -3940,7 +3940,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.hv.datastore.size[{$URL},{HOST.HOST},{#DATASTORE},pfree]</key>
-                            <delay>1m</delay>
+                            <delay>5m</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -4000,7 +4000,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.hv.datastore.size[{$URL},{HOST.HOST},{#DATASTORE}]</key>
-                            <delay>1m</delay>
+                            <delay>5m</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -4060,7 +4060,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.hv.datastore.write[{$URL},{HOST.HOST},{#DATASTORE},latency]</key>
-                            <delay>1m</delay>
+                            <delay>5m</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
