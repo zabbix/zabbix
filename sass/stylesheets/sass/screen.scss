@@ -4001,9 +4001,25 @@ $form-icon-btn: (
 	}
 
 	button {
-		white-space: nowrap;
+		background-color: $form-bg-color;
+		border-color: $form-border-color;
+		position: relative;
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
+
+		&:after {
+			background: url(../img/icon-sprite.svg) no-repeat -47px -478px;
+			content: '';
+			position: absolute;
+			left: 3px;
+			top: 4px;
+			height: 14px;
+			width: 15px;
+		}
+
+		&:hover {
+			background-color: $btn-form-hover-color;
+		}
 	}
 }
 

@@ -1092,6 +1092,17 @@ td.inactive-bg {
 	border: 3px dashed $font-color;
 }
 
+// Multiline input control.
+.multilineinput-control {
+
+	button {
+
+		&:after {
+			background-position: -206px -478px;
+		}
+	}
+}
+
 .btn-back-map-container {
 
 	a {

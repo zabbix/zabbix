@@ -2779,9 +2779,21 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .multilineinput-control:-ms-input-placeholder {
     color: #9d9d9d !important; }
   .multilineinput-control button {
-    white-space: nowrap;
+    background-color: #383838;
+    border-color: #4f4f4f;
+    position: relative;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0; }
+    .multilineinput-control button:after {
+      background: url(../img/icon-sprite.svg) no-repeat -47px -478px;
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 4px;
+      height: 14px;
+      width: 15px; }
+    .multilineinput-control button:hover {
+      background-color: #414141; }
 
 .multilineinput-modal {
   min-width: 960px; }

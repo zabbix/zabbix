@@ -125,7 +125,11 @@
 				monospace_font: true
 			}, options);
 
-			this.$hidden = $('<input>', {type: 'hidden', name: this.data('name')});
+			this.$hidden = $('<input>', {
+				type: 'hidden',
+				name: this.data('name')
+			});
+
 			this.$input = $('<input>', {
 				type: 'text',
 				placeholder: options.placeholder,
@@ -135,9 +139,11 @@
 				.toggleClass('monospace-font', this.options.monospace_font)
 				.prop('readonly', this.options.disabled ? null : true)
 				.on('click', this, openModal);
-			this.$button = $('<button>', {type: 'button'})
-				.text(t('S_OPEN'))
-				.on('click', this, openModal);
+
+			this.$button = $('<button>', {
+				type: 'button',
+				title: this.options.hint
+			}).on('click', this, openModal);
 
 			this.on('disable enable', this, setDisabled);
 
