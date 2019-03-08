@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-18 16:37+0200\n"
+"POT-Creation-Date: 2019-03-04 12:34+0200\n"
 "PO-Revision-Date: 2018-05-04 09:32+0300\n"
 "Last-Translator: Oscar <oscar.zabbix@linaresdigital.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -54,7 +54,7 @@ msgstr "Se espera un par \"equipo:clave\""
 msgid "$.path.to.node"
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:520
+#: include/classes/api/services/CDRule.php:548
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
 msgstr "%1$d caracteres superan el máximo de %2$d"
@@ -318,7 +318,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:239
 #: include/views/configuration.item.prototype.edit.php:504
 #: include/views/configuration.item.prototype.massupdate.php:235
-#: include/views/js/configuration.discovery.edit.js.php:113
+#: include/views/js/configuration.discovery.edit.js.php:137
 msgid "AES"
 msgstr "AES"
 
@@ -352,9 +352,9 @@ msgstr[1] "Cuenta bloqueada durante %1$s segundos."
 #: include/actions.inc.php:157 include/actions.inc.php:337
 #: include/blocks.inc.php:558
 #: include/classes/screens/CScreenHostTriggers.php:240
-#: include/classes/screens/CScreenProblem.php:885
-#: include/classes/screens/CScreenProblem.php:908
-#: include/classes/screens/CScreenProblem.php:1119 include/events.inc.php:250
+#: include/classes/screens/CScreenProblem.php:875
+#: include/classes/screens/CScreenProblem.php:898
+#: include/classes/screens/CScreenProblem.php:1109 include/events.inc.php:250
 #: include/events.inc.php:462 include/views/configuration.action.edit.php:1217
 msgid "Ack"
 msgstr "Reconocer"
@@ -510,10 +510,10 @@ msgstr "Acción actualizada"
 #: app/views/monitoring.dashboard.view.php:86
 #: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:559
 #: include/classes/screens/CScreenHostTriggers.php:240
-#: include/classes/screens/CScreenProblem.php:886
-#: include/classes/screens/CScreenProblem.php:909
-#: include/classes/screens/CScreenProblem.php:1120
-#: include/classes/screens/CScreenProblem.php:1160 include/events.inc.php:251
+#: include/classes/screens/CScreenProblem.php:876
+#: include/classes/screens/CScreenProblem.php:899
+#: include/classes/screens/CScreenProblem.php:1110
+#: include/classes/screens/CScreenProblem.php:1150 include/events.inc.php:251
 #: include/menu.inc.php:217 include/views/configuration.action.edit.php:24
 #: include/views/configuration.action.list.php:23
 #: include/views/monitoring.screen.list.php:81
@@ -597,7 +597,7 @@ msgstr "Activo hasta"
 #: include/views/configuration.correlation.edit.php:197
 #: include/views/configuration.correlation.edit.php:255
 #: include/views/configuration.correlation.edit.php:288
-#: include/views/configuration.discovery.edit.php:118
+#: include/views/configuration.discovery.edit.php:143
 #: include/views/configuration.graph.edit.php:390
 #: include/views/configuration.graph.edit.php:473
 #: include/views/configuration.host.discovery.edit.php:113
@@ -662,7 +662,7 @@ msgstr "Activo hasta"
 #: include/views/configuration.triggers.edit.php:324
 #: include/views/configuration.triggers.edit.php:339
 #: include/views/configuration.triggers.edit.php:593
-#: include/views/configuration.triggers.edit.php:625
+#: include/views/configuration.triggers.edit.php:626
 #: include/views/configuration.triggers.list.php:128
 #: include/views/configuration.triggers.massupdate.php:80
 #: include/views/configuration.triggers.massupdate.php:135
@@ -672,8 +672,8 @@ msgstr "Activo hasta"
 #: include/views/js/configuration.action.edit.js.php:268
 #: include/views/js/configuration.action.edit.js.php:654
 #: include/views/js/configuration.correlation.edit.js.php:47
-#: include/views/js/configuration.discovery.edit.js.php:126
-#: include/views/js/configuration.discovery.edit.js.php:707
+#: include/views/js/configuration.discovery.edit.js.php:150
+#: include/views/js/configuration.discovery.edit.js.php:752
 #: include/views/js/monitoring.screen.edit.js.php:83
 #: include/views/js/monitoring.slideconf.edit.js.php:99
 #: include/views/js/monitoring.sysmap.edit.js.php:101
@@ -1271,7 +1271,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:226
 #: include/views/configuration.item.prototype.edit.php:496
 #: include/views/configuration.item.prototype.massupdate.php:222
-#: include/views/js/configuration.discovery.edit.js.php:103
+#: include/views/js/configuration.discovery.edit.js.php:127
 msgid "Authentication passphrase"
 msgstr "Clave de autenticación"
 
@@ -1280,7 +1280,7 @@ msgstr "Clave de autenticación"
 #: include/views/configuration.item.massupdate.php:214
 #: include/views/configuration.item.prototype.edit.php:489
 #: include/views/configuration.item.prototype.massupdate.php:210
-#: include/views/js/configuration.discovery.edit.js.php:95
+#: include/views/js/configuration.discovery.edit.js.php:119
 msgid "Authentication protocol"
 msgstr "Protocolo de autenticación"
 
@@ -1497,8 +1497,8 @@ msgstr "CERT"
 #: app/views/monitoring.widget.problems.view.php:93
 #: include/classes/graph/CSvgGraph.php:968
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:983
-#: include/classes/screens/CScreenProblem.php:1142 include/events.inc.php:340
+#: include/classes/screens/CScreenProblem.php:973
+#: include/classes/screens/CScreenProblem.php:1132 include/events.inc.php:340
 #: include/events.inc.php:542
 msgid "CLOSING"
 msgstr "CERRANDO"
@@ -1562,10 +1562,10 @@ msgstr "Canadá (136 caracteres)"
 #: include/views/js/administration.general.trigger.options.js.php:21
 #: include/views/js/administration.general.triggerSeverity.js.php:13
 #: include/views/js/configuration.action.edit.js.php:76
-#: include/views/js/configuration.discovery.edit.js.php:127
-#: include/views/js/configuration.discovery.edit.js.php:569
-#: include/views/js/configuration.discovery.edit.js.php:640
-#: include/views/js/configuration.discovery.edit.js.php:670
+#: include/views/js/configuration.discovery.edit.js.php:151
+#: include/views/js/configuration.discovery.edit.js.php:611
+#: include/views/js/configuration.discovery.edit.js.php:682
+#: include/views/js/configuration.discovery.edit.js.php:712
 #: include/views/js/conf.import.js.php:16
 #: include/views/monitoring.slideconf.edit.php:277 jsLoader.php:112
 #: jsLoader.php:123 jsLoader.php:287 jsLoader.php:299 jsLoader.php:306
@@ -1611,7 +1611,7 @@ msgstr "No se pudo agregar la correlación"
 msgid "Cannot add correlation condition"
 msgstr "No se pudo agregar la condición de correlación"
 
-#: include/classes/api/services/CTrigger.php:951
+#: include/classes/api/services/CTrigger.php:963
 #: include/classes/api/services/CTriggerPrototype.php:791
 msgid "Cannot add dependency from a host to a template."
 msgstr "No se puede agregar una dependencia desde un equipo a una plantilla."
@@ -1850,12 +1850,12 @@ msgstr "No se puede crear un prototipo de equipo sobre el equipo descubierto \"%
 msgid "Cannot create another database connection."
 msgstr "No se pudo crear otra conexión a la base de datos."
 
-#: include/classes/api/services/CTrigger.php:985
+#: include/classes/api/services/CTrigger.php:997
 #: include/classes/api/services/CTriggerPrototype.php:822
 msgid "Cannot create circular dependencies."
 msgstr "No se pudo crear las dependencias de circular."
 
-#: include/classes/api/services/CTrigger.php:957
+#: include/classes/api/services/CTrigger.php:969
 msgid "Cannot create dependency on trigger itself."
 msgstr "No se puede crear una dependencia sobre el mismo disparador."
 
@@ -1863,7 +1863,7 @@ msgstr "No se puede crear una dependencia sobre el mismo disparador."
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "No se puede crear una dependencia en un prototipo de iniciador a sí mismo."
 
-#: discoveryconf.php:162
+#: discoveryconf.php:164
 msgid "Cannot create discovery rule"
 msgstr "No se pudo crear la regla de descubrimiento"
 
@@ -1917,7 +1917,7 @@ msgid_plural "Cannot delete dashboards"
 msgstr[0] "No pude borrar el tablero"
 msgstr[1] "No pude borrar los tableros"
 
-#: include/classes/api/services/CTrigger.php:855
+#: include/classes/api/services/CTrigger.php:867
 #: include/classes/api/services/CTriggerPrototype.php:588
 msgid "Cannot delete dependency"
 msgstr "No es posible eliminar la dependecia"
@@ -1927,11 +1927,11 @@ msgstr "No es posible eliminar la dependecia"
 msgid "Cannot delete discovered application \"%1$s\"."
 msgstr "No pude borrar la aplicación descubierta \"%1$s\"."
 
-#: discoveryconf.php:186 host_discovery.php:288
+#: discoveryconf.php:188 host_discovery.php:288
 msgid "Cannot delete discovery rule"
 msgstr "No es posible eliminar la regla"
 
-#: discoveryconf.php:228 host_discovery.php:607
+#: discoveryconf.php:230 host_discovery.php:607
 msgid "Cannot delete discovery rules"
 msgstr "No se pudo eliminar las reglas de descubrimiento"
 
@@ -2157,7 +2157,7 @@ msgid_plural "Cannot disable correlations"
 msgstr[0] "No se pudo desactivar la correlación"
 msgstr[1] "No se pudo desactivar las correlaciones"
 
-#: discoveryconf.php:213 host_discovery.php:597
+#: discoveryconf.php:215 host_discovery.php:597
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "No se pudo desactivar la regla de descubrimiento"
@@ -2220,7 +2220,7 @@ msgid_plural "Cannot enable correlations"
 msgstr[0] "No se pudo habilitar la correlación"
 msgstr[1] "No se pudieron habilitar las correlaciones"
 
-#: discoveryconf.php:212 host_discovery.php:596
+#: discoveryconf.php:214 host_discovery.php:596
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "No se pudo habilitar la regla de descubrimiento"
@@ -2573,12 +2573,12 @@ msgstr "No se pudo establecer \"%1$s\" para el ítem \"%2$s\"."
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "No pude definir \"%1$s\" para la plantilla de pantalla \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:498
+#: include/classes/api/services/CTriggerGeneral.php:499
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr "No se pudo establecer \"%1$s\" para el disparador \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:503
+#: include/classes/api/services/CTriggerGeneral.php:504
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "No pude definir \"%1$s\" para el prototipo de iniciador \"%2$s\"."
@@ -2659,22 +2659,22 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr "No se puede actualizar el \"%1$s\" de un ítem \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:650
+#: include/classes/api/services/CTriggerGeneral.php:651
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:656
+#: include/classes/api/services/CTriggerGeneral.php:657
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:649
+#: include/classes/api/services/CTriggerGeneral.php:650
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr "No se puede actualizar el \"%1$s\" de un disparador \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:655
+#: include/classes/api/services/CTriggerGeneral.php:656
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr ""
@@ -2689,9 +2689,9 @@ msgstr "No se pudo actualizar \"%2$s\" en el equipo descubierto \"%1$s\"."
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
 msgstr "No se pudo actualizar \"%2$s\" en el ítem descubierto \"%1$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:706
-#: include/classes/api/services/CTrigger.php:699
-#: include/classes/api/services/CTrigger.php:817
+#: include/classes/api/services/CTriggerGeneral.php:707
+#: include/classes/api/services/CTrigger.php:703
+#: include/classes/api/services/CTrigger.php:827
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "No se pudo actualizar \"%2$s\" en el disparador descubierto \"%1$s\"."
@@ -2759,7 +2759,7 @@ msgstr "No pude actualizar la descripción"
 msgid "Cannot update discovered application \"%1$s\"."
 msgstr "No pude actualizar la aplicación descubierta \"%1$s\"."
 
-#: discoveryconf.php:155 host_discovery.php:567
+#: discoveryconf.php:157 host_discovery.php:567
 msgid "Cannot update discovery rule"
 msgstr "No es posible actualizar la regla"
 
@@ -2922,7 +2922,7 @@ msgstr "No se pudo actualizar las plantillas del equipo descubierto \"%1$s\"."
 msgid "Cannot update trigger"
 msgstr "No es posible actualizar el iniciador"
 
-#: include/classes/api/services/CTriggerGeneral.php:1600
+#: include/classes/api/services/CTriggerGeneral.php:1612
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "No se pudo actualizar el iniciador \"%1$s\": %2$s."
@@ -2934,7 +2934,7 @@ msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "No se pudo actualizar el prototipo de disparador"
 msgstr[1] "No se pudo actualizar el prototipo de disparador"
 
-#: include/classes/api/services/CTriggerGeneral.php:1456
+#: include/classes/api/services/CTriggerGeneral.php:1468
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr "No se pudo actualizar el prototipo de iniciador \"%1$s\": %2$s."
@@ -2959,7 +2959,7 @@ msgstr "No se pudo actualizar el mapa de valores"
 msgid "Cannot update web scenario"
 msgstr "No se pudo actualizar el escenario web"
 
-#: include/views/js/configuration.discovery.edit.js.php:636
+#: include/views/js/configuration.discovery.edit.js.php:678
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr "No se pudo validar la verificación de descubrimiento porque la petición no es válida o la conexión al servidor Zabbix falló."
 
@@ -3054,7 +3054,7 @@ msgstr "Chasis"
 msgid "Chassis information. Returns string"
 msgstr "Información del chasis. Devuelve una cadena"
 
-#: include/views/js/configuration.discovery.edit.js.php:566
+#: include/views/js/configuration.discovery.edit.js.php:608
 msgid "Check already exists."
 msgstr "Verifique si ya existe."
 
@@ -3093,7 +3093,7 @@ msgstr "Comprobación de requisitos previos"
 msgid "Check the key, please. Default example was passed."
 msgstr "Compruebe la clave, por favor. El ejemplo por defecto fue pasado."
 
-#: include/views/js/configuration.discovery.edit.js.php:36
+#: include/views/js/configuration.discovery.edit.js.php:60
 msgid "Check type"
 msgstr "Compruebe el tipo"
 
@@ -3155,7 +3155,7 @@ msgstr "Comprueba el rendimiento del servicio TCP. Devuelve 0 - servicio caído;
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "Comprueba el rendimiento del servicio UDP. Devuelve 0 - servicio caído; segundos - número de segundos transcurridos esperando respuesta del servicio"
 
-#: include/classes/api/services/CDRule.php:624
+#: include/classes/api/services/CDRule.php:652
 msgid "Checks should be unique."
 msgstr "Las comprobaciones deben ser únicas."
 
@@ -3222,7 +3222,7 @@ msgstr "Reloj"
 #: include/views/configuration.action.edit.php:2364
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.correlation.edit.php:277
-#: include/views/configuration.discovery.edit.php:110
+#: include/views/configuration.discovery.edit.php:135
 #: include/views/configuration.graph.edit.php:465
 #: include/views/configuration.host.discovery.edit.php:757
 #: include/views/configuration.host.edit.php:831
@@ -3234,7 +3234,7 @@ msgstr "Reloj"
 #: include/views/configuration.maintenance.edit.php:287
 #: include/views/configuration.template.edit.php:452
 #: include/views/configuration.trigger.prototype.edit.php:616
-#: include/views/configuration.triggers.edit.php:616
+#: include/views/configuration.triggers.edit.php:617
 #: include/views/monitoring.screen.edit.php:222
 #: include/views/monitoring.slideconf.edit.php:275
 #: include/views/monitoring.sysmap.edit.php:389 jsLoader.php:236
@@ -3759,7 +3759,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:189
 #: include/views/configuration.item.prototype.edit.php:464
 #: include/views/configuration.item.prototype.massupdate.php:185
-#: include/views/js/configuration.discovery.edit.js.php:72
+#: include/views/js/configuration.discovery.edit.js.php:96
 msgid "Context name"
 msgstr "Nombre de contexto"
 
@@ -4150,7 +4150,7 @@ msgstr "DD.MM.AA"
 #: include/views/configuration.item.massupdate.php:238
 #: include/views/configuration.item.prototype.edit.php:503
 #: include/views/configuration.item.prototype.massupdate.php:234
-#: include/views/js/configuration.discovery.edit.js.php:112
+#: include/views/js/configuration.discovery.edit.js.php:136
 msgid "DES"
 msgstr "DES"
 
@@ -4167,6 +4167,8 @@ msgid "DNS"
 msgstr "DNS"
 
 #: app/views/administration.proxy.edit.php:43
+#: include/views/configuration.discovery.edit.php:99
+#: include/views/configuration.discovery.edit.php:112
 #: include/views/configuration.host.edit.php:109
 #: include/views/configuration.host.edit.php:192
 #: include/views/configuration.host.prototype.edit.php:84
@@ -4521,7 +4523,7 @@ msgstr "¿Borrar la correlación actual?"
 msgid "Delete dashboard?"
 msgstr ""
 
-#: include/views/configuration.discovery.edit.php:111
+#: include/views/configuration.discovery.edit.php:136
 #: include/views/configuration.host.discovery.edit.php:767
 msgid "Delete discovery rule?"
 msgstr "¿Desea eliminar la regla de descubrimiento?"
@@ -4763,7 +4765,7 @@ msgstr "¿Desea eliminar la plantilla?"
 msgid "Delete trigger prototype?"
 msgstr "¿Desea eliminar el prototipo de disparador?"
 
-#: include/views/configuration.triggers.edit.php:617
+#: include/views/configuration.triggers.edit.php:618
 msgid "Delete trigger?"
 msgstr "¿Desea eliminar el disparador?"
 
@@ -4805,7 +4807,7 @@ msgstr "Denegar"
 #: include/views/configuration.trigger.prototype.edit.php:602
 #: include/views/configuration.trigger.prototype.massupdate.php:181
 #: include/views/configuration.triggers.edit.php:588
-#: include/views/configuration.triggers.edit.php:610
+#: include/views/configuration.triggers.edit.php:611
 #: include/views/configuration.triggers.massupdate.php:161
 msgid "Dependencies"
 msgstr "Dependencias"
@@ -5067,9 +5069,9 @@ msgstr "Descubierto por proxy"
 msgid "Discovery check"
 msgstr "Comprobación de descubrimiento"
 
-#: include/views/js/configuration.discovery.edit.js.php:565
-#: include/views/js/configuration.discovery.edit.js.php:634
-#: include/views/js/configuration.discovery.edit.js.php:666
+#: include/views/js/configuration.discovery.edit.js.php:607
+#: include/views/js/configuration.discovery.edit.js.php:676
+#: include/views/js/configuration.discovery.edit.js.php:708
 msgid "Discovery check error"
 msgstr "Error de comprobación de descubrimiento"
 
@@ -5089,7 +5091,7 @@ msgstr "Objeto de descubrimiento"
 #: app/views/monitoring.widget.discovery.view.php:28
 #: include/actions.inc.php:52 include/audit.inc.php:46
 #: include/forms.inc.php:1114
-#: include/views/configuration.discovery.edit.php:102
+#: include/views/configuration.discovery.edit.php:127
 msgid "Discovery rule"
 msgstr "Regla de descubrimiento"
 
@@ -5111,33 +5113,33 @@ msgstr "La regla de descubrimiento \"%1$s\" ya existe en \"%2$s\"."
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr "La regla de descubrimiento \"%1$s\" ya existe."
 
-#: include/classes/api/services/CDRule.php:807
-#: include/classes/api/services/CDRule.php:824
+#: include/classes/api/services/CDRule.php:835
+#: include/classes/api/services/CDRule.php:852
 #, c-format
 msgid "Discovery rule \"%1$s\" is used in \"%2$s\" action."
 msgstr ""
 
-#: discoveryconf.php:161 host_discovery.php:564
+#: discoveryconf.php:163 host_discovery.php:564
 msgid "Discovery rule created"
 msgstr "Regla de descubrimiento creada"
 
-#: discoveryconf.php:186 host_discovery.php:288
+#: discoveryconf.php:188 host_discovery.php:288
 msgid "Discovery rule deleted"
 msgstr "Regla de descubrimiento eliminada"
 
-#: discoveryconf.php:210 host_discovery.php:594
+#: discoveryconf.php:212 host_discovery.php:594
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Regla de descubrimiento desactivada"
 msgstr[1] "Reglas de descubrimiento desactivadas"
 
-#: discoveryconf.php:209 host_discovery.php:593
+#: discoveryconf.php:211 host_discovery.php:593
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Regla de descubrimiento activada"
 msgstr[1] "Reglas de descubrimiento activadas"
 
-#: discoveryconf.php:154 host_discovery.php:567
+#: discoveryconf.php:156 host_discovery.php:567
 msgid "Discovery rule updated"
 msgstr "Regla de descubrimiento actualizada"
 
@@ -5152,7 +5154,7 @@ msgstr "Regla de descubrimiento actualizada"
 msgid "Discovery rules"
 msgstr "Reglas de descubrimiento"
 
-#: discoveryconf.php:228 host_discovery.php:607
+#: discoveryconf.php:230 host_discovery.php:607
 msgid "Discovery rules deleted"
 msgstr "Reglas de descubrimiento eliminadas"
 
@@ -5310,7 +5312,7 @@ msgstr "Valor \"nombre\" duplicado \"%1$s\" para el mapa."
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
 msgstr "Valor \"name\" duplicado \"%1$s\" para la pantalla."
 
-#: include/classes/api/services/CTrigger.php:1127
+#: include/classes/api/services/CTrigger.php:1139
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Dependencias duplicadas en el disparador \"%1$s\"."
@@ -5362,9 +5364,9 @@ msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "Usrgrpid duplicado \"%1$s\" en grupo de usuarios para la pantalla \"%2$s\"."
 
 #: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:557
-#: include/classes/screens/CScreenProblem.php:884
-#: include/classes/screens/CScreenProblem.php:907
-#: include/classes/screens/CScreenProblem.php:1118 include/events.inc.php:249
+#: include/classes/screens/CScreenProblem.php:874
+#: include/classes/screens/CScreenProblem.php:897
+#: include/classes/screens/CScreenProblem.php:1108 include/events.inc.php:249
 #: include/events.inc.php:461 include/views/configuration.action.edit.php:439
 msgid "Duration"
 msgstr "Duración"
@@ -5387,7 +5389,7 @@ msgstr ""
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Cada URL debería tener un único nombre. Por favor, asegúrese que sólo hay nombrada una URL"
 
-#: app/views/popup.trigdesc.view.php:98
+#: app/views/popup.trigdesc.view.php:104
 #: include/views/administration.users.edit.php:309
 #: include/views/configuration.action.edit.php:510
 #: include/views/configuration.action.edit.php:531
@@ -5551,8 +5553,8 @@ msgstr "Filtro de condición de macro vacío para la regla de descubrimiento \"%
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
 #: include/classes/api/services/CTemplate.php:586
-#: include/classes/api/services/CTrigger.php:677
-#: include/classes/api/services/CTrigger.php:795
+#: include/classes/api/services/CTrigger.php:678
+#: include/classes/api/services/CTrigger.php:802
 #: include/classes/api/services/CUserMacro.php:600
 msgid "Empty input parameter."
 msgstr "Vaciar parámetro de entrada."
@@ -5726,7 +5728,7 @@ msgstr ""
 #: include/views/configuration.correlation.edit.php:208
 #: include/views/configuration.correlation.list.php:45
 #: include/views/configuration.correlation.list.php:104
-#: include/views/configuration.discovery.edit.php:99
+#: include/views/configuration.discovery.edit.php:124
 #: include/views/configuration.discovery.list.php:44
 #: include/views/configuration.host.discovery.edit.php:572
 #: include/views/configuration.host.edit.php:280
@@ -6023,7 +6025,7 @@ msgid "FALSE"
 msgstr "INACTIVO"
 
 #: include/discovery.inc.php:50
-#: include/views/js/configuration.discovery.edit.js.php:183
+#: include/views/js/configuration.discovery.edit.js.php:207
 msgid "FTP"
 msgstr "FTP"
 
@@ -6097,12 +6099,12 @@ msgstr "El campo \"%1$s\" no puede estar vacío."
 #: include/classes/api/services/CAction.php:1607
 #: include/classes/api/services/CDRule.php:196
 #: include/classes/api/services/CDRule.php:318
-#: include/classes/api/services/CDRule.php:493
-#: include/classes/api/services/CDRule.php:503
+#: include/classes/api/services/CDRule.php:521
+#: include/classes/api/services/CDRule.php:531
 #: include/classes/api/services/CHostGroup.php:914
 #: include/classes/api/services/CHost.php:773
 #: include/classes/api/services/CTemplate.php:819
-#: include/classes/api/services/CTriggerGeneral.php:236
+#: include/classes/api/services/CTriggerGeneral.php:237
 #: include/classes/validators/CNewValidator.php:255
 #: include/validate.inc.php:300
 #, c-format
@@ -6479,7 +6481,7 @@ msgid "Gradient line"
 msgstr "Línea de gradiente"
 
 #: charts.php:100 include/audit.inc.php:30
-#: include/classes/screens/CScreenProblem.php:1221
+#: include/classes/screens/CScreenProblem.php:1211
 #: include/classes/widgets/CWidgetConfig.php:46
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
@@ -6800,7 +6802,7 @@ msgid "HTML"
 msgstr ""
 
 #: include/discovery.inc.php:51
-#: include/views/js/configuration.discovery.edit.js.php:184
+#: include/views/js/configuration.discovery.edit.js.php:208
 msgid "HTTP"
 msgstr "HTTP"
 
@@ -6832,7 +6834,7 @@ msgid "HTTP settings"
 msgstr ""
 
 #: include/discovery.inc.php:62
-#: include/views/js/configuration.discovery.edit.js.php:185
+#: include/views/js/configuration.discovery.edit.js.php:209
 msgid "HTTPS"
 msgstr "HTTPS"
 
@@ -6932,7 +6934,7 @@ msgstr ""
 
 #: app/views/monitoring.acknowledge.edit.php:34
 #: app/views/monitoring.problem.view.php:93 history.php:27
-#: include/classes/screens/CScreenProblem.php:1226
+#: include/classes/screens/CScreenProblem.php:1216
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:438 include/forms.inc.php:872
@@ -6999,9 +7001,9 @@ msgstr "Alineación horizontal"
 #: include/classes/screens/CScreenHostTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:186
 #: include/classes/screens/CScreenHttpTest.php:115
-#: include/classes/screens/CScreenProblem.php:880
-#: include/classes/screens/CScreenProblem.php:904
-#: include/classes/screens/CScreenProblem.php:1116
+#: include/classes/screens/CScreenProblem.php:870
+#: include/classes/screens/CScreenProblem.php:894
+#: include/classes/screens/CScreenProblem.php:1106
 #: include/classes/screens/CScreenTriggersInfo.php:40
 #: include/classes/setup/CSetupWizard.php:274
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
@@ -7220,6 +7222,8 @@ msgid "Host metadata"
 msgstr "Metadatos de equipo"
 
 #: host_prototypes.php:37 hosts.php:60 include/actions.inc.php:47
+#: include/views/configuration.discovery.edit.php:95
+#: include/views/configuration.discovery.edit.php:111
 #: include/views/configuration.host.edit.php:63
 #: include/views/configuration.host.prototype.edit.php:60
 #: include/views/inventory.host.view.php:37
@@ -7393,7 +7397,7 @@ msgid "Hungarian (hu_HU)"
 msgstr ""
 
 #: include/discovery.inc.php:60
-#: include/views/js/configuration.discovery.edit.js.php:186
+#: include/views/js/configuration.discovery.edit.js.php:210
 msgid "ICMP ping"
 msgstr "Ping ICMP"
 
@@ -7402,7 +7406,7 @@ msgid "ID"
 msgstr "ID"
 
 #: include/discovery.inc.php:54
-#: include/views/js/configuration.discovery.edit.js.php:187
+#: include/views/js/configuration.discovery.edit.js.php:211
 msgid "IMAP"
 msgstr "IMAP"
 
@@ -7416,6 +7420,8 @@ msgstr "IP"
 
 #: app/views/administration.proxy.edit.php:43 include/maps.inc.php:46
 #: include/views/configuration.discovery.edit.php:88
+#: include/views/configuration.discovery.edit.php:100
+#: include/views/configuration.discovery.edit.php:113
 #: include/views/configuration.host.edit.php:108
 #: include/views/configuration.host.edit.php:191
 #: include/views/configuration.host.prototype.edit.php:83
@@ -7774,13 +7780,13 @@ msgstr ""
 msgid "Incorrect API \"%1$s\"."
 msgstr "API \"%1$s\" incorrecta."
 
-#: include/classes/api/services/CDRule.php:543
-#: include/views/js/configuration.discovery.edit.js.php:603
+#: include/classes/api/services/CDRule.php:571
+#: include/views/js/configuration.discovery.edit.js.php:645
 msgid "Incorrect SNMP OID."
 msgstr "OID SNMP incorrecto."
 
-#: include/classes/api/services/CDRule.php:537
-#: include/views/js/configuration.discovery.edit.js.php:599
+#: include/classes/api/services/CDRule.php:565
+#: include/views/js/configuration.discovery.edit.js.php:641
 msgid "Incorrect SNMP community."
 msgstr "Comunidad SNMP incorrecta."
 
@@ -7934,7 +7940,7 @@ msgstr ""
 #: include/classes/api/services/CCorrelation.php:1297
 #: include/classes/api/services/CDRule.php:199
 #: include/classes/api/services/CDRule.php:341
-#: include/classes/api/services/CDRule.php:507
+#: include/classes/api/services/CDRule.php:535
 #: include/classes/api/services/CEvent.php:726
 #: include/classes/api/services/CHostInterface.php:234
 #: include/classes/api/services/CHostInterface.php:431
@@ -8193,7 +8199,7 @@ msgstr ""
 msgid "Incorrect item for axis value."
 msgstr "Elemento incorrecto para valor de eje."
 
-#: include/classes/api/services/CTriggerGeneral.php:1370
+#: include/classes/api/services/CTriggerGeneral.php:1382
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Proporcionada clave de elemento incorrecta \"%1$s\" para la expresión del iniciador en \"%2$s\"."
@@ -8309,7 +8315,7 @@ msgstr "Padre incorrecto para el servicio \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Servicio padre incorrecto."
 
-#: discoveryconf.php:104 include/classes/api/services/CDRule.php:485
+#: discoveryconf.php:106 include/classes/api/services/CDRule.php:489
 msgid "Incorrect port range."
 msgstr "Rango de puertos incorrecto."
 
@@ -8407,13 +8413,13 @@ msgstr ""
 msgid "Incorrect trigger expression."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1162
+#: include/classes/api/services/CTriggerGeneral.php:1172
 #: include/triggers.inc.php:633
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1163
+#: include/classes/api/services/CTriggerGeneral.php:1173
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr ""
 
@@ -8425,12 +8431,12 @@ msgstr ""
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1169
+#: include/classes/api/services/CTriggerGeneral.php:1179
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1170
+#: include/classes/api/services/CTriggerGeneral.php:1180
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
 msgstr ""
 
@@ -8491,9 +8497,9 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:386
 #: include/classes/api/services/CDRule.php:393
 #: include/classes/api/services/CDRule.php:445
-#: include/classes/api/services/CDRule.php:497
-#: include/classes/api/services/CDRule.php:558
-#: include/classes/api/services/CDRule.php:571
+#: include/classes/api/services/CDRule.php:525
+#: include/classes/api/services/CDRule.php:586
+#: include/classes/api/services/CDRule.php:599
 #: include/classes/api/services/CItemGeneral.php:529
 #: include/classes/api/services/CItemGeneral.php:2174
 #: include/classes/validators/CNewValidator.php:116
@@ -8607,10 +8613,12 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:362
 #: include/classes/api/services/CDRule.php:367
 #: include/classes/api/services/CDRule.php:379
-#: include/classes/api/services/CDRule.php:463
-#: include/classes/api/services/CDRule.php:470
-#: include/classes/api/services/CDRule.php:512
-#: include/classes/api/services/CDRule.php:519
+#: include/classes/api/services/CDRule.php:467
+#: include/classes/api/services/CDRule.php:474
+#: include/classes/api/services/CDRule.php:500
+#: include/classes/api/services/CDRule.php:506
+#: include/classes/api/services/CDRule.php:540
+#: include/classes/api/services/CDRule.php:547
 #: include/classes/api/services/CEvent.php:737
 #: include/classes/api/services/CEvent.php:780
 #: include/classes/api/services/CEvent.php:837
@@ -8707,23 +8715,23 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:791
 #: include/classes/api/services/CScreen.php:423
 #: include/classes/api/services/CScreen.php:429
-#: include/classes/api/services/CTriggerGeneral.php:241
-#: include/classes/api/services/CTriggerGeneral.php:247
-#: include/classes/api/services/CTriggerGeneral.php:257
-#: include/classes/api/services/CTriggerGeneral.php:540
-#: include/classes/api/services/CTriggerGeneral.php:548
-#: include/classes/api/services/CTriggerGeneral.php:566
-#: include/classes/api/services/CTriggerGeneral.php:573
-#: include/classes/api/services/CTriggerGeneral.php:580
-#: include/classes/api/services/CTriggerGeneral.php:586
-#: include/classes/api/services/CTriggerGeneral.php:594
-#: include/classes/api/services/CTriggerGeneral.php:776
-#: include/classes/api/services/CTriggerGeneral.php:785
-#: include/classes/api/services/CTriggerGeneral.php:793
-#: include/classes/api/services/CTriggerGeneral.php:803
-#: include/classes/api/services/CTriggerGeneral.php:811
-#: include/classes/api/services/CTriggerGeneral.php:817
-#: include/classes/api/services/CTriggerGeneral.php:825
+#: include/classes/api/services/CTriggerGeneral.php:242
+#: include/classes/api/services/CTriggerGeneral.php:248
+#: include/classes/api/services/CTriggerGeneral.php:258
+#: include/classes/api/services/CTriggerGeneral.php:541
+#: include/classes/api/services/CTriggerGeneral.php:549
+#: include/classes/api/services/CTriggerGeneral.php:567
+#: include/classes/api/services/CTriggerGeneral.php:574
+#: include/classes/api/services/CTriggerGeneral.php:581
+#: include/classes/api/services/CTriggerGeneral.php:587
+#: include/classes/api/services/CTriggerGeneral.php:595
+#: include/classes/api/services/CTriggerGeneral.php:777
+#: include/classes/api/services/CTriggerGeneral.php:786
+#: include/classes/api/services/CTriggerGeneral.php:794
+#: include/classes/api/services/CTriggerGeneral.php:804
+#: include/classes/api/services/CTriggerGeneral.php:812
+#: include/classes/api/services/CTriggerGeneral.php:818
+#: include/classes/api/services/CTriggerGeneral.php:826
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:532
 #: include/classes/graphdraw/CLineGraphDraw.php:113
@@ -8779,8 +8787,8 @@ msgstr ""
 #: include/actions.inc.php:1910 include/actions.inc.php:1994
 #: include/blocks.inc.php:553 include/classes/screens/CScreenActions.php:132
 #: include/classes/screens/CScreenHostTriggers.php:240
-#: include/classes/screens/CScreenProblem.php:879
-#: include/classes/screens/CScreenProblem.php:903
+#: include/classes/screens/CScreenProblem.php:869
+#: include/classes/screens/CScreenProblem.php:893
 #: include/views/administration.auditacts.list.php:62
 #: include/views/configuration.application.list.php:65
 #: include/views/configuration.host.discovery.list.php:60
@@ -8905,14 +8913,14 @@ msgstr "Periodo de almacenamiento de datos internos"
 
 #: include/classes/api/services/CGraphGeneral.php:495
 #: include/classes/api/services/CGraphGeneral.php:629
-#: include/classes/api/services/CTriggerGeneral.php:299
-#: include/classes/api/services/CTriggerGeneral.php:444
-#: include/classes/api/services/CTriggerGeneral.php:507
-#: include/classes/api/services/CTriggerGeneral.php:660
-#: include/classes/api/services/CTriggerGeneral.php:888
-#: include/classes/api/services/CTriggerGeneral.php:996
-#: include/classes/api/services/CTriggerGeneral.php:1175
-#: include/classes/api/services/CTriggerGeneral.php:1535
+#: include/classes/api/services/CTriggerGeneral.php:300
+#: include/classes/api/services/CTriggerGeneral.php:445
+#: include/classes/api/services/CTriggerGeneral.php:508
+#: include/classes/api/services/CTriggerGeneral.php:661
+#: include/classes/api/services/CTriggerGeneral.php:891
+#: include/classes/api/services/CTriggerGeneral.php:1002
+#: include/classes/api/services/CTriggerGeneral.php:1185
+#: include/classes/api/services/CTriggerGeneral.php:1547
 #: include/classes/core/CJsonRpc.php:205
 #: include/classes/import/validators/CXmlValidatorGeneral.php:155
 #: include/classes/widgets/fields/CWidgetField.php:100
@@ -9054,7 +9062,7 @@ msgstr ""
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr ""
 
-#: discoveryconf.php:110 include/classes/api/services/CDRule.php:527
+#: discoveryconf.php:112 include/classes/api/services/CDRule.php:555
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr ""
@@ -9525,7 +9533,7 @@ msgstr ""
 #: include/views/configuration.template.list.php:137
 #: include/views/configuration.template.list.php:239
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:148
-#: include/views/inventory.host.view.php:167 items.php:1686 queue.php:109
+#: include/views/inventory.host.view.php:167 items.php:1692 queue.php:109
 msgid "Items"
 msgstr "Monitores"
 
@@ -9660,7 +9668,7 @@ msgstr ""
 #: include/views/configuration.item.list.php:63
 #: include/views/configuration.item.prototype.edit.php:92
 #: include/views/configuration.item.prototype.list.php:53
-#: include/views/js/configuration.discovery.edit.js.php:56 items.php:47
+#: include/views/js/configuration.discovery.edit.js.php:80 items.php:47
 msgid "Key"
 msgstr "Monitor"
 
@@ -9690,7 +9698,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:30
 #: include/discovery.inc.php:48 include/users.inc.php:85
-#: include/views/js/configuration.discovery.edit.js.php:189
+#: include/views/js/configuration.discovery.edit.js.php:213
 msgid "LDAP"
 msgstr "LDAP"
 
@@ -9857,7 +9865,7 @@ msgid "Latest data"
 msgstr "Última fecha"
 
 #: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:556
-#: include/classes/screens/CScreenProblem.php:906 jsLoader.php:255
+#: include/classes/screens/CScreenProblem.php:896 jsLoader.php:255
 msgid "Latest values"
 msgstr ""
 
@@ -10146,7 +10154,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:218
 #: include/views/configuration.item.prototype.edit.php:491
 #: include/views/configuration.item.prototype.massupdate.php:214
-#: include/views/js/configuration.discovery.edit.js.php:97
+#: include/views/js/configuration.discovery.edit.js.php:121
 msgid "MD5"
 msgstr ""
 
@@ -10421,7 +10429,7 @@ msgstr "Marcar seleccionados"
 msgid "Mask"
 msgstr ""
 
-#: include/classes/screens/CScreenProblem.php:1103
+#: include/classes/screens/CScreenProblem.php:1093
 #: include/views/configuration.host.list.php:418
 #: include/views/configuration.item.list.php:249
 #: include/views/configuration.item.massupdate.php:574
@@ -10621,7 +10629,7 @@ msgstr "Tiempo de espera de mensajes"
 msgid "Message/Command"
 msgstr ""
 
-#: include/classes/screens/CScreenProblem.php:1153
+#: include/classes/screens/CScreenProblem.php:1143
 msgid "Messages"
 msgstr ""
 
@@ -10826,7 +10834,7 @@ msgid "Mute"
 msgstr "Silenciar"
 
 #: include/discovery.inc.php:53
-#: include/views/js/configuration.discovery.edit.js.php:190
+#: include/views/js/configuration.discovery.edit.js.php:214
 msgid "NNTP"
 msgstr "NNTP"
 
@@ -11099,8 +11107,8 @@ msgstr ""
 #: include/actions.inc.php:33 include/blocks.inc.php:441
 #: include/blocks.inc.php:632
 #: include/classes/screens/CScreenHostTriggers.php:298
-#: include/classes/screens/CScreenProblem.php:1072
-#: include/classes/screens/CScreenProblem.php:1175 include/events.inc.php:176
+#: include/classes/screens/CScreenProblem.php:1062
+#: include/classes/screens/CScreenProblem.php:1165 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
 #: include/triggers.inc.php:1235 include/triggers.inc.php:1240
 #: include/views/administration.users.list.php:111
@@ -11484,7 +11492,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:183
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CDRule.php:336
-#: include/classes/api/services/CDRule.php:791
+#: include/classes/api/services/CDRule.php:819
 #: include/classes/api/services/CEvent.php:763
 #: include/classes/api/services/CEvent.php:802
 #: include/classes/api/services/CEvent.php:827
@@ -11572,11 +11580,11 @@ msgstr ""
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
 #: include/classes/api/services/CTemplateScreen.php:756
-#: include/classes/api/services/CTriggerGeneral.php:722
+#: include/classes/api/services/CTriggerGeneral.php:723
 #: include/classes/api/services/CTrigger.php:652
-#: include/classes/api/services/CTrigger.php:692
-#: include/classes/api/services/CTrigger.php:728
-#: include/classes/api/services/CTrigger.php:810
+#: include/classes/api/services/CTrigger.php:696
+#: include/classes/api/services/CTrigger.php:732
+#: include/classes/api/services/CTrigger.php:820
 #: include/classes/api/services/CTriggerPrototype.php:533
 #: include/classes/api/services/CTriggerPrototype.php:711
 #: include/classes/api/services/CTriggerPrototype.php:729
@@ -11592,7 +11600,7 @@ msgstr ""
 #: include/classes/helpers/CMapHelper.php:80
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1758 items.php:1463 items.php:1658
+#: include/func.inc.php:1758 items.php:1469 items.php:1664
 msgid "No permissions to referred object or it does not exist!"
 msgstr "¡Sin permisos en el objeto o éste no existe!"
 
@@ -11713,7 +11721,7 @@ msgstr ""
 msgid "Not Ack"
 msgstr ""
 
-#: include/classes/api/services/CTrigger.php:1030
+#: include/classes/api/services/CTrigger.php:1042
 #: include/classes/api/services/CTriggerPrototype.php:870
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
@@ -12101,7 +12109,7 @@ msgstr ""
 msgid "Only Super Admins can update user groups."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:477
+#: include/classes/api/services/CDRule.php:481
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr ""
 
@@ -12127,7 +12135,7 @@ msgstr "Sólo cuentan los monitores asignados a equipos habilitados"
 msgid "Only one change step is allowed."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:583
+#: include/classes/api/services/CDRule.php:611
 msgid "Only one check can be unique."
 msgstr ""
 
@@ -12580,15 +12588,15 @@ msgid "PHP xmlwriter extension missing."
 msgstr ""
 
 #: include/discovery.inc.php:52
-#: include/views/js/configuration.discovery.edit.js.php:191
+#: include/views/js/configuration.discovery.edit.js.php:215
 msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
 #: include/classes/graph/CSvgGraph.php:963
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:983
-#: include/classes/screens/CScreenProblem.php:1142 include/events.inc.php:340
+#: include/classes/screens/CScreenProblem.php:973
+#: include/classes/screens/CScreenProblem.php:1132 include/events.inc.php:340
 #: include/events.inc.php:542 include/maps.inc.php:291
 #: include/maps.inc.php:375 include/maps.inc.php:468 include/maps.inc.php:567
 #: include/triggers.inc.php:232 include/views/monitoring.overview.items.php:32
@@ -12928,7 +12936,7 @@ msgstr "Puerto"
 msgid "Port cannot be empty for host interface."
 msgstr ""
 
-#: include/views/js/configuration.discovery.edit.js.php:40
+#: include/views/js/configuration.discovery.edit.js.php:64
 msgid "Port range"
 msgstr "Rango de puertos"
 
@@ -13023,7 +13031,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:247
 #: include/views/configuration.item.prototype.edit.php:508
 #: include/views/configuration.item.prototype.massupdate.php:242
-#: include/views/js/configuration.discovery.edit.js.php:118
+#: include/views/js/configuration.discovery.edit.js.php:142
 msgid "Privacy passphrase"
 msgstr "Clave de privacidad"
 
@@ -13032,7 +13040,7 @@ msgstr "Clave de privacidad"
 #: include/views/configuration.item.massupdate.php:234
 #: include/views/configuration.item.prototype.edit.php:501
 #: include/views/configuration.item.prototype.massupdate.php:230
-#: include/views/js/configuration.discovery.edit.js.php:110
+#: include/views/js/configuration.discovery.edit.js.php:134
 msgid "Privacy protocol"
 msgstr "Protocolo de privacidad"
 
@@ -13062,10 +13070,10 @@ msgstr "Nivel de privilegio"
 
 #: app/views/monitoring.problem.view.php:163
 #: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:555
-#: include/classes/screens/CScreenProblem.php:882
-#: include/classes/screens/CScreenProblem.php:905
-#: include/classes/screens/CScreenProblem.php:1039
-#: include/classes/screens/CScreenProblem.php:1117
+#: include/classes/screens/CScreenProblem.php:872
+#: include/classes/screens/CScreenProblem.php:895
+#: include/classes/screens/CScreenProblem.php:1029
+#: include/classes/screens/CScreenProblem.php:1107
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:58
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:58
 #: include/classes/widgets/forms/CWidgetFormProblems.php:75
@@ -13285,8 +13293,8 @@ msgstr "Cola de elementos para ser agregados"
 #: app/views/monitoring.widget.problems.view.php:79
 #: include/classes/graph/CSvgGraph.php:959
 #: include/classes/screens/CScreenEvents.php:121
-#: include/classes/screens/CScreenProblem.php:969
-#: include/classes/screens/CScreenProblem.php:1130 include/events.inc.php:345
+#: include/classes/screens/CScreenProblem.php:959
+#: include/classes/screens/CScreenProblem.php:1120 include/events.inc.php:345
 #: include/events.inc.php:528
 msgid "RESOLVED"
 msgstr "RESUELTO"
@@ -13376,7 +13384,7 @@ msgstr "Destinatario (ascendente)"
 msgid "Recipient (descending)"
 msgstr "Destinatario (descendente)"
 
-#: include/classes/screens/CScreenProblem.php:1040
+#: include/classes/screens/CScreenProblem.php:1030
 #: include/views/administration.users.edit.php:374
 #: include/views/configuration.item.list.php:170
 #: include/views/configuration.trigger.prototype.list.php:130
@@ -13404,9 +13412,9 @@ msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:51
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:877
-#: include/classes/screens/CScreenProblem.php:900
-#: include/classes/screens/CScreenProblem.php:1114 include/events.inc.php:246
+#: include/classes/screens/CScreenProblem.php:867
+#: include/classes/screens/CScreenProblem.php:890
+#: include/classes/screens/CScreenProblem.php:1104 include/events.inc.php:246
 #: include/events.inc.php:459
 msgid "Recovery time"
 msgstr "Hora de recuperación"
@@ -13777,27 +13785,27 @@ msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:133
 #: include/classes/screens/CScreenHostTriggers.php:266
-#: include/classes/screens/CScreenProblem.php:1000
+#: include/classes/screens/CScreenProblem.php:990
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr "Resuelto por la regla de correlación \"%1$s\"."
 
 #: app/views/monitoring.widget.problems.view.php:136
 #: include/classes/screens/CScreenHostTriggers.php:269
-#: include/classes/screens/CScreenProblem.php:1003
+#: include/classes/screens/CScreenProblem.php:993
 msgid "Resolved by correlation rule."
 msgstr "Resuelto por regla de correlación."
 
 #: app/views/monitoring.widget.problems.view.php:142
 #: include/classes/screens/CScreenHostTriggers.php:275
-#: include/classes/screens/CScreenProblem.php:1009
+#: include/classes/screens/CScreenProblem.php:999
 #, c-format
 msgid "Resolved by user \"%1$s\"."
 msgstr "Resuelto por el usuario \"%1$s\"."
 
 #: app/views/monitoring.widget.problems.view.php:143
 #: include/classes/screens/CScreenHostTriggers.php:276
-#: include/classes/screens/CScreenProblem.php:1010
+#: include/classes/screens/CScreenProblem.php:1000
 msgid "Resolved by user."
 msgstr "Resuelto por un usuario."
 
@@ -14003,7 +14011,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:219
 #: include/views/configuration.item.prototype.edit.php:492
 #: include/views/configuration.item.prototype.massupdate.php:215
-#: include/views/js/configuration.discovery.edit.js.php:98
+#: include/views/js/configuration.discovery.edit.js.php:122
 msgid "SHA"
 msgstr ""
 
@@ -14018,7 +14026,7 @@ msgid "SMS"
 msgstr "SMS"
 
 #: include/discovery.inc.php:49
-#: include/views/js/configuration.discovery.edit.js.php:195
+#: include/views/js/configuration.discovery.edit.js.php:219
 msgid "SMTP"
 msgstr "SMTP"
 
@@ -14049,7 +14057,7 @@ msgstr "SNMP"
 #: include/views/configuration.host.discovery.edit.php:378
 #: include/views/configuration.item.edit.php:474
 #: include/views/configuration.item.prototype.edit.php:457
-#: include/views/js/configuration.discovery.edit.js.php:64 items.php:124
+#: include/views/js/configuration.discovery.edit.js.php:88 items.php:124
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
@@ -14059,7 +14067,7 @@ msgstr "SNMP OID"
 #: include/views/configuration.item.massupdate.php:182
 #: include/views/configuration.item.prototype.edit.php:469
 #: include/views/configuration.item.prototype.massupdate.php:178
-#: include/views/js/configuration.discovery.edit.js.php:48 items.php:117
+#: include/views/js/configuration.discovery.edit.js.php:72 items.php:117
 msgid "SNMP community"
 msgstr "Comunidad SNMP"
 
@@ -14079,17 +14087,17 @@ msgid "SNMP trap key is invalid."
 msgstr ""
 
 #: include/discovery.inc.php:57 include/items.inc.php:88
-#: include/views/js/configuration.discovery.edit.js.php:192
+#: include/views/js/configuration.discovery.edit.js.php:216
 msgid "SNMPv1 agent"
 msgstr "Agente SNMPv1"
 
 #: include/discovery.inc.php:58 include/items.inc.php:89
-#: include/views/js/configuration.discovery.edit.js.php:193
+#: include/views/js/configuration.discovery.edit.js.php:217
 msgid "SNMPv2 agent"
 msgstr "Agente SNMPv2"
 
 #: include/discovery.inc.php:59 include/items.inc.php:90
-#: include/views/js/configuration.discovery.edit.js.php:194
+#: include/views/js/configuration.discovery.edit.js.php:218
 msgid "SNMPv3 agent"
 msgstr "Agente SNMPv3"
 
@@ -14120,7 +14128,7 @@ msgstr "La ejecución de la instrucción SQL ha fallado \"%1$s\"."
 #: include/views/configuration.action.edit.php:926
 #: include/views/configuration.action.edit.php:1686
 #: include/views/configuration.action.edit.php:2162
-#: include/views/js/configuration.discovery.edit.js.php:196
+#: include/views/js/configuration.discovery.edit.js.php:220
 msgid "SSH"
 msgstr "SSH"
 
@@ -14439,7 +14447,7 @@ msgstr "Segundos"
 #: include/views/configuration.item.massupdate.php:203
 #: include/views/configuration.item.prototype.edit.php:481
 #: include/views/configuration.item.prototype.massupdate.php:199
-#: include/views/js/configuration.discovery.edit.js.php:86
+#: include/views/js/configuration.discovery.edit.js.php:110
 msgid "Security level"
 msgstr ""
 
@@ -14449,7 +14457,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:196
 #: include/views/configuration.item.prototype.edit.php:475
 #: include/views/configuration.item.prototype.massupdate.php:192
-#: include/views/js/configuration.discovery.edit.js.php:79
+#: include/views/js/configuration.discovery.edit.js.php:103
 msgid "Security name"
 msgstr ""
 
@@ -14770,9 +14778,9 @@ msgstr ""
 #: app/views/popup.triggerwizard.php:144
 #: include/classes/screens/CScreenEvents.php:33
 #: include/classes/screens/CScreenHistory.php:259
-#: include/classes/screens/CScreenProblem.php:874
-#: include/classes/screens/CScreenProblem.php:896
-#: include/classes/screens/CScreenProblem.php:1112
+#: include/classes/screens/CScreenProblem.php:864
+#: include/classes/screens/CScreenProblem.php:886
+#: include/classes/screens/CScreenProblem.php:1102
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:67
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:67
 #: include/classes/widgets/forms/CWidgetFormProblems.php:84
@@ -14803,7 +14811,7 @@ msgid "Severity changed"
 msgstr ""
 
 #: include/actions.inc.php:1829
-#: include/classes/screens/CScreenProblem.php:1156
+#: include/classes/screens/CScreenProblem.php:1146
 msgid "Severity changes"
 msgstr ""
 
@@ -15250,9 +15258,9 @@ msgstr ""
 #: include/classes/screens/CScreenActions.php:131
 #: include/classes/screens/CScreenHttpTestDetails.php:86
 #: include/classes/screens/CScreenHttpTest.php:119
-#: include/classes/screens/CScreenProblem.php:878
-#: include/classes/screens/CScreenProblem.php:902
-#: include/classes/screens/CScreenProblem.php:1115
+#: include/classes/screens/CScreenProblem.php:868
+#: include/classes/screens/CScreenProblem.php:892
+#: include/classes/screens/CScreenProblem.php:1105
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:247 include/events.inc.php:460
@@ -15519,7 +15527,7 @@ msgid "T"
 msgstr ""
 
 #: include/discovery.inc.php:55
-#: include/views/js/configuration.discovery.edit.js.php:188
+#: include/views/js/configuration.discovery.edit.js.php:212
 msgid "TCP"
 msgstr "TCP"
 
@@ -15552,7 +15560,7 @@ msgstr ""
 msgid "Tag"
 msgstr "Etiqueta"
 
-#: include/classes/api/services/CTriggerGeneral.php:267
+#: include/classes/api/services/CTriggerGeneral.php:268
 #, c-format
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
 msgstr ""
@@ -15582,9 +15590,9 @@ msgstr ""
 
 #: app/views/monitoring.problem.view.php:283
 #: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:560
-#: include/classes/screens/CScreenProblem.php:856
-#: include/classes/screens/CScreenProblem.php:910
-#: include/classes/screens/CScreenProblem.php:1121
+#: include/classes/screens/CScreenProblem.php:846
+#: include/classes/screens/CScreenProblem.php:900
+#: include/classes/screens/CScreenProblem.php:1111
 #: include/classes/widgets/forms/CWidgetFormProblems.php:93
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
 #: include/events.inc.php:235 include/events.inc.php:463
@@ -15640,7 +15648,7 @@ msgstr "Tipo de destino"
 #: include/views/configuration.action.edit.php:927
 #: include/views/configuration.action.edit.php:1687
 #: include/views/configuration.action.edit.php:2163
-#: include/views/js/configuration.discovery.edit.js.php:197
+#: include/views/js/configuration.discovery.edit.js.php:221
 msgid "Telnet"
 msgstr "Telnet"
 
@@ -15990,8 +15998,8 @@ msgstr "Hasta"
 #: include/actions.inc.php:2044 include/blocks.inc.php:535
 #: include/classes/screens/CScreenActions.php:126
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:833
-#: include/classes/screens/CScreenProblem.php:1113
+#: include/classes/screens/CScreenProblem.php:823
+#: include/classes/screens/CScreenProblem.php:1103
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
 #: include/classes/widgets/forms/CWidgetFormProblems.php:194
@@ -16076,7 +16084,7 @@ msgstr "A"
 msgid "To set a host interface select a single item type for all items"
 msgstr ""
 
-#: include/classes/screens/CScreenProblem.php:731 include/func.inc.php:2654
+#: include/classes/screens/CScreenProblem.php:721 include/func.inc.php:2654
 #: srv_status.php:39
 msgid "Today"
 msgstr "Hoy"
@@ -16197,12 +16205,12 @@ msgstr "Tendencias"
 msgid "Trigger"
 msgstr "Iniciadores"
 
-#: include/classes/api/services/CTriggerGeneral.php:290
+#: include/classes/api/services/CTriggerGeneral.php:291
 #, c-format
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1527
+#: include/classes/api/services/CTriggerGeneral.php:1539
 #, c-format
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr ""
@@ -16216,7 +16224,7 @@ msgstr ""
 msgid "Trigger added"
 msgstr "Iniciador añadido"
 
-#: include/classes/api/services/CTrigger.php:1073
+#: include/classes/api/services/CTrigger.php:1085
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
@@ -16269,7 +16277,7 @@ msgstr "Periodo de almacenamiento de datos de eventos y alertas"
 msgid "Trigger event and alert data storage period \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:454
+#: include/classes/api/services/CTriggerGeneral.php:455
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr ""
 
@@ -16311,17 +16319,17 @@ msgstr "Vistazo general de los iniciadores"
 msgid "Trigger prototype"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:295
+#: include/classes/api/services/CTriggerGeneral.php:296
 #, c-format
 msgid "Trigger prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1531
+#: include/classes/api/services/CTriggerGeneral.php:1543
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1450
+#: include/classes/api/services/CTriggerGeneral.php:1462
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr ""
@@ -16331,7 +16339,7 @@ msgstr ""
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1445
+#: include/classes/api/services/CTriggerGeneral.php:1457
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr ""
@@ -16372,7 +16380,7 @@ msgstr ""
 msgid "Trigger prototypes updated"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:466
+#: include/classes/api/services/CTriggerGeneral.php:467
 msgid "Trigger recovery expression must contain at least one host:key reference."
 msgstr ""
 
@@ -16711,7 +16719,7 @@ msgstr "Unidad"
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:497
 #: include/views/configuration.triggers.list.php:71
-#: include/views/js/configuration.discovery.edit.js.php:206
+#: include/views/js/configuration.discovery.edit.js.php:230
 msgid "Unknown"
 msgstr "Desconocido"
 
@@ -16895,7 +16903,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:2363
 #: include/views/configuration.application.edit.php:50
 #: include/views/configuration.correlation.edit.php:276
-#: include/views/configuration.discovery.edit.php:108
+#: include/views/configuration.discovery.edit.php:133
 #: include/views/configuration.graph.edit.php:449
 #: include/views/configuration.host.discovery.edit.php:771
 #: include/views/configuration.host.edit.php:829
@@ -16914,9 +16922,9 @@ msgstr ""
 #: include/views/configuration.template.massupdate.php:166
 #: include/views/configuration.trigger.prototype.edit.php:615
 #: include/views/configuration.trigger.prototype.massupdate.php:189
-#: include/views/configuration.triggers.edit.php:615
+#: include/views/configuration.triggers.edit.php:616
 #: include/views/configuration.triggers.massupdate.php:169
-#: include/views/js/configuration.discovery.edit.js.php:384
+#: include/views/js/configuration.discovery.edit.js.php:423
 #: include/views/monitoring.screen.constructor.edit.php:920
 #: include/views/monitoring.screen.edit.php:220
 #: include/views/monitoring.slideconf.edit.php:273
@@ -17304,7 +17312,7 @@ msgid "VMware datastore capacity statistics in bytes or in percentage from total
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:691
-msgid "VMware event log, <url> - VMware service URL"
+msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:747
@@ -17684,6 +17692,7 @@ msgstr "Vista no procesada."
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
 
+#: include/views/configuration.discovery.edit.php:107
 #: include/views/configuration.host.edit.php:69
 #: include/views/configuration.host.prototype.edit.php:66
 #: include/views/configuration.template.edit.php:86
@@ -17945,13 +17954,13 @@ msgstr ""
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:502
-#: include/classes/api/services/CTriggerGeneral.php:654
+#: include/classes/api/services/CTriggerGeneral.php:503
+#: include/classes/api/services/CTriggerGeneral.php:655
 msgid "Wrong fields for trigger prototype."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:497
-#: include/classes/api/services/CTriggerGeneral.php:648
+#: include/classes/api/services/CTriggerGeneral.php:498
+#: include/classes/api/services/CTriggerGeneral.php:649
 msgid "Wrong fields for trigger."
 msgstr ""
 
@@ -17959,8 +17968,8 @@ msgstr ""
 #: include/classes/api/services/CMap.php:958
 #: include/classes/api/services/CMap.php:1418
 #: include/classes/api/services/CScreenItem.php:967
-#: include/classes/api/services/CTriggerGeneral.php:522
-#: include/classes/api/services/CTriggerGeneral.php:675
+#: include/classes/api/services/CTriggerGeneral.php:523
+#: include/classes/api/services/CTriggerGeneral.php:676
 msgid "Wrong value for url field."
 msgstr ""
 
@@ -18084,8 +18093,8 @@ msgstr "Anual"
 #: include/actions.inc.php:32 include/blocks.inc.php:441
 #: include/blocks.inc.php:632
 #: include/classes/screens/CScreenHostTriggers.php:298
-#: include/classes/screens/CScreenProblem.php:1072
-#: include/classes/screens/CScreenProblem.php:1175 include/events.inc.php:176
+#: include/classes/screens/CScreenProblem.php:1062
+#: include/classes/screens/CScreenProblem.php:1165 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
 #: include/triggers.inc.php:1234 include/triggers.inc.php:1239
 #: include/views/administration.general.valuemapping.list.php:65
@@ -18102,7 +18111,7 @@ msgstr "Anual"
 msgid "Yes"
 msgstr "Sí"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2648
+#: include/classes/screens/CScreenProblem.php:729 include/func.inc.php:2648
 msgid "Yesterday"
 msgstr ""
 
@@ -18217,7 +18226,7 @@ msgstr "Usuario Zabbix"
 #: include/views/configuration.action.edit.php:942
 #: include/views/configuration.action.edit.php:1720
 #: include/views/configuration.action.edit.php:2188
-#: include/views/js/configuration.discovery.edit.js.php:198
+#: include/views/js/configuration.discovery.edit.js.php:222
 msgid "Zabbix agent"
 msgstr "Agente Zabbix"
 
@@ -18316,8 +18325,8 @@ msgstr ""
 msgid "a boolean is expected"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:241
-#: include/classes/api/services/CTriggerGeneral.php:257
+#: include/classes/api/services/CTriggerGeneral.php:242
+#: include/classes/api/services/CTriggerGeneral.php:258
 #: include/classes/api/services/CUser.php:649
 #: include/classes/import/validators/CXmlValidatorGeneral.php:201
 #: include/classes/validators/CApiInputValidator.php:234
@@ -18412,7 +18421,7 @@ msgstr "agente"
 #: include/views/configuration.triggers.list.php:152
 #: include/views/js/configuration.graph.edit.js.php:55 report2.php:238
 #: report2.php:257 report2.php:289 report2.php:322 report2.php:364
-#: report2.php:383 report4.php:87 report4.php:287
+#: report2.php:383 report4.php:87 report4.php:289
 msgid "all"
 msgstr "todo"
 
@@ -18420,8 +18429,8 @@ msgstr "todo"
 msgid "all media"
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:463
-#: include/classes/api/services/CDRule.php:470
+#: include/classes/api/services/CDRule.php:467
+#: include/classes/api/services/CDRule.php:474
 #: include/classes/api/services/CItemGeneral.php:2129
 #: include/classes/api/services/CItemGeneral.php:2153
 #: include/classes/import/validators/CXmlValidatorGeneral.php:215
@@ -18539,7 +18548,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:319
 #: include/classes/api/services/CDRule.php:345
 #: include/classes/api/services/CDRule.php:357
-#: include/classes/api/services/CDRule.php:512
+#: include/classes/api/services/CDRule.php:540
 #: include/classes/api/services/CEvent.php:780
 #: include/classes/api/services/CHost.php:1602
 #: include/classes/api/services/CHost.php:1608
@@ -18566,11 +18575,11 @@ msgstr ""
 #: include/classes/api/services/CMediatype.php:761
 #: include/classes/api/services/CProxy.php:578
 #: include/classes/api/services/CProxy.php:584
-#: include/classes/api/services/CTriggerGeneral.php:247
-#: include/classes/api/services/CTriggerGeneral.php:548
-#: include/classes/api/services/CTriggerGeneral.php:580
-#: include/classes/api/services/CTriggerGeneral.php:793
-#: include/classes/api/services/CTriggerGeneral.php:811
+#: include/classes/api/services/CTriggerGeneral.php:248
+#: include/classes/api/services/CTriggerGeneral.php:549
+#: include/classes/api/services/CTriggerGeneral.php:581
+#: include/classes/api/services/CTriggerGeneral.php:794
+#: include/classes/api/services/CTriggerGeneral.php:812
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:532
 #: include/classes/api/services/CUser.php:660
@@ -19295,10 +19304,10 @@ msgstr "descripción corta"
 #: include/classes/api/services/CMaintenance.php:675
 #: include/classes/api/services/CProxy.php:661
 #: include/classes/api/services/CProxy.php:784
-#: include/classes/api/services/CTriggerGeneral.php:540
-#: include/classes/api/services/CTriggerGeneral.php:566
-#: include/classes/api/services/CTriggerGeneral.php:785
-#: include/classes/api/services/CTriggerGeneral.php:803
+#: include/classes/api/services/CTriggerGeneral.php:541
+#: include/classes/api/services/CTriggerGeneral.php:567
+#: include/classes/api/services/CTriggerGeneral.php:786
+#: include/classes/api/services/CTriggerGeneral.php:804
 msgid "should be empty"
 msgstr ""
 
@@ -19407,11 +19416,11 @@ msgstr "iniciador"
 msgid "trigger does not allow manual closing"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1457
+#: include/classes/api/services/CTriggerGeneral.php:1469
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:1602
+#: include/classes/api/services/CTriggerGeneral.php:1614
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr ""
 
@@ -19461,12 +19470,12 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1535
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
-#: include/classes/api/services/CTriggerGeneral.php:574
-#: include/classes/api/services/CTriggerGeneral.php:587
-#: include/classes/api/services/CTriggerGeneral.php:595
-#: include/classes/api/services/CTriggerGeneral.php:777
-#: include/classes/api/services/CTriggerGeneral.php:818
-#: include/classes/api/services/CTriggerGeneral.php:826
+#: include/classes/api/services/CTriggerGeneral.php:575
+#: include/classes/api/services/CTriggerGeneral.php:588
+#: include/classes/api/services/CTriggerGeneral.php:596
+#: include/classes/api/services/CTriggerGeneral.php:778
+#: include/classes/api/services/CTriggerGeneral.php:819
+#: include/classes/api/services/CTriggerGeneral.php:827
 #, c-format
 msgid "unexpected value \"%1$s\""
 msgstr ""

@@ -1188,10 +1188,10 @@ if (isset($_REQUEST['form'])) {
 			$itemPrototype['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
-		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
+		if (getRequest('type', $itemPrototype['type']) == ITEM_TYPE_DEPENDENT) {
 			$master_prototypes = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'itemids' => [$itemPrototype['master_itemid']],
+				'itemids' => [getRequest('master_itemid', $itemPrototype['master_itemid'])],
 				'hostids' => [$itemPrototype['hostid']],
 				'webitems' => true
 			])

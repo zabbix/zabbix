@@ -1065,7 +1065,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				'Request type' => 'GET',
 				'Timeout' => '3s',
 				'Required status codes' => '200',
-				'Follow redirects' => false,
+				'Follow redirects' => true,
 				'Convert to JSON' => false,
 				'HTTP authentication' => 'None',
 				'SSL verify peer' => false,

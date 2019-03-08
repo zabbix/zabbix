@@ -113,9 +113,6 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (SUCCEED == ret)
 	{
-		zbx_rtrim(s.buffer, " \r\n");
-		zbx_ltrim(s.buffer, " ");
-
 		zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s.buffer);
 
 		if (0 == strcmp(s.buffer, ZBX_NOTSUPPORTED))

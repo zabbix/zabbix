@@ -1,9 +1,48 @@
+Changes for 4.2.0rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-15196] fixed "Follow redirects" checkbox not being enabled by default for HTTP agent in item, item prototype and LLD rule create forms (Ivo)
+.......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
+..F....... [ZBX-15483] fixed undefined index in Item Prototype update (vasilijs)
+..F....... [ZBX-15270] fixed graph widget configuration form cross browser issues (agriscenko)
+..F....... [ZBX-15300] fixed widgets extra space at the bottom (ashubin, vasilijs)
+...G...... [ZBX-8091] added alphabetic ordering of net.dns.record respond (akozlovs)
+..F....... [ZBX-15707] fixed check box design when drag and drop an interface into SNMP (vasilijs)
+..F....... [ZBX-15535] fixed validation of min/max value range in graph widget; fixed translation string in graph widget (miks)
+..F....... [ZBX-15648] removed unused WIDGET_HAT_EVENTACTIONMCMDS and WIDGET_HAT_EVENTACTIONMSGS constants (agriscenko)
+A.F....... [ZBX-15386] fixed Trigger overview not showing OK triggers (vasilijs)
+A.F....... [ZBX-14538] fixed error message when value of lifetime or history/trends storage period is out of range (agriscenko)
+A.F....... [ZBX-15614] fixed validation of y axis item on classic graph create and update (agriscenko)
+..F....... [ZBX-15226] fixed missing visual gap under page title (gcalenko)
+..F....... [ZBX-15560] fixed incorrect URL argument formatting when parameters are non-indexed arrays (Ivo)
+..F....... [ZBX-15719] fixed undefined index in trigger expression popup (Ivo)
+..F....... [ZBX-15332] fixed dashboard svg graph update on timeselector interval change (gcalenko)
+...G...... [ZBX-15728] fixed agent startup problem in Win 2008 R2 w/o SP1, removed dependency on version helper API (kalimulin)
+
+--------------------------------------------------------------------------------
 Changes for 4.2.0beta2
 
 New features:
+A.F....PS. [ZBXNEXT-158] added ability to use discovery returned string as hostname and visible name (akozlovs, vasilijs)
+....I..... [ZBXNEXT-5013] removed adaptive chunking from TimescaleDB script (kalimulin)
+........S. [ZBXNEXT-5016] extended preprocessing error messages to include intermediate step results (wiper)
+...G...... [ZBXNEXT-4898] added support IPv6 for "net.dns" and "net.dns.record" (MVekslers)
+.......PS. [ZBXNEXT-5037] added "skip" parameter for vmware.eventlog key (MVekslers)
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+..F....... [ZBX-15622] fixed trigger expression test dialog not being usable with long trigger expressions (talbergs)
+..F....... [ZBX-13332] fixed issue for large post data in web scenario steps (talbergs)
+...G...... [ZBX-15607] fixed possibility of zombie processes occurring when signaling agent during metric execution (akozlovs)
+.D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
+..F....... [ZBX-15625] removed links leading to media type edit form for non-superadmins in Reports->Notifications page (Ivo)
+.D.G...PS. [ZBX-8344] remove trimming of leading and trailing whitespaces for data received from agent (akozlovs)
+.......PS. [ZBX-15703] fixed use of uninitialized variable when receiving 0 bytes on listening socket (akozlovs)
+..F....... [ZBX-15537] fixed visual bug when filter tab was overlapped by sub navigation (gcalenko)
+..F....... [ZBX-15539] fixed validation of master item in item update form (miks)
+..F....... [ZBX-15532] fixed undefined index error on problems page when trigger expression contains web items (gcalenko, Sasha)
 A......... [ZBX-15488] fixed permission check for inherited triggers (miks)
 ..F....... [ZBX-15646] fixed web-server 'Request-URI Too Long' error in trigger description dialog (miks)
 ..F....... [ZBX-15688] fixed wrong host group and host selection in trigger dependencies window (talbergs)
@@ -158,9 +197,37 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.6rc1
 
 New features:
+...G...... [ZBXNEXT-4898] added support IPv6 for "net.dns" and "net.dns.record" (MVekslers)
+.......PS. [ZBXNEXT-5037] added "skip" parameter for vmware.eventlog key (MVekslers)
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+..F....... [ZBX-15196] fixed "Follow redirects" checkbox not being enabled by default for HTTP agent in item, item prototype and LLD rule create forms (Ivo)
+.......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
+..F....... [ZBX-15483] fixed undefined index in Item Prototype update (vasilijs)
+..F....... [ZBX-15270] fixed graph widget configuration form cross browser issues (agriscenko)
+..F....... [ZBX-15300] fixed widgets extra space at the bottom (ashubin, vasilijs)
+...G...... [ZBX-8091] added alphabetic ordering of net.dns.record respond (akozlovs)
+..F....... [ZBX-15707] fixed check box design when drag and drop an interface into SNMP (vasilijs)
+..F....... [ZBX-15535] fixed validation of min/max value range in graph widget; fixed translation string in graph widget (miks)
+..F....... [ZBX-15648] removed unused WIDGET_HAT_EVENTACTIONMCMDS and WIDGET_HAT_EVENTACTIONMSGS constants (agriscenko)
+A.F....... [ZBX-15386] fixed Trigger overview not showing OK triggers (vasilijs)
+A.F....... [ZBX-14538] fixed error message when value of lifetime or history/trends storage period is out of range (agriscenko)
+A.F....... [ZBX-15614] fixed validation of y axis item on classic graph create and update (agriscenko)
+..F....... [ZBX-15226] fixed missing visual gap under page title (gcalenko)
+..F....... [ZBX-15560] fixed incorrect URL argument formatting when parameters are non-indexed arrays (Ivo)
+..F....... [ZBX-15719] fixed undefined index in trigger expression popup (Ivo)
+..F....... [ZBX-15332] fixed dashboard svg graph update on timeselector interval change (gcalenko)
+...G...... [ZBX-15728] fixed agent startup problem in Win 2008 R2 w/o SP1, removed dependency on version helper API (kalimulin)
+..F....... [ZBX-15622] fixed trigger expression test dialog not being usable with long trigger expressions (talbergs)
+..F....... [ZBX-13332] fixed issue for large post data in web scenario steps (talbergs)
+...G...... [ZBX-15607] fixed possibility of zombie processes occurring when signaling agent during metric execution (akozlovs)
+.D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
+..F....... [ZBX-15625] removed links leading to media type edit form for non-superadmins in Reports->Notifications page (Ivo)
+.......PS. [ZBX-15703] fixed use of uninitialized variable when receiving 0 bytes on listening socket (akozlovs)
+..F....... [ZBX-15537] fixed visual bug when filter tab was overlapped by sub navigation (gcalenko)
+..F....... [ZBX-15539] fixed validation of master item in item update form (miks)
+..F....... [ZBX-15532] fixed undefined index error on problems page when trigger expression contains web items (gcalenko, Sasha)
 A......... [ZBX-15488] fixed permission check for inherited triggers (miks)
 ..F....... [ZBX-15646] fixed web-server 'Request-URI Too Long' error in trigger description dialog (miks)
 
@@ -2403,6 +2470,9 @@ Changes for 3.0.26rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
+.......PS. [ZBX-14858] fixed processing of unlimited vmware maxQueryMetrics value (MVekslers)
+.D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
 ...G....S. [ZBX-15494] fixed handling numbers that written in scientific notation (asitals)
 ...G...... [ZBX-15316] fixed problem with socket inheritance preventing Windows agent from restarting under certain circumstances (kalimulin)
 
