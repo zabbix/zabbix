@@ -1717,5 +1717,17 @@ in:
   value_type: state
 out:
   result: FAIL
+---
+test case: 'Apply -1 metric filter on +1 value'
+in:
+  data: |
+    cpu_usage_system{cpu="cpu-total",state="23",host="host1"} inf
+    cpu_usage_system{cpu="cpu0",state="10",host="host2"} nan
+    cpu_usage_system{cpu="cpu1",state="88",host="host3"} 3.5180249088e+11
+  params: cpu_usage_system==3.5180249088e+11
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 3.5180249088e+11
 ...
 

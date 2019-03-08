@@ -927,12 +927,8 @@ static int	condition_match_key_value(const zbx_prometheus_condition_t *condition
 static int	condition_match_metric_value(const char *pattern, const char *value)
 {
 	char	buffer[5];
-	int	double_pattern;
 
-	if ((double_pattern = is_double(pattern)) != is_double(value))
-		return FAIL;
-
-	if (SUCCEED != double_pattern)
+	if (SUCCEED != is_double(pattern))
 	{
 		if ('+' == *pattern)
 			pattern++;
@@ -944,6 +940,9 @@ static int	condition_match_metric_value(const char *pattern, const char *value)
 		zbx_strlower(buffer);
 		return (0 == strcmp(pattern, buffer) ? SUCCEED : FAIL);
 	}
+
+	if (SUCCEED != is_double(value))
+		return FAIL;
 
 	if (ZBX_DOUBLE_EPSILON <= fabs(atof(pattern) - atof(value)))
 		return FAIL;
