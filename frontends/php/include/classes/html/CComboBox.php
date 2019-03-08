@@ -92,6 +92,24 @@ class CComboBox extends CTag {
 	}
 
 	/**
+	 * Enable or disable readonly mode for the element.
+	 *
+	 * @param bool $value
+	 *
+	 * @return CComboBox
+	 */
+	public function setReadonly($value) {
+		if ($value) {
+			$this->setAttribute('readonly', 'readonly');
+		}
+		else {
+			$this->removeAttribute('readonly');
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Enable or disable the element.
 	 *
 	 * @param $value

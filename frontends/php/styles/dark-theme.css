@@ -1388,7 +1388,8 @@ select {
     select[multiple] option {
       padding: 0; }
   select[readonly] {
-    color: #f2f2f2 !important; }
+    color: #f2f2f2 !important;
+    pointer-events: none; }
 
 .form-input-margin {
   display: inline-block;

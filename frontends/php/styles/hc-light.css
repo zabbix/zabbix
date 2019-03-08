@@ -1351,7 +1351,8 @@ select {
     select[multiple] option {
       padding: 0; }
   select[readonly] {
-    color: #000 !important; }
+    color: #000 !important;
+    pointer-events: none; }
 
 .form-input-margin {
   display: inline-block;

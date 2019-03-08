@@ -1410,25 +1410,16 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 
 	foreach ($preprocessing as $step) {
 		// Create a combo box with preprocessing types.
-		if ($readonly) {
-			$preproc_types_cbbox = (new CTextBox('preprocessing['.$i.'][type_name]',
-				get_preprocessing_types($step['type'], false, $types))
-			)->setReadonly(true);
+		$preproc_types_cbbox = (new CComboBox('preprocessing['.$i.'][type]', $step['type']))->setReadonly($readonly);
 
-			$form->addVar('preprocessing['.$i.'][type]', $step['type']);
-		}
-		else {
-			$preproc_types_cbbox = new CComboBox('preprocessing['.$i.'][type]', $step['type']);
+		foreach (get_preprocessing_types(null, true, $types) as $group) {
+			$cb_group = new COptGroup($group['label']);
 
-			foreach (get_preprocessing_types(null, true, $types) as $group) {
-				$cb_group = new COptGroup($group['label']);
-
-				foreach ($group['types'] as $type => $label) {
-					$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
-				}
-
-				$preproc_types_cbbox->addItem($cb_group);
+			foreach ($group['types'] as $type => $label) {
+				$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
 			}
+
+			$preproc_types_cbbox->addItem($cb_group);
 		}
 
 		// Depending on preprocessing type, display corresponding params field and placeholders.

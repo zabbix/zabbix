@@ -2106,7 +2106,8 @@ select {
 	}
 
 	&[readonly] {
-		color: $font-color!important;
+		color: $font-color !important;
+		pointer-events: none;
 		@extend %form-disabled;
 	}
 }
