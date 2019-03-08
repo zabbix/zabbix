@@ -3,6 +3,7 @@ Changes for 4.2.0rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15694] fixed trimming of empty spaces for custom multiplier in item and item prototype preprocessing forms (Ivo)
 ..F....... [ZBX-15196] fixed "Follow redirects" checkbox not being enabled by default for HTTP agent in item, item prototype and LLD rule create forms (Ivo)
 .......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
 ..F....... [ZBX-15483] fixed undefined index in Item Prototype update (vasilijs)
@@ -202,6 +203,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+..F....... [ZBX-15694] fixed trimming of empty spaces for custom multiplier in item and item prototype preprocessing forms (Ivo)
 ..F....... [ZBX-15196] fixed "Follow redirects" checkbox not being enabled by default for HTTP agent in item, item prototype and LLD rule create forms (Ivo)
 .......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
 ..F....... [ZBX-15483] fixed undefined index in Item Prototype update (vasilijs)
