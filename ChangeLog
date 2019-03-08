@@ -3,6 +3,7 @@ Changes for 4.2.0rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15308] fixed timeselector in screens when page is opened with link containing sid argument (ashubin, gcalenko)
 ..F....... [ZBX-15694] fixed trimming of empty spaces for custom multiplier in item and item prototype preprocessing forms (Ivo)
 ..F....... [ZBX-15196] fixed "Follow redirects" checkbox not being enabled by default for HTTP agent in item, item prototype and LLD rule create forms (Ivo)
 .......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
