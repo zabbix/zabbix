@@ -1372,7 +1372,7 @@ function getItemFormData(array $item = [], array $options = []) {
  * @param string      $elements_field
  * @param null|string $title
  *
- * @return array|null
+ * @return array
  */
 function getCopyElementsFormData($elements_field, $title = null) {
 	$data = [
@@ -1384,11 +1384,10 @@ function getCopyElementsFormData($elements_field, $title = null) {
 		'hostid' => getRequest('hostid', 0)
 	];
 
-	// validate elements
-	if (empty($data['elements']) || !is_array($data['elements'])) {
-		error(_('Incorrect list of items.'));
+	if (!$data['elements'] || !is_array($data['elements'])) {
+		show_error_message(_('Incorrect list of items.'));
 
-		return null;
+		return $data;
 	}
 
 	if ($data['copy_targetids']) {
@@ -1415,12 +1414,6 @@ function getCopyElementsFormData($elements_field, $title = null) {
 					'groupids' => $data['copy_targetids'],
 					'editable' => true
 				]), ['groupid' => 'id']);
-				break;
-
-			default:
-				error(_('Page received incorrect data'));
-
-				return null;
 		}
 	}
 

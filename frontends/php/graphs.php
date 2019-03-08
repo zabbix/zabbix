@@ -36,7 +36,10 @@ $fields = [
 	'parent_discoveryid' =>	[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'groupid' =>			[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
-	'copy_type' => [T_ZBX_INT, O_OPT, P_SYS, IN([COPY_TYPE_TO_HOST, COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_TEMPLATE]), 'isset({copy})'],
+	'copy_type' =>			[T_ZBX_INT, O_OPT, P_SYS,
+								IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
+								'isset({copy})'
+							],
 	'copy_mode' =>			[T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null],
 	'graphid' =>			[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({form}) && {form} == "update"'],
 	'name' =>				[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
@@ -310,7 +313,7 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 }
 elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('copy')
 		&& hasRequest('group_graphid')) {
-	if (hasRequest('copy_targetids') && getRequest('copy_targetids') > 0 && hasRequest('copy_type')) {
+	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
 		$result = true;
 
 		$options = [

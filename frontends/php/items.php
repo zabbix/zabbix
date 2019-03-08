@@ -37,7 +37,10 @@ $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 $fields = [
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
 	'interfaceid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
-	'copy_type' =>				[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), 'isset({copy})'],
+	'copy_type' =>				[T_ZBX_INT, O_OPT, P_SYS,
+									IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
+									'isset({copy})'
+								],
 	'copy_mode' =>				[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
 	'itemid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
@@ -1204,7 +1207,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
 		&& hasRequest('group_itemid')) {
-	if (hasRequest('copy_targetids') && getRequest('copy_targetids') > 0 && hasRequest('copy_type')) {
+	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
 		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
 			$hosts_ids = getRequest('copy_targetids');
