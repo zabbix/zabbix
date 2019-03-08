@@ -75,9 +75,10 @@ function get_item_logtype_style($logtype) {
 }
 
 /**
- * Get item type string name by item type number, or array of all item types if null passed
+ * Get item type string name by item type number, or array of all item types if null passed.
  *
  * @param int|null $type
+ *
  * @return array|string
  */
 function item_type2str($type = null) {
@@ -103,15 +104,12 @@ function item_type2str($type = null) {
 		ITEM_TYPE_HTTPTEST => _('Web monitoring'),
 		ITEM_TYPE_DEPENDENT => _('Dependent item')
 	];
-	if (is_null($type)) {
+
+	if ($type === null) {
 		return $types;
 	}
-	elseif (isset($types[$type])) {
-		return $types[$type];
-	}
-	else {
-		return _('Unknown');
-	}
+
+	return array_key_exists($type, $types) ? $types[$type] : _('Unknown');
 }
 
 /**

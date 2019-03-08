@@ -941,8 +941,9 @@ function prepareItemHttpAgentFormData(array $item) {
 /**
  * Get data for item edit page.
  *
- * @param array	$item							Item, item prototype, LLD rule or LLD item to take the data from.
- * @param bool $options['is_discovery_rule']
+ * @param array $item                          Item, item prototype, LLD rule or LLD item to take the data from.
+ * @param array $options
+ * @param bool  $options['is_discovery_rule']
  *
  * @return array
  */
@@ -1079,11 +1080,10 @@ function getItemFormData(array $item = [], array $options = []) {
 	// types, http items only for internal processes
 	$data['types'] = item_type2str();
 	unset($data['types'][ITEM_TYPE_HTTPTEST]);
-	if (!empty($options['is_discovery_rule'])) {
+	if ($data['is_discovery_rule']) {
 		unset($data['types'][ITEM_TYPE_AGGREGATE],
 			$data['types'][ITEM_TYPE_CALCULATED],
-			$data['types'][ITEM_TYPE_SNMPTRAP],
-			$data['types'][ITEM_TYPE_DEPENDENT]
+			$data['types'][ITEM_TYPE_SNMPTRAP]
 		);
 	}
 
@@ -1110,7 +1110,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	// caption
-	if (!empty($data['is_discovery_rule'])) {
+	if ($data['is_discovery_rule']) {
 		$data['caption'] = _('Discovery rule');
 	}
 	else {

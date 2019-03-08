@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'codeeditor.js', 'items.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'codeeditor.js', 'multiselect.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -48,9 +48,15 @@ $fields = [
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'description' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'key' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Key')],
+	'master_itemid' =>			[T_ZBX_STR, O_OPT, null,	null,
+									'(isset({add}) || isset({update})) && isset({type})'.
+										' && {type} == '.ITEM_TYPE_DEPENDENT,
+									_('Master item')
+								],
 	'delay' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
 									'(isset({add}) || isset({update})) && isset({type})'.
-										' && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP,
+										' && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.
+										' && {type} != '.ITEM_TYPE_DEPENDENT,
 									_('Update interval')
 								],
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
@@ -60,7 +66,7 @@ $fields = [
 										ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3,
 										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-										ITEM_TYPE_HTTPAGENT
+										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT
 									]),
 									'isset({add}) || isset({update})'
 								],
@@ -240,7 +246,7 @@ if (getRequest('itemid', false)) {
 	$item = API::DiscoveryRule()->get([
 		'itemids' => getRequest('itemid'),
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => ['status', 'flags'],
+		'selectHosts' => ['hostid', 'name', 'status', 'flags'],
 		'selectFilter' => ['formula', 'evaltype', 'conditions'],
 		'selectLLDMacroPaths' => ['lld_macro', 'path'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -255,8 +261,8 @@ if (getRequest('itemid', false)) {
 }
 else {
 	$hosts = API::Host()->get([
-		'hostids' => $_REQUEST['hostid'],
-		'output' => ['status', 'flags'],
+		'output' => ['hostid', 'name', 'status', 'flags'],
+		'hostids' => getRequest('hostid'),
 		'templated_hosts' => true,
 		'editable' => true
 	]);
@@ -279,7 +285,7 @@ if (hasRequest('preprocessing')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
+if (hasRequest('delete') && hasRequest('itemid')) {
 	$result = API::DiscoveryRule()->delete([getRequest('itemid')]);
 
 	if ($result) {
@@ -288,6 +294,10 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
+}
+elseif (hasRequest('clone') && hasRequest('itemid')) {
+	unset($_REQUEST['itemid']);
+	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
@@ -544,6 +554,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$newItem['preprocessing'] = $preprocessing;
 			}
 
+			if (getRequest('type') == ITEM_TYPE_DEPENDENT) {
+				$newItem['master_itemid'] = getRequest('master_itemid');
+			}
+
 			$result = API::DiscoveryRule()->update($newItem);
 			$result = DBend($result);
 		}
@@ -554,6 +568,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($preprocessing) {
 				$newItem['preprocessing'] = $preprocessing;
+			}
+
+			if ($newItem['type'] == ITEM_TYPE_DEPENDENT) {
+				$newItem['master_itemid'] = getRequest('master_itemid');
 			}
 
 			$result = API::DiscoveryRule()->create([$newItem]);
@@ -622,9 +640,50 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masschec
 /*
  * Display
  */
-if (isset($_REQUEST['form'])) {
-	$formItem = (hasRequest('itemid') && !hasRequest('clone')) ? $item : [];
-	$data = getItemFormData($formItem, [
+if (hasRequest('form')) {
+	$has_errors = false;
+	$master_item_options = [];
+
+	if (hasRequest('itemid')) {
+		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT) {
+			// Unset master item if submitted form has no master_itemid set.
+			if (hasRequest('form_refresh') && !hasRequest('master_itemid')) {
+				$item['master_itemid'] = 0;
+			}
+			else {
+				$master_item_options = [
+					'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+					'itemids' => getRequest('master_itemid', $item['master_itemid']),
+					'webitems' => true
+				];
+			}
+		}
+	}
+	else {
+		$item = [];
+
+		if (getRequest('master_itemid')) {
+			$master_item_options = [
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+				'itemids' => getRequest('master_itemid'),
+				'hostids' => $host['hostid'],
+				'webitems' => true
+			];
+		}
+	}
+
+	if ($master_item_options) {
+		$master_items = API::Item()->get($master_item_options);
+		if ($master_items) {
+			$item['master_item'] = reset($master_items);
+		}
+		else {
+			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
+			$has_errors = true;
+		}
+	}
+
+	$data = getItemFormData($item, [
 		'is_discovery_rule' => true
 	]);
 	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
@@ -655,11 +714,6 @@ if (isset($_REQUEST['form'])) {
 		$data['conditions'] = $item['filter']['conditions'];
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 	}
-	// clone form
-	elseif (hasRequest('clone')) {
-		unset($data['itemid']);
-		$data['form'] = 'clone';
-	}
 
 	// Sort interfaces to be listed starting with one selected as 'main'.
 	CArrayHelper::sort($data['interfaces'], [
@@ -671,9 +725,11 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	// render view
-	$itemView = new CView('configuration.host.discovery.edit', $data);
-	$itemView->render();
-	$itemView->show();
+	if (!$has_errors) {
+		$itemView = new CView('configuration.host.discovery.edit', $data);
+		$itemView->render();
+		$itemView->show();
+	}
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));

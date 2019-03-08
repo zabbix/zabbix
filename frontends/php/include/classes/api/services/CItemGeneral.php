@@ -773,9 +773,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		if ($this instanceof CItem || $this instanceof CItemPrototype) {
-			$this->validateDependentItems($new_items);
-		}
+		$this->validateDependentItems($new_items);
 
 		// Save the new items.
 		if ($ins_items) {
@@ -1158,11 +1156,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		if ($class === 'CItem' || $class === 'CItemPrototype') {
-			$new_items = $this->prepareDependentItems($tpl_items, $new_items, $hostids);
-		}
-
-		return $new_items;
+		return $this->prepareDependentItems($tpl_items, $new_items, $hostids);
 	}
 
 	/**

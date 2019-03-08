@@ -1176,12 +1176,6 @@ class CDiscoveryRule extends CItemGeneral {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 
-			if (array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_DEPENDENT) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-					ITEM_TYPE_DEPENDENT, 'type'
-				));
-			}
-
 			// unset fields that are updated using the 'filter' parameter
 			unset($item['evaltype']);
 			unset($item['formula']);
