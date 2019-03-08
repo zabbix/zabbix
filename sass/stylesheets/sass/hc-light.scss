@@ -1100,6 +1100,10 @@ td.inactive-bg {
 		&:after {
 			background-position: -206px -478px;
 		}
+
+		&:focus:after {
+			background-position: -359px -478px;
+		}
 	}
 }
 
