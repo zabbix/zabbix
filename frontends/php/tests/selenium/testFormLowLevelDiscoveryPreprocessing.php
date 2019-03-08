@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
+require_once dirname(__FILE__).'/traits/PreprocessingTrait.php';
 
 /**
  * @backup items
@@ -27,6 +28,8 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 
 	const HOST_ID = 40001;
+
+	use PreprocessingTrait;
 
 	public static function getCreateData() {
 		return [
@@ -321,8 +324,10 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormLowLevelDiscoveryPreprocessing_Create($data) {
-		$sql_items = 'SELECT * FROM items ORDER BY itemid';
-		$old_hash = CDBHelper::getHash($sql_items);
+		if ($data['expected'] === TEST_BAD) {
+			$sql_items = 'SELECT * FROM items ORDER BY itemid';
+			$old_hash = CDBHelper::getHash($sql_items);
+		}
 
 		$this->page->login()->open('host_discovery.php?hostid='.self::HOST_ID);
 		$this->query('button:Create discovery rule')->one()->click();
@@ -330,12 +335,9 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 		$form = $this->query('name:itemForm')->asForm()->one();
 		$form->fill($data['fields']);
 		$form->selectTab('Preprocessing');
-
-		foreach ($data['preprocessing'] as $step_count => $options) {
-			$this->selectTypeAndFillParameters($step_count, $options);
-		}
-
+		$this->addPreprocessingSteps($data['preprocessing']);
 		$form->submit();
+
 		$this->page->waitUntilReady();
 		// Get global message.
 		$message = CMessageElement::find()->one();
@@ -346,28 +348,13 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 				$this->assertTrue($message->isGood());
 				// Check message title.
 				$this->assertEquals('Discovery rule created', $message->getTitle());
-				// Check the results in DB.
-				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($data['fields']['Key'])));
 
 				// Check result in frontend form.
 				$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
 				$this->page->open('host_discovery.php?form=update&itemid='.$id);
-				$form = $this->query('name:itemForm')->asForm()->one();
 				$form->selectTab('Preprocessing');
 
-				foreach ($data['preprocessing'] as $step => $options) {
-					$type = $this->query('id:preprocessing_'.$step.'_type')->asDropdown()->one()->getText();
-					$this->assertEquals($options['type'], $type);
-
-					if (array_key_exists('parameter_1', $options)) {
-						$parameter_1 = $this->query('id:preprocessing_'.$step.'_params_0')->one()->getValue();
-						$this->assertEquals($options['parameter_1'], $parameter_1);
-					}
-					if (array_key_exists('parameter_2', $options)) {
-						$parameter_2 = $this->query('id:preprocessing_'.$step.'_params_1')->one()->getValue();
-						$this->assertEquals($options['parameter_2'], $parameter_2);
-					}
-				}
+				$this->assertPreprocessingSteps($data['preprocessing']);
 				break;
 
 			case TEST_BAD:
@@ -384,54 +371,72 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 	}
 
 	public static function getCustomOnFailData() {
-		return [
-			[
-				[
-					'lld_fields' => [
-						'Name' => 'LLD Preprocessing Discard on fail',
-						'Key' => 'lld-preprocessing-steps-discard-on-fail'.microtime(true)
-					],
-					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => '\1'],
-						['type' => 'JSONPath', 'parameter_1' => '$.data.test'],
-						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern'],
-						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path'],
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '30']
-					]
-				]
-			]
+		$options = [
+			ZBX_PREPROC_FAIL_DISCARD_VALUE	=> 'Discard value',
+			ZBX_PREPROC_FAIL_SET_VALUE		=> 'Set value to',
+			ZBX_PREPROC_FAIL_SET_ERROR		=> 'Set error to'
 		];
-	}
 
-	/**
-	 * @dataProvider getCustomOnFailData
-	 */
-	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFailDiscard($data) {
-		$this->exectueCustomOnFail('Discard value', $data, ZBX_PREPROC_FAIL_DISCARD_VALUE);
-	}
+		$data = [];
+		foreach ($options as $value => $label) {
+			$item = [
+				'lld_fields' => [
+					'Name' => 'LLD Preprocessing '.$label,
+					'Key' => 'lld-preprocessing-steps-discard-on-fail'.$value
+				],
+				'preprocessing' => [
+					[
+						'type' => 'Regular expression',
+						'parameter_1' => 'expression',
+						'parameter_2' => '\1',
+						'on_fail' => true
+					],
+					[
+						'type' => 'JSONPath',
+						'parameter_1' => '$.data.test',
+						'on_fail' => true
+					],
+					[
+						'type' => 'Does not match regular expression',
+						'parameter_1' => 'Pattern',
+						'on_fail' => true
+					],
+					[
+						'type' => 'Check for error in JSON',
+						'parameter_1' => '$.new.path'
+					],
+					[
+						'type' => 'Discard unchanged with heartbeat',
+						'parameter_1' => '30'
+					]
+				],
+				'value' => $value
+			];
 
-	/**
-	 * @dataProvider getCustomOnFailData
-	 */
-	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFailSetValue($data) {
-		$this->exectueCustomOnFail('Set value to', $data, ZBX_PREPROC_FAIL_SET_VALUE);
-	}
+			foreach ($item['preprocessing'] as &$step) {
+				if (!array_key_exists('on_fail', $step) || !$step['on_fail']) {
+					continue;
+				}
 
-	/**
-	 * @dataProvider getCustomOnFailData
-	 */
-	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFailSetError($data) {
-		$this->exectueCustomOnFail('Set error to', $data, ZBX_PREPROC_FAIL_SET_ERROR);
+				$step['error_handler'] = $label;
+
+				if ($value !== ZBX_PREPROC_FAIL_DISCARD_VALUE) {
+					$step['error_handler_params'] = 'handler parameter';
+				}
+			}
+
+			$data[] = [$item];
+		}
+
+		return $data;
 	}
 
 	/**
 	 * Check Custom on fail checkbox.
 	 *
-	 * @param array $data test case data from data provider
+	 * @dataProvider getCustomOnFailData
 	 */
-	private function exectueCustomOnFail($action, $data, $error_handler) {
-		$error_handler_params = 'handler parameter';
-
+	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFail($data) {
 		$this->page->login()->open('host_discovery.php?hostid='.self::HOST_ID);
 		$this->query('button:Create discovery rule')->one()->click();
 
@@ -439,28 +444,14 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 		$form->fill($data['lld_fields']);
 
 		$form->selectTab('Preprocessing');
+		$this->addPreprocessingSteps($data['preprocessing']);
+		$steps = $this->getPreprocessingSteps();
 
-		foreach ($data['preprocessing'] as $step_count => $options) {
-			$this->selectTypeAndFillParameters($step_count, $options);
-			$checkbox = $this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox();
+		foreach ($data['preprocessing'] as $i => $options) {
+			if ($options['type'] === 'Check for error in JSON'
+					|| $options['type'] === 'Discard unchanged with heartbeat') {
 
-			switch ($options['type']) {
-				case 'Regular expression':
-				case 'JSONPath':
-				case 'Does not match regular expression':
-					$this->assertTrue($checkbox->isEnabled());
-					$checkbox->check();
-					// Set value or error and type parameter.
-					if ($action === 'Set value to' or $action === 'Set error to') {
-						$this->query('id:preprocessing_'.$step_count.'_error_handler')->asSegmentedRadio()->one()->select($action);
-						$this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->type($error_handler_params);
-					}
-					break;
-
-				case 'Check for error in JSON':
-				case 'Discard unchanged with heartbeat':
-					$this->assertFalse($checkbox->isEnabled());
-					break;
+				$this->assertFalse($steps[$i]['on_fail']->isEnabled());
 			}
 		}
 
@@ -473,182 +464,193 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 		$this->assertEquals('Discovery rule created', $message->getTitle());
 
 		// Get item data from DB.
-		$db_item = CDBHelper::getRow('SELECT name,key_,itemid FROM items where key_ = '.zbx_dbstr($data['lld_fields']['Key']));
+		$db_item = CDBHelper::getRow('SELECT name,key_,itemid FROM items where key_='.
+				zbx_dbstr($data['lld_fields']['Key'])
+		);
 		$this->assertEquals($db_item['name'], $data['lld_fields']['Name']);
 		$itemid = $db_item['itemid'];
 
 		// Check saved pre-processing.
 		$this->page->open('host_discovery.php?form=update&itemid='.$itemid);
 		$form->selectTab('Preprocessing');
-		foreach ($data['preprocessing'] as $step_count => $options) {
-			// Get preprocessing step from DB.
-			$db_preproc_step = CDBHelper::getRow('SELECT * FROM item_preproc WHERE step='.($step_count + 1).' AND itemid = '.$itemid);
+		$steps = $this->assertPreprocessingSteps($data['preprocessing']);
 
-			$checkbox = $this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox();
+		$rows = [];
+		foreach (CDBHelper::getAll('SELECT step, error_handler FROM item_preproc WHERE itemid='.$itemid) as $row) {
+			$rows[$row['step']] = $row['error_handler'];
+		}
+
+		foreach ($data['preprocessing'] as $i => $options) {
+			// Validate preprocessing step in DB.
+			$expected = (!array_key_exists('on_fail', $options) || !$options['on_fail'])
+					? ZBX_PREPROC_FAIL_DEFAULT : $data['value'];
+
+			$this->assertEquals($expected, $rows[$i + 1]);
 
 			switch ($options['type']) {
 				case 'Regular expression':
 				case 'JSONPath':
 				case 'Does not match regular expression':
 					// Check preprocessing in frontend.
-					$this->assertTrue($checkbox->isSelected());
-					$this->assertTrue($checkbox->isEnabled());
-
-					$selected_element = $this->query('id:preprocessing_'.$step_count.'_error_handler')
-							->asSegmentedRadio()->one()->getText();
-					$this->assertEquals($action, $selected_element);
-
-					// Check pre-processing error handler type in DB.
-					$this->assertEquals($error_handler, $db_preproc_step['error_handler']);
-					if ($action === 'Set value to' or $action === 'Set error to') {
-						$get_prarameter_text = $this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->getValue();
-						$this->assertEquals($error_handler_params, $get_prarameter_text);
-					}
+					$this->assertTrue($steps[$i]['on_fail']->isSelected());
+					$this->assertTrue($steps[$i]['on_fail']->isEnabled());
 					break;
 				case 'Check for error in JSON':
 				case 'Discard unchanged with heartbeat':
 					// Check pre-processing error handler type in DB.
-					$this->assertEquals(ZBX_PREPROC_FAIL_DEFAULT, $db_preproc_step['error_handler']);
-					$this->assertFalse($checkbox->isEnabled());
-					$this->assertFalse($checkbox->isSelected());
+					$this->assertFalse($steps[$i]['on_fail']->isEnabled());
+					$this->assertFalse($steps[$i]['on_fail']->isSelected());
+
+					$this->assertTrue($steps[$i]['error_handler'] === null || !$steps[$i]['error_handler']->isVisible());
+					$this->assertTrue($steps[$i]['error_handler_params'] === null
+							|| !$steps[$i]['error_handler_params']->isVisible()
+					);
 					break;
 			}
 		}
 	}
 
 	public static function getCustomOnFailValidationData() {
-		return [
+		$cases = [
 			// 'Set value to' validation.
 			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' =>[
-						'Name' => 'Set value empty',
-						'Key' => 'set-value-empty'
-					],
-					'custom_on_fail' => [
-						['option' => 'Set value to', 'input' => '']
-					]
+				'expected' => TEST_GOOD,
+				'fields' =>[
+					'Name' => 'Set value empty',
+					'Key' => 'set-value-empty'
+				],
+				'custom_on_fail' => [
+					'error_handler' => 'Set value to',
+					'error_handler_params' => ''
 				]
 			],
 			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' =>[
-						'Name' => 'Set value number',
-						'Key' => 'set-value-number'
-					],
-					'custom_on_fail' => [
-						['option' => 'Set value to', 'input' => '500']
-					]
+				'expected' => TEST_GOOD,
+				'fields' =>[
+					'Name' => 'Set value number',
+					'Key' => 'set-value-number'
+				],
+				'custom_on_fail' => [
+					'error_handler' => 'Set value to',
+					'error_handler_params' => '500'
 				]
 			],
 			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' =>[
-						'Name' => 'Set value string',
-						'Key' => 'set-value-string'
-					],
-					'custom_on_fail' => [
-						['option' => 'Set error to', 'input' => 'String']
-					]
+				'expected' => TEST_GOOD,
+				'fields' =>[
+					'Name' => 'Set value string',
+					'Key' => 'set-value-string'
+				],
+				'custom_on_fail' => [
+					'error_handler' => 'Set error to',
+					'error_handler_params' => 'String'
 				]
 			],
 			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' =>[
-						'Name' => 'Set value special-symbols',
-						'Key' => 'set-value-special-symbols'
-					],
-					'custom_on_fail' => [
-						['option' => 'Set value to', 'input' => '!@#$%^&*()_+<>,.\/']
-					]
+				'expected' => TEST_GOOD,
+				'fields' =>[
+					'Name' => 'Set value special-symbols',
+					'Key' => 'set-value-special-symbols'
+				],
+				'custom_on_fail' => [
+					'error_handler' => 'Set value to',
+					'error_handler_params' => '!@#$%^&*()_+<>,.\/'
 				]
 			],
 			// 'Set error to' validation.
 			[
-				[
-					'expected' => TEST_BAD,
-					'fields' =>[
-						'Name' => 'Set error empty',
-						'Key' => 'set-error-empty'
-					],
-					'custom_on_fail' => [
-						['option' => 'Set error to', 'input' => '']
-					],
-					'error_details' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+				'expected' => TEST_BAD,
+				'fields' =>[
+					'Name' => 'Set error empty',
+					'Key' => 'set-error-empty'
+				],
+				'custom_on_fail' => [
+					'error_handler' => 'Set error to',
+					'error_handler_params' => ''
+				],
+				'error_details' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+			],
+			[
+				'expected' => TEST_GOOD,
+				'fields' =>[
+					'Name' => 'Set error string',
+					'Key' => 'set-error-string'
+				],
+				'custom_on_fail' => [
+					'error_handler' => 'Set error to',
+					'error_handler_params' => 'Test error'
 				]
 			],
 			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' =>[
-						'Name' => 'Set error string',
-						'Key' => 'set-error-string'
-					],
-					'custom_on_fail' => [
-						['option' => 'Set error to', 'input' => 'Test error']
-					]
+				'expected' => TEST_GOOD,
+				'fields' =>[
+					'Name' => 'Set error number',
+					'Key' => 'set-error-number'
+				],
+				'custom_on_fail' => [
+					'error_handler' => 'Set error to',
+					'error_handler_params' => '999'
 				]
 			],
 			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' =>[
-						'Name' => 'Set error number',
-						'Key' => 'set-error-number'
-					],
-					'custom_on_fail' => [
-						['option' => 'Set error to', 'input' => '999']
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' =>[
-						'Name' => 'Set error special symbols',
-						'Key' => 'set-error-special-symbols'
-					],
-					'custom_on_fail' => [
-						['option' => 'Set error to', 'input' => '!@#$%^&*()_+<>,.\/']
-					]
+				'expected' => TEST_GOOD,
+				'fields' =>[
+					'Name' => 'Set error special symbols',
+					'Key' => 'set-error-special-symbols'
+				],
+				'custom_on_fail' => [
+					'error_handler' => 'Set error to',
+					'error_handler_params' => '!@#$%^&*()_+<>,.\/'
 				]
 			]
 		];
+
+		$data = [];
+		$preprocessing = [
+			[
+				'type' => 'Regular expression',
+				'parameter_1' => 'expression',
+				'parameter_2' => '\1',
+				'on_fail' => true
+			],
+			[
+				'type' => 'JSONPath',
+				'parameter_1' => '$.data.test',
+				'on_fail' => true
+			],
+			[
+				'type' => 'Does not match regular expression',
+				'parameter_1' => 'Pattern',
+				'on_fail' => true
+			]
+		];
+
+		foreach ($cases as $case) {
+			$case['preprocessing'] = [];
+			foreach ($preprocessing as $step) {
+				$case['preprocessing'][] = array_merge($step, $case['custom_on_fail']);
+			}
+
+			$data[] = [$case];
+		}
+
+		return $data;
 	}
 
 	/**
 	 * @dataProvider getCustomOnFailValidationData
 	 */
 	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFailValidation($data) {
-		$preprocessing = [
-			['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => '\1'],
-			['type' => 'JSONPath', 'parameter_1' => '$.data.test'],
-			['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern'],
-		];
-
 		$this->page->login()->open('host_discovery.php?hostid='.self::HOST_ID);
 		$this->query('button:Create discovery rule')->one()->click();
 
 		$form = $this->query('name:itemForm')->asForm()->one();
 		$form->fill($data['fields']);
-
 		$form->selectTab('Preprocessing');
-
-		foreach ($preprocessing as $step_count => $options) {
-			$this->selectTypeAndFillParameters($step_count, $options);
-			$this->query('id:preprocessing_'.$step_count.'_on_fail')->one()->asCheckbox()->check();
-			foreach ($data['custom_on_fail'] as $error_type) {
-				$this->query('id:preprocessing_'.$step_count.'_error_handler')
-						->asSegmentedRadio()->one()->select($error_type['option']);
-				$this->query('id:preprocessing_'.$step_count.'_error_handler_params')->one()->type($error_type['input']);
-			}
-		}
+		$this->addPreprocessingSteps($data['preprocessing']);
 		$form->submit();
 		$this->page->waitUntilReady();
+
 		// Get global message.
 		$message = CMessageElement::find()->one();
 
@@ -659,7 +661,9 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 				// Check message title.
 				$this->assertEquals('Discovery rule created', $message->getTitle());
 				// Check the results in DB.
-				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($data['fields']['Key'])));
+				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.
+						zbx_dbstr($data['fields']['Key']))
+				);
 				break;
 
 			case TEST_BAD:
@@ -669,23 +673,10 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 				$this->assertEquals('Cannot add discovery rule', $message->getTitle());
 				$this->assertTrue($message->hasLine($data['error_details']));
 				// Check that DB.
-				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM items where key_ = '.zbx_dbstr($data['fields']['Key'])));
+				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM items where key_ = '.
+						zbx_dbstr($data['fields']['Key']))
+				);
 				break;
-		}
-	}
-
-	/**
-	 * Add new preprocessing, select preprocessing type and parameters if exist.
-	 */
-	private function selectTypeAndFillParameters($step, $options) {
-		$this->query('id:param_add')->one()->click();
-		$this->query('id:preprocessing_'.$step.'_type')->asDropdown()->one()->select($options['type']);
-
-		if (array_key_exists('parameter_1', $options)) {
-			$this->query('id:preprocessing_'.$step.'_params_0')->one()->type($options['parameter_1']);
-		}
-		if (array_key_exists('parameter_2', $options)) {
-			$this->query('id:preprocessing_'.$step.'_params_1')->one()->type($options['parameter_2']);
 		}
 	}
 }
