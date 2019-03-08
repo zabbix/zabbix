@@ -360,7 +360,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$db_items = $this->get([
-			'output' => ['itemid', 'name', 'type', 'authtype', 'allow_traps', 'retrieve_mode'],
+			'output' => ['itemid', 'name', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'preservekeys' => true
@@ -369,7 +369,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->checkInput($items, true, $db_items);
 		$this->validateUpdateLLDMacroPaths($items);
 
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type']);
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type', 'master_itemid']);
 
 		$defaults = DB::getDefaults('items');
 		$clean = [

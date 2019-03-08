@@ -554,7 +554,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$newItem['preprocessing'] = $preprocessing;
 			}
 
-			if (getRequest('type') == ITEM_TYPE_DEPENDENT) {
+			if (getRequest('type') == ITEM_TYPE_DEPENDENT && hasRequest('master_itemid')
+					&& bccomp($item['master_itemid'], getRequest('master_itemid')) != 0) {
 				$newItem['master_itemid'] = getRequest('master_itemid');
 			}
 
