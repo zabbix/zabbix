@@ -423,7 +423,6 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 				}
 				else {
 					var url = new Curl('zabbix.php');
-
 					url.setArgument('action', 'dashboard.widget.rfrate');
 
 					jQuery.ajax({
@@ -452,7 +451,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 
 							obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 
-							jQuery('.dashbrd-grid-widget-container')
+							jQuery('.dashbrd-grid-container')
 								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
 						},
 						error: function() {

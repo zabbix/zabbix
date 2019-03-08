@@ -49,6 +49,10 @@
 				}))
 			)
 		);
+		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container'})
+			.append(widget['content_header'])
+			.append(widget['content_body'])
+			.append(widget['content_script']);
 
 		return $('<div>', {
 			'class': 'dashbrd-grid-widget' + (!widget['widgetid'].length ? ' new-widget' : ''),
@@ -58,12 +62,7 @@
 			}
 		})
 			.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
-			.append(
-				$('<div>', {'class': 'dashbrd-grid-widget-padding'})
-					.append(widget['content_header'])
-					.append(widget['content_body'])
-					.append(widget['content_script'])
-			);
+			.append(widget['container']);
 	}
 
 	function makeWidgetInfoBtns(btns) {
@@ -178,7 +177,7 @@
 	}
 
 	function getCurrentCellWidth(data) {
-		return $('.dashbrd-grid-widget-container').width() / data['options']['max-columns'];
+		return $('.dashbrd-grid-container').width() / data['options']['max-columns'];
 	}
 
 	function setDivPosition($div, data, pos) {
@@ -1153,8 +1152,8 @@
 			'initial_load': widget['initial_load'] ? 1 : 0,
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
 			'storage': widget['storage'],
-			'content_width': widget['content_body'].width(),
-			'content_height': widget['content_body'].height() - 4 // -4 is added to avoid scrollbar
+			'content_width': Math.floor(widget['content_body'].css('overflow', 'hidden').width()),
+			'content_height': Math.floor(widget['content_body'].height())
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -1194,7 +1193,7 @@
 				if (typeof(resp.messages) !== 'undefined') {
 					widget['content_body'].append(resp.messages);
 				}
-				widget['content_body'].append(resp.body);
+				widget['content_body'].append(resp.body).css('overflow', '');
 
 				if (typeof(resp.debug) !== 'undefined') {
 					$(resp.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
@@ -1361,7 +1360,7 @@
 						// 5px shift is widget padding.
 						$('html, body')
 							.animate({scrollTop: pos['y'] * data['options']['widget-height']
-								+ $('.dashbrd-grid-widget-container').position().top - 5})
+								+ $('.dashbrd-grid-container').position().top - 5})
 							.promise()
 							.then(add_new_widget);
 					}
@@ -2030,6 +2029,13 @@
 
 				var	data = $this.data('dashboardGrid');
 
+				var resize_delay,
+					resize_handler = function () {
+						data.widgets.each(function(widget) {
+							doAction('onResizeEnd', $this, data, widget);
+						});
+					};
+
 				$(window)
 					.on('beforeunload', function() {
 						var	res = confirmExit($this, data);
@@ -2040,6 +2046,9 @@
 						}
 					})
 					.on('resize', function() {
+						clearTimeout(resize_delay);
+						resize_delay = setTimeout(resize_handler, 200);
+
 						// Recalculate dashboard container minimal required height.
 						data.minimalHeight = calculateGridMinHeight($this);
 						data['cell-width'] = getCurrentCellWidth(data);
@@ -2236,13 +2245,12 @@
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
-					current_url = new Curl(location.href),
-					url = new Curl('zabbix.php');
+					current_url = new Curl(),
+					url = new Curl('zabbix.php', false);
 
 				// Don't show warning about existing updates.
 				data['options']['updated'] = false;
 
-				url.unsetArgument('sid');
 				url.setArgument('action', 'dashboard.view');
 				if (current_url.getArgument('dashboardid')) {
 					url.setArgument('dashboardid', current_url.getArgument('dashboardid'));
