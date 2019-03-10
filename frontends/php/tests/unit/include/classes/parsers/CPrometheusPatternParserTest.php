@@ -287,6 +287,14 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '{label1="{$M}"}'
 				]
 			],
+			// Double backslash at the end of label value.
+			[
+				'{label1==="value1\\\\"}', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => ''
+				]
+			],
 			// partial success
 			[
 				'metric=1.e1', 0, [],
