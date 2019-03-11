@@ -1501,9 +1501,8 @@ abstract class CItemGeneral extends CApiService {
 						if ($prometheus) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one Prometheus step is allowed.'));
 						}
-						else {
-							$prometheus = true;
-						}
+
+						$prometheus = true;
 
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1538,14 +1537,13 @@ abstract class CItemGeneral extends CApiService {
 								));
 							}
 						}
-
 						// Prometheus to JSON can be empty and has only one parameter.
-						if ($prometheus_pattern_parser->parse($preprocessing['params']) != CParser::PARSE_SUCCESS
-								&& $preprocessing['params'] !== ''
-								&& $preprocessing['type'] == ZBX_PREPROC_PROMETHEUS_TO_JSON) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('invalid Prometheus pattern')
-							));
+						elseif ($preprocessing['params'] !== '') {
+							if ($prometheus_pattern_parser->parse($preprocessing['params']) != CParser::PARSE_SUCCESS) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('invalid Prometheus pattern')
+								));
+							}
 						}
 						break;
 				}
