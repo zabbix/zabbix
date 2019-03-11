@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+..F....... [ZBX-15608] fixed when Widget Graph show disabled trigger/problem (vasilijs)
 ..F....... [ZBX-10397] fixed when global messaging severities unchecked if profile saved earlier (ashubin, vasilijs)
 A.F....... [ZBX-15596] fixed when widget in frontend can be created larger than API validation supports (ashubin, vasilijs)
 ..F....... [ZBX-15308] fixed timeselector in screens when page is opened with link containing sid argument (ashubin, gcalenko)
