@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+..F....... [ZBX-15548] fixed resolving of {ITEM.VALUE} macro in the trigger description (Sasha)
 ........S. [ZBX-15774] fixed memory leak in housekeeper when elasticsearch is used (vso)
 ........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
 ..F....... [ZBX-15608] fixed when Widget Graph show disabled trigger/problem (vasilijs)
