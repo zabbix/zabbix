@@ -1843,10 +1843,10 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 			ret = item_preproc_script(value, op->params, history_value, error);
 			break;
 		case ZBX_PREPROC_PROMETHEUS_PATTERN:
-			ret = item_preproc_prometheus_pattern(value, op->params, &errmsg);
+			ret = item_preproc_prometheus_pattern(value, op->params, error);
 			break;
 		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-			ret = item_preproc_prometheus_to_json(value, op->params, &errmsg);
+			ret = item_preproc_prometheus_to_json(value, op->params, error);
 			break;
 		default:
 			*error = zbx_dsprintf(*error, "unknown preprocessing operation");
