@@ -89,8 +89,8 @@ class CSvgGraphGrid extends CSvgTag {
 		foreach ($this->points_value as $pos => $value) {
 			if (($this->position_y + $this->height - $pos) <= ($this->position_y + $this->height)) {
 				$path
-					->moveTo($this->position_x, floor($this->position_y + $this->height - $pos))
-					->lineTo($this->position_x + $this->width, floor($this->position_y + $this->height - $pos));
+					->moveTo($this->position_x, $this->position_y + $this->height - $pos)
+					->lineTo($this->position_x + $this->width, $this->position_y + $this->height - $pos);
 			}
 		}
 
