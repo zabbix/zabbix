@@ -3982,7 +3982,7 @@ $form-icon-btn: (
 		&[readonly] {
 			background: $form-bg-color !important;
 			border-color: $form-border-color;
-			color: $form-font-color !important;
+			color: $form-font-color;
 		}
 
 		&.monospace-font {
@@ -4001,8 +4001,6 @@ $form-icon-btn: (
 	}
 
 	button {
-		background-color: $form-bg-color;
-		border-color: $form-border-color;
 		position: relative;
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
@@ -4017,8 +4015,31 @@ $form-icon-btn: (
 			width: 15px;
 		}
 
-		&:hover {
-			background-color: $btn-form-hover-color;
+		&:not([disabled]):not([readonly]) {
+			background-color: $form-bg-color;
+			border-color: $form-border-color;
+
+			&:hover {
+				background-color: $btn-form-hover-color;
+			}
+		}
+	}
+
+	&.multilineinput-readonly {
+
+		input[type=text][readonly] {
+			background-color: $form-disabled-bg-color !important;
+		}
+	}
+
+	&.multilineinput-disabled {
+
+		input[type=text] {
+			cursor: default;
+		}
+
+		button:after {
+			opacity: .5;
 		}
 	}
 }

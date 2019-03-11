@@ -2745,7 +2745,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .multilineinput-control input[type=text][readonly] {
       background: #fff !important;
       border-color: #acbbc2;
-      color: #1f2c33 !important; }
+      color: #1f2c33; }
     .multilineinput-control input[type=text].monospace-font {
       font-family: "Courier New", Courier, monospace;
       padding-top: 1px; }
@@ -2755,8 +2755,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .multilineinput-control:-ms-input-placeholder {
     color: #9d9d9d !important; }
   .multilineinput-control button {
-    background-color: #fff;
-    border-color: #acbbc2;
     position: relative;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0; }
@@ -2768,8 +2766,17 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       top: 4px;
       height: 14px;
       width: 15px; }
-    .multilineinput-control button:hover {
-      background-color: #e8f5ff; }
+    .multilineinput-control button:not([disabled]):not([readonly]) {
+      background-color: #fff;
+      border-color: #acbbc2; }
+      .multilineinput-control button:not([disabled]):not([readonly]):hover {
+        background-color: #e8f5ff; }
+  .multilineinput-control.multilineinput-readonly input[type=text][readonly] {
+    background-color: #ebebeb !important; }
+  .multilineinput-control.multilineinput-disabled input[type=text] {
+    cursor: default; }
+  .multilineinput-control.multilineinput-disabled button:after {
+    opacity: .5; }
 
 .multilineinput-modal {
   min-width: 960px; }

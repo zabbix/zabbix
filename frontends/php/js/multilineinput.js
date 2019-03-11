@@ -26,8 +26,14 @@
 
 		e.data.options.disabled = disabled;
 		e.data.$hidden.prop('disabled', disabled ? true : null);
-		e.data.$input.prop('disabled', disabled ? true : null);
+		e.data.$input
+			.prop('disabled', disabled ? true : null)
+			.prop('readonly', disabled ? null : true);
 		e.data.$button.prop('disabled', disabled ? true : null);
+
+		$(this)
+			.toggleClass('multilineinput-readonly', (e.data.options.readonly && !disabled))
+			.toggleClass('multilineinput-disabled', disabled);
 	}
 
 	function openModal(e) {
