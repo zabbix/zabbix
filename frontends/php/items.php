@@ -618,7 +618,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
 				case ZBX_PREPROC_MULTIPLIER:
-				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 					$step['params'] = trim($step['params'][0]);
 					break;
 
@@ -633,11 +632,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				case ZBX_PREPROC_ERROR_FIELD_XML:
 				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 				case ZBX_PREPROC_SCRIPT:
+				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 					$step['params'] = $step['params'][0];
 					break;
 
 				case ZBX_PREPROC_VALIDATE_RANGE:
-				case ZBX_PREPROC_PROMETHEUS_PATTERN:
 					foreach ($step['params'] as &$param) {
 						$param = trim($param);
 					}
@@ -648,6 +647,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				case ZBX_PREPROC_REGSUB:
 				case ZBX_PREPROC_ERROR_FIELD_REGEX:
+				case ZBX_PREPROC_PROMETHEUS_PATTERN:
 					$step['params'] = implode("\n", $step['params']);
 					break;
 
@@ -1152,7 +1152,6 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					foreach ($preprocessing as &$step) {
 						switch ($step['type']) {
 							case ZBX_PREPROC_MULTIPLIER:
-							case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 								$step['params'] = trim($step['params'][0]);
 								break;
 
@@ -1167,11 +1166,11 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 							case ZBX_PREPROC_ERROR_FIELD_XML:
 							case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 							case ZBX_PREPROC_SCRIPT:
+							case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 								$step['params'] = $step['params'][0];
 								break;
 
 							case ZBX_PREPROC_VALIDATE_RANGE:
-							case ZBX_PREPROC_PROMETHEUS_PATTERN:
 								foreach ($step['params'] as &$param) {
 									$param = trim($param);
 								}
@@ -1182,6 +1181,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 							case ZBX_PREPROC_REGSUB:
 							case ZBX_PREPROC_ERROR_FIELD_REGEX:
+							case ZBX_PREPROC_PROMETHEUS_PATTERN:
 								$step['params'] = implode("\n", $step['params']);
 								break;
 
