@@ -358,12 +358,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
+				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+					$step['params'] = trim($step['params'][0]);
+					break;
+
 				case ZBX_PREPROC_JSONPATH:
 				case ZBX_PREPROC_VALIDATE_NOT_REGEX:
 				case ZBX_PREPROC_ERROR_FIELD_JSON:
 				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 				case ZBX_PREPROC_SCRIPT:
-				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 					$step['params'] = $step['params'][0];
 					break;
 
