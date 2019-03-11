@@ -34,14 +34,6 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
-/* successful preprocessing step execution result */
-typedef struct
-{
-	zbx_variant_t	value;
-	int		action;
-}
-zbx_preproc_result_t;
-
 #define ZBX_PREPROC_VALUE_PREVIEW_LEN		100
 
 zbx_es_t	es_engine;
@@ -223,38 +215,42 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
 		zbx_preproc_op_t *steps, int steps_num, zbx_vector_ptr_t *history_in, zbx_vector_ptr_t *history_out,
 		zbx_preproc_result_t *results, int *results_num, char **error)
 {
-	int	i, ret = SUCCEED;
+	int		i, ret = SUCCEED;
 
 	for (i = 0; i < steps_num; i++)
 	{
 		zbx_preproc_op_t		*op = &steps[i];
 		zbx_variant_t			history_value;
 		zbx_timespec_t			history_ts;
-		zbx_preproc_op_history_t	*ophistory;
 
-		if (NULL != (ophistory = zbx_preproc_history_get_value(history_in, i)))
+		zbx_preproc_history_pop_value(history_in, i, &history_value, &history_ts);
+
+		if (FAIL == (ret = zbx_item_preproc(value_type, value, ts, op, &history_value, &history_ts, error)))
 		{
-			history_value = ophistory->value;
-			zbx_variant_set_none(&ophistory->value);
-			history_ts = ophistory->ts;
+			results[i].action = op->error_handler;
+			ret = zbx_item_preproc_handle_error(value, op, error);
 		}
 		else
+			results[i].action = ZBX_PREPROC_FAIL_DEFAULT;
+
+		if (SUCCEED == ret)
 		{
-			zbx_variant_set_none(&history_value);
-			history_ts.sec = 0;
-			history_ts.ns = 0;
+			if (NULL == *error)
+			{
+				/* result history is kept to report results of steps before failing step, */
+				/* which means it can be omitted for the last step.                       */
+				if (i != steps_num - 1)
+					zbx_variant_set_variant(&results[i].value, value);
+				else
+					zbx_variant_set_none(&results[i].value);
+			}
+			else
+			{
+				/* preprocessing step successfully extracted error, set it */
+				results[i].action = ZBX_PREPROC_FAIL_FORCE_ERROR;
+				ret = FAIL;
+			}
 		}
-
-		ret = zbx_item_preproc(value_type, value, ts, op, &history_value, &history_ts, &results[i].action,
-				error);
-
-		/* store result history */
-		/* value is stored to report previous step results a step fails, */
-		/* which means it can be omitted for the last step               */
-		if (i != steps_num - 1)
-			zbx_variant_set_variant(&results[i].value, value);
-		else
-			zbx_variant_set_none(&results[i].value);
 
 		if (SUCCEED != ret)
 		{
@@ -289,11 +285,12 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
  ******************************************************************************/
 static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
 {
+	const char			*__function_name = "worker_preprocess_value";
 	zbx_uint32_t			size = 0;
 	unsigned char			*data = NULL, value_type;
 	zbx_uint64_t			itemid;
 	zbx_variant_t			value, value_start;
-	int				i, steps_num, results_num;
+	int				i, steps_num, results_num, ret;
 	char				*errmsg = NULL, *error = NULL;
 	zbx_timespec_t			*ts;
 	zbx_preproc_op_t		*steps;
@@ -308,9 +305,10 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 
 	zbx_variant_set_variant(&value_start, &value);
 	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * steps_num);
+	memset(results, 0, sizeof(zbx_preproc_result_t) * steps_num);
 
-	if (FAIL == worker_item_preproc_execute(value_type, &value, ts, steps, steps_num, &history_in, &history_out,
-			results, &results_num, &errmsg) && 0 != results_num)
+	if (FAIL == (ret = worker_item_preproc_execute(value_type, &value, ts, steps, steps_num, &history_in,
+			&history_out, results, &results_num, &errmsg)) && 0 != results_num)
 	{
 		int action = results[results_num - 1].action;
 
@@ -321,6 +319,16 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 		}
 		else
 			error = errmsg;
+	}
+
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		const char	*result;
+
+		result = (SUCCEED == ret ? zbx_variant_value_desc(&value) : error);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): %s", __function_name, zbx_variant_value_desc(&value_start));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: %s %s",__function_name,  zbx_result_string(ret), result);
+
 	}
 
 	size = zbx_preprocessor_pack_result(&data, &value, &history_out, error);
@@ -349,6 +357,148 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_vector_ptr_clear_ext(&history_in, (zbx_clean_func_t)zbx_preproc_op_history_free);
 	zbx_vector_ptr_destroy(&history_in);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: worker_item_preproc_test                                         *
+ *                                                                            *
+ * Purpose: test preprocessing steps                                          *
+ *                                                                            *
+ * Parameters: value_type    - [IN] the item value type                       *
+ *             value         - [IN/OUT] the value to process                  *
+ *             ts            - [IN] the value timestamp                       *
+ *             steps         - [IN] the preprocessing steps to execute        *
+ *             steps_num     - [IN] the number of preprocessing steps         *
+ *             history_in    - [IN] the preprocessing history                 *
+ *             history_out   - [OUT] the new preprocessing history            *
+ *             results       - [OUT] the preprocessing step results           *
+ *             results_num   - [OUT] the number of step results               *
+ *             error         - [OUT] error message                            *
+ *                                                                            *
+ * Return value: SUCCEED - the preprocessing steps finished successfully      *
+ *               FAIL - otherwise, error contains the error message           *
+ *                                                                            *
+ ******************************************************************************/
+static int	worker_item_preproc_test(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
+		zbx_preproc_op_t *steps, int steps_num, zbx_vector_ptr_t *history_in, zbx_vector_ptr_t *history_out,
+		zbx_preproc_result_t *results, int *results_num, char **error)
+{
+	int	i, ret = SUCCEED;
+
+	for (i = 0; i < steps_num; i++)
+	{
+		zbx_preproc_op_t		*op = &steps[i];
+		zbx_variant_t			history_value;
+		zbx_timespec_t			history_ts;
+
+		zbx_preproc_history_pop_value(history_in, i, &history_value, &history_ts);
+
+		if (FAIL == (ret = zbx_item_preproc(value_type, value, ts, op, &history_value, &history_ts, error)))
+		{
+			results[i].action = op->error_handler;
+			results[i].error = zbx_strdup(NULL, *error);
+			ret = zbx_item_preproc_handle_error(value, op, error);
+		}
+		else
+		{
+			results[i].action = ZBX_PREPROC_FAIL_DEFAULT;
+			results[i].error = NULL;
+		}
+
+		if (SUCCEED == ret)
+		{
+			if (NULL == *error)
+				zbx_variant_set_variant(&results[i].value, value);
+			else
+				ret = FAIL;
+		}
+
+		if (SUCCEED != ret)
+		{
+			zbx_variant_clear(&history_value);
+			break;
+		}
+
+		if (ZBX_VARIANT_NONE != history_value.type)
+		{
+			/* the value is byte copied to history_out vector and doesn't have to be cleared */
+			zbx_preproc_history_add_value(history_out, i, &history_value, &history_ts);
+		}
+
+		if (ZBX_VARIANT_NONE == value->type)
+			break;
+	}
+
+	*results_num = (i == steps_num ? i : i + 1);
+
+	return ret;
+}
+/******************************************************************************
+ *                                                                            *
+ * Function: worker_test_value                                                *
+ *                                                                            *
+ * Purpose: handle item value test preprocessing task                         *
+ *                                                                            *
+ * Parameters: socket  - [IN] IPC socket                                      *
+ *             message - [IN] packed preprocessing task                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	worker_test_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
+{
+	zbx_uint32_t			size = 0;
+	unsigned char			*data = NULL, value_type;
+	zbx_variant_t			value, value_start;
+	int				i, steps_num, results_num;
+	char				*error = NULL, *value_str = NULL;
+	zbx_timespec_t			ts;
+	zbx_preproc_op_t		*steps;
+	zbx_vector_ptr_t		history_in, history_out;
+	zbx_preproc_result_t		*results;
+
+	zbx_vector_ptr_create(&history_in);
+	zbx_vector_ptr_create(&history_out);
+
+	zbx_preprocessor_unpack_test_request(&value_type, &value_str, &ts, &history_in, &steps, &steps_num,
+			message->data);
+
+	zbx_variant_set_str(&value, value_str);
+	zbx_variant_set_variant(&value_start, &value);
+
+	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * steps_num);
+	memset(results, 0, sizeof(zbx_preproc_result_t) * steps_num);
+
+	worker_item_preproc_test(value_type, &value, &ts, steps, steps_num, &history_in, &history_out, results,
+			&results_num, &error);
+
+	size = zbx_preprocessor_pack_test_result(&data, results, results_num, &history_out, error);
+
+	if (FAIL == zbx_ipc_socket_write(socket, ZBX_IPC_PREPROCESSOR_TEST_RESULT, data, size))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send preprocessing result");
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_variant_clear(&value);
+	zbx_free(error);
+	zbx_free(steps);
+	zbx_free(data);
+
+	zbx_variant_clear(&value_start);
+
+	for (i = 0; i < results_num; i++)
+	{
+		zbx_variant_clear(&results[i].value);
+		zbx_free(results[i].error);
+	}
+	zbx_free(results);
+
+	zbx_vector_ptr_clear_ext(&history_out, (zbx_clean_func_t)zbx_preproc_op_history_free);
+	zbx_vector_ptr_destroy(&history_out);
+
+	zbx_vector_ptr_clear_ext(&history_in, (zbx_clean_func_t)zbx_preproc_op_history_free);
+	zbx_vector_ptr_destroy(&history_in);
+}
+
 
 ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 {
@@ -401,6 +551,9 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 		{
 			case ZBX_IPC_PREPROCESSOR_REQUEST:
 				worker_preprocess_value(&socket, &message);
+				break;
+			case ZBX_IPC_PREPROCESSOR_TEST_REQUEST:
+				worker_test_value(&socket, &message);
 				break;
 		}
 

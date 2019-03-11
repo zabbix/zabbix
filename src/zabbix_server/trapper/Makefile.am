@@ -10,4 +10,5 @@ libzbxtrapper_a_SOURCES = \
 	proxydiscovery.c proxydiscovery.h \
 	proxyautoreg.c proxyautoreg.h \
 	proxyhosts.c proxyhosts.h \
-	proxydata.c proxydata.h
+	proxydata.c proxydata.h \
+	trapper_preproc.c trapper_preproc.h
