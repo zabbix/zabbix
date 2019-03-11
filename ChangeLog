@@ -3,6 +3,7 @@ Changes for 4.2.0rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
 ..F....... [ZBX-15608] fixed when Widget Graph show disabled trigger/problem (vasilijs)
 ..F....... [ZBX-10397] fixed when global messaging severities unchecked if profile saved earlier (ashubin, vasilijs)
 ..F.I...S. [ZBX-15693] fixed widget default height in schema.tmpl (asestakovs)
@@ -208,6 +209,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
 ..F....... [ZBX-15608] fixed when Widget Graph show disabled trigger/problem (vasilijs)
 ..F....... [ZBX-10397] fixed when global messaging severities unchecked if profile saved earlier (ashubin, vasilijs)
 A.F....... [ZBX-15596] fixed when widget in frontend can be created larger than API validation supports (ashubin, vasilijs)
@@ -2481,6 +2483,7 @@ Changes for 3.0.26rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
 .......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
 .......PS. [ZBX-14858] fixed processing of unlimited vmware maxQueryMetrics value (MVekslers)
 .D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)
