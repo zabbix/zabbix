@@ -3,6 +3,7 @@ Changes for 4.2.0rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15774] fixed memory leak in housekeeper when elasticsearch is used (vso)
 ........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
 ..F....... [ZBX-15608] fixed when Widget Graph show disabled trigger/problem (vasilijs)
 ..F....... [ZBX-10397] fixed when global messaging severities unchecked if profile saved earlier (ashubin, vasilijs)
@@ -209,6 +210,7 @@ New features:
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+........S. [ZBX-15774] fixed memory leak in housekeeper when elasticsearch is used (vso)
 ........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
 ..F....... [ZBX-15608] fixed when Widget Graph show disabled trigger/problem (vasilijs)
 ..F....... [ZBX-10397] fixed when global messaging severities unchecked if profile saved earlier (ashubin, vasilijs)
