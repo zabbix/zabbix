@@ -1729,11 +1729,10 @@ abstract class CItemGeneral extends CApiService {
 		$dep_items = [];
 		$upd_itemids = [];
 
-		// Discovery rule can be dependent item.
 		foreach ($items as $item) {
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				if ($this instanceof CItemPrototype || $item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL
-						|| $item['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
+				if ($this instanceof CDiscoveryRule || $this instanceof CItemPrototype
+						|| $item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 					$dep_items[] = $item;
 				}
 
@@ -1788,6 +1787,7 @@ abstract class CItemGeneral extends CApiService {
 						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])
 				);
 			}
+			// CDiscoveryRule, CItem
 			else {
 				$db_master_items = DBselect(
 					'SELECT i.itemid,i.hostid,i.master_itemid'.

@@ -338,9 +338,9 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 
 			// Option 'Convert to JSON' is not supported for discovery rule.
-			unset($item['output_format']);
-			unset($item['itemid']);
+			unset($item['itemid'], $item['output_format']);
 		}
+		unset($item);
 
 		$this->validateCreateLLDMacroPaths($items);
 		$this->validateDependentItems($items);
@@ -1563,7 +1563,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-		// Master item should exists for LLD with type dependent item.
+		// Master item should exists for LLD rule with type dependent item.
 		if ($srcDiscovery['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_item = API::Item()->get([
 				'output' => ['key_'],
