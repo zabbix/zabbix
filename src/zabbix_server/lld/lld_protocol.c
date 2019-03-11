@@ -138,7 +138,7 @@ void	zbx_lld_process_value(zbx_uint64_t itemid, const char *value, const zbx_tim
  ******************************************************************************/
 void	zbx_lld_process_agent_result(zbx_uint64_t itemid, AGENT_RESULT *result, zbx_timespec_t *ts, char *error)
 {
-	const char	*value;
+	const char	*value = NULL;
 	unsigned char	meta = 0;
 	zbx_uint64_t	lastlogsize = 0;
 	int		mtime = 0;
