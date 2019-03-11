@@ -73,7 +73,10 @@ foreach ($data['discoveries'] as $discovery) {
 		}
 		else {
 			$description[] = (new CLink(CHtml::encode($discovery['master_item']['name_expanded']),
-				'?form=update&itemid='.$discovery['master_item']['itemid']
+				(new CUrl('items.php'))
+					->setArgument('form', 'update')
+					->setArgument('itemid', $discovery['master_item']['itemid'])
+					->getUrl()
 			))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_TEAL);
