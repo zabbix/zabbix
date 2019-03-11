@@ -28,66 +28,86 @@ class CPrometheusOutputParserTest extends PHPUnit_Framework_TestCase {
 		return [
 			// success
 			[
-				'labelname123', 0, [],
+				'labelname123', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'labelname123'
 				]
 			],
+			[
+				'labelname123', 8,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'e123'
+				]
+			],
 			// partial success
 			[
-				'label1=', 0, [],
+				'label1=', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => 'label1'
 				]
 			],
 			[
-				'label1  ', 0, [],
+				'label1  ', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => 'label1'
+				]
+			],
+			[
+				'label1  ', 4,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'l1'
 				]
 			],
 			// fail
 			[
-				'', 0, [],
+				'', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'{', 0, [],
+				'{', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'0', 0, [],
+				'0', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'09label', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			// Macros are not allowed for label name.
-			[
-				'{$M}', 0, ['usermacros' => true],
+				'09label', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'{#LLD}', 0, ['lldmacros' => true],
+				'label123', 5,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M}', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{#LLD}', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -101,11 +121,10 @@ class CPrometheusOutputParserTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param string $source
 	 * @param int    $pos
-	 * @param array  $options
 	 * @param array  $expected
 	*/
-	public function testParse($source, $pos, $options, $expected) {
-		$parser = new CPrometheusOutputParser($options);
+	public function testParse($source, $pos, $expected) {
+		$parser = new CPrometheusOutputParser();
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
