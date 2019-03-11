@@ -830,3 +830,9 @@ insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values (1
 -- T4 depends on T5 depends on T0 (LLD discovered version)
 INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up) VALUES (138888,134004,134005);
 INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up) VALUES (138889,134005,134118);
+
+-- testDiscoveryRule
+INSERT INTO items (itemid,master_itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110012,1501,1006,null,18,4,'API LLD rule 5','apilldrule5','0','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,master_itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110013,90006,1006,null,18,4,'API LLD rule 6','apilldrule6','0','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,type,name,key_,params,description,posts,headers) values (90006,1006,2,'item.5','item.5','','','','');
+

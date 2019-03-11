@@ -56,6 +56,51 @@ class testDiscoveryRule extends CAPITest {
 					'delay' => '30s'
 				],
 				'expected_error' => 'Item with key "apilldrule4" already exists on "API Host".'
+			],
+			'Test LLD rule as dependent item no master_itemid set.' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule 6',
+					'key_' => 'apilldrule6',
+					'hostid' => '1004',
+					'type' => '18'
+				],
+				'expected_error' => 'Incorrect value for field "master_itemid": cannot be empty.'
+			],
+			'Test LLD rule as dependent item for master having already maximum dependency levels.' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule 7',
+					'key_' => 'apilldrule7',
+					// dependent.items.host.2
+					'hostid' => '1006',
+					'type' => '18',
+					// dependent.item.1.1
+					'master_itemid' => '1504'
+				],
+				'expected_error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.'
+			],
+			'Test LLD rule as dependent item for master itemprototype.' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule 7',
+					'key_' => 'apilldrule7',
+					// dependent.items.host.1
+					'hostid' => '1006',
+					'type' => '18',
+					// item.proto.1
+					'master_itemid' => '1333'
+				],
+				'expected_error' => 'Incorrect value for field "master_itemid": Item "1333" does not exist or you have no access to this item.'
+			],
+			'Test LLD rule as dependent item for master lld rule.' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule 7',
+					'key_' => 'apilldrule7',
+					// dependent.items.host.1
+					'hostid' => '1006',
+					'type' => '18',
+					// discovery.rule.1
+					'master_itemid' => '1317'
+				],
+				'expected_error' => 'Incorrect value for field "master_itemid": Item "1317" does not exist or you have no access to this item.'
 			]
 		];
 
@@ -74,6 +119,17 @@ class testDiscoveryRule extends CAPITest {
 					'delay' => '30s'
 				],
 				'expected_error' => null
+			],
+			'Test LLD rule as dependent item.' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule 8',
+					'key_' => 'apilldrule8',
+					// dependent.items.host.2
+					'hostid' => '1006',
+					'type' => '18',
+					// dependent.item.1.1
+					'master_itemid' => '1501'
+				]
 			]
 		];
 
@@ -2418,6 +2474,22 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 				// TODO: Error is very strange and API should be checked for bugs.
+			],
+			'Test LLD dependent on master which does not exists on destination host.' => [
+				'params' => [
+					'discoveryids' => ['110012'],
+					// dependent.items.host.3
+					'hostids' => ['1009']
+				],
+				'expected_error' => 'Item "apilldrule5" has master item and cannot be copied.'
+			],
+			'Test LLD dependent on master having max dep.' => [
+				'params' => [
+					'discoveryids' => ['110013'],
+					// dependent.items.host.3
+					'hostids' => ['1009']
+				],
+				'expected_error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.'
 			]
 		];
 	}
@@ -2428,6 +2500,13 @@ class testDiscoveryRule extends CAPITest {
 				'params' => [
 					'discoveryids' => ['110006'],
 					'hostids' => ['50012', '50013']
+				],
+				'expected_error' => null
+			],
+			'Test copy LLD dependent to host having master item with same key_' => [
+				'params' => [
+					'discoveryids' => ['110012'],
+					'hostids' => ['1007']
 				],
 				'expected_error' => null
 			]
@@ -2455,7 +2534,7 @@ class testDiscoveryRule extends CAPITest {
 						'i.snmpv3_privprotocol,i.snmpv3_contextname,i.jmx_endpoint,i.url,i.query_fields,i.timeout,'.
 						'i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,'.
 						'i.request_method,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,i.verify_peer,'.
-						'i.verify_host,i.allow_traps'.
+						'i.verify_host,i.allow_traps,i.master_itemid'.
 				' FROM items i'.
 				' WHERE '.dbConditionId('i.itemid', $params['discoveryids'])
 			);
