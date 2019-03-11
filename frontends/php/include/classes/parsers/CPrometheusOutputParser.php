@@ -33,23 +33,10 @@ class CPrometheusOutputParser extends CParser {
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
-		$trim = " \t";
+
 		$p = $pos;
 
-		while (isset($source[$p]) && strpos($trim, $source[$p]) !== false) {
-			$p++;
-		}
-
-		if ($this->parseLabelName($source, $p) === true) {
-			while (isset($source[$p]) && strpos($trim, $source[$p]) !== false) {
-				$p++;
-			}
-		}
-		else {
-			return self::PARSE_FAIL;
-		}
-
-		if ($pos == $p) {
+		if (!$this->parseLabelName($source, $p)) {
 			return self::PARSE_FAIL;
 		}
 

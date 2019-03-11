@@ -34,23 +34,16 @@ class CPrometheusOutputParserTest extends PHPUnit_Framework_TestCase {
 					'match' => 'labelname123'
 				]
 			],
-			[
-				'   labelname123    ', 0, [],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '   labelname123    '
-				]
-			],
-			[
-				'   __name__   ', 0, [],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '   __name__   '
-				]
-			],
 			// partial success
 			[
 				'label1=', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'label1'
+				]
+			],
+			[
+				'label1  ', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => 'label1'
