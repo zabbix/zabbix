@@ -238,6 +238,7 @@ check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
+$item = [];
 
 /*
  * Permissions
@@ -294,10 +295,6 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-}
-elseif (hasRequest('clone') && hasRequest('itemid')) {
-	unset($_REQUEST['itemid']);
-	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
@@ -419,7 +416,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'privatekey' => getRequest('privatekey'),
 			'params' => getRequest('params'),
 			'ipmi_sensor' => getRequest('ipmi_sensor'),
-			'lifetime' => getRequest('lifetime')
+			'lifetime' => getRequest('lifetime'),
+			'master_itemid' => getRequest('master_itemid')
 		];
 
 		if ($newItem['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -451,6 +449,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if ($newItem['type'] == ITEM_TYPE_JMX) {
 			$newItem['jmx_endpoint'] = getRequest('jmx_endpoint', '');
+		}
+
+		if (getRequest('type') != ITEM_TYPE_DEPENDENT) {
+			unset($newItem['master_itemid']);
 		}
 
 		// add macros; ignore empty new macros
@@ -554,11 +556,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$newItem['preprocessing'] = $preprocessing;
 			}
 
-			if (getRequest('type') == ITEM_TYPE_DEPENDENT && hasRequest('master_itemid')
-					&& bccomp($item['master_itemid'], getRequest('master_itemid')) != 0) {
-				$newItem['master_itemid'] = getRequest('master_itemid');
-			}
-
 			$result = API::DiscoveryRule()->update($newItem);
 			$result = DBend($result);
 		}
@@ -569,10 +566,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($preprocessing) {
 				$newItem['preprocessing'] = $preprocessing;
-			}
-
-			if ($newItem['type'] == ITEM_TYPE_DEPENDENT) {
-				$newItem['master_itemid'] = getRequest('master_itemid');
 			}
 
 			$result = API::DiscoveryRule()->create([$newItem]);
@@ -643,48 +636,25 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masschec
  */
 if (hasRequest('form')) {
 	$has_errors = false;
-	$master_item_options = [];
+	$form_item = (hasRequest('itemid') && !hasRequest('clone')) ? $item : [];
+	$masterid = $form_item && !hasRequest('form_refresh') ? $form_item['master_itemid'] : getRequest('master_itemid');
 
-	if (hasRequest('itemid')) {
-		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT) {
-			// Unset master item if submitted form has no master_itemid set.
-			if (hasRequest('form_refresh') && !hasRequest('master_itemid')) {
-				$item['master_itemid'] = 0;
-			}
-			else {
-				$master_item_options = [
-					'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-					'itemids' => getRequest('master_itemid', $item['master_itemid']),
-					'webitems' => true
-				];
-			}
-		}
-	}
-	else {
-		$item = [];
+	if (getRequest('type', $form_item ? $form_item['type'] : null) == ITEM_TYPE_DEPENDENT && $masterid) {
+		$dbmaster_item = API::Item()->get([
+			'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+			'itemids' => $masterid,
+			'webitems' => true
+		]);
 
-		if (getRequest('master_itemid')) {
-			$master_item_options = [
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'itemids' => getRequest('master_itemid'),
-				'hostids' => $host['hostid'],
-				'webitems' => true
-			];
-		}
-	}
-
-	if ($master_item_options) {
-		$master_items = API::Item()->get($master_item_options);
-		if ($master_items) {
-			$item['master_item'] = reset($master_items);
-		}
-		else {
+		if (!$dbmaster_item) {
 			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
 			$has_errors = true;
 		}
+
+		$form_item['master_item'] = $dbmaster_item[0];
 	}
 
-	$data = getItemFormData($item, [
+	$data = getItemFormData($form_item, [
 		'is_discovery_rule' => true
 	]);
 	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
@@ -714,6 +684,11 @@ if (hasRequest('form')) {
 		$data['formula'] = $item['filter']['formula'];
 		$data['conditions'] = $item['filter']['conditions'];
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
+	}
+	// clone form
+	elseif (hasRequest('clone')) {
+		unset($data['itemid']);
+		$data['form'] = 'clone';
 	}
 
 	// Sort interfaces to be listed starting with one selected as 'main'.
@@ -780,6 +755,7 @@ else {
 	// paging
 	$url = (new CUrl('host_discovery.php'))->setArgument('hostid', $data['hostid']);
 
+	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
 	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder, $url);
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
 

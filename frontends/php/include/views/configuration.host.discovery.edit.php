@@ -358,7 +358,7 @@ $form_list
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'master_itemid',
 					'hostid' => $data['hostid'],
-					'excludeids' => ($data['itemid'] != 0) ? [$data['itemid']] : [],
+					'excludeids' => array_key_exists('itemid', $data) ? [$data['itemid']] : [],
 					'webitems' => true
 				]
 			]
