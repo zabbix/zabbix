@@ -423,7 +423,6 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 				}
 				else {
 					var url = new Curl('zabbix.php');
-
 					url.setArgument('action', 'dashboard.widget.rfrate');
 
 					jQuery.ajax({
