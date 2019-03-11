@@ -245,6 +245,20 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'{label1="value1"}==-1E-5', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{label1="value1"}==-1E-5'
+				]
+			],
+			[
+				'{label1="value1"}==-1E+5', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{label1="value1"}==-1E+5'
+				]
+			],
+			[
 				'{label1="value1"}==-1.E5', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -336,6 +350,13 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => 'metric'
+				]
+			],
+			[
+				'metric==1e|1', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'metric==1'
 				]
 			],
 			[

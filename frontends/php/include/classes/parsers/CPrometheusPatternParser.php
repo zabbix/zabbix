@@ -282,19 +282,12 @@ class CPrometheusPatternParser extends CParser {
 	 * @return bool
 	 */
 	private function parseNumber($source, &$pos) {
-		if (preg_match('/^(\+|\-)?([0-9]+(\.[0-9]*)?|\.[0-9]+)([E|e][+|-]?[0-9]+)?/', substr($source, $pos),
-				$matches)) {
+		$pattern_num = '[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)(e[+-]?[0-9]+)?';
+		$pattern_inf = '[+-]?inf';
+		$pattern_nan = 'nan';
+
+		if (preg_match('/^('.$pattern_num.'|'.$pattern_inf.'|'.$pattern_nan.')/i', substr($source, $pos), $matches)) {
 			$pos += strlen($matches[0]);
-
-			return true;
-		}
-		elseif (strtolower(substr($source, $pos, 4)) === '+inf' || strtolower(substr($source, $pos, 4)) === '-inf') {
-			$pos += 4;
-
-			return true;
-		}
-		elseif (strtolower(substr($source, $pos, 3)) === 'nan' || strtolower(substr($source, $pos, 3)) === 'inf') {
-			$pos += 3;
 
 			return true;
 		}
