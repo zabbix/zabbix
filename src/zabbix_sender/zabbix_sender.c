@@ -494,29 +494,18 @@ static int	check_response(char *response)
 
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
-	ZBX_THREAD_SENDVAL_ARGS	sendval_args;
+	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
 	int			tcp_ret, ret = FAIL;
 	char			*tls_arg1, *tls_arg2;
 	zbx_socket_t		sock;
 
-	assert(args);
-	assert(((zbx_thread_args_t *)args)->args);
-
-	sendval_args.server = ((ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args)->server;
-	sendval_args.port = ((ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args)->port;
-	sendval_args.json = ((ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args)->json;
-	sendval_args.sync_timestamp = ((ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args)->sync_timestamp;
-
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	sendval_args.tls_vars = ((ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args)->tls_vars;
-
 	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
 	{
 		/* take TLS data passed from 'main' thread */
-		zbx_tls_take_vars(&sendval_args.tls_vars);
+		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
 #endif
-	zbx_free(args);
 
 #if !defined(_WINDOWS)
 	signal(SIGINT,  send_signal_handler);
@@ -545,20 +534,20 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 			goto out;
 	}
 
-	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args.server, sendval_args.port,
+	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args->server, sendval_args->port,
 			GET_SENDER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
-		if (1 == sendval_args.sync_timestamp)
+		if (1 == sendval_args->sync_timestamp)
 		{
 			zbx_timespec_t	ts;
 
 			zbx_timespec(&ts);
 
-			zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_CLOCK, ts.sec);
-			zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_NS, ts.ns);
+			zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+			zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_NS, ts.ns);
 		}
 
-		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sendval_args.json.buffer)))
+		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sendval_args->json.buffer)))
 		{
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock)))
 			{
