@@ -31,8 +31,6 @@ class CPrometheusPatternParser extends CParser {
 
 	private $user_macro_parser;
 	private $lld_macro_parser;
-	private $trim = " \t";
-	private $metric_name_exists;
 
 	public function __construct($options = []) {
 		if (array_key_exists('usermacros', $options)) {
@@ -61,91 +59,58 @@ class CPrometheusPatternParser extends CParser {
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
-		$this->metric_name_exists = false;
+
+		$has_metric_name = false;
+
 		$p = $pos;
 
-		while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-			$p++;
+		if ($this->parseMetric($source, $p)) {
+			$has_metric_name = true;
 		}
 
-		if ($this->parseMetric($source, $p) === true) {
-			$this->metric_name_exists = true;
+		$p_tmp = $p;
 
-			while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-				$p++;
-			}
+		if ($has_metric_name) {
+			self::skipWhitespaces($source, $p_tmp);
+		}
 
-			$p_tmp = $p;
+		if (self::parseLabelsValues($source, $p_tmp, $has_metric_name)) {
+			$p = $p_tmp;
+		}
+		elseif (!$has_metric_name) {
+			return self::PARSE_FAIL;
+		}
 
-			if ($this->parseLabelsValues($source, $p) === true) {
-				while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-					$p++;
-				}
+		$p_tmp = $p;
 
-				if (isset($source[$p])) {
-					$p_tmp = $p;
+		self::skipWhitespaces($source, $p_tmp);
 
-					if ($this->parseComparisonOperator($source, $p) === true) {
-						while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-							$p++;
-						}
+		if ($this->parseComparisonOperator($source, $p_tmp)) {
+			self::skipWhitespaces($source, $p_tmp);
 
-						if ($this->parseNumber($source, $p) === false) {
-							$p = $p_tmp;
-						}
-
-					}
-					else {
-						$p = $p_tmp;
-					}
-				}
-			}
-			elseif ($this->parseComparisonOperator($source, $p) === true) {
-				while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-					$p++;
-				}
-
-				if ($this->parseNumber($source, $p) === false) {
-					$p = $p_tmp;
-				}
-			}
-			else {
+			if ($this->parseNumber($source, $p_tmp)) {
 				$p = $p_tmp;
 			}
-		}
-		elseif ($this->parseLabelsValues($source, $p) === true) {
-			while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-				$p++;
-			}
-
-			$p_tmp = $p;
-
-			if ($this->parseComparisonOperator($source, $p) === true) {
-				while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-					$p++;
-				}
-
-				if ($this->parseNumber($source, $p) === false) {
-					$p = $p_tmp;
-				}
-			}
-		}
-		else {
-			return self::PARSE_FAIL;
-		}
-
-		while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-			$p++;
-		}
-
-		if ($pos == $p) {
-			return self::PARSE_FAIL;
 		}
 
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
 
 		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+	}
+
+	/**
+	 * Move pointer at the end of whitespaces.
+	 *
+	 * @param string $source  [IN]      Source string that needs to be parsed.
+	 * @param int    $pos     [IN/OUT]  Position offset.
+	 *
+	 * @return bool
+	 */
+	private static function skipWhitespaces($source, &$pos) {
+		while (isset($source[$pos]) && ($source[$pos] === ' ' || $source[$pos] === "\t")) {
+			$pos++;
+		}
 	}
 
 	/**
@@ -184,12 +149,13 @@ class CPrometheusPatternParser extends CParser {
 	 * Trailing comma is allowed. Spaces are trimmed before and after each unit (label name, operator, label value
 	 * and comma).
 	 *
-	 * @param string $source  [IN]      Source string that needs to be parsed.
-	 * @param int    $pos     [IN/OUT]  Position offset.
+	 * @param string $source            [IN]     Source string that needs to be parsed.
+	 * @param int    $pos               [IN/OUT] Position offset.
+	 * @param bool   $has_metric_label  [IN/OUT] Returns true if __name__ is present.
 	 *
 	 * @return bool
 	 */
-	private function parseLabelValuePairs($source, &$pos) {
+	private static function parseLabelValuePair($source, &$pos, &$has_metric_label) {
 		$p = $pos;
 
 		// Parse label name.
@@ -198,18 +164,16 @@ class CPrometheusPatternParser extends CParser {
 		}
 
 		if ($matches[0] === '__name__') {
-			if ($this->metric_name_exists) {
+			if ($has_metric_label) {
 				return false;
 			}
 
-			$this->metric_name_exists = true;
+			$has_metric_label = true;
 		}
 
 		$p += strlen($matches[0]);
 
-		while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-			$p++;
-		}
+		self::skipWhitespaces($source, $p);
 
 		// Parse operator.
 		if (!isset($source[$p]) || $source[$p] !== '=') {
@@ -221,9 +185,7 @@ class CPrometheusPatternParser extends CParser {
 			$p++;
 		}
 
-		while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-			$p++;
-		}
+		self::skipWhitespaces($source, $p);
 
 		// Parse label value.
 		if (!isset($source[$p]) || $source[$p] !== '"') {
@@ -232,49 +194,29 @@ class CPrometheusPatternParser extends CParser {
 		$p++;
 
 		while (isset($source[$p])) {
-			if ($source[$p] === '"' && $source[$p - 1] !== '\\') {
-				$p++;
-				break;
+			switch ($source[$p]) {
+				case '\\':
+					switch (isset($source[$p + 1]) ? $source[$p + 1] : null) {
+						case '\\':
+						case '"':
+						case 'n':
+							$p++;
+							break;
+						default:
+							return false;
+					}
+					break;
+
+				case '"':
+					break 2;
 			}
 			$p++;
 		}
 
-		if ($source[$p - 1] !== '"' && $source[$p - 2] !== '\\') {
+		if (!isset($source[$p]) || $source[$p] !== '"') {
 			return false;
 		}
-
-		while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-			$p++;
-		}
-
-		if (!isset($source[$p])) {
-			return false;
-		}
-
-		if (isset($source[$p]) && $source[$p] === ',') {
-			$p++;
-
-			while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-				$p++;
-			}
-
-			if (isset($source[$p]) && $source[$p] !== '}') {
-				$p_tmp = $p;
-
-				// recursion
-				if ($this->parseLabelValuePairs($source, $p) === false) {
-					$p = $p_tmp;
-				}
-			}
-		}
-
-		if (!isset($source[$p])) {
-			return false;
-		}
-
-		if ($pos == $p) {
-			return false;
-		}
+		$p++;
 
 		$pos = $p;
 
@@ -283,39 +225,44 @@ class CPrometheusPatternParser extends CParser {
 
 	/**
 	 * Parse label names and label value pairs as one parameter that is wrapped in curly braces. Spaces are trimmed
-	 * before and after each curly braces and label value pairs.
-	 * and comma).
+	 * before and after each curly braces and label value pairs. Two __name__ labels are not allowed.
 	 *
-	 * @param string $source  [IN]      Source string that needs to be parsed.
-	 * @param int    $pos     [IN/OUT]  Position offset.
+	 * @param string $source           [IN]     Source string that needs to be parsed.
+	 * @param int    $pos              [IN/OUT] Position offset.
+	 * @param bool   $has_metric_name  [IN]     Metric name is present in the pattern.
 	 *
 	 * @return bool
 	 */
-	private function parseLabelsValues($source, &$pos) {
+	private static function parseLabelsValues($source, &$pos, $has_metric_name) {
 		$p = $pos;
 
-		if (isset($source[$p]) && $source[$p] !== '{') {
+		if (!isset($source[$p]) || $source[$p] !== '{') {
 			return false;
 		}
 		$p++;
 
-		while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
+		$has_metric_label = false;
+
+		while (true) {
+			self::skipWhitespaces($source, $p);
+
+			if (!self::parseLabelValuePair($source, $p, $has_metric_label)) {
+				break;
+			}
+
+			self::skipWhitespaces($source, $p);
+
+			if (!isset($source[$p]) || $source[$p] !== ',') {
+				break;
+			}
 			$p++;
 		}
 
-		$p_tmp = $p;
-
-		if ($this->parseLabelValuePairs($source, $p) === false) {
-			$pos = $p_tmp;
-
+		if ($has_metric_name && $has_metric_label) {
 			return false;
 		}
 
-		while (isset($source[$p]) && strpos($this->trim, $source[$p]) !== false) {
-			$p++;
-		}
-
-		if (isset($source[$p]) && $source[$p] !== '}') {
+		if (!isset($source[$p]) || $source[$p] !== '}') {
 			return false;
 		}
 		$p++;

@@ -35,6 +35,34 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'{}', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{}'
+				]
+			],
+			[
+				'metric{}', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'metric{}'
+				]
+			],
+			[
+				"{ \t}", 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => "{ \t}"
+				]
+			],
+			[
+				"metric\t  { \t}", 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => "metric\t  { \t}"
+				]
+			],
+			[
 				'metric==6', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -252,6 +280,13 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'met:ric_0123456789', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'met:ric_0123456789'
+				]
+			],
+			[
 				'{$M}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -289,10 +324,10 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 			],
 			// Double backslash at the end of label value.
 			[
-				'{label1==="value1\\\\"}', 0, [],
+				'{label1="value1\\\\"}', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => ''
+					'match' => '{label1="value1\\\\"}'
 				]
 			],
 			// partial success
@@ -405,7 +440,7 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				'metric metric{label1=~"value1", label2="value2"}', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => 'metric '
+					'match' => 'metric'
 				]
 			],
 			[
@@ -419,7 +454,7 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				'metric   {   label1  =    "value1" ,   label2  =~ "value2"  }   ==    ', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => 'metric   {   label1  =    "value1" ,   label2  =~ "value2"  }   '
+					'match' => 'metric   {   label1  =    "value1" ,   label2  =~ "value2"  }'
 				]
 			],
 			[
@@ -470,7 +505,7 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				'{#LLD}  {label1="value1"}  ==  {{#LLD}.regsub("^([0-9]+)", "{#LLD}: \1")}', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{#LLD}  {label1="value1"}  '
+					'match' => '{#LLD}  {label1="value1"}'
 				]
 			],
 			// fail
