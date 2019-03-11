@@ -1512,7 +1512,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'url',
 				'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
 				'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-				'verify_peer', 'verify_host', 'allow_traps'
+				'verify_peer', 'verify_host', 'allow_traps', 'master_itemid'
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
@@ -1561,6 +1561,35 @@ class CDiscoveryRule extends CItemGeneral {
 					$dstDiscovery['key_']
 				));
 			}
+		}
+
+		// Master item should exists for LLD with type dependent item.
+		if ($srcDiscovery['type'] == ITEM_TYPE_DEPENDENT) {
+			$master_item = API::Item()->get([
+				'output' => ['key_'],
+				'itemids' => $srcDiscovery['master_itemid']
+			]);
+
+			if (!$master_item) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			$dst_master_item = API::Item()->get([
+				'output' => ['itemid'],
+				'hostids' => $dstDiscovery['hostid'],
+				'filter' => ['key_' => $master_item[0]['key_']]
+			]);
+
+			if (!$dst_master_item) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Item "%1$s" has master item and cannot be copied.',
+					$dstDiscovery['key_']
+				));
+			}
+
+			$dstDiscovery['master_itemid'] = $dst_master_item[0]['itemid'];
+			$this->validateDependentItems([$dstDiscovery]);
 		}
 
 		// save new discovery
