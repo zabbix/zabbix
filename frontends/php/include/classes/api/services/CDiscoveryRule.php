@@ -339,10 +339,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 			// Option 'Convert to JSON' is not supported for discovery rule.
 			unset($item['output_format']);
+			unset($item['itemid']);
 		}
-		unset($item);
 
 		$this->validateCreateLLDMacroPaths($items);
+		$this->validateDependentItems($items);
 		$this->createReal($items);
 		$this->inherit($items);
 
@@ -370,6 +371,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->validateUpdateLLDMacroPaths($items);
 
 		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type', 'master_itemid']);
+		$this->validateDependentItems($items);
 
 		$defaults = DB::getDefaults('items');
 		$clean = [

@@ -1729,9 +1729,11 @@ abstract class CItemGeneral extends CApiService {
 		$dep_items = [];
 		$upd_itemids = [];
 
+		// Discovery rule can be dependent item.
 		foreach ($items as $item) {
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				if ($this instanceof CItemPrototype || $item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				if ($this instanceof CItemPrototype || $item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL
+						|| $item['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
 					$dep_items[] = $item;
 				}
 
@@ -1774,17 +1776,9 @@ abstract class CItemGeneral extends CApiService {
 
 		$master_items = [];
 
-		// Fill relations array by master items (item prototypes).
+		// Fill relations array by master items (item prototypes). Discovery rule should not be master item.
 		do {
-			if ($this instanceof CItem) {
-				$db_master_items = DBselect(
-					'SELECT i.itemid,i.hostid,i.master_itemid'.
-					' FROM items i'.
-					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
-						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])
-				);
-			}
-			else {
+			if ($this instanceof CItemPrototype) {
 				$db_master_items = DBselect(
 					'SELECT i.itemid,i.hostid,i.master_itemid,i.flags,id.parent_itemid AS ruleid'.
 					' FROM items i'.
@@ -1792,6 +1786,14 @@ abstract class CItemGeneral extends CApiService {
 							' ON i.itemid=id.itemid'.
 					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
 						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])
+				);
+			}
+			else {
+				$db_master_items = DBselect(
+					'SELECT i.itemid,i.hostid,i.master_itemid'.
+					' FROM items i'.
+					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])
 				);
 			}
 
