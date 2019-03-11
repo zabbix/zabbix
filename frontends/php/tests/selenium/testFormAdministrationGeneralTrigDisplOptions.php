@@ -138,17 +138,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'period' => '1441m',
-				'error_msg' => 'Invalid displaying of OK triggers: must be between "0" and "86400".'
+				'error_msg' => 'Invalid displaying of OK triggers: value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '2d',
-				'error_msg' => 'Invalid displaying of OK triggers: must be between "0" and "86400".'
+				'error_msg' => 'Invalid displaying of OK triggers: value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '86401',
-				'error_msg' => 'Invalid displaying of OK triggers: must be between "0" and "86400".'
+				'error_msg' => 'Invalid displaying of OK triggers: value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
@@ -226,17 +226,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'period' => '1441m',
-				'error_msg' => 'Invalid blinking on trigger status change: must be between "0" and "86400".'
+				'error_msg' => 'Invalid blinking on trigger status change: value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '2d',
-				'error_msg' => 'Invalid blinking on trigger status change: must be between "0" and "86400".'
+				'error_msg' => 'Invalid blinking on trigger status change: value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '86401',
-				'error_msg' => 'Invalid blinking on trigger status change: must be between "0" and "86400".'
+				'error_msg' => 'Invalid blinking on trigger status change: value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,

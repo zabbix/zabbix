@@ -332,7 +332,8 @@ $triggers_form->addItem([
 			'trigger.masscopyto' => ['name' => _('Copy')],
 			'trigger.massupdateform' => ['name' => _('Mass update')],
 			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?')]
-		]
+		],
+		$data['single_selected_hostid']
 	)
 ]);
 

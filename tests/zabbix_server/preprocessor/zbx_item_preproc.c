@@ -178,7 +178,7 @@ void	zbx_mock_test_entry(void **state)
 	unsigned char			value_type;
 	zbx_timespec_t			ts, history_ts, expected_history_ts;
 	zbx_preproc_op_t		op;
-	int				returned_ret, expected_ret;
+	int				returned_ret, expected_ret, action;
 	char				*error = NULL;
 
 	ZBX_UNUSED(state);
@@ -197,7 +197,7 @@ void	zbx_mock_test_entry(void **state)
 		history_ts.ns = 0;
 	}
 
-	returned_ret = zbx_item_preproc(0, value_type, &value, &ts, &op, &history_value, &history_ts, &error);
+	returned_ret = zbx_item_preproc(value_type, &value, &ts, &op, &history_value, &history_ts, &action, &error);
 	if (SUCCEED != returned_ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "Preprocessing error: %s", error);
 

@@ -313,15 +313,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define ITEM_SNMPV3_PRIVPROTOCOL_DES		0
 #define ITEM_SNMPV3_PRIVPROTOCOL_AES		1
 
-/* item multiplier types */
-#define ITEM_MULTIPLIER_DO_NOT_USE		0
-#define ITEM_MULTIPLIER_USE			1
-
-/* item delta types */
-#define ITEM_STORE_AS_IS			0
-#define ITEM_STORE_SPEED_PER_SECOND		1
-#define ITEM_STORE_SIMPLE_CHANGE		2
-
 /* condition evaluation types */
 #define CONDITION_EVAL_TYPE_AND_OR		0
 #define CONDITION_EVAL_TYPE_AND			1
@@ -1492,10 +1483,14 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_PROMETHEUS_PATTERN		22
 #define ZBX_PREPROC_PROMETHEUS_TO_JSON		23
 
+/* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0
 #define ZBX_PREPROC_FAIL_DISCARD_VALUE	1
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
+
+/* internal on fail actions */
+#define ZBX_PREPROC_FAIL_FORCE_ERROR	4
 
 #define ZBX_HTTPFIELD_HEADER		0
 #define ZBX_HTTPFIELD_VARIABLE		1
@@ -1551,6 +1546,7 @@ void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source);
 int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);
 
 int	zbx_variant_convert(zbx_variant_t *value, int type);
+const char	*zbx_get_variant_type_desc(unsigned char type);
 const char	*zbx_variant_value_desc(const zbx_variant_t *value);
 const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 
