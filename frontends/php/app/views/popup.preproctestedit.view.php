@@ -78,7 +78,7 @@ $form_list = (new CFormList())
 				'readonly' => false
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			new CLabel(_('Time'), 'time'),
-			(new CTextBox(null, _('now'), true))
+			(new CTextBox(null, 'now', true))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setId('time')
 		]))->addClass('preproc-test-popup-value-row')

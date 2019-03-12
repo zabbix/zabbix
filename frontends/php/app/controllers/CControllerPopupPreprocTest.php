@@ -30,7 +30,7 @@ abstract class CControllerPopupPreprocTest extends CController {
 	/**
 	 * Item value type used if user has not specified one.
 	 */
-	const ZBX_DEFAULT_VALUE_TYPE = ITEM_VALUE_TYPE_STR;
+	const ZBX_DEFAULT_VALUE_TYPE = ITEM_VALUE_TYPE_TEXT;
 
 	/**
 	 * @var object

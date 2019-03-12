@@ -118,7 +118,7 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 
 		// Send test details to Zabbix server.
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-		$result = $server->testItemPreprocessingSteps($data, get_cookie('zbx_sessionid'));
+		$result = $server->testPreprocessingSteps($data, get_cookie('zbx_sessionid'));
 
 		if ($result === false) {
 			error($server->getError());

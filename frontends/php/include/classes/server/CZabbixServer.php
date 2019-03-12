@@ -162,7 +162,7 @@ class CZabbixServer {
 	 *
 	 * @return array
 	 */
-	public function testItemPreprocessingSteps(array $data, $sid) {
+	public function testPreprocessingSteps(array $data, $sid) {
 		return $this->request([
 			'request' => 'preprocessing.test',
 			'data' => $data,
