@@ -1567,7 +1567,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 		if (*sql_offset <= ZBX_SQL_EXEC_FROM)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			goto reset_buffer;
+			return ret;
 		}
 
 		/* Oracle fails with ORA-00911 if it encounters ';' w/o PL/SQL block */
@@ -1579,7 +1579,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */
 		if (ZBX_DB_OK > DBexecute("%s", *sql + ZBX_SQL_EXEC_FROM))
 			ret = FAIL;
-reset_buffer:
+
 		*sql_offset = 0;
 
 		DBbegin_multiple_update(sql, sql_alloc, sql_offset);
