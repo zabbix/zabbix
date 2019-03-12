@@ -45,7 +45,7 @@ class CMultilineInput extends CDiv {
 	 * @param string  $value
 	 * @param array   $options
 	 * @param string  $options['title']           Modal dialog title.
-	 * @param string  $options['hint']            Hint message fro input element.
+	 * @param string  $options['hint']            Hint message for input element.
 	 * @param string  $options['placeholder']     Placeholder for empty value.
 	 * @param int     $options['maxlength']       Max characters length (default: 255).
 	 * @param bool    $options['line_numbers']    Show line numbers (default: true).
@@ -78,8 +78,8 @@ class CMultilineInput extends CDiv {
 	}
 
 	/**
-	 * @param string $key
-	 * @param any $value
+	 * @param string           $key
+	 * @param string|int|bool  $value
 	 *
 	 * @return CMultilineInput
 	 */
