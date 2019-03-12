@@ -1425,7 +1425,6 @@ static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const cha
 	zbx_lrtrim(*error, " \t\n\r");
 	if ('\0' == **error)
 		zbx_free(*error);
-
 out:
 	zbx_variant_clear(&value_str);
 
