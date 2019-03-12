@@ -3,6 +3,7 @@ Changes for 4.2.0rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15468] fixed LDAP configuration form not being able to save changes when user password field is empty string (gcalenko)
 ..F....... [ZBX-15669] fixed page scroll after widget being added to dashboard (gcalenko)
 ..F....... [ZBX-15548] fixed resolving of {ITEM.VALUE} macro in the trigger description (Sasha)
 ........S. [ZBX-15774] fixed memory leak in housekeeper when elasticsearch is used (vso)
