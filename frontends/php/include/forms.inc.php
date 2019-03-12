@@ -1531,7 +1531,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				$params[0]->setAttribute('placeholder',
 					_('<metric name>{<label name>="<label value>", ...} == <value>')
 				);
-				$params[1]->setAttribute('placeholder', _('<empty>|<label name>'));
+				$params[1]->setAttribute('placeholder', _('<label name>'));
 				break;
 
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:

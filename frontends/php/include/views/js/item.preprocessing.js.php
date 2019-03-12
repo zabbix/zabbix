@@ -225,7 +225,7 @@
 							) ?>)
 							.show();
 						$(params[1])
-							.attr('placeholder', <?= CJs::encodeJson(_('<empty>|<label name>')) ?>)
+							.attr('placeholder', <?= CJs::encodeJson(_('<label name>')) ?>)
 							.show();
 						break;
 
