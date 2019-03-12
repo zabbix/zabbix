@@ -54,70 +54,15 @@ $form_list = new CFormList('elements_form_list');
 // append copy types to form list
 $form_list->addRow(new CLabel(_('Target type'), 'copy_type'),
 	(new CRadioButtonList('copy_type', (int) $data['copy_type']))
-		->addValue(_('Host groups'), COPY_TYPE_TO_HOST_GROUP, null, 'this.form.submit()')
-		->addValue(_('Hosts'), COPY_TYPE_TO_HOST, null, 'this.form.submit()')
-		->addValue(_('Templates'), COPY_TYPE_TO_TEMPLATE, null, 'this.form.submit()')
+		->addValue(_('Host groups'), COPY_TYPE_TO_HOST_GROUP)
+		->addValue(_('Hosts'), COPY_TYPE_TO_HOST)
+		->addValue(_('Templates'), COPY_TYPE_TO_TEMPLATE)
 		->setModern(true)
 );
 
-switch ($data['copy_type']) {
-	case COPY_TYPE_TO_HOST:
-		$multiselect_options = [
-			'name' => 'copy_targetids[]',
-			'object_name' => 'hosts',
-			'data' => $data['copy_targetids'],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'hosts',
-					'srcfld1' => 'hostid',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'copy_targetids_',
-					'editable' => true
-				]
-			]
-		];
-		break;
-
-	case COPY_TYPE_TO_TEMPLATE:
-		$multiselect_options = [
-			'name' => 'copy_targetids[]',
-			'object_name' => 'templates',
-			'data' => $data['copy_targetids'],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'templates',
-					'srcfld1' => 'hostid',
-					'srcfld2' => 'host',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'copy_targetids_',
-					'editable' => true
-				]
-			]
-		];
-		break;
-
-	case COPY_TYPE_TO_HOST_GROUP:
-		$multiselect_options = [
-			'name' => 'copy_targetids[]',
-			'object_name' => 'hostGroup',
-			'data' => $data['copy_targetids'],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'copy_targetids_',
-					'editable' => true
-				]
-			]
-		];
-		break;
-}
-
-$form_list->addRow((new CLabel(_('Target'), 'copy_targets'))->setAsteriskMark(),
-	(new CMultiSelect($multiselect_options))
-		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		->setAriaRequired()
+// append multiselect wrapper to form list
+$form_list->addRow((new CLabel(_('Target'), 'copy_targetids_ms'))->setAsteriskMark(),
+	(new CDiv())->setId('copy_targets')
 );
 
 // append tabs to form
@@ -131,5 +76,7 @@ $tab_view->setFooter(makeFormFooter(
 
 $form->addItem($tab_view);
 $widget->addItem($form);
+
+require_once dirname(__FILE__).'/js/configuration.copy.elements.js.php';
 
 return $widget;

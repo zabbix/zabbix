@@ -1392,6 +1392,14 @@ function getCopyElementsFormData($elements_field, $title = null) {
 
 	if ($data['copy_targetids']) {
 		switch ($data['copy_type']) {
+			case COPY_TYPE_TO_HOST_GROUP:
+				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+					'output' => ['groupid', 'name'],
+					'groupids' => $data['copy_targetids'],
+					'editable' => true
+				]), ['groupid' => 'id']);
+				break;
+
 			case COPY_TYPE_TO_HOST:
 				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
 					'output' => ['hostid', 'name'],
@@ -1406,14 +1414,6 @@ function getCopyElementsFormData($elements_field, $title = null) {
 					'templateids' => $data['copy_targetids'],
 					'editable' => true
 				]), ['templateid' => 'id']);
-				break;
-
-			case COPY_TYPE_TO_HOST_GROUP:
-				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-					'output' => ['groupid', 'name'],
-					'groupids' => $data['copy_targetids'],
-					'editable' => true
-				]), ['groupid' => 'id']);
 		}
 	}
 
