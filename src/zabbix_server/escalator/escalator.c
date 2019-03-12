@@ -1446,13 +1446,15 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource || EVENT_SOURCE_INTERNAL == action->eventsource)
 	{
-		char	*sql = zbx_dsprintf(NULL,
-					"select null"
-					" from operations"
-					" where actionid=" ZBX_FS_UI64
-						" and (esc_step_from>%d or esc_step_to=0)"
-						" and recovery=%d",
-						action->actionid, escalation->esc_step, ZBX_OPERATION_MODE_NORMAL);
+		char	*sql;
+
+		sql = zbx_dsprintf(NULL,
+				"select null"
+				" from operations"
+				" where actionid=" ZBX_FS_UI64
+					" and (esc_step_from>%d or esc_step_to=0)"
+					" and recovery=%d",
+					action->actionid, escalation->esc_step, ZBX_OPERATION_MODE_NORMAL);
 		result = DBselectN(sql, 1);
 
 		if (NULL != DBfetch(result))
@@ -1469,6 +1471,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 			escalation->status = ESCALATION_STATUS_COMPLETED;
 
 		DBfree_result(result);
+		zbx_free(sql);
 	}
 	else
 		escalation->status = ESCALATION_STATUS_COMPLETED;
