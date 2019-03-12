@@ -46,6 +46,7 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 $result_table = (new CTable())
 	->setId('preprocessing-steps')
 	->addClass('preprocessing-test-results')
+	->setAttribute('aria-live', 'polite')
 	->addStyle('width: 100%;')
 	->setHeader([
 		'',
