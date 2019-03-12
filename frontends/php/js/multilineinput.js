@@ -22,18 +22,20 @@
 	'use strict';
 
 	function setDisabled(e) {
-		var disabled = (e.type === 'disable');
+		if (e.data[0] !== e.target) {
+			return;
+		}
 
-		e.data.options.disabled = disabled;
-		e.data.$hidden.prop('disabled', disabled ? true : null);
+		e.data.options.disabled = (e.type === 'disable');
+		e.data.$hidden.prop('disabled', e.data.options.disabled ? true : null);
 		e.data.$input
-			.prop('disabled', disabled ? true : null)
-			.prop('readonly', disabled ? null : true);
-		e.data.$button.prop('disabled', disabled ? true : null);
+			.prop('disabled', e.data.options.disabled ? true : null)
+			.prop('readonly', e.data.options.disabled ? null : true);
+		e.data.$button.prop('disabled', e.data.options.disabled ? true : null);
 
 		$(this)
-			.toggleClass('multilineinput-readonly', (e.data.options.readonly && !disabled))
-			.toggleClass('multilineinput-disabled', disabled);
+			.toggleClass('multilineinput-readonly', (e.data.options.readonly && !e.data.options.disabled))
+			.toggleClass('multilineinput-disabled', e.data.options.disabled);
 	}
 
 	function openModal(e) {
