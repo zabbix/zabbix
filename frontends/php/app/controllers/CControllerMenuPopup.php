@@ -86,7 +86,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @return mixed
 	 */
-	private static function setMenuDataHistory(array $data) {
+	private static function getMenuDataHistory(array $data) {
 		$db_items = API::Item()->get([
 			'output' => ['value_type'],
 			'itemids' => $data['itemid'],
@@ -390,6 +390,15 @@ class CControllerMenuPopup extends CController {
 							$menu_data['urls'] = $selement['urls'];
 						}
 						return $menu_data;
+
+					case SYSMAP_ELEMENT_TYPE_IMAGE:
+						$menu_data = [
+							'type' => 'map_element_image',
+						];
+						if ($selement['urls']) {
+							$menu_data['urls'] = $selement['urls'];
+						}
+						return $menu_data;
 				}
 			}
 		}
@@ -430,8 +439,8 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['triggerid']
+	 * @param string $data['eventid']                 (optional) Mandatory for Acknowledge and Description menus.
 	 * @param array  $data['acknowledge']             (optional) Acknowledge link parameters.
-	 * @param string $data['acknowledge']['eventid']
 	 * @param string $data['acknowledge']['backurl']
 	 * @param int    $data['severity_min']            (optional)
 	 * @param bool   $data['show_suppressed']         (optional)
@@ -524,6 +533,10 @@ class CControllerMenuPopup extends CController {
 				$menu_data['description_enabled'] = false;
 			}
 
+			if (array_key_exists('eventid', $data)) {
+				$menu_data['eventid'] = $data['eventid'];
+			}
+
 			if (array_key_exists('acknowledge', $data)) {
 				$menu_data['acknowledge'] = $data['acknowledge'];
 			}
@@ -561,7 +574,7 @@ class CControllerMenuPopup extends CController {
 				break;
 
 			case 'history':
-				$menu_data = self::setMenuDataHistory($data);
+				$menu_data = self::getMenuDataHistory($data);
 				break;
 
 			case 'host':
