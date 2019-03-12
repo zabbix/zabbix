@@ -1578,7 +1578,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 			if (!$master_item) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_s('Discovery rule "%1$s" is a dependent item and cannot be copied without its master item.',
+					_s('Discovery rule "%1$s" cannot be copied without its master item.',
 						$srcDiscovery['name']
 				));
 			}
