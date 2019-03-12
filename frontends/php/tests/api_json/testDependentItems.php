@@ -111,6 +111,14 @@ class testDependentItems extends CAPITest {
 					'itemid' => 2305	// dependent.items.host.7:net.if.in[eth0]
 				]
 			],
+			// Simple update discovery rule dependent item.
+			[
+				'error' => null,
+				'method' => 'discoveryrule.update',
+				'request_data' => [
+					'itemid' => 1506	// dependent.items.host.2:dependent.lld.1
+				]
+			],
 			// Set incorrect master_itemid for item (create).
 			[
 				'error' => 'Incorrect value for field "master_itemid": Item "2499" does not exist or you have no access to this item.',
@@ -143,6 +151,29 @@ class testDependentItems extends CAPITest {
 				'method' => 'itemprototype.update',
 				'request_data' => [
 					'itemid' => 2405,		// dependent.items.host.8:dependent.item.proto.1.1
+					'master_itemid' => 2499	// this ID does not exists in the DB
+				]
+			],
+			// Set incorrect master_itemid for discovery rule (create).
+			[
+				'error' => 'Incorrect value for field "master_itemid": Item "2499" does not exist or you have no access to this item.',
+				'method' => 'discoveryrule.create',
+				// 1006: dependent.items.host.2
+				// 2499: this ID does not exists in the DB
+				'request_data' => [
+					'name' => 'dependent.lld.3',
+					'key_' => 'dependent.lld.3',
+					'hostid' => 1006,
+					'type' => 18,
+					'master_itemid' => 2499 // this ID does not exists in the DB
+				]
+			],
+			// Set incorrect master_itemid for discovery rule (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": Item "2499" does not exist or you have no access to this item.',
+				'method' => 'discoveryrule.update',
+				'request_data' => [
+					'itemid' => 1506,		// dependent.items.host.2:dependent.lld.1
 					'master_itemid' => 2499	// this ID does not exists in the DB
 				]
 			],
@@ -197,6 +228,29 @@ class testDependentItems extends CAPITest {
 				'request_data' => [
 					'itemid' => 2405,		// dependent.items.host.8:dependent.item.proto.1.1
 					'master_itemid' => 2407	// dependent.items.host.8:master.item.proto.2
+				]
+			],
+			// Set master_itemid from other host for discovery rule (create).
+			[
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'method' => 'discoveryrule.create',
+				// 1006: dependent.items.host.2
+				// 1701: dependent.items.host.4:item.1
+				'request_data' => [
+					'name' => 'dependent.lld.3',
+					'key_' => 'dependent.lld.3',
+					'hostid' => 1006,
+					'type' => 18,
+					'master_itemid' => 1701
+				]
+			],
+			// Set incorrect master_itemid for discovery rule (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'method' => 'discoveryrule.update',
+				'request_data' => [
+					'itemid' => 1506,		// dependent.items.host.2:dependent.lld.1
+					'master_itemid' => 1701	// dependent.items.host.4:item.1
 				]
 			],
 			// Create dependent item, which depends on discovered item.
@@ -267,6 +321,15 @@ class testDependentItems extends CAPITest {
 					'master_itemid' => 1032
 				]
 			],
+			// Circular dependency to itself (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": Item "1506" does not exist or you have no access to this item.',
+				'method' => 'discoveryrule.update',
+				'request_data' => [
+					'itemid' => 1506,
+					'master_itemid' => 1506
+				]
+			],
 			// Circular dependency to between several items (update).
 			[
 				'error' => 'Incorrect value for field "master_itemid": circular item dependency is not allowed.',
@@ -298,6 +361,20 @@ class testDependentItems extends CAPITest {
 					'master_itemid' => 1001	// dependent.items.template.1:master.item.1
 				]
 			],
+			// Set "master_itemid" for not-dependent discovery rule (create).
+			[
+				'error' => 'Incorrect value for field "master_itemid": should be empty.',
+				'method' => 'discoveryrule.create',
+				// 1006: dependent.items.host.2
+				// 1505: dependent.items.host.2:item.5
+				'request_data' => [
+					'name' => 'dependent.lld.3',
+					'key_' => 'dependent.lld.3',
+					'hostid' => 1006,
+					'type' => 2,
+					'master_itemid' => 1505
+				]
+			],
 			// Set "master_itemid" for not-dependent item prototype (create).
 			[
 				'error' => 'Incorrect value for field "master_itemid": should be empty.',
@@ -319,6 +396,15 @@ class testDependentItems extends CAPITest {
 				'request_data' => [
 					'itemid' => 1016,		// dependent.items.template.1:trap.1
 					'master_itemid' => 1001	// dependent.items.template.1:master.item.1
+				]
+			],
+			// Set "master_itemid" for not-dependent discovery rule (update).
+			[
+				'error' => 'Incorrect value for field "master_itemid": should be empty.',
+				'method' => 'discoveryrule.update',
+				'request_data' => [
+					'itemid' => 1602,		// dependent.items.host.3:discovery.rule.1
+					'master_itemid' => 1601	// dependent.items.host.3:dependent.item.1.1
 				]
 			],
 			// Set "master_itemid" for not-dependent item prototype (update).
@@ -346,6 +432,20 @@ class testDependentItems extends CAPITest {
 				// 1017: dependent.items.template.1:discovery.rule.1
 				// 1025: dependent.items.template.1:dependent.item.proto.1.1.1.1
 				'request_data' => self::getItemPrototypes(1001, 1017, 1025, 'dependent.item.1.1.1.1', 1, 1)
+			],
+			// Check for maximum depth of the discovery rule tree (create). Add 4th level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
+				'method' => 'discoveryrule.create',
+				// 1006: dependent.items.host.2
+				// 1504: dependent.items.host.2:dependent.item.proto.1.1.1.1
+				'request_data' => [
+					'name' => 'dependent.lld.3',
+					'key_' => 'dependent.lld.3',
+					'hostid' => 1006,
+					'type' => 18,
+					'master_itemid' => 1504
+				]
 			],
 			// Check for maximum depth of the items tree (update). Add 4th level.
 			[
@@ -397,6 +497,16 @@ class testDependentItems extends CAPITest {
 					'master_itemid' => 2102	// dependent.items.template.6:item.proto.1
 				]
 			],
+			// Check for maximum depth of the discovery rule tree (update). Add 4th level at the top.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
+				'method' => 'discoveryrule.update',
+				'request_data' => [
+					'itemid' => 1507,		// dependent.items.host.2:dependent.lld.2
+					'type' => 18,			// ITEM_TYPE_DEPENDENT
+					'master_itemid' => 1504	// dependent.items.host.2:dependent.item.1.1.1.1.1
+				]
+			],
 			// Check for maximum depth of the items tree (link a template).
 			[
 				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
@@ -439,6 +549,14 @@ class testDependentItems extends CAPITest {
 					self::getItems(1001, 1003, 'dependent.item.1.2', 3, 495)
 				)
 			],
+			// Check for maximum count of discovery rule in the tree on the template level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
+				'method' => 'discoveryrule.create',
+				// 1001: dependent.items.template.1
+				// 1001: dependent.items.template.1:master.item.1
+				'request_data' => self::getItems(1001, 1001, 'dependent.lld.1', 3, 988)
+			],
 			// Check for maximum count of items in the tree on the host level.
 			[
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
@@ -458,6 +576,14 @@ class testDependentItems extends CAPITest {
 					self::getItems(1004, 1302, 'dependent.item.1.1', 3, 495),
 					self::getItems(1004, 1303, 'dependent.item.1.2', 3, 495)
 				)
+			],
+			// Check for maximum count of discovery rule in the tree on the host level.
+			[
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
+				'method' => 'discoveryrule.create',
+				// 1006: dependent.items.host.2
+				// 1505: dependent.items.host.2:master.item.5
+				'request_data' => self::getItems(1006, 1505, 'dependent.lld.2', 1, 999)
 			],
 			// Check for maximum count of items in the tree on the template level.
 			[
