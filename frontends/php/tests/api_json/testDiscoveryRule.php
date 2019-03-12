@@ -2421,19 +2421,19 @@ class testDiscoveryRule extends CAPITest {
 			],
 			'Test LLD dependent on master which does not exists on destination host.' => [
 				'params' => [
-					// dependent.items.host.2:dependent.lld.1
-					'discoveryids' => ['1506'],
-					// dependent.items.host.4
-					'hostids' => ['1009']
+					// test.discovery.rule.1:dependent.lld.3
+					'discoveryids' => ['2605'],
+					// test.discovery.rule.2
+					'hostids' => ['1018']
 				],
-				'expected_error' => 'Discovery rule "dependent.lld.1" cannot be copied without its master item.'
+				'expected_error' => 'Discovery rule "dependent.lld.3" cannot be copied without its master item.'
 			],
 			'Test LLD dependent on master having max dependency levels.' => [
 				'params' => [
-					// dependent.items.host.2:dependent.lld.2
-					'discoveryids' => ['1507'],
-					// dependent.items.host.4
-					'hostids' => ['1009']
+					// test.discovery.rule.1:dependent.lld.1
+					'discoveryids' => ['2601'],
+					// test.discovery.rule.2
+					'hostids' => ['1018']
 				],
 				'expected_error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.'
 			]
@@ -2451,10 +2451,10 @@ class testDiscoveryRule extends CAPITest {
 			],
 			'Test copy LLD dependent to host having master item with same key_' => [
 				'params' => [
-					// dependent.items.host.2:dependent.lld.1
-					'discoveryids' => ['1506'],
-					// dependent.items.host.3
-					'hostids' => ['1007']
+					// test.discovery.rule.1:dependent.lld.2
+					'discoveryids' => ['2603'],
+					// test.discovery.rule.2
+					'hostids' => ['1018']
 				],
 				'expected_error' => null
 			]
