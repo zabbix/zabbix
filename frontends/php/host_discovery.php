@@ -416,8 +416,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'privatekey' => getRequest('privatekey'),
 			'params' => getRequest('params'),
 			'ipmi_sensor' => getRequest('ipmi_sensor'),
-			'lifetime' => getRequest('lifetime'),
-			'master_itemid' => getRequest('master_itemid')
+			'lifetime' => getRequest('lifetime')
 		];
 
 		if ($newItem['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -451,8 +450,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$newItem['jmx_endpoint'] = getRequest('jmx_endpoint', '');
 		}
 
-		if (getRequest('type') != ITEM_TYPE_DEPENDENT) {
-			unset($newItem['master_itemid']);
+		if (getRequest('type') == ITEM_TYPE_DEPENDENT) {
+			$newItem['master_itemid'] = getRequest('master_itemid');
 		}
 
 		// add macros; ignore empty new macros
@@ -637,21 +636,24 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masschec
 if (hasRequest('form')) {
 	$has_errors = false;
 	$form_item = (hasRequest('itemid') && !hasRequest('clone')) ? $item : [];
-	$masterid = $form_item && !hasRequest('form_refresh') ? $form_item['master_itemid'] : getRequest('master_itemid');
+	$master_itemid = $form_item && !hasRequest('form_refresh')
+		? $form_item['master_itemid']
+		: getRequest('master_itemid');
 
-	if (getRequest('type', $form_item ? $form_item['type'] : null) == ITEM_TYPE_DEPENDENT && $masterid) {
-		$dbmaster_item = API::Item()->get([
+	if (getRequest('type', $form_item ? $form_item['type'] : null) == ITEM_TYPE_DEPENDENT && $master_itemid != 0) {
+		$db_master_items = API::Item()->get([
 			'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-			'itemids' => $masterid,
+			'itemids' => $master_itemid,
 			'webitems' => true
 		]);
 
-		if (!$dbmaster_item) {
+		if (!$db_master_items) {
 			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
 			$has_errors = true;
 		}
-
-		$form_item['master_item'] = $dbmaster_item[0];
+		else {
+			$form_item['master_item'] = $db_master_items[0];
+		}
 	}
 
 	$data = getItemFormData($form_item, [
