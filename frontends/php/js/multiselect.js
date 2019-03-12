@@ -43,7 +43,7 @@ jQuery(function($) {
 		options = $.extend({objectOptions: {}}, options);
 
 		// url
-		options.url = new Curl('jsrpc.php');
+		options.url = new Curl('jsrpc.php', false);
 		options.url.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 		options.url.setArgument('method', 'multiselect.get');
 		options.url.setArgument('objectName', options.objectName);
@@ -426,7 +426,7 @@ jQuery(function($) {
 							window.setTimeout(function() {
 								values.isWaiting = false;
 
-								var search = $input.val();
+								var search = $input.val().replace(/^\s+/g, '');
 
 								// re-check search after delay
 								if (search !== '' && $input.data('lastSearch') != search) {
