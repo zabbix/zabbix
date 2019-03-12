@@ -127,7 +127,7 @@
 		function openPreprocessingTestDialog(step_nums) {
 			PopUp('popup.preproctest.edit', {
 				delay: $('#delay').val() || '',
-				value_type: $('#value_type').val(),
+				value_type: $('#value_type').val() || <?= CControllerPopupPreprocTest::ZBX_DEFAULT_VALUE_TYPE ?>,
 				steps: getPreprocessingSteps(step_nums),
 				hostid: <?= $data['hostid'] ?>,
 				test_type: <?= $data['preprocessing_test_type'] ?>

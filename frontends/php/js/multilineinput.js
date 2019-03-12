@@ -151,7 +151,7 @@
 				title: this.options.hint
 			}).on('click', this, openModal);
 
-			this.on('disable enable', this, setDisabled);
+			//this.on('disable enable', this, setDisabled);
 
 			methods.value.call(this, this.options.value);
 

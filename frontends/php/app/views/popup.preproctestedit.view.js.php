@@ -88,16 +88,6 @@ function processItemPreprocessingTestResults(steps) {
 		tmpl_act_done = new Template(jQuery('#preprocessing-step-action-done').html());
 
 	steps.each(function(step, i) {
-		if (typeof step.error !== 'undefined') {
-			step.result = jQuery(tmpl_err_icon.evaluate({error: step.error}));
-		}
-		else if (typeof step.result === 'undefined') {
-			step.result = jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text('<?= _('No value') ?>');
-		}
-		else if (step.result === '') {
-			step.result = jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text('<?= _('<empty string>') ?>');
-		}
-
 		if (typeof step.action !== 'undefined') {
 			switch (step.action) {
 				case <?= ZBX_PREPROC_FAIL_DEFAULT ?>:
@@ -113,7 +103,7 @@ function processItemPreprocessingTestResults(steps) {
 				case <?= ZBX_PREPROC_FAIL_SET_VALUE ?>:
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= CJs::encodeJson([
 						'action_name' => _('Set value to')
-					]) ?>, {failed: step.failed})));
+					]) ?>, {failed: step.result})));
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_SET_ERROR ?>:
@@ -122,6 +112,16 @@ function processItemPreprocessingTestResults(steps) {
 					]) ?>, {failed: step.failed})));
 					break;
 			}
+		}
+
+		if (typeof step.error !== 'undefined') {
+			step.result = jQuery(tmpl_err_icon.evaluate({error: step.error}));
+		}
+		else if (typeof step.result === 'undefined') {
+			step.result = jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text('<?= _('No value') ?>');
+		}
+		else if (step.result === '') {
+			step.result = jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text('<?= _('<empty string>') ?>');
 		}
 
 		jQuery('#preproc-test-step-'+i+'-name > div').remove()

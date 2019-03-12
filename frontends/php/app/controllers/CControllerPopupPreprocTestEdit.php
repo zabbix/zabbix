@@ -125,9 +125,9 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 
 		// Get previous value time.
 		if ($show_prev) {
-			$delay = ($delay_macro && array_key_exists($delay_macro[0], $db_macros))
-				? $db_macros[$delay_macro[0]]
-				: ZBX_ITEM_DELAY_DEFAULT;
+			if ($delay_macro && array_key_exists($delay_macro[0], $db_macros)) {
+				$delay = $db_macros[$delay_macro[0]];
+			}
 
 			$prev_time = (timeUnitToSeconds($delay) > 0)
 				? 'now-'.$delay
