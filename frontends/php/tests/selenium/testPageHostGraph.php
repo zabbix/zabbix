@@ -449,7 +449,7 @@ class testPageHostGraph extends CLegacyWebTest {
 
 		// Select check boxes of defined targets.
 		if (array_key_exists('targets', $data)) {
-			$this->zbxTestClickButtonMultiselect('copy_targetids_');
+			$this->zbxTestClickButtonMultiselect('copy_targetids');
 			$this->zbxTestLaunchOverlayDialog($data['target_type']);
 
 			// Select hosts or templates.

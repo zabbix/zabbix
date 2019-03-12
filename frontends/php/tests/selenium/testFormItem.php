@@ -2738,7 +2738,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickButton('item.masscopyto');
 
 		$this->zbxTestClickXpathWait('//label[@for="copy_type_1"][text()="Hosts"]');
-		$this->zbxTestClickButtonMultiselect('copy_targetids_');
+		$this->zbxTestClickButtonMultiselect('copy_targetids');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickLinkTextWait($this->host);
