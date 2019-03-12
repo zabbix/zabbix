@@ -624,7 +624,7 @@ abstract class CItemGeneral extends CApiService {
 
 			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create');
 
-			$this->validateItemPreprocessing($fullItem, $update ? 'update' : 'create');
+			$this->validateItemPreprocessing($fullItem);
 		}
 		unset($item);
 
@@ -1255,9 +1255,8 @@ abstract class CItemGeneral extends CApiService {
 	 *                                                                  2 - ZBX_PREPROC_FAIL_SET_VALUE;
 	 *                                                                  3 - ZBX_PREPROC_FAIL_SET_ERROR.
 	 * @param string $item['preprocessing'][]['error_handler_params']  Error handler parameters.
-	 * @param string $method                                           A string of "create" or "update" method.
 	 */
-	protected function validateItemPreprocessing(array $item, $method) {
+	protected function validateItemPreprocessing(array $item) {
 		if (array_key_exists('preprocessing', $item)) {
 			if (!is_array($item['preprocessing'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1562,6 +1561,24 @@ abstract class CItemGeneral extends CApiService {
 						}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Method validates preprocessing steps independently from other item properties.
+	 *
+	 * @param array  $preprocessing_steps    An array of item pre-processing step details.
+	 *                                       See self::validateItemPreprocessing for details.
+	 *
+	 * @return bool|string
+	 */
+	public function validateItemPreprocessingSteps(array $preprocessing_steps) {
+		try {
+			$this->validateItemPreprocessing(['preprocessing' => $preprocessing_steps]);
+			return true;
+		}
+		catch (APIException $error) {
+			return $error->getMessage();
 		}
 	}
 

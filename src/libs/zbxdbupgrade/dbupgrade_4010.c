@@ -223,6 +223,13 @@ static int	DBpatch_4010023(void)
 	return DBcreate_index("proxy_dhistory", "proxy_dhistory_2", "druleid", 0);
 }
 
+static int	DBpatch_4010024(void)
+{
+	const ZBX_FIELD	field = {"height", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("widget", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(4010)
@@ -252,5 +259,6 @@ DBPATCH_ADD(4010020, 0, 1)
 DBPATCH_ADD(4010021, 0, 1)
 DBPATCH_ADD(4010022, 0, 1)
 DBPATCH_ADD(4010023, 0, 1)
+DBPATCH_ADD(4010024, 0, 1)
 
 DBPATCH_END()

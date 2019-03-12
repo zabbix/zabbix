@@ -1776,6 +1776,10 @@ output {
 					margin: 3px 0;
 				}
 			}
+
+			&:last-child {
+				padding-right: 0;
+			}
 		}
 
 		.table-forms-separator {
@@ -2110,7 +2114,8 @@ select {
 	}
 
 	&[readonly] {
-		color: $font-color!important;
+		color: $font-color !important;
+		pointer-events: none;
 		@extend %form-disabled;
 	}
 }
@@ -3909,62 +3914,6 @@ $form-icon-btn: (
 		min-width: 650px;
 	}
 
-	&.modal-code-editor {
-		min-width: 960px;
-
-		.code-editor {
-			$line-height: 18px;
-
-			position: relative;
-			display: flex;
-			height: calc(100vh - 190px);
-			max-height: 548px;
-			overflow: hidden;
-
-			.line-numbers {
-				counter-reset: line;
-				overflow: hidden;
-				padding: 5px 5px 5px 0;
-				position: absolute;
-				left: 0;
-				top: 0;
-				bottom: 0;
-
-				li {
-					color: $font-alt-color;
-					font-family: $font-stack-mono;
-					line-height: $line-height;
-					text-align: right;
-
-					&::before {
-						counter-increment: line;
-						content: counter(line);
-						user-select: none;
-					}
-				}
-			}
-
-			.code-editor-textarea {
-				font-family: $font-stack-mono;
-				line-height: $line-height;
-				resize: none;
-				white-space: pre;
-				height: 100%;
-				width: 100%;
-
-				&::-webkit-scrollbar {
-					height: 9px;
-				}
-			}
-		}
-
-		.symbols-remaining {
-			color: $font-alt-color;
-			float: left;
-			line-height: 24px;
-		}
-	}
-
 	.msg-bad,
 	.msg-good {
 		position: -webkit-sticky;
@@ -4014,13 +3963,30 @@ $form-icon-btn: (
 	}
 }
 
-input.open-modal-code-editor {
-	overflow: hidden;
-	cursor: pointer;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	font-family: $font-stack-mono;
-	border-right: none;
+// Multiline input control.
+.multilineinput-control {
+	display: flex;
+	width: 100%;
+
+	input[type=text] {
+		overflow: hidden;
+		cursor: pointer;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		border-right: none;
+		width: 100%;
+
+		&[readonly] {
+			background: $form-bg-color !important;
+			border-color: $form-border-color;
+			color: $form-font-color;
+		}
+
+		&.monospace-font {
+			font-family: $font-stack-mono;
+			padding-top: 1px;
+		}
+	}
 
 	&.editable {
 		background-color: $form-bg-color !important;
@@ -4031,10 +3997,106 @@ input.open-modal-code-editor {
 		color: $input-placeholder-color !important;
 	}
 
-	~ button {
-		white-space: nowrap;
+	button {
+		position: relative;
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
+
+		&:after {
+			background: url(../img/icon-sprite.svg) no-repeat -47px -478px;
+			content: '';
+			position: absolute;
+			left: 3px;
+			top: 4px;
+			height: 14px;
+			width: 15px;
+		}
+
+		&:not([disabled]):not([readonly]) {
+			background-color: $form-bg-color;
+			border-color: $form-border-color;
+
+			&:hover {
+				background-color: $btn-form-hover-color;
+			}
+		}
+	}
+
+	&.multilineinput-readonly {
+
+		input[type=text][readonly] {
+			background-color: $form-disabled-bg-color !important;
+		}
+	}
+
+	&.multilineinput-disabled {
+
+		input[type=text] {
+			cursor: default;
+		}
+
+		button:after {
+			opacity: .5;
+		}
+	}
+}
+
+.multilineinput-modal {
+	$line-height: 18px;
+
+	min-width: 960px;
+
+	.multilineinput-container {
+		position: relative;
+		display: flex;
+		height: calc(100vh - 190px);
+		max-height: 548px;
+		overflow: hidden;
+	}
+
+	.multilineinput-line-numbers {
+		counter-reset: line;
+		overflow: hidden;
+		padding: 5px 5px 5px 0;
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+
+		li {
+			color: $font-alt-color;
+			font-family: $font-stack-mono;
+			line-height: $line-height;
+			text-align: right;
+
+			&::before {
+				counter-increment: line;
+				content: counter(line);
+				user-select: none;
+			}
+		}
+	}
+
+	.multilineinput-textarea {
+		line-height: $line-height;
+		resize: none;
+		white-space: pre;
+		height: 100%;
+		width: 100%;
+
+		&.monospace-font {
+			font-family: $font-stack-mono;
+		}
+
+		&::-webkit-scrollbar {
+			height: 9px;
+		}
+	}
+
+	.multilineinput-symbols-remaining {
+		color: $font-alt-color;
+		float: left;
+		line-height: 24px;
 	}
 }
 
@@ -5983,99 +6045,130 @@ ul.checkbox-list {
 }
 
 .preprocessing-list {
-	display: table;
-	width: 100%;
-	min-width: 730px;
+	$name-width: 240px;
+	$on-fail-width: 100px;
+	$action-width: 120px;
+
+	display: block;
 	max-width: 930px;
-	padding-left: 10px;
+	min-width: 730px;
 
-	.columns-wrapper {
+	> li {
+		display: block;
 		position: relative;
+	}
 
-		[class^=column-] {
-			display: flex;
-			box-sizing: border-box;
-			padding: 5px 5px 5px 0;
+	.drag-icon {
+		position: absolute;
+		left: 0;
+		top: 5px;
+	}
 
-			&:last-child {
-				padding-right: 0;
-			}
+	.list-numbered-item:before {
+		content: counter(line) ":";
+		flex: 0 0 15px;
+		max-width: 15px;
+		line-height: 24px;
+		padding-right: 5px;
+	}
 
-			input[type=text], select {
-				width: 100%;
-				flex: 1;
-			}
+	input[type=text],
+	select {
+		width: 100%;
+	}
+
+	input[type=text],
+	.btn-link {
+
+		&:not(:last-of-type) {
+			margin-right: 10px;
+		}
+	}
+
+	.preprocessing-list-head,
+	.preprocessing-list-foot,
+	.preprocessing-step,
+	.on-fail-options,
+	.step-name,
+	.step-parameters,
+	.step-on-fail,
+	.step-action {
+		display: flex;
+		align-items: center;
+		box-sizing: border-box;
+	}
+
+	.step-name,
+	.step-parameters,
+	.step-on-fail,
+	.step-action,
+	.on-fail-options > label,
+	.on-fail-options > .radio-segmented {
+		padding: 5px 5px 5px 0;
+	}
+
+	.step-name {
+		flex: 0 0 $name-width;
+		max-width: $name-width;
+	}
+
+	.step-parameters {
+		flex: 1;
+	}
+
+	.step-on-fail {
+		flex: 0 0 $on-fail-width;
+		max-width: $on-fail-width;
+		justify-content: center;
+		text-align: center;
+	}
+
+	.step-action {
+		flex: 0 0 $action-width;
+		max-width: $action-width;
+		padding-right: 0;
+	}
+
+	.on-fail-options {
+		padding-right: $on-fail-width + $action-width + 5px;
+		margin-bottom: 5px;
+
+		& > label {
+			padding-left: 30px;
+		}
+
+		input[type=text] {
+			flex: 1;
 		}
 	}
 
 	.preprocessing-list-head {
-		line-height: 24px;
+		color: $font-alt-color;
+		line-height: 14px;
 
-		[class^=column-] {
-			padding: 0 5px 0 0;
-			color: $font-alt-color;
-
-			&:first-child {
-				padding-left: 20px;
-			}
+		.step-name {
+			padding-left: 30px;
 		}
 	}
 
 	.preprocessing-list-item {
 
-		.drag-icon {
-			position: absolute;
-			top: 5px;
-			margin-left: -20px;
-		}
-
-		.preprocessing-step {
-
-			.list-numbered-item {
-
-				&::before {
-					content: counter(line) ":";
-					width: 15px;
-					margin-right: 5px;
-					line-height: 24px;
-				}
-			}
-		}
-
-		.on-fail-options {
-			margin-bottom: 5px;
-
-			> .column-75 {
-
-				> div {
-					padding-right: 5px;
-
-					&:first-child {
-						padding-left: 20px;
-					}
-
-					&:last-child {
-						flex: 1;
-					}
-				}
-			}
+		.step-name {
+			padding-left: 10px;
 		}
 	}
 
 	.preprocessing-list-foot {
-		line-height: 24px;
+		justify-content: space-between;
 
-		> div {
-			margin-left: -10px;
+		.step-action {
+			height: 24px;
 		}
-	}
 
-	> li:nth-last-of-type(2) > .on-fail-options {
-		margin-bottom: 0;
-	}
-
-	.element-table-add, .element-table-remove {
-		line-height: normal;
+		.step-action + .step-action:last-child {
+			margin-left: auto;
+			justify-self: flex-end;
+		}
 	}
 }
 
@@ -6632,6 +6725,27 @@ $range-input-width: 31px;
 // Screen reader
 .inline-sr-only {
 	font-size: 0;
+}
+
+.preproc-test-popup-value-row {
+	display: flex;
+
+	label {
+		padding: 0 10px;
+		margin-left: auto;
+		line-height: 24px;
+	}
+}
+
+table.preprocessing-test-results {
+	td {
+		vertical-align: top !important;
+	}
+
+	.rel-container {
+		top: 4px;
+		margin-left: 3px;
+	}
 }
 
 @if $theme_name == 'dev' {
