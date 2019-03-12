@@ -1565,31 +1565,25 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// Master item should exists for LLD rule with type dependent item.
 		if ($srcDiscovery['type'] == ITEM_TYPE_DEPENDENT) {
-			$master_item = API::Item()->get([
-				'output' => ['key_'],
-				'itemids' => $srcDiscovery['master_itemid']
-			]);
+			$master_key = DBfetch(DBSelect(
+				'SELECT key_ FROM items WHERE itemid='.zbx_dbstr($srcDiscovery['master_itemid'])
+			));
+
+			$master_item = DBfetch(DBselect(
+				'SELECT itemid'.
+				' FROM items'.
+				' WHERE hostid='.zbx_dbstr($dstDiscovery['hostid']).
+					' AND key_='.zbx_dbstr($master_key['key_'])
+			));
 
 			if (!$master_item) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			$dst_master_item = API::Item()->get([
-				'output' => ['itemid'],
-				'hostids' => $dstDiscovery['hostid'],
-				'filter' => ['key_' => $master_item[0]['key_']]
-			]);
-
-			if (!$dst_master_item) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Item "%1$s" has master item and cannot be copied.',
-					$dstDiscovery['key_']
+					_s('Discovery rule "%1$s" is a dependent item and cannot be copied without its master item.',
+						$srcDiscovery['name']
 				));
 			}
 
-			$dstDiscovery['master_itemid'] = $dst_master_item[0]['itemid'];
-			$this->validateDependentItems([$dstDiscovery]);
+			$dstDiscovery['master_itemid'] = $master_item['itemid'];
 		}
 
 		// save new discovery
