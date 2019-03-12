@@ -17,7 +17,7 @@
 						parameters: {
 							dstfrm: '<?= $form->getName() ?>',
 							dstfld1: 'copy_targetids',
-							editable: true,
+							writeonly: 1,
 							multiselect: 1
 						}
 					}
