@@ -7,6 +7,7 @@ A.F....... [ZBX-15286] dropped support use of discovered items as master (Sasha)
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+........S. [ZBX-15716] fixed escalation cancel message is called if escalation interrupts with unfinished step or recovery (akozlovs)
 ..F....... [ZBX-15468] fixed LDAP configuration form not being able to save changes when user password field is empty string (gcalenko)
 ..F....... [ZBX-15669] fixed page scroll after widget being added to dashboard (gcalenko)
 ..F....... [ZBX-15548] fixed resolving of {ITEM.VALUE} macro in the trigger description (Sasha)
