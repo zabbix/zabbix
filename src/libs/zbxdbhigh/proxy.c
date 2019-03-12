@@ -1454,15 +1454,15 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=" ZBX_FS_UI64 ";\n",
 						table->recid, recid);
+
+				if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+					goto clean;
 			}
 			else
 			{
 				sql_offset = tmp_offset;	/* discard this update, all fields are the same */
 				*(sql + sql_offset) = '\0';
 			}
-
-			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-				goto clean;
 		}
 	}
 
