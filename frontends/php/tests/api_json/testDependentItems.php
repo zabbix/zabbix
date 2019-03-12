@@ -315,7 +315,7 @@ class testDependentItems extends CAPITest {
 					'itemid' => 1332	// dependent.items.host.1:dependent.item.proto.1.2.2.2
 				]
 			],
-			// Simple update templated dependent doscivery rule.
+			// Simple update templated dependent discovery rule.
 			[
 				'error' => null,
 				'method' => 'discoveryrule.update',
