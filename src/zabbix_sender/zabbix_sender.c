@@ -1467,7 +1467,7 @@ exit:
 #endif
 	zabbix_close_log();
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && defined(HAVE_PTHREAD_PROCESS_SHARED)
 	zbx_locks_disable();
 #endif
 	if (FAIL == ret)
