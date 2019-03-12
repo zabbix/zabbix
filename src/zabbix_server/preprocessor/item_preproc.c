@@ -1745,25 +1745,21 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 
 int	zbx_item_preproc_handle_error(zbx_variant_t *value, const zbx_preproc_op_t *op, char **error)
 {
-	int	ret = FAIL;
-
 	switch (op->error_handler)
 	{
 		case ZBX_PREPROC_FAIL_DISCARD_VALUE:
 			zbx_variant_clear(value);
 			zbx_free(*error);
-			ret = SUCCEED;
-			break;
+			return SUCCEED;
 		case ZBX_PREPROC_FAIL_SET_VALUE:
 			zbx_variant_clear(value);
 			zbx_variant_set_str(value, zbx_strdup(NULL, op->error_handler_params));
 			zbx_free(*error);
-			ret = SUCCEED;
-			break;
+			return SUCCEED;
 		case ZBX_PREPROC_FAIL_SET_ERROR:
 			*error = zbx_strdup(*error, op->error_handler_params);
-			break;
+			return FAIL;
+		default:
+			return FAIL;
 	}
-
-	return ret;
 }
