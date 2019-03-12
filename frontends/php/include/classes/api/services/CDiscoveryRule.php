@@ -610,8 +610,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * the user doesn't have the necessary permissions.
 	 *
 	 * @param array $data
-	 * @param array $data['discoveryruleids']	An array of item ids to be cloned
-	 * @param array $data['hostids']			An array of host ids were the items should be cloned to
+	 * @param array $data['discoveryids']  An array of item ids to be cloned.
+	 * @param array $data['hostids']       An array of host ids were the items should be cloned to.
 	 *
 	 * @return bool
 	 */
@@ -1565,25 +1565,21 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// Master item should exists for LLD rule with type dependent item.
 		if ($srcDiscovery['type'] == ITEM_TYPE_DEPENDENT) {
-			$master_key = DBfetch(DBSelect(
-				'SELECT key_ FROM items WHERE itemid='.zbx_dbstr($srcDiscovery['master_itemid'])
+			$master_items = DBfetchArray(DBselect(
+				'SELECT i1.itemid'.
+				' FROM items i1,items i2'.
+				' WHERE i1.key_=i2.key_'.
+					' AND i1.hostid='.zbx_dbstr($dstDiscovery['hostid']).
+					' AND i2.itemid='.zbx_dbstr($srcDiscovery['master_itemid'])
 			));
 
-			$master_item = DBfetch(DBselect(
-				'SELECT itemid'.
-				' FROM items'.
-				' WHERE hostid='.zbx_dbstr($dstDiscovery['hostid']).
-					' AND key_='.zbx_dbstr($master_key['key_'])
-			));
-
-			if (!$master_item) {
+			if (!$master_items) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_s('Discovery rule "%1$s" cannot be copied without its master item.',
-						$srcDiscovery['name']
-				));
+					_s('Discovery rule "%1$s" cannot be copied without its master item.', $srcDiscovery['name'])
+				);
 			}
 
-			$dstDiscovery['master_itemid'] = $master_item['itemid'];
+			$dstDiscovery['master_itemid'] = $master_items[0]['itemid'];
 		}
 
 		// save new discovery

@@ -537,9 +537,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 
 					// Master item does not exist on destination host or has not been selected for copying.
 					if (!$item_found) {
-						error(_s('Item "%1$s" cannot be copied without its master item.',
-							$item['name']
-						));
+						error(_s('Item "%1$s" cannot be copied without its master item.', $item['name']));
 
 						return false;
 					}
