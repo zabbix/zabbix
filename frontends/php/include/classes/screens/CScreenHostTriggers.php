@@ -190,7 +190,7 @@ class CScreenHostTriggers extends CScreenBase {
 
 		if (array_key_exists('sortfield', $filter)) {
 			$sort_field = $filter['sortfield'];
-			$sort_order = $filter['sortfield'] !== 'lastchange' ? $filter['sortorder'] : ZBX_SORT_DOWN;
+			$sort_order = ($sort_field !== 'lastchange') ? $filter['sortorder'] : ZBX_SORT_DOWN;
 
 			$header[$sort_field] = [
 				$header[$sort_field],
@@ -290,7 +290,9 @@ class CScreenHostTriggers extends CScreenBase {
 				$host_name,
 				(new CCol([
 					(new CLinkAction($problem['name']))
-						->setHint(make_popup_eventlist($trigger, $problem['eventid'], $back_url))
+						->setHint(make_popup_eventlist(['comments' => $problem['comments']] + $trigger,
+							$problem['eventid'], $back_url
+						))
 				]))->addClass(getSeverityStyle($problem['severity'])),
 				$clock,
 				zbx_date2age($problem['clock']),
