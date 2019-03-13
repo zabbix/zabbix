@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,7 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	DWORD	dwSize = 256;
 	wchar_t	computerName[256];
 	char	*type, buffer[256];
-	int	netbios, rc;
-	WSADATA sockInfo;
+	int	netbios;
 
 	if (1 < request->nparam)
 	{
@@ -67,14 +66,7 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		if (0 != (rc = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "WSAStartup() failed: %s", strerror_from_system(rc));
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize Winsock DLL: %s",
-					strerror_from_system(rc)));
-			return SYSINFO_RET_FAIL;
-		}
-		else if (SUCCEED != gethostname(buffer, sizeof(buffer)))
+		if (SUCCEED != gethostname(buffer, sizeof(buffer)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "gethostname() failed: %s", strerror_from_system(WSAGetLastError()));
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain host name: %s",

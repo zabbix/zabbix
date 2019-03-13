@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ class testFormLogin extends CLegacyWebTest {
 	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds() {
 		$this->zbxTestOpen('index.php');
 
-		for ($i = 1; $i <= 5; $i++) {
+		for ($i = 1; $i < 5; $i++) {
 			$this->zbxTestInputTypeWait('name', 'user-for-blocking');
 			$this->zbxTestInputTypeWait('password', '!@$#%$&^*(\"\'\\*;:');
 			$this->zbxTestClickWait('enter');

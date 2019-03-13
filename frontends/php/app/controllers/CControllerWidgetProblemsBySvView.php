@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,8 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 			'show_suppressed' => $fields['show_suppressed'],
 			'hide_empty_groups' => $fields['hide_empty_groups'],
 			'ext_ack' => $fields['ext_ack'],
-			'show_timeline' => $fields['show_timeline']
+			'show_timeline' => $fields['show_timeline'],
+			'show_latest_values' => $fields['show_latest_values']
 		];
 
 		$this->setResponse(new CControllerResponseData([

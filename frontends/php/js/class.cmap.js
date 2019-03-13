@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -258,7 +258,7 @@ ZABBIX.apps.map = (function($) {
 			expand_sources: [],
 
 			save: function() {
-				var url = new Curl(location.href);
+				var url = new Curl();
 
 				$.ajax({
 					url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
@@ -293,7 +293,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			expandMacros: function(source) {
-				var url = new Curl(location.href);
+				var url = new Curl();
 
 				if (source !== null) {
 					if (/\{.+\}/.test(source.getLabel(false))) {

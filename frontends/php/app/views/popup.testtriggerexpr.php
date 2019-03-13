@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,7 +83,13 @@ if ($allowed_testing && $test) {
 	}
 }
 
-$result_table->setFooter([$data['outline'], (new CCol($result))->addClass($style)]);
+$result_table->setFooter([
+	(new CCol($data['outline']))
+		->setAttribute('title', $data['outline'])
+		->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+		->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+	(new CCol($result))->addClass($style)
+]);
 
 $form_list->addRow(_('Result'),
 	(new CDiv($result_table))

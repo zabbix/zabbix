@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,6 +79,9 @@
 #	endif
 #	ifndef T_TXT
 #		define T_TXT	16
+#	endif
+#	ifndef T_AAAA
+#		define T_AAAA	28
 #	endif
 #	ifndef T_SRV
 #		define T_SRV	33

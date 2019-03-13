@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 
 #include "daemon.h"
 #include "../../libs/zbxcrypto/tls.h"
+#include "../../libs/zbxserver/zabbix_stats.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -911,9 +912,101 @@ out:
 #undef ZBX_GET_STATUS_FULL
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: send_internal_stats_json                                         *
+ *                                                                            *
+ * Purpose: process Zabbix stats request                                      *
+ *                                                                            *
+ * Parameters: sock  - [IN] the request socket                                *
+ *             jp    - [IN] the request data                                  *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+{
+	const char	*__function_name = "send_internal_stats_json";
+	struct zbx_json	json;
+	char		type[MAX_STRING_LEN], error[MAX_STRING_LEN];
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL == CONFIG_STATS_ALLOWED_IP ||
+			SUCCEED != zbx_tcp_check_allowed_peers(sock, CONFIG_STATS_ALLOWED_IP))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming stats request: %s",
+				NULL == CONFIG_STATS_ALLOWED_IP ? "StatsAllowedIP not set" : zbx_socket_strerror());
+		strscpy(error, "Permission denied.");
+		goto out;
+	}
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)) &&
+			0 == strcmp(type, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
+	{
+		char			from_str[ZBX_MAX_UINT64_LEN + 1], to_str[ZBX_MAX_UINT64_LEN + 1];
+		int			from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
+		struct zbx_json_parse	jp_data;
+
+		if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_PARAMS, &jp_data))
+		{
+			zbx_snprintf(error, sizeof(error), "cannot find tag: %s", ZBX_PROTO_TAG_PARAMS);
+			goto param_error;
+		}
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_FROM, from_str, sizeof(from_str))
+				&& FAIL == is_time_suffix(from_str, &from, ZBX_LENGTH_UNLIMITED))
+		{
+			strscpy(error, "invalid 'from' parameter");
+			goto param_error;
+		}
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_TO, to_str, sizeof(to_str)) &&
+				FAIL == is_time_suffix(to_str, &to, ZBX_LENGTH_UNLIMITED))
+		{
+			strscpy(error, "invalid 'to' parameter");
+			goto param_error;
+		}
+
+		if (ZBX_QUEUE_TO_INFINITY != to && from > to)
+		{
+			strscpy(error, "parameters represent an invalid interval");
+			goto param_error;
+		}
+
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+		zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE, DCget_item_queue(NULL, from, to));
+	}
+	else
+	{
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+		zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
+
+		zbx_get_zabbix_stats(&json);
+
+		zbx_json_close(&json);
+	}
+
+	(void)zbx_tcp_send(sock, json.buffer);
+	ret = SUCCEED;
+param_error:
+	zbx_json_free(&json);
+out:
+	if (SUCCEED != ret)
+		zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
 static void	active_passive_misconfig(zbx_socket_t *sock)
 {
-	char   *msg = NULL;
+	char	*msg = NULL;
 
 	msg = zbx_dsprintf(msg, "misconfiguration error: the proxy is running in the active mode but server at \"%s\""
 			" sends requests to it as to proxy in passive mode", sock->peer);
@@ -1040,6 +1133,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					ret = recv_getstatus(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
+			{
+				ret = send_internal_stats_json(sock, &jp);
 			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);

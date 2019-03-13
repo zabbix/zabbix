@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2018 Zabbix SIA
+ ** Copyright (C) 2001-2019 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ jQuery(function ($) {
 
 		if (data) {
 			if (!data.isHintBoxFrozen) {
-				$('.dashbrd-grid-widget-container')
+				$('.dashbrd-grid-container')
 					.dashboardGrid('unpauseWidgetRefresh', graph.data('widget')['uniqueid']);
 			}
 
@@ -67,7 +67,7 @@ jQuery(function ($) {
 	 */
 	function dropDocumentListeners(e, graph) {
 		var widgets_boxing = 0; // Number of widgets with active SBox.
-		$('.dashbrd-grid-widget-container').data('dashboardGrid')['widgets'].forEach(function(w) {
+		$('.dashbrd-grid-container').data('dashboardGrid')['widgets'].forEach(function(w) {
 			if (w !== graph.data('widget') && w['type'] === 'svggraph') {
 				var svg_graph = $('svg', w['content_body']);
 				if (svg_graph.length && svg_graph.data('options')['boxing']) {
@@ -118,10 +118,10 @@ jQuery(function ($) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
 			data.isHintBoxFrozen = true;
-			$('.dashbrd-grid-widget-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
+			$('.dashbrd-grid-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
 
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
-				$('.dashbrd-grid-widget-container')
+				$('.dashbrd-grid-container')
 					.dashboardGrid('unpauseWidgetRefresh', graph.data('widget')['uniqueid']);
 				data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
 				graph.off('mouseup', hintboxSilentMode);
@@ -185,7 +185,7 @@ jQuery(function ($) {
 
 		// If mouse movement detected (SBox has dragged), destroy opened hintbox and pause widget refresh.
 		if (data.start != data.end && !data.boxing) {
-			$('.dashbrd-grid-widget-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
+			$('.dashbrd-grid-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
 			data.isHintBoxFrozen = false;
 			data.boxing = true;
 			destroyHintbox(graph);
@@ -279,11 +279,25 @@ jQuery(function ($) {
 					var direction_string = '',
 						label = [],
 						data_set = nodes[i].getAttribute('data-set'),
-						paths = nodes[i].querySelectorAll('.svg-graph-line');
+						data_nodes = nodes[i].childNodes,
+						elmnt_label,
+						cx,
+						cy;
 
-					for (var index = 0, len = paths.length; index < len; index++) {
-						direction_string += ' ' + paths[index].getAttribute('d');
-						label.push(paths[index].getAttribute('label'));
+					for (var index = 0, len = data_nodes.length; index < len; index++) {
+						elmnt_label = data_nodes[index].getAttribute('label');
+						if (elmnt_label) {
+							label.push(elmnt_label);
+
+							if (data_nodes[index].tagName.toLowerCase() === 'circle') {
+								cx = data_nodes[index].getAttribute('cx');
+								cy = data_nodes[index].getAttribute('cy');
+								direction_string += ' _' + cx + ',' + cy;
+							}
+							else {
+								direction_string += ' ' + data_nodes[index].getAttribute('d');
+							}
+						}
 					}
 
 					label = label.join(',').split(',');
@@ -349,12 +363,13 @@ jQuery(function ($) {
 	 * this function. Tolerance is used to find exacly matched point only.
 	 */
 	function getDataPointTolerance(ds) {
-		if (ds.getAttribute('data-set') === 'points') {
-			// Take radius of first real data set point (the 0th is .svg-point-highlight).
+		var data_tag = ds.querySelector(':not(.svg-point-highlight)');
+
+		if (data_tag.tagName.toLowerCase() === 'circle') {
 			return +ds.childNodes[1].getAttribute('r');
 		}
 		else {
-			return +window.getComputedStyle(ds.querySelectorAll('path')[0])['strokeWidth'];
+			return +window.getComputedStyle(data_tag)['strokeWidth'];
 		}
 	}
 
@@ -487,8 +502,16 @@ jQuery(function ($) {
 				});
 
 				if (show_hint) {
+					// Calculate time at mouse position.
+					var time = parseInt(data.timeFrom + ((offsetX - data.dimX) * data.spp));
+
 					html = $('<div></div>')
 							.addClass('svg-graph-hintbox')
+							.append(
+								$('<div></div>')
+									.addClass('header')
+									.html(time2str(time))
+							)
 							.append(html)
 							.append(points_total > data.hintMaxRows
 								? makeHintBoxFooter(data.hintMaxRows, points_total)
@@ -560,6 +583,7 @@ jQuery(function ($) {
 						hintMaxRows: options.hint_max_rows,
 						isHintBoxFrozen: false,
 						spp: options.spp || null,
+						timeFrom: options.time_from,
 						minPeriod: options.min_period,
 						boxing: false
 					};

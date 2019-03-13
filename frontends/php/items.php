@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -571,6 +571,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
 				case ZBX_PREPROC_MULTIPLIER:
+					$step['params'] = trim($step['params'][0]);
+					break;
+
 				case ZBX_PREPROC_RTRIM:
 				case ZBX_PREPROC_LTRIM:
 				case ZBX_PREPROC_TRIM:
@@ -1105,6 +1108,9 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					foreach ($preprocessing as &$step) {
 						switch ($step['type']) {
 							case ZBX_PREPROC_MULTIPLIER:
+								$step['params'] = trim($step['params'][0]);
+								break;
+
 							case ZBX_PREPROC_RTRIM:
 							case ZBX_PREPROC_LTRIM:
 							case ZBX_PREPROC_TRIM:
@@ -1346,11 +1352,17 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		}
 
 		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT) {
-			$master_item_options = [
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'itemids' => getRequest('master_itemid', $item['master_itemid']),
-				'webitems' => true
-			];
+			// Unset master item if submitted form has no master_itemid set.
+			if (hasRequest('form_refresh') && !hasRequest('master_itemid')) {
+				$item['master_itemid'] = 0;
+			}
+			else {
+				$master_item_options = [
+					'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+					'itemids' => getRequest('master_itemid', $item['master_itemid']),
+					'webitems' => true
+				];
+			}
 		}
 	}
 	else {
@@ -1625,7 +1637,7 @@ else {
 		],
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'selectTriggers' => ['triggerid', 'description'],
+		'selectTriggers' => ['triggerid'],
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
@@ -1939,9 +1951,10 @@ else {
 	}
 	$data['itemTriggers'] = API::Trigger()->get([
 		'triggerids' => $itemTriggerIds,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'priority',
+			'status', 'state', 'error', 'templateid', 'flags'
+		],
 		'selectHosts' => ['hostid', 'name', 'host'],
-		'selectFunctions' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	]);
 

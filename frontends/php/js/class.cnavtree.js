@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -816,7 +816,7 @@ jQuery(function($) {
 							step_in_path = $(this).closest('.tree-item'),
 							widget = getWidgetData($obj);
 
-						if ($('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
+						if ($('.dashbrd-grid-container').dashboardGrid('widgetDataShare', widget,
 								'selected_mapid', data_to_share)
 						) {
 							$('.selected', $obj).removeClass('selected');
@@ -1129,7 +1129,7 @@ jQuery(function($) {
 
 			var getWidgetData = function($obj) {
 				var widget_data = $obj.data('widgetData'),
-					response = $(".dashbrd-grid-widget-container")
+					response = $(".dashbrd-grid-container")
 						.dashboardGrid('getWidgetsBy', 'uniqueid', widget_data['uniqueid']);
 
 				if (response.length) {
@@ -1146,7 +1146,7 @@ jQuery(function($) {
 			 * @returns {boolean}
 			 */
 			var isEditMode = function() {
-				return $(".dashbrd-grid-widget-container").dashboardGrid('isEditMode');
+				return $(".dashbrd-grid-container").dashboardGrid('isEditMode');
 			};
 
 			/*
@@ -1355,7 +1355,7 @@ jQuery(function($) {
 				 * If 'send_data' is set to be 'false', use an unexisting 'data_name', just to check if widget has
 				 * linked widgets, but avoid real data sharing.
 				 */
-				if (item_id && $('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget,
+				if (item_id && $('.dashbrd-grid-container').dashboardGrid('widgetDataShare', widget,
 						send_data ? 'selected_mapid' : '', {mapid: $(selected_item).data('mapid')})) {
 					$('.selected', $obj).removeClass('selected');
 
@@ -1434,7 +1434,7 @@ jQuery(function($) {
 							triggers = ['onEditStart', 'beforeDashboardSave','beforeConfigLoad', 'onDashboardReady'];
 
 						$.each(triggers, function(index, trigger) {
-							$(".dashbrd-grid-widget-container").dashboardGrid("addAction", trigger,
+							$(".dashbrd-grid-container").dashboardGrid("addAction", trigger,
 								'zbx_widget_navtree_trigger', options.uniqueid, {
 									'parameters': [trigger],
 									'grid': {'widget': 1},
@@ -1448,7 +1448,7 @@ jQuery(function($) {
 							switchToEditMode($this);
 						}
 						else {
-							$('.dashbrd-grid-widget-container').dashboardGrid('registerDataExchange', {
+							$('.dashbrd-grid-container').dashboardGrid('registerDataExchange', {
 								uniqueid: widget_data['uniqueid'],
 								data_name: 'current_sysmapid',
 								callback: function(widget, data) {

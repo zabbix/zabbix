@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,6 +81,7 @@ class CRouter {
 		'mediatype.enable'				=> ['CControllerMediatypeEnable',			null,					null],
 		'mediatype.list'				=> ['CControllerMediatypeList',				'layout.htmlpage',		'administration.mediatype.list'],
 		'mediatype.update'				=> ['CControllerMediatypeUpdate',			null,					null],
+		'menu.popup'					=> ['CControllerMenuPopup',					'layout.json',			null],
 		'problem.view'					=> ['CControllerProblemView',				'layout.htmlpage',		'monitoring.problem.view'],
 		'problem.view.csv'				=> ['CControllerProblemView',				'layout.csv',			'monitoring.problem.view'],
 		'profile.update'				=> ['CControllerProfileUpdate',				'layout.json',			null],

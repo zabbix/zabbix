@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,9 @@ function updateMessageSettings($messages) {
 		$messages['enabled'] = 0;
 	}
 	if (isset($messages['triggers.severities'])) {
-		$messages['triggers.severities'] = serialize($messages['triggers.severities']);
+		$messages['triggers.severities'] = serialize(array_filter($messages['triggers.severities'], function($v) {
+			return $v == 1;
+		}));
 	}
 
 	$dbProfiles = DBselect(

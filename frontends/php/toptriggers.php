@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -172,15 +172,12 @@ while ($row = DBfetch($result)) {
 }
 
 $data['triggers'] = API::Trigger()->get([
-	'output' => ['triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'],
-	'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+	'output' => ['triggerid', 'description', 'expression', 'priority', 'lastchange'],
 	'selectHosts' => ['hostid', 'status', 'name'],
 	'triggerids' => array_keys($triggersEventCount),
 	'expandDescription' => true,
 	'preservekeys' => true
 ]);
-
-$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
 
 $trigger_hostids = [];
 
@@ -198,13 +195,9 @@ CArrayHelper::sort($data['triggers'], [
 
 $data['hosts'] = API::Host()->get([
 	'output' => ['hostid', 'status'],
-	'selectGraphs' => API_OUTPUT_COUNT,
-	'selectScreens' => API_OUTPUT_COUNT,
 	'hostids' => $trigger_hostids,
 	'preservekeys' => true
 ]);
-
-$data['scripts'] = API::Script()->getScriptsByHosts($trigger_hostids);
 
 // render view
 $historyView = new CView('reports.toptriggers', $data);

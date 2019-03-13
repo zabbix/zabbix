@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -279,7 +279,9 @@ else {
 
 		$links = [];
 		foreach ($media_types as $id => $description) {
-			$links[] = new CLink($description, 'zabbix.php?action=mediatype.edit&mediatypeid='.$id);
+			$links[] = (CWebUser::getType() < USER_TYPE_SUPER_ADMIN)
+				? $description
+				: new CLink($description, 'zabbix.php?action=mediatype.edit&mediatypeid='.$id);
 			$links[] = SPACE.'/'.SPACE;
 		}
 		array_pop($links);

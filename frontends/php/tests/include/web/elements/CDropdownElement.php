@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,9 +61,26 @@ class CDropdownElement extends CElement {
 	public function select($text) {
 		$option = $this->query('xpath:.//option[text()='.CXPathHelper::escapeQuotes($text).']')->one();
 		if (!$option->isSelected()) {
-			$option->click();
+			if ($option->isClickable()) {
+				$option->click();
+			}
+			else {
+				throw new Exception('Cannot select disabled dropdown element.');
+			}
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Alias for select.
+	 * @see self::select
+	 *
+	 * @param string $text    option text to be selected
+	 *
+	 * @return $this
+	 */
+	public function fill($text) {
+		return $this->select($text);
 	}
 }

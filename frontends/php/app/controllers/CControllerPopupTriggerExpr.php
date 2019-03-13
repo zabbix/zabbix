@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'shift' => [
 				'C' => _('Time shift'),
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => false
 			]
 		];
 
@@ -76,19 +77,22 @@ class CControllerPopupTriggerExpr extends CController {
 		$this->param1Str = [
 			'pattern' => [
 				'C' => 'T',
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			]
 		];
 
 		$this->param2SecCount = [
 			'pattern' => [
 				'C' => 'V',
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			],
 			'last' => [
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
-				'M' => $this->metrics
+				'M' => $this->metrics,
+				'A' => false
 			]
 		];
 
@@ -101,15 +105,18 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'v' => [
 				'C' => 'V',
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			],
 			'o' => [
 				'C' => 'O',
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			],
 			'shift' => [
 				'C' => _('Time shift'),
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => false
 			]
 		];
 
@@ -122,7 +129,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'shift' => [
 				'C' => _('Time shift'),
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => false
 			],
 			'p' => [
 				'C' => _('Percentage').' (P)',
@@ -145,7 +153,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'shift' => [
 				'C' => _('Time shift'),
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => false
 			]
 		];
 
@@ -158,7 +167,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'shift' => [
 				'C' => _('Time shift'),
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => false
 			],
 			'time' => [
 				'C' => _('Time').' (t)',
@@ -167,11 +177,13 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'fit' => [
 				'C' => _('Fit'),
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			],
 			'mode' => [
 				'C' => _('Mode'),
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			]
 		];
 
@@ -184,7 +196,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'shift' => [
 				'C' => _('Time shift'),
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => false
 			],
 			't' => [
 				'C' => _('Threshold'),
@@ -193,7 +206,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'fit' => [
 				'C' => _('Fit'),
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			]
 		];
 
@@ -321,7 +335,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'fuzzytime' => [
-				'description' => _('fuzzytime() - Difference between item timestamp value and Zabbix server timestamp is over T seconds (1 - true, 0 - false)'),
+				'description' => _('fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)'),
 				'params' => $this->param1Sec,
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>']

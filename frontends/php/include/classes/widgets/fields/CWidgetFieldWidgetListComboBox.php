@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField {
 	 */
 	public function getJavascript() {
 		return
-			'var dashboard = jQuery(".dashbrd-grid-widget-container"),'.
+			'var dashboard = jQuery(".dashbrd-grid-container"),'.
 				'dashboard_data = dashboard.data("dashboardGrid"),'.
 				'filters_box = jQuery("#'.$this->getName().'");'.
 			'jQuery("<option />").text("'._('Select widget').'").val("").appendTo(filters_box);'.

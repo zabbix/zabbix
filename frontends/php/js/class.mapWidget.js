@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 				jQuery('#' + div_id).zbx_mapwidget('update', grid['widget']);
 				break;
 			case 'afterUpdateWidgetConfig':
-				jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue',
+				jQuery('.dashbrd-grid-container').dashboardGrid('setWidgetStorageValue',
 					grid['widget']['uniqueid'], 'current_sysmapid', grid['widget']['fields']['sysmapid']);
 				break;
 			case 'onDashboardReady':
@@ -43,7 +43,7 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 				}
 				break;
 			case 'onEditStart':
-				jQuery(".dashbrd-grid-widget-container").dashboardGrid('refreshWidget', grid['widget']['widgetid']);
+				jQuery(".dashbrd-grid-container").dashboardGrid('refreshWidget', grid['widget']['widgetid']);
 				break;
 		}
 	}
@@ -60,7 +60,7 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 	 *									  level or back to the top level.
 	 */
 	function navigateToSubmap(submapid, uniqueid, reset_previous) {
-		var widget = jQuery('.dashbrd-grid-widget-container').dashboardGrid('getWidgetsBy', 'uniqueid', uniqueid),
+		var widget = jQuery('.dashbrd-grid-container').dashboardGrid('getWidgetsBy', 'uniqueid', uniqueid),
 			reset_previous = reset_previous || false,
 			previous_maps = '';
 
@@ -85,12 +85,12 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 				}
 			}
 
-			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue', uniqueid,
+			jQuery('.dashbrd-grid-container').dashboardGrid('setWidgetStorageValue', uniqueid,
 				'current_sysmapid', submapid);
-			jQuery('.dashbrd-grid-widget-container').dashboardGrid('setWidgetStorageValue', uniqueid, 'previous_maps',
+			jQuery('.dashbrd-grid-container').dashboardGrid('setWidgetStorageValue', uniqueid, 'previous_maps',
 				previous_maps);
-			jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget', uniqueid);
-			jQuery('.dashbrd-grid-widget-container').dashboardGrid('widgetDataShare', widget[0], 'current_sysmapid',
+			jQuery('.dashbrd-grid-container').dashboardGrid('refreshWidget', uniqueid);
+			jQuery('.dashbrd-grid-container').dashboardGrid('widgetDataShare', widget[0], 'current_sysmapid',
 				{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0});
 			jQuery('.action-menu').menuPopup('close', null);
 		}
@@ -130,7 +130,7 @@ jQuery(function($) {
 									widget_data['map_instance'].update(data);
 								}
 								else {
-									jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget',
+									jQuery('.dashbrd-grid-container').dashboardGrid('refreshWidget',
 										widget_data['uniqueid']);
 								}
 							});

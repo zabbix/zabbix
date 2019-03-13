@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -215,12 +215,10 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->zbxTestCheckHeader('Global view');
 				$row = DBfetch(DBselect("select refresh from users where alias='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals($data['refresh'] , $row['refresh']);
-				$this->zbxTestCheckFatalErrors();
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Cannot update user');
 				$this->zbxTestTextPresent($data['error_msg']);
-				$this->zbxTestCheckFatalErrors();
 				$this->zbxTestCheckTitle('User profile');
 				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 				break;
@@ -323,14 +321,12 @@ class testFormUserProfile extends CLegacyWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckHeader('Global view');
-				$this->zbxTestCheckFatalErrors();
 				$row = DBfetch(DBselect("select autologout from users where alias='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals($data['autologout'] , $row['autologout']);
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Cannot update user');
 				$this->zbxTestTextPresent($data['error_msg']);
-				$this->zbxTestCheckFatalErrors();
 				$this->zbxTestCheckTitle('User profile');
 				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 				break;
@@ -367,37 +363,37 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '0',
-				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '1s',
-				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '29',
-				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '25h',
-				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '2d',
-				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '86401',
-				'error_msg' => 'Incorrect value for field "timeout": must be between "30" and "86400".'
+				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
@@ -474,12 +470,10 @@ class testFormUserProfile extends CLegacyWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckHeader('Global view');
-				$this->zbxTestCheckFatalErrors();
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Cannot update user');
 				$this->zbxTestTextPresent($data['error_msg']);
-				$this->zbxTestCheckFatalErrors();
 				break;
 		}
 	}
@@ -575,14 +569,12 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_bg']"));
 				$this->zbxTestClickWait('update');
 				$this->zbxTestCheckHeader('Global view');
-				$this->zbxTestCheckFatalErrors();
 				$sql = "SELECT * FROM media WHERE sendto = '".$data['send_to']."'";
 				$this->assertEquals(1, CDBHelper::getCount($sql));
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='overlay-dialogue-body']//div[@class='msg-details']"));
 				$this->zbxTestTextPresent($data['error_msg']);
-				$this->zbxTestCheckFatalErrors();
 				break;
 		}
 	}

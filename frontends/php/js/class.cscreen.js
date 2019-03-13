@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ Cscreen.prototype = {
 		var x2 = dropDiv.data('xcoord');
 		var y2 = dropDiv.data('ycoord');
 
-		var url = new Curl(location.href);
+		var url = new Curl();
 		var params = {
 			ajaxAction: 'sw_pos',
 			output: 'ajax',

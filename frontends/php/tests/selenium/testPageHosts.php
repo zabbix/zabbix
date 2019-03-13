@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class testPageHosts extends CLegacyWebTest {
 				' LEFT JOIN hstgrp g'.
 					' ON g.groupid=hg.groupid'.
 			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-			" AND h.name NOT LIKE '%{#%'"
+			" AND NOT h.flags = 2"
 		);
 	}
 
@@ -149,7 +149,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Hosts disabled');
 
 		$sql = "select * from hosts where status=".HOST_STATUS_MONITORED.
-			" and name NOT LIKE '%{#%'";
+			" and NOT flags = 2";
 		$this->assertEquals(0, CDBHelper::getCount($sql), "Chuck Norris: all hosts disabled but DB does not match");
 	}
 
@@ -214,7 +214,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Hosts enabled');
 
 		$sql = "select host from hosts where status=".HOST_STATUS_NOT_MONITORED.
-			" and name NOT LIKE '%{#%'";
+			" and NOT flags = 2";
 		$this->assertEquals(0, CDBHelper::getCount($sql), "Chuck Norris: all hosts activated but DB does not match");
 	}
 

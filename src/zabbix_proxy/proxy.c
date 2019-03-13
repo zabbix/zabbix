@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -270,6 +270,8 @@ char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
+char	*CONFIG_STATS_ALLOWED_IP	= NULL;
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
@@ -530,6 +532,13 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
 		err = 1;
 	}
+
+	if (NULL != CONFIG_STATS_ALLOWED_IP && FAIL == zbx_validate_peer_list(CONFIG_STATS_ALLOWED_IP, &ch_error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"StatsAllowedIP\" configuration parameter: %s", ch_error);
+		zbx_free(ch_error);
+		err = 1;
+	}
 #if !defined(HAVE_IPV6)
 	err |= (FAIL == check_cfg_feature_str("Fping6Location", CONFIG_FPING6_LOCATION, "IPv6 support"));
 #endif
@@ -742,6 +751,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1},
 		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,
 			PARM_OPT,	0,			1},
+		{"StatsAllowedIP",		&CONFIG_STATS_ALLOWED_IP,		TYPE_STRING_LIST,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 

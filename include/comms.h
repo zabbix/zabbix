@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -200,6 +200,10 @@ int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
 					sizeof(struct sockaddr_in) :		\
 					sizeof(struct sockaddr_in6),		\
 					host, hostlen, serv, servlen, flags)
+#endif
+
+#ifdef _WINDOWS
+int	zbx_socket_start(char **error);
 #endif
 
 #endif

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,6 +122,8 @@ class CLdap {
 
 	public function checkPass($user, $pass) {
 		if (!$pass) {
+			$this->error = static::ERR_USER_NOT_FOUND;
+
 			return false;
 		}
 
@@ -163,7 +165,7 @@ class CLdap {
 		if ($dn) {
 			// user/password bind
 			if (!@ldap_bind($this->ds, $dn, $pass)) {
-				$this->error = static::ERR_BIND_FAILED;
+				$this->error = static::ERR_USER_NOT_FOUND;
 
 				return false;
 			}
@@ -185,7 +187,7 @@ class CLdap {
 
 			// try to bind with the dn provided
 			if (!@ldap_bind($this->ds, $dn, $pass)) {
-				$this->error = static::ERR_BIND_FAILED;
+				$this->error = static::ERR_USER_NOT_FOUND;
 
 				return false;
 			}

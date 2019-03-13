@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -3117,7 +3117,7 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
 				strftime(value, max_len, "%Y.%m.%d %H:%M:%S", local_time);
 				break;
 			}
-			/* break; is not missing here */
+			ZBX_FALLTHROUGH;
 		case ITEM_VALUE_TYPE_FLOAT:
 			if (0 == strcmp(units, "s"))
 				add_value_suffix_s(value, max_len);
@@ -3216,7 +3216,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
 			del_zeros(value);
-			/* break; is not missing here */
+			ZBX_FALLTHROUGH;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (SUCCEED != replace_value_by_map(value, max_len, valuemapid))
 				add_value_suffix(value, max_len, units, value_type);

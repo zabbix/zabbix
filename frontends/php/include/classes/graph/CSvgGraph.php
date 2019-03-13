@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2017 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,14 @@
 class CSvgGraph extends CSvg {
 
 	const SVG_GRAPH_X_AXIS_HEIGHT = 20;
+	const SVG_GRAPH_DEFAULT_COLOR = '#b0af07';
+	const SVG_GRAPH_DEFAULT_TRANSPARENCY = 5;
+	const SVG_GRAPH_DEFAULT_POINTSIZE = 1;
+	const SVG_GRAPH_DEFAULT_LINE_WIDTH = 1;
+
+	const SVG_GRAPH_X_AXIS_LABEL_MARGIN = 5;
+	const SVG_GRAPH_Y_AXIS_LEFT_LABEL_MARGIN = 5;
+	const SVG_GRAPH_Y_AXIS_RIGHT_LABEL_MARGIN = 12;
 
 	protected $canvas_height;
 	protected $canvas_width;
@@ -89,11 +97,13 @@ class CSvgGraph extends CSvg {
 	protected $left_y_min = null;
 	protected $left_y_max = null;
 	protected $left_y_units = null;
+	protected $left_y_empty = true;
 
 	protected $right_y_show = false;
 	protected $right_y_min = null;
 	protected $right_y_max = null;
 	protected $right_y_units = null;
+	protected $right_y_empty = true;
 
 	protected $right_y_zero = null;
 	protected $left_y_zero = null;
@@ -149,6 +159,7 @@ class CSvgGraph extends CSvg {
 		$this->grid_color = '#' . $theme['gridcolor'];
 
 		$this
+			->addClass(ZBX_STYLE_SVG_GRAPH)
 			->setTimePeriod($options['time_period']['time_from'], $options['time_period']['time_to'])
 			->setXAxis($options['x_axis'])
 			->setYAxisLeft($options['left_y_axis'])
@@ -212,11 +223,18 @@ class CSvgGraph extends CSvg {
 	 * @return CSvgGraph
 	 */
 	public function addMetrics(array $metrics = []) {
+		$metrics_for_each_axes = [
+			GRAPH_YAXIS_SIDE_LEFT => 0,
+			GRAPH_YAXIS_SIDE_RIGHT => 0
+		];
+
 		foreach ($metrics as $i => $metric) {
 			$min_value = null;
 			$max_value = null;
 
 			if ($metric['points']) {
+				$metrics_for_each_axes[$metric['options']['axisy']]++;
+
 				foreach ($metric['points'] as $point) {
 					if ($min_value === null || $min_value > $point['value']) {
 						$min_value = $point['value'];
@@ -254,6 +272,9 @@ class CSvgGraph extends CSvg {
 				'options' => ['order' => $i] + $metric['options']
 			];
 		}
+
+		$this->left_y_empty = ($metrics_for_each_axes[GRAPH_YAXIS_SIDE_LEFT] == 0);
+		$this->right_y_empty = ($metrics_for_each_axes[GRAPH_YAXIS_SIDE_RIGHT] == 0);
 
 		return $this;
 	}
@@ -294,7 +315,8 @@ class CSvgGraph extends CSvg {
 			$this->left_y_max = $options['max'];
 		}
 		if ($options['units'] !== null) {
-			$this->left_y_units = $options['units'];
+			$units = trim(preg_replace('/\s+/', ' ', $options['units']));
+			$this->left_y_units = htmlspecialchars($units);
 		}
 
 		return $this;
@@ -321,7 +343,8 @@ class CSvgGraph extends CSvg {
 			$this->right_y_max = $options['max'];
 		}
 		if ($options['units'] !== null) {
-			$this->right_y_units = $options['units'];
+			$units = trim(preg_replace('/\s+/', ' ', $options['units']));
+			$this->right_y_units = htmlspecialchars($units);
 		}
 
 		return $this;
@@ -346,51 +369,27 @@ class CSvgGraph extends CSvg {
 	 * @return array
 	 */
 	public function getTimeGridWithPosition() {
-		$intervals = [
-			1 => ['H:i:s', 'H:i:s'],					// 1 second
-			5 => ['H:i:s', 'H:i:s'],					// 5 seconds
-			10 => ['H:i:s', 'H:i:s'],					// 10 seconds
-			30 => ['H:i:s', 'H:i:s'],					// 30 seconds
-			SEC_PER_MIN => ['H:i:s', 'H:i:s'],			// 1 minute
-			SEC_PER_MIN * 2 => ['H:i','H:i'],			// 2 minutes
-			SEC_PER_MIN * 5 => ['H:i', 'H:i'],			// 5 minutes
-			SEC_PER_MIN * 15 => ['H:i', 'H:i'],			// 15 minutes
-			SEC_PER_MIN * 30 => ['H:i', 'H:i'],			// 30 minutes
-			SEC_PER_HOUR => ['H:i', 'H:i'],				// 1 hours
-			SEC_PER_HOUR * 3 => ['H:i', 'n-d H:i'],		// 3 hours
-			SEC_PER_HOUR * 6 => ['H:i', 'n-d H:i'],		// 6 hours
-			SEC_PER_HOUR * 12 => ['H:i', 'n-d H:i'],	// 12 hours
-			SEC_PER_DAY => ['H:i', 'n-d H:i'],			// 1 day
-			SEC_PER_WEEK => ['n-d', 'n-d'],				// 1 week
-			SEC_PER_WEEK * 2 => ['n-d', 'n-d'],			// 2 weeks
-			SEC_PER_MONTH => ['n-d', 'Y-n-d'],			// 30 days
-			SEC_PER_MONTH * 3 => ['Y-n-d', 'Y-n-d'],	// 90 days
-			SEC_PER_MONTH * 4 => ['Y-n-d', 'Y-n-d'],	// 120 days
-			SEC_PER_MONTH * 6 => ['Y-n-d', 'Y-n-d'],	// 180 days
-			SEC_PER_YEAR => ['Y-n-d', 'Y-n-d'],			// 1 year
-			SEC_PER_YEAR * 2 => ['Y-n-d', 'Y-n-d']		// 2 years
-		];
-
 		$period = $this->time_till - $this->time_from;
-		$step = $period / $this->canvas_width * 100; // Grid cell (100px) in seconds.
-		$same_day = (date('d', $this->time_till) === date('d', $this->time_from));
-		$same_year = (date('y', $this->time_till) === date('y', $this->time_from));
-		$time_fmt = 'Y-n-d';
+		$step = round(bcmul(bcdiv($period, $this->canvas_width), 100)); // Grid cell (100px) in seconds.
+		$start = $this->time_from + $step - $this->time_from % $step;
+		$time_formats = ['Y-n-d', 'n-d', 'n-d H:i','H:i', 'H:i:s'];
 
-		foreach ($intervals as $interval => $format) {
-			if ($interval > $step) {
-				$fmt = $same_day && $same_year ? 0 : 1;
-				$time_fmt = $format[$fmt];
+		// Search for most appropriate time format.
+		foreach ($time_formats as $fmt) {
+			$grid_values = [];
+
+			for ($clock = $start; $this->time_till >= $clock; $clock += $step) {
+				$relative_pos = round($this->canvas_width - $this->canvas_width * ($this->time_till - $clock) / $period);
+				$grid_values[$relative_pos] = date($fmt, $clock);
+			}
+
+			/**
+			 * If at least two calculated time-strings are equal, proceed with next format. Do that as long as each date
+			 * is different or there is no more time formats to test.
+			 */
+			if (count(array_flip($grid_values)) == count($grid_values) || $fmt === end($time_formats)) {
 				break;
 			}
-		}
-
-		$grid_values = [];
-		$start = $this->time_from + $step - $this->time_from % $step;
-
-		for ($clock = $start; $this->time_till >= $clock; $clock += $step) {
-			$relative_pos = round($this->canvas_width - $this->canvas_width * ($this->time_till - $clock) / $period);
-			$grid_values[$relative_pos] = date($time_fmt, $clock);
 		}
 
 		return $grid_values;
@@ -428,7 +427,6 @@ class CSvgGraph extends CSvg {
 	 */
 	public function draw() {
 		$this->applyMissingDataFunc();
-		$this->calculateYAxis();
 		$this->calculateDimensions();
 		$this->calculatePaths();
 
@@ -437,7 +435,7 @@ class CSvgGraph extends CSvg {
 		if ($this->left_y_show) {
 			$this->drawCanvasLeftYAxis();
 		}
-		if ($this->right_y_show && (!$this->left_y_show || $this->max_value_right !== null)) {
+		if ($this->right_y_show) {
 			$this->drawCanvasRightYAxis();
 		}
 		if ($this->x_show) {
@@ -479,27 +477,6 @@ class CSvgGraph extends CSvg {
 	}
 
 	/**
-	 * Calculate which Y axis will be shown in graph.
-	 */
-	protected function calculateYAxis() {
-		$metrics_for_each_axes = [
-			GRAPH_YAXIS_SIDE_LEFT => 0,
-			GRAPH_YAXIS_SIDE_RIGHT => 0
-		];
-
-		foreach ($this->metrics as $metric) {
-			$metrics_for_each_axes[$metric['options']['axisy']]++;
-		}
-
-		if ($metrics_for_each_axes[GRAPH_YAXIS_SIDE_LEFT] == 0) {
-			$this->left_y_show = false;
-		}
-		if ($metrics_for_each_axes[GRAPH_YAXIS_SIDE_RIGHT] == 0) {
-			$this->right_y_show = false;
-		}
-	}
-
-	/**
 	 * Calculate canvas size, margins and offsets for graph canvas inside SVG element.
 	 */
 	protected function calculateDimensions() {
@@ -516,6 +493,19 @@ class CSvgGraph extends CSvg {
 		if ($this->left_y_max === null) {
 			$this->left_y_max = $this->max_value_left ? : 1;
 		}
+
+		if (bccomp($this->left_y_min, $this->left_y_max) == 0) {
+			$this->left_y_min -= 0.5;
+			$this->left_y_max += 0.5;
+		}
+		elseif (bccomp($this->left_y_min, $this->left_y_max) == 1) {
+			$this->left_y_max = $this->left_y_min + 1;
+		}
+
+		$grid = $this->getValueGrid($this->left_y_min, $this->left_y_max);
+		$this->left_y_min = $grid[0];
+		$this->left_y_max = end($grid);
+
 		if ($this->left_y_units === null) {
 			$this->left_y_units = '';
 			foreach ($this->metrics as $metric) {
@@ -534,6 +524,18 @@ class CSvgGraph extends CSvg {
 			$this->right_y_max = $this->max_value_right ? : 1;
 		}
 
+		if (bccomp($this->right_y_min, $this->right_y_max) == 0) {
+			$this->right_y_min -= 0.5;
+			$this->right_y_max += 0.5;
+		}
+		elseif (bccomp($this->right_y_min, $this->right_y_max) == 1) {
+			$this->right_y_max = $this->right_y_min + 1;
+		}
+
+		$grid = $this->getValueGrid($this->right_y_min, $this->right_y_max);
+		$this->right_y_min = $grid[0];
+		$this->right_y_max = end($grid);
+
 		if ($this->right_y_units === null) {
 			$this->right_y_units = '';
 			foreach ($this->metrics as $metric) {
@@ -548,7 +550,7 @@ class CSvgGraph extends CSvg {
 		$approx_width = 10;
 
 		if ($this->left_y_show) {
-			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
+			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
 
 			if ($values) {
 				$offset_left = max($this->offset_left, max(array_map('strlen', $values)) * $approx_width);
@@ -557,10 +559,11 @@ class CSvgGraph extends CSvg {
 		}
 
 		if ($this->right_y_show) {
-			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
+			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
 
 			if ($values) {
 				$offset_right = max($this->offset_right, max(array_map('strlen', $values)) * $approx_width);
+				$offset_right += self::SVG_GRAPH_Y_AXIS_RIGHT_LABEL_MARGIN;
 				$this->offset_right = (int) min($offset_right, $this->max_yaxis_width);
 			}
 		}
@@ -584,8 +587,11 @@ class CSvgGraph extends CSvg {
 	 *
 	 * @return array
 	 */
-	protected function getValuesGridWithPosition($side) {
-		if ($side === GRAPH_YAXIS_SIDE_LEFT) {
+	protected function getValuesGridWithPosition($side, $empty_set = false) {
+		if ($empty_set) {
+			$units = '';
+		}
+		elseif ($side === GRAPH_YAXIS_SIDE_LEFT) {
 			$min_value = $this->left_y_min;
 			$max_value = $this->left_y_max;
 			$units = $this->left_y_units;
@@ -596,13 +602,12 @@ class CSvgGraph extends CSvg {
 			$units = $this->right_y_units;
 		}
 
-		$min_value = (float) $min_value;
-		$max_value = (float) $max_value;
-		$grid = $this->getValueGrid($min_value, $max_value);
+		$grid = $empty_set ? [0, 1] : $this->getValueGrid($min_value, $max_value);
+		$min_value = $grid[0];
+		$max_value = end($grid);
 		$delta = ($max_value != $min_value)
 			? $max_value - $min_value
 			: (count($grid) > 1 ? end($grid) - $grid[0] : 1);
-		$y_rows = (count($grid) - 1) ? : 1;
 		$grid_values = [];
 
 		foreach ($grid as $value) {
@@ -617,6 +622,31 @@ class CSvgGraph extends CSvg {
 			}
 		}
 
+		/*
+		 * This will fix a rare corner case when values on Y axes are aligned in such a way that calculated Y=0 (based
+		 * on steps calculated by self::getValueGrid) is out of the allowed area (typically by less then 1px) and are
+		 * not drawn on Y axis. Fix will calculate the real value on Y=0. The interval will always be smaller than
+		 * interval between any other 2 grid values.
+		 *
+		 * This is done on left side Y axis only, because on right side Y axis we will not draw label on Y=0 to not
+		 * overlap the arrow on X axis.
+		 *
+		 * This is also done only if distance between Y=0 and next lowest Y value is larger than 25px, to avoid label
+		 * overlapping.
+		 */
+		if ($side == GRAPH_YAXIS_SIDE_LEFT) {
+			$lowest = key($grid_values);
+
+			if (!array_key_exists(0, $grid_values) && $lowest > 25) {
+				$grid_values[0] = convert_units([
+					'value' => $grid_values[$lowest] - ($lowest * ($max_value - $min_value) / $this->canvas_height),
+					'units' => $units,
+					'convert' => ITEM_CONVERT_NO_UNITS
+				]);
+				ksort($grid_values);
+			}
+		}
+
 		return $grid_values;
 	}
 
@@ -624,8 +654,9 @@ class CSvgGraph extends CSvg {
 	 * Add Y axis with labels to left side of graph.
 	 */
 	protected function drawCanvasLeftYaxis() {
+		$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
 		$this->addItem(
-			(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT), GRAPH_YAXIS_SIDE_LEFT))
+			(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_LEFT))
 				->setSize($this->offset_left, $this->canvas_height)
 				->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
 				->setTextColor($this->text_color)
@@ -637,8 +668,15 @@ class CSvgGraph extends CSvg {
 	 * Add Y axis with labels to right side of graph.
 	 */
 	protected function drawCanvasRightYAxis() {
+		$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
+
+		// Do not draw label at the bottom of right Y axis to avoid label averlapping with horizontal axis arrow.
+		if (array_key_exists(0, $grid_values)) {
+			unset($grid_values[0]);
+		}
+
 		$this->addItem(
-			(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT), GRAPH_YAXIS_SIDE_RIGHT))
+			(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_RIGHT))
 				->setSize($this->offset_right, $this->canvas_height)
 				->setPosition($this->canvas_x + $this->canvas_width, $this->canvas_y)
 				->setTextColor($this->text_color)
@@ -670,11 +708,13 @@ class CSvgGraph extends CSvg {
 	protected function getValueGrid($min, $max) {
 		$res = [];
 
+		// If absolute min/max is equal, calculate grid with 4 rows to make 0 centered. 5 rows otherwise.
+		$grid_rows = (abs($min) == abs($max)) ? 4 : 5;
 		$decimals = strlen(substr(strrchr($max, '.'), 1));
 		$decimals = $decimals > 4 ? 4 : $decimals;
 		$decimals = $decimals < 2 ? 2 : $decimals;
 		for ($base = 10; $base > .01; $base /= 10) {
-			$mul = $max ? 1 / pow($base, floor(log10($max))) : 1;
+			$mul = ($max > 0) ? 1 / pow($base, floor(log10($max))) : 1;
 			$max10 = ceil($mul * $max) / $mul;
 			$min10 = floor($mul * $min) / $mul;
 			$delta = $max10 - $min10;
@@ -682,7 +722,7 @@ class CSvgGraph extends CSvg {
 
 			if ($mul >= 1) {
 				if ($delta) {
-					for($i = 0; $delta >= $i; $i += $delta / 5) {
+					for ($i = 0; $delta >= $i; $i += $delta / $grid_rows) {
 						$res[] = sprintf('%.'.$decimals.'f', $i + $min10);
 					}
 				}
@@ -704,12 +744,12 @@ class CSvgGraph extends CSvg {
 		$value_points = [];
 
 		if ($this->left_y_show) {
-			$value_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
+			$value_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
 
 			unset($time_points[0]);
 		}
 		elseif ($this->right_y_show) {
-			$value_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
+			$value_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
 
 			unset($time_points[$this->canvas_width]);
 		}
@@ -762,7 +802,8 @@ class CSvgGraph extends CSvg {
 				 */
 				$in_range = ($max_value >= $point && $min_value <= $point);
 				if ($in_range || $metric['options']['type'] != SVG_GRAPH_TYPE_POINTS) {
-					$x = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
+					$x = $this->canvas_x + $this->canvas_width
+						- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 					$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
 					$paths[$path_num][] = [$x, $y, convert_units([
 						'value' => $point,
@@ -871,7 +912,9 @@ class CSvgGraph extends CSvg {
 		$y_zero = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) ? $this->right_y_zero : $this->left_y_zero;
 
 		foreach ($paths as $path) {
-			$this->addItem(new CSvgGraphArea($path, $metric, $y_zero));
+			if (count($path) > 1) {
+				$this->addItem(new CSvgGraphArea($path, $metric, $y_zero));
+			}
 		}
 	}
 
@@ -882,23 +925,11 @@ class CSvgGraph extends CSvg {
 		foreach ($this->metrics as $index => $metric) {
 			if (array_key_exists($index, $this->paths) && ($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
 					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE)) {
-				$group = (new CSvgGroup())
-					->setAttribute('data-set', $metric['options']['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
-					->setAttribute('data-metric', CHtml::encode($metric['name']))
-					->setAttribute('data-color', $metric['options']['color']);
-
 				if ($metric['options']['fill'] > 0) {
 					$this->drawMetricArea($metric, $this->paths[$index]);
 				}
 
-				foreach ($this->paths[$index] as $path) {
-					$group->addItem(new CSvgGraphLine($path, $metric));
-				}
-
-				$this->addItem($group->addItem(
-					(new CSvgCircle(-10, -10, $metric['options']['width'] + 4))
-						->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
-				));
+				$this->addItem(new CSvgGraphLineGroup($this->paths[$index], $metric));
 			}
 		}
 	}
@@ -923,10 +954,14 @@ class CSvgGraph extends CSvg {
 
 		foreach ($this->problems as $problem) {
 			// If problem is never recovered, it will be drown till the end of graph or till current time.
-			$time_to =  ($problem['r_clock'] == 0) ? min($this->time_till, time()) : $problem['r_clock'];
+			$time_to =  ($problem['r_clock'] == 0)
+				? min($this->time_till, time())
+				: min($this->time_till, $problem['r_clock']);
 			$time_range = $this->time_till - $this->time_from;
-			$x1 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $problem['clock']) / $time_range;
-			$x2 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $time_to) / $time_range;
+			$x1 = $this->canvas_x + $this->canvas_width
+				- $this->canvas_width * ($this->time_till - $problem['clock']) / $time_range;
+			$x2 = $this->canvas_x + $this->canvas_width
+				- $this->canvas_width * ($this->time_till - $time_to) / $time_range;
 
 			if ($this->canvas_x > $x1) {
 				$x1 = $this->canvas_x;
@@ -965,7 +1000,7 @@ class CSvgGraph extends CSvg {
 					->setArgument('eventid', $problem['eventid'])
 					->getUrl(),
 				'r_eventid' => $problem['r_eventid'],
-				'severity' => ($problem['r_clock'] == 0) ? getSeverityStyle($problem['severity']) : '',
+				'severity' => getSeverityStyle($problem['severity'], $problem['r_clock'] == 0),
 				'status' => $status_str,
 				'status_color' => $status_color
 			];
@@ -974,11 +1009,11 @@ class CSvgGraph extends CSvg {
 			$draw_type = ($x2 - $x1) > 2 ? CSvgGraphAnnotation::TYPE_RANGE : CSvgGraphAnnotation::TYPE_SIMPLE;
 
 			// Draw border lines. Make them dashed if beginning or ending of highligted zone is visible in graph.
-			if ($problem['clock'] >= $this->time_from) {
+			if ($problem['clock'] > $this->time_from) {
 				$draw_type |= CSvgGraphAnnotation::DASH_LINE_START;
 			}
 
-			if ($this->time_till >= $time_to) {
+			if ($this->time_till > $time_to) {
 				$draw_type |= CSvgGraphAnnotation::DASH_LINE_END;
 			}
 

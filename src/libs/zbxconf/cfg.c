@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -466,7 +466,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 						break;
 					case TYPE_STRING_LIST:
 						zbx_trim_str_list(value, ',');
-						/* break; is not missing here */
+						ZBX_FALLTHROUGH;
 					case TYPE_STRING:
 						*((char **)cfg[i].variable) =
 								zbx_strdup(*((char **)cfg[i].variable), value);

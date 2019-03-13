@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -374,7 +374,7 @@ class CZabbixServer {
 
 		$response = CJs::decodeJson(substr($response, ZBX_TCP_HEADER_LEN + ZBX_TCP_DATALEN_LEN));
 
-		if (!$response || !$this->validateResponse($response)) {
+		if (!$response || !$this->normalizeResponse($response)) {
 			$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
 
 			return false;
@@ -441,7 +441,7 @@ class CZabbixServer {
 	 *
 	 * @return bool
 	 */
-	protected function validateResponse(array $response) {
+	protected function normalizeResponse(array &$response) {
 		return (isset($response['response'])
 					&& ($response['response'] == self::RESPONSE_SUCCESS && isset($response['data'])
 						|| $response['response'] == self::RESPONSE_FAILED && isset($response['info'])));
