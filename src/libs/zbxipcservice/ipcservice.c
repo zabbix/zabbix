@@ -835,7 +835,7 @@ static void	ipc_service_remove_client(zbx_ipc_service_t *service, zbx_ipc_client
  *                                                                            *
  * Function: ipc_client_read_event_cb                                         *
  *                                                                            *
- * Purpose: servoce client read event libevent callback                       *
+ * Purpose: service client read event libevent callback                       *
  *                                                                            *
  ******************************************************************************/
 static void	ipc_client_read_event_cb(evutil_socket_t fd, short what, void *arg)
@@ -896,7 +896,8 @@ static void	ipc_async_socket_write_event_cb(evutil_socket_t fd, short what, void
 	if (SUCCEED != ipc_client_write(asocket->client))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to IPC client");
-		zbx_ipc_client_close(asocket->client);
+		ipc_client_free_events(asocket->client);
+		zbx_ipc_socket_close(&asocket->client->csocket);
 		asocket->state = ZBX_IPC_ASYNC_SOCKET_STATE_ERROR;
 		return;
 	}
@@ -1169,6 +1170,7 @@ int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int
 		{
 			*error = zbx_dsprintf(*error, "Cannot connect to service \"%s\": %s.", service_name,
 					zbx_strerror(errno));
+			close(csocket->fd);
 			goto out;
 		}
 
@@ -1803,20 +1805,19 @@ int	zbx_ipc_client_connected(zbx_ipc_client_t *client)
 int	zbx_ipc_async_socket_open(zbx_ipc_async_socket_t *asocket, const char *service_name, int timeout, char **error)
 {
 	const char		*__function_name = "zbx_ipc_async_socket_open";
-	const char		*socket_path;
 	int			ret = FAIL, flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (NULL == (socket_path = ipc_make_path(service_name, error)))
-		goto out;
 
 	memset(asocket, 0, sizeof(zbx_ipc_async_socket_t));
 	asocket->client = (zbx_ipc_client_t *)zbx_malloc(NULL, sizeof(zbx_ipc_client_t));
 	memset(asocket->client, 0, sizeof(zbx_ipc_client_t));
 
 	if (SUCCEED != zbx_ipc_socket_open(&asocket->client->csocket, service_name, timeout, error))
+	{
+		zbx_free(asocket->client);
 		goto out;
+	}
 
 	if (-1 == (flags = fcntl(asocket->client->csocket.fd, F_GETFL, 0)))
 	{
@@ -2038,7 +2039,6 @@ int	zbx_ipc_async_socket_flush(zbx_ipc_async_socket_t *asocket, int timeout)
 		ret = SUCCEED;
 		asocket->state = ZBX_IPC_CLIENT_STATE_NONE;
 	}
-	else	ret = FAIL;
 out:
 	evtimer_del(asocket->ev_timer);
 

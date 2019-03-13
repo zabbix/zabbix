@@ -25,9 +25,67 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  *
  * @required-components server
  * @backup items
- * @hosts discovery
  */
 class testLowLevelDiscovery extends CIntegrationTest {
+
+	private static $hostid;
+	private static $ruleid;
+
+	/**
+	 * @inheritdoc
+	 */
+	public function prepareData() {
+		// Create host "discovery".
+		$response = $this->call('host.create', [
+			'host' => 'discovery',
+			'interfaces' => [
+				[
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
+				]
+			],
+			'groups' => [
+				[
+					'groupid' => 4
+				]
+			]
+		]);
+
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+		self::$hostid = $response['result']['hostids'][0];
+
+		// Create discovery rule.
+		$response = $this->call('discoveryrule.create', [
+			'hostid' => self::$hostid,
+			'name' => 'Trapper discovery',
+			'key_' => 'item_discovery',
+			'type' => ITEM_TYPE_TRAPPER
+		]);
+
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		self::$ruleid = $response['result']['itemids'][0];
+
+		// Create item prototype.
+		$response = $this->call('itemprototype.create', [
+			'hostid' => self::$hostid,
+			'ruleid' => self::$ruleid,
+			'name' => 'Item: {#KEY}',
+			'key_' => 'trap[{#KEY}]',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
+		]);
+
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+
+		return true;
+	}
 
 	/**
 	 * Test discovery by checking creation of items from item prototype.
@@ -43,7 +101,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 
 			// Retrieve data from API.
 			$data = $this->call('item.get', [
-				'hostids'	=> 20001,
+				'hostids'	=> self::$hostid,
 				'output'	=> ['name', 'key_', 'type', 'value_type'],
 				'sortfield'	=> 'key_'
 			]);
@@ -70,7 +128,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 	public function testLowLevelDiscovery_LooseItems() {
 		// Update lifetime of discovery rule.
 		$this->call('discoveryrule.update', [
-			'itemid' => 80001,
+			'itemid' => self::$ruleid,
 			'lifetime' => 0
 		]);
 
@@ -83,7 +141,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 
 		// Retrieve data from API.
 		$data = $this->call('item.get', [
-			'hostids'	=> 20001,
+			'hostids'	=> self::$hostid,
 			'output'	=> ['itemid', 'name', 'key_', 'type', 'value_type'],
 			'sortfield'	=> 'key_'
 		]);

@@ -3334,8 +3334,11 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
 			*value = '\0';
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)) && '\0' != *dns &&
-				FAIL == zbx_validate_hostname(dns))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)))
+		{
+			*dns = '\0';
+		}
+		else if ('\0' != *dns && FAIL == zbx_validate_hostname(dns))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid hostname", __function_name, dns);
 			continue;

@@ -416,7 +416,8 @@ $itemFormList->addRow(
 				'dstfld1' => 'master_itemid',
 				'hostid' => $data['hostid'],
 				'excludeids' => $data['itemid'] != 0 ? [$data['itemid']] : [],
-				'webitems' => true
+				'webitems' => true,
+				'normal_only' => true
 			]
 		]
 	]))
