@@ -1191,12 +1191,14 @@ define('API_INT32',				2);
 define('API_ID',				3);
 define('API_BOOLEAN',			4);
 define('API_FLAG',				5);
+define('API_FLOAT',				25);
 // arrays
 define('API_OBJECT',			6);
 define('API_IDS',				7);
 define('API_OBJECTS',			8);
 define('API_STRINGS_UTF8',		9);
 define('API_INTS32',			10);
+define('API_FLOATS',			26);
 // specific types
 define('API_HG_NAME',			11);
 define('API_SCRIPT_NAME',		12);

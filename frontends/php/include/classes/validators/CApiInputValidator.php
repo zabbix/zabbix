@@ -91,6 +91,12 @@ class CApiInputValidator {
 			case API_INTS32:
 				return self::validateInts32($rule, $data, $path, $error);
 
+			case API_FLOAT:
+				return self::validateFloat($rule, $data, $path, $error);
+
+			case API_FLOATS:
+				return self::validateFloats($rule, $data, $path, $error);
+
 			case API_ID:
 				return self::validateId($rule, $data, $path, $error);
 
@@ -434,6 +440,84 @@ class CApiInputValidator {
 		return true;
 	}
 
+	/**
+	 * Floating point number validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateFloat($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if ((!is_int($data) && !is_float($data) && !is_string($data))
+				|| 1 != preg_match('/^\-?([0-9]{1,12}+)(\.[0-9]{1,4}+)?$/', strval($data))) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+			return false;
+		}
+
+		if (!is_float($data)) {
+			$data = (float) $data;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Array of floating point numbers validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateFloats($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (($flags & API_NORMALIZE) && self::validateFloat([], $data, '', $e)) {
+			$data = [$data];
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) && !$data) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		$data = array_values($data);
+		$rules = ['type' => API_FLOAT];
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateData($rules, $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
+
+		return true;
+	}
+
 	private static function Int32In($data, $in) {
 		$valid = false;
 
@@ -485,7 +569,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
-	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: 'xml,json'
+	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: '0,60:900'
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
