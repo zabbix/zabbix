@@ -428,13 +428,12 @@ static int	preprocessor_unpack_steps(const unsigned char *data, zbx_preproc_op_t
 	const unsigned char	*offset = data;
 	int			i;
 
-
 	offset += zbx_deserialize_int(offset, steps_num);
 	if (0 < *steps_num)
 	{
 		*steps = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) * (*steps_num));
 		for (i = 0; i < *steps_num; i++)
-			offset += preprocessor_unpack_step(offset, &(*steps)[i]);
+			offset += preprocessor_unpack_step(offset, *steps + i);
 	}
 	else
 		*steps = NULL;
