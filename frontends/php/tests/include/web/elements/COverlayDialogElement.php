@@ -28,6 +28,7 @@ class COverlayDialogElement extends CElement {
 	 */
 	public function waitUntilReady() {
 		$this->query('class:preloader')->waitUntilNotPresent();
+
 		return $this;
 	}
 
@@ -45,6 +46,45 @@ class COverlayDialogElement extends CElement {
 	 */
 	public function getTitle() {
 		return $this->query('xpath:./div[@class="dashbrd-widget-head"]/h4')->one()->getText();
+	}
+
+	/**
+	 * Set context (host / hostgroup) of overlay dialog.
+	 *
+	 * @param array $context
+	 */
+	public function setDataContext($context) {
+		if (!$context) {
+			return $this;
+		}
+
+		$query = $this->query('xpath:./div[@class="overlay-dialogue-controls"]//select')->asDropdown()->waitUntilPresent();
+
+		if (!is_array($context)) {
+			$query->one()->select($context);
+			$this->waitUntilReady();
+
+			return $this;
+		}
+
+		$controls = $query->all()->indexByAttribute('name');
+
+		foreach ($context as $name => $value) {
+			if (is_array($value) && array_key_exists('name', $value) && array_key_exists('value', $value)) {
+				$name = $value['name'];
+				$value = $value['value'];
+			}
+
+			if ($controls->exists($name)) {
+				$controls->get($name)->select($value);
+				$this->waitUntilReady();
+			}
+			else {
+				throw new Exception('Cannot set overlay dialog context for \"'.$name.'\" to \"'.$value.'\".');
+			}
+		}
+
+		return $this;
 	}
 
 	/**

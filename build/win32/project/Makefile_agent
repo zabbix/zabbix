@@ -66,6 +66,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\common\http.o \
 	..\..\..\src\libs\zbxsysinfo\common\net.o \
 	..\..\..\src\libs\zbxsysinfo\common\system.o \
+	..\..\..\src\libs\zbxsysinfo\common\zabbix_stats.o \
 	..\..\..\src\libs\zbxsysinfo\simple\ntp.o \
 	..\..\..\src\libs\zbxsysinfo\simple\simple.o \
 	..\..\..\src\libs\zbxsysinfo\win32\cpu.o \

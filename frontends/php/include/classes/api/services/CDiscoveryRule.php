@@ -1140,57 +1140,6 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 	}
 
-	protected function inherit(array $items, array $hostids = null) {
-		if (!$items) {
-			return;
-		}
-
-		// Prepare the child discovery rules.
-		$new_items = $this->prepareInheritedItems($items, $hostids);
-		if (!$new_items) {
-			return;
-		}
-
-		$ins_items = [];
-		$upd_items = [];
-		foreach ($new_items as $new_item) {
-			if (array_key_exists('itemid', $new_item)) {
-				$upd_items[] = $new_item;
-			}
-			else {
-				$ins_items[] = $new_item;
-			}
-		}
-
-		// Save the new items.
-		$this->createReal($ins_items);
-		$this->updateReal($upd_items);
-
-		$new_items = array_merge($upd_items, $ins_items);
-
-		// Inheriting items from the templates.
-		$tpl_items = DBselect(
-			'SELECT i.itemid'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
-				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
-		);
-
-		$tpl_itemids = [];
-		while ($tpl_item = DBfetch($tpl_items)) {
-			$tpl_itemids[$tpl_item['itemid']] = true;
-		}
-
-		foreach ($new_items as $index => $new_item) {
-			if (!array_key_exists($new_item['itemid'], $tpl_itemids)) {
-				unset($new_items[$index]);
-			}
-		}
-
-		$this->inherit($new_items);
-	}
-
 	/**
 	 * Copies the given discovery rule to the specified host.
 	 *
@@ -1208,7 +1157,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'itemids' => $discoveryid,
 			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
-				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'lastlogsize', 'logtimefmt',
+				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'lastlogsize', 'logtimefmt',
 				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'mtime', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
 				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'url',

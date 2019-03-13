@@ -36,7 +36,7 @@ class CWidgetElement extends CElement {
 		$action = $this->query('class:btn-widget-action')->one();
 		$settings = json_decode($action->getAttribute('data-menu-popup'));
 
-		return $settings->currentRate;
+		return $settings->data->currentRate;
 	}
 
 	/**
@@ -65,5 +65,16 @@ class CWidgetElement extends CElement {
 	public function edit() {
 		$this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->click();
 		return $this->query('xpath://div[@data-dialogueid="widgetConfg"]//form')->waitUntilVisible()->asForm()->one();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getReadyCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return ($target->query('xpath:.//div[@class="preloader-container"]')->one(false) === null);
+		};
 	}
 }

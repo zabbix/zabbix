@@ -180,7 +180,7 @@ class CScreenHostTriggers extends CScreenBase {
 			'sort_order' => ZBX_SORT_DOWN
 		];
 
-		$data = CScreenProblem::getData($filter, $config);
+		$data = CScreenProblem::getData($filter, $config, true, true);
 
 		$header = [
 			'hostname' => _('Host'),
@@ -190,7 +190,7 @@ class CScreenHostTriggers extends CScreenBase {
 
 		if (array_key_exists('sortfield', $filter)) {
 			$sort_field = $filter['sortfield'];
-			$sort_order = $filter['sortfield'] !== 'lastchange' ? $filter['sortorder'] : ZBX_SORT_DOWN;
+			$sort_order = ($sort_field !== 'lastchange') ? $filter['sortorder'] : ZBX_SORT_DOWN;
 
 			$header[$sort_field] = [
 				$header[$sort_field],
@@ -208,7 +208,7 @@ class CScreenHostTriggers extends CScreenBase {
 			min($config['search_limit'], count($data['problems']))
 		);
 		$data['problems'] = array_slice($data['problems'], 0, $filter['limit'], true);
-		$data = CScreenProblem::makeData($data, $filter);
+		$data = CScreenProblem::makeData($data, $filter, true, true);
 
 		$hostids = [];
 		foreach ($data['triggers'] as $trigger) {
@@ -216,12 +216,9 @@ class CScreenHostTriggers extends CScreenBase {
 		}
 		$hostids = array_keys($hostids);
 
-		$scripts = API::Script()->getScriptsByHosts($hostids);
 		$hosts = API::Host()->get([
 			'hostids' => $hostids,
-			'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenance_type', 'maintenanceid'],
-			'selectGraphs' => API_OUTPUT_COUNT,
-			'selectScreens' => API_OUTPUT_COUNT,
+			'output' => ['hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'],
 			'preservekeys' => true
 		]);
 
@@ -249,7 +246,7 @@ class CScreenHostTriggers extends CScreenBase {
 			$host = reset($trigger['hosts']);
 			$host = $hosts[$host['hostid']];
 			$host_name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
+				->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
 					&& array_key_exists($host['maintenanceid'], $maintenances)) {
@@ -293,7 +290,9 @@ class CScreenHostTriggers extends CScreenBase {
 				$host_name,
 				(new CCol([
 					(new CLinkAction($problem['name']))
-						->setHint(make_popup_eventlist($trigger, $problem['eventid'], $back_url))
+						->setHint(make_popup_eventlist(['comments' => $problem['comments']] + $trigger,
+							$problem['eventid'], $back_url
+						))
 				]))->addClass(getSeverityStyle($problem['severity'])),
 				$clock,
 				zbx_date2age($problem['clock']),

@@ -34,6 +34,7 @@ require_once dirname(__FILE__).'/elements/CMessageElement.php';
 require_once dirname(__FILE__).'/elements/CMultiselectElement.php';
 require_once dirname(__FILE__).'/elements/CSegmentedRadioElement.php';
 require_once dirname(__FILE__).'/elements/CRangeControlElement.php';
+require_once dirname(__FILE__).'/elements/CCheckboxListElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -138,7 +139,12 @@ class CElementQuery implements IWaitable {
 		}
 
 		if ($locator === null) {
-			list($type, $locator) = explode(':', $type, 2);
+			$parts = explode(':', $type, 2);
+			if (count($parts) !== 2) {
+				throw new Exception('Element selector "'.$type.'" is not well formatted.');
+			}
+
+			list($type, $locator) = $parts;
 		}
 
 		$mapping = [
@@ -147,7 +153,7 @@ class CElementQuery implements IWaitable {
 			'tag' => 'tagName',
 			'link' => 'linkText',
 			'button' => function () use ($locator) {
-				return WebDriverBy::xpath('//button[contains(text(),'.CXPathHelper::escapeQuotes($locator).')]');
+				return WebDriverBy::xpath('.//button[contains(text(),'.CXPathHelper::escapeQuotes($locator).')]');
 			}
 		];
 
@@ -200,6 +206,22 @@ class CElementQuery implements IWaitable {
 	}
 
 	/**
+	 * Apply chained element query.
+	 *
+	 * @param mixed  $type     selector type (method) or selector
+	 * @param string $locator  locator part of selector
+	 *
+	 * @return $this
+	 */
+	public function query($type, $locator = null) {
+		$prefix = CXPathHelper::fromWebDriverBy($this->by);
+		$suffix = CXPathHelper::fromSelector($type, $locator);
+		$this->by = static::getSelector('xpath', './'.$prefix.'/'.$suffix);
+
+		return $this;
+	}
+
+	/**
 	 * Get wait instance.
 	 *
 	 * @return WebDriverWait
@@ -209,13 +231,13 @@ class CElementQuery implements IWaitable {
 	}
 
 	/**
-	 * Wait until condition is met for target.
+	 * Get element condition callable name.
 	 *
-	 * @param IWaitable $target       target for wait operation
-	 * @param string    $condition    condition to be waited for
-	 * @param array     $params       condition params
+	 * @param string $condition    condition name
+	 *
+	 * @return array
 	 */
-	public static function waitUntil($target, $condition, $params = []) {
+	public static function getConditionCallable($condition) {
 		$conditions = [
 			static::READY => 'getReadyCondition',
 			static::PRESENT => 'getPresentCondition',
@@ -230,12 +252,27 @@ class CElementQuery implements IWaitable {
 			static::NOT_CLICKABLE => 'getNotClickableCondition'
 		];
 
+		if (!array_key_exists($condition, $conditions)) {
+			throw new Exception('Cannot get element condition callable by name "'.$condition.'"!');
+		}
+
+		return $conditions[$condition];
+	}
+
+	/**
+	 * Wait until condition is met for target.
+	 *
+	 * @param IWaitable $target       target for wait operation
+	 * @param string    $condition    condition to be waited for
+	 * @param array     $params       condition params
+	 */
+	public static function waitUntil($target, $condition, $params = []) {
 		$selector = $target->getSelectorAsText();
 		if ($selector !== null) {
 			$selector = ' located by '.$selector;
 		}
 
-		$callable = call_user_func_array([$target, $conditions[$condition]], $params);
+		$callable = call_user_func_array([$target, self::getConditionCallable($condition)], $params);
 		self::wait()->until($callable, 'Failed to wait for element'.$selector.' to be '.$condition.'.');
 	}
 

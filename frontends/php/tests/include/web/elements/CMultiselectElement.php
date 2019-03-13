@@ -53,11 +53,12 @@ class CMultiselectElement extends CElement {
 	 * Add selection by label.
 	 *
 	 * @param string $label    label text
+	 * @param mixed  $context  overlay dialog context (hostgroup / host)
 	 *
 	 * @return $this
 	 */
-	public function select($label) {
-		$this->edit()->query('link:'.$label)->one()->click();
+	public function select($label, $context = null) {
+		$this->edit($context)->query('link:'.$label)->one()->click();
 		$this->query('xpath:.//span[@class="subfilter-enabled"][string()='.CXPathHelper::escapeQuotes($label).']')
 				->waitUntilPresent();
 
@@ -67,17 +68,25 @@ class CMultiselectElement extends CElement {
 	/**
 	 * Add selection by multiple labels.
 	 *
-	 * @param array $label    array of label texts
+	 * @param array  $labels   array of label texts
+	 * @param mixed  $context  multiselect context (hostgroup / host)
 	 *
 	 * @return $this
 	 */
-	public function selectMultiple($labels) {
+	public function selectMultiple($labels, $context = null) {
 		if ($labels) {
-			$table = $this->edit()->getContent()->asTable();
+			if (!is_array($labels)) {
+				$labels = [$labels];
+			}
+
+			$overlay = $this->edit($context);
+			$table = $overlay->getContent()->asTable();
 
 			foreach ($labels as $label) {
 				$table->findRow('Name', $label)->select();
 			}
+			$overlay->getFooter()->query('button:Select')->one()->click();
+			$overlay->waitUntilNotPresent();
 		}
 
 		return $this;
@@ -86,10 +95,12 @@ class CMultiselectElement extends CElement {
 	/**
 	 * Select all possible options.
 	 *
+	 * @param mixed $context  overlay dialog context (hostgroup / host)
+	 *
 	 * @return $this
 	 */
-	public function selectAll() {
-		$overlay = $this->edit();
+	public function selectAll($context = null) {
+		$overlay = $this->edit($context);
 		$overlay->query('xpath:.//input[@name="all_records"]')->one()->click();
 		$overlay->getFooter()->query('button:Select')->one()->click();
 
@@ -119,11 +130,50 @@ class CMultiselectElement extends CElement {
 	/**
 	 * Open selection overlay dialog.
 	 *
+	 * @param mixed $context  overlay dialog context (hostgroup / host)
+	 *
 	 * @return COverlayDialogElement
 	 */
-	public function edit() {
+	public function edit($context = null) {
 		$this->query('xpath:.//div[@class="multiselect-button"]/button')->one()->click();
 
-		return COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		return COverlayDialogElement::find()->all()->last()->waitUntilReady()->setDataContext($context);
+	}
+
+	/**
+	 * Alias for selectMultiple.
+	 * @see self::selectMultiple
+	 *
+	 * @param array $labels    array of label texts
+	 * @param mixed $context   overlay dialog context (hostgroup / host)
+	 *
+	 * @return $this
+	 */
+	public function fill($labels, $context = null) {
+		$this->clear();
+
+		if ($context === null && is_array($labels)) {
+			if (array_key_exists('values', $labels)) {
+				if (array_key_exists('context', $labels)) {
+					$context = $labels['context'];
+				}
+
+				$labels = $labels['values'];
+			}
+			else {
+				foreach ($labels as $label) {
+					if (is_array($label) && array_key_exists('values', $label)) {
+						$context = (array_key_exists('context', $label)) ? $label['context'] : null;
+						$label = $label['values'];
+					}
+
+					$this->selectMultiple($label, $context);
+				}
+
+				return $this;
+			}
+		}
+
+		return $this->selectMultiple($labels, $context);
 	}
 }

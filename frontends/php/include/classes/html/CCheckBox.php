@@ -45,8 +45,6 @@ class CCheckBox extends CInput {
 	 */
 	private $label_position = self::LABEL_POSITION_RIGHT;
 
-	private $unchecked_value = null;
-
 	public function __construct($name = 'checkbox', $value = '1') {
 		parent::__construct('checkbox', $name, $value);
 		$this->setChecked(false);
@@ -115,30 +113,24 @@ class CCheckBox extends CInput {
 	/**
 	 * Allow to set value for not checked checkbox.
 	 *
-	 * @param string $value    Value for unchecked state.
+	 * @param string $value  Value for unchecked state.
 	 *
 	 * @return CCheckBox
 	 */
 	public function setUncheckedValue($value) {
-		$this->unchecked_value = $value;
+		$this->setAttribute('unchecked-value', $value);
 
 		return $this;
 	}
 
 	public function toString($destroy = true) {
-		$unchecked = '';
-
-		if ($this->unchecked_value !== null) {
-			$unchecked = (new CVar($this->getName(), $this->unchecked_value))
-				->removeId()
-				->setEnabled(!$this->getAttribute('disabled'))
-				->toString();
-		}
-
-		$elements = ($this->label_position == self::LABEL_POSITION_LEFT)
+		$elements = ($this->label_position === self::LABEL_POSITION_LEFT)
 			? [$this->label, new CSpan()]
 			: [new CSpan(), $this->label];
 
-		return $unchecked.parent::toString($destroy).((new CLabel($elements, $this->getId()))->toString(true));
+		$label = (new CLabel($elements, $this->getId()))
+			->addClass($this->label_position === self::LABEL_POSITION_LEFT ? 'label-pos-left' : null);
+
+		return parent::toString($destroy).($label->toString(true));
 	}
 }

@@ -291,6 +291,69 @@ class CElementCollection implements Iterator {
 	}
 
 	/**
+	 * Get attribute of elements as array of strings.
+	 *
+	 * @return array
+	 */
+	public function asAttributeValue($attribute) {
+		$values = [];
+
+		foreach ($this->elements as $key => $element) {
+			$values[$key] = $element->getAttribute($attribute);
+		}
+
+		return $values;
+	}
+
+	/**
+	 * Index collection by value of the attribute.
+	 *
+	 * @return array
+	 */
+	public function indexByAttribute($attribute) {
+		$elements = [];
+
+		foreach ($this->elements as $element) {
+			$key = $element->getAttribute($attribute);
+			if (array_key_exists($key, $elements)) {
+				CTest::addWarning('Attribute values of attribute "'.$attribute.'" is not unique within collection.');
+			}
+
+			$elements[$key] = $element;
+		}
+
+		return new CElementCollection($elements, $this->element_class);
+	}
+
+	/**
+	 * Filter element collection based on a specified condition and params.
+	 *
+	 * @param string $condition    condition to be filtered by
+	 * @param array  $params       condition params
+	 *
+	 * @return CElementCollection
+	 * @throws Exception
+	 */
+	public function filter($condition, $params = []) {
+		$method = CElementQuery::getConditionCallable($condition);
+
+		$elements = [];
+		foreach ($this->elements as $key => $element) {
+			$callable = call_user_func_array([$element, $method], $params);
+
+			try {
+				if (call_user_func($callable) === true) {
+					$elements[$key] = $element;
+				}
+			} catch (Exception $e) {
+				// Code is not missing here.
+			}
+		}
+
+		return new CElementCollection($elements, $this->element_class);
+	}
+
+	/**
 	 * Call methods specific for custom element types.
 	 *
 	 * @param string $name         method name

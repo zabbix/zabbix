@@ -122,7 +122,21 @@ class testFormTemplate extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('new_group', $data)) {
-			$this->zbxTestMultiselectNew('groups_', $data['new_group']);
+			$selected = false;
+
+			for ($i = 0; $i < 3; $i++) {
+				try {
+					$this->zbxTestMultiselectNew('groups_', $data['new_group']);
+					$selected = true;
+					break;
+				} catch (NoSuchElementException $ex) {
+					// Retry. Code is not missing here.
+				}
+			}
+
+			if (!$selected) {
+				$this->fail('Failed to set new group "'.$data['new_group'].'" in multiselect.');
+			}
 		}
 
 		if (isset ($data['description'])) {
