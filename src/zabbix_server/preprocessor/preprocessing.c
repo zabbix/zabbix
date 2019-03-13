@@ -237,18 +237,14 @@ static int	preprocessor_pack_history(zbx_packed_field_t *fields, const zbx_vecto
 
 	fields[offset++] = PACKED_FIELD(history_num, sizeof(int));
 
-	if (0 != *history_num)
+	for (i = 0; i < *history_num; i++)
 	{
-		for (i = 0; i < history->values_num; i++)
-		{
-			zbx_preproc_op_history_t	*ophistory = (zbx_preproc_op_history_t *)history->values[i];
+		zbx_preproc_op_history_t	*ophistory = (zbx_preproc_op_history_t *)history->values[i];
 
-			fields[offset++] = PACKED_FIELD(&ophistory->index, sizeof(int));
-			offset += preprocessor_pack_variant(&fields[offset], &ophistory->value);
-			fields[offset++] = PACKED_FIELD(&ophistory->ts.sec, sizeof(int));
-			fields[offset++] = PACKED_FIELD(&ophistory->ts.ns, sizeof(int));
-		}
-
+		fields[offset++] = PACKED_FIELD(&ophistory->index, sizeof(int));
+		offset += preprocessor_pack_variant(&fields[offset], &ophistory->value);
+		fields[offset++] = PACKED_FIELD(&ophistory->ts.sec, sizeof(int));
+		fields[offset++] = PACKED_FIELD(&ophistory->ts.ns, sizeof(int));
 	}
 
 	return offset;
