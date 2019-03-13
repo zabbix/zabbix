@@ -794,16 +794,17 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true,
 		return '1=0';
 	}
 
-	$values = array_flip($values);
-
 	$has_zero = false;
+	if ($zero_to_null) {
+		$values = array_flip($values);
 
-	if ($zero_to_null && array_key_exists(0, $values)) {
-		$has_zero = true;
-		unset($values[0]);
+		if (array_key_exists(0, $values)) {
+			$has_zero = true;
+			unset($values[0]);
+		}
+
+		$values = array_keys($values);
 	}
-
-	$values = array_keys($values);
 
 	if ($sort) {
 		natsort($values);
