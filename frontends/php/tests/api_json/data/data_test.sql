@@ -769,7 +769,12 @@ INSERT INTO history (itemid, clock, value, ns) VALUES
 (133759, 1549350950, 0.0000, 866715049),
 (133759, 1549350953, 1.0000, 154942891),
 (133759, 1549350955, 1.0000, 719111385),
-(133759, 1549350957, 1.0000, 594538048);
+(133759, 1549350957, 1.0000, 594538048),
+(133759, 1549350958, 1.5000, 594538048),
+(133759, 1549350959, 1.0001, 594538048),
+(133759, 1549350960, 1.5000, 594538048),
+(133759, 1549350961, -1.0000, 594538048),
+(133759, 1549350962, -1.5000, 594538048);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133760, 120005, 'item3', 2, 'item3', 1, '90d', 0, NULL, NULL, '', '', '', '');
 INSERT INTO history_str (itemid, clock, value, ns) VALUES
 (133760, 1549350960, '1', 754460948),

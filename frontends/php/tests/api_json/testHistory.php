@@ -97,24 +97,24 @@ class testHistory extends CAPITest {
 				],
 				'expected_result' => [
 					[
-						'value' => '1.0000',
-						'clock' => '1549350957'
+						'value' => '-1.5000',
+						'clock' => '1549350962'
 					],
 					[
-						'value' => '1.0000',
-						'clock' => '1549350955'
+						'value' => '-1.0000',
+						'clock' => '1549350961'
 					],
 					[
-						'value' => '1.0000',
-						'clock' => '1549350953'
+						'value' => '1.5000',
+						'clock' => '1549350960'
 					],
 					[
-						'value' => '0.0000',
-						'clock' => '1549350950'
+						'value' => '1.0001',
+						'clock' => '1549350959'
 					],
 					[
-						'value' => '0.0000',
-						'clock' => '1549350948'
+						'value' => '1.5000',
+						'clock' => '1549350958'
 					]
 				],
 				'expected_error' => false
@@ -184,6 +184,51 @@ class testHistory extends CAPITest {
 				],
 				'expected_result' => '3',
 				'expected_error' => false
+			],
+			// Get floating point number values using differently casted filter values.
+			[
+				'api_request' => [
+					'output' => ['value', 'clock'],
+					'history' => 0,
+					'filter' => [
+						'value' => ["1.5", 1.0001, -1, -1.5]
+					]
+				],
+				'expected_result' => [
+					[
+						'value' => '1.5000',
+						'clock' => '1549350958'
+					],
+					[
+						'value' => '1.0001',
+						'clock' => '1549350959'
+					],
+					[
+						'value' => '1.5000',
+						'clock' => '1549350960'
+					],
+					[
+						'value' => '-1.0000',
+						'clock' => '1549350961'
+					],
+					[
+						'value' => '-1.5000',
+						'clock' => '1549350962'
+					]
+				],
+				'expected_error' => false
+			],
+			// Unsupported type of value in filter request.
+			[
+				'api_request' => [
+					'output' => [],
+					'history' => 0,
+					'filter' => [
+						'value' => [[]]
+					]
+				],
+				'expected_result' => null,
+				'expected_error' => 'Invalid parameter "/filter/value/1": a number is expected.'
 			]
 		];
 	}
@@ -192,13 +237,13 @@ class testHistory extends CAPITest {
 	 * @dataProvider history_get_data
 	 */
 	public function testHistory_Get($api_request, $expected_result, $expected_error) {
-		$result = $this->call('history.get', $api_request);
+		$result = $this->call('history.get', $api_request, $expected_error);
 
 		if ($expected_error === false) {
 			$this->assertSame($result['result'], $expected_result);
 		}
 		else {
-			$this->assertSame($result['data'], $expected_error);
+			$this->assertSame($result['error']['data'], $expected_error);
 		}
 	}
 }
