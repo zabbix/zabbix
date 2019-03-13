@@ -266,7 +266,7 @@ static int	preprocessor_pack_history(zbx_packed_field_t *fields, const zbx_vecto
  ******************************************************************************/
 static int	preprocessor_pack_step(zbx_packed_field_t *fields, const zbx_preproc_op_t *step)
 {
-	int	 offset = 0;
+	int	offset = 0;
 
 	fields[offset++] = PACKED_FIELD(&step->type, sizeof(char));
 	fields[offset++] = PACKED_FIELD(step->params, 0);
