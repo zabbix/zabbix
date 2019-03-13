@@ -93,7 +93,7 @@ static int	variant_to_dbl(zbx_variant_t *value)
 			return FAIL;
 	}
 
-	zbx_rtrim(buffer, "\n\r"); /* trim \r\n for historical reasons / backwards compatibility */
+	zbx_rtrim(buffer, "\n\r"); /* trim newline for historical reasons / backwards compatibility */
 	zbx_trim_float(buffer);
 
 	if (SUCCEED != is_double(buffer))
@@ -129,7 +129,7 @@ static int	variant_to_ui64(zbx_variant_t *value)
 			return FAIL;
 	}
 
-	zbx_rtrim(buffer, "\n\r"); /* trim \r\n for historical reasons / backwards compatibility */
+	zbx_rtrim(buffer, "\n\r"); /* trim newline for historical reasons / backwards compatibility */
 	zbx_trim_integer(buffer);
 	del_zeros(buffer);
 
@@ -191,7 +191,7 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 
 	zbx_strlcpy(buffer, text, sizeof(buffer));
 
-	zbx_rtrim(buffer, "\n\r"); /* trim \r\n for historical reasons / backwards compatibility */
+	zbx_rtrim(buffer, "\n\r"); /* trim newline for historical reasons / backwards compatibility */
 	zbx_trim_integer(buffer);
 	del_zeros(buffer);
 
