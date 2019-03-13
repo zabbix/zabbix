@@ -310,12 +310,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve macros in trigger name.
 	 *
+	 * @param array  $triggers
 	 * @param string $triggers[$triggerid]['expression']
 	 * @param string $triggers[$triggerid]['description']
-	 * @param int    $triggers[$triggerid]['clock']			(optional)
-	 * @param int    $triggers[$triggerid]['ns']			(optional)
 	 * @param array  $options
-	 * @param bool   $options['references_only']			resolve only $1-$9 macros
+	 * @param bool   $options['references_only']           resolve only $1-$9 macros
 	 *
 	 * @return array
 	 */
@@ -438,7 +437,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = $this->transformToPositionTypes($types);
 
 		// Replace macros to value.
-		foreach ($macro_values as $triggerid => $macro) {
+		foreach ($macro_values as $triggerid => $foo) {
 			$trigger = &$triggers[$triggerid];
 
 			$matched_macros = $this->getMacroPositions($trigger['description'], $types);
@@ -459,12 +458,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve macros in trigger description.
 	 *
+	 * @param array  $triggers
 	 * @param string $triggers[$triggerid]['expression']
 	 * @param string $triggers[$triggerid]['comments']
+	 * @param int    $triggers[$triggerid]['clock']       (optional)
+	 * @param int    $triggers[$triggerid]['ns']          (optional)
+	 * @param bool   $options['events']                   Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
 	 *
 	 * @return array
 	 */
-	public function resolveTriggerDescriptions(array $triggers) {
+	public function resolveTriggerDescriptions(array $triggers, array $options) {
 		$macros = [
 			'host' => [],
 			'interface' => [],
@@ -535,7 +538,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Get macro value.
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
-		$macro_values = $this->getItemMacros($macros['item'], $macro_values);
+		$macro_values = $this->getItemMacros($macros['item'], $macro_values, $triggers, $options['events']);
 
 		if ($usermacros) {
 			// Get hosts for triggers.
@@ -564,7 +567,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = $this->transformToPositionTypes($types);
 
 		// Replace macros to value
-		foreach ($macro_values as $triggerid => $macro) {
+		foreach ($macro_values as $triggerid => $foo) {
 			$trigger = &$triggers[$triggerid];
 
 			$matched_macros = $this->getMacroPositions($trigger['comments'], $types);

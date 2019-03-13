@@ -1,11 +1,20 @@
 Changes for 4.0.6rc1
 
 New features:
+A.F....... [ZBX-15286] dropped support use of discovered items as master (Sasha)
 ...G...... [ZBXNEXT-4898] added support IPv6 for "net.dns" and "net.dns.record" (MVekslers)
 .......PS. [ZBXNEXT-5037] added "skip" parameter for vmware.eventlog key (MVekslers)
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+A.F....... [ZBX-15219] fixed unwanted removing scenario post fields on scenario update (gcalenko, vasilijs)
+..F....... [ZBX-11278] reworked property state indicator in mass update screens (miks)
+........S. [ZBX-15716] fixed escalation cancel message is called if escalation interrupts with unfinished step or recovery (akozlovs)
+..F....... [ZBX-15468] fixed LDAP configuration form not being able to save changes when user password field is empty string (gcalenko)
+..F....... [ZBX-15669] fixed page scroll after widget being added to dashboard (gcalenko)
+..F....... [ZBX-15548] fixed resolving of {ITEM.VALUE} macro in the trigger description (Sasha)
+........S. [ZBX-15774] fixed memory leak in housekeeper when elasticsearch is used (vso)
+........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
 ..F....... [ZBX-15608] fixed when Widget Graph show disabled trigger/problem (vasilijs)
 ..F....... [ZBX-10397] fixed when global messaging severities unchecked if profile saved earlier (ashubin, vasilijs)
 A.F....... [ZBX-15596] fixed when widget in frontend can be created larger than API validation supports (ashubin, vasilijs)
@@ -2279,6 +2288,7 @@ Changes for 3.0.26rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
 .......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
 .......PS. [ZBX-14858] fixed processing of unlimited vmware maxQueryMetrics value (MVekslers)
 .D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)

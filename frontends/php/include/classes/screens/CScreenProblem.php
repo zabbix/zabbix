@@ -622,7 +622,25 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($resolve_comments) {
-			$data['triggers'] = CMacrosResolverHelper::resolveTriggerDescriptions($data['triggers']);
+			foreach ($data['problems'] as &$problem) {
+				$trigger = $data['triggers'][$problem['objectid']];
+				$problem['comments'] = CMacrosResolverHelper::resolveTriggerDescription(
+					[
+						'triggerid' => $problem['objectid'],
+						'expression' => $trigger['expression'],
+						'comments' => $trigger['comments'],
+						'clock' => $problem['clock'],
+						'ns' => $problem['ns']
+					],
+					['events' => true]
+				);
+			}
+			unset($problem);
+
+			foreach ($data['triggers'] as &$trigger) {
+				unset($trigger['comments']);
+			}
+			unset($trigger);
 		}
 
 		if ($resolve_urls) {
@@ -1020,7 +1038,7 @@ class CScreenProblem extends CScreenBase {
 					? makeTriggerDependencies($dependencies[$trigger['triggerid']])
 					: [];
 				$description[] = (new CLinkAction($problem['name']))
-					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid']));
+					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']));
 
 				if ($this->data['filter']['details'] == 1) {
 					$description[] = BR();
