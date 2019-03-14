@@ -328,7 +328,6 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 		result = (SUCCEED == ret ? zbx_variant_value_desc(&value) : error);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): %s", __function_name, zbx_variant_value_desc(&value_start));
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: %s %s",__function_name,  zbx_result_string(ret), result);
-
 	}
 
 	size = zbx_preprocessor_pack_result(&data, &value, &history_out, error);
@@ -445,15 +444,15 @@ static int	worker_item_preproc_test(unsigned char value_type, zbx_variant_t *val
  ******************************************************************************/
 static void	worker_test_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
 {
-	zbx_uint32_t			size = 0;
-	unsigned char			*data = NULL, value_type;
-	zbx_variant_t			value, value_start;
-	int				i, steps_num, results_num;
-	char				*error = NULL, *value_str = NULL;
-	zbx_timespec_t			ts;
-	zbx_preproc_op_t		*steps;
-	zbx_vector_ptr_t		history_in, history_out;
-	zbx_preproc_result_t		*results;
+	zbx_uint32_t		size;
+	unsigned char		*data, value_type;
+	zbx_variant_t		value, value_start;
+	int			i, steps_num, results_num;
+	char			*error = NULL, *value_str;
+	zbx_timespec_t		ts;
+	zbx_preproc_op_t	*steps;
+	zbx_vector_ptr_t	history_in, history_out;
+	zbx_preproc_result_t	*results;
 
 	zbx_vector_ptr_create(&history_in);
 	zbx_vector_ptr_create(&history_out);
