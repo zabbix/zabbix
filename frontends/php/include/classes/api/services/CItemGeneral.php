@@ -1575,6 +1575,7 @@ abstract class CItemGeneral extends CApiService {
 	public function validateItemPreprocessingSteps(array $preprocessing_steps) {
 		try {
 			$this->validateItemPreprocessing(['preprocessing' => $preprocessing_steps]);
+
 			return true;
 		}
 		catch (APIException $error) {
