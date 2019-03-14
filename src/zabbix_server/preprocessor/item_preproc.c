@@ -1743,6 +1743,23 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_item_preproc_handle_error                                    *
+ *                                                                            *
+ * Purpose: apply 'on fail' preprocessing error handler                       *
+ *                                                                            *
+ * Parameters: value         - [IN/OUT] the value                             *
+ *             op            - [IN] the preprocessing operation that produced *
+ *                                  the error                                 *
+ *             error         - [INT/OUT] error message                        *
+ *                                                                            *
+ * Return value: SUCCEED - the preprocessing step result was overridden by    *
+ *                         error handler to successful result.                *
+ *               FAIL    - the preprocessing step must still fail, error might*
+ *                         have been changed.                                 *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_item_preproc_handle_error(zbx_variant_t *value, const zbx_preproc_op_t *op, char **error)
 {
 	switch (op->error_handler)

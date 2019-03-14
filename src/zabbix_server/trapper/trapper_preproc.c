@@ -24,6 +24,24 @@
 #include "preproc.h"
 #include "trapper_preproc.h"
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_trapper_preproc_test                                         *
+ *                                                                            *
+ * Purpose: processes preprocessing test request                              *
+ *                                                                            *
+ * Parameters: sock - [IN] the request source socket (frontend)               *
+ *             jp   - [IN] the request                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the request was processed successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: This function will send proper (success/fail) response to the    *
+ *           request socket.                                                  *
+ *           Preprocessing failure (error returned by a preprocessing step)   *
+ *           is counted as successful test and will return success response.  *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_trapper_preproc_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
 	char			buffer[MAX_STRING_LEN], *error = NULL, *value = NULL, *last_value = NULL,

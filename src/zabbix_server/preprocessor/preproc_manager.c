@@ -34,7 +34,6 @@
 #include "linked_list.h"
 #include "preproc_history.h"
 
-
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num, CONFIG_PREPROCESSOR_FORKS;
 

@@ -1074,7 +1074,8 @@ int	zbx_preprocessor_test(unsigned char value_type, const char *value, const cha
 
 		if (NULL == message)
 		{
-			*error = zbx_strdup(NULL, "timeout occurred while waiting for response from pre-processing manager");
+			*error = zbx_strdup(NULL, "timeout occurred while waiting for response from pre-processing"
+					" manager");
 			goto out;
 		}
 
