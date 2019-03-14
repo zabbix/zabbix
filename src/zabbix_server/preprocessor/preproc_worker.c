@@ -386,9 +386,9 @@ static int	worker_item_preproc_test(unsigned char value_type, zbx_variant_t *val
 
 	for (i = 0; i < steps_num; i++)
 	{
-		zbx_preproc_op_t		*op = &steps[i];
-		zbx_variant_t			history_value;
-		zbx_timespec_t			history_ts;
+		zbx_preproc_op_t	*op = &steps[i];
+		zbx_variant_t		history_value;
+		zbx_timespec_t		history_ts;
 
 		zbx_preproc_history_pop_value(history_in, i, &history_value, &history_ts);
 
