@@ -939,21 +939,6 @@ AC_DEFINE(HAVE___VA_COPY,1,[Define to 1 if macro '__va_copy' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
-AC_MSG_CHECKING(for macro __VA_ARGS__)
-AC_TRY_COMPILE(
-[
-#define ZBX_CONST_STRING(str)   str
-int test(const char *fmt, ...) { return 0; }
-],
-[
-#define TEST(fmt, ...) test(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-TEST("%s","test");
-TEST("test");
-],
-AC_DEFINE(HAVE___VA_ARGS__,1,[Define to 1 if macro '__VA_ARGS__' exists.])
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
-
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                 Checks for library functions                  *
