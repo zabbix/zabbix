@@ -98,6 +98,13 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 
 		// Resolve macros used in parameter fields.
 		foreach ($data['steps'] as &$step) {
+			/**
+			 * Values received from html form may be transformed so we must removed redundant "\r" before sending data
+			 * to Zabbix server.
+			 */
+			$step['params'] = str_replace("\r\n", "\n", $step['params']);
+
+			// Resolve macros in parameter fields before send data to Zabbix server.
 			foreach (['params', 'error_handler_params'] as $field) {
 				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($step[$field], $macros_types);
 
