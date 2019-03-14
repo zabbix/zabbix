@@ -1565,7 +1565,10 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 		/* make sure we are not called twice without */
 		/* putting a new sql into the buffer first */
 		if (*sql_offset <= ZBX_SQL_EXEC_FROM)
+		{
 			THIS_SHOULD_NEVER_HAPPEN;
+			return ret;
+		}
 
 		/* Oracle fails with ORA-00911 if it encounters ';' w/o PL/SQL block */
 		zbx_rtrim(*sql, ZBX_WHITESPACE ";");
