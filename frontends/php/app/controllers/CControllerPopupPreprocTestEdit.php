@@ -61,23 +61,26 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 		$support_lldmacros = ($this->preproc_item instanceof CItemPrototype);
 		$show_prev = (count(array_intersect($preprocessing_types, self::$preproc_steps_using_prev_value)) > 0);
 
-		$macros_parser_types = $support_lldmacros
-			? ['usermacros' => true, 'lldmacros' => true]
-			: ['usermacros' => true];
+		// Extract macros and get effective values.
+		$usermacros = CMacrosResolverHelper::extractMacrosFromPreprocessingSteps([
+			'steps' => $preprocessing_steps,
+			'hostid' => $this->getInput('hostid', 0),
+			'delay' => $show_prev ? $this->getInput('delay', ZBX_ITEM_DELAY_DEFAULT) : ''
+		], $support_lldmacros);
 
-		if ($show_prev && ($delay = $this->getInput('delay')) === '') {
-			$delay = ZBX_ITEM_DELAY_DEFAULT;
+		// Get previous value time.
+		if ($show_prev) {
+			$delay = timeUnitToSeconds($usermacros['delay']);
+			$prev_time = ($delay !== null && $delay > 0)
+				? 'now-'.$usermacros['delay']
+				: 'now';
+		}
+		else {
+			$prev_time = '';
 		}
 
-		// Extract delay macro.
-		$delay_macro = [];
-		if ($show_prev && $delay[0] === '{') {
-			$update_interval_parser = new CUpdateIntervalParser($macros_parser_types);
-
-			if ($update_interval_parser->parse($this->getInput('delay')) == CParser::PARSE_SUCCESS) {
-				$delay_macro = [$update_interval_parser->getDelay()];
-			}
-		}
+		// Sort macros.
+		ksort($usermacros['macros']);
 
 		// Add step number and name for each preprocessing step.
 		$num = 0;
@@ -87,71 +90,11 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 		}
 		unset($step);
 
-		// Extract macros from parameter property.
-		$parameters = [];
-		foreach ($preprocessing_steps as $step) {
-			if ($step['params'] !== '') {
-				$parameters[] = $step['params'];
-			}
-			if ($step['error_handler_params'] !== '') {
-				$parameters[] = $step['error_handler_params'];
-			}
-		}
-		$matched_macros = $parameters ?
-			(new CMacrosResolverGeneral)->extractMacros($parameters, $macros_parser_types)
-			: ['usermacros' => [], 'lldmacros' => []];
-
-		// Select user macros values from database.
-		$macros_to_resolve = array_merge(array_keys($matched_macros['usermacros']), $delay_macro);
-		$db_macros = ($macros_to_resolve && $this->getInput('hostid', 0) != 0)
-			? API::UserMacro()->get([
-				'output' => ['macro', 'value'],
-				'hostids' => $this->getInput('hostid'),
-				'filter' => [
-					'macro' => $macros_to_resolve
-				]
-			])
-			: [];
-
-		$db_macros_map = [];
-		foreach ($db_macros as $db_macro) {
-			$db_macros_map[$db_macro['macro']] = $db_macro['value'];
-		}
-		$db_macros = $db_macros_map;
-		unset($db_macros_map);
-
-		// Combine selected macros and apply values selected from database.
-		$macros = $support_lldmacros
-			? $matched_macros['usermacros'] + $matched_macros['lldmacros']
-			: $matched_macros['usermacros'];
-		ksort($macros);
-
-		foreach ($macros as $macro_name => &$macro_value) {
-			$macro_value = array_key_exists($macro_name, $db_macros)
-				? $db_macros[$macro_name]
-				: '';
-		}
-		unset($macro_value);
-
-		// Get previous value time.
-		if ($show_prev) {
-			if ($delay_macro && array_key_exists($delay_macro[0], $db_macros)) {
-				$delay = $db_macros[$delay_macro[0]];
-			}
-
-			$prev_time = (timeUnitToSeconds($delay) > 0)
-				? 'now-'.$delay
-				: 'now';
-		}
-		else {
-			$prev_time = '';
-		}
-
 		$this->setResponse(new CControllerResponseData([
 			'title' => _('Test item preprocessing'),
 			'errors' => hasErrorMesssages() ? getMessages() : null,
 			'steps' => $preprocessing_steps,
-			'macros' => $macros,
+			'macros' => $usermacros['macros'],
 			'show_prev' => $show_prev,
 			'prev_time' => $prev_time,
 			'hostid' => $this->getInput('hostid'),

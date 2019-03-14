@@ -573,4 +573,23 @@ class CMacrosResolverHelper {
 
 		return self::$macrosResolver->sortItemsByExpressionOrder($triggers);
 	}
+
+	/**
+	 * Extract macros from properties used for preprocessing step test and find effective values.
+	 *
+	 * @param array  $data
+	 * @param string $data['steps']                              Preprocessing steps details.
+	 * @param string $data['steps'][]['params']                  Preprocessing step parameters.
+	 * @param string $data['steps'][]['error_handler_params]     Preprocessing steps error handle parameters.
+	 * @param string $data['delay']                              Update interval value.
+	 * @param string $data['hostids']                            Hostid for which tested item belongs to.
+	 * @param bool   $support_lldmacros                          Enable or disable LLD macro selection.
+	 *
+	 * @return array
+	 */
+	public static function extractMacrosFromPreprocessingSteps(array $data, $support_lldmacros) {
+		self::init();
+
+		return self::$macrosResolver->extractMacrosFromPreprocessingSteps($data, $support_lldmacros);
+	}
 }
