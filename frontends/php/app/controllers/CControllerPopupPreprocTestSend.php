@@ -82,8 +82,10 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 
 		// Get previous value and time.
 		if (count(array_intersect($preprocessing_types, self::$preproc_steps_using_prev_value)) > 0) {
-			if (($prev_time = $this->getInput('prev_time', '')) === '') {
-				$prev_time = 'now-'.ZBX_ITEM_DELAY_DEFAULT;
+			$prev_time = $this->getInput('prev_time', '');
+			$relative_time_parser = new CRelativeTimeParser();
+			if ($relative_time_parser->parse($prev_time) != CParser::PARSE_SUCCESS) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'), _('a time is expected')));
 			}
 
 			$data += [
@@ -110,7 +112,6 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 		}
 		unset($step);
 
-		$msg_status = true;
 		$output = [
 			'steps' => [],
 			'user' => [
@@ -118,45 +119,49 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 			]
 		];
 
-		// Send test details to Zabbix server.
-		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-		$result = $server->testPreprocessingSteps($data, get_cookie('zbx_sessionid'));
-
-		if ($result === false) {
-			error($server->getError());
-			$msg_status = false;
+		if (($messages = getMessages(false)) !== null) {
+			$output['messages'] = $messages->toString();
 		}
-		elseif (is_array($result)) {
-			$test_failed = false;
-			foreach ($data['steps'] as $i => &$step) {
-				if ($test_failed) {
-					// If test is failed, proceesing steps are skipped from results.
-					unset($data['steps'][$i]);
-					continue;
-				}
-				elseif (array_key_exists($i, $result)) {
-					$step += $result[$i];
+		else {
+			// Send test details to Zabbix server.
+			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+			$result = $server->testPreprocessingSteps($data, get_cookie('zbx_sessionid'));
 
-					if (array_key_exists('error', $step)) {
-						// If error happened and no value is set, frontend shows label 'No value'.
-						if (!array_key_exists('action', $step) || $step['action'] != ZBX_PREPROC_FAIL_SET_VALUE) {
-							unset($step['result']);
-							$test_failed = true;
+			if ($result === false) {
+				error($server->getError());
+			}
+			elseif (is_array($result)) {
+				$test_failed = false;
+				foreach ($data['steps'] as $i => &$step) {
+					if ($test_failed) {
+						// If test is failed, proceesing steps are skipped from results.
+						unset($data['steps'][$i]);
+						continue;
+					}
+					elseif (array_key_exists($i, $result)) {
+						$step += $result[$i];
+
+						if (array_key_exists('error', $step)) {
+							// If error happened and no value is set, frontend shows label 'No value'.
+							if (!array_key_exists('action', $step) || $step['action'] != ZBX_PREPROC_FAIL_SET_VALUE) {
+								unset($step['result']);
+								$test_failed = true;
+							}
 						}
 					}
-				}
 
-				unset($step['type']);
-				unset($step['params']);
-				unset($step['error_handler']);
-				unset($step['error_handler_params']);
+					unset($step['type']);
+					unset($step['params']);
+					unset($step['error_handler']);
+					unset($step['error_handler_params']);
+				}
+				unset($step);
 			}
-			unset($step);
+
+			$output['steps'] = $data['steps'];
 		}
 
-		$output['steps'] = $data['steps'];
-
-		if (($messages = getMessages($msg_status)) !== null) {
+		if (($messages = getMessages(false)) !== null) {
 			$output['messages'] = $messages->toString();
 		}
 
