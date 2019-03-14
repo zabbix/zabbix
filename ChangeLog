@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-15286] dropped support use of discovered items as master (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-15798] fixed proxy configuration update failure on Oracle; fixed failure on empty SQL buffer on Oracle (kalimulin)
 A.F....... [ZBX-15219] fixed unwanted removing scenario post fields on scenario update (gcalenko, vasilijs)
 ..F....... [ZBX-11278] reworked property state indicator in mass update screens (miks)
 ........S. [ZBX-15716] fixed escalation cancel message is called if escalation interrupts with unfinished step or recovery (akozlovs)
@@ -218,6 +219,7 @@ A.F....... [ZBX-15286] dropped support use of discovered items as master (Sasha)
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+.......PS. [ZBX-15798] fixed proxy configuration update failure on Oracle; fixed failure on empty SQL buffer on Oracle (kalimulin)
 A.F....... [ZBX-15219] fixed unwanted removing scenario post fields on scenario update (gcalenko, vasilijs)
 ..F....... [ZBX-11278] reworked property state indicator in mass update screens (miks)
 ........S. [ZBX-15716] fixed escalation cancel message is called if escalation interrupts with unfinished step or recovery (akozlovs)
