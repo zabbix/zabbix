@@ -4819,6 +4819,9 @@ table.preprocessing-test-results .rel-container {
   top: 4px;
   margin-left: 3px; }
 
+#preprocessing-test-form .table-forms-separator {
+  margin-top: -2px; }
+
 .list-table thead th {
   border-color: #404040; }
 

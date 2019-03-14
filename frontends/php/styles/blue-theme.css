@@ -4794,3 +4794,6 @@ table.preprocessing-test-results td {
 table.preprocessing-test-results .rel-container {
   top: 4px;
   margin-left: 3px; }
+
+#preprocessing-test-form .table-forms-separator {
+  margin-top: -2px; }

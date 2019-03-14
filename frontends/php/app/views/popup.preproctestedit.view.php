@@ -100,9 +100,7 @@ $form_list = (new CFormList())
 if ($macros_table) {
 	$form_list->addRow(
 		_('Macros'),
-		(new CDiv($macros_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px; margin-top: -2px; width: 100%;')
+		(new CDiv($macros_table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	);
 }
 
@@ -110,7 +108,7 @@ $form_list->addRow(
 	_('Preprocessing steps'),
 	(new CDiv($result_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px; margin-top: -2px; width: 100%;')
+		->addStyle('width: 100%;')
 );
 
 $form

@@ -6678,6 +6678,12 @@ table.preprocessing-test-results {
 	}
 }
 
+#preprocessing-test-form {
+	.table-forms-separator {
+		margin-top: -2px;
+	}
+}
+
 @if $theme_name == 'dev' {
 
 /*doc
