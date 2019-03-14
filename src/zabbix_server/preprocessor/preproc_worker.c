@@ -432,6 +432,7 @@ static int	worker_item_preproc_test(unsigned char value_type, zbx_variant_t *val
 
 	return ret;
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: worker_test_value                                                *
@@ -497,7 +498,6 @@ static void	worker_test_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *messa
 	zbx_vector_ptr_clear_ext(&history_in, (zbx_clean_func_t)zbx_preproc_op_history_free);
 	zbx_vector_ptr_destroy(&history_in);
 }
-
 
 ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 {
