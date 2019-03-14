@@ -88,8 +88,18 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 		unset($step);
 
 		// Extract macros from parameter property.
-		$parameters = zbx_objectValues($preprocessing_steps, 'params');
-		$matched_macros = (new CMacrosResolverGeneral)->extractMacros($parameters, $macros_parser_types);
+		$parameters = [];
+		foreach ($preprocessing_steps as $step) {
+			if ($step['params'] !== '') {
+				$parameters[] = $step['params'];
+			}
+			if ($step['error_handler_params'] !== '') {
+				$parameters[] = $step['error_handler_params'];
+			}
+		}
+		$matched_macros = $parameters
+			? (new CMacrosResolverGeneral)->extractMacros($parameters, $macros_parser_types)
+			: [];
 
 		// Select user macros values from database.
 		$macros_to_resolve = array_merge(array_keys($matched_macros['usermacros']), $delay_macro);

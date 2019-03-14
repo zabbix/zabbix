@@ -96,14 +96,16 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 
 		// Resolve macros used in parameter fields.
 		foreach ($data['steps'] as &$step) {
-			$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($step['params'], $macros_types);
+			foreach (['params', 'error_handler_params'] as $field) {
+				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($step[$field], $macros_types);
 
-			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-				$macro_value = array_key_exists($macro, $macros_posted)
-					? $macros_posted[$macro]
-					: '';
+				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+					$macro_value = array_key_exists($macro, $macros_posted)
+						? $macros_posted[$macro]
+						: '';
 
-				$step['params'] = substr_replace($step['params'], $macro_value, $pos, strlen($macro));
+					$step[$field] = substr_replace($step[$field], $macro_value, $pos, strlen($macro));
+				}
 			}
 		}
 		unset($step);
