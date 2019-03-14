@@ -328,12 +328,26 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '{$M}  {   label1   =     "value1"   ,   label2  =~  "{$M}"  ,  }   ==   {#LLD}'
 				]
 			],
+			[
+				'{{$M}="value1"}==1', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M}="value1"}==1'
+				]
+			],
 			// Label value can by anything, no user macro enabling flag is required.
 			[
 				'{label1="{$M}"}', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{label1="{$M}"}'
+				]
+			],
+			[
+				'{{$M}="{$M"}==1', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M}="{$M"}==1'
 				]
 			],
 			// Double backslash at the end of label value.
@@ -527,6 +541,14 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{#LLD}  {label1="value1"}'
+				]
+			],
+			// LLD macros are not supported in label names.
+			[
+				'metric{{#LLD}="value1"}==1', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'metric'
 				]
 			],
 			// fail
@@ -732,6 +754,14 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 			// Functional macros are not supported.
 			[
 				'{{#LLD}.regsub("^([0-9]+)", "{#LLD}: \1")}  {label1="value1"}  ==  {{#LLD}.regsub("^([0-9]+)", "{#LLD}: \1")}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			// Invalid label name using a user macro.
+			[
+				'{__{$M}__="value1"}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''

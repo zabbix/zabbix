@@ -74,7 +74,7 @@ class CPrometheusPatternParser extends CParser {
 			self::skipWhitespaces($source, $p_tmp);
 		}
 
-		if (self::parseLabelsValues($source, $p_tmp, $has_metric_name)) {
+		if ($this->parseLabelsValues($source, $p_tmp, $has_metric_name)) {
 			$p = $p_tmp;
 		}
 		elseif (!$has_metric_name) {
@@ -155,23 +155,27 @@ class CPrometheusPatternParser extends CParser {
 	 *
 	 * @return bool
 	 */
-	private static function parseLabelValuePair($source, &$pos, &$has_metric_label) {
+	private function parseLabelValuePair($source, &$pos, &$has_metric_label) {
 		$p = $pos;
 
 		// Parse label name.
-		if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*/', substr($source, $p), $matches)) {
-			return false;
-		}
+		if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*/', substr($source, $p), $matches)) {
+			if ($matches[0] === '__name__') {
+				if ($has_metric_label) {
+					return false;
+				}
 
-		if ($matches[0] === '__name__') {
-			if ($has_metric_label) {
-				return false;
+				$has_metric_label = true;
 			}
 
-			$has_metric_label = true;
+			$p += strlen($matches[0]);
 		}
-
-		$p += strlen($matches[0]);
+		elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->user_macro_parser->getLength();
+		}
+		else {
+			return false;
+		}
 
 		self::skipWhitespaces($source, $p);
 
@@ -233,7 +237,7 @@ class CPrometheusPatternParser extends CParser {
 	 *
 	 * @return bool
 	 */
-	private static function parseLabelsValues($source, &$pos, $has_metric_name) {
+	private function parseLabelsValues($source, &$pos, $has_metric_name) {
 		$p = $pos;
 
 		if (!isset($source[$p]) || $source[$p] !== '{') {
@@ -246,7 +250,7 @@ class CPrometheusPatternParser extends CParser {
 		while (true) {
 			self::skipWhitespaces($source, $p);
 
-			if (!self::parseLabelValuePair($source, $p, $has_metric_label)) {
+			if (!$this->parseLabelValuePair($source, $p, $has_metric_label)) {
 				break;
 			}
 
