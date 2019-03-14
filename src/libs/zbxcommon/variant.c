@@ -295,9 +295,9 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 	}
 }
 
-const char	*zbx_variant_type_desc(const zbx_variant_t *value)
+const char	*zbx_get_variant_type_desc(unsigned char type)
 {
-	switch (value->type)
+	switch (type)
 	{
 		case ZBX_VARIANT_DBL:
 			return "double";
@@ -313,6 +313,11 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value)
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_UNKNOWN_STR;
 	}
+}
+
+const char	*zbx_variant_type_desc(const zbx_variant_t *value)
+{
+	return zbx_get_variant_type_desc(value->type);
 }
 
 int	zbx_validate_value_dbl(double value)

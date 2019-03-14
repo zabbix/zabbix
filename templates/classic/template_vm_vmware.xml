@@ -40,7 +40,7 @@
                     <type>3</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>vmware.eventlog[{$URL}]</key>
+                    <key>vmware.eventlog[{$URL},skip]</key>
                     <delay>1m</delay>
                     <history>90d</history>
                     <trends>0</trends>

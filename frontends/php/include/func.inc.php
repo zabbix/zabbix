@@ -811,7 +811,7 @@ function convert_units($options = []) {
  *
  * @param string $time
  *
- * @return int
+ * @return null|string
  */
 function timeUnitToSeconds($time) {
 	preg_match('/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/', $time, $matches);
@@ -821,7 +821,8 @@ function timeUnitToSeconds($time) {
 	if (!array_key_exists('number', $matches)) {
 		return null;
 	}
-	elseif (array_key_exists('suffix', $matches)) {
+
+	if (array_key_exists('suffix', $matches)) {
 		$time = $matches['number'];
 
 		switch ($matches['suffix']) {

@@ -72,9 +72,9 @@ $pair_tables = [
 			'label' => _('Post type'),
 			'items' => (new CRadioButtonList('post_type', $options['post_type']))
 				->addValue(_('Form data'), ZBX_POSTTYPE_FORM, null,
-					'return switchToPostType("'.$http_popup_form->getId().'", this.value);')
+					'return switchToPostType("'.$http_popup_form->getId().'", this.value, this);')
 				->addValue(_('Raw data'), ZBX_POSTTYPE_RAW, null,
-					'return switchToPostType("'.$http_popup_form->getId().'", this.value);')
+					'return switchToPostType("'.$http_popup_form->getId().'", this.value, this);')
 				->setModern(true)
 		],
 		'footer' => [
