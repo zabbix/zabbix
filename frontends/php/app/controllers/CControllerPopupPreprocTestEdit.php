@@ -97,9 +97,9 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 				$parameters[] = $step['error_handler_params'];
 			}
 		}
-		$matched_macros = $parameters
-			? (new CMacrosResolverGeneral)->extractMacros($parameters, $macros_parser_types)
-			: [];
+		$matched_macros = $parameters ?
+			(new CMacrosResolverGeneral)->extractMacros($parameters, $macros_parser_types)
+			: ['usermacros' => [], 'lldmacros' => []];
 
 		// Select user macros values from database.
 		$macros_to_resolve = array_merge(array_keys($matched_macros['usermacros']), $delay_macro);
