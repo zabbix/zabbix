@@ -7,8 +7,5 @@ libzbxtrapper_a_SOURCES = \
 	trapper.c trapper.h \
 	nodecommand.c nodecommand.h \
 	proxyconfig.c proxyconfig.h \
-	proxydiscovery.c proxydiscovery.h \
-	proxyautoreg.c proxyautoreg.h \
-	proxyhosts.c proxyhosts.h \
 	proxydata.c proxydata.h \
 	trapper_preproc.c trapper_preproc.h

@@ -4940,114 +4940,7 @@ a.link-action {
 	background-color: $alt-red;
 }
 
-.na-bg {
-	color: darken($alt-blue-grey, 45%);
-
-	a.link-action,
-	input[type="radio"]:checked + label {
-		color: darken($alt-blue-grey, 45%);
-	}
-}
-
-td.na-bg {
-	~ td.na-bg {
-		border-left: 1px dotted $table-border-color;
-	}
-}
-
-.log-na-bg {
-	color: darken($alt-blue-grey,45%);
-	background-color: $alt-blue-grey;
-}
-
-.normal-bg {
-	color: darken($alt-green,45%);
-	@extend .green-bg;
-
-	a.link-action {
-	color: darken($alt-green,45%);
-	}
-}
-
-td.normal-bg {
-	@extend td.na-bg;
-}
-
-.info-bg {
-	color: darken($alt-dark-blue, 45%);
-
-	a.link-action,
-	input[type="radio"]:checked + label {
-		color: darken($alt-dark-blue, 45%);
-	}
-}
-
-td.info-bg {
-	@extend td.na-bg;
-}
-
-.log-info-bg {
-	color: darken($alt-dark-blue,45%);
-	background-color: $alt-dark-blue;
-}
-
-.average-bg {
-	color: darken($alt-orange, 45%);
-
-	a.link-action,
-	input[type="radio"]:checked + label {
-		color: darken($alt-orange, 45%);
-	}
-}
-
-td.average-bg {
-	@extend td.na-bg;
-}
-
-.warning-bg {
-	color: darken($alt-yellow, 45%);
-
-	a.link-action,
-	input[type="radio"]:checked + label {
-		color: darken($alt-yellow, 45%);
-	}
-}
-
-td.warning-bg {
-	@extend td.na-bg;
-}
-
-.log-warning-bg {
-	color: darken($alt-yellow,45%);
-	background-color: $alt-yellow;
-}
-
-.high-bg {
-	color: darken($alt-dark-orange, 45%);
-
-	a.link-action,
-	input[type="radio"]:checked + label {
-		color: darken($alt-dark-orange, 45%);
-	}
-}
-
-td.high-bg {
-	@extend td.na-bg;
-}
-
-.log-high-bg {
-	color: darken($alt-dark-orange,45%);
-	background-color: $alt-dark-orange;
-}
-
-.disaster-bg {
-	color: darken($alt-red, 45%);
-
-	a.link-action,
-	input[type="radio"]:checked + label {
-		color: darken($alt-red, 45%);
-	}
-}
+// SEVERITY STATUSES
 
 .na-bg,
 .normal-bg,
@@ -5069,14 +4962,53 @@ td.high-bg {
 		}
 	}
 }
-
-td.disaster-bg {
-	@extend td.na-bg;
+@if $theme_name == 'blue' or $theme_name == 'dark' {
+	td[class] {
+		+ {
+			td.na-bg,
+			td.normal-bg,
+			td.info-bg,
+			td.average-bg,
+			td.warning-bg,
+			td.high-bg,
+			td.disaster-bg {
+				border-left: 1px dotted $table-border-color;
+			}
+		}
+	}
 }
 
-.log-disaster-bg {
-	color: darken($alt-red,45%);
-	background-color: $alt-red;
+@each $severity-type, $color in (
+	na-bg: $alt-blue-grey,
+	normal-bg: $alt-green,
+	info-bg: $alt-dark-blue,
+	average-bg: $alt-orange,
+	warning-bg: $alt-yellow,
+	high-bg: $alt-dark-orange,
+	disaster-bg: $alt-red,
+) {
+	.#{$severity-type} {
+		color: darken($color, 45%);
+
+		@if $severity-type == normal-bg {
+			background-color: $color;
+
+			a.link-action {
+				color: darken($color, 45%);
+			}
+		}
+		@else {
+			a.link-action,
+			input[type="radio"]:checked + label {
+				color: darken($color, 45%);
+			}
+		}
+	}
+
+	.log-#{$severity-type} {
+		color: darken($color,45%);
+		background-color: $color;
+	}
 }
 
 .inactive-bg {
@@ -5088,7 +5020,7 @@ td.inactive-bg {
 	@extend .inactive-bg;
 }
 
-// Filter Checkboxes
+// FILTER CHECKBOXES
 
 .table-forms-second-column {
 	display: inline-block;
@@ -5556,8 +5488,7 @@ a.overlay-close-btn {
 		animation: fadein 2s ease-in 0.5s normal forwards;
 	}
 
-	&.delayed-15s::before {
-		@extend .in-progress::before;
+	&.delayed-15s:before {
 		animation-delay: 15s;
 	}
 
@@ -5578,8 +5509,7 @@ a.overlay-close-btn {
 		animation: fadein 2s ease-in 0.5s normal forwards,load 0.6s infinite linear;
 	}
 
-	&.delayed-15s::after {
-		@extend .in-progress::after;
+	&.delayed-15s:after {
 		animation-delay: 15s;
 	}
 }
@@ -6525,7 +6455,7 @@ ul.checkbox-list {
 	background-position: -349px -245px;
 }
 .icon-action-severity-down::before {
-	background-position: -375px -245px;
+	background-position: -374px -245px;
 }
 .icon-action-severity-changed::before {
 	background-position: -399px -245px;

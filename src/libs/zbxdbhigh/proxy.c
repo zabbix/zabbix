@@ -30,6 +30,7 @@
 #include "zbxalgo.h"
 #include "preproc.h"
 #include "../zbxcrypto/tls_tcp_active.h"
+#include "zbxlld.h"
 
 extern char	*CONFIG_SERVER;
 
@@ -484,14 +485,35 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 				",hosts r where t.hostid=r.hostid"
 					" and r.proxy_hostid=" ZBX_FS_UI64
 					" and r.status in (%d,%d)"
-					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+					" and t.flags<>%d"
+					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 				proxy_hostid,
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+				ZBX_FLAG_DISCOVERY_PROTOTYPE,
 				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c,
 				ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH,
 				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL,
-				ITEM_TYPE_HTTPAGENT);
+				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_DEPENDENT);
+	}
+	else if (0 == strcmp(table->table, "item_preproc"))
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				",items i,hosts r"
+				" where t.itemid=i.itemid"
+					" and i.hostid=r.hostid"
+					" and r.proxy_hostid=" ZBX_FS_UI64
+					" and r.status in (%d,%d)"
+					" and i.flags<>%d"
+					" and i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+				proxy_hostid,
+				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+				ZBX_FLAG_DISCOVERY_PROTOTYPE,
+				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c,
+				ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
+				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH,
+				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL,
+				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_DEPENDENT);
 	}
 	else if (0 == strcmp(table->table, "drules"))
 	{
@@ -694,6 +716,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		"hosts_templates",
 		"hostmacro",
 		"items",
+		"item_preproc",
 		"drules",
 		"dchecks",
 		"regexps",
@@ -1468,15 +1491,15 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=" ZBX_FS_UI64 ";\n",
 						table->recid, recid);
+
+				if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+					goto clean;
 			}
 			else
 			{
 				sql_offset = tmp_offset;	/* discard this update, all fields are the same */
 				*(sql + sql_offset) = '\0';
 			}
-
-			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-				goto clean;
 		}
 	}
 
@@ -2368,6 +2391,36 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
 
 /******************************************************************************
  *                                                                            *
+ * Function: process_item_value                                               *
+ *                                                                            *
+ * Purpose: processes item value depending on proxy/flags settings            *
+ *                                                                            *
+ * Parameters: item    - [IN] the item to process                             *
+ *             result  - [IN] the item result                                 *
+ *                                                                            *
+ * Comments: Values gathered by server are sent to the preprocessing manager, *
+ *           while values received from proxy are already preprocessed and    *
+ *           must be either directly stored to history cache or sent to lld   *
+ *           manager.                                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	process_item_value(const DC_ITEM *item, AGENT_RESULT *result, zbx_timespec_t *ts, char *error)
+{
+	if (0 == item->host.proxy_hostid)
+	{
+		zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, result, ts, item->state, error);
+	}
+	else
+	{
+		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
+			zbx_lld_process_agent_result(item->itemid, result, ts, error);
+		else
+			dc_add_history(item->itemid, item->value_type, item->flags, result, ts, item->state, error);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_history_data_value                                       *
  *                                                                            *
  * Purpose: process single value from incoming history data                   *
@@ -2408,8 +2461,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 		zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s", item->host.host, item->key_orig, value->value);
 
 		item->state = ITEM_STATE_NOTSUPPORTED;
-		zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, NULL, &value->ts, item->state,
-				value->value);
+		process_item_value(item, NULL, &value->ts, value->value);
 	}
 	else
 	{
@@ -2456,8 +2508,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 			set_result_meta(&result, value->lastlogsize, value->mtime);
 
 		item->state = ITEM_STATE_NORMAL;
-		zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, &result, &value->ts, item->state,
-				NULL);
+		process_item_value(item, &result, &value->ts, NULL);
 
 		free_result(&result);
 	}
@@ -2510,6 +2561,7 @@ int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcode
 		zbx_dc_items_update_nextcheck(items, values, errcodes, values_num);
 
 	zbx_preprocessor_flush();
+	dc_flush_history();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
 

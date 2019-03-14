@@ -452,37 +452,13 @@ static void	preprocessor_free_direct_request(zbx_preprocessing_direct_request_t 
  ******************************************************************************/
 static void	preprocessor_flush_value(const zbx_preproc_item_value_t *value)
 {
-	if (0 == (value->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+	if (0 == (value->item_flags & ZBX_FLAG_DISCOVERY_RULE) || 0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		dc_add_history(value->itemid, value->item_value_type, value->item_flags, value->result, value->ts,
 				value->state, value->error);
 	}
 	else
-	{
-		const char	*value_text = NULL;
-		unsigned char	meta = 0;
-		zbx_uint64_t	lastlogsize = 0;
-		int		mtime = 0;
-
-		if (NULL != value->result)
-		{
-			if (NULL != GET_TEXT_RESULT(value->result))
-				value_text = *(GET_TEXT_RESULT(value->result));
-
-			if (0 != ISSET_META(value->result))
-			{
-				meta = 1;
-				lastlogsize = value->result->lastlogsize;
-				mtime = value->result->mtime;
-			}
-		}
-
-		if (NULL != value_text || NULL != value->error || 0 != meta)
-		{
-			zbx_lld_process_value(value->itemid, value_text, value->ts, meta, lastlogsize, mtime,
-					value->error);
-		}
-	}
+		zbx_lld_process_agent_result(value->itemid, value->result, value->ts, value->error);
 }
 
 /******************************************************************************
