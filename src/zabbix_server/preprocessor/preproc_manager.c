@@ -1258,15 +1258,12 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 				case ZBX_IPC_PREPROCESSOR_WORKER:
 					preprocessor_register_worker(&manager, client, message);
 					break;
-
 				case ZBX_IPC_PREPROCESSOR_REQUEST:
 					preprocessor_add_request(&manager, message);
 					break;
-
 				case ZBX_IPC_PREPROCESSOR_RESULT:
 					preprocessor_add_result(&manager, client, message);
 					break;
-
 				case ZBX_IPC_PREPROCESSOR_QUEUE:
 					zbx_ipc_client_send(client, message->code, (unsigned char *)&manager.queued_num,
 							sizeof(zbx_uint64_t));
