@@ -1593,6 +1593,10 @@ if test "x$server" = "xyes"; then
 	have_ipcservice="yes"
 fi
 
+if test "x$proxy" = "xyes"; then
+	have_ipcservice="yes"
+fi
+
 AM_CONDITIONAL(PROXY_IPCSERVICE, [test "x$have_ipmi" = "xyes"])
 
 dnl Check for libevent, used by Zabbix IPC services
@@ -1607,10 +1611,8 @@ if test "x$have_ipcservice" = "xyes"; then
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBEVENT_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $LIBEVENT_LIBS"
 
-	if test "x$have_ipmi" = "xyes"; then
-		PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBEVENT_LDFLAGS"
-		PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
-	fi
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBEVENT_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
 fi
 
 dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]

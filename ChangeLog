@@ -1,6 +1,7 @@
 Changes for 4.2.0rc1
 
 New features:
+.......PS. [ZBXNEXT-5081] added item preprocessing support to proxies (wiper)
 ...G...... [ZBXNEXT-4967] added Zabbix sender data sending to multiple destinations given in ServerActive configuration parameter (viktors)
 
 Bug fixes:
