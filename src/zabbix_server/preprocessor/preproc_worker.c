@@ -414,6 +414,7 @@ static int	worker_item_preproc_test(unsigned char value_type, zbx_variant_t *val
 		}
 
 		zbx_variant_set_variant(&results[i].value, value);
+		results[i].error = NULL;
 
 		if (ZBX_VARIANT_NONE != history_value.type)
 		{
