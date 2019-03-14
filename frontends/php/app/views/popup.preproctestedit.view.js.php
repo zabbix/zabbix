@@ -117,7 +117,7 @@ function processItemPreprocessingTestResults(steps) {
 		if (typeof step.error !== 'undefined') {
 			step.result = jQuery(tmpl_err_icon.evaluate({error: step.error}));
 		}
-		else if (typeof step.result === 'undefined') {
+		else if (typeof step.result === 'undefined' || step.result === null) {
 			step.result = jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text('<?= _('No value') ?>');
 		}
 		else if (step.result === '') {
