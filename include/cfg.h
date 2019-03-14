@@ -63,6 +63,6 @@ int	check_cfg_feature_int(const char *parameter, int value, const char *feature)
 int	check_cfg_feature_str(const char *parameter, const char *value, const char *feature);
 
 typedef int	(*add_serveractive_host_f)(const char *host, unsigned short port);
-void	zbx_get_serveractive_hosts(char *active_hosts, add_serveractive_host_f cb);
+void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f cb);
 
 #endif

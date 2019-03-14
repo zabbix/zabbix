@@ -800,7 +800,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
 
 	if (NULL != active_hosts && '\0' != *active_hosts)
-		zbx_get_serveractive_hosts(active_hosts, add_serveractive_host_cb);
+		zbx_set_data_destination_hosts(active_hosts, add_serveractive_host_cb);
 
 	zbx_free(active_hosts);
 
