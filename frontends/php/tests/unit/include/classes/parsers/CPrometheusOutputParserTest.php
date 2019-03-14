@@ -48,6 +48,13 @@ class CPrometheusOutputParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '{$M}'
 				]
 			],
+			[
+				'{$FS_MAX: "/home"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$FS_MAX: "/home"}'
+				]
+			],
 			// partial success
 			[
 				'label1=', 0, [],
