@@ -545,6 +545,13 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'{,}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
 				'0', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -740,7 +747,7 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 	 * @param int    $pos
 	 * @param array  $options
 	 * @param array  $expected
-	*/
+	 */
 	public function testParse($source, $pos, $options, $expected) {
 		$parser = new CPrometheusPatternParser($options);
 

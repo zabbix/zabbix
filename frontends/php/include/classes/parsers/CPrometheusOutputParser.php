@@ -24,6 +24,21 @@
  */
 class CPrometheusOutputParser extends CParser {
 
+	private $options = [
+		'usermacros' => false
+	];
+
+	private $user_macro_parser;
+
+	public function __construct($options = []) {
+		if (array_key_exists('usermacros', $options)) {
+			$this->options['usermacros'] = $options['usermacros'];
+		}
+		if ($this->options['usermacros']) {
+			$this->user_macro_parser = new CUserMacroParser();
+		}
+	}
+
 	/**
 	 * Parse the given source string.
 	 *
@@ -55,12 +70,17 @@ class CPrometheusOutputParser extends CParser {
 	 * @return bool
 	 */
 	private function parseLabelName($source, &$pos) {
-		if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*/', substr($source, $pos), $matches)) {
-			return false;
+		if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*/', substr($source, $pos), $matches)) {
+			$pos += strlen($matches[0]);
+
+			return true;
+		}
+		elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+			$pos += $this->user_macro_parser->getLength();
+
+			return true;
 		}
 
-		$pos += strlen($matches[0]);
-
-		return true;
+		return false;
 	}
 }
