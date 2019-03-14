@@ -5454,7 +5454,7 @@ td.inactive-bg {
 .multilineinput-control button:after {
   background-position: -359px -478px; }
 .multilineinput-control button:focus:after {
-  background-position: -206px -478px; }
+  background-position: -359px -478px; }
 
 .btn-back-map-container a {
   border-bottom: none; }
