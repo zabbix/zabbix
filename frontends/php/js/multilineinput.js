@@ -180,13 +180,11 @@
 			}
 		},
 		disable: function() {
-			//jQuery(this).options.disabled = true;
 			this.trigger('disable');
 
 			return this;
 		},
 		enable: function() {
-			//jQuery(this).options.disabled = false;
 			this.trigger('enable');
 
 			return this;
