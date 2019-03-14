@@ -123,7 +123,7 @@
 		init: function(options) {
 			this.options = $.extend({
 				title: '',
-				hint: '',
+				hint: t('S_CLICK_TO_VIEW_OR_EDIT'),
 				value: '',
 				placeholder: '',
 				maxlength: 255,
