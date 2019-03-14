@@ -53,24 +53,17 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-single-tmpl">
-	<?php
-		echo (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', '#{placeholder}');
-	?>
+	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', '#{placeholder}') ?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-double-tmpl">
-	<?php
-		echo (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', '#{placeholder_0}').
-			(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))->setAttribute('placeholder', '#{placeholder_1}');
+	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', '#{placeholder_0}').
+			(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))->setAttribute('placeholder', '#{placeholder_1}')
 	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-multiline-tmpl">
-	<?php
-		echo (new CMultilineInput('preprocessing[#{rowNum}][params][0]', '', [
-			'add_post_js' => false
-		]));
-	?>
+	<?= (new CMultilineInput('preprocessing[#{rowNum}][params][0]', '', ['add_post_js' => false])) ?>
 </script>
 
 <script type="text/javascript">
@@ -78,7 +71,7 @@
 		/**
 		 * Collect current preprocessing step properties.
 		 *
-		 * @param array step_nums   List of step numbers to collect.
+		 * @param {array} step_nums  List of step numbers to collect.
 		 *
 		 * @return array
 		 */
@@ -86,14 +79,14 @@
 			var steps = [];
 
 			step_nums.each(function(num) {
-				var type = $('[name="preprocessing['+num+'][type]"]', preprocessing).val(),
+				var type = $('[name="preprocessing[' + num + '][type]"]', $preprocessing).val(),
 					on_fail = {},
 					params = [];
 
-				if ($('[name="preprocessing['+num+'][on_fail]"]').is(':checked')) {
+				if ($('[name="preprocessing[' + num + '][on_fail]"]').is(':checked')) {
 					on_fail = {
-						error_handler: $('[name="preprocessing['+num+'][error_handler]"]:checked').val(),
-						error_handler_params: $('[name="preprocessing['+num+'][error_handler_params]"]').val()
+						error_handler: $('[name="preprocessing[' + num + '][error_handler]"]:checked').val(),
+						error_handler_params: $('[name="preprocessing[' + num + '][error_handler_params]"]').val()
 					};
 				}
 				else {
@@ -103,11 +96,11 @@
 					};
 				}
 
-				if ($('[name="preprocessing['+num+'][params][0]"]', preprocessing).length) {
-					params.push($('[name="preprocessing['+num+'][params][0]"]', preprocessing).val());
+				if ($('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).length) {
+					params.push($('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).val());
 				}
-				if ($('[name="preprocessing['+num+'][params][1]"]', preprocessing).length) {
-					params.push($('[name="preprocessing['+num+'][params][1]"]', preprocessing).val());
+				if ($('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).length) {
+					params.push($('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
 				}
 
 				steps.push($.extend({
@@ -122,7 +115,7 @@
 		/**
 		 * Creates preprocessing test modal window.
 		 *
-		 * @param array step_nums   List of step numbers to collect.
+		 * @param {array} step_nums  List of step numbers to collect.
 		 */
 		function openPreprocessingTestDialog(step_nums) {
 			PopUp('popup.preproctest.edit', {
@@ -250,7 +243,7 @@
 			})
 			.on('click', '#preproc_test_all', function() {
 				var step_nums = [];
-				$('select[name^="preprocessing"][name$="[type]"]', preprocessing).each(function() {
+				$('select[name^="preprocessing"][name$="[type]"]', $preprocessing).each(function() {
 					var str = $(this).attr('name');
 					step_nums.push(str.substr(14, str.length - 21));
 				});
