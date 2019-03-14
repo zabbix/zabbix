@@ -491,7 +491,7 @@ class CControllerMenuPopup extends CController {
 			foreach ($db_trigger['items'] as $item) {
 				$items[] = [
 					'name' => $with_hostname
-						? $$item['hostname'].NAME_DELIMITER.$item['name_expanded']
+						? $item['hostname'].NAME_DELIMITER.$item['name_expanded']
 						: $item['name_expanded'],
 					'params' => [
 						'itemid' => $item['itemid'],
