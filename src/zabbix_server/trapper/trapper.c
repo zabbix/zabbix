@@ -1141,7 +1141,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PREPROCESSING_TEST))
 			{
-				ret = zbx_trapper_preproc_test(sock, &jp);
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					ret = zbx_trapper_preproc_test(sock, &jp);
 			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);
