@@ -115,16 +115,17 @@
 		/**
 		 * Creates preprocessing test modal window.
 		 *
-		 * @param {array} step_nums  List of step numbers to collect.
+		 * @param {array}  step_nums     List of step numbers to collect.
+		 * @param {object} trigger_elmnt UI element triggered function.
 		 */
-		function openPreprocessingTestDialog(step_nums) {
+		function openPreprocessingTestDialog(step_nums, trigger_elmnt) {
 			PopUp('popup.preproctest.edit', {
 				delay: $('#delay').val() || '',
 				value_type: $('#value_type').val() || <?= CControllerPopupPreprocTest::ZBX_DEFAULT_VALUE_TYPE ?>,
 				steps: getPreprocessingSteps(step_nums),
 				hostid: <?= $data['hostid'] ?>,
 				test_type: <?= $data['preprocessing_test_type'] ?>
-			}, null, this);
+			}, null, trigger_elmnt);
 		}
 
 		function makeParameterInput(index, type) {
@@ -247,13 +248,13 @@
 					step_nums.push(str.substr(14, str.length - 21));
 				});
 
-				openPreprocessingTestDialog(step_nums);
+				openPreprocessingTestDialog(step_nums, this);
 			})
 			.on('click', '.preprocessing-step-test', function() {
 				var str = $(this).attr('name'),
 					num = str.substr(14, str.length - 21);
 
-				openPreprocessingTestDialog([num]);
+				openPreprocessingTestDialog([num], this);
 			})
 			.on('click', '.element-table-remove', function() {
 				$(this).closest('li.sortable').remove();
