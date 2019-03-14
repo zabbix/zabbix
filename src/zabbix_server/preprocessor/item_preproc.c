@@ -1663,6 +1663,10 @@ fail:
  * Return value: SUCCEED - the preprocessing step finished successfully       *
  *               FAIL - otherwise, error contains the error message           *
  *                                                                            *
+ * Comments: When preprocessing step was executed successfully, but it must   *
+ *           force an error (extract error steps), then success will be       *
+ *           returned with error set.                                         *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
 		const zbx_preproc_op_t *op, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **error)
