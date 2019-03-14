@@ -306,6 +306,7 @@ $popup_options = [
 	'dstfrm' => $triggersForm->getName(),
 	'dstfld1' => $data['recovery_expression_field_name']
 ];
+
 if ($data['groupid'] && $data['hostid']) {
 	$popup_options['groupid'] = $data['groupid'];
 	$popup_options['hostid'] = $data['hostid'];
@@ -616,14 +617,14 @@ if (!empty($data['triggerid'])) {
 			new CSubmit('clone', _('Clone')),
 			(new CButtonDelete(_('Delete trigger?'), url_params(['form', 'hostid', 'triggerid'])))
 				->setEnabled(!$data['limited']),
-			new CButtonCancel(url_param('hostid'))
+			new CButtonCancel()
 		]
 	));
 }
 else {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('hostid'))]
+		[new CButtonCancel()]
 	));
 }
 

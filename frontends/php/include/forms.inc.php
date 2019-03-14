@@ -232,8 +232,8 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 }
 
 function getItemFilterForm(&$items) {
-	$filter_groupId				= $_REQUEST['filter_groupid'];
-	$filter_hostId				= $_REQUEST['filter_hostid'];
+	$filter_groupids			= $_REQUEST['filter_groupids'];
+	$filter_hostids				= $_REQUEST['filter_hostids'];
 	$filter_application			= $_REQUEST['filter_application'];
 	$filter_name				= $_REQUEST['filter_name'];
 	$filter_type				= $_REQUEST['filter_type'];
@@ -319,25 +319,25 @@ function getItemFilterForm(&$items) {
 	zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($fTypeVisibility, true).');');
 
 	// row 1
-	$group_filter = !empty($filter_groupId)
+	$group_filter = !empty($filter_groupids)
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
-			'groupids' => $filter_groupId
+			'groupids' => $filter_groupids,
+			'editable' => true
 		]), ['groupid' => 'id'])
 		: [];
 
-	$filterColumn1->addRow((new CLabel(_('Host group'), 'filter_groupid_ms')),
+	$filterColumn1->addRow((new CLabel(_('Host groups'), 'filter_groupid_ms')),
 		(new CMultiSelect([
-			'name' => 'filter_groupid',
+			'name' => 'filter_groupids[]',
 			'object_name' => 'hostGroup',
-			'multiple' => false,
 			'data' => $group_filter,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $filter->getName(),
-					'dstfld1' => 'filter_groupid',
+					'dstfld1' => 'filter_groupids_',
 					'editable' => true
 				]
 			]
@@ -364,26 +364,26 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 2
-	$host_filter = !empty($filter_hostId)
+	$host_filter = !empty($filter_hostids)
 		? CArrayHelper::renameObjectsKeys(API::Host()->get([
 			'output' => ['hostid', 'name'],
-			'hostids' => $filter_hostId,
-			'templated_hosts' => true
+			'hostids' => $filter_hostids,
+			'templated_hosts' => true,
+			'editable' => true
 		]), ['hostid' => 'id'])
 		: [];
 
-	$filterColumn1->addRow((new CLabel(_('Host'), 'filter_hostid_ms')),
+	$filterColumn1->addRow((new CLabel(_('Hosts'), 'filter_hostid_ms')),
 		(new CMultiSelect([
-			'name' => 'filter_hostid',
+			'name' => 'filter_hostids[]',
 			'object_name' => 'hosts',
-			'multiple' => false,
 			'data' => $host_filter,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_templates',
 					'srcfld1' => 'hostid',
 					'dstfrm' => $filter->getName(),
-					'dstfld1' => 'filter_hostid',
+					'dstfld1' => 'filter_hostids_',
 					'editable' => true,
 					'templated_hosts' => true
 				]
@@ -418,8 +418,8 @@ function getItemFilterForm(&$items) {
 						'dstfld1' => 'filter_application',
 						'with_applications' => '1'
 					]).
-					',(jQuery("input[name=\'filter_hostid\']").length > 0)'.
-						' ? {hostid: jQuery("input[name=\'filter_hostid\']").val()}'.
+					',(jQuery("input[name=\'filter_hostids\']").length > 0)'.
+						' ? {hostid: jQuery("input[name=\'filter_hostids\']").val()}'.
 						' : {}'.
 					'), null, this);'
 				)
@@ -460,8 +460,8 @@ function getItemFilterForm(&$items) {
 	$filterColumn4->addRow(_('Template'),
 		new CComboBox('filter_templated_items', $filter_templated_items, null, [
 			-1 => _('all'),
-			1 => _('Templated items'),
-			0 => _('Not Templated items'),
+			1 => _('Inherited items'),
+			0 => _('Not inherited items'),
 		])
 	);
 
@@ -511,7 +511,7 @@ function getItemFilterForm(&$items) {
 	// generate array with values for subfilters of selected items
 	foreach ($items as $item) {
 		// hosts
-		if (zbx_empty($filter_hostId)) {
+		if ($filter_hostids) {
 			$host = reset($item['hosts']);
 
 			if (!isset($item_params['hosts'][$host['hostid']])) {
@@ -642,10 +642,10 @@ function getItemFilterForm(&$items) {
 		// template
 		if ($filter_templated_items == -1) {
 			if ($item['templateid'] == 0 && !isset($item_params['templated_items'][0])) {
-				$item_params['templated_items'][0] = ['name' => _('Not Templated items'), 'count' => 0];
+				$item_params['templated_items'][0] = ['name' => _('Not inherited items'), 'count' => 0];
 			}
 			elseif ($item['templateid'] > 0 && !isset($item_params['templated_items'][1])) {
-				$item_params['templated_items'][1] = ['name' => _('Templated items'), 'count' => 0];
+				$item_params['templated_items'][1] = ['name' => _('Inherited items'), 'count' => 0];
 			}
 			$show_item = true;
 			foreach ($item['subfilters'] as $name => $value) {
@@ -823,9 +823,9 @@ function getItemFilterForm(&$items) {
 	}
 
 	// output
-	if (zbx_empty($filter_hostId) && count($item_params['hosts']) > 1) {
+	if ($filter_hostids && count($item_params['hosts']) > 1) {
 		$hosts_output = prepareSubfilterOutput(_('Hosts'), $item_params['hosts'], $subfilter_hosts, 'subfilter_hosts');
-		$table_subfilter->addRow($hosts_output);
+		$table_subfilter->addRow([$hosts_output]);
 	}
 
 	if (!empty($item_params['applications']) && count($item_params['applications']) > 1) {
@@ -1001,7 +1001,9 @@ function getItemFormData(array $item = [], array $options = []) {
 		'query_fields' => getRequest('query_fields', []),
 		'posts' => getRequest('posts'),
 		'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-		'follow_redirects' => (int) getRequest('follow_redirects'),
+		'follow_redirects' => hasRequest('form_refresh')
+			? (int) getRequest('follow_redirects')
+			: getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
 		'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
 		'http_proxy' => getRequest('http_proxy'),
 		'headers' => getRequest('headers', []),

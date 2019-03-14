@@ -235,7 +235,7 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 	}
 
 	$inventoryFormList->addRow(
-		(new CVisibilityBox('visible['.$field.']', 'host_inventory['.$field.']', _('Original')))
+		(new CVisibilityBox('visible['.$field.']', $fieldInput->getId(), _('Original')))
 			->setLabel($fieldInfo['title'])
 			->setChecked(array_key_exists($field, $data['visible'])),
 		$fieldInput, null, 'formrow-inventory'

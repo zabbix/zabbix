@@ -236,11 +236,19 @@ foreach ($data['templates'] as $template) {
 			CViewHelper::showNum($template['applications'])
 		],
 		[
-			new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$template['templateid'].url_param('groupid')),
+			new CLink(_('Items'),
+				(new CUrl('items.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['templateid']])
+			),
 			CViewHelper::showNum($template['items'])
 		],
 		[
-			new CLink(_('Triggers'), 'triggers.php?hostid='.$template['templateid'].url_param('groupid')),
+			new CLink(_('Triggers'),
+				(new CUrl('triggers.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['templateid']])
+			),
 			CViewHelper::showNum($template['triggers'])
 		],
 		[

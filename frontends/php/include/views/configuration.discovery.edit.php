@@ -91,6 +91,31 @@ $discoveryFormList->addRow(_('Device uniqueness criteria'),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
+// append host source to form list
+$discoveryFormList->addRow(_('Host name'),
+	(new CDiv(
+		(new CRadioButtonList('host_source', $this->data['drule']['host_source']))
+			->makeVertical()
+			->addValue(_('DNS name'), ZBX_DISCOVERY_DNS, 'host_source_chk_dns')
+			->addValue(_('IP address'), ZBX_DISCOVERY_IP, 'host_source_chk_ip')
+	))
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+);
+
+// append name source to form list
+$discoveryFormList->addRow(_('Visible name'),
+	(new CDiv(
+		(new CRadioButtonList('name_source', $this->data['drule']['name_source']))
+			->makeVertical()
+			->addValue(_('Host name'), ZBX_DISCOVERY_UNSPEC, 'name_source_chk_host')
+			->addValue(_('DNS name'), ZBX_DISCOVERY_DNS, 'name_source_chk_dns')
+			->addValue(_('IP address'), ZBX_DISCOVERY_IP, 'name_source_chk_ip')
+	))
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+);
+
 // append status to form list
 $status = (empty($this->data['druleid']) && empty($this->data['form_refresh']))
 	? true

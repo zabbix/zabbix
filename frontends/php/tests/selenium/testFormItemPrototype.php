@@ -1772,7 +1772,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'history' => ' ',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value for field "history": a time unit is expected.'
+						'Incorrect value for field "history": a time unit is expected.'
 					]
 				]
 			],
@@ -1785,7 +1785,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'history' => 3599,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value for field "history": must be between "3600" and "788400000".'
+						'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -1798,7 +1798,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'history' => 788400001,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Incorrect value for field "history": must be between "3600" and "788400000".'
+						'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -1811,7 +1811,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'history' => '-1',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value for field "history": a time unit is expected.'
+						'Incorrect value for field "history": a time unit is expected.'
 					]
 				]
 			],
@@ -1824,7 +1824,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'trends' => ' ',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value for field "trends": a time unit is expected.'
+						'Incorrect value for field "trends": a time unit is expected.'
 					]
 				]
 			],
@@ -1837,7 +1837,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'trends' => '-1',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value for field "trends": a time unit is expected.'
+						'Incorrect value for field "trends": a time unit is expected.'
 					]
 				]
 			],
@@ -1847,10 +1847,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
-					'trends' => 3599,
+					'trends' => 86399,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value for field "trends": must be between "86400" and "788400000".'
+						'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
 					]
 				]
 			],
@@ -1863,7 +1863,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'trends' => 788400001,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Incorrect value for field "trends": must be between "86400" and "788400000".'
+						'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
 					]
 				]
 			],
@@ -2136,7 +2136,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'key' => 'item-ipmi-agent-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "IPMI sensor": cannot be empty.'
+						'Incorrect value for field "IPMI sensor": cannot be empty.'
 					]
 				]
 			],
@@ -2148,8 +2148,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'key' => 'item-ssh-agent-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "User name": cannot be empty.',
-							'Incorrect value for field "Executed script": cannot be empty.'
+						'Incorrect value for field "User name": cannot be empty.',
+						'Incorrect value for field "Executed script": cannot be empty.'
 					]
 				]
 			],
@@ -2161,8 +2161,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'key' => 'item-telnet-agent-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "User name": cannot be empty.',
-							'Incorrect value for field "Executed script": cannot be empty.'
+						'Incorrect value for field "User name": cannot be empty.',
+						'Incorrect value for field "Executed script": cannot be empty.'
 					]
 				]
 			],
@@ -2197,7 +2197,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'key' => 'item-calculated',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "Formula": cannot be empty.'
+						'Incorrect value for field "Formula": cannot be empty.'
 					]
 				]
 			],
@@ -2209,7 +2209,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'name' => 'Database monitor',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "SQL query": cannot be empty.'
+						'Incorrect value for field "SQL query": cannot be empty.'
 					]
 				]
 			],
@@ -2222,7 +2222,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'params_ap' => 'SELECT * FROM items',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+						'Check the key, please. Default example was passed.'
 					]
 				]
 			],
@@ -2236,7 +2236,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'params_es' => 'script to be executed',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+						'Check the key, please. Default example was passed.'
 					]
 				]
 			],
@@ -2250,7 +2250,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'params_es' => 'script to be executed',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+						'Check the key, please. Default example was passed.'
 					]
 				]
 			],
@@ -2263,7 +2263,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'username' => 'zabbix',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "Key": cannot be empty.'
+						'Incorrect value for field "Key": cannot be empty.'
 					]
 				]
 			]

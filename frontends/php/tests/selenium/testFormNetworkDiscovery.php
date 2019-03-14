@@ -194,7 +194,11 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'checks' => [
 						['check_action' => 'New', 'type' => 'Zabbix agent', 'key' => 'ping']
 					],
-					'criteria' => 'Zabbix agent "ping"'
+					'radio_buttons' => [
+						'Device uniqueness criteria' => 'Zabbix agent "ping"',
+						'Host name' => 'IP address',
+						'Visible name' => 'DNS name'
+					]
 				]
 			],
 			[
@@ -299,7 +303,11 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 							'priv_passphrase' => '3'
 						]
 					],
-					'criteria' => 'SNMPv1 agent "1"'
+					'radio_buttons' => [
+						'Device uniqueness criteria' => 'SNMPv1 agent "1"',
+						'Host name' => 'SNMPv3 agent "3"',
+						'Visible name' => 'Zabbix agent "ping"'
+					]
 				]
 			]
 		];
@@ -430,7 +438,11 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 			[
 				[
 					'old_name' => 'Local network',
-					'criteria' => 'Zabbix agent "system.uname"'
+					'radio_buttons' => [
+						'Device uniqueness criteria' => 'Zabbix agent "system.uname"',
+						'Host name' => 'IP address',
+						'Visible name' => 'DNS name'
+					]
 				]
 			],
 			[
@@ -604,8 +616,12 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 			$this->zbxTestCheckboxSelect('status', $data['enabled']);
 		}
 
-		if (array_key_exists('criteria', $data)) {
-			$this->zbxTestClickXpathWait('//label[text()=\''.$data['criteria'].'\']');
+		if (array_key_exists('radio_buttons', $data)) {
+			foreach ($data['radio_buttons'] as $field_name => $label) {
+				$prefix = '//div[@class="table-forms-td-left"]//label[text()='.CXPathHelper::escapeQuotes($field_name).']/../..';
+				$xpath = $prefix.'//label[text()='.CXPathHelper::escapeQuotes($label).']';
+				$this->zbxTestClickXpathWait($xpath);
+			}
 		}
 	}
 

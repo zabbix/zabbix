@@ -134,6 +134,102 @@ static int	DBpatch_4010012(void)
 	return DBmodify_field_type("item_preproc", &field, NULL);
 }
 
+static int	DBpatch_4010013(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.items.filter_groupids'"
+				" where idx='web.items.filter_groupid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+
+static int	DBpatch_4010014(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.items.filter_hostids'"
+				" where idx='web.items.filter_hostid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4010015(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.items.filter_inherited'"
+				" where idx='web.items.filter_templated_items'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4010016(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.triggers.filter_priority' and value_int='-1'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4010017(void)
+{
+	const ZBX_FIELD	field = {"host_source", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
+static int	DBpatch_4010018(void)
+{
+	const ZBX_FIELD	field = {"name_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
+static int	DBpatch_4010019(void)
+{
+	return DBdrop_foreign_key("dchecks", 1);
+}
+
+static int	DBpatch_4010020(void)
+{
+	return DBdrop_index("dchecks", "dchecks_1");
+}
+
+static int	DBpatch_4010021(void)
+{
+	return DBcreate_index("dchecks", "dchecks_1", "druleid,host_source,name_source", 0);
+}
+
+static int	DBpatch_4010022(void)
+{
+	const ZBX_FIELD	field = {"druleid", NULL, "drules", "druleid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("dchecks", 1, &field);
+}
+
+static int	DBpatch_4010023(void)
+{
+	return DBcreate_index("proxy_dhistory", "proxy_dhistory_2", "druleid", 0);
+}
+
+static int	DBpatch_4010024(void)
+{
+	const ZBX_FIELD	field = {"height", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("widget", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(4010)
@@ -152,5 +248,17 @@ DBPATCH_ADD(4010009, 0, 1)
 DBPATCH_ADD(4010010, 0, 1)
 DBPATCH_ADD(4010011, 0, 1)
 DBPATCH_ADD(4010012, 0, 1)
+DBPATCH_ADD(4010013, 0, 1)
+DBPATCH_ADD(4010014, 0, 1)
+DBPATCH_ADD(4010015, 0, 1)
+DBPATCH_ADD(4010016, 0, 1)
+DBPATCH_ADD(4010017, 0, 1)
+DBPATCH_ADD(4010018, 0, 1)
+DBPATCH_ADD(4010019, 0, 1)
+DBPATCH_ADD(4010020, 0, 1)
+DBPATCH_ADD(4010021, 0, 1)
+DBPATCH_ADD(4010022, 0, 1)
+DBPATCH_ADD(4010023, 0, 1)
+DBPATCH_ADD(4010024, 0, 1)
 
 DBPATCH_END()
