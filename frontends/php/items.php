@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'codeeditor.js', 'multiselect.js', 'items.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -618,6 +618,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
 				case ZBX_PREPROC_MULTIPLIER:
+					$step['params'] = trim($step['params'][0]);
+					break;
+
 				case ZBX_PREPROC_RTRIM:
 				case ZBX_PREPROC_LTRIM:
 				case ZBX_PREPROC_TRIM:
@@ -632,8 +635,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					$step['params'] = $step['params'][0];
 					break;
 
-				case ZBX_PREPROC_REGSUB:
 				case ZBX_PREPROC_VALIDATE_RANGE:
+					foreach ($step['params'] as &$param) {
+						$param = trim($param);
+					}
+					unset($param);
+
+					$step['params'] = implode("\n", $step['params']);
+					break;
+
+				case ZBX_PREPROC_REGSUB:
 				case ZBX_PREPROC_ERROR_FIELD_REGEX:
 					$step['params'] = implode("\n", $step['params']);
 					break;
@@ -1139,6 +1150,9 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					foreach ($preprocessing as &$step) {
 						switch ($step['type']) {
 							case ZBX_PREPROC_MULTIPLIER:
+								$step['params'] = trim($step['params'][0]);
+								break;
+
 							case ZBX_PREPROC_RTRIM:
 							case ZBX_PREPROC_LTRIM:
 							case ZBX_PREPROC_TRIM:
@@ -1153,8 +1167,16 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 								$step['params'] = $step['params'][0];
 								break;
 
-							case ZBX_PREPROC_REGSUB:
 							case ZBX_PREPROC_VALIDATE_RANGE:
+								foreach ($step['params'] as &$param) {
+									$param = trim($param);
+								}
+								unset($param);
+
+								$step['params'] = implode("\n", $step['params']);
+								break;
+
+							case ZBX_PREPROC_REGSUB:
 							case ZBX_PREPROC_ERROR_FIELD_REGEX:
 								$step['params'] = implode("\n", $step['params']);
 								break;

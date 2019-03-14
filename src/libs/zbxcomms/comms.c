@@ -24,10 +24,12 @@
 #include "zbxcompress.h"
 
 #ifdef _WINDOWS
-#include <VersionHelpers.h>
-#ifndef WSA_FLAG_NO_HANDLE_INHERIT
-#	define WSA_FLAG_NO_HANDLE_INHERIT	0x80	/* allow compilation on older Windows systems */
-#endif
+#	ifndef _WIN32_WINNT_WIN7
+#		define _WIN32_WINNT_WIN7		0x0601	/* allow compilation on older Windows systems */
+#	endif
+#	ifndef WSA_FLAG_NO_HANDLE_INHERIT
+#		define WSA_FLAG_NO_HANDLE_INHERIT	0x80	/* allow compilation on older Windows systems */
+#	endif
 #endif
 
 #define IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
@@ -188,6 +190,40 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 }
 #endif	/* HAVE_IPV6 */
 #endif	/* _WINDOWS */
+
+#ifdef _WINDOWS
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_is_win_ver_or_greater                                        *
+ *                                                                            *
+ * Purpose: check Windows version                                             *
+ *                                                                            *
+ * Parameters: major    - [IN] major windows version                          *
+ *             minor    - [IN] minor windows version                          *
+ *             servpack - [IN] service pack version                           *
+ *                                                                            *
+ * Return value: SUCCEED - Windows version matches input parameters           *
+ *                         or greater                                         *
+ *               FAIL    - Windows version is older                           *
+ *                                                                            *
+ * Comments: This is reimplementation of IsWindowsVersionOrGreater() from     *
+ *           Version Helper API. We need it because the original function is  *
+ *           only available in newer Windows toolchains (VS2013+)             *
+ *                                                                            *
+ ******************************************************************************/
+static int zbx_is_win_ver_or_greater(zbx_uint32_t major, zbx_uint32_t minor, zbx_uint32_t servpack)
+{
+	OSVERSIONINFOEXW vi = { sizeof(vi), major, minor, 0, 0, { 0 }, servpack, 0 };
+
+	/* no need to test for an error, check VersionHelpers.h and usage examples */
+
+	return VerifyVersionInfoW(&vi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR,
+			VerSetConditionMask(VerSetConditionMask(VerSetConditionMask(0,
+			VER_MAJORVERSION, VER_GREATER_EQUAL),
+			VER_MINORVERSION, VER_GREATER_EQUAL),
+			VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL)) ? SUCCEED : FAIL;
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -913,11 +949,15 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 	int		i, err, on, ret = FAIL;
 #ifdef _WINDOWS
 	/* WSASocket() option to prevent inheritance is available on */
-	/* Windows Server 2008 R2 or newer and on Windows 7 SP1 or newer */
+	/* Windows Server 2008 R2 SP1 or newer and on Windows 7 SP1 or newer */
 	static int	no_inherit_wsapi = -1;
 
 	if (-1 == no_inherit_wsapi)
-		no_inherit_wsapi = IsWindows7SP1OrGreater() || (IsWindowsServer() && IsWindows7OrGreater());
+	{
+		/* Both Windows 7 and Windows 2008 R2 are 0x0601 */
+		no_inherit_wsapi = zbx_is_win_ver_or_greater((_WIN32_WINNT_WIN7 >> 8) & 0xff,
+				_WIN32_WINNT_WIN7 & 0xff, 1) == SUCCEED;
+	}
 #endif
 
 	zbx_socket_clean(s);
@@ -965,21 +1005,17 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 					(0 != no_inherit_wsapi ? WSA_FLAG_NO_HANDLE_INHERIT : 0) |
 					WSA_FLAG_OVERLAPPED);
 			if (ZBX_SOCKET_ERROR == s->sockets[s->num_socks])
+			{
+				zbx_set_socket_strerror("WSASocket() for [[%s]:%s] failed: %s",
+						ip ? ip : "-", port, strerror_from_system(zbx_socket_last_error()));
+				if (WSAEAFNOSUPPORT == zbx_socket_last_error())
 #else
 			if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] =
 					socket(current_ai->ai_family, current_ai->ai_socktype | SOCK_CLOEXEC,
 					current_ai->ai_protocol)))
-#endif
 			{
-#ifdef _WINDOWS
-				zbx_set_socket_strerror("WSASocket() for [[%s]:%s] failed: %s",
-#else
 				zbx_set_socket_strerror("socket() for [[%s]:%s] failed: %s",
-#endif
 						ip ? ip : "-", port, strerror_from_system(zbx_socket_last_error()));
-#ifdef _WINDOWS
-				if (WSAEAFNOSUPPORT == zbx_socket_last_error())
-#else
 				if (EAFNOSUPPORT == zbx_socket_last_error())
 #endif
 					continue;
@@ -1113,7 +1149,11 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 	static int	no_inherit_wsapi = -1;
 
 	if (-1 == no_inherit_wsapi)
-		no_inherit_wsapi = IsWindows7SP1OrGreater() || (IsWindowsServer() && IsWindows7OrGreater());
+	{
+		/* Both Windows 7 and Windows 2008 R2 are 0x0601 */
+		no_inherit_wsapi = zbx_is_win_ver_or_greater((_WIN32_WINNT_WIN7 >> 8) & 0xff,
+				_WIN32_WINNT_WIN7 & 0xff, 1) == SUCCEED;
+	}
 #endif
 
 	zbx_socket_clean(s);
@@ -1139,7 +1179,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 			goto out;
 		}
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 		/* WSA_FLAG_NO_HANDLE_INHERIT prevents socket inheritance if we call CreateProcess() */
 		/* later on. If it's not available we still try to avoid inheritance by calling  */
 		/* SetHandleInformation() below. WSA_FLAG_OVERLAPPED is not mandatory but strongly */
@@ -1147,16 +1187,15 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 		s->sockets[s->num_socks] = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0,
 				(0 != no_inherit_wsapi ? WSA_FLAG_NO_HANDLE_INHERIT : 0) | WSA_FLAG_OVERLAPPED);
 		if (ZBX_SOCKET_ERROR == s->sockets[s->num_socks])
+		{
+			zbx_set_socket_strerror("WSASocket() for [[%s]:%hu] failed: %s",
+					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
 #else
 		if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
-#endif
 		{
-#ifdef _WINDOWS
-			zbx_set_socket_strerror("WSASocket() for [[%s]:%hu] failed: %s",
-#else
 			zbx_set_socket_strerror("socket() for [[%s]:%hu] failed: %s",
-#endif
 					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
+#endif
 			goto out;
 		}
 

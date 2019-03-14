@@ -225,6 +225,13 @@ static int	DBpatch_4010023(void)
 
 static int	DBpatch_4010024(void)
 {
+	const ZBX_FIELD	field = {"height", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("widget", &field, NULL);
+}
+
+static int	DBpatch_4010025(void)
+{
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	nextid;
@@ -253,7 +260,7 @@ static int	DBpatch_4010024(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_4010025(void)
+static int	DBpatch_4010026(void)
 {
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -263,7 +270,6 @@ static int	DBpatch_4010025(void)
 
 	return SUCCEED;
 }
-
 #endif
 
 DBPATCH_START(4010)
@@ -295,5 +301,6 @@ DBPATCH_ADD(4010022, 0, 1)
 DBPATCH_ADD(4010023, 0, 1)
 DBPATCH_ADD(4010024, 0, 1)
 DBPATCH_ADD(4010025, 0, 1)
+DBPATCH_ADD(4010026, 0, 1)
 
 DBPATCH_END()

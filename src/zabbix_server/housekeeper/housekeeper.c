@@ -650,7 +650,7 @@ static int	housekeeping_history_and_trends(int now)
 	/* we need to clear records from */
 	for (rule = hk_history_rules; NULL != rule->table; rule++)
 	{
-		if (ZBX_HK_MODE_DISABLED == *rule->poption_mode || FAIL == zbx_history_requires_trends(rule->type))
+		if (ZBX_HK_MODE_DISABLED == *rule->poption_mode)
 			continue;
 
 		/* If partitioning enabled for history and/or trends then drop partitions with expired history.  */

@@ -84,7 +84,9 @@ function updateMessageSettings($messages) {
 		$messages['enabled'] = 0;
 	}
 	if (isset($messages['triggers.severities'])) {
-		$messages['triggers.severities'] = serialize($messages['triggers.severities']);
+		$messages['triggers.severities'] = serialize(array_filter($messages['triggers.severities'], function($v) {
+			return $v == 1;
+		}));
 	}
 
 	$dbProfiles = DBselect(

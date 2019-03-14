@@ -25,6 +25,7 @@
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
+#include "mutexs.h"
 #include "../libs/zbxcrypto/tls.h"
 
 #ifndef _WINDOWS
@@ -239,12 +240,23 @@ static char	*INPUT_FILE = NULL;
 static int	WITH_TIMESTAMPS = 0;
 static int	REAL_TIME = 0;
 
-static char		*CONFIG_SOURCE_IP = NULL;
-static char		*ZABBIX_SERVER = NULL;
-static unsigned short	ZABBIX_SERVER_PORT = 0;
-static char		*ZABBIX_HOSTNAME = NULL;
-static char		*ZABBIX_KEY = NULL;
-static char		*ZABBIX_KEY_VALUE = NULL;
+static char	*CONFIG_SOURCE_IP = NULL;
+static char	*ZABBIX_SERVER = NULL;
+static char	*ZABBIX_SERVER_PORT = NULL;
+static char	*ZABBIX_HOSTNAME = NULL;
+static char	*ZABBIX_KEY = NULL;
+static char	*ZABBIX_KEY_VALUE = NULL;
+
+typedef struct
+{
+	char			*host;
+	unsigned short		port;
+	ZBX_THREAD_HANDLE	*thread;
+}
+zbx_send_destinations_t;
+
+static zbx_send_destinations_t	*destinations = NULL;		/* list of servers to send data to */
+static int			destinations_count = 0;
 
 #if !defined(_WINDOWS)
 static void	send_signal_handler(int sig)
@@ -259,7 +271,6 @@ static void	send_signal_handler(int sig)
 
 typedef struct
 {
-	char		*source_ip;
 	char		*server;
 	unsigned short	port;
 	struct zbx_json	json;
@@ -274,27 +285,64 @@ ZBX_THREAD_SENDVAL_ARGS;
 
 /******************************************************************************
  *                                                                            *
- * Function: update_exit_status                                               *
+ * Function: sender_threads_wait                                              *
  *                                                                            *
- * Purpose: manage exit status updates after batch sends                      *
+ * Purpose: waits until the "threads" are in the signalled state and manages  *
+ *          exit status updates                                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      threads -     [IN] thread handles                                     *
+ *      threads_num - [IN] thread count                                       *
+ *      old_status  - [IN] previous status                                    *
+ *                                                                            *
+ * Return value:  SUCCEED - success with all values at all destinations       *
+ *                FAIL - an error occurred                                    *
+ *                SUCCEED_PARTIAL - data sending was completed successfully   *
+ *                to at least one destination or processing of at least one   *
+ *                value at least at one destination failed                    *
  *                                                                            *
  * Comments: SUCCEED_PARTIAL status should be sticky in the sense that        *
  *           SUCCEED statuses that come after should not overwrite it         *
  *                                                                            *
  ******************************************************************************/
-static int	update_exit_status(int old_status, int new_status)
+static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num, const int old_status)
 {
-	if (FAIL == old_status || FAIL == new_status || (unsigned char)FAIL == new_status)
+	int		i, sp_count = 0, fail_count = 0;
+#if defined(_WINDOWS)
+	/* wait for threads to finish */
+	WaitForMultipleObjectsEx(threads_num, threads, TRUE, INFINITE, FALSE);
+#endif
+	for (i = 0; i < threads_num; i++)
+	{
+		int	new_status;
+
+		if (SUCCEED_PARTIAL == (new_status = zbx_thread_wait(threads[i])))
+				sp_count++;
+
+		if (SUCCEED != new_status && SUCCEED_PARTIAL != new_status)
+		{
+			int	j;
+
+			for (fail_count++, j = 0; j < destinations_count; j++)
+			{
+				if (destinations[j].thread == &threads[i])
+				{
+					zbx_free(destinations[j].host);
+					destinations[j] = destinations[--destinations_count];
+					break;
+				}
+			}
+		}
+
+		threads[i] = ZBX_THREAD_HANDLE_NULL;
+	}
+
+	if (threads_num == fail_count)
 		return FAIL;
-
-	if (SUCCEED == old_status)
-		return new_status;
-
-	if (SUCCEED_PARTIAL == old_status)
-		return old_status;
-
-	THIS_SHOULD_NEVER_HAPPEN;
-	return FAIL;
+	else if (SUCCEED_PARTIAL == old_status || 0 != sp_count || 0 != fail_count)
+		return SUCCEED_PARTIAL;
+	else
+		return SUCCEED;
 }
 
 /******************************************************************************
@@ -446,15 +494,10 @@ static int	check_response(char *response)
 
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
-	ZBX_THREAD_SENDVAL_ARGS	*sendval_args;
+	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
 	int			tcp_ret, ret = FAIL;
 	char			*tls_arg1, *tls_arg2;
 	zbx_socket_t		sock;
-
-	assert(args);
-	assert(((zbx_thread_args_t *)args)->args);
-
-	sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
@@ -523,6 +566,108 @@ out:
 	zbx_thread_exit(ret);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: perform_data_sending                                             *
+ *                                                                            *
+ * Purpose: Send data to all destinations each in a separate thread and wait  *
+ *          till threads have completed their task                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      sendval_args - [IN] arguments for thread function                     *
+ *      old_status   - [IN] previous status                                   *
+ *                                                                            *
+ * Return value:  SUCCEED - success with all values at all destinations       *
+ *                FAIL - an error occurred                                    *
+ *                SUCCEED_PARTIAL - data sending was completed successfully   *
+ *                to at least one destination or processing of at least one   *
+ *                value at least at one destination failed                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_status)
+{
+	int			i, ret;
+	ZBX_THREAD_HANDLE	*threads = NULL;
+
+	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, destinations_count, sizeof(ZBX_THREAD_HANDLE));
+
+	for (i = 0; i < destinations_count; i++)
+	{
+		zbx_thread_args_t	*thread_args;
+
+		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
+
+		thread_args->args = &sendval_args[i];
+
+		sendval_args[i].server = destinations[i].host;
+		sendval_args[i].port = destinations[i].port;
+
+		if (0 != i)
+		{
+			sendval_args[i].json = sendval_args[0].json;
+#if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+			sendval_args[i].tls_vars = sendval_args[0].tls_vars;
+#endif
+			sendval_args[i].sync_timestamp = sendval_args[0].sync_timestamp;
+		}
+
+		destinations[i].thread = &threads[i];
+
+		zbx_thread_start(send_value, thread_args, &threads[i]);
+#ifndef _WINDOWS
+		zbx_free(thread_args);
+#endif
+	}
+
+	ret = sender_threads_wait(threads, destinations_count, old_status);
+
+	zbx_free(threads);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: sender_add_serveractive_host_cb                                  *
+ *                                                                            *
+ * Purpose: add server or proxy to the list of destinations                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      host - [IN] IP or hostname                                            *
+ *      port - [IN] port number                                               *
+ *                                                                            *
+ * Return value:  SUCCEED - destination added successfully                    *
+ *                FAIL - destination has been already added                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	sender_add_serveractive_host_cb(const char *host, unsigned short port)
+{
+	int	i;
+
+	for (i = 0; i < destinations_count; i++)
+	{
+		if (0 == strcmp(destinations[i].host, host) && destinations[i].port == port)
+			return FAIL;
+	}
+
+	destinations_count++;
+#if defined(_WINDOWS)
+	if (MAXIMUM_WAIT_OBJECTS < destinations_count)
+	{
+		zbx_error("error parsing the \"ServerActive\" parameter: maximum destination limit of %d has been"
+				" exceeded", MAXIMUM_WAIT_OBJECTS);
+		exit(EXIT_FAILURE);
+	}
+#endif
+	destinations = (zbx_send_destinations_t *)zbx_realloc(destinations,
+			sizeof(zbx_send_destinations_t) * destinations_count);
+
+	destinations[destinations_count - 1].host = zbx_strdup(NULL, host);
+	destinations[destinations_count - 1].port = port;
+
+	return SUCCEED;
+}
+
 static void	zbx_fill_from_config_file(char **dst, char *src)
 {
 	/* helper function, only for TYPE_STRING configuration parameters */
@@ -536,12 +681,12 @@ static void	zbx_fill_from_config_file(char **dst, char *src)
 	}
 }
 
-static void    zbx_load_config(const char *config_file)
+static void	zbx_load_config(const char *config_file)
 {
-	char	*cfg_source_ip = NULL, *cfg_active_hosts = NULL, *cfg_hostname = NULL, *r = NULL,
-		*cfg_tls_connect = NULL, *cfg_tls_ca_file = NULL, *cfg_tls_crl_file = NULL,
-		*cfg_tls_server_cert_issuer = NULL, *cfg_tls_server_cert_subject = NULL, *cfg_tls_cert_file = NULL,
-		*cfg_tls_key_file = NULL, *cfg_tls_psk_file = NULL, *cfg_tls_psk_identity = NULL;
+	char	*cfg_source_ip = NULL, *cfg_active_hosts = NULL, *cfg_hostname = NULL, *cfg_tls_connect = NULL,
+		*cfg_tls_ca_file = NULL, *cfg_tls_crl_file = NULL, *cfg_tls_server_cert_issuer = NULL,
+		*cfg_tls_server_cert_subject = NULL, *cfg_tls_cert_file = NULL, *cfg_tls_key_file = NULL,
+		*cfg_tls_psk_file = NULL, *cfg_tls_psk_identity = NULL;
 
 	struct cfg_line	cfg[] =
 	{
@@ -574,9 +719,6 @@ static void    zbx_load_config(const char *config_file)
 		{NULL}
 	};
 
-	if (NULL == config_file)
-		return;
-
 	/* do not complain about unknown parameters in agent configuration file */
 	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT);
 
@@ -585,23 +727,7 @@ static void    zbx_load_config(const char *config_file)
 	if (NULL == ZABBIX_SERVER)
 	{
 		if (NULL != cfg_active_hosts && '\0' != *cfg_active_hosts)
-		{
-			unsigned short	cfg_server_port = 0;
-
-			if (NULL != (r = strchr(cfg_active_hosts, ',')))
-				*r = '\0';
-
-			if (SUCCEED != parse_serveractive_element(cfg_active_hosts, &ZABBIX_SERVER,
-					&cfg_server_port, 0))
-			{
-				zbx_error("error parsing \"ServerActive\" option: address \"%s\" is invalid",
-						cfg_active_hosts);
-				exit(EXIT_FAILURE);
-			}
-
-			if (0 == ZABBIX_SERVER_PORT && 0 != cfg_server_port)
-				ZABBIX_SERVER_PORT = cfg_server_port;
-		}
+			zbx_set_data_destination_hosts(cfg_active_hosts, sender_add_serveractive_host_cb);
 	}
 	zbx_free(cfg_active_hosts);
 
@@ -620,6 +746,11 @@ static void    zbx_load_config(const char *config_file)
 
 static void	parse_commandline(int argc, char **argv)
 {
+/* Minimum and maximum port numbers Zabbix sender can connect to. */
+/* Do not forget to modify port number validation below if MAX_ZABBIX_PORT is ever changed. */
+#define MIN_ZABBIX_PORT 1u
+#define MAX_ZABBIX_PORT 65535u
+
 	int		i, fatal = 0;
 	char		ch;
 	unsigned int	opt_mask = 0;
@@ -653,7 +784,8 @@ static void	parse_commandline(int argc, char **argv)
 					ZABBIX_SERVER = zbx_strdup(ZABBIX_SERVER, zbx_optarg);
 				break;
 			case 'p':
-				ZABBIX_SERVER_PORT = (unsigned short)atoi(zbx_optarg);
+				if (NULL == ZABBIX_SERVER_PORT)
+					ZABBIX_SERVER_PORT = zbx_strdup(ZABBIX_SERVER_PORT, zbx_optarg);
 				break;
 			case 's':
 				if (NULL == ZABBIX_HOSTNAME)
@@ -731,6 +863,26 @@ static void	parse_commandline(int argc, char **argv)
 				exit(EXIT_FAILURE);
 				break;
 		}
+	}
+
+	if (NULL != ZABBIX_SERVER)
+	{
+		unsigned short	port;
+
+		if (NULL != ZABBIX_SERVER_PORT)
+		{
+			if (SUCCEED != is_ushort(ZABBIX_SERVER_PORT, &port) || MIN_ZABBIX_PORT > port)
+			{
+				zbx_error("option \"-p\" used with invalid port number \"%s\", valid port numbers are"
+						" %d-%d", ZABBIX_SERVER_PORT, (int)MIN_ZABBIX_PORT,
+						(int)MAX_ZABBIX_PORT);
+				exit(EXIT_FAILURE);
+			}
+		}
+		else
+			port = (unsigned short)ZBX_DEFAULT_SERVER_PORT;
+
+		sender_add_serveractive_host_cb(ZABBIX_SERVER, port);
 	}
 
 	/* every option may be specified only once */
@@ -1000,24 +1152,25 @@ static char	*zbx_fgets_alloc(char **buffer, size_t *buffer_alloc, FILE *fp)
 
 int	main(int argc, char **argv)
 {
-	FILE			*in;
-	char			*in_line = NULL, hostname[MAX_STRING_LEN], key[MAX_STRING_LEN], *key_value = NULL,
-				clock[32], *error = NULL;
-	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = FAIL,
-				timestamp;
-	size_t			in_line_alloc = MAX_BUFFER_LEN, key_value_alloc = 0;
-	double			last_send = 0;
-	const char		*p;
-	zbx_thread_args_t	thread_args;
-	ZBX_THREAD_SENDVAL_ARGS sendval_args;
-	ZBX_THREAD_HANDLE	thread;
+	char			*error = NULL;
+	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp;
+	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = NULL;
 
 	progname = get_program_name(argv[0]);
 
 	parse_commandline(argc, argv);
 
-	zbx_load_config(CONFIG_FILE);
+	if (NULL != CONFIG_FILE)
+		zbx_load_config(CONFIG_FILE);
 
+#ifndef _WINDOWS
+	if (SUCCEED != zbx_locks_create(&error))
+	{
+		zbx_error("cannot create locks: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+#endif
 	if (SUCCEED != zabbix_open_log(LOG_TYPE_UNDEFINED, CONFIG_LOG_LEVEL, NULL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
@@ -1039,27 +1192,11 @@ int	main(int argc, char **argv)
 		goto exit;
 	}
 #endif
-	if (NULL == ZABBIX_SERVER)
+	if (0 == destinations_count)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "'ServerActive' parameter required");
 		goto exit;
 	}
-
-	if (0 == ZABBIX_SERVER_PORT)
-		ZABBIX_SERVER_PORT = ZBX_DEFAULT_SERVER_PORT;
-
-	if (MIN_ZABBIX_PORT > ZABBIX_SERVER_PORT)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Incorrect port number [%d]. Allowed [%d:%d]",
-				(int)ZABBIX_SERVER_PORT, (int)MIN_ZABBIX_PORT, (int)MAX_ZABBIX_PORT);
-		goto exit;
-	}
-
-	thread_args.server_num = 0;
-	thread_args.args = &sendval_args;
-
-	sendval_args.server = ZABBIX_SERVER;
-	sendval_args.port = ZABBIX_SERVER_PORT;
 
 	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
 			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
@@ -1083,19 +1220,27 @@ int	main(int argc, char **argv)
 #endif
 	}
 
+	sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)zbx_calloc(sendval_args, destinations_count,
+			sizeof(ZBX_THREAD_SENDVAL_ARGS));
+
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
 	{
 		/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
-		zbx_tls_pass_vars(&sendval_args.tls_vars);
+		zbx_tls_pass_vars(&sendval_args->tls_vars);
 	}
 #endif
-	zbx_json_init(&sendval_args.json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
-	zbx_json_addarray(&sendval_args.json, ZBX_PROTO_TAG_DATA);
+	zbx_json_init(&sendval_args->json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
+	zbx_json_addarray(&sendval_args->json, ZBX_PROTO_TAG_DATA);
 
 	if (INPUT_FILE)
 	{
+		FILE	*in;
+		char	*in_line = NULL, *key_value = NULL;
+		int	buffer_count = 0;
+		size_t	in_line_alloc = MAX_BUFFER_LEN;
+
 		if (0 == strcmp(INPUT_FILE, "-"))
 		{
 			in = stdin;
@@ -1111,7 +1256,7 @@ int	main(int argc, char **argv)
 			goto free;
 		}
 
-		sendval_args.sync_timestamp = WITH_TIMESTAMPS;
+		sendval_args->sync_timestamp = WITH_TIMESTAMPS;
 		in_line = (char *)zbx_malloc(NULL, in_line_alloc);
 
 		ret = SUCCEED;
@@ -1119,6 +1264,12 @@ int	main(int argc, char **argv)
 		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) &&
 				NULL != zbx_fgets_alloc(&in_line, &in_line_alloc, in))
 		{
+			char		hostname[MAX_STRING_LEN], key[MAX_STRING_LEN], clock[32];
+			int		read_more = 0;
+			size_t		key_value_alloc = 0;
+			double		last_send = 0;
+			const char	*p;
+
 			/* line format: <hostname> <key> [<timestamp>] <value> */
 
 			total_count++; /* also used as inputline */
@@ -1195,13 +1346,13 @@ int	main(int argc, char **argv)
 				break;
 			}
 
-			zbx_json_addobject(&sendval_args.json, NULL);
-			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
+			zbx_json_addobject(&sendval_args->json, NULL);
+			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
 			if (1 == WITH_TIMESTAMPS)
-				zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_CLOCK, timestamp);
-			zbx_json_close(&sendval_args.json);
+				zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_CLOCK, timestamp);
+			zbx_json_close(&sendval_args->json);
 
 			succeed_count++;
 			buffer_count++;
@@ -1235,25 +1386,24 @@ int	main(int argc, char **argv)
 
 			if (VALUES_MAX == buffer_count || (stdin == in && 1 == REAL_TIME && 0 >= read_more))
 			{
-				zbx_json_close(&sendval_args.json);
+				zbx_json_close(&sendval_args->json);
 
 				last_send = zbx_time();
-				zbx_thread_start(send_value, &thread_args, &thread);
-				ret = update_exit_status(ret, zbx_thread_wait(thread));
+
+				ret = perform_data_sending(sendval_args, ret);
 
 				buffer_count = 0;
-				zbx_json_clean(&sendval_args.json);
-				zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
-						ZBX_JSON_TYPE_STRING);
-				zbx_json_addarray(&sendval_args.json, ZBX_PROTO_TAG_DATA);
+				zbx_json_clean(&sendval_args->json);
+				zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_REQUEST,
+						ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
+				zbx_json_addarray(&sendval_args->json, ZBX_PROTO_TAG_DATA);
 			}
 		}
 
 		if (FAIL != ret && 0 != buffer_count)
 		{
-			zbx_json_close(&sendval_args.json);
-			zbx_thread_start(send_value, &thread_args, &thread);
-			ret = update_exit_status(ret, zbx_thread_wait(thread));
+			zbx_json_close(&sendval_args->json);
+			ret = perform_data_sending(sendval_args, ret);
 		}
 
 		if (in != stdin)
@@ -1264,7 +1414,7 @@ int	main(int argc, char **argv)
 	}
 	else
 	{
-		sendval_args.sync_timestamp = 0;
+		sendval_args->sync_timestamp = 0;
 		total_count++;
 
 		do /* try block simulation */
@@ -1287,20 +1437,21 @@ int	main(int argc, char **argv)
 
 			ret = SUCCEED;
 
-			zbx_json_addobject(&sendval_args.json, NULL);
-			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE, ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&sendval_args.json);
+			zbx_json_addobject(&sendval_args->json, NULL);
+			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&sendval_args->json);
 
 			succeed_count++;
-			zbx_thread_start(send_value, &thread_args, &thread);
-			ret = update_exit_status(ret, zbx_thread_wait(thread));
+
+			ret = perform_data_sending(sendval_args, ret);
 		}
 		while (0); /* try block simulation */
 	}
 free:
-	zbx_json_free(&sendval_args.json);
+	zbx_json_free(&sendval_args->json);
+	zbx_free(sendval_args);
 exit:
 	if (FAIL != ret)
 	{
@@ -1325,6 +1476,9 @@ exit:
 #if defined(_WINDOWS)
 	while (0 == WSACleanup())
 		;
+#endif
+#if !defined(_WINDOWS) && defined(HAVE_PTHREAD_PROCESS_SHARED)
+	zbx_locks_disable();
 #endif
 	if (FAIL == ret)
 		ret = EXIT_FAILURE;
