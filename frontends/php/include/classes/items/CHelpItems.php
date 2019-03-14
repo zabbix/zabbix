@@ -339,6 +339,10 @@ class CHelpItems {
 				[
 					'key' => 'wmi.get[<namespace>,<query>]',
 					'description' => _('Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)')
+				],
+				[
+					'key' => 'zabbix.stats[<ip>,<port>]',
+					'description' => _('Returns a JSON object containing Zabbix server or Proxy internal metrics.')
 				]
 			],
 			ITEM_TYPE_ZABBIX_ACTIVE => [
@@ -683,8 +687,8 @@ class CHelpItems {
 					'description' => _('VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name')
 				],
 				[
-					'key' => 'vmware.eventlog[<url>]',
-					'description' => _('VMware event log, <url> - VMware service URL')
+					'key' => 'vmware.eventlog[<url>,<mode>]',
+					'description' => _('VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data')
 				],
 				[
 					'key' => 'vmware.fullname[<url>]',
@@ -977,6 +981,10 @@ class CHelpItems {
 				[
 					'key' => 'zabbix[requiredperformance]',
 					'description' => _('Required performance of the Zabbix server, in new values per second expected.')
+				],
+				[
+					'key' => 'zabbix[stats,<ip>,<port>]',
+					'description' => _('Returns a JSON object containing Zabbix server or Proxy internal metrics.')
 				],
 				[
 					'key' => 'zabbix[trends]',

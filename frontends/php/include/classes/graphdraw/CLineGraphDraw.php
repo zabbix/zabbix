@@ -2382,7 +2382,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$y_offsets = $this->shiftY + self::legendOffsetY;
 
 		if (!$this->with_vertical_padding) {
-			$y_offsets -= $this->m_showTriggers
+			$y_offsets -= ($this->m_showTriggers && count($this->triggers) > 0)
 				? static::DEFAULT_TOP_BOTTOM_PADDING / 2
 				: static::DEFAULT_TOP_BOTTOM_PADDING;
 		}
@@ -2517,6 +2517,7 @@ class CLineGraphDraw extends CGraphDraw {
 	public function drawDimensions() {
 		set_image_header();
 
+		$this->calculateTopPadding();
 		$this->selectTriggers();
 		$this->calcDimentions();
 
