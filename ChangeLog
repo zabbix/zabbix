@@ -1,6 +1,7 @@
 Changes for 4.2.0rc1
 
 New features:
+...G...... [ZBXNEXT-4967] added Zabbix sender data sending to multiple destinations given in ServerActive configuration parameter (viktors)
 
 Bug fixes:
 ..F....... [ZBX-15207] fixed deprecated css features (ashubin)
