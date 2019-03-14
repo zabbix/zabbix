@@ -295,8 +295,13 @@ jQuery(function ($){
 		was_dragged = false,
 		prevent_click = false;
 
-	$(document).on('mousedown', 'img', selectionHandlerDragStart)
+	$(document)
+		.on('mousedown', 'img', selectionHandlerDragStart)
 		.on('dblclick', 'img', function(e) {
+			if (typeof $(e.target).data('zbx_sbox') === 'undefined') {
+				return;
+			}
+
 			$.publish('timeselector.zoomout', {
 				from: element.from.val(),
 				to: element.to.val()
@@ -305,6 +310,10 @@ jQuery(function ($){
 			return cancelEvent(e);
 		})
 		.on('click', 'a', function(e) {
+			if (typeof $(e.target).data('zbx_sbox') === 'undefined') {
+				return;
+			}
+
 			// Prevent click on graph image parent <a/> element when clicked inside graph selectable area.
 			if ($(e.target).is('img') && prevent_click && $(this).hasClass('dashbrd-widget-graph-link')) {
 				return cancelEvent(e);
