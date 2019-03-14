@@ -81,7 +81,7 @@ typedef struct
 }
 zbx_item_link_t;
 
-/* direct request to be forwarded to worker */
+/* direct request to be forwarded to worker, bypassing the preprocessing queue */
 typedef struct
 {
 	zbx_ipc_client_t	*client;	/* the IPC client sending forward message to worker */
@@ -104,7 +104,8 @@ typedef struct
 	zbx_uint64_t			preproc_num;	/* queued values with preprocessing steps */
 	zbx_list_iterator_t		priority_tail;	/* iterator to the last queued priority item */
 
-	zbx_list_t			forward_queue;	/* queue of testing requests */
+	zbx_list_t			direct_queue;	/* Queue of external requests that have to be */
+							/* forwarded to workers for preprocessing.    */
 }
 zbx_preprocessing_manager_t;
 
@@ -264,7 +265,7 @@ static void	*preprocessor_get_next_task(zbx_preprocessing_manager_t *manager, zb
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED == zbx_list_pop(&manager->forward_queue, (void **)&direct_request))
+	if (SUCCEED == zbx_list_pop(&manager->direct_queue, (void **)&direct_request))
 	{
 		*message = direct_request->message;
 		zbx_ipc_message_init(&direct_request->message);
@@ -837,7 +838,7 @@ static void	preprocessor_add_test_request(zbx_preprocessing_manager_t *manager, 
 	direct_request = zbx_malloc(NULL, sizeof(zbx_preprocessing_direct_request_t));
 	direct_request->client = client;
 	zbx_ipc_message_copy(&direct_request->message, message);
-	zbx_list_append(&manager->forward_queue, direct_request, NULL);
+	zbx_list_append(&manager->direct_queue, direct_request, NULL);
 
 	preprocessor_assign_tasks(manager);
 	preprocessing_flush_queue(manager);
@@ -1102,7 +1103,7 @@ static void	preprocessor_init_manager(zbx_preprocessing_manager_t *manager)
 	manager->workers = (zbx_preprocessing_worker_t *)zbx_calloc(NULL, CONFIG_PREPROCESSOR_FORKS,
 			sizeof(zbx_preprocessing_worker_t));
 	zbx_list_create(&manager->queue);
-	zbx_list_create(&manager->forward_queue);
+	zbx_list_create(&manager->direct_queue);
 	zbx_hashset_create_ext(&manager->item_config, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
 			(zbx_clean_func_t)preproc_item_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
@@ -1174,10 +1175,12 @@ static void	preprocessor_destroy_manager(zbx_preprocessing_manager_t *manager)
 	zbx_free(manager->workers);
 
 	/* this is the place where values are lost */
-	while (SUCCEED == zbx_list_pop(&manager->queue, (void **)&direct_request))
+	while (SUCCEED == zbx_list_pop(&manager->direct_queue, (void **)&direct_request))
 		preprocessor_free_direct_request(direct_request);
 
-	while (SUCCEED == zbx_list_pop(&manager->forward_queue, (void **)&request))
+	zbx_list_destroy(&manager->direct_queue);
+
+	while (SUCCEED == zbx_list_pop(&manager->queue, (void **)&request))
 		preprocessor_free_request(request);
 
 	zbx_list_destroy(&manager->queue);
