@@ -375,7 +375,7 @@ int	zabbix_check_log_level(int level)
 	return ZBX_CHECK_LOG_LEVEL(level);
 }
 
-void	__zbx_zabbix_log(int level, const char *fmt, ...)
+void	zabbix_log(int level, const char *fmt, ...)
 {
 	char		message[MAX_BUFFER_LEN];
 	va_list		args;

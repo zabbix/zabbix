@@ -52,14 +52,8 @@ typedef enum
 }
 zbx_err_codes_t;
 
-#ifdef HAVE___VA_ARGS__
-#	define zabbix_log(level, fmt, ...) __zbx_zabbix_log(level, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zabbix_log __zbx_zabbix_log
-#endif
-
 int		zabbix_open_log(int type, int level, const char *filename, char **error);
-void		__zbx_zabbix_log(int level, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
+void		zabbix_log(int level, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
 void		zabbix_close_log(void);
 
 #ifndef _WINDOWS

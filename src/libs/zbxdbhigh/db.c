@@ -263,7 +263,7 @@ void	DBstatement_prepare(const char *sql)
  * Comments: retry until DB is up                                             *
  *                                                                            *
  ******************************************************************************/
-int	__zbx_DBexecute(const char *fmt, ...)
+int	DBexecute(const char *fmt, ...)
 {
 	va_list	args;
 	int	rc;
@@ -299,7 +299,7 @@ int	__zbx_DBexecute(const char *fmt, ...)
  * Comments: don't retry if DB is down                                        *
  *                                                                            *
  ******************************************************************************/
-int	__zbx_DBexecute_once(const char *fmt, ...)
+int	DBexecute_once(const char *fmt, ...)
 {
 	va_list	args;
 	int	rc;
@@ -330,7 +330,7 @@ DB_ROW	DBfetch(DB_RESULT result)
  * Purpose: execute a select statement                                        *
  *                                                                            *
  ******************************************************************************/
-DB_RESULT	__zbx_DBselect_once(const char *fmt, ...)
+DB_RESULT	DBselect_once(const char *fmt, ...)
 {
 	va_list		args;
 	DB_RESULT	rc;
@@ -353,7 +353,7 @@ DB_RESULT	__zbx_DBselect_once(const char *fmt, ...)
  * Comments: retry until DB is up                                             *
  *                                                                            *
  ******************************************************************************/
-DB_RESULT	__zbx_DBselect(const char *fmt, ...)
+DB_RESULT	DBselect(const char *fmt, ...)
 {
 	va_list		args;
 	DB_RESULT	rc;

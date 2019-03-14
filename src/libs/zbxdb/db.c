@@ -286,14 +286,8 @@ static void	zbx_postgresql_error(char **error, const PGresult *pg_result)
 }
 #endif /*HAVE_POSTGRESQL*/
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_db_execute(fmt, ...)	__zbx_zbx_db_execute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_db_execute		__zbx_zbx_db_execute
-#endif
-
 __zbx_attr_format_printf(1, 2)
-static int	__zbx_zbx_db_execute(const char *fmt, ...)
+static int	zbx_db_execute(const char *fmt, ...)
 {
 	va_list	args;
 	int	ret;
@@ -305,14 +299,8 @@ static int	__zbx_zbx_db_execute(const char *fmt, ...)
 	return ret;
 }
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_db_select(fmt, ...)	__zbx_zbx_db_select(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_db_select		__zbx_zbx_db_select
-#endif
-
 __zbx_attr_format_printf(1, 2)
-static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
+static DB_RESULT	zbx_db_select(const char *fmt, ...)
 {
 	va_list		args;
 	DB_RESULT	result;
