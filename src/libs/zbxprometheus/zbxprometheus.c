@@ -1419,7 +1419,7 @@ static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *da
 			{
 				if (SUCCEED != prometheus_parse_hint(filter, data, pos, hints, &loc, &errmsg))
 					goto out;
-				pos = loc.r + 1;
+				pos = loc.r;
 			}
 			continue;
 		}
@@ -1433,7 +1433,7 @@ static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *da
 			zbx_vector_ptr_append(rows, row);
 		}
 
-		pos = loc.r + 1;
+		pos = loc.r;
 	}
 
 	ret = SUCCEED;
