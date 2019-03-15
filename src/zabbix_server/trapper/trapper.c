@@ -32,10 +32,12 @@
 #include "nodecommand.h"
 #include "proxyconfig.h"
 #include "proxydata.h"
+#include "../alerter/alerter_protocol.h"
 
 #include "daemon.h"
 #include "../../libs/zbxcrypto/tls.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
+#include "zbxipcservice.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -450,6 +452,51 @@ out:
 	return ret;
 }
 
+static	int	ipc_async_exchange(const char *service_name, zbx_uint32_t code, const unsigned char *data,
+		zbx_uint32_t size, unsigned char **out, char **error)
+{
+	zbx_ipc_message_t	*message;
+	zbx_ipc_async_socket_t	asocket;
+	int			ret = FAIL;
+
+	if (FAIL == zbx_ipc_async_socket_open(&asocket, service_name, 60, error))
+		return FAIL;
+
+	if (FAIL == zbx_ipc_async_socket_send(&asocket, code, data, size))
+	{
+		*error = zbx_strdup(*error, "Cannot send media type test message to alert manager");
+		goto fail;
+	}
+
+	if (FAIL == zbx_ipc_async_socket_flush(&asocket, 60))
+	{
+		*error = zbx_strdup(*error, "Cannot flush media type test message to alert manager");
+		goto fail;
+	}
+
+	if (FAIL == zbx_ipc_async_socket_recv(&asocket, 60, &message))
+	{
+		*error = zbx_strdup(*error, "Cannot receive media type test response from alert manager");
+		goto fail;
+	}
+
+	if (NULL == message)
+	{
+		*error = zbx_strdup(*error, "Timeout while waiting for media type test response from alert manager");
+		goto fail;
+	}
+
+	*out = message->data;
+	message->data = NULL;
+
+	zbx_ipc_message_free(message);
+	ret = SUCCEED;
+fail:
+	zbx_ipc_async_socket_close(&asocket);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: recv_alert_send                                                  *
@@ -468,12 +515,13 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	const char		*__function_name = "recv_alert_send";
 	int			ret = FAIL;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1], error[MAX_STRING_LEN], *sendto = NULL, *subject = NULL,
-				*message = NULL;
+				*message = NULL, *errmsg = NULL;
 	zbx_uint64_t		mediatypeid;
 	size_t			string_alloc;
 	struct zbx_json		json;
 	struct zbx_json_parse	jp_data;
-	unsigned char		*data;
+	unsigned char		*data, *result;
+	zbx_uint32_t		size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -517,14 +565,23 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 		goto fail;
 	}
 
-	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, sendto, subject, message);
 
-	zbx_alerter_serialize_alert_send(&data, mediatypeid, sendto, subject, message);
+	if (SUCCEED != ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_ALERT, data, size, &result, &errmsg))
+	{
+		strscpy(error, errmsg);
+		zbx_free(errmsg);
+		zbx_free(data);
+		goto fail;
+	}
 
 	zbx_free(data);
 
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+
 	(void)zbx_tcp_send(sock, json.buffer);
+
 	zbx_json_free(&json);
 	ret = SUCCEED;
 fail:

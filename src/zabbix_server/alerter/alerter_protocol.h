@@ -27,6 +27,7 @@
 /* alerter -> manager */
 #define ZBX_IPC_ALERTER_REGISTER	1000
 #define ZBX_IPC_ALERTER_RESULT		1001
+#define ZBX_IPC_ALERTER_ALERT		1002
 
 
 /* manager -> alerter */
