@@ -142,7 +142,7 @@ jQuery(document).ready(function($) {
 	$('#value').multilineInput({
 		placeholder: '<?= _('value') ?>',
 		monospace_font: false,
-		maxlength: 65536,
+		maxlength: 65535,
 		autofocus: true,
 		readonly: false
 	});
@@ -150,7 +150,7 @@ jQuery(document).ready(function($) {
 	$('#prev_value').multilineInput({
 		placeholder: '<?= $data['show_prev'] ? _('value') : '' ?>',
 		monospace_font: false,
-		maxlength: 65536,
+		maxlength: 65535,
 		disabled: <?= $data['show_prev'] ? 'false' : 'true' ?>
 	});
 });
