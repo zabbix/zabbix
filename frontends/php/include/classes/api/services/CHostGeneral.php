@@ -464,69 +464,65 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-
 		/* GRAPHS {{{ */
-		$sqlFrom = ' graphs g,hosts h';
-		$sqlWhere = ' EXISTS ('.
-			'SELECT ggi.graphid'.
-			' FROM graphs_items ggi,items ii'.
-			' WHERE ggi.graphid=g.templateid'.
-			' AND ii.itemid=ggi.itemid'.
-			' AND '.dbConditionInt('ii.hostid', $templateids).')'.
-			' AND '.dbConditionInt('g.flags', $flags);
-
-
-		if (!is_null($targetids)) {
-			$sqlFrom = ' graphs g,graphs_items gi,items i,hosts h';
-			$sqlWhere .= ' AND '.dbConditionInt('i.hostid', $targetids).
+		$db_tpl_graphs = DBselect(
+			'SELECT DISTINCT g.graphid'.
+			' FROM graphs g,graphs_items gi,items i'.
+			' WHERE g.graphid=gi.graphid'.
 				' AND gi.itemid=i.itemid'.
-				' AND g.graphid=gi.graphid'.
-				' AND h.hostid=i.hostid';
+				' AND '.dbConditionInt('i.hostid', $templateids).
+				' AND '.dbConditionInt('g.flags', $flags)
+		);
+
+		$tpl_graphids = [];
+
+		while ($db_tpl_graph = DBfetch($db_tpl_graphs)) {
+			$tpl_graphids[] = $db_tpl_graph['graphid'];
 		}
-		$sql = 'SELECT DISTINCT g.graphid,g.name,g.flags,h.name as host'.
-			' FROM '.$sqlFrom.
-			' WHERE '.$sqlWhere;
-		$dbGraphs = DBSelect($sql);
-		$graphs = [
-			ZBX_FLAG_DISCOVERY_NORMAL => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
-		];
-		while ($graph = DBfetch($dbGraphs)) {
-			$graphs[$graph['flags']][$graph['graphid']] = [
-				'name' => $graph['name'],
-				'graphid' => $graph['graphid'],
-				'host' => $graph['host']
+
+		if ($tpl_graphids) {
+			$sql = ($targetids !== null)
+				? 'SELECT DISTINCT g.graphid,g.flags'.
+					' FROM graphs g,graphs_items gi,items i'.
+					' WHERE g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' AND '.dbConditionInt('g.templateid', $tpl_graphids).
+						' AND '.dbConditionInt('i.hostid', $targetids)
+				: 'SELECT g.graphid,g.flags'.
+					' FROM graphs g'.
+					' WHERE '.dbConditionInt('g.templateid', $tpl_graphids);
+
+			$db_graphs = DBSelect($sql);
+
+			$graphs = [
+				ZBX_FLAG_DISCOVERY_NORMAL => [],
+				ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 			];
-		}
-
-		if (!empty($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
-			if ($clear) {
-				CGraphPrototypeManager::delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
+			while ($db_graph = DBfetch($db_graphs)) {
+				$graphs[$db_graph['flags']][] = $db_graph['graphid'];
 			}
-			else{
-				DB::update('graphs', [
-					'values' => ['templateid' => 0],
-					'where' => ['graphid' => array_keys($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE])]
-				]);
 
-				foreach ($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $graph) {
-					info(_s('Unlinked: Graph prototype "%1$s" on "%2$s".', $graph['name'], $graph['host']));
+			if ($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+				if ($clear) {
+					CGraphPrototypeManager::delete($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				}
+				else {
+					DB::update('graphs', [
+						'values' => ['templateid' => 0],
+						'where' => ['graphid' => $graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]]
+					]);
 				}
 			}
-		}
 
-		if (!empty($graphs[ZBX_FLAG_DISCOVERY_NORMAL])) {
-			if ($clear) {
-				CGraphManager::delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_NORMAL]));
-			}
-			else{
-				DB::update('graphs', [
-					'values' => ['templateid' => 0],
-					'where' => ['graphid' => array_keys($graphs[ZBX_FLAG_DISCOVERY_NORMAL])]
-				]);
-
-				foreach ($graphs[ZBX_FLAG_DISCOVERY_NORMAL] as $graph) {
-					info(_s('Unlinked: Graph "%1$s" on "%2$s".', $graph['name'], $graph['host']));
+			if ($graphs[ZBX_FLAG_DISCOVERY_NORMAL]) {
+				if ($clear) {
+					CGraphManager::delete($graphs[ZBX_FLAG_DISCOVERY_NORMAL]);
+				}
+				else {
+					DB::update('graphs', [
+						'values' => ['templateid' => 0],
+						'where' => ['graphid' => $graphs[ZBX_FLAG_DISCOVERY_NORMAL]]
+					]);
 				}
 			}
 		}
