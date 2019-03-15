@@ -30,8 +30,11 @@
 		e.data.$hidden.prop('disabled', e.data.options.disabled ? true : null);
 		e.data.$input
 			.prop('disabled', e.data.options.disabled ? true : null)
-			.prop('readonly', e.data.options.disabled ? null : true);
-		e.data.$button.prop('disabled', e.data.options.disabled ? true : null);
+			.prop('readonly', e.data.options.disabled ? null : true)
+			.prop('title', e.data.options.disabled ? '' : e.data.options.hint);
+		e.data.$button
+			.prop('disabled', e.data.options.disabled ? true : null)
+			.prop('title', e.data.options.disabled ? '' : e.data.options.hint);
 
 		$(this)
 			.toggleClass('multilineinput-readonly', (e.data.options.readonly && !e.data.options.disabled))
