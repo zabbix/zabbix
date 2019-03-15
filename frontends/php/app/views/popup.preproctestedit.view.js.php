@@ -120,18 +120,18 @@ function processItemPreprocessingTestResults(steps) {
 
 		if (typeof step.error !== 'undefined') {
 			step.result = jQuery(
-				tmpl_err_icon.evaluate({error: step.error || '<?= CJs::encodeJson(_('<empty string>')) ?>'})
+				tmpl_err_icon.evaluate({error: step.error || <?= CJs::encodeJson(_('<empty string>')) ?>})
 			);
 		}
 		else if (typeof step.result === 'undefined' || step.result === null) {
 			step.result = jQuery('<span>',
 				{'class': '<?= ZBX_STYLE_GREY ?>'}
-			).text('<?= CJs::encodeJson(_('No value')) ?>');
+			).text(<?= CJs::encodeJson(_('No value')) ?>);
 		}
 		else if (step.result === '') {
 			step.result = jQuery('<span>',
 				{'class': '<?= ZBX_STYLE_GREY ?>'}
-			).text('<?= CJs::encodeJson(_('<empty string>')) ?>');
+			).text(<?= CJs::encodeJson(_('<empty string>')) ?>);
 		}
 
 		if (typeof step.action !== 'undefined' && step.action !== null) {
@@ -146,7 +146,7 @@ function processItemPreprocessingTestResults(steps) {
 
 jQuery(document).ready(function($) {
 	$('#value').multilineInput({
-		placeholder: '<?= CJs::encodeJson(_('value')) ?>',
+		placeholder: <?= CJs::encodeJson(_('value')) ?>,
 		monospace_font: false,
 		maxlength: 65535,
 		autofocus: true,
@@ -154,7 +154,7 @@ jQuery(document).ready(function($) {
 	});
 
 	$('#prev_value').multilineInput({
-		placeholder: '<?= $data['show_prev'] ? CJs::encodeJson(_('value')) : '' ?>',
+		placeholder: <?= $data['show_prev'] ? CJs::encodeJson(_('value')) : '' ?>,
 		monospace_font: false,
 		maxlength: 65535,
 		disabled: <?= $data['show_prev'] ? 'false' : 'true' ?>
