@@ -1897,6 +1897,7 @@ AC_OUTPUT([
 	src/libs/zbxhistory/Makefile
 	src/libs/zbxcompress/Makefile
 	src/libs/zbxembed/Makefile
+	src/libs/zbxprometheus/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile

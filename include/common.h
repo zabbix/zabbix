@@ -1352,6 +1352,7 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_REGEXP	0x040000
 #define ZBX_TOKEN_XPATH		0x080000
 #define ZBX_TOKEN_REGEXP_OUTPUT	0x100000
+#define ZBX_TOKEN_PROMETHEUS	0x200000
 
 /* location of a substring */
 typedef struct
@@ -1476,6 +1477,8 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_THROTTLE_VALUE		19
 #define ZBX_PREPROC_THROTTLE_TIMED_VALUE	20
 #define ZBX_PREPROC_SCRIPT			21
+#define ZBX_PREPROC_PROMETHEUS_PATTERN		22
+#define ZBX_PREPROC_PROMETHEUS_TO_JSON		23
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0

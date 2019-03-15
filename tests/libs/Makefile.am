@@ -8,6 +8,7 @@ SUBDIRS = \
 	zbxsysinfo \
 	zbxcommshigh \
 	zbxcommon \
-	zbxalgo
+	zbxalgo \
+	zbxprometheus
 	
 

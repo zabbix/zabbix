@@ -111,6 +111,9 @@
 #define ZBX_PROTO_TAG_ACTION			"action"
 #define ZBX_PROTO_TAG_FAILED			"failed"
 #define ZBX_PROTO_TAG_RESULT			"result"
+#define ZBX_PROTO_TAG_LINE_RAW		"line_raw"
+#define ZBX_PROTO_TAG_LABELS		"labels"
+#define ZBX_PROTO_TAG_HELP		"help"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

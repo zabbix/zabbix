@@ -1784,6 +1784,14 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 		ZBX_PREPROC_THROTTLE_TIMED_VALUE => [
 			'group' => _('Throttling'),
 			'name' => _('Discard unchanged with heartbeat')
+		],
+		ZBX_PREPROC_PROMETHEUS_PATTERN => [
+			'group' => _('Prometheus'),
+			'name' => _('Prometheus pattern')
+		],
+		ZBX_PREPROC_PROMETHEUS_TO_JSON => [
+			'group' => _('Prometheus'),
+			'name' => _('Prometheus to JSON')
 		]
 	];
 

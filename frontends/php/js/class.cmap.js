@@ -2395,8 +2395,7 @@ ZABBIX.apps.map = (function($) {
 				var fieldName,
 					dataFelds = ['elementtype', 'elements', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
-						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'elementExpressionTrigger',
-						'application'
+						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'application'
 					],
 					fieldsUnsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'],
 					i,
@@ -3021,9 +3020,7 @@ ZABBIX.apps.map = (function($) {
 							data.elements[i] = {
 								triggerid: $(this).val(),
 								elementName: $('input[name^="element_name[' + $(this).val() + ']"]').val(),
-								priority: $('input[name^="element_priority[' + $(this).val() + ']"]').val(),
-								elementExpressionTrigger: $('input[name^="element_expression[' + $(this).val()
-									+ ']"]').val()
+								priority: $('input[name^="element_priority[' + $(this).val() + ']"]').val()
 							};
 							i++;
 						});

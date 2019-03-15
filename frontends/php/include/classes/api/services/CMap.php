@@ -954,7 +954,18 @@ class CMap extends CMapElement {
 						);
 					}
 
-					if (!CHtmlUrlValidator::validate($url['url'], false)) {
+					$url_validate_options = ['allow_user_macro' => false];
+					if ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
+						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_HOST;
+					}
+					elseif ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_TRIGGER;
+					}
+					else {
+						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_NONE;
+					}
+
+					if (!CHtmlUrlValidator::validate($url['url'], $url_validate_options)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
 					}
 
@@ -1414,7 +1425,18 @@ class CMap extends CMapElement {
 						);
 					}
 
-					if (!CHtmlUrlValidator::validate($url['url'], false)) {
+					$url_validate_options = ['allow_user_macro' => false];
+					if ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
+						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_HOST;
+					}
+					elseif ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_TRIGGER;
+					}
+					else {
+						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_NONE;
+					}
+
+					if (!CHtmlUrlValidator::validate($url['url'], $url_validate_options)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
 					}
 
@@ -1802,7 +1824,7 @@ class CMap extends CMapElement {
 			'selectLines' => ['sysmap_shapeid', 'x1', 'y1', 'x2', 'y2', 'line_type', 'line_width', 'line_color',
 				'zindex'
 			],
-			'selectUrls' => ['sysmapid', 'sysmapurlid', 'name', 'url'],
+			'selectUrls' => ['sysmapid', 'sysmapurlid', 'name', 'url', 'elementtype'],
 			'selectUsers' => ['sysmapuserid', 'sysmapid', 'userid', 'permission'],
 			'selectUserGroups' => ['sysmapusrgrpid', 'sysmapid', 'usrgrpid', 'permission'],
 			'editable' => true,
@@ -2257,35 +2279,6 @@ class CMap extends CMapElement {
 		return ['sysmapids' => $sysmapids];
 	}
 
-	private function expandUrlMacro($url, $selement) {
-		switch ($selement['elementtype']) {
-			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				$macro = '{HOSTGROUP.ID}';
-				break;
-
-			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$macro = '{TRIGGER.ID}';
-				break;
-
-			case SYSMAP_ELEMENT_TYPE_MAP:
-				$macro = '{MAP.ID}';
-				break;
-
-			case SYSMAP_ELEMENT_TYPE_HOST:
-				$macro = '{HOST.ID}';
-				break;
-
-			default:
-				$macro = false;
-		}
-
-		if ($macro) {
-			$url['url'] = str_replace($macro, $selement['elementid'], $url['url']);
-		}
-
-		return $url;
-	}
-
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -2295,7 +2288,7 @@ class CMap extends CMapElement {
 		if ($options['selectSelements'] !== null && $options['selectSelements'] != API_OUTPUT_COUNT) {
 			$selements = API::getApiService()->select('sysmaps_elements', [
 				'output' => $this->outputExtend($options['selectSelements'], ['selementid', 'sysmapid', 'elementtype',
-					'elementid'
+					'elementid', 'elementsubtype'
 				]),
 				'filter' => ['sysmapid' => $sysmapIds],
 				'preservekeys' => true
@@ -2371,7 +2364,7 @@ class CMap extends CMapElement {
 											|| ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS
 													&& $mapUrl['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
 										)) {
-								$selements[$snum]['urls'][] = $this->expandUrlMacro($mapUrl, $selement);
+								$selements[$snum]['urls'][] = $mapUrl;
 							}
 						}
 					}
@@ -2383,9 +2376,12 @@ class CMap extends CMapElement {
 					' WHERE '.dbConditionInt('seu.selementid', array_keys($selements))
 				);
 				while ($selementUrl = DBfetch($dbSelementUrls)) {
-					$selements[$selementUrl['selementid']]['urls'][] = is_null($options['expandUrls'])
-						? $selementUrl
-						: $this->expandUrlMacro($selementUrl, $selements[$selementUrl['selementid']]);
+					$selements[$selementUrl['selementid']]['urls'][] = $selementUrl;
+				}
+
+				if (!is_null($options['expandUrls'])) {
+					$resolve_opt = ['resolve_element_urls' => true];
+					$selements = CMacrosResolverHelper::resolveMacrosInMapElements($selements, $resolve_opt);
 				}
 			}
 
@@ -2494,7 +2490,8 @@ class CMap extends CMapElement {
 			}
 			unset($selement);
 
-			$selements = $this->unsetExtraFields($selements, ['sysmapid', 'selementid', 'elementtype'],
+			$selements = $this->unsetExtraFields($selements,
+				['sysmapid', 'selementid', 'elementtype', 'elementsubtype'],
 				$options['selectSelements']
 			);
 			$result = $relation_map->mapMany($result, $selements, 'selements');

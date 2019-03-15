@@ -30,6 +30,7 @@
 #include "zbxregexp.h"
 #include "zbxjson.h"
 #include "zbxembed.h"
+#include "zbxprometheus.h"
 
 #include "item_preproc.h"
 
@@ -1648,6 +1649,85 @@ fail:
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_preproc_prometheus_pattern                                  *
+ *                                                                            *
+ * Purpose: parse Prometheus format metrics                                   *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_prometheus_pattern(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output, *value_out = NULL,
+		*err = NULL;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	zbx_strlcpy(pattern, params, sizeof(pattern));
+
+	if (NULL == (output = strchr(pattern, '\n')))
+	{
+		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
+		return FAIL;
+	}
+
+	*output++ = '\0';
+
+	if (FAIL == zbx_prometheus_pattern(value->data.str, pattern, output, &value_out, &err))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "cannot apply Prometheus pattern: %s", err);
+		zbx_free(err);
+		return FAIL;
+	}
+
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, value_out);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_prometheus_to_json                                  *
+ *                                                                            *
+ * Purpose: convert Prometheus format metrics to JSON format                  *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	char	*value_out = NULL, *err = NULL;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	if (FAIL == zbx_prometheus_to_json(value->data.str, params, &value_out, &err))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "cannot convert Prometheus data to JSON: %s", err);
+		zbx_free(err);
+		return FAIL;
+	}
+
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, value_out);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_item_preproc                                                 *
  *                                                                            *
  * Purpose: execute preprocessing operation                                   *
@@ -1738,6 +1818,12 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 			break;
 		case ZBX_PREPROC_SCRIPT:
 			ret = item_preproc_script(value, op->params, history_value, error);
+			break;
+		case ZBX_PREPROC_PROMETHEUS_PATTERN:
+			ret = item_preproc_prometheus_pattern(value, op->params, error);
+			break;
+		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+			ret = item_preproc_prometheus_to_json(value, op->params, error);
 			break;
 		default:
 			*error = zbx_dsprintf(*error, "unknown preprocessing operation");

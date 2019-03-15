@@ -618,6 +618,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
 				case ZBX_PREPROC_MULTIPLIER:
+				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 					$step['params'] = trim($step['params'][0]);
 					break;
 
@@ -636,6 +637,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					break;
 
 				case ZBX_PREPROC_VALIDATE_RANGE:
+				case ZBX_PREPROC_PROMETHEUS_PATTERN:
 					foreach ($step['params'] as &$param) {
 						$param = trim($param);
 					}
@@ -1150,6 +1152,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					foreach ($preprocessing as &$step) {
 						switch ($step['type']) {
 							case ZBX_PREPROC_MULTIPLIER:
+							case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 								$step['params'] = trim($step['params'][0]);
 								break;
 
@@ -1168,6 +1171,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 								break;
 
 							case ZBX_PREPROC_VALIDATE_RANGE:
+							case ZBX_PREPROC_PROMETHEUS_PATTERN:
 								foreach ($step['params'] as &$param) {
 									$param = trim($param);
 								}

@@ -49,7 +49,8 @@ class C40ImportConverterTest extends CImportConverterTest {
 												]
 											]
 										]
-									]
+									],
+									'master_item' => []
 								]
 							]
 						]
@@ -78,7 +79,8 @@ class C40ImportConverterTest extends CImportConverterTest {
 												]
 											]
 										]
-									]
+									],
+									'master_item' => []
 								]
 							]
 						]
