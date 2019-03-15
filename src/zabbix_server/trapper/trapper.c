@@ -520,7 +520,7 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	size_t			string_alloc;
 	struct zbx_json		json;
 	struct zbx_json_parse	jp_data;
-	unsigned char		*data, *result;
+	unsigned char		*data = NULL, *result;
 	zbx_uint32_t		size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -571,11 +571,8 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	{
 		strscpy(error, errmsg);
 		zbx_free(errmsg);
-		zbx_free(data);
 		goto fail;
 	}
-
-	zbx_free(data);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
@@ -591,6 +588,7 @@ fail:
 	zbx_free(message);
 	zbx_free(subject);
 	zbx_free(sendto);
+	zbx_free(data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
