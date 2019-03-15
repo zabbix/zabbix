@@ -21,13 +21,16 @@
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
+/**
+ * @backup items
+ */
 class testDiscoveryRule extends CAPITest {
 	public static function discoveryrule_create_data_invalid() {
 		return [
 			'Test invalid permissions to host' => [
 				'discoveryrule' => [
-					'name' => 'API LLD rule 5',
-					'key_' => 'apilldrule5',
+					'name' => 'API LLD rule invalid permissions',
+					'key_' => 'apilldruleinvalidpermissions',
 					'hostid' => '1',
 					'type' => '0',
 					'interfaceid' => '50022',
@@ -37,8 +40,8 @@ class testDiscoveryRule extends CAPITest {
 			],
 			'Test invalid interface ID' => [
 				'discoveryrule' => [
-					'name' => 'API LLD rule 5',
-					'key_' => 'apilldrule5',
+					'name' => 'API LLD rule invalid interface',
+					'key_' => 'apilldruleinvalidinterface',
 					'hostid' => '50009',
 					'type' => '0',
 					'interfaceid' => '1',
@@ -66,8 +69,8 @@ class testDiscoveryRule extends CAPITest {
 		return [
 			'Test valid LLD rule with default properties' => [
 				'discoveryrule' => [
-					'name' => 'API LLD rule 5',
-					'key_' => 'apilldrule5',
+					'name' => 'API LLD rule default',
+					'key_' => 'apilldruledefault',
 					'hostid' => '50009',
 					'type' => '0',
 					'interfaceid' => '50022',
@@ -83,7 +86,6 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_create_data_invalid
 	 * @dataProvider discoveryrule_create_data_valid
-	 * @backup-once items
 	 */
 	public function testDiscoveryRule_Create(array $discoveryrules, $expected_error) {
 		$result = $this->call('discoveryrule.create', $discoveryrules, $expected_error);
@@ -116,8 +118,8 @@ class testDiscoveryRule extends CAPITest {
 		$test_data = self::discoveryrule_preprocessing_data_invalid();
 
 		$default_options = [
-			'name' => 'API LLD rule 5',
-			'key_' => 'apilldrule5',
+			'name' => 'API LLD rule with preprocessing invalid',
+			'key_' => 'apilldrulewithpreprocessinginvalid',
 			'hostid' => '50009',
 			'type' => '0',
 			'interfaceid' => '50022',
@@ -135,16 +137,19 @@ class testDiscoveryRule extends CAPITest {
 	public static function discoveryrule_preprocessing_create_data_valid() {
 		$test_data = self::discoveryrule_preprocessing_data_valid();
 		$default_options = [
-			'name' => 'API LLD rule 5',
-			'key_' => 'apilldrule5',
 			'hostid' => '50009',
 			'type' => '0',
 			'interfaceid' => '50022',
 			'delay' => '30s'
 		];
+		$i = 1;
 
 		foreach ($test_data as &$test) {
-			$test['discoveryrule'] += $default_options;
+			$test['discoveryrule'] += $default_options + [
+				'name' => 'API LLD rule with preprocessing valid '.$i,
+				'key_' => 'apilldrulewithpreprocessingvalid'.$i
+			];
+			$i++;
 		}
 		unset($test);
 
@@ -154,7 +159,6 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_preprocessing_create_data_invalid
 	 * @dataProvider discoveryrule_preprocessing_create_data_valid
-	 * @backup-once items
 	 */
 	public function testDiscoveryRulePreprocessing_Create(array $discoveryrules, $expected_error) {
 		$result = $this->call('discoveryrule.create', $discoveryrules, $expected_error);
@@ -317,8 +321,8 @@ class testDiscoveryRule extends CAPITest {
 	public static function discoveryrule_lld_macro_paths_create_data_invalid() {
 		$test_data = self::discoveryrule_lld_macro_paths_data_invalid();
 		$default_options = [
-			'name' => 'API LLD rule 5',
-			'key_' => 'apilldrule5',
+			'name' => 'API LLD rule with LLD macros invalid',
+			'key_' => 'apilldrulewithlldmacrosinvalid',
 			'hostid' => '50009',
 			'type' => '0',
 			'interfaceid' => '50022',
@@ -433,8 +437,8 @@ class testDiscoveryRule extends CAPITest {
 
 	public static function discoveryrule_lld_macro_paths_create_data_valid() {
 		$default_options = [
-			'name' => 'API LLD rule 5',
-			'key_' => 'apilldrule5',
+			'name' => 'API LLD rule with LLD macro paths on a host',
+			'key_' => 'apilldrulewithlldmacropathsonahost',
 			'hostid' => '50009',
 			'type' => '0',
 			'interfaceid' => '50022',
@@ -463,8 +467,8 @@ class testDiscoveryRule extends CAPITest {
 			],
 			'Test successful creation of LLD rule with LLD macro paths on a template' => [
 				'discoveryrule' => [
-					'name' => 'API LLD rule 5',
-					'key_' => 'apilldrule5',
+					'name' => 'API LLD rule with LLD macro paths on a template',
+					'key_' => 'apilldrulewithlldmacropathsonatemplate',
 					'hostid' => '50010',
 					'type' => '0',
 					'delay' => '30s',
@@ -491,7 +495,6 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_lld_macro_paths_create_data_invalid
 	 * @dataProvider discoveryrule_lld_macro_paths_create_data_valid
-	 * @backup-once items
 	 */
 	public function testDiscoveryRuleLLDMacroPaths_Create(array $discoveryrules, $expected_error) {
 		$result = $this->call('discoveryrule.create', $discoveryrules, $expected_error);
@@ -1041,15 +1044,92 @@ class testDiscoveryRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Only one throttling step is allowed.'
+			],
+			'Test filled preprocessing error handler params (ZBX_PREPROC_PROMETHEUS_TO_JSON + ZBX_PREPROC_FAIL_DEFAULT)' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_PROMETHEUS_TO_JSON,
+							'params' => 'wmi_service_state{name="dhcp",state="running"} == 1',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			'Test filled preprocessing error handler params (ZBX_PREPROC_PROMETHEUS_TO_JSON + ZBX_PREPROC_FAIL_DISCARD_VALUE)' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_PROMETHEUS_TO_JSON,
+							'params' => 'wmi_service_state{name="dhcp",state="running"} == 1',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
+			],
+			'Test two preprocessing steps for type ZBX_PREPROC_PROMETHEUS_TO_JSON' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_PROMETHEUS_TO_JSON,
+							'params' => 'wmi_service_state{name="dhcp",state="running"} == 1',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						],
+						[
+							'type' => ZBX_PREPROC_PROMETHEUS_TO_JSON,
+							'params' => 'wmi_service_state{name="dhcp",state="running"} == 1',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Only one Prometheus step is allowed.'
 			]
 		];
 	}
 
 	public static function discoveryrule_preprocessing_data_valid() {
 		return [
-			'Test valid empty preprocessing' => [
+			'Test two valid preprocessing steps (same)' => [
 				'discoveryrule' => [
-					'preprocessing' => []
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						],
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'def',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test two valid preprocessing steps (different)' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						],
+						[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.path.to.node',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
 				],
 				'expected_error' => null
 			],
@@ -1118,44 +1198,6 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test two valid preprocessing steps (same)' => [
-				'discoveryrule' => [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						],
-						[
-							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
-							'params' => 'def',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			'Test two valid preprocessing steps (different)' => [
-				'discoveryrule' => [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_VALIDATE_NOT_REGEX,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						],
-						[
-							'type' => ZBX_PREPROC_JSONPATH,
-							'params' => '$.path.to.node',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => null
-			],
 			'Test valid preprocessing (ZBX_PREPROC_ERROR_FIELD_JSON + ZBX_PREPROC_FAIL_DEFAULT)' => [
 				'discoveryrule' => [
 					'preprocessing' => [
@@ -1207,6 +1249,25 @@ class testDiscoveryRule extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			'Test valid preprocessing with type ZBX_PREPROC_PROMETHEUS_TO_JSON' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_PROMETHEUS_TO_JSON,
+							'params' => 'wmi_service_state{name="dhcp",state="running"} == 1',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid empty preprocessing' => [
+				'discoveryrule' => [
+					'preprocessing' => []
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -1245,6 +1306,20 @@ class testDiscoveryRule extends CAPITest {
 		unset($test);
 
 		return $test_data + [
+			'Test replacing preprocessing steps by ID' => [
+				'discoveryrule' => $default_options + [
+					'preprocessing' => [
+						[
+							'item_preprocid' => '5536',
+							'type' => ZBX_PREPROC_REGSUB,
+							'params' => "^abc\n123$",
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => 'Error param'
+						]
+					]
+				],
+				'expected_error' => null
+			],
 			'Test templated discovery rule preprocessing step update' => [
 				'discoveryrule' => [
 					'itemid' => '110011',
@@ -1258,20 +1333,6 @@ class testDiscoveryRule extends CAPITest {
 					]
 				],
 				// After ZBX-3783 (112) is fixed, this will fail with error.
-				'expected_error' => null
-			],
-			'Test replacing preprocessing steps by ID' => [
-				'discoveryrule' => $default_options + [
-					'preprocessing' => [
-						[
-							'item_preprocid' => '5536',
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => "^abc\n123$",
-							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
-							'error_handler_params' => 'Error param'
-						]
-					]
-				],
 				'expected_error' => null
 			],
 			'Test valid update by adding new preprocessing steps' => [
@@ -1294,7 +1355,6 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_preprocessing_update_data_invalid
 	 * @dataProvider discoveryrule_preprocessing_update_data_valid
-	 * @backup-once items
 	 */
 	public function testDiscoveryRulePreprocessing_Update($discoveryrules, $expected_error) {
 		if ($expected_error === null) {
@@ -1440,7 +1500,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test successful update by not chaning existing records by giving lld_macro_pathid' => [
+			'Test successful update by not changing existing records by giving lld_macro_pathid' => [
 				'discoveryrule' => [
 					'itemid' => '110007',
 					'lld_macro_paths' => [
@@ -1715,7 +1775,6 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_lld_macro_paths_update_data_invalid
 	 * @dataProvider discoveryrule_lld_macro_paths_update_data_valid
-	 * @backup-once items
 	 */
 	public function testDiscoveryRuleLLDMacroPaths_Update($discoveryrules, $expected_error) {
 		if ($expected_error === null) {
@@ -1933,82 +1992,6 @@ class testDiscoveryRule extends CAPITest {
 		}
 	}
 
-	public static function discoveryrule_preprocessing_delete_data() {
-		return [
-			'Test successful delete of LLD rule and preprocessing data' => [
-				'discoveryrule' => [
-					'110006'
-				],
-				'expected_error' => null
-			]
-		];
-
-		// TODO: add templated discovery rules.
-	}
-
-	/**
-	 * @dataProvider discoveryrule_preprocessing_delete_data
-	 * @backup-once items
-	 */
-	public function testDiscoveryRulePreprocessing_Delete($discoveryrule, $expected_error) {
-		$result = $this->call('discoveryrule.delete', $discoveryrule, $expected_error);
-
-		if ($expected_error === null) {
-			foreach ($result['result']['ruleids'] as $id) {
-				$this->assertEquals(0, CDBHelper::getCount(
-					'SELECT i.itemid FROM items i WHERE i.itemid='.zbx_dbstr($id)
-				));
-
-				// Check related tables - preprocessing.
-				$this->assertEquals(0, CDBHelper::getCount(
-					'SELECT ip.item_preprocid'.
-					' FROM item_preproc ip'.
-					' WHERE ip.itemid='.zbx_dbstr($id)
-				));
-			}
-		}
-
-		// TODO: add templated discovery rules and check on errors.
-	}
-
-	public static function discoveryrule_lld_macro_paths_delete_data() {
-		return [
-			'Test successful delete of LLD rule and LLD macro paths' => [
-				'discoveryrule' => [
-					'110009'
-				],
-				'expected_error' => null
-			]
-		];
-
-		// TODO: add templated discovery rules.
-	}
-
-	/**
-	 * @dataProvider discoveryrule_lld_macro_paths_delete_data
-	 * @backup-once items
-	 */
-	public function testDiscoveryRuleLLDMacroPaths_Delete($discoveryrule, $expected_error) {
-		$result = $this->call('discoveryrule.delete', $discoveryrule, $expected_error);
-
-		if ($expected_error === null) {
-			foreach ($result['result']['ruleids'] as $id) {
-				$this->assertEquals(0, CDBHelper::getCount(
-					'SELECT i.itemid FROM items i WHERE i.itemid='.zbx_dbstr($id)
-				));
-
-				// Check related tables - LLD macro paths.
-				$this->assertEquals(0, CDBHelper::getCount(
-					'SELECT lmp.lld_macro_pathid'.
-					' FROM lld_macro_path lmp'.
-					' WHERE lmp.itemid='.zbx_dbstr($id)
-				));
-			}
-		}
-
-		// TODO: add templated discovery rules and check on errors.
-	}
-
 	public static function discoveryrule_get_data_invalid() {
 		return [
 			'Test getting non-existing LLD rule' => [
@@ -2061,15 +2044,17 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	public static function discoveryrule_lld_macro_paths_get_data_valid() {
+		$itemid = '110012';
+
 		return [
 			'Test getting lld_macro and path' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
-					'itemids' => ['110006'],
+					'itemids' => [$itemid],
 					'selectLLDMacroPaths' => ['lld_macro', 'path']
 				],
 				'get_result' => [
-					'itemid' => '110006',
+					'itemid' => $itemid,
 					'lld_macro_paths' => [
 						[
 							'lld_macro' => '{#A}',
@@ -2098,34 +2083,34 @@ class testDiscoveryRule extends CAPITest {
 			'Test getting lld_macro_pathid, lld_macro and path' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
-					'itemids' => '110006',
+					'itemids' => [$itemid],
 					'selectLLDMacroPaths' => ['lld_macro_pathid', 'lld_macro', 'path']
 				],
 				'get_result' => [
-					'itemid' => '110006',
+					'itemid' => $itemid,
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '1',
+							'lld_macro_pathid' => '18',
 							'lld_macro' => '{#A}',
 							'path' => '$.list[:1].type'
 						],
 						[
-							'lld_macro_pathid' => '2',
+							'lld_macro_pathid' => '19',
 							'lld_macro' => '{#B}',
 							'path' => '$.list[:2].type'
 						],
 						[
-							'lld_macro_pathid' => '3',
+							'lld_macro_pathid' => '20',
 							'lld_macro' => '{#C}',
 							'path' => '$.list[:3].type'
 						],
 						[
-							'lld_macro_pathid' => '4',
+							'lld_macro_pathid' => '21',
 							'lld_macro' => '{#D}',
 							'path' => '$.list[:4].type'
 						],
 						[
-							'lld_macro_pathid' => '5',
+							'lld_macro_pathid' => '22',
 							'lld_macro' => '{#E}',
 							'path' => '$.list[:5].type'
 						]
@@ -2136,34 +2121,34 @@ class testDiscoveryRule extends CAPITest {
 			'Test getting all LLD macro path fields' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
-					'itemids' => '110006',
+					'itemids' => [$itemid],
 					'selectLLDMacroPaths' => 'extend'
 				],
 				'get_result' => [
-					'itemid' => '110006',
+					'itemid' => $itemid,
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '1',
+							'lld_macro_pathid' => '18',
 							'lld_macro' => '{#A}',
 							'path' => '$.list[:1].type'
 						],
 						[
-							'lld_macro_pathid' => '2',
+							'lld_macro_pathid' => '19',
 							'lld_macro' => '{#B}',
 							'path' => '$.list[:2].type'
 						],
 						[
-							'lld_macro_pathid' => '3',
+							'lld_macro_pathid' => '20',
 							'lld_macro' => '{#C}',
 							'path' => '$.list[:3].type'
 						],
 						[
-							'lld_macro_pathid' => '4',
+							'lld_macro_pathid' => '21',
 							'lld_macro' => '{#D}',
 							'path' => '$.list[:4].type'
 						],
 						[
-							'lld_macro_pathid' => '5',
+							'lld_macro_pathid' => '22',
 							'lld_macro' => '{#E}',
 							'path' => '$.list[:5].type'
 						]
@@ -2207,11 +2192,11 @@ class testDiscoveryRule extends CAPITest {
 			'Test getting type, params, error_handler and error_handler_params from preprocessing' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
-					'itemids' => '110006',
+					'itemids' => ['110013'],
 					'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params']
 				],
 				'get_result' => [
-					'itemid' => '110006',
+					'itemid' => '110013',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_REGSUB,
@@ -2244,7 +2229,7 @@ class testDiscoveryRule extends CAPITest {
 			'Test getting params from preprocessing' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
-					'itemids' => '110010',
+					'itemids' => ['110010'],
 					'selectPreprocessing' => ['params']
 				],
 				'get_result' => [
@@ -2269,7 +2254,7 @@ class testDiscoveryRule extends CAPITest {
 			'Test getting all preprocessing fields' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
-					'itemids' => '110011',
+					'itemids' => ['110011'],
 					'selectPreprocessing' => 'extend'
 				],
 				'get_result' => [
@@ -2464,7 +2449,6 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_copy_data_invalid
 	 * @dataProvider discoveryrule_copy_data_valid
-	 * @backup-once items
 	 */
 	public function testDiscoveryRule_Copy($params, $expected_error) {
 		$result = $this->call('discoveryrule.copy', $params, $expected_error);
@@ -2519,10 +2503,21 @@ class testDiscoveryRule extends CAPITest {
 		}
 	}
 
+	public static function discoveryrule_lld_macro_paths_copy_data_valid() {
+		return [
+			'Test successful LLD rule with macro paths copy to two hosts' => [
+				'params' => [
+					'discoveryids' => ['110012'],
+					'hostids' => ['50012', '50013']
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider discoveryrule_copy_data_invalid
-	 * @dataProvider discoveryrule_copy_data_valid
-	 * @backup-once items
+	 * @dataProvider discoveryrule_lld_macro_paths_copy_data_valid
 	 */
 	public function testDiscoveryRuleLLDMacroPaths_Copy($params, $expected_error) {
 		$result = $this->call('discoveryrule.copy', $params, $expected_error);
@@ -2573,10 +2568,21 @@ class testDiscoveryRule extends CAPITest {
 		}
 	}
 
+	public static function discoveryrule_preprocessing_copy_data_valid() {
+		return [
+			'Test successful LLD rule with preprocessing copy to two hosts' => [
+				'params' => [
+					'discoveryids' => ['110013'],
+					'hostids' => ['50012', '50013']
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider discoveryrule_copy_data_invalid
-	 * @dataProvider discoveryrule_copy_data_valid
-	 * @backup-once items
+	 * @dataProvider discoveryrule_preprocessing_copy_data_valid
 	 */
 	public function testDiscoveryRulePreprocessing_Copy($params, $expected_error) {
 		$result = $this->call('discoveryrule.copy', $params, $expected_error);
@@ -2626,6 +2632,80 @@ class testDiscoveryRule extends CAPITest {
 				}
 			}
 		}
+	}
+
+	public static function discoveryrule_preprocessing_delete_data() {
+		return [
+			'Test successful delete of LLD rule and preprocessing data' => [
+				'discoveryrule' => [
+					'110006'
+				],
+				'expected_error' => null
+			]
+		];
+
+		// TODO: add templated discovery rules.
+	}
+
+	/**
+	 * @dataProvider discoveryrule_preprocessing_delete_data
+	 */
+	public function testDiscoveryRulePreprocessing_Delete($discoveryrule, $expected_error) {
+		$result = $this->call('discoveryrule.delete', $discoveryrule, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['ruleids'] as $id) {
+				$this->assertEquals(0, CDBHelper::getCount(
+					'SELECT i.itemid FROM items i WHERE i.itemid='.zbx_dbstr($id)
+				));
+
+				// Check related tables - preprocessing.
+				$this->assertEquals(0, CDBHelper::getCount(
+					'SELECT ip.item_preprocid'.
+					' FROM item_preproc ip'.
+					' WHERE ip.itemid='.zbx_dbstr($id)
+				));
+			}
+		}
+
+		// TODO: add templated discovery rules and check on errors.
+	}
+
+	public static function discoveryrule_lld_macro_paths_delete_data() {
+		return [
+			'Test successful delete of LLD rule and LLD macro paths' => [
+				'discoveryrule' => [
+					'110009'
+				],
+				'expected_error' => null
+			]
+		];
+
+		// TODO: add templated discovery rules.
+	}
+
+	/**
+	 * @dataProvider discoveryrule_lld_macro_paths_delete_data
+	 */
+	public function testDiscoveryRuleLLDMacroPaths_Delete($discoveryrule, $expected_error) {
+		$result = $this->call('discoveryrule.delete', $discoveryrule, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['ruleids'] as $id) {
+				$this->assertEquals(0, CDBHelper::getCount(
+					'SELECT i.itemid FROM items i WHERE i.itemid='.zbx_dbstr($id)
+				));
+
+				// Check related tables - LLD macro paths.
+				$this->assertEquals(0, CDBHelper::getCount(
+					'SELECT lmp.lld_macro_pathid'.
+					' FROM lld_macro_path lmp'.
+					' WHERE lmp.itemid='.zbx_dbstr($id)
+				));
+			}
+		}
+
+		// TODO: add templated discovery rules and check on errors.
 	}
 
 	// TODO: add more tests to check other related discovery rule properties and perfom more tests on templates and templated objects.

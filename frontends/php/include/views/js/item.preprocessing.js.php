@@ -29,15 +29,15 @@
 		(new CDiv([
 			new CLabel(_('Custom on fail')),
 			(new CRadioButtonList('preprocessing[#{rowNum}][error_handler]', ZBX_PREPROC_FAIL_DISCARD_VALUE))
-				->addValue(_('Discard value'), ZBX_PREPROC_FAIL_DISCARD_VALUE)
-				->addValue(_('Set value to'), ZBX_PREPROC_FAIL_SET_VALUE)
-				->addValue(_('Set error to'), ZBX_PREPROC_FAIL_SET_ERROR)
-				->setModern(true)
+						->addValue(_('Discard value'), ZBX_PREPROC_FAIL_DISCARD_VALUE)
+						->addValue(_('Set value to'), ZBX_PREPROC_FAIL_SET_VALUE)
+						->addValue(_('Set error to'), ZBX_PREPROC_FAIL_SET_ERROR)
+						->setModern(true)
 				->setEnabled(false),
-			(new CTextBox('preprocessing[#{rowNum}][error_handler_params]'))
-				->setEnabled(false)
-				->addStyle('display: none;')
-		]))
+					(new CTextBox('preprocessing[#{rowNum}][error_handler_params]'))
+						->setEnabled(false)
+						->addStyle('display: none;')
+			]))
 			->addClass('on-fail-options')
 			->addStyle('display: none;')
 	]))
@@ -135,10 +135,27 @@
 
 				case '<?= ZBX_PREPROC_SCRIPT ?>':
 					return $(preproc_param_multiline_tmpl.evaluate({rowNum: index})).multilineInput({
-						title: '<?= _('JavaScript') ?>',
-						placeholder: '<?= _('script') ?>',
-						maxlength: <?= $data['preprocessing_script_maxlength'] ?>
+						title: '<?= CJs::encodeJson(_('JavaScript')) ?>',
+						placeholder: '<?= CJs::encodeJson(_('script')) ?>',
+						maxlength: <?= (int) $data['preprocessing_script_maxlength'] ?>
 					});
+
+				case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':
+					return $(preproc_param_double_tmpl.evaluate({
+						rowNum: index,
+						placeholder_0: <?= CJs::encodeJson(
+							_('<metric name>{<label name>="<label value>", ...} == <value>')
+						) ?>,
+						placeholder_1: <?= CJs::encodeJson(_('<label name>')) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_PROMETHEUS_TO_JSON ?>':
+					return $(preproc_param_single_tmpl.evaluate({
+						rowNum: index,
+						placeholder: <?= CJs::encodeJson(
+							_('<metric name>{<label name>="<label value>", ...} == <value>')
+						) ?>
+					}));
 
 				default:
 					return '';

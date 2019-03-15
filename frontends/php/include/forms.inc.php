@@ -1501,6 +1501,21 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					'readonly' => $readonly
 				]);
 				break;
+
+			case ZBX_PREPROC_PROMETHEUS_PATTERN:
+				$params = [
+					$step_param_0->setAttribute('placeholder',
+						_('<metric name>{<label name>="<label value>", ...} == <value>')
+					),
+					$step_param_1->setAttribute('placeholder', _('<label name>'))
+				];
+				break;
+
+			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+				$params = $step_param_0->setAttribute('placeholder',
+					_('<metric name>{<label name>="<label value>", ...} == <value>')
+				);
+				break;
 		}
 
 		// Create checkbox "Custom on fail" and enable or disable depending on preprocessing type.

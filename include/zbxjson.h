@@ -102,6 +102,9 @@
 #define ZBX_PROTO_TAG_PARAMS		"params"
 #define ZBX_PROTO_TAG_FROM		"from"
 #define ZBX_PROTO_TAG_TO		"to"
+#define ZBX_PROTO_TAG_LINE_RAW		"line_raw"
+#define ZBX_PROTO_TAG_LABELS		"labels"
+#define ZBX_PROTO_TAG_HELP		"help"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

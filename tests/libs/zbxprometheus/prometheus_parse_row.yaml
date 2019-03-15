@@ -1,0 +1,196 @@
+---
+test case: cpu{type="intel"} 1 (1)
+in: 
+  data: |-
+    cpu{type="intel"} 1
+    xyz
+out:
+  return: SUCCEED
+  metric: cpu
+  value: 1
+  labels:
+    - name: type
+      value: intel
+  next: "\nxyz"
+---
+test case: cpu{type="intel"} 1 12344 (2)
+in: 
+  data: |-
+    cpu{type="intel"} 1
+    xyz
+out:
+  return: SUCCEED
+  metric: cpu
+  value: 1
+  labels:
+    - name: type
+      value: intel
+  next: "\nxyz"
+---
+test case: cpu{type="intel"} 1 (3)
+in: 
+  data: 'cpu{type="intel"} 1'
+out:
+  return: SUCCEED
+  metric: cpu
+  value: 1
+  labels:
+    - name: type
+      value: intel
+  next: ""
+---
+test case: cpu {type="intel"} 1
+in: 
+  data: 'cpu {type="intel"} 1'
+out:
+  return: SUCCEED
+  metric: cpu
+  value: 1
+  labels:
+    - name: type
+      value: intel
+  next: ""
+---
+test case: cpu 1 1
+in: 
+  data: 'cpu 1'
+out:
+  return: SUCCEED
+  metric: cpu
+  value: 1
+  next: ""
+---
+test case: cpu { type = "intel" , model = "i9" , } 1
+in: 
+  data: cpu { type = "intel" , model = "i9" , } 1
+out:
+  return: SUCCEED
+  metric: cpu
+  value: 1
+  labels:
+    - name: type
+      value: intel
+    - name: model
+      value: i9
+  next: ""
+---
+test case: 1cpu 1
+in: 
+  data: '1cpu 1'
+out:
+  return: FAIL
+---
+test case: cpu! 1
+in: 
+  data: 'cpu! 1'
+out:
+  return: FAIL
+---
+test case: cpu none
+in: 
+  data: 'cpu none'
+out:
+  return: FAIL
+---
+test case: '{vendor="intel"}'
+in: 
+  data: '{vendor="intel"}'
+out:
+  return: FAIL
+---
+test case: cpu{vendor=="intel"}
+in: 
+  data: cpu{vendor=="intel"}
+out:
+  return: FAIL
+---
+test case: cpu{,vendor=="intel"}
+in: 
+  data: cpu{,vendor=="intel"}
+out:
+  return: FAIL
+---
+test case: cpu{ven:dor=="intel"}
+in: 
+  data: cpu{ven:dor=="intel"}
+out:
+  return: FAIL
+---
+test case: cpu{vendor=="in"tel"}
+in: 
+  data: cpu{vendor=="in"tel"}
+out:
+  return: FAIL
+---
+test case: cpu{vendor=="intel\n"}
+in: 
+  data: cpu{vendor=="intel\n"}
+out:
+  return: FAIL
+---
+test case: cpu{type="intel"} 1x
+in: 
+  data: 'cpu{type="intel"} 1x'
+out:
+  return: FAIL
+---
+test case: cpu:0{vendor="intel"} 1
+in: 
+  data: 'cpu:0{vendor="intel"} 1'
+out:
+  return: SUCCEED
+  metric: cpu:0
+  value: 1
+  labels:
+    - name: vendor
+      value: intel
+  next: ""
+---
+test case: cpu{vendor="in\"t\"el"} 1
+in: 
+  data: 'cpu{vendor="in\"t\"el"} 1'
+out:
+  return: SUCCEED
+  metric: cpu
+  value: 1
+  labels:
+    - name: vendor
+      value: in"t"el
+  next: ""
+---
+test case: cpu{vendor="intel\\"} 1
+in: 
+  data: 'cpu{vendor="intel\\"} 1'
+out:
+  return: SUCCEED
+  metric: cpu
+  value: 1
+  labels:
+    - name: vendor
+      value: intel\
+  next: ""
+---
+test case: cpu{vendor="intel\n"} 1
+in: 
+  data: 'cpu{vendor="intel\n"} 1'
+out:
+  return: SUCCEED
+  metric: cpu
+  value: 1
+  labels:
+    - name: vendor
+      value: "intel\n"
+  next: ""
+---
+test case: cpu$ 1
+in: 
+  data: 'cpu$ 1'
+out:
+  return: FAIL
+---
+test case: cpu{vendor="intel"}1
+in: 
+  data: 'cpu{vendor="intel"}1'
+out:
+  return: FAIL
+...

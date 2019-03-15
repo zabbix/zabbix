@@ -757,6 +757,8 @@ INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,his
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110009,50009,50022,0,4,'API LLD rule 4','apilldrule4','30s','90d',0,0,'','',1,'','');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110010,50010,null,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,0,'','',1,'','');
 INSERT INTO items (itemid,hostid,interfaceid,templateid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110011,50009,50022,110010,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110012,50009,50022,0,4,'API LLD rule get LLD macro paths','apilldrulegetlldmacropaths','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110013,50009,50022,0,4,'API LLD rule get preprocessing','apilldrulegetpreprocessing','30s','90d',0,0,'','',1,'','');
 
 -- LLD macro paths
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1,110006,'{#A}','$.list[:1].type');
@@ -776,7 +778,11 @@ INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (14,1
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (15,110011,'{#A}','$.list[:1].type');
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (16,110011,'{#B}','$.list[:2].type');
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (17,110011,'{#C}','$.list[:3].type');
-
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (18,110012,'{#A}','$.list[:1].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (19,110012,'{#B}','$.list[:2].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (20,110012,'{#C}','$.list[:3].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (21,110012,'{#D}','$.list[:4].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (22,110012,'{#E}','$.list[:5].type');
 
 -- LLD preprocessing
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (9900,110006,1,5,'^abc$
@@ -795,6 +801,14 @@ INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,e
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (9909,110011,2,12,'$.path.to.node2',1,'');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (9910,110011,3,12,'$.path.to.node3',2,'xxx');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (9911,110011,4,12,'$.path.to.node4',3,'error');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (9912,110013,1,5,'^abc$
+123',0,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (9913,110013,2,5,'^def$
+123',1,'');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (9914,110013,3,5,'^ghi$
+123',2,'xxx');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (9915,110013,4,5,'^jkl$
+123',3,'error');
 
 -- testtriggerfilter
 insert into hstgrp (groupid,name,internal) values (139000,'triggerstester',0);

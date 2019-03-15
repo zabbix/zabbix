@@ -26,6 +26,7 @@
 #include "zbxjson.h"
 #include "dbcache.h"
 #include "zbxembed.h"
+#include "log.h"
 
 #include "../../../src/zabbix_server/preprocessor/item_preproc.h"
 
@@ -73,6 +74,10 @@ static int	str_to_preproc_type(const char *str)
 		return ZBX_PREPROC_THROTTLE_VALUE;
 	if (0 == strcmp(str, "ZBX_PREPROC_THROTTLE_TIMED_VALUE"))
 		return ZBX_PREPROC_THROTTLE_TIMED_VALUE;
+	if (0 == strcmp(str, "ZBX_PREPROC_PROMETHEUS_PATTERN"))
+		return ZBX_PREPROC_PROMETHEUS_PATTERN;
+	if (0 == strcmp(str, "ZBX_PREPROC_PROMETHEUS_TO_JSON"))
+		return ZBX_PREPROC_PROMETHEUS_TO_JSON;
 
 	fail_msg("unknow preprocessing step type: %s", str);
 	return FAIL;
@@ -193,6 +198,8 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	returned_ret = zbx_item_preproc(value_type, &value, &ts, &op, &history_value, &history_ts, &action, &error);
+	if (SUCCEED != returned_ret)
+		zabbix_log(LOG_LEVEL_DEBUG, "Preprocessing error: %s", error);
 
 	if (SUCCEED == is_step_supported(op.type))
 		expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));

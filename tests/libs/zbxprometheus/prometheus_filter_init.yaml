@@ -1,0 +1,407 @@
+---
+test case: cpu{type="intel"} == 1
+in: 
+  filter: cpu{type="intel"} == 1
+out:
+  return: SUCCEED
+  metric:
+    pattern: cpu
+    op: =
+  value:
+    pattern: 1
+    op: ==
+  labels:
+    - key: type
+      pattern: intel
+      op: =
+---
+test case: '{__name__="cpu", type="intel"}'
+in: 
+  filter: '{__name__="cpu", type="intel"}'
+out:
+  return: SUCCEED
+  metric:
+    pattern: cpu
+    op: =
+  labels:
+    - key: type
+      pattern: intel
+      op: =
+---
+test case: '{__name__="cpu", type="intel", cores=~"4"}'
+in: 
+  filter: '{__name__="cpu", type="intel", cores=~"4"}'
+out:
+  return: SUCCEED
+  metric:
+    pattern: cpu
+    op: =
+  labels:
+    - key: type
+      pattern: intel
+      op: =
+    - key: cores
+      pattern: 4
+      op: =~
+---
+test case: cpu == 1
+in: 
+  filter: cpu == 1
+out:
+  return: SUCCEED
+  metric:
+    pattern: cpu
+    op: =
+  value:
+    pattern: 1
+    op: ==
+---
+test case: 'cpu{decription="CPU \"Intel\""}'
+in: 
+  filter: 'cpu{decription=~"CPU \"Intel\""}'
+out:
+  return: SUCCEED
+  metric:
+    pattern: cpu
+    op: =
+  labels:
+    - key: decription
+      pattern: CPU "Intel"
+      op: =~
+---
+test case: 'cpu{__name__="cpu"}'
+in: 
+  filter: 'cpu{__name__="cpu"}'
+out:
+  return: FAIL
+---
+test case: '{__name__="cpu", __name__="cpu"}'
+in: 
+  filter: '{__name__="cpu", __name__="cpu"}'
+out:
+  return: FAIL
+---
+test case: cpu = 1
+in: 
+  filter: cpu = 1
+out:
+  return: FAIL
+---
+test case: cpu =~ 1
+in: 
+  filter: cpu =~ 1
+out:
+  return: FAIL
+---
+test case: cpu{type=="intel"} == 1
+in: 
+  filter: cpu{type=="intel"} == 1
+out:
+  return: FAIL
+---
+test case: Empty
+in: 
+  filter: ""
+out:
+  return: SUCCEED
+---
+test case: sensor == Nan
+in: 
+  filter: sensor == Nan
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: nan
+    op: ==
+---
+test case: sensor == +Nan
+in: 
+  filter: sensor == +Nan
+out:
+  return: FAIL
+---
+test case: sensor == +Inf
+in: 
+  filter: sensor == +Inf
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: +inf
+    op: ==
+---
+test case: sensor == -.1
+in: 
+  filter: sensor == -.1
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: -.1
+    op: ==
+---
+test case: sensor == -.1e2
+in: 
+  filter: sensor == -.1e2
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: -.1e2
+    op: ==
+---
+test case: sensor == +1.
+in: 
+  filter: sensor == +1.
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: +1.
+    op: ==
+---
+test case: sensor == +1.e2
+in: 
+  filter: sensor == +1.e2
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: +1.e2
+    op: ==
+---
+test case: sensor == +1.0000
+in: 
+  filter: sensor == +1.0000
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: +1.0000
+    op: ==
+---
+test case: sensor == +1.0000e-2
+in: 
+  filter: sensor == +1.0000e-2
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: +1.0000e-2
+    op: ==
+---
+test case: sensor == .
+in: 
+  filter: sensor == .
+out:
+  return: FAIL
+---
+test case: sensor == 1e
+in: 
+  filter: sensor == 1e
+out:
+  return: FAIL
+---
+test case: sensor == 1e1 1
+in: 
+  filter: sensor == 1e1 1
+out:
+  return: FAIL
+---
+test case: '{type="intel"cores="4"}'
+in: 
+  filter: '{type="intel"cores=~"4"}'
+out:
+  return: FAIL
+---
+test case: '{}'
+in: 
+  filter: '{}'
+out:
+  return: SUCCEED
+---
+test case: '  {vendor="intel", cores="4"}  '
+in: 
+  filter: '  {vendor="intel", cores="4"}  '
+out:
+  return: SUCCEED
+  labels:
+    - key: vendor
+      pattern: intel
+      op: =
+    - key: cores
+      pattern: 4
+      op: =
+---
+test case: '  cpu  '
+in: 
+  filter: '  cpu  '
+out:
+  return: SUCCEED
+  metric:
+    pattern: cpu
+    op: =
+---
+test case: '{vendor="intel", cores="4",}'
+in: 
+  filter: '{vendor="intel", cores="4",}'
+out:
+  return: SUCCEED
+  labels:
+    - key: vendor
+      pattern: intel
+      op: =
+    - key: cores
+      pattern: 4
+      op: =
+---
+test case: '{vendor="intel" , }'
+in: 
+  filter: '{vendor="intel" ,}'
+out:
+  return: SUCCEED
+  labels:
+    - key: vendor
+      pattern: intel
+      op: =
+---
+test case: '{vendor="intel",,}'
+in: 
+  filter: '{vendor="intel",,}'
+out:
+  return: FAIL
+---
+test case: '{vendor="intel \x"}'
+in: 
+  filter: '{vendor="intel \x"}'
+out:
+  return: FAIL
+---
+test case: 'cpu{__="intel"}'
+in: 
+  filter: 'cpu{__="intel"}'
+out:
+  return: SUCCEED
+  metric:
+    pattern: cpu
+    op: =
+  labels:
+    - key: __
+      pattern: intel
+      op: =
+---
+test case: sensor == NAN
+in: 
+  filter: sensor == NAN
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: nan
+    op: ==
+---
+test case: sensor == nan
+in: 
+  filter: sensor == nan
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: nan
+    op: ==
+---
+test case: sensor == NaN
+in: 
+  filter: sensor == NaN
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: nan
+    op: ==
+---
+test case: sensor == nAn
+in: 
+  filter: sensor == nAn
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: nan
+    op: ==
+---
+test case: sensor == +INF
+in: 
+  filter: sensor == +INF
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: +inf
+    op: ==
+---
+test case: sensor == -inf
+in: 
+  filter: sensor == -inf
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: -inf
+    op: ==
+---
+test case: sensor == InF
+in: 
+  filter: sensor == InF
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: inf
+    op: ==
+---
+test case: sensor == iNf
+in: 
+  filter: sensor == iNf
+out:
+  return: SUCCEED
+  metric:
+    pattern: sensor
+    op: =
+  value:
+    pattern: inf
+    op: ==
+...
+
+
