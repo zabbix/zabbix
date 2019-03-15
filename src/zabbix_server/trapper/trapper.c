@@ -465,30 +465,71 @@ out:
  ******************************************************************************/
 static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
-	const char	*__function_name = "recv_alert_send";
-	int		ret = FAIL;
-	char		tmp[MAX_ID_LEN + 1], error[MAX_STRING_LEN];
-	zbx_uint64_t	mediatypeid;
+	const char		*__function_name = "recv_alert_send";
+	int			ret = FAIL;
+	char			tmp[ZBX_MAX_UINT64_LEN + 1], error[MAX_STRING_LEN], *sendto = NULL, *subject = NULL,
+				*message = NULL;
+	zbx_uint64_t		mediatypeid;
+	size_t			string_alloc;
+	struct zbx_json		json;
+	struct zbx_json_parse	jp_data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == super_admin_active_session(jp))
+	if (SUCCEED != super_admin_active_session(jp))
 	{
 		strscpy(error, "Permission denied.");
 		goto fail;
 	}
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_MEDIATYPEID, tmp, sizeof(tmp)) ||
-			FAIL == is_uint64(tmp, &mediatypeid))
+	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	{
+		zbx_snprintf(error, sizeof(error), "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
+		goto fail;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_MEDIATYPEID, tmp, sizeof(tmp)) ||
+			SUCCEED != is_uint64(tmp, &mediatypeid))
 	{
 		zbx_snprintf(error, sizeof(error), "Cannot parse request tag: %s.", ZBX_PROTO_TAG_MEDIATYPEID);
 		goto fail;
 	}
 
+	string_alloc = 0;
+	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SENDTO, &sendto, &string_alloc))
+	{
+		zbx_snprintf(error, sizeof(error), "Cannot parse request tag: %s.", ZBX_PROTO_TAG_SENDTO);
+		goto fail;
+	}
+
+	string_alloc = 0;
+	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SUBJECT, &subject, &string_alloc))
+	{
+		zbx_snprintf(error, sizeof(error), "Cannot parse request tag: %s.", ZBX_PROTO_TAG_SUBJECT);
+		goto fail;
+	}
+
+	string_alloc = 0;
+	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_MESSAGE, &message, &string_alloc))
+	{
+		zbx_snprintf(error, sizeof(error), "Cannot parse request tag: %s.", ZBX_PROTO_TAG_MESSAGE);
+		goto fail;
+	}
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
+			ZBX_JSON_TYPE_STRING);
+
+	(void)zbx_tcp_send(sock, json.buffer);
+	zbx_json_free(&json);
 	ret = SUCCEED;
 fail:
 	if (FAIL == ret)
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
+
+	zbx_free(message);
+	zbx_free(subject);
+	zbx_free(sendto);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
