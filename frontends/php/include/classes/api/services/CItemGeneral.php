@@ -1276,7 +1276,9 @@ abstract class CItemGeneral extends CApiService {
 			$prometheus_pattern_parser = new CPrometheusPatternParser(['usermacros' => true,
 				'lldmacros' => ($this instanceof CItemPrototype)
 			]);
-			$prometheus_output_parser = new CPrometheusOutputParser(['usermacros' => true]);
+			$prometheus_output_parser = new CPrometheusOutputParser(['usermacros' => true,
+				'lldmacros' => ($this instanceof CItemPrototype)
+			]);
 
 			$required_fields = ['type', 'params', 'error_handler', 'error_handler_params'];
 			$delta = false;
