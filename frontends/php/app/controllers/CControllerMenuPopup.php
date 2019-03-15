@@ -281,6 +281,49 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
+	 * Combines map URLs with element's URLs and performs other modifications with the URLs.
+	 *
+	 * @param array  $selement
+	 * @param array  $map_urls
+	 *
+	 * @return array
+	 */
+	private static function prepareMapElementUrls(array $selement, array $map_urls) {
+		// Remove unused selement url data.
+		foreach ($selement['urls'] as &$url) {
+			unset($url['sysmapelementurlid'], $url['selementid']);
+		}
+		unset($url);
+
+		// Add map urls to element's urls based on their type.
+		foreach ($map_urls as $map_url) {
+			if ($selement['elementtype'] == $map_url['elementtype']) {
+				unset($map_url['elementtype']);
+				$selement['urls'][] = $map_url;
+			}
+		}
+
+		$selement = CMacrosResolverHelper::resolveMacrosInMapElements([$selement], ['resolve_element_urls' => true])[0];
+
+		// Unset URLs with empty name or value.
+		foreach ($selement['urls'] as $url_nr => $url) {
+			if ($url['name'] === '' || $url['url'] === '') {
+				unset($selement['urls'][$url_nr]);
+			}
+			elseif (CHtmlUrlValidator::validate($url['url']) === false) {
+				$selement['urls'][$url_nr]['url'] = 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.',
+					zbx_jsvalue($url['url'], false, false)).'\');';
+			}
+		}
+
+		CArrayHelper::sort($selement['urls'], ['name']);
+		// Prepare urls for processing in menupopup.js.
+		$selement['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
+
+		return $selement;
+	}
+
+	/**
 	 * Prepare data for map element context menu popup.
 	 *
 	 * @param array  $data
@@ -296,8 +339,8 @@ class CControllerMenuPopup extends CController {
 		$db_maps = API::Map()->get([
 			'output' => ['show_suppressed'],
 			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls'],
-			'sysmapids' => $data['sysmapid'],
-			'expandUrls' => true
+			'selectUrls' => ['name', 'url', 'elementtype'],
+			'sysmapids' => $data['sysmapid']
 		]);
 
 		if ($db_maps) {
@@ -312,25 +355,15 @@ class CControllerMenuPopup extends CController {
 			}
 
 			if ($selement !== null) {
-				CArrayHelper::sort($selement['urls'], ['name']);
-				$selement['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
-
 				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
 						&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS
 						&& array_key_exists('hostid', $data) && $data['hostid'] != 0) {
 					$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_HOST;
 					$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
 					$selement['elements'][0]['hostid'] = $data['hostid'];
-
-					/*
-					 * Expanding host URL macros again as some hosts were added from hostgroup areas and automatic
-					 * expanding only happens for elements that are defined for map in DB.
-					 */
-					foreach ($selement['urls'] as &$url) {
-						$url['url'] = str_replace('{HOST.ID}', $data['hostid'], $url['url']);
-					}
-					unset($url);
 				}
+
+				$selement = self::prepareMapElementUrls($selement, $db_map['urls']);
 
 				switch ($selement['elementtype']) {
 					case SYSMAP_ELEMENT_TYPE_MAP:
