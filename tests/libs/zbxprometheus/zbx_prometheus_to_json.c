@@ -95,7 +95,7 @@ void	zbx_mock_test_entry(void **state)
 
 			/* metrics parameter is not mandatory if output_raw is set */
 			if (ZBX_MOCK_SUCCESS != zbx_mock_out_parameter("metrics", &metrics))
-				return;
+				goto out;
 		}
 		else
 			metrics = zbx_mock_get_parameter_handle("out.metrics");
@@ -150,4 +150,8 @@ void	zbx_mock_test_entry(void **state)
 		if ((num_params_rec != num_params_exp) || (zbx_json_count(&jp) != num_metrics_exp))
 			fail_msg("More metrics/parameters than expected returned by zbx_prometheus_to_json()");
 	}
+
+out:
+	zbx_free(ret_output);
+	zbx_free(ret_err);
 }

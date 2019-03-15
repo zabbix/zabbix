@@ -49,5 +49,8 @@ void	zbx_mock_test_entry(void **state)
 
 		output = zbx_mock_get_parameter_string("out.output");
 		zbx_mock_assert_str_eq("Invalid zbx_prometheus_pattern() returned output", output, ret_output);
+		zbx_free(ret_output);
 	}
+	else
+		zbx_free(ret_err);
 }
