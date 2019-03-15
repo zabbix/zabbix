@@ -34,15 +34,15 @@
 		(new CDiv([
 			new CLabel(_('Custom on fail')),
 			(new CRadioButtonList('preprocessing[#{rowNum}][error_handler]', ZBX_PREPROC_FAIL_DISCARD_VALUE))
-						->addValue(_('Discard value'), ZBX_PREPROC_FAIL_DISCARD_VALUE)
-						->addValue(_('Set value to'), ZBX_PREPROC_FAIL_SET_VALUE)
-						->addValue(_('Set error to'), ZBX_PREPROC_FAIL_SET_ERROR)
-						->setModern(true)
+				->addValue(_('Discard value'), ZBX_PREPROC_FAIL_DISCARD_VALUE)
+				->addValue(_('Set value to'), ZBX_PREPROC_FAIL_SET_VALUE)
+				->addValue(_('Set error to'), ZBX_PREPROC_FAIL_SET_ERROR)
+				->setModern(true)
 				->setEnabled(false),
-					(new CTextBox('preprocessing[#{rowNum}][error_handler_params]'))
-						->setEnabled(false)
-						->addStyle('display: none;')
-			]))
+			(new CTextBox('preprocessing[#{rowNum}][error_handler_params]'))
+				->setEnabled(false)
+				->addStyle('display: none;')
+		]))
 			->addClass('on-fail-options')
 			->addStyle('display: none;')
 	]))
