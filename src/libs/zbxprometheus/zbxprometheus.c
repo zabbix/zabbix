@@ -1352,7 +1352,7 @@ static int	prometheus_parse_hint(zbx_prometheus_filter_t *filter, const char *da
 		if (NULL != (ptr = strchr(data + pos, '\n')))
 			loc->r = ptr - data - 1;
 		else
-			loc->r = strlen(data + pos) + pos;
+			loc->r = strlen(data + pos) + pos - 1;
 
 		return SUCCEED;
 	}
@@ -1419,7 +1419,7 @@ static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *da
 			{
 				if (SUCCEED != prometheus_parse_hint(filter, data, pos, hints, &loc, &errmsg))
 					goto out;
-				pos = loc.r;
+				pos = loc.r + 1;
 			}
 			continue;
 		}
@@ -1433,7 +1433,7 @@ static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *da
 			zbx_vector_ptr_append(rows, row);
 		}
 
-		pos = loc.r;
+		pos = loc.r + 1;
 	}
 
 	ret = SUCCEED;
