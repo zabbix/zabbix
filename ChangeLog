@@ -7,6 +7,7 @@ A.F....... [ZBX-15286] dropped support use of discovered items as master (Sasha)
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+...G...PS. [ZBX-15552] fixed compilation with LibreSSL as OpenSSL replacement and OpenSSL without PSK support (Andris)
 ..F....... [ZBX-10317] made info column on item list page always visible (agriscenko)
 ..F....... [ZBX-15322] fixed graph area near grid line with 0 value (ashubin)
 .......PS. [ZBX-15798] fixed proxy configuration update failure on Oracle; fixed failure on empty SQL buffer on Oracle (kalimulin)
