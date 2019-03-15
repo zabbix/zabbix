@@ -193,8 +193,17 @@ foreach ($data['items'] as $item) {
 		$triggerInfo = '';
 	}
 
+	$wizard = (new CSpan(
+		(new CButton(null))
+			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getItem($item['itemid']))
+	))->addClass(ZBX_STYLE_REL_CONTAINER);
+
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
+	}
+	else if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		$wizard = '';
 	}
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
@@ -205,12 +214,6 @@ foreach ($data['items'] as $item) {
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
-
-	$wizard = (new CSpan(
-		(new CButton(null))
-			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getItem($item['itemid']))
-	))->addClass(ZBX_STYLE_REL_CONTAINER);
 
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),

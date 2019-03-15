@@ -397,6 +397,10 @@ class CConfigurationExportBuilder {
 				$data['headers'] = $headers;
 			}
 
+			$data['master_item'] = ($discoveryRule['type'] == ITEM_TYPE_DEPENDENT)
+				? ['key' => $discoveryRule['master_item']['key_']]
+				: [];
+
 			$result[] = $data;
 		}
 
