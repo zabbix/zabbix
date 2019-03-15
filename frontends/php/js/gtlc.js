@@ -298,24 +298,19 @@ jQuery(function ($){
 	$(document)
 		.on('mousedown', 'img', selectionHandlerDragStart)
 		.on('dblclick', 'img', function(e) {
-			if (typeof $(e.target).data('zbx_sbox') === 'undefined') {
-				return;
+			if (typeof $(e.target).data('zbx_sbox') !== 'undefined') {
+				$.publish('timeselector.zoomout', {
+					from: element.from.val(),
+					to: element.to.val()
+				});
+
+				return cancelEvent(e);
 			}
-
-			$.publish('timeselector.zoomout', {
-				from: element.from.val(),
-				to: element.to.val()
-			});
-
-			return cancelEvent(e);
 		})
 		.on('click', 'a', function(e) {
-			if (typeof $(e.target).data('zbx_sbox') === 'undefined') {
-				return;
-			}
-
 			// Prevent click on graph image parent <a/> element when clicked inside graph selectable area.
-			if ($(e.target).is('img') && prevent_click && $(this).hasClass('dashbrd-widget-graph-link')) {
+			if ($(e.target).is('img') && typeof $(e.target).data('zbx_sbox') !== 'undefined' && prevent_click
+					&& $(this).hasClass('dashbrd-widget-graph-link')) {
 				return cancelEvent(e);
 			}
 		});
