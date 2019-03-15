@@ -473,6 +473,7 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	size_t			string_alloc;
 	struct zbx_json		json;
 	struct zbx_json_parse	jp_data;
+	unsigned char		*data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -517,8 +518,11 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	}
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
-			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+
+	zbx_alerter_serialize_alert_send(&data, mediatypeid, sendto, subject, message);
+
+	zbx_free(data);
 
 	(void)zbx_tcp_send(sock, json.buffer);
 	zbx_json_free(&json);

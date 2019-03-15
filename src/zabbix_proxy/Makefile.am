@@ -14,7 +14,8 @@ noinst_LIBRARIES = libzbxproxy.a
 libzbxproxy_a_SOURCES = \
 	servercomms.c servercomms.h \
 	events.c \
-	proxy_lld.c
+	proxy_lld.c \
+	proxy_alerter_protocol.c
 
 libzbxproxy_a_CFLAGS = \
 	-DZABBIX_DAEMON
