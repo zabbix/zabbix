@@ -1301,6 +1301,8 @@ abstract class CItemGeneral extends CApiService {
 					);
 				}
 
+				$preprocessing['params'] = str_replace("\r\n", "\n", $preprocessing['params']);
+
 				switch ($preprocessing['type']) {
 					case ZBX_PREPROC_MULTIPLIER:
 						// Check if custom multiplier is a valid number.
