@@ -55,6 +55,13 @@ class CPrometheusOutputParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '{$FS_MAX: "/home"}'
 				]
 			],
+			[
+				'{#LLD}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{#LLD}'
+				]
+			],
 			// partial success
 			[
 				'label1=', 0, [],
@@ -121,9 +128,9 @@ class CPrometheusOutputParserTest extends PHPUnit_Framework_TestCase {
 					'match' => ''
 				]
 			],
-			// LLD macros are not supported.
+			// LLD macros are not enabled.
 			[
-				'{#LLD}', 0, ['lldmacros' => true],
+				'{#LLD}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''

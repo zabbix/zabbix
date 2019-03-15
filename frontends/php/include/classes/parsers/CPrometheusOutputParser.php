@@ -25,7 +25,8 @@
 class CPrometheusOutputParser extends CParser {
 
 	private $options = [
-		'usermacros' => false
+		'usermacros' => false,
+		'lldmacros' => false
 	];
 
 	private $user_macro_parser;
@@ -34,8 +35,15 @@ class CPrometheusOutputParser extends CParser {
 		if (array_key_exists('usermacros', $options)) {
 			$this->options['usermacros'] = $options['usermacros'];
 		}
+		if (array_key_exists('lldmacros', $options)) {
+			$this->options['lldmacros'] = $options['lldmacros'];
+		}
+
 		if ($this->options['usermacros']) {
 			$this->user_macro_parser = new CUserMacroParser();
+		}
+		if ($this->options['lldmacros']) {
+			$this->lld_macro_parser = new CLLDMacroParser();
 		}
 	}
 
@@ -62,7 +70,8 @@ class CPrometheusOutputParser extends CParser {
 	}
 
 	/**
-	 * Parse label names. It must follow the [a-zA-Z_][a-zA-Z0-9_]* regular expression.
+	 * Parse label names. It must follow the [a-zA-Z_][a-zA-Z0-9_]* regular expression. User macros and LLD macros
+	 * are allowed.
 	 *
 	 * @param string $source  [IN]      Source string that needs to be parsed.
 	 * @param int    $pos     [IN/OUT]  Position offset.
@@ -77,6 +86,11 @@ class CPrometheusOutputParser extends CParser {
 		}
 		elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
 			$pos += $this->user_macro_parser->getLength();
+
+			return true;
+		}
+		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+			$pos += $this->lld_macro_parser->getLength();
 
 			return true;
 		}

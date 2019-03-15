@@ -329,10 +329,17 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{{$M}="value1"}==1', 0, ['usermacros' => true],
+				'{$M}{{$M}="value1"}=={$M}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{{$M}="value1"}==1'
+					'match' => '{$M}{{$M}="value1"}=={$M}'
+				]
+			],
+			[
+				'{#LLD1}{{#LLD2}="value1"}=={#LLD3}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{#LLD1}{{#LLD2}="value1"}=={#LLD3}'
 				]
 			],
 			// Label value can by anything, no user macro enabling flag is required.
@@ -541,14 +548,6 @@ class CPrometheusPatternParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{#LLD}  {label1="value1"}'
-				]
-			],
-			// LLD macros are not supported in label names.
-			[
-				'metric{{#LLD}="value1"}==1', 0, ['lldmacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => 'metric'
 				]
 			],
 			// fail

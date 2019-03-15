@@ -173,6 +173,9 @@ class CPrometheusPatternParser extends CParser {
 		elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->user_macro_parser->getLength();
 		}
+		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+			$p += $this->lld_macro_parser->getLength();
+		}
 		else {
 			return false;
 		}
