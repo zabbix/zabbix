@@ -223,6 +223,7 @@ A.F....... [ZBX-15286] dropped support use of discovered items as master (Sasha)
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+..F....... [ZBX-10317] made info column on item list page always visible (agriscenko)
 ..F....... [ZBX-15322] fixed graph area near grid line with 0 value (ashubin)
 .......PS. [ZBX-15798] fixed proxy configuration update failure on Oracle; fixed failure on empty SQL buffer on Oracle (kalimulin)
 A.F....... [ZBX-15219] fixed unwanted removing scenario post fields on scenario update (gcalenko, vasilijs)
