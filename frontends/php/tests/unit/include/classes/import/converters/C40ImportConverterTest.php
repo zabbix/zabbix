@@ -116,6 +116,7 @@ class C40ImportConverterTest extends CImportConverterTest {
 											]
 										]
 									],
+									'master_item' => [],
 									'lld_macro_paths' => [],
 									'preprocessing' => []
 								]
@@ -151,6 +152,7 @@ class C40ImportConverterTest extends CImportConverterTest {
 											]
 										]
 									],
+									'master_item' => [],
 									'lld_macro_paths' => [],
 									'preprocessing' => []
 								]
