@@ -111,27 +111,37 @@ class CItemManager {
 			CItemPrototypeManager::delete(array_keys($del_item_prototypeids));
 		}
 
-		// Deleting graphs and graph prototypes, which will remain without items.
+		// Deleting graphs, which will remain without items.
 		$db_graphs = DBselect(
 			'SELECT DISTINCT gi.graphid'.
 			' FROM graphs_items gi'.
-			' WHERE '.dbConditionInt('gi.itemid', $del_itemids).
-				' AND NOT EXISTS ('.
-					'SELECT NULL'.
-					' FROM graphs_items gii'.
-					' WHERE gii.graphid=gi.graphid'.
-						' AND '.dbConditionInt('gii.itemid', $del_itemids, true).
-				')'
+			' WHERE '.dbConditionInt('gi.itemid', $del_itemids)
 		);
 
 		$del_graphids = [];
 
 		while ($db_graph = DBfetch($db_graphs)) {
-			$del_graphids[] = $db_graph['graphid'];
+			$del_graphids[$db_graph['graphid']] = true;
+		}
+
+		$db_graphs = DBselect(
+			'SELECT g.graphid'.
+			' FROM graphs g'.
+			' WHERE '.dbConditionInt('g.graphid', array_keys($del_graphids)).
+				' AND EXISTS ('.
+					'SELECT NULL'.
+					' FROM graphs_items gi'.
+					' WHERE gi.graphid=g.graphid'.
+						' AND '.dbConditionInt('gi.itemid', $del_itemids, true).
+				')'
+		);
+
+		while ($db_graph = DBfetch($db_graphs)) {
+			unset($del_graphids[$db_graph['graphid']]);
 		}
 
 		if ($del_graphids) {
-			CGraphManager::delete($del_graphids);
+			CGraphManager::delete(array_keys($del_graphids));
 		}
 
 		// Cleanup ymin_itemid and ymax_itemid fields for graphs and graph prototypes.
