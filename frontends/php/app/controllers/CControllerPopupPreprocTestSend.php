@@ -42,6 +42,7 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 			$this->preproc_item = self::getPreprocessingItemType($this->getInput('test_type'));
 
 			if (($error = $this->preproc_item->validateItemPreprocessingSteps($this->getInput('steps'))) !== true) {
+				$ret = false;
 				error($error);
 			}
 		}
