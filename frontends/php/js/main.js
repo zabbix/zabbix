@@ -563,7 +563,7 @@ var hintBox = {
 	},
 
 	showHint: function(e, target, hintText, className, isStatic, styles) {
-		if (target.hintBoxItem) {
+		if (target.hintBoxItem || hintText === '') {
 			return;
 		}
 
