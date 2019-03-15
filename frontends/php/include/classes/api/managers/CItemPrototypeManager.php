@@ -77,35 +77,25 @@ class CItemPrototypeManager {
 		$db_graphs = DBselect(
 			'SELECT DISTINCT gi.graphid'.
 			' FROM graphs_items gi'.
-			' WHERE '.dbConditionInt('gi.itemid', $del_itemids)
+			' WHERE '.dbConditionInt('gi.itemid', $del_itemids).
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM graphs_items gii,items i'.
+					' WHERE gi.graphid=gii.graphid'.
+						' AND gii.itemid=i.itemid'.
+						' AND '.dbConditionInt('gii.itemid', $del_itemids, true).
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
+				')'
 		);
 
 		$del_graphids = [];
 
 		while ($db_graph = DBfetch($db_graphs)) {
-			$del_graphids[$db_graph['graphid']] = true;
-		}
-
-		$db_graphs = DBselect(
-			'SELECT g.graphid'.
-			' FROM graphs g'.
-			' WHERE '.dbConditionInt('g.graphid', array_keys($del_graphids)).
-				' AND EXISTS ('.
-					'SELECT NULL'.
-					' FROM graphs_items gi,items i'.
-					' WHERE g.graphid=gi.graphid'.
-						' AND gi.itemid=i.itemid'.
-						' AND '.dbConditionInt('gi.itemid', $del_itemids, true).
-						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
-				')'
-		);
-
-		while ($db_graph = DBfetch($db_graphs)) {
-			unset($del_graphids[$db_graph['graphid']]);
+			$del_graphids[] = $db_graph['graphid'];
 		}
 
 		if ($del_graphids) {
-			CGraphPrototypeManager::delete(array_keys($del_graphids));
+			CGraphPrototypeManager::delete($del_graphids);
 		}
 
 		// Cleanup ymin_itemid and ymax_itemid fields for graphs and graph prototypes.
