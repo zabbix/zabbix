@@ -154,7 +154,7 @@ jQuery(document).ready(function($) {
 	});
 
 	$('#prev_value').multilineInput({
-		placeholder: <?= $data['show_prev'] ? CJs::encodeJson(_('value')) : '' ?>,
+		placeholder: <?= $data['show_prev'] ? CJs::encodeJson(_('value')) : '""' ?>,
 		monospace_font: false,
 		maxlength: 65535,
 		disabled: <?= $data['show_prev'] ? 'false' : 'true' ?>
