@@ -20,6 +20,7 @@
 
 
 class CControllerPopupServices extends CController {
+
 	protected function init() {
 		$this->disableSIDvalidation();
 	}
