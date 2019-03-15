@@ -51,6 +51,10 @@ function itemPreprocessingTest(form) {
 			jQuery('.submit-test-btn')
 				.prop('disabled', true)
 				.hide();
+
+			// Clean previous results.
+			jQuery('[id^="preproc-test-step-"][id$="-result"]').empty();
+			jQuery('[id^="preproc-test-step-"][id$="-name"] > div').remove();
 		},
 		success: function(ret) {
 			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
@@ -124,16 +128,13 @@ function processItemPreprocessingTestResults(steps) {
 			step.result = jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text('<?= _('<empty string>') ?>');
 		}
 
-		jQuery('#preproc-test-step-'+i+'-name > div').remove()
 		if (typeof step.action !== 'undefined' && step.action !== null) {
 			jQuery('#preproc-test-step-'+i+'-name').append(jQuery(tmpl_gray_label.evaluate(<?= CJs::encodeJson([
 				'label' => _('Custom on fail')
 			]) ?>)));
 		}
 
-		jQuery('#preproc-test-step-'+i+'-result')
-			.empty()
-			.append(step.result, step.action);
+		jQuery('#preproc-test-step-'+i+'-result').append(step.result, step.action);
 	});
 }
 

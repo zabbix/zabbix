@@ -163,9 +163,9 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 					unset($step['error_handler_params']);
 				}
 				unset($step);
-			}
 
-			$output['steps'] = $data['steps'];
+				$output['steps'] = $data['steps'];
+			}
 		}
 
 		if (($messages = getMessages(false)) !== null) {
