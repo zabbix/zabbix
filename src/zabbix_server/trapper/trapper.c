@@ -32,6 +32,7 @@
 #include "nodecommand.h"
 #include "proxyconfig.h"
 #include "proxydata.h"
+#include "trapper_preproc.h"
 
 #include "daemon.h"
 #include "../../libs/zbxcrypto/tls.h"
@@ -1035,6 +1036,11 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
 			{
 				ret = send_internal_stats_json(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PREPROCESSING_TEST))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					ret = zbx_trapper_preproc_test(sock, &jp);
 			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);

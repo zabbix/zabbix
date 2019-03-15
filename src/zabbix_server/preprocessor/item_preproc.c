@@ -1291,19 +1291,18 @@ out:
  *                                                                            *
  * Parameters: value  - [IN/OUT] the value to process                         *
  *             params - [IN] the operation parameters                         *
- *             action - [OUT] the taken on fail action                        *
  *             error  - [OUT] error message                                   *
  *                                                                            *
- * Return value: FAIL - the specified error field exists                      *
- *               SUCCEED - otherwise                                          *
+ * Return value: FAIL - preprocessing step error                              *
+ *               SUCCEED - preprocessing step succeeded, error may contain    *
+ *                         extracted error message                            *
  *                                                                            *
  * Comments: This preprocessing step is used to check if the returned data    *
  *           contains explicit (API related) error message and sets it as     *
- *           error.                                                           *
+ *           error, while returning SUCCEED.                                  *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *params, int *action,
-		char **error)
+static int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *params, char **error)
 {
 	zbx_variant_t		value_str;
 	char			err[MAX_STRING_LEN];
@@ -1328,18 +1327,11 @@ static int	item_preproc_get_error_from_json(const zbx_variant_t *value, const ch
 	if (FAIL == zbx_json_open(value->data.str, &jp) || FAIL == zbx_json_path_open(&jp, params, &jp_out))
 		goto out;
 
-	zbx_free(*error);
 	zbx_json_value_dyn(&jp_out, error, &data_alloc);
 
 	zbx_lrtrim(*error, " \t\n\r");
 	if ('\0' == **error)
-	{
 		zbx_free(*error);
-		goto out;
-	}
-
-	*action = ZBX_PREPROC_FAIL_FORCE_ERROR;
-	ret = FAIL;
 out:
 	zbx_variant_clear(&value_str);
 
@@ -1354,24 +1346,22 @@ out:
  *                                                                            *
  * Parameters: value  - [IN/OUT] the value to process                         *
  *             params - [IN] the operation parameters                         *
- *             action - [OUT] the taken on fail action                        *
  *             error  - [OUT] the error message                               *
  *                                                                            *
- * Return value: FAIL - the specified error field exists                      *
- *               SUCCEED - otherwise                                          *
+ * Return value: FAIL - preprocessing step error                              *
+ *               SUCCEED - preprocessing step succeeded, error may contain    *
+ *                         extracted error message                            *
  *                                                                            *
  * Comments: This preprocessing step is used to check if the returned data    *
  *           contains explicit (API related) error message and sets it as     *
- *           error.                                                           *
+ *           error, while returning SUCCEED.                                  *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const char *params, int *action,
-		char **error)
+static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const char *params, char **error)
 {
 #ifndef HAVE_LIBXML2
 	ZBX_UNUSED(value);
 	ZBX_UNUSED(params);
-	ZBX_UNUSED(action);
 	ZBX_UNUSED(error);
 	*error = zbx_dsprintf(*error, "Zabbix was compiled without libxml2 support");
 	return FAIL;
@@ -1435,13 +1425,7 @@ static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const cha
 
 	zbx_lrtrim(*error, " \t\n\r");
 	if ('\0' == **error)
-	{
 		zbx_free(*error);
-		goto out;
-	}
-
-	*action = ZBX_PREPROC_FAIL_FORCE_ERROR;
-	ret = FAIL;
 out:
 	zbx_variant_clear(&value_str);
 
@@ -1466,19 +1450,18 @@ out:
  *                                                                            *
  * Parameters: value  - [IN/OUT] the value to process                         *
  *             params - [IN] the operation parameters                         *
- *             action - [OUT] the taken on fail action                        *
  *             error  - [OUT] the error message                               *
  *                                                                            *
- * Return value: FAIL - the specified error field exists                      *
- *               SUCCEED - otherwise                                          *
+ * Return value: FAIL - preprocessing step error                              *
+ *               SUCCEED - preprocessing step succeeded, error may contain    *
+ *                         extracted error message                            *
  *                                                                            *
  * Comments: This preprocessing step is used to check if the returned data    *
  *           contains explicit (API related) error message and sets it as     *
- *           error.                                                           *
+ *           error, while returning SUCCEED.                                  *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const char *params, int *action,
-		char **error)
+static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const char *params, char **error)
 {
 	zbx_variant_t	value_str;
 	int		ret;
@@ -1513,13 +1496,7 @@ static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const c
 	{
 		zbx_lrtrim(*error, " \t\n\r");
 		if ('\0' == **error)
-		{
 			zbx_free(*error);
-			goto out;
-		}
-
-		*action = ZBX_PREPROC_FAIL_FORCE_ERROR;
-		ret = FAIL;
 	}
 out:
 	zbx_variant_clear(&value_str);
@@ -1761,20 +1738,20 @@ static int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *par
  *             op            - [IN] the preprocessing operation to execute    *
  *             history_value - [IN/OUT] last historical data of items with    *
  *                                      delta type preprocessing operation    *
- *             action        - [OUT] the taken 'on fail' action               *
  *             error         - [OUT] error message                            *
  *                                                                            *
  * Return value: SUCCEED - the preprocessing step finished successfully       *
  *               FAIL - otherwise, error contains the error message           *
  *                                                                            *
+ * Comments: When preprocessing step was executed successfully, but it must   *
+ *           force an error (extract error steps), then success will be       *
+ *           returned with error set.                                         *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
-		const zbx_preproc_op_t *op, zbx_variant_t *history_value, zbx_timespec_t *history_ts, int *action,
-		char **error)
+		const zbx_preproc_op_t *op, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **error)
 {
 	int	ret;
-
-	*action = ZBX_PREPROC_FAIL_DEFAULT;
 
 	switch (op->type)
 	{
@@ -1824,13 +1801,13 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 			ret = item_preproc_validate_not_regex(value, op->params, error);
 			break;
 		case ZBX_PREPROC_ERROR_FIELD_JSON:
-			ret = item_preproc_get_error_from_json(value, op->params, action, error);
+			ret = item_preproc_get_error_from_json(value, op->params, error);
 			break;
 		case ZBX_PREPROC_ERROR_FIELD_XML:
-			ret = item_preproc_get_error_from_xml(value, op->params, action, error);
+			ret = item_preproc_get_error_from_xml(value, op->params, error);
 			break;
 		case ZBX_PREPROC_ERROR_FIELD_REGEX:
-			ret = item_preproc_get_error_from_regex(value, op->params, action, error);
+			ret = item_preproc_get_error_from_regex(value, op->params, error);
 			break;
 		case ZBX_PREPROC_THROTTLE_VALUE:
 			ret = item_preproc_throttle_value(value, ts, history_value, history_ts);
@@ -1853,31 +1830,43 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 			ret = FAIL;
 	}
 
-	if (SUCCEED == ret)
-		return SUCCEED;
-
-	if (ZBX_PREPROC_FAIL_DEFAULT == *action)
-	{
-		*action = op->error_handler;
-
-		switch (op->error_handler)
-		{
-			case ZBX_PREPROC_FAIL_DISCARD_VALUE:
-				zbx_variant_clear(value);
-				zbx_free(*error);
-				ret = SUCCEED;
-				break;
-			case ZBX_PREPROC_FAIL_SET_VALUE:
-				zbx_variant_clear(value);
-				zbx_variant_set_str(value, zbx_strdup(NULL, op->error_handler_params));
-				zbx_free(*error);
-				ret = SUCCEED;
-				break;
-			case ZBX_PREPROC_FAIL_SET_ERROR:
-				*error = zbx_strdup(*error, op->error_handler_params);
-				break;
-		}
-	}
-
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_item_preproc_handle_error                                    *
+ *                                                                            *
+ * Purpose: apply 'on fail' preprocessing error handler                       *
+ *                                                                            *
+ * Parameters: value         - [IN/OUT] the value                             *
+ *             op            - [IN] the preprocessing operation that produced *
+ *                                  the error                                 *
+ *             error         - [INT/OUT] error message                        *
+ *                                                                            *
+ * Return value: SUCCEED - the preprocessing step result was overridden by    *
+ *                         error handler to successful result.                *
+ *               FAIL    - the preprocessing step must still fail, error might*
+ *                         have been changed.                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_item_preproc_handle_error(zbx_variant_t *value, const zbx_preproc_op_t *op, char **error)
+{
+	switch (op->error_handler)
+	{
+		case ZBX_PREPROC_FAIL_DISCARD_VALUE:
+			zbx_variant_clear(value);
+			zbx_free(*error);
+			return SUCCEED;
+		case ZBX_PREPROC_FAIL_SET_VALUE:
+			zbx_variant_clear(value);
+			zbx_variant_set_str(value, zbx_strdup(NULL, op->error_handler_params));
+			zbx_free(*error);
+			return SUCCEED;
+		case ZBX_PREPROC_FAIL_SET_ERROR:
+			*error = zbx_strdup(*error, op->error_handler_params);
+			return FAIL;
+		default:
+			return FAIL;
+	}
 }

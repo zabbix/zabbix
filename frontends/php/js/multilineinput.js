@@ -30,8 +30,11 @@
 		e.data.$hidden.prop('disabled', e.data.options.disabled ? true : null);
 		e.data.$input
 			.prop('disabled', e.data.options.disabled ? true : null)
-			.prop('readonly', e.data.options.disabled ? null : true);
-		e.data.$button.prop('disabled', e.data.options.disabled ? true : null);
+			.prop('readonly', e.data.options.disabled ? null : true)
+			.prop('title', e.data.options.disabled ? '' : e.data.options.hint);
+		e.data.$button
+			.prop('disabled', e.data.options.disabled ? true : null)
+			.prop('title', e.data.options.disabled ? '' : e.data.options.hint);
 
 		$(this)
 			.toggleClass('multilineinput-readonly', (e.data.options.readonly && !e.data.options.disabled))
@@ -129,6 +132,7 @@
 				maxlength: 255,
 				readonly: false,
 				disabled: false,
+				autofocus: false,
 				line_numbers: true,
 				monospace_font: true
 			}, options);
@@ -146,11 +150,12 @@
 			})
 				.toggleClass('monospace-font', this.options.monospace_font)
 				.prop('readonly', this.options.disabled ? null : true)
-				.on('click', this, openModal);
+				.on('mousedown', this, openModal);
 
 			this.$button = $('<button>', {
 				type: 'button',
-				title: this.options.hint
+				title: this.options.hint,
+				autofocus: this.options.autofocus || null
 			}).on('click', this, openModal);
 
 			this.on('disable enable', this, setDisabled);
@@ -178,6 +183,16 @@
 
 				return this;
 			}
+		},
+		disable: function() {
+			this.trigger('disable');
+
+			return this;
+		},
+		enable: function() {
+			this.trigger('enable');
+
+			return this;
 		},
 		destroy: function() {}
 	};

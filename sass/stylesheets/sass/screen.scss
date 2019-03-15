@@ -1776,6 +1776,10 @@ output {
 					margin: 3px 0;
 				}
 			}
+
+			&:last-child {
+				padding-right: 0;
+			}
 		}
 
 		.table-forms-separator {
@@ -3970,6 +3974,7 @@ $form-icon-btn: (
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		border-right: none;
+		width: 100%;
 
 		&[readonly] {
 			background: $form-bg-color !important;
@@ -6006,7 +6011,7 @@ ul.checkbox-list {
 	.btn-link {
 
 		&:not(:last-of-type) {
-			margin-right: 5px;
+			margin-right: 10px;
 		}
 	}
 
@@ -6650,6 +6655,33 @@ $range-input-width: 31px;
 // Screen reader
 .inline-sr-only {
 	font-size: 0;
+}
+
+.preproc-test-popup-value-row {
+	display: flex;
+
+	label {
+		padding: 0 10px;
+		margin-left: auto;
+		line-height: 24px;
+	}
+}
+
+table.preprocessing-test-results {
+	td {
+		vertical-align: top !important;
+	}
+
+	.rel-container {
+		top: 4px;
+		margin-left: 3px;
+	}
+}
+
+#preprocessing-test-form {
+	.table-forms-separator {
+		margin-top: -2px;
+	}
 }
 
 @if $theme_name == 'dev' {

@@ -669,6 +669,7 @@ if (hasRequest('form')) {
 	$data['conditions'] = getRequest('conditions', []);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['host'] = $host;
+	$data['preprocessing_test_type'] = CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;
 
 	if (!hasRequest('form_refresh')) {

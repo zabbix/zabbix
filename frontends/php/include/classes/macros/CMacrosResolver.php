@@ -2559,4 +2559,75 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		return $triggers;
 	}
+
+	/**
+	 * Extract macros from properties used for preprocessing step test and find effective values.
+	 *
+	 * @param array  $data
+	 * @param string $data['steps']                              Preprocessing steps details.
+	 * @param string $data['steps'][]['params']                  Preprocessing step parameters.
+	 * @param string $data['steps'][]['error_handler_params]     Preprocessing steps error handle parameters.
+	 * @param string $data['delay']                              Update interval value.
+	 * @param string $data['hostids']                            Hostid for which tested item belongs to.
+	 * @param bool   $support_lldmacros                          Enable or disable LLD macro selection.
+	 *
+	 * @return array
+	 */
+	public function extractMacrosFromPreprocessingSteps(array $data, $support_lldmacros = false) {
+		$types = $support_lldmacros
+			? ['usermacros' => true, 'lldmacros' => true]
+			: ['usermacros' => true];
+		$delay_macro = $data['delay'];
+
+		$texts = [];
+		foreach ($data['steps'] as $step) {
+			if ($step['params'] !== '') {
+				$texts[] = $step['params'];
+			}
+			if ($step['error_handler_params'] !== '') {
+				$texts[] = $step['error_handler_params'];
+			}
+		}
+
+		$delay_dual_usage = false;
+		if ($delay_macro !== '') {
+			if (in_array($delay_macro, $texts)) {
+				$delay_dual_usage = true;
+			}
+			else {
+				$texts[] = $delay_macro;
+			}
+		}
+
+		$matched_macros = $this->extractMacros($texts, $types);
+		$usermacros = [[
+			'macros' => $matched_macros['usermacros'],
+			'hostids' =>  $data['hostid']
+				? [$data['hostid']]
+				: []
+		]];
+
+		$usermacros = $this->getUserMacros($usermacros)[0]['macros'];
+
+		$macros = $support_lldmacros
+			? $matched_macros['lldmacros']
+			: [];
+
+		foreach ($usermacros as $macro => $value) {
+			$macros[$macro] = ($macro === $value) ? '' : $value;
+		}
+
+		if (array_key_exists($delay_macro, $macros)) {
+			$data['delay'] = $macros[$delay_macro];
+
+			if (!$delay_dual_usage) {
+				unset($macros[$delay_macro]);
+			}
+		}
+
+		return [
+			'delay' => $data['delay'],
+			'macros' => $macros
+		];
+	}
 }

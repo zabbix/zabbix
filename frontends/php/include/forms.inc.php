@@ -1400,7 +1400,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				(new CDiv(_('Name')))->addClass('step-name'),
 				(new CDiv(_('Parameters')))->addClass('step-parameters'),
 				(new CDiv(_('Custom on fail')))->addClass('step-on-fail'),
-				(new CDiv(_('Action')))->addClass('step-action')
+				(new CDiv(_('Actions')))->addClass('step-action')
 			]))
 				->addClass('preprocessing-list-head')
 				->addStyle(!$preprocessing ? 'display: none;' : null)
@@ -1589,12 +1589,17 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 						->addClass('step-name'),
 					(new CDiv($params))->addClass('step-parameters'),
 					(new CDiv($on_fail))->addClass('step-on-fail'),
-					(new CDiv((new CButton('preprocessing['.$i.'][remove]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
-						->setEnabled(!$readonly)
-						->removeId()
-					))->addClass('step-action'),
+					(new CDiv([
+						(new CButton('preprocessing['.$i.'][test]', _('Test')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('preprocessing-step-test')
+							->removeId(),
+						(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-remove')
+							->setEnabled(!$readonly)
+							->removeId()
+					]))->addClass('step-action'),
 				]))->addClass('preprocessing-step'),
 				$on_fail_options
 			]))
@@ -1607,14 +1612,19 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 	}
 
 	$preprocessing_list->addItem(
-		(new CListItem(
+		(new CListItem([
 			(new CDiv(
 				(new CButton('param_add', _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-add')
 					->setEnabled(!$readonly)
+			))->addClass('step-action'),
+			(new CDiv(
+				(new CButton('preproc_test_all', _('Test all steps')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled(($i > 0) ? true : false)
 			))->addClass('step-action')
-		))->addClass('preprocessing-list-foot')
+		]))->addClass('preprocessing-list-foot')
 	);
 
 	return $preprocessing_list;
