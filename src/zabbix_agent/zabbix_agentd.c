@@ -658,7 +658,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		exit(EXIT_FAILURE);
 }
 
-static int	add_activechk_host(const char *host, unsigned short port)
+static int	add_serveractive_host_cb(const char *host, unsigned short port)
 {
 	int	i;
 
@@ -669,62 +669,13 @@ static int	add_activechk_host(const char *host, unsigned short port)
 	}
 
 	CONFIG_ACTIVE_FORKS++;
-	CONFIG_ACTIVE_ARGS = (ZBX_THREAD_ACTIVECHK_ARGS *)zbx_realloc(CONFIG_ACTIVE_ARGS, sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * CONFIG_ACTIVE_FORKS);
+	CONFIG_ACTIVE_ARGS = (ZBX_THREAD_ACTIVECHK_ARGS *)zbx_realloc(CONFIG_ACTIVE_ARGS,
+			sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * CONFIG_ACTIVE_FORKS);
+
 	CONFIG_ACTIVE_ARGS[CONFIG_ACTIVE_FORKS - 1].host = zbx_strdup(NULL, host);
 	CONFIG_ACTIVE_ARGS[CONFIG_ACTIVE_FORKS - 1].port = port;
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_serveractive_hosts                                           *
- *                                                                            *
- * Purpose: parse string like IP<:port>,[IPv6]<:port>                         *
- *                                                                            *
- ******************************************************************************/
-static void	get_serveractive_hosts(char *active_hosts)
-{
-	char	*l = active_hosts, *r;
-	int	rc = SUCCEED;
-
-	do
-	{
-		char		*host = NULL;
-		unsigned short	port;
-
-		if (NULL != (r = strchr(l, ',')))
-			*r = '\0';
-
-		if (SUCCEED != parse_serveractive_element(l, &host, &port, (unsigned short)ZBX_DEFAULT_SERVER_PORT))
-			goto fail;
-
-		rc = add_activechk_host(host, port);
-
-		zbx_free(host);
-
-		if (SUCCEED != rc)
-			goto fail;
-
-		if (NULL != r)
-		{
-			*r = ',';
-			l = r + 1;
-		}
-	}
-	while (NULL != r);
-
-	return;
-fail:
-	if (SUCCEED != rc)
-		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" specified more than once", l);
-	else
-		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid", l);
-
-	if (NULL != r)
-		*r = ',';
-
-	exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -849,7 +800,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
 
 	if (NULL != active_hosts && '\0' != *active_hosts)
-		get_serveractive_hosts(active_hosts);
+		zbx_set_data_destination_hosts(active_hosts, add_serveractive_host_cb);
 
 	zbx_free(active_hosts);
 

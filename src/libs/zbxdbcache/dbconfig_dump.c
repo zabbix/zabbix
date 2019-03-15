@@ -692,6 +692,40 @@ static void	DCdump_template_items(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
+static void	DCdump_master_items(void)
+{
+	const char		*__function_name = "DCdump_master_items";
+
+	ZBX_DC_MASTERITEM	*master_item;
+	zbx_hashset_iter_t	iter;
+	int			i, j;
+	zbx_vector_ptr_t	index;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&index);
+	zbx_hashset_iter_reset(&config->masteritems, &iter);
+
+	while (NULL != (master_item = (ZBX_DC_MASTERITEM *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_ptr_append(&index, master_item);
+
+	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		master_item = (ZBX_DC_MASTERITEM *)index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "master itemid:" ZBX_FS_UI64, master_item->itemid);
+
+		for (j = 0; j < master_item->dep_itemids.values_num; j++)
+			zabbix_log(LOG_LEVEL_TRACE, "  itemid:" ZBX_FS_UI64, master_item->dep_itemids.values[j]);
+
+	}
+
+	zbx_vector_ptr_destroy(&index);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
+}
+
 static void	DCdump_prototype_items(void)
 {
 	const char			*__function_name = "DCdump_prototype_items";
@@ -1273,6 +1307,7 @@ void	DCdump_configuration()
 	DCdump_items();
 	DCdump_interface_snmpitems();
 	DCdump_template_items();
+	DCdump_master_items();
 	DCdump_prototype_items();
 	DCdump_triggers();
 	DCdump_trigdeps();

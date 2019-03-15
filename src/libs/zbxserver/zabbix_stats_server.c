@@ -56,9 +56,6 @@ void	zbx_get_zabbix_stats_ext(struct zbx_json *json)
 		zbx_free(error);
 	}
 
-	/* zabbix[preprocessing_queue] */
-	zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
-
 	/* zabbix[triggers] */
 	zbx_json_adduint64(json, "triggers", DCget_trigger_count());
 

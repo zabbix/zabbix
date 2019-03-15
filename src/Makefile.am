@@ -53,6 +53,7 @@ PROXY_SUBDIRS = \
 	zabbix_server/ipmi \
 	zabbix_server/odbc \
 	zabbix_server/scripts \
+	zabbix_server/preprocessor \
 	zabbix_proxy
 	
 endif
