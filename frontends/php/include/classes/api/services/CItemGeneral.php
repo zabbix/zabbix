@@ -773,9 +773,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		if ($this instanceof CItem || $this instanceof CItemPrototype) {
-			$this->validateDependentItems($new_items);
-		}
+		$this->validateDependentItems($new_items);
 
 		// Save the new items.
 		if ($ins_items) {
@@ -1158,11 +1156,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		if ($class === 'CItem' || $class === 'CItemPrototype') {
-			$new_items = $this->prepareDependentItems($tpl_items, $new_items, $hostids);
-		}
-
-		return $new_items;
+		return $this->prepareDependentItems($tpl_items, $new_items, $hostids);
 	}
 
 	/**
@@ -1757,7 +1751,8 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($items as $item) {
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				if ($this instanceof CItemPrototype || $item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				if ($this instanceof CDiscoveryRule || $this instanceof CItemPrototype
+						|| $item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 					$dep_items[] = $item;
 				}
 
@@ -1800,17 +1795,9 @@ abstract class CItemGeneral extends CApiService {
 
 		$master_items = [];
 
-		// Fill relations array by master items (item prototypes).
+		// Fill relations array by master items (item prototypes). Discovery rule should not be master item.
 		do {
-			if ($this instanceof CItem) {
-				$db_master_items = DBselect(
-					'SELECT i.itemid,i.hostid,i.master_itemid'.
-					' FROM items i'.
-					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
-						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL])
-				);
-			}
-			else {
+			if ($this instanceof CItemPrototype) {
 				$db_master_items = DBselect(
 					'SELECT i.itemid,i.hostid,i.master_itemid,i.flags,id.parent_itemid AS ruleid'.
 					' FROM items i'.
@@ -1818,6 +1805,15 @@ abstract class CItemGeneral extends CApiService {
 							' ON i.itemid=id.itemid'.
 					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
 						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])
+				);
+			}
+			// CDiscoveryRule, CItem
+			else {
+				$db_master_items = DBselect(
+					'SELECT i.itemid,i.hostid,i.master_itemid'.
+					' FROM items i'.
+					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL])
 				);
 			}
 

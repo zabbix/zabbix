@@ -924,6 +924,12 @@ class CConfigurationImport {
 					$item['query_fields'] = $query_fields;
 				}
 
+				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					$item['master_itemid'] = $this->referencer->resolveItem($hostId,  $item['master_item']['key']);
+				}
+
+				unset($item['master_item']);
+
 				if ($itemId) {
 					$item['itemid'] = $itemId;
 					$itemsToUpdate[] = $item;
