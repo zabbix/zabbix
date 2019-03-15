@@ -2403,6 +2403,24 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 				// TODO: Error is very strange and API should be checked for bugs.
+			],
+			'Test LLD dependent on master which does not exists on destination host.' => [
+				'params' => [
+					// test.discovery.rule.1:dependent.lld.3
+					'discoveryids' => ['2605'],
+					// test.discovery.rule.2
+					'hostids' => ['1018']
+				],
+				'expected_error' => 'Discovery rule "dependent.lld.3" cannot be copied without its master item.'
+			],
+			'Test LLD dependent on master having max dependency levels.' => [
+				'params' => [
+					// test.discovery.rule.1:dependent.lld.1
+					'discoveryids' => ['2601'],
+					// test.discovery.rule.2
+					'hostids' => ['1018']
+				],
+				'expected_error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.'
 			]
 		];
 	}
@@ -2413,6 +2431,15 @@ class testDiscoveryRule extends CAPITest {
 				'params' => [
 					'discoveryids' => ['110006'],
 					'hostids' => ['50012', '50013']
+				],
+				'expected_error' => null
+			],
+			'Test copy LLD dependent to host having master item with same key_' => [
+				'params' => [
+					// test.discovery.rule.1:dependent.lld.2
+					'discoveryids' => ['2603'],
+					// test.discovery.rule.2
+					'hostids' => ['1018']
 				],
 				'expected_error' => null
 			]
@@ -2439,7 +2466,7 @@ class testDiscoveryRule extends CAPITest {
 						'i.snmpv3_privprotocol,i.snmpv3_contextname,i.jmx_endpoint,i.url,i.query_fields,i.timeout,'.
 						'i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,'.
 						'i.request_method,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,i.verify_peer,'.
-						'i.verify_host,i.allow_traps'.
+						'i.verify_host,i.allow_traps,i.master_itemid'.
 				' FROM items i'.
 				' WHERE '.dbConditionId('i.itemid', $params['discoveryids'])
 			);
