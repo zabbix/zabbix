@@ -102,6 +102,7 @@
 #define ZBX_PROTO_TAG_PARAMS		"params"
 #define ZBX_PROTO_TAG_FROM		"from"
 #define ZBX_PROTO_TAG_TO		"to"
+#define ZBX_PROTO_TAG_MEDIATYPEID	"mediatypeid"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -128,6 +129,8 @@
 
 #define ZBX_PROTO_VALUE_ZABBIX_STATS		"zabbix.stats"
 #define ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE	"queue"
+
+#define ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND	"alert.send"
 
 typedef enum
 {

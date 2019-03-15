@@ -280,6 +280,20 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_
 	return i1->nextcheck - i2->nextcheck;
 }
 
+static	int	super_admin_active_session(const struct zbx_json_parse *jp)
+{
+	char		sessionid[MAX_STRING_LEN];
+	zbx_user_t	user;
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
+			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: recv_getqueue                                                    *
@@ -297,8 +311,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_getqueue";
 	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i, limit;
-	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
-	zbx_user_t		user;
+	char			type[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
 	zbx_vector_ptr_t	queue;
 	struct zbx_json		json;
 	zbx_hashset_t		queue_stats;
@@ -306,8 +319,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
-			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
+	if (SUCCEED != super_admin_active_session(jp))
 	{
 		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
@@ -436,6 +448,49 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: recv_alert_send                                                  *
+ *                                                                            *
+ * Purpose: process alert send request that is used to test media types       *
+ *                                                                            *
+ * Parameters:  sock  - [IN] the request socket                               *
+ *              jp    - [IN] the request data                                 *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+{
+	const char	*__function_name = "recv_alert_send";
+	int		ret = FAIL;
+	char		tmp[MAX_ID_LEN + 1], error[MAX_STRING_LEN];
+	zbx_uint64_t	mediatypeid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (FAIL == super_admin_active_session(jp))
+	{
+		strscpy(error, "Permission denied.");
+		goto fail;
+	}
+
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_MEDIATYPEID, tmp, sizeof(tmp)) ||
+			FAIL == is_uint64(tmp, &mediatypeid))
+	{
+		zbx_snprintf(error, sizeof(error), "Cannot parse request tag: %s.", ZBX_PROTO_TAG_MEDIATYPEID);
+		goto fail;
+	}
+
+	ret = SUCCEED;
+fail:
+	if (FAIL == ret)
+		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
 
 static int	DBget_template_count(zbx_uint64_t *count)
@@ -1035,6 +1090,11 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
 			{
 				ret = send_internal_stats_json(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					recv_alert_send(sock, &jp);
 			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);
