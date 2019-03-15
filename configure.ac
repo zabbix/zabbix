@@ -1660,12 +1660,12 @@ if test "x$want_openssl" = "xyes"; then
 		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
 	fi
 
-	if test "x$found_openssl" != "xyes"; then
+	if test "x$found_openssl" != "xOpenSSL" -a "x$found_openssl" != "xOpenSSL (PSK not supported)"; then
 		AC_MSG_ERROR([OpenSSL library libssl or libcrypto not found])
 	elif test "x$accept_openssl_version" != "xyes"; then
 		AC_MSG_ERROR([OpenSSL library version requirement not met (>= 1.0.1)])
 	else
-		have_tls="OpenSSL"
+		have_tls=$found_openssl
 	fi
 	TLS_CFLAGS="$OPENSSL_CFLAGS"
 	TLS_LDFLAGS="$OPENSSL_LDFLAGS"
