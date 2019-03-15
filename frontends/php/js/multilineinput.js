@@ -129,6 +129,7 @@
 				maxlength: 255,
 				readonly: false,
 				disabled: false,
+				autofocus: false,
 				line_numbers: true,
 				monospace_font: true
 			}, options);
@@ -150,7 +151,8 @@
 
 			this.$button = $('<button>', {
 				type: 'button',
-				title: this.options.hint
+				title: this.options.hint,
+				autofocus: this.options.autofocus || null
 			}).on('click', this, openModal);
 
 			this.on('disable enable', this, setDisabled);

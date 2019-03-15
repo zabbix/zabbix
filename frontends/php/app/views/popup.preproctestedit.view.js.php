@@ -141,6 +141,7 @@ jQuery(document).ready(function($) {
 	$('#value').multilineInput({
 		placeholder: '<?= _('value') ?>',
 		monospace_font: false,
+		autofocus: true,
 		readonly: false
 	});
 
