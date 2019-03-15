@@ -472,8 +472,8 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['triggerid']
+	 * @param string $data['eventid']                 (optional) Mandatory for Acknowledge and Description menus.
 	 * @param array  $data['acknowledge']             (optional) Acknowledge link parameters.
-	 * @param string $data['acknowledge']['eventid']
 	 * @param string $data['acknowledge']['backurl']
 	 * @param int    $data['severity_min']            (optional)
 	 * @param bool   $data['show_suppressed']         (optional)
@@ -564,6 +564,10 @@ class CControllerMenuPopup extends CController {
 			}
 			else if (!$options['description_enabled']) {
 				$menu_data['description_enabled'] = false;
+			}
+
+			if (array_key_exists('eventid', $data)) {
+				$menu_data['eventid'] = $data['eventid'];
 			}
 
 			if (array_key_exists('acknowledge', $data)) {

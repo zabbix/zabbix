@@ -216,12 +216,19 @@ class CMacrosResolverHelper {
 	 *
 	 * @static
 	 *
-	 * @param array $trigger
+	 * @param array  $trigger
+	 * @param string $trigger['expression']
+	 * @param string $trigger['comments']
+	 * @param int    $trigger['clock']       (optional)
+	 * @param int    $trigger['ns']          (optional)
+	 * @param array  $options
+	 * @param bool   $options['events']      (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 *                                       Default: false.
 	 *
 	 * @return string
 	 */
-	public static function resolveTriggerDescription(array $trigger) {
-		$triggers = self::resolveTriggerDescriptions([$trigger['triggerid'] => $trigger]);
+	public static function resolveTriggerDescription(array $trigger, array $options = []) {
+		$triggers = self::resolveTriggerDescriptions([$trigger['triggerid'] => $trigger], $options);
 
 		return $triggers[$trigger['triggerid']]['comments'];
 	}
@@ -231,14 +238,25 @@ class CMacrosResolverHelper {
 	 *
 	 * @static
 	 *
-	 * @param array $triggers
+	 * @param array  $triggers
+	 * @param string $triggers[$triggerid]['expression']
+	 * @param string $triggers[$triggerid]['comments']
+	 * @param int    $triggers[$triggerid]['clock']       (optional)
+	 * @param int    $triggers[$triggerid]['ns']          (optional)
+	 * @param array  $options
+	 * @param bool   $options['events']                   (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns'
+	 *                                                    fields. Default: false.
 	 *
 	 * @return array
 	 */
-	public static function resolveTriggerDescriptions(array $triggers) {
+	public static function resolveTriggerDescriptions(array $triggers, array $options = []) {
 		self::init();
 
-		return self::$macrosResolver->resolveTriggerDescriptions($triggers);
+		$options += [
+			'events' => false
+		];
+
+		return self::$macrosResolver->resolveTriggerDescriptions($triggers, $options);
 	}
 
 	/**

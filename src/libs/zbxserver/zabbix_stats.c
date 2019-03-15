@@ -23,6 +23,7 @@
 #include "zbxself.h"
 #include "valuecache.h"
 #include "../../zabbix_server/vmware/vmware.h"
+#include "preproc.h"
 
 #include "zabbix_stats.h"
 
@@ -64,6 +65,9 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 
 	/* zabbix[requiredperformance] */
 	zbx_json_addfloat(json, "requiredperformance", count_stats.requiredperformance);
+
+	/* zabbix[preprocessing_queue] */
+	zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
 
 	zbx_get_zabbix_stats_ext(json);
 

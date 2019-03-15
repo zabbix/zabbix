@@ -223,6 +223,53 @@ static int	DBpatch_4010023(void)
 	return DBcreate_index("proxy_dhistory", "proxy_dhistory_2", "druleid", 0);
 }
 
+static int	DBpatch_4010024(void)
+{
+	const ZBX_FIELD	field = {"height", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("widget", &field, NULL);
+}
+
+static int	DBpatch_4010025(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	nextid;
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='proxy_history'"))
+		return FAIL;
+
+	result = DBselect("select max(id) from proxy_history");
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_DBROW2UINT64(nextid, row[0]);
+	else
+		nextid = 0;
+
+	DBfree_result(result);
+
+	if (0 != nextid && ZBX_DB_OK > DBexecute("insert into ids values ('proxy_history','history_lastid'," ZBX_FS_UI64
+			")", nextid))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4010026(void)
+{
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update hosts set status=1"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(4010)
@@ -252,5 +299,8 @@ DBPATCH_ADD(4010020, 0, 1)
 DBPATCH_ADD(4010021, 0, 1)
 DBPATCH_ADD(4010022, 0, 1)
 DBPATCH_ADD(4010023, 0, 1)
+DBPATCH_ADD(4010024, 0, 1)
+DBPATCH_ADD(4010025, 0, 1)
+DBPATCH_ADD(4010026, 0, 1)
 
 DBPATCH_END()

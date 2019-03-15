@@ -3497,6 +3497,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 			" from item_preproc pp,items i,hosts h"
 			" where pp.itemid=i.itemid"
 				" and i.hostid=h.hostid"
+				" and h.proxy_hostid is null"
 				" and h.status in (%d,%d)"
 				" and i.flags<>%d"
 			" order by pp.itemid",

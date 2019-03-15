@@ -20,6 +20,7 @@
 #include "common.h"
 #include "cfg.h"
 #include "log.h"
+#include "comms.h"
 
 extern unsigned char	program_type;
 
@@ -578,4 +579,49 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
 	}
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_set_data_destination_hosts                                   *
+ *                                                                            *
+ * Purpose: parse "ServerActive' parameter value and set destination servers  *
+ *          using a calback function                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f cb)
+{
+	char	*l = active_hosts, *r;
+
+	do
+	{
+		char		*host = NULL;
+		unsigned short	port;
+
+		if (NULL != (r = strchr(l, ',')))
+			*r = '\0';
+
+		if (SUCCEED != parse_serveractive_element(l, &host, &port, (unsigned short)ZBX_DEFAULT_SERVER_PORT))
+		{
+			zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" is invalid", l);
+			exit(EXIT_FAILURE);
+		}
+
+		if (SUCCEED != cb(host, port))
+		{
+			zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than"
+					" once", l);
+			zbx_free(host);
+			exit(EXIT_FAILURE);
+		}
+
+		zbx_free(host);
+
+		if (NULL != r)
+		{
+			*r = ',';
+			l = r + 1;
+		}
+	}
+	while (NULL != r);
 }
