@@ -150,7 +150,7 @@
 			})
 				.toggleClass('monospace-font', this.options.monospace_font)
 				.prop('readonly', this.options.disabled ? null : true)
-				.on('click', this, openModal);
+				.on('mousedown', this, openModal);
 
 			this.$button = $('<button>', {
 				type: 'button',
