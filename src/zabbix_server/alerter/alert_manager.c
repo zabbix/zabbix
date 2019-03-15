@@ -2077,7 +2077,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 						failed_num++;
 					break;
 				case ZBX_IPC_ALERTER_ALERT:
-					THIS_SHOULD_NEVER_HAPPEN;
+					zbx_ipc_client_send(client, ZBX_IPC_ALERTER_ALERT, NULL, 0);
 					break;
 			}
 
