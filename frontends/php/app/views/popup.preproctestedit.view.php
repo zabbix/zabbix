@@ -123,7 +123,7 @@ $templates = [
 		->setAttribute('type', 'text/x-jquery-tmpl')
 		->setId('preprocessing-gray-label')
 		->addItem(
-			(new CDiv(_('#{label}')))
+			(new CDiv('#{label}'))
 				->addStyle('margin-top: 5px;')
 				->addClass(ZBX_STYLE_GREY)
 			),
