@@ -66,6 +66,25 @@ foreach ($data['discoveries'] as $discovery) {
 	// description
 	$description = [];
 	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_RULE);
+
+	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {
+		if ($discovery['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
+			$description[] = CHtml::encode($discovery['master_item']['name_expanded']);
+		}
+		else {
+			$description[] = (new CLink(CHtml::encode($discovery['master_item']['name_expanded']),
+				(new CUrl('items.php'))
+					->setArgument('form', 'update')
+					->setArgument('itemid', $discovery['master_item']['itemid'])
+					->getUrl()
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_TEAL);
+		}
+
+		$description[] = NAME_DELIMITER;
+	}
+
 	$description[] = new CLink($discovery['name_expanded'], '?form=update&itemid='.$discovery['itemid']);
 
 	// status
@@ -99,8 +118,9 @@ foreach ($data['discoveries'] as $discovery) {
 		];
 	}
 
-	// Hide zeros for trapper and SNMP trap items.
-	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP) {
+	// Hide zeros for trapper, SNMP trap and dependent items.
+	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
+			|| $discovery['type'] == ITEM_TYPE_DEPENDENT) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {

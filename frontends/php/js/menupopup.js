@@ -742,7 +742,20 @@ function getMenuPopupItem(options, trigger_elmnt) {
 
 	items.push({
 		label: t('Create dependent item'),
-		url: url.getUrl()
+		url: url.getUrl(),
+		disabled: !options.create_dependent_item
+	});
+
+	url = new Curl('host_discovery.php');
+	url.setArgument('form', 'create');
+	url.setArgument('hostid', options.hostid);
+	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
+	url.setArgument('master_itemid', options.itemid);
+
+	items.push({
+		label: t('Create dependent discovery rule'),
+		url: url.getUrl(),
+		disabled: !options.create_dependent_discovery
 	});
 
 	return [{

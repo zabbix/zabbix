@@ -197,7 +197,7 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataItem(array $data) {
 		$db_items = API::Item()->get([
-			'output' => ['hostid', 'name', 'value_type'],
+			'output' => ['hostid', 'name', 'value_type', 'flags'],
 			'itemids' => $data['itemid'],
 			'webitems' => true
 		]);
@@ -208,7 +208,9 @@ class CControllerMenuPopup extends CController {
 				'type' => 'item',
 				'itemid' => $data['itemid'],
 				'hostid' => $db_item['hostid'],
-				'name' => $db_item['name']
+				'name' => $db_item['name'],
+				'create_dependent_item' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
+				'create_dependent_discovery' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			];
 
 			if (in_array($db_item['value_type'], [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {

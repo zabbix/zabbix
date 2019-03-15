@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'items.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -48,9 +48,15 @@ $fields = [
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'description' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'key' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Key')],
+	'master_itemid' =>			[T_ZBX_STR, O_OPT, null,	null,
+									'(isset({add}) || isset({update})) && isset({type})'.
+										' && {type} == '.ITEM_TYPE_DEPENDENT,
+									_('Master item')
+								],
 	'delay' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
 									'(isset({add}) || isset({update})) && isset({type})'.
-										' && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP,
+										' && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.
+										' && {type} != '.ITEM_TYPE_DEPENDENT,
 									_('Update interval')
 								],
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
@@ -60,7 +66,7 @@ $fields = [
 										ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3,
 										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-										ITEM_TYPE_HTTPAGENT
+										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT
 									]),
 									'isset({add}) || isset({update})'
 								],
@@ -232,6 +238,7 @@ check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
+$item = [];
 
 /*
  * Permissions
@@ -240,7 +247,7 @@ if (getRequest('itemid', false)) {
 	$item = API::DiscoveryRule()->get([
 		'itemids' => getRequest('itemid'),
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => ['status', 'flags'],
+		'selectHosts' => ['hostid', 'name', 'status', 'flags'],
 		'selectFilter' => ['formula', 'evaltype', 'conditions'],
 		'selectLLDMacroPaths' => ['lld_macro', 'path'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -255,8 +262,8 @@ if (getRequest('itemid', false)) {
 }
 else {
 	$hosts = API::Host()->get([
-		'hostids' => $_REQUEST['hostid'],
-		'output' => ['status', 'flags'],
+		'output' => ['hostid', 'name', 'status', 'flags'],
+		'hostids' => getRequest('hostid'),
 		'templated_hosts' => true,
 		'editable' => true
 	]);
@@ -279,7 +286,7 @@ if (hasRequest('preprocessing')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
+if (hasRequest('delete') && hasRequest('itemid')) {
 	$result = API::DiscoveryRule()->delete([getRequest('itemid')]);
 
 	if ($result) {
@@ -441,6 +448,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if ($newItem['type'] == ITEM_TYPE_JMX) {
 			$newItem['jmx_endpoint'] = getRequest('jmx_endpoint', '');
+		}
+
+		if (getRequest('type') == ITEM_TYPE_DEPENDENT) {
+			$newItem['master_itemid'] = getRequest('master_itemid');
 		}
 
 		// add macros; ignore empty new macros
@@ -622,9 +633,30 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masschec
 /*
  * Display
  */
-if (isset($_REQUEST['form'])) {
-	$formItem = (hasRequest('itemid') && !hasRequest('clone')) ? $item : [];
-	$data = getItemFormData($formItem, [
+if (hasRequest('form')) {
+	$has_errors = false;
+	$form_item = (hasRequest('itemid') && !hasRequest('clone')) ? $item : [];
+	$master_itemid = $form_item && !hasRequest('form_refresh')
+		? $form_item['master_itemid']
+		: getRequest('master_itemid');
+
+	if (getRequest('type', $form_item ? $form_item['type'] : null) == ITEM_TYPE_DEPENDENT && $master_itemid != 0) {
+		$db_master_items = API::Item()->get([
+			'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+			'itemids' => $master_itemid,
+			'webitems' => true
+		]);
+
+		if (!$db_master_items) {
+			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
+			$has_errors = true;
+		}
+		else {
+			$form_item['master_item'] = $db_master_items[0];
+		}
+	}
+
+	$data = getItemFormData($form_item, [
 		'is_discovery_rule' => true
 	]);
 	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
@@ -671,9 +703,11 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	// render view
-	$itemView = new CView('configuration.host.discovery.edit', $data);
-	$itemView->render();
-	$itemView->show();
+	if (!$has_errors) {
+		$itemView = new CView('configuration.host.discovery.edit', $data);
+		$itemView->render();
+		$itemView->show();
+	}
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -723,6 +757,7 @@ else {
 	// paging
 	$url = (new CUrl('host_discovery.php'))->setArgument('hostid', $data['hostid']);
 
+	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
 	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder, $url);
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
 

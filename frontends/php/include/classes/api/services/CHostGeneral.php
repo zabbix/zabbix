@@ -174,15 +174,15 @@ abstract class CHostGeneral extends CHostBase {
 		foreach ($hostsLinkageInserts as $hostTplIds){
 			Manager::Application()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
 
-			API::DiscoveryRule()->syncTemplates([
-				'hostids' => $hostTplIds['hostid'],
-				'templateids' => $hostTplIds['templateid']
-			]);
-
 			// Fist link web items, so that later regular items can use web item as their master item.
 			Manager::HttpTest()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
 
 			API::Item()->syncTemplates([
+				'hostids' => $hostTplIds['hostid'],
+				'templateids' => $hostTplIds['templateid']
+			]);
+
+			API::DiscoveryRule()->syncTemplates([
 				'hostids' => $hostTplIds['hostid'],
 				'templateids' => $hostTplIds['templateid']
 			]);

@@ -243,6 +243,7 @@ $tranStrings = [
 		'Create new' => _('Create new'),
 		'Create trigger' => _('Create trigger'),
 		'Create dependent item' => _('Create dependent item'),
+		'Create dependent discovery rule' => _('Create dependent discovery rule'),
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Description' => _('Description'),
