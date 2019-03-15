@@ -65,7 +65,8 @@ PROXY_SUBDIRS = \
 	zbxself \
 	zbxtasks \
 	zbxhistory \
-	zbxcompress
+	zbxcompress \
+	zbxembed
 endif
 endif
 

@@ -31,9 +31,6 @@
 #include "active.h"
 #include "nodecommand.h"
 #include "proxyconfig.h"
-#include "proxydiscovery.h"
-#include "proxyautoreg.h"
-#include "proxyhosts.h"
 #include "proxydata.h"
 
 #include "daemon.h"
@@ -139,77 +136,6 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
 
 	zbx_free(info);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: recv_proxyhistory                                                *
- *                                                                            *
- * Purpose: processes the received values from active proxies                 *
- *                                                                            *
- ******************************************************************************/
-static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
-{
-	const char	*__function_name = "recv_proxyhistory";
-	char		*error = NULL;
-	int		ret = FAIL;
-	DC_PROXY	proxy;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (SUCCEED != get_active_proxy_from_request(jp, &proxy, &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot parse history data from active proxy at \"%s\": %s",
-				sock->peer, error);
-		goto out;
-	}
-
-	if (SUCCEED != zbx_proxy_check_permissions(&proxy, sock, &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\", allowed address:"
-				" \"%s\": %s", proxy.host, sock->peer, proxy.proxy_address, error);
-		goto out;
-	}
-
-	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
-			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
-
-	if (SUCCEED != (ret = process_proxy_history_data(&proxy, jp, ts, &error)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "received invalid history data from proxy \"%s\" at \"%s\": %s",
-				proxy.host, sock->peer, error);
-		goto out;
-	}
-out:
-	/* 'history data' request is sent only by pre 3.4 version proxies */
-	/* that did not have compression support                          */
-	zbx_send_response_ext(sock, ret, error, NULL, ZBX_TCP_PROTOCOL, CONFIG_TIMEOUT);
-
-	zbx_free(error);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: send_proxyhistory                                                *
- *                                                                            *
- * Purpose: send history data to a Zabbix server                              *
- *                                                                            *
- * Comments: 'history data' request is deprecated starting with Zabbix v3.4   *
- *                                                                            *
- ******************************************************************************/
-static void	send_proxyhistory(zbx_socket_t *sock)
-{
-	const char	*__function_name = "send_proxyhistory";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	/* do not send any reply to server in this case as the server expects history data */
-	if (SUCCEED == check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "history data request"))
-		zbx_send_proxy_response(sock, FAIL, "Deprecated request", CONFIG_TIMEOUT);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1082,27 +1008,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 					zbx_send_proxy_data(sock, ts);
 			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					recv_proxyhistory(sock, &jp, ts);
-				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-					send_proxyhistory(sock);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					recv_discovery_data(sock, &jp, ts);
-				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-					send_discovery_data(sock);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					recv_areg_data(sock, &jp, ts);
-				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-					send_areg_data(sock);
-			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -1111,13 +1016,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 			{
 				ret = send_list_of_active_checks_json(sock, &jp);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_HOST_AVAILABILITY))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					recv_host_availability(sock, &jp);
-				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-					send_host_availability(sock);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
 			{

@@ -2564,9 +2564,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		/* dependent items */
 
-		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[38]))
+		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[38]) && 0 == host->proxy_hostid)
 		{
-			depitem = (ZBX_DC_DEPENDENTITEM *)DCfind_id(&config->dependentitems, itemid, sizeof(ZBX_DC_DEPENDENTITEM), &found);
+			depitem = (ZBX_DC_DEPENDENTITEM *)DCfind_id(&config->dependentitems, itemid,
+					sizeof(ZBX_DC_DEPENDENTITEM), &found);
 
 			if (1 == found)
 				depitem->last_master_itemid = depitem->master_itemid;

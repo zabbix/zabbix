@@ -854,9 +854,6 @@ do														\
 }														\
 while (0)
 
-#define MIN_ZABBIX_PORT 1024u
-#define MAX_ZABBIX_PORT 65535u
-
 extern const char	*progname;
 extern const char	title_message[];
 extern const char	syslog_app_name[];
@@ -1457,7 +1454,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 #define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
 #define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
-#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFF)
+#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFFFF)
 
 #define ZBX_PREPROC_MULTIPLIER			1
 #define ZBX_PREPROC_RTRIM			2

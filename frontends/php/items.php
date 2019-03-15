@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'codeeditor.js', 'multiselect.js', 'items.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -2040,14 +2040,6 @@ else {
 	]);
 
 	$data['trigger_parent_templates'] = getTriggerParentTemplates($data['itemTriggers'], ZBX_FLAG_DISCOVERY_NORMAL);
-
-	// determine, show or not column of errors
-	if ($data['hostid'] != 0 && array_key_exists('templateid', $host)) {
-		$data['showInfoColumn'] = false;
-	}
-	else {
-		$data['showInfoColumn'] = true;
-	}
 
 	// render view
 	$itemView = new CView('configuration.item.list', $data);

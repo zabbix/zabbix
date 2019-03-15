@@ -1826,9 +1826,7 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
 		tmp_offset = strlen(tmp);
 		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_offset);
 
-		if (++tmp_offset > tmp_alloc)
-			tmp_alloc = tmp_offset;
-
+		tmp_alloc = tmp_offset + 1;
 		tmp_offset = 0;
 
 		/* substitute LLD macros in function parameters */

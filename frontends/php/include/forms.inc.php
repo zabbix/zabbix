@@ -1396,17 +1396,12 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		->addClass('preprocessing-list')
 		->addClass('list-numbered')
 		->addItem(
-			(new CListItem(
-				(new CDiv([
-					(new CDiv(_('Name')))->addClass(ZBX_STYLE_COLUMN_35),
-					(new CDiv(_('Parameters')))->addClass(ZBX_STYLE_COLUMN_20),
-					(new CDiv())->addClass(ZBX_STYLE_COLUMN_20),
-					(new CDiv(_('Custom on fail')))
-						->addClass(ZBX_STYLE_COLUMN_15)
-						->addClass(ZBX_STYLE_COLUMN_CENTER),
-					(new CDiv(_('Action')))->addClass(ZBX_STYLE_COLUMN_10)
-				]))->addClass(ZBX_STYLE_COLUMNS)
-			))
+			(new CListItem([
+				(new CDiv(_('Name')))->addClass('step-name'),
+				(new CDiv(_('Parameters')))->addClass('step-parameters'),
+				(new CDiv(_('Custom on fail')))->addClass('step-on-fail'),
+				(new CDiv(_('Action')))->addClass('step-action')
+			]))
 				->addClass('preprocessing-list-head')
 				->addStyle(!$preprocessing ? 'display: none;' : null)
 		);
@@ -1417,128 +1412,109 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 
 	foreach ($preprocessing as $step) {
 		// Create a combo box with preprocessing types.
-		if ($readonly) {
-			$preproc_types_cbbox = (new CTextBox('preprocessing['.$i.'][type_name]',
-				get_preprocessing_types($step['type'], false, $types))
-			)->setReadonly(true);
+		$preproc_types_cbbox = (new CComboBox('preprocessing['.$i.'][type]', $step['type']))->setReadonly($readonly);
 
-			$form->addVar('preprocessing['.$i.'][type]', $step['type']);
-		}
-		else {
-			$preproc_types_cbbox = new CComboBox('preprocessing['.$i.'][type]', $step['type']);
+		foreach (get_preprocessing_types(null, true, $types) as $group) {
+			$cb_group = new COptGroup($group['label']);
 
-			foreach (get_preprocessing_types(null, true, $types) as $group) {
-				$cb_group = new COptGroup($group['label']);
-
-				foreach ($group['types'] as $type => $label) {
-					$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
-				}
-
-				$preproc_types_cbbox->addItem($cb_group);
+			foreach ($group['types'] as $type => $label) {
+				$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
 			}
+
+			$preproc_types_cbbox->addItem($cb_group);
 		}
 
 		// Depending on preprocessing type, display corresponding params field and placeholders.
-		$params = [];
+		$params = '';
 
 		// Create a primary param text box, so it can be hidden if necessary.
-		$step_param_0 = array_key_exists('params', $step) ? $step['params'][0] : '';
-		$params[] = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0))
-			->setTitle($step_param_0)
+		$step_param_0_value = array_key_exists('params', $step) ? $step['params'][0] : '';
+		$step_param_0 = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0_value))
+			->setTitle($step_param_0_value)
 			->setReadonly($readonly);
 
 		// Create a secondary param text box, so it can be hidden if necessary.
-		$step_param_1 = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
-				? $step['params'][1]
-				: '';
-		$params[] = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1))
-			->setTitle($step_param_1)
+		$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
+			? $step['params'][1]
+			: '';
+		$step_param_1 = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1_value))
+			->setTitle($step_param_1_value)
 			->setReadonly($readonly);
 
 		// Add corresponding placeholders and show or hide text boxes.
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
-				$params[0]->setAttribute('placeholder', _('number'));
-				$params[1]->addStyle('display: none;');
+				$params = $step_param_0
+					->setAttribute('placeholder', _('number'))
+					->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH);
 				break;
 
 			case ZBX_PREPROC_RTRIM:
 			case ZBX_PREPROC_LTRIM:
 			case ZBX_PREPROC_TRIM:
-				$params[0]->setAttribute('placeholder', _('list of characters'));
-				$params[1]->addStyle('display: none;');
+				$params = $step_param_0
+					->setAttribute('placeholder', _('list of characters'))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 				break;
 
 			case ZBX_PREPROC_XPATH:
 			case ZBX_PREPROC_ERROR_FIELD_XML:
-				$params[0]->setAttribute('placeholder', _('XPath'));
-				$params[1]->addStyle('display: none;');
+				$params = $step_param_0->setAttribute('placeholder', _('XPath'));
 				break;
 
 			case ZBX_PREPROC_JSONPATH:
 			case ZBX_PREPROC_ERROR_FIELD_JSON:
-				$params[0]->setAttribute('placeholder', _('$.path.to.node'));
-				$params[1]->addStyle('display: none;');
+				$params = $step_param_0->setAttribute('placeholder', _('$.path.to.node'));
 				break;
 
 			case ZBX_PREPROC_REGSUB:
 			case ZBX_PREPROC_ERROR_FIELD_REGEX:
-				$params[0]->setAttribute('placeholder', _('pattern'));
-				$params[1]->setAttribute('placeholder', _('output'));
-				break;
-
-			case ZBX_PREPROC_BOOL2DEC:
-			case ZBX_PREPROC_OCT2DEC:
-			case ZBX_PREPROC_HEX2DEC:
-			case ZBX_PREPROC_DELTA_VALUE:
-			case ZBX_PREPROC_DELTA_SPEED:
-			case ZBX_PREPROC_THROTTLE_VALUE:
-				$params[0]->addStyle('display: none;');
-				$params[1]->addStyle('display: none;');
+				$params = [
+					$step_param_0->setAttribute('placeholder', _('pattern')),
+					$step_param_1->setAttribute('placeholder', _('output'))
+				];
 				break;
 
 			case ZBX_PREPROC_VALIDATE_RANGE:
-				$params[0]->setAttribute('placeholder', _('min'));
-				$params[1]->setAttribute('placeholder', _('max'));
+				$params = [
+					$step_param_0->setAttribute('placeholder', _('min')),
+					$step_param_1->setAttribute('placeholder', _('max'))
+				];
 				break;
 
 			case ZBX_PREPROC_VALIDATE_REGEX:
 			case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-				$params[0]->setAttribute('placeholder', _('pattern'));
-				$params[1]->addStyle('display: none;');
+				$params = $step_param_0->setAttribute('placeholder', _('pattern'));
 				break;
 
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-				$params[0]->setAttribute('placeholder', _('seconds'));
-				$params[1]->addStyle('display: none;');
+				$params = $step_param_0
+					->setAttribute('placeholder', _('seconds'))
+					->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH);
 				break;
 
 			case ZBX_PREPROC_SCRIPT:
-				$params[0]
-					->removeId()
-					->setAttribute('value', explode("\n", trim($step_param_0))[0])
-					->setAttribute('placeholder', _('script'))
-					->setAttribute('maxlength', $script_maxlength)
-					->setAttribute('title', _('Click to view or edit code'))
-					->addClass('open-modal-code-editor');
-				if (!$readonly) {
-					$params[0]->addClass('editable');
-				}
-				$params[1]->addStyle('display: none;');
+				$params = new CMultilineInput($step_param_0->getName(), $step_param_0_value, [
+					'title' => _('JavaScript'),
+					'placeholder' => _('script'),
+					'maxlength' => $script_maxlength,
+					'readonly' => $readonly
+				]);
 				break;
 
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
-				$params[0]->setAttribute('placeholder',
-					_('<metric name>{<label name>="<label value>", ...} == <value>')
-				);
-				$params[1]->setAttribute('placeholder', _('<label name>'));
+				$params = [
+					$step_param_0->setAttribute('placeholder',
+						_('<metric name>{<label name>="<label value>", ...} == <value>')
+					),
+					$step_param_1->setAttribute('placeholder', _('<label name>'))
+				];
 				break;
 
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-				$params[0]->setAttribute('placeholder',
+				$params = $step_param_0->setAttribute('placeholder',
 					_('<metric name>{<label name>="<label value>", ...} == <value>')
 				);
-				$params[1]->addStyle('display: none;');
 				break;
 		}
 
@@ -1593,16 +1569,10 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		}
 
 		$on_fail_options = (new CDiv([
-			(new CDiv([
-				new CDiv(new CLabel(_('Custom on fail'))),
-				new CDiv($error_handler->setReadonly($readonly)),
-				new CDiv($error_handler_params->setReadonly($readonly))
-			]))
-				->addClass(ZBX_STYLE_COLUMN_75)
-				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
-		]))
-			->addClass(ZBX_STYLE_COLUMNS)
-			->addClass('on-fail-options');
+			new CLabel(_('Custom on fail')),
+			$error_handler->setReadonly($readonly),
+			$error_handler_params->setReadonly($readonly)
+		]))->addClass('on-fail-options');
 
 		if ($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT) {
 			$on_fail_options->addStyle('display: none;');
@@ -1615,46 +1585,36 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 						->addClass(ZBX_STYLE_DRAG_ICON)
 						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
 					(new CDiv($preproc_types_cbbox))
-						->addClass(ZBX_STYLE_COLUMN_35)
-						->addClass('list-numbered-item'),
-					(new CDiv([
-						$params[0],
-						($step['type'] == ZBX_PREPROC_SCRIPT)
-							? new CInput('hidden', $params[0]->getName(), trim(implode($step['params'])))
-							: null
-					]))->addClass(ZBX_STYLE_COLUMN_20),
-					(new CDiv($params[1]))->addClass(ZBX_STYLE_COLUMN_20),
-					(new CDiv($on_fail))
-						->addClass(ZBX_STYLE_COLUMN_15)
-						->addClass(ZBX_STYLE_COLUMN_MIDDLE)
-						->addClass(ZBX_STYLE_COLUMN_CENTER),
+						->addClass('list-numbered-item')
+						->addClass('step-name'),
+					(new CDiv($params))->addClass('step-parameters'),
+					(new CDiv($on_fail))->addClass('step-on-fail'),
 					(new CDiv((new CButton('preprocessing['.$i.'][remove]', _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-remove')
 						->setEnabled(!$readonly)
 						->removeId()
-					))
-						->addClass(ZBX_STYLE_COLUMN_10)
-						->addClass(ZBX_STYLE_COLUMN_MIDDLE),
-				]))
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass('preprocessing-step'),
+					))->addClass('step-action'),
+				]))->addClass('preprocessing-step'),
 				$on_fail_options
 			]))
 				->addClass('preprocessing-list-item')
 				->addClass('sortable')
+				->setAttribute('data-step', $i)
 		);
 
 		$i++;
 	}
 
 	$preprocessing_list->addItem(
-		(new CListItem(new CDiv(
-			(new CButton('param_add', _('Add')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-add')
-				->setEnabled(!$readonly)
-		)))->addClass('preprocessing-list-foot')
+		(new CListItem(
+			(new CDiv(
+				(new CButton('param_add', _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-add')
+					->setEnabled(!$readonly)
+			))->addClass('step-action')
+		))->addClass('preprocessing-list-foot')
 	);
 
 	return $preprocessing_list;

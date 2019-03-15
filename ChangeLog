@@ -1,8 +1,25 @@
 Changes for 4.2.0rc1
 
 New features:
+.......PS. [ZBXNEXT-5081] added item preprocessing support to proxies (wiper)
+...G...... [ZBXNEXT-4967] added Zabbix sender data sending to multiple destinations given in ServerActive configuration parameter (viktors)
+A.F....... [ZBX-15286] dropped support use of discovered items as master (Sasha)
 
 Bug fixes:
+..F....... [ZBX-10317] made info column on item list page always visible (agriscenko)
+..F....... [ZBX-15322] fixed graph area near grid line with 0 value (ashubin)
+..F....... [ZBX-15207] fixed deprecated css features (ashubin)
+.......PS. [ZBX-15798] fixed proxy configuration update failure on Oracle; fixed failure on empty SQL buffer on Oracle (kalimulin)
+A.F....... [ZBX-15219] fixed unwanted removing scenario post fields on scenario update (gcalenko, vasilijs)
+..F....... [ZBX-11278] reworked property state indicator in mass update screens (miks)
+........S. [ZBX-15716] fixed escalation cancel message is called if escalation interrupts with unfinished step or recovery (akozlovs)
+..F....... [ZBX-15468] fixed LDAP configuration form not being able to save changes when user password field is empty string (gcalenko)
+..F....... [ZBX-15669] fixed page scroll after widget being added to dashboard (gcalenko)
+..F....... [ZBX-15548] fixed resolving of {ITEM.VALUE} macro in the trigger description (Sasha)
+........S. [ZBX-15774] fixed memory leak in housekeeper when elasticsearch is used (vso)
+........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
+..F....... [ZBX-15608] fixed when Widget Graph show disabled trigger/problem (vasilijs)
+..F....... [ZBX-10397] fixed when global messaging severities unchecked if profile saved earlier (ashubin, vasilijs)
 ..F.I...S. [ZBX-15693] fixed widget default height in schema.tmpl (asestakovs)
 A.F....... [ZBX-15596] fixed when widget in frontend can be created larger than API validation supports (ashubin, vasilijs)
 ..F....... [ZBX-15308] fixed timeselector in screens when page is opened with link containing sid argument (ashubin, gcalenko)
@@ -201,11 +218,25 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.6rc1
 
 New features:
+A.F....... [ZBX-15286] dropped support use of discovered items as master (Sasha)
 ...G...... [ZBXNEXT-4898] added support IPv6 for "net.dns" and "net.dns.record" (MVekslers)
 .......PS. [ZBXNEXT-5037] added "skip" parameter for vmware.eventlog key (MVekslers)
 ..F....... [ZBXNEXT-4819] implemented date and time showing in SVG graph widget (miks)
 
 Bug fixes:
+..F....... [ZBX-10317] made info column on item list page always visible (agriscenko)
+..F....... [ZBX-15322] fixed graph area near grid line with 0 value (ashubin)
+.......PS. [ZBX-15798] fixed proxy configuration update failure on Oracle; fixed failure on empty SQL buffer on Oracle (kalimulin)
+A.F....... [ZBX-15219] fixed unwanted removing scenario post fields on scenario update (gcalenko, vasilijs)
+..F....... [ZBX-11278] reworked property state indicator in mass update screens (miks)
+........S. [ZBX-15716] fixed escalation cancel message is called if escalation interrupts with unfinished step or recovery (akozlovs)
+..F....... [ZBX-15468] fixed LDAP configuration form not being able to save changes when user password field is empty string (gcalenko)
+..F....... [ZBX-15669] fixed page scroll after widget being added to dashboard (gcalenko)
+..F....... [ZBX-15548] fixed resolving of {ITEM.VALUE} macro in the trigger description (Sasha)
+........S. [ZBX-15774] fixed memory leak in housekeeper when elasticsearch is used (vso)
+........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
+..F....... [ZBX-15608] fixed when Widget Graph show disabled trigger/problem (vasilijs)
+..F....... [ZBX-10397] fixed when global messaging severities unchecked if profile saved earlier (ashubin, vasilijs)
 A.F....... [ZBX-15596] fixed when widget in frontend can be created larger than API validation supports (ashubin, vasilijs)
 ..F....... [ZBX-15308] fixed timeselector in screens when page is opened with link containing sid argument (ashubin, gcalenko)
 ..F....... [ZBX-15694] fixed trimming of empty spaces for custom multiplier in item and item prototype preprocessing forms (Ivo)
@@ -2477,6 +2508,7 @@ Changes for 3.0.26rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
 .......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
 .......PS. [ZBX-14858] fixed processing of unlimited vmware maxQueryMetrics value (MVekslers)
 .D........ [ZBX-10496] fixed links to installation instructions in README file (dimir)

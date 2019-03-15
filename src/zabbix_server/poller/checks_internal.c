@@ -794,6 +794,16 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			}
 		}
 	}
+	else if (0 == strcmp(tmp, "preprocessing_queue"))
+	{
+		if (1 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		SET_UI64_RESULT(result, zbx_preprocessor_get_queue_size());
+	}
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
