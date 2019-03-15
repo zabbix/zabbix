@@ -717,8 +717,11 @@ static void	DCdump_master_items(void)
 		zabbix_log(LOG_LEVEL_TRACE, "master itemid:" ZBX_FS_UI64, master_item->itemid);
 
 		for (j = 0; j < master_item->dep_itemids.values_num; j++)
-			zabbix_log(LOG_LEVEL_TRACE, "  itemid:" ZBX_FS_UI64, master_item->dep_itemids.values[j]);
-
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "  itemid:" ZBX_FS_UI64 " flags:" ZBX_FS_UI64,
+					master_item->dep_itemids.values[j].first,
+					master_item->dep_itemids.values[j].second);
+		}
 	}
 
 	zbx_vector_ptr_destroy(&index);
