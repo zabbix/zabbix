@@ -1931,10 +1931,10 @@ function filter_messages(array $messages = []) {
 /**
  * Returns the message box when messages are present; null otherwise
  *
- * @param  boolean	$good			Parameter passed to makeMessageBox to specify message box style.
- * @param  string	$title			Message box title.
- * @param  boolean  $show_close_box Show or hide close button in error message box.
- * @global array	$ZBX_MESSAGES
+ * @param  bool    $good            Parameter passed to makeMessageBox to specify message box style.
+ * @param  string  $title           Message box title.
+ * @param  bool    $show_close_box  Show or hide close button in error message box.
+ * @global array   $ZBX_MESSAGES
  *
  * @return CDiv|null
  */
