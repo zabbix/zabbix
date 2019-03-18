@@ -189,8 +189,8 @@
 
 				case '<?= ZBX_PREPROC_SCRIPT ?>':
 					return $(preproc_param_multiline_tmpl.evaluate({rowNum: index})).multilineInput({
-						title: '<?= CJs::encodeJson(_('JavaScript')) ?>',
-						placeholder: '<?= CJs::encodeJson(_('script')) ?>',
+						title: <?= CJs::encodeJson(_('JavaScript')) ?>,
+						placeholder: <?= CJs::encodeJson(_('script')) ?>,
 						maxlength: <?= (int) $data['preprocessing_script_maxlength'] ?>
 					});
 
