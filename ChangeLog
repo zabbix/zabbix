@@ -2290,8 +2290,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.26rc1
 
-New features:
-
 Bug fixes:
 ...G...PS. [ZBX-15552] fixed compilation with LibreSSL as OpenSSL replacement and OpenSSL without PSK support (Andris)
 ........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
