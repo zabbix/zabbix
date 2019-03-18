@@ -1931,6 +1931,18 @@ static int	am_check_queue(zbx_am_t *manager, int now)
 	return SUCCEED;
 }
 
+static void	am_process_alert_send(zbx_am_t *manager, zbx_ipc_client_t *client, const unsigned char *data)
+{
+	zbx_uint64_t	mediatypeid;
+	char		*sendto, *subject, *message;
+
+	zbx_alerter_deserialize_alert_send(data, &mediatypeid, &sendto, &subject, &message);
+
+	zbx_free(message);
+	zbx_free(subject);
+	zbx_free(sendto);
+}
+
 ZBX_THREAD_ENTRY(alert_manager_thread, args)
 {
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -2084,7 +2096,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 						failed_num++;
 					break;
 				case ZBX_IPC_ALERTER_ALERT:
-					zbx_ipc_client_send(client, ZBX_IPC_ALERTER_ALERT, NULL, 0);
+					am_process_alert_send(&manager, client, message->data);
 					break;
 			}
 
