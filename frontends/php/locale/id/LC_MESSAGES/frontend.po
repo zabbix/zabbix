@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-17 01:44+0200\n"
+"POT-Creation-Date: 2019-03-18 11:18+0200\n"
 "PO-Revision-Date: 2019-03-16 19:32+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -230,7 +230,7 @@ msgstr "(tanpa proxy)"
 msgid "0 - use default port"
 msgstr ""
 
-#: include/triggers.inc.php:1824
+#: include/triggers.inc.php:1826
 msgid "0 or 1"
 msgstr "0 atau 1"
 
@@ -865,7 +865,7 @@ msgstr ""
 msgid "All templates"
 msgstr ""
 
-#: include/triggers.inc.php:1226
+#: include/triggers.inc.php:1228
 #: include/views/configuration.trigger.prototype.edit.php:520
 #: include/views/configuration.trigger.prototype.massupdate.php:173
 #: include/views/configuration.triggers.edit.php:554
@@ -884,7 +884,7 @@ msgstr "Host yang diizinkan"
 msgid "Alternatively, you can install it manually:"
 msgstr ""
 
-#: include/triggers.inc.php:1292
+#: include/triggers.inc.php:1294
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:1150
 #: include/views/configuration.correlation.edit.php:94
@@ -4658,7 +4658,7 @@ msgstr "Tolak"
 msgid "Dependencies"
 msgstr "Dependensi"
 
-#: include/triggers.inc.php:2689
+#: include/triggers.inc.php:2691
 msgid "Dependent"
 msgstr "Tergantung"
 
@@ -4666,7 +4666,7 @@ msgstr "Tergantung"
 msgid "Dependent item"
 msgstr ""
 
-#: app/views/popup.generic.php:287 include/triggers.inc.php:2689
+#: app/views/popup.generic.php:287 include/triggers.inc.php:2691
 #: include/views/configuration.services.edit.php:152
 #: include/views/configuration.trigger.prototype.list.php:81
 #: include/views/configuration.triggers.list.php:207
@@ -4831,7 +4831,7 @@ msgstr ""
 #: include/discovery.inc.php:108 include/hosts.inc.php:1299
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:142 include/items.inc.php:145
-#: include/items.inc.php:189 include/triggers.inc.php:2145
+#: include/items.inc.php:189 include/triggers.inc.php:2147
 #: include/users.inc.php:86
 #: include/views/administration.general.other.edit.php:57
 #: include/views/administration.usergroups.list.php:44
@@ -5531,7 +5531,7 @@ msgstr ""
 #: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
 #: include/httptest.inc.php:45 include/items.inc.php:142
 #: include/items.inc.php:145 include/items.inc.php:186
-#: include/triggers.inc.php:1231 include/triggers.inc.php:2142
+#: include/triggers.inc.php:1233 include/triggers.inc.php:2144
 #: include/views/administration.usergroups.edit.php:73
 #: include/views/administration.usergroups.edit.php:87
 #: include/views/administration.usergroups.edit.php:88
@@ -5635,7 +5635,7 @@ msgstr ""
 msgid "Event details"
 msgstr "Detail event"
 
-#: include/triggers.inc.php:1221
+#: include/triggers.inc.php:1223
 msgid "Event generation"
 msgstr "Pembuatan event"
 
@@ -6250,7 +6250,7 @@ msgid "Get content of web page. Returns web page source as text"
 msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
-#: include/triggers.inc.php:1375
+#: include/triggers.inc.php:1377
 msgid "Given expression is not a macro"
 msgstr "Ekspresi yang diberikan bukan sebuah macro"
 
@@ -7485,11 +7485,11 @@ msgstr ""
 
 #: include/graphs.inc.php:271 include/hosts.inc.php:658
 #: include/hosts.inc.php:827 include/httptest.inc.php:209
-#: include/items.inc.php:898 include/triggers.inc.php:2430
+#: include/items.inc.php:898 include/triggers.inc.php:2432
 msgid "Inaccessible template"
 msgstr ""
 
-#: include/triggers.inc.php:2659 include/triggers.inc.php:2667
+#: include/triggers.inc.php:2661 include/triggers.inc.php:2669
 msgid "Inaccessible trigger"
 msgstr ""
 
@@ -7919,7 +7919,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1376
+#: include/triggers.inc.php:1378
 msgid "Incorrect function is used"
 msgstr "Kesalahan fungsi telah digunakan"
 
@@ -8009,7 +8009,7 @@ msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:51
-#: include/triggers.inc.php:1377
+#: include/triggers.inc.php:1379
 msgid "Incorrect item value type"
 msgstr ""
 
@@ -10550,7 +10550,7 @@ msgstr "Mozilla Firefox"
 msgid "Multiple"
 msgstr ""
 
-#: include/triggers.inc.php:1222
+#: include/triggers.inc.php:1224
 msgid "Multiple PROBLEM events"
 msgstr "Beberapa MASALAH event"
 
@@ -10834,7 +10834,7 @@ msgstr ""
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
-#: include/triggers.inc.php:1228 include/triggers.inc.php:1233
+#: include/triggers.inc.php:1230 include/triggers.inc.php:1235
 #: include/views/administration.users.list.php:111
 #: include/views/administration.users.list.php:115
 #: include/views/configuration.host.prototype.list.php:126
@@ -11420,7 +11420,7 @@ msgid "None"
 msgstr "Tidak ada"
 
 #: app/views/popup.generic.php:545 include/graphs.inc.php:24
-#: include/items.inc.php:160 include/triggers.inc.php:1221
+#: include/items.inc.php:160 include/triggers.inc.php:1223
 #: include/views/configuration.triggers.list.php:42
 #: include/views/monitoring.history.php:224
 msgid "Normal"
@@ -11653,13 +11653,13 @@ msgid "Numeral systems"
 msgstr ""
 
 #: include/forms.inc.php:352 include/items.inc.php:129
-#: include/triggers.inc.php:1822 include/views/configuration.item.edit.php:678
+#: include/triggers.inc.php:1824 include/views/configuration.item.edit.php:678
 #: include/views/configuration.item.massupdate.php:278
 #: include/views/configuration.item.prototype.edit.php:606
 msgid "Numeric (float)"
 msgstr "Numerik (float)"
 
-#: include/triggers.inc.php:1823
+#: include/triggers.inc.php:1825
 msgid "Numeric (integer)"
 msgstr ""
 
@@ -11959,7 +11959,7 @@ msgstr ""
 #: app/views/monitoring.problem.view.php:228
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:379
-#: include/triggers.inc.php:1292
+#: include/triggers.inc.php:1294
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:1151
 #: include/views/configuration.correlation.edit.php:95
@@ -12741,7 +12741,7 @@ msgstr ""
 msgid "Problem display"
 msgstr "Masalah tampilan"
 
-#: include/triggers.inc.php:1214
+#: include/triggers.inc.php:1216
 #: include/views/js/configuration.triggers.edit.js.php:39
 msgid "Problem expression"
 msgstr ""
@@ -13031,7 +13031,7 @@ msgstr "Penerima (descending)"
 msgid "Recovery"
 msgstr "Pemulihan"
 
-#: include/triggers.inc.php:1218
+#: include/triggers.inc.php:1220
 #: include/views/configuration.trigger.prototype.edit.php:273
 #: include/views/configuration.trigger.prototype.edit.php:355
 #: include/views/configuration.triggers.edit.php:297
@@ -14400,7 +14400,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblems.php:196
 #: include/classes/widgets/forms/CWidgetFormProblems.php:197
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
-#: include/events.inc.php:167 include/triggers.inc.php:1199
+#: include/events.inc.php:167 include/triggers.inc.php:1201
 #: include/views/configuration.item.list.php:145
 #: include/views/configuration.trigger.prototype.edit.php:65
 #: include/views/configuration.trigger.prototype.list.php:50
@@ -16290,7 +16290,7 @@ msgstr "Unit"
 #: include/items.inc.php:171 include/maintenances.inc.php:39
 #: include/maps.inc.php:39 include/regexp.inc.php:236
 #: include/screens.inc.php:57 include/triggers.inc.php:120
-#: include/triggers.inc.php:242 include/triggers.inc.php:2142
+#: include/triggers.inc.php:242 include/triggers.inc.php:2144
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:497
 #: include/views/configuration.triggers.list.php:43
@@ -16316,12 +16316,12 @@ msgstr "Fungsi yang tidak dikenal."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: app/controllers/CControllerPopupTriggerExpr.php:534
-#: include/triggers.inc.php:1374
+#: include/triggers.inc.php:1376
 msgid "Unknown host item, no such item in selected host"
 msgstr "Item host yang tidak dikenal, tidak ada item tersebut dalam host yang terpilih"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: include/triggers.inc.php:1373
+#: include/triggers.inc.php:1375
 msgid "Unknown host, no such host present in system"
 msgstr "Host tidak dikenal, tidak ada host yang hadir dalam sistem"
 
@@ -17639,7 +17639,7 @@ msgstr "Tahunan"
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
-#: include/triggers.inc.php:1227 include/triggers.inc.php:1232
+#: include/triggers.inc.php:1229 include/triggers.inc.php:1234
 #: include/views/administration.general.valuemapping.list.php:65
 #: include/views/administration.users.list.php:109
 #: include/views/configuration.host.prototype.list.php:126
