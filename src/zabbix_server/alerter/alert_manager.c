@@ -1361,13 +1361,13 @@ out:
  *               FAIL    - database connection error                          *
  *                                                                            *
  ******************************************************************************/
-static int	am_db_queue_alerts(zbx_am_t *manager, int now)
+static int	am_db_queue_alerts(zbx_am_t *manager, const zbx_vector_ptr_t *alerts)
 {
 	const char		*__function_name = "am_db_queue_alerts";
 
 	zbx_am_alert_t		*alert;
-	zbx_vector_ptr_t	alerts;
-	int			i, ret;
+
+	int			i, ret = SUCCEED;
 	zbx_am_alertpool_t	*alertpool;
 	zbx_am_mediatype_t	*mediatype;
 	zbx_vector_uint64_t	mediatypeids;
@@ -1375,18 +1375,13 @@ static int	am_db_queue_alerts(zbx_am_t *manager, int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_ptr_create(&alerts);
-
-	if (FAIL == (ret = am_db_get_alerts(manager, &alerts, now)))
-		goto out;
-
 	/* update media types for new and queued alerts */
 
 	zbx_vector_uint64_create(&mediatypeids);
 
-	for (i = 0; i < alerts.values_num; i++)
+	for (i = 0; i < alerts->values_num; i++)
 	{
-		alert = (zbx_am_alert_t *)alerts.values[i];
+		alert = (zbx_am_alert_t *)alerts->values[i];
 		zbx_vector_uint64_append(&mediatypeids, alert->mediatypeid);
 	}
 
@@ -1409,9 +1404,9 @@ static int	am_db_queue_alerts(zbx_am_t *manager, int now)
 
 	/* queue new alerts */
 
-	for (i = 0; i < alerts.values_num; i++)
+	for (i = 0; i < alerts->values_num; i++)
 	{
-		alert = (zbx_am_alert_t *)alerts.values[i];
+		alert = (zbx_am_alert_t *)alerts->values[i];
 
 		if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
 		{
@@ -1429,8 +1424,6 @@ static int	am_db_queue_alerts(zbx_am_t *manager, int now)
 		am_push_mediatype(manager, mediatype);
 	}
 out:
-	zbx_vector_ptr_destroy(&alerts);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -2025,7 +2018,16 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		if (ZBX_DB_OK == manager.dbstatus && now - time_db >= ZBX_AM_DB_POLL_DELAY)
 		{
 			if (SUCCEED == (ret = am_db_flush_alert_updates(&manager)))
-				ret = am_db_queue_alerts(&manager, now);
+			{
+				zbx_vector_ptr_t	alerts;
+
+				zbx_vector_ptr_create(&alerts);
+
+				if (SUCCEED == (ret = am_db_get_alerts(&manager, &alerts, now)))
+					ret = am_db_queue_alerts(&manager, &alerts);
+
+				zbx_vector_ptr_destroy(&alerts);
+			}
 
 			if (FAIL == ret)
 			{
