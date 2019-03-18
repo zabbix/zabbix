@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 11:19+0200\n"
+"POT-Creation-Date: 2019-03-18 16:47+0200\n"
 "PO-Revision-Date: 2018-12-04 06:16+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -50,7 +50,7 @@ msgstr "\"host:key\"의 페어로 지정해 주십시오"
 #: include/forms.inc.php:1467
 #: include/views/configuration.host.discovery.edit.php:747
 #: include/views/js/configuration.host.discovery.edit.js.php:52
-#: include/views/js/item.preprocessing.js.php:162
+#: include/views/js/item.preprocessing.js.php:159
 msgid "$.path.to.node"
 msgstr ""
 
@@ -285,12 +285,12 @@ msgstr "5초"
 msgid "500 latest values"
 msgstr "최근 500개의 값"
 
-#: app/views/popup.preproctestedit.view.js.php:123
-#: app/views/popup.preproctestedit.view.js.php:134
+#: app/views/popup.preproctestedit.view.js.php:124
+#: app/views/popup.preproctestedit.view.js.php:135
 msgid "<empty string>"
 msgstr ""
 
-#: include/forms.inc.php:1510 include/views/js/item.preprocessing.js.php:206
+#: include/forms.inc.php:1510 include/views/js/item.preprocessing.js.php:203
 msgid "<label name>"
 msgstr ""
 
@@ -299,8 +299,8 @@ msgid "<manual>"
 msgstr "<manual>"
 
 #: include/forms.inc.php:1508 include/forms.inc.php:1516
-#: include/views/js/item.preprocessing.js.php:204
-#: include/views/js/item.preprocessing.js.php:213
+#: include/views/js/item.preprocessing.js.php:201
+#: include/views/js/item.preprocessing.js.php:210
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
 msgstr ""
 
@@ -4053,7 +4053,7 @@ msgstr "맵\"%2$s\"의 커스텀라벨 타입요소 \"%1$s\"를 설정해 주십
 msgid "Custom multiplier"
 msgstr "승수"
 
-#: app/views/popup.preproctestedit.view.js.php:139 include/forms.inc.php:1402
+#: app/views/popup.preproctestedit.view.js.php:143 include/forms.inc.php:1402
 #: include/forms.inc.php:1572 include/views/js/item.preprocessing.js.php:35
 msgid "Custom on fail"
 msgstr ""
@@ -4286,7 +4286,7 @@ msgstr "하드웨어 구입일"
 msgid "Day"
 msgstr "일"
 
-#: include/func.inc.php:2650
+#: include/func.inc.php:2651
 msgid "Day before yesterday"
 msgstr "그저께"
 
@@ -4971,7 +4971,7 @@ msgstr ""
 msgid "Discard unchanged with heartbeat"
 msgstr ""
 
-#: app/views/popup.preproctestedit.view.js.php:103 include/forms.inc.php:1551
+#: app/views/popup.preproctestedit.view.js.php:104 include/forms.inc.php:1551
 #: include/views/js/item.preprocessing.js.php:37
 msgid "Discard value"
 msgstr ""
@@ -9576,7 +9576,7 @@ msgid "Japanese (ja_JP)"
 msgstr "일본어 (ja_JP)"
 
 #: include/forms.inc.php:1498 include/items.inc.php:1754
-#: include/views/js/item.preprocessing.js.php:195
+#: include/views/js/item.preprocessing.js.php:192
 msgid "JavaScript"
 msgstr ""
 
@@ -9699,37 +9699,37 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "최근"
 
-#: include/func.inc.php:2703
+#: include/func.inc.php:2704
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "최신 %1$d 일간"
 
-#: include/func.inc.php:2697
+#: include/func.inc.php:2698
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] "최신 %1$d 시간"
 
-#: include/func.inc.php:2690
+#: include/func.inc.php:2691
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] "최신 %1$d 분간"
 
-#: include/func.inc.php:2706
+#: include/func.inc.php:2707
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] "최신 %1$d 개월간"
 
-#: include/func.inc.php:2683
+#: include/func.inc.php:2684
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] "최신 %1$d 초간"
 
-#: include/func.inc.php:2709
+#: include/func.inc.php:2710
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -11604,7 +11604,7 @@ msgstr "트리거ID\"%1$s\"를 지닌 트리거는 존재하지 않습니다."
 msgid "No triggers defined."
 msgstr "트리거가 설정되어 있지 않습니다"
 
-#: app/views/popup.preproctestedit.view.js.php:129
+#: app/views/popup.preproctestedit.view.js.php:130
 msgid "No value"
 msgstr ""
 
@@ -12936,7 +12936,7 @@ msgstr ""
 msgid "Preview"
 msgstr "미리보기"
 
-#: include/func.inc.php:2653
+#: include/func.inc.php:2654
 msgid "Previous month"
 msgstr "저번 달"
 
@@ -12944,11 +12944,11 @@ msgstr "저번 달"
 msgid "Previous value"
 msgstr ""
 
-#: include/func.inc.php:2652
+#: include/func.inc.php:2653
 msgid "Previous week"
 msgstr "저번 주"
 
-#: include/func.inc.php:2654
+#: include/func.inc.php:2655
 msgid "Previous year"
 msgstr "작년"
 
@@ -14709,7 +14709,7 @@ msgstr "세션이 끊겼습니다. 다시 로그인하여 주십시오."
 msgid "Set custom time period"
 msgstr "시간범위의 커스터마이즈"
 
-#: app/views/popup.preproctestedit.view.js.php:115 include/forms.inc.php:1553
+#: app/views/popup.preproctestedit.view.js.php:116 include/forms.inc.php:1553
 #: include/views/js/item.preprocessing.js.php:39
 msgid "Set error to"
 msgstr ""
@@ -14718,7 +14718,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "인벤토리 모드의 설정"
 
-#: app/views/popup.preproctestedit.view.js.php:109 include/forms.inc.php:1552
+#: app/views/popup.preproctestedit.view.js.php:110 include/forms.inc.php:1552
 #: include/views/js/item.preprocessing.js.php:38
 msgid "Set value to"
 msgstr ""
@@ -15746,7 +15746,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:147
 #: app/views/administration.authentication.edit.php:150
-#: app/views/popup.preproctestedit.view.php:156
+#: app/views/popup.preproctestedit.view.php:168
 #: app/views/popup.testtriggerexpr.php:116 include/forms.inc.php:1593
 #: include/views/administration.general.regularexpressions.edit.php:139
 #: include/views/configuration.trigger.prototype.edit.php:239
@@ -15894,7 +15894,7 @@ msgstr "Web시나리오가 설정되어있는 호스트와 다른 호스트에 �
 msgid "Theme"
 msgstr "테마"
 
-#: include/func.inc.php:2651
+#: include/func.inc.php:2652
 msgid "This day last week"
 msgstr "저번주의 오늘"
 
@@ -15903,11 +15903,11 @@ msgstr "저번주의 오늘"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "이 항목은 아이템 \"%s\"에 의해 자동적으로 설정됩니다."
 
-#: include/func.inc.php:2659 srv_status.php:41
+#: include/func.inc.php:2660 srv_status.php:41
 msgid "This month"
 msgstr "이번 달"
 
-#: include/func.inc.php:2660
+#: include/func.inc.php:2661
 msgid "This month so far"
 msgstr "이번 달의 지금까지"
 
@@ -15919,19 +15919,19 @@ msgstr "스크린의 열은 공백이 아닙니다. 삭제합니까?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "스크린의 행은 공백이 아닙니다. 삭제합니까?"
 
-#: include/func.inc.php:2657 srv_status.php:40
+#: include/func.inc.php:2658 srv_status.php:40
 msgid "This week"
 msgstr "이번주"
 
-#: include/func.inc.php:2658
+#: include/func.inc.php:2659
 msgid "This week so far"
 msgstr "저번주의 지금까지"
 
-#: include/func.inc.php:2661 srv_status.php:42
+#: include/func.inc.php:2662 srv_status.php:42
 msgid "This year"
 msgstr "올해"
 
-#: include/func.inc.php:2662
+#: include/func.inc.php:2663
 msgid "This year so far"
 msgstr "올해의 지금까지"
 
@@ -16056,12 +16056,12 @@ msgstr "종료"
 msgid "To set a host interface select a single item type for all items"
 msgstr "모든 아이템은 하나의 호스트 인터페이스를 선택할 필요가 있습니다"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2655
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2656
 #: srv_status.php:39
 msgid "Today"
 msgstr "오늘"
 
-#: include/func.inc.php:2656
+#: include/func.inc.php:2657
 msgid "Today so far"
 msgstr "오늘의 지금까지"
 
@@ -17972,7 +17972,7 @@ msgstr "XML 데이터"
 msgid "XML is empty"
 msgstr "XML이 비어있습니다."
 
-#: include/forms.inc.php:1462 include/views/js/item.preprocessing.js.php:155
+#: include/forms.inc.php:1462 include/views/js/item.preprocessing.js.php:152
 msgid "XPath"
 msgstr ""
 
@@ -18079,7 +18079,7 @@ msgstr "연간"
 msgid "Yes"
 msgstr "예"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2649
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2650
 msgid "Yesterday"
 msgstr "어제"
 
@@ -18709,7 +18709,7 @@ msgstr "일치하지 않음"
 msgid "equals"
 msgstr "같음"
 
-#: include/views/js/item.preprocessing.js.php:353
+#: include/views/js/item.preprocessing.js.php:350
 msgid "error message"
 msgstr ""
 
@@ -18922,7 +18922,7 @@ msgstr "last() - 최신값"
 msgid "left"
 msgstr "왼쪽"
 
-#: include/forms.inc.php:1456 include/views/js/item.preprocessing.js.php:148
+#: include/forms.inc.php:1456 include/views/js/item.preprocessing.js.php:145
 msgid "list of characters"
 msgstr "문자열의 리스트"
 
@@ -18988,7 +18988,7 @@ msgstr "일치한다"
 #: include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
-#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:174
 msgid "max"
 msgstr "최대"
 
@@ -19013,7 +19013,7 @@ msgstr "의존 레벨 수가 최대수에 도달하였습니다"
 #: include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
-#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:173
 msgid "min"
 msgstr "최소"
 
@@ -19118,7 +19118,7 @@ msgstr "선택되지 않음"
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Epoch를 기준으로 한 경과 시간 (초단위)"
 
-#: include/forms.inc.php:1448 include/views/js/item.preprocessing.js.php:140
+#: include/forms.inc.php:1448 include/views/js/item.preprocessing.js.php:137
 msgid "number"
 msgstr "수치"
 
@@ -19180,13 +19180,13 @@ msgstr "on"
 msgid "other"
 msgstr "그 외"
 
-#: include/forms.inc.php:1474 include/views/js/item.preprocessing.js.php:170
+#: include/forms.inc.php:1474 include/views/js/item.preprocessing.js.php:167
 msgid "output"
 msgstr "출력"
 
 #: include/forms.inc.php:1473 include/forms.inc.php:1487
-#: include/views/js/item.preprocessing.js.php:169
-#: include/views/js/item.preprocessing.js.php:184
+#: include/views/js/item.preprocessing.js.php:166
+#: include/views/js/item.preprocessing.js.php:181
 msgid "pattern"
 msgstr "패턴"
 
@@ -19244,7 +19244,7 @@ msgctxt "second short"
 msgid "s"
 msgstr "s"
 
-#: include/forms.inc.php:1499 include/views/js/item.preprocessing.js.php:196
+#: include/forms.inc.php:1499 include/views/js/item.preprocessing.js.php:193
 msgid "script"
 msgstr ""
 
@@ -19257,7 +19257,7 @@ msgstr "제2"
 msgid "second parameter is expected"
 msgstr "2번째 파라미터를 지정해주세요"
 
-#: include/forms.inc.php:1492 include/views/js/item.preprocessing.js.php:190
+#: include/forms.inc.php:1492 include/views/js/item.preprocessing.js.php:187
 msgid "seconds"
 msgstr ""
 
@@ -19481,8 +19481,8 @@ msgstr "지원되지 않는 버전의 번호입니다."
 
 #: app/views/monitoring.problem.view.js.php:26
 #: app/views/monitoring.problem.view.php:244
-#: app/views/popup.preproctestedit.view.js.php:149
-#: app/views/popup.preproctestedit.view.js.php:157
+#: app/views/popup.preproctestedit.view.js.php:153
+#: app/views/popup.preproctestedit.view.js.php:161
 #: app/views/popup.preproctestedit.view.php:40
 #: include/classes/widgets/CWidgetHelper.php:403
 #: include/classes/widgets/CWidgetHelper.php:448
@@ -19513,7 +19513,7 @@ msgstr "지원되지 않는 버전의 번호입니다."
 #: include/views/js/configuration.template.list.js.php:11
 #: include/views/js/configuration.triggers.list.js.php:11
 #: include/views/js/hostmacros.js.php:11
-#: include/views/js/item.preprocessing.js.php:347
+#: include/views/js/item.preprocessing.js.php:344
 msgid "value"
 msgstr "값"
 

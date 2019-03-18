@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 11:19+0200\n"
+"POT-Creation-Date: 2019-03-18 16:47+0200\n"
 "PO-Revision-Date: 2019-03-16 22:15+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -50,7 +50,7 @@ msgstr "Cặp \"host:key\" được dự đoán"
 #: include/forms.inc.php:1467
 #: include/views/configuration.host.discovery.edit.php:747
 #: include/views/js/configuration.host.discovery.edit.js.php:52
-#: include/views/js/item.preprocessing.js.php:162
+#: include/views/js/item.preprocessing.js.php:159
 msgid "$.path.to.node"
 msgstr ""
 
@@ -285,12 +285,12 @@ msgstr "5 giây"
 msgid "500 latest values"
 msgstr "500 giá trị gần nhất"
 
-#: app/views/popup.preproctestedit.view.js.php:123
-#: app/views/popup.preproctestedit.view.js.php:134
+#: app/views/popup.preproctestedit.view.js.php:124
+#: app/views/popup.preproctestedit.view.js.php:135
 msgid "<empty string>"
 msgstr ""
 
-#: include/forms.inc.php:1510 include/views/js/item.preprocessing.js.php:206
+#: include/forms.inc.php:1510 include/views/js/item.preprocessing.js.php:203
 msgid "<label name>"
 msgstr ""
 
@@ -299,8 +299,8 @@ msgid "<manual>"
 msgstr "<bằng tay>"
 
 #: include/forms.inc.php:1508 include/forms.inc.php:1516
-#: include/views/js/item.preprocessing.js.php:204
-#: include/views/js/item.preprocessing.js.php:213
+#: include/views/js/item.preprocessing.js.php:201
+#: include/views/js/item.preprocessing.js.php:210
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
 msgstr ""
 
@@ -4061,7 +4061,7 @@ msgstr "Tùy chỉnh nhãn cho phần tử bản đồ \"%2$s\" của kiê�
 msgid "Custom multiplier"
 msgstr "Tùy chỉnh nhân bản"
 
-#: app/views/popup.preproctestedit.view.js.php:139 include/forms.inc.php:1402
+#: app/views/popup.preproctestedit.view.js.php:143 include/forms.inc.php:1402
 #: include/forms.inc.php:1572 include/views/js/item.preprocessing.js.php:35
 msgid "Custom on fail"
 msgstr ""
@@ -4294,7 +4294,7 @@ msgstr "Ngày HW đã mua"
 msgid "Day"
 msgstr "Ngày"
 
-#: include/func.inc.php:2650
+#: include/func.inc.php:2651
 msgid "Day before yesterday"
 msgstr "Ngày trước hôm qua"
 
@@ -4979,7 +4979,7 @@ msgstr ""
 msgid "Discard unchanged with heartbeat"
 msgstr ""
 
-#: app/views/popup.preproctestedit.view.js.php:103 include/forms.inc.php:1551
+#: app/views/popup.preproctestedit.view.js.php:104 include/forms.inc.php:1551
 #: include/views/js/item.preprocessing.js.php:37
 msgid "Discard value"
 msgstr ""
@@ -9583,7 +9583,7 @@ msgid "Japanese (ja_JP)"
 msgstr "Japanese (ja_JP)"
 
 #: include/forms.inc.php:1498 include/items.inc.php:1754
-#: include/views/js/item.preprocessing.js.php:195
+#: include/views/js/item.preprocessing.js.php:192
 msgid "JavaScript"
 msgstr ""
 
@@ -9706,37 +9706,37 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Giá trị cuối cùng"
 
-#: include/func.inc.php:2703
+#: include/func.inc.php:2704
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "%1$d ngày cuối cùng"
 
-#: include/func.inc.php:2697
+#: include/func.inc.php:2698
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] "%1$d giờ cuối cùng"
 
-#: include/func.inc.php:2690
+#: include/func.inc.php:2691
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] "%1$d phút cuối cùng"
 
-#: include/func.inc.php:2706
+#: include/func.inc.php:2707
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] "%1$d tháng cuối cùng"
 
-#: include/func.inc.php:2683
+#: include/func.inc.php:2684
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] "%1$d giây cuối cùng"
 
-#: include/func.inc.php:2709
+#: include/func.inc.php:2710
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -11611,7 +11611,7 @@ msgstr "Không có trigger với triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Không xác định được trigger nào."
 
-#: app/views/popup.preproctestedit.view.js.php:129
+#: app/views/popup.preproctestedit.view.js.php:130
 msgid "No value"
 msgstr ""
 
@@ -12943,7 +12943,7 @@ msgstr ""
 msgid "Preview"
 msgstr "Xem trước"
 
-#: include/func.inc.php:2653
+#: include/func.inc.php:2654
 msgid "Previous month"
 msgstr "quay lại tháng trước"
 
@@ -12951,11 +12951,11 @@ msgstr "quay lại tháng trước"
 msgid "Previous value"
 msgstr ""
 
-#: include/func.inc.php:2652
+#: include/func.inc.php:2653
 msgid "Previous week"
 msgstr "Quay lại tuần trước"
 
-#: include/func.inc.php:2654
+#: include/func.inc.php:2655
 msgid "Previous year"
 msgstr "Quay lại năm trước"
 
@@ -14716,7 +14716,7 @@ msgstr "Kết thúc phiên làm việc, hãy đăng nhập lại."
 msgid "Set custom time period"
 msgstr "Đặt chu kỳ thời gian tùy chỉnh"
 
-#: app/views/popup.preproctestedit.view.js.php:115 include/forms.inc.php:1553
+#: app/views/popup.preproctestedit.view.js.php:116 include/forms.inc.php:1553
 #: include/views/js/item.preprocessing.js.php:39
 msgid "Set error to"
 msgstr ""
@@ -14725,7 +14725,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "Đặt chế độ kiểm kê máy chủ"
 
-#: app/views/popup.preproctestedit.view.js.php:109 include/forms.inc.php:1552
+#: app/views/popup.preproctestedit.view.js.php:110 include/forms.inc.php:1552
 #: include/views/js/item.preprocessing.js.php:38
 msgid "Set value to"
 msgstr ""
@@ -15753,7 +15753,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:147
 #: app/views/administration.authentication.edit.php:150
-#: app/views/popup.preproctestedit.view.php:156
+#: app/views/popup.preproctestedit.view.php:168
 #: app/views/popup.testtriggerexpr.php:116 include/forms.inc.php:1593
 #: include/views/administration.general.regularexpressions.edit.php:139
 #: include/views/configuration.trigger.prototype.edit.php:239
@@ -15901,7 +15901,7 @@ msgstr "Ứng dụng web scenario thuộc về một host khác hơn so vơ
 msgid "Theme"
 msgstr "Giao diện"
 
-#: include/func.inc.php:2651
+#: include/func.inc.php:2652
 msgid "This day last week"
 msgstr "Ngày cuối tuần"
 
@@ -15910,11 +15910,11 @@ msgstr "Ngày cuối tuần"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Trường này được tự động gắn vào bởi item \"%s\"."
 
-#: include/func.inc.php:2659 srv_status.php:41
+#: include/func.inc.php:2660 srv_status.php:41
 msgid "This month"
 msgstr "Tháng này"
 
-#: include/func.inc.php:2660
+#: include/func.inc.php:2661
 msgid "This month so far"
 msgstr "Tháng này đến nay"
 
@@ -15926,19 +15926,19 @@ msgstr "Cột screen này không được để trống. Xóa nó?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "Hàng screen này không được để trống. Xóa chúng?"
 
-#: include/func.inc.php:2657 srv_status.php:40
+#: include/func.inc.php:2658 srv_status.php:40
 msgid "This week"
 msgstr "Tuần này"
 
-#: include/func.inc.php:2658
+#: include/func.inc.php:2659
 msgid "This week so far"
 msgstr "Tuần này cho đến nay"
 
-#: include/func.inc.php:2661 srv_status.php:42
+#: include/func.inc.php:2662 srv_status.php:42
 msgid "This year"
 msgstr "Năm này"
 
-#: include/func.inc.php:2662
+#: include/func.inc.php:2663
 msgid "This year so far"
 msgstr "Năm này cho đến nay"
 
@@ -16063,12 +16063,12 @@ msgstr "To"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Để thiết lập một host interface chọn một kiểu item duy nhất cho tất cả các item"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2655
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2656
 #: srv_status.php:39
 msgid "Today"
 msgstr "Hôm nay"
 
-#: include/func.inc.php:2656
+#: include/func.inc.php:2657
 msgid "Today so far"
 msgstr "Hôm nay"
 
@@ -17979,7 +17979,7 @@ msgstr "Dữ liệu XML"
 msgid "XML is empty"
 msgstr "XML trống"
 
-#: include/forms.inc.php:1462 include/views/js/item.preprocessing.js.php:155
+#: include/forms.inc.php:1462 include/views/js/item.preprocessing.js.php:152
 msgid "XPath"
 msgstr ""
 
@@ -18086,7 +18086,7 @@ msgstr "Hàng năm"
 msgid "Yes"
 msgstr "Yes"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2649
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2650
 msgid "Yesterday"
 msgstr "hôm qua"
 
@@ -18715,7 +18715,7 @@ msgstr "Không khớp"
 msgid "equals"
 msgstr "bằng"
 
-#: include/views/js/item.preprocessing.js.php:353
+#: include/views/js/item.preprocessing.js.php:350
 msgid "error message"
 msgstr ""
 
@@ -18928,7 +18928,7 @@ msgstr "last() - Giá trị T cuối cùng (gần đây nhất)"
 msgid "left"
 msgstr "bên trái"
 
-#: include/forms.inc.php:1456 include/views/js/item.preprocessing.js.php:148
+#: include/forms.inc.php:1456 include/views/js/item.preprocessing.js.php:145
 msgid "list of characters"
 msgstr "Danh sách kí tự"
 
@@ -18994,7 +18994,7 @@ msgstr "Khớp với"
 #: include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
-#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:174
 msgid "max"
 msgstr "max"
 
@@ -19019,7 +19019,7 @@ msgstr "số lượng mức độ phụ thuộc tối đa đạt được"
 #: include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
-#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:173
 msgid "min"
 msgstr "min"
 
@@ -19124,7 +19124,7 @@ msgstr "Không được chọn"
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now () - Số giây kể từ Epoch"
 
-#: include/forms.inc.php:1448 include/views/js/item.preprocessing.js.php:140
+#: include/forms.inc.php:1448 include/views/js/item.preprocessing.js.php:137
 msgid "number"
 msgstr "số"
 
@@ -19186,13 +19186,13 @@ msgstr "on"
 msgid "other"
 msgstr "Khác"
 
-#: include/forms.inc.php:1474 include/views/js/item.preprocessing.js.php:170
+#: include/forms.inc.php:1474 include/views/js/item.preprocessing.js.php:167
 msgid "output"
 msgstr "đầu ra"
 
 #: include/forms.inc.php:1473 include/forms.inc.php:1487
-#: include/views/js/item.preprocessing.js.php:169
-#: include/views/js/item.preprocessing.js.php:184
+#: include/views/js/item.preprocessing.js.php:166
+#: include/views/js/item.preprocessing.js.php:181
 msgid "pattern"
 msgstr "Mẫu"
 
@@ -19250,7 +19250,7 @@ msgctxt "second short"
 msgid "s"
 msgstr "s"
 
-#: include/forms.inc.php:1499 include/views/js/item.preprocessing.js.php:196
+#: include/forms.inc.php:1499 include/views/js/item.preprocessing.js.php:193
 msgid "script"
 msgstr ""
 
@@ -19263,7 +19263,7 @@ msgstr "giây"
 msgid "second parameter is expected"
 msgstr "tham số thứ hai được kì vọng"
 
-#: include/forms.inc.php:1492 include/views/js/item.preprocessing.js.php:190
+#: include/forms.inc.php:1492 include/views/js/item.preprocessing.js.php:187
 msgid "seconds"
 msgstr ""
 
@@ -19487,8 +19487,8 @@ msgstr "Số phiên bản không được hỗ trợ"
 
 #: app/views/monitoring.problem.view.js.php:26
 #: app/views/monitoring.problem.view.php:244
-#: app/views/popup.preproctestedit.view.js.php:149
-#: app/views/popup.preproctestedit.view.js.php:157
+#: app/views/popup.preproctestedit.view.js.php:153
+#: app/views/popup.preproctestedit.view.js.php:161
 #: app/views/popup.preproctestedit.view.php:40
 #: include/classes/widgets/CWidgetHelper.php:403
 #: include/classes/widgets/CWidgetHelper.php:448
@@ -19519,7 +19519,7 @@ msgstr "Số phiên bản không được hỗ trợ"
 #: include/views/js/configuration.template.list.js.php:11
 #: include/views/js/configuration.triggers.list.js.php:11
 #: include/views/js/hostmacros.js.php:11
-#: include/views/js/item.preprocessing.js.php:347
+#: include/views/js/item.preprocessing.js.php:344
 msgid "value"
 msgstr "Giá trị"
 

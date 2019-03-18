@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 11:19+0200\n"
+"POT-Creation-Date: 2019-03-18 16:47+0200\n"
 "PO-Revision-Date: 2018-09-25 16:34+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -50,7 +50,7 @@ msgstr "очікувалась пара \"вузел мережі:ключ\""
 #: include/forms.inc.php:1467
 #: include/views/configuration.host.discovery.edit.php:747
 #: include/views/js/configuration.host.discovery.edit.js.php:52
-#: include/views/js/item.preprocessing.js.php:162
+#: include/views/js/item.preprocessing.js.php:159
 msgid "$.path.to.node"
 msgstr ""
 
@@ -315,12 +315,12 @@ msgstr "5 секунд"
 msgid "500 latest values"
 msgstr "500 останніх значень"
 
-#: app/views/popup.preproctestedit.view.js.php:123
-#: app/views/popup.preproctestedit.view.js.php:134
+#: app/views/popup.preproctestedit.view.js.php:124
+#: app/views/popup.preproctestedit.view.js.php:135
 msgid "<empty string>"
 msgstr ""
 
-#: include/forms.inc.php:1510 include/views/js/item.preprocessing.js.php:206
+#: include/forms.inc.php:1510 include/views/js/item.preprocessing.js.php:203
 msgid "<label name>"
 msgstr ""
 
@@ -329,8 +329,8 @@ msgid "<manual>"
 msgstr "<вручну>"
 
 #: include/forms.inc.php:1508 include/forms.inc.php:1516
-#: include/views/js/item.preprocessing.js.php:204
-#: include/views/js/item.preprocessing.js.php:213
+#: include/views/js/item.preprocessing.js.php:201
+#: include/views/js/item.preprocessing.js.php:210
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
 msgstr ""
 
@@ -4175,7 +4175,7 @@ msgstr "Ярлик користувача для елементів карти �
 msgid "Custom multiplier"
 msgstr "Користувацький множник"
 
-#: app/views/popup.preproctestedit.view.js.php:139 include/forms.inc.php:1402
+#: app/views/popup.preproctestedit.view.js.php:143 include/forms.inc.php:1402
 #: include/forms.inc.php:1572 include/views/js/item.preprocessing.js.php:35
 msgid "Custom on fail"
 msgstr ""
@@ -4410,7 +4410,7 @@ msgstr "Дата придбання HW"
 msgid "Day"
 msgstr "День"
 
-#: include/func.inc.php:2650
+#: include/func.inc.php:2651
 msgid "Day before yesterday"
 msgstr "Позавчора"
 
@@ -5097,7 +5097,7 @@ msgstr ""
 msgid "Discard unchanged with heartbeat"
 msgstr ""
 
-#: app/views/popup.preproctestedit.view.js.php:103 include/forms.inc.php:1551
+#: app/views/popup.preproctestedit.view.js.php:104 include/forms.inc.php:1551
 #: include/views/js/item.preprocessing.js.php:37
 msgid "Discard value"
 msgstr ""
@@ -9727,7 +9727,7 @@ msgid "Japanese (ja_JP)"
 msgstr "Японська (ja_JP)"
 
 #: include/forms.inc.php:1498 include/items.inc.php:1754
-#: include/views/js/item.preprocessing.js.php:195
+#: include/views/js/item.preprocessing.js.php:192
 msgid "JavaScript"
 msgstr ""
 
@@ -9850,7 +9850,7 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Остання"
 
-#: include/func.inc.php:2703
+#: include/func.inc.php:2704
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
@@ -9858,7 +9858,7 @@ msgstr[0] "Останній %1$d день"
 msgstr[1] "Останні %1$d дні"
 msgstr[2] "Останні %1$d днів"
 
-#: include/func.inc.php:2697
+#: include/func.inc.php:2698
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
@@ -9866,7 +9866,7 @@ msgstr[0] "Остання %1$d година"
 msgstr[1] "Останні %1$d години"
 msgstr[2] "Останні %1$d годин"
 
-#: include/func.inc.php:2690
+#: include/func.inc.php:2691
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
@@ -9874,7 +9874,7 @@ msgstr[0] "Остання %1$d хвилина"
 msgstr[1] "Останні %1$d хвилини"
 msgstr[2] "Останні %1$d хвилин"
 
-#: include/func.inc.php:2706
+#: include/func.inc.php:2707
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
@@ -9882,7 +9882,7 @@ msgstr[0] "Останній %1$d місяць"
 msgstr[1] "Останні %1$d місяці"
 msgstr[2] "Останні %1$d місяців"
 
-#: include/func.inc.php:2683
+#: include/func.inc.php:2684
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
@@ -9890,7 +9890,7 @@ msgstr[0] "Остання %1$d секунда"
 msgstr[1] "Останні %1$d секунди"
 msgstr[2] "Останні %1$d секунд"
 
-#: include/func.inc.php:2709
+#: include/func.inc.php:2710
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -11777,7 +11777,7 @@ msgstr "Немає тригера з triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Тригерів не визначено."
 
-#: app/views/popup.preproctestedit.view.js.php:129
+#: app/views/popup.preproctestedit.view.js.php:130
 msgid "No value"
 msgstr ""
 
@@ -13111,7 +13111,7 @@ msgstr ""
 msgid "Preview"
 msgstr "Попередній перегляд"
 
-#: include/func.inc.php:2653
+#: include/func.inc.php:2654
 msgid "Previous month"
 msgstr "Попередній місяць"
 
@@ -13119,11 +13119,11 @@ msgstr "Попередній місяць"
 msgid "Previous value"
 msgstr ""
 
-#: include/func.inc.php:2652
+#: include/func.inc.php:2653
 msgid "Previous week"
 msgstr "Попередній тиждень"
 
-#: include/func.inc.php:2654
+#: include/func.inc.php:2655
 msgid "Previous year"
 msgstr "Попередній рік"
 
@@ -14890,7 +14890,7 @@ msgstr "Сесія завершилась, будь-ласка повторно 
 msgid "Set custom time period"
 msgstr "Задати користувацький період часу"
 
-#: app/views/popup.preproctestedit.view.js.php:115 include/forms.inc.php:1553
+#: app/views/popup.preproctestedit.view.js.php:116 include/forms.inc.php:1553
 #: include/views/js/item.preprocessing.js.php:39
 msgid "Set error to"
 msgstr ""
@@ -14899,7 +14899,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "Встановити режим інвентарних даних вузла мережі"
 
-#: app/views/popup.preproctestedit.view.js.php:109 include/forms.inc.php:1552
+#: app/views/popup.preproctestedit.view.js.php:110 include/forms.inc.php:1552
 #: include/views/js/item.preprocessing.js.php:38
 msgid "Set value to"
 msgstr ""
@@ -15927,7 +15927,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:147
 #: app/views/administration.authentication.edit.php:150
-#: app/views/popup.preproctestedit.view.php:156
+#: app/views/popup.preproctestedit.view.php:168
 #: app/views/popup.testtriggerexpr.php:116 include/forms.inc.php:1593
 #: include/views/administration.general.regularexpressions.edit.php:139
 #: include/views/configuration.trigger.prototype.edit.php:239
@@ -16079,7 +16079,7 @@ msgstr "Група елементів даних веб сценарію нал�
 msgid "Theme"
 msgstr "Тема інтерфейсу"
 
-#: include/func.inc.php:2651
+#: include/func.inc.php:2652
 msgid "This day last week"
 msgstr "Цей день попереднього тижня"
 
@@ -16088,11 +16088,11 @@ msgstr "Цей день попереднього тижня"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Це поле автоматично заповнюється елементом даних \"%s\"."
 
-#: include/func.inc.php:2659 srv_status.php:41
+#: include/func.inc.php:2660 srv_status.php:41
 msgid "This month"
 msgstr "Цей місяць"
 
-#: include/func.inc.php:2660
+#: include/func.inc.php:2661
 msgid "This month so far"
 msgstr "Цей місяць по нині"
 
@@ -16104,19 +16104,19 @@ msgstr "Стовпчик комплексного екрану не порожн
 msgid "This screen row is not empty. Delete it?"
 msgstr "Рядок комплексного екрану не порожній. Видалити його?"
 
-#: include/func.inc.php:2657 srv_status.php:40
+#: include/func.inc.php:2658 srv_status.php:40
 msgid "This week"
 msgstr "Цей тиждень"
 
-#: include/func.inc.php:2658
+#: include/func.inc.php:2659
 msgid "This week so far"
 msgstr "Цей тиждень по нині"
 
-#: include/func.inc.php:2661 srv_status.php:42
+#: include/func.inc.php:2662 srv_status.php:42
 msgid "This year"
 msgstr "Цей рік"
 
-#: include/func.inc.php:2662
+#: include/func.inc.php:2663
 msgid "This year so far"
 msgstr "Цей рік по нині"
 
@@ -16241,12 +16241,12 @@ msgstr "До"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Для встановлення інтерфейсу вузла мережі виберіть один тип елемента даних для всіх елементів даних"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2655
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2656
 #: srv_status.php:39
 msgid "Today"
 msgstr "Сьогодні"
 
-#: include/func.inc.php:2656
+#: include/func.inc.php:2657
 msgid "Today so far"
 msgstr "Сьогодні по нині"
 
@@ -18175,7 +18175,7 @@ msgstr "XML дані"
 msgid "XML is empty"
 msgstr "XML пустий"
 
-#: include/forms.inc.php:1462 include/views/js/item.preprocessing.js.php:155
+#: include/forms.inc.php:1462 include/views/js/item.preprocessing.js.php:152
 msgid "XPath"
 msgstr ""
 
@@ -18282,7 +18282,7 @@ msgstr "Щороку"
 msgid "Yes"
 msgstr "Так"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2649
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2650
 msgid "Yesterday"
 msgstr "Вчора"
 
@@ -18911,7 +18911,7 @@ msgstr "не співпадає"
 msgid "equals"
 msgstr "дорівнює"
 
-#: include/views/js/item.preprocessing.js.php:353
+#: include/views/js/item.preprocessing.js.php:350
 msgid "error message"
 msgstr ""
 
@@ -19124,7 +19124,7 @@ msgstr "last() - Останнє (найбільш недавнє) значенн
 msgid "left"
 msgstr "зліва"
 
-#: include/forms.inc.php:1456 include/views/js/item.preprocessing.js.php:148
+#: include/forms.inc.php:1456 include/views/js/item.preprocessing.js.php:145
 msgid "list of characters"
 msgstr "список символів"
 
@@ -19190,7 +19190,7 @@ msgstr "співпадає"
 #: include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
-#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:174
 msgid "max"
 msgstr "макс."
 
@@ -19215,7 +19215,7 @@ msgstr "досягнуто максимальну кількість рівні�
 #: include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
-#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:173
 msgid "min"
 msgstr "мін."
 
@@ -19320,7 +19320,7 @@ msgstr "не обрано"
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Кількість секунд починаючи з Epoch"
 
-#: include/forms.inc.php:1448 include/views/js/item.preprocessing.js.php:140
+#: include/forms.inc.php:1448 include/views/js/item.preprocessing.js.php:137
 msgid "number"
 msgstr "число"
 
@@ -19382,13 +19382,13 @@ msgstr "в"
 msgid "other"
 msgstr "інший"
 
-#: include/forms.inc.php:1474 include/views/js/item.preprocessing.js.php:170
+#: include/forms.inc.php:1474 include/views/js/item.preprocessing.js.php:167
 msgid "output"
 msgstr "вивід"
 
 #: include/forms.inc.php:1473 include/forms.inc.php:1487
-#: include/views/js/item.preprocessing.js.php:169
-#: include/views/js/item.preprocessing.js.php:184
+#: include/views/js/item.preprocessing.js.php:166
+#: include/views/js/item.preprocessing.js.php:181
 msgid "pattern"
 msgstr "шаблон"
 
@@ -19446,7 +19446,7 @@ msgctxt "second short"
 msgid "s"
 msgstr "с"
 
-#: include/forms.inc.php:1499 include/views/js/item.preprocessing.js.php:196
+#: include/forms.inc.php:1499 include/views/js/item.preprocessing.js.php:193
 msgid "script"
 msgstr ""
 
@@ -19459,7 +19459,7 @@ msgstr "другий"
 msgid "second parameter is expected"
 msgstr "очікується другий параметр"
 
-#: include/forms.inc.php:1492 include/views/js/item.preprocessing.js.php:190
+#: include/forms.inc.php:1492 include/views/js/item.preprocessing.js.php:187
 msgid "seconds"
 msgstr ""
 
@@ -19683,8 +19683,8 @@ msgstr "непідтримуваний номер версії"
 
 #: app/views/monitoring.problem.view.js.php:26
 #: app/views/monitoring.problem.view.php:244
-#: app/views/popup.preproctestedit.view.js.php:149
-#: app/views/popup.preproctestedit.view.js.php:157
+#: app/views/popup.preproctestedit.view.js.php:153
+#: app/views/popup.preproctestedit.view.js.php:161
 #: app/views/popup.preproctestedit.view.php:40
 #: include/classes/widgets/CWidgetHelper.php:403
 #: include/classes/widgets/CWidgetHelper.php:448
@@ -19715,7 +19715,7 @@ msgstr "непідтримуваний номер версії"
 #: include/views/js/configuration.template.list.js.php:11
 #: include/views/js/configuration.triggers.list.js.php:11
 #: include/views/js/hostmacros.js.php:11
-#: include/views/js/item.preprocessing.js.php:347
+#: include/views/js/item.preprocessing.js.php:344
 msgid "value"
 msgstr "значення"
 
