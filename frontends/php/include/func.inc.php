@@ -1933,17 +1933,18 @@ function filter_messages(array $messages = []) {
  *
  * @param  boolean	$good			Parameter passed to makeMessageBox to specify message box style.
  * @param  string	$title			Message box title.
+ * @param  boolean  $show_close_box Show or hide close button in error message box.
  * @global array	$ZBX_MESSAGES
  *
  * @return CDiv|null
  */
-function getMessages($good = false, $title = null) {
+function getMessages($good = false, $title = null, $show_close_box = true) {
 	global $ZBX_MESSAGES;
 
 	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
 
 	$message_box = ($title || $messages)
-		? makeMessageBox($good, $messages, $title)
+		? makeMessageBox($good, $messages, $title, $show_close_box)
 		: null;
 
 	$ZBX_MESSAGES = [];

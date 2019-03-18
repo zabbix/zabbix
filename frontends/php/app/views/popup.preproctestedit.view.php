@@ -150,7 +150,7 @@ $templates = [
 $output = [
 	'header' => $data['title'],
 	'script_inline' => require 'app/views/popup.preproctestedit.view.js.php',
-	'body' => (new CDiv([$data['errors'], $form, $templates]))->toString(),
+	'body' => (new CDiv([$form, $templates]))->toString(),
 	'buttons' => [
 		[
 			'title' => _('Test'),

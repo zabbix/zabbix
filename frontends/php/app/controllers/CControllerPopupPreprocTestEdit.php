@@ -44,7 +44,7 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 			}
 		}
 
-		if (($messages = getMessages()) !== null) {
+		if (($messages = getMessages(false, null, false)) !== null) {
 			$this->setResponse(
 				(new CControllerResponseData([
 					'main_block' => CJs::encodeJson(['errors' => $messages->toString()])
@@ -93,7 +93,6 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 
 		$this->setResponse(new CControllerResponseData([
 			'title' => _('Test item preprocessing'),
-			'errors' => hasErrorMesssages() ? getMessages() : null,
 			'steps' => $preprocessing_steps,
 			'macros' => $usermacros['macros'],
 			'show_prev' => $show_prev,
