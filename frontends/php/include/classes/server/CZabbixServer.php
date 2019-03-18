@@ -173,6 +173,29 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Request server to test media type.
+	 *
+	 * @param array  $data                 Array of media type test data to send.
+	 * @param string $data['mediatypeid']  Media type ID.
+	 * @param string $data['sendto']       Message destination.
+	 * @param string $data['subject']      Message subject.
+	 * @param string $data['message']      Message body.
+	 * @param string $sid                  User session ID.
+	 *
+	 * @return bool|array
+	 */
+	public function testMediaType(array $data, $sid) {
+		return $this->request([
+			'request' => 'alert.send',
+			'sid' => $sid,
+			'mediatypeid' => $data['mediatypeid'],
+			'sendto' => $data['sendto'],
+			'subject' => $data['subject'],
+			'message' => $data['message']
+		]);
+	}
+
+	/**
 	 * Retrieve System information.
 	 *
 	 * @param $sid
