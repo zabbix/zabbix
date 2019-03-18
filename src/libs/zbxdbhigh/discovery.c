@@ -139,6 +139,7 @@ static void	discovery_register_host(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_D
 
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		new_value = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' status:%d value:'%s'",
 			__function_name, ip, status, value);
@@ -153,6 +154,8 @@ static void	discovery_register_host(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_D
 
 			result = discovery_get_dhost_by_ip(drule->druleid, ip);
 			row = DBfetch(result);
+			if (DOBJECT_STATUS_UP == status)
+				new_value = 1;
 		}
 	}
 	else
@@ -179,15 +182,43 @@ static void	discovery_register_host(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_D
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "host at %s is already in database", ip);
+		if (1 == new_value)
+		{
+			zbx_uint64_t	dhostid;
+			char		*ip_esc;
 
-		ZBX_STR2UINT64(dhost->dhostid, row[0]);
-		dhost->status = atoi(row[1]);
-		dhost->lastup = atoi(row[2]);
-		dhost->lastdown = atoi(row[3]);
+			ZBX_STR2UINT64(dhost->dhostid, row[0]);
+			dhostid = DBget_maxid("dhosts");
+			ip_esc = DBdyn_escape_field("dservices", "ip", ip);
+			DBexecute("insert into dhosts (dhostid,druleid)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+					dhostid, drule->druleid);
 
-		if (0 == drule->unique_dcheckid)
-			discovery_separate_host(drule, dhost, ip);
+			DBexecute("update dservices"
+					" set dhostid=" ZBX_FS_UI64
+					" where dhostid=" ZBX_FS_UI64
+						" and ip" ZBX_SQL_STRCMP,
+					dhostid, dhost->dhostid, ZBX_SQL_STRVAL_EQ(ip_esc));
+
+			dhost->dhostid = dhostid;
+			dhost->status = DOBJECT_STATUS_DOWN;
+			dhost->lastup = 0;
+			dhost->lastdown = 0;
+
+			zbx_free(ip_esc);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "host at %s is already in database", ip);
+
+			ZBX_STR2UINT64(dhost->dhostid, row[0]);
+			dhost->status = atoi(row[1]);
+			dhost->lastup = atoi(row[2]);
+			dhost->lastdown = atoi(row[3]);
+
+			if (0 == drule->unique_dcheckid)
+				discovery_separate_host(drule, dhost, ip);
+		}
 	}
 	DBfree_result(result);
 
@@ -496,7 +527,7 @@ void	discovery_update_service(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *
 	memset(&dservice, 0, sizeof(dservice));
 
 	/* register host if is not registered yet */
-	if (0 == dhost->dhostid)
+	if (0 == dhost->dhostid || (drule->unique_dcheckid == dcheckid && DOBJECT_STATUS_UP == status))
 		discovery_register_host(drule, dcheckid, dhost, ip, status, value);
 
 	/* register service if is not registered yet */
