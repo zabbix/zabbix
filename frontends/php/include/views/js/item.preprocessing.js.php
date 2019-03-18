@@ -80,21 +80,18 @@
 
 			step_nums.each(function(num) {
 				var type = $('[name="preprocessing[' + num + '][type]"]', $preprocessing).val(),
-					on_fail = {},
+					error_handler = $('[name="preprocessing[' + num + '][on_fail]"]').is(':checked')
+						? $('[name="preprocessing[' + num + '][error_handler]"]:checked').val()
+						: <?= ZBX_PREPROC_FAIL_DEFAULT ?>,
 					params = [];
 
-				if ($('[name="preprocessing[' + num + '][on_fail]"]').is(':checked')) {
-					on_fail = {
-						error_handler: $('[name="preprocessing[' + num + '][error_handler]"]:checked').val(),
-						error_handler_params: $('[name="preprocessing[' + num + '][error_handler_params]"]').val()
-					};
-				}
-				else {
-					on_fail = {
-						error_handler: 0,
-						error_handler_params: ''
-					};
-				}
+				var on_fail = {
+					error_handler: error_handler,
+					error_handler_params: (error_handler == <?= ZBX_PREPROC_FAIL_SET_VALUE ?>
+							|| error_handler == <?= ZBX_PREPROC_FAIL_SET_ERROR ?>)
+						? $('[name="preprocessing[' + num + '][error_handler_params]"]').val()
+						: ''
+				};
 
 				if ($('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).length) {
 					params.push($('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).val());
@@ -192,8 +189,8 @@
 
 				case '<?= ZBX_PREPROC_SCRIPT ?>':
 					return $(preproc_param_multiline_tmpl.evaluate({rowNum: index})).multilineInput({
-						title: '<?= CJs::encodeJson(_('JavaScript')) ?>',
-						placeholder: '<?= CJs::encodeJson(_('script')) ?>',
+						title: <?= CJs::encodeJson(_('JavaScript')) ?>,
+						placeholder: <?= CJs::encodeJson(_('script')) ?>,
 						maxlength: <?= (int) $data['preprocessing_script_maxlength'] ?>
 					});
 

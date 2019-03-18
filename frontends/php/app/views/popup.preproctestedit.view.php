@@ -126,7 +126,19 @@ $templates = [
 			(new CDiv('#{label}'))
 				->addStyle('margin-top: 5px;')
 				->addClass(ZBX_STYLE_GREY)
-			),
+		),
+	(new CTag('script', true))
+		->setAttribute('type', 'text/x-jquery-tmpl')
+		->setId('preprocessing-step-result')
+		->addItem(
+			(new CDiv(
+				(new CSpan('#{result}'))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->setHint('#{result}', '', true, 'max-width:'.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;')
+			))
+				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+		),
 	(new CTag('script', true))
 		->setAttribute('type', 'text/x-jquery-tmpl')
 		->setId('preprocessing-step-action-done')
@@ -150,7 +162,7 @@ $templates = [
 $output = [
 	'header' => $data['title'],
 	'script_inline' => require 'app/views/popup.preproctestedit.view.js.php',
-	'body' => (new CDiv([$data['errors'], $form, $templates]))->toString(),
+	'body' => (new CDiv([$form, $templates]))->toString(),
 	'buttons' => [
 		[
 			'title' => _('Test'),

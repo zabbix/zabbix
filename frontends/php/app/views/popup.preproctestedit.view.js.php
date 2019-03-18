@@ -89,7 +89,8 @@ function itemPreprocessingTest(form) {
 function processItemPreprocessingTestResults(steps) {
 	var tmpl_err_icon = new Template(jQuery('#preprocessing-step-error-icon').html()),
 		tmpl_gray_label = new Template(jQuery('#preprocessing-gray-label').html()),
-		tmpl_act_done = new Template(jQuery('#preprocessing-step-action-done').html());
+		tmpl_act_done = new Template(jQuery('#preprocessing-step-action-done').html()),
+		tmpl_step_result = new Template(jQuery('#preprocessing-step-result').html());
 
 	steps.each(function(step, i) {
 		if (typeof step.action !== 'undefined') {
@@ -132,6 +133,9 @@ function processItemPreprocessingTestResults(steps) {
 			step.result = jQuery('<span>',
 				{'class': '<?= ZBX_STYLE_GREY ?>'}
 			).text(<?= CJs::encodeJson(_('<empty string>')) ?>);
+		}
+		else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
+			step.result = jQuery(tmpl_step_result.evaluate(jQuery.extend({result: step.result})));
 		}
 
 		if (typeof step.action !== 'undefined' && step.action !== null) {

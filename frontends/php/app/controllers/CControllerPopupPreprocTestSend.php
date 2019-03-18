@@ -68,7 +68,7 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$data = [
-			'value' => $this->getInput('value'),
+			'value' => $this->getInput('value', ''),
 			'value_type' => $this->getInput('value_type', ITEM_VALUE_TYPE_STR),
 			'steps' => $this->getInput('steps')
 		];
