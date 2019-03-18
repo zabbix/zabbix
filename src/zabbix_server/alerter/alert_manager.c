@@ -1361,7 +1361,7 @@ out:
  *               FAIL    - database connection error                          *
  *                                                                            *
  ******************************************************************************/
-static int	am_db_queue_alerts(zbx_am_t *manager, const zbx_vector_ptr_t *alerts)
+static int	am_db_queue_alerts(zbx_am_t *manager, zbx_vector_ptr_t *alerts)
 {
 	const char		*__function_name = "am_db_queue_alerts";
 
@@ -1423,6 +1423,8 @@ static int	am_db_queue_alerts(zbx_am_t *manager, const zbx_vector_ptr_t *alerts)
 		am_push_alertpool(mediatype, alertpool);
 		am_push_mediatype(manager, mediatype);
 	}
+
+	zbx_vector_ptr_clear(alerts);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1931,12 +1933,18 @@ static int	am_check_queue(zbx_am_t *manager, int now)
 	return SUCCEED;
 }
 
-static void	am_process_alert_send(zbx_am_t *manager, zbx_ipc_client_t *client, const unsigned char *data)
+static void	am_process_alert_send(zbx_am_t *manager, zbx_ipc_client_t *client, const unsigned char *data,
+		zbx_vector_ptr_t *alerts)
 {
 	zbx_uint64_t	mediatypeid;
 	char		*sendto, *subject, *message;
+	zbx_am_alert_t	*alert;
 
 	zbx_alerter_deserialize_alert_send(data, &mediatypeid, &sendto, &subject, &message);
+
+	alert = am_create_alert(0, mediatypeid, 0, 0, 0, sendto, subject, message, 0, 0, 0);
+
+	zbx_vector_ptr_append(alerts, alert);
 
 	zbx_free(message);
 	zbx_free(subject);
@@ -1954,6 +1962,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
 	zbx_am_alerter_t	*alerter;
+	zbx_vector_ptr_t	alerts;
 	int			ret, sent_num = 0, failed_num = 0, now, time_db = 0, time_watchdog = 0, freq_watchdog;
 	int			time_connect;
 	double			time_stat, time_idle = 0, time_now, sec;
@@ -1988,6 +1997,8 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
+	zbx_vector_ptr_create(&alerts);
 
 	for (;;)
 	{
@@ -2031,14 +2042,10 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		{
 			if (SUCCEED == (ret = am_db_flush_alert_updates(&manager)))
 			{
-				zbx_vector_ptr_t	alerts;
-
-				zbx_vector_ptr_create(&alerts);
-
 				if (SUCCEED == (ret = am_db_get_alerts(&manager, &alerts, now)))
 					ret = am_db_queue_alerts(&manager, &alerts);
 
-				zbx_vector_ptr_destroy(&alerts);
+				zbx_vector_ptr_clear_ext(&alerts, (zbx_mem_free_func_t)am_alert_free);
 			}
 
 			if (FAIL == ret)
@@ -2096,7 +2103,8 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 						failed_num++;
 					break;
 				case ZBX_IPC_ALERTER_ALERT:
-					am_process_alert_send(&manager, client, message->data);
+					am_process_alert_send(&manager, client, message->data, &alerts);
+					time_db = 0;	/* queue immediately */
 					break;
 			}
 
@@ -2109,6 +2117,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 	zbx_ipc_service_close(&alerter_service);
 	am_destroy(&manager);
+	zbx_vector_ptr_destroy(&alerts);
 
 	DBclose();
 
