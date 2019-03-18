@@ -1177,7 +1177,7 @@ function make_trigger_details($trigger) {
 	]);
 
 	if (count($hosts) > 1) {
-		order_result($hosts, 'name', ZBX_SORT_UP);
+		order_result($hosts, 'name');
 	}
 
 	foreach ($hosts as $host) {
@@ -1193,7 +1193,9 @@ function make_trigger_details($trigger) {
 		])
 		->addRow([
 			new CCol(_('Trigger')),
-			new CCol(CMacrosResolverHelper::resolveTriggerName($trigger))
+			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
+				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid']))
+			)
 		])
 		->addRow([
 			_('Severity'),
