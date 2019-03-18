@@ -708,7 +708,7 @@ void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, unsigned char *value_typ
 
 	offset += preprocesser_unpack_variant(offset, value);
 	offset += preprocesser_unpack_history(offset, history);
-	offset += preprocessor_unpack_steps(offset, steps, steps_num);
+	(void)preprocessor_unpack_steps(offset, steps, steps_num);
 }
 
 /******************************************************************************
@@ -989,7 +989,7 @@ void	zbx_preprocessor_unpack_test_request(unsigned char *value_type, char **valu
 	offset += zbx_deserialize_int(offset, &ts->ns);
 
 	offset += preprocesser_unpack_history(offset, history);
-	offset += preprocessor_unpack_steps(offset, steps, steps_num);
+	(void)preprocessor_unpack_steps(offset, steps, steps_num);
 }
 
 /******************************************************************************
