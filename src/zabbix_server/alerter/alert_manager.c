@@ -28,6 +28,7 @@
 #include "alerter_protocol.h"
 #include "alert_manager.h"
 #include "zbxmedia.h"
+#include "zbxserialize.h"
 
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
@@ -495,15 +496,19 @@ static int	am_release_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
  * Return value: The alert pool id.                                           *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	am_calc_alertpoolid(int source, int object, zbx_uint64_t objectid)
+zbx_uint64_t	am_calc_alertpoolid(unsigned short source, unsigned short object, zbx_uint64_t objectid)
 {
+	zbx_uint64_t	alertpoolid;
+	unsigned char	*ptr;
 	zbx_hash_t	hash;
 
+	ptr = (unsigned char*)&alertpoolid;
+	ptr += zbx_serialize_short(ptr, source);
+	ptr += zbx_serialize_short(ptr, object);
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&objectid);
-	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&source, sizeof(source), hash);
-	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&object, sizeof(object), hash);
+	(void)zbx_serialize_int(ptr, hash);
 
-	return hash;
+	return alertpoolid;
 }
 
 /******************************************************************************
