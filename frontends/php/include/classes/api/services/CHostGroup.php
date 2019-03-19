@@ -516,7 +516,6 @@ class CHostGroup extends CApiService {
 		$this->validateDelete($groupids, $db_groups, $nopermissions);
 
 		// delete screens items
-		// delete screens items
 		$resources = [
 			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
 			SCREEN_RESOURCE_HOST_INFO,
