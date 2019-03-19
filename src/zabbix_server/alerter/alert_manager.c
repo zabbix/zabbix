@@ -1368,7 +1368,6 @@ static int	am_db_queue_alerts(zbx_am_t *manager, zbx_vector_ptr_t *alerts)
 	const char		*__function_name = "am_db_queue_alerts";
 
 	zbx_am_alert_t		*alert;
-
 	int			i, ret = SUCCEED;
 	zbx_am_alertpool_t	*alertpool;
 	zbx_am_mediatype_t	*mediatype;
