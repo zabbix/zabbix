@@ -2042,10 +2042,17 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		{
 			if (SUCCEED == (ret = am_db_flush_alert_updates(&manager)))
 			{
-				if (SUCCEED == (ret = am_db_get_alerts(&manager, &alerts, now)))
-					ret = am_db_queue_alerts(&manager, &alerts);
+				zbx_vector_ptr_t	alerts_new;
 
-				zbx_vector_ptr_clear_ext(&alerts, (zbx_mem_free_func_t)am_alert_free);
+				zbx_vector_ptr_create(&alerts_new);
+
+				if (SUCCEED == (ret = am_db_get_alerts(&manager, &alerts_new, now)))
+					zbx_vector_ptr_append_array(&alerts, alerts_new.values, alerts_new.values_num);
+
+				zbx_vector_ptr_destroy(&alerts_new);
+
+				if (SUCCEED == ret)
+					ret = am_db_queue_alerts(&manager, &alerts);
 			}
 
 			if (FAIL == ret)
