@@ -1838,8 +1838,7 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 		zbx_ipc_message_t *message)
 {
 	const char		*__function_name = "am_process_result";
-	int			ret = FAIL, errcode, status;
-	char			*errmsg;
+	int			ret = FAIL;
 	zbx_am_alerter_t	*alerter;
 	unsigned short		source;
 
@@ -1860,24 +1859,8 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 	(void)zbx_deserialize_short(&alerter->alert->alertpoolid, &source);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:"
-			ZBX_FS_UI64 " source: %u", __function_name, alerter->alert->alertid, alerter->alert->mediatypeid,
-			alerter->alert->alertpoolid, source);
-
-	zbx_alerter_deserialize_result(message->data, &errcode, &errmsg);
-
-	if (SUCCEED == errcode)
-	{
-		errmsg = zbx_strdup(errmsg, "");
-		status = ALERT_STATUS_SENT;
-		ret = SUCCEED;
-	}
-	else
-	{
-		if (SUCCEED == am_retry_alert(manager, alerter->alert))
-			status = ALERT_STATUS_NOT_SENT;
-		else
-			status = ALERT_STATUS_FAILED;
-	}
+			ZBX_FS_UI64 " source: %u", __function_name, alerter->alert->alertid,
+			alerter->alert->mediatypeid, alerter->alert->alertpoolid, source);
 
 	if (ALERT_SOURCE_MANUAL == source)
 	{
@@ -1887,15 +1870,39 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 			zbx_ipc_client_send(alert_send_client, ZBX_IPC_ALERTER_ALERT, message->data, message->size);
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "client has disconnected");
+
+		am_remove_alert(manager, alerter->alert);
 	}
 	else
+	{
+		char	*errmsg;
+		int	errcode, status;
+
+		zbx_alerter_deserialize_result(message->data, &errcode, &errmsg);
+
+		if (SUCCEED == errcode)
+		{
+			errmsg = zbx_strdup(errmsg, "");
+			status = ALERT_STATUS_SENT;
+			ret = SUCCEED;
+		}
+		else
+		{
+			if (SUCCEED == am_retry_alert(manager, alerter->alert))
+				status = ALERT_STATUS_NOT_SENT;
+			else
+				status = ALERT_STATUS_FAILED;
+		}
+
 		am_db_update_alert(manager, alerter->alert->alertid, status, alerter->alert->retries, errmsg);
 
-	if (ALERT_STATUS_NOT_SENT != status)
-		am_remove_alert(manager, alerter->alert);
+		zbx_free(errmsg);
+
+		if (ALERT_STATUS_NOT_SENT != status)
+			am_remove_alert(manager, alerter->alert);
+	}
 
 	alerter->alert = NULL;
-	zbx_free(errmsg);
 
 	zbx_queue_ptr_push(&manager->free_alerters, alerter);
 out:
