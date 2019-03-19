@@ -527,7 +527,7 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	if (SUCCEED != super_admin_active_session(jp))
 	{
-		zbx_strdup(NULL, "Permission denied.");
+		error = zbx_strdup(NULL, "Permission denied.");
 		goto fail;
 	}
 
