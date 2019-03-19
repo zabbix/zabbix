@@ -1787,6 +1787,11 @@ int	zbx_ipc_client_connected(zbx_ipc_client_t *client)
 	return (NULL == client->rx_event ? FAIL : SUCCEED);
 }
 
+zbx_uint64_t	zbx_ipc_client_id(const zbx_ipc_client_t *client)
+{
+	return client->id;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_ipc_async_socket_open                                        *

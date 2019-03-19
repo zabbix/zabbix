@@ -1938,8 +1938,7 @@ static int	am_check_queue(zbx_am_t *manager, int now)
 	return SUCCEED;
 }
 
-static void	am_process_alert_send(zbx_am_t *manager, zbx_ipc_client_t *client, const unsigned char *data,
-		zbx_vector_ptr_t *alerts)
+static void	am_process_alert_send(zbx_uint64_t id, const unsigned char *data, zbx_vector_ptr_t *alerts)
 {
 	zbx_uint64_t	mediatypeid;
 	char		*sendto, *subject, *message;
@@ -1947,7 +1946,7 @@ static void	am_process_alert_send(zbx_am_t *manager, zbx_ipc_client_t *client, c
 
 	zbx_alerter_deserialize_alert_send(data, &mediatypeid, &sendto, &subject, &message);
 
-	alert = am_create_alert(0, mediatypeid, ALERT_SOURCE_MANUAL, 0, 0, sendto, subject, message, 0, 0, 0);
+	alert = am_create_alert(id, mediatypeid, ALERT_SOURCE_MANUAL, 0, id, sendto, subject, message, 0, 0, 0);
 
 	zbx_vector_ptr_append(alerts, alert);
 
@@ -2115,7 +2114,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 						failed_num++;
 					break;
 				case ZBX_IPC_ALERTER_ALERT:
-					am_process_alert_send(&manager, client, message->data, &alerts);
+					am_process_alert_send(zbx_ipc_client_id(client), message->data, &alerts);
 					time_db = 0;	/* queue immediately */
 					break;
 			}
