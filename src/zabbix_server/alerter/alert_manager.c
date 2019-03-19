@@ -498,7 +498,7 @@ static int	am_release_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
  * Return value: The alert pool id.                                           *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	am_calc_alertpoolid(unsigned short source, unsigned short object, zbx_uint64_t objectid)
+static zbx_uint64_t	am_calc_alertpoolid(unsigned short source, unsigned short object, zbx_uint64_t objectid)
 {
 	zbx_uint64_t	alertpoolid;
 	unsigned char	*ptr;
