@@ -3652,6 +3652,10 @@ $form-icon-btn: (
 	.msg-good, .msg-bad {
 		margin: 0 10px;
 	}
+
+	&.dashbrd-widget-fluid {
+		margin-right: 0;
+	}
 }
 
 %nothing-to-show {
