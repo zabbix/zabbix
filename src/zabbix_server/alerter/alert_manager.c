@@ -39,6 +39,8 @@
 
 #define ZBX_AM_DB_POLL_DELAY	1
 
+#define ALERT_SOURCE_MANUAL	0xffff
+
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
@@ -1835,10 +1837,10 @@ out:
 static int	am_process_result(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
 {
 	const char		*__function_name = "am_process_result";
-
 	int			ret = FAIL, errcode, status;
 	char			*errmsg;
 	zbx_am_alerter_t	*alerter;
+	unsigned short		source;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1874,7 +1876,10 @@ static int	am_process_result(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ip
 			status = ALERT_STATUS_FAILED;
 	}
 
-	am_db_update_alert(manager, alerter->alert->alertid, status, alerter->alert->retries, errmsg);
+	(void)zbx_deserialize_short(&alerter->alert->alertpoolid, &source);
+
+	if (ALERT_SOURCE_MANUAL != source)
+		am_db_update_alert(manager, alerter->alert->alertid, status, alerter->alert->retries, errmsg);
 
 	if (ALERT_STATUS_NOT_SENT != status)
 		am_remove_alert(manager, alerter->alert);
@@ -1942,7 +1947,7 @@ static void	am_process_alert_send(zbx_am_t *manager, zbx_ipc_client_t *client, c
 
 	zbx_alerter_deserialize_alert_send(data, &mediatypeid, &sendto, &subject, &message);
 
-	alert = am_create_alert(0, mediatypeid, 0, 0, 0, sendto, subject, message, 0, 0, 0);
+	alert = am_create_alert(0, mediatypeid, ALERT_SOURCE_MANUAL, 0, 0, sendto, subject, message, 0, 0, 0);
 
 	zbx_vector_ptr_append(alerts, alert);
 
