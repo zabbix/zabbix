@@ -21,10 +21,12 @@
 #include "sysinfo.h"
 #include "stats.h"
 #include "diskdevices.h"
+#include "zbxjson.h"
 
-#define ZBX_DEV_PFX	"/dev/"
-#define ZBX_DEV_READ	0
-#define ZBX_DEV_WRITE	1
+#define ZBX_DEV_PFX		"/dev/"
+#define ZBX_DEV_READ		0
+#define ZBX_DEV_WRITE		1
+#define ZBX_SYS_BLKDEV_PFX	"/sys/dev/block/"
 
 #if defined(KERNEL_2_4)
 #	define INFO_FILE_NAME	"/proc/partitions"
@@ -289,4 +291,88 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dev_rw(request, result, ZBX_DEV_WRITE);
+}
+
+int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+#define DEVTYPE_STR	"DEVTYPE="
+#define DEVTYPE_STR_LEN	ZBX_CONST_STRLEN(DEVTYPE_STR)
+
+	DIR		*dir;
+	struct dirent	*entries;
+	char		tmp[MAX_STRING_LEN];
+	zbx_stat_t	stat_buf;
+	struct zbx_json	j;
+	int		devtype_found, sysfs_found;
+
+	ZBX_UNUSED(request);
+
+	if (NULL != (dir = opendir(ZBX_DEV_PFX)))
+	{
+		zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+		/* check if sys fs with block devices is available */
+		if (0 == zbx_stat(ZBX_SYS_BLKDEV_PFX, &stat_buf) && 0 != S_ISDIR(stat_buf.st_mode))
+			sysfs_found = 1;
+		else
+			sysfs_found = 0;
+
+		while (NULL != (entries = readdir(dir)))
+		{
+			zbx_snprintf(tmp, sizeof(tmp), ZBX_DEV_PFX "%s", entries->d_name);
+
+			if (0 == zbx_stat(tmp, &stat_buf) && 0 != S_ISBLK(stat_buf.st_mode))
+			{
+				devtype_found = 0;
+				zbx_json_addobject(&j, NULL);
+				zbx_json_addstring(&j, "{#DEVNAME}", entries->d_name, ZBX_JSON_TYPE_STRING);
+
+				if (1 == sysfs_found)
+				{
+					FILE	*f;
+
+					zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%d:%d/uevent",
+							major(stat_buf.st_rdev), minor(stat_buf.st_rdev));
+
+					if (NULL != (f = fopen(tmp, "r")))
+					{
+						while (NULL != fgets(tmp, sizeof(tmp), f))
+						{
+							if (0 == strncmp(tmp, DEVTYPE_STR, DEVTYPE_STR_LEN))
+							{
+								char	*p;
+
+								/* dismiss trailing \n */
+								p = tmp + strlen(tmp) - 1;
+								if ('\n' == *p)
+									*p = '\0';
+
+								devtype_found = 1;
+								break;
+							}
+						}
+						zbx_fclose(f);
+					}
+				}
+
+				zbx_json_addstring(&j, "{#DEVTYPE}", 1 == devtype_found ? tmp + DEVTYPE_STR_LEN : "",
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_close(&j);
+			}
+		}
+		closedir(dir);
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot open /dev directory"));
+		return SYSINFO_RET_FAIL;
+	}
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+
+#undef DEVTYPE_STR
+#undef DEVTYPE_STR_LEN
 }
