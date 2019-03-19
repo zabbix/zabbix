@@ -67,7 +67,8 @@ static void	ipmi_poller_register(zbx_ipc_async_socket_t *socket)
  *             value   - [IN] the resulting value/error message               *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_poller_send_result(zbx_ipc_async_socket_t *socket, zbx_uint32_t code, int errcode, const char *value)
+static void	ipmi_poller_send_result(zbx_ipc_async_socket_t *socket, zbx_uint32_t code, int errcode,
+		const char *value)
 {
 	unsigned char	*data;
 	zbx_uint32_t	data_len;

@@ -775,7 +775,7 @@ static int	zbx_perform_openipmi_ops(zbx_ipmi_host_t *h, const char *func_name)
  *                                                                            *
  * Function: zbx_perform_all_openipmi_ops                                     *
  *                                                                            *
- * Purpose: Pass control to OpenIPMI library to process all internal events.  *
+ * Purpose: Pass control to OpenIPMI library to process all internal events   *
  *                                                                            *
  * Parameters: timeout - [IN] timeout (in seconds) for processing single      *
  *                            operation; processing multiple operations may   *
