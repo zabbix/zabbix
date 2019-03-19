@@ -513,7 +513,7 @@ fail:
 static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_alert_send";
-	int			ret = FAIL;
+	int			ret = FAIL, errcode;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1], error[MAX_STRING_LEN], *sendto = NULL, *subject = NULL,
 				*message = NULL, *errmsg = NULL;
 	zbx_uint64_t		mediatypeid;
@@ -574,8 +574,20 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 		goto fail;
 	}
 
+	zbx_alerter_deserialize_result(result, &errcode, &errmsg);
+	zbx_free(result);
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+
+	if (SUCCEED != errcode)
+	{
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, errmsg, ZBX_JSON_TYPE_STRING);
+	}
+	else
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+
+	zbx_free(errmsg);
 
 	(void)zbx_tcp_send(sock, json.buffer);
 
