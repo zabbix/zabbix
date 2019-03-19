@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -323,6 +323,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	 */
 	if (!in_array($type, [ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP]) && hasRequest('delay_flex')) {
 		$intervals = [];
+		$simple_interval_parser = new CSimpleIntervalParser([
+			'usermacros' => true,
+			'lldmacros' => true
+		]);
+		$time_period_parser = new CTimePeriodParser([
+			'usermacros' => true,
+			'lldmacros' => true
+		]);
+		$scheduling_interval_parser = new CSchedulingIntervalParser([
+			'usermacros' => true,
+			'lldmacros' => true
+		]);
 
 		foreach (getRequest('delay_flex') as $interval) {
 			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
@@ -330,12 +342,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					continue;
 				}
 
-				if (strpos($interval['delay'], ';') !== false) {
+				if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
-				elseif (strpos($interval['period'], ';') !== false) {
+				elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['period']));
 					break;
@@ -348,7 +360,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					continue;
 				}
 
-				if (strpos($interval['schedule'], ';') !== false) {
+				if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['schedule']));
 					break;
@@ -388,6 +400,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
 				case ZBX_PREPROC_MULTIPLIER:
+					$step['params'] = trim($step['params'][0]);
+					break;
+
 				case ZBX_PREPROC_RTRIM:
 				case ZBX_PREPROC_LTRIM:
 				case ZBX_PREPROC_TRIM:
@@ -661,10 +676,10 @@ if (isset($_REQUEST['form'])) {
 			$itemPrototype['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
-		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
+		if (getRequest('type', $itemPrototype['type']) == ITEM_TYPE_DEPENDENT) {
 			$master_prototypes = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'itemids' => [$itemPrototype['master_itemid']],
+				'itemids' => [getRequest('master_itemid', $itemPrototype['master_itemid'])],
 				'hostids' => [$itemPrototype['hostid']],
 				'webitems' => true
 			])

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,6 +77,12 @@ extern char ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN];
 extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 
 #	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
+#endif
+
+#if defined(__GNUC__) && __GNUC__ >= 7
+#	define ZBX_FALLTHROUGH	__attribute__ ((fallthrough))
+#else
+#	define ZBX_FALLTHROUGH
 #endif
 
 #define	SUCCEED		0
@@ -306,15 +312,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 /* item snmpv3 privacy protocol */
 #define ITEM_SNMPV3_PRIVPROTOCOL_DES		0
 #define ITEM_SNMPV3_PRIVPROTOCOL_AES		1
-
-/* item multiplier types */
-#define ITEM_MULTIPLIER_DO_NOT_USE		0
-#define ITEM_MULTIPLIER_USE			1
-
-/* item delta types */
-#define ITEM_STORE_AS_IS			0
-#define ITEM_STORE_SPEED_PER_SECOND		1
-#define ITEM_STORE_SIMPLE_CHANGE		2
 
 /* condition evaluation types */
 #define CONDITION_EVAL_TYPE_AND_OR		0
@@ -1020,8 +1017,9 @@ size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
 
 typedef struct zbx_custom_interval	zbx_custom_interval_t;
-int	zbx_interval_preproc(const char *interval_str, int *simple_interval,
-		zbx_custom_interval_t **custom_intervals, char **error);
+int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
+		char **error);
+int	zbx_validate_interval(const char *str, char **error);
 void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals);
 int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
 		const zbx_custom_interval_t *custom_intervals, time_t now);
@@ -1098,6 +1096,8 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
+
+void	zbx_strsplit(const char *src, char delimiter, char **left, char **right);
 
 /* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
@@ -1347,11 +1347,12 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
 
 /* additional token flags */
-#define ZBX_TOKEN_NUMERIC	0x08000
-#define ZBX_TOKEN_JSON		0x10000
-#define ZBX_TOKEN_XML		0x20000
-#define ZBX_TOKEN_REGEXP	0x40000
-#define ZBX_TOKEN_XPATH		0x80000
+#define ZBX_TOKEN_NUMERIC	0x008000
+#define ZBX_TOKEN_JSON		0x010000
+#define ZBX_TOKEN_XML		0x020000
+#define ZBX_TOKEN_REGEXP	0x040000
+#define ZBX_TOKEN_XPATH		0x080000
+#define ZBX_TOKEN_REGEXP_OUTPUT	0x100000
 
 /* location of a substring */
 typedef struct
@@ -1434,7 +1435,7 @@ typedef struct
 	/* token type, see ZBX_TOKEN_ defines */
 	int			type;
 	/* the token location in expression including opening and closing brackets {} */
-	zbx_strloc_t		token;
+	zbx_strloc_t		loc;
 	/* the token type specific data */
 	zbx_token_data_t	data;
 }

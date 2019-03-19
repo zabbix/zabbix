@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -148,7 +148,7 @@ class CSvgGraphAnnotation extends CSvgTag {
 			(new CSvgRect($this->x, $this->y, $this->width, $this->height))
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_BOX),
 			$end_line,
-			(new CSvgRect($this->x, $this->y + $this->height + 1, $this->width, 4))
+			(new CSvgRect($this->x, $this->y + $this->height, $this->width, 4))
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_HANDLE)
 				->setAttribute('data-info', $this->data_info)
 		];

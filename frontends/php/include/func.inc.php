@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -811,7 +811,7 @@ function convert_units($options = []) {
  *
  * @param string $time
  *
- * @return int
+ * @return null|string
  */
 function timeUnitToSeconds($time) {
 	preg_match('/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/', $time, $matches);
@@ -821,7 +821,8 @@ function timeUnitToSeconds($time) {
 	if (!array_key_exists('number', $matches)) {
 		return null;
 	}
-	elseif (array_key_exists('suffix', $matches)) {
+
+	if (array_key_exists('suffix', $matches)) {
 		$time = $matches['number'];
 
 		switch ($matches['suffix']) {
@@ -923,7 +924,13 @@ function zbx_avg($values) {
 	return bcdiv($sum, count($values));
 }
 
-// accepts parameter as integer either
+/**
+ * Check if every character in given string value is a decimal digit.
+ *
+ * @param string | int   $x Value to check.
+ *
+ * @return boolean
+ */
 function zbx_ctype_digit($x) {
 	return ctype_digit(strval($x));
 }
@@ -1905,6 +1912,10 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 			}
 		}
 		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS)->addItem($list);
+	}
+
+	if ($title !== null) {
+		$title = new CSpan($title);
 	}
 
 	// Details link should be in front of title.

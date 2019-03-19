@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -191,7 +191,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*perfcounter;
-	zbx_ptr_pair_t			*perfvalue;
+	zbx_str_uint64_pair_t		*perfvalue;
 	int				i, ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t			value;
 
@@ -234,9 +234,9 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 
 	for (i = 0; i < perfcounter->values.values_num; i++)
 	{
-		perfvalue = (zbx_ptr_pair_t *)&perfcounter->values.values[i];
+		perfvalue = &perfcounter->values.values[i];
 
-		if (0 == strcmp((char *)perfvalue->first, instance))
+		if (0 == strcmp(perfvalue->name, instance))
 			break;
 	}
 
@@ -247,19 +247,15 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 	}
 
 	/* VMware returns -1 value if the performance data for the specified period is not ready - ignore it */
-	if (0 == strcmp((char *)perfvalue->second, "-1"))
+	if (ZBX_MAX_UINT64 == perfvalue->value)
 	{
 		ret = SYSINFO_RET_OK;
 		goto out;
 	}
 
-	if (SUCCEED == is_uint64((char *)perfvalue->second, &value))
-	{
-		value *= coeff;
-
-		SET_UI64_RESULT(result, value);
-		ret = SYSINFO_RET_OK;
-	}
+	value = perfvalue->value * coeff;
+	SET_UI64_RESULT(result, value);
+	ret = SYSINFO_RET_OK;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
@@ -690,13 +686,14 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 {
 	const char		*__function_name = "check_vcenter_eventlog";
 
-	char			*url;
+	const char		*url, *skip;
+	unsigned char		skip_old;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (1 != request->nparam)
+	if (2 < request->nparam || 0 == request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -704,16 +701,31 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 
 	url = get_rparam(request, 0);
 
+	if (NULL == (skip = get_rparam(request, 1)) || '\0' == *skip || 0 == strcmp(skip, "all"))
+	{
+		skip_old = 0;
+	}
+	else if (0 == strcmp(skip, "skip"))
+	{
+		skip_old = 1;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
 		goto unlock;
 
-	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog_last_key)
+	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key)
 	{
-		service->eventlog_last_key = request->lastlogsize;
+		service->eventlog.last_key = request->lastlogsize;
+		service->eventlog.skip_old = skip_old;
 	}
-	else if (request->lastlogsize < service->eventlog_last_key)
+	else if (request->lastlogsize < service->eventlog.last_key)
 	{
 		/* this may happen if there are multiple vmware.eventlog items for the same service URL or item has  */
 		/* been polled, but values got stuck in history cache and item's lastlogsize hasn't been updated yet */
@@ -723,7 +735,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	else if (0 < service->data->events.values_num)
 	{
 		vmware_get_events(&service->data->events, request->lastlogsize, item, add_results);
-		service->eventlog_last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
+		service->eventlog.last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
 	}
 
 	ret = SYSINFO_RET_OK;
@@ -931,6 +943,8 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addstring(&json_data, "{#DATACENTER.NAME}", hv->datacenter_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#CLUSTER.NAME}",
 				NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#PARENT.NAME}", hv->parent_name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#PARENT.TYPE}", hv->parent_type, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
 	}
 

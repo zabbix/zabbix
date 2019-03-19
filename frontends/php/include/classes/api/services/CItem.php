@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -427,7 +427,7 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
-		$this->validateDependentItems($items, __METHOD__);
+		$this->validateDependentItems($items);
 
 		$json = new CJson();
 
@@ -554,7 +554,6 @@ class CItem extends CItemGeneral {
 
 		parent::checkInput($items, true);
 		self::validateInventoryLinks($items, true);
-		$this->validateDependentItems($items, __METHOD__);
 
 		$db_items = $this->get([
 			'output' => ['flags', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
@@ -563,7 +562,9 @@ class CItem extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type']);
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type', 'master_itemid']);
+
+		$this->validateDependentItems($items);
 
 		$defaults = DB::getDefaults('items');
 		$clean = [
@@ -594,11 +595,8 @@ class CItem extends CItemGeneral {
 		foreach ($items as &$item) {
 			$type_change = ($item['type'] != $db_items[$item['itemid']]['type']);
 
-			if ($item['type'] != ITEM_TYPE_DEPENDENT && $db_items[$item['itemid']]['master_itemid']) {
-				$item['master_itemid'] = null;
-			}
-			elseif (!array_key_exists('master_itemid', $item)) {
-				$item['master_itemid'] = $db_items[$item['itemid']]['master_itemid'];
+			if ($item['type'] != ITEM_TYPE_DEPENDENT && $db_items[$item['itemid']]['master_itemid'] != 0) {
+				$item['master_itemid'] = 0;
 			}
 
 			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -658,146 +656,54 @@ class CItem extends CItemGeneral {
 	/**
 	 * Delete items.
 	 *
-	 * @param array $itemIds
-	 * @param bool  $nopermissions
+	 * @param array $itemids
 	 *
 	 * @return array
 	 */
-	public function delete(array $itemIds, $nopermissions = false) {
-		if (!$itemIds) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	public function delete(array $itemids) {
+		$this->validateDelete($itemids, $db_items);
+
+		CItemManager::delete($itemids);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, $db_items);
+
+		return ['itemids' => $itemids];
+	}
+
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @param array $itemids   [IN/OUT]
+	 * @param array $db_items  [OUT]
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateDelete(array &$itemids, array &$db_items = null) {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $itemids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$itemIds = array_keys(array_flip($itemIds));
-
-		$delItems = $this->get([
+		$db_items = $this->get([
 			'output' => ['itemid', 'name', 'templateid', 'flags'],
-			'itemids' => $itemIds,
+			'itemids' => $itemids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		// TODO: remove $nopermissions hack
-		if (!$nopermissions) {
-			foreach ($itemIds as $itemId) {
-				if (!isset($delItems[$itemId])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-				}
-				$delItem = $delItems[$itemId];
+		foreach ($itemids as $itemid) {
+			if (!array_key_exists($itemid, $db_items)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 
-				if ($delItem['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated item.'));
-				}
+			$db_item = $db_items[$itemid];
+
+			if ($db_item['templateid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated item.'));
 			}
 		}
-
-		// first delete child items
-		$parentItemIds = $itemIds;
-		$db_dependent_items = $delItems;
-		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid',
-				$parentItemIds
-			));
-			$parentItemIds = [];
-			while ($dbItem = DBfetch($dbItems)) {
-				$parentItemIds[] = $dbItem['itemid'];
-				$itemIds[$dbItem['itemid']] = $dbItem['itemid'];
-				$db_dependent_items[$dbItem['itemid']] = $dbItem['itemid'];
-			}
-		} while ($parentItemIds);
-
-		$dependent_items = [];
-
-		while ($db_dependent_items) {
-			$db_dependent_items = $this->get([
-				'output' => ['itemid', 'name'],
-				'filter' => ['type' => ITEM_TYPE_DEPENDENT, 'master_itemid' => array_keys($db_dependent_items)],
-				'preservekeys' => true
-			]);
-			$db_dependent_items = array_diff_key($db_dependent_items, $dependent_items);
-			$dependent_items += $db_dependent_items;
-		};
-		$dependent_itemids = array_keys($dependent_items);
-		$itemIds += array_combine($dependent_itemids, $dependent_itemids);
-
-		// delete graphs, leave if graph still have item
-		$delGraphs = [];
-		$dbGraphs = DBselect(
-			'SELECT gi.graphid'.
-			' FROM graphs_items gi'.
-			' WHERE '.dbConditionInt('gi.itemid', $itemIds).
-				' AND NOT EXISTS ('.
-					'SELECT NULL'.
-					' FROM graphs_items gii'.
-					' WHERE gii.graphid=gi.graphid'.
-						' AND '.dbConditionInt('gii.itemid', $itemIds, true).
-				')'
-		);
-		while ($dbGraph = DBfetch($dbGraphs)) {
-			$delGraphs[$dbGraph['graphid']] = $dbGraph['graphid'];
-		}
-
-		if ($delGraphs) {
-			API::Graph()->delete($delGraphs, true);
-		}
-
-		// check if any graphs are referencing this item
-		$this->checkGraphReference($itemIds);
-
-		$triggers = API::Trigger()->get([
-			'output' => [],
-			'itemids' => $itemIds,
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-		if ($triggers) {
-			API::Trigger()->delete(array_keys($triggers), true);
-		}
-
-		$triggerPrototypes = API::TriggerPrototype()->get([
-			'output' => [],
-			'itemids' => $itemIds,
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-		if ($triggerPrototypes) {
-			API::TriggerPrototype()->delete(array_keys($triggerPrototypes), true);
-		}
-
-		DB::delete('screens_items', [
-			'resourceid' => $itemIds,
-			'resourcetype' => [SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_CLOCK]
-		]);
-
-		DB::delete('items', ['itemid' => $itemIds]);
-
-		DB::delete('profiles', [
-			'idx' => 'web.favorite.graphids',
-			'source' => 'itemid',
-			'value_id' => $itemIds
-		]);
-
-		$table_names = ['trends', 'trends_uint', 'history_text', 'history_log', 'history_uint', 'history_str',
-			'history', 'events'
-		];
-
-		$insert = [];
-
-		foreach ($itemIds as $itemId) {
-			foreach ($table_names as $table_name) {
-				$insert[] = [
-					'tablename' => $table_name,
-					'field' => 'itemid',
-					'value' => $itemId
-				];
-			}
-		}
-
-		DB::insertBatch('housekeeper', $insert);
-
-		$itemids = array_map('strval', array_values($itemIds));
-
-		return ['itemids' => $itemids];
 	}
 
 	public function syncTemplates($data) {
@@ -876,67 +782,6 @@ class CItem extends CItemGeneral {
 		}
 
 		$this->validateItemPreprocessing($item, $method);
-	}
-
-	protected function inherit(array $items, array $hostids = null) {
-		if (!$items) {
-			return;
-		}
-
-		// Prepare the child items.
-		$new_items = $this->prepareInheritedItems($items, $hostids);
-		if (!$new_items) {
-			return;
-		}
-
-		$ins_items = [];
-		$upd_items = [];
-		foreach ($new_items as $new_item) {
-			if (array_key_exists('itemid', $new_item)) {
-				$upd_items[] = $new_item;
-			}
-			else {
-				$ins_items[] = $new_item;
-			}
-		}
-
-		// Save the new items.
-		if ($ins_items) {
-			self::validateInventoryLinks($ins_items, false); // false means 'create'
-			$this->createReal($ins_items);
-		}
-
-		if ($upd_items) {
-			self::validateInventoryLinks($upd_items, true); // true means 'update'
-			$this->updateReal($upd_items);
-		}
-
-		$new_items = array_merge($upd_items, $ins_items);
-
-		// Update master_itemid for inserted or updated inherited dependent items.
-		$this->inheritDependentItems($new_items);
-
-		// Inheriting items from the templates.
-		$tpl_items = DBselect(
-			'SELECT i.itemid'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
-				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
-		);
-
-		$tpl_itemids = [];
-		while ($tpl_item = DBfetch($tpl_items)) {
-			$tpl_itemids[$tpl_item['itemid']] = true;
-		}
-
-		foreach ($new_items as $index => $new_item) {
-			if (!array_key_exists($new_item['itemid'], $tpl_itemids)) {
-				unset($new_items[$index]);
-			}
-		}
-
-		$this->inherit($new_items);
 	}
 
 	/**

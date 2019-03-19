@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1010,6 +1010,7 @@ int	main(int argc, char **argv)
 	const char		*p;
 	zbx_thread_args_t	thread_args;
 	ZBX_THREAD_SENDVAL_ARGS sendval_args;
+	ZBX_THREAD_HANDLE	thread;
 
 	progname = get_program_name(argv[0]);
 
@@ -1023,7 +1024,14 @@ int	main(int argc, char **argv)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-
+#if defined(_WINDOWS)
+	if (SUCCEED != zbx_socket_start(&error))
+	{
+		zbx_error(error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+#endif
 #if !defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
 	{
@@ -1230,8 +1238,8 @@ int	main(int argc, char **argv)
 				zbx_json_close(&sendval_args.json);
 
 				last_send = zbx_time();
-
-				ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
+				zbx_thread_start(send_value, &thread_args, &thread);
+				ret = update_exit_status(ret, zbx_thread_wait(thread));
 
 				buffer_count = 0;
 				zbx_json_clean(&sendval_args.json);
@@ -1244,7 +1252,8 @@ int	main(int argc, char **argv)
 		if (FAIL != ret && 0 != buffer_count)
 		{
 			zbx_json_close(&sendval_args.json);
-			ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
+			zbx_thread_start(send_value, &thread_args, &thread);
+			ret = update_exit_status(ret, zbx_thread_wait(thread));
 		}
 
 		if (in != stdin)
@@ -1285,8 +1294,8 @@ int	main(int argc, char **argv)
 			zbx_json_close(&sendval_args.json);
 
 			succeed_count++;
-
-			ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
+			zbx_thread_start(send_value, &thread_args, &thread);
+			ret = update_exit_status(ret, zbx_thread_wait(thread));
 		}
 		while (0); /* try block simulation */
 	}
@@ -1313,7 +1322,10 @@ exit:
 	}
 #endif
 	zabbix_close_log();
-
+#if defined(_WINDOWS)
+	while (0 == WSACleanup())
+		;
+#endif
 	if (FAIL == ret)
 		ret = EXIT_FAILURE;
 

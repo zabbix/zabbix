@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,12 +21,14 @@
 #include "threads.h"
 #include "module.h"
 
+#include "../zbxcrypto/tls.h"
+
 #ifdef HAVE_ICONV
 #	include <iconv.h>
 #endif
 
 static const char	copyright_message[] =
-	"Copyright (C) 2018 Zabbix SIA\n"
+	"Copyright (C) 2019 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
@@ -54,6 +56,10 @@ void	version(void)
 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	printf("\n");
+	zbx_tls_version();
+#endif
 }
 
 /******************************************************************************
@@ -415,19 +421,39 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
  ******************************************************************************/
 void	del_zeros(char *s)
 {
-	int     i;
+	int	trim = 0;
+	size_t	len = 0;
 
-	if(strchr(s,'.')!=NULL)
+	while ('\0' != s[len])
 	{
-		for(i = (int)strlen(s)-1;;i--)
+		if ('e' == s[len] || 'E' == s[len])
 		{
-			if(s[i]=='0')
+			/* don't touch numbers that are written in scientific notation */
+			return;
+		}
+
+		if ('.' == s[len])
+		{
+			/* number has decimal part */
+			trim = 1;
+		}
+
+		len++;
+	}
+
+	if (1 == trim)
+	{
+		size_t	i;
+
+		for (i = len - 1; ; i--)
+		{
+			if ('0' == s[i])
 			{
-				s[i]=0;
+				s[i] = '\0';
 			}
-			else if(s[i]=='.')
+			else if ('.' == s[i])
 			{
-				s[i]=0;
+				s[i] = '\0';
 				break;
 			}
 			else
@@ -3238,8 +3264,8 @@ static int	zbx_token_parse_user_macro(const char *expression, const char *macro,
 
 	/* initialize token */
 	token->type = ZBX_TOKEN_USER_MACRO;
-	token->token.l = offset;
-	token->token.r = offset + macro_r;
+	token->loc.l = offset;
+	token->loc.r = offset + macro_r;
 
 	/* initialize token data */
 	data = &token->data.user_macro;
@@ -3260,7 +3286,7 @@ static int	zbx_token_parse_user_macro(const char *expression, const char *macro,
 	}
 	else
 	{
-		data->name.r = token->token.r - 1;
+		data->name.r = token->loc.r - 1;
 		data->context.l = 0;
 		data->context.r = 0;
 	}
@@ -3310,13 +3336,13 @@ static int	zbx_token_parse_lld_macro(const char *expression, const char *macro, 
 
 	/* initialize token */
 	token->type = ZBX_TOKEN_LLD_MACRO;
-	token->token.l = offset;
-	token->token.r = offset + (ptr - macro);
+	token->loc.l = offset;
+	token->loc.r = offset + (ptr - macro);
 
 	/* initialize token data */
 	data = &token->data.lld_macro;
 	data->name.l = offset + 2;
-	data->name.r = token->token.r - 1;
+	data->name.r = token->loc.r - 1;
 
 	return SUCCEED;
 }
@@ -3364,13 +3390,13 @@ static int	zbx_token_parse_objectid(const char *expression, const char *macro, z
 
 	/* initialize token */
 	token->type = ZBX_TOKEN_OBJECTID;
-	token->token.l = offset;
-	token->token.r = offset + (ptr - macro);
+	token->loc.l = offset;
+	token->loc.r = offset + (ptr - macro);
 
 	/* initialize token data */
 	data = &token->data.objectid;
 	data->name.l = offset + 1;
-	data->name.r = token->token.r - 1;
+	data->name.r = token->loc.r - 1;
 
 	return SUCCEED;
 }
@@ -3417,13 +3443,13 @@ static int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_
 
 	/* initialize token */
 	token->type = ZBX_TOKEN_MACRO;
-	token->token.l = offset;
-	token->token.r = offset + (ptr - macro);
+	token->loc.l = offset;
+	token->loc.r = offset + (ptr - macro);
 
 	/* initialize token data */
 	data = &token->data.macro;
 	data->name.l = offset + 1;
-	data->name.r = token->token.r - 1;
+	data->name.r = token->loc.r - 1;
 
 	return SUCCEED;
 }
@@ -3512,8 +3538,8 @@ static int	zbx_token_parse_func_macro(const char *expression, const char *macro,
 
 	/* initialize token */
 	token->type = token_type;
-	token->token.l = offset;
-	token->token.r = ptr - expression;
+	token->loc.l = offset;
+	token->loc.r = ptr - expression;
 
 	/* initialize token data */
 	data = ZBX_TOKEN_FUNC_MACRO == token_type ? &token->data.func_macro : &token->data.lld_func_macro;
@@ -3565,7 +3591,7 @@ static int	zbx_token_parse_simple_macro_key(const char *expression, const char *
 		if (SUCCEED != zbx_token_parse_macro(expression, key, &key_token))
 			return FAIL;
 
-		ptr = expression + key_token.token.r + 1;
+		ptr = expression + key_token.loc.r + 1;
 	}
 
 	/* If the key is without parameters, then parse_key() will move cursor past function name - */
@@ -3600,8 +3626,8 @@ static int	zbx_token_parse_simple_macro_key(const char *expression, const char *
 
 	/* initialize token */
 	token->type = ZBX_TOKEN_SIMPLE_MACRO;
-	token->token.l = offset;
-	token->token.r = ptr - expression;
+	token->loc.l = offset;
+	token->loc.r = ptr - expression;
 
 	/* initialize token data */
 	data = &token->data.simple_macro;
@@ -3748,7 +3774,7 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
  *                                                                            *
  *           zbx_token_t token = {0};                                         *
  *                                                                            *
- *           while (SUCCEED == zbx_token_find(expression, token.token.r + 1,  *
+ *           while (SUCCEED == zbx_token_find(expression, token.loc.r + 1,    *
  *                       &token))                                             *
  *           {                                                                *
  *                   process_token(expression, &token);                       *
@@ -3779,8 +3805,8 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 
 					token->data.reference.index = dollar[1] - '0';
 					token->type = ZBX_TOKEN_REFERENCE;
-					token->token.l = dollar - expression;
-					token->token.r = token->token.l + 1;
+					token->loc.l = dollar - expression;
+					token->loc.r = token->loc.l + 1;
 					return SUCCEED;
 				}
 
@@ -3822,7 +3848,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 			case '9':
 				if (SUCCEED == (ret = zbx_token_parse_objectid(expression, ptr, token)))
 					break;
-				/* break; is not missing here */
+				ZBX_FALLTHROUGH;
 			default:
 				if (SUCCEED != (ret = zbx_token_parse_macro(expression, ptr, token)))
 					ret = zbx_token_parse_simple_macro(expression, ptr, token);
@@ -3857,7 +3883,7 @@ static size_t	zbx_no_function(const char *expr)
 		else if ('{' == *ptr && '{' == *(ptr + 1) && '#' == *(ptr + 2) &&
 				SUCCEED == zbx_token_parse_nested_macro(ptr, ptr, &token))
 		{
-			ptr += token.token.r - token.token.l + 1;
+			ptr += token.loc.r - token.loc.l + 1;
 		}
 		else if (SUCCEED != is_function_char(*ptr))
 		{
@@ -3869,6 +3895,10 @@ static size_t	zbx_no_function(const char *expr)
 				NULL != strchr("()" ZBX_WHITESPACE, ptr[len]))
 		{
 			ptr += len;	/* skip to the position after and/or/not operator */
+		}
+		else if (ptr > expr && 0 != isdigit(*(ptr - 1)) && NULL != strchr(ZBX_UNIT_SYMBOLS, *ptr))
+		{
+			ptr++;	/* skip unit suffix symbol if it's preceded by a digit */
 		}
 		else
 			break;
@@ -4622,7 +4652,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 			else if ('{' == (*data)[i] && '{' == (*data)[i + 1] && '#' == (*data)[i + 2] &&
 					SUCCEED == zbx_token_parse_nested_macro(&(*data)[i], &(*data)[i], &token))
 			{
-				i += token.token.r - token.token.l + 1;
+				i += token.loc.r - token.loc.l + 1;
 			}
 			else if ('[' != (*data)[i])
 			{
@@ -4936,4 +4966,43 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
 	memcpy(*data + offset, from, sz_from);
 
 	return (int)sz_changed;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strsplit                                                     *
+ *                                                                            *
+ * Purpose: splits string                                                     *
+ *                                                                            *
+ * Parameters: src       - [IN] source string                                 *
+ *             delimiter - [IN] delimiter                                     *
+ *             left      - [IN/OUT] first part of the string                  *
+ *             right     - [IN/OUT] second part of the string or NULL, if     *
+ *                                  delimiter was not found                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strsplit(const char *src, char delimiter, char **left, char **right)
+{
+	char	*delimiter_ptr;
+
+	if (NULL == (delimiter_ptr = strchr(src, delimiter)))
+	{
+		*left = zbx_strdup(NULL, src);
+		*right = NULL;
+	}
+	else
+	{
+		size_t	left_size;
+		size_t	right_size;
+
+		left_size = (size_t)(delimiter_ptr - src) + 1;
+		right_size = strlen(src) - (size_t)(delimiter_ptr - src);
+
+		*left = zbx_malloc(NULL, left_size);
+		*right = zbx_malloc(NULL, right_size);
+
+		memcpy(*left, src, left_size - 1);
+		(*left)[left_size - 1] = '\0';
+		memcpy(*right, delimiter_ptr + 1, right_size);
+	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -162,12 +162,7 @@ if ($min_dimentions['height'] > $graph->getHeight()) {
 
 if (getRequest('onlyHeight', '0') === '1') {
 	$graph->drawDimensions();
-	$height = $graph->getHeight() + 1;
-
-	if (getRequest('widget_view') === '1') {
-		$height = $height - CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
-	}
-	header('X-ZBX-SBOX-HEIGHT: '.$height);
+	header('X-ZBX-SBOX-HEIGHT: '.($graph->getHeight() + 1));
 }
 else {
 	$graph->draw();

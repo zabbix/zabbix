@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -425,6 +425,9 @@ class CHttpTest extends CApiService {
 				'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
 				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'templateid'
 			],
+			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required',
+				'status_codes', 'follow_redirects', 'retrieve_mode', 'post_type'
+			],
 			'httptestids' => zbx_objectValues($httptests, 'httptestid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -433,20 +436,9 @@ class CHttpTest extends CApiService {
 		foreach ($db_httptests as &$db_httptest) {
 			$db_httptest['headers'] = [];
 			$db_httptest['variables'] = [];
-			$db_httptest['steps'] = [];
+			$db_httptest['steps'] = zbx_toHash($db_httptest['steps'], 'httpstepid');
 		}
 		unset($db_httptest);
-
-		$db_httpsteps = DB::select('httpstep', [
-			'output' => ['httpstepid', 'httptestid', 'name', 'no', 'url', 'timeout', 'posts', 'required',
-				'status_codes', 'follow_redirects', 'retrieve_mode'
-			],
-			'filter' => ['httptestid' => array_keys($db_httptests)]
-		]);
-
-		foreach ($db_httpsteps as $db_httpstep) {
-			$db_httptests[$db_httpstep['httptestid']]['steps'][$db_httpstep['httpstepid']] = $db_httpstep;
-		}
 
 		$names_by_hostid = [];
 
@@ -596,7 +588,7 @@ class CHttpTest extends CApiService {
 		}
 
 		if ($del_itemids) {
-			API::Item()->delete($del_itemids, true);
+			CItemManager::delete($del_itemids);
 		}
 
 		DB::delete('httptest', ['httptestid' => $del_httptestids]);
@@ -1076,6 +1068,8 @@ class CHttpTest extends CApiService {
 
 					if ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
 						if (($httpstep['posts'] !== '' && $httpstep['posts'] !== []) || $httpstep['required'] !== '') {
+							$field_name = $httpstep['required'] !== '' ? 'required' : 'posts';
+
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
 							);

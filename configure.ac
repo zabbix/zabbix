@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2018 Zabbix SIA
+dnl Copyright (C) 2001-2019 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.0.1])
+AC_INIT([Zabbix],[4.0.6rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -310,6 +310,131 @@ AC_TRY_LINK(
 	res_ndestroy(&res_state_local);
 ],
 AC_DEFINE(HAVE_RES_NDESTROY,1,[Define to 1 if 'res_ndestroy' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for _res._u._ext.nsaddrs[])
+AC_TRY_LINK(
+[
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
+#endif
+#ifdef HAVE_RESOLV_H
+#	include <resolv.h>
+#endif
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
+],
+[
+	struct sockaddr_in6	*sockaddrin6;
+
+	sockaddrin6 = _res._u._ext.nsaddrs[0];
+],
+AC_DEFINE(HAVE_RES_U_EXT,1,[Define to 1 if '_res._u._ext.nsaddrs[]' exists. /Linux/])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for _res._u._ext.ext)
+AC_TRY_LINK(
+[
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
+#endif
+#ifdef HAVE_RESOLV_H
+#	include <resolv.h>
+#endif
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
+],
+[
+	struct __res_state_ext	*ext;
+
+	ext = _res._u._ext.ext;
+],
+AC_DEFINE(HAVE_RES_U_EXT_EXT,1,[Define to 1 if '_res._u._ext.ext' exists. /BSD/])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for _res._ext.ext.nsaddrs[])
+AC_TRY_LINK(
+[
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
+#endif
+#ifdef HAVE_RESOLV_H
+#	include <resolv.h>
+#endif
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
+],
+[
+	union res_sockaddr_union	*na;
+
+	na = &_res._ext.ext.nsaddrs[0];
+],
+AC_DEFINE(HAVE_RES_EXT_EXT,1,[Define to 1 if '_res._ext.ext.nsaddrs[]' exists. /AIX/])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for struct sockaddr_in6.sin6_len)
+AC_TRY_LINK(
+[
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
+#endif
+#ifdef HAVE_RESOLV_H
+#	include <resolv.h>
+#endif
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
+],
+[
+	struct sockaddr_in6	sin6;
+	unsigned int		len;
+
+	len = sin6.sin6_len;
+],
+AC_DEFINE(HAVE_RES_SIN6_LEN,1,[Define to 1 if 'sockaddr_in6.sin6_len' exists. /BSD/])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -1533,12 +1658,12 @@ if test "x$want_openssl" = "xyes"; then
 		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
 	fi
 
-	if test "x$found_openssl" != "xyes"; then
+	if test "x$found_openssl" != "xOpenSSL" -a "x$found_openssl" != "xOpenSSL (PSK not supported)"; then
 		AC_MSG_ERROR([OpenSSL library libssl or libcrypto not found])
 	elif test "x$accept_openssl_version" != "xyes"; then
 		AC_MSG_ERROR([OpenSSL library version requirement not met (>= 1.0.1)])
 	else
-		have_tls="OpenSSL"
+		have_tls=$found_openssl
 	fi
 	TLS_CFLAGS="$OPENSSL_CFLAGS"
 	TLS_LDFLAGS="$OPENSSL_LDFLAGS"
@@ -1714,24 +1839,8 @@ dnl *                 Output configuration results                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-if test -d tests; then
-	AC_CONFIG_FILES(
-	tests/Makefile
-	tests/libs/Makefile
-	tests/libs/zbxcommon/Makefile
-	tests/libs/zbxconf/Makefile
-	tests/libs/zbxdbcache/Makefile
-	tests/libs/zbxdbhigh/Makefile
-	tests/libs/zbxhistory/Makefile
-	tests/libs/zbxjson/Makefile
-	tests/libs/zbxsysinfo/Makefile
-	tests/libs/zbxsysinfo/linux/Makefile
-	tests/libs/zbxsysinfo/common/Makefile
-	tests/libs/zbxcommshigh/Makefile
-	tests/libs/zbxalgo/Makefile
-	)
-	AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
-fi
+sinclude([conf_tests.m4])
+m4_ifdef([CONF_TESTS],[CONF_TESTS(ZBXCMOCKA)])
 
 AC_OUTPUT([
 	Makefile

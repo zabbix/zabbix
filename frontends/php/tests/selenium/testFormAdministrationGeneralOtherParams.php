@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,6 +138,6 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('refresh_unsupported', '86401');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
-		$this->zbxTestTextPresent('Invalid refresh of unsupported items: must be between "0" and "86400"');
+		$this->zbxTestTextPresent('Invalid refresh of unsupported items: value must be one of 0-86400');
 	}
 }

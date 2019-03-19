@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -553,11 +553,13 @@ class CLineGraphDraw extends CGraphDraw {
 			return $this->yaxismin;
 		}
 
-		if ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+		if ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE && $this->ymin_itemid != 0) {
 			$item = get_item_by_itemid($this->ymin_itemid);
-			$history = Manager::History()->getLastValues([$item]);
-			if (isset($history[$item['itemid']])) {
-				return $history[$item['itemid']][0]['value'];
+			if ($item) {
+				$history = Manager::History()->getLastValues([$item]);
+				if (isset($history[$item['itemid']])) {
+					return $history[$item['itemid']][0]['value'];
+				}
 			}
 		}
 
@@ -627,11 +629,13 @@ class CLineGraphDraw extends CGraphDraw {
 			return $this->yaxismax;
 		}
 
-		if ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+		if ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE && $this->ymax_itemid != 0) {
 			$item = get_item_by_itemid($this->ymax_itemid);
-			$history = Manager::History()->getLastValues([$item]);
-			if (isset($history[$item['itemid']])) {
-				return $history[$item['itemid']][0]['value'];
+			if ($item) {
+				$history = Manager::History()->getLastValues([$item]);
+				if (isset($history[$item['itemid']])) {
+					return $history[$item['itemid']][0]['value'];
+				}
 			}
 		}
 
@@ -750,7 +754,6 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	protected function calcMinMaxInterval() {
-		// init intervals
 		$intervals = [];
 		foreach ([1, 2, 3, 4] as $num) {
 			$dec = pow(0.1, $num);
@@ -759,7 +762,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 		}
 
-		// check if items use B or Bps units
+		// Check if items use B or Bps units.
 		$leftBase1024 = false;
 		$rightBase1024 = false;
 
@@ -839,7 +842,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$side = GRAPH_YAXIS_SIDE_LEFT;
 		$other_side = GRAPH_YAXIS_SIDE_RIGHT;
 
-		// invert sides and it bases, if left side not exist
+		// Invert sides and its bases, if left side doesn't exist.
 		if (!isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT])) {
 			$side = GRAPH_YAXIS_SIDE_RIGHT;
 			$other_side = GRAPH_YAXIS_SIDE_LEFT;
@@ -865,14 +868,14 @@ class CLineGraphDraw extends CGraphDraw {
 		$tmp_minY = $this->m_minY;
 		$tmp_maxY = $this->m_maxY;
 
-		// calc interval
+		// Calculate interval.
 		$columnInterval = bcdiv(bcmul($this->gridPixelsVert, (bcsub($this->m_maxY[$side], $this->m_minY[$side]))), $this->sizeY);
 
 		$dist = bcmul(5, bcpow(10, 18));
 
 		$interval = 0;
 		foreach ($intervals as $int) {
-			// we must get a positive number
+			// We must get a positive number.
 			if (bccomp($int, $columnInterval) == -1) {
 				$t = bcsub($columnInterval, $int);
 			}
@@ -886,7 +889,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 		}
 
-		// calculate interval, if left side use B or Bps
+		// Calculate interval, if left side use B or Bps.
 		if ($leftBase1024) {
 			$interval = getBase1024Interval($interval, $this->m_minY[$side], $this->m_maxY[$side]);
 		}
@@ -897,7 +900,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$interval_other_side = 0;
 		foreach ($intervals as $int) {
-			// we must get a positive number
+			// We must get a positive number.
 			if (bccomp($int, $columnInterval) == -1) {
 				$t = bcsub($columnInterval, $int);
 			}
@@ -911,13 +914,13 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 		}
 
-		// calculate interval, if right side use B or Bps
+		// Calculate interval, if right side use B or Bps.
 		if ($rightBase1024) {
 			$interval_other_side = getBase1024Interval($interval_other_side, $this->m_minY[$other_side],
 				$this->m_maxY[$other_side]);
 		}
 
-		// save original min and max items values
+		// Save original min and max items values.
 		foreach ($sides as $graphSide) {
 			$minY[$graphSide] = $this->m_minY[$graphSide];
 			$maxY[$graphSide] = $this->m_maxY[$graphSide];
@@ -930,13 +933,13 @@ class CLineGraphDraw extends CGraphDraw {
 			$maxY[$side] = 0;
 		}
 
-		// correcting MIN & MAX
+		// Correcting MIN & MAX.
 		$this->m_minY[$side] = bcmul(bcfloor(bcdiv($this->m_minY[$side], $interval)), $interval);
 		$this->m_maxY[$side] = bcmul(bcceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
 		$this->m_minY[$other_side] = bcmul(bcfloor(bcdiv($this->m_minY[$other_side], $interval_other_side)), $interval_other_side);
 		$this->m_maxY[$other_side] = bcmul(bcceil(bcdiv($this->m_maxY[$other_side], $interval_other_side)), $interval_other_side);
 
-		// add intervals so min/max Y wouldn't be at the top
+		// Add intervals so min/max Y wouldn't be too close to graph's top/bottom edges.
 		foreach ($sides as $graphSide) {
 			if ($graphSide == $side) {
 				$tmpInterval = $interval;
@@ -956,7 +959,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 		}
 
-		// calculate interval count for main and other side
+		// Calculate interval count for main and other side.
 		$this->gridLinesCount[$side] = bcceil(bcdiv(bcsub($this->m_maxY[$side], $this->m_minY[$side]), $interval));
 		$this->gridLinesCount[$other_side] = bcceil(bcdiv(bcsub($this->m_maxY[$other_side], $this->m_minY[$other_side]), $interval_other_side));
 
@@ -964,7 +967,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->gridStep[$side] = $interval;
 
 		if (isset($this->axis_valuetype[$other_side])) {
-			// other side correction
+			// Other side correction.
 			$dist = bcsub($this->m_maxY[$other_side], $this->m_minY[$other_side]);
 			$interval = 1;
 
@@ -975,11 +978,11 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 
-			// correcting MIN & MAX
+			// Correcting MIN & MAX on other side Y axis.
 			$this->m_minY[$other_side] = bcmul(bcfloor(bcdiv($this->m_minY[$other_side], $interval)), $interval);
 			$this->m_maxY[$other_side] = bcmul(bcceil(bcdiv($this->m_maxY[$other_side], $interval)), $interval);
 
-			// if we lowered min more than highed max - need additional recalculating
+			// Do recalculation in case if calculated min value is greater than calculated max value.
 			if (bccomp($tmp_maxY[$other_side], $this->m_maxY[$other_side]) == 1 || bccomp($tmp_minY[$other_side], $this->m_minY[$other_side]) == -1) {
 				$dist = bcsub($this->m_maxY[$other_side], $this->m_minY[$other_side]);
 				$interval = 0;
@@ -990,15 +993,15 @@ class CLineGraphDraw extends CGraphDraw {
 					}
 				}
 
-				// recorrecting MIN & MAX
+				// Correcting MIN & MAX values on other side Y axis.
 				$this->m_minY[$other_side] = bcmul(bcfloor(bcdiv($this->m_minY[$other_side], $interval)), $interval);
 				$this->m_maxY[$other_side] = bcmul(bcceil(bcdiv($this->m_maxY[$other_side], $interval)), $interval);
 			}
 
-			// calculate interval, if right side use B or Bps
+			// Calculate interval, if right side use B or Bps.
 			if (isset($rightBase1024)) {
 				$interval = getBase1024Interval($interval, $this->m_minY[$side], $this->m_maxY[$side]);
-				// recorrecting MIN & MAX
+				// Correcting MIN & MAX values on other side Y axis.
 				$this->m_minY[$other_side] = bcmul(bcfloor(bcdiv($this->m_minY[$other_side], $interval)), $interval);
 				$this->m_maxY[$other_side] = bcmul(bcceil(bcdiv($this->m_maxY[$other_side], $interval)), $interval);
 			}
@@ -1034,7 +1037,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$this->validateMinMax($this->m_minY[$graphSide], $this->m_maxY[$graphSide]);
 		}
 
-		// division by zero
+		// Get diff between min/max Y values and fix potential division by zero.
 		$diff_val = bcsub($this->m_maxY[$side], $this->m_minY[$side]);
 		if (bccomp($diff_val, 0) == 0) {
 			$diff_val = 1;
@@ -2379,7 +2382,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$y_offsets = $this->shiftY + self::legendOffsetY;
 
 		if (!$this->with_vertical_padding) {
-			$y_offsets -= $this->m_showTriggers
+			$y_offsets -= ($this->m_showTriggers && count($this->triggers) > 0)
 				? static::DEFAULT_TOP_BOTTOM_PADDING / 2
 				: static::DEFAULT_TOP_BOTTOM_PADDING;
 		}
@@ -2514,6 +2517,7 @@ class CLineGraphDraw extends CGraphDraw {
 	public function drawDimensions() {
 		set_image_header();
 
+		$this->calculateTopPadding();
 		$this->selectTriggers();
 		$this->calcDimentions();
 

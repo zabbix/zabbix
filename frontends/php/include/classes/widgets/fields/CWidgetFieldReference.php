@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class CWidgetFieldReference extends CWidgetField {
 		return
 			'var reference_field = jQuery("input[name=\"'.$this->getName().'\"]", "'.$form_selector.'");'.
 			'if (!reference_field.val().length) {'.
-				'var reference = jQuery(".dashbrd-grid-widget-container").dashboardGrid("makeReference");'.
+				'var reference = jQuery(".dashbrd-grid-container").dashboardGrid("makeReference");'.
 				'reference_field.val(reference);'.
 			'}';
 	}

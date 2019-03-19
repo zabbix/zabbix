@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,11 +110,27 @@ class CCheckBox extends CInput {
 		return $this;
 	}
 
+	/**
+	 * Allow to set value for not checked checkbox.
+	 *
+	 * @param string $value  Value for unchecked state.
+	 *
+	 * @return CCheckBox
+	 */
+	public function setUncheckedValue($value) {
+		$this->setAttribute('unchecked-value', $value);
+
+		return $this;
+	}
+
 	public function toString($destroy = true) {
-		$elements = ($this->label_position == self::LABEL_POSITION_LEFT)
+		$elements = ($this->label_position === self::LABEL_POSITION_LEFT)
 			? [$this->label, new CSpan()]
 			: [new CSpan(), $this->label];
 
-		return parent::toString($destroy).((new CLabel($elements, $this->getId()))->toString(true));
+		$label = (new CLabel($elements, $this->getId()))
+			->addClass($this->label_position === self::LABEL_POSITION_LEFT ? 'label-pos-left' : null);
+
+		return parent::toString($destroy).($label->toString(true));
 	}
 }

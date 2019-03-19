@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,10 +74,10 @@ class CControllerFavouriteDelete extends CController {
 					'switchElementClass(\'addrm_fav\', \'btn-remove-fav\', \'btn-add-fav\');'."\n".
 				'}'."\n".
 				'else {'."\n".
-					'var $widgets = jQuery(".dashbrd-grid-widget-container").dashboardGrid('."\n".
+					'var $widgets = jQuery(".dashbrd-grid-container").dashboardGrid('."\n".
 						'"getWidgetsBy", "type", "'.$widgetids[$object].'");'."\n".
 					'jQuery.each($widgets, function(index, widget) {'."\n".
-						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('."\n".
+						'jQuery(".dashbrd-grid-container").dashboardGrid('."\n".
 							'"refreshWidget", widget["widgetid"]);'."\n".
 					'});'."\n".
 				'}';

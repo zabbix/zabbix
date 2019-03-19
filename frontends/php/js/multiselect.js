@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ jQuery(function($) {
 		options = $.extend({objectOptions: {}}, options);
 
 		// url
-		options.url = new Curl('jsrpc.php');
+		options.url = new Curl('jsrpc.php', false);
 		options.url.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 		options.url.setArgument('method', 'multiselect.get');
 		options.url.setArgument('objectName', options.objectName);
@@ -162,6 +162,7 @@ jQuery(function($) {
 					ms = $obj.data('multiSelect');
 
 				if (ms.options.disabled === false) {
+					$obj.attr('aria-disabled', true);
 					$('.multiselect-list', $obj).addClass('disabled');
 					$('.multiselect-button > button', $wrapper).attr('disabled', 'disabled');
 					$('input[type=text]', $wrapper).remove();
@@ -186,6 +187,7 @@ jQuery(function($) {
 
 				if (ms.options.disabled === true) {
 					var $input = makeMultiSelectInput($obj);
+					$obj.removeAttr('aria-disabled');
 					$('.multiselect-list', $obj).removeClass('disabled');
 					$('.multiselect-button > button', $wrapper).removeAttr('disabled');
 					$obj.append($input);
@@ -424,7 +426,7 @@ jQuery(function($) {
 							window.setTimeout(function() {
 								values.isWaiting = false;
 
-								var search = $input.val();
+								var search = $input.val().replace(/^\s+/g, '');
 
 								// re-check search after delay
 								if (search !== '' && $input.data('lastSearch') != search) {
@@ -467,7 +469,7 @@ jQuery(function($) {
 					hideAvailable($obj);
 				}
 			})
-			.on('keypress keydown', function(e) {
+			.on('keydown', function(e) {
 				switch (e.which) {
 
 					case KEY.TAB:
@@ -867,9 +869,9 @@ jQuery(function($) {
 		// highlight matched
 		var text = item.name.toLowerCase(),
 			search = values.search.toLowerCase(),
+			is_new = item.isNew || false,
 			start = 0,
-			end = 0,
-			searchLength = search.length;
+			end = 0;
 
 		while (text.indexOf(search, end) > -1) {
 			end = text.indexOf(search, end);
@@ -881,11 +883,11 @@ jQuery(function($) {
 			}
 
 			li.append($('<span>', {
-				'class': 'suggest-found',
-				text: item.name.substring(end, end + searchLength)
-			}));
+				'class': !is_new ? 'suggest-found' : null,
+				text: item.name.substring(end, end + search.length)
+			})).toggleClass('suggest-new', is_new);
 
-			end += searchLength;
+			end += search.length;
 			start = end;
 		}
 

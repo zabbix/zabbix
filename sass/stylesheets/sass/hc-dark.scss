@@ -128,6 +128,37 @@ $ok-ack-fg-color: #00ff00;
 // Important! @import string should come after variables
 @import 'screen.scss';
 
+// DASHBOARD
+.dashbrd-grid-new-widget-placeholder {
+	.dashbrd-grid-widget-new-box,
+	.dashbrd-grid-widget-set-position,
+	.dashbrd-grid-widget-set-size {
+		box-shadow: none;
+		border-color: $font-color;
+		background-color: transparent;
+	}
+
+	.dashbrd-grid-widget-set-size {
+		border: 2px dashed $font-color;
+		box-shadow: none;
+		background: darken($body-bg-color, 6%);
+	}
+
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -269px -888px;
+		}
+	}
+}
+
+.dashbrd-grid-widget-set-size {
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -457px -888px;
+		}
+	}
+}
+
 // ICONS
 $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -357px -802px,
@@ -356,22 +387,22 @@ button {
 
 		input[type="radio"] {
 
-			&:checked:not([disabled]) + label,
-			&:focus + label {
-				border-color: $form-border-focus-color;
+			&:checked:not([disabled]) + label {
 				color: $white;
 			}
 
 			&:checked + label {
-				background-color: $ui-bg-selected-color;
+				background-color: $ui-bg-selected-color !important;
+			}
+
+			&:focus + label {
+				@include box-shadow(0 0 0 2px rgba($blue, 1) !important);
+				background-color: darken($btn-bg-color, 10%) !important;
+				color: $white;
 			}
 
 			&:checked[disabled] + label {
 				background-color: #595959 !important;
-			}
-
-			&:focus + label {
-				background-color: $link-hover-color !important;
 			}
 		}
 	}

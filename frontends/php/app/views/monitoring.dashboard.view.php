@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,11 @@ else {
 	$this->addJsFile('colorpicker.js');
 	$this->addJsFile('class.csvggraph.js');
 	$this->addJsFile('csvggraphwidget.js');
+	$this->addJsFile('class.cclock.js');
+	$this->addJsFile('class.cnavtree.js');
+	$this->addJsFile('class.mapWidget.js');
+	$this->addJsFile('class.svg.canvas.js');
+	$this->addJsFile('class.svg.map.js');
 
 	$this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
@@ -61,20 +66,6 @@ else {
 		);
 	}
 
-	$url_create = (new CUrl('zabbix.php'))
-		->setArgument('action', 'dashboard.view')
-		->setArgument('new', '1');
-	$url_clone = (new CUrl('zabbix.php'))
-		->setArgument('action', 'dashboard.view')
-		->setArgument('source_dashboardid', $data['dashboard']['dashboardid']);
-
-	if ($data['dashboard']['editable']) {
-		$url_delete = (new CUrl('zabbix.php'))
-			->setArgument('action', 'dashboard.delete')
-			->setArgument('dashboardids', [$data['dashboard']['dashboardid']])
-			->setArgumentSID();
-	}
-
 	$web_layout_mode = CView::getLayoutMode();
 
 	$widget = (new CWidget())
@@ -85,48 +76,18 @@ else {
 			->addItem($main_filter_form)
 			->addItem((new CTag('nav', true, [
 				(new CList())
-					->addItem((
-						(new CButton('dashbrd-edit', _('Edit dashboard')))
-							->setEnabled($data['dashboard']['editable'])
-							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
-					))
+					->addItem((new CButton('dashbrd-edit', _('Edit dashboard')))
+						->setEnabled($data['dashboard']['editable'])
+						->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
+					)
 					->addItem((new CButton('', '&nbsp;'))
 						->addClass(ZBX_STYLE_BTN_ACTION)
 						->setId('dashbrd-actions')
 						->setTitle(_('Actions'))
 						->setAttribute('aria-haspopup', true)
-						->setMenuPopup([
-							'type' => 'dashboard',
-							'label' => _('Actions'),
-							'items' => [
-								'sharing' => [
-									'label' => _('Sharing'),
-									'form_data' => [
-										'dashboardid' => $data['dashboard']['dashboardid']
-									],
-									'disabled' => !$data['dashboard']['editable']
-								],
-							'create' => [
-								'label' => _('Create new'),
-								'url' => $url_create->getUrl()
-							],
-							'clone' => [
-								'label' => _('Clone'),
-								'url' => $url_clone->getUrl()
-							],
-							'delete' => [
-								'label' => _('Delete'),
-								'confirmation' => _('Delete dashboard?'),
-								'url' => 'javascript:void(0)',
-								'redirect' => $data['dashboard']['editable']
-									? $url_delete->getUrl()
-									: null,
-								'disabled' => !$data['dashboard']['editable']
-							]
-						]
-					])
-				)
-				->addItem(get_icon('fullscreen'))
+						->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid']))
+					)
+					->addItem(get_icon('fullscreen'))
 			]))->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem((new CListItem([
@@ -155,19 +116,16 @@ else {
 
 	$timeline = null;
 	if ($data['show_timeselector']) {
-		$timeline = (new CFilter())
+		$timeline = (new CFilter(new CUrl()))
 			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
-			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
-
-		if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-			$timeline = (new CDiv($timeline))->addStyle('display: none;');
+			->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
+				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE);
 		}
-	}
 
 	$widget
 		->addItem($timeline)
-		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
+		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
 		->show();
 
 	/*
@@ -190,7 +148,9 @@ else {
 	$dashboard_options = [
 		'max-rows' => DASHBOARD_MAX_ROWS,
 		'max-columns' => DASHBOARD_MAX_COLUMNS,
-		'editable' => $data['dashboard']['editable']
+		'widget-max-rows' => DASHBOARD_WIDGET_MAX_ROWS,
+		'editable' => $data['dashboard']['editable'],
+		'edit_mode' => $data['dashboard_edit_mode']
 	];
 	if ($data['dashboard']['dashboardid'] != 0) {
 		$dashboard_data['id'] = $data['dashboard']['dashboardid'];
@@ -216,7 +176,7 @@ else {
 
 	// Initialize dashboard grid.
 	$this->addPostJS(
-		'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
+		'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
 			'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
 			'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
 			'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widget_defaults']).')'.

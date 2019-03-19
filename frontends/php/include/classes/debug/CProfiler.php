@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,7 +236,6 @@ class CProfiler {
 		return (new CPre())
 			->addClass(ZBX_STYLE_DEBUG_OUTPUT)
 			->setAttribute('name', 'zbx_debug_info')
-			->addStyle('display: none;')
 			->addItem($debug);
 	}
 
@@ -254,11 +253,6 @@ class CProfiler {
 	 * @param string $sql
 	 */
 	public function profileSql($time, $sql) {
-		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
-				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
-			return;
-		}
-
 		$time = round($time, 6);
 
 		$this->sqlTotalTime += $time;
@@ -278,11 +272,6 @@ class CProfiler {
 	 * @param array  $result
 	 */
 	public function profileApiCall($class, $method, $params, $result) {
-		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
-				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
-			return;
-		}
-
 		$backtrace = debug_backtrace();
 
 		// Use the file name and line number from the first call to the API wrapper object.

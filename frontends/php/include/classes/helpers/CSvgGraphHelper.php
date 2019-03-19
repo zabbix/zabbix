@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@ class CSvgGraphHelper {
 	public static function get(array $options = [], $width, $height) {
 		$metrics = [];
 		$errors = [];
-		$problems = [];
 
 		// Find which metrics will be shown in graph and calculate time periods and display options.
 		self::getMetrics($metrics, $options['data_sets']);
@@ -317,21 +316,19 @@ class CSvgGraphHelper {
 			}
 		}
 
-		// Filter out only items of selected metrics.
-		if ($problem_options['itemids'] !== null) {
-			$options['objectids'] = array_keys(API::Trigger()->get([
-				'output' => [],
-				'hostids' => array_key_exists('hostids', $options) ? $options['hostids'] : null,
-				'itemids' => $problem_options['itemids'],
-				'preservekeys' => true
-			]));
+		$options['objectids'] = array_keys(API::Trigger()->get([
+			'output' => [],
+			'hostids' => array_key_exists('hostids', $options) ? $options['hostids'] : null,
+			'itemids' => $problem_options['itemids'],
+			'monitored' => true,
+			'preservekeys' => true
+		]));
 
-			// Return if no triggers found.
-			if (!$options['objectids']) {
-				return [];
-			}
+		unset($options['hostids']);
 
-			unset($options['hostids']);
+		// Return if no triggers found.
+		if (!$options['objectids']) {
+			return [];
 		}
 
 		// Add severity filter.
@@ -411,6 +408,7 @@ class CSvgGraphHelper {
 					],
 					'selectHosts' => ['hostid', 'name'],
 					'hostids' => array_keys($hosts),
+					'webitems' => true,
 					'filter' => [
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 					],

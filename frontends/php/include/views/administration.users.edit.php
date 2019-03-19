@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -345,7 +345,9 @@ if ($data['is_profile']) {
 
 	$userMessagingFormList = new CFormList();
 	$userMessagingFormList->addRow(_('Frontend messaging'),
-		(new CCheckBox('messages[enabled]'))->setChecked($data['messages']['enabled'] == 1)
+		(new CCheckBox('messages[enabled]'))
+			->setChecked($data['messages']['enabled'] == 1)
+			->setUncheckedValue(0)
 	);
 	$userMessagingFormList->addRow(_('Message timeout'),
 		(new CTextBox('messages[timeout]', $data['messages']['timeout']))
@@ -372,7 +374,8 @@ if ($data['is_profile']) {
 		->addRow([
 			(new CCheckBox('messages[triggers.recovery]'))
 				->setLabel(_('Recovery'))
-				->setChecked($data['messages']['triggers.recovery'] == 1),
+				->setChecked($data['messages']['triggers.recovery'] == 1)
+				->setUncheckedValue(0),
 			[
 				$soundList,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -408,7 +411,8 @@ if ($data['is_profile']) {
 		$triggersTable->addRow([
 			(new CCheckBox('messages[triggers.severities]['.$severity.']'))
 				->setLabel(getSeverityName($severity, $data['config']))
-				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities'])),
+				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
+				->setUncheckedValue(0),
 			[
 				$soundList,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -433,6 +437,7 @@ if ($data['is_profile']) {
 		->addRow(_('Show suppressed problems'),
 			(new CCheckBox('messages[show_suppressed]'))
 				->setChecked($data['messages']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
 		);
 }
 else {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,6 +95,47 @@ class CGlobalRegexpTest extends PHPUnit_Framework_TestCase
 				'expression' => $this->expr(EXPRESSION_TYPE_TRUE, 'http://example.com/', 0),
 				'success' => ['referrer: http://example.com/', 'request to http://example.com/test'],
 				'fail' => ['example.com']
+			],
+			// empty part of search string is ignored during match
+			[
+				'expression' => $this->expr(EXPRESSION_TYPE_ANY_INCLUDED, '/', 0, '/'),
+				'success' => ['/'],
+				'fail' => []
+			],
+			// empty part of search string is ignored during match
+			[
+				'expression' => $this->expr(EXPRESSION_TYPE_ANY_INCLUDED, '/0/a/ /', 0, '/'),
+				'success' => ['d// e', '1/0// '],
+				'fail' => ['/', 'b//	b']
+			]
+		];
+	}
+
+	public function dataProviderMatchMethod() {
+		return [
+			// Char '/' is escaped before preg_match call.
+			[
+				'expression' => '/',
+				'type' => EXPRESSION_TYPE_TRUE,
+				'string' => 'test\/string'
+			],
+			// Double escaping of '/' should fail.
+			[
+				'expression' => '\\/',
+				'type' => EXPRESSION_TYPE_FALSE,
+				'string' => 'test/string'
+			],
+			// Char '/' should not be escaped if used as part of regex pattern.
+			[
+				'expression' => '^[a-z/]+$',
+				'type' => EXPRESSION_TYPE_TRUE,
+				'string' => 'test/string'
+			],
+			// Char '/' should not be escaped if used as part of regex pattern.
+			[
+				'expression' => '^[a-z\\\\/]+$',
+				'type' => EXPRESSION_TYPE_TRUE,
+				'string' => 'test/\\string'
 			]
 		];
 	}
@@ -102,7 +143,7 @@ class CGlobalRegexpTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @dataProvider dataProvider
 	 */
-	public function testMatchExpressions ($expression, $successValues, $failValues)
+	public function testMatchExpressions($expression, $successValues, $failValues)
 	{
 		foreach ($successValues as $successValue) {
 			$this->assertTrue(CGlobalRegexp::matchExpression($expression, $successValue), 'Value: '.$successValue);
@@ -110,6 +151,20 @@ class CGlobalRegexpTest extends PHPUnit_Framework_TestCase
 
 		foreach ($failValues as $failValue) {
 			$this->assertFalse(CGlobalRegexp::matchExpression($expression, $failValue), 'Value: '.$failValue);
+		}
+	}
+
+	/**
+	 * @dataProvider dataProviderMatchMethod
+	 */
+	public function testMatchMethod($expression, $expression_type, $string) {
+		$expr = new CGlobalRegexp($expression);
+
+		if ($expression_type == EXPRESSION_TYPE_TRUE) {
+			$this->assertTrue($expr->match($string));
+		}
+		else {
+			$this->assertFalse($expr->match($string));
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,19 +43,28 @@
 
 #define ZBX_VMWARE_EVENT_KEY_UNINITIALIZED	__UINT64_C(0xffffffffffffffff)
 
+typedef struct
+{
+	char		*name;
+	zbx_uint64_t	value;
+}
+zbx_str_uint64_pair_t;
+
+ZBX_VECTOR_DECL(str_uint64_pair, zbx_str_uint64_pair_t)
+
 /* performance counter data */
 typedef struct
 {
 	/* the counter id */
-	zbx_uint64_t		counterid;
+	zbx_uint64_t			counterid;
 
 	/* the counter values for various instances */
-	/*    pair->first  - instance               */
-	/*    pair->second - value                  */
-	zbx_vector_ptr_pair_t	values;
+	/*    pair->name  - instance                */
+	/*    pair->value - value                   */
+	zbx_vector_str_uint64_pair_t	values;
 
 	/* the counter state, see ZBX_VMAWRE_COUNTER_* defines */
-	unsigned char		state;
+	unsigned char			state;
 }
 zbx_vmware_perf_counter_t;
 
@@ -134,6 +143,8 @@ typedef struct
 	char			*id;
 	char			*clusterid;
 	char			*datacenter_name;
+	char			*parent_name;
+	char			*parent_type;
 	char			**props;
 	zbx_vector_ptr_t	datastores;
 	zbx_vector_ptr_t	vms;
@@ -156,6 +167,15 @@ typedef struct
 	char	*status;
 }
 zbx_vmware_cluster_t;
+
+/* the vmware eventlog state */
+typedef struct
+{
+	zbx_uint64_t	last_key;	/* lastlogsize when vmware.eventlog[] item was polled last time */
+	unsigned char	skip_old;	/* skip old event log records */
+
+}
+zbx_vmware_eventlog_state_t;
 
 /* the vmware event data */
 typedef struct
@@ -182,39 +202,39 @@ zbx_vmware_data_t;
 /* the vmware service data */
 typedef struct
 {
-	char			*url;
-	char			*username;
-	char			*password;
+	char				*url;
+	char				*username;
+	char				*password;
 
 	/* the service type - vCenter or vSphere */
-	unsigned char		type;
+	unsigned char			type;
 
 	/* the service state - see ZBX_VMWARE_STATE_* defines */
-	int			state;
+	int				state;
 
-	int			lastcheck;
-	int			lastperfcheck;
+	int				lastcheck;
+	int				lastperfcheck;
 
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
-	int			lastaccess;
+	int				lastaccess;
 
 	/* the vmware service instance version */
-	char			*version;
+	char				*version;
 
 	/* the vmware service instance fullname */
-	char			*fullname;
+	char				*fullname;
 
 	/* the performance counters */
-	zbx_hashset_t		counters;
+	zbx_hashset_t			counters;
 
 	/* list of entities to monitor with performance counters */
-	zbx_hashset_t		entities;
+	zbx_hashset_t			entities;
 
 	/* the service data object that is swapped with a new one during service update */
-	zbx_vmware_data_t	*data;
+	zbx_vmware_data_t		*data;
 
-	/* lastlogsize when vmware.eventlog[] item was polled last time */
-	zbx_uint64_t		eventlog_last_key;
+	/* lastlogsize when vmware.eventlog[] item was polled last time and skip old flag*/
+	zbx_vmware_eventlog_state_t	eventlog;
 }
 zbx_vmware_service_t;
 
@@ -256,76 +276,6 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 		zbx_uint64_t counterid, const char *instance);
 zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
 		const char *id);
-
-#define ZBX_VM_NONAME_XML	"noname.xml"
-
-#define ZBX_XPATH_VM_QUICKSTATS(property)								\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
-		"/*[local-name()='val']/*[local-name()='quickStats']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_VM_RUNTIME(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
-		"/*[local-name()='val']/*[local-name()='runtime']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_VM_CONFIG(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
-		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_VM_STORAGE(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
-		"/*[local-name()='val']/*[local-name()='storage']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_VM_HARDWARE(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.hardware']]"	\
-		"/*[local-name()='val']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_VM_GUESTDISKS()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='guest.disk']]"		\
-	"/*/*[local-name()='GuestDiskInfo']"
-
-#define ZBX_XPATH_VM_UUID()										\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
-		"/*[local-name()='val']"
-
-#define ZBX_XPATH_VM_INSTANCE_UUID()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
-		"/*[local-name()='val']"
-
-#define ZBX_XPATH_HV_QUICKSTATS(property)								\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.quickStats']]"	\
-		"/*[local-name()='val']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_HV_CONFIG(property)									\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.config']]"		\
-		"/*[local-name()='val']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_HV_CONFIG_PRODUCT(property)								\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.config']]"		\
-		"/*[local-name()='val']/*[local-name()='product']"					\
-		"/*[local-name()='" property "']"
-
-#define ZBX_XPATH_HV_HARDWARE(property)									\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.hardware']]"		\
-		"/*[local-name()='val']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_HV_SENSOR_STATUS(sensor)								\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name']"					\
-		"[text()='runtime.healthSystemRuntime.systemHealthInfo']]"				\
-		"/*[local-name()='val']/*[local-name()='numericSensorInfo']"				\
-		"[*[local-name()='name'][text()='" sensor "']]"						\
-		"/*[local-name()='healthState']/*[local-name()='key']"
-
-#define ZBX_XPATH_HV_STATUS()										\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='overallStatus']]"		\
-		"/*[local-name()='val']"
-
-#define ZBX_XPATH_VMWARE_ABOUT(property)								\
-	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
-
-#	define ZBX_XPATH_LN(LN)			"/*[local-name()='" LN "']"
-#	define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
-#	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
-#	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
 
 /* hypervisor properties */
 #define ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE		0
@@ -371,6 +321,11 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_TYPE_UNKNOWN	0
 #define ZBX_VMWARE_TYPE_VSPHERE	1
 #define ZBX_VMWARE_TYPE_VCENTER	2
+
+#define ZBX_VMWARE_SOAP_DATACENTER	"Datacenter"
+#define ZBX_VMWARE_SOAP_FOLDER		"Folder"
+#define ZBX_VMWARE_SOAP_CLUSTER		"ClusterComputeResource"
+#define ZBX_VMWARE_SOAP_DEFAULT		"VMware"
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

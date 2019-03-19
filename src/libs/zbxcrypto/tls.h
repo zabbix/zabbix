@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,11 +60,13 @@ typedef struct
 	gnutls_priority_t			ciphersuites_psk;
 #elif defined(HAVE_OPENSSL)
 	SSL_CTX			*ctx_cert;
+#ifdef HAVE_OPENSSL_WITH_PSK
 	SSL_CTX			*ctx_psk;
 	const char		*psk_identity_for_cb;
 	size_t			psk_identity_len_for_cb;
 	char			*psk_for_cb;
 	size_t			psk_len_for_cb;
+#endif
 #endif
 }
 ZBX_THREAD_SENDVAL_TLS_ARGS;
@@ -79,6 +81,7 @@ void	zbx_tls_init_parent(void);
 void	zbx_tls_init_child(void);
 void	zbx_tls_free(void);
 void	zbx_tls_free_on_signal(void);
+void	zbx_tls_version(void);
 
 #endif	/* #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 

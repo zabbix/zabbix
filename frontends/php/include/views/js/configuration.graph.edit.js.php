@@ -86,7 +86,7 @@
 		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 	<?php endif ?>
 	<td>
-		<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false)->toString() ?>
+		<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
 	</td>
 	<?php if (!$readonly): ?>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
@@ -118,8 +118,14 @@
 			row = jQuery(itemTpl.evaluate(item));
 
 		jQuery('#itemButtonsRow').before(row);
+
+		var items_calc_fnc = jQuery('#items_' + number + '_calc_fnc');
+
+		items_calc_fnc.val(calc_fnc);
+		if (items_calc_fnc[0].selectedIndex < 0) {
+			items_calc_fnc[0].selectedIndex = 0;
+		}
 		jQuery('#items_' + number + '_type').val(type);
-		jQuery('#items_' + number + '_calc_fnc').val(calc_fnc);
 		jQuery('#items_' + number + '_drawtype').val(drawtype);
 		jQuery('#items_' + number + '_yaxisside').val(yaxisside);
 		row.find('.input-color-picker input').colorpicker();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ require_once dirname(__FILE__).'/zbx_dbcast_2bigintTest.php';
 require_once dirname(__FILE__).'/dbConditionIntTest.php';
 require_once dirname(__FILE__).'/dbConditionIdTest.php';
 require_once dirname(__FILE__).'/dbConditionStringTest.php';
+require_once dirname(__FILE__).'/testHistoryManager.php';
 // require_once dirname(__FILE__).'/urlParamTest.php';
 
 class GeneralTests {
@@ -54,6 +55,7 @@ class GeneralTests {
 		$suite->addTestSuite('dbConditionIntTest');
 		$suite->addTestSuite('dbConditionIdTest');
 		$suite->addTestSuite('dbConditionStringTest');
+		$suite->addTestSuite('testHistoryManager');
 //		$suite->addTestSuite('urlParamTest');
 
 		return $suite;

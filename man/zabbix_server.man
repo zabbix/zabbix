@@ -1,4 +1,39 @@
-.TH ZABBIX_SERVER 8 "2018\-10\-11" Zabbix
+.\" Start URL macro. Copied from an-ext.tmac for portability
+.de UR
+.  ds m1 \\$1\"
+.  nh
+.  if \\n(mH \{\
+.    \" Start diversion in a new environment.
+.    do ev URL-div
+.    do di URL-div
+.  \}
+..
+.\" End URL macro. Copied from an-ext.tmac for portability
+.de UE
+.  ie \\n(mH \{\
+.    br
+.    di
+.    ev
+.
+.    \" Has there been one or more input lines for the link text?
+.    ie \\n(dn \{\
+.      do HTML-NS "<a href=""\\*(m1"">"
+.      \" Yes, strip off final newline of diversion and emit it.
+.      do chop URL-div
+.      do URL-div
+\c
+.      do HTML-NS </a>
+.    \}
+.    el \
+.      do HTML-NS "<a href=""\\*(m1"">\\*(m1</a>"
+\&\\$*\"
+.  \}
+.  el \
+\\*(la\\*(m1\\*(ra\\$*\"
+.
+.  hy \\n(HY
+..
+.TH ZABBIX_SERVER 8 "2019\-01\-29" Zabbix
 .SH NAME
 zabbix_server \- Zabbix server daemon
 .SH SYNOPSIS
@@ -58,7 +93,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (e.g., poller)
+All processes of specified type (alerter, alert\ manager, configuration\ syncer, discoverer, escalator, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, preprocessing\ manager, preprocessing\ worker, proxy\ poller, self\-monitoring, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector)
 .RE
 .RS 4
 .TP 4
@@ -68,7 +103,7 @@ Process type and number (e.g., poller,3)
 .RS 4
 .TP 4
 .I pid
-Process identifier, up to 65535. For larger values specify target as "process\-type,N" 
+Process identifier, up to 65535. For larger values specify target as "process\-type,N"
 .RE
 .RE
 .IP "\fB\-h\fR, \fB\-\-help\fR"
@@ -80,6 +115,10 @@ Output version information and exit.
 .I /usr/local/etc/zabbix_server.conf
 Default location of Zabbix server configuration file (if not modified during compile time).
 .SH "SEE ALSO"
+.UR https://www.zabbix.com/manuals
+Documentation
+.UE
+.PP
 .BR zabbix_agentd (8),
 .BR zabbix_get (8),
 .BR zabbix_proxy (8),

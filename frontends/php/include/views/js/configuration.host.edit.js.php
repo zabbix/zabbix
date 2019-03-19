@@ -178,8 +178,8 @@
 							<?= CJs::encodeJson(_('Interface is used by items that require this type of the interface.')) ?>
 						);
 					},
-					function (event) {
-						hintBox.hideHint(event, this);
+					function () {
+						hintBox.hideHint(this);
 					}
 				);
 		}
@@ -388,6 +388,7 @@
 						bulkItem.append(jQuery('<input>', {
 							id: 'interfaces_' + hostInterfaceId + '_bulk',
 							type: 'checkbox',
+							class: '<?= ZBX_STYLE_CHECKBOX_RADIO ?>',
 							name: 'interfaces[' + hostInterfaceId + '][bulk]',
 							value: 1,
 							checked: true

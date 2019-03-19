@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,7 +110,6 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
 
 $applications = [];
 $items = [];
-$hostScripts = [];
 $child_groups = [];
 
 // multiselect host groups
@@ -159,7 +158,6 @@ if ($filterSet) {
 		'output' => ['name', 'hostid', 'status'],
 		'hostids' => $filter['hostids'],
 		'groupids' => $groupids,
-		'selectGraphs' => API_OUTPUT_COUNT,
 		'with_monitored_items' => true,
 		'preservekeys' => true
 	]);
@@ -283,21 +281,6 @@ if ($items) {
 			array_push($sortFields, 'name', 'applicationid');
 			CArrayHelper::sort($applications, $sortFields);
 		}
-
-		// get host scripts
-		$hostScripts = API::Script()->getScriptsByHosts($hostIds);
-
-		// get templates screen count
-		$screens = API::TemplateScreen()->get([
-			'hostids' => $hostIds,
-			'countOutput' => true,
-			'groupCount' => true
-		]);
-		$screens = zbx_toHash($screens, 'hostid');
-		foreach ($hosts as &$host) {
-			$host['screens'] = isset($screens[$host['hostid']]);
-		}
-		unset($host);
 	}
 }
 
@@ -332,7 +315,7 @@ $widget = (new CWidget())
 
 if (in_array($page['web_layout_mode'], [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	// Filter
-	$widget->addItem((new CFilter())
+	$widget->addItem((new CFilter(new CUrl('latest.php')))
 		->setProfile('web.latest.filter')
 		->setActiveTab(CProfile::get('web.latest.filter.active', 1))
 		->addFilterTab(_('Filter'), [
@@ -347,7 +330,8 @@ if (in_array($page['web_layout_mode'], [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN
 								'srctbl' => 'host_groups',
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'groupids_'
+								'dstfld1' => 'groupids_',
+								'real_hosts' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -542,7 +526,6 @@ foreach ($items as $key => $item) {
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		]);
-		$change = nbsp($change);
 	}
 	else {
 		$change = UNKNOWN_VALUE;
@@ -631,8 +614,7 @@ foreach ($applications as $appid => $dbApp) {
 
 	$open_state = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
-	$hostName = (new CLinkAction($host['name']))
-		->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+	$hostName = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($dbApp['hostid']));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);
 	}
@@ -697,7 +679,6 @@ foreach ($items as $item) {
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		]);
-		$change = nbsp($change);
 	}
 	else {
 		$change = UNKNOWN_VALUE;
@@ -776,8 +757,7 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	$open_state = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
-	$hostName = (new CLinkAction($host['name']))
-		->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+	$hostName = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostId));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);
 	}

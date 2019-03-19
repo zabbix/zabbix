@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ function zbx_svggraph_widget_trigger(hook_name) {
 
 	switch (hook_name) {
 		case 'onResizeEnd':
-			jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget', grid.widget['uniqueid']);
+			jQuery('.dashbrd-grid-container').dashboardGrid('refreshWidget', grid.widget['uniqueid']);
 			break;
 
 		case 'onEditStart':

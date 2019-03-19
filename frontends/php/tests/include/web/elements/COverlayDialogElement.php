@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ class COverlayDialogElement extends CElement {
 	 */
 	public function waitUntilReady() {
 		$this->query('class:preloader')->waitUntilNotPresent();
+
 		return $this;
 	}
 
@@ -48,12 +49,51 @@ class COverlayDialogElement extends CElement {
 	}
 
 	/**
+	 * Set context (host / hostgroup) of overlay dialog.
+	 *
+	 * @param array $context
+	 */
+	public function setDataContext($context) {
+		if (!$context) {
+			return $this;
+		}
+
+		$query = $this->query('xpath:./div[@class="overlay-dialogue-controls"]//select')->asDropdown()->waitUntilPresent();
+
+		if (!is_array($context)) {
+			$query->one()->select($context);
+			$this->waitUntilReady();
+
+			return $this;
+		}
+
+		$controls = $query->all()->indexByAttribute('name');
+
+		foreach ($context as $name => $value) {
+			if (is_array($value) && array_key_exists('name', $value) && array_key_exists('value', $value)) {
+				$name = $value['name'];
+				$value = $value['value'];
+			}
+
+			if ($controls->exists($name)) {
+				$controls->get($name)->select($value);
+				$this->waitUntilReady();
+			}
+			else {
+				throw new Exception('Cannot set overlay dialog context for \"'.$name.'\" to \"'.$value.'\".');
+			}
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Get content of overlay dialog.
 	 *
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('class:overlay-dialogue-body')->one();
+		return $this->query('class:overlay-dialogue-body')->waitUntilPresent()->one();
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,32 +53,43 @@ class CXPathHelper {
 	 *
 	 * @throws Exception
 	 */
-	public function fromSelector($type, $locator = null) {
-		$selector = CElementQuery::getSelector($type, $locator);
+	public static function fromSelector($type, $locator = null) {
+		return self::fromWebDriverBy(CElementQuery::getSelector($type, $locator));
+	}
 
-		switch ($selector->getMechanism()) {
+	/**
+	 * Get XPath selector from WebDriverBy selector.
+	 *
+	 * @param WebDriverBy  $by     selector
+	 *
+	 * @return string
+	 *
+	 * @throws Exception
+	 */
+	public static function fromWebDriverBy($by) {
+		switch ($by->getMechanism()) {
 			case 'class name':
-				return '*[@class='.static::escapeQuotes($selector->getValue()).']';
+				return '*[@class='.static::escapeQuotes($by->getValue()).']';
 
 			case 'id':
-				return '*[@id='.static::escapeQuotes($selector->getValue()).']';
+				return '*[@id='.static::escapeQuotes($by->getValue()).']';
 
 			case 'name':
-				return '*[@name='.static::escapeQuotes($selector->getValue()).']';
+				return '*[@name='.static::escapeQuotes($by->getValue()).']';
 
 			case 'link text':
-				return 'a[string()='.static::escapeQuotes($selector->getValue()).']';
+				return 'a[string()='.static::escapeQuotes($by->getValue()).']';
 
 			case 'partial link text':
-				return 'a[contains(string(), '.static::escapeQuotes($selector->getValue()).')]';
+				return 'a[contains(string(), '.static::escapeQuotes($by->getValue()).')]';
 
 			case 'tag name':
-				return $selector->getValue();
+				return $by->getValue();
 
 			case 'xpath':
-				return ltrim($selector->getValue(), './');
+				return ltrim($by->getValue(), './');
 		}
 
-		throw new Exception('Not supported selector type "'.$type.'".');
+		throw new Exception('Not supported selector type "'.$by->getMechanism().'".');
 	}
 }

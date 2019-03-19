@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2018 Zabbix SIA
+ ** Copyright (C) 2001-2019 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -269,14 +269,12 @@
 							screen.isRefreshing = false;
 
 							$('main .msg-bad').remove();
-							$('[data-hintbox=1]', $('#flickerfreescreen_' + id)).trigger('remove');
 							$('#flickerfreescreen_' + id).replaceWith(html);
 							$('main .msg-bad').insertBefore('main > :first-child');
 
 							window.flickerfreeScreen.setElementProgressState(id, false);
 						}
 						else if (!html.length) {
-							$('[data-hintbox=1]', $('#flickerfreescreen_' + id)).trigger('remove');
 							$('#flickerfreescreen_' + id).remove();
 						}
 
@@ -347,7 +345,6 @@
 				$('img', '#flickerfreescreen_' + id).each(function() {
 					var domImg = $(this),
 						url = new Curl(domImg.attr('src'), false),
-						on_dashboard = timeControl.objectList[id].onDashboard,
 						zbx_sbox = domImg.data('zbx_sbox');
 
 					if (zbx_sbox && zbx_sbox.prevent_refresh) {
@@ -400,7 +397,7 @@
 							}
 						});
 
-					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
+					var async = flickerfreeScreen.getImageSboxHeight(url, function(height) {
 							zbx_sbox.height = parseInt(height, 10);
 							// 'src' should be added only here to trigger load event after new height is received.
 							img.data('zbx_sbox', zbx_sbox)

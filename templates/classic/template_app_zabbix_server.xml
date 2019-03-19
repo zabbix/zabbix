@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.0</version>
-    <date>2018-09-28T08:47:43Z</date>
+    <date>2018-11-20T15:59:47Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -1504,7 +1504,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>zabbix[queue]</key>
-                    <delay>10m</delay>
+                    <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -2641,7 +2641,7 @@
                             <dynamic>0</dynamic>
                             <sort_triggers>0</sort_triggers>
                             <resource>
-                                <name>Zabbix cache usage, % free</name>
+                                <name>Zabbix cache usage, % used</name>
                                 <host>Template App Zabbix Server</host>
                             </resource>
                             <max_columns>3</max_columns>
@@ -3240,7 +3240,7 @@
             </graph_items>
         </graph>
         <graph>
-            <name>Zabbix cache usage, % free</name>
+            <name>Zabbix cache usage, % used</name>
             <width>900</width>
             <height>200</height>
             <yaxismin>0.0000</yaxismin>

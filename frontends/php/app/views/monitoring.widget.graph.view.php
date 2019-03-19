@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ else {
 			->setId($data['graph']['containerid'])
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK)
 		)
-		->addClass('flickerfreescreen')
+		->addClass('flickerfreescreen ')
 		->setAttribute('data-timestamp', $data['graph']['timestamp'])
 		->setId('flickerfreescreen_'.$data['graph']['dataid']);
 
@@ -47,22 +47,23 @@ if ($data['widget']['initial_load'] == 1) {
 	$script .=
 		'if (typeof(zbx_graph_widget_resize_end) !== typeof(Function)) {'.
 			'function zbx_graph_widget_resize_end(img_id) {'.
-				'var content = jQuery("#"+img_id).closest(".dashbrd-grid-widget-content"),'.
+				'var img = jQuery("#"+img_id),'.
+					'content = img.closest(".dashbrd-grid-widget-content"),'.
 					'property_zone_height = timeControl.objectList[img_id]["objDims"]["graphPropertyZoneHeight"],'.
-					'new_width = content.width() - 1,'.
-					'new_height = content.height() - 4,'.
-					'src = jQuery("#"+img_id).attr("src");'.
+					'src = img.attr("src");'.
+					'timeControl.objectList[img_id]["objDims"].width = Math.floor(content.width());'.
 
 				'if (typeof src === "undefined") {'.
 					'return;'.
 				'}'.
 
 				'var img_url = new Curl(src);'.
-
-				'img_url.setArgument("width", new_width);'.
-				'img_url.setArgument("height", new_height);'.
-				'jQuery("#"+img_id)'.
-					'.attr("src", img_url.getUrl());'.
+				'content.css("overflow", "hidden");'.
+				'img_url.setArgument("width", Math.floor(content.width()));'.
+				'img_url.setArgument("height", Math.floor(content.height()));'.
+				'img_url.setArgument("_", (new Date).getTime().toString(34));'.
+				'content.css("overflow", "");'.
+				'img.attr("src", img_url.getUrl());'.
 			'}'.
 		'}'.
 
@@ -72,13 +73,13 @@ if ($data['widget']['initial_load'] == 1) {
 			'}'.
 		'}'.
 
-		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd", '.
+		'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onResizeEnd", '.
 			'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
 				'parameters: ["'.$data['graph']['dataid'].'"],'.
 				'trigger_name: "graph_widget_resize_end_'.$data['widget']['uniqueid'].'"'.
 			'});'.
 
-		'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "timer_refresh", '.
+		'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "timer_refresh", '.
 			'"zbx_graph_widget_timer_refresh", "'.$data['widget']['uniqueid'].'", {'.
 				'parameters: ["'.$data['graph']['dataid'].'"],'.
 				'trigger_name: "graph_widget_timer_refresh_'.$data['widget']['uniqueid'].'"'.

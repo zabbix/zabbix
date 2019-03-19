@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,30 @@
 
 
 jQuery.noConflict();
+
+/**
+ * jQuery based publish/subscribe handler.
+ *
+ * - $.subscribe(event_name, callback)
+ * - $.unsubscribe(event_name, callback)
+ * - $.publish(event_name, data_object)
+ *
+ */
+(function($) {
+	var pubsub = $({});
+
+	$.subscribe = function() {
+		pubsub.on.apply(pubsub, arguments);
+	};
+
+	$.unsubscribe = function() {
+		pubsub.off.apply(pubsub, arguments);
+	};
+
+	$.publish = function() {
+		pubsub.trigger.apply(pubsub, arguments);
+	};
+}(jQuery));
 
 var overlays_stack = [];
 
@@ -423,14 +447,12 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 
 	var url = new Curl('zabbix.php');
 	url.setArgument('action', action);
-	jQuery.each(options, function(key, value) {
-		url.setArgument(key, value);
-	});
 
 	jQuery.ajax({
 		url: url.getUrl(),
-		type: 'get',
+		type: 'post',
 		dataType: 'json',
+		data: options,
 		beforeSend: function(jqXHR) {
 			overlayDialogue(ovelay_properties, trigger_elmnt, jqXHR);
 		},
@@ -524,7 +546,7 @@ function closeDialogHandler(event) {
 
 				// Close overlay hintbox.
 				case 'hintbox':
-					hintBox.hideHint(null, dialog.element, true);
+					hintBox.hideHint(dialog.element, true);
 					break;
 
 				// Close context menu overlays.
@@ -816,15 +838,32 @@ function redirect(uri, method, needle, invert_needle, add_sid) {
 			var is_needle = (typeof(needle) != 'undefined' && key.indexOf(needle) > -1);
 
 			if ((is_needle && !invert_needle) || (!is_needle && invert_needle)) {
-				action += '&' + key + '=' + args[key];
+				if (Array.isArray(args[key])) {
+					for (var i = 0, l = args[key].length; i < l; i++) {
+						action += '&' + key + '[]=' + args[key][i];
+					}
+				}
+				else {
+					action += '&' + key + '=' + args[key];
+				}
+
 				continue;
 			}
 
 			var hInput = document.createElement('input');
 			hInput.setAttribute('type', 'hidden');
 			postForm.appendChild(hInput);
-			hInput.setAttribute('name', key);
-			hInput.setAttribute('value', args[key]);
+
+			if (Array.isArray(args[key])) {
+				hInput.setAttribute('name', key + '[]');
+				for (var i = 0, l = args[key].length; i < l; i++) {
+					hInput.setAttribute('value', args[key][i]);
+				}
+			}
+			else {
+				hInput.setAttribute('name', key);
+				hInput.setAttribute('value', args[key]);
+			}
 		}
 
 		postForm.setAttribute('action', url.getPath() + '?' + action.substr(1));
@@ -933,6 +972,25 @@ function basename(path, suffix) {
  */
 function appendZero(val) {
 	return val < 10 ? '0' + val : val;
+}
+
+/**
+ * Function converts unix timestamp to human readable time in format 'Y-m-d H:i:s'.
+ *
+ * @param {type} time   Unix timestamp to convert.
+ *
+ * @returns {string}
+ */
+function time2str(time) {
+	var dt = new Date(time * 1000),
+		Y = dt.getFullYear(),
+		m = appendZero(dt.getMonth()+1),
+		d = appendZero(dt.getDate()),
+		H = appendZero(dt.getHours()),
+		i = appendZero(dt.getMinutes()),
+		s = appendZero(dt.getSeconds());
+
+	return Y + '-' + m + '-' + d + ' ' + H + ':' + i + ':' + s;
 }
 
 /**

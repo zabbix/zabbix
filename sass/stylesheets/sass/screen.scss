@@ -500,23 +500,34 @@ ul.top-nav-icons {
 	@include transform(scale(.9999));
 }
 
-.header-title {
+.header-title,
+.object-group {
+	min-height: 24px;
+	line-height: 24px;
+	padding: 10px 0 6px;
 	position: relative;
-	width: 100%;
-	padding: 0 0 6px 0;
-	margin: 0 0 10px 0;
-	text-align: right;
-	border-bottom: 1px solid $ui-border-color;
+	vertical-align: top;
+}
 
-	.cell:first-child {
-		max-width: calc(100vw - 370px);
+.header-title {
+	border-bottom: 1px solid $ui-border-color;
+	margin: -10px 0 10px;
+	padding: 10px 0 6px;
+	width: 100%;
+
+	.cell {
+
+		&:first-child {
+			max-width: calc(100vw - 370px);
+		}
 	}
 
 	h1 {
-		text-align: left;
-		white-space: nowrap;
-		text-overflow: ellipsis;
+		line-height: 24px;
 		overflow: hidden;
+		padding-top: 1px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	form {
@@ -525,6 +536,8 @@ ul.top-nav-icons {
 	}
 
 	ul {
+		text-align: right;
+
 		li {
 			display: inline-block;
 			vertical-align: top;
@@ -535,12 +548,17 @@ ul.top-nav-icons {
 		ul li:first-child {
 			padding-left: 0;
 		}
+
+		button {
+			line-height: 22px;
+		}
 	}
 
 	.dashbrd-edit {
 		position: relative;
 		display: inline-block;
 		background-color: $ui-bg-color;
+		margin-right: 5px;
 		@include box-shadow(0 0 0 4px $ui-bg-color);
 
 		&::after {
@@ -578,9 +596,7 @@ article {
 
 // Object Group Navigation
 .object-group {
-	min-height: 24px;
-	line-height: 24px;
-	margin-bottom: 5px;
+	margin-bottom: -1px;
 
 	li {
 		float: left;
@@ -613,6 +629,14 @@ article {
 	.arrow-right {
 		border-left-color: $font-color;
 	}
+
+	button {
+		line-height: 22px;
+	}
+
+	.btn-link {
+		line-height: 14px;
+	}
 }
 
 .hor-list {
@@ -634,19 +658,24 @@ article {
 // Breadcrumbs inline with filter block
 .filter-breadcrumb {
 	display: inline-block;
-	position: relative;
-	top: 0;
+	padding-top: 0;
 	z-index: 3;
-	margin-bottom: 0;
+	max-width: calc(100vw - 200px);
 
-	& > li:first-child {
-		float: left;
-		white-space: nowrap;
+	li {
+		line-height: 14px;
+		vertical-align: top;
+		float: none;
+		display: inline-block;
 
-		& > span {
+		.status-container {
+			padding-top: 3px;
+		}
+
+		> span {
 			display: inline-block;
-			line-height: 1;
-			padding: 4px 7px;
+			height: 18px;
+			padding: 4px 7px 0;
 
 			a {
 				display: inline-block;
@@ -658,8 +687,16 @@ article {
 		}
 	}
 
-	& + .filter-space {
-		margin-top: -28px;
+	> li {
+		padding: 1px 0;
+	}
+
+	> li:first-child {
+		white-space: nowrap;
+	}
+
+	+ .filter-space {
+		margin-top: -29px;
 	}
 }
 
@@ -1041,6 +1078,9 @@ output {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
+		&.latest-value {
+			max-width: 300px;
+		}
 	}
 
 	tbody th {
@@ -1470,8 +1510,6 @@ output {
 	}
 }
 
-.hidden {display: none !important;}
-
 .multiselect-wrapper {
 	position: relative;
 	vertical-align: top;
@@ -1489,6 +1527,10 @@ output {
 
 	&.active {
 		border-color: $form-border-focus-color;
+	}
+
+	&[aria-disabled] {
+		@extend %form-disabled;
 	}
 
 	input[type="text"] {
@@ -1606,6 +1648,14 @@ output {
 .suggest-found {
 	font-weight: bold;
 	color: $dark-yellow;
+}
+
+.suggest-new {
+	border-top: 1px solid $form-border-color;
+
+	span:first-child {
+		font-weight: bold;
+	}
 }
 
 // Forms
@@ -1878,7 +1928,7 @@ output {
 		}
 
 		&:checked:focus + label {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			@include box-shadow(0 0 0 2px rgba($blue, .35));
 			position: relative;
 			z-index: 2;
 		}
@@ -1993,6 +2043,10 @@ textarea {
 	&[readonly] {
 		color: $font-color!important;
 		@extend %form-disabled;
+
+		&:focus {
+			border-color: $form-border-focus-color;
+		}
 	}
 }
 
@@ -2115,6 +2169,10 @@ select {
 		&:active {
 			border-color: $form-border-color;
 		}
+	}
+
+	+ label.label-pos-left span {
+		margin-left: 4px;
 	}
 
 	&:focus + label span {
@@ -2458,14 +2516,15 @@ $icon-widget-btn: (
 			background-color: $ui-bg-color;
 			border: 1px solid $ui-border-color;
 			border-bottom: none;
-			margin: 0 0 0 6px;
-			padding: 0 34px 7px 10px;
+			margin: -1px 0 0 6px;
+			padding: 1px 34px 7px 10px;
 			@include border-radius(2px 2px 0 0);
 		}
 
 		.btn-time {
 			&:after {
 				background-position: -246px -583px;
+				top: 1px;
 			}
 		}
 
@@ -2497,6 +2556,7 @@ $icon-widget-btn: (
 
 .filter-space {
 	box-sizing: border-box;
+	margin-top: 10px;
 
 	li a.ui-tabs-anchor {
 		vertical-align: top;
@@ -2747,10 +2807,15 @@ $icon-widget-btn: (
 }
 
 %btn-disabled {
-	color: $btn-disabled-font-color;
+	color: $btn-disabled-font-color !important;
 	background-color: $btn-disabled-bg-color;
 	border-color: $btn-disabled-border-color;
 	cursor: default;
+
+	&.icon-cal {
+		opacity: 0.3;
+		background-color: transparent;
+	}
 }
 
 %form-disabled {
@@ -3152,9 +3217,9 @@ $form-icon-btn: (
 }
 
 // Dashboard
-.dashbrd-grid-widget-container {
+.dashbrd-grid-container {
 	position: relative;
-	margin: -.25rem;
+	margin: -4px;
 }
 
 .dashbrd-grid-widget-placeholder {
@@ -3164,22 +3229,73 @@ $form-icon-btn: (
 	z-index: 999;
 }
 
-.dashbrd-grid-empty-placeholder {
+.dashbrd-grid-new-widget-placeholder {
+	box-sizing: border-box;
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: calc(100% / 6 - .65rem);
 	height: 200px;
-	margin: .25rem;
+	padding: .25rem;
+	width: calc(100% / 6 - .65rem);
+	z-index: 999;
+	color: $font-alt-color;
+	cursor:pointer;
 
-	h1 {
-		padding: 10px;
+	.dashbrd-grid-widget-new-box,
+	.dashbrd-grid-widget-set-position,
+	.dashbrd-grid-widget-set-size {
+		@include box-shadow(2px 2px 6px $action-shadow-color);
+		border: 1px dashed $form-border-color;
+		background-color: rgba($ui-bg-color, .7);
+		flex: 1;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.dashbrd-grid-widget-set-size {
+		@include box-shadow(inset 2px 2px 6px $action-shadow-color);
+		background: darken($body-bg-color, 6%);
+	}
+
+	.dashbrd-grid-new-widget-label {
+		$icon-height: 28px;
+
+		position: absolute;
+		left: 0;
+		top: calc(50% - #{$icon-height / 2});
+		right: 0;
+		bottom: 0;
+		padding: ($icon-height + 10px) 5px 5px;
 		text-align: center;
+
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -157px -888px;
+			content: ' ';
+			height: $icon-height;
+			width: 36px;
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+	}
+
+	&.disabled {
+		@include opacity(1);
+
+		.dashbrd-grid-widget-new-box {
+			background-color: rgba($ui-bg-color, .7);
+
+			.dashbrd-grid-new-widget-label::before {
+				background: url(../img/icon-sprite.svg) no-repeat -122px -284px;
+			}
+		}
+	}
+}
+
+.dashbrd-grid-widget-set-size {
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -345px -888px;
+		}
 	}
 }
 
@@ -3201,7 +3317,7 @@ $form-icon-btn: (
 
 .dashbrd-grid-widget-content {
 	flex: 1;
-	overflow-y: auto;
+	overflow: auto;
 	@extend %webkit-scrollbar;
 
 	.list-table {
@@ -3243,7 +3359,7 @@ $form-icon-btn: (
 	position: absolute;
 }
 
-.dashbrd-grid-widget-padding {
+.dashbrd-grid-widget-container {
 	display: flex;
 	flex-grow: 1;
 	flex-direction: column;
@@ -3602,19 +3718,6 @@ $form-icon-btn: (
 	&:link {
 		border: none;
 	}
-
-	&:focus {
-
-		&:after {
-			content: "";
-			background: rgba($blue, .35);
-			height: 2px;
-			position: absolute;
-			left: 0;
-			right: 0;
-			bottom: -2px;
-		}
-	}
 }
 
 // Action Menus, Pop-up Menus
@@ -3783,6 +3886,7 @@ $form-icon-btn: (
 
 	.msg-bad,
 	.msg-good {
+		position: -webkit-sticky;
 		position: sticky;
 		top: 0;
 		z-index: 1000;
@@ -4199,8 +4303,8 @@ $form-icon-btn: (
 	stroke-width: 2px;
 }
 .svg-point-highlight {
-	fill: $font-color;
-	fill-opacity: 0.5;
+	fill: $font-color !important;
+	fill-opacity: 0.5 !important;
 }
 
 .svg-graph-preview {
@@ -4220,6 +4324,10 @@ $form-icon-btn: (
 	}
 }
 
+.svg-graph {
+	display: block;
+}
+
 .svg-single-item-graph-legend,
 .svg-single-two-items-graph-legend,
 .svg-graph-legend {
@@ -4230,13 +4338,14 @@ $form-icon-btn: (
 	overflow-y: hidden;
 	white-space: normal;
 	margin: 0 10px;
+	line-height: $svg-legend-line-height;
 
 	div {
 		display: inline-block;
 		margin: 0 4px;
 		font-size: 12px;
-		line-height: $svg-legend-line-height;
-		vertical-align: middle;
+		line-height: 1.1;
+		vertical-align: bottom;
 		min-width: 120px;
 		overflow: hidden;
 		white-space: nowrap;
@@ -4297,6 +4406,10 @@ $form-icon-btn: (
 			display: block;
 		}
 	}
+
+	.header {
+		margin: 0 0 10px 3px;
+	}
 }
 
 .ui-selectable-helper {
@@ -4320,6 +4433,7 @@ $form-icon-btn: (
 
 // Debug, Overlay Description
 .debug-output {
+	display: none;
 	max-height: 600px;
 	overflow-y: auto;
 	padding: 11px;
@@ -5232,21 +5346,22 @@ a.overlay-close-btn {
 		cursor: pointer;
 	}
 
-	input[readonly] + div, input:disabled + div {
-		cursor: default;
+	input[readonly],
+	input:disabled {
+		color: $form-disabled-font-color !important;
+
+		+ div {
+			cursor: default;
+		}
+	}
+
+	input:disabled + div {
+		background: $form-disabled-font-color !important;
+		border: 1px solid $form-disabled-font-color;
 	}
 
 	input[type="text"] {
 		padding-left: 25px;
-	}
-
-	&.disabled {
-		opacity: 1;
-
-		div {
-			background: $form-disabled-font-color !important;
-			border: 1px solid $form-disabled-font-color;
-		}
 	}
 }
 
@@ -5483,6 +5598,11 @@ tr.cursor-move {
 
 .flickerfreescreen {
 	position: relative;
+	overflow: hidden;
+}
+
+.graph-wrapper {
+	display: inline;
 }
 
 // Analog Clock
@@ -5544,6 +5664,7 @@ svg {
 	border: 10px solid $ui-bg-color;
 	background: $ui-bg-color;
 	display: block;
+	margin: 4px 0;
 
 	.map-container {
 		display: table;
@@ -5575,6 +5696,7 @@ svg {
 .overrides-list {
 	display: table;
 	width: 90%;
+	max-width: 738px;
 	padding-left: 15px;
 
 	.overrides-list-item {
@@ -5678,6 +5800,10 @@ svg {
 			height: 24px;
 		}
 	}
+}
+
+.patternselect {
+	line-height: 14px;
 }
 
 .columns-wrapper {
@@ -6211,15 +6337,16 @@ $range-input-width: 31px;
 		margin-left: -$range-thumb-size/2;
 		width: $range-thumb-size;
 		height: $range-thumb-size;
-		border-radius: $range-thumb-size/2;
-		box-shadow: 0 0 1px white;
+		border-radius: 50%;
 		background: $range-thumb-color;
 	}
 
 	&.range-control-focus {
 		.range-control-thumb {
+			margin-top: -$range-thumb-size/1.5;
+			margin-left: -$range-thumb-size/1.5;
 			background: $range-thumb-color-focus;
-			box-shadow: 0 0 0 2px lighten($btn-bg-color, 10%);
+			border: 2px solid lighten($btn-bg-color, 10%);
 		}
 
 		.range-control-progress {

@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2018 Zabbix SIA
+ ** Copyright (C) 2001-2019 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,15 @@
 
 
 jQuery(function($) {
+
+	$.propHooks.disabled = {
+		set: function (el, val) {
+			if (el.disabled !== val) {
+				el.disabled = val;
+				$(el).trigger(val ? 'disable' : 'enable');
+			}
+		}
+	};
 
 	var $search = $('#search');
 
@@ -61,6 +70,82 @@ jQuery(function($) {
 		changeClass(comboBox);
 	});
 
+	function uncheckedHandler($checkbox) {
+		var $hidden = $checkbox.prev('input[type=hidden][name="' + $checkbox.prop('name') + '"]');
+
+		if ($checkbox.is(':checked') || $checkbox.is(':disabled')) {
+			$hidden.remove();
+		}
+		else if (!$hidden.length) {
+			$('<input>', {'type': 'hidden', 'name': $checkbox.prop('name')})
+				.val($checkbox.attr('unchecked-value'))
+				.insertBefore($checkbox);
+		}
+	}
+
+	$('input[unchecked-value]').each(function() {
+		var $this = $(this);
+
+		uncheckedHandler($this);
+		$this.on('change enable disable', function() {
+			uncheckedHandler($(this));
+		});
+	});
+
+	function showMenuPopup(obj, data, event) {
+		switch (data.type) {
+			case 'history':
+				data = getMenuPopupHistory(data);
+				break;
+
+			case 'host':
+				data = getMenuPopupHost(data, obj);
+				break;
+
+			case 'map_element_submap':
+				data = getMenuPopupMapElementSubmap(data);
+				break;
+
+			case 'map_element_group':
+				data = getMenuPopupMapElementGroup(data);
+				break;
+
+			case 'map_element_trigger':
+				data = getMenuPopupMapElementTrigger(data);
+				break;
+
+			case 'map_element_image':
+				data = getMenuPopupMapElementImage(data);
+				break;
+
+			case 'refresh':
+				data = getMenuPopupRefresh(data, obj);
+				break;
+
+			case 'trigger':
+				data = getMenuPopupTrigger(data, obj);
+				break;
+
+			case 'trigger_macro':
+				data = getMenuPopupTriggerMacro(data);
+				break;
+
+			case 'dashboard':
+				data = getMenuPopupDashboard(data, obj);
+				break;
+
+			case 'item':
+				data = getMenuPopupItem(data, obj);
+				break;
+
+			case 'item_prototype':
+				data = getMenuPopupItemPrototype(data);
+				break;
+		}
+
+		obj.menuPopup(data, event);
+	}
+
 	/**
 	 * Build menu popup for given elements.
 	 */
@@ -77,45 +162,25 @@ jQuery(function($) {
 			event.target = this;
 		}
 
-		switch (data.type) {
-			case 'history':
-				data = getMenuPopupHistory(data);
-				break;
+		var	url = new Curl('zabbix.php'),
+			ajax_data = {
+				data: data.data
+			};
 
-			case 'host':
-				data = getMenuPopupHost(data, obj);
-				break;
+		url.setArgument('action', 'menu.popup');
+		url.setArgument('type', data.type);
 
-			case 'map':
-				data = getMenuPopupMap(data, obj);
-				break;
-
-			case 'refresh':
-				data = getMenuPopupRefresh(data);
-				break;
-
-			case 'trigger':
-				data = getMenuPopupTrigger(data);
-				break;
-
-			case 'triggerLog':
-				data = getMenuPopupTriggerLog(data, obj);
-				break;
-
-			case 'triggerMacro':
-				data = getMenuPopupTriggerMacro(data);
-				break;
-
-			case 'dependent_items':
-				data = getMenuPopupDependentItems(data);
-				break;
-
-			case 'dashboard':
-				data = getMenuPopupDashboard(data, obj);
-				break;
-		}
-
-		obj.menuPopup(data, event);
+		$.ajax({
+			url: url.getUrl(),
+			method: 'POST',
+			data: ajax_data,
+			dataType: 'json',
+			success: function(resp) {
+				showMenuPopup(obj, resp.data, event);
+			},
+			error: function() {
+			}
+		});
 
 		return false;
 	});
@@ -151,22 +216,26 @@ jQuery(function($) {
 		}
 		else if ($('[name="'+data.parentId+'"]').hasClass('patternselect')) {
 			/**
-			 * Pattern select allows enter multiple comma or newline separated values in same editable field. Values
-			 * passed to add.popup should be appended at the and of existing value string. Duplicates are skipped.
+			 * Pattern select allows to enter multiple comma or newline separated values in same editable field. Values
+			 * passed to add.popup should be appended at the end of existing value string.
+			 *
+			 * values_arr is used to catch duplicates.
+			 * values_str is used to store user's original syntax.
 			 */
-			var values = $('[name="'+data.parentId+'"]').val();
+			var values_str = $('[name="'+data.parentId+'"]').val(),
+				values_arr = values_str.split(/[,|\n]+/).map(function(str) {return str.trim()});
+
 			data.values.forEach(function(val) {
-				var escaped = val[data.object].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-				if (!values.match(new RegExp('(' + escaped + '([,|\n]|$))', 'gm'))) {
-					if (values !== '') {
-						values = values + ', ';
+				if (values_arr.indexOf(val[data.object]) == -1) {
+					if (values_str !== '') {
+						values_str += ', ';
 					}
-					values = values + val[data.object];
+					values_str += val[data.object];
 				}
 			});
 
 			$('[name="'+data.parentId+'"]')
-				.val(values)
+				.val(values_str)
 				.trigger('change');
 		}
 		else if (typeof addPopupValues !== 'undefined') {

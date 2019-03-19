@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "http.h"
 #include "net.h"
 #include "system.h"
+#include "zabbix_stats.h"
 #include "zbxexec.h"
 
 #if !defined(_WINDOWS)
@@ -79,6 +80,8 @@ ZBX_METRIC	parameters_common[] =
 	{"logrt",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
 	{"logrt.count",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
 	{"eventlog",		CF_HAVEPARAMS,	ONLY_ACTIVE, 		"system"},
+
+	{"zabbix.stats",	CF_HAVEPARAMS,	ZABBIX_STATS,		"127.0.0.1,10051"},
 
 	{NULL}
 };

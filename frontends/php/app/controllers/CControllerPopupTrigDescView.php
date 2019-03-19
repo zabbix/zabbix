@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 class CControllerPopupTrigDescView extends CController {
 	private $trigger;
+	private $event;
 
 	protected function init() {
 		$this->disableSIDvalidation();
@@ -29,6 +30,7 @@ class CControllerPopupTrigDescView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'triggerid' => 'required|db triggers.triggerid',
+			'eventid' => 'db events.objectid',
 			'success' => 'in 1'
 		];
 
@@ -58,6 +60,19 @@ class CControllerPopupTrigDescView extends CController {
 			return false;
 		}
 
+		if ($this->hasInput('eventid')) {
+			$events = API::Event()->get([
+				'output' => ['clock', 'ns'],
+				'eventids' => $this->getInput('eventid')
+			]);
+
+			if (!$events) {
+				return false;
+			}
+
+			$this->event = $events[0];
+		}
+
 		$this->trigger = $triggers[0];
 
 		return true;
@@ -82,11 +97,19 @@ class CControllerPopupTrigDescView extends CController {
 			'trigger' => $this->trigger,
 			'isTriggerEditable' => (bool) $rw_triggers,
 			'isCommentExist' => ($this->trigger['comments'] !== ''),
-			'resolved' => CMacrosResolverHelper::resolveTriggerDescription($this->trigger),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
+
+		if ($this->hasInput('eventid')) {
+			$data['eventid'] = $this->getInput('eventid');
+			$data['resolved'] =
+				CMacrosResolverHelper::resolveTriggerDescription($this->trigger + $this->event, ['events' => true]);
+		}
+		else {
+			$data['resolved'] = CMacrosResolverHelper::resolveTriggerDescription($this->trigger);
+		}
 
 		if (($messages = getMessages($this->hasInput('success'))) !== null) {
 			$data['messages'] = $messages;

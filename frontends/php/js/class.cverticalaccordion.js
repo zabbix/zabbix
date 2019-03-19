@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2018 Zabbix SIA
+ ** Copyright (C) 2001-2019 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -72,6 +72,8 @@ jQuery(function ($) {
 			$('.' + options['active_class'], accordion)
 				.removeClass(options['active_class'])
 				.addClass(options['closed_class']);
+
+			$('textarea', accordion).scrollTop(0);
 
 			$(options['handler'], accordion).attr('title', t('S_EXPAND'));
 		},

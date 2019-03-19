@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,7 +92,18 @@ class CTableElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getRows() {
-		return $this->query('xpath:.//tbody/tr')->asTableRow(['parent' => $this])->all();
+		return $this->query('xpath:./tbody/tr')->asTableRow(['parent' => $this])->all();
+	}
+
+	/**
+	 * Get table row by index.
+	 *
+	 * @param $index    row index
+	 *
+	 * @return CTableRow
+	 */
+	public function getRow($index) {
+		return $this->query('xpath:./tbody/tr['.((int)$index + 1).']')->asTableRow(['parent' => $this])->one();
 	}
 
 	/**
@@ -107,7 +118,7 @@ class CTableElement extends CElement {
 		foreach ($this->getRows() as $row) {
 			$data = [];
 
-			foreach ($row->query('xpath:./td')->all() as $i => $column) {
+			foreach ($row->query('xpath:./*')->all() as $i => $column) {
 				$data[$headers[$i]] = $column;
 			}
 

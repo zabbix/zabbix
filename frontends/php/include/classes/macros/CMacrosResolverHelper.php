@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -216,12 +216,19 @@ class CMacrosResolverHelper {
 	 *
 	 * @static
 	 *
-	 * @param array $trigger
+	 * @param array  $trigger
+	 * @param string $trigger['expression']
+	 * @param string $trigger['comments']
+	 * @param int    $trigger['clock']       (optional)
+	 * @param int    $trigger['ns']          (optional)
+	 * @param array  $options
+	 * @param bool   $options['events']      (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 *                                       Default: false.
 	 *
 	 * @return string
 	 */
-	public static function resolveTriggerDescription(array $trigger) {
-		$triggers = self::resolveTriggerDescriptions([$trigger['triggerid'] => $trigger]);
+	public static function resolveTriggerDescription(array $trigger, array $options = []) {
+		$triggers = self::resolveTriggerDescriptions([$trigger['triggerid'] => $trigger], $options);
 
 		return $triggers[$trigger['triggerid']]['comments'];
 	}
@@ -231,14 +238,25 @@ class CMacrosResolverHelper {
 	 *
 	 * @static
 	 *
-	 * @param array $triggers
+	 * @param array  $triggers
+	 * @param string $triggers[$triggerid]['expression']
+	 * @param string $triggers[$triggerid]['comments']
+	 * @param int    $triggers[$triggerid]['clock']       (optional)
+	 * @param int    $triggers[$triggerid]['ns']          (optional)
+	 * @param array  $options
+	 * @param bool   $options['events']                   (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns'
+	 *                                                    fields. Default: false.
 	 *
 	 * @return array
 	 */
-	public static function resolveTriggerDescriptions(array $triggers) {
+	public static function resolveTriggerDescriptions(array $triggers, array $options = []) {
 		self::init();
 
-		return self::$macrosResolver->resolveTriggerDescriptions($triggers);
+		$options += [
+			'events' => false
+		];
+
+		return self::$macrosResolver->resolveTriggerDescriptions($triggers, $options);
 	}
 
 	/**
@@ -537,5 +555,22 @@ class CMacrosResolverHelper {
 		self::init();
 
 		return self::$macrosResolver->resolveTimeUnitMacros($data, ['sources' => $field_names]);
+	}
+
+	/**
+	 * Set every trigger items array elements order by item usage order in trigger expression and recovery expression.
+	 *
+	 * @param array  $triggers                            Array of triggers.
+	 * @param string $triggers[]['expression']            Trigger expression used to define order of trigger items.
+	 * @param string $triggers[]['recovery_expression']   Trigger expression used to define order of trigger items.
+	 * @param array  $triggers[]['items]                  Items to be sorted.
+	 * @param string $triggers[]['items][]['itemid']      Item id.
+	 *
+	 * @return array
+	 */
+	public static function sortItemsByExpressionOrder(array $triggers) {
+		self::init();
+
+		return self::$macrosResolver->sortItemsByExpressionOrder($triggers);
 	}
 }

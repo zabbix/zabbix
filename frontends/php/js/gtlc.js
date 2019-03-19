@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,38 +18,14 @@
 **/
 
 
-/**
- * jQuery based publish/subscribe handler.
- *
- * - $.subscribe(event_name, callback)
- * - $.unsubscribe(event_name, callback)
- * - $.publish(event_name, data_object)
- *
- */
-(function($) {
-	var pubsub = $({});
-
-	$.subscribe = function() {
-		pubsub.on.apply(pubsub, arguments);
-	};
-
-	$.unsubscribe = function() {
-		pubsub.off.apply(pubsub, arguments);
-	};
-
-	$.publish = function() {
-		pubsub.trigger.apply(pubsub, arguments);
-	};
-}(jQuery));
-
 // Time range selector.
 jQuery(function ($){
 	var container = $('.filter-space').first(),
 		xhr = null,
-		endpoint = new Curl('zabbix.php'),
+		endpoint = new Curl('zabbix.php', false),
 		element = {
-			from: container.find('#from'),
-			to: container.find('#to'),
+			from: container.find('[name=from]'),
+			to: container.find('[name=to]'),
 			from_clndr: container.find('[name=from_calendar]'),
 			to_clndr: container.find('[name=to_calendar]'),
 			apply: container.find('[name=apply]'),
@@ -60,11 +36,12 @@ jQuery(function ($){
 			label: container.find('.btn-time')
 		},
 		request_data = {
-			idx: container.length ? container.data()['profileIdx'] : '',
-			idx2: container.length ? container.data()['profileIdx2'] : 0,
+			idx: container.data('profileIdx'),
+			idx2: container.data('profileIdx2'),
 			from: element.from.val(),
 			to: element.to.val()
 		},
+		ui_accessible = (container.data('accessible') == 1),
 		ui_disabled = false;
 
 	endpoint.setArgument('action', 'timeselector.update');
@@ -136,6 +113,10 @@ jQuery(function ($){
 	 * @param {object} data Server response on 'timeselector.rangechange' request.
 	 */
 	function updateTimeSelectorUI(data) {
+		if (!ui_accessible) {
+			return;
+		}
+
 		if ('error' in data === false) {
 			element.from.val(data.from);
 			element.to.val(data.to);
@@ -170,6 +151,10 @@ jQuery(function ($){
 	 * Disable time selector UI.
 	 */
 	function disableTimeSelectorUI() {
+		if (!ui_accessible) {
+			return;
+		}
+
 		element.apply.closest('.ui-tabs-panel').addClass('in-progress');
 		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', true);
 		$([element.decrement[0], element.zoomout[0], element.increment[0]]).addClass('disabled');
@@ -306,7 +291,6 @@ jQuery(function ($){
 
 	// Time selection box for graphs.
 	var selection = null,
-		anchor = null,
 		noclick_area = null,
 		was_dragged = false,
 		prevent_click = false;
@@ -322,7 +306,7 @@ jQuery(function ($){
 		})
 		.on('click', 'a', function(e) {
 			// Prevent click on graph image parent <a/> element when clicked inside graph selectable area.
-			if ($(e.target).is('img') && prevent_click) {
+			if ($(e.target).is('img') && prevent_click && $(this).hasClass('dashbrd-widget-graph-link')) {
 				return cancelEvent(e);
 			}
 		});
@@ -411,9 +395,9 @@ jQuery(function ($){
 	 * @param {object} e    jQuery event object.
 	 */
 	function selectionHandlerDragEnd(e) {
-		var left = Math.floor(selection.dom.position().left),
+		var left = Math.floor(Math.max(selection.dom.position().left, selection.min)),
 			from_offset = (left - selection.min) * selection.seconds_per_px,
-			to_offset = (selection.max - selection.dom.width() - left) * selection.seconds_per_px,
+			to_offset = (selection.max - Math.floor(selection.dom.width()) - left) * selection.seconds_per_px,
 			zbx_sbox = e.data.zbx_sbox;
 
 		zbx_sbox.prevent_refresh = false;
@@ -448,7 +432,7 @@ jQuery(function ($){
 			width = Math.abs(x - selection.base_x),
 			seconds = Math.round(width * selection.seconds_per_px),
 			label = formatTimestamp(seconds, false, true)
-				+ (seconds < 60 ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
+				+ (seconds < 60 ? ' [min 1' + t('S_MINUTE_SHORT') + ']'  : '');
 
 		if (!was_dragged) {
 			was_dragged = true;
@@ -531,9 +515,8 @@ var timeControl = {
 
 				// url
 				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
-					var graphUrl = new Curl(obj.src);
-					graphUrl.unsetArgument('sid');
-					graphUrl.setArgument('width', obj.objDims.width - 1);
+					var graphUrl = new Curl(obj.src, false);
+					graphUrl.setArgument('width', Math.floor(obj.objDims.width));
 
 					obj.src = graphUrl.getUrl();
 				}
@@ -612,7 +595,7 @@ var timeControl = {
 				id: img.attr('id'),
 				'class': img.attr('class')
 			})
-			.on('load', function() {
+			.one('load', function() {
 				img.replaceWith(clone);
 				window.flickerfreeScreen.setElementProgressState(obj.id, false);
 			});
@@ -672,13 +655,13 @@ var timeControl = {
 		}
 	},
 
-	removeAllSBox: function() {
+	disableAllSBox: function() {
 		jQuery.each(this.objectList, function(i, obj) {
 			if (obj.loadSBox == 1) {
-				obj.loadSBox = 0;
-				jQuery('#'+obj.id).data('zbx_sbox', null);
+				jQuery('#'+obj.containerid).removeClass('dashbrd-widget-graph-link');
 			}
 		});
+		jQuery(document).off('dblclick mousedown', 'img');
 	},
 
 	/**

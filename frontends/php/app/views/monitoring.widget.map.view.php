@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ $item = new CDashboardWidgetMap($data['sysmap_data'], $data['widget_settings']);
 $output = [
 	'header' => $data['name'],
 	'body' => $item->toString(),
-	'script_file' => $item->getScriptFile(),
 	'script_inline' => $item->getScriptRun()
 ];
 

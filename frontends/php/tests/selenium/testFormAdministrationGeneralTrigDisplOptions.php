@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		$this->zbxTestTextPresent(
 			[
 				'Trigger displaying options',
-				'Use custom event status colors',
+				'Use custom event status colours',
 				'blinking',
 				'Unacknowledged PROBLEM events',
 				'Acknowledged PROBLEM events',
@@ -138,17 +138,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'period' => '1441m',
-				'error_msg' => 'Invalid displaying of OK triggers: must be between "0" and "86400".'
+				'error_msg' => 'Invalid displaying of OK triggers: value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '2d',
-				'error_msg' => 'Invalid displaying of OK triggers: must be between "0" and "86400".'
+				'error_msg' => 'Invalid displaying of OK triggers: value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '86401',
-				'error_msg' => 'Invalid displaying of OK triggers: must be between "0" and "86400".'
+				'error_msg' => 'Invalid displaying of OK triggers: value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
@@ -199,7 +199,6 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 				$this->zbxTestTextPresent($data['error_msg']);
 				break;
 		}
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public static function blink_period() {
@@ -227,17 +226,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'period' => '1441m',
-				'error_msg' => 'Invalid blinking on trigger status change: must be between "0" and "86400".'
+				'error_msg' => 'Invalid blinking on trigger status change: value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '2d',
-				'error_msg' => 'Invalid blinking on trigger status change: must be between "0" and "86400".'
+				'error_msg' => 'Invalid blinking on trigger status change: value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '86401',
-				'error_msg' => 'Invalid blinking on trigger status change: must be between "0" and "86400".'
+				'error_msg' => 'Invalid blinking on trigger status change: value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
@@ -288,7 +287,6 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 				$this->zbxTestTextPresent($data['error_msg']);
 				break;
 		}
-		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function testFormAdministrationGeneralTrigDisplOptions_ResetTrigDisplOptions() {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -148,6 +148,7 @@ void	zbx_hashset_create_ext(zbx_hashset_t *hs, size_t init_size,
 				zbx_mem_free_func_t mem_free_func);
 void	zbx_hashset_destroy(zbx_hashset_t *hs);
 
+int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req);
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size);
 void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset);
 void	*zbx_hashset_search(zbx_hashset_t *hs, const void *data);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,13 +19,13 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.1');
-define('ZABBIX_API_VERSION',	'4.0.1');
+define('ZABBIX_VERSION',		'4.0.6rc1');
+define('ZABBIX_API_VERSION',	'4.0.6');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2018');
+define('ZABBIX_COPYRIGHT_TO',	'2019');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -210,37 +210,39 @@ define('AUDIT_ACTION_LOGOUT',	4);
 define('AUDIT_ACTION_ENABLE',	5);
 define('AUDIT_ACTION_DISABLE',	6);
 
-define('AUDIT_RESOURCE_USER',			0);
-define('AUDIT_RESOURCE_ZABBIX_CONFIG',	2);
-define('AUDIT_RESOURCE_MEDIA_TYPE',		3);
-define('AUDIT_RESOURCE_HOST',			4);
-define('AUDIT_RESOURCE_ACTION',			5);
-define('AUDIT_RESOURCE_GRAPH',			6);
-define('AUDIT_RESOURCE_GRAPH_ELEMENT',	7);
-define('AUDIT_RESOURCE_USER_GROUP',		11);
-define('AUDIT_RESOURCE_APPLICATION',	12);
-define('AUDIT_RESOURCE_TRIGGER',		13);
-define('AUDIT_RESOURCE_HOST_GROUP',		14);
-define('AUDIT_RESOURCE_ITEM',			15);
-define('AUDIT_RESOURCE_IMAGE',			16);
-define('AUDIT_RESOURCE_VALUE_MAP',		17);
-define('AUDIT_RESOURCE_IT_SERVICE',		18);
-define('AUDIT_RESOURCE_MAP',			19);
-define('AUDIT_RESOURCE_SCREEN',			20);
-define('AUDIT_RESOURCE_SCENARIO',		22);
-define('AUDIT_RESOURCE_DISCOVERY_RULE',	23);
-define('AUDIT_RESOURCE_SLIDESHOW',		24);
-define('AUDIT_RESOURCE_SCRIPT',			25);
-define('AUDIT_RESOURCE_PROXY',			26);
-define('AUDIT_RESOURCE_MAINTENANCE',	27);
-define('AUDIT_RESOURCE_REGEXP',			28);
-define('AUDIT_RESOURCE_MACRO',			29);
-define('AUDIT_RESOURCE_TEMPLATE',		30);
-define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE', 31);
-define('AUDIT_RESOURCE_ICON_MAP',		32);
-define('AUDIT_RESOURCE_DASHBOARD',		33);
-define('AUDIT_RESOURCE_CORRELATION',	34);
-define('AUDIT_RESOURCE_HOST_PROTOTYPE', 35);
+define('AUDIT_RESOURCE_USER',				0);
+define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2);
+define('AUDIT_RESOURCE_MEDIA_TYPE',			3);
+define('AUDIT_RESOURCE_HOST',				4);
+define('AUDIT_RESOURCE_ACTION',				5);
+define('AUDIT_RESOURCE_GRAPH',				6);
+define('AUDIT_RESOURCE_GRAPH_ELEMENT',		7);
+define('AUDIT_RESOURCE_USER_GROUP',			11);
+define('AUDIT_RESOURCE_APPLICATION',		12);
+define('AUDIT_RESOURCE_TRIGGER',			13);
+define('AUDIT_RESOURCE_HOST_GROUP',			14);
+define('AUDIT_RESOURCE_ITEM',				15);
+define('AUDIT_RESOURCE_IMAGE',				16);
+define('AUDIT_RESOURCE_VALUE_MAP',			17);
+define('AUDIT_RESOURCE_IT_SERVICE',			18);
+define('AUDIT_RESOURCE_MAP',				19);
+define('AUDIT_RESOURCE_SCREEN',				20);
+define('AUDIT_RESOURCE_SCENARIO',			22);
+define('AUDIT_RESOURCE_DISCOVERY_RULE',		23);
+define('AUDIT_RESOURCE_SLIDESHOW',			24);
+define('AUDIT_RESOURCE_SCRIPT',				25);
+define('AUDIT_RESOURCE_PROXY',				26);
+define('AUDIT_RESOURCE_MAINTENANCE',		27);
+define('AUDIT_RESOURCE_REGEXP',				28);
+define('AUDIT_RESOURCE_MACRO',				29);
+define('AUDIT_RESOURCE_TEMPLATE',			30);
+define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE',	31);
+define('AUDIT_RESOURCE_ICON_MAP',			32);
+define('AUDIT_RESOURCE_DASHBOARD',			33);
+define('AUDIT_RESOURCE_CORRELATION',		34);
+define('AUDIT_RESOURCE_GRAPH_PROTOTYPE',	35);
+define('AUDIT_RESOURCE_ITEM_PROTOTYPE',		36);
+define('AUDIT_RESOURCE_HOST_PROTOTYPE',		37);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -752,8 +754,9 @@ define('ZBX_MIN_WIDGET_LINES', 1);
 define('ZBX_MAX_WIDGET_LINES', 100);
 
 // dashboards
-define('DASHBOARD_MAX_ROWS', 64);
-define('DASHBOARD_MAX_COLUMNS', 12);
+define('DASHBOARD_MAX_COLUMNS',		12);
+define('DASHBOARD_MAX_ROWS',		64);
+define('DASHBOARD_WIDGET_MAX_ROWS',	32);
 
 // alignments
 define('HALIGN_DEFAULT',	0);
@@ -1327,9 +1330,7 @@ define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
 // event details widgets
 define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
 define('WIDGET_HAT_EVENTDETAILS',		'hat_eventdetails');
-define('WIDGET_HAT_EVENTACK',			'hat_eventack');
-define('WIDGET_HAT_EVENTACTIONMSGS',	'hat_eventactionmsgs');
-define('WIDGET_HAT_EVENTACTIONMCMDS',	'hat_eventactionmcmds');
+define('WIDGET_HAT_EVENTACTIONS',		'hat_eventactions');
 define('WIDGET_HAT_EVENTLIST',			'hat_eventlist');
 // search widget
 define('WIDGET_SEARCH_HOSTS',			'search_hosts');
@@ -1471,7 +1472,7 @@ define('ZBX_STYLE_COLUMN_TAGS_3', 'column-tags-3');
 define('ZBX_STYLE_COMPACT_VIEW', 'compact-view');
 define('ZBX_STYLE_CURSOR_MOVE', 'cursor-move');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
-define('ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER', 'dashbrd-grid-widget-container');
+define('ZBX_STYLE_DASHBRD_GRID_CONTAINER', 'dashbrd-grid-container');
 define('ZBX_STYLE_DASHBRD_WIDGET_HEAD', 'dashbrd-widget-head');
 define('ZBX_STYLE_DASHBRD_WIDGET_FOOT', 'dashbrd-widget-foot');
 define('ZBX_STYLE_DASHBRD_EDIT', 'dashbrd-edit');
@@ -1512,13 +1513,13 @@ define('ZBX_STYLE_FLH_WARNING_BG', 'flh-warning-bg');
 define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
+define('ZBX_STYLE_GRAPH_WRAPPER', 'graph-wrapper');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
 define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_TEAL', 'teal');
 define('ZBX_STYLE_HEADER_LOGO', 'header-logo');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
-define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
@@ -1634,6 +1635,7 @@ define('ZBX_STYLE_STATUS_NA_BG', 'status-na-bg');
 define('ZBX_STYLE_STATUS_RED', 'status-red');
 define('ZBX_STYLE_STATUS_WARNING_BG', 'status-warning-bg');
 define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
+define('ZBX_STYLE_SVG_GRAPH', 'svg-graph');
 define('ZBX_STYLE_SVG_GRAPH_PREVIEW', 'svg-graph-preview');
 define('ZBX_STYLE_SUBFILTER', 'subfilter');
 define('ZBX_STYLE_SUBFILTER_ENABLED', 'subfilter-enabled');

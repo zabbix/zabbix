@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 # Zabbix
-# Copyright (C) 2001-2018 Zabbix SIA
+# Copyright (C) 2001-2019 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -45,7 +45,7 @@ my %c = (
 
 $c{"before"} = "/*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -240,9 +240,10 @@ sub process_table
 
 		for ($flags)
 		{
-			# do not output ZBX_DATA and ZBX_TEMPLATE, remove it
+			# do not output ZBX_DATA ZBX_DASHBOARD and ZBX_TEMPLATE, remove it
 			s/ZBX_DATA//;
 			s/ZBX_TEMPLATE//;
+			s/ZBX_DASHBOARD//;
 			s/,+$//;
 			s/^,+//;
 			s/,+/ \| /g;

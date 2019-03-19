@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,15 +108,17 @@ class CControllerAuthenticationUpdate extends CController {
 	private function validateLdap() {
 		$is_valid = true;
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
-		$ldap_fields = ['ldap_host', 'ldap_port', 'ldap_base_dn', 'ldap_bind_dn', 'ldap_search_attribute',
-			'ldap_bind_password', 'ldap_configured'
-		];
+		$ldap_fields = ['ldap_host', 'ldap_port', 'ldap_base_dn', 'ldap_search_attribute', 'ldap_configured'];
 		$config = select_config();
-		$this->getInputs($config, $ldap_fields);
+		$this->getInputs($config, array_merge($ldap_fields, ['ldap_bind_dn', 'ldap_bind_password']));
 		$ldap_settings_changed = array_diff_assoc($config, select_config());
 
 		if (!$ldap_settings_changed && !$this->hasInput('ldap_test')) {
 			return $is_valid;
+		}
+
+		if ($this->getInput('ldap_bind_password', '') !== '') {
+			$ldap_fields[] = 'ldap_bind_dn';
 		}
 
 		foreach($ldap_fields as $field) {
@@ -157,10 +159,7 @@ class CControllerAuthenticationUpdate extends CController {
 			]);
 
 			if (!$login) {
-				$this->response->setMessageError($this->hasInput('test')
-					? _('LDAP login was not successful')
-					: _('Login name or password is incorrect!')
-				);
+				$this->response->setMessageError($ldap_validator->getError());
 				$is_valid = false;
 			}
 		}
@@ -186,7 +185,7 @@ class CControllerAuthenticationUpdate extends CController {
 			return;
 		}
 
-		$data = DB::getDefaults('config');
+		$config = select_config();
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
@@ -215,22 +214,23 @@ class CControllerAuthenticationUpdate extends CController {
 				$fields['ldap_bind_password'] = '';
 			}
 			else {
-				unset($data['ldap_bind_password']);
+				unset($config['ldap_bind_password']);
 			}
 		}
 
-		$data = array_merge($data, $fields);
+		$data = array_merge($config, $fields);
 		$this->getInputs($data, array_keys($fields));
-
-		$config = select_config();
 		$data = array_diff_assoc($data, $config);
+
+		if (array_key_exists('ldap_bind_dn', $data) && trim($data['ldap_bind_dn']) === '') {
+			$data['ldap_bind_password'] = '';
+		}
 
 		if ($data) {
 			$result = update_config($data);
 
 			if ($result) {
-				if (array_key_exists('authentication_type', $data)
-						&& $config['authentication_type'] != $data['authentication_type']) {
+				if (array_key_exists('authentication_type', $data)) {
 					$this->invalidateSessions();
 				}
 
