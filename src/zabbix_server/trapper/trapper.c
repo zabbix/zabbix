@@ -464,25 +464,25 @@ static	int	ipc_async_exchange(const char *service_name, zbx_uint32_t code, const
 
 	if (FAIL == zbx_ipc_async_socket_send(&asocket, code, data, size))
 	{
-		*error = zbx_strdup(*error, "Cannot send media type test message to alert manager");
+		*error = zbx_strdup(NULL, "Cannot send media type test message to alert manager");
 		goto fail;
 	}
 
 	if (FAIL == zbx_ipc_async_socket_flush(&asocket, 60))
 	{
-		*error = zbx_strdup(*error, "Cannot flush media type test message to alert manager");
+		*error = zbx_strdup(NULL, "Cannot flush media type test message to alert manager");
 		goto fail;
 	}
 
 	if (FAIL == zbx_ipc_async_socket_recv(&asocket, 60, &message))
 	{
-		*error = zbx_strdup(*error, "Cannot receive media type test response from alert manager");
+		*error = zbx_strdup(NULL, "Cannot receive media type test response from alert manager");
 		goto fail;
 	}
 
 	if (NULL == message)
 	{
-		*error = zbx_strdup(*error, "Timeout while waiting for media type test response from alert manager");
+		*error = zbx_strdup(NULL, "Timeout while waiting for media type test response from alert manager");
 		goto fail;
 	}
 
@@ -514,8 +514,8 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_alert_send";
 	int			ret = FAIL, errcode;
-	char			tmp[ZBX_MAX_UINT64_LEN + 1], error[MAX_STRING_LEN], *sendto = NULL, *subject = NULL,
-				*message = NULL, *errmsg = NULL;
+	char			tmp[ZBX_MAX_UINT64_LEN + 1], *sendto = NULL, *subject = NULL, *message = NULL,
+				*error = NULL;
 	zbx_uint64_t		mediatypeid;
 	size_t			string_alloc;
 	struct zbx_json		json;
@@ -527,80 +527,72 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	if (SUCCEED != super_admin_active_session(jp))
 	{
-		strscpy(error, "Permission denied.");
+		zbx_strdup(NULL, "Permission denied.");
 		goto fail;
 	}
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		zbx_snprintf(error, sizeof(error), "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
+		zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
 		goto fail;
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_MEDIATYPEID, tmp, sizeof(tmp)) ||
 			SUCCEED != is_uint64(tmp, &mediatypeid))
 	{
-		zbx_snprintf(error, sizeof(error), "Cannot parse request tag: %s.", ZBX_PROTO_TAG_MEDIATYPEID);
+		zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_MEDIATYPEID);
 		goto fail;
 	}
 
 	string_alloc = 0;
 	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SENDTO, &sendto, &string_alloc))
 	{
-		zbx_snprintf(error, sizeof(error), "Cannot parse request tag: %s.", ZBX_PROTO_TAG_SENDTO);
+		zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_SENDTO);
 		goto fail;
 	}
 
 	string_alloc = 0;
 	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SUBJECT, &subject, &string_alloc))
 	{
-		zbx_snprintf(error, sizeof(error), "Cannot parse request tag: %s.", ZBX_PROTO_TAG_SUBJECT);
+		zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_SUBJECT);
 		goto fail;
 	}
 
 	string_alloc = 0;
 	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_MESSAGE, &message, &string_alloc))
 	{
-		zbx_snprintf(error, sizeof(error), "Cannot parse request tag: %s.", ZBX_PROTO_TAG_MESSAGE);
+		zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_MESSAGE);
 		goto fail;
 	}
 
 	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, sendto, subject, message);
 
-	if (SUCCEED != ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_ALERT, data, size, &result, &errmsg))
-	{
-		strscpy(error, errmsg);
-		zbx_free(errmsg);
+	if (SUCCEED != ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_ALERT, data, size, &result, &error))
 		goto fail;
-	}
 
-	zbx_alerter_deserialize_result(result, &errcode, &errmsg);
+	zbx_alerter_deserialize_result(result, &errcode, &error);
 	zbx_free(result);
 
-	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-
 	if (SUCCEED != errcode)
-	{
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, errmsg, ZBX_JSON_TYPE_STRING);
-	}
-	else
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+		goto fail;
 
-	zbx_free(errmsg);
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 
 	(void)zbx_tcp_send(sock, json.buffer);
 
 	zbx_json_free(&json);
+
 	ret = SUCCEED;
 fail:
-	if (FAIL == ret)
+	if (SUCCEED != ret)
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 
 	zbx_free(message);
 	zbx_free(subject);
 	zbx_free(sendto);
 	zbx_free(data);
+	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
