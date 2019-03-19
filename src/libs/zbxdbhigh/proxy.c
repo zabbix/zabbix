@@ -150,6 +150,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
@@ -159,6 +160,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 			return FAIL;
 		}
 	}
+#endif
 	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
 	{
 		*error = zbx_strdup(*error, "internal error: invalid connection type");
@@ -190,6 +192,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (strlen(proxy->tls_psk_identity) != attr.psk_identity_len ||
@@ -199,6 +202,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 			return FAIL;
 		}
 	}
+#endif
 #endif
 	return SUCCEED;
 }
@@ -233,6 +237,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
@@ -242,6 +247,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
 			return FAIL;
 		}
 	}
+#endif
 	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
 	{
 		*error = zbx_strdup(*error, "internal error: invalid connection type");
@@ -273,6 +279,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (strlen(host->tls_psk_identity) != attr.psk_identity_len ||
@@ -282,6 +289,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
 			return FAIL;
 		}
 	}
+#endif
 #endif
 	return SUCCEED;
 }
