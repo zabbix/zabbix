@@ -1857,9 +1857,11 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 		goto out;
 	}
 
+	(void)zbx_deserialize_short(&alerter->alert->alertpoolid, &source);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:"
-			ZBX_FS_UI64, __function_name, alerter->alert->alertid, alerter->alert->mediatypeid,
-			alerter->alert->alertpoolid);
+			ZBX_FS_UI64 " source:", __function_name, alerter->alert->alertid, alerter->alert->mediatypeid,
+			alerter->alert->alertpoolid, source);
 
 	zbx_alerter_deserialize_result(message->data, &errcode, &errmsg);
 
@@ -1876,8 +1878,6 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 		else
 			status = ALERT_STATUS_FAILED;
 	}
-
-	(void)zbx_deserialize_short(&alerter->alert->alertpoolid, &source);
 
 	if (ALERT_SOURCE_MANUAL == source)
 	{
