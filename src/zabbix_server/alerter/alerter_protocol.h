@@ -29,7 +29,6 @@
 #define ZBX_IPC_ALERTER_RESULT		1001
 #define ZBX_IPC_ALERTER_ALERT		1002
 
-
 /* manager -> alerter */
 #define ZBX_IPC_ALERTER_EMAIL		1100
 #define ZBX_IPC_ALERTER_JABBER		1101

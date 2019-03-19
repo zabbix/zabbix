@@ -1834,7 +1834,8 @@ out:
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	am_process_result(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manager, zbx_ipc_client_t *client,
+		zbx_ipc_message_t *message)
 {
 	const char		*__function_name = "am_process_result";
 	int			ret = FAIL, errcode, status;
@@ -1878,7 +1879,14 @@ static int	am_process_result(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ip
 
 	(void)zbx_deserialize_short(&alerter->alert->alertpoolid, &source);
 
-	if (ALERT_SOURCE_MANUAL != source)
+	if (ALERT_SOURCE_MANUAL == source)
+	{
+		zbx_ipc_client_t	*alert_send_client;
+
+		if (NULL != (alert_send_client = ipc_client_by_id(alerter_service, alerter->alert->alertid)))
+			zbx_ipc_client_send(alert_send_client, ZBX_IPC_ALERTER_ALERT, message->data, message->size);
+	}
+	else
 		am_db_update_alert(manager, alerter->alert->alertid, status, alerter->alert->retries, errmsg);
 
 	if (ALERT_STATUS_NOT_SENT != status)
@@ -2108,7 +2116,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 					am_register_alerter(&manager, client, message);
 					break;
 				case ZBX_IPC_ALERTER_RESULT:
-					if (SUCCEED == am_process_result(&manager, client, message))
+					if (SUCCEED == am_process_result(&alerter_service, &manager, client, message))
 						sent_num++;
 					else
 						failed_num++;

@@ -831,6 +831,22 @@ static void	ipc_service_remove_client(zbx_ipc_service_t *service, zbx_ipc_client
 	}
 }
 
+zbx_ipc_client_t	*ipc_client_by_id(const zbx_ipc_service_t *service, zbx_uint64_t id)
+{
+	int			i;
+	zbx_ipc_client_t	*client;
+
+	for (i = 0; i < service->clients.values_num; i++)
+	{
+		client = (zbx_ipc_client_t *) service->clients.values[i];
+
+		if (id == client->id)
+			return client;
+	}
+
+	return NULL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: ipc_client_read_event_cb                                         *

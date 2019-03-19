@@ -102,10 +102,11 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service);
 int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsigned char *data, zbx_uint32_t size);
 void	zbx_ipc_client_close(zbx_ipc_client_t *client);
 
-void		zbx_ipc_client_addref(zbx_ipc_client_t *client);
-void		zbx_ipc_client_release(zbx_ipc_client_t *client);
-int		zbx_ipc_client_connected(zbx_ipc_client_t *client);
-zbx_uint64_t	zbx_ipc_client_id(const zbx_ipc_client_t *client);
+void			zbx_ipc_client_addref(zbx_ipc_client_t *client);
+void			zbx_ipc_client_release(zbx_ipc_client_t *client);
+int			zbx_ipc_client_connected(zbx_ipc_client_t *client);
+zbx_uint64_t		zbx_ipc_client_id(const zbx_ipc_client_t *client);
+zbx_ipc_client_t	*ipc_client_by_id(const zbx_ipc_service_t *service, zbx_uint64_t id);
 
 int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int timeout, char **error);
 void	zbx_ipc_socket_close(zbx_ipc_socket_t *csocket);
