@@ -1885,6 +1885,8 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 
 		if (NULL != (alert_send_client = ipc_client_by_id(alerter_service, alerter->alert->alertid)))
 			zbx_ipc_client_send(alert_send_client, ZBX_IPC_ALERTER_ALERT, message->data, message->size);
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "client has disconnected");
 	}
 	else
 		am_db_update_alert(manager, alerter->alert->alertid, status, alerter->alert->retries, errmsg);
