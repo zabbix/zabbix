@@ -672,7 +672,7 @@ abstract class CHostGeneral extends CHostBase {
 		$hostids = array_keys($result);
 
 		// adding groups
-		if ($options['selectGroups'] !== null) {
+		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
 			$groups = API::HostGroup()->get([
 				'output' => $options['selectGroups'],
@@ -704,7 +704,9 @@ abstract class CHostGeneral extends CHostBase {
 				]);
 				$templates = zbx_toHash($templates, 'hostid');
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['parentTemplates'] = isset($templates[$hostid]) ? $templates[$hostid]['rowscount'] : 0;
+					$result[$hostid]['parentTemplates'] = array_key_exists($hostid, $templates)
+						? $templates[$hostid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -737,7 +739,7 @@ abstract class CHostGeneral extends CHostBase {
 				]);
 				$items = zbx_toHash($items, 'hostid');
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['items'] = isset($items[$hostid]) ? $items[$hostid]['rowscount'] : 0;
+					$result[$hostid]['items'] = array_key_exists($hostid, $items) ? $items[$hostid]['rowscount'] : '0';
 				}
 			}
 		}
@@ -770,7 +772,9 @@ abstract class CHostGeneral extends CHostBase {
 				]);
 				$items = zbx_toHash($items, 'hostid');
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['discoveries'] = isset($items[$hostid]) ? $items[$hostid]['rowscount'] : 0;
+					$result[$hostid]['discoveries'] = array_key_exists($hostid, $items)
+						? $items[$hostid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -809,7 +813,9 @@ abstract class CHostGeneral extends CHostBase {
 				$triggers = zbx_toHash($triggers, 'hostid');
 
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['triggers'] = isset($triggers[$hostid]) ? $triggers[$hostid]['rowscount'] : 0;
+					$result[$hostid]['triggers'] = array_key_exists($hostid, $triggers)
+						? $triggers[$hostid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -847,7 +853,9 @@ abstract class CHostGeneral extends CHostBase {
 				]);
 				$graphs = zbx_toHash($graphs, 'hostid');
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['graphs'] = isset($graphs[$hostid]) ? $graphs[$hostid]['rowscount'] : 0;
+					$result[$hostid]['graphs'] = array_key_exists($hostid, $graphs)
+						? $graphs[$hostid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -879,8 +887,10 @@ abstract class CHostGeneral extends CHostBase {
 					'groupCount' => true
 				]);
 				$httpTests = zbx_toHash($httpTests, 'hostid');
-				foreach ($result as $hostId => $host) {
-					$result[$hostId]['httpTests'] = isset($httpTests[$hostId]) ? $httpTests[$hostId]['rowscount'] : 0;
+				foreach ($result as $hostid => $host) {
+					$result[$hostid]['httpTests'] = array_key_exists($hostid, $httpTests)
+						? $httpTests[$hostid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -917,7 +927,9 @@ abstract class CHostGeneral extends CHostBase {
 
 				$applications = zbx_toHash($applications, 'hostid');
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['applications'] = isset($applications[$hostid]) ? $applications[$hostid]['rowscount'] : 0;
+					$result[$hostid]['applications'] = array_key_exists($hostid, $applications)
+						? $applications[$hostid]['rowscount']
+						: '0';
 				}
 			}
 		}

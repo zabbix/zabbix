@@ -363,7 +363,7 @@ class CValueMap extends CApiService {
 				);
 
 				foreach ($result as &$valuemap) {
-					$valuemap['mappings'] = 0;
+					$valuemap['mappings'] = '0';
 				}
 				unset($valuemap);
 

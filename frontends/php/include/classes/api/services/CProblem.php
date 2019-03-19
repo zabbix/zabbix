@@ -428,7 +428,7 @@ class CProblem extends CApiService {
 				foreach ($result as &$event) {
 					$event['acknowledges'] = array_key_exists($event['eventid'], $acknowledges)
 						? $acknowledges[$event['eventid']]['rowscount']
-						: 0;
+						: '0';
 				}
 				unset($event);
 			}

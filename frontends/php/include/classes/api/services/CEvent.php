@@ -1119,12 +1119,9 @@ class CEvent extends CApiService {
 						' GROUP BY a.eventid'
 				), 'eventid');
 				foreach ($result as &$event) {
-					if ((isset($acknowledges[$event['eventid']]))) {
-						$event['acknowledges'] = $acknowledges[$event['eventid']]['rowscount'];
-					}
-					else {
-						$event['acknowledges'] = 0;
-					}
+					$event['acknowledges'] = array_key_exists($event['eventid'], $acknowledges)
+						? $acknowledges[$event['eventid']]['rowscount']
+						: '0';
 				}
 				unset($event);
 			}

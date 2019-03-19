@@ -280,6 +280,7 @@ class CItemPrototype extends CItemGeneral {
 				$item['headers'] = $this->headersStringToArray($item['headers']);
 			}
 		}
+		unset($item);
 
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
@@ -1043,12 +1044,9 @@ class CItemPrototype extends CItemGeneral {
 				$triggers = zbx_toHash($triggers, 'itemid');
 
 				foreach ($result as $itemid => $item) {
-					if (isset($triggers[$itemid])) {
-						$result[$itemid]['triggers'] = $triggers[$itemid]['rowscount'];
-					}
-					else {
-						$result[$itemid]['triggers'] = 0;
-					}
+					$result[$itemid]['triggers'] = array_key_exists($itemid, $triggers)
+						? $triggers[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1077,12 +1075,9 @@ class CItemPrototype extends CItemGeneral {
 				$graphs = zbx_toHash($graphs, 'itemid');
 
 				foreach ($result as $itemid => $item) {
-					if (isset($graphs[$itemid])) {
-						$result[$itemid]['graphs'] = $graphs[$itemid]['rowscount'];
-					}
-					else {
-						$result[$itemid]['graphs'] = 0;
-					}
+					$result[$itemid]['graphs'] = array_key_exists($itemid, $graphs)
+						? $graphs[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1099,6 +1094,7 @@ class CItemPrototype extends CItemGeneral {
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
+		// adding preprocessing
 		if ($options['selectPreprocessing'] !== null && $options['selectPreprocessing'] != API_OUTPUT_COUNT) {
 			$db_item_preproc = API::getApiService()->select('item_preproc', [
 				'output' => $this->outputExtend($options['selectPreprocessing'], ['itemid', 'step']),
