@@ -2524,6 +2524,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border-color: #888; }
   .dashbrd-widget .msg-good, .dashbrd-widget .msg-bad {
     margin: 0 10px; }
+  .dashbrd-widget.dashbrd-widget-fluid {
+    margin-right: 0; }
 
 .list-table tbody tr.nothing-to-show {
   text-align: center;
