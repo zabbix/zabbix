@@ -2027,7 +2027,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	if (FAIL == zbx_ipc_service_start(&alerter_service, ZBX_IPC_SERVICE_ALERTER, &error))
