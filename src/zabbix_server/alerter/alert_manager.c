@@ -1739,7 +1739,7 @@ static void	am_abort_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *m
 	{
 		zbx_ipc_client_t	*client;
 
-		if (NULL != (client = ipc_client_by_id(alerter_service, alert->alertid)))
+		if (NULL != (client = zbx_ipc_client_by_id(alerter_service, alert->alertid)))
 		{
 			unsigned char	*data;
 			zbx_uint32_t	data_len;
@@ -1894,7 +1894,7 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 	{
 		zbx_ipc_client_t	*alert_send_client;
 
-		if (NULL != (alert_send_client = ipc_client_by_id(alerter_service, alerter->alert->alertid)))
+		if (NULL != (alert_send_client = zbx_ipc_client_by_id(alerter_service, alerter->alert->alertid)))
 			zbx_ipc_client_send(alert_send_client, ZBX_IPC_ALERTER_ALERT, message->data, message->size);
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "client has disconnected");

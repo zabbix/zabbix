@@ -831,7 +831,7 @@ static void	ipc_service_remove_client(zbx_ipc_service_t *service, zbx_ipc_client
 	}
 }
 
-zbx_ipc_client_t	*ipc_client_by_id(const zbx_ipc_service_t *service, zbx_uint64_t id)
+zbx_ipc_client_t	*zbx_ipc_client_by_id(const zbx_ipc_service_t *service, zbx_uint64_t id)
 {
 	int			i;
 	zbx_ipc_client_t	*client;
