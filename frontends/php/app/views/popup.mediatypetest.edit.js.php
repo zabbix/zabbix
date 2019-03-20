@@ -23,44 +23,47 @@ ob_start(); ?>
 /**
  * Send media type test data to server and get a response.
  *
- * @param {string} formname		form name that is sent to server for validation.
+ * @param {string} formname  Form name that is sent to server for validation.
  */
 function mediatypeTestSend(formname) {
 	var form = window.document.forms[formname],
-		url = new Curl(jQuery(form).attr('action'));
+		$form = jQuery(form),
+		$form_fields = $form.find('#sendto, #subject, #message'),
+		$submit_btn = jQuery('.submit-test-btn'),
+		url = new Curl($form.attr('action'));
 
-	jQuery(form).trimValues(['#sendto', '#subject', '#message']);
+	$form.trimValues(['#sendto', '#subject', '#message']);
 
 	jQuery.ajax({
 		url: url.getUrl(),
-		data: jQuery(form).serialize(),
+		data: $form.serialize(),
 		beforeSend: function() {
-			jQuery(form).find('#sendto, #subject, #message').prop('disabled', true);
+			$form_fields.prop('disabled', true);
 
 			jQuery('<span></span>')
 				.addClass('preloader')
-				.insertAfter(jQuery('.submit-test-btn'))
+				.insertAfter($submit_btn)
 				.css({
 					'display': 'inline-block',
 					'margin': '0 10px -8px'
 				});
 
-			jQuery('.submit-test-btn')
+			$submit_btn
 				.attr('disabled', true)
 				.hide();
 		},
 		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
+			$form.parent().find('.msg-bad, .msg-good').remove();
 
 			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore(jQuery(form));
-				jQuery(form).parent().find('.link-action').click();
+				jQuery(ret.messages).insertBefore($form);
+				$form.parent().find('.link-action').click();
 			}
 
-			jQuery(form).find('#sendto, #subject, #message').prop('disabled', false);
+			$form_fields.prop('disabled', false);
 
 			jQuery('.preloader').remove();
-			jQuery('.submit-test-btn')
+			$submit_btn
 				.attr('disabled', false)
 				.show();
 		},
