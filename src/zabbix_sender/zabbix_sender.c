@@ -482,7 +482,7 @@ static int	check_response(char *response, const char *server, unsigned short por
 	{
 		int	failed;
 
-		printf("Response from %s:%hu \"%s\"\n", server, port, info);
+		printf("Response from [%s:%hu]: \"%s\"\n", server, port, info);
 		fflush(stdout);
 
 		if (1 == sscanf(info, "processed: %*d; failed: %d", &failed) && 0 < failed)
@@ -552,10 +552,12 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "answer [%s]", sock.buffer);
-				if (NULL == sock.buffer || FAIL == (ret = check_response(sock.buffer,
-						sendval_args->server, sendval_args->port)))
+
+				if (FAIL == (ret = check_response(sock.buffer, sendval_args->server,
+						sendval_args->port)))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from server [%s]", sock.buffer);
+					zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from [%s:%hu]: [%s]",
+							sendval_args->server, sendval_args->port, sock.buffer);
 				}
 			}
 		}
