@@ -1782,7 +1782,7 @@ static int	am_process_alert(zbx_ipc_service_t *alerter_service, zbx_am_t *manage
 	char			*cmd = NULL, *error = NULL;
 	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:0x"
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:0x"
 			ZBX_FS_UX64, __function_name, alert->alertid, alert->mediatypeid, alert->alertpoolid);
 
 	if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
@@ -2020,7 +2020,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_DEBUG, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	if (FAIL == zbx_ipc_service_start(&alerter_service, ZBX_IPC_SERVICE_ALERTER, &error))
@@ -2093,8 +2093,11 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 				zbx_vector_ptr_create(&alerts_new);
 
-				if (SUCCEED == (ret = am_db_get_alerts(&manager, &alerts_new, now)))
+				if (SUCCEED == (ret = am_db_get_alerts(&manager, &alerts_new, now)) &&
+						0 != alerts_new.values_num)
+				{
 					zbx_vector_ptr_append_array(&alerts, alerts_new.values, alerts_new.values_num);
+				}
 
 				zbx_vector_ptr_destroy(&alerts_new);
 
