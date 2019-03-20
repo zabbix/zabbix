@@ -1776,7 +1776,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	am_process_alert(zbx_ipc_service_t *alerter_service, zbx_am_t *manager, zbx_am_alerter_t *alerter,
+static int	am_process_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *manager, zbx_am_alerter_t *alerter,
 		zbx_am_alert_t *alert)
 {
 	const char		*__function_name = "am_process_alert";
@@ -1793,6 +1793,7 @@ static int	am_process_alert(zbx_ipc_service_t *alerter_service, zbx_am_t *manage
 
 	if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
 	{
+		am_abort_alert_send(alerter_service, alert, "Media type unavailable");
 		am_alert_free(alert);
 		goto out;
 	}
