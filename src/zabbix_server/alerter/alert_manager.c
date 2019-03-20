@@ -1112,7 +1112,7 @@ static void	am_destroy(zbx_am_t *manager)
  *             error   - [IN] the error message                               *
  *                                                                            *
  ******************************************************************************/
-static void	am_db_update_alert(zbx_am_t *manager, zbx_uint64_t alertid, int status, int retries, char *error)
+static void	am_db_update_alert(zbx_am_t *manager, zbx_uint64_t alertid, int status, int retries, const char *error)
 {
 	const char		*__function_name = "am_db_update_alert";
 
@@ -1728,6 +1728,33 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 	return ret;
 }
 
+static void	am_abort_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *manager,
+		const zbx_am_alert_t *alert, const char *error)
+{
+	unsigned short	source;
+
+	(void)zbx_deserialize_short(&alert->alertpoolid, &source);
+
+	if (ALERT_SOURCE_MANUAL == source)
+	{
+		zbx_ipc_client_t	*client;
+
+		if (NULL != (client = ipc_client_by_id(alerter_service, alert->alertid)))
+		{
+			unsigned char	*data;
+			zbx_uint32_t	data_len;
+
+			data_len = zbx_alerter_serialize_result(&data, FAIL, error);
+			zbx_ipc_client_send(client, ZBX_IPC_ALERTER_ALERT, data, data_len);
+			zbx_free(data);
+		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "client has disconnected");
+	}
+	else
+		am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, error);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: am_process_alert                                                 *
@@ -1742,7 +1769,8 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am_alert_t *alert)
+static int	am_process_alert(zbx_ipc_service_t *alerter_service, zbx_am_t *manager, zbx_am_alerter_t *alerter,
+		zbx_am_alert_t *alert)
 {
 	const char		*__function_name = "am_process_alert";
 
@@ -1792,7 +1820,8 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 			command = ZBX_IPC_ALERTER_EXEC;
 			if (FAIL == am_prepare_mediatype_exec_command(mediatype, alert, &cmd, &error))
 			{
-				am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, error);
+				am_abort_alert(alerter_service, manager, alert, error);
+
 				am_remove_alert(manager, alert);
 				zbx_free(error);
 				goto out;
@@ -1801,7 +1830,7 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 			zbx_free(cmd);
 			break;
 		default:
-			am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, (char *)"unsupported media type");
+			am_abort_alert(alerter_service, manager, alert, "unsupported media type");
 			zabbix_log(LOG_LEVEL_ERR, "cannot process alertid:" ZBX_FS_UI64 ": unsupported media type: %d",
 					alert->alertid, mediatype->type);
 			am_remove_alert(manager, alert);
@@ -2102,7 +2131,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 			if (NULL == (alerter = (zbx_am_alerter_t *)zbx_queue_ptr_pop(&manager.free_alerters)))
 				break;
 
-			if (FAIL == am_process_alert(&manager, alerter, am_pop_alert(&manager)))
+			if (FAIL == am_process_alert(&alerter_service, &manager, alerter, am_pop_alert(&manager)))
 				zbx_queue_ptr_push(&manager.free_alerters, alerter);
 		}
 
