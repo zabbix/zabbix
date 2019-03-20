@@ -1680,7 +1680,10 @@
 						return;
 					}
 
-					if (data.add_widget_dimension.y < pos.y) {
+					if ((pos.y + pos.height) > data['options']['max-rows']) {
+						pos.y = data['options']['max-rows'] - pos.height;
+					}
+					else if (data.add_widget_dimension.y < pos.y) {
 						--pos.y;
 					}
 
@@ -1712,10 +1715,7 @@
 					}
 				}
 
-				if ((pos.y + pos.height) > data['options']['max-rows']) {
-					pos.y = data['options']['max-rows'] - pos.height;
-				}
-				else if ((pos.y + pos.height) > data['options']['rows']) {
+				if ((pos.y + pos.height) > data['options']['rows']) {
 					resizeDashboardGrid($obj, data, pos.y + pos.height);
 				}
 
