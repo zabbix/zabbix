@@ -170,6 +170,13 @@ $output = [
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'return itemPreprocessingTest("#'.$form->getId().'");'
+		],
+		[
+			'title' => _('Cancel'),
+			'cancel' => true,
+			'keepOpen' => false,
+			'class' => ZBX_STYLE_BTN_ALT,
+			'action' => 'return savePreprocessingTestInputs();'
 		]
 	]
 ];
