@@ -121,6 +121,8 @@ int	zbx_ipc_async_socket_send(zbx_ipc_async_socket_t *asocket, zbx_uint32_t code
 int	zbx_ipc_async_socket_recv(zbx_ipc_async_socket_t *asocket, int timeout, zbx_ipc_message_t **message);
 int	zbx_ipc_async_socket_flush(zbx_ipc_async_socket_t *asocket, int timeout);
 int	zbx_ipc_async_socket_check_unsent(zbx_ipc_async_socket_t *asocket);
+int	zbx_ipc_async_exchange(const char *service_name, zbx_uint32_t code, int timeout, const unsigned char *data,
+		zbx_uint32_t size, unsigned char **out, char **error);
 
 
 void	zbx_ipc_message_free(zbx_ipc_message_t *message);
