@@ -25,20 +25,17 @@ $form_list = (new CFormList())
 		(new CTextBox('sendto', $data['sendto'], false, 1024))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
-			->setAriaRequired(),
-		'sendto'
+			->setAriaRequired()
 	)
 	->addRow(
 		new CLabel(_('Subject'), 'subject'),
-		(new CTextBox('subject', $data['subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH),
-		'subject'
+		(new CTextBox('subject', $data['subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	)
 	->addRow(
 		(new CLabel(_('Message'), 'message'))->setAsteriskMark(),
 		(new CTextArea('message', $data['message'], ['rows' => 10]))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAriaRequired(),
-		'message'
+			->setAriaRequired()
 	);
 
 $form = (new CForm())
