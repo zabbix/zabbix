@@ -214,10 +214,12 @@ class CZabbixServer {
 		return $this->request([
 			'request' => 'alert.send',
 			'sid' => $sid,
-			'mediatypeid' => $data['mediatypeid'],
-			'sendto' => $data['sendto'],
-			'subject' => $data['subject'],
-			'message' => $data['message']
+			'data' => [
+				'mediatypeid' => $data['mediatypeid'],
+				'sendto' => $data['sendto'],
+				'subject' => $data['subject'],
+				'message' => $data['message']
+			]
 		]);
 	}
 
