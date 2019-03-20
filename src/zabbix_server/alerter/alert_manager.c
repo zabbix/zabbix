@@ -28,7 +28,6 @@
 #include "alerter_protocol.h"
 #include "alert_manager.h"
 #include "zbxmedia.h"
-#include "zbxserialize.h"
 
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
