@@ -40,6 +40,8 @@
 
 #define ALERT_SOURCE_MANUAL	0xffff
 
+#define ZBX_ALERTPOOL_SOURCE(id) (id >> 48)
+
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
@@ -1734,7 +1736,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 static void	am_abort_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *manager,
 		const zbx_am_alert_t *alert, const char *error)
 {
-	if (ALERT_SOURCE_MANUAL == (alert->alertpoolid >> 48 & 0xffff))
+	if (ALERT_SOURCE_MANUAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
 	{
 		zbx_ipc_client_t	*client;
 
@@ -1886,7 +1888,7 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 			ZBX_FS_UX64, __function_name, alerter->alert->alertid, alerter->alert->mediatypeid,
 			alerter->alert->alertpoolid);
 
-	if (ALERT_SOURCE_MANUAL == (alerter->alert->alertpoolid >> 48 & 0xffff))
+	if (ALERT_SOURCE_MANUAL == ZBX_ALERTPOOL_SOURCE(alerter->alert->alertpoolid))
 	{
 		zbx_ipc_client_t	*alert_send_client;
 
