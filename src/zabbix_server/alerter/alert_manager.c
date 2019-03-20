@@ -1145,6 +1145,33 @@ static void	am_db_update_alert(zbx_am_t *manager, zbx_uint64_t alertid, int stat
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static void	am_abort_alert_send(const zbx_ipc_service_t *alerter_service, const zbx_am_alert_t *alert,
+		const char *error)
+{
+	zbx_ipc_client_t	*client;
+
+	if (NULL != (client = zbx_ipc_client_by_id(alerter_service, alert->alertid)))
+	{
+		unsigned char	*data;
+		zbx_uint32_t	data_len;
+
+		data_len = zbx_alerter_serialize_result(&data, FAIL, error);
+		zbx_ipc_client_send(client, ZBX_IPC_ALERTER_ALERT, data, data_len);
+		zbx_free(data);
+	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "client has disconnected");
+}
+
+static void	am_abort_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *manager,
+		const zbx_am_alert_t *alert, const char *error)
+{
+	if (ALERT_SOURCE_MANUAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
+		am_abort_alert_send(alerter_service, alert, error);
+	else
+		am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, error);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: am_db_get_alerts                                                 *
@@ -1368,7 +1395,8 @@ out:
  *               FAIL    - database connection error                          *
  *                                                                            *
  ******************************************************************************/
-static int	am_db_queue_alerts(zbx_am_t *manager, zbx_vector_ptr_t *alerts)
+static int	am_db_queue_alerts(const zbx_ipc_service_t *alerter_service, zbx_am_t *manager,
+		zbx_vector_ptr_t *alerts)
 {
 	const char		*__function_name = "am_db_queue_alerts";
 
@@ -1416,6 +1444,7 @@ static int	am_db_queue_alerts(zbx_am_t *manager, zbx_vector_ptr_t *alerts)
 
 		if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
 		{
+			am_abort_alert_send(alerter_service, alert, "Media type unavailable");
 			am_alert_free(alert);
 			continue;
 		}
@@ -1731,29 +1760,6 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 	}
 
 	return ret;
-}
-
-static void	am_abort_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *manager,
-		const zbx_am_alert_t *alert, const char *error)
-{
-	if (ALERT_SOURCE_MANUAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
-	{
-		zbx_ipc_client_t	*client;
-
-		if (NULL != (client = zbx_ipc_client_by_id(alerter_service, alert->alertid)))
-		{
-			unsigned char	*data;
-			zbx_uint32_t	data_len;
-
-			data_len = zbx_alerter_serialize_result(&data, FAIL, error);
-			zbx_ipc_client_send(client, ZBX_IPC_ALERTER_ALERT, data, data_len);
-			zbx_free(data);
-		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "client has disconnected");
-	}
-	else
-		am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, error);
 }
 
 /******************************************************************************
@@ -2102,7 +2108,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 				zbx_vector_ptr_destroy(&alerts_new);
 
 				if (SUCCEED == ret)
-					ret = am_db_queue_alerts(&manager, &alerts);
+					ret = am_db_queue_alerts(&alerter_service, &manager, &alerts);
 			}
 
 			if (FAIL == ret)
