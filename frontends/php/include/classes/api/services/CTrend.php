@@ -93,7 +93,7 @@ class CTrend extends CApiService {
 			}
 		}
 
-		return $result;
+		return (is_array($result) ? $result : (string) $result);
 	}
 
 	/**

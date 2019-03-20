@@ -169,7 +169,7 @@ class CEvent extends CApiService {
 		}
 
 		if ($options['countOutput']) {
-			return $result;
+			return (is_array($result) ? $result : (string) $result);
 		}
 
 		if ($result) {
