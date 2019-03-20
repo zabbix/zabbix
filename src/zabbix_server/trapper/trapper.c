@@ -453,37 +453,42 @@ out:
 	return ret;
 }
 
-static	int	ipc_async_exchange(const char *service_name, zbx_uint32_t code, const unsigned char *data,
+static	int	ipc_async_exchange(const char *service_name, zbx_uint32_t code, int timeout, const unsigned char *data,
 		zbx_uint32_t size, unsigned char **out, char **error)
 {
+	const char		*__function_name = "ipc_async_exchange";
+
 	zbx_ipc_message_t	*message;
 	zbx_ipc_async_socket_t	asocket;
 	int			ret = FAIL;
 
-	if (FAIL == zbx_ipc_async_socket_open(&asocket, service_name, SEC_PER_MIN, error))
-		return FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() service:'%s' code:%u timeout:%d", __function_name, service_name, code,
+			timeout);
+
+	if (FAIL == zbx_ipc_async_socket_open(&asocket, service_name, timeout, error))
+		goto out;
 
 	if (FAIL == zbx_ipc_async_socket_send(&asocket, code, data, size))
 	{
-		*error = zbx_strdup(NULL, "Cannot send media type test message to alert manager");
+		*error = zbx_strdup(NULL, "Cannot send request");
 		goto fail;
 	}
 
-	if (FAIL == zbx_ipc_async_socket_flush(&asocket, SEC_PER_MIN))
+	if (FAIL == zbx_ipc_async_socket_flush(&asocket, timeout))
 	{
-		*error = zbx_strdup(NULL, "Cannot flush media type test message to alert manager");
+		*error = zbx_strdup(NULL, "Cannot flush request");
 		goto fail;
 	}
 
-	if (FAIL == zbx_ipc_async_socket_recv(&asocket, SEC_PER_MIN, &message))
+	if (FAIL == zbx_ipc_async_socket_recv(&asocket, timeout, &message))
 	{
-		*error = zbx_strdup(NULL, "Cannot receive media type test response from alert manager");
+		*error = zbx_strdup(NULL, "Cannot receive response");
 		goto fail;
 	}
 
 	if (NULL == message)
 	{
-		*error = zbx_strdup(NULL, "Timeout while waiting for media type test response from alert manager");
+		*error = zbx_strdup(NULL, "Timeout while waiting for response");
 		goto fail;
 	}
 
@@ -494,7 +499,8 @@ static	int	ipc_async_exchange(const char *service_name, zbx_uint32_t code, const
 	ret = SUCCEED;
 fail:
 	zbx_ipc_async_socket_close(&asocket);
-
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 	return ret;
 }
 
@@ -568,8 +574,11 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, sendto, subject, message);
 
-	if (SUCCEED != ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_ALERT, data, size, &result, &error))
+	if (SUCCEED != ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_ALERT, SEC_PER_MIN, data, size,
+			&result, &error))
+	{
 		goto fail;
+	}
 
 	zbx_alerter_deserialize_result(result, &errcode, &error);
 	zbx_free(result);
