@@ -460,7 +460,7 @@ static	int	ipc_async_exchange(const char *service_name, zbx_uint32_t code, const
 	zbx_ipc_async_socket_t	asocket;
 	int			ret = FAIL;
 
-	if (FAIL == zbx_ipc_async_socket_open(&asocket, service_name, 60, error))
+	if (FAIL == zbx_ipc_async_socket_open(&asocket, service_name, SEC_PER_MIN, error))
 		return FAIL;
 
 	if (FAIL == zbx_ipc_async_socket_send(&asocket, code, data, size))
@@ -469,13 +469,13 @@ static	int	ipc_async_exchange(const char *service_name, zbx_uint32_t code, const
 		goto fail;
 	}
 
-	if (FAIL == zbx_ipc_async_socket_flush(&asocket, 60))
+	if (FAIL == zbx_ipc_async_socket_flush(&asocket, SEC_PER_MIN))
 	{
 		*error = zbx_strdup(NULL, "Cannot flush media type test message to alert manager");
 		goto fail;
 	}
 
-	if (FAIL == zbx_ipc_async_socket_recv(&asocket, 60, &message))
+	if (FAIL == zbx_ipc_async_socket_recv(&asocket, SEC_PER_MIN, &message))
 	{
 		*error = zbx_strdup(NULL, "Cannot receive media type test response from alert manager");
 		goto fail;
