@@ -1240,6 +1240,7 @@ int	main(int argc, char **argv)
 		char	*in_line = NULL, *key_value = NULL;
 		int	buffer_count = 0;
 		size_t	in_line_alloc = MAX_BUFFER_LEN;
+		double	last_send = 0;
 
 		if (0 == strcmp(INPUT_FILE, "-"))
 		{
@@ -1267,7 +1268,6 @@ int	main(int argc, char **argv)
 			char		hostname[MAX_STRING_LEN], key[MAX_STRING_LEN], clock[32];
 			int		read_more = 0;
 			size_t		key_value_alloc = 0;
-			double		last_send = 0;
 			const char	*p;
 
 			/* line format: <hostname> <key> [<timestamp>] <value> */

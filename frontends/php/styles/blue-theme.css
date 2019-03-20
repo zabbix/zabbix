@@ -1184,6 +1184,8 @@ output {
         vertical-align: middle; }
         .table-forms .table-forms-td-right td.center .btn-grey {
           margin: 3px 0; }
+      .table-forms .table-forms-td-right td:last-child {
+        padding-right: 0; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
   .table-forms h4 {
@@ -2738,7 +2740,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     cursor: pointer;
     white-space: nowrap;
     text-overflow: ellipsis;
-    border-right: none; }
+    border-right: none;
+    width: 100%; }
     .multilineinput-control input[type=text][readonly] {
       background: #fff !important;
       border-color: #acbbc2;
@@ -4254,7 +4257,7 @@ ul.checkbox-list.col-3 > li {
     width: 100%; }
   .preprocessing-list input[type=text]:not(:last-of-type),
   .preprocessing-list .btn-link:not(:last-of-type) {
-    margin-right: 5px; }
+    margin-right: 10px; }
   .preprocessing-list .preprocessing-list-head,
   .preprocessing-list .preprocessing-list-foot,
   .preprocessing-list .preprocessing-step,
@@ -4778,3 +4781,19 @@ ul.checkbox-list.col-3 > li {
 
 .inline-sr-only {
   font-size: 0; }
+
+.preproc-test-popup-value-row {
+  display: flex; }
+  .preproc-test-popup-value-row label {
+    padding: 0 10px;
+    margin-left: auto;
+    line-height: 24px; }
+
+table.preprocessing-test-results td {
+  vertical-align: top !important; }
+table.preprocessing-test-results .rel-container {
+  top: 4px;
+  margin-left: 3px; }
+
+#preprocessing-test-form .table-forms-separator {
+  margin-top: -2px; }

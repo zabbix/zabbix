@@ -58,8 +58,19 @@ abstract class CMapElement extends CApiService {
 			}
 
 			if (array_key_exists('urls', $selement)) {
+				$url_validate_options = ['allow_user_macro' => false];
+				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
+					$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_HOST;
+				}
+				elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+					$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_TRIGGER;
+				}
+				else {
+					$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_NONE;
+				}
+
 				foreach ($selement['urls'] as $url_data) {
-					if (!CHtmlUrlValidator::validate($url_data['url'], false)) {
+					if (!CHtmlUrlValidator::validate($url_data['url'], $url_validate_options)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
 					}
 				}

@@ -26,6 +26,7 @@
 #include "zbxjson.h"
 #include "dbcache.h"
 #include "zbxembed.h"
+#include "log.h"
 
 #include "../../../src/zabbix_server/preprocessor/item_preproc.h"
 
@@ -73,6 +74,10 @@ static int	str_to_preproc_type(const char *str)
 		return ZBX_PREPROC_THROTTLE_VALUE;
 	if (0 == strcmp(str, "ZBX_PREPROC_THROTTLE_TIMED_VALUE"))
 		return ZBX_PREPROC_THROTTLE_TIMED_VALUE;
+	if (0 == strcmp(str, "ZBX_PREPROC_PROMETHEUS_PATTERN"))
+		return ZBX_PREPROC_PROMETHEUS_PATTERN;
+	if (0 == strcmp(str, "ZBX_PREPROC_PROMETHEUS_TO_JSON"))
+		return ZBX_PREPROC_PROMETHEUS_TO_JSON;
 
 	fail_msg("unknow preprocessing step type: %s", str);
 	return FAIL;
@@ -173,7 +178,7 @@ void	zbx_mock_test_entry(void **state)
 	unsigned char			value_type;
 	zbx_timespec_t			ts, history_ts, expected_history_ts;
 	zbx_preproc_op_t		op;
-	int				returned_ret, expected_ret, action;
+	int				returned_ret, expected_ret;
 	char				*error = NULL;
 
 	ZBX_UNUSED(state);
@@ -192,7 +197,10 @@ void	zbx_mock_test_entry(void **state)
 		history_ts.ns = 0;
 	}
 
-	returned_ret = zbx_item_preproc(value_type, &value, &ts, &op, &history_value, &history_ts, &action, &error);
+	if (FAIL == (returned_ret = zbx_item_preproc(value_type, &value, &ts, &op, &history_value, &history_ts, &error)))
+		returned_ret = zbx_item_preproc_handle_error(&value, &op, &error);
+	if (SUCCEED != returned_ret)
+		zabbix_log(LOG_LEVEL_DEBUG, "Preprocessing error: %s", error);
 
 	if (SUCCEED == is_step_supported(op.type))
 		expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
@@ -203,41 +211,48 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == returned_ret)
 	{
-		if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.value"))
+		if (SUCCEED == is_step_supported(op.type) && ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.error"))
 		{
-			if (ZBX_VARIANT_NONE == value.type)
-				fail_msg("preprocessing result was empty value");
-
-			zbx_variant_convert(&value, ZBX_VARIANT_STR);
-			zbx_mock_assert_str_eq("processed value", zbx_mock_get_parameter_string("out.value"),
-					value.data.str);
+			zbx_mock_assert_str_eq("error message", zbx_mock_get_parameter_string("out.error"), error);
 		}
 		else
 		{
-			if (ZBX_VARIANT_NONE != value.type)
-				fail_msg("expected empty value, but got %s", zbx_variant_value_desc(&value));
-		}
+			if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.value"))
+			{
+				if (ZBX_VARIANT_NONE == value.type)
+					fail_msg("preprocessing result was empty value");
 
-		if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.history"))
-		{
-			if (ZBX_VARIANT_NONE == history_value.type)
-				fail_msg("preprocessing history was empty value");
+				zbx_variant_convert(&value, ZBX_VARIANT_STR);
+				zbx_mock_assert_str_eq("processed value", zbx_mock_get_parameter_string("out.value"),
+						value.data.str);
+			}
+			else
+			{
+				if (ZBX_VARIANT_NONE != value.type)
+					fail_msg("expected empty value, but got %s", zbx_variant_value_desc(&value));
+			}
 
-			zbx_variant_convert(&history_value, ZBX_VARIANT_STR);
-			zbx_mock_assert_str_eq("preprocessing step history value",
-					zbx_mock_get_parameter_string("out.history.data"), history_value.data.str);
+			if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.history"))
+			{
+				if (ZBX_VARIANT_NONE == history_value.type)
+					fail_msg("preprocessing history was empty value");
 
-			zbx_strtime_to_timespec(zbx_mock_get_parameter_string("out.history.time"), &expected_history_ts);
-			zbx_mock_assert_timespec_eq("preprocessing step history time", &expected_history_ts, &history_ts);
-		}
-		else
-		{
-			if (ZBX_VARIANT_NONE != history_value.type)
-				fail_msg("expected empty history, but got %s", zbx_variant_value_desc(&history_value));
+				zbx_variant_convert(&history_value, ZBX_VARIANT_STR);
+				zbx_mock_assert_str_eq("preprocessing step history value",
+						zbx_mock_get_parameter_string("out.history.data"), history_value.data.str);
+
+				zbx_strtime_to_timespec(zbx_mock_get_parameter_string("out.history.time"), &expected_history_ts);
+				zbx_mock_assert_timespec_eq("preprocessing step history time", &expected_history_ts, &history_ts);
+			}
+			else
+			{
+				if (ZBX_VARIANT_NONE != history_value.type)
+					fail_msg("expected empty history, but got %s", zbx_variant_value_desc(&history_value));
+			}
 		}
 	}
-	else if (SUCCEED == is_step_supported(op.type) && ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.error"))
-		zbx_mock_assert_str_eq("error message", zbx_mock_get_parameter_string("out.error"), error);
+	else
+		zbx_mock_assert_ptr_ne("error message", NULL, error);
 
 	zbx_variant_clear(&value);
 	zbx_variant_clear(&history_value);

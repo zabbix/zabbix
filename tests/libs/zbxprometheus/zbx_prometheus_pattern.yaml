@@ -1,0 +1,1733 @@
+---
+test case: 'Get metric value using params: "wmi_os_physical_memory_free_bytes"'
+in:
+  data: wmi_os_physical_memory_free_bytes 8.492331008e+09
+  params: wmi_os_physical_memory_free_bytes
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 8.492331008e+09
+---
+test case: 'Get metric value using params: "cpu_usage_system{cpu="cpu-total"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Get metric value using params: "wmi_logical_disk_free_bytes{volume="{#VOLUME}"}"'
+in:
+  data: |
+    # HELP wmi_logical_disk_free_bytes Free space in bytes (LogicalDisk.PercentFreeSpace)
+    # TYPE wmi_logical_disk_free_bytes gauge
+    wmi_logical_disk_free_bytes{volume="{#VOLUME}"} 3.5180249088e+11
+    wmi_logical_disk_free_bytes{volume="D:"} 2.627731456e+09
+    wmi_logical_disk_free_bytes{volume="HarddiskVolume4"} 4.59276288e+08
+  params: 'wmi_logical_disk_free_bytes{volume="{#VOLUME}"}'
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 3.5180249088e+11
+---
+test case: 'Get label value (volume) using params: "wmi_logical_disk_free_bytes{volume="{#VOLUME}"}"'
+in:
+  data: |
+    # HELP wmi_logical_disk_free_bytes Free space in bytes (LogicalDisk.PercentFreeSpace)
+    # TYPE wmi_logical_disk_free_bytes gauge
+    wmi_logical_disk_free_bytes{volume="C:"} 3.5180249088e+11
+    wmi_logical_disk_free_bytes{volume="{#VOLUME}"} 2.627731456e+09
+    wmi_logical_disk_free_bytes{volume="HarddiskVolume4"} 4.59276288e+08
+  params: 'wmi_logical_disk_free_bytes{volume="{#VOLUME}"}'
+  value_type: volume
+out:
+  result: SUCCEED
+  output: '{#VOLUME}'
+---
+test case: 'Get metric value using params: "cpu_usage_system{cpu="cpu-total",host=~".*"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total",host=~".*"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Get metric value using params: "cpu_usage_system{cpu="cpu-total",host=~".*"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total",host=~".*"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Get metric value using params: "cpu_usage_system{cpu="cpu-total"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Get metric value using params: "cpu_usage_system{cpu=~"cpu-tot.+"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: cpu_usage_system{cpu=~"cpu-tot.+"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Get metric value using params: "{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: '{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Get metric value using params: "cpu_usage_system{cpu=~".*"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: cpu_usage_system{cpu=~".*"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Get metric value using params: "cpu_usage_system{cpu=~"cpu-tot.+"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: cpu_usage_system{cpu=~"cpu-tot.+"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Get label value (state) using params: "wmi_service_state{name="dhcp"} == 1"'
+in:
+  data: |
+    wmi_service_state{name="devicesflowusersvc_7b100",state="running"} 1
+    wmi_service_state{name="devicesflowusersvc_7b100",state="start pending"} 0
+    wmi_service_state{name="devicesflowusersvc_7b100",state="stop pending"} 0
+    wmi_service_state{name="devicesflowusersvc_7b100",state="stopped"} 0
+    wmi_service_state{name="devicesflowusersvc_7b100",state="unknown"} 0
+    wmi_service_state{name="dhcp",state="continue pending"} 0
+    wmi_service_state{name="dhcp",state="pause pending"} 0
+    wmi_service_state{name="dhcp",state="paused"} 0
+    wmi_service_state{name="dhcp",state="running"} 1
+    wmi_service_state{name="dhcp",state="start pending"} 0
+    wmi_service_state{name="dhcp",state="stop pending"} 0
+    wmi_service_state{name="dhcp",state="stopped"} 0
+    wmi_service_state{name="dhcp",state="unknown"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="continue pending"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="pause pending"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="paused"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="running"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="start pending"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="stop pending"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="stopped"} 1
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="unknown"} 0
+  params: wmi_service_state{name="dhcp"} == 1
+  value_type: state
+out:
+  result: SUCCEED
+  output: 'running'
+---
+test case: 'Get label value (timezone) using params: "wmi_os_timezone{timezone=~".*"} == 1"'
+in:
+  data: |
+    # HELP wmi_os_timezone OperatingSystem.LocalDateTime
+    # TYPE wmi_os_timezone gauge
+    wmi_os_timezone{timezone="MSK"} 1
+  params: wmi_os_timezone{timezone=~".*"} == 1
+  value_type: timezone
+out:
+  result: SUCCEED
+  output: 'MSK'
+---
+test case: 'Multiple spaces in metric before the value'
+in:
+  data: |
+    # HELP http_requests_total The total number of HTTP requests.
+    # TYPE http_requests_total counter
+    http_requests_total{method="post",code="200"} 1027 1395066363000
+    http_requests_total{method="post",code="400"}    3 1395066363000
+  params: http_requests_total{code="400"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 3
+---
+test case: 'Escaping in label values'
+in:
+  data: msdos_file_access_time_seconds{path="C:\\DIR\\FILE.TXT",error="Cannot find file:\n\"FILE.TXT\""} 1.458255915e9
+  params: msdos_file_access_time_seconds{error="Cannot find file:\n\"FILE.TXT\""} == 1.458255915e9
+  value_type: path
+out:
+  result: SUCCEED
+  output: 'C:\DIR\FILE.TXT'
+---
+test case: 'Minimalistic line'
+in:
+  data: metric_without_timestamp_and_labels 12.47
+  params: metric_without_timestamp_and_labels
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 12.47
+---
+test case: 'A weird metric from before the epoch'
+in:
+  data: something_weird{problem="division by zero"} +Inf -3982045
+  params: something_weird
+  value_type: ""
+out:
+  result: SUCCEED
+  output: +Inf
+---
+test case: 'A histogram, which has a pretty complex representation in the text format'
+in:
+  data: |
+    # HELP http_request_duration_seconds A histogram of the request duration.
+    # TYPE http_request_duration_seconds histogram
+    http_request_duration_seconds_bucket{le="0.05"} 24054
+    http_request_duration_seconds_bucket{le="0.1"} 33444
+    http_request_duration_seconds_bucket{le="0.2"} 100392
+    http_request_duration_seconds_bucket{le="0.5"} 129389
+    http_request_duration_seconds_bucket{le="1"} 133988
+    http_request_duration_seconds_bucket{le="+Inf"} 144320
+    http_request_duration_seconds_sum 53423
+    http_request_duration_seconds_count 144320
+  params: http_request_duration_seconds_bucket{le="+Inf"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 144320
+---
+test case: 'A summary, which has a complex representation'
+in:
+  data: |
+    # HELP rpc_duration_seconds A summary of the RPC duration in seconds.
+    # TYPE rpc_duration_seconds summary
+    rpc_duration_seconds{quantile="0.01"} 3102
+    rpc_duration_seconds{quantile="0.05"} 3272
+    rpc_duration_seconds{quantile="0.5"} 4773
+    rpc_duration_seconds{quantile="0.9"} 9001
+    rpc_duration_seconds{quantile="0.99"} 76656
+    rpc_duration_seconds_sum 1.7560473e+07
+    rpc_duration_seconds_count 2693
+  params: rpc_duration_seconds_sum
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.7560473e+07
+---
+test case: 'Invalid metric (expected "fail"): empty metric'
+in:
+  data: ""
+  params: wmi_os_timezone
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Empty params'
+in:
+  data: wmi_os_timezone{timezone="MSK"} 1
+  params: ""
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1
+---
+test case: 'Empty params but value_type is set'
+in:
+  data: wmi_os_timezone{timezone="MSK"} 1
+  params: ""
+  value_type: timezone
+out:
+  result: SUCCEED
+  output: 'MSK'
+---
+test case: 'Empty params but value_type is set (multiline metric)'
+in:
+  data: |
+    wmi_service_state{name="dhcp",state="running"} 1
+    wmi_service_state{name="dhcp",state="start pending"} 0
+    wmi_service_state{name="dhcp",state="stop pending"} 0
+    wmi_service_state{name="postdhcp",state="stopped"} 1
+  params: ""
+  value_type: state
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): empty metric and empty params'
+in:
+  data: ""
+  params: ""
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): metric consists of spaces only #1'
+in:
+  data: '      '
+  params: wmi_os_timezone
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Params hold multiple spaces only'
+in:
+  data: wmi_os_timezone{timezone="MSK"} 1
+  params: '           '
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1
+---
+test case: 'Params hold multiple spaces only (multiline metric)'
+in:
+  data: |
+    rpc_duration_seconds{quantile="0.01"} 3102
+    rpc_duration_seconds{quantile="0.05"} 3272
+    rpc_duration_seconds{quantile="0.5"} 4773
+    rpc_duration_seconds{quantile="0.9"} 9001
+    rpc_duration_seconds{quantile="0.99"} 76656
+    rpc_duration_seconds_sum 1.7560473e+07
+    rpc_duration_seconds_count 2693
+  params: '       '
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): metric consists of spaces only #2'
+in:
+  data: '      '
+  params: '           '
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Empty multiline metric'
+in:
+  data: "\n\n\n\n"
+  params: wmi_os_timezone
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Empty value_type'
+in:
+  data: wmi_os_physical_memory_free_bytes 8.492331008e+09
+  params: wmi_os_physical_memory_free_bytes
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 8.492331008e+09
+---
+test case: 'Invalid metric (expected "fail"): metric without value'
+in:
+  data: wmi_os_physical_memory_free_bytes
+  params: wmi_os_physical_memory_free_bytes
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): label value is missing but equal sign remains "wmi_os_timezone{timezone=} 1"'
+in:
+  data: |
+    # HELP wmi_os_timezone OperatingSystem.LocalDateTime
+    # TYPE wmi_os_timezone gauge
+    wmi_os_timezone{timezone=} 1
+  params: wmi_os_timezone
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): label value is missing "wmi_os_timezone{timezone} 1"'
+in:
+  data: |
+    # HELP wmi_os_timezone OperatingSystem.LocalDateTime
+    # TYPE wmi_os_timezone gauge
+    wmi_os_timezone{timezone} 1
+  params: wmi_os_timezone
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): label value is missing and value_type is set to that label "wmi_os_timezone{timezone} 1"'
+in:
+  data: |
+    # HELP wmi_os_timezone OperatingSystem.LocalDateTime
+    # TYPE wmi_os_timezone gauge
+    wmi_os_timezone{timezone} 1
+  params: wmi_os_timezone == 1
+  value_type: timezone
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): label value is missing, value_type is set to that label; params: "wmi_os_timezone{timezone=~".*"} == 1"'
+in:
+  data: |
+    # HELP wmi_os_timezone OperatingSystem.LocalDateTime
+    # TYPE wmi_os_timezone gauge
+    wmi_os_timezone{timezone} 1
+  params: wmi_os_timezone{timezone=~".*"} == 1
+  value_type: timezone
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): wrong metric data'
+in:
+  data: asdlkdlkasdasd09814mnvclmx
+  params: wmi_os_timezone
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): wrong metric data (a space within)'
+in:
+  data: asdlkdlkasda sd09814mnvclmx
+  params: wmi_os_timezone
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): metric name with unsupported characters included'
+in:
+  data: wmi_os_physical_^&;memory_free_bytes 8.492331008e+09
+  params: wmi_os_physical_^&;memory_free_bytes
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): wrong metric data with valid HELP/TYPE'
+in:
+  data: |
+    # HELP wmi_os_timezone OperatingSystem.LocalDateTime
+    # TYPE wmi_os_timezone gauge
+    asdlkdlkasdasd09814mnvclmx
+  params: wmi_os_timezone
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): metric consists of hash symbol only'
+in:
+  data: '#'
+  params: wmi_os_timezone
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): metric consists of empty space only'
+in:
+  data: ' '
+  params: wmi_os_timezone
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): metric consists of 3 byte UTF-8 character only'
+in:
+  data: "ࠀ"
+  params: wmi_os_timezone
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Metric with 3 byte UTF-8 byte character included in label value'
+in:
+  data: |
+    # HELP http_requests_total The total number of HTTP requests.
+    # TYPE http_requests_total counter
+    http_requests_total{method="post",code="200"} 1027 1395066363000
+    http_requests_total{method="post",code="-⃠"} 3 1395066363000
+  params: http_requests_total == 3
+  value_type: code
+out:
+  result: SUCCEED
+  output: '-⃠'
+---
+test case: 'Invalid metric (expected "fail"): metric with missing "{"'
+in:
+  data: cpu_usage_systemcpu="cpu-total"} 1.1940298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): metric with missing "}"'
+in:
+  data: cpu_usage_system{cpu="cpu-total" 1.1940298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): metric with missing "'
+in:
+  data: cpu_usage_system{cpu=cpu-total"} 1.1940298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): metric with missing ","'
+in:
+  data: cpu_usage_system{cpu="cpu-total"host="host1"} 1.1940298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): metric with missing "," and params set to empty'
+in:
+  data: cpu_usage_system{cpu="cpu-total"host="host1"} 1.1940298507220641
+  params: ""
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): double equal sign (==) instead of single equal sign (=) in label value assignment (multiline metric)'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu=="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): double equal sign (==) instead of single equal sign (=) in label value assignment (desired metric)'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu=="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): double equal sign (==) instead of single equal sign (=) in label value assignment'
+in:
+  data: cpu_usage_system{cpu=="cpu-total"} 1.1940298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Label value and params holds new line character'
+in:
+  data: "cpu_usage_system{cpu=\"cpu\ntotal\"} 1.1940298507220641"
+  params: "cpu_usage_system{cpu=\"cpu\ntotal\"}"
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Invalid metric (expected "fail"): metric name holds new line character'
+in:
+  data: "cpu_usa\nge_system{cpu=\"cputotal\"} 1.1940298507220641"
+  params: 'cpu_usage_system{cpu="cputotal"}'
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid params (expected "fail"): params hold new line character'
+in:
+  data: 'cpu_usage_system{cpu=\"cputotal\"} 1.1940298507220641'
+  params: "cpu_usa\nge_system{cpu=\"cputotal\"}"
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): metric name and params hold new line character'
+in:
+  data: "cpu_usa\nge_system{cpu=\"cputotal\"} 1.1940298507220641"
+  params: "cpu_usa\nge_system{cpu=\"cputotal\"}"
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid params (expected "fail"): double equal sign (==) instead of single equal sign (=) in label value assignment'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu=="cpu-total"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid params (expected "fail"): single equal sign (=) instead of double equal sign (==) in metric value assignment #1'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"} = 1.1940298507220641
+  value_type: cpu
+out:
+  result: FAIL
+---
+test case: 'Invalid params (expected "fail"): single equal sign (=) instead of double equal sign (==) in metric value assignment #2'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"} = 1.1940298507220641
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'More than one metric (2) corresponds to the given params'
+in:
+  data: |
+    wmi_service_state{name="devicesflowusersvc_7b100",state="running"} 1
+    wmi_service_state{name="devicesflowusersvc_7b100",state="start pending"} 0
+    wmi_service_state{name="devicesflowusersvc_7b100",state="stop pending"} 0
+    wmi_service_state{name="devicesflowusersvc_7b100",state="stopped"} 0
+    wmi_service_state{name="devicesflowusersvc_7b100",state="unknown"} 0
+    wmi_service_state{name="dhcp",state="continue pending"} 0
+    wmi_service_state{name="dhcp",state="pause pending"} 0
+    wmi_service_state{name="dhcp",state="paused"} 0
+    wmi_service_state{name="dhcp",state="running"} 1
+    wmi_service_state{name="dhcp",state="start pending"} 0
+    wmi_service_state{name="dhcp",state="stop pending"} 0
+    wmi_service_state{name="dhcp",state="stopped"} 1
+    wmi_service_state{name="dhcp",state="unknown"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="continue pending"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="pause pending"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="paused"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="running"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="start pending"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="stop pending"} 0
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="stopped"} 1
+    wmi_service_state{name="diagnosticshub.standardcollector.service",state="unknown"} 0
+  params: wmi_service_state{name="dhcp"} == 1
+  value_type: state
+out:
+  result: FAIL
+---
+test case: 'All metrics (8) correspond to the given params'
+in:
+  data: |
+    wmi_service_state{name="dhcp",state="continue pending"} 1
+    wmi_service_state{name="dhcp",state="pause pending"} 1
+    wmi_service_state{name="dhcp",state="paused"} 1
+    wmi_service_state{name="dhcp",state="running"} 1
+    wmi_service_state{name="dhcp",state="start pending"} 1
+    wmi_service_state{name="dhcp",state="stop pending"} 1
+    wmi_service_state{name="dhcp",state="stopped"} 1
+    wmi_service_state{name="dhcp",state="unknown"} 1
+  params: wmi_service_state{name="dhcp"} == 1
+  value_type: state
+out:
+  result: FAIL
+---
+test case: 'All metrics (16) correspond to the given params'
+in:
+  data: |
+    wmi_service_state{name="dhcp",state="continue pending"} 1
+    wmi_service_state{name="dhcp",state="pause pending"} 1
+    wmi_service_state{name="dhcp",state="paused"} 1
+    wmi_service_state{name="dhcp",state="running"} 1
+    wmi_service_state{name="dhcp",state="start pending"} 1
+    wmi_service_state{name="dhcp",state="stop pending"} 1
+    wmi_service_state{name="dhcp",state="stopped"} 1
+    wmi_service_state{name="dhcp",state="unknown"} 1
+    wmi_service_state{name="dhcp",state="continue pending"} 1
+    wmi_service_state{name="dhcp",state="pause pending"} 1
+    wmi_service_state{name="dhcp",state="paused"} 1
+    wmi_service_state{name="dhcp",state="running"} 1
+    wmi_service_state{name="dhcp",state="start pending"} 1
+    wmi_service_state{name="dhcp",state="stop pending"} 1
+    wmi_service_state{name="dhcp",state="stopped"} 1
+    wmi_service_state{name="dhcp",state="unknown"} 1
+  params: wmi_service_state{name="dhcp"} == 1
+  value_type: state
+out:
+  result: FAIL
+---
+test case: 'Multiple metrics (16 of 18) correspond to the given params'
+in:
+  data: |
+    wmi_service_state{name="dhcp",state="continue pending"} 0
+    wmi_service_state{name="dhcp",state="continue pending"} 1
+    wmi_service_state{name="dhcp",state="pause pending"} 1
+    wmi_service_state{name="dhcp",state="paused"} 1
+    wmi_service_state{name="dhcp",state="running"} 1
+    wmi_service_state{name="dhcp",state="start pending"} 1
+    wmi_service_state{name="dhcp",state="stop pending"} 1
+    wmi_service_state{name="dhcp",state="stopped"} 1
+    wmi_service_state{name="dhcp",state="unknown"} 1
+    wmi_service_state{name="dhcp",state="continue pending"} 1
+    wmi_service_state{name="dhcp",state="pause pending"} 1
+    wmi_service_state{name="dhcp",state="paused"} 1
+    wmi_service_state{name="dhcp",state="running"} 1
+    wmi_service_state{name="dhcp",state="start pending"} 1
+    wmi_service_state{name="dhcp",state="stop pending"} 1
+    wmi_service_state{name="dhcp",state="stopped"} 1
+    wmi_service_state{name="dhcp",state="unknown"} 1
+    wmi_service_state{name="dhcp",state="unknown"} 0
+  params: wmi_service_state == 1
+  value_type: state
+out:
+  result: FAIL
+---
+test case: 'Metric with "Nan" value'
+in:
+  data: wmi_os_physical_memory_free_bytes Nan
+  params: wmi_os_physical_memory_free_bytes
+  value_type: ""
+out:
+  result: SUCCEED
+  output: Nan
+---
+test case: 'Metric with "+Inf" value'
+in:
+  data: wmi_os_physical_memory_free_bytes +Inf
+  params: wmi_os_physical_memory_free_bytes
+  value_type: ""
+out:
+  result: SUCCEED
+  output: +Inf
+---
+test case: 'Metric with "-Inf" value'
+in:
+  data: wmi_os_physical_memory_free_bytes -Inf
+  params: wmi_os_physical_memory_free_bytes
+  value_type: ""
+out:
+  result: SUCCEED
+  output: -Inf
+---
+test case: 'Invalid metric (expected "fail"): metric with "NAN" value'
+in:
+  data: wmi_os_physical_memory_free_bytes NAN
+  params: wmi_os_physical_memory_free_bytes
+  value_type: ""
+out:
+  output: NAN
+  result: SUCCEED
+---
+test case: 'Metric with timestamp'
+in:
+  data: wmi_os_physical_memory_free_bytes 8.492331008e+09 25
+  params: wmi_os_physical_memory_free_bytes
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 8.492331008e+09
+---
+test case: 'Invalid metric (expected "succeed"): additional value after timestamp'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641 25 66
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Metric with negative timestamp'
+in:
+  data: http_requests_total{method="post",code="200"} 1027 -123
+  params: http_requests_total
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1027
+---
+test case: 'Metric with negative value'
+in:
+  data: http_requests_total{method="post",code="200"} -1027
+  params: http_requests_total
+  value_type: ""
+out:
+  result: SUCCEED
+  output: -1027
+---
+test case: 'Multilne metric with negative value (multiline metric)'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} -654
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: '{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
+  value_type: ""
+out:
+  result: SUCCEED
+  output: -654
+---
+test case: 'The __name__ identifier is specified as last in params #1'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: '{cpu="cpu-total",__name__="cpu_usage_system"}'
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'The __name__ identifier is specified as last in params #2'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: '{cpu=~"cpu-tot.+",__name__=~"cpu_usage_syst.+"}'
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Label name set in value_type is not present in the metrics'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: something
+out:
+  result: FAIL
+---
+test case: 'Get metric value using params: "cpu_usage_system{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.19402985
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: 'cpu_usage_system{__name__=~"cpu_usage_syst.+",cpu=~"cpu-tot.+"}'
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Get metric value using params: "cpu_usage_system{__name__=~"cpu_age_syst.+",cpu=~"cpu-tot.+"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.19402985
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: 'cpu_usage_system{__name__=~"cpu_age_syst.+",cpu=~"cpu-tot.+"}'
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Random characters in value_type'
+in:
+  data: |
+    # HELP wmi_logical_disk_free_bytes Free space in bytes (LogicalDisk.PercentFreeSpace)
+    # TYPE wmi_logical_disk_free_bytes gauge
+    wmi_logical_disk_free_bytes{volume="C:"} 3.5180249088e+11
+  params: wmi_logical_disk_free_bytes
+  value_type: \\&{},.13%},.
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "succeed"): multiple HELP lines'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # HELP cpu_usage_system collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Invalid metric (expected "succeed"): multiple TYPE:untyped lines'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system untyped
+    # TYPE cpu_usage_system untyped
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Invalid metric (expected "succeed"): unsupported TYPE'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system something
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Invalid metric (expected "succeed"): only one argument for TYPE'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Invalid metric (expected "succeed"): empty TYPE'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Multiple spaces before metric value'
+in:
+  data: wmi_os_physical_memory_free_bytes            8.492331008e+09
+  params: wmi_os_physical_memory_free_bytes
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 8.492331008e+09
+---
+test case: 'Invalid metric (expected "succeed"): empty HELP'
+in:
+  data: |
+    # HELP
+    cpu_usage_system{cpu="cpu-total"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Invalid metric (expected "fail"): unsupported characters in label name'
+in:
+  data: cpu_usage_system{cp%^&u="cpu-total"} 1.1940298507220641
+  params: cpu_usage_system{cp%^&u="cpu-total"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Get metric value using params: "wmi_os_timezone"'
+in:
+  data: |
+    # HELP wmi_os_timezone OperatingSystem.LocalDateTime
+    # TYPE wmi_os_timezone gauge
+    wmi_os_timezone{timezone="MSK"} 1
+  params: wmi_os_timezone
+  value_type: timezone
+out:
+  result: SUCCEED
+  output: 'MSK'
+---
+test case: 'Metric name consists of all supported characters'
+in:
+  data: AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789 1
+  params: AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz:_0123456789
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1
+---
+test case: 'Label name consists of all supported characters'
+in:
+  data: cpu_usage_system{AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789="test"} 1
+  params: cpu_usage_system == 1
+  value_type: AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz_0123456789
+out:
+  result: SUCCEED
+  output: 'test'
+---
+test case: 'Invalid params (expected "fail"): regular expression but without prefix "~"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total",host=".*"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid params (expected "fail"): wrong regular expression'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu-total",host=~"[0-9"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid params (expected "fail"): unsupported identifier __cpu__ #1'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} -654
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: '{__name__="cpu_usage_system",__cpu__="cpu-total"}'
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid params (expected "fail"): unsupported identifier __cpu__ #2'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} -654
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: '{__name__=~"cpu_usage_syst.+",__cpu__=~"cpu-tot.+"}'
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): incorrect float'
+in:
+  data: wmi_logical_disk_free_bytes{volume="D:"} 8.49233.1008e+09
+  params: wmi_logical_disk_free_bytes
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid params (expected "fail"): "{}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cputotal"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1"} 1.1340298507220641
+  params: '{}'
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid params (expected "fail"): "a{}"'
+in:
+  data: |
+    # HELP a Telegraf collected metric
+    # TYPE a gauge
+    a{cpu="cputotal"} 1.1940298507220641
+    a{cpu="cpu0"} 1.1940298507220641
+    a{cpu="cpu1"} 1.1340298507220641
+  params: a{}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid metric (expected "fail"): "{}"'
+in:
+  data: '{}'
+  params: metric
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Get metric value using params: "wmi_os_timezone{timezone="MSK"} == -1"'
+in:
+  data: |
+    # HELP wmi_os_timezone OperatingSystem.LocalDateTime
+    # TYPE wmi_os_timezone gauge
+    wmi_os_timezone{timezone="MSK"} -1
+  params: wmi_os_timezone{timezone="MSK"} == -1
+  value_type: ""
+out:
+  result: SUCCEED
+  output: -1
+---
+test case: 'Get label value using regular expression for date #1'
+in:
+  data: |
+    random_date{year="2019",month="february",day="02/12/2019"} 1
+    random_date{year="2019",month="march",day="03/07/2019"} 2
+  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"} == 1
+  value_type: month
+out:
+  result: SUCCEED
+  output: 'february'
+---
+test case: 'Get label value using regular expression for date #2'
+in:
+  data: |
+    random_date{year="2019",month="february",day="02/12/2019"} 1
+    random_date{year="2019",month="march",day="03/07/2019"} 2
+  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"} == 2
+  value_type: month
+out:
+  result: SUCCEED
+  output: 'march'
+---
+test case: 'Get label value using regular expression for date #3'
+in:
+  data: |
+    random_date{year="2019",month="february",day="02/12/2019"} 1
+    random_date{year="2019",month="march",day="03/07/2019"} 2
+  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"} == 2
+  value_type: day
+out:
+  result: SUCCEED
+  output: '03/07/2019'
+---
+test case: 'Get label value using regular expression for date #4'
+in:
+  data: |
+    random_date{year="2019",month="february",day="02/12/2019"} 1
+    random_date{year="2019",month="march",day="03-07-2019"} 2
+  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"} == 2
+  value_type: day
+out:
+  result: FAIL
+---
+test case: 'Get label value using regular expression for date #5'
+in:
+  data: |
+    random_date{year="2019",month="february",day="02/12/2019"} 1
+    random_date{year="2019",month="march",day="03/07/2019"} 2
+  params: random_date{year="2019",day=~"^([0-2][0-9]|(3)[0-1])(\\/)(((0)[0-9])|((1)[0-2]))(\\/)\\d{4}$"}
+  value_type: day
+out:
+  result: FAIL
+---
+test case: 'Invalid params (expected "fail"): double equal sign (==) is missing'
+in:
+  data: |
+    # HELP wmi_os_timezone OperatingSystem.LocalDateTime
+    # TYPE wmi_os_timezone gauge
+    wmi_os_timezone{timezone="MSK"} 1
+  params: wmi_os_timezone 1
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Get label value using regular expression for email address #1'
+in:
+  data: |
+    some_user{country="lv",addr="user1@domain.com"} 1
+    some_user{country="lv",addr="user2@domain.org"} 2
+    some_user{country="lv",addr="no_valid_addr"} 2
+  params: some_user{country="lv",addr=~"[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}"} == 1
+  value_type: addr
+out:
+  result: SUCCEED
+  output: 'user1@domain.com'
+---
+test case: 'Get label value using regular expression for email address #2'
+in:
+  data: |
+    some_user{country="lv",addr="user1@domain.com"} 1
+    some_user{country="lv",addr="user2@domain.org"} 2
+    some_user{country="lv",addr="no_valid_addr"} 2
+  params: some_user{country="lv",addr=~"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"} == 2
+  value_type: addr
+out:
+  result: SUCCEED
+  output: 'user2@domain.org'
+---
+test case: 'Get label value using regular expression for email address #3'
+in:
+  data: |
+    some_user{country="lv",addr="user1@domain.com"} 1
+    some_user{country="lv",addr="user2@domain.org"} 2
+    some_user{country="lv",addr="no_valid_addr"} 3
+  params: some_user{country="lv",addr=~"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"} == 3
+  value_type: addr
+out:
+  result: FAIL
+---
+test case: 'Get metric value using regular expression for email address'
+in:
+  data: |
+    some_user{country="lv",addr="user1@domain.com"} 1
+    some_user{country="lv",addr="user2@domain.org"} 2
+    some_user{country="lv",addr="no_valid_addr"} 3
+  params: some_user{country="lv",addr=~"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"}
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Label value holds "{"'
+in:
+  data: cpu_usage_system{cpu="cpu{total"} 1.1940298507220641
+  params: cpu_usage_system{cpu="cpu{total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Label value holds "{}"'
+in:
+  data: cpu_usage_system{cpu="cpu{}total"} 1.1940298507220641
+  params: cpu_usage_system{cpu="cpu{}total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Label value holds "}"'
+in:
+  data: cpu_usage_system{cpu="cpu}total"} 1.1940298507220641
+  params: cpu_usage_system{cpu="cpu}total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Label value holds ","'
+in:
+  data: important_metric{important_number="42,0"} 42
+  params: important_metric{important_number="42,0"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 42
+---
+test case: 'Get label value (cpu) using params: "cpu_usage_system{cpu="cpu{total"} == 1.1940298507220641"'
+in:
+  data: cpu_usage_system{cpu="cpu{total"} 1.1940298507220641
+  params: cpu_usage_system{cpu="cpu{total"} == 1.1940298507220641
+  value_type: cpu
+out:
+  result: SUCCEED
+  output: 'cpu{total'
+---
+test case: 'Get label value (cpu) using params: "cpu_usage_system{cpu="cpu}total"} == 1.1940298507220641"'
+in:
+  data: cpu_usage_system{cpu="cpu}total"} 1.1940298507220641
+  params: cpu_usage_system{cpu="cpu}total"} == 1.1940298507220641
+  value_type: cpu
+out:
+  result: SUCCEED
+  output: 'cpu}total'
+---
+test case: 'Metric with five values'
+in:
+  data: cpu_usage_system{cpu="cputotal"} 1.1940298507220641 2.23443 333 four five
+  params: cpu_usage_system{cpu="cputotal"} == 1.1940298507220641
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Different metrics under one HELP/TYPE header #1'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    wmi_os_timezone{timezone="MSK"} 1
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: cpu_usage_system{cpu="cpu1",host=~".*"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1340298507220641
+---
+test case: 'Different metrics under one HELP/TYPE header #2'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    wmi_os_timezone{timezone="MSK"} 1
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: wmi_os_timezone
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1
+---
+test case: 'Metrics of different type #1'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+    # HELP http_requests_total The total number of HTTP requests.
+    # TYPE http_requests_total counter
+    http_requests_total{method="post",code="200"} 1027 1395066363000
+    http_requests_total{method="post",code="400"}    3 1395066363000
+  params: http_requests_total == 3
+  value_type: code
+out:
+  result: SUCCEED
+  output: 400
+---
+test case: 'Metrics of different type #2'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+    # HELP http_requests_total The total number of HTTP requests.
+    # TYPE http_requests_total counter
+    http_requests_total{method="post",code="200"} 1027 1395066363000
+    http_requests_total{method="post",code="400"}    3 1395066363000
+  params: '{cpu="cpu0"}'
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Metrics of different type #3'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+    # HELP http_requests_total The total number of HTTP requests.
+    # TYPE http_requests_total counter
+    http_requests_total{method="post",code="200"} 1027 1395066363000
+    http_requests_total{method="post",code="400",host="host1"}    3 1395066363000
+  params: '{host="host1"}'
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Get metric value using params: "cpu_usage_system { cpu = "cpu-total" , host = "host1",perf="100" }"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1",perf="100"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1",perf="100"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1",perf="100"} 1.1340298507220641
+  params: cpu_usage_system { cpu = "cpu-total" , host = "host1",perf="100" }
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Invalid params (expected "fail"): no spaces around double equal sign (==)'
+in:
+  data: |
+    # HELP http_requests_total The total number of HTTP requests.
+    # TYPE http_requests_total counter
+    http_requests_total{method="post2",code="200"} 1027 1395066363000
+    http_requests_total{method="post1",code="400"}    3 1395066363000
+  params: http_requests_total{code="400"}==3
+  value_type: "method"
+out:
+  result: SUCCEED
+  output: post1
+---
+test case: 'Get metric value using params: "http_requests_total{code="400"} == 3"'
+in:
+  data: |
+    # HELP http_requests_total The total number of HTTP requests.
+    # TYPE http_requests_total counter
+    http_requests_total{method="post1",code="200"} 1027 1395066363000
+    http_requests_total{method="post2",code="400"}    3 1395066363000
+  params: http_requests_total{code="400"} == 3
+  value_type: "method"
+out:
+  result: SUCCEED
+  output: post2
+---
+test case: 'Invalid metric (expected "fail"): metric with string value'
+in:
+  data: wmi_os_physical_memory_free_bytes some_value
+  params: wmi_os_physical_memory_free_bytes
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Invalid params (expected "fail"): metric with string value'
+in:
+  data: |
+    # HELP wmi_os_timezone OperatingSystem.LocalDateTime
+    # TYPE wmi_os_timezone gauge
+    wmi_os_timezone{timezone="MSK"} 1
+  params: wmi_os_timezone{timezone="MSK"} == some_value
+  value_type: "timezone"
+out:
+  result: FAIL
+---
+test case: 'Invalid params (expected "fail"): __name__ identifier is specified twice'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu1",host="host1"} 1.1340298507220641
+  params: '{__name__=~".*",cpu="cpu-total",__name__="cpu_usage_system"}'
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Get metric value using params: "{cpu=~".*",cpu=~"cpu-tot.+",perf="100"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1",perf="100"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1",perf="100"} 1.1640298507220641
+    cpu_usage_system{cpu="cpu1",host="host1",perf="100"} 1.1340298507220641
+  params: '{cpu=~".*",cpu=~"cpu-tot.+",perf="100"}'
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 1.1940298507220641
+---
+test case: 'Get metric value using params: "{cpu=~"z.+",cpu=~"cpu-tot.+",perf="100"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1",perf="100"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1",perf="100"} 1.1640298507220641
+    cpu_usage_system{cpu="cpu1",host="host1",perf="100"} 1.1340298507220641
+  params: '{cpu=~"z.+",cpu=~"cpu-tot.+",perf="100"}'
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Get metric value using params: "{cpu=~"z.+",cpu=~"y.+",perf="100"}"'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1",perf="100"} 1.1940298507220641
+    cpu_usage_system{cpu="cpu0",host="host1",perf="100"} 1.1640298507220641
+    cpu_usage_system{cpu="cpu1",host="host1",perf="100"} 1.1340298507220641
+  params: '{cpu=~"z.+",cpu=~"y.+",perf="100"}'
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Apply INF metric filter on multiple inf values'
+in:
+  data: |
+    apache{state="red"} Inf
+    apache{state="yellow"} 0
+    apache{state="green"} inf
+  params: apache == INF
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Apply INF metric filter on multiple inf values (2)'
+in:
+  data: |
+    apache{state="red"} Inf
+    apache{state="yellow"} 0
+    apache{state="green"} +inf
+  params: apache == INF
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Apply INF metric filter on multiple nan values '
+in:
+  data: |
+    apache{state="red"} NaN
+    apache{state="yellow"} 0
+    apache{state="green"} nan
+  params: apache == NAN
+  value_type: ""
+out:
+  result: FAIL
+---
+test case: 'Apply INF metric filter on matching inf value'
+in:
+  data: |
+    apache{state="red"} Inf
+    apache{state="yellow"} 0
+    apache{state="green"} 0
+  params: apache == INF
+  value_type: state
+out:
+  result: SUCCEED
+  output: red
+---
+test case: 'Apply INF metric filter on matching inf value (2)'
+in:
+  data: |
+    apache{state="red"} Inf
+    apache{state="yellow"} 0
+    apache{state="green"} 0
+  params: apache == +INF
+  value_type: state
+out:
+  result: SUCCEED
+  output: red
+---
+test case: 'Apply INF metric filter on matching inf value (3)'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} -Inf
+    apache{state="green"} 0
+  params: apache == -INF
+  value_type: state
+out:
+  result: SUCCEED
+  output: yellow
+---
+test case: 'Apply INF metric filter on matching inf value (4)'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} NaN
+    apache{state="green"} 0
+  params: apache == -INF
+  value_type: state
+out:
+  result: FAIL
+---
+test case: 'Apply INF metric filter on matching nan value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} NaN
+  params: apache == NAN
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply 1 metric filter on 1.0 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} 1.0
+  params: apache == 1
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply 10 metric filter on 1e1 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} 1e1
+  params: apache == 10
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply 125 metric filter on 1.25e2 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} 1.25e2
+  params: apache == 125
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply 00.0100 metric filter on 1e-2 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} 1e-2
+  params: apache == 00.0100
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply 125 metric filter on multiple matching values'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 1.25e2
+    apache{state="green"} 12500e-2
+  params: apache == 125
+  value_type: state
+out:
+  result: FAIL
+---
+test case: 'Apply 1 metric filter on +1 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} +1
+  params: apache == 1
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply +1 metric filter on +1 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} +1
+  params: apache == +1
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply +1 metric filter on 1 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} 1
+  params: apache == +1
+  value_type: state
+out:
+  result: SUCCEED
+  output: green
+---
+test case: 'Apply +1 metric filter on -1 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} -1
+  params: apache == +1
+  value_type: state
+out:
+  result: FAIL
+---
+test case: 'Apply -1 metric filter on +1 value'
+in:
+  data: |
+    apache{state="red"} 0
+    apache{state="yellow"} 0
+    apache{state="green"} +1
+  params: apache == -1
+  value_type: state
+out:
+  result: FAIL
+---
+test case: 'Apply -1 metric filter on +1 value'
+in:
+  data: |
+    cpu_usage_system{cpu="cpu-total",state="23",host="host1"} inf
+    cpu_usage_system{cpu="cpu0",state="10",host="host2"} nan
+    cpu_usage_system{cpu="cpu1",state="88",host="host3"} 3.5180249088e+11
+  params: cpu_usage_system==3.5180249088e+11
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 3.5180249088e+11
+...
+

@@ -236,7 +236,7 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	protected function extractMacros(array $texts, array $types) {
+	public function extractMacros(array $texts, array $types) {
 		$macros = [];
 		$extract_usermacros = array_key_exists('usermacros', $types);
 		$extract_macros = array_key_exists('macros', $types);

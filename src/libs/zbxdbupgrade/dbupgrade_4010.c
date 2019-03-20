@@ -270,6 +270,13 @@ static int	DBpatch_4010026(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_4010027(void)
+{
+	const ZBX_FIELD	field = {"details", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("triggers", &field);
+}
 #endif
 
 DBPATCH_START(4010)
@@ -302,5 +309,6 @@ DBPATCH_ADD(4010023, 0, 1)
 DBPATCH_ADD(4010024, 0, 1)
 DBPATCH_ADD(4010025, 0, 1)
 DBPATCH_ADD(4010026, 0, 1)
+DBPATCH_ADD(4010027, 0, 1)
 
 DBPATCH_END()

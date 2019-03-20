@@ -209,6 +209,9 @@ src/libs/zbxmodules/Makefile.in
 src/libs/zbxnix/.deps
 src/libs/zbxnix/Makefile
 src/libs/zbxnix/Makefile.in
+src/libs/zbxprometheus/.deps
+src/libs/zbxprometheus/Makefile
+src/libs/zbxprometheus/Makefile.in
 src/libs/zbxregexp/.deps
 src/libs/zbxregexp/Makefile
 src/libs/zbxregexp/Makefile.in
@@ -445,6 +448,13 @@ tests/libs/zbxjson/Makefile
 tests/libs/zbxjson/Makefile.in
 tests/libs/zbxjson/zbx_json_path_open
 tests/libs/zbxjson/zbx_jsonpath_next
+tests/libs/zbxprometheus/.deps
+tests/libs/zbxprometheus/Makefile
+tests/libs/zbxprometheus/Makefile.in
+tests/libs/zbxprometheus/prometheus_filter_init
+tests/libs/zbxprometheus/prometheus_parse_row
+tests/libs/zbxprometheus/zbx_prometheus_pattern
+tests/libs/zbxprometheus/zbx_prometheus_to_json
 tests/libs/zbxsysinfo/.deps
 tests/libs/zbxsysinfo/Makefile
 tests/libs/zbxsysinfo/Makefile.in

@@ -618,6 +618,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
 				case ZBX_PREPROC_MULTIPLIER:
+				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 					$step['params'] = trim($step['params'][0]);
 					break;
 
@@ -636,6 +637,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					break;
 
 				case ZBX_PREPROC_VALIDATE_RANGE:
+				case ZBX_PREPROC_PROMETHEUS_PATTERN:
 					foreach ($step['params'] as &$param) {
 						$param = trim($param);
 					}
@@ -1150,6 +1152,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					foreach ($preprocessing as &$step) {
 						switch ($step['type']) {
 							case ZBX_PREPROC_MULTIPLIER:
+							case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 								$step['params'] = trim($step['params'][0]);
 								break;
 
@@ -1168,6 +1171,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 								break;
 
 							case ZBX_PREPROC_VALIDATE_RANGE:
+							case ZBX_PREPROC_PROMETHEUS_PATTERN:
 								foreach ($step['params'] as &$param) {
 									$param = trim($param);
 								}
@@ -1498,6 +1502,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	$data['config'] = select_config();
 	$data['host'] = $host;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
+	$data['preprocessing_test_type'] = CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_ITEM;
 	$data['preprocessing_types'] = CItem::$supported_preprocessing_types;
 
 	// Sort interfaces to be listed starting with one selected as 'main'.
@@ -1563,6 +1568,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'headers' => getRequest('headers', []),
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
+		'preprocessing_test_type' => CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_ITEM,
 		'preprocessing_types' => CItem::$supported_preprocessing_types,
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];

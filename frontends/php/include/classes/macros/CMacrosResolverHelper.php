@@ -498,25 +498,6 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve all kinds of macros in map labels.
-	 *
-	 * @static
-	 *
-	 * @param array  $selement
-	 * @param string $selement['label']						label to expand
-	 * @param int    $selement['elementtype']				element type
-	 * @param array    $selement['elements']				elements
-	 * @param string $selement['elementExpressionTrigger']	if type is trigger, then trigger expression
-	 *
-	 * @return string
-	 */
-	public static function resolveMapLabelMacrosAll(array $selement) {
-		self::init();
-
-		return self::$macrosResolver->resolveMapLabelMacrosAll($selement);
-	}
-
-	/**
 	 * Resolve macros in dashboard widget URL.
 	 *
 	 * @static
@@ -558,7 +539,34 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve supported macros used in map element label as well as in URL names and values.
+	 *
+	 * @static
+	 *
+	 * @param array        $selements[]
+	 * @param int          $selements[]['elementtype']          Map element type.
+	 * @param int          $selements[]['elementsubtype']       Map element subtype.
+	 * @param string       $selements[]['label']                Map element label.
+	 * @param array        $selements[]['urls']                 Map element urls.
+	 * @param string       $selements[]['urls'][]['name']       Map element url name.
+	 * @param string       $selements[]['urls'][]['url']        Map element url value.
+	 * @param int | array  $selements[]['elementid']            Element id linked to map element.
+	 * @param array        $options
+	 * @param bool         $options['resolve_element_urls']     Resolve macros in map element url name and value.
+	 * @param bool         $options['resolve_element_label']    Resolve macros in map element label.
+	 *
+	 * @return array
+	 */
+	public static function resolveMacrosInMapElements(array $selements, array $options) {
+		self::init();
+
+		return self::$macrosResolver->resolveMacrosInMapElements($selements, $options);
+	}
+
+	/**
 	 * Set every trigger items array elements order by item usage order in trigger expression and recovery expression.
+	 *
+	 * @static
 	 *
 	 * @param array  $triggers                            Array of triggers.
 	 * @param string $triggers[]['expression']            Trigger expression used to define order of trigger items.
@@ -572,5 +580,24 @@ class CMacrosResolverHelper {
 		self::init();
 
 		return self::$macrosResolver->sortItemsByExpressionOrder($triggers);
+	}
+
+	/**
+	 * Extract macros from properties used for preprocessing step test and find effective values.
+	 *
+	 * @param array  $data
+	 * @param string $data['steps']                              Preprocessing steps details.
+	 * @param string $data['steps'][]['params']                  Preprocessing step parameters.
+	 * @param string $data['steps'][]['error_handler_params]     Preprocessing steps error handle parameters.
+	 * @param string $data['delay']                              Update interval value.
+	 * @param string $data['hostids']                            Hostid for which tested item belongs to.
+	 * @param bool   $support_lldmacros                          Enable or disable LLD macro selection.
+	 *
+	 * @return array
+	 */
+	public static function extractMacrosFromPreprocessingSteps(array $data, $support_lldmacros) {
+		self::init();
+
+		return self::$macrosResolver->extractMacrosFromPreprocessingSteps($data, $support_lldmacros);
 	}
 }

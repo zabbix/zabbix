@@ -1981,8 +1981,6 @@ int	zbx_ipc_async_socket_recv(zbx_ipc_async_socket_t *asocket, int timeout, zbx_
 
 			zbx_free(data);
 		}
-
-		ret = SUCCEED;
 	}
 
 	if (NULL != *message || ZBX_IPC_ASYNC_SOCKET_STATE_ERROR != asocket->state)

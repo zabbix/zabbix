@@ -624,7 +624,7 @@ abstract class CItemGeneral extends CApiService {
 
 			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create');
 
-			$this->validateItemPreprocessing($fullItem, $update ? 'update' : 'create');
+			$this->validateItemPreprocessing($fullItem);
 		}
 		unset($item);
 
@@ -773,9 +773,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		if ($this instanceof CItem || $this instanceof CItemPrototype) {
-			$this->validateDependentItems($new_items);
-		}
+		$this->validateDependentItems($new_items);
 
 		// Save the new items.
 		if ($ins_items) {
@@ -1158,11 +1156,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		if ($class === 'CItem' || $class === 'CItemPrototype') {
-			$new_items = $this->prepareDependentItems($tpl_items, $new_items, $hostids);
-		}
-
-		return $new_items;
+		return $this->prepareDependentItems($tpl_items, $new_items, $hostids);
 	}
 
 	/**
@@ -1244,7 +1238,9 @@ abstract class CItemGeneral extends CApiService {
 	 *                                                                  18 - ZBX_PREPROC_ERROR_FIELD_REGEX;
 	 *                                                                  19 - ZBX_PREPROC_THROTTLE_VALUE;
 	 *                                                                  20 - ZBX_PREPROC_THROTTLE_TIMED_VALUE;
-	 *                                                                  21 - ZBX_PREPROC_SCRIPT.
+	 *                                                                  21 - ZBX_PREPROC_SCRIPT;
+	 *                                                                  22 - ZBX_PREPROC_PROMETHEUS_PATTERN;
+	 *                                                                  23 - ZBX_PREPROC_PROMETHEUS_TO_JSON.
 	 * @param string $item['preprocessing'][]['params']                Additional parameters used by preprocessing
 	 *                                                                 option. Multiple parameters are separated by LF
 	 *                                                                 (\n) character.
@@ -1255,9 +1251,8 @@ abstract class CItemGeneral extends CApiService {
 	 *                                                                  2 - ZBX_PREPROC_FAIL_SET_VALUE;
 	 *                                                                  3 - ZBX_PREPROC_FAIL_SET_ERROR.
 	 * @param string $item['preprocessing'][]['error_handler_params']  Error handler parameters.
-	 * @param string $method                                           A string of "create" or "update" method.
 	 */
-	protected function validateItemPreprocessing(array $item, $method) {
+	protected function validateItemPreprocessing(array $item) {
 		if (array_key_exists('preprocessing', $item)) {
 			if (!is_array($item['preprocessing'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1271,9 +1266,17 @@ abstract class CItemGeneral extends CApiService {
 				]
 			]);
 
+			$prometheus_pattern_parser = new CPrometheusPatternParser(['usermacros' => true,
+				'lldmacros' => ($this instanceof CItemPrototype)
+			]);
+			$prometheus_output_parser = new CPrometheusOutputParser(['usermacros' => true,
+				'lldmacros' => ($this instanceof CItemPrototype)
+			]);
+
 			$required_fields = ['type', 'params', 'error_handler', 'error_handler_params'];
 			$delta = false;
 			$throttling = false;
+			$prometheus = false;
 
 			foreach ($item['preprocessing'] as $preprocessing) {
 				$missing_keys = array_diff($required_fields, array_keys($preprocessing));
@@ -1301,6 +1304,8 @@ abstract class CItemGeneral extends CApiService {
 						)
 					);
 				}
+
+				$preprocessing['params'] = str_replace("\r\n", "\n", $preprocessing['params']);
 
 				switch ($preprocessing['type']) {
 					case ZBX_PREPROC_MULTIPLIER:
@@ -1487,6 +1492,57 @@ abstract class CItemGeneral extends CApiService {
 							$throttling = true;
 						}
 						break;
+
+					case ZBX_PREPROC_PROMETHEUS_PATTERN:
+					case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+						if ($prometheus) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one Prometheus step is allowed.'));
+						}
+
+						$prometheus = true;
+
+						if (is_array($preprocessing['params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+
+						if ($preprocessing['type'] == ZBX_PREPROC_PROMETHEUS_PATTERN) {
+							if ($preprocessing['params'] === '' || $preprocessing['params'] === null
+									|| $preprocessing['params'] === false) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
+								);
+							}
+
+							$params = explode("\n", $preprocessing['params']);
+
+							if ($params[0] === '') {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('first parameter is expected')
+								));
+							}
+
+							if ($prometheus_pattern_parser->parse($params[0]) != CParser::PARSE_SUCCESS) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('invalid Prometheus pattern')
+								));
+							}
+
+							if ($params[1] !== ''
+									&& $prometheus_output_parser->parse($params[1]) != CParser::PARSE_SUCCESS) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('invalid Prometheus output')
+								));
+							}
+						}
+						// Prometheus to JSON can be empty and has only one parameter.
+						elseif ($preprocessing['params'] !== '') {
+							if ($prometheus_pattern_parser->parse($preprocessing['params']) != CParser::PARSE_SUCCESS) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('invalid Prometheus pattern')
+								));
+							}
+						}
+						break;
 				}
 
 				switch ($preprocessing['type']) {
@@ -1562,6 +1618,25 @@ abstract class CItemGeneral extends CApiService {
 						}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Method validates preprocessing steps independently from other item properties.
+	 *
+	 * @param array  $preprocessing_steps    An array of item pre-processing step details.
+	 *                                       See self::validateItemPreprocessing for details.
+	 *
+	 * @return bool|string
+	 */
+	public function validateItemPreprocessingSteps(array $preprocessing_steps) {
+		try {
+			$this->validateItemPreprocessing(['preprocessing' => $preprocessing_steps]);
+
+			return true;
+		}
+		catch (APIException $error) {
+			return $error->getMessage();
 		}
 	}
 
@@ -1737,7 +1812,8 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($items as $item) {
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				if ($this instanceof CItemPrototype || $item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				if ($this instanceof CDiscoveryRule || $this instanceof CItemPrototype
+						|| $item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 					$dep_items[] = $item;
 				}
 
@@ -1780,17 +1856,9 @@ abstract class CItemGeneral extends CApiService {
 
 		$master_items = [];
 
-		// Fill relations array by master items (item prototypes).
+		// Fill relations array by master items (item prototypes). Discovery rule should not be master item.
 		do {
-			if ($this instanceof CItem) {
-				$db_master_items = DBselect(
-					'SELECT i.itemid,i.hostid,i.master_itemid'.
-					' FROM items i'.
-					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
-						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL])
-				);
-			}
-			else {
+			if ($this instanceof CItemPrototype) {
 				$db_master_items = DBselect(
 					'SELECT i.itemid,i.hostid,i.master_itemid,i.flags,id.parent_itemid AS ruleid'.
 					' FROM items i'.
@@ -1798,6 +1866,15 @@ abstract class CItemGeneral extends CApiService {
 							' ON i.itemid=id.itemid'.
 					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
 						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])
+				);
+			}
+			// CDiscoveryRule, CItem
+			else {
+				$db_master_items = DBselect(
+					'SELECT i.itemid,i.hostid,i.master_itemid'.
+					' FROM items i'.
+					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL])
 				);
 			}
 

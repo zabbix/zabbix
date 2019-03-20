@@ -23,6 +23,7 @@
 #include "zbxalgo.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
+#include "zbxprometheus.h"
 
 typedef struct
 {
@@ -1346,7 +1347,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 {
 	int		ret = SUCCEED;
 	zbx_token_t	token;
-	char		err[MAX_STRING_LEN];
+	char		err[MAX_STRING_LEN], *errmsg = NULL;
 	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2;
 	const char*	regexp_err = NULL;
 	zbx_uint64_t	value_ui64;
@@ -1453,6 +1454,40 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 				ret = FAIL;
 			}
 			break;
+		case ZBX_PREPROC_PROMETHEUS_PATTERN:
+			zbx_strlcpy(param1, pp->params, sizeof(param1));
+			if (NULL == (param2 = strchr(param1, '\n')))
+			{
+				zbx_snprintf(err, sizeof(err), "cannot find second parameter: %s", pp->params);
+				ret = FAIL;
+				break;
+			}
+			*param2++ = '\0';
+
+			if (FAIL == zbx_prometheus_validate_filter(param1, &errmsg))
+			{
+				zbx_snprintf(err, sizeof(err), "invalid pattern: %s", param1);
+				zbx_free(errmsg);
+				ret = FAIL;
+				break;
+			}
+
+			if (FAIL == zbx_prometheus_validate_label(param2))
+			{
+				zbx_snprintf(err, sizeof(err), "invalid label name: %s", param2);
+				ret = FAIL;
+				break;
+			}
+
+			break;
+		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+			if (FAIL == zbx_prometheus_validate_filter(pp->params, &errmsg))
+			{
+				zbx_snprintf(err, sizeof(err), "invalid pattern: %s", pp->params);
+				zbx_free(errmsg);
+				ret = FAIL;
+				break;
+			}
 	}
 
 	if (SUCCEED != ret)
@@ -2481,16 +2516,43 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
  *             sub_params      - [IN/OUT] the preprocessing parameters        *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_t *lld_row,
+static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_t *lld_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **sub_params)
 {
-	if (ZBX_PREPROC_REGSUB == type ||
-			ZBX_PREPROC_VALIDATE_REGEX == type ||
-			ZBX_PREPROC_VALIDATE_NOT_REGEX == type ||
-			ZBX_PREPROC_ERROR_FIELD_REGEX == type)
+	int	params_num = 1, flags1, flags2;
+
+	switch (type)
 	{
-		char	*param1 = NULL, *param2 = NULL;
-		size_t	sub_params_size;
+		case ZBX_PREPROC_REGSUB:
+		case ZBX_PREPROC_ERROR_FIELD_REGEX:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP;
+			flags2 = ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT;
+			params_num = 2;
+			break;
+		case ZBX_PREPROC_VALIDATE_REGEX:
+		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP;
+			params_num = 1;
+			break;
+		case ZBX_PREPROC_XPATH:
+		case ZBX_PREPROC_ERROR_FIELD_XML:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_XPATH;
+			params_num = 1;
+			break;
+		case ZBX_PREPROC_PROMETHEUS_PATTERN:
+		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_PROMETHEUS;
+			params_num = 1;
+			break;
+		default:
+			flags1 = ZBX_MACRO_ANY;
+			params_num = 1;
+	}
+
+	if (2 == params_num)
+	{
+		char	*param1, *param2;
+		size_t	params_alloc, params_offset = 0;
 
 		zbx_strsplit(*sub_params, '\n', &param1, &param2);
 
@@ -2502,30 +2564,21 @@ static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_
 			return;
 		}
 
-		substitute_lld_macros(&param1, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP,
-				NULL, 0);
-		substitute_lld_macros(&param2, &lld_row->jp_row, lld_macro_paths,
-				ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT, NULL, 0);
+		substitute_lld_macros(&param1, &lld_row->jp_row, lld_macro_paths, flags1, NULL, 0);
+		substitute_lld_macros(&param2, &lld_row->jp_row, lld_macro_paths, flags2, NULL, 0);
 
-		sub_params_size = strlen(param1) + strlen(param2) + 2;
-		*sub_params = (char*)zbx_realloc(*sub_params, sub_params_size);
+		params_alloc = strlen(param1) + strlen(param2) + 2;
+		*sub_params = (char*)zbx_realloc(*sub_params, params_alloc);
 
-		zbx_snprintf(*sub_params, sub_params_size, "%s\n%s", param1, param2);
+		zbx_strcpy_alloc(sub_params, &params_alloc, &params_offset, param1);
+		zbx_chrcpy_alloc(sub_params, &params_alloc, &params_offset, '\n');
+		zbx_strcpy_alloc(sub_params, &params_alloc, &params_offset, param2);
 
 		zbx_free(param1);
 		zbx_free(param2);
 	}
 	else
-	{
-		int	token_type = ZBX_MACRO_ANY;
-
-		if (ZBX_PREPROC_XPATH == type || ZBX_PREPROC_ERROR_FIELD_XML == type)
-		{
-			token_type |= ZBX_TOKEN_XPATH;
-		}
-
-		substitute_lld_macros(sub_params, &lld_row->jp_row, lld_macro_paths, token_type, NULL, 0);
-	}
+		substitute_lld_macros(sub_params, &lld_row->jp_row, lld_macro_paths, flags1, NULL, 0);
 }
 
 /******************************************************************************
@@ -2583,7 +2636,7 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
 				ppdst->error_handler = ppsrc->error_handler;
 				ppdst->error_handler_params = zbx_strdup(NULL, ppsrc->error_handler_params);
 
-				substitute_lld_macors_in_preproc_params(ppsrc->type, item->lld_row, lld_macro_paths,
+				substitute_lld_macros_in_preproc_params(ppsrc->type, item->lld_row, lld_macro_paths,
 						&ppdst->params);
 				substitute_lld_macros(&ppdst->error_handler_params, &item->lld_row->jp_row,
 						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
@@ -2611,7 +2664,7 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
 			}
 
 			buffer = zbx_strdup(buffer, ppsrc->params);
-			substitute_lld_macors_in_preproc_params(ppsrc->type, item->lld_row, lld_macro_paths, &buffer);
+			substitute_lld_macros_in_preproc_params(ppsrc->type, item->lld_row, lld_macro_paths, &buffer);
 
 			if (0 != strcmp(ppdst->params, buffer))
 			{

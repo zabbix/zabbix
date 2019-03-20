@@ -145,6 +145,32 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Request server to test item preprocessing steps.
+	 *
+	 * @param array  $data                                     Array of preprocessing steps test.
+	 * @param string $data['value']                            Value to use for preprocessing step testing.
+	 * @param int    $data['value_type']                       Item value type.
+	 * @param array  $data['history']                          Previous value object.
+	 * @param string $data['history']['value']                 Previous value.
+	 * @param string $data['history']['timestamp']             Previous value time.
+	 * @param array  $data['steps']                            Preprocessing step object.
+	 * @param int    $data['steps'][]['type']                  Type of preprocessing step.
+	 * @param string $data['steps'][]['params']                Parameters of preprocessing step.
+	 * @param int    $data['steps'][]['error_handler']         Error handler selected as "custom on fail".
+	 * @param string $data['steps'][]['error_handler_params']  Parameters configured for selected error handler.
+	 * @param string $sid                                      User session ID.
+	 *
+	 * @return array
+	 */
+	public function testPreprocessingSteps(array $data, $sid) {
+		return $this->request([
+			'request' => 'preprocessing.test',
+			'data' => $data,
+			'sid' => $sid
+		]);
+	}
+
+	/**
 	 * Retrieve item queue information.
 	 *
 	 * Possible $type values:

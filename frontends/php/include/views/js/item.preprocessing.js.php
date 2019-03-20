@@ -20,11 +20,16 @@
 				->addClass('step-name'),
 			(new CDiv())->addClass('step-parameters'),
 			(new CDiv(new CCheckBox('preprocessing[#{rowNum}][on_fail]')))->addClass('step-on-fail'),
-			(new CDiv((new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-				->removeId()
-			))->addClass('step-action')
+			(new CDiv([
+				(new CButton('preprocessing[#{rowNum}][test]', _('Test')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('preprocessing-step-test')
+					->removeId(),
+				(new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+					->removeId()
+			]))->addClass('step-action')
 		]))->addClass('preprocessing-step'),
 		(new CDiv([
 			new CLabel(_('Custom on fail')),
@@ -48,28 +53,77 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-single-tmpl">
-	<?php
-		echo (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', '#{placeholder}');
-	?>
+	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', '#{placeholder}') ?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-double-tmpl">
-	<?php
-		echo (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', '#{placeholder_0}').
-			(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))->setAttribute('placeholder', '#{placeholder_1}');
+	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', '#{placeholder_0}').
+			(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))->setAttribute('placeholder', '#{placeholder_1}')
 	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-multiline-tmpl">
-	<?php
-		echo (new CMultilineInput('preprocessing[#{rowNum}][params][0]', '', [
-			'add_post_js' => false
-		]));
-	?>
+	<?= (new CMultilineInput('preprocessing[#{rowNum}][params][0]', '', ['add_post_js' => false])) ?>
 </script>
 
 <script type="text/javascript">
 	jQuery(function($) {
+		/**
+		 * Collect current preprocessing step properties.
+		 *
+		 * @param {array} step_nums  List of step numbers to collect.
+		 *
+		 * @return array
+		 */
+		function getPreprocessingSteps(step_nums) {
+			var steps = [];
+
+			step_nums.each(function(num) {
+				var type = $('[name="preprocessing[' + num + '][type]"]', $preprocessing).val(),
+					error_handler = $('[name="preprocessing[' + num + '][on_fail]"]').is(':checked')
+						? $('[name="preprocessing[' + num + '][error_handler]"]:checked').val()
+						: <?= ZBX_PREPROC_FAIL_DEFAULT ?>,
+					params = [];
+
+				var on_fail = {
+					error_handler: error_handler,
+					error_handler_params: (error_handler == <?= ZBX_PREPROC_FAIL_SET_VALUE ?>
+							|| error_handler == <?= ZBX_PREPROC_FAIL_SET_ERROR ?>)
+						? $('[name="preprocessing[' + num + '][error_handler_params]"]').val()
+						: ''
+				};
+
+				if ($('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).length) {
+					params.push($('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).val());
+				}
+				if ($('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).length) {
+					params.push($('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
+				}
+
+				steps.push($.extend({
+					type: type,
+					params: params.join("\n")
+				}, on_fail));
+			});
+
+			return steps;
+		}
+
+		/**
+		 * Creates preprocessing test modal window.
+		 *
+		 * @param {array}  step_nums     List of step numbers to collect.
+		 * @param {object} trigger_elmnt UI element triggered function.
+		 */
+		function openPreprocessingTestDialog(step_nums, trigger_elmnt) {
+			PopUp('popup.preproctest.edit', {
+				delay: $('#delay').val() || '',
+				value_type: $('#value_type').val() || <?= CControllerPopupPreprocTest::ZBX_DEFAULT_VALUE_TYPE ?>,
+				steps: getPreprocessingSteps(step_nums),
+				hostid: <?= $data['hostid'] ?>,
+				test_type: <?= $data['preprocessing_test_type'] ?>
+			}, null, trigger_elmnt);
+		}
 
 		function makeParameterInput(index, type) {
 			var preproc_param_single_tmpl = new Template($('#preprocessing-steps-parameters-single-tmpl').html()),
@@ -135,10 +189,27 @@
 
 				case '<?= ZBX_PREPROC_SCRIPT ?>':
 					return $(preproc_param_multiline_tmpl.evaluate({rowNum: index})).multilineInput({
-						title: '<?= _('JavaScript') ?>',
-						placeholder: '<?= _('script') ?>',
-						maxlength: <?= $data['preprocessing_script_maxlength'] ?>
+						title: <?= CJs::encodeJson(_('JavaScript')) ?>,
+						placeholder: <?= CJs::encodeJson(_('script')) ?>,
+						maxlength: <?= (int) $data['preprocessing_script_maxlength'] ?>
 					});
+
+				case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':
+					return $(preproc_param_double_tmpl.evaluate({
+						rowNum: index,
+						placeholder_0: <?= CJs::encodeJson(
+							_('<metric name>{<label name>="<label value>", ...} == <value>')
+						) ?>,
+						placeholder_1: <?= CJs::encodeJson(_('<label name>')) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_PROMETHEUS_TO_JSON ?>':
+					return $(preproc_param_single_tmpl.evaluate({
+						rowNum: index,
+						placeholder: <?= CJs::encodeJson(
+							_('<metric name>{<label name>="<label value>", ...} == <value>')
+						) ?>
+					}));
 
 				default:
 					return '';
@@ -174,6 +245,7 @@
 
 				if (sortable_count == 1) {
 					$preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
+					$('#preproc_test_all').prop('disabled', false);
 				}
 				else if (sortable_count > 1) {
 					$preprocessing
@@ -183,6 +255,21 @@
 
 				step_index++;
 			})
+			.on('click', '#preproc_test_all', function() {
+				var step_nums = [];
+				$('select[name^="preprocessing"][name$="[type]"]', $preprocessing).each(function() {
+					var str = $(this).attr('name');
+					step_nums.push(str.substr(14, str.length - 21));
+				});
+
+				openPreprocessingTestDialog(step_nums, this);
+			})
+			.on('click', '.preprocessing-step-test', function() {
+				var str = $(this).attr('name'),
+					num = str.substr(14, str.length - 21);
+
+				openPreprocessingTestDialog([num], this);
+			})
 			.on('click', '.element-table-remove', function() {
 				$(this).closest('li.sortable').remove();
 
@@ -190,6 +277,7 @@
 
 				if (sortable_count == 0) {
 					$('.preprocessing-list-head').hide();
+					$('#preproc_test_all').prop('disabled', true);
 				}
 				else if (sortable_count == 1) {
 					$preprocessing

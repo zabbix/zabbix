@@ -75,9 +75,10 @@ function get_item_logtype_style($logtype) {
 }
 
 /**
- * Get item type string name by item type number, or array of all item types if null passed
+ * Get item type string name by item type number, or array of all item types if null passed.
  *
  * @param int|null $type
+ *
  * @return array|string
  */
 function item_type2str($type = null) {
@@ -103,15 +104,12 @@ function item_type2str($type = null) {
 		ITEM_TYPE_HTTPTEST => _('Web monitoring'),
 		ITEM_TYPE_DEPENDENT => _('Dependent item')
 	];
-	if (is_null($type)) {
+
+	if ($type === null) {
 		return $types;
 	}
-	elseif (isset($types[$type])) {
-		return $types[$type];
-	}
-	else {
-		return _('Unknown');
-	}
+
+	return array_key_exists($type, $types) ? $types[$type] : _('Unknown');
 }
 
 /**
@@ -539,7 +537,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 
 					// Master item does not exist on destination host or has not been selected for copying.
 					if (!$item_found) {
-						error(_s('Item "%1$s" has master item and cannot be copied.', $item['name']));
+						error(_s('Item "%1$s" cannot be copied without its master item.', $item['name']));
 
 						return false;
 					}
@@ -1786,6 +1784,14 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 		ZBX_PREPROC_THROTTLE_TIMED_VALUE => [
 			'group' => _('Throttling'),
 			'name' => _('Discard unchanged with heartbeat')
+		],
+		ZBX_PREPROC_PROMETHEUS_PATTERN => [
+			'group' => _('Prometheus'),
+			'name' => _('Prometheus pattern')
+		],
+		ZBX_PREPROC_PROMETHEUS_TO_JSON => [
+			'group' => _('Prometheus'),
+			'name' => _('Prometheus to JSON')
 		]
 	];
 

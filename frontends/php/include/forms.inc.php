@@ -941,8 +941,9 @@ function prepareItemHttpAgentFormData(array $item) {
 /**
  * Get data for item edit page.
  *
- * @param array	$item							Item, item prototype, LLD rule or LLD item to take the data from.
- * @param bool $options['is_discovery_rule']
+ * @param array $item                          Item, item prototype, LLD rule or LLD item to take the data from.
+ * @param array $options
+ * @param bool  $options['is_discovery_rule']
  *
  * @return array
  */
@@ -1081,11 +1082,10 @@ function getItemFormData(array $item = [], array $options = []) {
 	// types, http items only for internal processes
 	$data['types'] = item_type2str();
 	unset($data['types'][ITEM_TYPE_HTTPTEST]);
-	if (!empty($options['is_discovery_rule'])) {
+	if ($data['is_discovery_rule']) {
 		unset($data['types'][ITEM_TYPE_AGGREGATE],
 			$data['types'][ITEM_TYPE_CALCULATED],
-			$data['types'][ITEM_TYPE_SNMPTRAP],
-			$data['types'][ITEM_TYPE_DEPENDENT]
+			$data['types'][ITEM_TYPE_SNMPTRAP]
 		);
 	}
 
@@ -1112,7 +1112,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	// caption
-	if (!empty($data['is_discovery_rule'])) {
+	if ($data['is_discovery_rule']) {
 		$data['caption'] = _('Discovery rule');
 	}
 	else {
@@ -1400,7 +1400,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				(new CDiv(_('Name')))->addClass('step-name'),
 				(new CDiv(_('Parameters')))->addClass('step-parameters'),
 				(new CDiv(_('Custom on fail')))->addClass('step-on-fail'),
-				(new CDiv(_('Action')))->addClass('step-action')
+				(new CDiv(_('Actions')))->addClass('step-action')
 			]))
 				->addClass('preprocessing-list-head')
 				->addStyle(!$preprocessing ? 'display: none;' : null)
@@ -1501,6 +1501,21 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					'readonly' => $readonly
 				]);
 				break;
+
+			case ZBX_PREPROC_PROMETHEUS_PATTERN:
+				$params = [
+					$step_param_0->setAttribute('placeholder',
+						_('<metric name>{<label name>="<label value>", ...} == <value>')
+					),
+					$step_param_1->setAttribute('placeholder', _('<label name>'))
+				];
+				break;
+
+			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+				$params = $step_param_0->setAttribute('placeholder',
+					_('<metric name>{<label name>="<label value>", ...} == <value>')
+				);
+				break;
 		}
 
 		// Create checkbox "Custom on fail" and enable or disable depending on preprocessing type.
@@ -1574,12 +1589,17 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 						->addClass('step-name'),
 					(new CDiv($params))->addClass('step-parameters'),
 					(new CDiv($on_fail))->addClass('step-on-fail'),
-					(new CDiv((new CButton('preprocessing['.$i.'][remove]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
-						->setEnabled(!$readonly)
-						->removeId()
-					))->addClass('step-action'),
+					(new CDiv([
+						(new CButton('preprocessing['.$i.'][test]', _('Test')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('preprocessing-step-test')
+							->removeId(),
+						(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-remove')
+							->setEnabled(!$readonly)
+							->removeId()
+					]))->addClass('step-action'),
 				]))->addClass('preprocessing-step'),
 				$on_fail_options
 			]))
@@ -1592,14 +1612,19 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 	}
 
 	$preprocessing_list->addItem(
-		(new CListItem(
+		(new CListItem([
 			(new CDiv(
 				(new CButton('param_add', _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-add')
 					->setEnabled(!$readonly)
+			))->addClass('step-action'),
+			(new CDiv(
+				(new CButton('preproc_test_all', _('Test all steps')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled(($i > 0) ? true : false)
 			))->addClass('step-action')
-		))->addClass('preprocessing-list-foot')
+		]))->addClass('preprocessing-list-foot')
 	);
 
 	return $preprocessing_list;
