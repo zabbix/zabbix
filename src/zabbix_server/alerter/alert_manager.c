@@ -498,17 +498,21 @@ static int	am_release_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
  * Return value: The alert pool id.                                           *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	am_calc_alertpoolid(unsigned short source, unsigned short object, zbx_uint64_t objectid)
+static zbx_uint64_t	am_calc_alertpoolid(int source, int object, zbx_uint64_t objectid)
 {
 	zbx_uint64_t	alertpoolid;
-	unsigned char	*ptr;
-	zbx_hash_t	hash;
 
-	ptr = (unsigned char*)&alertpoolid;
-	ptr += zbx_serialize_short(ptr, source);
-	ptr += zbx_serialize_short(ptr, object);
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&objectid);
-	(void)zbx_serialize_int(ptr, hash);
+	if (source < 0 || source > 0xffff)
+		THIS_SHOULD_NEVER_HAPPEN;
+
+	if (object < 0 || object > 0xffff)
+		THIS_SHOULD_NEVER_HAPPEN;
+
+	alertpoolid = source & 0xffff;
+	alertpoolid <<= 16;
+	alertpoolid |= object & 0xffff;
+	alertpoolid <<= 32;
+	alertpoolid |= ZBX_DEFAULT_UINT64_HASH_FUNC(&objectid);
 
 	return alertpoolid;
 }
@@ -1733,7 +1737,7 @@ static void	am_abort_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *m
 {
 	unsigned short	source;
 
-	(void)zbx_deserialize_short(&alert->alertpoolid, &source);
+	source = alert->alertpoolid >> 48 & 0xffff;
 
 	if (ALERT_SOURCE_MANUAL == source)
 	{
@@ -1884,10 +1888,10 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 		goto out;
 	}
 
-	(void)zbx_deserialize_short(&alerter->alert->alertpoolid, &source);
+	source = alerter->alert->alertpoolid >> 48 & 0xffff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:"
-			ZBX_FS_UI64 " source: %u", __function_name, alerter->alert->alertid,
+			ZBX_FS_UI64 " source:0x%02x", __function_name, alerter->alert->alertid,
 			alerter->alert->mediatypeid, alerter->alert->alertpoolid, source);
 
 	if (ALERT_SOURCE_MANUAL == source)
