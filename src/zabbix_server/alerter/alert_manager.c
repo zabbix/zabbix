@@ -1883,8 +1883,8 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:0x"
-			ZBX_FS_UX64, __function_name, alerter->alert->alertid,
-			alerter->alert->mediatypeid, alerter->alert->alertpoolid);
+			ZBX_FS_UX64, __function_name, alerter->alert->alertid, alerter->alert->mediatypeid,
+			alerter->alert->alertpoolid);
 
 	if (ALERT_SOURCE_MANUAL == (alerter->alert->alertpoolid >> 48 & 0xffff))
 	{
