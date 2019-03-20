@@ -22,24 +22,24 @@
  * Automatic checkbox range selection
  */
 var chkbxRange = {
-	startbox:		null,	// start checkbox obj
-	chkboxes:		{},		// ckbx list
-	prefix:			null,	// prefix for cookie name
-	pageGoName:		null,	// which checkboxes should be counted by Go button and saved to cookies
-	selectedIds:	{},		// ids of selected objects
-	footerButtons:	{},		// action buttons at the bottom of page
-	cookieName:		null,
+	startbox:			null,	// start checkbox obj
+	chkboxes:			{},		// ckbx list
+	prefix:				null,	// prefix for cookie name
+	pageGoName:			null,	// which checkboxes should be counted by Go button and saved to cookies
+	selectedIds:		{},		// ids of selected objects
+	footerButtons:		{},		// action buttons at the bottom of page
+	sessionStorageName:	null,
 
 	init: function() {
-		// cookie name
+		// sessionStorage name
 		var path = new Curl();
 		var filename = basename(path.getPath(), '.php');
-		this.cookieName = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
+		this.sessionStorageName = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
 		// Erase old checkboxes.
 		this.chkboxes = {};
 		this.startbox = null;
 
-		this.resetOtherPageCookies();
+		this.resetOtherPage();
 
 		// initialize checkboxes
 		var chkboxes = jQuery('.list-table tbody input[type=checkbox]:not(:disabled)');
@@ -51,7 +51,9 @@ var chkbxRange = {
 
 		// load selected checkboxes from cookies or cache
 		if (this.pageGoName != null) {
-			this.selectedIds = cookie.readJSON(this.cookieName);
+			this.selectedIds = sessionStorage.getItem(this.sessionStorageName) === null
+				? {}
+				: JSON.parse(sessionStorage.getItem(this.sessionStorageName));
 
 			// check if checkboxes should be selected from cookies
 			if (!jQuery.isEmptyObject(this.selectedIds)) {
@@ -123,7 +125,7 @@ var chkbxRange = {
 		}
 
 		this.update(object);
-		this.saveCookies(object);
+		this.saveSessionStorage(object);
 
 		this.startbox = checkbox;
 	},
@@ -290,28 +292,31 @@ var chkbxRange = {
 	},
 
 	/**
-	 * Save the state of the checkboxes belonging to the given object group in cookies.
+	 * Save the state of the checkboxes belonging to the given object group in SessionStorage.
 	 *
 	 * @param {string} object
 	 */
-	saveCookies: function(object) {
+	saveSessionStorage: function(object) {
 		if (this.pageGoName == object) {
-			cookie.createJSON(this.cookieName, this.selectedIds);
+			sessionStorage.setItem(this.sessionStorageName, JSON.stringify(this.selectedIds));
 		}
 	},
 
 	clearSelectedOnFilterChange: function() {
-		cookie.eraseArray(this.cookieName);
+		sessionStorage.removeItem(this.sessionStorageName);
 	},
 
 	/**
 	 * Reset all selections on other pages.
 	 */
-	resetOtherPageCookies: function() {
-		for (var key in cookie.cookies) {
-			var cookiePair = key.split('=');
-			if (cookiePair[0].indexOf('cb_') > -1 && cookiePair[0].indexOf(this.cookieName) == -1) {
-				cookie.erase(key);
+	resetOtherPage: function() {
+		var key_;
+
+		for (var i = 0; i < sessionStorage.length; i++) {
+			key_ = sessionStorage.key(i);
+
+			if (key_.substring(0, 3) === 'cb_' && key_ != this.sessionStorageName) {
+				sessionStorage.removeItem(key_);
 			}
 		}
 	},

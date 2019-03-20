@@ -2412,12 +2412,19 @@ function hasErrorMesssages() {
 /**
  * Clears table rows selection's cookies.
  *
- * @param string $cookieId		parent ID, is used as cookie suffix
+ * @param string $parentid  parent ID, is used as sessionStorage suffix
+ * @param array  $keepids   checked rows ids [id1 => id1, id2 => id2, ...]
  */
-function uncheckTableRows($cookieId = null) {
-	insert_js('cookie.eraseArray("cb_'.basename($_SERVER['SCRIPT_NAME'], '.php').
-		($cookieId === null ? '' : '_'.$cookieId).'")'
-	);
+function uncheckTableRows($parentid = null, $keepids = []) {
+	$key = implode('_', array_filter(['cb', basename($_SERVER['SCRIPT_NAME'], '.php'), $parentid]));
+
+	if ($keepids) {
+		$keepids = array_combine($keepids, $keepids);
+		insert_js('sessionStorage.setItem("'.$key.'", JSON.stringify('.CJs::encodeJson($keepids).'))');
+	}
+	else {
+		insert_js('sessionStorage.removeItem("'.$key.'")');
+	}
 }
 
 /**

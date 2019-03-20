@@ -155,14 +155,14 @@ $triggerIds = zbx_toArray($triggerIds);
 if ($triggerIds) {
 	$triggerIds = array_unique($triggerIds);
 
-	$count = API::Trigger()->get([
-		'countOutput' => true,
+	$triggers = API::Trigger()->get([
+		'output' => [],
 		'triggerids' => $triggerIds,
 		'editable' => true
 	]);
 
-	if ($count != count($triggerIds)) {
-		access_deny();
+	if (count($triggers) != count($triggerIds)) {
+		uncheckTableRows(getRequest('hostid'), array_column($triggers, 'triggerid'));
 	}
 }
 
