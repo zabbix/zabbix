@@ -445,12 +445,14 @@ class CPageFilter {
 
 			if ($hostId) {
 				// Get child groups for "profileIds['groupid']".
+				$group = reset($this->data['groups']);
+				$profileids = [];
+
 				if (array_key_exists($this->_profileIds['groupid'], $this->data['groups'])) {
 					$profileids = [$this->_profileIds['groupid']];
 					$parent = $this->data['groups'][$this->_profileIds['groupid']]['name'].'/';
 				}
-				else {
-					$group = reset($this->data['groups']);
+				elseif (array_key_exists($group['groupid'], $this->data['groups'])) {
 					$profileids = [$group['groupid']];
 					$parent = $this->data['groups'][$group['groupid']]['name'].'/';
 				}
