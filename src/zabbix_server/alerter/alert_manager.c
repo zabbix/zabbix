@@ -1782,7 +1782,7 @@ static int	am_process_alert(zbx_ipc_service_t *alerter_service, zbx_am_t *manage
 	char			*cmd = NULL, *error = NULL;
 	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:0x"
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:0x"
 			ZBX_FS_UX64, __function_name, alert->alertid, alert->mediatypeid, alert->alertpoolid);
 
 	if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
