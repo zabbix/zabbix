@@ -283,20 +283,6 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_
 	return i1->nextcheck - i2->nextcheck;
 }
 
-static	int	super_admin_active_session(const struct zbx_json_parse *jp)
-{
-	char		sessionid[MAX_STRING_LEN];
-	zbx_user_t	user;
-
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
-			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: recv_getqueue                                                    *
@@ -314,7 +300,8 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_getqueue";
 	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i, limit;
-	char			type[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
+	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
+	zbx_user_t		user;
 	zbx_vector_ptr_t	queue;
 	struct zbx_json		json;
 	zbx_hashset_t		queue_stats;
@@ -322,7 +309,8 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != super_admin_active_session(jp))
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
+			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
 		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
@@ -470,18 +458,20 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_alert_send";
 	int			ret = FAIL, errcode;
-	char			tmp[ZBX_MAX_UINT64_LEN + 1], *sendto = NULL, *subject = NULL, *message = NULL,
-				*error = NULL;
+	char			tmp[ZBX_MAX_UINT64_LEN + 1], sessionid[MAX_STRING_LEN], *sendto = NULL, *subject = NULL,
+				*message = NULL, *error = NULL;
 	zbx_uint64_t		mediatypeid;
 	size_t			string_alloc;
 	struct zbx_json		json;
 	struct zbx_json_parse	jp_data;
 	unsigned char		*data = NULL, *result;
 	zbx_uint32_t		size;
+	zbx_user_t		user;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != super_admin_active_session(jp))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
+			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
 		error = zbx_strdup(NULL, "Permission denied.");
 		goto fail;
