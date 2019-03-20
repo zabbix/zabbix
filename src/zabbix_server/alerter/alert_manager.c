@@ -1721,7 +1721,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 	}
 	else
 	{
-		*error = zbx_dsprintf(*error, "Cannot exectue command \"%s\": %s", *cmd, zbx_strerror(errno));
+		*error = zbx_dsprintf(*error, "Cannot execute command \"%s\": %s", *cmd, zbx_strerror(errno));
 		zbx_free(*cmd);
 	}
 

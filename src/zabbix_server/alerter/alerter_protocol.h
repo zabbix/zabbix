@@ -73,4 +73,10 @@ zbx_uint32_t	zbx_alerter_serialize_exec(unsigned char **data, zbx_uint64_t alert
 
 void	zbx_alerter_deserialize_exec(const unsigned char *data, zbx_uint64_t *alertid, char **command);
 
+zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t mediatypeid, const char *sendto,
+		const char *subject, const char *message);
+
+void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t *mediatypeid, char **sendto,
+		char **subject, char **message);
+
 #endif
