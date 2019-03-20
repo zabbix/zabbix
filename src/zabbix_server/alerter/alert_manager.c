@@ -1734,11 +1734,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 static void	am_abort_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *manager,
 		const zbx_am_alert_t *alert, const char *error)
 {
-	unsigned short	source;
-
-	source = alert->alertpoolid >> 48 & 0xffff;
-
-	if (ALERT_SOURCE_MANUAL == source)
+	if (ALERT_SOURCE_MANUAL == (alert->alertpoolid >> 48 & 0xffff))
 	{
 		zbx_ipc_client_t	*client;
 
@@ -1784,8 +1780,8 @@ static int	am_process_alert(zbx_ipc_service_t *alerter_service, zbx_am_t *manage
 	char			*cmd = NULL, *error = NULL;
 	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:"
-			ZBX_FS_UI64, __function_name, alert->alertid, alert->mediatypeid, alert->alertpoolid);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:0x"
+			ZBX_FS_UX64, __function_name, alert->alertid, alert->mediatypeid, alert->alertpoolid);
 
 	if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
 	{
@@ -1871,7 +1867,6 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 	const char		*__function_name = "am_process_result";
 	int			ret = FAIL;
 	zbx_am_alerter_t	*alerter;
-	unsigned short		source;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1887,13 +1882,11 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 		goto out;
 	}
 
-	source = alerter->alert->alertpoolid >> 48 & 0xffff;
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:0x"
+			ZBX_FS_UX64, __function_name, alerter->alert->alertid,
+			alerter->alert->mediatypeid, alerter->alert->alertpoolid);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() alertid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64 " alertpoolid:"
-			ZBX_FS_UI64 " source:0x%02x", __function_name, alerter->alert->alertid,
-			alerter->alert->mediatypeid, alerter->alert->alertpoolid, source);
-
-	if (ALERT_SOURCE_MANUAL == source)
+	if (ALERT_SOURCE_MANUAL == (alerter->alert->alertpoolid >> 48 & 0xffff))
 	{
 		zbx_ipc_client_t	*alert_send_client;
 
