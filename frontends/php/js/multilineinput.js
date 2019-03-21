@@ -22,7 +22,7 @@
 	'use strict';
 
 	function setDisabled(e) {
-		if ($(this) !== e.target) {
+		if ($(this)[0] !== e.target) {
 			return;
 		}
 
