@@ -24,9 +24,9 @@ class CControllerPopupMediatypeTestSend extends CController {
 	protected function checkInput() {
 		$fields = [
 			'mediatypeid' =>	'fatal|required|db media_type.mediatypeid',
-			'sendto' =>		'string|not_empty',
+			'sendto' =>			'string',
 			'subject' =>		'string',
-			'message' =>		'string|not_empty'
+			'message' =>		'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -61,34 +61,47 @@ class CControllerPopupMediatypeTestSend extends CController {
 		$msg_title = null;
 
 		if ($mediatype) {
-			$mediatype = reset($mediatype);
-
-			if ($mediatype['type'] == MEDIA_TYPE_EMAIL) {
-				$email_validator = new CEmailValidator();
-
-				if (!$email_validator->validate($this->getInput('sendto'))) {
+			if ($mediatype[0]['type'] != MEDIA_TYPE_EXEC) {
+				if ($this->getInput('sendto') === '') {
 					$result = false;
-					error($email_validator->getError());
+					error(_s('Incorrect value for field "%1$s": cannot be empty.', _('Send to')));
+				}
+				elseif ($this->getInput('message') === '') {
+					$result = false;
+					error(_s('Incorrect value for field "%1$s": cannot be empty.', _('Message')));
 				}
 			}
 
 			if ($result) {
-				$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-				$result = $server->testMediaType([
-						'mediatypeid' => $this->getInput('mediatypeid'),
-						'sendto' =>	$this->getInput('sendto'),
-						'subject' => $this->getInput('subject'),
-						'message' => $this->getInput('message')
-					],
-					get_cookie('zbx_sessionid')
-				);
+				if ($mediatype[0]['type'] == MEDIA_TYPE_EMAIL) {
+					$email_validator = new CEmailValidator();
+
+					if (!$email_validator->validate($this->getInput('sendto'))) {
+						$result = false;
+						error($email_validator->getError());
+					}
+				}
 
 				if ($result) {
-					info(_('Media type test successful.'));
-				}
-				else {
-					$msg_title = _('Media type test failed.');
-					error($server->getError());
+					$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT,
+						ZBX_SOCKET_BYTES_LIMIT
+					);
+					$result = $server->testMediaType([
+							'mediatypeid' => $this->getInput('mediatypeid'),
+							'sendto' =>	$this->getInput('sendto'),
+							'subject' => $this->getInput('subject'),
+							'message' => $this->getInput('message')
+						],
+						get_cookie('zbx_sessionid')
+					);
+
+					if ($result) {
+						info(_('Media type test successful.'));
+					}
+					else {
+						$msg_title = _('Media type test failed.');
+						error($server->getError());
+					}
 				}
 			}
 		}

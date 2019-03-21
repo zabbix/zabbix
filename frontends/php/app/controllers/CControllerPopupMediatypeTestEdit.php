@@ -47,8 +47,8 @@ class CControllerPopupMediatypeTestEdit extends CController {
 	}
 
 	protected function doAction() {
-		$mediatype = (bool) API::MediaType()->get([
-			'output' => [],
+		$mediatype = API::MediaType()->get([
+			'output' => ['type'],
 			'mediatypeids' => $this->getInput('mediatypeid'),
 			'filter' => ['status' => MEDIA_STATUS_ACTIVE]
 		]);
@@ -62,7 +62,8 @@ class CControllerPopupMediatypeTestEdit extends CController {
 			'errors' => hasErrorMesssages() ? getMessages() : null,
 			'mediatypeid' => $this->getInput('mediatypeid'),
 			'subject' => _('Test subject'),
-			'message' => _('This is the test message from Zabbix')
+			'message' => _('This is the test message from Zabbix'),
+			'type' => $mediatype[0]['type']
 		]));
 	}
 }

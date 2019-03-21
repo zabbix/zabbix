@@ -21,21 +21,21 @@
 
 $form_list = (new CFormList())
 	->addRow(
-		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
+		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark($data['type'] != MEDIA_TYPE_EXEC),
 		(new CTextBox('sendto', $data['sendto'], false, 1024))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
-			->setAriaRequired()
+			->setAriaRequired($data['type'] != MEDIA_TYPE_EXEC)
 	)
 	->addRow(
 		new CLabel(_('Subject'), 'subject'),
 		(new CTextBox('subject', $data['subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	)
 	->addRow(
-		(new CLabel(_('Message'), 'message'))->setAsteriskMark(),
+		(new CLabel(_('Message'), 'message'))->setAsteriskMark($data['type'] != MEDIA_TYPE_EXEC),
 		(new CTextArea('message', $data['message'], ['rows' => 10]))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAriaRequired()
+			->setAriaRequired($data['type'] != MEDIA_TYPE_EXEC)
 	);
 
 $form = (new CForm())
