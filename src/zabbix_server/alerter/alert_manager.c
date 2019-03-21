@@ -38,7 +38,7 @@
 
 #define ZBX_AM_DB_POLL_DELAY	1
 
-#define ALERT_SOURCE_MANUAL	0xffff
+#define ALERT_SOURCE_EXTERNAL	0xffff
 
 #define ZBX_ALERTPOOL_SOURCE(id) (id >> 48)
 
@@ -1145,7 +1145,7 @@ static void	am_db_update_alert(zbx_am_t *manager, zbx_uint64_t alertid, int stat
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	am_abort_external_request(const zbx_ipc_service_t *alerter_service, const zbx_am_alert_t *alert,
+static void	am_abort_external_alert(const zbx_ipc_service_t *alerter_service, const zbx_am_alert_t *alert,
 		const char *error)
 {
 	zbx_ipc_client_t	*client;
@@ -1435,8 +1435,8 @@ static int	am_db_queue_alerts(const zbx_ipc_service_t *alerter_service, zbx_am_t
 
 		if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
 		{
-			if (ALERT_SOURCE_MANUAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
-				am_abort_external_request(alerter_service, alert, "Media type unavailable");
+			if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
+				am_abort_external_alert(alerter_service, alert, "Media type unavailable");
 
 			am_alert_free(alert);
 			continue;
@@ -1820,8 +1820,8 @@ static int	am_process_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *
 			command = ZBX_IPC_ALERTER_EXEC;
 			if (FAIL == am_prepare_mediatype_exec_command(mediatype, alert, &cmd, &error))
 			{
-				if (ALERT_SOURCE_MANUAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
-					am_abort_external_request(alerter_service, alert, error);
+				if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
+					am_abort_external_alert(alerter_service, alert, error);
 				else
 					am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, error);
 
@@ -1834,8 +1834,8 @@ static int	am_process_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *
 			break;
 		default:
 			error = "unsupported media type";
-			if (ALERT_SOURCE_MANUAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
-				am_abort_external_request(alerter_service, alert, error);
+			if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
+				am_abort_external_alert(alerter_service, alert, error);
 			else
 				am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, error);
 
@@ -1895,7 +1895,7 @@ static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manag
 			ZBX_FS_UX64, __function_name, alerter->alert->alertid, alerter->alert->mediatypeid,
 			alerter->alert->alertpoolid);
 
-	if (ALERT_SOURCE_MANUAL == ZBX_ALERTPOOL_SOURCE(alerter->alert->alertpoolid))
+	if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alerter->alert->alertpoolid))
 	{
 		zbx_ipc_client_t	*alert_send_client;
 
@@ -1988,7 +1988,7 @@ static int	am_check_queue(zbx_am_t *manager, int now)
 	return SUCCEED;
 }
 
-static void	am_process_external_request(zbx_uint64_t id, const unsigned char *data, zbx_vector_ptr_t *alerts)
+static void	am_process_external_alert(zbx_uint64_t id, const unsigned char *data, zbx_vector_ptr_t *alerts)
 {
 	zbx_uint64_t	mediatypeid;
 	char		*sendto, *subject, *message;
@@ -1996,7 +1996,7 @@ static void	am_process_external_request(zbx_uint64_t id, const unsigned char *da
 
 	zbx_alerter_deserialize_alert_send(data, &mediatypeid, &sendto, &subject, &message);
 
-	alert = am_create_alert(id, mediatypeid, ALERT_SOURCE_MANUAL, 0, id, sendto, subject, message, 0, 0, 0);
+	alert = am_create_alert(id, mediatypeid, ALERT_SOURCE_EXTERNAL, 0, id, sendto, subject, message, 0, 0, 0);
 
 	zbx_vector_ptr_append(alerts, alert);
 
@@ -2167,7 +2167,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 						failed_num++;
 					break;
 				case ZBX_IPC_ALERTER_ALERT:
-					am_process_external_request(zbx_ipc_client_id(client), message->data, &alerts);
+					am_process_external_alert(zbx_ipc_client_id(client), message->data, &alerts);
 					time_db = 0;	/* queue immediately */
 					break;
 			}
