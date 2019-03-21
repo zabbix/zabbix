@@ -79,6 +79,12 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
 #endif
 
+#if defined(__GNUC__) && __GNUC__ >= 7
+#	define ZBX_FALLTHROUGH	__attribute__ ((fallthrough))
+#else
+#	define ZBX_FALLTHROUGH
+#endif
+
 #define	SUCCEED		0
 #define	FAIL		-1
 #define	NOTSUPPORTED	-2
@@ -306,15 +312,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 /* item snmpv3 privacy protocol */
 #define ITEM_SNMPV3_PRIVPROTOCOL_DES		0
 #define ITEM_SNMPV3_PRIVPROTOCOL_AES		1
-
-/* item multiplier types */
-#define ITEM_MULTIPLIER_DO_NOT_USE		0
-#define ITEM_MULTIPLIER_USE			1
-
-/* item delta types */
-#define ITEM_STORE_AS_IS			0
-#define ITEM_STORE_SPEED_PER_SECOND		1
-#define ITEM_STORE_SIMPLE_CHANGE		2
 
 /* condition evaluation types */
 #define CONDITION_EVAL_TYPE_AND_OR		0

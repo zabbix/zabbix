@@ -150,6 +150,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
@@ -159,6 +160,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 			return FAIL;
 		}
 	}
+#endif
 	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
 	{
 		*error = zbx_strdup(*error, "internal error: invalid connection type");
@@ -190,6 +192,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (strlen(proxy->tls_psk_identity) != attr.psk_identity_len ||
@@ -199,6 +202,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 			return FAIL;
 		}
 	}
+#endif
 #endif
 	return SUCCEED;
 }
@@ -233,6 +237,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
@@ -242,6 +247,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
 			return FAIL;
 		}
 	}
+#endif
 	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
 	{
 		*error = zbx_strdup(*error, "internal error: invalid connection type");
@@ -273,6 +279,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (strlen(host->tls_psk_identity) != attr.psk_identity_len ||
@@ -282,6 +289,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
 			return FAIL;
 		}
 	}
+#endif
 #endif
 	return SUCCEED;
 }
@@ -1454,19 +1462,19 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=" ZBX_FS_UI64 ";\n",
 						table->recid, recid);
+
+				if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+					goto clean;
 			}
 			else
 			{
 				sql_offset = tmp_offset;	/* discard this update, all fields are the same */
 				*(sql + sql_offset) = '\0';
 			}
-
-			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-				goto clean;
 		}
 	}
 
-	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 	{
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1606,9 +1614,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	zbx_vector_ptr_destroy(&tables_proxy);
 
-	DBend(ret);
-
-	if (SUCCEED != ret)
+	if (SUCCEED != (ret = DBend(ret)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to update local proxy configuration copy: %s",
 				(NULL == error ? "database error" : error));
@@ -3336,8 +3342,11 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
 			*value = '\0';
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)) && '\0' != *dns &&
-				FAIL == zbx_validate_hostname(dns))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DNS, dns, sizeof(dns)))
+		{
+			*dns = '\0';
+		}
+		else if ('\0' != *dns && FAIL == zbx_validate_hostname(dns))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid hostname", __function_name, dns);
 			continue;

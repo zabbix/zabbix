@@ -120,7 +120,7 @@ class CFormElement extends CElement {
 				'/ul[@class="radio-segmented"]',
 				'/div/ul[@class="radio-segmented"]',
 			],
-			'CCheckboxListElement'		=> '/ul[@class="list-check-radio"]',
+			'CCheckboxListElement'		=> '/ul[@class="checkbox-list col-3"]',
 			'CTableElement'				=> [
 				'/table',
 				'/*[@class="table-forms-separator"]/table'

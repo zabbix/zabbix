@@ -199,9 +199,9 @@ class testDependentItems extends CAPITest {
 					'master_itemid' => 2407	// dependent.items.host.8:master.item.proto.2
 				]
 			],
-			// Create dependent item, which depends on discovered item. Shuld to fail after ZBX-15286.
+			// Create dependent item, which depends on discovered item.
 			[
-				'error' => null,
+				'error' => 'Incorrect value for field "master_itemid": Item "2304" does not exist or you have no access to this item.',
 				'method' => 'item.create',
 				// 1014: dependent.items.host.7
 				// 2305: dependent.items.host.7:net.if[eth0]
