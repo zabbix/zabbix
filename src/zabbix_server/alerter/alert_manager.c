@@ -1147,17 +1147,17 @@ static void	am_db_update_alert(zbx_am_t *manager, zbx_uint64_t alertid, int stat
 
 /******************************************************************************
  *                                                                            *
- * Function: am_abort_external_alert                                          *
+ * Function: am_external_alert_send_response                                  *
  *                                                                            *
- * Purpose: abort external alert if it cannot be performed due to error       *
+ * Purpose: send response to external alert request                           *
  *                                                                            *
  * Parameters: alerter_service - [IN] the IPC service                         *
  *             alert           - [IN] the alert                               *
  *             error           - [IN] the error message                       *
  *                                                                            *
  ******************************************************************************/
-static void	am_abort_external_alert(const zbx_ipc_service_t *alerter_service, const zbx_am_alert_t *alert,
-		const char *error)
+static void	am_external_alert_send_response(const zbx_ipc_service_t *alerter_service, const zbx_am_alert_t *alert,
+		int errcode, const char *error)
 {
 	zbx_ipc_client_t	*client;
 
@@ -1166,7 +1166,7 @@ static void	am_abort_external_alert(const zbx_ipc_service_t *alerter_service, co
 		unsigned char	*data;
 		zbx_uint32_t	data_len;
 
-		data_len = zbx_alerter_serialize_result(&data, FAIL, error);
+		data_len = zbx_alerter_serialize_result(&data, errcode, error);
 		zbx_ipc_client_send(client, ZBX_IPC_ALERTER_ALERT, data, data_len);
 		zbx_free(data);
 	}
@@ -1449,7 +1449,7 @@ static int	am_db_queue_alerts(zbx_am_t *manager, const zbx_ipc_service_t *alerte
 		if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
 		{
 			if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
-				am_abort_external_alert(alerter_service, alert, "Media type unavailable");
+				am_external_alert_send_response(alerter_service, alert, FAIL, "Media type unavailable");
 
 			am_alert_free(alert);
 			continue;
@@ -1835,7 +1835,7 @@ static int	am_process_alert(zbx_am_t *manager, const zbx_ipc_service_t *alerter_
 			if (FAIL == am_prepare_mediatype_exec_command(mediatype, alert, &cmd, &error))
 			{
 				if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
-					am_abort_external_alert(alerter_service, alert, error);
+					am_external_alert_send_response(alerter_service, alert, FAIL, error);
 				else
 					am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, error);
 
@@ -1849,7 +1849,7 @@ static int	am_process_alert(zbx_am_t *manager, const zbx_ipc_service_t *alerter_
 		default:
 			error = "unsupported media type";
 			if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
-				am_abort_external_alert(alerter_service, alert, error);
+				am_external_alert_send_response(alerter_service, alert, FAIL, error);
 			else
 				am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, error);
 
@@ -1891,6 +1891,8 @@ static int	am_process_result(zbx_am_t *manager, const zbx_ipc_service_t *alerter
 	const char		*__function_name = "am_process_result";
 	int			ret = FAIL;
 	zbx_am_alerter_t	*alerter;
+	char			*errmsg;
+	int			errcode, status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1910,24 +1912,17 @@ static int	am_process_result(zbx_am_t *manager, const zbx_ipc_service_t *alerter
 			ZBX_FS_UX64, __function_name, alerter->alert->alertid, alerter->alert->mediatypeid,
 			alerter->alert->alertpoolid);
 
+	zbx_alerter_deserialize_result(message->data, &errcode, &errmsg);
+
 	if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alerter->alert->alertpoolid))
 	{
-		zbx_ipc_client_t	*external_alert_client;
+		ret = errcode;
 
-		if (NULL != (external_alert_client = zbx_ipc_client_by_id(alerter_service, alerter->alert->alertid)))
-			zbx_ipc_client_send(external_alert_client, ZBX_IPC_ALERTER_ALERT, message->data, message->size);
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "client has disconnected");
-
+		am_external_alert_send_response(alerter_service, alerter->alert, errcode, errmsg);
 		am_remove_alert(manager, alerter->alert);
 	}
 	else
 	{
-		char	*errmsg;
-		int	errcode, status;
-
-		zbx_alerter_deserialize_result(message->data, &errcode, &errmsg);
-
 		if (SUCCEED == errcode)
 		{
 			errmsg = zbx_strdup(errmsg, "");
@@ -1944,12 +1939,11 @@ static int	am_process_result(zbx_am_t *manager, const zbx_ipc_service_t *alerter
 
 		am_db_update_alert(manager, alerter->alert->alertid, status, alerter->alert->retries, errmsg);
 
-		zbx_free(errmsg);
-
 		if (ALERT_STATUS_NOT_SENT != status)
 			am_remove_alert(manager, alerter->alert);
 	}
 
+	zbx_free(errmsg);
 	alerter->alert = NULL;
 
 	zbx_queue_ptr_push(&manager->free_alerters, alerter);
@@ -2005,7 +1999,7 @@ static int	am_check_queue(zbx_am_t *manager, int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: am_process_external_alert                                        *
+ * Function: am_process_external_alert_request                                *
  *                                                                            *
  * Purpose: process external alert request                                    *
  *                                                                            *
@@ -2014,9 +2008,9 @@ static int	am_check_queue(zbx_am_t *manager, int now)
  *             alerts - [OUT] the new alerts                                  *
  *                                                                            *
  ******************************************************************************/
-static void	am_process_external_alert(zbx_uint64_t id, const unsigned char *data, zbx_vector_ptr_t *alerts)
+static void	am_process_external_alert_request(zbx_uint64_t id, const unsigned char *data, zbx_vector_ptr_t *alerts)
 {
-	const char		*__function_name = "am_process_external_alert";
+	const char		*__function_name = "am_process_external_alert_request";
 	zbx_uint64_t		mediatypeid;
 	char			*sendto, *subject, *message;
 	zbx_am_alert_t		*alert;
@@ -2198,7 +2192,8 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 						failed_num++;
 					break;
 				case ZBX_IPC_ALERTER_ALERT:
-					am_process_external_alert(zbx_ipc_client_id(client), message->data, &alerts);
+					am_process_external_alert_request(zbx_ipc_client_id(client), message->data,
+							&alerts);
 					time_db = 0;	/* queue immediately */
 					break;
 			}
