@@ -28,7 +28,7 @@ class CControllerPopupHttpStep extends CController {
 	protected function checkInput() {
 		$fields = [
 			'dstfrm' =>				'required|string|not_empty',
-			'stepid' =>				'db httpstep.httpstepid',
+			'stepid' =>				'int32',
 			'list_name' =>			'string',
 			'name' =>				'string|not_empty',
 			'url' =>				'string|not_empty',
