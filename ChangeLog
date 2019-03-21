@@ -8,6 +8,7 @@ Bug fixes:
 Changes for 4.2.0rc1
 
 New features:
+...G...... [ZBXNEXT-5123] added server address and port to the Zabbix sender output (wiper)
 ..F....... [ZBXNEXT-5105] added context menu for trigger name in event details page (agriscenko)
 A.F.....S. [ZBXNEXT-5011,ZBXNEXT-5012] implemented testing option for item preprocessing steps (miks, wiper)
 A.F....PS. [ZBXNEXT-4865,ZBXNEXT-4961] added preprocessing steps to work with Prometheus agents (Ivo, wiper)
