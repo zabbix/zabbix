@@ -3,7 +3,7 @@ Changes for 4.2.0rc2
 New features:
 
 Bug fixes:
-.........T [ZBX-8907]  fixed weird description for queue trigger in templates (akozlovs)
+.........T [ZBX-8907] fixed weird description for queue trigger in templates (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.0rc1
