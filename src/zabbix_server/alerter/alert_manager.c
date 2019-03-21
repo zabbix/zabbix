@@ -2016,9 +2016,12 @@ static int	am_check_queue(zbx_am_t *manager, int now)
  ******************************************************************************/
 static void	am_process_external_alert(zbx_uint64_t id, const unsigned char *data, zbx_vector_ptr_t *alerts)
 {
-	zbx_uint64_t	mediatypeid;
-	char		*sendto, *subject, *message;
-	zbx_am_alert_t	*alert;
+	const char		*__function_name = "am_process_external_alert";
+	zbx_uint64_t		mediatypeid;
+	char			*sendto, *subject, *message;
+	zbx_am_alert_t		*alert;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_alerter_deserialize_alert_send(data, &mediatypeid, &sendto, &subject, &message);
 
@@ -2029,6 +2032,8 @@ static void	am_process_external_alert(zbx_uint64_t id, const unsigned char *data
 	zbx_free(message);
 	zbx_free(subject);
 	zbx_free(sendto);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 ZBX_THREAD_ENTRY(alert_manager_thread, args)
