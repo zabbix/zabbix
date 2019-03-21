@@ -29,6 +29,13 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 	 */
 	protected $use_prev_value;
 
+	/**
+	 * Time suffixes supported by Zabbix server.
+	 *
+	 * @var array
+	 */
+	protected static $supported_time_suffixes = ['w', 'd', 'h', 'm', 's'];
+
 	protected function checkInput() {
 		$fields = [
 			'hostid' => 'db hosts.hostid',
@@ -65,6 +72,22 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
 						_('a relative time is expected')
 					));
+				}
+				else {
+					foreach ($relative_time_parser->getTokens() as $token) {
+						if ($token['type'] == CRelativeTimeParser::ZBX_TOKEN_PRECISION) {
+							error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
+								_('a relative time is expected')
+							));
+							break;
+						}
+						elseif (!in_array($token['suffix'], self::$supported_time_suffixes)) {
+							error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
+								_('unsupported time suffix')
+							));
+							break;
+						}
+					}
 				}
 			}
 		}
