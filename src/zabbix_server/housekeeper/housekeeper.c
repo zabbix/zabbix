@@ -577,7 +577,7 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_history_and_trends_partitioned                                *
+ * Function: hk_drop_partition_for_rule                                       *
  *                                                                            *
  * Purpose: drop appropriate partitions from the history and trends tables    *
  *                                                                            *
@@ -589,8 +589,8 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
  ******************************************************************************/
 static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 {
-	int			keep_from, history_seconds;
-	DB_RESULT		result;
+	int		keep_from, history_seconds;
+	DB_RESULT	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
