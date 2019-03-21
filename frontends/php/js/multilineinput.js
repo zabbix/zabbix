@@ -48,25 +48,26 @@
 			return;
 		}
 
-		var $textarea = $('<textarea>', {
-				class: 'multilineinput-textarea',
-				text: e.data.$hidden.val(),
-				maxlength: e.data.options.maxlength,
-				readonly: e.data.options.readonly ? true : null
-			})
-				.attr('wrap', 'off')
-				.toggleClass('monospace-font', e.data.options.monospace_font),
-			$line_numbers = $('<ul>', {class: 'multilineinput-line-numbers'}).append('<li>'),
-			$footer = $('<div>', {class: 'multilineinput-symbols-remaining'})
-				.html(sprintf(t('S_N_SYMBOLS_REMAINING'), '<span>0</span>'));
-
 		function updateSymbolsRemaining(count) {
 			$('span', $footer).text(count);
 		}
 
 		function updateLineNumbers(lines_count) {
-			var diff = lines_count - $line_numbers[0].childElementCount,
+			var min_rows = 3,
+				line_height = 18,
+				diff = lines_count - $line_numbers[0].childElementCount,
 				li = '';
+
+			switch (e.data.options.grow) {
+				case 'fixed':
+					$content.height(e.data.options.rows * line_height + 2);
+					break;
+				case 'auto':
+					$content.height(Math.min(Math.max(lines_count, min_rows), e.data.options.rows) * line_height + 2);
+					break;
+				default:
+					$content.height($content.css('max-height'));
+			}
 
 			while (diff > 0) {
 				li += '<li></li>';
@@ -79,16 +80,27 @@
 				diff++;
 			}
 
+			$line_numbers.css('top', -Math.floor($textarea.prop('scrollTop') - 1));
 			$textarea.css('margin-left', $line_numbers.outerWidth());
-			$line_numbers.css('top', -Math.floor($textarea.prop('scrollTop')));
 		}
+
+		var height_offset = 190,
+			$content = $('<div>', {class: 'multilineinput-container'}),
+			$textarea = $('<textarea>', {
+				class: 'multilineinput-textarea',
+				text: e.data.$hidden.val(),
+				maxlength: e.data.options.maxlength,
+				readonly: e.data.options.readonly ? true : null,
+				placeholder: e.data.options.placeholder_textarea
+			}).attr('wrap', 'off'),
+			$line_numbers = $('<ul>', {class: 'multilineinput-line-numbers'}).append('<li>'),
+			$footer = $('<div>', {class: 'multilineinput-symbols-remaining'})
+				.html(sprintf(t('S_N_SYMBOLS_REMAINING'), '<span>0</span>'));
 
 		overlayDialogue({
 			'title': e.data.options.title,
-			'class': 'multilineinput-modal',
-			'content': $('<div>', {class: 'multilineinput-container'}).append(
-				e.data.options.line_numbers ? $line_numbers : '', $textarea
-			),
+			'class': 'multilineinput-modal' + (e.data.options.monospace_font ? ' monospace-font' : ''),
+			'content': $content,
 			'footer': $footer,
 			'buttons': [
 				{
@@ -107,6 +119,24 @@
 				}
 			]
 		}, e.data.$button);
+
+		if (e.data.options.label_before.length) {
+			height_offset += $('<div>', {class: 'multilineinput-label'})
+				.html(e.data.options.label_before)
+				.insertBefore($content)
+				.height();
+		}
+
+		if (e.data.options.label_after.length) {
+			height_offset += $('<div>', {class: 'multilineinput-label'})
+				.html(e.data.options.label_after)
+				.insertAfter($content)
+				.height();
+		}
+
+		$content
+			.append(e.data.options.line_numbers ? $line_numbers : '', $textarea)
+			.css('max-height', 'calc(100vh - ' + (height_offset + 2) + 'px)');
 
 		$textarea[0].setSelectionRange(0, 0);
 
@@ -129,7 +159,12 @@
 				hint: t('S_CLICK_TO_VIEW_OR_EDIT'),
 				value: '',
 				placeholder: '',
+				placeholder_textarea: '',
+				label_before: '',
+				label_after: '',
 				maxlength: 255,
+				rows: 20,
+				grow: 'fixed',
 				readonly: false,
 				disabled: false,
 				autofocus: false,

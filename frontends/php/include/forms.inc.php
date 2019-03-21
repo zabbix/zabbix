@@ -1497,8 +1497,13 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				$params = new CMultilineInput($step_param_0->getName(), $step_param_0_value, [
 					'title' => _('JavaScript'),
 					'placeholder' => _('script'),
+					'placeholder_textarea' => 'return value',
+					'label_before' => 'function (value) {',
+					'label_after' => '}',
+					'grow' => 'auto',
+					'rows' => 100,
 					'maxlength' => $script_maxlength,
-					'readonly' => $readonly
+					'readonly' => $readonly,
 				]);
 				break;
 
