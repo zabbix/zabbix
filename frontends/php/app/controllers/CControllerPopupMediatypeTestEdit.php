@@ -63,7 +63,8 @@ class CControllerPopupMediatypeTestEdit extends CController {
 			'mediatypeid' => $this->getInput('mediatypeid'),
 			'subject' => _('Test subject'),
 			'message' => _('This is the test message from Zabbix'),
-			'type' => $mediatype[0]['type']
+			'type' => $mediatype ? $mediatype[0]['type'] : null,
+			'enabled' => (bool) $mediatype
 		]));
 	}
 }

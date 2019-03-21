@@ -26,16 +26,20 @@ $form_list = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 			->setAriaRequired($data['type'] != MEDIA_TYPE_EXEC)
+			->setEnabled($data['enabled'])
 	)
 	->addRow(
 		new CLabel(_('Subject'), 'subject'),
-		(new CTextBox('subject', $data['subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+		(new CTextBox('subject', $data['subject'], false, 1024))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setEnabled($data['enabled'])
 	)
 	->addRow(
 		(new CLabel(_('Message'), 'message'))->setAsteriskMark($data['type'] != MEDIA_TYPE_EXEC),
 		(new CTextArea('message', $data['message'], ['rows' => 10]))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAriaRequired($data['type'] != MEDIA_TYPE_EXEC)
+			->setEnabled($data['enabled'])
 	);
 
 $form = (new CForm())
@@ -58,6 +62,7 @@ $output = [
 			'class' => 'submit-test-btn',
 			'keepOpen' => true,
 			'isSubmit' => true,
+			'enabled' => $data['enabled'],
 			'action' => 'mediatypeTestSend("'.$form->getName().'");'
 		]
 	]
