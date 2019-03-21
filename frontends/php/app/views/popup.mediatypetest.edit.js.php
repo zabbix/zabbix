@@ -19,7 +19,7 @@
 **/
 
 
-ob_start(); ?>
+return <<<'JS'
 /**
  * Send media type test data to server and get a response.
  *
@@ -30,28 +30,28 @@ function mediatypeTestSend(formname) {
 		$form = jQuery(form),
 		$form_fields = $form.find('#sendto, #subject, #message'),
 		$submit_btn = jQuery('.submit-test-btn'),
+		data = $form.serialize(),
 		url = new Curl($form.attr('action'));
 
 	$form.trimValues(['#sendto', '#subject', '#message']);
 
+	$form_fields.prop('disabled', true);
+
+	jQuery('<span></span>')
+		.addClass('preloader')
+		.insertAfter($submit_btn)
+		.css({
+			'display': 'inline-block',
+			'margin': '0 10px -8px'
+		});
+
+	$submit_btn
+		.attr('disabled', true)
+		.hide();
+
 	jQuery.ajax({
 		url: url.getUrl(),
-		data: $form.serialize(),
-		beforeSend: function() {
-			$form_fields.prop('disabled', true);
-
-			jQuery('<span></span>')
-				.addClass('preloader')
-				.insertAfter($submit_btn)
-				.css({
-					'display': 'inline-block',
-					'margin': '0 10px -8px'
-				});
-
-			$submit_btn
-				.attr('disabled', true)
-				.hide();
-		},
+		data: data,
 		success: function(ret) {
 			$form.parent().find('.msg-bad, .msg-good').remove();
 
@@ -67,8 +67,23 @@ function mediatypeTestSend(formname) {
 				.attr('disabled', false)
 				.show();
 		},
+		error: function(request, status, error) {
+			if (request.status == 200) {
+				alert(error);
+			}
+			else if (window.document.forms[formname]) {
+				var request = this,
+					retry = function() {
+						jQuery.ajax(request);
+					};
+
+				// Retry with 2s interval.
+				setTimeout(retry, 2000);
+			}
+		},
 		dataType: 'json',
 		type: 'post'
 	});
 }
-<?php return ob_get_clean(); ?>
+JS;
+
