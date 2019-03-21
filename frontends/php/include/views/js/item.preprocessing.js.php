@@ -195,7 +195,7 @@
 						label_before: 'function (value) {',
 						label_after: '}',
 						grow: 'auto',
-						rows: 100,
+						rows: 0,
 						maxlength: <?= (int) $data['preprocessing_script_maxlength'] ?>
 					});
 

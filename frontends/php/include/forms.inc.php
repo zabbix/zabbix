@@ -1501,7 +1501,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					'label_before' => 'function (value) {',
 					'label_after' => '}',
 					'grow' => 'auto',
-					'rows' => 100,
+					'rows' => 0,
 					'maxlength' => $script_maxlength,
 					'readonly' => $readonly,
 				]);

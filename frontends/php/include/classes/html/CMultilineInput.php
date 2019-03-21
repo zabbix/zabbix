@@ -53,7 +53,7 @@ class CMultilineInput extends CDiv {
 	 * @param int         $options['maxlength']             Max characters length (default: 255).
 	 * @param bool        $options['line_numbers']          Show line numbers (default: true).
 	 * @param int         $options['rows']                  Textarea rows number for grow=fixed
-	 *                                                      or max-rows for grow=auto (default: 20).
+	 *                                                      or rows limit for grow=auto if more then 0 (default: 20).
 	 * @param bool        $options['grow']                  Textarea grow mode fixed|auto|stretch (default: 'fixed').
 	 * @param bool        $options['monospace_font']        Monospace font type (default: true).
 	 * @param bool        $options['readonly']              Readonly component (default: false).
