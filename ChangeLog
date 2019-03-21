@@ -3,6 +3,7 @@ Changes for 4.2.0rc2
 New features:
 
 Bug fixes:
+..F....... [ZBX-15351] fixed PHP error in "Problems by severity" if no problems (vasilijs)
 .........T [ZBX-8907] fixed weird description for queue trigger in templates (akozlovs)
 
 --------------------------------------------------------------------------------
@@ -235,6 +236,7 @@ Changes for 4.0.6rc2
 New features:
 
 Bug fixes:
+..F....... [ZBX-15351] fixed PHP error in "Problems by severity" if no problems (vasilijs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.6rc1
