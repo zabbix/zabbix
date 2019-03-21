@@ -431,14 +431,14 @@ class CZabbixServer {
 			return false;
 		}
 
-		// request executed successfully
+		// Request executed successfully.
 		if ($response['response'] == self::RESPONSE_SUCCESS) {
 			// saves total count
 			$this->total = array_key_exists('total', $response) ? $response['total'] : null;
 
-			return $response['data'];
+			return array_key_exists('data', $response) ? $response['data'] : true;
 		}
-		// an error on the server side occurred
+		// An error on the server side occurred.
 		else {
 			$this->error = $response['info'];
 
@@ -493,8 +493,8 @@ class CZabbixServer {
 	 * @return bool
 	 */
 	protected function normalizeResponse(array &$response) {
-		return (isset($response['response'])
-					&& ($response['response'] == self::RESPONSE_SUCCESS && isset($response['data'])
-						|| $response['response'] == self::RESPONSE_FAILED && isset($response['info'])));
+		return (array_key_exists('response', $response) && $response['response'] == self::RESPONSE_SUCCESS
+				|| $response['response'] == self::RESPONSE_FAILED && array_key_exists('info', $response)
+		);
 	}
 }
