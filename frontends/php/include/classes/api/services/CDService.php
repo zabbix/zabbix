@@ -298,10 +298,9 @@ class CDService extends CApiService {
 			}
 
 			if ($options['selectHosts'] == API_OUTPUT_COUNT) {
-				foreach ($result as &$dservice) {
-					$dservice['hosts'] = (string) $dservice['hosts'];
+				foreach ($result as $dserviceid => $dservice) {
+					$result[$dserviceid]['hosts'] = (string) $dservice['hosts'];
 				}
-				unset($dservice);
 			}
 		}
 

@@ -425,12 +425,11 @@ class CProblem extends CApiService {
 						' GROUP BY a.eventid'
 				), 'eventid');
 
-				foreach ($result as &$event) {
-					$event['acknowledges'] = array_key_exists($event['eventid'], $acknowledges)
-						? $acknowledges[$event['eventid']]['rowscount']
+				foreach ($result as $eventid => $event) {
+					$result[$eventid]['acknowledges'] = array_key_exists($eventid, $acknowledges)
+						? $acknowledges[$eventid]['rowscount']
 						: '0';
 				}
-				unset($event);
 			}
 		}
 

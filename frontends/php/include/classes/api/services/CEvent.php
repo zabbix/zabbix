@@ -169,7 +169,7 @@ class CEvent extends CApiService {
 		}
 
 		if ($options['countOutput']) {
-			return (is_array($result) ? $result : (string) $result);
+			return is_array($result) ? $result : (string) $result;
 		}
 
 		if ($result) {
@@ -1118,12 +1118,12 @@ class CEvent extends CApiService {
 						' WHERE '.dbConditionInt('a.eventid', $eventids).
 						' GROUP BY a.eventid'
 				), 'eventid');
-				foreach ($result as &$event) {
-					$event['acknowledges'] = array_key_exists($event['eventid'], $acknowledges)
-						? $acknowledges[$event['eventid']]['rowscount']
+
+				foreach ($result as $eventid => $event) {
+					$result[$eventid]['acknowledges'] = array_key_exists($eventid, $acknowledges)
+						? $acknowledges[$eventid]['rowscount']
 						: '0';
 				}
-				unset($event);
 			}
 		}
 
