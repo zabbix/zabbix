@@ -41,11 +41,11 @@ class CActionButtonList extends CObject {
 	protected $checkboxesName;
 
 	/**
-	 * Prefix for cookies used for remembering which checkboxes have been checked when navigating between pages.
+	 * Prefix for sessionStorage used for remembering which checkboxes have been checked when navigating between pages.
 	 *
 	 * @var string|null
 	 */
-	protected $cookieNamePrefix = null;
+	protected $name_prefix = null;
 
 	/**
 	 * Element that is used to show number of selected checkboxes.
@@ -60,11 +60,11 @@ class CActionButtonList extends CObject {
 	 * @param array			$buttonsData			buttons data array
 	 * @param string		$buttonsData['name']	button caption
 	 * @param string		$buttonsData['confirm']	confirmation text (optional)
-	 * @param string|null	$cookieNamePrefix		Prefix for cookie used for storing currently selected checkboxes.
+	 * @param string|null	$name_prefix		Prefix for sessionStorage used for storing currently selected checkboxes.
 	 */
-	function __construct($actionName, $checkboxesName, array $buttonsData, $cookieNamePrefix = null) {
+	function __construct($actionName, $checkboxesName, array $buttonsData, $name_prefix = null) {
 		$this->checkboxesName = $checkboxesName;
-		$this->cookieNamePrefix = $cookieNamePrefix;
+		$this->name_prefix = $name_prefix;
 
 		foreach ($buttonsData as $action => $buttonData) {
 			$this->buttons[$action] = (new CSubmit($actionName, $buttonData['name']))
@@ -103,7 +103,7 @@ class CActionButtonList extends CObject {
 	 */
 	public function toString($destroy = true) {
 		zbx_add_post_js('chkbxRange.pageGoName = '.CJs::encodeJson($this->checkboxesName).';');
-		zbx_add_post_js('chkbxRange.prefix = '.CJs::encodeJson($this->cookieNamePrefix).';');
+		zbx_add_post_js('chkbxRange.prefix = '.CJs::encodeJson($this->name_prefix).';');
 
 		$this->items[] = (new CDiv([$this->getSelectedCountElement(), $this->buttons]))
 			->setId('action_buttons')
