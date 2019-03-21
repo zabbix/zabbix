@@ -1145,6 +1145,17 @@ static void	am_db_update_alert(zbx_am_t *manager, zbx_uint64_t alertid, int stat
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: am_abort_external_alert                                          *
+ *                                                                            *
+ * Purpose: abort external alert if it cannot be performed due to error       *
+ *                                                                            *
+ * Parameters: alerter_service - [IN] the IPC service                         *
+ *             alert           - [IN] the alert                               *
+ *             error           - [IN] the error message                       *
+ *                                                                            *
+ ******************************************************************************/
 static void	am_abort_external_alert(const zbx_ipc_service_t *alerter_service, const zbx_am_alert_t *alert,
 		const char *error)
 {
@@ -1379,11 +1390,13 @@ out:
  *                                                                            *
  * Purpose: queues new alerts from database                                   *
  *                                                                            *
- * Parameters: manager - [IN] the alert manager                               *
- *             now     - [IN] the current timestamp                           *
+ * Parameters: manager         - [IN] the alert manager                       *
+ *             alerter_service - [IN] the IPC service                         *
+ *             alerts          - [IN/OUT] alerts to be moved into queue       *
  *                                                                            *
- * Return value: SUCCEED - alerts were queued successfully                    *
- *               FAIL    - database connection error                          *
+ * Return value: SUCCEED - alerts were queued successfully and cleared        *
+ *               FAIL    - database connection error, alerts remain unchanged *
+ *                         and must be queued when database become available  *
  *                                                                            *
  ******************************************************************************/
 static int	am_db_queue_alerts(zbx_am_t *manager, const zbx_ipc_service_t *alerter_service,
@@ -1761,9 +1774,10 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
  *                                                                            *
  * Purpose: sends alert to the alerter                                        *
  *                                                                            *
- * Parameters: manager - [IN] the alert manager                               *
- *             alerter - [IN] the target alerter                              *
- *             alert   - [IN] the alert to send                               *
+ * Parameters: manager         - [IN] the alert manager                       *
+ *             alerter_service - [IN] the IPC service                         *
+ *             alerter         - [IN] the target alerter                      *
+ *             alert           - [IN] the alert to send                       *
  *                                                                            *
  * Return value: SUCCEED - the alert was successfully sent to alerter         *
  *               FAIL    - otherwise                                          *
@@ -1862,9 +1876,10 @@ out:
  *                                                                            *
  * Purpose: process alerter result                                            *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             client  - [IN] the connected alerter                           *
- *             message - [IN] the received message                            *
+ * Parameters: manager         - [IN] the manager                             *
+ *             alerter_service - [IN] the IPC service                         *
+ *             client          - [IN] the connected alerter                   *
+ *             message         - [IN] the received message                    *
  *                                                                            *
  * Return value: SUCCEED - the alert was sent successfully                    *
  *               FAIL - otherwise                                             *
@@ -1988,6 +2003,17 @@ static int	am_check_queue(zbx_am_t *manager, int now)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: am_process_external_alert                                        *
+ *                                                                            *
+ * Purpose: process external alert request                                    *
+ *                                                                            *
+ * Parameters: id     - [IN] client id that sent external alert request       *
+ *             data   - [IN] the received message                             *
+ *             alerts - [OUT] the new alerts                                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	am_process_external_alert(zbx_uint64_t id, const unsigned char *data, zbx_vector_ptr_t *alerts)
 {
 	zbx_uint64_t	mediatypeid;
