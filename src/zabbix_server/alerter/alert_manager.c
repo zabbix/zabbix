@@ -1889,10 +1889,9 @@ static int	am_process_result(zbx_am_t *manager, const zbx_ipc_service_t *alerter
 		zbx_ipc_message_t *message)
 {
 	const char		*__function_name = "am_process_result";
-	int			ret = FAIL;
+	int			ret = FAIL, status;
 	zbx_am_alerter_t	*alerter;
 	char			*errmsg;
-	int			errcode, status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1912,22 +1911,19 @@ static int	am_process_result(zbx_am_t *manager, const zbx_ipc_service_t *alerter
 			ZBX_FS_UX64, __function_name, alerter->alert->alertid, alerter->alert->mediatypeid,
 			alerter->alert->alertpoolid);
 
-	zbx_alerter_deserialize_result(message->data, &errcode, &errmsg);
+	zbx_alerter_deserialize_result(message->data, &ret, &errmsg);
 
 	if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alerter->alert->alertpoolid))
 	{
-		ret = errcode;
-
-		am_external_alert_send_response(alerter_service, alerter->alert, errcode, errmsg);
+		am_external_alert_send_response(alerter_service, alerter->alert, ret, errmsg);
 		am_remove_alert(manager, alerter->alert);
 	}
 	else
 	{
-		if (SUCCEED == errcode)
+		if (SUCCEED == ret)
 		{
 			errmsg = zbx_strdup(errmsg, "");
 			status = ALERT_STATUS_SENT;
-			ret = SUCCEED;
 		}
 		else
 		{
