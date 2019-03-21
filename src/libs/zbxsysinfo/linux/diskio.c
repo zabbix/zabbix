@@ -364,7 +364,8 @@ int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot open /dev directory"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL,
+				"Cannot obtain device list: failed to open " ZBX_DEV_PFX " directory."));
 		return SYSINFO_RET_FAIL;
 	}
 
