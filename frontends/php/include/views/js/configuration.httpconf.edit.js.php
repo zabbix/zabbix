@@ -226,8 +226,17 @@
 
 			/**
 			 * Makes sortable handler inactive, if nothing to sort.
+			 *
+			 * @param {string} formid  Id of current form HTML element.
 			 */
-			refresh: function() {
+			refresh: function(formid) {
+				if (formid) {
+					jQuery('.pair-container').each(function() {
+						if (jQuery(this).find('.pairRow').length == 0) {
+							renderPairRow(formid, createNewPair({formid: formid, type: this.id}));
+						}
+					});
+				}
 				refreshContainers();
 			},
 
@@ -279,7 +288,7 @@
 				for (var p = 0; p < pairs.length; p++) {
 					if (allPairs[pairs[p]].formid === formid
 							&& (type === '' || allPairs[pairs[p]].type === type)) {
-						jQuery('#pairRow_' + pairs[p]).remove();
+						jQuery('#'+formid+' [id="pairRow_'+pairs[p]+'"]').remove();
 						delete allPairs[pairs[p]];
 					}
 				}
@@ -595,7 +604,8 @@
 					value: pairs[i].value
 				});
 			}
-			pairManager.refresh();
+			pairManager.refresh(formid);
+
 		}
 		else {
 			var fields = [],
