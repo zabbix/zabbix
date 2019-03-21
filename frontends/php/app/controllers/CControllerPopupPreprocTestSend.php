@@ -86,7 +86,7 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 			$prev_time = $this->getInput('prev_time', '');
 			$relative_time_parser = new CRelativeTimeParser();
 			if ($relative_time_parser->parse($prev_time) != CParser::PARSE_SUCCESS) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'), _('a time is expected')));
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'), _('a relative time is expected')));
 			}
 
 			$data += [
