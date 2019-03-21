@@ -3914,6 +3914,15 @@ $form-icon-btn: (
 		min-width: 650px;
 	}
 
+	.hintbox-scrollable {
+		overflow: auto;
+		width: 100%;
+		max-height: calc(100vh - 190px);
+		max-width: 45vw;
+		white-space: nowrap;
+		@extend %webkit-scrollbar;
+	}
+
 	.msg-bad,
 	.msg-good {
 		position: -webkit-sticky;

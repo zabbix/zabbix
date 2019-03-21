@@ -1248,7 +1248,7 @@ class CScreenProblem extends CScreenBase {
 		array_pop($tooltip);
 		array_unshift($tooltip, (new CDiv())
 			->addClass('main-hint')
-			->setHint($hint_table, '', true)
+			->setHint($hint_table)
 		);
 
 		return (new CCol($tooltip))->addClass('latest-value');
