@@ -831,6 +831,18 @@ static void	ipc_service_remove_client(zbx_ipc_service_t *service, zbx_ipc_client
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ipc_client_by_id                                             *
+ *                                                                            *
+ * Purpose: to find connected client when only it's ID is known               *
+ *                                                                            *
+ * Parameters: service - [IN] the IPC service                                 *
+ *             id      - [IN] ID of client                                    *
+ *                                                                            *
+ * Return value: address of client or NULL if client has already disconnected *
+ *                                                                            *
+ ******************************************************************************/
 zbx_ipc_client_t	*zbx_ipc_client_by_id(const zbx_ipc_service_t *service, zbx_uint64_t id)
 {
 	int			i;
@@ -2083,6 +2095,27 @@ int	zbx_ipc_async_socket_check_unsent(zbx_ipc_async_socket_t *asocket)
 	return (0 == asocket->client->tx_bytes ? FAIL : SUCCEED);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ipc_async_exchange                                           *
+ *                                                                            *
+ * Purpose: connect, send message and receive response in a given timeout     *
+ *                                                                            *
+ * Parameters: service_name - [IN] the IPC service name                       *
+ *             code         - [IN] the message code                           *
+ *             timeout      - [IN] time allowed to be spent on receive, note  *
+ *                                 that this does not include open, send and  *
+ *                                 flush that have their own timeouts         *
+ *             data         - [IN] the data                                   *
+ *             size         - [IN] the data size                              *
+ *             out          - [OUT] the received message or NULL on error     *
+ *                                  The message must be freed by zbx_free()   *
+ *             error        - [OUT] the error message                         *
+ *                                                                            *
+ * Return value: SUCCEED - successfully sent message and received response    *
+ *               FAIL    - error occurred                                     *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_ipc_async_exchange(const char *service_name, zbx_uint32_t code, int timeout, const unsigned char *data,
 		zbx_uint32_t size, unsigned char **out, char **error)
 {
