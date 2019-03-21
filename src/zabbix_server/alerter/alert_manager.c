@@ -1145,7 +1145,7 @@ static void	am_db_update_alert(zbx_am_t *manager, zbx_uint64_t alertid, int stat
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	am_abort_alert_send(const zbx_ipc_service_t *alerter_service, const zbx_am_alert_t *alert,
+static void	am_abort_external_request(const zbx_ipc_service_t *alerter_service, const zbx_am_alert_t *alert,
 		const char *error)
 {
 	zbx_ipc_client_t	*client;
@@ -1161,15 +1161,6 @@ static void	am_abort_alert_send(const zbx_ipc_service_t *alerter_service, const 
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "client has disconnected");
-}
-
-static void	am_abort_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *manager,
-		const zbx_am_alert_t *alert, const char *error)
-{
-	if (ALERT_SOURCE_MANUAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
-		am_abort_alert_send(alerter_service, alert, error);
-	else
-		am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, error);
 }
 
 /******************************************************************************
@@ -1444,7 +1435,9 @@ static int	am_db_queue_alerts(const zbx_ipc_service_t *alerter_service, zbx_am_t
 
 		if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
 		{
-			am_abort_alert_send(alerter_service, alert, "Media type unavailable");
+			if (ALERT_SOURCE_MANUAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
+				am_abort_external_request(alerter_service, alert, "Media type unavailable");
+
 			am_alert_free(alert);
 			continue;
 		}
@@ -1793,7 +1786,6 @@ static int	am_process_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *
 
 	if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
 	{
-		am_abort_alert_send(alerter_service, alert, "Media type unavailable");
 		am_alert_free(alert);
 		goto out;
 	}
@@ -1828,7 +1820,10 @@ static int	am_process_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *
 			command = ZBX_IPC_ALERTER_EXEC;
 			if (FAIL == am_prepare_mediatype_exec_command(mediatype, alert, &cmd, &error))
 			{
-				am_abort_alert(alerter_service, manager, alert, error);
+				if (ALERT_SOURCE_MANUAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
+					am_abort_external_request(alerter_service, alert, error);
+				else
+					am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, error);
 
 				am_remove_alert(manager, alert);
 				zbx_free(error);
@@ -1838,7 +1833,12 @@ static int	am_process_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *
 			zbx_free(cmd);
 			break;
 		default:
-			am_abort_alert(alerter_service, manager, alert, "unsupported media type");
+			error = "unsupported media type";
+			if (ALERT_SOURCE_MANUAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
+				am_abort_external_request(alerter_service, alert, error);
+			else
+				am_db_update_alert(manager, alert->alertid, ALERT_STATUS_FAILED, 0, error);
+
 			zabbix_log(LOG_LEVEL_ERR, "cannot process alertid:" ZBX_FS_UI64 ": unsupported media type: %d",
 					alert->alertid, mediatype->type);
 			am_remove_alert(manager, alert);
