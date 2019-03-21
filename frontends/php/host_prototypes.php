@@ -259,6 +259,15 @@ elseif (hasRequest('action') && getRequest('action') == 'hostprototype.massdelet
 	show_messages($result, _('Host prototypes deleted'), _('Cannot delete host prototypes'));
 }
 
+if (hasRequest('action') && hasRequest('group_hostid') && !$result) {
+	$host_prototypes = API::HostPrototype()->get([
+		'hostids' => array_keys(getRequest('group_hostid')),
+		'output' => [],
+		'editable' => true
+	]);
+	uncheckTableRows($discoveryRule['itemid'], array_column($host_prototypes, 'hostid', 'hostid'));
+}
+
 $config = select_config();
 
 /*

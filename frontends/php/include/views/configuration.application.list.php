@@ -129,7 +129,7 @@ $form->addItem([
 			'application.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected applications?')],
 			'application.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected applications?')]
 		],
-		$this->data['hostid']
+		$this->data['hostid'] ? $this->data['hostid'] : null
 	)
 ]);
 

@@ -298,6 +298,15 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 		if ($result) {
 			uncheckTableRows(getRequest('parent_discoveryid'));
 		}
+		else {
+			$graphs = API::GraphPrototype()->get([
+				'graphids' => $graphIds,
+				'output' => [],
+				'editable' => true
+			]);
+
+			uncheckTableRows(getRequest('parent_discoveryid'), array_column($graphs, 'graphid', 'graphid'));
+		}
 		show_messages($result, _('Graph prototypes deleted'), _('Cannot delete graph prototypes'));
 	}
 	else {
@@ -305,6 +314,15 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 
 		if ($result) {
 			uncheckTableRows($hostId);
+		}
+		else {
+			$graphs = API::Graph()->get([
+				'graphids' => $graphIds,
+				'output' => [],
+				'editable' => true
+			]);
+
+			uncheckTableRows($hostId, array_column($graphs, 'graphid', 'graphid'));
 		}
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}

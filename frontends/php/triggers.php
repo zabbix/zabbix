@@ -162,7 +162,7 @@ if ($triggerIds) {
 	]);
 
 	if (count($triggers) != count($triggerIds)) {
-		uncheckTableRows(getRequest('hostid'), array_column($triggers, 'triggerid'));
+		uncheckTableRows(getRequest('hostid'), array_column($triggers, 'triggerid', 'triggerid'));
 	}
 }
 

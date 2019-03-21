@@ -171,7 +171,7 @@ $httpForm->addItem([
 			],
 			'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?')]
 		],
-		$this->data['hostid']
+		$this->data['hostid'] ? $this->data['hostid'] : null
 	)
 ]);
 

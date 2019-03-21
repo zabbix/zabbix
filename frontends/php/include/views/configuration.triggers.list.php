@@ -304,7 +304,7 @@ $triggers_form->addItem([
 			'trigger.massupdateform' => ['name' => _('Mass update')],
 			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?')]
 		],
-		$data['hostid']
+		$data['hostid'] ? $data['hostid'] : null
 	)
 ]);
 

@@ -529,6 +529,15 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masschec
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 
+if (hasRequest('action') && hasRequest('g_hostdruleid') && !$result) {
+	$hostdrules = API::DiscoveryRule()->get([
+		'itemids' => array_keys(getRequest('g_hostdruleid')),
+		'output' => [],
+		'editable' => true
+	]);
+	uncheckTableRows(getRequest('hostid'), array_column($hostdrules, 'itemid', 'itemid'));
+}
+
 /*
  * Display
  */

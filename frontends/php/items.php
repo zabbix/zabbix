@@ -1314,6 +1314,15 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' &&
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 
+if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
+	$itemids = API::Item()->get([
+		'output' => [],
+		'itemids' => getRequest('group_itemid'),
+		'editable' => true
+	]);
+	uncheckTableRows(getRequest('hostid'), array_column($itemids, 'itemid', 'itemid'));
+}
+
 /*
  * Display
  */
