@@ -29,11 +29,13 @@ class CControllerPopupMediatypeTestSend extends CController {
 			'message' =>		'string'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateMediaType();
 
 		if (!$ret) {
 			$output = [];
-			if (($messages = getMessages()) !== null) {
+			$msg_title = _('Media type test failed.');
+
+			if (($messages = getMessages(false, $msg_title)) !== null) {
 				$output['messages'] = $messages->toString();
 			}
 
@@ -49,65 +51,73 @@ class CControllerPopupMediatypeTestSend extends CController {
 		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
-	protected function doAction() {
-		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+	/**
+	 * Additional method to validate fields specific for mediatype.
+	 *
+	 * @return bool
+	 */
+	protected function validateMediaType() {
+		$ret = true;
 
 		$mediatype = API::MediaType()->get([
 			'output' => ['type'],
 			'mediatypeids' => $this->getInput('mediatypeid'),
 			'filter' => ['status' => MEDIA_STATUS_ACTIVE]
 		]);
-		$result = true;
-		$msg_title = null;
 
-		if ($mediatype) {
-			if ($mediatype[0]['type'] != MEDIA_TYPE_EXEC) {
-				if ($this->getInput('sendto') === '') {
-					$result = false;
-					error(_s('Incorrect value for field "%1$s": cannot be empty.', _('Send to')));
-				}
-				elseif ($this->getInput('message') === '') {
-					$result = false;
-					error(_s('Incorrect value for field "%1$s": cannot be empty.', _('Message')));
-				}
+		if (!$mediatype) {
+			error(_('No permissions to referred object or it does not exist!'));
+
+			return false;
+		}
+
+		if ($mediatype[0]['type'] != MEDIA_TYPE_EXEC) {
+			$validator = new CNewValidator(array_map('trim', $this->getInputAll()), [
+				'sendto' =>		'string|not_empty',
+				'message' =>	'string|not_empty'
+			]);
+
+			foreach ($validator->getAllErrors() as $error) {
+				error($error);
 			}
 
-			if ($result) {
-				if ($mediatype[0]['type'] == MEDIA_TYPE_EMAIL) {
-					$email_validator = new CEmailValidator();
+			$ret = !$validator->isError();
 
-					if (!$email_validator->validate($this->getInput('sendto'))) {
-						$result = false;
-						error($email_validator->getError());
-					}
-				}
+			if ($ret && $mediatype[0]['type'] == MEDIA_TYPE_EMAIL) {
+				$email_validator = new CEmailValidator();
+				$ret = $email_validator->validate($this->getInput('sendto'));
 
-				if ($result) {
-					$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT,
-						ZBX_SOCKET_BYTES_LIMIT
-					);
-					$result = $server->testMediaType([
-							'mediatypeid' => $this->getInput('mediatypeid'),
-							'sendto' =>	$this->getInput('sendto'),
-							'subject' => $this->getInput('subject'),
-							'message' => $this->getInput('message')
-						],
-						get_cookie('zbx_sessionid')
-					);
-
-					if ($result) {
-						info(_('Media type test successful.'));
-					}
-					else {
-						$msg_title = _('Media type test failed.');
-						error($server->getError());
-					}
+				if (!$ret) {
+					error($email_validator->getError());
 				}
 			}
 		}
+
+		return $ret;
+	}
+
+	protected function doAction() {
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		$msg_title = null;
+		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT,
+			ZBX_SOCKET_BYTES_LIMIT
+		);
+		$result = $server->testMediaType([
+				'mediatypeid' => $this->getInput('mediatypeid'),
+				'sendto' =>	$this->getInput('sendto'),
+				'subject' => $this->getInput('subject'),
+				'message' => $this->getInput('message')
+			],
+			CWebUser::getSessionCookie()
+		);
+
+		if ($result) {
+			info(_('Media type test successful.'));
+		}
 		else {
-			$result = false;
-			error(_('No permissions to referred object or it does not exist!'));
+			$msg_title = _('Media type test failed.');
+			error($server->getError());
 		}
 
 		$output = [
