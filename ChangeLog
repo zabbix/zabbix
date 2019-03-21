@@ -1,3 +1,10 @@
+Changes for 4.2.0rc2
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 4.2.0rc1
 
 New features:
@@ -11,6 +18,7 @@ A.F....PS. [ZBXNEXT-5083,ZBXNEXT-4861] added support of LLD rule as dependent it
 A.F....... [ZBX-15286] dropped support use of discovered items as master (Sasha)
 
 Bug fixes:
+.........T [ZBX-8907]  fixed weird description for queue trigger in templates (akozlovs)
 ...G...PS. [ZBX-15552] fixed compilation with LibreSSL as OpenSSL replacement and OpenSSL without PSK support (Andris)
 ..F....... [ZBX-10317] made info column on item list page always visible (agriscenko)
 ..F....... [ZBX-15322] fixed graph area near grid line with 0 value (ashubin)
@@ -219,6 +227,13 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.6rc2
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.6rc1
