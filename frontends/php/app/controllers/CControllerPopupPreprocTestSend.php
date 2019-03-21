@@ -58,7 +58,6 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 
 			// Check preprocessing steps.
 			if (($error = $this->preproc_item->validateItemPreprocessingSteps($steps)) !== true) {
-				$ret = false;
 				error($error);
 			}
 
@@ -68,7 +67,6 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 
 				$relative_time_parser = new CRelativeTimeParser();
 				if ($relative_time_parser->parse($prev_time) != CParser::PARSE_SUCCESS) {
-					$ret = false;
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
 						_('a relative time is expected')
 					));
@@ -104,6 +102,7 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 					])
 				]))->disableView()
 			);
+			$ret = false;
 		}
 
 		return $ret;
