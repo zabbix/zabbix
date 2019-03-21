@@ -34,6 +34,10 @@ $form = (new CForm())
 				->setAttribute('autofocus', 'autofocus')
 		));
 
+if (array_key_exists('eventid', $data)) {
+	$form->addVar('eventid', $data['eventid']);
+}
+
 $script_inline = '';
 
 if ($data['isTriggerEditable']) {
@@ -57,6 +61,7 @@ if ($data['isTriggerEditable']) {
 					'url: "zabbix.php?action=trigdesc.update",'.
 					'data: {'.
 						'"triggerid": '.$data['trigger']['triggerid'].','.
+						(array_key_exists('eventid', $data) ? '"eventid": '.$data['eventid'].',' : '').
 						'"comments": jQuery("[name=comments]", forms).val(),'.
 						'"sid": jQuery("[name=sid]", forms).val()'.
 					'},'.

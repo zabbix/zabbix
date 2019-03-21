@@ -516,7 +516,7 @@
 	 * @param {string}	formid	Id of current form HTML element.
 	 * @param {int}		type	New value for "Post type" field.
 	 */
-	function switchToPostType(formid, type) {
+	function switchToPostType(formid, type, trigger_elmnt) {
 		if (type == <?= ZBX_POSTTYPE_FORM ?>) {
 			var	posts = jQuery('#posts', jQuery('#'+formid)).val(),
 				fields,
@@ -581,7 +581,7 @@
 								action: function() {}
 							}
 						]
-					});
+					}, trigger_elmnt);
 
 					return false;
 				}
