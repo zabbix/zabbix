@@ -493,8 +493,8 @@ class CZabbixServer {
 	 * @return bool
 	 */
 	protected function normalizeResponse(array &$response) {
-		return (array_key_exists('response', $response) && $response['response'] == self::RESPONSE_SUCCESS
-				|| $response['response'] == self::RESPONSE_FAILED && array_key_exists('info', $response)
+		return (array_key_exists('response', $response) && ($response['response'] == self::RESPONSE_SUCCESS
+				|| $response['response'] == self::RESPONSE_FAILED && array_key_exists('info', $response))
 		);
 	}
 }
