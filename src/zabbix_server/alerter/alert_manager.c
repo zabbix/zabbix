@@ -1386,7 +1386,7 @@ out:
  *               FAIL    - database connection error                          *
  *                                                                            *
  ******************************************************************************/
-static int	am_db_queue_alerts(const zbx_ipc_service_t *alerter_service, zbx_am_t *manager,
+static int	am_db_queue_alerts(zbx_am_t *manager, const zbx_ipc_service_t *alerter_service,
 		zbx_vector_ptr_t *alerts)
 {
 	const char		*__function_name = "am_db_queue_alerts";
@@ -1769,7 +1769,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	am_process_alert(const zbx_ipc_service_t *alerter_service, zbx_am_t *manager, zbx_am_alerter_t *alerter,
+static int	am_process_alert(zbx_am_t *manager, const zbx_ipc_service_t *alerter_service, zbx_am_alerter_t *alerter,
 		zbx_am_alert_t *alert)
 {
 	const char		*__function_name = "am_process_alert";
@@ -1870,7 +1870,7 @@ out:
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	am_process_result(zbx_ipc_service_t *alerter_service, zbx_am_t *manager, zbx_ipc_client_t *client,
+static int	am_process_result(zbx_am_t *manager, const zbx_ipc_service_t *alerter_service, zbx_ipc_client_t *client,
 		zbx_ipc_message_t *message)
 {
 	const char		*__function_name = "am_process_result";
@@ -2109,7 +2109,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 				zbx_vector_ptr_destroy(&alerts_new);
 
 				if (SUCCEED == ret)
-					ret = am_db_queue_alerts(&alerter_service, &manager, &alerts);
+					ret = am_db_queue_alerts(&manager, &alerter_service, &alerts);
 			}
 
 			if (FAIL == ret)
@@ -2139,7 +2139,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 			if (NULL == (alerter = (zbx_am_alerter_t *)zbx_queue_ptr_pop(&manager.free_alerters)))
 				break;
 
-			if (FAIL == am_process_alert(&alerter_service, &manager, alerter, am_pop_alert(&manager)))
+			if (FAIL == am_process_alert(&manager, &alerter_service, alerter, am_pop_alert(&manager)))
 				zbx_queue_ptr_push(&manager.free_alerters, alerter);
 		}
 
@@ -2161,7 +2161,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 					am_register_alerter(&manager, client, message);
 					break;
 				case ZBX_IPC_ALERTER_RESULT:
-					if (SUCCEED == am_process_result(&alerter_service, &manager, client, message))
+					if (SUCCEED == am_process_result(&manager, &alerter_service, client, message))
 						sent_num++;
 					else
 						failed_num++;
