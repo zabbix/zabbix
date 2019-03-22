@@ -6,6 +6,7 @@ New features:
 ...G...... [ZBXNEXT-5123] added server address and port to the Zabbix sender output (wiper)
 
 Bug fixes:
+.......PS. [ZBX-15578] fixed IPMI errors in case of infrequent reading of values (asitals)
 ........S. [ZBX-15862] fixed processing of long (megabytes) preprocessing test results (wiper)
 ..F....... [ZBX-15098] fixed undefined index in application selection popup window (Ivo)
 ........S. [ZBX-15840] fixed the type of pre-installed first email media as "text/plain" (MVekslers)
@@ -241,6 +242,7 @@ Changes for 4.0.6rc2
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15578] fixed IPMI errors in case of infrequent reading of values (asitals)
 ..F....... [ZBX-15098] fixed undefined index in application selection popup window (Ivo)
 ..F....... [ZBX-15351] fixed PHP error in "Problems by severity" if no problems (vasilijs)
 
