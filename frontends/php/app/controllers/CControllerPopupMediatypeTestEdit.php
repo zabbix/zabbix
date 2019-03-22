@@ -54,7 +54,7 @@ class CControllerPopupMediatypeTestEdit extends CController {
 		]);
 
 		if (!$mediatype) {
-			error(_('No permissions to referred object or it does not exist!'));
+			error(_('Cannot test disabled media type.'));
 		}
 
 		$this->setResponse(new CControllerResponseData([
