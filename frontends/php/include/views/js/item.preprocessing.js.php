@@ -191,6 +191,11 @@
 					return $(preproc_param_multiline_tmpl.evaluate({rowNum: index})).multilineInput({
 						title: <?= CJs::encodeJson(_('JavaScript')) ?>,
 						placeholder: <?= CJs::encodeJson(_('script')) ?>,
+						placeholder_textarea: 'return value',
+						label_before: 'function (value) {',
+						label_after: '}',
+						grow: 'auto',
+						rows: 0,
 						maxlength: <?= (int) $data['preprocessing_script_maxlength'] ?>
 					});
 
