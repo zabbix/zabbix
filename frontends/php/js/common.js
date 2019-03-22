@@ -461,22 +461,13 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 				ovelay_properties['content'] = resp.errors;
 			}
 			else {
-				var buttons = resp.buttons !== null ? resp.buttons : [],
-					has_cancel_btn = false;
+				var buttons = resp.buttons !== null ? resp.buttons : [];
 
-				jQuery.each(buttons, function(index, obj) {
-					if ('cancel' in obj && obj.cancel === true) {
-						has_cancel_btn = true;
-					}
+				buttons.push({
+					'title': t('Cancel'),
+					'class': 'btn-alt',
+					'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
 				});
-
-				if (!has_cancel_btn) {
-					buttons.push({
-						'title': t('Cancel'),
-						'class': 'btn-alt',
-						'action': function() {}
-					});
-				}
 
 				ovelay_properties['title'] = resp.header;
 				ovelay_properties['content'] = resp.body;

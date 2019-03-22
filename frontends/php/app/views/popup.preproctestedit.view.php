@@ -163,6 +163,7 @@ $output = [
 	'header' => $data['title'],
 	'script_inline' => require 'app/views/popup.preproctestedit.view.js.php',
 	'body' => (new CDiv([$form, $templates]))->toString(),
+	'cancel_action' => 'return savePreprocessingTestInputs();',
 	'buttons' => [
 		[
 			'title' => _('Test'),
@@ -170,13 +171,6 @@ $output = [
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'return itemPreprocessingTest("#'.$form->getId().'");'
-		],
-		[
-			'title' => _('Cancel'),
-			'cancel' => true,
-			'keepOpen' => false,
-			'class' => ZBX_STYLE_BTN_ALT,
-			'action' => 'return savePreprocessingTestInputs();'
 		]
 	]
 ];
