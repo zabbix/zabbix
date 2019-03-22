@@ -147,11 +147,9 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 
 		// Get previous value and time.
 		if ($this->use_prev_value) {
-			$data += [
-				'history' => [
-					'value' => $this->getInput('prev_value', ''),
-					'timestamp' => $this->getInput('prev_time')
-				]
+			$data['history'] = [
+				'value' => $this->getInput('prev_value', ''),
+				'timestamp' => $this->getInput('prev_time')
 			];
 		}
 
