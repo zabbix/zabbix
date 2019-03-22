@@ -1,10 +1,12 @@
 Changes for 4.2.0rc2
 
 New features:
+..F.....S. [ZBXNEXT-1238,ZBXNEXT-4988] added ability to test media types from UI (Ivo, vso)
 ..F....... [ZBXNEXT-5114] improved multiline input control (ashubin)
 ...G...... [ZBXNEXT-5123] added server address and port to the Zabbix sender output (wiper)
 
 Bug fixes:
+..F....... [ZBX-15098] fixed undefined index in application selection popup window (Ivo)
 ........S. [ZBX-15840] fixed the type of pre-installed first email media as "text/plain" (MVekslers)
 ..F....... [ZBX-15351] fixed PHP error in "Problems by severity" if no problems (vasilijs)
 .........T [ZBX-8907] fixed weird description for queue trigger in templates (akozlovs)
@@ -238,6 +240,7 @@ Changes for 4.0.6rc2
 New features:
 
 Bug fixes:
+..F....... [ZBX-15098] fixed undefined index in application selection popup window (Ivo)
 ..F....... [ZBX-15351] fixed PHP error in "Problems by severity" if no problems (vasilijs)
 
 --------------------------------------------------------------------------------

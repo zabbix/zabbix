@@ -94,7 +94,7 @@ static void	alerter_send_result(zbx_ipc_socket_t *socket, int errcode, const cha
 	unsigned char	*data;
 	zbx_uint32_t	data_len;
 
-	data_len = zbx_alerter_serialize_result(&data,  errcode, errmsg);
+	data_len = zbx_alerter_serialize_result(&data, errcode, errmsg);
 	zbx_ipc_socket_write(socket, ZBX_IPC_ALERTER_RESULT, data, data_len);
 
 	zbx_free(data);
