@@ -72,19 +72,27 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 					));
 				}
 				else {
-					foreach ($relative_time_parser->getTokens() as $token) {
-						if ($token['type'] == CRelativeTimeParser::ZBX_TOKEN_PRECISION) {
-							error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
-								_('a relative time is expected')
-							));
-							break;
-						}
-						elseif (!in_array($token['suffix'], self::$supported_time_suffixes)) {
-							error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
-								_('unsupported time suffix')
-							));
-							break;
-						}
+					$tokens = $relative_time_parser->getTokens();
+
+					if (count($tokens) > 1) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
+							_('only one time unit is allowed')
+						));
+					}
+					elseif ($tokens && $tokens[0]['type'] == CRelativeTimeParser::ZBX_TOKEN_PRECISION) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
+							_('a relative time is expected')
+						));
+					}
+					elseif ($tokens && !in_array($tokens[0]['suffix'], self::$supported_time_suffixes)) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
+							_('unsupported time suffix')
+						));
+					}
+					elseif ($tokens && $tokens[0]['sign'] !== '-') {
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
+							_('should be less than current time')
+						));
 					}
 				}
 			}
