@@ -228,6 +228,9 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dsn:'%s' user:'%s'", __function_name, dsn, user);
 
+	if (NULL != user && '\0' == user[0]) user = NULL;
+	if (NULL != pass && '\0' == pass[0]) pass = NULL;
+
 	data_source = (zbx_odbc_data_source_t *)zbx_malloc(data_source, sizeof(zbx_odbc_data_source_t));
 
 	if (0 != SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &data_source->henv)))
