@@ -33,9 +33,8 @@ class CControllerPopupMediatypeTestSend extends CController {
 
 		if (!$ret) {
 			$output = [];
-			$msg_title = _('Media type test failed.');
 
-			if (($messages = getMessages(false, $msg_title)) !== null) {
+			if (($messages = getMessages(false, _('Media type test failed.'))) !== null) {
 				$output['messages'] = $messages->toString();
 			}
 
@@ -57,19 +56,24 @@ class CControllerPopupMediatypeTestSend extends CController {
 	 * @return bool
 	 */
 	protected function validateMediaType() {
-		$ret = true;
-
 		$mediatype = API::MediaType()->get([
-			'output' => ['type'],
+			'output' => ['type', 'status'],
 			'mediatypeids' => $this->getInput('mediatypeid'),
-			'filter' => ['status' => MEDIA_STATUS_ACTIVE]
 		]);
 
 		if (!$mediatype) {
+			error(_('No permissions to referred object or it does not exist!'));
+
+			return false;
+		}
+
+		if ($mediatype[0]['status'] != MEDIA_STATUS_ACTIVE) {
 			error(_('Cannot test disabled media type.'));
 
 			return false;
 		}
+
+		$ret = true;
 
 		if ($mediatype[0]['type'] != MEDIA_TYPE_EXEC) {
 			$validator = new CNewValidator(array_map('trim', $this->getInputAll()), [
@@ -99,10 +103,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		$msg_title = null;
-		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT,
-			ZBX_SOCKET_BYTES_LIMIT
-		);
+		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
 		$result = $server->testMediaType([
 				'mediatypeid' => $this->getInput('mediatypeid'),
 				'sendto' =>	$this->getInput('sendto'),
@@ -113,6 +114,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 		);
 
 		if ($result) {
+			$msg_title = null;
 			info(_('Media type test successful.'));
 		}
 		else {

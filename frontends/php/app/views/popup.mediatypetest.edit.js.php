@@ -86,4 +86,3 @@ function mediatypeTestSend(formname) {
 	});
 }
 JS;
-

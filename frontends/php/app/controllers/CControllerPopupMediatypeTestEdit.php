@@ -48,12 +48,26 @@ class CControllerPopupMediatypeTestEdit extends CController {
 
 	protected function doAction() {
 		$mediatype = API::MediaType()->get([
-			'output' => ['type'],
+			'output' => ['type', 'status'],
 			'mediatypeids' => $this->getInput('mediatypeid'),
-			'filter' => ['status' => MEDIA_STATUS_ACTIVE]
 		]);
 
 		if (!$mediatype) {
+			error(_('No permissions to referred object or it does not exist!'));
+
+			$output = [];
+			if (($messages = getMessages(false, null, false)) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
+
+			return;
+		}
+
+		if ($mediatype[0]['status'] != MEDIA_STATUS_ACTIVE) {
 			error(_('Cannot test disabled media type.'));
 		}
 
@@ -61,10 +75,12 @@ class CControllerPopupMediatypeTestEdit extends CController {
 			'title' => _('Test media type'),
 			'errors' => hasErrorMesssages() ? getMessages() : null,
 			'mediatypeid' => $this->getInput('mediatypeid'),
+			'sendto' => '',
 			'subject' => _('Test subject'),
 			'message' => _('This is the test message from Zabbix'),
-			'type' => $mediatype ? $mediatype[0]['type'] : null,
-			'enabled' => (bool) $mediatype
+			'type' => $mediatype[0]['type'],
+			'enabled' => ($mediatype[0]['status'] == MEDIA_STATUS_ACTIVE),
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		]));
 	}
 }
