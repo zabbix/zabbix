@@ -2805,15 +2805,14 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .multilineinput-modal {
   min-width: 960px; }
   .multilineinput-modal .multilineinput-container {
+    padding: 1px;
     position: relative;
     display: flex;
-    height: calc(100vh - 190px);
-    max-height: 548px;
     overflow: hidden; }
   .multilineinput-modal .multilineinput-line-numbers {
     counter-reset: line;
     overflow: hidden;
-    padding: 5px 5px 5px 0;
+    padding: 1px 5px 1px 0;
     position: absolute;
     left: 0;
     top: 0;
@@ -2822,25 +2821,31 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       color: #737373;
       font-family: "Courier New", Courier, monospace;
       line-height: 18px;
-      text-align: right; }
+      text-align: right;
+      min-width: 24px; }
       .multilineinput-modal .multilineinput-line-numbers li::before {
         counter-increment: line;
         content: counter(line);
         user-select: none; }
+  .multilineinput-modal .multilineinput-label {
+    color: #737373;
+    line-height: 24px; }
   .multilineinput-modal .multilineinput-textarea {
+    flex: 1;
     line-height: 18px;
     resize: none;
     white-space: pre;
-    height: 100%;
-    width: 100%; }
-    .multilineinput-modal .multilineinput-textarea.monospace-font {
-      font-family: "Courier New", Courier, monospace; }
+    padding: 0 5px;
+    z-index: 20; }
     .multilineinput-modal .multilineinput-textarea::-webkit-scrollbar {
       height: 9px; }
   .multilineinput-modal .multilineinput-symbols-remaining {
     color: #737373;
     float: left;
     line-height: 24px; }
+  .multilineinput-modal.monospace-font .multilineinput-textarea,
+  .multilineinput-modal.monospace-font .multilineinput-label {
+    font-family: "Courier New", Courier, monospace; }
 
 .btn-back-map-container {
   text-align: left;

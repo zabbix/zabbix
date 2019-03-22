@@ -154,12 +154,12 @@ function processItemPreprocessingTestResults(steps) {
 function savePreprocessingTestInputs() {
 	var is_prev_enabled = <?= $data['show_prev'] ? 'true' : 'false' ?>,
 		input_values = {
-			value: jQuery("[type=hidden]", jQuery('#value')).val()
+			value: jQuery('#value').multilineInput('value')
 		},
 		macros = {};
 
 	if (is_prev_enabled) {
-		input_values.prev_value = jQuery("[type=hidden]", jQuery('#prev_value')).val();
+		input_values.prev_value = jQuery('#prev_value').multilineInput('value');
 		input_values.prev_time = jQuery('#prev_time').val();
 	}
 
@@ -182,7 +182,9 @@ jQuery(document).ready(function($) {
 		monospace_font: false,
 		maxlength: 65535,
 		autofocus: true,
-		readonly: false
+		readonly: false,
+		grow: 'auto',
+		rows: 0
 	});
 
 	$('#prev_value').multilineInput({
@@ -190,7 +192,9 @@ jQuery(document).ready(function($) {
 		value: <?= CJs::encodeJson($data['prev_value']) ?>,
 		monospace_font: false,
 		maxlength: 65535,
-		disabled: <?= $data['show_prev'] ? 'false' : 'true' ?>
+		disabled: <?= $data['show_prev'] ? 'false' : 'true' ?>,
+		grow: 'auto',
+		rows: 0
 	});
 });
 
