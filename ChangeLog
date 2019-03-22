@@ -3,6 +3,7 @@ Changes for 4.0.6rc2
 New features:
 
 Bug fixes:
+A......... [ZBX-15821] fixed SQL statement performance used in template.unlink() method (Sasha)
 .......PS. [ZBX-15578] fixed IPMI errors in case of infrequent reading of values (asitals)
 ..F....... [ZBX-15098] fixed undefined index in application selection popup window (Ivo)
 ..F....... [ZBX-15351] fixed PHP error in "Problems by severity" if no problems (vasilijs)
