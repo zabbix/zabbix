@@ -21,11 +21,11 @@
 
 $form_list = (new CFormList())
 	->addRow(
-		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark($data['type'] != MEDIA_TYPE_EXEC),
+		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
 		(new CTextBox('sendto', $data['sendto'], false, 1024))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
-			->setAriaRequired($data['type'] != MEDIA_TYPE_EXEC)
+			->setAriaRequired()
 			->setEnabled($data['enabled'])
 	)
 	->addRow(

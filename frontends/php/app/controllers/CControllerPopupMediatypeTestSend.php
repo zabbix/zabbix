@@ -24,7 +24,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 	protected function checkInput() {
 		$fields = [
 			'mediatypeid' =>	'fatal|required|db media_type.mediatypeid',
-			'sendto' =>			'string',
+			'sendto' =>			'string|not_empty',
 			'subject' =>		'string',
 			'message' =>		'string'
 		];
@@ -77,7 +77,6 @@ class CControllerPopupMediatypeTestSend extends CController {
 
 		if ($mediatype[0]['type'] != MEDIA_TYPE_EXEC) {
 			$validator = new CNewValidator(array_map('trim', $this->getInputAll()), [
-				'sendto' =>		'string|not_empty',
 				'message' =>	'string|not_empty'
 			]);
 
