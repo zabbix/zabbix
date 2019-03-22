@@ -510,25 +510,6 @@ function getOverlayDialogueId() {
 }
 
 /**
- * Get overlay dialog info from overlay stack.
- *
- * @param string   dialogueid   Dialogue identifyer to search for.
- *
- * @param {object}
- */
-function getOverlayDialogueData(dialogueid) {
-	var dialog = null;
-
-	jQuery(overlays_stack).each(function(i, item) {
-		if (item.dialogueid === dialogueid) {
-			return dialog = item;
-		}
-	});
-
-	return dialog;
-}
-
-/**
  * Display modal window.
  *
  * @param {object} params                                   Modal window params.

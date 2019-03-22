@@ -31,7 +31,8 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 			'test_type' => 'in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
 			'steps' => 'required|array',
 			'delay' => 'string',
-			'data' => 'array'
+			'data' => 'array',
+			'step_obj' => 'required|int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -115,6 +116,7 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 			'hostid' => $this->getInput('hostid'),
 			'value_type' => $this->getInput('value_type'),
 			'test_type' => $this->getInput('test_type'),
+			'step_obj' => $this->getInput('step_obj'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
