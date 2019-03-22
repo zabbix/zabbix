@@ -133,6 +133,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		host_inventory.url = host_inventory_url.getUrl();
 
 		// latest data link
+		if (typeof options.filter_application !== 'undefined') {
+			latest_data_url.setArgument('application', options.filter_application);
+		}
 		latest_data_url.setArgument('hostids[]', options.hostid);
 		latest_data_url.setArgument('filter_set', '1');
 		latest_data.url = latest_data_url.getUrl();
