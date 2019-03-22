@@ -1946,19 +1946,22 @@ int	zbx_ipc_async_socket_recv(zbx_ipc_async_socket_t *asocket, int timeout, zbx_
 	else
 		flags = EVLOOP_NONBLOCK;
 
-	if (ZBX_IPC_ASYNC_SOCKET_STATE_ERROR != asocket->state)
+	while (ZBX_IPC_ASYNC_SOCKET_STATE_NONE == asocket->state)
+	{
 		event_base_loop(asocket->ev, flags);
 
-	if (NULL != (*message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&asocket->client->rx_queue)))
-	{
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+		if (NULL != (*message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&asocket->client->rx_queue)))
 		{
-			char	*data = NULL;
+			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+			{
+				char	*data = NULL;
 
-			zbx_ipc_message_format(*message, &data);
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __function_name, data);
+				zbx_ipc_message_format(*message, &data);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __function_name, data);
 
-			zbx_free(data);
+				zbx_free(data);
+			}
+			break;
 		}
 	}
 
