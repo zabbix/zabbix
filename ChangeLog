@@ -6,6 +6,7 @@ New features:
 ...G...... [ZBXNEXT-5123] added server address and port to the Zabbix sender output (wiper)
 
 Bug fixes:
+A......... [ZBX-15821] fixed SQL statement performance used in template.unlink() method (Sasha)
 .......PS. [ZBX-15578] fixed IPMI errors in case of infrequent reading of values (asitals)
 ........S. [ZBX-15862] fixed processing of long (megabytes) preprocessing test results (wiper)
 ..F....... [ZBX-15098] fixed undefined index in application selection popup window (Ivo)
