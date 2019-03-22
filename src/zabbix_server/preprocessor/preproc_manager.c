@@ -1049,7 +1049,8 @@ static void	preprocessor_flush_test_result(zbx_preprocessing_manager_t *manager,
 	direct_request = (zbx_preprocessing_direct_request_t *)worker->task;
 
 	/* forward the response to the client */
-	zbx_ipc_client_send(direct_request->client, message->code, message->data, message->size);
+	if (SUCCEED == zbx_ipc_client_connected(direct_request->client))
+		zbx_ipc_client_send(direct_request->client, message->code, message->data, message->size);
 
 	worker->task = NULL;
 	preprocessor_free_direct_request(direct_request);
