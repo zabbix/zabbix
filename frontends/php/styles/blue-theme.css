@@ -498,12 +498,14 @@ article, main {
           margin-bottom: -2px; }
   .filter-breadcrumb > li {
     padding: 1px 0; }
-  .filter-breadcrumb > li:first-child {
-    line-height: 22px;
-    white-space: nowrap; }
-    .filter-breadcrumb > li:first-child > span a {
+    .filter-breadcrumb > li > span a {
       margin-top: 1px;
       line-height: 13px; }
+  .filter-breadcrumb > li {
+    line-height: 22px;
+    white-space: nowrap; }
+    .filter-breadcrumb > li .status-container {
+      line-height: 14px; }
   .filter-breadcrumb + .filter-space {
     margin-top: -29px; }
 

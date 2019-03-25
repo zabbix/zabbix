@@ -695,11 +695,6 @@ article {
 
 	> li {
 		padding: 1px 0;
-	}
-
-	> li:first-child {
-		line-height: 22px;
-		white-space: nowrap;
 
 		> span {
 
@@ -707,6 +702,15 @@ article {
 				margin-top: 1px;
 				line-height: 13px;
 			}
+		}
+	}
+
+	> li {
+		line-height: 22px;
+		white-space: nowrap;
+
+		.status-container {
+			line-height: 14px;
 		}
 	}
 
