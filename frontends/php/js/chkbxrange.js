@@ -24,14 +24,13 @@
 var chkbxRange = {
 	startbox:			null,	// start checkbox obj
 	chkboxes:			{},		// ckbx list
-	prefix:				null,	// prefix for cookie name
-	pageGoName:			null,	// which checkboxes should be counted by Go button and saved to cookies
+	prefix:				null,	// prefix for session storage variable name
+	pageGoName:			null,	// which checkboxes should be counted by Go button and saved to session storage
 	selectedIds:		{},		// ids of selected objects
 	footerButtons:		{},		// action buttons at the bottom of page
 	sessionStorageName:	null,
 
 	init: function() {
-		// sessionStorage name
 		var path = new Curl();
 		var filename = basename(path.getPath(), '.php');
 		this.sessionStorageName = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
@@ -49,17 +48,17 @@ var chkbxRange = {
 			}
 		}
 
-		// load selected checkboxes from cookies or cache
+		// load selected checkboxes from session storage or cache
 		if (this.pageGoName != null) {
 			this.selectedIds = sessionStorage.getItem(this.sessionStorageName) === null
 				? {}
 				: JSON.parse(sessionStorage.getItem(this.sessionStorageName));
 
-			// check if checkboxes should be selected from cookies
+			// check if checkboxes should be selected from session storage
 			if (!jQuery.isEmptyObject(this.selectedIds)) {
 				var objectIds = jQuery.map(this.selectedIds, function(id) { return id });
 			}
-			// no checkboxes selected from cookies, check browser cache if checkboxes are still checked and update state
+			// no checkboxes selected, check browser cache if checkboxes are still checked and update state
 			else {
 				var checkedFromCache = jQuery('main .list-table tbody input[type=checkbox]:checked:not(:disabled)');
 				var objectIds = jQuery.map(checkedFromCache, jQuery.proxy(function(checkbox) {

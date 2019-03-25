@@ -261,8 +261,8 @@ elseif (hasRequest('action') && getRequest('action') == 'hostprototype.massdelet
 
 if (hasRequest('action') && hasRequest('group_hostid') && !$result) {
 	$host_prototypes = API::HostPrototype()->get([
-		'hostids' => array_keys(getRequest('group_hostid')),
 		'output' => [],
+		'hostids' => getRequest('group_hostid'),
 		'editable' => true
 	]);
 	uncheckTableRows($discoveryRule['itemid'], array_column($host_prototypes, 'hostid', 'hostid'));

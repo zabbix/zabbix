@@ -290,8 +290,6 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$data['hostid'].'";');
-
 // append table to form
 $triggers_form->addItem([
 	$triggers_table,
@@ -304,7 +302,7 @@ $triggers_form->addItem([
 			'trigger.massupdateform' => ['name' => _('Mass update')],
 			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?')]
 		],
-		$data['hostid'] ? $data['hostid'] : null
+		$data['hostid']
 	)
 ]);
 

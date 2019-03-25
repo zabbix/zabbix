@@ -53,14 +53,6 @@ $fields = [
 ];
 check_fields($fields);
 
-$pageFilter = new CPageFilter([
-	'groups' => ['editable' => true, 'with_hosts_and_templates' => true],
-	'hosts' => ['editable' => true, 'templated_hosts' => true],
-	'hostid' => getRequest('hostid'),
-	'groupid' => getRequest('groupid')
-]);
-
-
 /*
  * Permissions
  */
@@ -79,11 +71,11 @@ if (hasRequest('action')) {
 	}
 	else {
 		$applications = API::Application()->get([
-			'applicationids' => getRequest('applications'),
-			'output' => []
+			'output' => [],
+			'applicationids' => getRequest('applications')
 		]);
 		if (count($applications) != count(getRequest('applications'))) {
-			uncheckTableRows($pageFilter->hostid, array_column($applications, 'applicationid', 'applicationid'));
+			uncheckTableRows(getRequest('hostid'), array_column($applications, 'applicationid', 'applicationid'));
 		}
 	}
 }
@@ -93,6 +85,13 @@ if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
 if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 	access_deny();
 }
+
+$pageFilter = new CPageFilter([
+	'groups' => ['editable' => true, 'with_hosts_and_templates' => true],
+	'hosts' => ['editable' => true, 'templated_hosts' => true],
+	'hostid' => getRequest('hostid'),
+	'groupid' => getRequest('groupid')
+]);
 
 /*
  * Actions

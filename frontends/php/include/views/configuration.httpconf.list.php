@@ -156,8 +156,6 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
-
 // append table to form
 $httpForm->addItem([
 	$httpTable,
@@ -171,7 +169,7 @@ $httpForm->addItem([
 			],
 			'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?')]
 		],
-		$this->data['hostid'] ? $this->data['hostid'] : null
+		$this->data['hostid']
 	)
 ]);
 

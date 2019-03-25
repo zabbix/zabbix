@@ -144,13 +144,6 @@ foreach ($data['graphs'] as $graph) {
 	]);
 }
 
-if ($this->data['parent_discoveryid']) {
-	zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
-}
-else {
-	zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
-}
-
 // buttons
 $buttonsArray = [];
 if (!$this->data['parent_discoveryid']) {
@@ -168,7 +161,7 @@ $graphForm->addItem([
 	new CActionButtonList('action', 'group_graphid', $buttonsArray,
 		$this->data['parent_discoveryid']
 			? $this->data['parent_discoveryid']
-			: ($this->data['hostid'] ? $this->data['hostid'] : null)
+			: $this->data['hostid']
 	)
 ]);
 

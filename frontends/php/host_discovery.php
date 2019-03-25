@@ -531,8 +531,8 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masschec
 
 if (hasRequest('action') && hasRequest('g_hostdruleid') && !$result) {
 	$hostdrules = API::DiscoveryRule()->get([
-		'itemids' => array_keys(getRequest('g_hostdruleid')),
 		'output' => [],
+		'itemids' => getRequest('g_hostdruleid'),
 		'editable' => true
 	]);
 	uncheckTableRows(getRequest('hostid'), array_column($hostdrules, 'itemid', 'itemid'));

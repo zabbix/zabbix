@@ -117,8 +117,6 @@ foreach ($data['applications'] as $application) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
-
 // append table to form
 $form->addItem([
 	$applicationTable,
@@ -129,7 +127,7 @@ $form->addItem([
 			'application.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected applications?')],
 			'application.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected applications?')]
 		],
-		$this->data['hostid'] ? $this->data['hostid'] : null
+		$this->data['hostid']
 	)
 ]);
 
