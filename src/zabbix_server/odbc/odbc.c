@@ -245,11 +245,11 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, cons
 
 				if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_DBC, data_source->hdbc, rc, &diag))
 				{
-					/* look for user in data source instead of using no user */
+					/* look for user in data source instead of no user */
 					if ('\0' == user[0])
 						user = NULL;
 
-					/* look for password in data source instead of using no password */
+					/* look for password in data source instead of no password */
 					if ('\0' == pass[0])
 						pass = NULL;
 
