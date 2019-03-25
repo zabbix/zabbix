@@ -1056,6 +1056,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 	 */
 	private function selectTypeAndfillParameters($step, $options) {
 		$this->zbxTestClickWait('param_add');
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('preprocessing_'.$step.'_type'));
 		$this->zbxTestDropdownSelect('preprocessing_'.$step.'_type', $options['type']);
 
 		if (array_key_exists('parameter_1', $options) && array_key_exists('parameter_2', $options)) {

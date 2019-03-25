@@ -257,4 +257,35 @@ void	zbx_alerter_deserialize_exec(const unsigned char *data, zbx_uint64_t *alert
 	(void)zbx_deserialize_str(data, command, len);
 }
 
+zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t mediatypeid, const char *sendto,
+		const char *subject, const char *message)
+{
+	unsigned char	*ptr;
+	zbx_uint32_t	data_len = 0, sendto_len, subject_len, message_len;
 
+	zbx_serialize_prepare_value(data_len, mediatypeid);
+	zbx_serialize_prepare_str(data_len, sendto);
+	zbx_serialize_prepare_str(data_len, subject);
+	zbx_serialize_prepare_str(data_len, message);
+
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr = *data;
+	ptr += zbx_serialize_value(ptr, mediatypeid);
+	ptr += zbx_serialize_str(ptr, sendto, sendto_len);
+	ptr += zbx_serialize_str(ptr, subject, subject_len);
+	(void)zbx_serialize_str(ptr, message, message_len);
+
+	return data_len;
+}
+
+void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t *mediatypeid, char **sendto,
+		char **subject, char **message)
+{
+	zbx_uint32_t	len;
+
+	data += zbx_deserialize_value(data, mediatypeid);
+	data += zbx_deserialize_str(data, sendto, len);
+	data += zbx_deserialize_str(data, subject, len);
+	(void)zbx_deserialize_str(data, message, len);
+}

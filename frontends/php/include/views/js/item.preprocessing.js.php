@@ -116,13 +116,16 @@
 		 * @param {object} trigger_elmnt UI element triggered function.
 		 */
 		function openPreprocessingTestDialog(step_nums, trigger_elmnt) {
-			PopUp('popup.preproctest.edit', {
+			var $step_obj = $(trigger_elmnt).closest('.preprocessing-list-item, .preprocessing-list-foot');
+
+			PopUp('popup.preproctest.edit', $.extend({
 				delay: $('#delay').val() || '',
 				value_type: $('#value_type').val() || <?= CControllerPopupPreprocTest::ZBX_DEFAULT_VALUE_TYPE ?>,
 				steps: getPreprocessingSteps(step_nums),
 				hostid: <?= $data['hostid'] ?>,
-				test_type: <?= $data['preprocessing_test_type'] ?>
-			}, null, trigger_elmnt);
+				test_type: <?= $data['preprocessing_test_type'] ?>,
+				step_obj: $step_obj.attr('data-step') || -1
+			}, {'data': $step_obj.data('test-data') || []}), 'preprocessing-test', trigger_elmnt);
 		}
 
 		function makeParameterInput(index, type) {
@@ -191,6 +194,11 @@
 					return $(preproc_param_multiline_tmpl.evaluate({rowNum: index})).multilineInput({
 						title: <?= CJs::encodeJson(_('JavaScript')) ?>,
 						placeholder: <?= CJs::encodeJson(_('script')) ?>,
+						placeholder_textarea: 'return value',
+						label_before: 'function (value) {',
+						label_after: '}',
+						grow: 'auto',
+						rows: 0,
 						maxlength: <?= (int) $data['preprocessing_script_maxlength'] ?>
 					});
 

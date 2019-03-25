@@ -490,17 +490,27 @@ article, main {
     .filter-breadcrumb li > span {
       display: inline-block;
       height: 18px;
-      padding: 4px 7px 0; }
+      padding: 4px 7px 0;
+      line-height: 14px; }
       .filter-breadcrumb li > span a {
         display: inline-block;
         max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
-        vertical-align: top; }
+        vertical-align: top;
+        margin-bottom: -1px; }
+        .filter-breadcrumb li > span a:focus {
+          margin-bottom: -2px; }
   .filter-breadcrumb > li {
     padding: 1px 0; }
-  .filter-breadcrumb > li:first-child {
+    .filter-breadcrumb > li > span a {
+      margin-top: 1px;
+      line-height: 13px; }
+  .filter-breadcrumb > li {
+    line-height: 22px;
     white-space: nowrap; }
+    .filter-breadcrumb > li .status-container {
+      line-height: 14px; }
   .filter-breadcrumb + .filter-space {
     margin-top: -29px; }
 
@@ -2774,15 +2784,14 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .multilineinput-modal {
   min-width: 960px; }
   .multilineinput-modal .multilineinput-container {
+    padding: 1px;
     position: relative;
     display: flex;
-    height: calc(100vh - 190px);
-    max-height: 548px;
     overflow: hidden; }
   .multilineinput-modal .multilineinput-line-numbers {
     counter-reset: line;
     overflow: hidden;
-    padding: 5px 5px 5px 0;
+    padding: 1px 5px 1px 0;
     position: absolute;
     left: 0;
     top: 0;
@@ -2791,25 +2800,31 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       color: #cacaca;
       font-family: "Courier New", Courier, monospace;
       line-height: 18px;
-      text-align: right; }
+      text-align: right;
+      min-width: 24px; }
       .multilineinput-modal .multilineinput-line-numbers li::before {
         counter-increment: line;
         content: counter(line);
         user-select: none; }
+  .multilineinput-modal .multilineinput-label {
+    color: #cacaca;
+    line-height: 24px; }
   .multilineinput-modal .multilineinput-textarea {
+    flex: 1;
     line-height: 18px;
     resize: none;
     white-space: pre;
-    height: 100%;
-    width: 100%; }
-    .multilineinput-modal .multilineinput-textarea.monospace-font {
-      font-family: "Courier New", Courier, monospace; }
+    padding: 0 5px;
+    z-index: 20; }
     .multilineinput-modal .multilineinput-textarea::-webkit-scrollbar {
       height: 9px; }
   .multilineinput-modal .multilineinput-symbols-remaining {
     color: #cacaca;
     float: left;
     line-height: 24px; }
+  .multilineinput-modal.monospace-font .multilineinput-textarea,
+  .multilineinput-modal.monospace-font .multilineinput-label {
+    font-family: "Courier New", Courier, monospace; }
 
 .btn-back-map-container {
   text-align: left;
@@ -4942,8 +4957,11 @@ ul.top-nav-icons input {
   ul.top-nav-icons input:focus {
     border: 1px solid #e0e0e0 !important; }
 
-.filter-breadcrumb a:focus {
-  margin-bottom: -1px; }
+.filter-breadcrumb li > span a:focus,
+.filter-breadcrumb > li:first-child > span a:focus {
+  margin-bottom: -2px; }
+.filter-breadcrumb > li > span a:focus {
+  line-height: 12px; }
 
 .add-child-btn {
   background: url(../img/icon-sprite.svg) no-repeat -359px -551px !important; }

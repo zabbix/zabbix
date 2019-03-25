@@ -677,6 +677,7 @@ article {
 			display: inline-block;
 			height: 18px;
 			padding: 4px 7px 0;
+			line-height: 14px;
 
 			a {
 				display: inline-block;
@@ -684,16 +685,34 @@ article {
 				overflow: hidden;
 				text-overflow: ellipsis;
 				vertical-align: top;
+				margin-bottom: -1px;
+
+				&:focus {
+					margin-bottom: -2px;
+				}
 			}
 		}
 	}
 
 	> li {
 		padding: 1px 0;
+
+		> span {
+
+			a {
+				margin-top: 1px;
+				line-height: 13px;
+			}
+		}
 	}
 
-	> li:first-child {
+	> li {
+		line-height: 22px;
 		white-space: nowrap;
+
+		.status-container {
+			line-height: 14px;
+		}
 	}
 
 	+ .filter-space {
@@ -4056,17 +4075,16 @@ $form-icon-btn: (
 	min-width: 960px;
 
 	.multilineinput-container {
+		padding: 1px;
 		position: relative;
 		display: flex;
-		height: calc(100vh - 190px);
-		max-height: 548px;
 		overflow: hidden;
 	}
 
 	.multilineinput-line-numbers {
 		counter-reset: line;
 		overflow: hidden;
-		padding: 5px 5px 5px 0;
+		padding: 1px 5px 1px 0;
 		position: absolute;
 		left: 0;
 		top: 0;
@@ -4077,6 +4095,7 @@ $form-icon-btn: (
 			font-family: $font-stack-mono;
 			line-height: $line-height;
 			text-align: right;
+			min-width: 24px;
 
 			&::before {
 				counter-increment: line;
@@ -4086,16 +4105,18 @@ $form-icon-btn: (
 		}
 	}
 
+	.multilineinput-label {
+		color: $font-alt-color;
+		line-height: 24px;
+	}
+
 	.multilineinput-textarea {
+		flex: 1;
 		line-height: $line-height;
 		resize: none;
 		white-space: pre;
-		height: 100%;
-		width: 100%;
-
-		&.monospace-font {
-			font-family: $font-stack-mono;
-		}
+		padding: 0 5px;
+		z-index: 20;
 
 		&::-webkit-scrollbar {
 			height: 9px;
@@ -4106,6 +4127,14 @@ $form-icon-btn: (
 		color: $font-alt-color;
 		float: left;
 		line-height: 24px;
+	}
+
+	&.monospace-font {
+
+		.multilineinput-textarea,
+		.multilineinput-label {
+			font-family: $font-stack-mono;
+		}
 	}
 }
 

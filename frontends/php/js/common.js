@@ -466,7 +466,8 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 				buttons.push({
 					'title': t('Cancel'),
 					'class': 'btn-alt',
-					'action': function() {}
+					'cancel': true,
+					'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
 				});
 
 				ovelay_properties['title'] = resp.header;

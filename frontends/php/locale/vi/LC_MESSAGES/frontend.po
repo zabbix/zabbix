@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 16:47+0200\n"
-"PO-Revision-Date: 2019-03-16 22:15+0300\n"
+"POT-Creation-Date: 2019-03-25 10:17+0200\n"
+"PO-Revision-Date: 2019-03-23 23:51+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: vi\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1552767332.000000\n"
+"X-POOTLE-MTIME: 1553377866.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -290,7 +290,7 @@ msgstr "500 giá trị gần nhất"
 msgid "<empty string>"
 msgstr ""
 
-#: include/forms.inc.php:1510 include/views/js/item.preprocessing.js.php:203
+#: include/forms.inc.php:1515 include/views/js/item.preprocessing.js.php:208
 msgid "<label name>"
 msgstr ""
 
@@ -298,9 +298,9 @@ msgstr ""
 msgid "<manual>"
 msgstr "<bằng tay>"
 
-#: include/forms.inc.php:1508 include/forms.inc.php:1516
-#: include/views/js/item.preprocessing.js.php:201
-#: include/views/js/item.preprocessing.js.php:210
+#: include/forms.inc.php:1513 include/forms.inc.php:1521
+#: include/views/js/item.preprocessing.js.php:206
+#: include/views/js/item.preprocessing.js.php:215
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
 msgstr ""
 
@@ -349,7 +349,7 @@ msgstr[0] "Tài khoản bị khóa khoảng %1$s giây."
 
 #: app/views/monitoring.widget.problems.view.php:62
 #: include/actions.inc.php:157 include/actions.inc.php:337
-#: include/blocks.inc.php:558
+#: include/blocks.inc.php:560
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:916
@@ -381,6 +381,7 @@ msgid "Acknowledged RESOLVED events"
 msgstr " Sự kiện được ghi nhận giải quyết"
 
 #: app/views/administration.mediatype.edit.php:104
+#: app/views/administration.mediatype.list.php:69
 #: app/views/dashboard.sharing.edit.php:24
 #: app/views/dashboard.sharing.edit.php:45
 #: app/views/monitoring.widget.actionlog.view.php:30
@@ -504,7 +505,7 @@ msgid "Action updated"
 msgstr "Hành động đã cập nhật"
 
 #: app/views/monitoring.dashboard.view.php:86
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:559
+#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:561
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:894
 #: include/classes/screens/CScreenProblem.php:917
@@ -561,8 +562,8 @@ msgstr "Kích hoạt"
 #: app/views/popup.httpstep.php:161 app/views/popup.media.php:48
 #: app/views/popup.media.php:112 app/views/popup.triggerwizard.php:169
 #: app/views/popup.triggerwizard.php:195
-#: include/classes/widgets/CWidgetHelper.php:420 include/forms.inc.php:1617
-#: include/forms.inc.php:2507
+#: include/classes/widgets/CWidgetHelper.php:420 include/forms.inc.php:1622
+#: include/forms.inc.php:2512
 #: include/views/administration.auditlogs.list.php:46
 #: include/views/administration.general.iconmap.edit.php:101
 #: include/views/administration.general.iconmap.edit.php:142
@@ -1072,7 +1073,7 @@ msgstr "Đang tiếp cận"
 msgid "Apr"
 msgstr "Tháng Tư"
 
-#: include/forms.inc.php:2315 include/func.inc.php:119
+#: include/forms.inc.php:2320 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:139
 msgid "April"
 msgstr "Tháng tư"
@@ -1144,7 +1145,7 @@ msgstr "Tại %1$s:%2$s trên %3$s %4$s của %5$s"
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
 msgstr "Tại %1$s:%2$s ngày %3$s của %4$s"
 
-#: include/forms.inc.php:2433
+#: include/forms.inc.php:2438
 msgid "At (hour:minute)"
 msgstr "Tại (giờ: phút)"
 
@@ -1227,7 +1228,7 @@ msgstr "Kiểm tra log"
 msgid "Aug"
 msgstr "Th8"
 
-#: include/forms.inc.php:2302 include/func.inc.php:123
+#: include/forms.inc.php:2307 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:143
 msgid "August"
 msgstr "Tháng 8"
@@ -2473,7 +2474,7 @@ msgstr "Không thể đọc JSON: %1$s."
 msgid "Cannot read XML: %1$s."
 msgstr "Không thể đọc XML: %1$s."
 
-#: include/classes/server/CZabbixServer.php:389
+#: include/classes/server/CZabbixServer.php:414
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Không thể đọc các câu trả lời, kiểm tra kết nối với zabbix server \"%1$s\"."
@@ -2492,7 +2493,7 @@ msgstr "Không thể lưu các quy tắc phát hiện với các kiểm 
 msgid "Cannot save widget \"%1$s\"."
 msgstr "Không thể lưu ô điều khiển \"%1$s\"."
 
-#: include/classes/server/CZabbixServer.php:330
+#: include/classes/server/CZabbixServer.php:355
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Không thể gửi lệnh, kiểm tra kết nối đến zabbix server \"%1$s\"."
@@ -2571,19 +2572,24 @@ msgstr "Không thể đặt ID nguồn cho phần tử screen."
 msgid "Cannot switch host for interface."
 msgstr "Không thể chuyển đổi host cho interface."
 
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:71
+#: app/controllers/CControllerPopupMediatypeTestSend.php:71
+msgid "Cannot test disabled media type."
+msgstr ""
+
 #: users.php:260
 msgid "Cannot unblock users"
 msgstr "Không thể không ngăn chặn các người dùng"
 
-#: include/classes/api/services/CHostGeneral.php:559
+#: include/classes/api/services/CHostGeneral.php:555
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Không thể ngắt kết nối hoặc xóa các web scenario."
 
-#: include/classes/api/services/CHostGeneral.php:620
+#: include/classes/api/services/CHostGeneral.php:616
 msgid "Cannot unlink and clear applications."
 msgstr "Không thể ngắt kết nối hoặc xóa các ứng dụng."
 
-#: include/classes/api/services/CHostGeneral.php:363
+#: include/classes/api/services/CHostGeneral.php:427
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Không thể ngắt kết nối hoặc xóa các quy tắc phát hiện"
 
@@ -3557,12 +3563,12 @@ msgstr "Đã kết nối"
 msgid "Connection security"
 msgstr "Bảo mật kết nối"
 
-#: include/classes/server/CZabbixServer.php:343
+#: include/classes/server/CZabbixServer.php:368
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Thời gian kết nối của %1$s đã vượt quá khi kết nối đến máy chủ Zabbix \"%2$s\"."
 
-#: include/classes/server/CZabbixServer.php:451
+#: include/classes/server/CZabbixServer.php:476
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -3573,7 +3579,7 @@ msgstr ""
 "1. IP/DNS máy chủ không chính xác trong \"zabbix.conf.php\";\n"
 "2. Cấu hình máy chủ DNS không chính xác.\n"
 
-#: include/classes/server/CZabbixServer.php:439
+#: include/classes/server/CZabbixServer.php:464
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -3588,7 +3594,7 @@ msgstr ""
 "3. Trình nền máy chủ zabbix không chạy;\n"
 "4. Tường lửa đang chặn kết nối TCP.\n"
 
-#: include/classes/server/CZabbixServer.php:447
+#: include/classes/server/CZabbixServer.php:472
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -4062,7 +4068,7 @@ msgid "Custom multiplier"
 msgstr "Tùy chỉnh nhân bản"
 
 #: app/views/popup.preproctestedit.view.js.php:143 include/forms.inc.php:1402
-#: include/forms.inc.php:1572 include/views/js/item.preprocessing.js.php:35
+#: include/forms.inc.php:1577 include/views/js/item.preprocessing.js.php:35
 msgid "Custom on fail"
 msgstr ""
 
@@ -4133,7 +4139,7 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "TÊN DNS"
 
-#: app/views/report.services.php:34 include/forms.inc.php:2210
+#: app/views/report.services.php:34 include/forms.inc.php:2215
 #: include/maintenances.inc.php:33 report4.php:107
 msgid "Daily"
 msgstr "Hàng ngày"
@@ -4270,7 +4276,7 @@ msgstr "Kiểu cơ sở dữ liệu"
 msgid "Database user"
 msgstr "Người dùng cơ sở dữ liệu"
 
-#: include/forms.inc.php:2339 include/forms.inc.php:2424 maintenance.php:51
+#: include/forms.inc.php:2344 include/forms.inc.php:2429 maintenance.php:51
 msgid "Date"
 msgstr "Ngày"
 
@@ -4298,16 +4304,16 @@ msgstr "Ngày"
 msgid "Day before yesterday"
 msgstr "Ngày trước hôm qua"
 
-#: include/forms.inc.php:2341 include/forms.inc.php:2402
+#: include/forms.inc.php:2346 include/forms.inc.php:2407
 msgid "Day of month"
 msgstr "Ngày trong tháng"
 
-#: include/forms.inc.php:2243 include/forms.inc.php:2342
-#: include/forms.inc.php:2350
+#: include/forms.inc.php:2248 include/forms.inc.php:2347
+#: include/forms.inc.php:2355
 msgid "Day of week"
 msgstr "Ngày trong tuần "
 
-#: include/forms.inc.php:2451
+#: include/forms.inc.php:2456
 msgid "Days"
 msgstr "Các ngày"
 
@@ -4329,7 +4335,7 @@ msgstr "Chế độ gỡ lỗi được cập nhật"
 msgid "Dec"
 msgstr "Dec"
 
-#: include/forms.inc.php:2334 include/func.inc.php:127
+#: include/forms.inc.php:2339 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:147
 msgid "December"
 msgstr "Tháng 12"
@@ -4408,7 +4414,7 @@ msgid "Delayed by"
 msgstr "Trễ bởi"
 
 #: app/views/administration.mediatype.edit.php:243
-#: app/views/administration.mediatype.list.php:153
+#: app/views/administration.mediatype.list.php:162
 #: app/views/administration.proxy.edit.php:135
 #: app/views/administration.proxy.list.php:167
 #: app/views/administration.script.edit.php:129
@@ -4637,7 +4643,7 @@ msgstr "Xóa sơ đồ đã chọn?"
 msgid "Delete selected maps?"
 msgstr "Xóa các sơ đồ được chọn?"
 
-#: app/views/administration.mediatype.list.php:153
+#: app/views/administration.mediatype.list.php:162
 msgid "Delete selected media types?"
 msgstr "Xóa các media type được chọn?"
 
@@ -4814,7 +4820,7 @@ msgstr "Mô tả"
 msgid "Description updated"
 msgstr "Mô tả được cập nhật"
 
-#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:434
+#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:436
 #: include/func.inc.php:1850
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:439
@@ -4852,7 +4858,7 @@ msgstr "Kích thước (cột x hàng)"
 msgid "Directory size (in bytes). Returns integer"
 msgstr "Kích thước thư mục (byte). Trả về integer"
 
-#: app/views/administration.mediatype.list.php:152
+#: app/views/administration.mediatype.list.php:161
 #: include/views/administration.auditlogs.list.php:50
 #: include/views/administration.usergroups.list.php:169
 #: include/views/configuration.action.list.php:134
@@ -4925,7 +4931,7 @@ msgstr "Vô hiệu hóa các host đã chọn?"
 msgid "Disable selected items?"
 msgstr "Vô hiệu hóa các item đã chọn?"
 
-#: app/views/administration.mediatype.list.php:152
+#: app/views/administration.mediatype.list.php:161
 msgid "Disable selected media types?"
 msgstr "Vô hiệu hóa các media type đã chọn?"
 
@@ -4938,7 +4944,7 @@ msgid "Disable selected web scenarios?"
 msgstr "Vô hiệu hóa web scenario đã chọn?"
 
 #: app/views/administration.mediatype.list.php:47
-#: app/views/administration.mediatype.list.php:128 auditlogs.php:147
+#: app/views/administration.mediatype.list.php:129 auditlogs.php:147
 #: include/discovery.inc.php:108 include/hosts.inc.php:1299
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:140 include/items.inc.php:143
@@ -4979,7 +4985,7 @@ msgstr ""
 msgid "Discard unchanged with heartbeat"
 msgstr ""
 
-#: app/views/popup.preproctestedit.view.js.php:104 include/forms.inc.php:1551
+#: app/views/popup.preproctestedit.view.js.php:104 include/forms.inc.php:1556
 #: include/views/js/item.preprocessing.js.php:37
 msgid "Discard value"
 msgstr ""
@@ -5321,7 +5327,7 @@ msgstr "Tạo bản sao id nhóm người dùng \"%1$s\" trong nhóm người d�
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "Tạo bản sao id nhóm người \"%1$s\" dùng trong nhóm người dùng cho screen \"%2$s\"."
 
-#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:557
+#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:559
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:915
 #: include/classes/screens/CScreenProblem.php:1126 include/events.inc.php:249
@@ -5548,7 +5554,7 @@ msgstr "Không có screen ID cho template screen."
 msgid "Empty screen ID."
 msgstr "ID screen trống."
 
-#: app/views/administration.mediatype.list.php:151
+#: app/views/administration.mediatype.list.php:160
 #: include/views/administration.auditlogs.list.php:49
 #: include/views/administration.usergroups.list.php:168
 #: include/views/configuration.action.list.php:133
@@ -5641,7 +5647,7 @@ msgstr "Kích hoạt các host được chọn?"
 msgid "Enable selected items?"
 msgstr "Kích hoạt các item được chọn?"
 
-#: app/views/administration.mediatype.list.php:151
+#: app/views/administration.mediatype.list.php:160
 msgid "Enable selected media types?"
 msgstr "Kích hoạt các media type đã chọn?"
 
@@ -5663,7 +5669,7 @@ msgstr "Kích hoạt trap"
 
 #: app/views/administration.mediatype.edit.php:178
 #: app/views/administration.mediatype.list.php:46
-#: app/views/administration.mediatype.list.php:124
+#: app/views/administration.mediatype.list.php:125
 #: app/views/popup.media.php:74 app/views/popup.triggerwizard.php:187
 #: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
 #: include/httptest.inc.php:45 include/items.inc.php:140
@@ -5808,11 +5814,11 @@ msgstr[0] "Sự kiện được cập nhật"
 msgid "Events and alerts"
 msgstr "Các sự kiện và các thông báo"
 
-#: include/forms.inc.php:2224
+#: include/forms.inc.php:2229
 msgid "Every day(s)"
 msgstr "Hàng ngày(s)"
 
-#: include/forms.inc.php:2237
+#: include/forms.inc.php:2242
 msgid "Every week(s)"
 msgstr "Hàng tuần(s)"
 
@@ -5945,8 +5951,8 @@ msgstr "Biểu thức không thể bị rỗng"
 msgid "Expression constructor"
 msgstr "Người xây dựng biểu thức"
 
-#: include/forms.inc.php:1985 include/forms.inc.php:1990
-#: include/forms.inc.php:1998
+#: include/forms.inc.php:1990 include/forms.inc.php:1995
+#: include/forms.inc.php:2003
 msgid "Expression syntax error."
 msgstr "Biểu thức lỗi cú pháp."
 
@@ -6036,7 +6042,7 @@ msgstr "Screen ưa thích"
 msgid "Feb"
 msgstr "Tháng 2"
 
-#: include/forms.inc.php:2299 include/func.inc.php:117
+#: include/forms.inc.php:2304 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:137
 msgid "February"
 msgstr "Tháng 2"
@@ -6295,7 +6301,7 @@ msgstr "Pháp(fr_FR)"
 msgid "Fri"
 msgstr "Thứ sáu"
 
-#: include/forms.inc.php:2267 include/forms.inc.php:2382
+#: include/forms.inc.php:2272 include/forms.inc.php:2387
 #: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:152
 msgid "Friday"
 msgstr "Thứ sáu"
@@ -6354,7 +6360,7 @@ msgid "GMT%1$s"
 msgstr "GMT%1$s"
 
 #: app/views/administration.mediatype.edit.php:130
-#: app/views/administration.mediatype.list.php:85
+#: app/views/administration.mediatype.list.php:86
 msgid "GSM modem"
 msgstr "Bộ điều giải GSM"
 
@@ -6948,7 +6954,7 @@ msgstr "Sắp xếp theo chiều ngang"
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
 #: app/views/popup.generic.php:137 app/views/search.php:26 httpconf.php:191
 #: httpconf.php:492 include/actions.inc.php:50 include/audit.inc.php:27
-#: include/blocks.inc.php:554 include/classes/screens/CScreenEvents.php:32
+#: include/blocks.inc.php:556 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
@@ -7056,7 +7062,7 @@ msgstr[0] "Host được kích hoạtCác host được kích hoạt"
 #: app/views/monitoring.widget.problemhosts.view.php:27
 #: app/views/monitoring.widget.web.view.php:26 app/views/search.php:128
 #: include/actions.inc.php:48 include/audit.inc.php:37
-#: include/blocks.inc.php:340 include/maps.inc.php:25
+#: include/blocks.inc.php:342 include/maps.inc.php:25
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:183
 #: include/views/administration.users.edit.php:478
@@ -7329,7 +7335,7 @@ msgstr "Vị trí các host"
 msgid "Hosts updated"
 msgstr "Các host đã cập nhật"
 
-#: include/forms.inc.php:2453
+#: include/forms.inc.php:2458
 msgid "Hours"
 msgstr "Giờ"
 
@@ -8165,7 +8171,7 @@ msgstr "Kiểu giá trị item không chính xác"
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "Kiểu giá trị item \"%1$s\" được cung cấp không chính xác đối với hàm trigger \"%2$s\"."
 
-#: include/forms.inc.php:1649
+#: include/forms.inc.php:1654
 msgid "Incorrect list of items."
 msgstr "Thống kê không chính xác của các item."
 
@@ -8279,9 +8285,9 @@ msgstr "Biểu thức chính quy \"%1$s\" không chính xác: \"%2$s\""
 msgid "Incorrect resource type provided for screen item."
 msgstr "Kiểu tài nguyên không chính xác được cung cấp cho screen item."
 
-#: include/classes/server/CZabbixServer.php:355
-#: include/classes/server/CZabbixServer.php:397
-#: include/classes/server/CZabbixServer.php:404
+#: include/classes/server/CZabbixServer.php:380
+#: include/classes/server/CZabbixServer.php:422
+#: include/classes/server/CZabbixServer.php:429
 #, c-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr "Đáp ứng không chính xác nhận được từ máy chủ Zabbix  \"%1$s\"."
@@ -8736,7 +8742,7 @@ msgstr "Indonesian (id_ID)"
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/monitoring.widget.problems.view.php:53
 #: include/actions.inc.php:1910 include/actions.inc.php:1994
-#: include/blocks.inc.php:553 include/classes/screens/CScreenActions.php:132
+#: include/blocks.inc.php:555 include/classes/screens/CScreenActions.php:132
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:911
@@ -9565,7 +9571,7 @@ msgid "Jabber"
 msgstr "Jabber"
 
 #: app/views/administration.mediatype.edit.php:154
-#: app/views/administration.mediatype.list.php:89
+#: app/views/administration.mediatype.list.php:90
 msgid "Jabber identifier"
 msgstr "Định danh jabber"
 
@@ -9573,7 +9579,7 @@ msgstr "Định danh jabber"
 msgid "Jan"
 msgstr "Tháng 1"
 
-#: include/forms.inc.php:2291 include/func.inc.php:116
+#: include/forms.inc.php:2296 include/func.inc.php:116
 #: include/func.inc.php:253 jsLoader.php:136
 msgid "January"
 msgstr "Tháng 1"
@@ -9591,7 +9597,7 @@ msgstr ""
 msgid "Jul"
 msgstr "Tháng 7"
 
-#: include/forms.inc.php:2294 include/func.inc.php:122
+#: include/forms.inc.php:2299 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:142
 msgid "July"
 msgstr "Tháng 7"
@@ -9600,7 +9606,7 @@ msgstr "Tháng 7"
 msgid "Jun"
 msgstr "Tháng 6"
 
-#: include/forms.inc.php:2331 include/func.inc.php:121
+#: include/forms.inc.php:2336 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:141
 msgid "June"
 msgstr "Tháng 6"
@@ -9809,7 +9815,7 @@ msgstr "Đồ thị tuần cuối cùng"
 msgid "Latest data"
 msgstr "Dữ liệu gần đây nhất"
 
-#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:556
+#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:558
 #: include/classes/screens/CScreenProblem.php:914 jsLoader.php:262
 msgid "Latest values"
 msgstr "Các giá trị gần đây nhất"
@@ -10206,7 +10212,7 @@ msgstr "Bảo trì đã bị xóa"
 msgid "Maintenance period"
 msgstr "Chu kỳ bảo trì"
 
-#: include/forms.inc.php:2447
+#: include/forms.inc.php:2452
 msgid "Maintenance period length"
 msgstr "Độ dài chu kỳ bảo trì"
 
@@ -10353,7 +10359,7 @@ msgstr "Các bản đồ"
 msgid "Mar"
 msgstr "Tháng 3"
 
-#: include/forms.inc.php:2307 include/func.inc.php:118
+#: include/forms.inc.php:2312 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:138
 msgid "March"
 msgstr "Tháng 3"
@@ -10454,7 +10460,7 @@ msgstr[0] "Chu kỳ thời gian tối đa để hiển thị là %1$s ngà
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "Tổng chiều dài tối đa của địa chỉ email vượt quá đối với loại phương tiện có ID \"%1$s\"."
 
-#: include/forms.inc.php:2323 include/func.inc.php:120
+#: include/forms.inc.php:2328 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:140
 msgid "May"
 msgstr "Tháng 5"
@@ -10505,6 +10511,15 @@ msgstr[0] "Loại phương tiện đã được kích hoạtCác loại ph�
 msgid "Media type is missing parameters: %1$s"
 msgstr "Loại phương tiện là thiếu tham số: %1$s"
 
+#: app/controllers/CControllerPopupMediatypeTestSend.php:37
+#: app/controllers/CControllerPopupMediatypeTestSend.php:120
+msgid "Media type test failed."
+msgstr ""
+
+#: app/controllers/CControllerPopupMediatypeTestSend.php:117
+msgid "Media type test successful."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeUpdate.php:169
 msgid "Media type updated"
 msgstr "Loại phương tiện đã được cập nhật"
@@ -10546,8 +10561,9 @@ msgstr "Bộ nhớ đã sử dụng bởi tiến trình theo byte. Trả về ki
 
 #: app/views/monitoring.acknowledge.edit.php:26
 #: app/views/monitoring.widget.actionlog.view.php:33
-#: include/actions.inc.php:1775 include/actions.inc.php:2044
-#: include/actions.inc.php:2148 include/classes/screens/CScreenActions.php:130
+#: app/views/popup.mediatypetest.edit.php:38 include/actions.inc.php:1775
+#: include/actions.inc.php:2044 include/actions.inc.php:2148
+#: include/classes/screens/CScreenActions.php:130
 #: include/views/administration.auditacts.list.php:60
 #: include/views/administration.auditacts.list.php:91
 #: include/views/configuration.action.edit.php:791
@@ -10644,7 +10660,7 @@ msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
 msgstr[0] "Chu kì thời gian tối thiểu hiển thị là %1$s phút."
 
-#: include/forms.inc.php:2455
+#: include/forms.inc.php:2460
 msgid "Minutes"
 msgstr "Phút"
 
@@ -10707,7 +10723,7 @@ msgstr "Mô hình"
 msgid "Mon"
 msgstr "Thứ 2"
 
-#: include/forms.inc.php:2247 include/forms.inc.php:2362
+#: include/forms.inc.php:2252 include/forms.inc.php:2367
 #: include/func.inc.php:135 include/func.inc.php:225 jsLoader.php:148
 msgid "Monday"
 msgstr "Thứ 2"
@@ -10734,11 +10750,11 @@ msgstr "Đang theo dõi"
 msgid "Monospace"
 msgstr "Không gian nhỏ"
 
-#: app/views/report.services.php:67 include/forms.inc.php:2287 report4.php:166
+#: app/views/report.services.php:67 include/forms.inc.php:2292 report4.php:166
 msgid "Month"
 msgstr "Tháng"
 
-#: app/views/report.services.php:36 include/forms.inc.php:2212
+#: app/views/report.services.php:36 include/forms.inc.php:2217
 #: include/maintenances.inc.php:37 report4.php:109
 msgid "Monthly"
 msgstr "Hàng tháng"
@@ -11051,8 +11067,8 @@ msgid "Next step"
 msgstr "Bước tiếp theo"
 
 #: app/views/monitoring.widget.problems.view.php:221
-#: include/actions.inc.php:33 include/blocks.inc.php:441
-#: include/blocks.inc.php:632
+#: include/actions.inc.php:33 include/blocks.inc.php:443
+#: include/blocks.inc.php:634
 #: include/classes/screens/CScreenHostTriggers.php:300
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
@@ -11411,6 +11427,8 @@ msgstr "Không có quyền truy cập hệ thống."
 #: app/controllers/CControllerMenuPopup.php:278
 #: app/controllers/CControllerMenuPopup.php:441
 #: app/controllers/CControllerMenuPopup.php:589
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:56
+#: app/controllers/CControllerPopupMediatypeTestSend.php:65
 #: app/controllers/CControllerPopupScriptExec.php:99
 #: app/controllers/CControllerWidgetClockView.php:80
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
@@ -11740,7 +11758,7 @@ msgstr "Thống báo tất cả các vấn đề"
 msgid "Nov"
 msgstr "Tháng 11"
 
-#: include/forms.inc.php:2326 include/func.inc.php:126
+#: include/forms.inc.php:2331 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:146
 msgid "November"
 msgstr "Tháng 11"
@@ -11754,11 +11772,11 @@ msgstr "Số lượng CPU. Trả về kiểu integer"
 msgid "Number of enabled items on the host."
 msgstr "Số lượng item kích hoạt trên máy chủ."
 
-#: include/blocks.inc.php:445
+#: include/blocks.inc.php:447
 msgid "Number of hosts (enabled/disabled/templates)"
 msgstr "Số lượng máy chủ (Kích hoạt/vô hiệu hóa/mẫu)"
 
-#: include/blocks.inc.php:455
+#: include/blocks.inc.php:457
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Số lượng item (Kích hoạt/vô hiệu hóa/không hỗ trợ)"
 
@@ -11820,7 +11838,7 @@ msgstr "Số trạng thái thay đổi"
 msgid "Number of steps"
 msgstr "Số bước"
 
-#: include/blocks.inc.php:466
+#: include/blocks.inc.php:468
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Số lượng trigger (Kích hoạt/vô hiệu hóa [Problem/ok]"
 
@@ -11836,7 +11854,7 @@ msgstr "Số lượng item không được hỗ trợ trong cơ sở dữ
 msgid "Number of unsupported items on the host."
 msgstr "Số lượng item không được hỗ trợ trên máy chủ."
 
-#: include/blocks.inc.php:478
+#: include/blocks.inc.php:480
 msgid "Number of users (online)"
 msgstr "Số lượng người dùng (trực tuyến)"
 
@@ -11968,7 +11986,7 @@ msgstr "Tháng 10"
 msgid "Octal to decimal"
 msgstr "Bát phân đến thập phân"
 
-#: include/forms.inc.php:2318 include/func.inc.php:125
+#: include/forms.inc.php:2323 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:145
 msgid "October"
 msgstr "Tháng 10"
@@ -12024,7 +12042,7 @@ msgstr "Một"
 msgid "One of the objects is left without a host group."
 msgstr "Một trong các đối tượng rời khỏi một nhóm host."
 
-#: include/forms.inc.php:2209 include/maintenances.inc.php:31
+#: include/forms.inc.php:2214 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "Một lần duy nhất"
 
@@ -12079,7 +12097,7 @@ msgstr "Chỉ quản trị viên mới có thể đặt chủ sở hữu screen.
 msgid "Only administrators can set slide show owner."
 msgstr "Chỉ quản trị viên mới có thể đặt chủ sở hữu slide show."
 
-#: include/blocks.inc.php:456
+#: include/blocks.inc.php:458
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Chỉ các item được gán đến host đã kích hoạt mới được tính"
 
@@ -12134,7 +12152,7 @@ msgstr "Chỉ Siêu Admin mới có thể cập nhật giá trị sơ đồ."
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "Chỉ có 20%% cuối cùng của bộ chỉ thị được hiển thị."
 
-#: include/blocks.inc.php:467
+#: include/blocks.inc.php:469
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Chỉ các trigger được gán đến các host đã kích hoạt và tùy thuộc vào các item đã kích hoạt mới được tính"
 
@@ -12596,7 +12614,7 @@ msgstr "PSK quá ngắn. Tối thiểu là %1$s hex-digits."
 msgid "Page received incorrect data"
 msgstr "Trang nhận được dữ liệu không chính xác"
 
-#: app/views/administration.mediatype.edit.php:104 include/blocks.inc.php:434
+#: app/views/administration.mediatype.edit.php:104 include/blocks.inc.php:436
 msgid "Parameter"
 msgstr "Tham số"
 
@@ -12752,7 +12770,7 @@ msgstr "Thực hiện một truy vấn DNS. Trả về chuỗi ký tự với lo
 msgid "Period"
 msgstr "Chu kỳ"
 
-#: include/forms.inc.php:2207
+#: include/forms.inc.php:2212
 #: include/views/configuration.maintenance.edit.php:77
 #: include/views/configuration.services.edit.php:226
 msgid "Period type"
@@ -13030,7 +13048,7 @@ msgid "Privilege level"
 msgstr "Cấp đặc quyền"
 
 #: app/views/monitoring.problem.view.php:163
-#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:555
+#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:557
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:913
 #: include/classes/screens/CScreenProblem.php:1047
@@ -13374,8 +13392,8 @@ msgstr "Sự phục hồi"
 msgid "Recovery expression"
 msgstr "Biểu thức phục hồi"
 
-#: include/forms.inc.php:2028 include/forms.inc.php:2033
-#: include/forms.inc.php:2041
+#: include/forms.inc.php:2033 include/forms.inc.php:2038
+#: include/forms.inc.php:2046
 msgid "Recovery expression syntax error."
 msgstr "Phục hồi lỗi cú pháp biểu thức."
 
@@ -13489,8 +13507,8 @@ msgstr "Lệnh từ xa"
 #: app/views/popup.triggerwizard.js.php:335
 #: app/views/popup.triggerwizard.php:57 app/views/popup.triggerwizard.php:101
 #: include/classes/widgets/CWidgetHelper.php:408
-#: include/classes/widgets/CWidgetHelper.php:452 include/forms.inc.php:1597
-#: include/forms.inc.php:2481
+#: include/classes/widgets/CWidgetHelper.php:452 include/forms.inc.php:1602
+#: include/forms.inc.php:2486
 #: include/views/administration.general.iconmap.edit.php:84
 #: include/views/administration.general.macros.edit.php:56
 #: include/views/administration.general.regularexpressions.edit.php:77
@@ -13705,7 +13723,7 @@ msgstr "Hiệu năng cần thiết (vps)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Hiệu năng cần thiết của máy chủ Zabbix, trong các giá trị mới được dự tính trên mỗi giây."
 
-#: include/blocks.inc.php:482
+#: include/blocks.inc.php:484
 msgid "Required server performance, new values per second"
 msgstr "Hiệu năng cần thiết của máy chủ, các giá trị mới trên mỗi giây"
 
@@ -14004,17 +14022,17 @@ msgid "SMTP"
 msgstr "SMTP"
 
 #: app/views/administration.mediatype.edit.php:75
-#: app/views/administration.mediatype.list.php:77
+#: app/views/administration.mediatype.list.php:78
 msgid "SMTP email"
 msgstr "SMTP email"
 
 #: app/views/administration.mediatype.edit.php:70
-#: app/views/administration.mediatype.list.php:76
+#: app/views/administration.mediatype.list.php:77
 msgid "SMTP helo"
 msgstr "SMTP hello"
 
 #: app/views/administration.mediatype.edit.php:62
-#: app/views/administration.mediatype.list.php:75
+#: app/views/administration.mediatype.list.php:76
 msgid "SMTP server"
 msgstr "Máy chủ SMTP"
 
@@ -14166,7 +14184,7 @@ msgstr "Sans-Serif"
 msgid "Sat"
 msgstr "Thứ bảy"
 
-#: include/forms.inc.php:2272 include/forms.inc.php:2387
+#: include/forms.inc.php:2277 include/forms.inc.php:2392
 #: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:153
 msgid "Saturday"
 msgstr "Thứ bảy"
@@ -14328,7 +14346,7 @@ msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
 msgstr "Danh sách đường dẫn script \"%1$s\" đã được sử dụng trong tên script \"%2$s\"."
 
 #: app/views/administration.mediatype.edit.php:96
-#: app/views/administration.mediatype.list.php:81
+#: app/views/administration.mediatype.list.php:82
 #: include/views/configuration.action.edit.php:933
 #: include/views/configuration.action.edit.php:1710
 #: include/views/configuration.action.edit.php:2168
@@ -14542,6 +14560,7 @@ msgid "Send only to"
 msgstr "Chỉ gửi đến"
 
 #: app/views/popup.media.php:57 app/views/popup.media.php:64
+#: app/views/popup.mediatypetest.edit.php:24
 #: include/views/administration.users.edit.php:243
 msgid "Send to"
 msgstr "Gửi tới"
@@ -14578,7 +14597,7 @@ msgstr "Sep"
 msgid "Separated"
 msgstr "Bị ngăn cách"
 
-#: include/forms.inc.php:2310 include/func.inc.php:124
+#: include/forms.inc.php:2315 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:144
 msgid "September"
 msgstr "Tháng 9"
@@ -14716,7 +14735,7 @@ msgstr "Kết thúc phiên làm việc, hãy đăng nhập lại."
 msgid "Set custom time period"
 msgstr "Đặt chu kỳ thời gian tùy chỉnh"
 
-#: app/views/popup.preproctestedit.view.js.php:116 include/forms.inc.php:1553
+#: app/views/popup.preproctestedit.view.js.php:116 include/forms.inc.php:1558
 #: include/views/js/item.preprocessing.js.php:39
 msgid "Set error to"
 msgstr ""
@@ -14725,7 +14744,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "Đặt chế độ kiểm kê máy chủ"
 
-#: app/views/popup.preproctestedit.view.js.php:110 include/forms.inc.php:1552
+#: app/views/popup.preproctestedit.view.js.php:110 include/forms.inc.php:1557
 #: include/views/js/item.preprocessing.js.php:38
 msgid "Set value to"
 msgstr ""
@@ -15018,7 +15037,7 @@ msgstr "Site quốc gia / tỉnh"
 msgid "Size"
 msgstr "Kích thước"
 
-#: include/classes/server/CZabbixServer.php:376
+#: include/classes/server/CZabbixServer.php:401
 #, c-format
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "Kích thước của các đáp ứng nhận được từ máy chủ Zabbix \"%1$s\" vượt quá kích thước cho phép của %2$s byte. Giá trị này có thể được tăng lên trong các hằng số ZBX_SOCKET_BYTES_LIMIT trong include/defines.inc.php."
@@ -15360,6 +15379,7 @@ msgstr "Điều hướng phụ"
 msgid "Subfilter"
 msgstr "Bộ lọc con"
 
+#: app/views/popup.mediatypetest.edit.php:32
 #: include/views/administration.auditacts.list.php:86
 #: include/views/configuration.action.edit.php:787
 #: include/views/configuration.action.edit.php:1539
@@ -15397,7 +15417,7 @@ msgstr "Tổng số thống kê lưu lượng đến và đi trên interface. Tr
 msgid "Sun"
 msgstr "Chủ nhật"
 
-#: include/forms.inc.php:2277 include/forms.inc.php:2392
+#: include/forms.inc.php:2282 include/forms.inc.php:2397
 #: include/func.inc.php:142 include/func.inc.php:224 jsLoader.php:154
 msgid "Sunday"
 msgstr "Chủ nhật"
@@ -15559,7 +15579,7 @@ msgid "Tag value"
 msgstr "Thẻ giá trị"
 
 #: app/views/monitoring.problem.view.php:283
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:560
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:562
 #: include/classes/screens/CScreenProblem.php:864
 #: include/classes/screens/CScreenProblem.php:918
 #: include/classes/screens/CScreenProblem.php:1129
@@ -15753,8 +15773,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:147
 #: app/views/administration.authentication.edit.php:150
+#: app/views/administration.mediatype.list.php:134
+#: app/views/popup.mediatypetest.edit.php:61
 #: app/views/popup.preproctestedit.view.php:168
-#: app/views/popup.testtriggerexpr.php:116 include/forms.inc.php:1593
+#: app/views/popup.testtriggerexpr.php:116 include/forms.inc.php:1598
 #: include/views/administration.general.regularexpressions.edit.php:139
 #: include/views/configuration.trigger.prototype.edit.php:239
 #: include/views/configuration.trigger.prototype.edit.php:434
@@ -15764,7 +15786,7 @@ msgstr ""
 msgid "Test"
 msgstr "Kiểm tra"
 
-#: include/forms.inc.php:1623
+#: include/forms.inc.php:1628
 msgid "Test all steps"
 msgstr ""
 
@@ -15788,10 +15810,18 @@ msgstr "Kiểm tra các biểu thức"
 msgid "Test item preprocessing"
 msgstr ""
 
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:75
+msgid "Test media type"
+msgstr ""
+
 #: adm.regexps.php:37
 #: include/views/administration.general.regularexpressions.edit.php:119
 msgid "Test string"
 msgstr "Kiểm tra chuỗi"
+
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:79
+msgid "Test subject"
+msgstr ""
 
 #: include/forms.inc.php:355 include/items.inc.php:133
 #: include/items.inc.php:1705 include/items.inc.php:1709
@@ -15910,6 +15940,10 @@ msgstr "Ngày cuối tuần"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Trường này được tự động gắn vào bởi item \"%s\"."
 
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:80
+msgid "This is the test message from Zabbix"
+msgstr ""
+
 #: include/func.inc.php:2660 srv_status.php:41
 msgid "This month"
 msgstr "Tháng này"
@@ -15954,7 +15988,7 @@ msgstr ""
 msgid "Thu"
 msgstr "Thứ 5"
 
-#: include/forms.inc.php:2262 include/forms.inc.php:2377
+#: include/forms.inc.php:2267 include/forms.inc.php:2382
 #: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:151
 msgid "Thursday"
 msgstr "Thứ năm"
@@ -15974,7 +16008,7 @@ msgstr "Cho tới"
 #: app/views/popup.triggerexpr.php:128 app/views/popup.triggerexpr.php:132
 #: include/actions.inc.php:1775 include/actions.inc.php:1829
 #: include/actions.inc.php:1910 include/actions.inc.php:1994
-#: include/actions.inc.php:2044 include/blocks.inc.php:535
+#: include/actions.inc.php:2044 include/blocks.inc.php:537
 #: include/classes/screens/CScreenActions.php:126
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:841
@@ -16432,7 +16466,7 @@ msgstr "Hãy thử đọc không tiếp cận với thuộc tính \"%s\".
 msgid "Tue"
 msgstr "Thứ ba"
 
-#: include/forms.inc.php:2252 include/forms.inc.php:2367
+#: include/forms.inc.php:2257 include/forms.inc.php:2372
 #: include/func.inc.php:136 include/func.inc.php:226 jsLoader.php:149
 msgid "Tuesday"
 msgstr "Thứ ba"
@@ -16766,42 +16800,32 @@ msgstr "Hủy liên kết từ template"
 msgid "Unlink from templates"
 msgstr "Hủy liên kết từ các template"
 
-#: include/classes/api/services/CHostGeneral.php:626
+#: include/classes/api/services/CHostGeneral.php:622
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Hủy liên kết: Ứng dụng \"%1$s\" trên \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:372
+#: include/classes/api/services/CHostGeneral.php:436
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Hủy liên kết: Quy tắc phát hiện \"%1$s\" trên \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:529
-#, c-format
-msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
-msgstr "Hủy liên kết: Đồ thị \"%1$s\" trên \"%2$s\"."
-
-#: include/classes/api/services/CHostGeneral.php:513
-#, c-format
-msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
-msgstr "Hủy liên kết: kiểu đồ thị \"%1$s\" trên \"%2$s\"."
-
-#: include/classes/api/services/CHostGeneral.php:462
+#: include/classes/api/services/CHostGeneral.php:526
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Hủy liên kết: Kiểu host \"%1$s\" trên \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:388
+#: include/classes/api/services/CHostGeneral.php:452
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Hủy liên kết: Item \"%1$s\" trên \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:407
+#: include/classes/api/services/CHostGeneral.php:471
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Hủy liên kết: Kiểu item \"%1$s\" trên \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:568
+#: include/classes/api/services/CHostGeneral.php:564
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Hủy liên kết: Web scenario \"%1$s\" trên \"%2$s\"."
@@ -17244,7 +17268,7 @@ msgstr "Người dùng/Người nhận"
 
 #: app/views/administration.mediatype.edit.php:95
 #: app/views/administration.mediatype.edit.php:159
-#: app/views/administration.mediatype.list.php:93 disc_prototypes.php:259
+#: app/views/administration.mediatype.list.php:94 disc_prototypes.php:259
 #: host_discovery.php:208 include/views/configuration.host.edit.php:675
 #: include/views/configuration.host.massupdate.php:173
 #: include/views/configuration.host.prototype.edit.php:335
@@ -17473,7 +17497,7 @@ msgstr ""
 #: app/views/monitoring.widget.plaintext.view.php:46
 #: app/views/popup.httpstep.php:109
 #: app/views/popup.preproctestedit.view.php:74
-#: app/views/popup.testtriggerexpr.php:30 include/blocks.inc.php:434
+#: app/views/popup.testtriggerexpr.php:30 include/blocks.inc.php:436
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHistory.php:264
@@ -17773,12 +17797,12 @@ msgstr "Web scenarios"
 msgid "Wed"
 msgstr "Thứ 4"
 
-#: include/forms.inc.php:2257 include/forms.inc.php:2372
+#: include/forms.inc.php:2262 include/forms.inc.php:2377
 #: include/func.inc.php:137 include/func.inc.php:227 jsLoader.php:150
 msgid "Wednesday"
 msgstr "Thứ tư"
 
-#: app/views/report.services.php:35 include/forms.inc.php:2211
+#: app/views/report.services.php:35 include/forms.inc.php:2216
 #: include/maintenances.inc.php:35 report4.php:108
 msgid "Weekly"
 msgstr "Hàng tuần"
@@ -18037,7 +18061,7 @@ msgstr "Y1"
 msgid "Y2"
 msgstr "Y2"
 
-#: include/forms.inc.php:2427
+#: include/forms.inc.php:2432
 #: include/views/configuration.maintenance.edit.php:57
 #: include/views/configuration.maintenance.edit.php:63
 #: include/views/configuration.services.edit.php:246
@@ -18065,8 +18089,8 @@ msgid "Yearly"
 msgstr "Hàng năm"
 
 #: app/views/monitoring.widget.problems.view.php:221
-#: include/actions.inc.php:32 include/blocks.inc.php:441
-#: include/blocks.inc.php:632
+#: include/actions.inc.php:32 include/blocks.inc.php:443
+#: include/blocks.inc.php:634
 #: include/classes/screens/CScreenHostTriggers.php:300
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
@@ -18237,7 +18261,7 @@ msgstr "Mẫu đăng nhập zabbix"
 msgid "Zabbix server"
 msgstr "Máy chủ Zabbix"
 
-#: include/classes/server/CZabbixServer.php:443
+#: include/classes/server/CZabbixServer.php:468
 #, c-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"
@@ -18264,7 +18288,7 @@ msgstr "Chi tiết máy chủ zabbix"
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Máy chủ Zabbix đang không hoạt động: Thông tin được hiển thị có thể không tồn tại."
 
-#: include/blocks.inc.php:440
+#: include/blocks.inc.php:442
 msgid "Zabbix server is running"
 msgstr "Máy chủ Zabbix đang hoạt động"
 
@@ -18382,7 +18406,7 @@ msgstr "agent"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/html/CSeverity.php:49
-#: include/classes/pagefilter/CPageFilter.php:875
+#: include/classes/pagefilter/CPageFilter.php:885
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -18649,7 +18673,7 @@ msgstr "dayofweek () - Ngày trong tuần"
 msgid "days"
 msgstr "Ngày"
 
-#: include/classes/pagefilter/CPageFilter.php:749
+#: include/classes/pagefilter/CPageFilter.php:759
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/widgets/CWidgetHelper.php:53
 #: include/views/js/monitoring.slideconf.edit.js.php:14
@@ -18715,7 +18739,7 @@ msgstr "Không khớp"
 msgid "equals"
 msgstr "bằng"
 
-#: include/views/js/item.preprocessing.js.php:350
+#: include/views/js/item.preprocessing.js.php:355
 msgid "error message"
 msgstr ""
 
@@ -18731,7 +18755,7 @@ msgstr "Biểu thức trống"
 msgid "failed to parse JSON"
 msgstr "thất bại trong việc phân tích JSON"
 
-#: include/forms.inc.php:2353 include/maintenances.inc.php:111
+#: include/forms.inc.php:2358 include/maintenances.inc.php:111
 msgid "first"
 msgstr "đầu tiên"
 
@@ -18744,7 +18768,7 @@ msgstr "tham số đầu tiên được mong đợi"
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr "dự báo () - Dự báo cho t giây tiếp theo dựa trên khoảng thời gian T"
 
-#: include/forms.inc.php:2356 include/maintenances.inc.php:114
+#: include/forms.inc.php:2361 include/maintenances.inc.php:114
 msgid "fourth"
 msgstr "Thứ tư"
 
@@ -18914,7 +18938,7 @@ msgid "key is empty"
 msgstr "Không có key"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1850
-#: include/classes/graphdraw/CPieGraphDraw.php:330 include/forms.inc.php:2357
+#: include/classes/graphdraw/CPieGraphDraw.php:330 include/forms.inc.php:2362
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
 msgid "last"
@@ -19114,8 +19138,8 @@ msgstr "not in"
 
 #: app/controllers/CControllerDashboardView.php:134
 #: hostinventoriesoverview.php:76
-#: include/classes/pagefilter/CPageFilter.php:808
-#: include/classes/pagefilter/CPageFilter.php:875 include/forms.inc.php:1134
+#: include/classes/pagefilter/CPageFilter.php:818
+#: include/classes/pagefilter/CPageFilter.php:885 include/forms.inc.php:1134
 #: include/views/monitoring.screen.php:63 slides.php:187
 msgid "not selected"
 msgstr "Không được chọn"
@@ -19129,7 +19153,7 @@ msgid "number"
 msgstr "số"
 
 #: app/views/monitoring.widget.problemhosts.view.php:116
-#: include/blocks.inc.php:407
+#: include/blocks.inc.php:409
 msgid "of"
 msgstr "of"
 
@@ -19254,7 +19278,7 @@ msgstr "s"
 msgid "script"
 msgstr ""
 
-#: include/forms.inc.php:2354 include/maintenances.inc.php:112
+#: include/forms.inc.php:2359 include/maintenances.inc.php:112
 msgctxt "adjective"
 msgid "second"
 msgstr "giây"
@@ -19330,7 +19354,7 @@ msgstr "thông tin được cung cấp không phải là duy nhất"
 #: app/views/monitoring.problem.view.php:237
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/widgets/CWidgetHelper.php:393
-#: include/classes/widgets/CWidgetHelper.php:440 include/forms.inc.php:2476
+#: include/classes/widgets/CWidgetHelper.php:440 include/forms.inc.php:2481
 #: include/views/administration.usergroups.edit.php:241
 #: include/views/configuration.action.edit.php:364
 #: include/views/configuration.action.edit.php:374
@@ -19378,7 +19402,7 @@ msgstr "Tham số \"%1$s\" bị thiếu"
 msgid "the tag \"%1$s\" is missing"
 msgstr "Thẻ \"%1$s\" bị thiếu"
 
-#: include/forms.inc.php:2355 include/maintenances.inc.php:113
+#: include/forms.inc.php:2360 include/maintenances.inc.php:113
 msgid "third"
 msgstr "Thứ ba"
 
@@ -19494,7 +19518,7 @@ msgstr "Số phiên bản không được hỗ trợ"
 #: include/classes/widgets/CWidgetHelper.php:448
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:174
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:247
-#: include/forms.inc.php:2479
+#: include/forms.inc.php:2484
 #: include/views/administration.general.macros.edit.php:53
 #: include/views/administration.usergroups.edit.php:246
 #: include/views/configuration.action.edit.php:370
@@ -19519,7 +19543,7 @@ msgstr "Số phiên bản không được hỗ trợ"
 #: include/views/js/configuration.template.list.js.php:11
 #: include/views/js/configuration.triggers.list.js.php:11
 #: include/views/js/hostmacros.js.php:11
-#: include/views/js/item.preprocessing.js.php:344
+#: include/views/js/item.preprocessing.js.php:349
 msgid "value"
 msgstr "Giá trị"
 

@@ -163,6 +163,7 @@ $output = [
 	'header' => $data['title'],
 	'script_inline' => require 'app/views/popup.preproctestedit.view.js.php',
 	'body' => (new CDiv([$form, $templates]))->toString(),
+	'cancel_action' => 'return savePreprocessingTestInputs();',
 	'buttons' => [
 		[
 			'title' => _('Test'),
