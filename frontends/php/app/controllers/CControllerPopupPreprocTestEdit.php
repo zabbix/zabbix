@@ -30,7 +30,9 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
 			'test_type' => 'in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
 			'steps' => 'required|array',
-			'delay' => 'string'
+			'delay' => 'string',
+			'data' => 'array',
+			'step_obj' => 'required|int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -61,6 +63,7 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
 		$support_lldmacros = ($this->preproc_item instanceof CItemPrototype);
 		$show_prev = (count(array_intersect($preprocessing_types, self::$preproc_steps_using_prev_value)) > 0);
+		$data = $this->getInput('data', []);
 
 		// Extract macros and get effective values.
 		$usermacros = CMacrosResolverHelper::extractMacrosFromPreprocessingSteps([
@@ -69,8 +72,19 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 			'delay' => $show_prev ? $this->getInput('delay', ZBX_ITEM_DELAY_DEFAULT) : ''
 		], $support_lldmacros);
 
+		// Set resolved macros to previously specified values.
+		if ($usermacros['macros'] && array_key_exists('macros', $data) && is_array($data['macros'])) {
+			foreach (array_keys($usermacros['macros']) as $macro_name) {
+				if (array_key_exists($macro_name, $data['macros']))
+				$usermacros['macros'][$macro_name] = $data['macros'][$macro_name];
+			}
+		}
+
 		// Get previous value time.
-		if ($show_prev) {
+		if ($show_prev && array_key_exists('prev_time', $data)) {
+			$prev_time = $data['prev_time'];
+		}
+		elseif ($show_prev) {
 			$delay = timeUnitToSeconds($usermacros['delay']);
 			$prev_time = ($delay !== null && $delay > 0)
 				? 'now-'.$usermacros['delay']
@@ -94,12 +108,15 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 		$this->setResponse(new CControllerResponseData([
 			'title' => _('Test item preprocessing'),
 			'steps' => $preprocessing_steps,
+			'value' => array_key_exists('value', $data) ? $data['value'] : '',
+			'prev_value' => ($show_prev && array_key_exists('prev_value', $data)) ? $data['prev_value'] : '',
 			'macros' => $usermacros['macros'],
 			'show_prev' => $show_prev,
 			'prev_time' => $prev_time,
 			'hostid' => $this->getInput('hostid'),
 			'value_type' => $this->getInput('value_type'),
 			'test_type' => $this->getInput('test_type'),
+			'step_obj' => $this->getInput('step_obj'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

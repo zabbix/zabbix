@@ -148,20 +148,53 @@ function processItemPreprocessingTestResults(steps) {
 	});
 }
 
+/**
+ * Collect values from opened preprocessing test dialog and save input values for repeated use.
+ */
+function savePreprocessingTestInputs() {
+	var is_prev_enabled = <?= $data['show_prev'] ? 'true' : 'false' ?>,
+		input_values = {
+			value: jQuery('#value').multilineInput('value')
+		},
+		macros = {};
+
+	if (is_prev_enabled) {
+		input_values.prev_value = jQuery('#prev_value').multilineInput('value');
+		input_values.prev_time = jQuery('#prev_time').val();
+	}
+
+	jQuery('[name^=macros]').each(function(i, macro) {
+		var name = macro.name.toString();
+		macros[name.substr(7, name.length - 8)] = macro.value;
+	});
+	input_values.macros = macros;
+
+	jQuery('<?= ($data['step_obj'] == -1)
+		? '.preprocessing-list-foot'
+		: '.preprocessing-list-item[data-step='.$data['step_obj'].']'
+	?>', jQuery('#preprocessing')).data('test-data', input_values);
+}
+
 jQuery(document).ready(function($) {
 	$('#value').multilineInput({
 		placeholder: <?= CJs::encodeJson(_('value')) ?>,
+		value: <?= CJs::encodeJson($data['value']) ?>,
 		monospace_font: false,
 		maxlength: 65535,
 		autofocus: true,
-		readonly: false
+		readonly: false,
+		grow: 'auto',
+		rows: 0
 	});
 
 	$('#prev_value').multilineInput({
 		placeholder: <?= $data['show_prev'] ? CJs::encodeJson(_('value')) : '""' ?>,
+		value: <?= CJs::encodeJson($data['prev_value']) ?>,
 		monospace_font: false,
 		maxlength: 65535,
-		disabled: <?= $data['show_prev'] ? 'false' : 'true' ?>
+		disabled: <?= $data['show_prev'] ? 'false' : 'true' ?>,
+		grow: 'auto',
+		rows: 0
 	});
 });
 

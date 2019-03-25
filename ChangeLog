@@ -1,6 +1,7 @@
 Changes for 4.2.0rc2
 
 New features:
+..F....... [ZBXNEXT-5109] implemented test value saving before test sessions in preprocessing test forms (miks)
 ..F.....S. [ZBXNEXT-1238,ZBXNEXT-4988] added ability to test media types from UI (Ivo, vso)
 ..F....... [ZBXNEXT-5114] improved multiline input control (ashubin)
 ...G...... [ZBXNEXT-5123] added server address and port to the Zabbix sender output (wiper)
