@@ -6,6 +6,7 @@ New features:
 ...G...... [ZBXNEXT-5123] added server address and port to the Zabbix sender output (wiper)
 
 Bug fixes:
+........S. [ZBX-15867] fixed invalid DNS being accepted when receiving discovery contents from Zabbix proxy (vso)
 A......... [ZBX-15821] fixed SQL statement performance used in template.unlink() method (Sasha)
 .......PS. [ZBX-15578] fixed IPMI errors in case of infrequent reading of values (asitals)
 ........S. [ZBX-15862] fixed processing of long (megabytes) preprocessing test results (wiper)
@@ -243,6 +244,7 @@ Changes for 4.0.6rc2
 New features:
 
 Bug fixes:
+........S. [ZBX-15867] fixed invalid DNS being accepted when receiving discovery contents from Zabbix proxy (vso)
 A......... [ZBX-15821] fixed SQL statement performance used in template.unlink() method (Sasha)
 .......PS. [ZBX-15578] fixed IPMI errors in case of infrequent reading of values (asitals)
 ..F....... [ZBX-15098] fixed undefined index in application selection popup window (Ivo)
@@ -2542,6 +2544,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.26rc1
 
 Bug fixes:
+........S. [ZBX-15867] fixed invalid DNS being accepted when receiving discovery contents from Zabbix proxy (vso)
 ...G...PS. [ZBX-15552] fixed compilation with LibreSSL as OpenSSL replacement and OpenSSL without PSK support (Andris)
 ........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
 .......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
