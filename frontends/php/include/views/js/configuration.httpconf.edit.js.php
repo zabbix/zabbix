@@ -16,6 +16,7 @@
 			(new CTextBox('pairs[#{pair.id}][value]', '#{pair.value}'))
 				->setAttribute('data-type', 'value')
 				->setAttribute('placeholder', _('value'))
+				->setAttribute('maxlength', '#{maxlength}')
 				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 			(new CCol(
 				(new CButton('removePair_#{pair.id}', _('Remove')))
@@ -50,7 +51,8 @@
 		function renderPairRow(formid, pair) {
 			var parent,
 				target = jQuery(getDomTargetIdForRowInsert(pair.type), jQuery('#'+formid)),
-				pair_row = jQuery(rowTemplate.evaluate({'pair': pair}));
+				maxLength = pair.type === 'headers' ? 1000 : 255,
+				pair_row = jQuery(rowTemplate.evaluate({pair: pair, maxlength: maxLength}));
 
 			if (!target.parents('.pair-container').hasClass('pair-container-sortable')) {
 				pair_row.find('.<?= ZBX_STYLE_DRAG_ICON ?>').remove();
