@@ -493,11 +493,16 @@ article, main {
         overflow: hidden;
         text-overflow: ellipsis;
         vertical-align: top; }
+        .filter-breadcrumb li > span a:focus {
+          margin-bottom: -2px; }
   .filter-breadcrumb > li {
     padding: 1px 0; }
   .filter-breadcrumb > li:first-child {
     line-height: 22px;
     white-space: nowrap; }
+    .filter-breadcrumb > li:first-child > span a {
+      margin-top: 1px;
+      line-height: 13px; }
   .filter-breadcrumb + .filter-space {
     margin-top: -29px; }
 

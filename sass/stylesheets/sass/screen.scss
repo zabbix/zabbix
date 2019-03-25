@@ -684,6 +684,10 @@ article {
 				overflow: hidden;
 				text-overflow: ellipsis;
 				vertical-align: top;
+
+				&:focus {
+					margin-bottom: -2px;
+				}
 			}
 		}
 	}
@@ -695,6 +699,14 @@ article {
 	> li:first-child {
 		line-height: 22px;
 		white-space: nowrap;
+
+		> span {
+
+			a {
+				margin-top: 1px;
+				line-height: 13px;
+			}
+		}
 	}
 
 	+ .filter-space {

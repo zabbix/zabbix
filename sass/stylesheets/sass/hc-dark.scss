@@ -333,9 +333,12 @@ ul.top-nav-icons {
 }
 
 .filter-breadcrumb {
-	a {
-		&:focus {
-			margin-bottom: -1px;
+
+	li,
+	> li:first-child {
+
+		> span a:focus {
+			margin-bottom: -2px;
 		}
 	}
 }
