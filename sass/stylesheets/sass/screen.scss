@@ -676,6 +676,7 @@ article {
 			display: inline-block;
 			height: 18px;
 			padding: 4px 7px 0;
+			line-height: 14px;
 
 			a {
 				display: inline-block;
@@ -692,6 +693,7 @@ article {
 	}
 
 	> li:first-child {
+		line-height: 22px;
 		white-space: nowrap;
 	}
 

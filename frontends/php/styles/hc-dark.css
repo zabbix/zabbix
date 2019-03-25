@@ -490,7 +490,8 @@ article, main {
     .filter-breadcrumb li > span {
       display: inline-block;
       height: 18px;
-      padding: 4px 7px 0; }
+      padding: 4px 7px 0;
+      line-height: 14px; }
       .filter-breadcrumb li > span a {
         display: inline-block;
         max-width: 200px;
@@ -500,6 +501,7 @@ article, main {
   .filter-breadcrumb > li {
     padding: 1px 0; }
   .filter-breadcrumb > li:first-child {
+    line-height: 22px;
     white-space: nowrap; }
   .filter-breadcrumb + .filter-space {
     margin-top: -29px; }
