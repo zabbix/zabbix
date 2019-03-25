@@ -2607,14 +2607,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				: []
 		]];
 
+		$macros = [];
+		if ($support_lldmacros) {
+			foreach (array_keys($matched_macros['lldmacros']) as $lldmacro) {
+				$macros[$lldmacro] = $lldmacro;
+			}
+		}
+
 		$usermacros = $this->getUserMacros($usermacros)[0]['macros'];
-
-		$macros = $support_lldmacros
-			? $matched_macros['lldmacros']
-			: [];
-
 		foreach ($usermacros as $macro => $value) {
-			$macros[$macro] = ($macro === $value) ? '' : $value;
+			$macros[$macro] = $value;
 		}
 
 		if (array_key_exists($delay_macro, $macros)) {
