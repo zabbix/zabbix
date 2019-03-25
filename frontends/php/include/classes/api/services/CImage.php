@@ -573,9 +573,9 @@ class CImage extends CApiService {
 					}
 				}
 			}
-
-			$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
+
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		return $sqlParts;
 	}
