@@ -2416,7 +2416,7 @@ function hasErrorMesssages() {
  * @param array  $keepids   checked rows ids [id1 => id1, id2 => id2, ...]
  */
 function uncheckTableRows($parentid = null, $keepids = []) {
-	$key = implode('_', array_filter(['cb', basename($_SERVER['SCRIPT_NAME'], '.php'), $parentid], 'strlen'));
+	$key = implode('_', array_filter(['cb', basename($_SERVER['SCRIPT_NAME'], '.php'), $parentid]));
 
 	if ($keepids) {
 		insert_js('sessionStorage.setItem("'.$key.'", JSON.stringify('.CJs::encodeJson($keepids).'))');

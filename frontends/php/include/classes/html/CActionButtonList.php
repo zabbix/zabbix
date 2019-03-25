@@ -64,7 +64,7 @@ class CActionButtonList extends CObject {
 	 */
 	function __construct($actionName, $checkboxesName, array $buttonsData, $name_prefix = null) {
 		$this->checkboxesName = $checkboxesName;
-		$this->name_prefix = $name_prefix;
+		$this->name_prefix = $name_prefix ? $name_prefix : null;
 
 		foreach ($buttonsData as $action => $buttonData) {
 			$this->buttons[$action] = (new CSubmit($actionName, $buttonData['name']))
