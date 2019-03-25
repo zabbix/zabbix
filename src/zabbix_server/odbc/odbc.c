@@ -228,11 +228,6 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dsn:'%s' user:'%s'", __function_name, dsn, user);
 
-	if (NULL != user && '\0' == user[0])
-		user = NULL;
-	if (NULL != pass && '\0' == pass[0])
-		pass = NULL;
-
 	data_source = (zbx_odbc_data_source_t *)zbx_malloc(data_source, sizeof(zbx_odbc_data_source_t));
 
 	if (0 != SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &data_source->henv)))
@@ -250,6 +245,14 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, cons
 
 				if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_DBC, data_source->hdbc, rc, &diag))
 				{
+					/* look for user in data source instead of using no user */
+					if ('\0' == user[0])
+						user = NULL;
+
+					/* look for password in data source instead of using no password */
+					if ('\0' == pass[0])
+						pass = NULL;
+
 					rc = SQLConnect(data_source->hdbc, (SQLCHAR *)dsn, SQL_NTS, (SQLCHAR *)user,
 							SQL_NTS, (SQLCHAR *)pass, SQL_NTS);
 
