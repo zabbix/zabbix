@@ -518,7 +518,8 @@ article, main {
         max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
-        vertical-align: top; }
+        vertical-align: top;
+        margin-bottom: -1px; }
         .filter-breadcrumb li > span a:focus {
           margin-bottom: -2px; }
   .filter-breadcrumb > li {

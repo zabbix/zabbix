@@ -497,7 +497,8 @@ article, main {
         max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
-        vertical-align: top; }
+        vertical-align: top;
+        margin-bottom: -1px; }
         .filter-breadcrumb li > span a:focus {
           margin-bottom: -2px; }
   .filter-breadcrumb > li {
@@ -4703,6 +4704,8 @@ ul.top-nav-icons input {
 .filter-breadcrumb li > span a:focus,
 .filter-breadcrumb > li:first-child > span a:focus {
   margin-bottom: -2px; }
+.filter-breadcrumb > li:first-child > span a:focus {
+  line-height: 12px; }
 
 .add-child-btn {
   background: url(../img/icon-sprite.svg) no-repeat -359px -551px !important; }

@@ -684,6 +684,7 @@ article {
 				overflow: hidden;
 				text-overflow: ellipsis;
 				vertical-align: top;
+				margin-bottom: -1px;
 
 				&:focus {
 					margin-bottom: -2px;

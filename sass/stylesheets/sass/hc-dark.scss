@@ -341,6 +341,13 @@ ul.top-nav-icons {
 			margin-bottom: -2px;
 		}
 	}
+
+	> li:first-child {
+
+		> span a:focus {
+			line-height: 12px;
+		}
+	}
 }
 
 .add-child-btn {
