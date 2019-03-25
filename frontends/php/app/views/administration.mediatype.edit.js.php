@@ -172,10 +172,10 @@
 			var maxsessions_type = $('#maxsessions_type :radio');
 
 			if (media_type == <?= MEDIA_TYPE_SMS ?>) {
-				maxsessions_type.attr('disabled', true).filter('[value=one]').attr('disabled', false);
+				maxsessions_type.prop('disabled', true).filter('[value=one]').prop('disabled', false);
 			}
 			else {
-				maxsessions_type.attr('disabled', false);
+				maxsessions_type.prop('disabled', false);
 			}
 
 			if (old_media_type != media_type) {

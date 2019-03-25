@@ -215,7 +215,7 @@
 						jQuery('#post_fields', $form).toggleClass('disabled',this.checked);
 						jQuery('#required, #posts, #post_fields input[type="text"], #post_fields .btn-link,' +
 								'#post_type input', $form)
-							.attr('disabled', this.checked);
+							.prop('disabled', this.checked);
 
 						if (this.checked === false) {
 							pairManager.refresh();
@@ -475,10 +475,10 @@
 			var httpFieldsDisabled = ($(this).val() == <?= HTTPTEST_AUTH_NONE ?>);
 
 			$('#http_user')
-				.attr('disabled', httpFieldsDisabled)
+				.prop('disabled', httpFieldsDisabled)
 				.closest('li').toggle(!httpFieldsDisabled);
 			$('#http_password')
-				.attr('disabled', httpFieldsDisabled)
+				.prop('disabled', httpFieldsDisabled)
 				.closest('li').toggle(!httpFieldsDisabled);
 		});
 

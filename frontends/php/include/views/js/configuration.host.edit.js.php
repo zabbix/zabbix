@@ -318,8 +318,8 @@
 				jQuery('.interfaceRow').find('input')
 					.removeAttr('id')
 					.removeAttr('name');
-				jQuery('.interfaceRow').find('input[type="text"]').attr('readonly', true);
-				jQuery('.interfaceRow').find('input[type="radio"], input[type="checkbox"]').attr('disabled', true);
+				jQuery('.interfaceRow').find('input[type="text"]').prop('readonly', true);
+				jQuery('.interfaceRow').find('input[type="radio"], input[type="checkbox"]').prop('disabled', true);
 			}
 		}
 	}());

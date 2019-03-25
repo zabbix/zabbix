@@ -602,7 +602,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				$(':radio', '#retrieve_mode')
 					.filter('[value=<?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>]').click()
 					.end()
-					.attr('disabled', 'disabled');
+					.prop('disabled', true);
 			}
 			else {
 				$(':radio', '#retrieve_mode').prop('disabled', false);

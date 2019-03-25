@@ -37,7 +37,7 @@ jQuery(function($) {
 		$search.keyup(function() {
 			$search
 				.siblings('button')
-				.attr('disabled', ($.trim($search.val()) === '') ? true : null);
+				.prop('disabled', ($.trim($search.val()) === ''));
 		}).closest('form').submit(function() {
 			if ($.trim($search.val()) === '') {
 				return false;
@@ -73,7 +73,7 @@ jQuery(function($) {
 	function uncheckedHandler($checkbox) {
 		var $hidden = $checkbox.prev('input[type=hidden][name="' + $checkbox.prop('name') + '"]');
 
-		if ($checkbox.is(':checked') || $checkbox.is(':disabled')) {
+		if ($checkbox.is(':checked') || $checkbox.prop('disabled')) {
 			$hidden.remove();
 		}
 		else if (!$hidden.length) {
