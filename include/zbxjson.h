@@ -114,6 +114,10 @@
 #define ZBX_PROTO_TAG_LINE_RAW		"line_raw"
 #define ZBX_PROTO_TAG_LABELS		"labels"
 #define ZBX_PROTO_TAG_HELP		"help"
+#define ZBX_PROTO_TAG_MEDIATYPEID	"mediatypeid"
+#define ZBX_PROTO_TAG_SENDTO		"sendto"
+#define ZBX_PROTO_TAG_SUBJECT		"subject"
+#define ZBX_PROTO_TAG_MESSAGE		"message"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -141,6 +145,7 @@
 #define ZBX_PROTO_VALUE_ZABBIX_STATS		"zabbix.stats"
 #define ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE	"queue"
 
+#define ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND	"alert.send"
 #define ZBX_PROTO_VALUE_PREPROCESSING_TEST	"preprocessing.test"
 
 typedef enum

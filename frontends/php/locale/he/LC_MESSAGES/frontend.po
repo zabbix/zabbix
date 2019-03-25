@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 16:47+0200\n"
-"PO-Revision-Date: 2018-11-30 14:04+0300\n"
+"POT-Creation-Date: 2019-03-25 10:17+0200\n"
+"PO-Revision-Date: 2019-03-24 15:52+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1543579464.000000\n"
+"X-POOTLE-MTIME: 1553435559.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -29,7 +29,7 @@ msgstr "אמור להיות „%1$s”"
 #: include/classes/api/services/CItemGeneral.php:1422
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "„%1$s” אמור להיות קטן או שווה לערך „%2$s”"
 
 #: include/classes/api/services/CMaintenance.php:353
 #: include/classes/api/services/CMaintenance.php:358
@@ -51,7 +51,7 @@ msgstr "אמור להיות „מארח:מפתח”"
 #: include/views/js/configuration.host.discovery.edit.js.php:52
 #: include/views/js/item.preprocessing.js.php:159
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.נתיב.אל.המפרק"
 
 #: include/classes/api/services/CDRule.php:548
 #, c-format
@@ -193,7 +193,7 @@ msgstr[1] "%1$s שניות"
 #: jsLoader.php:217
 #, c-format
 msgid "%1$s symbols remaining"
-msgstr ""
+msgstr "נותרו %1$s סמלים"
 
 #: app/views/monitoring.widget.problems.view.php:240
 #, c-format
@@ -218,7 +218,7 @@ msgstr "%1$s, קריאה בלבד"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, בבחירה"
 
 #: app/views/layout.htmlpage.php:109 include/page_header.php:279
 #, c-format
@@ -302,21 +302,21 @@ msgstr "500 הערכים האחרונים"
 #: app/views/popup.preproctestedit.view.js.php:124
 #: app/views/popup.preproctestedit.view.js.php:135
 msgid "<empty string>"
-msgstr ""
+msgstr "<מחרוזת ריקה>"
 
-#: include/forms.inc.php:1510 include/views/js/item.preprocessing.js.php:203
+#: include/forms.inc.php:1515 include/views/js/item.preprocessing.js.php:208
 msgid "<label name>"
-msgstr ""
+msgstr "<שם תווית>"
 
 #: include/views/monitoring.sysmap.edit.php:116
 msgid "<manual>"
 msgstr "<ידני>"
 
-#: include/forms.inc.php:1508 include/forms.inc.php:1516
-#: include/views/js/item.preprocessing.js.php:201
-#: include/views/js/item.preprocessing.js.php:210
+#: include/forms.inc.php:1513 include/forms.inc.php:1521
+#: include/views/js/item.preprocessing.js.php:206
+#: include/views/js/item.preprocessing.js.php:215
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr ""
+msgstr "<שם מדד>{<שם תווית>=\"<ערך התווית>\", ...} == <ערך>"
 
 #: app/views/administration.script.edit.php:39
 msgid "<sub-menu/sub-menu/...>script"
@@ -364,7 +364,7 @@ msgstr[1] "החשבון חסום למשך %1$s שניות."
 
 #: app/views/monitoring.widget.problems.view.php:62
 #: include/actions.inc.php:157 include/actions.inc.php:337
-#: include/blocks.inc.php:558
+#: include/blocks.inc.php:560
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:916
@@ -396,6 +396,7 @@ msgid "Acknowledged RESOLVED events"
 msgstr "אירועים מוכרים שנפתרו"
 
 #: app/views/administration.mediatype.edit.php:104
+#: app/views/administration.mediatype.list.php:69
 #: app/views/dashboard.sharing.edit.php:24
 #: app/views/dashboard.sharing.edit.php:45
 #: app/views/monitoring.widget.actionlog.view.php:30
@@ -521,7 +522,7 @@ msgid "Action updated"
 msgstr "המשימה עודכנה"
 
 #: app/views/monitoring.dashboard.view.php:86
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:559
+#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:561
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:894
 #: include/classes/screens/CScreenProblem.php:917
@@ -578,8 +579,8 @@ msgstr "פעיל עד"
 #: app/views/popup.httpstep.php:161 app/views/popup.media.php:48
 #: app/views/popup.media.php:112 app/views/popup.triggerwizard.php:169
 #: app/views/popup.triggerwizard.php:195
-#: include/classes/widgets/CWidgetHelper.php:420 include/forms.inc.php:1617
-#: include/forms.inc.php:2507
+#: include/classes/widgets/CWidgetHelper.php:420 include/forms.inc.php:1622
+#: include/forms.inc.php:2512
 #: include/views/administration.auditlogs.list.php:46
 #: include/views/administration.general.iconmap.edit.php:101
 #: include/views/administration.general.iconmap.edit.php:142
@@ -1090,7 +1091,7 @@ msgstr "בהמשך"
 msgid "Apr"
 msgstr "אפר׳"
 
-#: include/forms.inc.php:2315 include/func.inc.php:119
+#: include/forms.inc.php:2320 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:139
 msgid "April"
 msgstr "אפריל"
@@ -1160,7 +1161,7 @@ msgstr "ב־%1$s:%2$s ב־%3$s %4$s בכל %5$s"
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
 msgstr "בשעה %1$s:%2$s ביום %3$s של כל %4$s"
 
-#: include/forms.inc.php:2433
+#: include/forms.inc.php:2438
 msgid "At (hour:minute)"
 msgstr "בשעה (שעה:דקה)"
 
@@ -1243,7 +1244,7 @@ msgstr "יומן פיקוח"
 msgid "Aug"
 msgstr "אוג׳"
 
-#: include/forms.inc.php:2302 include/func.inc.php:123
+#: include/forms.inc.php:2307 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:143
 msgid "August"
 msgstr "אוגוסט"
@@ -1694,7 +1695,7 @@ msgstr "לא ניתן להוסיף עבודת תחזוקה"
 #: include/classes/api/services/CMap.php:1509
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "לא ניתן להוסיף רכיב מפה למפה „%1$s” עקב הפניה מעגלית."
 
 #: app/controllers/CControllerMediatypeCreate.php:70
 #: app/controllers/CControllerMediatypeCreate.php:160
@@ -1977,15 +1978,15 @@ msgstr "לא ניתן למחוק מארח"
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק את המארח כיוון שעל משימת התחזוקה „%1$s” להכיל מארח אחד ומעלה או קבוצת מארחים אחת ומעלה."
+msgstr[1] "לא ניתן למחוק את המארחים הנבחרים כיוון שעל משימת התחזוקה „%1$s” להכיל מארח אחד ומעלה או קבוצת מארחים אחת ומעלה."
 
 #: include/classes/api/services/CHostGroup.php:1503
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק את קבוצת המארחים כיוון שעל משימת התחזוקה „%1$s” להכיל מארח אחד ומעלה או קבוצת מארחים אחת ומעלה."
+msgstr[1] "לא ניתן למחוק את קבוצות המארחים הנבחרות כיוון שעל משימת התחזוקה „%1$s” להכיל מארח אחד ומעלה או קבוצת מארחים אחת ומעלה."
 
 #: include/classes/api/services/CDiscoveryRule.php:551
 msgid "Cannot delete host prototype."
@@ -2090,11 +2091,11 @@ msgstr "לא ניתן למחוק יישומים בתבנית."
 
 #: include/classes/api/services/CGraphPrototype.php:575
 msgid "Cannot delete templated graph prototype."
-msgstr ""
+msgstr "נא ניתן למחוק אבטיפוס תרשים מתבנית."
 
 #: include/classes/api/services/CGraph.php:559
 msgid "Cannot delete templated graph."
-msgstr ""
+msgstr "לא ניתן למחוק תרשים מתבנית."
 
 #: include/classes/api/services/CHostPrototype.php:1071
 msgid "Cannot delete templated host prototype."
@@ -2102,7 +2103,7 @@ msgstr "לא ניתן למחוק אבטיפוס מארח בתבנית."
 
 #: include/classes/api/services/CItemPrototype.php:891
 msgid "Cannot delete templated item prototype."
-msgstr ""
+msgstr "לא ניתן למחוק אבטיפוס פריט מתבנית."
 
 #: include/classes/api/services/CItem.php:720
 msgid "Cannot delete templated item."
@@ -2120,7 +2121,7 @@ msgstr "לא ניתן למחוק הקפצה בתבנית „%1$s:%2$s”."
 #: include/classes/api/services/CTriggerPrototype.php:541
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr ""
+msgstr "לא ניתן למחוק אבטיפוס של הקפצה מתבנית „%1$s:%2$s”."
 
 #: include/classes/api/services/CHttpTest.php:547
 #, c-format
@@ -2518,7 +2519,7 @@ msgstr "לא ניתן לקרוא JSON:‏ %1$s."
 msgid "Cannot read XML: %1$s."
 msgstr "לא ניתן לקרוא XML:‏ %1$s."
 
-#: include/classes/server/CZabbixServer.php:389
+#: include/classes/server/CZabbixServer.php:414
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "לא ניתן לקרוא את התגובה, יש לבדוק את החיבור לשרת ה־Zabbix‏ „%1$s”."
@@ -2537,7 +2538,7 @@ msgstr "לא ניתן לשמור את כלל הגילוי ללא בדיקות."
 msgid "Cannot save widget \"%1$s\"."
 msgstr "לא ניתן לשמור את הווידג׳ט „%1$s”."
 
-#: include/classes/server/CZabbixServer.php:330
+#: include/classes/server/CZabbixServer.php:355
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "לא ניתן לשלוח פקודה, נא לבדוק את החיבור לשרת ה־Zabbix‏ „%1$s“."
@@ -2616,19 +2617,24 @@ msgstr "לא ניתן להגדיר מזהה משאב עבור פריט מסך."
 msgid "Cannot switch host for interface."
 msgstr "לא ניתן להחליף מארח למנשק."
 
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:71
+#: app/controllers/CControllerPopupMediatypeTestSend.php:71
+msgid "Cannot test disabled media type."
+msgstr "לא ניתן לבדוק סוג מדיה מושבת."
+
 #: users.php:260
 msgid "Cannot unblock users"
 msgstr "לא ניתן לשחרר משתמשים"
 
-#: include/classes/api/services/CHostGeneral.php:559
+#: include/classes/api/services/CHostGeneral.php:555
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "לא ניתן לנתק ולפנות תרחישי רשת."
 
-#: include/classes/api/services/CHostGeneral.php:620
+#: include/classes/api/services/CHostGeneral.php:616
 msgid "Cannot unlink and clear applications."
 msgstr "לא ניתן לנתק ולפנות יישומים."
 
-#: include/classes/api/services/CHostGeneral.php:363
+#: include/classes/api/services/CHostGeneral.php:427
 msgid "Cannot unlink and clear discovery rules"
 msgstr "לא ניתן לנתק ולפנות את כללי הגילוי"
 
@@ -2844,7 +2850,7 @@ msgstr[1] "לא ניתן לעדכן את אבות הטיפוס של הפריט"
 
 #: disc_prototypes.php:1153
 msgid "Cannot update item prototypes"
-msgstr ""
+msgstr "לא ניתן לעדכן אבות טיפוס של פריטים"
 
 #: items.php:1281
 msgid "Cannot update items"
@@ -2915,7 +2921,7 @@ msgstr "לא ניתן לעדכן את היישומים בתבנית."
 
 #: templates.php:398
 msgid "Cannot update templates"
-msgstr ""
+msgstr "לא ניתן לעדכן תבניות"
 
 #: include/classes/api/services/CTemplate.php:791
 #: include/classes/api/services/CTemplate.php:1125
@@ -3070,15 +3076,15 @@ msgstr "בדיקת החלק של הביטוי שמתחיל ב־„%1$s“."
 
 #: include/items.inc.php:1770
 msgid "Check for error in JSON"
-msgstr ""
+msgstr "בדיקת שגיאות ב־JSON"
 
 #: include/items.inc.php:1774
 msgid "Check for error in XML"
-msgstr ""
+msgstr "בדיקת שגיאות ב־XML"
 
 #: include/items.inc.php:1778
 msgid "Check for error using regular expression"
-msgstr ""
+msgstr "בדיקה לאיתור שגיאות בעזרת ביטויים רגולריים"
 
 #: include/views/configuration.host.discovery.edit.php:793
 #: include/views/configuration.host.discovery.list.php:177
@@ -3208,11 +3214,11 @@ msgstr "פינוי בעת ניתוק"
 
 #: jsLoader.php:119
 msgid "Click and drag to desired size."
-msgstr ""
+msgstr "יש לגרור לגודל הרצוי."
 
 #: jsLoader.php:218
 msgid "Click to view or edit"
-msgstr ""
+msgstr "יש ללחוץ כדי לצפות או לערוך"
 
 #: include/classes/widgets/CWidgetConfig.php:34 include/screens.inc.php:28
 msgid "Clock"
@@ -3606,12 +3612,12 @@ msgstr "מחובר"
 msgid "Connection security"
 msgstr "אבטחת חיבור"
 
-#: include/classes/server/CZabbixServer.php:343
+#: include/classes/server/CZabbixServer.php:368
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "תוקף זמן החיבור על סך %1$s שניות חרג בעת החיבור לשרת ה־Zabbix‏ „%2$s”."
 
-#: include/classes/server/CZabbixServer.php:451
+#: include/classes/server/CZabbixServer.php:476
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -3622,7 +3628,7 @@ msgstr ""
 "1. כתובת ה־IP או ה־DNS שגויים בקובץ „zabbix.conf.php”;\n"
 "2. הגדרת שרת DNS שגויה.\n"
 
-#: include/classes/server/CZabbixServer.php:439
+#: include/classes/server/CZabbixServer.php:464
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -3637,7 +3643,7 @@ msgstr ""
 "3. סוכן שרת ה־Zabbix אינו פועל;\n"
 "4. חומת אש חוסמת את חיבורי ה־TCP.\n"
 
-#: include/classes/server/CZabbixServer.php:447
+#: include/classes/server/CZabbixServer.php:472
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -3897,7 +3903,7 @@ msgstr "יצירת לוח מחוונים"
 
 #: jsLoader.php:246
 msgid "Create dependent discovery rule"
-msgstr ""
+msgstr "יצירת כלל גילוי תלוי"
 
 #: jsLoader.php:245
 msgid "Create dependent item"
@@ -4114,9 +4120,9 @@ msgid "Custom multiplier"
 msgstr "מכפיל מותאם אישית"
 
 #: app/views/popup.preproctestedit.view.js.php:143 include/forms.inc.php:1402
-#: include/forms.inc.php:1572 include/views/js/item.preprocessing.js.php:35
+#: include/forms.inc.php:1577 include/views/js/item.preprocessing.js.php:35
 msgid "Custom on fail"
-msgstr ""
+msgstr "התאמה אישית עם כשל"
 
 #: screens.php:28
 msgid "Custom screens"
@@ -4130,7 +4136,7 @@ msgstr "סקריפט מותאם אישית"
 
 #: include/items.inc.php:1753
 msgid "Custom scripts"
-msgstr ""
+msgstr "סקריפטים בהתאמה אישית"
 
 #: include/views/administration.general.triggerSeverity.edit.php:87
 msgid "Custom severity names affect all locales and require manual translation!"
@@ -4185,7 +4191,7 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "שם DNS"
 
-#: app/views/report.services.php:34 include/forms.inc.php:2210
+#: app/views/report.services.php:34 include/forms.inc.php:2215
 #: include/maintenances.inc.php:33 report4.php:107
 msgid "Daily"
 msgstr "יומי"
@@ -4323,7 +4329,7 @@ msgstr "סוג מסד הנתונים"
 msgid "Database user"
 msgstr "שם המשתמש במסד הנתונים"
 
-#: include/forms.inc.php:2339 include/forms.inc.php:2424 maintenance.php:51
+#: include/forms.inc.php:2344 include/forms.inc.php:2429 maintenance.php:51
 msgid "Date"
 msgstr "תאריך"
 
@@ -4351,16 +4357,16 @@ msgstr "יום"
 msgid "Day before yesterday"
 msgstr "יום שלפני אתמול"
 
-#: include/forms.inc.php:2341 include/forms.inc.php:2402
+#: include/forms.inc.php:2346 include/forms.inc.php:2407
 msgid "Day of month"
 msgstr "יום בחודש"
 
-#: include/forms.inc.php:2243 include/forms.inc.php:2342
-#: include/forms.inc.php:2350
+#: include/forms.inc.php:2248 include/forms.inc.php:2347
+#: include/forms.inc.php:2355
 msgid "Day of week"
 msgstr "יום בשבוע"
 
-#: include/forms.inc.php:2451
+#: include/forms.inc.php:2456
 msgid "Days"
 msgstr "ימים"
 
@@ -4382,7 +4388,7 @@ msgstr "מצב ניפוי השגיאות עודכן"
 msgid "Dec"
 msgstr "דצמ׳"
 
-#: include/forms.inc.php:2334 include/func.inc.php:127
+#: include/forms.inc.php:2339 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:147
 msgid "December"
 msgstr "דצמבר"
@@ -4461,7 +4467,7 @@ msgid "Delayed by"
 msgstr "בהשהיה של"
 
 #: app/views/administration.mediatype.edit.php:243
-#: app/views/administration.mediatype.list.php:153
+#: app/views/administration.mediatype.list.php:162
 #: app/views/administration.proxy.edit.php:135
 #: app/views/administration.proxy.list.php:167
 #: app/views/administration.script.edit.php:129
@@ -4690,7 +4696,7 @@ msgstr "למחוק את המפה הנבחרת?"
 msgid "Delete selected maps?"
 msgstr "למחוק את המפות הנבחרות?"
 
-#: app/views/administration.mediatype.list.php:153
+#: app/views/administration.mediatype.list.php:162
 msgid "Delete selected media types?"
 msgstr "למחוק את סוגי המדיה הנבחרים?"
 
@@ -4868,7 +4874,7 @@ msgstr "תיאור"
 msgid "Description updated"
 msgstr "התיאור עודכן"
 
-#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:434
+#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:436
 #: include/func.inc.php:1850
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:439
@@ -4906,7 +4912,7 @@ msgstr "ממדים (עמודות × שורות)"
 msgid "Directory size (in bytes). Returns integer"
 msgstr "גודל תיקייה (בבתים). מחזירה מספר שלם"
 
-#: app/views/administration.mediatype.list.php:152
+#: app/views/administration.mediatype.list.php:161
 #: include/views/administration.auditlogs.list.php:50
 #: include/views/administration.usergroups.list.php:169
 #: include/views/configuration.action.list.php:134
@@ -4979,7 +4985,7 @@ msgstr "להשבית את המארחים הנבחרים?"
 msgid "Disable selected items?"
 msgstr "להשבית את הפריטים הנבחרים?"
 
-#: app/views/administration.mediatype.list.php:152
+#: app/views/administration.mediatype.list.php:161
 msgid "Disable selected media types?"
 msgstr "להשבית את סוגי המדיה הנבחרים?"
 
@@ -4992,7 +4998,7 @@ msgid "Disable selected web scenarios?"
 msgstr "להשבית את תרחישי הרשת הנבחרים?"
 
 #: app/views/administration.mediatype.list.php:47
-#: app/views/administration.mediatype.list.php:128 auditlogs.php:147
+#: app/views/administration.mediatype.list.php:129 auditlogs.php:147
 #: include/discovery.inc.php:108 include/hosts.inc.php:1299
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:140 include/items.inc.php:143
@@ -5027,16 +5033,16 @@ msgstr "אסון"
 
 #: include/items.inc.php:1782
 msgid "Discard unchanged"
-msgstr ""
+msgstr "התעלמות מכאלו שלא נשמרו"
 
 #: include/items.inc.php:1786
 msgid "Discard unchanged with heartbeat"
-msgstr ""
+msgstr "התעלמות מכאלו שלא נשמרו בהינף יד"
 
-#: app/views/popup.preproctestedit.view.js.php:104 include/forms.inc.php:1551
+#: app/views/popup.preproctestedit.view.js.php:104 include/forms.inc.php:1556
 #: include/views/js/item.preprocessing.js.php:37
 msgid "Discard value"
-msgstr ""
+msgstr "התעלמות מערך"
 
 #: include/discovery.inc.php:138 include/forms.inc.php:698
 #: include/views/configuration.triggers.list.php:143
@@ -5126,7 +5132,7 @@ msgstr "כלל הגילוי „%1$s“ כבר קיים."
 #: include/classes/api/services/CDiscoveryRule.php:1578
 #, c-format
 msgid "Discovery rule \"%1$s\" cannot be copied without its master item."
-msgstr ""
+msgstr "לא ניתן להעתיק את כלל הגילוי „%1$s” ללא פריט ההורה שלו."
 
 #: include/classes/api/services/CDRule.php:835
 #: include/classes/api/services/CDRule.php:852
@@ -5224,7 +5230,7 @@ msgstr "מוצגים %1$s עד %2$s מתוך %3$s פריטים שנמצאו"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:252
 msgid "Displaying options"
-msgstr ""
+msgstr "אפשרויות הצגה"
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -5236,7 +5242,7 @@ msgstr "להחליף את הביטוי המותנה?"
 
 #: include/items.inc.php:1766
 msgid "Does not match regular expression"
-msgstr ""
+msgstr "אינו תואם לביטוי רגולרי"
 
 #: include/graphs.inc.php:61 include/views/js/monitoring.sysmaps.js.php:700
 #: include/views/js/monitoring.sysmaps.js.php:788
@@ -5377,7 +5383,7 @@ msgstr "usrgrpid משוכפל „%1$s” בקבוצות משתמשים עבור 
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "usrgrpid משוכפל „%1$s” בקבוצות משתמשים עבור המסך „%2$s”."
 
-#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:557
+#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:559
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:915
 #: include/classes/screens/CScreenProblem.php:1126 include/events.inc.php:249
@@ -5604,7 +5610,7 @@ msgstr "מזהה מסך ריק עבור תבנית מסך."
 msgid "Empty screen ID."
 msgstr "מזהה מסך ריק."
 
-#: app/views/administration.mediatype.list.php:151
+#: app/views/administration.mediatype.list.php:160
 #: include/views/administration.auditlogs.list.php:49
 #: include/views/administration.usergroups.list.php:168
 #: include/views/configuration.action.list.php:133
@@ -5697,7 +5703,7 @@ msgstr "להפעיל את המארחים הנבחרים?"
 msgid "Enable selected items?"
 msgstr "להפעיל את הפריטים הנבחרים?"
 
-#: app/views/administration.mediatype.list.php:151
+#: app/views/administration.mediatype.list.php:160
 msgid "Enable selected media types?"
 msgstr "להפעיל את סוגי המדיה הנבחרים?"
 
@@ -5719,7 +5725,7 @@ msgstr "הפעלת לכידה"
 
 #: app/views/administration.mediatype.edit.php:178
 #: app/views/administration.mediatype.list.php:46
-#: app/views/administration.mediatype.list.php:124
+#: app/views/administration.mediatype.list.php:125
 #: app/views/popup.media.php:74 app/views/popup.triggerwizard.php:187
 #: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
 #: include/httptest.inc.php:45 include/items.inc.php:140
@@ -5865,11 +5871,11 @@ msgstr[1] "האירועים עודכנו"
 msgid "Events and alerts"
 msgstr "אירועים והתראות"
 
-#: include/forms.inc.php:2224
+#: include/forms.inc.php:2229
 msgid "Every day(s)"
 msgstr "כל יום/ימים"
 
-#: include/forms.inc.php:2237
+#: include/forms.inc.php:2242
 msgid "Every week(s)"
 msgstr "כל שבוע/שבועות"
 
@@ -6002,8 +6008,8 @@ msgstr "הביטוי לא יכול להיות ריק"
 msgid "Expression constructor"
 msgstr "בונה ביטויים"
 
-#: include/forms.inc.php:1985 include/forms.inc.php:1990
-#: include/forms.inc.php:1998
+#: include/forms.inc.php:1990 include/forms.inc.php:1995
+#: include/forms.inc.php:2003
 msgid "Expression syntax error."
 msgstr "שגיאת תחביר בביטוי."
 
@@ -6093,7 +6099,7 @@ msgstr "מסכים מועדפים"
 msgid "Feb"
 msgstr "פבר׳"
 
-#: include/forms.inc.php:2299 include/func.inc.php:117
+#: include/forms.inc.php:2304 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:137
 msgid "February"
 msgstr "פברואר"
@@ -6352,7 +6358,7 @@ msgstr "צרפתית (fr_FR)"
 msgid "Fri"
 msgstr "ו׳"
 
-#: include/forms.inc.php:2267 include/forms.inc.php:2382
+#: include/forms.inc.php:2272 include/forms.inc.php:2387
 #: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:152
 msgid "Friday"
 msgstr "יום שישי"
@@ -6411,7 +6417,7 @@ msgid "GMT%1$s"
 msgstr "GMT%1$s"
 
 #: app/views/administration.mediatype.edit.php:130
-#: app/views/administration.mediatype.list.php:85
+#: app/views/administration.mediatype.list.php:86
 msgid "GSM modem"
 msgstr "מודם GSM"
 
@@ -6811,7 +6817,7 @@ msgstr "H:i:s"
 
 #: app/views/administration.mediatype.edit.php:174
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: include/discovery.inc.php:51
 #: include/views/js/configuration.discovery.edit.js.php:208
@@ -7007,7 +7013,7 @@ msgstr "יישור אופקי"
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
 #: app/views/popup.generic.php:137 app/views/search.php:26 httpconf.php:191
 #: httpconf.php:492 include/actions.inc.php:50 include/audit.inc.php:27
-#: include/blocks.inc.php:554 include/classes/screens/CScreenEvents.php:32
+#: include/blocks.inc.php:556 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
@@ -7118,7 +7124,7 @@ msgstr[1] "מארחים מופעלים"
 #: app/views/monitoring.widget.problemhosts.view.php:27
 #: app/views/monitoring.widget.web.view.php:26 app/views/search.php:128
 #: include/actions.inc.php:48 include/audit.inc.php:37
-#: include/blocks.inc.php:340 include/maps.inc.php:25
+#: include/blocks.inc.php:342 include/maps.inc.php:25
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:183
 #: include/views/administration.users.edit.php:478
@@ -7392,7 +7398,7 @@ msgstr "מיקומי מארחים"
 msgid "Hosts updated"
 msgstr "המארחים עודכנו"
 
-#: include/forms.inc.php:2453
+#: include/forms.inc.php:2458
 msgid "Hours"
 msgstr "שעות"
 
@@ -7661,7 +7667,7 @@ msgstr "בתהליך"
 
 #: include/items.inc.php:1758
 msgid "In range"
-msgstr ""
+msgstr "בטווח"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:107
 msgid "Inaccessible graph"
@@ -7681,7 +7687,7 @@ msgstr "פריט בלתי נגיש"
 
 #: include/classes/screens/CScreenProblem.php:414
 msgid "Inaccessible maintenance"
-msgstr ""
+msgstr "תחזוקה בלתי נגישה"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:103
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:84
@@ -8228,7 +8234,7 @@ msgstr "סוג ערך הפריט שגוי"
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "סופק סוג ערך פריט „%1$s” שגוי עבור פונקציית ההקפצה „%2$s”."
 
-#: include/forms.inc.php:1649
+#: include/forms.inc.php:1654
 msgid "Incorrect list of items."
 msgstr "רשימת פריטים שגויה."
 
@@ -8342,9 +8348,9 @@ msgstr "הביטוי הרגולרי „%1$s” שגוי: „%2$s”"
 msgid "Incorrect resource type provided for screen item."
 msgstr "סופק סוג משאב שגוי עבור פריט במסך."
 
-#: include/classes/server/CZabbixServer.php:355
-#: include/classes/server/CZabbixServer.php:397
-#: include/classes/server/CZabbixServer.php:404
+#: include/classes/server/CZabbixServer.php:380
+#: include/classes/server/CZabbixServer.php:422
+#: include/classes/server/CZabbixServer.php:429
 #, c-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr "התקבלה תגובה שגויה משרת ה־Zabbix‏ „%1$s”."
@@ -8589,7 +8595,7 @@ msgstr "ערך שגוי „%1$s” בשדה „%2$s” עבור סוג המדי�
 #: include/validate.inc.php:358
 #, c-format
 msgid "Incorrect value for \"%1$s\" field."
-msgstr ""
+msgstr "ערך שגוי לשדה „%1$s”."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:95
 #: app/controllers/CControllerPopupHttpStep.php:103
@@ -8799,7 +8805,7 @@ msgstr "אינדונזית (id_ID)"
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/monitoring.widget.problems.view.php:53
 #: include/actions.inc.php:1910 include/actions.inc.php:1994
-#: include/blocks.inc.php:553 include/classes/screens/CScreenActions.php:132
+#: include/blocks.inc.php:555 include/classes/screens/CScreenActions.php:132
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:911
@@ -8831,7 +8837,7 @@ msgstr "מידע על שירות. מחזירה מספר שלם וחיובי עם
 
 #: include/views/configuration.triggers.list.php:136
 msgid "Inherited"
-msgstr ""
+msgstr "בירושה"
 
 #: include/views/hostmacros.php:180
 msgid "Inherited and host macros"
@@ -8843,11 +8849,11 @@ msgstr "מאקרואים שהתקבלו בירושה ושל התבנית"
 
 #: include/views/configuration.tags.tab.php:118
 msgid "Inherited and trigger tags"
-msgstr ""
+msgstr "תגיות שהתקבלו בירושה ושל ההקפצה"
 
 #: include/forms.inc.php:463 include/forms.inc.php:648
 msgid "Inherited items"
-msgstr ""
+msgstr "פריטים שהתקבלו בירושה"
 
 #: app/views/popup.triggerexpr.php:180
 msgid "Insert"
@@ -9340,7 +9346,7 @@ msgstr "הפריט „%1$s” כבר קיים תחת „%2$s”."
 #: include/items.inc.php:540
 #, c-format
 msgid "Item \"%1$s\" cannot be copied without its master item."
-msgstr ""
+msgstr "לא ניתן להעתיק את הפריט „%1$s” ללא פריט ההורה שלו."
 
 #: include/classes/api/services/CItem.php:905
 #, c-format
@@ -9466,7 +9472,7 @@ msgstr "אבות טיפוס פריט נמחקו"
 
 #: disc_prototypes.php:1153
 msgid "Item prototypes updated"
-msgstr ""
+msgstr "אבות הטיפוס של הפריט עודכנו"
 
 #: items.php:934
 msgid "Item updated"
@@ -9625,14 +9631,14 @@ msgstr "גרסת ה־JSON-rpc לא צוינה."
 #: include/items.inc.php:1726
 #: include/views/configuration.host.discovery.edit.php:714
 msgid "JSONPath"
-msgstr ""
+msgstr "JSONPath"
 
 #: app/views/administration.mediatype.edit.php:53 include/media.inc.php:27
 msgid "Jabber"
 msgstr "Jabber"
 
 #: app/views/administration.mediatype.edit.php:154
-#: app/views/administration.mediatype.list.php:89
+#: app/views/administration.mediatype.list.php:90
 msgid "Jabber identifier"
 msgstr "מזהה Jabber"
 
@@ -9640,7 +9646,7 @@ msgstr "מזהה Jabber"
 msgid "Jan"
 msgstr "ינו׳"
 
-#: include/forms.inc.php:2291 include/func.inc.php:116
+#: include/forms.inc.php:2296 include/func.inc.php:116
 #: include/func.inc.php:253 jsLoader.php:136
 msgid "January"
 msgstr "ינואר"
@@ -9652,13 +9658,13 @@ msgstr "יפנית (ja_JP)"
 #: include/forms.inc.php:1498 include/items.inc.php:1754
 #: include/views/js/item.preprocessing.js.php:192
 msgid "JavaScript"
-msgstr ""
+msgstr "JavaScript"
 
 #: include/func.inc.php:242
 msgid "Jul"
 msgstr "יול׳"
 
-#: include/forms.inc.php:2294 include/func.inc.php:122
+#: include/forms.inc.php:2299 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:142
 msgid "July"
 msgstr "יולי"
@@ -9667,7 +9673,7 @@ msgstr "יולי"
 msgid "Jun"
 msgstr "יונ׳"
 
-#: include/forms.inc.php:2331 include/func.inc.php:121
+#: include/forms.inc.php:2336 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:141
 msgid "June"
 msgstr "יוני"
@@ -9742,12 +9748,12 @@ msgstr "הגדרות LDAP"
 
 #: include/views/configuration.host.discovery.edit.php:714
 msgid "LLD macro"
-msgstr ""
+msgstr "מאקרו LLD (גילוי ברמה נמוכה)"
 
 #: include/views/configuration.host.discovery.edit.php:766
 #: include/views/configuration.host.discovery.edit.php:781
 msgid "LLD macros"
-msgstr ""
+msgstr "מאקרואים LLD (גילוי ברמה נמוכה)"
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:1100
@@ -9882,7 +9888,7 @@ msgstr "תרשים השבוע שעבר"
 msgid "Latest data"
 msgstr "נתונים עדכניים"
 
-#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:556
+#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:558
 #: include/classes/screens/CScreenProblem.php:914 jsLoader.php:262
 msgid "Latest values"
 msgstr "ערכים אחרונים"
@@ -10279,7 +10285,7 @@ msgstr "נמחק מצב תחזוקה"
 msgid "Maintenance period"
 msgstr "תקופת תחזוקה"
 
-#: include/forms.inc.php:2447
+#: include/forms.inc.php:2452
 msgid "Maintenance period length"
 msgstr "משך תקופת תחזוקה"
 
@@ -10426,7 +10432,7 @@ msgstr "מפות"
 msgid "Mar"
 msgstr "מרץ"
 
-#: include/forms.inc.php:2307 include/func.inc.php:118
+#: include/forms.inc.php:2312 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:138
 msgid "March"
 msgstr "מרץ"
@@ -10478,7 +10484,7 @@ msgstr "פריט אב"
 
 #: include/items.inc.php:1762
 msgid "Matches regular expression"
-msgstr ""
+msgstr "תואם לביטוי רגולרי"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:140
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:213
@@ -10528,7 +10534,7 @@ msgstr[1] "תקופת הזמן המרבית להצגה היא %1$s ימים."
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "חרגת מהאורך הכללי המרבי המותר לכתובת דוא״ל עבור סוג המדיה עם המזהה „%1$s”."
 
-#: include/forms.inc.php:2323 include/func.inc.php:120
+#: include/forms.inc.php:2328 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:140
 msgid "May"
 msgstr "מאי"
@@ -10582,6 +10588,15 @@ msgstr[1] "סוגי המדיה מופעלים"
 msgid "Media type is missing parameters: %1$s"
 msgstr "בסוג המדיה חסרים פרמטרים: %1$s"
 
+#: app/controllers/CControllerPopupMediatypeTestSend.php:37
+#: app/controllers/CControllerPopupMediatypeTestSend.php:120
+msgid "Media type test failed."
+msgstr "בדיקת סוג מדיה מושבת נכשלה."
+
+#: app/controllers/CControllerPopupMediatypeTestSend.php:117
+msgid "Media type test successful."
+msgstr "בדיקת סוג מדיה מושבת הצליחה."
+
 #: app/controllers/CControllerMediatypeUpdate.php:169
 msgid "Media type updated"
 msgstr "סוג המדיה עודכן"
@@ -10623,8 +10638,9 @@ msgstr "הזיכרון שמנוצל על ידי תהליך בבתים. מחזי�
 
 #: app/views/monitoring.acknowledge.edit.php:26
 #: app/views/monitoring.widget.actionlog.view.php:33
-#: include/actions.inc.php:1775 include/actions.inc.php:2044
-#: include/actions.inc.php:2148 include/classes/screens/CScreenActions.php:130
+#: app/views/popup.mediatypetest.edit.php:38 include/actions.inc.php:1775
+#: include/actions.inc.php:2044 include/actions.inc.php:2148
+#: include/classes/screens/CScreenActions.php:130
 #: include/views/administration.auditacts.list.php:60
 #: include/views/administration.auditacts.list.php:91
 #: include/views/configuration.action.edit.php:791
@@ -10636,7 +10652,7 @@ msgstr "הודעה"
 
 #: app/views/administration.mediatype.edit.php:172
 msgid "Message format"
-msgstr ""
+msgstr "מבנה הודעה"
 
 #: app/views/administration.mediatype.edit.php:168
 msgid "Message text limit"
@@ -10722,7 +10738,7 @@ msgid_plural "Minimum time period to display is %1$s minutes."
 msgstr[0] "הזמן המזערי להצגה הוא דקה %1$s."
 msgstr[1] "הזמן המזערי להצגה הוא %1$s דקות."
 
-#: include/forms.inc.php:2455
+#: include/forms.inc.php:2460
 msgid "Minutes"
 msgstr "דקות"
 
@@ -10785,7 +10801,7 @@ msgstr "דגם"
 msgid "Mon"
 msgstr "ב׳"
 
-#: include/forms.inc.php:2247 include/forms.inc.php:2362
+#: include/forms.inc.php:2252 include/forms.inc.php:2367
 #: include/func.inc.php:135 include/func.inc.php:225 jsLoader.php:148
 msgid "Monday"
 msgstr "יום שני"
@@ -10812,11 +10828,11 @@ msgstr "מעקב"
 msgid "Monospace"
 msgstr "רוחב אחיד"
 
-#: app/views/report.services.php:67 include/forms.inc.php:2287 report4.php:166
+#: app/views/report.services.php:67 include/forms.inc.php:2292 report4.php:166
 msgid "Month"
 msgstr "חודש"
 
-#: app/views/report.services.php:36 include/forms.inc.php:2212
+#: app/views/report.services.php:36 include/forms.inc.php:2217
 #: include/maintenances.inc.php:37 report4.php:109
 msgid "Monthly"
 msgstr "חודשי"
@@ -11129,8 +11145,8 @@ msgid "Next step"
 msgstr "השלב הבא"
 
 #: app/views/monitoring.widget.problems.view.php:221
-#: include/actions.inc.php:33 include/blocks.inc.php:441
-#: include/blocks.inc.php:632
+#: include/actions.inc.php:33 include/blocks.inc.php:443
+#: include/blocks.inc.php:634
 #: include/classes/screens/CScreenHostTriggers.php:300
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
@@ -11489,6 +11505,8 @@ msgstr "אין הרשאות לגישה למערכת."
 #: app/controllers/CControllerMenuPopup.php:278
 #: app/controllers/CControllerMenuPopup.php:441
 #: app/controllers/CControllerMenuPopup.php:589
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:56
+#: app/controllers/CControllerPopupMediatypeTestSend.php:65
 #: app/controllers/CControllerPopupScriptExec.php:99
 #: app/controllers/CControllerWidgetClockView.php:80
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
@@ -11691,7 +11709,7 @@ msgstr "לא הוגדרו הקפצות."
 
 #: app/views/popup.preproctestedit.view.js.php:130
 msgid "No value"
-msgstr ""
+msgstr "אין ערך"
 
 #: include/classes/validators/CApiInputValidator.php:622
 msgid "Non-boolean flags are deprecated."
@@ -11776,7 +11794,7 @@ msgstr "אין סיווג"
 
 #: include/forms.inc.php:464 include/forms.inc.php:645
 msgid "Not inherited items"
-msgstr ""
+msgstr "פריטים שלא התקבלו בירושה"
 
 #: include/items.inc.php:159 include/items.inc.php:184
 msgid "Not supported"
@@ -11818,7 +11836,7 @@ msgstr "לשלוח התרעות לכל המעורבים"
 msgid "Nov"
 msgstr "נוב׳"
 
-#: include/forms.inc.php:2326 include/func.inc.php:126
+#: include/forms.inc.php:2331 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:146
 msgid "November"
 msgstr "נובמבר"
@@ -11832,11 +11850,11 @@ msgstr "מספר המעבדים. מחזירה מספר שלם וחיובי"
 msgid "Number of enabled items on the host."
 msgstr "מספר הפריטים הפעילים על המארח."
 
-#: include/blocks.inc.php:445
+#: include/blocks.inc.php:447
 msgid "Number of hosts (enabled/disabled/templates)"
 msgstr "מספר מארחים (פעילים/מושבתים/תבניות)"
 
-#: include/blocks.inc.php:455
+#: include/blocks.inc.php:457
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "מספר פריטים (פעילים/מושבתים/לא נתמכים)"
 
@@ -11898,7 +11916,7 @@ msgstr "מספר שינויי המצב"
 msgid "Number of steps"
 msgstr "מספר השלבים"
 
-#: include/blocks.inc.php:466
+#: include/blocks.inc.php:468
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "מספר ההקפצות (פעיל/מנוטרל [תקלה/תקין])"
 
@@ -11914,7 +11932,7 @@ msgstr "מספר הפריטים שאינם נתמכים במסד הנתונים 
 msgid "Number of unsupported items on the host."
 msgstr "מספר הפריטים שאינם נתמכים במארח."
 
-#: include/blocks.inc.php:478
+#: include/blocks.inc.php:480
 msgid "Number of users (online)"
 msgstr "מספר המשתמשים (מקוונים)"
 
@@ -12046,7 +12064,7 @@ msgstr "אוק׳"
 msgid "Octal to decimal"
 msgstr "אוקטלי לעשרוני"
 
-#: include/forms.inc.php:2318 include/func.inc.php:125
+#: include/forms.inc.php:2323 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:145
 msgid "October"
 msgstr "אוקטובר"
@@ -12102,7 +12120,7 @@ msgstr "אחד"
 msgid "One of the objects is left without a host group."
 msgstr "אחד מהפריטים נותר ללא קבוצת מארחים."
 
-#: include/forms.inc.php:2209 include/maintenances.inc.php:31
+#: include/forms.inc.php:2214 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "פעם אחת בלבד"
 
@@ -12157,13 +12175,13 @@ msgstr "רק מנהלים יכולים להגדיר בעלות על מסך."
 msgid "Only administrators can set slide show owner."
 msgstr "רק מנהלים יכולים להגדיר בעלות על מצגת."
 
-#: include/blocks.inc.php:456
+#: include/blocks.inc.php:458
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "רק פריטים שהוקצו למארחים פעילים נספרים"
 
 #: include/classes/api/services/CItemGeneral.php:1499
 msgid "Only one Prometheus step is allowed."
-msgstr ""
+msgstr "מותר רק שלב Prometheus אחד."
 
 #: include/classes/api/services/CItemGeneral.php:1467
 msgid "Only one change step is allowed."
@@ -12176,7 +12194,7 @@ msgstr "רק בדיקה אחת יכולה להיות ייחודית."
 #: include/classes/api/services/CItemGeneral.php:1444
 #: include/classes/api/services/CItemGeneral.php:1489
 msgid "Only one throttling step is allowed."
-msgstr ""
+msgstr "מותר רק צעד האטה אחד."
 
 #: app/views/monitoring.acknowledge.edit.php:49
 msgid "Only selected problem"
@@ -12213,7 +12231,7 @@ msgstr "רק מנהלי על יכולים לעדכן מפות ערכים."
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "רק 20%% האחרונים של המחוון מוצגים."
 
-#: include/blocks.inc.php:467
+#: include/blocks.inc.php:469
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלויות בפריטים פעילים נספרות"
 
@@ -12503,11 +12521,11 @@ msgstr "התמיכה ב־FreeType עבור PHP gd."
 
 #: include/classes/setup/CFrontendSetup.php:478
 msgid "PHP gd GIF image support missing."
-msgstr ""
+msgstr "חסרה תמיכה בתמונות PHP gd GIF"
 
 #: include/classes/setup/CFrontendSetup.php:474
 msgid "PHP gd GIF support"
-msgstr ""
+msgstr "תמיכה ב־PHP gd GIF"
 
 #: include/classes/setup/CFrontendSetup.php:461
 msgid "PHP gd JPEG image support missing."
@@ -12675,7 +12693,7 @@ msgstr "ה־PSK קצר מדי. הכמות המזערית ביותר היא %1$s 
 msgid "Page received incorrect data"
 msgstr "העמוד קיבל נתונים שגויים"
 
-#: app/views/administration.mediatype.edit.php:104 include/blocks.inc.php:434
+#: app/views/administration.mediatype.edit.php:104 include/blocks.inc.php:436
 msgid "Parameter"
 msgstr "פרמטר"
 
@@ -12708,7 +12726,7 @@ msgstr "שירות הורה"
 
 #: include/views/configuration.tags.tab.php:37
 msgid "Parent templates"
-msgstr ""
+msgstr "תבניות הורה"
 
 #: include/views/configuration.trigger.prototype.edit.php:56
 #: include/views/configuration.triggers.edit.php:67
@@ -12831,7 +12849,7 @@ msgstr "ביצוע שאילתת DNS. מחזירה מחרוזת תווים עם �
 msgid "Period"
 msgstr "תקופה"
 
-#: include/forms.inc.php:2207
+#: include/forms.inc.php:2212
 #: include/views/configuration.maintenance.edit.php:77
 #: include/views/configuration.services.edit.php:226
 msgid "Period type"
@@ -13013,7 +13031,7 @@ msgstr "שלבי עיבוד טרומי"
 #: app/controllers/CControllerPopupPreprocTestSend.php:89
 #: app/views/popup.preproctestedit.view.php:92
 msgid "Prev. time"
-msgstr ""
+msgstr "פעם קודמת"
 
 #: include/views/administration.general.iconmap.edit.php:77
 #: include/views/administration.general.iconmap.edit.php:110
@@ -13028,7 +13046,7 @@ msgstr "החודש הקודם"
 
 #: app/views/popup.preproctestedit.view.php:87
 msgid "Previous value"
-msgstr ""
+msgstr "ערך קודם"
 
 #: include/func.inc.php:2653
 msgid "Previous week"
@@ -13109,7 +13127,7 @@ msgid "Privilege level"
 msgstr "רמת ההרשאות"
 
 #: app/views/monitoring.problem.view.php:163
-#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:555
+#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:557
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:913
 #: include/classes/screens/CScreenProblem.php:1047
@@ -13206,15 +13224,15 @@ msgstr "אחוז ניצול המעבד. מחזירה שבר עשרוני"
 
 #: include/items.inc.php:1789 include/items.inc.php:1793
 msgid "Prometheus"
-msgstr ""
+msgstr "Prometheus"
 
 #: include/items.inc.php:1790
 msgid "Prometheus pattern"
-msgstr ""
+msgstr "תבנית Prometheus"
 
 #: include/items.inc.php:1794
 msgid "Prometheus to JSON"
-msgstr ""
+msgstr "Prometheus ל־JSON"
 
 #: include/views/monitoring.screen.list.php:90
 #: include/views/monitoring.slideconf.list.php:74
@@ -13454,8 +13472,8 @@ msgstr "שחזור"
 msgid "Recovery expression"
 msgstr "ביטוי שחזור"
 
-#: include/forms.inc.php:2028 include/forms.inc.php:2033
-#: include/forms.inc.php:2041
+#: include/forms.inc.php:2033 include/forms.inc.php:2038
+#: include/forms.inc.php:2046
 msgid "Recovery expression syntax error."
 msgstr "שגיאה בתחביר ביטוי השחזור."
 
@@ -13547,7 +13565,7 @@ msgstr "פריטים רגילים"
 
 #: jsLoader.php:118
 msgid "Release to create a new widget."
-msgstr ""
+msgstr "יש לשחרר כדי ליצור וידג׳ט חדש."
 
 #: include/views/general.login.php:67
 msgid "Remember me for 30 days"
@@ -13570,8 +13588,8 @@ msgstr "פקודה מרוחקת"
 #: app/views/popup.triggerwizard.js.php:335
 #: app/views/popup.triggerwizard.php:57 app/views/popup.triggerwizard.php:101
 #: include/classes/widgets/CWidgetHelper.php:408
-#: include/classes/widgets/CWidgetHelper.php:452 include/forms.inc.php:1597
-#: include/forms.inc.php:2481
+#: include/classes/widgets/CWidgetHelper.php:452 include/forms.inc.php:1602
+#: include/forms.inc.php:2486
 #: include/views/administration.general.iconmap.edit.php:84
 #: include/views/administration.general.macros.edit.php:56
 #: include/views/administration.general.regularexpressions.edit.php:77
@@ -13786,7 +13804,7 @@ msgstr "ביצועים נדרשים (ערכים לשנייה)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "ביצועים נדרשים משרת ה־Zabbix, בציפייה לערכים חדשים בשנייה."
 
-#: include/blocks.inc.php:482
+#: include/blocks.inc.php:484
 msgid "Required server performance, new values per second"
 msgstr "דרישות שרת נדרשות, ערכים חדשים לשנייה"
 
@@ -13932,7 +13950,7 @@ msgstr "מחזירה תגובת ping מסוג ICMP בשניות. למשל: 0.02"
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:987
 msgid "Returns a JSON object containing Zabbix server or Proxy internal metrics."
-msgstr ""
+msgstr "מחזירה פריט JSON שמכיל מדדים פנימיים של שרת Zabbix או שרת מתווך."
 
 #: include/classes/items/CHelpItems.php:939
 msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
@@ -14085,17 +14103,17 @@ msgid "SMTP"
 msgstr "SMTP"
 
 #: app/views/administration.mediatype.edit.php:75
-#: app/views/administration.mediatype.list.php:77
+#: app/views/administration.mediatype.list.php:78
 msgid "SMTP email"
 msgstr "דוא״ל SMTP"
 
 #: app/views/administration.mediatype.edit.php:70
-#: app/views/administration.mediatype.list.php:76
+#: app/views/administration.mediatype.list.php:77
 msgid "SMTP helo"
 msgstr "פקודת helo ב־SMTP"
 
 #: app/views/administration.mediatype.edit.php:62
-#: app/views/administration.mediatype.list.php:75
+#: app/views/administration.mediatype.list.php:76
 msgid "SMTP server"
 msgstr "שרת SMTP"
 
@@ -14247,7 +14265,7 @@ msgstr "ללא עיטורים"
 msgid "Sat"
 msgstr "ש׳"
 
-#: include/forms.inc.php:2272 include/forms.inc.php:2387
+#: include/forms.inc.php:2277 include/forms.inc.php:2392
 #: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:153
 msgid "Saturday"
 msgstr "שבת"
@@ -14410,7 +14428,7 @@ msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
 msgstr "הנתיב „%1$s” בתפריט הסקריפטים כבר בשימוש לטובת סקריפט בשם „%2$s”."
 
 #: app/views/administration.mediatype.edit.php:96
-#: app/views/administration.mediatype.list.php:81
+#: app/views/administration.mediatype.list.php:82
 #: include/views/configuration.action.edit.php:933
 #: include/views/configuration.action.edit.php:1710
 #: include/views/configuration.action.edit.php:2168
@@ -14624,6 +14642,7 @@ msgid "Send only to"
 msgstr "שליחה רק אל"
 
 #: app/views/popup.media.php:57 app/views/popup.media.php:64
+#: app/views/popup.mediatypetest.edit.php:24
 #: include/views/administration.users.edit.php:243
 msgid "Send to"
 msgstr "שליחה אל"
@@ -14660,7 +14679,7 @@ msgstr "ספט׳"
 msgid "Separated"
 msgstr "מופרד"
 
-#: include/forms.inc.php:2310 include/func.inc.php:124
+#: include/forms.inc.php:2315 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:144
 msgid "September"
 msgstr "ספטמבר"
@@ -14798,19 +14817,19 @@ msgstr "ההפעלה נפסקה, נא להיכנס שוב, בבקשה."
 msgid "Set custom time period"
 msgstr "הגדרת טווח זמן מותאם אישית"
 
-#: app/views/popup.preproctestedit.view.js.php:116 include/forms.inc.php:1553
+#: app/views/popup.preproctestedit.view.js.php:116 include/forms.inc.php:1558
 #: include/views/js/item.preprocessing.js.php:39
 msgid "Set error to"
-msgstr ""
+msgstr "הגדרת השגיאה לכדי"
 
 #: include/actions.inc.php:1135
 msgid "Set host inventory mode"
 msgstr "הגדרת מצב מלאי למארח"
 
-#: app/views/popup.preproctestedit.view.js.php:110 include/forms.inc.php:1552
+#: app/views/popup.preproctestedit.view.js.php:110 include/forms.inc.php:1557
 #: include/views/js/item.preprocessing.js.php:38
 msgid "Set value to"
-msgstr ""
+msgstr "הגדרת הערך לכדי"
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Setting LDAP dereferencing mode failed."
@@ -14935,7 +14954,7 @@ msgstr "הצגת פריטים ללא נתונים"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:95
 #: include/classes/widgets/forms/CWidgetFormProblems.php:178
 msgid "Show latest values"
-msgstr ""
+msgstr "הצגת הערכים העדכניים ביותר"
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:73
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:275
@@ -15100,7 +15119,7 @@ msgstr "מדינה / מחוז של האתר"
 msgid "Size"
 msgstr "גודל"
 
-#: include/classes/server/CZabbixServer.php:376
+#: include/classes/server/CZabbixServer.php:401
 #, c-format
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "גודל התגובה שהתקבל משרת ה־Zabbix‏ „%1$s” חורג מהגודל המותר על סך %2$s בתים. ניתן להגדיל את הערך הזה על ידי שינוי הקבוע ZBX_SOCKET_BYTES_LIMIT בתוך include/defines.inc.php."
@@ -15442,6 +15461,7 @@ msgstr "תת ניווט"
 msgid "Subfilter"
 msgstr "תת־מסנן"
 
+#: app/views/popup.mediatypetest.edit.php:32
 #: include/views/administration.auditacts.list.php:86
 #: include/views/configuration.action.edit.php:787
 #: include/views/configuration.action.edit.php:1539
@@ -15479,7 +15499,7 @@ msgstr "סכום של תעבורת נתונים נכנסת ויוצאת על מ�
 msgid "Sun"
 msgstr "א׳"
 
-#: include/forms.inc.php:2277 include/forms.inc.php:2392
+#: include/forms.inc.php:2282 include/forms.inc.php:2397
 #: include/func.inc.php:142 include/func.inc.php:224 jsLoader.php:154
 msgid "Sunday"
 msgstr "יום ראשון"
@@ -15641,7 +15661,7 @@ msgid "Tag value"
 msgstr "ערך תגית"
 
 #: app/views/monitoring.problem.view.php:283
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:560
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:562
 #: include/classes/screens/CScreenProblem.php:864
 #: include/classes/screens/CScreenProblem.php:918
 #: include/classes/screens/CScreenProblem.php:1129
@@ -15831,12 +15851,14 @@ msgstr "התבניות „%1$s” נותקו מהמארחים „%2$s”."
 
 #: templates.php:392
 msgid "Templates updated"
-msgstr ""
+msgstr "תבניות עודכנו"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:147
 #: app/views/administration.authentication.edit.php:150
+#: app/views/administration.mediatype.list.php:134
+#: app/views/popup.mediatypetest.edit.php:61
 #: app/views/popup.preproctestedit.view.php:168
-#: app/views/popup.testtriggerexpr.php:116 include/forms.inc.php:1593
+#: app/views/popup.testtriggerexpr.php:116 include/forms.inc.php:1598
 #: include/views/administration.general.regularexpressions.edit.php:139
 #: include/views/configuration.trigger.prototype.edit.php:239
 #: include/views/configuration.trigger.prototype.edit.php:434
@@ -15846,9 +15868,9 @@ msgstr ""
 msgid "Test"
 msgstr "בדיקה"
 
-#: include/forms.inc.php:1623
+#: include/forms.inc.php:1628
 msgid "Test all steps"
-msgstr ""
+msgstr "בדיקת כל השלבים"
 
 #: app/views/administration.authentication.edit.php:122
 msgid "Test authentication"
@@ -15868,12 +15890,20 @@ msgstr "ביטויי בדיקה"
 
 #: app/controllers/CControllerPopupPreprocTestEdit.php:95
 msgid "Test item preprocessing"
-msgstr ""
+msgstr "בדיקת עיבוד מאוחר של פריט"
+
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:75
+msgid "Test media type"
+msgstr "בדיקת סוג מדיה"
 
 #: adm.regexps.php:37
 #: include/views/administration.general.regularexpressions.edit.php:119
 msgid "Test string"
 msgstr "מחרוזת בדיקה"
+
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:79
+msgid "Test subject"
+msgstr "הנבדק"
 
 #: include/forms.inc.php:355 include/items.inc.php:133
 #: include/items.inc.php:1705 include/items.inc.php:1709
@@ -15994,6 +16024,10 @@ msgstr "היום הזה בשבוע שעבר"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "שדה זה מתמלא אוטומטית על ידי הפריט „%s”."
 
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:80
+msgid "This is the test message from Zabbix"
+msgstr "זו הודעת הבדיקה מ־Zabbix"
+
 #: include/func.inc.php:2660 srv_status.php:41
 msgid "This month"
 msgstr "החודש"
@@ -16032,13 +16066,13 @@ msgstr "סף"
 
 #: include/items.inc.php:1781 include/items.inc.php:1785
 msgid "Throttling"
-msgstr ""
+msgstr "האטה"
 
 #: include/func.inc.php:216
 msgid "Thu"
 msgstr "ה"
 
-#: include/forms.inc.php:2262 include/forms.inc.php:2377
+#: include/forms.inc.php:2267 include/forms.inc.php:2382
 #: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:151
 msgid "Thursday"
 msgstr "יום חמישי"
@@ -16058,7 +16092,7 @@ msgstr "עד"
 #: app/views/popup.triggerexpr.php:128 app/views/popup.triggerexpr.php:132
 #: include/actions.inc.php:1775 include/actions.inc.php:1829
 #: include/actions.inc.php:1910 include/actions.inc.php:1994
-#: include/actions.inc.php:2044 include/blocks.inc.php:535
+#: include/actions.inc.php:2044 include/blocks.inc.php:537
 #: include/classes/screens/CScreenActions.php:126
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:841
@@ -16467,7 +16501,7 @@ msgstr "מצב ההקפצה הוא „בעיה”"
 
 #: include/views/configuration.tags.tab.php:117
 msgid "Trigger tags"
-msgstr ""
+msgstr "תגיות הקפצה"
 
 #: triggers.php:390 triggers.php:508
 msgid "Trigger updated"
@@ -16520,7 +16554,7 @@ msgstr "התבצע ניסיון לקריאת מאפיין בלתי נגיש „%
 msgid "Tue"
 msgstr "ג׳"
 
-#: include/forms.inc.php:2252 include/forms.inc.php:2367
+#: include/forms.inc.php:2257 include/forms.inc.php:2372
 #: include/func.inc.php:136 include/func.inc.php:226 jsLoader.php:149
 msgid "Tuesday"
 msgstr "יום שלישי"
@@ -16854,42 +16888,32 @@ msgstr "הפרדה מתבנית"
 msgid "Unlink from templates"
 msgstr "הפרדה מתבניות"
 
-#: include/classes/api/services/CHostGeneral.php:626
+#: include/classes/api/services/CHostGeneral.php:622
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "מופרד: יישום „%1$s” על „%2$s”."
 
-#: include/classes/api/services/CHostGeneral.php:372
+#: include/classes/api/services/CHostGeneral.php:436
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "נותק: כלל הגילוי „%1$s“ על „%2$s“."
 
-#: include/classes/api/services/CHostGeneral.php:529
-#, c-format
-msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
-msgstr "מופרד: תרשים „%1$s” על „%2$s”."
-
-#: include/classes/api/services/CHostGeneral.php:513
-#, c-format
-msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
-msgstr "מופרד: אבטיפוס תרשים „%1$s” על „%2$s”."
-
-#: include/classes/api/services/CHostGeneral.php:462
+#: include/classes/api/services/CHostGeneral.php:526
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "מופרד: אבטיפוס מארח „%1$s” על „%2$s”."
 
-#: include/classes/api/services/CHostGeneral.php:388
+#: include/classes/api/services/CHostGeneral.php:452
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "מופרד: פריט „%1$s” על „%2$s”."
 
-#: include/classes/api/services/CHostGeneral.php:407
+#: include/classes/api/services/CHostGeneral.php:471
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "מופרד: אבטיפוס פריט „%1$s” על „%2$s”."
 
-#: include/classes/api/services/CHostGeneral.php:568
+#: include/classes/api/services/CHostGeneral.php:564
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "מופרד: תרחיש רשת „%1$s” על „%2$s”."
@@ -17334,7 +17358,7 @@ msgstr "משתמש/נמען"
 
 #: app/views/administration.mediatype.edit.php:95
 #: app/views/administration.mediatype.edit.php:159
-#: app/views/administration.mediatype.list.php:93 disc_prototypes.php:259
+#: app/views/administration.mediatype.list.php:94 disc_prototypes.php:259
 #: host_discovery.php:208 include/views/configuration.host.edit.php:675
 #: include/views/configuration.host.massupdate.php:173
 #: include/views/configuration.host.prototype.edit.php:335
@@ -17376,7 +17400,7 @@ msgstr "סטטיסטיקת נפח אחסון הנתונים של VMWare בבתי
 
 #: include/classes/items/CHelpItems.php:691
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
-msgstr ""
+msgstr "יומן אירועים של VMware,‏ <url> - כתובת שירות VMware,‏ <mode>‏ - all (הכול - בררת מחדל), skip - לדלג על נתונים ישנים"
 
 #: include/classes/items/CHelpItems.php:747
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -17558,12 +17582,12 @@ msgstr "זמן הפעילות של מכונה וירטואלית של VMware,‏
 #: include/items.inc.php:1765 include/items.inc.php:1769
 #: include/items.inc.php:1773 include/items.inc.php:1777
 msgid "Validation"
-msgstr ""
+msgstr "אימות"
 
 #: app/views/monitoring.widget.plaintext.view.php:46
 #: app/views/popup.httpstep.php:109
 #: app/views/popup.preproctestedit.view.php:74
-#: app/views/popup.testtriggerexpr.php:30 include/blocks.inc.php:434
+#: app/views/popup.testtriggerexpr.php:30 include/blocks.inc.php:436
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHistory.php:264
@@ -17866,12 +17890,12 @@ msgstr "תרחישי רשת"
 msgid "Wed"
 msgstr "ד׳"
 
-#: include/forms.inc.php:2257 include/forms.inc.php:2372
+#: include/forms.inc.php:2262 include/forms.inc.php:2377
 #: include/func.inc.php:137 include/func.inc.php:227 jsLoader.php:150
 msgid "Wednesday"
 msgstr "יום רביעי"
 
-#: app/views/report.services.php:35 include/forms.inc.php:2211
+#: app/views/report.services.php:35 include/forms.inc.php:2216
 #: include/maintenances.inc.php:35 report4.php:108
 msgid "Weekly"
 msgstr "שבועי"
@@ -17921,7 +17945,7 @@ msgstr "עם איסוף נתונים"
 
 #: include/views/configuration.triggers.list.php:150
 msgid "With dependencies"
-msgstr ""
+msgstr "עם תלויות"
 
 #: include/views/common.filter.trigger.php:48
 msgid "With last event unacknowledged"
@@ -18074,7 +18098,7 @@ msgstr "ה־XML ריק"
 
 #: include/forms.inc.php:1462 include/views/js/item.preprocessing.js.php:152
 msgid "XPath"
-msgstr ""
+msgstr "XPath"
 
 #: include/views/js/monitoring.sysmaps.js.php:247
 #: include/views/js/monitoring.sysmaps.js.php:383
@@ -18088,7 +18112,7 @@ msgstr "ערך מרבי של ציר ה־Y"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:515
 msgid "Y axis MAX value must be greater than Y axis MIN value"
-msgstr ""
+msgstr "הערך המרבי של ציר ה־Y חייב להיות גדול מהערך המזערי של ציר ה־Y"
 
 #: include/classes/api/services/CGraphGeneral.php:314
 #: include/classes/graphdraw/CLineGraphDraw.php:709
@@ -18130,7 +18154,7 @@ msgstr "Y1"
 msgid "Y2"
 msgstr "Y2"
 
-#: include/forms.inc.php:2427
+#: include/forms.inc.php:2432
 #: include/views/configuration.maintenance.edit.php:57
 #: include/views/configuration.maintenance.edit.php:63
 #: include/views/configuration.services.edit.php:246
@@ -18158,8 +18182,8 @@ msgid "Yearly"
 msgstr "שנתי"
 
 #: app/views/monitoring.widget.problems.view.php:221
-#: include/actions.inc.php:32 include/blocks.inc.php:441
-#: include/blocks.inc.php:632
+#: include/actions.inc.php:32 include/blocks.inc.php:443
+#: include/blocks.inc.php:634
 #: include/classes/screens/CScreenHostTriggers.php:300
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
@@ -18330,7 +18354,7 @@ msgstr "טופס כניסה ל־Zabbix"
 msgid "Zabbix server"
 msgstr "שרת Zabbix"
 
-#: include/classes/server/CZabbixServer.php:443
+#: include/classes/server/CZabbixServer.php:468
 #, c-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"
@@ -18357,7 +18381,7 @@ msgstr "פרטי שרת ה־Zabbix"
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "שרת ה־Zabbix אינו פעיל: יכול להיות שהמידע המוצג אינו עדכני."
 
-#: include/blocks.inc.php:440
+#: include/blocks.inc.php:442
 msgid "Zabbix server is running"
 msgstr "שרת ה־Zabbix פעיל"
 
@@ -18411,7 +18435,7 @@ msgstr "אמור להיות קוד צבע הקסדצימלי (6 תווים)"
 
 #: include/classes/validators/CApiInputValidator.php:1059
 msgid "a low-level discovery macro is expected"
-msgstr ""
+msgstr "אמור להיות מאקרו לגילוי ברמה נמוכה"
 
 #: include/classes/validators/CApiInputValidator.php:421
 #: include/classes/validators/CApiInputValidator.php:558
@@ -18475,7 +18499,7 @@ msgstr "סוכן"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/html/CSeverity.php:49
-#: include/classes/pagefilter/CPageFilter.php:875
+#: include/classes/pagefilter/CPageFilter.php:885
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -18678,7 +18702,7 @@ msgstr "בקשת ה־Scroll API אינה תקינה, יכול להיות שהנ�
 
 #: include/classes/api/services/CDiscoveryRule.php:1403
 msgid "cannot update property for templated discovery rule"
-msgstr ""
+msgstr "לא ניתן לעדכן מאפיין של כלל גילוי מתבנית"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:260
 msgid "change() - Difference between last and previous value"
@@ -18742,7 +18766,7 @@ msgstr "dayofweek()‎ - יום בשבוע"
 msgid "days"
 msgstr "ימים"
 
-#: include/classes/pagefilter/CPageFilter.php:749
+#: include/classes/pagefilter/CPageFilter.php:759
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/widgets/CWidgetHelper.php:53
 #: include/views/js/monitoring.slideconf.edit.js.php:14
@@ -18808,9 +18832,9 @@ msgstr "לא תואם"
 msgid "equals"
 msgstr "שווה"
 
-#: include/views/js/item.preprocessing.js.php:350
+#: include/views/js/item.preprocessing.js.php:355
 msgid "error message"
-msgstr ""
+msgstr "הודעת שגיאה"
 
 #: include/classes/api/services/CAction.php:1618
 msgid "esc_step_from and esc_step_to must be set together."
@@ -18824,7 +18848,7 @@ msgstr "הביטוי ריק"
 msgid "failed to parse JSON"
 msgstr "פענוח ה־JSON נכשל"
 
-#: include/forms.inc.php:2353 include/maintenances.inc.php:111
+#: include/forms.inc.php:2358 include/maintenances.inc.php:111
 msgid "first"
 msgstr "ראשון"
 
@@ -18837,13 +18861,13 @@ msgstr "אמור להיות הפרמטר הראשון"
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr "forecast()‎ - תחזית למשך t השניות הבאות לפי נתונים במשך T"
 
-#: include/forms.inc.php:2356 include/maintenances.inc.php:114
+#: include/forms.inc.php:2361 include/maintenances.inc.php:114
 msgid "fourth"
 msgstr "רביעי"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:338
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
-msgstr ""
+msgstr "fuzzytime()‎ - ההפרש בין ערך פריט (בתור חותמת זמן) וחותמת הזמן של שרת ה־Zabbix קטנה או שווה ל־T שניות (1 - אמת, 0 - שקר)"
 
 #: include/views/configuration.item.edit.php:760
 #: include/views/configuration.item.edit.php:765
@@ -18928,12 +18952,12 @@ msgstr "פנימי"
 
 #: include/classes/api/services/CItemGeneral.php:1533
 msgid "invalid Prometheus output"
-msgstr ""
+msgstr "פלט Prometheus שגוי"
 
 #: include/classes/api/services/CItemGeneral.php:1526
 #: include/classes/api/services/CItemGeneral.php:1541
 msgid "invalid Prometheus pattern"
-msgstr ""
+msgstr "תבנית Prometheus שגויה"
 
 #: include/classes/parsers/CIPRangeParser.php:135
 #, c-format
@@ -19007,7 +19031,7 @@ msgid "key is empty"
 msgstr "המפתח ריק"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1850
-#: include/classes/graphdraw/CPieGraphDraw.php:330 include/forms.inc.php:2357
+#: include/classes/graphdraw/CPieGraphDraw.php:330 include/forms.inc.php:2362
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
 msgid "last"
@@ -19207,8 +19231,8 @@ msgstr "לא בין"
 
 #: app/controllers/CControllerDashboardView.php:134
 #: hostinventoriesoverview.php:76
-#: include/classes/pagefilter/CPageFilter.php:808
-#: include/classes/pagefilter/CPageFilter.php:875 include/forms.inc.php:1134
+#: include/classes/pagefilter/CPageFilter.php:818
+#: include/classes/pagefilter/CPageFilter.php:885 include/forms.inc.php:1134
 #: include/views/monitoring.screen.php:63 slides.php:187
 msgid "not selected"
 msgstr "לא נבחר"
@@ -19222,7 +19246,7 @@ msgid "number"
 msgstr "מספר"
 
 #: app/views/monitoring.widget.problemhosts.view.php:116
-#: include/blocks.inc.php:407
+#: include/blocks.inc.php:409
 msgid "of"
 msgstr "מתוך"
 
@@ -19345,9 +19369,9 @@ msgstr "שנ׳"
 
 #: include/forms.inc.php:1499 include/views/js/item.preprocessing.js.php:193
 msgid "script"
-msgstr ""
+msgstr "סקריפט"
 
-#: include/forms.inc.php:2354 include/maintenances.inc.php:112
+#: include/forms.inc.php:2359 include/maintenances.inc.php:112
 msgctxt "adjective"
 msgid "second"
 msgstr "שני"
@@ -19358,7 +19382,7 @@ msgstr "אמור להיות פרמטר שני"
 
 #: include/forms.inc.php:1492 include/views/js/item.preprocessing.js.php:187
 msgid "seconds"
-msgstr ""
+msgstr "שניות"
 
 #: include/classes/html/CActionButtonList.php:89
 msgid "selected"
@@ -19423,7 +19447,7 @@ msgstr "פרטי הגישה שסופקו אינם יחודיים"
 #: app/views/monitoring.problem.view.php:237
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/widgets/CWidgetHelper.php:393
-#: include/classes/widgets/CWidgetHelper.php:440 include/forms.inc.php:2476
+#: include/classes/widgets/CWidgetHelper.php:440 include/forms.inc.php:2481
 #: include/views/administration.usergroups.edit.php:241
 #: include/views/configuration.action.edit.php:364
 #: include/views/configuration.action.edit.php:374
@@ -19471,7 +19495,7 @@ msgstr "הפרמטר „%1$s” חסר"
 msgid "the tag \"%1$s\" is missing"
 msgstr "התגית „%1$s” חסרה"
 
-#: include/forms.inc.php:2355 include/maintenances.inc.php:113
+#: include/forms.inc.php:2360 include/maintenances.inc.php:113
 msgid "third"
 msgstr "שלישי"
 
@@ -19492,7 +19516,7 @@ msgstr "timeleft()‎ - זמן להגיע לסף המוערך בהתאם למש�
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:504
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:508
 msgid "too many decimal places"
-msgstr ""
+msgstr "יותר מדי מקומות עשרוניים"
 
 #: include/classes/api/services/CMap.php:849
 #: include/classes/api/services/CMap.php:1313 include/events.inc.php:34
@@ -19587,7 +19611,7 @@ msgstr "מספר הגרסה אינו נתמך"
 #: include/classes/widgets/CWidgetHelper.php:448
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:174
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:247
-#: include/forms.inc.php:2479
+#: include/forms.inc.php:2484
 #: include/views/administration.general.macros.edit.php:53
 #: include/views/administration.usergroups.edit.php:246
 #: include/views/configuration.action.edit.php:370
@@ -19612,14 +19636,14 @@ msgstr "מספר הגרסה אינו נתמך"
 #: include/views/js/configuration.template.list.js.php:11
 #: include/views/js/configuration.triggers.list.js.php:11
 #: include/views/js/hostmacros.js.php:11
-#: include/views/js/item.preprocessing.js.php:344
+#: include/views/js/item.preprocessing.js.php:349
 msgid "value"
 msgstr "ערך"
 
 #: include/classes/api/services/CDiscoveryRule.php:1317
 #, c-format
 msgid "value \"%1$s\" already exists"
-msgstr ""
+msgstr "הערך „%1$s” כבר קיים"
 
 #: include/classes/import/CConfigurationImport.php:808
 #: include/classes/import/CConfigurationImport.php:846

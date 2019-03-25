@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 16:47+0200\n"
+"POT-Creation-Date: 2019-03-25 10:17+0200\n"
 "PO-Revision-Date: 2019-02-03 00:51+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -320,7 +320,7 @@ msgstr "500 последних значений"
 msgid "<empty string>"
 msgstr ""
 
-#: include/forms.inc.php:1510 include/views/js/item.preprocessing.js.php:203
+#: include/forms.inc.php:1515 include/views/js/item.preprocessing.js.php:208
 msgid "<label name>"
 msgstr ""
 
@@ -328,9 +328,9 @@ msgstr ""
 msgid "<manual>"
 msgstr "<вручную>"
 
-#: include/forms.inc.php:1508 include/forms.inc.php:1516
-#: include/views/js/item.preprocessing.js.php:201
-#: include/views/js/item.preprocessing.js.php:210
+#: include/forms.inc.php:1513 include/forms.inc.php:1521
+#: include/views/js/item.preprocessing.js.php:206
+#: include/views/js/item.preprocessing.js.php:215
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
 msgstr ""
 
@@ -381,7 +381,7 @@ msgstr[2] "Аккаунт заблокирован на %1$s секунд."
 
 #: app/views/monitoring.widget.problems.view.php:62
 #: include/actions.inc.php:157 include/actions.inc.php:337
-#: include/blocks.inc.php:558
+#: include/blocks.inc.php:560
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:916
@@ -413,6 +413,7 @@ msgid "Acknowledged RESOLVED events"
 msgstr "Подтвержденные РЕШЁННЫЕ события"
 
 #: app/views/administration.mediatype.edit.php:104
+#: app/views/administration.mediatype.list.php:69
 #: app/views/dashboard.sharing.edit.php:24
 #: app/views/dashboard.sharing.edit.php:45
 #: app/views/monitoring.widget.actionlog.view.php:30
@@ -540,7 +541,7 @@ msgid "Action updated"
 msgstr "Действие обновлено"
 
 #: app/views/monitoring.dashboard.view.php:86
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:559
+#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:561
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:894
 #: include/classes/screens/CScreenProblem.php:917
@@ -597,8 +598,8 @@ msgstr "Активно до"
 #: app/views/popup.httpstep.php:161 app/views/popup.media.php:48
 #: app/views/popup.media.php:112 app/views/popup.triggerwizard.php:169
 #: app/views/popup.triggerwizard.php:195
-#: include/classes/widgets/CWidgetHelper.php:420 include/forms.inc.php:1617
-#: include/forms.inc.php:2507
+#: include/classes/widgets/CWidgetHelper.php:420 include/forms.inc.php:1622
+#: include/forms.inc.php:2512
 #: include/views/administration.auditlogs.list.php:46
 #: include/views/administration.general.iconmap.edit.php:101
 #: include/views/administration.general.iconmap.edit.php:142
@@ -1110,7 +1111,7 @@ msgstr "Близится"
 msgid "Apr"
 msgstr "Апр."
 
-#: include/forms.inc.php:2315 include/func.inc.php:119
+#: include/forms.inc.php:2320 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:139
 msgid "April"
 msgstr "Апрель"
@@ -1182,7 +1183,7 @@ msgstr "В %1$s:%2$s %3$s %4$s каждый %5$s"
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
 msgstr "В %1$s:%2$s на %3$s день каждый %4$s"
 
-#: include/forms.inc.php:2433
+#: include/forms.inc.php:2438
 msgid "At (hour:minute)"
 msgstr "В (час:минута)"
 
@@ -1265,7 +1266,7 @@ msgstr "Журнал аудита"
 msgid "Aug"
 msgstr "Авг"
 
-#: include/forms.inc.php:2302 include/func.inc.php:123
+#: include/forms.inc.php:2307 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:143
 msgid "August"
 msgstr "Август"
@@ -2573,7 +2574,7 @@ msgstr "Не удалось прочитать JSON: %1$s."
 msgid "Cannot read XML: %1$s."
 msgstr "Не удалось прочитать XML: %1$s."
 
-#: include/classes/server/CZabbixServer.php:389
+#: include/classes/server/CZabbixServer.php:414
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Не удалось прочитать ответ, проверьте соединение с Zabbix сервером \"%1$s\"."
@@ -2592,7 +2593,7 @@ msgstr "Невозможно сохранить правило обнаруже�
 msgid "Cannot save widget \"%1$s\"."
 msgstr "Не удалось сохранить виджет \"%1$s\"."
 
-#: include/classes/server/CZabbixServer.php:330
+#: include/classes/server/CZabbixServer.php:355
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Не удалось отправить команду, проверьте соединение с Zabbix сервером \"%1$s\"."
@@ -2671,19 +2672,24 @@ msgstr "Не удалось установить ID ресурса для эле
 msgid "Cannot switch host for interface."
 msgstr "Не удалось переключить узел сети на интерфейс."
 
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:71
+#: app/controllers/CControllerPopupMediatypeTestSend.php:71
+msgid "Cannot test disabled media type."
+msgstr ""
+
 #: users.php:260
 msgid "Cannot unblock users"
 msgstr "Не удалось разблокировать пользователей"
 
-#: include/classes/api/services/CHostGeneral.php:559
+#: include/classes/api/services/CHostGeneral.php:555
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Не удалось отсоединить и очистить Веб-сценарии."
 
-#: include/classes/api/services/CHostGeneral.php:620
+#: include/classes/api/services/CHostGeneral.php:616
 msgid "Cannot unlink and clear applications."
 msgstr "Не удалось отсоединить и очистить группы элементов данных."
 
-#: include/classes/api/services/CHostGeneral.php:363
+#: include/classes/api/services/CHostGeneral.php:427
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Не удалось отсоединить и очистить правила обнаружения"
 
@@ -3665,12 +3671,12 @@ msgstr "Соединение"
 msgid "Connection security"
 msgstr "Безопасность подключения"
 
-#: include/classes/server/CZabbixServer.php:343
+#: include/classes/server/CZabbixServer.php:368
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Превышено время ожидания %1$s секунд при подключении к Zabbix серверу \"%2$s\"."
 
-#: include/classes/server/CZabbixServer.php:451
+#: include/classes/server/CZabbixServer.php:476
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%s\" failed. Possible reasons:\n"
@@ -3681,7 +3687,7 @@ msgstr ""
 "1. Некорректные IP/DNS сервера в \"zabbix.conf.php\";\n"
 "2. Некорректная настройка DNS сервера.\n"
 
-#: include/classes/server/CZabbixServer.php:439
+#: include/classes/server/CZabbixServer.php:464
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%s\" refused. Possible reasons:\n"
@@ -3696,7 +3702,7 @@ msgstr ""
 "3. Демон Zabbix сервера не запущен;\n"
 "4. Фаервол блокирует TCP подключение.\n"
 
-#: include/classes/server/CZabbixServer.php:447
+#: include/classes/server/CZabbixServer.php:472
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%s\" timed out. Possible reasons:\n"
@@ -4176,7 +4182,7 @@ msgid "Custom multiplier"
 msgstr "Пользовательский множитель"
 
 #: app/views/popup.preproctestedit.view.js.php:143 include/forms.inc.php:1402
-#: include/forms.inc.php:1572 include/views/js/item.preprocessing.js.php:35
+#: include/forms.inc.php:1577 include/views/js/item.preprocessing.js.php:35
 msgid "Custom on fail"
 msgstr ""
 
@@ -4247,7 +4253,7 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "DNS имя"
 
-#: app/views/report.services.php:34 include/forms.inc.php:2210
+#: app/views/report.services.php:34 include/forms.inc.php:2215
 #: include/maintenances.inc.php:33 report4.php:107
 msgid "Daily"
 msgstr "Ежедневно"
@@ -4386,7 +4392,7 @@ msgstr "Тип базы данных"
 msgid "Database user"
 msgstr "Имя пользователя от базы данных"
 
-#: include/forms.inc.php:2339 include/forms.inc.php:2424 maintenance.php:51
+#: include/forms.inc.php:2344 include/forms.inc.php:2429 maintenance.php:51
 msgid "Date"
 msgstr "Дата"
 
@@ -4414,16 +4420,16 @@ msgstr "День"
 msgid "Day before yesterday"
 msgstr "За день до вчера"
 
-#: include/forms.inc.php:2341 include/forms.inc.php:2402
+#: include/forms.inc.php:2346 include/forms.inc.php:2407
 msgid "Day of month"
 msgstr "День месяца"
 
-#: include/forms.inc.php:2243 include/forms.inc.php:2342
-#: include/forms.inc.php:2350
+#: include/forms.inc.php:2248 include/forms.inc.php:2347
+#: include/forms.inc.php:2355
 msgid "Day of week"
 msgstr "День недели"
 
-#: include/forms.inc.php:2451
+#: include/forms.inc.php:2456
 msgid "Days"
 msgstr "Дни"
 
@@ -4445,7 +4451,7 @@ msgstr "Режим отладки обновлен"
 msgid "Dec"
 msgstr "Дек."
 
-#: include/forms.inc.php:2334 include/func.inc.php:127
+#: include/forms.inc.php:2339 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:147
 msgid "December"
 msgstr "Декабрь"
@@ -4524,7 +4530,7 @@ msgid "Delayed by"
 msgstr "Задерживается на"
 
 #: app/views/administration.mediatype.edit.php:243
-#: app/views/administration.mediatype.list.php:153
+#: app/views/administration.mediatype.list.php:162
 #: app/views/administration.proxy.edit.php:135
 #: app/views/administration.proxy.list.php:167
 #: app/views/administration.script.edit.php:129
@@ -4753,7 +4759,7 @@ msgstr "Удалить выбранную карту сети?"
 msgid "Delete selected maps?"
 msgstr "Удалить выбранные карты сети?"
 
-#: app/views/administration.mediatype.list.php:153
+#: app/views/administration.mediatype.list.php:162
 msgid "Delete selected media types?"
 msgstr "Удалить выбранные способы оповещений?"
 
@@ -4932,7 +4938,7 @@ msgstr "Описание"
 msgid "Description updated"
 msgstr "Описание обновлено"
 
-#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:434
+#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:436
 #: include/func.inc.php:1850
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:439
@@ -4970,7 +4976,7 @@ msgstr "Размер (столбцов x строк)"
 msgid "Directory size (in bytes). Returns integer"
 msgstr "Размер директории (в байтах). Возвращается целое число"
 
-#: app/views/administration.mediatype.list.php:152
+#: app/views/administration.mediatype.list.php:161
 #: include/views/administration.auditlogs.list.php:50
 #: include/views/administration.usergroups.list.php:169
 #: include/views/configuration.action.list.php:134
@@ -5043,7 +5049,7 @@ msgstr "Деактивировать выбранные узлы сети?"
 msgid "Disable selected items?"
 msgstr "Деактивировать выбранные элементы данных?"
 
-#: app/views/administration.mediatype.list.php:152
+#: app/views/administration.mediatype.list.php:161
 msgid "Disable selected media types?"
 msgstr "Деактивировать выбранные способы оповещения?"
 
@@ -5056,7 +5062,7 @@ msgid "Disable selected web scenarios?"
 msgstr "Деактивировать выбранные веб-сценарии?"
 
 #: app/views/administration.mediatype.list.php:47
-#: app/views/administration.mediatype.list.php:128 auditlogs.php:147
+#: app/views/administration.mediatype.list.php:129 auditlogs.php:147
 #: include/discovery.inc.php:108 include/hosts.inc.php:1299
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:140 include/items.inc.php:143
@@ -5097,7 +5103,7 @@ msgstr ""
 msgid "Discard unchanged with heartbeat"
 msgstr ""
 
-#: app/views/popup.preproctestedit.view.js.php:104 include/forms.inc.php:1551
+#: app/views/popup.preproctestedit.view.js.php:104 include/forms.inc.php:1556
 #: include/views/js/item.preprocessing.js.php:37
 msgid "Discard value"
 msgstr ""
@@ -5443,7 +5449,7 @@ msgstr "Дубликат usrgrpid \"%1$s\" в группах пользоват�
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "Дубликат usrgrpid \"%1$s\" в группах пользователей у комплексного экрана \"%2$s\"."
 
-#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:557
+#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:559
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:915
 #: include/classes/screens/CScreenProblem.php:1126 include/events.inc.php:249
@@ -5670,7 +5676,7 @@ msgstr "Пустой screen ID для шаблонного комплексно�
 msgid "Empty screen ID."
 msgstr "Пустой ID комплексного экрана."
 
-#: app/views/administration.mediatype.list.php:151
+#: app/views/administration.mediatype.list.php:160
 #: include/views/administration.auditlogs.list.php:49
 #: include/views/administration.usergroups.list.php:168
 #: include/views/configuration.action.list.php:133
@@ -5763,7 +5769,7 @@ msgstr "Активировать выбранные узлы сети?"
 msgid "Enable selected items?"
 msgstr "Активировать выбранные элементы данных?"
 
-#: app/views/administration.mediatype.list.php:151
+#: app/views/administration.mediatype.list.php:160
 msgid "Enable selected media types?"
 msgstr "Активировать выбранные способы оповещения?"
 
@@ -5785,7 +5791,7 @@ msgstr "Активировать трапы"
 
 #: app/views/administration.mediatype.edit.php:178
 #: app/views/administration.mediatype.list.php:46
-#: app/views/administration.mediatype.list.php:124
+#: app/views/administration.mediatype.list.php:125
 #: app/views/popup.media.php:74 app/views/popup.triggerwizard.php:187
 #: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
 #: include/httptest.inc.php:45 include/items.inc.php:140
@@ -5932,11 +5938,11 @@ msgstr[2] "Событий обновлено"
 msgid "Events and alerts"
 msgstr "События и оповещения"
 
-#: include/forms.inc.php:2224
+#: include/forms.inc.php:2229
 msgid "Every day(s)"
 msgstr "Каждый день(и)"
 
-#: include/forms.inc.php:2237
+#: include/forms.inc.php:2242
 msgid "Every week(s)"
 msgstr "Каждую неделю(и)"
 
@@ -6069,8 +6075,8 @@ msgstr "Выражение не может быть пустым"
 msgid "Expression constructor"
 msgstr "Конструктор выражения"
 
-#: include/forms.inc.php:1985 include/forms.inc.php:1990
-#: include/forms.inc.php:1998
+#: include/forms.inc.php:1990 include/forms.inc.php:1995
+#: include/forms.inc.php:2003
 msgid "Expression syntax error."
 msgstr "Синтаксическая ошибка в выражении."
 
@@ -6160,7 +6166,7 @@ msgstr "Избранные комплексные экраны"
 msgid "Feb"
 msgstr "Фев."
 
-#: include/forms.inc.php:2299 include/func.inc.php:117
+#: include/forms.inc.php:2304 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:137
 msgid "February"
 msgstr "Февраль"
@@ -6419,7 +6425,7 @@ msgstr "Французский (fr_FR)"
 msgid "Fri"
 msgstr "Пт"
 
-#: include/forms.inc.php:2267 include/forms.inc.php:2382
+#: include/forms.inc.php:2272 include/forms.inc.php:2387
 #: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:152
 msgid "Friday"
 msgstr "Пятница"
@@ -6478,7 +6484,7 @@ msgid "GMT%1$s"
 msgstr "GMT%1$s"
 
 #: app/views/administration.mediatype.edit.php:130
-#: app/views/administration.mediatype.list.php:85
+#: app/views/administration.mediatype.list.php:86
 msgid "GSM modem"
 msgstr "GSM модем"
 
@@ -7076,7 +7082,7 @@ msgstr "Выравнивание по горизонтали"
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
 #: app/views/popup.generic.php:137 app/views/search.php:26 httpconf.php:191
 #: httpconf.php:492 include/actions.inc.php:50 include/audit.inc.php:27
-#: include/blocks.inc.php:554 include/classes/screens/CScreenEvents.php:32
+#: include/blocks.inc.php:556 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
@@ -7190,7 +7196,7 @@ msgstr[2] "Узлы сети активированы"
 #: app/views/monitoring.widget.problemhosts.view.php:27
 #: app/views/monitoring.widget.web.view.php:26 app/views/search.php:128
 #: include/actions.inc.php:48 include/audit.inc.php:37
-#: include/blocks.inc.php:340 include/maps.inc.php:25
+#: include/blocks.inc.php:342 include/maps.inc.php:25
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:183
 #: include/views/administration.users.edit.php:478
@@ -7465,7 +7471,7 @@ msgstr "Расположение узлов сети"
 msgid "Hosts updated"
 msgstr "Узлы сети обновлены"
 
-#: include/forms.inc.php:2453
+#: include/forms.inc.php:2458
 msgid "Hours"
 msgstr "Часы"
 
@@ -8301,7 +8307,7 @@ msgstr "Некорректный тип значений элемента дан
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "Указан некорректный тип элемента данных \"%1$s\" для функции триггера \"%2$s\"."
 
-#: include/forms.inc.php:1649
+#: include/forms.inc.php:1654
 msgid "Incorrect list of items."
 msgstr "Некорректный список элементов данных."
 
@@ -8415,9 +8421,9 @@ msgstr "Некорректное регулярное выражение \"%1$s\
 msgid "Incorrect resource type provided for screen item."
 msgstr "Указан некорректный тип ресурса для элемента комплексного экрана."
 
-#: include/classes/server/CZabbixServer.php:355
-#: include/classes/server/CZabbixServer.php:397
-#: include/classes/server/CZabbixServer.php:404
+#: include/classes/server/CZabbixServer.php:380
+#: include/classes/server/CZabbixServer.php:422
+#: include/classes/server/CZabbixServer.php:429
 #, c-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr "Получен некорректный ответ от Zabbix сервера \"%1$s\"."
@@ -8872,7 +8878,7 @@ msgstr "Индонезийский (id_ID)"
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/monitoring.widget.problems.view.php:53
 #: include/actions.inc.php:1910 include/actions.inc.php:1994
-#: include/blocks.inc.php:553 include/classes/screens/CScreenActions.php:132
+#: include/blocks.inc.php:555 include/classes/screens/CScreenActions.php:132
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:911
@@ -9709,7 +9715,7 @@ msgid "Jabber"
 msgstr "Jabber"
 
 #: app/views/administration.mediatype.edit.php:154
-#: app/views/administration.mediatype.list.php:89
+#: app/views/administration.mediatype.list.php:90
 msgid "Jabber identifier"
 msgstr "Идентификатор Jabber"
 
@@ -9717,7 +9723,7 @@ msgstr "Идентификатор Jabber"
 msgid "Jan"
 msgstr "Янв"
 
-#: include/forms.inc.php:2291 include/func.inc.php:116
+#: include/forms.inc.php:2296 include/func.inc.php:116
 #: include/func.inc.php:253 jsLoader.php:136
 msgid "January"
 msgstr "Январь"
@@ -9735,7 +9741,7 @@ msgstr ""
 msgid "Jul"
 msgstr "Июл"
 
-#: include/forms.inc.php:2294 include/func.inc.php:122
+#: include/forms.inc.php:2299 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:142
 msgid "July"
 msgstr "Июль"
@@ -9744,7 +9750,7 @@ msgstr "Июль"
 msgid "Jun"
 msgstr "Июн"
 
-#: include/forms.inc.php:2331 include/func.inc.php:121
+#: include/forms.inc.php:2336 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:141
 msgid "June"
 msgstr "Июнь"
@@ -9965,7 +9971,7 @@ msgstr "График за последнюю неделю"
 msgid "Latest data"
 msgstr "Последние данные"
 
-#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:556
+#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:558
 #: include/classes/screens/CScreenProblem.php:914 jsLoader.php:262
 msgid "Latest values"
 msgstr "Последние значения"
@@ -10362,7 +10368,7 @@ msgstr "Обслуживание удалено"
 msgid "Maintenance period"
 msgstr "Период обслуживания"
 
-#: include/forms.inc.php:2447
+#: include/forms.inc.php:2452
 msgid "Maintenance period length"
 msgstr "Длительность периода обслуживания"
 
@@ -10509,7 +10515,7 @@ msgstr "Карты сетей"
 msgid "Mar"
 msgstr "Мрт."
 
-#: include/forms.inc.php:2307 include/func.inc.php:118
+#: include/forms.inc.php:2312 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:138
 msgid "March"
 msgstr "Март"
@@ -10612,7 +10618,7 @@ msgstr[2] "Максимальный период времени отображе
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "Превышена максимальная длина email адреса у способа оповещения с ID \"%1$s\"."
 
-#: include/forms.inc.php:2323 include/func.inc.php:120
+#: include/forms.inc.php:2328 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:140
 msgid "May"
 msgstr "Май"
@@ -10669,6 +10675,15 @@ msgstr[2] "Способы оповещения активированы"
 msgid "Media type is missing parameters: %1$s"
 msgstr "В типе оповещений пропущены параметры: %1$s"
 
+#: app/controllers/CControllerPopupMediatypeTestSend.php:37
+#: app/controllers/CControllerPopupMediatypeTestSend.php:120
+msgid "Media type test failed."
+msgstr ""
+
+#: app/controllers/CControllerPopupMediatypeTestSend.php:117
+msgid "Media type test successful."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeUpdate.php:169
 msgid "Media type updated"
 msgstr "Способ оповещений обновлен"
@@ -10710,8 +10725,9 @@ msgstr "Память используемая процессом в байтах
 
 #: app/views/monitoring.acknowledge.edit.php:26
 #: app/views/monitoring.widget.actionlog.view.php:33
-#: include/actions.inc.php:1775 include/actions.inc.php:2044
-#: include/actions.inc.php:2148 include/classes/screens/CScreenActions.php:130
+#: app/views/popup.mediatypetest.edit.php:38 include/actions.inc.php:1775
+#: include/actions.inc.php:2044 include/actions.inc.php:2148
+#: include/classes/screens/CScreenActions.php:130
 #: include/views/administration.auditacts.list.php:60
 #: include/views/administration.auditacts.list.php:91
 #: include/views/configuration.action.edit.php:791
@@ -10810,7 +10826,7 @@ msgstr[0] "Минимально отображаемым периодом явл
 msgstr[1] "Минимально отображаемым периодом является %1$s минуты."
 msgstr[2] "Минимально отображаемым периодом является %1$s минут."
 
-#: include/forms.inc.php:2455
+#: include/forms.inc.php:2460
 msgid "Minutes"
 msgstr "Минут"
 
@@ -10873,7 +10889,7 @@ msgstr "Модель"
 msgid "Mon"
 msgstr "Пн"
 
-#: include/forms.inc.php:2247 include/forms.inc.php:2362
+#: include/forms.inc.php:2252 include/forms.inc.php:2367
 #: include/func.inc.php:135 include/func.inc.php:225 jsLoader.php:148
 msgid "Monday"
 msgstr "Понедельник"
@@ -10900,11 +10916,11 @@ msgstr "Мониторинг"
 msgid "Monospace"
 msgstr "Моноширинный"
 
-#: app/views/report.services.php:67 include/forms.inc.php:2287 report4.php:166
+#: app/views/report.services.php:67 include/forms.inc.php:2292 report4.php:166
 msgid "Month"
 msgstr "Месяц"
 
-#: app/views/report.services.php:36 include/forms.inc.php:2212
+#: app/views/report.services.php:36 include/forms.inc.php:2217
 #: include/maintenances.inc.php:37 report4.php:109
 msgid "Monthly"
 msgstr "Ежемесячно"
@@ -11217,8 +11233,8 @@ msgid "Next step"
 msgstr "Далее"
 
 #: app/views/monitoring.widget.problems.view.php:221
-#: include/actions.inc.php:33 include/blocks.inc.php:441
-#: include/blocks.inc.php:632
+#: include/actions.inc.php:33 include/blocks.inc.php:443
+#: include/blocks.inc.php:634
 #: include/classes/screens/CScreenHostTriggers.php:300
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
@@ -11577,6 +11593,8 @@ msgstr "Нет прав доступа в систему."
 #: app/controllers/CControllerMenuPopup.php:278
 #: app/controllers/CControllerMenuPopup.php:441
 #: app/controllers/CControllerMenuPopup.php:589
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:56
+#: app/controllers/CControllerPopupMediatypeTestSend.php:65
 #: app/controllers/CControllerPopupScriptExec.php:99
 #: app/controllers/CControllerWidgetClockView.php:80
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
@@ -11906,7 +11924,7 @@ msgstr "Оповещать всех участников"
 msgid "Nov"
 msgstr "Нбр."
 
-#: include/forms.inc.php:2326 include/func.inc.php:126
+#: include/forms.inc.php:2331 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:146
 msgid "November"
 msgstr "Ноябрь"
@@ -11920,11 +11938,11 @@ msgstr "Количество CPU. Возвращает целое число"
 msgid "Number of enabled items on the host."
 msgstr "Количество активированных элементов данных у узла сети."
 
-#: include/blocks.inc.php:445
+#: include/blocks.inc.php:447
 msgid "Number of hosts (enabled/disabled/templates)"
 msgstr "Количество узлов сети (активированных/деактивированных/шаблонов)"
 
-#: include/blocks.inc.php:455
+#: include/blocks.inc.php:457
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Количество элементов данных (активированных/деактивированных/неподдерживаемых)"
 
@@ -11986,7 +12004,7 @@ msgstr "Количество изменений состояния"
 msgid "Number of steps"
 msgstr "Количество шагов"
 
-#: include/blocks.inc.php:466
+#: include/blocks.inc.php:468
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Количество триггеров (активированных/деактивированных [проблема/ок])"
 
@@ -12002,7 +12020,7 @@ msgstr "Количество неподдерживаемых элементов
 msgid "Number of unsupported items on the host."
 msgstr "Количество неподдерживаемых элементов данных у узла сети."
 
-#: include/blocks.inc.php:478
+#: include/blocks.inc.php:480
 msgid "Number of users (online)"
 msgstr "Количество пользователей (в сети)"
 
@@ -12134,7 +12152,7 @@ msgstr "Окт"
 msgid "Octal to decimal"
 msgstr "Восьмеричное в десятичное"
 
-#: include/forms.inc.php:2318 include/func.inc.php:125
+#: include/forms.inc.php:2323 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:145
 msgid "October"
 msgstr "Октябрь"
@@ -12190,7 +12208,7 @@ msgstr "Одна"
 msgid "One of the objects is left without a host group."
 msgstr "Один из объектов остался без группы узлов сети."
 
-#: include/forms.inc.php:2209 include/maintenances.inc.php:31
+#: include/forms.inc.php:2214 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "Единовременно"
 
@@ -12245,7 +12263,7 @@ msgstr "Только администраторы могут указывать 
 msgid "Only administrators can set slide show owner."
 msgstr "Только администраторы могут указывать владельца слайд-шоу."
 
-#: include/blocks.inc.php:456
+#: include/blocks.inc.php:458
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Подсчитываются только элементы данных у активированных узлов сети"
 
@@ -12302,7 +12320,7 @@ msgstr "Только супер администраторы могут обно
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "Индикатор отображает только последние 20%%."
 
-#: include/blocks.inc.php:467
+#: include/blocks.inc.php:469
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Подсчитываются только триггеры у активированных узлов сети и которые зависят от активных элементов данных"
 
@@ -12764,7 +12782,7 @@ msgstr "PSK слишком короткий. Минимально %1$s шест�
 msgid "Page received incorrect data"
 msgstr "Страница получила некорректные данные"
 
-#: app/views/administration.mediatype.edit.php:104 include/blocks.inc.php:434
+#: app/views/administration.mediatype.edit.php:104 include/blocks.inc.php:436
 msgid "Parameter"
 msgstr "Параметр"
 
@@ -12920,7 +12938,7 @@ msgstr "Выполнение DNS запроса. Возвращает строк
 msgid "Period"
 msgstr "Период"
 
-#: include/forms.inc.php:2207
+#: include/forms.inc.php:2212
 #: include/views/configuration.maintenance.edit.php:77
 #: include/views/configuration.services.edit.php:226
 msgid "Period type"
@@ -13198,7 +13216,7 @@ msgid "Privilege level"
 msgstr "Уровень привилегий"
 
 #: app/views/monitoring.problem.view.php:163
-#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:555
+#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:557
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:913
 #: include/classes/screens/CScreenProblem.php:1047
@@ -13544,8 +13562,8 @@ msgstr "Восстановление"
 msgid "Recovery expression"
 msgstr "Выражение восстановления"
 
-#: include/forms.inc.php:2028 include/forms.inc.php:2033
-#: include/forms.inc.php:2041
+#: include/forms.inc.php:2033 include/forms.inc.php:2038
+#: include/forms.inc.php:2046
 msgid "Recovery expression syntax error."
 msgstr "Синтаксическая ошибка в выражении восстановления."
 
@@ -13661,8 +13679,8 @@ msgstr "Удаленная команда"
 #: app/views/popup.triggerwizard.js.php:335
 #: app/views/popup.triggerwizard.php:57 app/views/popup.triggerwizard.php:101
 #: include/classes/widgets/CWidgetHelper.php:408
-#: include/classes/widgets/CWidgetHelper.php:452 include/forms.inc.php:1597
-#: include/forms.inc.php:2481
+#: include/classes/widgets/CWidgetHelper.php:452 include/forms.inc.php:1602
+#: include/forms.inc.php:2486
 #: include/views/administration.general.iconmap.edit.php:84
 #: include/views/administration.general.macros.edit.php:56
 #: include/views/administration.general.regularexpressions.edit.php:77
@@ -13877,7 +13895,7 @@ msgstr "Требуемое быстродействие (знч/сек)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Требуемая производительность Zabbix сервера, в ожидаемом количестве новых значений в секунду."
 
-#: include/blocks.inc.php:482
+#: include/blocks.inc.php:484
 msgid "Required server performance, new values per second"
 msgstr "Требуемое быстродействие сервера, новые значения в секунду"
 
@@ -14176,17 +14194,17 @@ msgid "SMTP"
 msgstr "SMTP"
 
 #: app/views/administration.mediatype.edit.php:75
-#: app/views/administration.mediatype.list.php:77
+#: app/views/administration.mediatype.list.php:78
 msgid "SMTP email"
 msgstr "SMTP email"
 
 #: app/views/administration.mediatype.edit.php:70
-#: app/views/administration.mediatype.list.php:76
+#: app/views/administration.mediatype.list.php:77
 msgid "SMTP helo"
 msgstr "SMTP helo"
 
 #: app/views/administration.mediatype.edit.php:62
-#: app/views/administration.mediatype.list.php:75
+#: app/views/administration.mediatype.list.php:76
 msgid "SMTP server"
 msgstr "SMTP сервер"
 
@@ -14338,7 +14356,7 @@ msgstr "Sans-Serif"
 msgid "Sat"
 msgstr "Сб"
 
-#: include/forms.inc.php:2272 include/forms.inc.php:2387
+#: include/forms.inc.php:2277 include/forms.inc.php:2392
 #: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:153
 msgid "Saturday"
 msgstr "Суббота"
@@ -14502,7 +14520,7 @@ msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
 msgstr "Путь \"%1$s\" меню скрипта уже используется в имени скрипта \"%2$s\"."
 
 #: app/views/administration.mediatype.edit.php:96
-#: app/views/administration.mediatype.list.php:81
+#: app/views/administration.mediatype.list.php:82
 #: include/views/configuration.action.edit.php:933
 #: include/views/configuration.action.edit.php:1710
 #: include/views/configuration.action.edit.php:2168
@@ -14716,6 +14734,7 @@ msgid "Send only to"
 msgstr "Отправлять только через"
 
 #: app/views/popup.media.php:57 app/views/popup.media.php:64
+#: app/views/popup.mediatypetest.edit.php:24
 #: include/views/administration.users.edit.php:243
 msgid "Send to"
 msgstr "Отправлять на"
@@ -14752,7 +14771,7 @@ msgstr "Сен."
 msgid "Separated"
 msgstr "Раздельно"
 
-#: include/forms.inc.php:2310 include/func.inc.php:124
+#: include/forms.inc.php:2315 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:144
 msgid "September"
 msgstr "Сентябрь"
@@ -14890,7 +14909,7 @@ msgstr "Сессия завершена, пожалуйста, зайдите п
 msgid "Set custom time period"
 msgstr "Задать пользовательский период времени"
 
-#: app/views/popup.preproctestedit.view.js.php:116 include/forms.inc.php:1553
+#: app/views/popup.preproctestedit.view.js.php:116 include/forms.inc.php:1558
 #: include/views/js/item.preprocessing.js.php:39
 msgid "Set error to"
 msgstr ""
@@ -14899,7 +14918,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "Установить режим инвентарных данных узлов сети"
 
-#: app/views/popup.preproctestedit.view.js.php:110 include/forms.inc.php:1552
+#: app/views/popup.preproctestedit.view.js.php:110 include/forms.inc.php:1557
 #: include/views/js/item.preprocessing.js.php:38
 msgid "Set value to"
 msgstr ""
@@ -15192,7 +15211,7 @@ msgstr "Область / район"
 msgid "Size"
 msgstr "Размер"
 
-#: include/classes/server/CZabbixServer.php:376
+#: include/classes/server/CZabbixServer.php:401
 #, c-format
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "Размер полученного ответа от Zabbix сервера \"%1$s\" превышает допустимый размер в %2$s байт. Это значение можно увеличить с помощью ZBX_SOCKET_BYTES_LIMIT константы в include/defines.inc.php."
@@ -15534,6 +15553,7 @@ msgstr "Поднавигация"
 msgid "Subfilter"
 msgstr "Подфильтр"
 
+#: app/views/popup.mediatypetest.edit.php:32
 #: include/views/administration.auditacts.list.php:86
 #: include/views/configuration.action.edit.php:787
 #: include/views/configuration.action.edit.php:1539
@@ -15571,7 +15591,7 @@ msgstr "Суммарная статистика входящего и исход
 msgid "Sun"
 msgstr "Вс"
 
-#: include/forms.inc.php:2277 include/forms.inc.php:2392
+#: include/forms.inc.php:2282 include/forms.inc.php:2397
 #: include/func.inc.php:142 include/func.inc.php:224 jsLoader.php:154
 msgid "Sunday"
 msgstr "Воскресенье"
@@ -15733,7 +15753,7 @@ msgid "Tag value"
 msgstr "Значение тега"
 
 #: app/views/monitoring.problem.view.php:283
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:560
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:562
 #: include/classes/screens/CScreenProblem.php:864
 #: include/classes/screens/CScreenProblem.php:918
 #: include/classes/screens/CScreenProblem.php:1129
@@ -15927,8 +15947,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:147
 #: app/views/administration.authentication.edit.php:150
+#: app/views/administration.mediatype.list.php:134
+#: app/views/popup.mediatypetest.edit.php:61
 #: app/views/popup.preproctestedit.view.php:168
-#: app/views/popup.testtriggerexpr.php:116 include/forms.inc.php:1593
+#: app/views/popup.testtriggerexpr.php:116 include/forms.inc.php:1598
 #: include/views/administration.general.regularexpressions.edit.php:139
 #: include/views/configuration.trigger.prototype.edit.php:239
 #: include/views/configuration.trigger.prototype.edit.php:434
@@ -15938,7 +15960,7 @@ msgstr ""
 msgid "Test"
 msgstr "Тест"
 
-#: include/forms.inc.php:1623
+#: include/forms.inc.php:1628
 msgid "Test all steps"
 msgstr ""
 
@@ -15962,10 +15984,18 @@ msgstr "Тест выражений"
 msgid "Test item preprocessing"
 msgstr ""
 
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:75
+msgid "Test media type"
+msgstr ""
+
 #: adm.regexps.php:37
 #: include/views/administration.general.regularexpressions.edit.php:119
 msgid "Test string"
 msgstr "Тестовая строка"
+
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:79
+msgid "Test subject"
+msgstr ""
 
 #: include/forms.inc.php:355 include/items.inc.php:133
 #: include/items.inc.php:1705 include/items.inc.php:1709
@@ -16088,6 +16118,10 @@ msgstr "Этот день прошлой недели"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Это поле автоматически заполняется элементом данных \"%s\"."
 
+#: app/controllers/CControllerPopupMediatypeTestEdit.php:80
+msgid "This is the test message from Zabbix"
+msgstr ""
+
 #: include/func.inc.php:2660 srv_status.php:41
 msgid "This month"
 msgstr "Этот месяц"
@@ -16132,7 +16166,7 @@ msgstr ""
 msgid "Thu"
 msgstr "Чт"
 
-#: include/forms.inc.php:2262 include/forms.inc.php:2377
+#: include/forms.inc.php:2267 include/forms.inc.php:2382
 #: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:151
 msgid "Thursday"
 msgstr "Четверг"
@@ -16152,7 +16186,7 @@ msgstr "До"
 #: app/views/popup.triggerexpr.php:128 app/views/popup.triggerexpr.php:132
 #: include/actions.inc.php:1775 include/actions.inc.php:1829
 #: include/actions.inc.php:1910 include/actions.inc.php:1994
-#: include/actions.inc.php:2044 include/blocks.inc.php:535
+#: include/actions.inc.php:2044 include/blocks.inc.php:537
 #: include/classes/screens/CScreenActions.php:126
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:841
@@ -16618,7 +16652,7 @@ msgstr "Попытка чтения недоступного свойства \"
 msgid "Tue"
 msgstr "Вт"
 
-#: include/forms.inc.php:2252 include/forms.inc.php:2367
+#: include/forms.inc.php:2257 include/forms.inc.php:2372
 #: include/func.inc.php:136 include/func.inc.php:226 jsLoader.php:149
 msgid "Tuesday"
 msgstr "Вторник"
@@ -16952,42 +16986,32 @@ msgstr "Отсоединить от шаблона"
 msgid "Unlink from templates"
 msgstr "Отсоединить от шаблонов"
 
-#: include/classes/api/services/CHostGeneral.php:626
+#: include/classes/api/services/CHostGeneral.php:622
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Группа элементов данных \"%1$s\" от \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:372
+#: include/classes/api/services/CHostGeneral.php:436
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Правило обнаружения \"%1$s\" от \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:529
-#, c-format
-msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
-msgstr "Отсоединено: График \"%1$s\" от \"%2$s\"."
-
-#: include/classes/api/services/CHostGeneral.php:513
-#, c-format
-msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
-msgstr "Отсоединено: Прототип графиков \"%1$s\" от \"%2$s\"."
-
-#: include/classes/api/services/CHostGeneral.php:462
+#: include/classes/api/services/CHostGeneral.php:526
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Прототип узлов сети \"%1$s\" от \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:388
+#: include/classes/api/services/CHostGeneral.php:452
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Элемент данных \"%1$s\" от \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:407
+#: include/classes/api/services/CHostGeneral.php:471
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Прототип элементов данных \"%1$s\" от \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:568
+#: include/classes/api/services/CHostGeneral.php:564
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Отсоединено: Веб-сценарий \"%1$s\" от \"%2$s\"."
@@ -17434,7 +17458,7 @@ msgstr "Пользователь/Получатель"
 
 #: app/views/administration.mediatype.edit.php:95
 #: app/views/administration.mediatype.edit.php:159
-#: app/views/administration.mediatype.list.php:93 disc_prototypes.php:259
+#: app/views/administration.mediatype.list.php:94 disc_prototypes.php:259
 #: host_discovery.php:208 include/views/configuration.host.edit.php:675
 #: include/views/configuration.host.massupdate.php:173
 #: include/views/configuration.host.prototype.edit.php:335
@@ -17663,7 +17687,7 @@ msgstr ""
 #: app/views/monitoring.widget.plaintext.view.php:46
 #: app/views/popup.httpstep.php:109
 #: app/views/popup.preproctestedit.view.php:74
-#: app/views/popup.testtriggerexpr.php:30 include/blocks.inc.php:434
+#: app/views/popup.testtriggerexpr.php:30 include/blocks.inc.php:436
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHistory.php:264
@@ -17969,12 +17993,12 @@ msgstr "Веб-сценарии"
 msgid "Wed"
 msgstr "Ср"
 
-#: include/forms.inc.php:2257 include/forms.inc.php:2372
+#: include/forms.inc.php:2262 include/forms.inc.php:2377
 #: include/func.inc.php:137 include/func.inc.php:227 jsLoader.php:150
 msgid "Wednesday"
 msgstr "Среда"
 
-#: app/views/report.services.php:35 include/forms.inc.php:2211
+#: app/views/report.services.php:35 include/forms.inc.php:2216
 #: include/maintenances.inc.php:35 report4.php:108
 msgid "Weekly"
 msgstr "Еженедельно"
@@ -18233,7 +18257,7 @@ msgstr "Y1"
 msgid "Y2"
 msgstr "Y2"
 
-#: include/forms.inc.php:2427
+#: include/forms.inc.php:2432
 #: include/views/configuration.maintenance.edit.php:57
 #: include/views/configuration.maintenance.edit.php:63
 #: include/views/configuration.services.edit.php:246
@@ -18261,8 +18285,8 @@ msgid "Yearly"
 msgstr "Ежегодно"
 
 #: app/views/monitoring.widget.problems.view.php:221
-#: include/actions.inc.php:32 include/blocks.inc.php:441
-#: include/blocks.inc.php:632
+#: include/actions.inc.php:32 include/blocks.inc.php:443
+#: include/blocks.inc.php:634
 #: include/classes/screens/CScreenHostTriggers.php:300
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
@@ -18433,7 +18457,7 @@ msgstr "Диалог входа в систему Zabbix"
 msgid "Zabbix server"
 msgstr "Zabbix сервер"
 
-#: include/classes/server/CZabbixServer.php:443
+#: include/classes/server/CZabbixServer.php:468
 #, c-format
 msgid ""
 "Zabbix server \"%s\" can not be reached. Possible reasons:\n"
@@ -18460,7 +18484,7 @@ msgstr "Детали Zabbix сервера"
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix сервер не запущен: отображаемая информация может быть не актуальной."
 
-#: include/blocks.inc.php:440
+#: include/blocks.inc.php:442
 msgid "Zabbix server is running"
 msgstr "Zabbix сервер запущен"
 
@@ -18578,7 +18602,7 @@ msgstr "агент"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/html/CSeverity.php:49
-#: include/classes/pagefilter/CPageFilter.php:875
+#: include/classes/pagefilter/CPageFilter.php:885
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -18845,7 +18869,7 @@ msgstr "dayofweek() - День недели"
 msgid "days"
 msgstr "дней"
 
-#: include/classes/pagefilter/CPageFilter.php:749
+#: include/classes/pagefilter/CPageFilter.php:759
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/widgets/CWidgetHelper.php:53
 #: include/views/js/monitoring.slideconf.edit.js.php:14
@@ -18911,7 +18935,7 @@ msgstr "не соответствует"
 msgid "equals"
 msgstr "равно"
 
-#: include/views/js/item.preprocessing.js.php:350
+#: include/views/js/item.preprocessing.js.php:355
 msgid "error message"
 msgstr ""
 
@@ -18927,7 +18951,7 @@ msgstr "пустое выражение"
 msgid "failed to parse JSON"
 msgstr "ошибка при разборе JSON"
 
-#: include/forms.inc.php:2353 include/maintenances.inc.php:111
+#: include/forms.inc.php:2358 include/maintenances.inc.php:111
 msgid "first"
 msgstr "первый"
 
@@ -18940,7 +18964,7 @@ msgstr "ожидается первый параметр"
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr "forecast() - Прогноз значения через t секунд на основе периода Т"
 
-#: include/forms.inc.php:2356 include/maintenances.inc.php:114
+#: include/forms.inc.php:2361 include/maintenances.inc.php:114
 msgid "fourth"
 msgstr "четвёртый"
 
@@ -19110,7 +19134,7 @@ msgid "key is empty"
 msgstr "ключ пустой"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1850
-#: include/classes/graphdraw/CPieGraphDraw.php:330 include/forms.inc.php:2357
+#: include/classes/graphdraw/CPieGraphDraw.php:330 include/forms.inc.php:2362
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
 msgid "last"
@@ -19310,8 +19334,8 @@ msgstr "не в"
 
 #: app/controllers/CControllerDashboardView.php:134
 #: hostinventoriesoverview.php:76
-#: include/classes/pagefilter/CPageFilter.php:808
-#: include/classes/pagefilter/CPageFilter.php:875 include/forms.inc.php:1134
+#: include/classes/pagefilter/CPageFilter.php:818
+#: include/classes/pagefilter/CPageFilter.php:885 include/forms.inc.php:1134
 #: include/views/monitoring.screen.php:63 slides.php:187
 msgid "not selected"
 msgstr "не выбрано"
@@ -19325,7 +19349,7 @@ msgid "number"
 msgstr "число"
 
 #: app/views/monitoring.widget.problemhosts.view.php:116
-#: include/blocks.inc.php:407
+#: include/blocks.inc.php:409
 msgid "of"
 msgstr "из"
 
@@ -19450,7 +19474,7 @@ msgstr "с"
 msgid "script"
 msgstr ""
 
-#: include/forms.inc.php:2354 include/maintenances.inc.php:112
+#: include/forms.inc.php:2359 include/maintenances.inc.php:112
 msgctxt "adjective"
 msgid "second"
 msgstr "второй"
@@ -19526,7 +19550,7 @@ msgstr "заданная учётная запись не уникальна"
 #: app/views/monitoring.problem.view.php:237
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/widgets/CWidgetHelper.php:393
-#: include/classes/widgets/CWidgetHelper.php:440 include/forms.inc.php:2476
+#: include/classes/widgets/CWidgetHelper.php:440 include/forms.inc.php:2481
 #: include/views/administration.usergroups.edit.php:241
 #: include/views/configuration.action.edit.php:364
 #: include/views/configuration.action.edit.php:374
@@ -19574,7 +19598,7 @@ msgstr "параметр \"%1$s\" отсутствует"
 msgid "the tag \"%1$s\" is missing"
 msgstr "тег \"%1$s\" пропущен"
 
-#: include/forms.inc.php:2355 include/maintenances.inc.php:113
+#: include/forms.inc.php:2360 include/maintenances.inc.php:113
 msgid "third"
 msgstr "третий"
 
@@ -19690,7 +19714,7 @@ msgstr "неподдерживаемый номер версии"
 #: include/classes/widgets/CWidgetHelper.php:448
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:174
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:247
-#: include/forms.inc.php:2479
+#: include/forms.inc.php:2484
 #: include/views/administration.general.macros.edit.php:53
 #: include/views/administration.usergroups.edit.php:246
 #: include/views/configuration.action.edit.php:370
@@ -19715,7 +19739,7 @@ msgstr "неподдерживаемый номер версии"
 #: include/views/js/configuration.template.list.js.php:11
 #: include/views/js/configuration.triggers.list.js.php:11
 #: include/views/js/hostmacros.js.php:11
-#: include/views/js/item.preprocessing.js.php:344
+#: include/views/js/item.preprocessing.js.php:349
 msgid "value"
 msgstr "значение"
 

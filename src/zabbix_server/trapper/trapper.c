@@ -32,11 +32,13 @@
 #include "nodecommand.h"
 #include "proxyconfig.h"
 #include "proxydata.h"
+#include "../alerter/alerter_protocol.h"
 #include "trapper_preproc.h"
 
 #include "daemon.h"
 #include "../../libs/zbxcrypto/tls.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
+#include "zbxipcservice.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -437,6 +439,111 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: recv_alert_send                                                  *
+ *                                                                            *
+ * Purpose: process alert send request that is used to test media types       *
+ *                                                                            *
+ * Parameters:  sock  - [IN] the request socket                               *
+ *              jp    - [IN] the request data                                 *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+{
+	const char		*__function_name = "recv_alert_send";
+	int			ret = FAIL, errcode;
+	char			tmp[ZBX_MAX_UINT64_LEN + 1], sessionid[MAX_STRING_LEN], *sendto = NULL, *subject = NULL,
+				*message = NULL, *error = NULL;
+	zbx_uint64_t		mediatypeid;
+	size_t			string_alloc;
+	struct zbx_json		json;
+	struct zbx_json_parse	jp_data;
+	unsigned char		*data = NULL, *result;
+	zbx_uint32_t		size;
+	zbx_user_t		user;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
+			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
+	{
+		error = zbx_strdup(NULL, "Permission denied.");
+		goto fail;
+	}
+
+	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	{
+		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
+		goto fail;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_MEDIATYPEID, tmp, sizeof(tmp)) ||
+			SUCCEED != is_uint64(tmp, &mediatypeid))
+	{
+		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_MEDIATYPEID);
+		goto fail;
+	}
+
+	string_alloc = 0;
+	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SENDTO, &sendto, &string_alloc))
+	{
+		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_SENDTO);
+		goto fail;
+	}
+
+	string_alloc = 0;
+	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SUBJECT, &subject, &string_alloc))
+	{
+		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_SUBJECT);
+		goto fail;
+	}
+
+	string_alloc = 0;
+	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_MESSAGE, &message, &string_alloc))
+	{
+		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_MESSAGE);
+		goto fail;
+	}
+
+	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, sendto, subject, message);
+
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_ALERT, SEC_PER_MIN, data, size,
+			&result, &error))
+	{
+		goto fail;
+	}
+
+	zbx_alerter_deserialize_result(result, &errcode, &error);
+	zbx_free(result);
+
+	if (SUCCEED != errcode)
+		goto fail;
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+
+	(void)zbx_tcp_send(sock, json.buffer);
+
+	zbx_json_free(&json);
+
+	ret = SUCCEED;
+fail:
+	if (SUCCEED != ret)
+		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
+
+	zbx_free(message);
+	zbx_free(subject);
+	zbx_free(sendto);
+	zbx_free(data);
+	zbx_free(error);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
 
 static int	DBget_template_count(zbx_uint64_t *count)
@@ -1036,6 +1143,11 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
 			{
 				ret = send_internal_stats_json(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					recv_alert_send(sock, &jp);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PREPROCESSING_TEST))
 			{

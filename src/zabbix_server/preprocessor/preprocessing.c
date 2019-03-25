@@ -1005,14 +1005,9 @@ int	zbx_preprocessor_test(unsigned char value_type, const char *value, const cha
 	unsigned char		*data = NULL;
 	zbx_uint32_t		size;
 	zbx_timespec_t		ts, timestamps[2];
-	zbx_ipc_async_socket_t	asocket;
 	int			ret = FAIL, i, values_num = 0;
-	zbx_ipc_message_t	*message;
 	zbx_vector_ptr_t	history;
 	const char		*values[2];
-
-	if (FAIL == zbx_ipc_async_socket_open(&asocket, ZBX_IPC_SERVICE_PREPROCESSING, SEC_PER_MIN, error))
-		return FAIL;
 
 	zbx_timespec(&ts);
 	zbx_vector_ptr_create(&history);
@@ -1051,38 +1046,21 @@ int	zbx_preprocessor_test(unsigned char value_type, const char *value, const cha
 
 	for (i = 0; i < values_num; i++)
 	{
+		unsigned char	*result;
+
 		zbx_free(data);
 		size = preprocessor_pack_test_request(&data, value_type, values[i], &timestamps[i], &history, steps);
 
-		if (FAIL == zbx_ipc_async_socket_send(&asocket, ZBX_IPC_PREPROCESSOR_TEST_REQUEST, data, size))
+		if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, ZBX_IPC_PREPROCESSOR_TEST_REQUEST,
+				SEC_PER_MIN, data, size, &result, error))
 		{
-			*error = zbx_strdup(NULL, "failed to queue message to pre-processing manager");
-			goto out;
-		}
-
-		if (FAIL == zbx_ipc_async_socket_flush(&asocket, ZBX_IPC_WAIT_FOREVER))
-		{
-			*error = zbx_strdup(NULL, "failed to flush queued message to pre-processing manager");
-			goto out;
-		}
-
-		if (FAIL == zbx_ipc_async_socket_recv(&asocket, SEC_PER_MIN, &message))
-		{
-			*error = zbx_strdup(NULL, "failed to receive response from pre-processing manager");
-			goto out;
-		}
-
-		if (NULL == message)
-		{
-			*error = zbx_strdup(NULL, "timeout occurred while waiting for response from pre-processing"
-					" manager");
 			goto out;
 		}
 
 		zbx_vector_ptr_clear_ext(results, (zbx_clean_func_t)zbx_preproc_result_free);
 		zbx_free(*preproc_error);
-		zbx_preprocessor_unpack_test_result(results, &history, preproc_error, message->data);
-		zbx_ipc_message_free(message);
+		zbx_preprocessor_unpack_test_result(results, &history, preproc_error, result);
+		zbx_free(result);
 	}
 
 	ret = SUCCEED;
@@ -1090,7 +1068,6 @@ out:
 	zbx_vector_ptr_clear_ext(&history, (zbx_clean_func_t)zbx_preproc_op_history_free);
 	zbx_vector_ptr_destroy(&history);
 
-	zbx_ipc_async_socket_close(&asocket);
 	zbx_free(data);
 
 	return ret;
