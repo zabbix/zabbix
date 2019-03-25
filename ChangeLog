@@ -242,8 +242,6 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.6rc2
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-15839] fixed broken layout of the breadcrumbs in Safari browser (ashubin)
 ........S. [ZBX-15867] fixed invalid DNS being accepted when receiving discovery contents from Zabbix proxy (vso)
