@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 11:18+0200\n"
-"PO-Revision-Date: 2019-02-15 12:47+0300\n"
+"POT-Creation-Date: 2019-03-25 10:16+0200\n"
+"PO-Revision-Date: 2019-03-19 11:55+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1550227636.000000\n"
+"X-POOTLE-MTIME: 1552989359.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -347,7 +347,7 @@ msgstr[2] "Обліковий запис заблокоровано на %1$s с
 
 #: app/views/monitoring.widget.problems.view.php:62
 #: include/actions.inc.php:155 include/actions.inc.php:335
-#: include/blocks.inc.php:558
+#: include/blocks.inc.php:560
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:916
@@ -503,7 +503,7 @@ msgid "Action updated"
 msgstr "Дію оновлено"
 
 #: app/views/monitoring.dashboard.view.php:86
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:559
+#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:561
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:894
 #: include/classes/screens/CScreenProblem.php:917
@@ -2622,15 +2622,15 @@ msgstr "Не вдалося переключити вузел мережі на 
 msgid "Cannot unblock users"
 msgstr "Не вдалося розблокувати користувачів"
 
-#: include/classes/api/services/CHostGeneral.php:559
+#: include/classes/api/services/CHostGeneral.php:555
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Не вдалося від'єднати і очистити веб сценарії."
 
-#: include/classes/api/services/CHostGeneral.php:620
+#: include/classes/api/services/CHostGeneral.php:616
 msgid "Cannot unlink and clear applications."
 msgstr "Не вдалося від'єднати і очистити групи елементів даних."
 
-#: include/classes/api/services/CHostGeneral.php:363
+#: include/classes/api/services/CHostGeneral.php:427
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Не вдалося від'єднати та очистити правила виявлення"
 
@@ -3191,7 +3191,7 @@ msgstr "Очистити при від'єднанні"
 
 #: jsLoader.php:118
 msgid "Click and drag to desired size."
-msgstr ""
+msgstr "Натисніть та тягніть до бажаного розміру."
 
 #: include/classes/widgets/CWidgetConfig.php:34 include/screens.inc.php:28
 msgid "Clock"
@@ -4826,7 +4826,7 @@ msgstr "Опис"
 msgid "Description updated"
 msgstr "Опис оновлено"
 
-#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:434
+#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:436
 #: include/func.inc.php:1886
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:439
@@ -5312,7 +5312,7 @@ msgstr "Дублікат usrgrpid \"%1$s\" у групах користувач�
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "Дублікат usrgrpid \"%1$s\" у групах користувачів для комплексного екрану \"%2$s\"."
 
-#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:557
+#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:559
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:915
 #: include/classes/screens/CScreenProblem.php:1126 include/events.inc.php:249
@@ -6933,7 +6933,7 @@ msgstr "Вирівнювання по горизонталі"
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
 #: app/views/popup.generic.php:137 httpconf.php:191 httpconf.php:495
 #: include/actions.inc.php:48 include/audit.inc.php:27
-#: include/blocks.inc.php:554 include/classes/screens/CScreenEvents.php:32
+#: include/blocks.inc.php:556 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
@@ -7047,7 +7047,7 @@ msgstr[2] "Вузли мережі активовано"
 #: app/views/administration.script.list.php:61
 #: app/views/monitoring.widget.problemhosts.view.php:27
 #: app/views/monitoring.widget.web.view.php:26 include/actions.inc.php:46
-#: include/audit.inc.php:37 include/blocks.inc.php:340
+#: include/audit.inc.php:37 include/blocks.inc.php:342
 #: include/forms.inc.php:329 include/maps.inc.php:25
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:183
@@ -8710,7 +8710,7 @@ msgstr "Індонезійська (id_ID)"
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/monitoring.widget.problems.view.php:53
 #: include/actions.inc.php:1904 include/actions.inc.php:1988
-#: include/blocks.inc.php:553 include/classes/screens/CScreenActions.php:132
+#: include/blocks.inc.php:555 include/classes/screens/CScreenActions.php:132
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:911
@@ -9761,7 +9761,7 @@ msgstr "Графік за останній тиждень"
 msgid "Latest data"
 msgstr "Останні дані"
 
-#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:556
+#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:558
 #: include/classes/screens/CScreenProblem.php:914 jsLoader.php:254
 msgid "Latest values"
 msgstr "Останні значення"
@@ -10995,8 +10995,8 @@ msgid "Next step"
 msgstr "Наступний крок"
 
 #: app/views/monitoring.widget.problems.view.php:221
-#: include/actions.inc.php:33 include/blocks.inc.php:441
-#: include/blocks.inc.php:632
+#: include/actions.inc.php:33 include/blocks.inc.php:443
+#: include/blocks.inc.php:634
 #: include/classes/screens/CScreenHostTriggers.php:300
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
@@ -11687,11 +11687,11 @@ msgstr "Кількість CPU. Повертає ціле число"
 msgid "Number of enabled items on the host."
 msgstr "Кількість активованих елементів даних у вузла мережі."
 
-#: include/blocks.inc.php:445
+#: include/blocks.inc.php:447
 msgid "Number of hosts (enabled/disabled/templates)"
 msgstr "Кількість вузлів мережі (активовані/дезактивовані/шаблони)"
 
-#: include/blocks.inc.php:455
+#: include/blocks.inc.php:457
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Кількість елементів даних (активовані/дезактивовані/не підтримуються)"
 
@@ -11753,7 +11753,7 @@ msgstr "Кількість змін стану"
 msgid "Number of steps"
 msgstr "Кількість кроків"
 
-#: include/blocks.inc.php:466
+#: include/blocks.inc.php:468
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Кількість тригерів (активовані/дезактивовані [проблема/ок])"
 
@@ -11769,7 +11769,7 @@ msgstr "Кількість елементів даних в базі даних 
 msgid "Number of unsupported items on the host."
 msgstr "Кількість елементів даних у вузла мережі, які не підтримуються."
 
-#: include/blocks.inc.php:478
+#: include/blocks.inc.php:480
 msgid "Number of users (online)"
 msgstr "Кількість користувачів (підключених в даний момент)"
 
@@ -12009,7 +12009,7 @@ msgstr "Тільки адміністратори можуть задавати 
 msgid "Only administrators can set slide show owner."
 msgstr "Тільки адміністратори можуть задавати власника слайд шоу."
 
-#: include/blocks.inc.php:456
+#: include/blocks.inc.php:458
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Підраховуються елементи даних тільки у вузлів мережі під спостереженням"
 
@@ -12057,7 +12057,7 @@ msgstr "Тільки супер адміністратори можуть оно
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "Індикатор відображує тільки останні 20%%."
 
-#: include/blocks.inc.php:467
+#: include/blocks.inc.php:469
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Підраховуються тригери тільки у вузлів мережі під спостереженням та які залежать від активних елементів даних"
 
@@ -12471,7 +12471,7 @@ msgstr "PSK занадто короткий. Мінімум це %1$s шістн
 msgid "Page received incorrect data"
 msgstr "Сторінка отримала некоректні дані"
 
-#: app/views/administration.mediatype.edit.php:102 include/blocks.inc.php:434
+#: app/views/administration.mediatype.edit.php:102 include/blocks.inc.php:436
 msgid "Parameter"
 msgstr "Параметр"
 
@@ -12881,7 +12881,7 @@ msgid "Privilege level"
 msgstr "Рівень привілеїв"
 
 #: app/views/monitoring.problem.view.php:163
-#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:555
+#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:557
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:913
 #: include/classes/screens/CScreenProblem.php:1047
@@ -13305,7 +13305,7 @@ msgstr "Звичайні елементи даних"
 
 #: jsLoader.php:117
 msgid "Release to create a new widget."
-msgstr ""
+msgstr "Відпустіть для створення нового віджета."
 
 #: include/views/general.login.php:67
 msgid "Remember me for 30 days"
@@ -13538,7 +13538,7 @@ msgstr "Необхідна продуктивність (знач/сек)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Необхідна швидкодія Zabbix сервера, в одиницях очікуваної кількості нових значень в секунду."
 
-#: include/blocks.inc.php:482
+#: include/blocks.inc.php:484
 msgid "Required server performance, new values per second"
 msgstr "Необхідна потужність сервера, нових значень в секунду"
 
@@ -15380,7 +15380,7 @@ msgid "Tag value"
 msgstr "Значення тегу"
 
 #: app/views/monitoring.problem.view.php:283
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:560
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:562
 #: include/classes/screens/CScreenProblem.php:864
 #: include/classes/screens/CScreenProblem.php:918
 #: include/classes/screens/CScreenProblem.php:1129
@@ -15765,7 +15765,7 @@ msgstr "До"
 #: app/views/popup.triggerexpr.php:128 app/views/popup.triggerexpr.php:132
 #: include/actions.inc.php:1769 include/actions.inc.php:1823
 #: include/actions.inc.php:1904 include/actions.inc.php:1988
-#: include/actions.inc.php:2038 include/blocks.inc.php:535
+#: include/actions.inc.php:2038 include/blocks.inc.php:537
 #: include/classes/screens/CScreenActions.php:126
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:841
@@ -16553,42 +16553,32 @@ msgstr "Від'єднати від шаблону"
 msgid "Unlink from templates"
 msgstr "Від'єднати від шаблонів"
 
-#: include/classes/api/services/CHostGeneral.php:626
+#: include/classes/api/services/CHostGeneral.php:622
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Від'єднано: Група елементів даних \"%1$s\" від \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:372
+#: include/classes/api/services/CHostGeneral.php:436
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Від'єднано: Правило виявлення \"%1$s\" від \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:529
-#, c-format
-msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
-msgstr "Від'єднано: Графік \"%1$s\" від \"%2$s\"."
-
-#: include/classes/api/services/CHostGeneral.php:513
-#, c-format
-msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
-msgstr "Від'єднано: Прототип графіка \"%1$s\" від \"%2$s\"."
-
-#: include/classes/api/services/CHostGeneral.php:462
+#: include/classes/api/services/CHostGeneral.php:526
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Від'єднано: Прототип вузлів мережі \"%1$s\" на \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:388
+#: include/classes/api/services/CHostGeneral.php:452
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Від'єднано: Елемент даних \"%1$s\" від \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:407
+#: include/classes/api/services/CHostGeneral.php:471
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Від'єднано: Прототип елемента даних \"%1$s\" від \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:568
+#: include/classes/api/services/CHostGeneral.php:564
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Від'єднано: Веб сценарій \"%1$s\" на \"%2$s\"."
@@ -17072,7 +17062,7 @@ msgstr "Статистика розміру сховища VMware в байта�
 
 #: include/classes/items/CHelpItems.php:691
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
-msgstr ""
+msgstr "Лог подій VMware , <url> - URL VMware сервісу, <mode> - all (по замовчуванню), skip - пропустити обробку старіших даних"
 
 #: include/classes/items/CHelpItems.php:747
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -17252,7 +17242,7 @@ msgstr "Час роботи (uptime) віртуальної машини VMware,
 
 #: app/views/monitoring.widget.plaintext.view.php:46
 #: app/views/popup.httpstep.php:109 app/views/popup.testtriggerexpr.php:30
-#: include/blocks.inc.php:434 include/classes/graphdraw/CPieGraphDraw.php:343
+#: include/blocks.inc.php:436 include/classes/graphdraw/CPieGraphDraw.php:343
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHistory.php:264
 #: include/classes/screens/CScreenHistory.php:361
@@ -17761,7 +17751,7 @@ msgstr "Максимальне значення вісі Y"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:515
 msgid "Y axis MAX value must be greater than Y axis MIN value"
-msgstr ""
+msgstr "Вісь Y  МАКС значення має бути більшим ніж вісь Y МІН значення"
 
 #: include/classes/api/services/CGraphGeneral.php:314
 #: include/classes/graphdraw/CLineGraphDraw.php:709
@@ -17830,8 +17820,8 @@ msgid "Yearly"
 msgstr "Щороку"
 
 #: app/views/monitoring.widget.problems.view.php:221
-#: include/actions.inc.php:32 include/blocks.inc.php:441
-#: include/blocks.inc.php:632
+#: include/actions.inc.php:32 include/blocks.inc.php:443
+#: include/blocks.inc.php:634
 #: include/classes/screens/CScreenHostTriggers.php:300
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
@@ -18026,7 +18016,7 @@ msgstr "Деталі Zabbix сервера"
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix сервер не запущено: відображувана інформація може бути не актуальною."
 
-#: include/blocks.inc.php:440
+#: include/blocks.inc.php:442
 msgid "Zabbix server is running"
 msgstr "Zabbix сервер в запущеному стані"
 
@@ -18137,7 +18127,7 @@ msgstr "агент"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/html/CSeverity.php:49
-#: include/classes/pagefilter/CPageFilter.php:875
+#: include/classes/pagefilter/CPageFilter.php:885
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -18393,7 +18383,7 @@ msgstr "dayofweek() - День тижня"
 msgid "days"
 msgstr "днів"
 
-#: include/classes/pagefilter/CPageFilter.php:749
+#: include/classes/pagefilter/CPageFilter.php:759
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/widgets/CWidgetHelper.php:53
 #: include/views/js/monitoring.slideconf.edit.js.php:14
@@ -18840,8 +18830,8 @@ msgstr "не в"
 
 #: app/controllers/CControllerDashboardView.php:134
 #: hostinventoriesoverview.php:76
-#: include/classes/pagefilter/CPageFilter.php:808
-#: include/classes/pagefilter/CPageFilter.php:875 include/forms.inc.php:1128
+#: include/classes/pagefilter/CPageFilter.php:818
+#: include/classes/pagefilter/CPageFilter.php:885 include/forms.inc.php:1128
 #: include/views/monitoring.screen.php:63 slides.php:187
 msgid "not selected"
 msgstr "не обрано"
@@ -18860,7 +18850,7 @@ msgid "number"
 msgstr "число"
 
 #: app/views/monitoring.widget.problemhosts.view.php:116
-#: include/blocks.inc.php:407
+#: include/blocks.inc.php:409
 msgid "of"
 msgstr "із"
 
@@ -19130,7 +19120,7 @@ msgstr "timeleft() - Час досягнення порогу, вирахува�
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:504
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:508
 msgid "too many decimal places"
-msgstr ""
+msgstr "надто багато десяткових знаків"
 
 #: include/classes/api/services/CMap.php:849
 #: include/classes/api/services/CMap.php:1302 include/events.inc.php:34
