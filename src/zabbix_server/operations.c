@@ -211,7 +211,6 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 	unsigned char		svc_type, interface_type;
 	zbx_config_t		cfg;
 	zbx_db_insert_t		db_insert;
-	int			status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __function_name, event->eventid);
 
@@ -232,7 +231,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 		if (EVENT_OBJECT_DHOST == event->object)
 		{
 			result = DBselect(
-					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type,ds.status"
+					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type"
 					" from drules dr,dchecks dc,dservices ds"
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
@@ -243,7 +242,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 		else
 		{
 			result = DBselect(
-					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type,ds.status"
+					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type"
 					" from drules dr,dchecks dc,dservices ds,dservices ds1"
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
@@ -258,9 +257,6 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 			ZBX_STR2UINT64(dhostid, row[0]);
 			ZBX_DBROW2UINT64(proxy_hostid, row[1]);
 			svc_type = (unsigned char)atoi(row[5]);
-			status = atoi(row[6]);
-
-			if (DOBJECT_STATUS_UP != status) continue;
 
 			switch (svc_type)
 			{

@@ -44,7 +44,7 @@ static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char 
 	return result;
 }
 
-static DB_RESULT	discovery_get_dhost_by_ip(zbx_uint64_t druleid, const char *ip)
+static DB_RESULT	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, const char *ip, int port)
 {
 	DB_RESULT	result;
 	char		*ip_esc;
@@ -57,8 +57,9 @@ static DB_RESULT	discovery_get_dhost_by_ip(zbx_uint64_t druleid, const char *ip)
 			" where ds.dhostid=dh.dhostid"
 				" and dh.druleid=" ZBX_FS_UI64
 				" and ds.ip" ZBX_SQL_STRCMP
+				" and ds.port=%d"
 			" order by dh.dhostid",
-			druleid, ZBX_SQL_STRVAL_EQ(ip_esc));
+			druleid, ZBX_SQL_STRVAL_EQ(ip_esc), port);
 
 	zbx_free(ip_esc);
 
@@ -133,13 +134,13 @@ static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char
  *                                                                            *
  ******************************************************************************/
 static void	discovery_register_host(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost,
-		const char *ip, int status, const char *value)
+		const char *ip, int port, int status, const char *value)
 {
 	const char	*__function_name = "discovery_register_host";
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		new_value = 0;
+	int		match_value = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' status:%d value:'%s'",
 			__function_name, ip, status, value);
@@ -152,15 +153,16 @@ static void	discovery_register_host(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_D
 		{
 			DBfree_result(result);
 
-			result = discovery_get_dhost_by_ip(drule->druleid, ip);
+			result = discovery_get_dhost_by_ip_port(drule->druleid, ip, port);
 			row = DBfetch(result);
-			if (DOBJECT_STATUS_UP == status)
-				new_value = 1;
 		}
+		else
+			match_value = 1;
+
 	}
 	else
 	{
-		result = discovery_get_dhost_by_ip(drule->druleid, ip);
+		result = discovery_get_dhost_by_ip_port(drule->druleid, ip, port);
 		row = DBfetch(result);
 	}
 
@@ -182,43 +184,15 @@ static void	discovery_register_host(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_D
 	}
 	else
 	{
-		if (1 == new_value)
-		{
-			zbx_uint64_t	dhostid;
-			char		*ip_esc;
+		zabbix_log(LOG_LEVEL_DEBUG, "host at %s is already in database", ip);
 
-			ZBX_STR2UINT64(dhost->dhostid, row[0]);
-			dhostid = DBget_maxid("dhosts");
-			ip_esc = DBdyn_escape_field("dservices", "ip", ip);
-			DBexecute("insert into dhosts (dhostid,druleid)"
-					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-					dhostid, drule->druleid);
+		ZBX_STR2UINT64(dhost->dhostid, row[0]);
+		dhost->status = atoi(row[1]);
+		dhost->lastup = atoi(row[2]);
+		dhost->lastdown = atoi(row[3]);
 
-			DBexecute("update dservices"
-					" set dhostid=" ZBX_FS_UI64
-					" where dhostid=" ZBX_FS_UI64
-						" and ip" ZBX_SQL_STRCMP,
-					dhostid, dhost->dhostid, ZBX_SQL_STRVAL_EQ(ip_esc));
-
-			dhost->dhostid = dhostid;
-			dhost->status = DOBJECT_STATUS_DOWN;
-			dhost->lastup = 0;
-			dhost->lastdown = 0;
-
-			zbx_free(ip_esc);
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "host at %s is already in database", ip);
-
-			ZBX_STR2UINT64(dhost->dhostid, row[0]);
-			dhost->status = atoi(row[1]);
-			dhost->lastup = atoi(row[2]);
-			dhost->lastdown = atoi(row[3]);
-
-			if (0 == drule->unique_dcheckid)
-				discovery_separate_host(drule, dhost, ip);
-		}
+		if (0 == match_value)
+			discovery_separate_host(drule, dhost, ip);
 	}
 	DBfree_result(result);
 
@@ -527,8 +501,8 @@ void	discovery_update_service(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *
 	memset(&dservice, 0, sizeof(dservice));
 
 	/* register host if is not registered yet */
-	if (0 == dhost->dhostid || (drule->unique_dcheckid == dcheckid && DOBJECT_STATUS_UP == status))
-		discovery_register_host(drule, dcheckid, dhost, ip, status, value);
+	if (0 == dhost->dhostid)
+		discovery_register_host(drule, dcheckid, dhost, ip, port, status, value);
 
 	/* register service if is not registered yet */
 	if (0 != dhost->dhostid)
