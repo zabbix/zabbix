@@ -156,10 +156,9 @@ $httpAuthenticationFormList->addRow(_('HTTP authentication'),
 );
 
 $httpAuthenticationFormList
-	->addRow((new CLabel(_('User'), 'http_user'))->setAsteriskMark(),
+	->addRow(new CLabel(_('User'), 'http_user'),
 		(new CTextBox('http_user', $this->data['http_user'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Password'), 'http_password'))->setAsteriskMark(),
 		(new CTextBox('http_password', $this->data['http_password'], false, 64))

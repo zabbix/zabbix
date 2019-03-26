@@ -964,18 +964,16 @@ class CHttpTest extends CApiService {
 					}
 				}
 				else {
-					foreach (['http_user', 'http_password'] as $field_name) {
-						$httptest += [
-							$field_name => ($method === 'validateUpdate')
-								? $db_httptests[$httptest['httptestid']][$field_name]
-								: ''
-						];
+					$httptest += [
+						'http_password' => ($method === 'validateUpdate')
+							? $db_httptests[$httptest['httptestid']]['http_password']
+							: ''
+					];
 
-						if ($httptest[$field_name] === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty'))
-							);
-						}
+					if ($httptest['http_password'] === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s.', 'http_password', _('cannot be empty'))
+						);
 					}
 				}
 			}

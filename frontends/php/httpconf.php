@@ -52,8 +52,12 @@ $fields = [
 	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    null],
 	'steps'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    'isset({add}) || isset({update})', _('Steps')],
 	'authentication'  => [T_ZBX_INT, O_OPT, null,  IN('0,1,2'),             'isset({add}) || isset({update})'],
-	'http_user'       => [T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               '(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
-		' || {authentication} == '.HTTPTEST_AUTH_NTLM.')', _('User')],
+	'http_user'       => [T_ZBX_STR, O_OPT, null,  null,
+		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
+			' || {authentication}=='.HTTPTEST_AUTH_NTLM.
+		')',
+		_('User')
+	],
 	'http_password'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
 		' || {authentication} == '.HTTPTEST_AUTH_NTLM.')', _('Password')],
 	'http_proxy'		=> [T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'],
