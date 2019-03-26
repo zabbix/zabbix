@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 11:18+0200\n"
-"PO-Revision-Date: 2019-01-30 08:53+0300\n"
+"POT-Creation-Date: 2019-03-25 10:16+0200\n"
+"PO-Revision-Date: 2019-03-21 16:26+0300\n"
 "Last-Translator: Daudet <aremy@gab6.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1548831201.000000\n"
+"X-POOTLE-MTIME: 1553178393.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -331,7 +331,7 @@ msgstr[1] "Le compte est bloqué pendant %1$s secondes."
 
 #: app/views/monitoring.widget.problems.view.php:62
 #: include/actions.inc.php:155 include/actions.inc.php:335
-#: include/blocks.inc.php:558
+#: include/blocks.inc.php:560
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:916
@@ -485,7 +485,7 @@ msgid "Action updated"
 msgstr "Action mise à jour"
 
 #: app/views/monitoring.dashboard.view.php:86
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:559
+#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:561
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:894
 #: include/classes/screens/CScreenProblem.php:917
@@ -2568,15 +2568,15 @@ msgstr "Impossible de changer d'hôte pour l'interface."
 msgid "Cannot unblock users"
 msgstr "Impossible de débloquer les utilisateurs"
 
-#: include/classes/api/services/CHostGeneral.php:559
+#: include/classes/api/services/CHostGeneral.php:555
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Impossible de délier et effacer les scénarios web."
 
-#: include/classes/api/services/CHostGeneral.php:620
+#: include/classes/api/services/CHostGeneral.php:616
 msgid "Cannot unlink and clear applications."
 msgstr "Impossible de délier et effacer les applications."
 
-#: include/classes/api/services/CHostGeneral.php:363
+#: include/classes/api/services/CHostGeneral.php:427
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Impossible de délier et effacer les règles de découverte"
 
@@ -3134,7 +3134,7 @@ msgstr "Effacer en déliant"
 
 #: jsLoader.php:118
 msgid "Click and drag to desired size."
-msgstr ""
+msgstr "Cliquez et faites glisser jusqu'à la taille désirée."
 
 #: include/classes/widgets/CWidgetConfig.php:34 include/screens.inc.php:28
 msgid "Clock"
@@ -4764,7 +4764,7 @@ msgstr "Description"
 msgid "Description updated"
 msgstr "Description mise à jour"
 
-#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:434
+#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:436
 #: include/func.inc.php:1886
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:439
@@ -5248,7 +5248,7 @@ msgstr "Identifiant de groupe d'utilisateurs \"%1$s\" en doublon dans les groupe
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "Identifiant de groupe d'utilisateurs \"%1$s\" en doublon dans les groupes d'utilisateurs pour l'écran \"%2$s\"."
 
-#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:557
+#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:559
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:915
 #: include/classes/screens/CScreenProblem.php:1126 include/events.inc.php:249
@@ -6866,7 +6866,7 @@ msgstr "Alignement horizontal"
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
 #: app/views/popup.generic.php:137 httpconf.php:191 httpconf.php:495
 #: include/actions.inc.php:48 include/audit.inc.php:27
-#: include/blocks.inc.php:554 include/classes/screens/CScreenEvents.php:32
+#: include/blocks.inc.php:556 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
@@ -6977,7 +6977,7 @@ msgstr[1] "Hôtes désactivés"
 #: app/views/administration.script.list.php:61
 #: app/views/monitoring.widget.problemhosts.view.php:27
 #: app/views/monitoring.widget.web.view.php:26 include/actions.inc.php:46
-#: include/audit.inc.php:37 include/blocks.inc.php:340
+#: include/audit.inc.php:37 include/blocks.inc.php:342
 #: include/forms.inc.php:329 include/maps.inc.php:25
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:183
@@ -8639,7 +8639,7 @@ msgstr "Indonésien (id_ID)"
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/monitoring.widget.problems.view.php:53
 #: include/actions.inc.php:1904 include/actions.inc.php:1988
-#: include/blocks.inc.php:553 include/classes/screens/CScreenActions.php:132
+#: include/blocks.inc.php:555 include/classes/screens/CScreenActions.php:132
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:911
@@ -9681,7 +9681,7 @@ msgstr "Graphique dernière semaine"
 msgid "Latest data"
 msgstr "Dernières données"
 
-#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:556
+#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:558
 #: include/classes/screens/CScreenProblem.php:914 jsLoader.php:254
 msgid "Latest values"
 msgstr "Dernières valeurs"
@@ -10910,8 +10910,8 @@ msgid "Next step"
 msgstr "Prochaine étape"
 
 #: app/views/monitoring.widget.problems.view.php:221
-#: include/actions.inc.php:33 include/blocks.inc.php:441
-#: include/blocks.inc.php:632
+#: include/actions.inc.php:33 include/blocks.inc.php:443
+#: include/blocks.inc.php:634
 #: include/classes/screens/CScreenHostTriggers.php:300
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
@@ -11602,11 +11602,11 @@ msgstr "Nombre de processeurs. Retourne un entier"
 msgid "Number of enabled items on the host."
 msgstr "Nombre d'éléments activés sur l'hôte."
 
-#: include/blocks.inc.php:445
+#: include/blocks.inc.php:447
 msgid "Number of hosts (enabled/disabled/templates)"
 msgstr "Nombre d'hôtes (activés/désactivés/modèles)"
 
-#: include/blocks.inc.php:455
+#: include/blocks.inc.php:457
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Nombre d'éléments (activés/désactivés/non supportés)"
 
@@ -11668,7 +11668,7 @@ msgstr "Nombre de changements d'états"
 msgid "Number of steps"
 msgstr "Nombre d'étapes"
 
-#: include/blocks.inc.php:466
+#: include/blocks.inc.php:468
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Nombre de déclencheurs (activés/désactivés [problème/ok])"
 
@@ -11684,7 +11684,7 @@ msgstr "Nombre d'éléments non supportés dans la base de données Zabbix."
 msgid "Number of unsupported items on the host."
 msgstr "Nombre d'éléments non supportés sur l'hôte."
 
-#: include/blocks.inc.php:478
+#: include/blocks.inc.php:480
 msgid "Number of users (online)"
 msgstr "Nombre d'utilisateurs (en ligne)"
 
@@ -11924,7 +11924,7 @@ msgstr "Seuls les administrateurs peuvent configurer le propriétaire de l'écra
 msgid "Only administrators can set slide show owner."
 msgstr "Seuls les administrateurs peuvent configurer le propriétaire du diaporama."
 
-#: include/blocks.inc.php:456
+#: include/blocks.inc.php:458
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Seuls les éléments assignés à des hôtes activés sont comptés"
 
@@ -11971,7 +11971,7 @@ msgstr "Seuls les super administrateurs peuvent mettre à jour les tables de cor
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "Seules les 20 derniers %% des indicateurs sont affichés."
 
-#: include/blocks.inc.php:467
+#: include/blocks.inc.php:469
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Seuls les déclencheurs assignés à des hôtes activés et dépendant d'éléments activés sont comptés"
 
@@ -12385,7 +12385,7 @@ msgstr "La PSK est trop courte. Le minimum est %1$s chiffres hexadécimaux."
 msgid "Page received incorrect data"
 msgstr "La page a reçu des données incorrectes"
 
-#: app/views/administration.mediatype.edit.php:102 include/blocks.inc.php:434
+#: app/views/administration.mediatype.edit.php:102 include/blocks.inc.php:436
 msgid "Parameter"
 msgstr "Paramètre"
 
@@ -12795,7 +12795,7 @@ msgid "Privilege level"
 msgstr "Niveau de privilège"
 
 #: app/views/monitoring.problem.view.php:163
-#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:555
+#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:557
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:913
 #: include/classes/screens/CScreenProblem.php:1047
@@ -13217,7 +13217,7 @@ msgstr "Eléments normaux"
 
 #: jsLoader.php:117
 msgid "Release to create a new widget."
-msgstr ""
+msgstr "Relâchez pour créer un nouveau widget."
 
 #: include/views/general.login.php:67
 msgid "Remember me for 30 days"
@@ -13450,7 +13450,7 @@ msgstr "Performance requise (vps)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Performance du serveur Zabbix requise, en nouvelles valeurs par seconde attendues."
 
-#: include/blocks.inc.php:482
+#: include/blocks.inc.php:484
 msgid "Required server performance, new values per second"
 msgstr "Performance serveur requise, nouvelles valeurs par seconde"
 
@@ -13598,7 +13598,7 @@ msgstr "Retourne le temps de réponse au ping ICMP en secondes. Exemple : 0.02"
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:987
 msgid "Returns a JSON object containing Zabbix server or Proxy internal metrics."
-msgstr ""
+msgstr "Retourne un objet JSON contenant le serveur Zabbix ou les métriques internes du proxy."
 
 #: include/classes/items/CHelpItems.php:939
 msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
@@ -15291,7 +15291,7 @@ msgid "Tag value"
 msgstr "Valeur du tag"
 
 #: app/views/monitoring.problem.view.php:283
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:560
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:562
 #: include/classes/screens/CScreenProblem.php:864
 #: include/classes/screens/CScreenProblem.php:918
 #: include/classes/screens/CScreenProblem.php:1129
@@ -15674,7 +15674,7 @@ msgstr "À"
 #: app/views/popup.triggerexpr.php:128 app/views/popup.triggerexpr.php:132
 #: include/actions.inc.php:1769 include/actions.inc.php:1823
 #: include/actions.inc.php:1904 include/actions.inc.php:1988
-#: include/actions.inc.php:2038 include/blocks.inc.php:535
+#: include/actions.inc.php:2038 include/blocks.inc.php:537
 #: include/classes/screens/CScreenActions.php:126
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:841
@@ -16458,42 +16458,32 @@ msgstr "Supprimer lien au modèle"
 msgid "Unlink from templates"
 msgstr "Supprimer lien aux modèles"
 
-#: include/classes/api/services/CHostGeneral.php:626
+#: include/classes/api/services/CHostGeneral.php:622
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Déliée : Application \"%1$s\" sur \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:372
+#: include/classes/api/services/CHostGeneral.php:436
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Déliée : Règle de découverte \"%1$s\" sur \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:529
-#, c-format
-msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
-msgstr "Délié : Graphique \"%1$s\" sur \"%2$s\"."
-
-#: include/classes/api/services/CHostGeneral.php:513
-#, c-format
-msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
-msgstr "Délié : Prototype de graphique \"%1$s\" sur \"%2$s\"."
-
-#: include/classes/api/services/CHostGeneral.php:462
+#: include/classes/api/services/CHostGeneral.php:526
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Délié : Prototype d'hôte \"%1$s\" sur \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:388
+#: include/classes/api/services/CHostGeneral.php:452
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Délié : Élément \"%1$s\" sur \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:407
+#: include/classes/api/services/CHostGeneral.php:471
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Délié : Prototype d'élément \"%1$s\" sur \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:568
+#: include/classes/api/services/CHostGeneral.php:564
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Délié : Scénario web \"%1$s\" sur \"%2$s\"."
@@ -16975,7 +16965,7 @@ msgstr "Statistiques de capacité du datastore VMware en octets ou en pourcentag
 
 #: include/classes/items/CHelpItems.php:691
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
-msgstr ""
+msgstr "Journal des événements VMware, <url> - URL du service VMware, <mode> - tout (par défaut), ignorer - ignorer le traitement des données plus anciennes"
 
 #: include/classes/items/CHelpItems.php:747
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -17155,7 +17145,7 @@ msgstr "Uptime d'une machine virtuelle VMware, <url> - URL du service VMware, <u
 
 #: app/views/monitoring.widget.plaintext.view.php:46
 #: app/views/popup.httpstep.php:109 app/views/popup.testtriggerexpr.php:30
-#: include/blocks.inc.php:434 include/classes/graphdraw/CPieGraphDraw.php:343
+#: include/blocks.inc.php:436 include/classes/graphdraw/CPieGraphDraw.php:343
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHistory.php:264
 #: include/classes/screens/CScreenHistory.php:361
@@ -17661,7 +17651,7 @@ msgstr "Valeur MAX axe Y"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:515
 msgid "Y axis MAX value must be greater than Y axis MIN value"
-msgstr ""
+msgstr "La valeur MAX de l'axe Y doit être supérieure à la valeur MIN de l'axe Y"
 
 #: include/classes/api/services/CGraphGeneral.php:314
 #: include/classes/graphdraw/CLineGraphDraw.php:709
@@ -17730,8 +17720,8 @@ msgid "Yearly"
 msgstr "Annuel"
 
 #: app/views/monitoring.widget.problems.view.php:221
-#: include/actions.inc.php:32 include/blocks.inc.php:441
-#: include/blocks.inc.php:632
+#: include/actions.inc.php:32 include/blocks.inc.php:443
+#: include/blocks.inc.php:634
 #: include/classes/screens/CScreenHostTriggers.php:300
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
@@ -17926,7 +17916,7 @@ msgstr "Détails du serveur Zabbix"
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Le serveur Zabbix ne fonctionne pas : les informations affichées peuvent ne pas être actuelles."
 
-#: include/blocks.inc.php:440
+#: include/blocks.inc.php:442
 msgid "Zabbix server is running"
 msgstr "Le serveur Zabbix est en cours d'exécution"
 
@@ -18037,7 +18027,7 @@ msgstr "agent"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/html/CSeverity.php:49
-#: include/classes/pagefilter/CPageFilter.php:875
+#: include/classes/pagefilter/CPageFilter.php:885
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -18293,7 +18283,7 @@ msgstr "dayofweek () - Jour de la semaine"
 msgid "days"
 msgstr "jours"
 
-#: include/classes/pagefilter/CPageFilter.php:749
+#: include/classes/pagefilter/CPageFilter.php:759
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/widgets/CWidgetHelper.php:53
 #: include/views/js/monitoring.slideconf.edit.js.php:14
@@ -18740,8 +18730,8 @@ msgstr "pas dans"
 
 #: app/controllers/CControllerDashboardView.php:134
 #: hostinventoriesoverview.php:76
-#: include/classes/pagefilter/CPageFilter.php:808
-#: include/classes/pagefilter/CPageFilter.php:875 include/forms.inc.php:1128
+#: include/classes/pagefilter/CPageFilter.php:818
+#: include/classes/pagefilter/CPageFilter.php:885 include/forms.inc.php:1128
 #: include/views/monitoring.screen.php:63 slides.php:187
 msgid "not selected"
 msgstr "non sélectionné"
@@ -18760,7 +18750,7 @@ msgid "number"
 msgstr "nombre"
 
 #: app/views/monitoring.widget.problemhosts.view.php:116
-#: include/blocks.inc.php:407
+#: include/blocks.inc.php:409
 msgid "of"
 msgstr "de"
 
@@ -19030,7 +19020,7 @@ msgstr "timeleft () - Temps nécessaire pour atteindre le seuil estimé en fonct
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:504
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:508
 msgid "too many decimal places"
-msgstr ""
+msgstr "trop de décimales"
 
 #: include/classes/api/services/CMap.php:849
 #: include/classes/api/services/CMap.php:1302 include/events.inc.php:34
