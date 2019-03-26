@@ -1663,7 +1663,7 @@ class CMap extends CMapElement {
 					$maps[$key]['selements'][$snum]['sysmapid'] = $sysmapid;
 				}
 
-				$selements += $maps[$key]['selements'];
+				$selements = array_merge($selements, $maps[$key]['selements']);
 			}
 
 			if (array_key_exists('shapes', $maps[$key])) {
