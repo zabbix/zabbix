@@ -1181,16 +1181,16 @@ static int	DBpatch_2030095(void)
 		}
 
 #if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
-		if (2048 < params_offset && 2048 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(params))
+		if (0 == params_offset || (2048 < params_offset && 2048 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(params)))
 #else
-		if (65535 < params_offset && 65535 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(params))
+		if (0 == params_offset ||
+				(65535 < params_offset && 65535 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(params)))
 #endif
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item expression \"%s\":"
 					" resulting expression is too long", row[1]);
 		}
-		/* NULL check to silence analyzer warning */
-		else if (NULL != params && 0 != strcmp(row[1], params))
+		else if ( 0 != strcmp(row[1], params))
 		{
 			params_esc = DBdyn_escape_string(params);
 
