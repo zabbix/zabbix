@@ -47,7 +47,7 @@ abstract class ItemChecker
 	static final String JSON_RESPONSE_SUCCESS = "success";
 
 	protected JSONObject request;
-	protected ArrayList<String> keys;
+	public ArrayList<String> keys;
 
 	protected ItemChecker(JSONObject request) throws ZabbixException
 	{

@@ -125,10 +125,6 @@ class JMXItemChecker extends ItemChecker
 		}
 		catch (Exception e)
 		{
-			// Display first item key to identify items with incorrect configuration, all items in batch have same JMX endpoint.
-			if (0 != keys.size())
-				throw new ZabbixException("%s: item \"%s\" endpoint \"%s\"", ZabbixException.getRootCauseMessage(e), keys.get(0), url);
-			else
 				throw new ZabbixException("%s: %s", ZabbixException.getRootCauseMessage(e), url);
 		}
 		finally
