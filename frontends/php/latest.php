@@ -185,7 +185,7 @@ if ($hosts) {
 		$applications = API::Application()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'hostids' => $hostIds,
-			'search' => ['name' => $filter['application']],
+			'filter' => ['name' => $filter['application']],
 			'preservekeys' => true
 		]);
 	}
