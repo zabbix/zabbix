@@ -1,3 +1,14 @@
+Changes for 4.0.6rc2
+
+Bug fixes:
+..F....... [ZBX-15839] fixed broken layout of the breadcrumbs in Safari browser (ashubin)
+........S. [ZBX-15867] fixed invalid DNS being accepted when receiving discovery contents from Zabbix proxy (vso)
+A......... [ZBX-15821] fixed SQL statement performance used in template.unlink() method (Sasha)
+.......PS. [ZBX-15578] fixed IPMI errors in case of infrequent reading of values (asitals)
+..F....... [ZBX-15098] fixed undefined index in application selection popup window (Ivo)
+..F....... [ZBX-15351] fixed PHP error in "Problems by severity" if no problems (vasilijs)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.6rc1
 
 New features:
@@ -2288,9 +2299,22 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.27rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 3.0.26
+
+3.0.26rc1 was released as 3.0.26 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.26rc1
 
 Bug fixes:
+........S. [ZBX-15867] fixed invalid DNS being accepted when receiving discovery contents from Zabbix proxy (vso)
 ...G...PS. [ZBX-15552] fixed compilation with LibreSSL as OpenSSL replacement and OpenSSL without PSK support (Andris)
 ........S. [ZBX-15788] fixed crash when substituting LLD macros in calculated item formula expression (vso)
 .......PS. [ZBX-15670] fixed inefficient vmware eventlog downloading (MVekslers)
