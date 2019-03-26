@@ -920,14 +920,14 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 	foreach ($selements as $selement) {
 		foreach ($selement['triggers'] as $trigger) {
 			if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
-				$triggerids[$trigger['triggerid']] = true;
+				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
 			}
 		}
 	}
 
 	$problems = API::Problem()->get([
 		'output' => ['eventid', 'objectid', 'name', 'acknowledged', 'clock', 'r_clock', 'severity'],
-		'objectids' => array_keys($triggerids),
+		'objectids' => $triggerids,
 		'recent' => true,
 		'suppressed' => ($sysmap['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
 	]);
@@ -999,10 +999,10 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 			}
 		}
 
-		$critical_problem = [];
+		$critical_problems = [];
 		$lately_changed = 0;
 
-		foreach ($selement['triggers'] as $trigger) {
+		foreach ($selement['triggers'] as $triggerid => $trigger) {
 			if ($trigger['status'] == TRIGGER_STATUS_DISABLED && $options['severity_min'] <= $trigger['priority']) {
 				$i['trigger_disabled']++;
 				continue;
@@ -1016,11 +1016,20 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 						if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
 							$i['problem_unack']++;
 						}
-					}
 
-					if (!$critical_problem || ($critical_problem['severity'] <= $problem['severity']
-							&& $critical_problem['eventid'] < $problem['eventid'])) {
-						$critical_problem = $problem;
+						if (!array_key_exists($triggerid, $critical_problems)
+								|| $critical_problems[$triggerid]['severity'] < $problem['severity']
+								|| ($critical_problems[$triggerid]['severity'] == $problem['severity']
+									&& $critical_problems[$triggerid]['eventid'] < $problem['eventid'])) {
+							if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+								foreach ($selement['elements'] as $index => $element) {
+									if ($triggerid == $element['triggerid']) {
+										$problem += ['sort_order' => $index];
+									}
+								}
+							}
+							$critical_problems[$triggerid] = $problem;
+						}
 					}
 
 					if ($problem['r_clock'] > $lately_changed) {
@@ -1034,6 +1043,19 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 
 			$i['latelyChanged'] |= ((time() - $lately_changed) < timeUnitToSeconds($config['blink_period']));
 		}
+
+		$sort_fields = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
+			? [
+				['field' => 'severity', 'order' => ZBX_SORT_DOWN],
+				['field' => 'sort_order', 'order' => ZBX_SORT_UP],
+				['field' => 'eventid', 'order' => ZBX_SORT_DOWN]
+			]
+			: [
+				['field' => 'severity', 'order' => ZBX_SORT_DOWN],
+				['field' => 'eventid', 'order' => ZBX_SORT_DOWN]
+			];
+		CArrayHelper::sort($critical_problems, $sort_fields);
+		$critical_problem = reset($critical_problems);
 
 		if ($critical_problem) {
 			$i['priority'] = $critical_problem['severity'];
