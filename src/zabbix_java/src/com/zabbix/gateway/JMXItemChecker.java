@@ -125,7 +125,7 @@ class JMXItemChecker extends ItemChecker
 		}
 		catch (Exception e)
 		{
-				throw new ZabbixException("%s: %s", ZabbixException.getRootCauseMessage(e), url);
+			throw new ZabbixException("%s: %s", ZabbixException.getRootCauseMessage(e), url);
 		}
 		finally
 		{
