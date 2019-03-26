@@ -166,7 +166,9 @@ $itemFormList->addRow(
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
-				(new CTextBox('headers[value][#{index}]', '#{value}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CTextBox('headers[value][#{index}]', '#{value}'))
+					->setAttribute('maxlength', 1000)
+					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->setAttribute('data-row-action', 'remove_row')
