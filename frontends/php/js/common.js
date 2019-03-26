@@ -447,14 +447,12 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 
 	var url = new Curl('zabbix.php');
 	url.setArgument('action', action);
-	jQuery.each(options, function(key, value) {
-		url.setArgument(key, value);
-	});
 
 	jQuery.ajax({
 		url: url.getUrl(),
-		type: 'get',
+		type: 'post',
 		dataType: 'json',
+		data: options,
 		beforeSend: function(jqXHR) {
 			overlayDialogue(ovelay_properties, trigger_elmnt, jqXHR);
 		},
@@ -840,15 +838,32 @@ function redirect(uri, method, needle, invert_needle, add_sid) {
 			var is_needle = (typeof(needle) != 'undefined' && key.indexOf(needle) > -1);
 
 			if ((is_needle && !invert_needle) || (!is_needle && invert_needle)) {
-				action += '&' + key + '=' + args[key];
+				if (Array.isArray(args[key])) {
+					for (var i = 0, l = args[key].length; i < l; i++) {
+						action += '&' + key + '[]=' + args[key][i];
+					}
+				}
+				else {
+					action += '&' + key + '=' + args[key];
+				}
+
 				continue;
 			}
 
 			var hInput = document.createElement('input');
 			hInput.setAttribute('type', 'hidden');
 			postForm.appendChild(hInput);
-			hInput.setAttribute('name', key);
-			hInput.setAttribute('value', args[key]);
+
+			if (Array.isArray(args[key])) {
+				hInput.setAttribute('name', key + '[]');
+				for (var i = 0, l = args[key].length; i < l; i++) {
+					hInput.setAttribute('value', args[key][i]);
+				}
+			}
+			else {
+				hInput.setAttribute('name', key);
+				hInput.setAttribute('value', args[key]);
+			}
 		}
 
 		postForm.setAttribute('action', url.getPath() + '?' + action.substr(1));
