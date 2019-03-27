@@ -51,9 +51,7 @@
 		function renderPairRow(formid, pair) {
 			var parent,
 				target = jQuery(getDomTargetIdForRowInsert(pair.type), jQuery('#'+formid)),
-				maxLength = pair.type === 'headers'
-					? <?= ZBX_INPUT_HEADER_VALUE_MAXLENGTH ?>
-					: <?= ZBX_INPUT_MAXLENGTH ?>,
+				maxLength = pair.type === 'headers' ? 1000 : 255,
 				pair_row = jQuery(rowTemplate.evaluate({pair: pair, maxlength: maxLength}));
 
 			if (!target.parents('.pair-container').hasClass('pair-container-sortable')) {

@@ -222,7 +222,7 @@ $itemFormList->addRow(
 				'&rArr;',
 				(new CTextBox('headers[value][#{index}]', '#{value}', $data['limited']))
 					->setAttribute('placeholder', _('value'))
-					->setAttribute('maxlength', ZBX_INPUT_HEADER_VALUE_MAXLENGTH)
+					->setAttribute('maxlength', 1000)
 					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)

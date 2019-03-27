@@ -1264,8 +1264,6 @@ define('ZBX_LAYOUT_KIOSKMODE',  2);
 define('ZBX_LAYOUT_MODE', 'layout-mode');
 
 // input fields
-define('ZBX_INPUT_MAXLENGTH',					255);
-define('ZBX_INPUT_HEADER_VALUE_MAXLENGTH',		1000);
 define('ZBX_TEXTAREA_MACRO_WIDTH',				200);
 define('ZBX_TEXTAREA_MACRO_VALUE_WIDTH',		250);
 define('ZBX_TEXTAREA_COLOR_WIDTH',				96);
