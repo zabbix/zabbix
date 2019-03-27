@@ -72,10 +72,10 @@ class SocketProcessor implements Runnable
 			String error = ZabbixException.getRootCauseMessage(e1);
 
 			// Display first item key to identify items with incorrect configuration, all items in batch have same configuration.
-			if (null == checker || 0 == checker.keys.size())
+			if (null == checker || null == checker.getFirstKey())
 				logger.warn("error processing request: {}", error);
 			else	
-				logger.warn("error processing request, item \"{}\" failed: {}", checker.keys.get(0), error);
+				logger.warn("error processing request, item \"{}\" failed: {}", checker.getFirstKey(), error);
 
 			logger.debug("error caused by", e1);
 

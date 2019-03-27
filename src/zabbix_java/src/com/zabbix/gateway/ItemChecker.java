@@ -47,7 +47,7 @@ abstract class ItemChecker
 	static final String JSON_RESPONSE_SUCCESS = "success";
 
 	protected JSONObject request;
-	public ArrayList<String> keys;
+	protected ArrayList<String> keys;
 
 	protected ItemChecker(JSONObject request) throws ZabbixException
 	{
@@ -75,6 +75,11 @@ abstract class ItemChecker
 			values.put(getJSONValue(key));
 
 		return values;
+	}
+
+	String getFirstKey()
+	{
+		return keys.size() == 0 ? null : keys.get(0);
 	}
 
 	protected final JSONObject getJSONValue(String key)
