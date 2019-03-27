@@ -120,10 +120,6 @@ class CMapHelper {
 	 * @param array $theme                    Theme used to create missing elements (like hostgroup frame).
 	 */
 	protected static function resolveMapState(array &$sysmap, array $options, array $theme) {
-		$map_info_options = [
-			'severity_min' => array_key_exists('severity_min', $options) ? $options['severity_min'] : null
-		];
-
 		foreach ($sysmap['selements'] as &$selement) {
 			$selement['selementid_orig'] = $selement['selementid'];
 			$selement['elementtype_orig'] = $selement['elementtype'];
@@ -138,7 +134,7 @@ class CMapHelper {
 		unset($selement);
 
 		$areas = populateFromMapAreas($sysmap, $theme);
-		$map_info = getSelementsInfo($sysmap, $map_info_options);
+		$map_info = getSelementsInfo($sysmap, ['severity_min' => $options['severity_min']]);
 		processAreasCoordinates($sysmap, $areas, $map_info);
 		// Adding element names and removing inaccessible triggers from readable elements.
 		addElementNames($sysmap['selements']);
@@ -273,7 +269,7 @@ class CMapHelper {
 				$color = $link['color'];
 				$linktriggers = $link['linktriggers'];
 				order_result($linktriggers, 'triggerid');
-				$max_severity = 0;
+				$max_severity = $options['severity_min'];
 				$triggers = [];
 
 				foreach ($linktriggers as $link_trigger) {
