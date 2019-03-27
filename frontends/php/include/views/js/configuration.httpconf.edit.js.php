@@ -50,8 +50,10 @@
 		function renderPairRow(formid, pair) {
 			var parent,
 				target = jQuery(getDomTargetIdForRowInsert(pair.type), jQuery('#'+formid)),
-				maxLength = pair.type === 'headers' ? 1000 : 255,
-				pair_row = jQuery(rowTemplate.evaluate({pair: pair, maxlength: maxLength}));
+				pair_row = jQuery(rowTemplate.evaluate({
+					pair: pair,
+					maxlength: (pair.type === 'headers') ? 1000 : 255
+				}));
 
 			if (!target.parents('.pair-container').hasClass('pair-container-sortable')) {
 				pair_row.find('.<?= ZBX_STYLE_DRAG_ICON ?>').remove();
