@@ -851,6 +851,10 @@ function getLastEvents($options) {
 		$eventOptions['value'] = $options['value'];
 	}
 	if (array_key_exists('suppressed', $options)) {
+		if (!$options['suppressed']) {
+			$triggerOptions['maintenance'] = false;
+		}
+
 		$eventOptions['suppressed'] = $options['suppressed'];
 	}
 
