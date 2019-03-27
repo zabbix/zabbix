@@ -80,7 +80,7 @@ if (!empty($_REQUEST['serviceid'])) {
 
 	$service = API::Service()->get($options);
 	$service = reset($service);
-	if (!$service) {
+	if (!$service && !hasRequest('delete')) {
 		access_deny();
 	}
 }
