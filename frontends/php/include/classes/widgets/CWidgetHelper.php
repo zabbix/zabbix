@@ -470,6 +470,26 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * @param CWidgetFieldApplication $field
+	 *
+	 * @return array
+	 */
+	public static function getApplicationSelector($field) {
+		return [
+			(new CTextBox($field->getName(), $field->getValue()))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired(self::isAriaRequired($field))
+				->addClass('simple-textbox'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton($field->getName().'_select', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick(
+					'return PopUp("popup.generic",'.CJs::encodeJson($field->getFilterParameters()).', null, this);'
+				)
+		];
+	}
+
+	/**
 	 * Function returns array containing HTML objects filled with given values. Used to generate HTML in widget
 	 * overrides field.
 	 *

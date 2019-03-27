@@ -238,7 +238,7 @@ jQuery(function($) {
 				.val(values_str)
 				.trigger('change');
 		}
-		else if (typeof addPopupValues !== 'undefined') {
+		else if (!$('[name="'+data.parentId+'"]').hasClass('simple-textbox') && typeof addPopupValues !== 'undefined') {
 			// execute function if they exist
 			addPopupValues(data);
 		}

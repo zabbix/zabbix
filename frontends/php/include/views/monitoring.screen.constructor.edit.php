@@ -643,10 +643,24 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
-	);
-	$screenFormList->addRow(_('Application'),
-		(new CTextBox('application', $application, false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
+	)
+	->addRow(_('Application'), [
+		(new CTextBox('application', $application))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('application_select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('return PopUp("popup.generic",'.
+				CJs::encodeJson([
+					'srctbl' => 'applications',
+					'srcfld1' => 'name',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'application',
+					'real_hosts' => '1',
+					'with_applications' => '1'
+				]).', null, this);'
+			)
+	]);
 }
 
 /*
