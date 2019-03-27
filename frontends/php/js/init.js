@@ -214,7 +214,7 @@ jQuery(function($) {
 				}
 			}
 		}
-		else if ($('[name="'+data.parentId+'"]').hasClass('patternselect')) {
+		else if ($('[name="' + data.parentId + '"]').hasClass('patternselect')) {
 			/**
 			 * Pattern select allows to enter multiple comma or newline separated values in same editable field. Values
 			 * passed to add.popup should be appended at the end of existing value string.
@@ -222,7 +222,7 @@ jQuery(function($) {
 			 * values_arr is used to catch duplicates.
 			 * values_str is used to store user's original syntax.
 			 */
-			var values_str = $('[name="'+data.parentId+'"]').val(),
+			var values_str = $('[name="' + data.parentId + '"]').val(),
 				values_arr = values_str.split(/[,|\n]+/).map(function(str) {return str.trim()});
 
 			data.values.forEach(function(val) {
@@ -234,11 +234,12 @@ jQuery(function($) {
 				}
 			});
 
-			$('[name="'+data.parentId+'"]')
+			$('[name="' + data.parentId + '"]')
 				.val(values_str)
 				.trigger('change');
 		}
-		else if (!$('[name="'+data.parentId+'"]').hasClass('simple-textbox') && typeof addPopupValues !== 'undefined') {
+		else if (!$('[name="' + data.parentId + '"]').hasClass('simple-textbox')
+				&& typeof addPopupValues !== 'undefined') {
 			// execute function if they exist
 			addPopupValues(data);
 		}

@@ -484,7 +484,7 @@ class CWidgetHelper {
 			(new CButton($field->getName().'_select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick(
-					'return PopUp("popup.generic",'.CJs::encodeJson($field->getFilterParameters()).', null, this);'
+					'return PopUp("popup.generic", '.CJs::encodeJson($field->getFilterParameters()).', null, this);'
 				)
 		];
 	}

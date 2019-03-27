@@ -650,7 +650,7 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
+			->onClick('return PopUp("popup.generic", '.
 				CJs::encodeJson([
 					'srctbl' => 'applications',
 					'srcfld1' => 'name',
