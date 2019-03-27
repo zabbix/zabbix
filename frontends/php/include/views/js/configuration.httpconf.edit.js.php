@@ -13,10 +13,9 @@
 				->setAttribute('placeholder', _('name'))
 				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 			'&rArr;',
-			(new CTextBox('pairs[#{pair.id}][value]', '#{pair.value}'))
+			(new CTextBox('pairs[#{pair.id}][value]', '#{pair.value}', false, '#{maxlength}'))
 				->setAttribute('data-type', 'value')
 				->setAttribute('placeholder', _('value'))
-				->setAttribute('maxlength', '#{maxlength}')
 				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 			(new CCol(
 				(new CButton('removePair_#{pair.id}', _('Remove')))
