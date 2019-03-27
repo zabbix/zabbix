@@ -58,8 +58,12 @@ $fields = [
 		')',
 		_('User')
 	],
-	'http_password'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
-		' || {authentication} == '.HTTPTEST_AUTH_NTLM.')', _('Password')],
+	'http_password'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM, null,
+		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
+			' || {authentication}=='.HTTPTEST_AUTH_NTLM.
+		')',
+		_('Password')
+	],
 	'http_proxy'		=> [T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'],
 	'new_application'	=> [T_ZBX_STR, O_OPT, null,	null,				null],
 	'hostname'			=> [T_ZBX_STR, O_OPT, null,	null,				null],

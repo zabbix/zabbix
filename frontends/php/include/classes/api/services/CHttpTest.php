@@ -942,10 +942,8 @@ class CHttpTest extends CApiService {
 	 */
 	private function validateAuthParameters(array &$httptests, $method, array $db_httptests = null) {
 		foreach ($httptests as &$httptest) {
-			if (array_key_exists('authentication', $httptest)
-					|| array_key_exists('http_user', $httptest)
+			if (array_key_exists('authentication', $httptest) || array_key_exists('http_user', $httptest)
 					|| array_key_exists('http_password', $httptest)) {
-
 				$httptest += [
 					'authentication' => ($method === 'validateUpdate')
 						? $db_httptests[$httptest['httptestid']]['authentication']
@@ -961,19 +959,6 @@ class CHttpTest extends CApiService {
 								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
 							);
 						}
-					}
-				}
-				else {
-					$httptest += [
-						'http_password' => ($method === 'validateUpdate')
-							? $db_httptests[$httptest['httptestid']]['http_password']
-							: ''
-					];
-
-					if ($httptest['http_password'] === '') {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s.', 'http_password', _('cannot be empty'))
-						);
 					}
 				}
 			}
