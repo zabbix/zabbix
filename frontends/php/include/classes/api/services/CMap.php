@@ -1687,7 +1687,7 @@ class CMap extends CMapElement {
 					$maps[$key]['shapes'][$snum]['sysmapid'] = $sysmapid;
 				}
 
-				$shapes += $maps[$key]['shapes'];
+				$shapes = array_merge($shapes, $maps[$key]['shapes']);
 			}
 
 			if (array_key_exists('lines', $maps[$key])) {
@@ -1719,7 +1719,7 @@ class CMap extends CMapElement {
 					$maps[$key]['links'][$lnum]['sysmapid'] = $sysmapid;
 				}
 
-				$links += $maps[$key]['links'];
+				$links = array_merge($links, $maps[$key]['links']);
 			}
 		}
 
