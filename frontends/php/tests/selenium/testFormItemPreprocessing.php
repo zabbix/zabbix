@@ -1143,15 +1143,8 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 	 */
 	private function selectTypeAndfillParameters($step, $options) {
 		$this->zbxTestClickWait('param_add');
-		// Workaround for troubles with adding new step on Jenkins.
-		try
-		{
-			$this->zbxTestDropdownSelect('preprocessing_'.$step.'_type', $options['type']);
-		}
-		catch (Exception $e) {
-			$this->zbxTestClickWait('param_add');
-			$this->zbxTestDropdownSelect('preprocessing_'.$step.'_type', $options['type']);
-		}
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('preprocessing_'.$step.'_type'));
+		$this->zbxTestDropdownSelect('preprocessing_'.$step.'_type', $options['type']);
 
 		if (array_key_exists('parameter_1', $options) && array_key_exists('parameter_2', $options)) {
 			$this->zbxTestInputType('preprocessing_'.$step.'_params_0', $options['parameter_1']);
