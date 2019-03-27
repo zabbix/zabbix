@@ -74,7 +74,7 @@ class SocketProcessor implements Runnable
 			// Display first item key to identify items with incorrect configuration, all items in batch have same configuration.
 			if (null == checker || null == checker.getFirstKey())
 				logger.warn("error processing request: {}", error);
-			else	
+			else
 				logger.warn("error processing request, item \"{}\" failed: {}", checker.getFirstKey(), error);
 
 			logger.debug("error caused by", e1);
