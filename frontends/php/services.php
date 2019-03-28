@@ -93,7 +93,7 @@ if (!empty($_REQUEST['serviceid'])) {
  */
 
 // delete
-if (isset($_REQUEST['delete']) && $service) {
+if (hasRequest('delete') && $service) {
 	DBstart();
 
 	$result = API::Service()->delete([$service['serviceid']]);
