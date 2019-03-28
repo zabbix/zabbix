@@ -81,7 +81,9 @@ class CBrandHelper {
 	 * @return string
 	 */
 	public static function getHelpUrl() {
-		return self::getValue('BRAND_HELP_URL', 'https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/');
+		return self::getValue('BRAND_HELP_URL', 'https://www.zabbix.com/documentation/'.
+			implode('.', array_slice(explode('.', ZABBIX_VERSION), 0, 2)).'/'
+		);
 	}
 
 	/**
