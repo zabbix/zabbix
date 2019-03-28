@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-25 10:17+0200\n"
-"PO-Revision-Date: 2019-03-23 23:50+0300\n"
+"POT-Creation-Date: 2019-03-28 14:35+0200\n"
+"PO-Revision-Date: 2019-03-28 07:26+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: sv\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1553377836.000000\n"
+"X-POOTLE-MTIME: 1553750796.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -50,7 +50,7 @@ msgstr ""
 #: include/forms.inc.php:1467
 #: include/views/configuration.host.discovery.edit.php:747
 #: include/views/js/configuration.host.discovery.edit.js.php:52
-#: include/views/js/item.preprocessing.js.php:159
+#: include/views/js/item.preprocessing.js.php:162
 msgid "$.path.to.node"
 msgstr ""
 
@@ -305,7 +305,7 @@ msgstr "500 senaste värdena"
 msgid "<empty string>"
 msgstr ""
 
-#: include/forms.inc.php:1515 include/views/js/item.preprocessing.js.php:208
+#: include/forms.inc.php:1515 include/views/js/item.preprocessing.js.php:211
 msgid "<label name>"
 msgstr ""
 
@@ -314,8 +314,8 @@ msgid "<manual>"
 msgstr ""
 
 #: include/forms.inc.php:1513 include/forms.inc.php:1521
-#: include/views/js/item.preprocessing.js.php:206
-#: include/views/js/item.preprocessing.js.php:215
+#: include/views/js/item.preprocessing.js.php:209
+#: include/views/js/item.preprocessing.js.php:218
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
 msgstr ""
 
@@ -8594,7 +8594,11 @@ msgstr ""
 #: app/controllers/CControllerPopupHttpStep.php:109
 #: app/controllers/CControllerPopupMedia.php:94
 #: app/controllers/CControllerPopupMedia.php:105
-#: app/controllers/CControllerPopupPreprocTestSend.php:89 correlation.php:227
+#: app/controllers/CControllerPopupPreprocTestSend.php:70
+#: app/controllers/CControllerPopupPreprocTestSend.php:78
+#: app/controllers/CControllerPopupPreprocTestSend.php:83
+#: app/controllers/CControllerPopupPreprocTestSend.php:88
+#: app/controllers/CControllerPopupPreprocTestSend.php:93 correlation.php:227
 #: correlation.php:237 correlation.php:243 correlation.php:263
 #: correlation.php:267 correlation.php:280
 #: include/classes/api/services/CAction.php:1639
@@ -9648,7 +9652,7 @@ msgid "Japanese (ja_JP)"
 msgstr "Japanska (ja_JP)"
 
 #: include/forms.inc.php:1498 include/items.inc.php:1754
-#: include/views/js/item.preprocessing.js.php:192
+#: include/views/js/item.preprocessing.js.php:195
 msgid "JavaScript"
 msgstr ""
 
@@ -13020,7 +13024,11 @@ msgstr ""
 msgid "Preprocessing steps"
 msgstr ""
 
-#: app/controllers/CControllerPopupPreprocTestSend.php:89
+#: app/controllers/CControllerPopupPreprocTestSend.php:70
+#: app/controllers/CControllerPopupPreprocTestSend.php:78
+#: app/controllers/CControllerPopupPreprocTestSend.php:83
+#: app/controllers/CControllerPopupPreprocTestSend.php:88
+#: app/controllers/CControllerPopupPreprocTestSend.php:93
 #: app/views/popup.preproctestedit.view.php:92
 msgid "Prev. time"
 msgstr ""
@@ -15849,7 +15857,7 @@ msgstr ""
 #: app/views/administration.authentication.edit.php:150
 #: app/views/administration.mediatype.list.php:134
 #: app/views/popup.mediatypetest.edit.php:61
-#: app/views/popup.preproctestedit.view.php:168
+#: app/views/popup.preproctestedit.view.php:169
 #: app/views/popup.testtriggerexpr.php:116 include/forms.inc.php:1598
 #: include/views/administration.general.regularexpressions.edit.php:139
 #: include/views/configuration.trigger.prototype.edit.php:239
@@ -15880,7 +15888,7 @@ msgstr ""
 msgid "Test expressions"
 msgstr ""
 
-#: app/controllers/CControllerPopupPreprocTestEdit.php:95
+#: app/controllers/CControllerPopupPreprocTestEdit.php:109
 msgid "Test item preprocessing"
 msgstr ""
 
@@ -18088,7 +18096,7 @@ msgstr ""
 msgid "XML is empty"
 msgstr ""
 
-#: include/forms.inc.php:1462 include/views/js/item.preprocessing.js.php:152
+#: include/forms.inc.php:1462 include/views/js/item.preprocessing.js.php:155
 msgid "XPath"
 msgstr ""
 
@@ -18448,7 +18456,11 @@ msgstr ""
 msgid "a numeric value is expected"
 msgstr ""
 
-#: app/controllers/CControllerPopupPreprocTestSend.php:89
+#: app/controllers/CControllerPopupPreprocTestSend.php:71
+#: app/controllers/CControllerPopupPreprocTestSend.php:84
+msgid "a relative time is expected"
+msgstr ""
+
 #: include/classes/validators/CNewValidator.php:266
 msgid "a time is expected"
 msgstr ""
@@ -18821,7 +18833,7 @@ msgstr ""
 msgid "equals"
 msgstr ""
 
-#: include/views/js/item.preprocessing.js.php:355
+#: include/views/js/item.preprocessing.js.php:358
 msgid "error message"
 msgstr ""
 
@@ -19034,7 +19046,7 @@ msgstr ""
 msgid "left"
 msgstr ""
 
-#: include/forms.inc.php:1456 include/views/js/item.preprocessing.js.php:145
+#: include/forms.inc.php:1456 include/views/js/item.preprocessing.js.php:148
 msgid "list of characters"
 msgstr ""
 
@@ -19100,7 +19112,7 @@ msgstr ""
 #: include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
-#: include/views/js/item.preprocessing.js.php:174
+#: include/views/js/item.preprocessing.js.php:177
 msgid "max"
 msgstr "max"
 
@@ -19125,7 +19137,7 @@ msgstr ""
 #: include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
-#: include/views/js/item.preprocessing.js.php:173
+#: include/views/js/item.preprocessing.js.php:176
 msgid "min"
 msgstr "min"
 
@@ -19230,7 +19242,7 @@ msgstr ""
 msgid "now() - Number of seconds since the Epoch"
 msgstr ""
 
-#: include/forms.inc.php:1448 include/views/js/item.preprocessing.js.php:137
+#: include/forms.inc.php:1448 include/views/js/item.preprocessing.js.php:140
 msgid "number"
 msgstr ""
 
@@ -19288,17 +19300,21 @@ msgstr ""
 msgid "on"
 msgstr ""
 
+#: app/controllers/CControllerPopupPreprocTestSend.php:79
+msgid "only one time unit is allowed"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:95
 msgid "other"
 msgstr ""
 
-#: include/forms.inc.php:1474 include/views/js/item.preprocessing.js.php:167
+#: include/forms.inc.php:1474 include/views/js/item.preprocessing.js.php:170
 msgid "output"
 msgstr ""
 
 #: include/forms.inc.php:1473 include/forms.inc.php:1487
-#: include/views/js/item.preprocessing.js.php:166
-#: include/views/js/item.preprocessing.js.php:181
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:184
 msgid "pattern"
 msgstr ""
 
@@ -19356,7 +19372,7 @@ msgctxt "second short"
 msgid "s"
 msgstr ""
 
-#: include/forms.inc.php:1499 include/views/js/item.preprocessing.js.php:193
+#: include/forms.inc.php:1499 include/views/js/item.preprocessing.js.php:196
 msgid "script"
 msgstr ""
 
@@ -19369,7 +19385,7 @@ msgstr ""
 msgid "second parameter is expected"
 msgstr ""
 
-#: include/forms.inc.php:1492 include/views/js/item.preprocessing.js.php:187
+#: include/forms.inc.php:1492 include/views/js/item.preprocessing.js.php:190
 msgid "seconds"
 msgstr ""
 
@@ -19403,6 +19419,10 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:786
 #: include/classes/api/services/CTriggerGeneral.php:804
 msgid "should be empty"
+msgstr ""
+
+#: app/controllers/CControllerPopupPreprocTestSend.php:94
+msgid "should be less than current time"
 msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:120
@@ -19587,14 +19607,18 @@ msgstr ""
 msgid "unknown"
 msgstr ""
 
+#: app/controllers/CControllerPopupPreprocTestSend.php:89
+msgid "unsupported time suffix"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidator.php:67
 msgid "unsupported version number"
 msgstr ""
 
 #: app/views/monitoring.problem.view.js.php:26
 #: app/views/monitoring.problem.view.php:244
-#: app/views/popup.preproctestedit.view.js.php:153
-#: app/views/popup.preproctestedit.view.js.php:161
+#: app/views/popup.preproctestedit.view.js.php:180
+#: app/views/popup.preproctestedit.view.js.php:191
 #: app/views/popup.preproctestedit.view.php:40
 #: include/classes/widgets/CWidgetHelper.php:403
 #: include/classes/widgets/CWidgetHelper.php:448
@@ -19625,7 +19649,7 @@ msgstr ""
 #: include/views/js/configuration.template.list.js.php:11
 #: include/views/js/configuration.triggers.list.js.php:11
 #: include/views/js/hostmacros.js.php:11
-#: include/views/js/item.preprocessing.js.php:349
+#: include/views/js/item.preprocessing.js.php:352
 msgid "value"
 msgstr ""
 

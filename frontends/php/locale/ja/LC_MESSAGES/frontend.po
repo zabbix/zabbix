@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-25 10:17+0200\n"
-"PO-Revision-Date: 2019-03-19 14:22+0300\n"
+"POT-Creation-Date: 2019-03-28 14:35+0200\n"
+"PO-Revision-Date: 2019-03-28 09:11+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1552998127.000000\n"
+"X-POOTLE-MTIME: 1553757068.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -50,7 +50,7 @@ msgstr "\"host:key\"のペアで指定してください"
 #: include/forms.inc.php:1467
 #: include/views/configuration.host.discovery.edit.php:747
 #: include/views/js/configuration.host.discovery.edit.js.php:52
-#: include/views/js/item.preprocessing.js.php:159
+#: include/views/js/item.preprocessing.js.php:162
 msgid "$.path.to.node"
 msgstr "$.path.to.node"
 
@@ -290,7 +290,7 @@ msgstr "最新500個の値"
 msgid "<empty string>"
 msgstr "<空文字列>"
 
-#: include/forms.inc.php:1515 include/views/js/item.preprocessing.js.php:208
+#: include/forms.inc.php:1515 include/views/js/item.preprocessing.js.php:211
 msgid "<label name>"
 msgstr "<ラベル名>"
 
@@ -299,8 +299,8 @@ msgid "<manual>"
 msgstr "<マニュアル>"
 
 #: include/forms.inc.php:1513 include/forms.inc.php:1521
-#: include/views/js/item.preprocessing.js.php:206
-#: include/views/js/item.preprocessing.js.php:215
+#: include/views/js/item.preprocessing.js.php:209
+#: include/views/js/item.preprocessing.js.php:218
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
 msgstr "<メトリクス名>{<ラベル名>=\\\"<ラベル値>\\\", ...} == <値>"
 
@@ -2567,7 +2567,7 @@ msgstr "インターフェースのためのホストを切り替えできませ
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:71
 #: app/controllers/CControllerPopupMediatypeTestSend.php:71
 msgid "Cannot test disabled media type."
-msgstr ""
+msgstr "無効なメディアタイプはテストできません。"
 
 #: users.php:260
 msgid "Cannot unblock users"
@@ -8531,7 +8531,11 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: app/controllers/CControllerPopupHttpStep.php:109
 #: app/controllers/CControllerPopupMedia.php:94
 #: app/controllers/CControllerPopupMedia.php:105
-#: app/controllers/CControllerPopupPreprocTestSend.php:89 correlation.php:227
+#: app/controllers/CControllerPopupPreprocTestSend.php:70
+#: app/controllers/CControllerPopupPreprocTestSend.php:78
+#: app/controllers/CControllerPopupPreprocTestSend.php:83
+#: app/controllers/CControllerPopupPreprocTestSend.php:88
+#: app/controllers/CControllerPopupPreprocTestSend.php:93 correlation.php:227
 #: correlation.php:237 correlation.php:243 correlation.php:263
 #: correlation.php:267 correlation.php:280
 #: include/classes/api/services/CAction.php:1639
@@ -9581,7 +9585,7 @@ msgid "Japanese (ja_JP)"
 msgstr "日本語 (ja_JP)"
 
 #: include/forms.inc.php:1498 include/items.inc.php:1754
-#: include/views/js/item.preprocessing.js.php:192
+#: include/views/js/item.preprocessing.js.php:195
 msgid "JavaScript"
 msgstr "JavaScript"
 
@@ -10506,11 +10510,11 @@ msgstr "メディアタイプがパラメータに設定されていません: %
 #: app/controllers/CControllerPopupMediatypeTestSend.php:37
 #: app/controllers/CControllerPopupMediatypeTestSend.php:120
 msgid "Media type test failed."
-msgstr ""
+msgstr "メディアタイプのテストに失敗しました。"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:117
 msgid "Media type test successful."
-msgstr ""
+msgstr "メディアタイプのテストに成功しました。"
 
 #: app/controllers/CControllerMediatypeUpdate.php:169
 msgid "Media type updated"
@@ -12941,7 +12945,11 @@ msgstr "保存前処理"
 msgid "Preprocessing steps"
 msgstr "保存前処理の設定"
 
-#: app/controllers/CControllerPopupPreprocTestSend.php:89
+#: app/controllers/CControllerPopupPreprocTestSend.php:70
+#: app/controllers/CControllerPopupPreprocTestSend.php:78
+#: app/controllers/CControllerPopupPreprocTestSend.php:83
+#: app/controllers/CControllerPopupPreprocTestSend.php:88
+#: app/controllers/CControllerPopupPreprocTestSend.php:93
 #: app/views/popup.preproctestedit.view.php:92
 msgid "Prev. time"
 msgstr "前の時間"
@@ -15767,7 +15775,7 @@ msgstr "テンプレートを更新しました"
 #: app/views/administration.authentication.edit.php:150
 #: app/views/administration.mediatype.list.php:134
 #: app/views/popup.mediatypetest.edit.php:61
-#: app/views/popup.preproctestedit.view.php:168
+#: app/views/popup.preproctestedit.view.php:169
 #: app/views/popup.testtriggerexpr.php:116 include/forms.inc.php:1598
 #: include/views/administration.general.regularexpressions.edit.php:139
 #: include/views/configuration.trigger.prototype.edit.php:239
@@ -15798,13 +15806,13 @@ msgstr "テストデータ"
 msgid "Test expressions"
 msgstr "条件式のテスト"
 
-#: app/controllers/CControllerPopupPreprocTestEdit.php:95
+#: app/controllers/CControllerPopupPreprocTestEdit.php:109
 msgid "Test item preprocessing"
 msgstr "アイテム保存前処理テスト"
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:75
 msgid "Test media type"
-msgstr ""
+msgstr "メディアタイプのテスト"
 
 #: adm.regexps.php:37
 #: include/views/administration.general.regularexpressions.edit.php:119
@@ -15813,7 +15821,7 @@ msgstr "テスト文字列"
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:79
 msgid "Test subject"
-msgstr ""
+msgstr "テスト用の件名"
 
 #: include/forms.inc.php:355 include/items.inc.php:133
 #: include/items.inc.php:1705 include/items.inc.php:1709
@@ -15934,7 +15942,7 @@ msgstr "このフィールドはアイテム\"%s\"によって自動的に設定
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:80
 msgid "This is the test message from Zabbix"
-msgstr ""
+msgstr "これはZabbixからのテストメッセージです"
 
 #: include/func.inc.php:2660 srv_status.php:41
 msgid "This month"
@@ -17995,7 +18003,7 @@ msgstr "XMLデータ"
 msgid "XML is empty"
 msgstr "XMLが空です"
 
-#: include/forms.inc.php:1462 include/views/js/item.preprocessing.js.php:152
+#: include/forms.inc.php:1462 include/views/js/item.preprocessing.js.php:155
 msgid "XPath"
 msgstr "XPath"
 
@@ -18358,7 +18366,11 @@ msgstr "数字が大きすぎます"
 msgid "a numeric value is expected"
 msgstr "数値で指定してください"
 
-#: app/controllers/CControllerPopupPreprocTestSend.php:89
+#: app/controllers/CControllerPopupPreprocTestSend.php:71
+#: app/controllers/CControllerPopupPreprocTestSend.php:84
+msgid "a relative time is expected"
+msgstr "相対的な時間で指定してください"
+
 #: include/classes/validators/CNewValidator.php:266
 msgid "a time is expected"
 msgstr "時間で指定してください"
@@ -18731,7 +18743,7 @@ msgstr "一致しない"
 msgid "equals"
 msgstr "等しい"
 
-#: include/views/js/item.preprocessing.js.php:355
+#: include/views/js/item.preprocessing.js.php:358
 msgid "error message"
 msgstr "エラーメッセージ"
 
@@ -18944,7 +18956,7 @@ msgstr "last() - 最新値"
 msgid "left"
 msgstr "左"
 
-#: include/forms.inc.php:1456 include/views/js/item.preprocessing.js.php:145
+#: include/forms.inc.php:1456 include/views/js/item.preprocessing.js.php:148
 msgid "list of characters"
 msgstr "文字列のリスト"
 
@@ -19010,7 +19022,7 @@ msgstr "一致する"
 #: include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
-#: include/views/js/item.preprocessing.js.php:174
+#: include/views/js/item.preprocessing.js.php:177
 msgid "max"
 msgstr "最大"
 
@@ -19035,7 +19047,7 @@ msgstr "依存レベルの数が最大数に達しました\""
 #: include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
-#: include/views/js/item.preprocessing.js.php:173
+#: include/views/js/item.preprocessing.js.php:176
 msgid "min"
 msgstr "最小"
 
@@ -19140,7 +19152,7 @@ msgstr "選択されていません"
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - エポックを基準とした経過秒数"
 
-#: include/forms.inc.php:1448 include/views/js/item.preprocessing.js.php:137
+#: include/forms.inc.php:1448 include/views/js/item.preprocessing.js.php:140
 msgid "number"
 msgstr "数値"
 
@@ -19198,17 +19210,21 @@ msgstr "古いイベントのタグ"
 msgid "on"
 msgstr "on"
 
+#: app/controllers/CControllerPopupPreprocTestSend.php:79
+msgid "only one time unit is allowed"
+msgstr "時間の単位は1つだけにしてください"
+
 #: include/views/configuration.httpconf.edit.php:95
 msgid "other"
 msgstr "その他"
 
-#: include/forms.inc.php:1474 include/views/js/item.preprocessing.js.php:167
+#: include/forms.inc.php:1474 include/views/js/item.preprocessing.js.php:170
 msgid "output"
 msgstr "出力"
 
 #: include/forms.inc.php:1473 include/forms.inc.php:1487
-#: include/views/js/item.preprocessing.js.php:166
-#: include/views/js/item.preprocessing.js.php:181
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:184
 msgid "pattern"
 msgstr "パターン"
 
@@ -19266,7 +19282,7 @@ msgctxt "second short"
 msgid "s"
 msgstr "s"
 
-#: include/forms.inc.php:1499 include/views/js/item.preprocessing.js.php:193
+#: include/forms.inc.php:1499 include/views/js/item.preprocessing.js.php:196
 msgid "script"
 msgstr "スクリプト"
 
@@ -19279,7 +19295,7 @@ msgstr "第2"
 msgid "second parameter is expected"
 msgstr "第2引数を指定してください"
 
-#: include/forms.inc.php:1492 include/views/js/item.preprocessing.js.php:187
+#: include/forms.inc.php:1492 include/views/js/item.preprocessing.js.php:190
 msgid "seconds"
 msgstr "秒"
 
@@ -19314,6 +19330,10 @@ msgstr "説明"
 #: include/classes/api/services/CTriggerGeneral.php:804
 msgid "should be empty"
 msgstr "空にしてください"
+
+#: app/controllers/CControllerPopupPreprocTestSend.php:94
+msgid "should be less than current time"
+msgstr "現在時刻より前の時間をを指定してください"
 
 #: include/views/monitoring.sysmap.edit.php:120
 msgid "show icon mappings"
@@ -19497,14 +19517,18 @@ msgstr "値\"%1$s\"が間違っています。"
 msgid "unknown"
 msgstr "不明"
 
+#: app/controllers/CControllerPopupPreprocTestSend.php:89
+msgid "unsupported time suffix"
+msgstr "サポートされていない時間の単位です"
+
 #: include/classes/import/validators/CXmlValidator.php:67
 msgid "unsupported version number"
 msgstr "サポートされていないバージョン番号です"
 
 #: app/views/monitoring.problem.view.js.php:26
 #: app/views/monitoring.problem.view.php:244
-#: app/views/popup.preproctestedit.view.js.php:153
-#: app/views/popup.preproctestedit.view.js.php:161
+#: app/views/popup.preproctestedit.view.js.php:180
+#: app/views/popup.preproctestedit.view.js.php:191
 #: app/views/popup.preproctestedit.view.php:40
 #: include/classes/widgets/CWidgetHelper.php:403
 #: include/classes/widgets/CWidgetHelper.php:448
@@ -19535,7 +19559,7 @@ msgstr "サポートされていないバージョン番号です"
 #: include/views/js/configuration.template.list.js.php:11
 #: include/views/js/configuration.triggers.list.js.php:11
 #: include/views/js/hostmacros.js.php:11
-#: include/views/js/item.preprocessing.js.php:349
+#: include/views/js/item.preprocessing.js.php:352
 msgid "value"
 msgstr "値"
 
