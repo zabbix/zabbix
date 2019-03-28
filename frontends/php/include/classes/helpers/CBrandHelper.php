@@ -82,7 +82,7 @@ class CBrandHelper {
 	 */
 	public static function getHelpUrl() {
 		return self::getValue('BRAND_HELP_URL', 'https://www.zabbix.com/documentation/'.
-			implode('.', array_slice(explode('.', ZABBIX_VERSION), 0, 2)).'/'
+			(preg_match('/^\d+\.\d+/', ZABBIX_VERSION, $version) ? $version[0].'/' : '')
 		);
 	}
 
