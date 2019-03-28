@@ -107,7 +107,6 @@ var CSuggest = Class.create({
 		var rpcRequest = {
 			'method': 'host.get',
 			'params': {
-				'startSearch': 1,
 				'search': {'name': needle},
 				'output': ['hostid', 'name', 'host'],
 				'sortfield': 'name',
@@ -472,6 +471,8 @@ var CSuggest = Class.create({
 			sugTab = document.createElement('div'),
 			count = 0;
 
+		needle = needle.toLowerCase();
+
 		for (var key in list) {
 			if (empty(list[key])) {
 				continue;
@@ -479,15 +480,33 @@ var CSuggest = Class.create({
 
 			count++;
 
-			var li = document.createElement('li');
+			var li = document.createElement('li'),
+				text = list[key].toLowerCase(),
+				start = 0,
+				end = 0;
+
 			li.setAttribute('id', 'line_' + count);
 			li.setAttribute('needle', list[key]);
 
-			var bold = document.createElement('span');
-			bold.appendChild(document.createTextNode(list[key].substr(0, needle.length)));
-			bold.setAttribute('class', 'suggest-found');
-			li.appendChild(bold);
-			li.appendChild(document.createTextNode(list[key].substr(needle.length)));
+			while (text.indexOf(needle, end) > -1) {
+				end = text.indexOf(needle, end);
+
+				if (end > start) {
+					li.appendChild(document.createTextNode(list[key].substring(start, end)));
+				}
+
+				var bold = document.createElement('span');
+				bold.appendChild(document.createTextNode(list[key].substring(end, end + needle.length)));
+				bold.setAttribute('class', 'suggest-found');
+				li.appendChild(bold);
+
+				end += needle.length;
+				start = end;
+			}
+
+			if (end < list[key].length) {
+				li.appendChild(document.createTextNode(list[key].substring(end, list[key].length)));
+			}
 
 			addListener(li, 'mouseover', this.mouseOver.bindAsEventListener(this), true);
 			addListener(li, 'mouseup', this.selectSuggest.bindAsEventListener(this), true);

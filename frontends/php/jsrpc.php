@@ -56,11 +56,10 @@ $result = [];
 switch ($data['method']) {
 	case 'host.get':
 		$result = API::Host()->get([
-			'startSearch' => true,
 			'search' => $data['params']['search'],
-			'output' => ['hostid', 'host', 'name'],
-			'sortfield' => 'name',
-			'limit' => 15
+			'output' => $data['params']['output'],
+			'sortfield' => $data['params']['sortfield'],
+			'limit' => $data['params']['limit']
 		]);
 		break;
 
