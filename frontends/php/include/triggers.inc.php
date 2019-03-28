@@ -764,7 +764,13 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 
 		foreach ($triggers as $triggerid => $trigger) {
 			if (!array_key_exists($triggerid, $objectids)) {
-				$triggers[$triggerid]['value'] = TRIGGER_VALUE_FALSE;
+				if ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null) {
+					// 'show any' mode
+					$triggers[$triggerid]['value'] = TRIGGER_VALUE_FALSE;
+				}
+				else {
+					unset($triggers[$triggerid]);
+				}
 			}
 			elseif ($trigger['priority'] < $problem_options['min_severity']) {
 				unset($triggers[$triggerid]);
