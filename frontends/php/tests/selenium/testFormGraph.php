@@ -747,7 +747,7 @@ class testFormGraph extends CLegacyWebTest {
 					],
 					'error-msg' => 'Cannot add graph',
 					'errors' => [
-						'No permissions to referred object or it does not exist!'
+						'Invalid parameter "ymin_itemid": cannot be empty.'
 					]
 				]
 			],

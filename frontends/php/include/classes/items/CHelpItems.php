@@ -699,8 +699,8 @@ class CHelpItems {
 					'description' => _('VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name')
 				],
 				[
-					'key' => 'vmware.eventlog[<url>]',
-					'description' => _('VMware event log, <url> - VMware service URL')
+					'key' => 'vmware.eventlog[<url>,<mode>]',
+					'description' => _('VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data')
 				],
 				[
 					'key' => 'vmware.fullname[<url>]',
