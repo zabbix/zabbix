@@ -327,6 +327,27 @@ function getMenuPopupMapElementTrigger(options) {
 }
 
 /**
+ * Get menu popup image map element section data.
+ *
+ * @param {array}  options['urls']             (optional)
+ * @param {string} options['url'][]['label']
+ * @param {string} options['url'][]['url']
+ *
+ * @return array
+ */
+function getMenuPopupMapElementImage(options) {
+	// urls
+	if (typeof options.urls !== 'undefined') {
+		return [{
+			label: t('URLs'),
+			items: options.urls
+		}];
+	}
+
+	return [];
+}
+
+/**
  * Get menu popup refresh section data.
  *
  * @param {string}   options['widgetName']   Widget name.
@@ -402,7 +423,6 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 				}
 				else {
 					var url = new Curl('zabbix.php');
-
 					url.setArgument('action', 'dashboard.widget.rfrate');
 
 					jQuery.ajax({
@@ -431,7 +451,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 
 							obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 
-							jQuery('.dashbrd-grid-widget-container')
+							jQuery('.dashbrd-grid-container')
 								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
 						},
 						error: function() {
@@ -525,11 +545,11 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
  * Get menu popup trigger section data.
  *
  * @param {string} options['triggerid']               Trigger ID.
+ * @param {string} options['eventid']                 (optional) Required for Acknowledge and Description sections.
  * @param {object} options['items']                   Link to trigger item history page (optional).
  * @param {string} options['items'][]['name']         Item name.
  * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
  * @param {object} options['acknowledge']             Link to acknowledge page (optional).
- * @param {string} options['acknowledge']['eventid']  Event ID
  * @param {string} options['acknowledge']['backurl']  Return URL.
  * @param {object} options['configuration']           Link to trigger configuration page (optional).
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
@@ -568,7 +588,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		var url = new Curl('zabbix.php', false);
 
 		url.setArgument('action', 'acknowledge.edit');
-		url.setArgument('eventids[]', options.acknowledge.eventid);
+		url.setArgument('eventids[]', options.eventid);
 		url.setArgument('backurl', options.acknowledge.backurl);
 
 		items[items.length] = {
@@ -585,11 +605,15 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 
 		if (typeof options.description_enabled === 'undefined' || options.description_enabled !== false) {
 			trigger_descr.clickCallback = function() {
+				var	popup_options = {triggerid: options.triggerid};
+
+				if (typeof options.eventid !== 'undefined') {
+					popup_options.eventid = options.eventid;
+				}
+
 				jQuery(this).closest('.action-menu').menuPopup('close', null);
 
-				return PopUp('popup.trigdesc.view', {
-					triggerid: options.triggerid
-				}, null, trigger_elmnt);
+				return PopUp('popup.trigdesc.view', popup_options, null, trigger_elmnt);
 			}
 		}
 		else {
