@@ -69,7 +69,7 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Applications'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-		$data['showInfoColumn'] ? _('Info') : null
+		_('Info')
 	]);
 
 if (!$this->data['filterSet']) {
@@ -130,27 +130,19 @@ foreach ($data['items'] as $item) {
 	);
 
 	// info
-	if ($data['showInfoColumn']) {
-		$info_icons = [];
+	$info_icons = [];
 
-		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
-			$info_icons[] = makeErrorIcon($item['error']);
-		}
+	if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
+		$info_icons[] = makeErrorIcon($item['error']);
+	}
 
-		// discovered item lifetime indicator
-		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
-			$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
-		}
+	// discovered item lifetime indicator
+	if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
+		$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
 	}
 
 	// triggers info
-	$triggerHintTable = (new CTableInfo())
-		->setHeader([
-			_('Severity'),
-			_('Name'),
-			_('Expression'),
-			_('Status')
-		]);
+	$triggerHintTable = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
 
 	foreach ($item['triggers'] as $num => &$trigger) {
 		$trigger = $this->data['itemTriggers'][$trigger['triggerid']];
@@ -176,8 +168,6 @@ foreach ($data['items'] as $item) {
 			$trigger['error'] = '';
 		}
 
-		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
-
 		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 			$expression = [
 				_('Problem'), ': ', $trigger['expression'], BR(),
@@ -195,48 +185,18 @@ foreach ($data['items'] as $item) {
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);
-
-		$item['triggers'][$num] = $trigger;
 	}
 	unset($trigger);
 
-	if (!empty($item['triggers'])) {
-		$triggerInfo = (new CLinkAction(_('Triggers')))
-			->setHint($triggerHintTable);
+	if ($triggerHintTable->getNumRows()) {
+		$triggerInfo = (new CLinkAction(_('Triggers')))->setHint($triggerHintTable);
 		$triggerInfo = [$triggerInfo];
-		$triggerInfo[] = CViewHelper::showNum(count($item['triggers']));
+		$triggerInfo[] = CViewHelper::showNum($triggerHintTable->getNumRows());
 
 		$triggerHintTable = [];
 	}
 	else {
-		$triggerInfo = SPACE;
-	}
-
-	$item_menu = CMenuPopupHelper::getDependentItem($item['itemid'], $item['hostid'], $item['name']);
-
-	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
-		$triggers = [];
-
-		foreach ($item['triggers'] as $trigger) {
-			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-				continue;
-			}
-
-			foreach ($trigger['functions'] as $function) {
-				if (!str_in_array($function['function'], ['regexp', 'iregexp'])) {
-					continue 2;
-				}
-			}
-
-			$triggers[] = [
-				'id' => $trigger['triggerid'],
-				'name' => $trigger['description']
-			];
-		}
-
-		$trigger_menu = CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers);
-		$trigger_menu['dependent_items'] = $item_menu;
-		$item_menu = $trigger_menu;
+		$triggerInfo = '';
 	}
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
@@ -253,7 +213,9 @@ foreach ($data['items'] as $item) {
 	}
 
 	$wizard = (new CSpan(
-		(new CButton(null))->addClass(ZBX_STYLE_ICON_WZRD_ACTION)->setMenuPopup($item_menu)
+		(new CButton(null))
+			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getItem($item['itemid']))
 	))->addClass(ZBX_STYLE_REL_CONTAINER);
 
 	$itemTable->addRow([
@@ -269,7 +231,7 @@ foreach ($data['items'] as $item) {
 		item_type2str($item['type']),
 		CHtml::encode($item['applications_list']),
 		$status,
-		$data['showInfoColumn'] ? makeInformationList($info_icons) : null
+		makeInformationList($info_icons)
 	]);
 }
 

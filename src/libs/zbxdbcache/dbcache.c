@@ -791,8 +791,11 @@ static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, in
 
 	trend = DCget_trend(history->itemid);
 
-	if (trend->num > 0 && (trend->clock != hour || trend->value_type != history->value_type))
+	if (trend->num > 0 && (trend->clock != hour || trend->value_type != history->value_type) &&
+			SUCCEED == zbx_history_requires_trends(trend->value_type))
+	{
 		DCflush_trend(trend, trends, trends_alloc, trends_num);
+	}
 
 	trend->value_type = history->value_type;
 	trend->clock = hour;
