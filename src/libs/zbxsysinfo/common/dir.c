@@ -1066,7 +1066,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_ptr_t	list;
 	zbx_stat_t		status;
 	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL, *regex_excl_dir = NULL;
-	zbx_uint64_t		min_size = 0, max_size = 0x7FFFffffFFFFffff;
+	zbx_uint64_t		min_size = 0, max_size = __UINT64_C(0x7FFFffffFFFFffff);
 	time_t			min_time = 0, max_time = 0x7fffffff;
 	size_t			dir_len;
 
