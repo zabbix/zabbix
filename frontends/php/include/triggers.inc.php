@@ -764,8 +764,9 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 
 		foreach ($triggers as $triggerid => $trigger) {
 			if (!array_key_exists($triggerid, $objectids)) {
-				if ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null) {
-					// 'show any' mode
+				if (!array_key_exists('only_true', $trigger_options)
+						|| ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null)) {
+					// Overview type = 'Data', Maps, Dasboard or Overview 'show any' mode.
 					$triggers[$triggerid]['value'] = TRIGGER_VALUE_FALSE;
 				}
 				else {
