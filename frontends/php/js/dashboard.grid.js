@@ -49,6 +49,10 @@
 				}))
 			)
 		);
+		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container'})
+			.append(widget['content_header'])
+			.append(widget['content_body'])
+			.append(widget['content_script']);
 
 		return $('<div>', {
 			'class': 'dashbrd-grid-widget' + (!widget['widgetid'].length ? ' new-widget' : ''),
@@ -58,12 +62,7 @@
 			}
 		})
 			.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
-			.append(
-				$('<div>', {'class': 'dashbrd-grid-widget-padding'})
-					.append(widget['content_header'])
-					.append(widget['content_body'])
-					.append(widget['content_script'])
-			);
+			.append(widget['container']);
 	}
 
 	function makeWidgetInfoBtns(btns) {
@@ -178,7 +177,7 @@
 	}
 
 	function getCurrentCellWidth(data) {
-		return $('.dashbrd-grid-widget-container').width() / data['options']['max-columns'];
+		return $('.dashbrd-grid-container').width() / data['options']['max-columns'];
 	}
 
 	function setDivPosition($div, data, pos) {
@@ -238,36 +237,46 @@
 	/**
 	 * Rearrange widgets on drag operation.
 	 *
-	 * @param {array}  widgets  Array of widget objects.
-	 * @param {object} widget   Moved widget object.
+	 * @param {array}  widgets   Array of widget objects.
+	 * @param {object} widget    Moved widget object.
+	 * @param {number} max_rows
+	 *
+	 * @returns {boolean}
 	 */
-	function realignWidget(widgets, widget) {
-		var realign = function(widgets, widget, allow_reorder) {
-			var next = [];
+	function realignWidget(widgets, widget, max_rows) {
+		var overflow = false,
+			realign = function(widgets, widget, allow_reorder) {
+				var next = [];
 
-			widgets.forEach(function(w) {
-				if (widget.uniqueid !== w.uniqueid) {
-					if (rectOverlap(widget.current_pos, w.current_pos)
-						|| (!allow_reorder && 'affected_by_id' in w && w.affected_by_id === widget.uniqueid)
-					) {
-						w.current_pos.y = Math.max(w.current_pos.y, widget.current_pos.y + widget.current_pos.height);
-						next.push(w);
+				widgets.forEach(function(w) {
+					if (widget.uniqueid !== w.uniqueid && !overflow) {
+						if (rectOverlap(widget.current_pos, w.current_pos)
+								|| (!allow_reorder && 'affected_by_id' in w && w.affected_by_id === widget.uniqueid)) {
+							w.current_pos.y = Math.max(w.current_pos.y,
+								widget.current_pos.y + widget.current_pos.height
+							);
+							next.push(w);
+							overflow = (overflow || (w.current_pos.y + w.current_pos.height) > max_rows);
+						}
 					}
-				}
-			});
+				});
 
-			next.forEach(function(widget) {
-				realign(widgets, widget, false);
-			});
-		}
+				next.forEach(function(widget) {
+					if (!overflow) {
+						realign(widgets, widget, false);
+					}
+				});
+			};
 
 		widgets.each(function(w) {
-			if (widget.uniqueid !== w.uniqueid) {
+			if (widget.uniqueid !== w.uniqueid && !overflow) {
 				w.current_pos = $.extend({}, w.pos);
 			}
 		});
 
 		realign(sortWidgets(widgets), widget, true);
+
+		return overflow;
 	}
 
 	function sortWidgets(widgets, by_current) {
@@ -773,7 +782,7 @@
 	/**
 	 * User action handler for resize of widget.
 	 *
-	 * @param {object} $obj  Dasboard DOM element.
+	 * @param {object} $obj  Dashboard DOM element.
 	 * @param {object} $div  Widget DOM element.
 	 * @param {object} data  Dashboard data object.
 	 */
@@ -812,31 +821,47 @@
 	function doWidgetPositioning($obj, $div, data) {
 		var	widget = getWidgetByTarget(data['widgets'], $div),
 			pos = getDivPosition($obj, data, $div),
-			rows = 0;
+			rows = 0,
+			overflow = false;
 
-		setDivPosition(data['placeholder'], data, pos);
+		if (!posEquals(pos, widget.current_pos)) {
+			widget.current_pos = pos;
+			overflow = realignWidget(data['widgets'], widget, data.options['max-rows']);
 
-		if (!posEquals(pos, widget['current_pos'])) {
-			widget['current_pos'] = pos;
-			realignWidget(data['widgets'], widget);
+			if (overflow) {
+				// restore last non-overflow position
+				data.widgets.each(function(w) {
+					w.current_pos = $.extend({}, data.undo_pos[w.uniqueid]);
+				});
+				pos = widget.current_pos;
+			}
+			else {
+				// store all widget current_pos objects
+				data.undo_pos = {};
+				data.widgets.each(function(w) {
+					data.undo_pos[w.uniqueid] = $.extend({}, w.current_pos);
+				});
 
-			data['widgets'].forEach(function(w) {
-				if (widget.uniqueid !== w.uniqueid) {
-					setDivPosition(w['div'], data, w['current_pos']);
+				data['widgets'].forEach(function(w) {
+					if (widget.uniqueid !== w.uniqueid) {
+						setDivPosition(w['div'], data, w.current_pos);
+					}
+
+					rows = Math.max(rows, w.current_pos.y + w.current_pos.height);
+				});
+
+				if (rows > data.options['rows']) {
+					data.options['rows_actual'] = rows;
+					resizeDashboardGrid($obj, data, rows);
 				}
-
-				rows = Math.max(rows, w['current_pos'].y + w['current_pos'].height);
-			});
-
-			if (rows > data['options']['rows']) {
-				data['options']['rows_actual'] = rows;
-				resizeDashboardGrid($obj, data, rows);
 			}
 		}
+
+		setDivPosition(data['placeholder'], data, pos);
 	}
 
 	function stopWidgetPositioning($obj, $div, data) {
-		var	widget = getWidgetByTarget(data['widgets'], $div);
+		var widget = getWidgetByTarget(data['widgets'], $div);
 
 		data['placeholder'].hide();
 		data['pos-action'] = '';
@@ -890,6 +915,10 @@
 				startWidgetPositioning(ui.helper, data, 'drag');
 
 				widget.current_pos = $.extend({}, widget.pos);
+				data.undo_pos = {};
+				data.widgets.each(function(w) {
+					data.undo_pos[w.uniqueid] = $.extend({}, w.current_pos);
+				});
 			},
 			drag: function(event, ui) {
 				// Limit element draggable area for X and Y axis.
@@ -902,6 +931,7 @@
 			},
 			stop: function(event, ui) {
 				delete data.calculated;
+				delete data.undo_pos;
 
 				data.widgets = sortWidgets(data.widgets).each(function(widget) {
 					delete widget.affected_by_draggable;
@@ -975,7 +1005,7 @@
 				$div.css({
 					top: ui.position.top,
 					left: ui.position.left,
-					height: ui.size.height,
+					height: Math.min(ui.size.height, data.options['widget-max-rows'] * data.options['widget-height']),
 					width: Math.min(ui.size.width,
 						data['cell-width'] * data['options']['max-columns'] - ui.position.left
 					)
@@ -1122,8 +1152,8 @@
 			'initial_load': widget['initial_load'] ? 1 : 0,
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
 			'storage': widget['storage'],
-			'content_width': widget['content_body'].width(),
-			'content_height': widget['content_body'].height() - 4 // -4 is added to avoid scrollbar
+			'content_width': Math.floor(widget['content_body'].css('overflow', 'hidden').width()),
+			'content_height': Math.floor(widget['content_body'].height())
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -1163,7 +1193,7 @@
 				if (typeof(resp.messages) !== 'undefined') {
 					widget['content_body'].append(resp.messages);
 				}
-				widget['content_body'].append(resp.body);
+				widget['content_body'].append(resp.body).css('overflow', '');
 
 				if (typeof(resp.debug) !== 'undefined') {
 					$(resp.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
@@ -1319,18 +1349,18 @@
 							};
 
 						if (pos['y'] + pos['height'] > data['options']['rows']) {
-							data['options']['rows'] = pos['y'] + pos['height'];
+							resizeDashboardGrid($obj, data, pos['y'] + pos['height']);
 							// Body height should be adjusted to animate scrollTop work.
-							$('body').css({
-								height: $('body').height() + pos['height'] *  data['options']['widget-height']
-							});
-							resizeDashboardGrid($obj, data);
+							$('body').css('height', Math.max(
+								$('body').height(),
+								(pos['y'] + pos['height']) * data['options']['widget-height']
+							));
 						}
 
 						// 5px shift is widget padding.
 						$('html, body')
 							.animate({scrollTop: pos['y'] * data['options']['widget-height']
-								+ $('.dashbrd-grid-widget-container').position().top - 5})
+								+ $('.dashbrd-grid-container').position().top - 5})
 							.promise()
 							.then(add_new_widget);
 					}
@@ -1999,6 +2029,13 @@
 
 				var	data = $this.data('dashboardGrid');
 
+				var resize_delay,
+					resize_handler = function () {
+						data.widgets.each(function(widget) {
+							doAction('onResizeEnd', $this, data, widget);
+						});
+					};
+
 				$(window)
 					.on('beforeunload', function() {
 						var	res = confirmExit($this, data);
@@ -2009,6 +2046,9 @@
 						}
 					})
 					.on('resize', function() {
+						clearTimeout(resize_delay);
+						resize_delay = setTimeout(resize_handler, 200);
+
 						// Recalculate dashboard container minimal required height.
 						data.minimalHeight = calculateGridMinHeight($this);
 						data['cell-width'] = getCurrentCellWidth(data);
@@ -2205,13 +2245,12 @@
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
-					current_url = new Curl(location.href),
-					url = new Curl('zabbix.php');
+					current_url = new Curl(),
+					url = new Curl('zabbix.php', false);
 
 				// Don't show warning about existing updates.
 				data['options']['updated'] = false;
 
-				url.unsetArgument('sid');
 				url.setArgument('action', 'dashboard.view');
 				if (current_url.getArgument('dashboardid')) {
 					url.setArgument('dashboardid', current_url.getArgument('dashboardid'));

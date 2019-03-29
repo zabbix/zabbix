@@ -159,6 +159,7 @@ class CSvgGraph extends CSvg {
 		$this->grid_color = '#' . $theme['gridcolor'];
 
 		$this
+			->addClass(ZBX_STYLE_SVG_GRAPH)
 			->setTimePeriod($options['time_period']['time_from'], $options['time_period']['time_to'])
 			->setXAxis($options['x_axis'])
 			->setYAxisLeft($options['left_y_axis'])
@@ -493,9 +494,12 @@ class CSvgGraph extends CSvg {
 			$this->left_y_max = $this->max_value_left ? : 1;
 		}
 
-		if ($this->left_y_min == $this->left_y_max) {
+		if (bccomp($this->left_y_min, $this->left_y_max) == 0) {
 			$this->left_y_min -= 0.5;
 			$this->left_y_max += 0.5;
+		}
+		elseif (bccomp($this->left_y_min, $this->left_y_max) == 1) {
+			$this->left_y_max = $this->left_y_min + 1;
 		}
 
 		$grid = $this->getValueGrid($this->left_y_min, $this->left_y_max);
@@ -520,9 +524,12 @@ class CSvgGraph extends CSvg {
 			$this->right_y_max = $this->max_value_right ? : 1;
 		}
 
-		if ($this->right_y_min == $this->right_y_max) {
+		if (bccomp($this->right_y_min, $this->right_y_max) == 0) {
 			$this->right_y_min -= 0.5;
 			$this->right_y_max += 0.5;
+		}
+		elseif (bccomp($this->right_y_min, $this->right_y_max) == 1) {
+			$this->right_y_max = $this->right_y_min + 1;
 		}
 
 		$grid = $this->getValueGrid($this->right_y_min, $this->right_y_max);
@@ -662,6 +669,12 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function drawCanvasRightYAxis() {
 		$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
+
+		// Do not draw label at the bottom of right Y axis to avoid label averlapping with horizontal axis arrow.
+		if (array_key_exists(0, $grid_values)) {
+			unset($grid_values[0]);
+		}
+
 		$this->addItem(
 			(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_RIGHT))
 				->setSize($this->offset_right, $this->canvas_height)
@@ -792,7 +805,7 @@ class CSvgGraph extends CSvg {
 					$x = $this->canvas_x + $this->canvas_width
 						- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 					$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
-					$paths[$path_num][] = [$x, $y, convert_units([
+					$paths[$path_num][] = [$x, ceil($y), convert_units([
 						'value' => $point,
 						'units' => $metric['units']
 					])];
