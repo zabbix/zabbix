@@ -913,6 +913,7 @@
 				setResizableState('disable', data.widgets, '');
 				dragPrepare(data.widgets, widget, data['options']['max-rows']);
 				startWidgetPositioning(ui.helper, data, 'drag');
+				realignWidget(data.widgets, widget, data.options['max-rows']);
 
 				widget.current_pos = $.extend({}, widget.pos);
 				data.undo_pos = {};
