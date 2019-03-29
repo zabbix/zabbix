@@ -1091,7 +1091,11 @@ class CUser extends CApiService {
 			return true;
 		}
 		else {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $ldapValidator->getError());
+			self::exception($ldapValidator->isConnectionError()
+					? ZBX_API_ERROR_PARAMETERS
+					: ZBX_API_ERROR_PERMISSIONS,
+				$ldapValidator->getError()
+			);
 		}
 	}
 
@@ -1159,20 +1163,14 @@ class CUser extends CApiService {
 			$config['authentication_type'], true
 		);
 
-		// Check if user is blocked.
 		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
-			$time_left = ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
+			$sec_left = ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
 
-			if ($time_left > 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', $time_left)
+			if ($sec_left > 0) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', $sec_left)
 				);
 			}
-
-			DB::update('users', [
-				'values' => ['attempt_clock' => time()],
-				'where' => ['userid' => $db_user['userid']]
-			]);
 		}
 
 		try {
@@ -1183,15 +1181,23 @@ class CUser extends CApiService {
 
 				case ZBX_AUTH_INTERNAL:
 					if (md5($user['password']) !== $db_user['passwd']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('Login name or password is incorrect.'));
 					}
+					break;
+
+				default:
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
 					break;
 			}
 		}
 		catch (APIException $e) {
+			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS) {
+				++$db_user['attempt_failed'];
+			}
+
 			DB::update('users', [
 				'values' => [
-					'attempt_failed' => ++$db_user['attempt_failed'],
+					'attempt_failed' => $db_user['attempt_failed'],
 					'attempt_clock' => time(),
 					'attempt_ip' => substr($db_user['userip'], 0, 39)
 				],
@@ -1202,7 +1208,13 @@ class CUser extends CApiService {
 				$db_user['userip']
 			);
 
-			self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
+			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS && $db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', ZBX_LOGIN_BLOCK)
+				);
+			}
+
+			self::exception(ZBX_API_ERROR_PERMISSIONS, $e->getMessage());
 		}
 
 		// Start session.
