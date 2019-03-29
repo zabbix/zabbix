@@ -736,7 +736,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 	$problem_triggerids = [];
 
 	foreach ($triggers as $triggerid => &$trigger) {
-		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
+		if ($trigger['value'] == TRIGGER_VALUE_TRUE
+				|| (array_key_exists('only_true', $trigger_options) && $trigger_options['only_true'])) {
 			$problem_triggerids[] = $triggerid;
 			$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
@@ -748,6 +749,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity'],
 			'objectids' => $problem_triggerids,
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
+			'recent' => array_key_exists('show_recent', $problem_options) ? $problem_options['show_recent'] : null,
 			'time_from' => $problem_options['time_from']
 		]);
 

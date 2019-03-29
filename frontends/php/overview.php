@@ -197,6 +197,7 @@ if ($type == SHOW_TRIGGERS) {
 		];
 
 		$problem_options = [
+			'show_recent' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
 			'show_suppressed' => $filter['show_suppressed'],
 			'min_severity' => $filter['showSeverity'],
 			'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null
