@@ -155,7 +155,7 @@ class CHistory extends CApiService {
 		// countOutput
 		if ($options['countOutput']) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = ['count(DISTINCT h.itemid) as rowscount'];
+			$sql_parts['select'] = ['count(DISTINCT h.hostid) as rowscount'];
 
 			// groupCount
 			if ($options['groupCount']) {
@@ -205,7 +205,7 @@ class CHistory extends CApiService {
 
 		while ($data = DBfetch($db_res)) {
 			if ($options['countOutput']) {
-				$result = $data['rowscount'];
+				$result = $data;
 			}
 			else {
 				$result[] = $data;
