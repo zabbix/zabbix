@@ -999,7 +999,10 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 			}
 		}
 
-		$critical_problems = [];
+		$critical_problem = [];
+		$trigger_order = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
+			? zbx_objectValues($selement['elements'], 'triggerid')
+			: [];
 		$lately_changed = 0;
 
 		foreach ($selement['triggers'] as $triggerid => $trigger) {
@@ -1017,18 +1020,23 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 							$i['problem_unack']++;
 						}
 
-						if (!array_key_exists($triggerid, $critical_problems)
-								|| $critical_problems[$triggerid]['severity'] < $problem['severity']
-								|| ($critical_problems[$triggerid]['severity'] == $problem['severity']
-									&& $critical_problems[$triggerid]['eventid'] < $problem['eventid'])) {
+						if (!$critical_problem || $critical_problem['severity'] < $problem['severity']) {
+							$critical_problem = $problem;
+						}
+						elseif ($critical_problem['severity'] === $problem['severity']) {
 							if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-								foreach ($selement['elements'] as $index => $element) {
-									if ($triggerid == $element['triggerid']) {
-										$problem += ['sort_order' => $index];
-									}
+								if ($problem['objectid'] === $critical_problem['objectid']
+										&& $critical_problem['eventid'] < $problem['eventid']) {
+									$critical_problem = $problem;
+								}
+								elseif (array_search($critical_problem['objectid'], $trigger_order)
+										> array_search($problem['objectid'], $trigger_order)) {
+									$critical_problem = $problem;
 								}
 							}
-							$critical_problems[$triggerid] = $problem;
+							elseif ($critical_problem['eventid'] < $problem['eventid']) {
+								$critical_problem = $problem;
+							}
 						}
 					}
 
@@ -1043,19 +1051,6 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 
 			$i['latelyChanged'] |= ((time() - $lately_changed) < timeUnitToSeconds($config['blink_period']));
 		}
-
-		$sort_fields = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-			? [
-				['field' => 'severity', 'order' => ZBX_SORT_DOWN],
-				['field' => 'sort_order', 'order' => ZBX_SORT_UP],
-				['field' => 'eventid', 'order' => ZBX_SORT_DOWN]
-			]
-			: [
-				['field' => 'severity', 'order' => ZBX_SORT_DOWN],
-				['field' => 'eventid', 'order' => ZBX_SORT_DOWN]
-			];
-		CArrayHelper::sort($critical_problems, $sort_fields);
-		$critical_problem = reset($critical_problems);
 
 		if ($critical_problem) {
 			$i['priority'] = $critical_problem['severity'];
