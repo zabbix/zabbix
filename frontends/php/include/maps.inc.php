@@ -920,14 +920,14 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 	foreach ($selements as $selement) {
 		foreach ($selement['triggers'] as $trigger) {
 			if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
-				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
+				$triggerids[$trigger['triggerid']] = true;
 			}
 		}
 	}
 
 	$problems = API::Problem()->get([
 		'output' => ['eventid', 'objectid', 'name', 'acknowledged', 'clock', 'r_clock', 'severity'],
-		'objectids' => $triggerids,
+		'objectids' => array_keys($triggerids),
 		'recent' => true,
 		'suppressed' => ($sysmap['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
 	]);
