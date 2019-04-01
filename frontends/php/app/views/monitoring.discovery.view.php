@@ -22,32 +22,52 @@
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
+$this->addJsFile('multiselect.js');
 
 $widget = (new CWidget())
 	->setTitle(_('Status of discovery'))
 	->setWebLayoutMode(CView::getLayoutMode())
-	->setControls(new CList([
+	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()
 			->addVar('action', 'discovery.view')
-			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Discovery rule'), 'druleid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getDiscoveryCB()
-				])
-			),
-		(new CTag('nav', true, get_icon('fullscreen')))
+				->addItem(get_icon('fullscreen'))
+			)
+		))
 			->setAttribute('aria-label', _('Content controls'))
-	]));
+	)
+	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'discovery.view')))
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [
+		(new CFormList())
+			->addRow(
+				(new CLabel(_('Discovery rule'), 'filter_druleids__ms')),
+				(new CMultiSelect([
+					'name' => 'filter_druleids[]',
+					'object_name' => 'drules',
+					'data' => $data['filter']['drules'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'drules',
+							'srcfld1' => 'druleid',
+							'dstfrm' => 'zbx_filter',
+							'dstfld1' => 'filter_druleids_'
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			)
+	])
+	->addVar('action', 'discovery.view')
+);
 
 $discovery_table = CScreenBuilder::getScreen([
 	'resourcetype' => SCREEN_RESOURCE_DISCOVERY,
 	'mode' => SCREEN_MODE_JS,
 	'dataId' => 'discovery',
 	'data' => [
-		'druleid' => $data['druleid'],
+		'filter_druleids' => $data['filter']['druleids'],
 		'sort' => $data['sort'],
 		'sortorder' => $data['sortorder']
 	]

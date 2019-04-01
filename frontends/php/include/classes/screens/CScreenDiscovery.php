@@ -53,20 +53,14 @@ class CScreenDiscovery extends CScreenBase {
 
 		$sort_field = $this->data['sort'];
 		$sort_order = $this->data['sortorder'];
-		$druleid = $this->data['druleid'];
 
-		$options = [
+		$drules = API::DRule()->get([
 			'output' => ['druleid', 'name'],
 			'selectDHosts' => ['dhostid', 'status', 'lastup', 'lastdown'],
+			'druleids' => $this->data['filter_druleids'] ? $this->data['filter_druleids'] : null,
 			'filter' => ['status' => DRULE_STATUS_ACTIVE],
 			'preservekeys' => true
-		];
-
-		if ($druleid != 0) {
-			$options['druleids'] = [$druleid];
-		}
-
-		$drules = API::DRule()->get($options);
+		]);
 
 		order_result($drules, 'name');
 
@@ -212,7 +206,7 @@ class CScreenDiscovery extends CScreenBase {
 				}
 			}
 
-			if ($druleid == 0 && $discovery_info) {
+			if ($discovery_info) {
 				$col = new CCol(
 					[bold($drule['name']), SPACE.'('._n('%d device', '%d devices', count($discovery_info)).')']
 				);
@@ -223,9 +217,9 @@ class CScreenDiscovery extends CScreenBase {
 			order_result($discovery_info, $sort_field, $sort_order);
 
 			foreach ($discovery_info as $ip => $h_data) {
-				$dns = $h_data['dns'] == '' ? '' : ' ('.$h_data['dns'].')';
+				$dns = ($h_data['dns'] === '') ? '' : ' ('.$h_data['dns'].')';
 				$row = [
-					$h_data['type'] == 'primary'
+					($h_data['type'] === 'primary')
 						? (new CSpan($ip.$dns))->addClass($h_data['class'])
 						: new CSpan(SPACE.SPACE.$ip.$dns),
 					new CSpan(array_key_exists('host', $h_data) ? $h_data['host'] : ''),

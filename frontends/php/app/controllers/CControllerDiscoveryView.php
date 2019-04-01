@@ -27,9 +27,11 @@ class CControllerDiscoveryView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'druleid' =>	'db drules.druleid',
-			'sort' =>		'in ip',
-			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
+			'sort' =>				'in ip',
+			'filter_set' =>			'in 1',
+			'filter_rst' =>			'in 1',
+			'filter_druleids' =>	'array_id',
+			'sortorder' =>			'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
 		];
 
 		$ret = $this->validateInput($fields);
@@ -42,22 +44,7 @@ class CControllerDiscoveryView extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_ADMIN) {
-			return false;
-		}
-
-		if ($this->hasInput('druleid') && $this->getInput('druleid') != 0) {
-			$drules = API::DRule()->get([
-				'output' => [],
-				'druleids' => [$this->getInput('druleid')],
-				'filter' => ['status' => DRULE_STATUS_ACTIVE]
-			]);
-			if (!$drules) {
-				return false;
-			}
-		}
-
-		return true;
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
 	}
 
 	protected function doAction() {
@@ -67,19 +54,36 @@ class CControllerDiscoveryView extends CController {
 		CProfile::update('web.discovery.php.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.discovery.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+		// filter
+		if (hasRequest('filter_set')) {
+			CProfile::updateArray('web.discovery.filter.druleids', $this->getInput('filter_druleids', []),
+				PROFILE_TYPE_ID
+			);
+		}
+		elseif (hasRequest('filter_rst')) {
+			CProfile::deleteIdx('web.discovery.filter.druleids');
+		}
+
+		$filter_druleids = CProfile::getArray('web.discovery.filter.druleids', []);
+
 		/*
 		 * Display
 		 */
 		$data = [
-			'druleid' => $this->getInput('druleid', 0),
 			'sort' => $sortField,
-			'sortorder' => $sortOrder
+			'sortorder' => $sortOrder,
+			'filter' => [
+				'druleids' => $filter_druleids,
+				'drules' => $filter_druleids
+					? CArrayHelper::renameObjectsKeys(API::DRule()->get([
+						'output' => ['druleid', 'name'],
+						'druleids' => $filter_druleids
+					]), ['druleid' => 'id'])
+					: [],
+			],
+			'profileIdx' => 'web.discovery.filter',
+			'active_tab' => CProfile::get('web.discovery.filter.active', 1)
 		];
-
-		$data['pageFilter'] = new CPageFilter([
-			'drules' => ['filter' => ['status' => DRULE_STATUS_ACTIVE]],
-			'druleid' => $data['druleid']
-		]);
 
 		CView::$has_web_layout_mode = true;
 

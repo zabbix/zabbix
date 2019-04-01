@@ -503,6 +503,26 @@ switch ($data['method']) {
 				}
 				break;
 
+			case 'drules':
+				$drules = API::DRule()->get([
+					'output' => ['druleid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $config['search_limit']
+				]);
+
+				if ($drules) {
+					CArrayHelper::sort($drules, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$applications = array_slice($drules, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($drules, ['druleid' => 'id']);
+				}
+				break;
+
 		}
 		break;
 
