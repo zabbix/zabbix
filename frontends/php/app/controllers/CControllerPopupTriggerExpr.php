@@ -474,9 +474,11 @@ class CControllerPopupTriggerExpr extends CController {
 			$result = $expression_data->parse($expression);
 
 			if ($result) {
-				// Only one item function macro is supported in an expression.
-				$function_macro_tokens = $result->getTokensByType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO);
-				if (count($function_macro_tokens) == 1) {
+				$function_macro_tokens = $result->getTokensByType(
+					CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO
+				);
+
+				if ($function_macro_tokens) {
 					$function_macro_token = $function_macro_tokens[0];
 					$function = $function_macro_token['data']['functionName'];
 
@@ -494,8 +496,8 @@ class CControllerPopupTriggerExpr extends CController {
 					}
 
 					/*
-					 * Try to find an operator and a numeric value.
-					 * The value and operator can be extracted only if the immediately follow the item function macro.
+					 * Try to find operator and value.
+					 * The value and operator can be extracted only if they immediately follow the item function macro.
 					 */
 					$tokens = $result->getTokens();
 					foreach ($tokens as $key => $token) {
@@ -503,9 +505,8 @@ class CControllerPopupTriggerExpr extends CController {
 							if (array_key_exists($key + 2, $tokens)
 									&& $tokens[$key + 1]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR
 									&& array_key_exists($function, $this->functions)
-									&& in_array($tokens[$key + 1]['value'], $this->functions[$function]['operators'])
-									&& $tokens[$key + 2]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER) {
-
+									&& in_array($tokens[$key + 1]['value'],
+										$this->functions[$function]['operators'])) {
 								$operator = $tokens[$key + 1]['value'];
 								$value = $tokens[$key + 2]['value'];
 							}

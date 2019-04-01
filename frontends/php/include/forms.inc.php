@@ -1625,6 +1625,15 @@ function getTriggerFormData(array $data) {
 	// Trigger expression constructor.
 	if ($data['expression_constructor'] == IM_TREE) {
 		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
+
+		if ($data['parent_discoveryid'] === null) {
+			$trigger_expression = new CTriggerExpression(['lldmacros' => false]);
+
+			if (!$trigger_expression->parse($data['expression'])) {
+				$analyze = false;
+			}
+		}
+
 		if ($analyze !== false) {
 			list($data['expression_formula'], $data['expression_tree']) = $analyze;
 			if ($data['expression_action'] !== '' && $data['expression_tree'] !== null) {
@@ -1667,6 +1676,15 @@ function getTriggerFormData(array $data) {
 	// Trigger recovery expression constructor.
 	if ($data['recovery_expression_constructor'] == IM_TREE) {
 		$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
+
+		if ($data['parent_discoveryid'] === null) {
+			$trigger_expression = new CTriggerExpression(['lldmacros' => false]);
+
+			if (!$trigger_expression->parse($data['recovery_expression'])) {
+				$analyze = false;
+			}
+		}
+
 		if ($analyze !== false) {
 			list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
 			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] !== null) {
