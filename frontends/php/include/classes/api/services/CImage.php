@@ -552,16 +552,16 @@ class CImage extends CApiService {
 	}
 
 	/**
-	 * Unset "image" field from output.
+	 * Unset "image" field from the output.
 	 *
-	 * @param string $tableName
-	 * @param string $tableAlias
+	 * @param string $table_name
+	 * @param string $table_alias
 	 * @param array  $options
-	 * @param array  $sqlParts
+	 * @param array  $sql_parts
 	 *
-	 * @return array				The resulting SQL parts array
+	 * @return array The resulting SQL parts array.
 	 */
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
 		if (!$options['countOutput']) {
 			if ($options['output'] == API_OUTPUT_EXTEND) {
 				$options['output'] = ['imageid', 'imagetype', 'name'];
@@ -575,8 +575,6 @@ class CImage extends CApiService {
 			}
 		}
 
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		return $sqlParts;
+		return parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 	}
 }
