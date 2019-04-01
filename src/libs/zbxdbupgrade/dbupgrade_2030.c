@@ -1187,9 +1187,8 @@ static int	DBpatch_2030095(void)
 				(65535 < params_offset && 65535 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(params)))
 #endif
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item expression \"%s\":"
-					" resulting expression is %s",
-					row[1], 0 == params_offset ? "empty" : "too long");
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item expression \"%s\": resulting"
+					" expression is %s", row[1], 0 == params_offset ? "empty" : "too long");
 		}
 		else if ( 0 != strcmp(row[1], params))
 		{
