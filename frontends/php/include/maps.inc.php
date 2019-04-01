@@ -1005,7 +1005,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 			: [];
 		$lately_changed = 0;
 
-		foreach ($selement['triggers'] as $triggerid => $trigger) {
+		foreach ($selement['triggers'] as $trigger) {
 			if ($trigger['status'] == TRIGGER_STATUS_DISABLED && $options['severity_min'] <= $trigger['priority']) {
 				$i['trigger_disabled']++;
 				continue;
