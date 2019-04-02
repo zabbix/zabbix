@@ -53,7 +53,10 @@ $hostList = new CFormList('hostlist');
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$hostList->addRow(_('Discovered by'),
 		new CLink($data['discoveryRule']['name'],
-			(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+			(new CUrl('host_prototypes.php'))
+				->setArgument('form', 'update')
+				->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+				->setArgument('hostid', $data['hostDiscovery']['parent_hostid'])
 		)
 	);
 }

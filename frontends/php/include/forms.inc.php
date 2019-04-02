@@ -1802,6 +1802,7 @@ function getTriggerFormData(array $data) {
 
 		if ($data['parent_discoveryid'] === null) {
 			$options['selectDiscoveryRule'] = ['itemid', 'name', 'templateid'];
+			$options['selectTriggerDiscovery'] = ['parent_triggerid'];
 			$triggers = API::Trigger()->get($options);
 			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
@@ -1964,6 +1965,7 @@ function getTriggerFormData(array $data) {
 
 		if ($data['parent_discoveryid'] === null) {
 			$data['discoveryRule'] = $trigger['discoveryRule'];
+			$data['triggerDiscovery'] = $trigger['triggerDiscovery'];
 		}
 
 		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $data['limited']) {

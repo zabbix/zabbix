@@ -55,7 +55,10 @@ if ($data['limited'] || $discovered_item) {
 
 if ($discovered_item) {
 	$form_list->addRow(_('Discovered by'), new CLink($data['item']['discoveryRule']['name'],
-		'disc_prototypes.php?parent_discoveryid='.$data['item']['discoveryRule']['itemid']
+		(new CUrl('disc_prototypes.php'))
+			->setArgument('form', 'edit')
+			->setArgument('parent_discoveryid', $data['item']['discoveryRule']['itemid'])
+			->setArgument('itemid', $data['item']['itemDiscovery']['parent_itemid'])
 	));
 }
 

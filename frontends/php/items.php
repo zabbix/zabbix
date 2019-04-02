@@ -1432,6 +1432,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 			],
 			'selectHosts' => ['status', 'name'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectItemDiscovery' => ['parent_itemid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'itemids' => getRequest('itemid')
 		]);
@@ -1758,7 +1759,7 @@ else {
 		'selectTriggers' => ['triggerid'],
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-		'selectItemDiscovery' => ['ts_delete'],
+		'selectItemDiscovery' => ['ts_delete', 'parent_itemid'],
 		'sortfield' => $sortField,
 		'limit' => $data['config']['search_limit'] + 1
 	];
