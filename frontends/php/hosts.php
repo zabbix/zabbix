@@ -1365,7 +1365,7 @@ else {
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'selectDiscoveryRule' => ['itemid', 'name'],
-		'selectHostDiscovery' => ['ts_delete', 'parent_hostid'],
+		'selectHostDiscovery' => ['ts_delete'],
 		'selectTags' => ['tag', 'value'],
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
 		'preservekeys' => true

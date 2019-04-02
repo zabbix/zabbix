@@ -86,10 +86,7 @@ foreach ($data['items'] as $item) {
 
 	if (!empty($item['discoveryRule'])) {
 		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
-			(new CUrl('disc_prototypes.php'))
-				->setArgument('form', 'update')
-				->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
-				->setArgument('itemid', $item['itemDiscovery']['parent_itemid'])
+			(new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);

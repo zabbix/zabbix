@@ -423,8 +423,10 @@ elseif (isset($_REQUEST['form'])) {
 		];
 
 		if ($data['parent_discoveryid'] === null) {
-			$options['selectDiscoveryRule'] = ['itemid', 'name'];
-			$options['selectGraphDiscovery'] = ['parent_graphid'];
+			$options += [
+				'selectDiscoveryRule'	=> ['itemid', 'name'],
+				'selectGraphDiscovery'	=> ['parent_graphid']
+			];
 			$graph = API::Graph()->get($options);
 		}
 		else {
@@ -648,7 +650,6 @@ else {
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
 			'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null,
-			'selectGraphDiscovery' => ['parent_graphid'],
 			'graphids' => zbx_objectValues($data['graphs'], 'graphid')
 		];
 

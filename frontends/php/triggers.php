@@ -834,7 +834,6 @@ else {
 			'selectHosts' => ['hostid', 'host', 'name', 'status'],
 			'selectDependencies' => ['triggerid', 'description'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectTriggerDiscovery' => ['parent_triggerid'],
 			'selectTags' => ['tag', 'value'],
 			'triggerids' => array_keys($prefetched_triggers),
 			'preservekeys' => true,

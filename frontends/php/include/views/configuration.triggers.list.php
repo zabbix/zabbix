@@ -220,10 +220,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	if ($trigger['discoveryRule']) {
 		$description[] = (new CLink(
 			CHtml::encode($trigger['discoveryRule']['name']),
-			(new CUrl('trigger_prototypes.php'))
-				->setArgument('form', 'update')
-				->setArgument('parent_discoveryid', $trigger['discoveryRule']['itemid'])
-				->setArgument('triggerid', $trigger['triggerDiscovery']['parent_triggerid'])
+			(new CUrl('trigger_prototypes.php'))->setArgument('parent_discoveryid', $trigger['discoveryRule']['itemid'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);

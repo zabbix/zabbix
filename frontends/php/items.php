@@ -1759,7 +1759,7 @@ else {
 		'selectTriggers' => ['triggerid'],
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-		'selectItemDiscovery' => ['ts_delete', 'parent_itemid'],
+		'selectItemDiscovery' => ['ts_delete'],
 		'sortfield' => $sortField,
 		'limit' => $data['config']['search_limit'] + 1
 	];
