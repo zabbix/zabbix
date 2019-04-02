@@ -542,7 +542,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.cluster.name[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -601,7 +601,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.cpu.num[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -660,7 +660,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.cpu.ready[{$URL},{HOST.HOST}]</key>
-                    <delay>5m</delay>
+                    <delay>{$VMWARE_PERF_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -719,7 +719,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.cpu.usage[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -778,7 +778,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.datacenter.name[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -837,7 +837,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.hv.name[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -896,7 +896,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.memory.size.ballooned[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -955,7 +955,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.memory.size.compressed[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1014,7 +1014,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.memory.size.private[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1073,7 +1073,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.memory.size.shared[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1132,7 +1132,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.memory.size.swapped[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1191,7 +1191,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.memory.size.usage.guest[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1250,7 +1250,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.memory.size.usage.host[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1309,7 +1309,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.memory.size[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1368,7 +1368,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.powerstate[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1429,7 +1429,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.storage.committed[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1488,7 +1488,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.storage.uncommitted[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1547,7 +1547,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.storage.unshared[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1606,7 +1606,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.vm.uptime[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -1699,7 +1699,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.net.if.in[{$URL},{HOST.HOST},{#IFNAME},bps]</key>
-                            <delay>30m</delay>
+                            <delay>{$VMWARE_PERF_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -1759,7 +1759,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.net.if.in[{$URL},{HOST.HOST},{#IFNAME},pps]</key>
-                            <delay>30m</delay>
+                            <delay>{$VMWARE_PERF_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -1819,7 +1819,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.net.if.out[{$URL},{HOST.HOST},{#IFNAME},bps]</key>
-                            <delay>30m</delay>
+                            <delay>{$VMWARE_PERF_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -1879,7 +1879,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.net.if.out[{$URL},{HOST.HOST},{#IFNAME},pps]</key>
-                            <delay>30m</delay>
+                            <delay>{$VMWARE_PERF_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -1994,7 +1994,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.vfs.dev.read[{$URL},{HOST.HOST},{#DISKNAME},bps]</key>
-                            <delay>30m</delay>
+                            <delay>{$VMWARE_PERF_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -2054,7 +2054,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.vfs.dev.read[{$URL},{HOST.HOST},{#DISKNAME},ops]</key>
-                            <delay>5m</delay>
+                            <delay>{$VMWARE_PERF_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -2114,7 +2114,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.vfs.dev.write[{$URL},{HOST.HOST},{#DISKNAME},bps]</key>
-                            <delay>30m</delay>
+                            <delay>{$VMWARE_PERF_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -2174,7 +2174,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.vfs.dev.write[{$URL},{HOST.HOST},{#DISKNAME},ops]</key>
-                            <delay>5m</delay>
+                            <delay>{$VMWARE_PERF_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -2289,7 +2289,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.vfs.fs.size[{$URL},{HOST.HOST},{#FSNAME},free]</key>
-                            <delay>1m</delay>
+                            <delay>{$VMWARE_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -2349,7 +2349,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.vfs.fs.size[{$URL},{HOST.HOST},{#FSNAME},pfree]</key>
-                            <delay>1m</delay>
+                            <delay>{$VMWARE_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -2409,7 +2409,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.vfs.fs.size[{$URL},{HOST.HOST},{#FSNAME},total]</key>
-                            <delay>1h</delay>
+                            <delay>{$VMWARE_INTERVAL:Conf}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -2469,7 +2469,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.vm.vfs.fs.size[{$URL},{HOST.HOST},{#FSNAME},used]</key>
-                            <delay>1m</delay>
+                            <delay>{$VMWARE_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -2548,7 +2548,20 @@
                 </discovery_rule>
             </discovery_rules>
             <httptests/>
-            <macros/>
+            <macros>
+                <macro>
+                    <macro>{$VMWARE_INTERVAL}</macro>
+                    <value>1m</value>
+                </macro>
+                <macro>
+                    <macro>{$VMWARE_INTERVAL:Conf}</macro>
+                    <value>1h</value>
+                </macro>
+                <macro>
+                    <macro>{$VMWARE_PERF_INTERVAL}</macro>
+                    <value>1m</value>
+                </macro>
+            </macros>
             <templates/>
             <screens/>
         </template>
@@ -2588,7 +2601,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.cluster.name[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -2647,7 +2660,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.cpu.usage[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -2706,7 +2719,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.datacenter.name[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -2765,7 +2778,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.fullname[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -2824,7 +2837,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.hw.cpu.freq[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -2886,7 +2899,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.hw.cpu.model[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -2948,7 +2961,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.hw.cpu.num[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3010,7 +3023,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.hw.cpu.threads[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3072,7 +3085,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.hw.memory[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3134,7 +3147,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.hw.model[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -3193,7 +3206,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.hw.uuid[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -3252,7 +3265,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.hw.vendor[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -3311,7 +3324,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.memory.size.ballooned[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3370,7 +3383,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.memory.used[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3429,7 +3442,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.network.in[{$URL},{HOST.HOST},bps]</key>
-                    <delay>30m</delay>
+                    <delay>{$VMWARE_PERF_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3488,7 +3501,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.network.out[{$URL},{HOST.HOST},bps]</key>
-                    <delay>30m</delay>
+                    <delay>{$VMWARE_PERF_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3547,7 +3560,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.sensor.health.state[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3608,7 +3621,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.status[{$URL},{HOST.HOST}]</key>
-                    <delay>1m</delay>
+                    <delay>{$VMWARE_INTERVAL}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3669,7 +3682,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.uptime[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3728,7 +3741,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.version[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>0</trends>
                     <status>0</status>
@@ -3787,7 +3800,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>vmware.hv.vm.num[{$URL},{HOST.HOST}]</key>
-                    <delay>1h</delay>
+                    <delay>{$VMWARE_INTERVAL:Conf}</delay>
                     <history>90d</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -3880,7 +3893,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.hv.datastore.read[{$URL},{HOST.HOST},{#DATASTORE},latency]</key>
-                            <delay>5m</delay>
+                            <delay>{$VMWARE_PERF_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -3940,7 +3953,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.hv.datastore.size[{$URL},{HOST.HOST},{#DATASTORE},pfree]</key>
-                            <delay>5m</delay>
+                            <delay>{$VMWARE_PERF_INTERVAL:Datastore}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -4000,7 +4013,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.hv.datastore.size[{$URL},{HOST.HOST},{#DATASTORE}]</key>
-                            <delay>5m</delay>
+                            <delay>{$VMWARE_PERF_INTERVAL:Datastore}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -4060,7 +4073,7 @@
                             <snmp_community/>
                             <snmp_oid/>
                             <key>vmware.hv.datastore.write[{$URL},{HOST.HOST},{#DATASTORE},latency]</key>
-                            <delay>5m</delay>
+                            <delay>{$VMWARE_PERF_INTERVAL}</delay>
                             <history>90d</history>
                             <trends>365d</trends>
                             <status>0</status>
@@ -4139,7 +4152,24 @@
                 </discovery_rule>
             </discovery_rules>
             <httptests/>
-            <macros/>
+            <macros>
+                <macro>
+                    <macro>{$VMWARE_INTERVAL}</macro>
+                    <value>1m</value>
+                </macro>
+                <macro>
+                    <macro>{$VMWARE_INTERVAL:Conf}</macro>
+                    <value>1h</value>
+                </macro>
+                <macro>
+                    <macro>{$VMWARE_PERF_INTERVAL}</macro>
+                    <value>1m</value>
+                </macro>
+                <macro>
+                    <macro>{$VMWARE_PERF_INTERVAL:Datastore}</macro>
+                    <value>5m</value>
+                </macro>
+            </macros>
             <templates/>
             <screens/>
         </template>
