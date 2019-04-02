@@ -68,7 +68,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 */
 	private function getAlerts($sortfield, $sortorder, $show_lines)
 	{
-		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,'.
+		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,a.alerttype,'.
 			'a.userid,a.actionid,a.mediatypeid,mt.description,mt.maxattempts'.
 			' FROM events e,alerts a'.
 			' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
@@ -95,6 +95,11 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 		$sql .= ' ORDER BY '.$sortfield.' '.$sortorder;
 		$alerts = DBfetchArray(DBselect($sql, $show_lines));
 		order_result($alerts, $sortfield, $sortorder);
+
+		foreach ($alerts as &$alert) {
+			$alert['action_type'] = ZBX_EVENT_HISTORY_ALERT;
+		}
+		unset($alert);
 
 		return $alerts;
 	}

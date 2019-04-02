@@ -72,7 +72,7 @@ class CScreenActions extends CScreenBase {
 				break;
 		}
 
-		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,'.
+		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,a.alerttype,'.
 					'a.userid,a.actionid,a.mediatypeid,mt.description,mt.maxattempts'.
 				' FROM events e,alerts a'.
 					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
@@ -109,13 +109,13 @@ class CScreenActions extends CScreenBase {
 			}
 		}
 
-		if ($userids) {
-			$dbUsers = API::User()->get([
+		$db_users = $userids
+			? API::User()->get([
 				'output' => ['userid', 'alias', 'name', 'surname'],
 				'userids' => array_keys($userids),
 				'preservekeys' => true
-			]);
-		}
+			])
+			: [];
 
 		// indicator of sort field
 		$sort_div = (new CSpan())->addClass(($sortorder === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
@@ -139,37 +139,20 @@ class CScreenActions extends CScreenBase {
 		]);
 
 		foreach ($alerts as $alert) {
-			if ($alert['status'] == ALERT_STATUS_SENT) {
-				$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
-			}
-			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW) {
-				$status = (new CSpan([
-					_('In progress').':',
-					BR(),
-					_n('%1$s retry left', '%1$s retries left', $alert['maxattempts'] - $alert['retries'])])
-				)
-					->addClass(ZBX_STYLE_YELLOW);
-			}
-			else {
-				$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
-			}
-
-			$recipient = ($alert['userid'] != 0 && array_key_exists($alert['userid'], $dbUsers))
-				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
-				: zbx_nl2br($alert['sendto']);
-
 			$info_icons = [];
 			if ($alert['error'] !== '') {
 				$info_icons[] = makeErrorIcon($alert['error']);
 			}
 
+			$alert['action_type'] = ZBX_EVENT_HISTORY_ALERT;
+
 			$table->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 				array_key_exists($alert['actionid'], $actions) ? $actions[$alert['actionid']]['name'] : '',
 				$alert['mediatypeid'] == 0 ? '' : $alert['description'],
-				$recipient,
+				makeEventDetailsTableUser($alert, $db_users),
 				[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
-				$status,
+				makeActionTableStatus($alert),
 				makeInformationList($info_icons)
 			]);
 		}

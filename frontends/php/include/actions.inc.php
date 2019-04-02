@@ -2190,7 +2190,13 @@ function makeActionTableStatus(array $action) {
 
 			case ALERT_STATUS_NEW:
 			case ALERT_STATUS_NOT_SENT:
-				$status_label = _('In progress');
+				$status_label = ($action['alerttype'] == ALERT_TYPE_COMMAND)
+					? _('In progress')
+					: [
+						_('In progress').':',
+						BR(),
+						_n('%1$s retry left', '%1$s retries left', $alert['maxattempts'] - $alert['retries'])
+					];
 				$status_color = ZBX_STYLE_YELLOW;
 				break;
 

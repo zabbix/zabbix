@@ -51,10 +51,6 @@ foreach ($data['alerts'] as $alert) {
 		$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
 	}
 
-	$recipient = ($alert['userid'] != 0 && array_key_exists($alert['userid'], $data['db_users']))
-		? [bold(getUserFullname($data['db_users'][$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
-		: zbx_nl2br($alert['sendto']);
-
 	$info_icons = [];
 	if ($alert['error'] !== '') {
 		$info_icons[] = makeErrorIcon($alert['error']);
@@ -64,9 +60,9 @@ foreach ($data['alerts'] as $alert) {
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 		array_key_exists($alert['actionid'], $data['actions']) ? $data['actions'][$alert['actionid']]['name'] : '',
 		$alert['mediatypeid'] == 0 ? '' : $alert['description'],
-		$recipient,
+		makeEventDetailsTableUser($alert, $data['db_users']),
 		[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
-		$status,
+		makeActionTableStatus($alert),
 		makeInformationList($info_icons)
 	]);
 }
