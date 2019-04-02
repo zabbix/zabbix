@@ -809,74 +809,66 @@ function getTagString(array $tag, $tag_name_format = PROBLEMS_TAG_NAME_FULL) {
 	}
 }
 
-function getLastEvents($options) {
-	if (!isset($options['limit'])) {
-		$options['limit'] = 15;
-	}
-
-	$triggerOptions = [
-		'output' => ['triggerid', 'priority'],
-		'filter' => [],
-		'skipDependent' => 1,
-		'selectHosts' => ['hostid', 'name'],
-		'sortfield' => 'lastchange',
-		'sortorder' => ZBX_SORT_DOWN,
-		'limit' => $options['triggerLimit']
-	];
-
-	$eventOptions = [
+/**
+ * Selects recent problems.
+ *
+ * @param array $options  Variate selection set using options. All fields are mandatory.
+ * @param string $options['time_from']
+ * @param bool $options['show_recovered']
+ * @param bool $options['show_suppressed']
+ * @param array $options['severities']
+ * @param int $options['limit']
+ *
+ * @return array
+ */
+function getLastEvents(array $options) {
+	$problem_options = [
+		'output' => ['suppressed', 'eventid', 'r_eventid', 'name', 'objectid', 'severity', 'clock', 'r_clock'],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
-		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => ['clock', 'eventid'],
-		'sortorder' => ZBX_SORT_DOWN
+		'severities' => $options['severities'],
+		'time_from' => $options['time_from'],
+		'sortorder' => ZBX_SORT_DOWN,
+		'sortfield' => ['eventid'],
+		'limit' => $options['limit'],
+		'editable' => true
 	];
 
-	if (isset($options['eventLimit'])) {
-		$eventOptions['limit'] = $options['eventLimit'];
+	if ($options['show_recovered']) {
+		$problem_options['recent'] = true;
 	}
 
-	if (isset($options['priority'])) {
-		$triggerOptions['filter']['priority'] = $options['priority'];
-	}
-	if (isset($options['monitored'])) {
-		$triggerOptions['monitored'] = $options['monitored'];
-	}
-	if (isset($options['lastChangeSince'])) {
-		$triggerOptions['lastChangeSince'] = $options['lastChangeSince'];
-		$eventOptions['time_from'] = $options['lastChangeSince'];
-	}
-	if (isset($options['value'])) {
-		$triggerOptions['filter']['value'] = $options['value'];
-		$eventOptions['value'] = $options['value'];
-	}
-	if (array_key_exists('suppressed', $options)) {
-		$triggerOptions['maintenance'] = $options['suppressed'];
-		$eventOptions['suppressed'] = $options['suppressed'];
+	if (!$options['show_suppressed']) {
+		$problem_options['suppressed'] = false;
 	}
 
-	// triggers
-	$triggers = API::Trigger()->get($triggerOptions);
-	$triggers = zbx_toHash($triggers, 'triggerid');
+	$problems = API::Problem()->get($problem_options);
+	$triggers = API::Trigger()->get([
+		'output' => ['triggerid', 'description'],
+		'selectHosts' => ['hostid', 'name'],
+		'triggerid' => zbx_objectValues($problems, 'objectid'),
+		'lastChangeSince' => $options['time_from'],
+		'preservekeys' => true
+	]);
+	$events = [];
 
-	// events
-	$eventOptions['objectids'] = zbx_objectValues($triggers, 'triggerid');
-	$events = API::Event()->get($eventOptions);
-
-	$sortClock = [];
-	$sortEvent = [];
-	foreach ($events as $enum => $event) {
-		if (!isset($triggers[$event['objectid']])) {
+	foreach ($problems as $problem) {
+		$resolved = ($problem['r_eventid'] != 0);
+		if (!array_key_exists($problem['objectid'], $triggers)) {
 			continue;
 		}
-
-		$events[$enum]['trigger'] = $triggers[$event['objectid']];
-		$events[$enum]['host'] = reset($events[$enum]['trigger']['hosts']);
-		$sortClock[$enum] = $event['clock'];
-		$sortEvent[$enum] = $event['eventid'];
-		$events[$enum]['trigger']['description'] = $event['name'];
+		$trigger = $triggers[$problem['objectid']];
+		$events[] = [
+			'resolved' => $resolved,
+			'triggerid' => $problem['objectid'],
+			'objectid' => $problem['objectid'],
+			'eventid' => $resolved ? $problem['r_eventid'] : $problem['eventid'],
+			'description' => $trigger['description'],
+			'host' => reset($trigger['hosts']),
+			'severity' => $problem['severity'],
+			'clock' => $resolved ? $problem['r_clock'] : $problem['clock']
+		];
 	}
-	array_multisort($sortClock, SORT_DESC, $sortEvent, SORT_DESC, $events);
 
 	return $events;
 }
