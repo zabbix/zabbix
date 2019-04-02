@@ -107,7 +107,7 @@ var CSuggest = Class.create({
 		var rpcRequest = {
 			'method': 'search',
 			'params': {
-				'search': {'name': needle, 'host': needle}
+				'search': needle
 			},
 			'onSuccess': this.serverRespond.bind(this, needle),
 			'onFailure': function() {
