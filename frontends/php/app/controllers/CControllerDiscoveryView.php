@@ -77,7 +77,8 @@ class CControllerDiscoveryView extends CController {
 				'drules' => $filter_druleids
 					? CArrayHelper::renameObjectsKeys(API::DRule()->get([
 						'output' => ['druleid', 'name'],
-						'druleids' => $filter_druleids
+						'druleids' => $filter_druleids,
+						'filter' => ['status' => DRULE_STATUS_ACTIVE]
 					]), ['druleid' => 'id'])
 					: [],
 			],

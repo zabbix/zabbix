@@ -507,6 +507,7 @@ switch ($data['method']) {
 				$drules = API::DRule()->get([
 					'output' => ['druleid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'filter' => ['status' => DRULE_STATUS_ACTIVE],
 					'limit' => $config['search_limit']
 				]);
 
