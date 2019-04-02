@@ -130,13 +130,7 @@ jQuery(function ($){
 			increment: data.can_increment,
 			zoomout: data.can_zoomout
 		}, function (elm, state) {
-			if (state === true) {
-				element[elm].prop('disabled', false);
-			}
-			else if (state === false) {
-				element[elm].prop('disabled', true);
-			}
-
+			element[elm].prop('disabled', !state);
 			element[elm].removeClass('disabled');
 		});
 
