@@ -57,7 +57,9 @@ class CScreenDiscovery extends CScreenBase {
 		$drules = API::DRule()->get([
 			'output' => ['druleid', 'name'],
 			'selectDHosts' => ['dhostid', 'status', 'lastup', 'lastdown'],
-			'druleids' => $this->data['filter_druleids'] ? $this->data['filter_druleids'] : null,
+			'druleids' => (array_key_exists('filter_druleids', $this->data) && $this->data['filter_druleids'])
+				? $this->data['filter_druleids']
+				: null,
 			'filter' => ['status' => DRULE_STATUS_ACTIVE],
 			'preservekeys' => true
 		]);
