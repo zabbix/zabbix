@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.2.0rc1');
-define('ZABBIX_API_VERSION',	'4.2.0');
+define('ZABBIX_VERSION',		'4.4.0alpha1');
+define('ZABBIX_API_VERSION',	'4.4.0');
 define('ZABBIX_EXPORT_VERSION',	'4.2');
-define('ZABBIX_DB_VERSION',	4010023);
+define('ZABBIX_DB_VERSION',	4020000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -552,6 +552,8 @@ define('ZBX_PREPROC_ERROR_FIELD_REGEX',		18);
 define('ZBX_PREPROC_THROTTLE_VALUE',		19);
 define('ZBX_PREPROC_THROTTLE_TIMED_VALUE',	20);
 define('ZBX_PREPROC_SCRIPT',				21);
+define('ZBX_PREPROC_PROMETHEUS_PATTERN',	22);
+define('ZBX_PREPROC_PROMETHEUS_TO_JSON',	23);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
@@ -773,8 +775,9 @@ define('ZBX_MIN_WIDGET_LINES', 1);
 define('ZBX_MAX_WIDGET_LINES', 100);
 
 // dashboards
-define('DASHBOARD_MAX_ROWS', 64);
-define('DASHBOARD_MAX_COLUMNS', 12);
+define('DASHBOARD_MAX_COLUMNS',		12);
+define('DASHBOARD_MAX_ROWS',		64);
+define('DASHBOARD_WIDGET_MAX_ROWS',	32);
 
 // alignments
 define('HALIGN_DEFAULT',	0);
@@ -1082,6 +1085,10 @@ define('EXPRESSION_TYPE_FALSE',			4);
 define('HOST_INVENTORY_DISABLED',	-1);
 define('HOST_INVENTORY_MANUAL',		0);
 define('HOST_INVENTORY_AUTOMATIC',	1);
+
+define('INVENTORY_URL_MACRO_NONE', -1);
+define('INVENTORY_URL_MACRO_HOST', 0);
+define('INVENTORY_URL_MACRO_TRIGGER', 1);
 
 define('EXPRESSION_HOST_UNKNOWN',			'#ERROR_HOST#');
 define('EXPRESSION_HOST_ITEM_UNKNOWN',		'#ERROR_ITEM#');

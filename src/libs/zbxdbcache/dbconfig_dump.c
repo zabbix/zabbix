@@ -517,7 +517,10 @@ static void	DCdump_masteritem(const ZBX_DC_MASTERITEM *masteritem)
 
 	zabbix_log(LOG_LEVEL_TRACE, "  dependent:");
 	for (i = 0; i < masteritem->dep_itemids.values_num; i++)
-		zabbix_log(LOG_LEVEL_TRACE, "    " ZBX_FS_UI64, masteritem->dep_itemids.values[i]);
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "    itemid:" ZBX_FS_UI64 " flags:" ZBX_FS_UI64,
+				masteritem->dep_itemids.values[i].first, masteritem->dep_itemids.values[i].second);
+	}
 }
 
 static void	DCdump_preprocitem(const ZBX_DC_PREPROCITEM *preprocitem)
@@ -682,6 +685,43 @@ static void	DCdump_template_items(void)
 		template_item = (ZBX_DC_TEMPLATE_ITEM *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " templateid:" ZBX_FS_UI64,
 				template_item->itemid, template_item->hostid, template_item->templateid);
+	}
+
+	zbx_vector_ptr_destroy(&index);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
+}
+
+static void	DCdump_master_items(void)
+{
+	const char		*__function_name = "DCdump_master_items";
+
+	ZBX_DC_MASTERITEM	*master_item;
+	zbx_hashset_iter_t	iter;
+	int			i, j;
+	zbx_vector_ptr_t	index;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&index);
+	zbx_hashset_iter_reset(&config->masteritems, &iter);
+
+	while (NULL != (master_item = (ZBX_DC_MASTERITEM *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_ptr_append(&index, master_item);
+
+	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		master_item = (ZBX_DC_MASTERITEM *)index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "master itemid:" ZBX_FS_UI64, master_item->itemid);
+
+		for (j = 0; j < master_item->dep_itemids.values_num; j++)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "  itemid:" ZBX_FS_UI64 " flags:" ZBX_FS_UI64,
+					master_item->dep_itemids.values[j].first,
+					master_item->dep_itemids.values[j].second);
+		}
 	}
 
 	zbx_vector_ptr_destroy(&index);
@@ -1270,6 +1310,7 @@ void	DCdump_configuration()
 	DCdump_items();
 	DCdump_interface_snmpitems();
 	DCdump_template_items();
+	DCdump_master_items();
 	DCdump_prototype_items();
 	DCdump_triggers();
 	DCdump_trigdeps();

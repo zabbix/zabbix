@@ -67,7 +67,7 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Applications'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-		$data['showInfoColumn'] ? _('Info') : null
+		_('Info')
 	]);
 
 $current_time = time();
@@ -124,17 +124,15 @@ foreach ($data['items'] as $item) {
 	);
 
 	// info
-	if ($data['showInfoColumn']) {
-		$info_icons = [];
+	$info_icons = [];
 
-		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
-			$info_icons[] = makeErrorIcon($item['error']);
-		}
+	if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
+		$info_icons[] = makeErrorIcon($item['error']);
+	}
 
-		// discovered item lifetime indicator
-		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
-			$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
-		}
+	// discovered item lifetime indicator
+	if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
+		$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
 	}
 
 	// triggers info
@@ -195,8 +193,17 @@ foreach ($data['items'] as $item) {
 		$triggerInfo = '';
 	}
 
+	$wizard = (new CSpan(
+		(new CButton(null))
+			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getItem($item['itemid']))
+	))->addClass(ZBX_STYLE_REL_CONTAINER);
+
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
+	}
+	else if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		$wizard = '';
 	}
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
@@ -207,12 +214,6 @@ foreach ($data['items'] as $item) {
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
-
-	$wizard = (new CSpan(
-		(new CButton(null))
-			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getItem($item['itemid']))
-	))->addClass(ZBX_STYLE_REL_CONTAINER);
 
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
@@ -227,7 +228,7 @@ foreach ($data['items'] as $item) {
 		item_type2str($item['type']),
 		CHtml::encode($item['applications_list']),
 		$status,
-		$data['showInfoColumn'] ? makeInformationList($info_icons) : null
+		makeInformationList($info_icons)
 	]);
 }
 

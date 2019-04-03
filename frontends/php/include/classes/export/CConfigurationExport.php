@@ -93,10 +93,10 @@ class CConfigurationExport {
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 				'snmpv3_privpassphrase', 'formula', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
 				'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'inventory_link', 'flags',
-				'filter', 'lifetime', 'jmx_endpoint', 'timeout', 'url', 'query_fields', 'posts', 'status_codes',
-				'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
-				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
-				'allow_traps'
+				'filter', 'lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
+				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
+				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
+				'verify_host', 'allow_traps'
 			],
 			'item_prototype' => ['hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_contextname', 'snmpv3_securityname',
@@ -541,9 +541,25 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
+		$itemids = [];
+		foreach ($hosts as $hostid => $host_data) {
+			foreach ($host_data['items'] as $item) {
+				$itemids[$item['itemid']] = $item['key_'];
+			}
+		};
+
 		$discovery_rules = $this->prepareDiscoveryRules($discovery_rules);
 
 		foreach ($discovery_rules as $discovery_rule) {
+			if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
+				if (!array_key_exists($discovery_rule['master_itemid'], $itemids)) {
+					// Do not export dependent discovery rule with master item from template.
+					continue;
+				}
+
+				$discovery_rule['master_item'] = ['key_' => $itemids[$discovery_rule['master_itemid']]];
+			}
+
 			$hosts[$discovery_rule['hostid']]['discoveryRules'][] = $discovery_rule;
 		}
 

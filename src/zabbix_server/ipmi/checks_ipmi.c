@@ -367,15 +367,12 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	ipmi_sensor_get_name(s->sensor, full_name, sizeof(full_name));
 	s->full_name = zbx_strdup(NULL, full_name + get_domain_offset(h, full_name));
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Added sensor: host:'%s:%d' id_type:%d id_sz:%d id:'%s' reading_type:0x%x "
-				"('%s') type:0x%x ('%s') domain:'%u' name:'%s'", h->ip, h->port, (int)s->id_type,
-				s->id_sz, zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
-				(unsigned int)s->reading_type, ipmi_sensor_get_event_reading_type_string(s->sensor),
-				(unsigned int)s->type, ipmi_sensor_get_sensor_type_string(s->sensor), h->domain_nr,
-				s->full_name);
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "Added sensor: host:'%s:%d' id_type:%d id_sz:%d id:'%s' reading_type:0x%x "
+			"('%s') type:0x%x ('%s') domain:'%u' name:'%s'", h->ip, h->port, (int)s->id_type, s->id_sz,
+			zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
+			(unsigned int)s->reading_type, ipmi_sensor_get_event_reading_type_string(s->sensor),
+			(unsigned int)s->type, ipmi_sensor_get_sensor_type_string(s->sensor), h->domain_nr,
+			s->full_name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)s);
 
@@ -608,7 +605,7 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 		case IPMI_BOTH_VALUES_PRESENT:
 			s->value.threshold = val;
 
-			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+			if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 			{
 				const char	*percent = "", *base, *mod_use = "", *modifier = "", *rate;
 				const char	*e_string, *s_type_string, *s_reading_type_string;
@@ -707,13 +704,10 @@ static void	zbx_got_discrete_states_cb(ipmi_sensor_t *sensor, int err, ipmi_stat
 
 		is_state_set = ipmi_is_state_set(states, i);
 
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "State [%s | %s | %s | %s | state %d value is %d]",
-					zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
-					ipmi_get_entity_id_string(id), ipmi_sensor_get_sensor_type_string(sensor),
-					ipmi_sensor_get_event_reading_type_string(sensor), i, is_state_set);
-		}
+		zabbix_log(LOG_LEVEL_DEBUG, "State [%s | %s | %s | %s | state %d value is %d]",
+				zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
+				ipmi_get_entity_id_string(id), ipmi_sensor_get_sensor_type_string(sensor),
+				ipmi_sensor_get_event_reading_type_string(sensor), i, is_state_set);
 
 		if (0 != is_state_set)
 			s->value.discrete |= 1 << i;
@@ -740,11 +734,8 @@ static int	zbx_perform_openipmi_ops(zbx_ipmi_host_t *h, const char *func_name)
 	const char	*__function_name = "zbx_perform_openipmi_ops";
 	struct timeval	tv;
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p from %s()", __function_name, h->ip,
-				h->port, (void *)h, func_name);
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p from %s()", __function_name, h->ip, h->port,
+			(void *)h, func_name);
 
 	tv.tv_sec = 10;		/* set timeout for one operation */
 	tv.tv_usec = 0;
@@ -756,19 +747,57 @@ static int	zbx_perform_openipmi_ops(zbx_ipmi_host_t *h, const char *func_name)
 		if (0 == (res = os_hnd->perform_one_op(os_hnd, &tv)))
 			continue;
 
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "End %s() from %s(): error: %s", __function_name, func_name,
-					zbx_strerror(res));
-		}
+		zabbix_log(LOG_LEVEL_DEBUG, "End %s() from %s(): error: %s", __function_name, func_name,
+				zbx_strerror(res));
 
 		return FAIL;
 	}
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		zabbix_log(LOG_LEVEL_DEBUG, "End %s() from %s()", __function_name, func_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End %s() from %s()", __function_name, func_name);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_perform_all_openipmi_ops                                     *
+ *                                                                            *
+ * Purpose: Pass control to OpenIPMI library to process all internal events   *
+ *                                                                            *
+ * Parameters: timeout - [IN] timeout (in seconds) for processing single      *
+ *                            operation; processing multiple operations may   *
+ *                            take more time                                  *
+ *                                                                            *
+ *****************************************************************************/
+void	zbx_perform_all_openipmi_ops(int timeout)
+{
+	struct timeval	tv;
+
+	tv.tv_sec = timeout;
+	tv.tv_usec = 0;
+
+	for (;;)
+	{
+		double	start_time;
+		int	res;
+
+		start_time = zbx_time();
+
+		res = os_hnd->perform_one_op(os_hnd, &tv);
+
+		/* perform_one_op() returns 0 on success, errno on failure (timeout means success) */
+		if (0 != res)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "IPMI error: %s", zbx_strerror(res));
+			break;
+		}
+
+		/* if duration is less than timeout, there may be more operations to be processed */
+		if (zbx_time() - start_time >= timeout)
+		{
+			break;
+		}
+	}
 }
 
 static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
@@ -1103,7 +1132,7 @@ static void	zbx_entity_change_cb(enum ipmi_update_e op, ipmi_domain_t *domain, i
 
 	RETURN_IF_CB_DATA_NULL(cb_data, __function_name);
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		char	entity_name[IPMI_ENTITY_NAME_LEN];
 

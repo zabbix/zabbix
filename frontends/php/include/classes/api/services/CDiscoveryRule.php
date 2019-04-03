@@ -37,7 +37,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	public static $supported_preprocessing_types = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
 		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-		ZBX_PREPROC_SCRIPT
+		ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON
 	];
 
 	public function __construct() {
@@ -338,11 +338,12 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 
 			// Option 'Convert to JSON' is not supported for discovery rule.
-			unset($item['output_format']);
+			unset($item['itemid'], $item['output_format']);
 		}
 		unset($item);
 
 		$this->validateCreateLLDMacroPaths($items);
+		$this->validateDependentItems($items);
 		$this->createReal($items);
 		$this->inherit($items);
 
@@ -360,7 +361,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$db_items = $this->get([
-			'output' => ['itemid', 'name', 'type', 'authtype', 'allow_traps', 'retrieve_mode'],
+			'output' => ['itemid', 'name', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'preservekeys' => true
@@ -369,7 +370,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->checkInput($items, true, $db_items);
 		$this->validateUpdateLLDMacroPaths($items);
 
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type']);
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type', 'master_itemid']);
+		$this->validateDependentItems($items);
 
 		$defaults = DB::getDefaults('items');
 		$clean = [
@@ -608,8 +610,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * the user doesn't have the necessary permissions.
 	 *
 	 * @param array $data
-	 * @param array $data['discoveryruleids']	An array of item ids to be cloned
-	 * @param array $data['hostids']			An array of host ids were the items should be cloned to
+	 * @param array $data['discoveryids']  An array of item ids to be cloned.
+	 * @param array $data['hostids']       An array of host ids were the items should be cloned to.
 	 *
 	 * @return bool
 	 */
@@ -1176,12 +1178,6 @@ class CDiscoveryRule extends CItemGeneral {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 
-			if (array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_DEPENDENT) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-					ITEM_TYPE_DEPENDENT, 'type'
-				));
-			}
-
 			// unset fields that are updated using the 'filter' parameter
 			unset($item['evaltype']);
 			unset($item['formula']);
@@ -1516,7 +1512,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'url',
 				'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
 				'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-				'verify_peer', 'verify_host', 'allow_traps'
+				'verify_peer', 'verify_host', 'allow_traps', 'master_itemid'
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
@@ -1565,6 +1561,25 @@ class CDiscoveryRule extends CItemGeneral {
 					$dstDiscovery['key_']
 				));
 			}
+		}
+
+		// Master item should exists for LLD rule with type dependent item.
+		if ($srcDiscovery['type'] == ITEM_TYPE_DEPENDENT) {
+			$master_items = DBfetchArray(DBselect(
+				'SELECT i1.itemid'.
+				' FROM items i1,items i2'.
+				' WHERE i1.key_=i2.key_'.
+					' AND i1.hostid='.zbx_dbstr($dstDiscovery['hostid']).
+					' AND i2.itemid='.zbx_dbstr($srcDiscovery['master_itemid'])
+			));
+
+			if (!$master_items) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Discovery rule "%1$s" cannot be copied without its master item.', $srcDiscovery['name'])
+				);
+			}
+
+			$dstDiscovery['master_itemid'] = $master_items[0]['itemid'];
 		}
 
 		// save new discovery

@@ -2989,6 +2989,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'details' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
 		],
 	],
 	'trigger_depends' => [
@@ -7408,7 +7414,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '1',
+				'default' => '2',
 			],
 		],
 	],

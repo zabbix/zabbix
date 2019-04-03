@@ -745,7 +745,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 
 	if ($problem_triggerids) {
 		$problems = API::Problem()->get([
-			'output' => ['objectid', 'severity'],
+			'output' => ['eventid', 'acknowledged', 'objectid', 'severity'],
 			'objectids' => $problem_triggerids,
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 			'time_from' => $problem_options['time_from']
@@ -756,6 +756,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 		foreach ($problems as $problem) {
 			if ($triggers[$problem['objectid']]['priority'] < $problem['severity']) {
 				$triggers[$problem['objectid']]['priority'] = $problem['severity'];
+				$triggers[$problem['objectid']]['problem']['eventid'] = $problem['eventid'];
+				$triggers[$problem['objectid']]['problem']['acknowledged'] = $problem['acknowledged'];
 			}
 			$objectids[$problem['objectid']] = true;
 		}
@@ -830,12 +832,17 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				$trcounter[$host['name']][$trigger_name] = 0;
 			}
 
-			$data[$trigger_name][$trcounter[$host['name']][$trigger_name]][$host['name']] = [
+			$trigger_data = [
 				'triggerid' => $trigger['triggerid'],
 				'value' => $trigger['value'],
 				'lastchange' => $trigger['lastchange'],
 				'priority' => $trigger['priority']
 			];
+			if (array_key_exists('problem', $trigger)) {
+				$trigger_data['problem'] = $trigger['problem'];
+			}
+
+			$data[$trigger_name][$trcounter[$host['name']][$trigger_name]][$host['name']] = $trigger_data;
 			$trcounter[$host['name']][$trigger_name]++;
 		}
 	}
@@ -927,6 +934,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 	$ack = null;
 	$css = null;
 	$desc = null;
+	$eventid = 0;
 	$acknowledge = [];
 
 	if ($trigger) {
@@ -936,25 +944,11 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 			$ack = null;
 
-			$event = getTriggerLastProblems([$trigger['triggerid']], ['eventid', 'acknowledged']);
+			if (array_key_exists('problem', $trigger)) {
+				$eventid = $trigger['problem']['eventid'];
+				$acknowledge = ['backurl' => ($screenid !== null) ? $pageFile.'?screenid='.$screenid : $pageFile];
 
-			if ($event) {
-				$event = reset($event);
-
-				if ($screenid !== null) {
-					$acknowledge = [
-						'eventid' => $event['eventid'],
-						'backurl' => $pageFile.'?screenid='.$screenid
-					];
-				}
-				else {
-					$acknowledge = [
-						'eventid' => $event['eventid'],
-						'backurl' => $pageFile
-					];
-				}
-
-				if ($event['acknowledged'] == 1) {
+				if ($trigger['problem']['acknowledged'] == 1) {
 					$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
 				}
 			}
@@ -985,7 +979,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $acknowledge));
+		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
 	}
 
 	return $column;
@@ -1183,7 +1177,7 @@ function make_trigger_details($trigger) {
 	]);
 
 	if (count($hosts) > 1) {
-		order_result($hosts, 'name', ZBX_SORT_UP);
+		order_result($hosts, 'name');
 	}
 
 	foreach ($hosts as $host) {
@@ -1199,7 +1193,9 @@ function make_trigger_details($trigger) {
 		])
 		->addRow([
 			new CCol(_('Trigger')),
-			new CCol(CMacrosResolverHelper::resolveTriggerName($trigger))
+			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
+				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid']))
+			)
 		])
 		->addRow([
 			_('Severity'),

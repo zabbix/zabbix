@@ -854,9 +854,6 @@ do														\
 }														\
 while (0)
 
-#define MIN_ZABBIX_PORT 1024u
-#define MAX_ZABBIX_PORT 65535u
-
 extern const char	*progname;
 extern const char	title_message[];
 extern const char	syslog_app_name[];
@@ -1355,6 +1352,7 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_REGEXP	0x040000
 #define ZBX_TOKEN_XPATH		0x080000
 #define ZBX_TOKEN_REGEXP_OUTPUT	0x100000
+#define ZBX_TOKEN_PROMETHEUS	0x200000
 
 /* location of a substring */
 typedef struct
@@ -1456,7 +1454,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 #define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
 #define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
-#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFF)
+#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFFFF)
 
 #define ZBX_PREPROC_MULTIPLIER			1
 #define ZBX_PREPROC_RTRIM			2
@@ -1479,6 +1477,8 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_THROTTLE_VALUE		19
 #define ZBX_PREPROC_THROTTLE_TIMED_VALUE	20
 #define ZBX_PREPROC_SCRIPT			21
+#define ZBX_PREPROC_PROMETHEUS_PATTERN		22
+#define ZBX_PREPROC_PROMETHEUS_TO_JSON		23
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0

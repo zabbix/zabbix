@@ -93,6 +93,7 @@ class C40ImportConverter extends CConverter {
 		foreach ($discovery_rules as &$discovery_rule) {
 			$discovery_rule += $default;
 			$discovery_rule['item_prototypes'] = $this->convertItems($discovery_rule['item_prototypes']);
+			$discovery_rule['master_item'] = [];
 		}
 		unset($discovery_rule);
 

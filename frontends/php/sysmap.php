@@ -125,9 +125,10 @@ if (isset($_REQUEST['favobj'])) {
 		}
 		elseif (getRequest('action') === 'expand') {
 			$values = [];
+			$return = [];
 			$sources = json_decode(getRequest('source'), true);
 
-			foreach ($sources as $source) {
+			foreach ($sources as $num => $source) {
 				if (is_array($source) && (array_key_exists('label', $source) || array_key_exists('text', $source))) {
 					if (array_key_exists('inherited_label', $source) && $source['inherited_label'] !== null) {
 						$source['label'] = $source['inherited_label'];
@@ -135,26 +136,36 @@ if (isset($_REQUEST['favobj'])) {
 
 					if (array_key_exists('elementtype', $source) && array_key_exists('elements', $source)
 							&& is_array($source['elements']) && CMapHelper::checkSelementPermissions([$source])) {
-
-						$values[] = CMacrosResolverHelper::resolveMapLabelMacrosAll($source);
+						$values[$num] = $source;
 					}
 					else {
 						$label = array_key_exists('label', $source) ? $source['label'] : $source['text'];
-						$values[] = CMacrosResolverHelper::resolveMapLabelMacros($label);
+						$return[$num] = CMacrosResolverHelper::resolveMapLabelMacros($label);
 					}
 				}
 				else {
-					$values[] = null;
+					$return[$num] = null;
 				}
 			}
 
-			echo CJs::encodeJson($values);
+			if ($values) {
+				// Resolve macros in map element labels.
+				$values = CMacrosResolverHelper::resolveMacrosInMapElements($values, ['resolve_element_label' => true]);
+
+				foreach ($values as $num => $value) {
+					$return[$num] = $value['label'];
+				}
+			}
+
+			ksort($return);
+
+			echo CJs::encodeJson($return);
 			exit;
 		}
 	}
 }
 
-if (PAGE_TYPE_HTML != $page['type']) {
+if ($page['type'] != PAGE_TYPE_HTML) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;
 }
@@ -199,6 +210,9 @@ $data = [
 	'defaultIconName' => null
 ];
 
+// Apply inherited element label properties.
+$data['sysmap'] = CMapHelper::applyMapElementLabelProperties($data['sysmap']);
+
 // get selements
 addElementNames($data['sysmap']['selements']);
 
@@ -216,18 +230,13 @@ $data['sysmap']['selements'] = zbx_toHash($data['sysmap']['selements'], 'selemen
 $data['sysmap']['shapes'] = zbx_toHash($data['sysmap']['shapes'], 'sysmap_shapeid');
 $data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');
 
-$data['sysmap'] = CMapHelper::setElementInheritedLabels($data['sysmap']);
-foreach ($data['sysmap']['selements'] as &$selement) {
-	if ($selement['inherited_label'] !== null) {
-		$label = $selement['label'];
-		$selement['label'] = $selement['inherited_label'];
-	}
+// Extend $selement adding resolved label as property named 'expanded'.
+$resolve_opt = ['resolve_element_label' => true];
+$selements_resolved = CMacrosResolverHelper::resolveMacrosInMapElements($data['sysmap']['selements'], $resolve_opt);
 
-	$selement['expanded'] = CMacrosResolverHelper::resolveMapLabelMacrosAll($selement);
-
-	if ($selement['inherited_label'] !== null) {
-		$selement['label'] = $label;
-	}
+// Set extended and restore original labels.
+foreach ($data['sysmap']['selements'] as $selementid => &$selement) {
+	$selement['expanded'] = $selements_resolved[$selementid]['label'];
 }
 unset($selement);
 
@@ -268,6 +277,7 @@ $images = API::Image()->get([
 	'filter' => ['imagetype' => IMAGE_TYPE_ICON],
 	'select_image' => true
 ]);
+
 foreach ($images as $image) {
 	$image['image'] = base64_decode($image['image']);
 	$ico = imagecreatefromstring($image['image']);
@@ -284,6 +294,7 @@ foreach ($images as $image) {
 		$data['defaultIconName'] = $image['name'];
 	}
 }
+
 if ($data['iconList']) {
 	CArrayHelper::sort($data['iconList'], ['name']);
 	$data['iconList'] = array_values($data['iconList']);

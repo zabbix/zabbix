@@ -2246,21 +2246,23 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 {
 	ZBX_DC_MASTERITEM	*masteritem;
 	int			index;
+	zbx_uint64_pair_t	pair;
 
 	if (NULL == (masteritem = (ZBX_DC_MASTERITEM *)zbx_hashset_search(&config->masteritems, &master_itemid)))
 		return;
 
-	if (FAIL == (index = zbx_vector_uint64_search(&masteritem->dep_itemids, dep_itemid,
+	pair.first = dep_itemid;
+	if (FAIL == (index = zbx_vector_uint64_pair_search(&masteritem->dep_itemids, pair,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 	{
 		return;
 	}
 
-	zbx_vector_uint64_remove_noorder(&masteritem->dep_itemids, index);
+	zbx_vector_uint64_pair_remove_noorder(&masteritem->dep_itemids, index);
 
 	if (0 == masteritem->dep_itemids.values_num)
 	{
-		zbx_vector_uint64_destroy(&masteritem->dep_itemids);
+		zbx_vector_uint64_pair_destroy(&masteritem->dep_itemids);
 		zbx_hashset_remove_direct(&config->masteritems, masteritem);
 	}
 }
@@ -2564,15 +2566,17 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		/* dependent items */
 
-		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[38]))
+		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[38]) && 0 == host->proxy_hostid)
 		{
-			depitem = (ZBX_DC_DEPENDENTITEM *)DCfind_id(&config->dependentitems, itemid, sizeof(ZBX_DC_DEPENDENTITEM), &found);
+			depitem = (ZBX_DC_DEPENDENTITEM *)DCfind_id(&config->dependentitems, itemid,
+					sizeof(ZBX_DC_DEPENDENTITEM), &found);
 
 			if (1 == found)
 				depitem->last_master_itemid = depitem->master_itemid;
 			else
 				depitem->last_master_itemid = 0;
 
+			depitem->flags = item->flags;
 			ZBX_STR2UINT64(depitem->master_itemid, row[38]);
 
 			if (depitem->last_master_itemid != depitem->master_itemid)
@@ -2817,9 +2821,12 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 	for (i = 0; i < dep_items.values_num; i++)
 	{
+		zbx_uint64_pair_t	pair;
+
 		depitem = (ZBX_DC_DEPENDENTITEM *)dep_items.values[i];
-		itemid = depitem->itemid;
-		dc_masteritem_remove_depitem(depitem->last_master_itemid, itemid);
+		dc_masteritem_remove_depitem(depitem->last_master_itemid, depitem->itemid);
+		pair.first = depitem->itemid;
+		pair.second = depitem->flags;
 
 		/* append item to dependent item vector of master item */
 		if (NULL == (master = (ZBX_DC_MASTERITEM *)zbx_hashset_search(&config->masteritems, &depitem->master_itemid)))
@@ -2829,11 +2836,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			master_local.itemid = depitem->master_itemid;
 			master = (ZBX_DC_MASTERITEM *)zbx_hashset_insert(&config->masteritems, &master_local, sizeof(master_local));
 
-			zbx_vector_uint64_create_ext(&master->dep_itemids, __config_mem_malloc_func,
+			zbx_vector_uint64_pair_create_ext(&master->dep_itemids, __config_mem_malloc_func,
 					__config_mem_realloc_func, __config_mem_free_func);
 		}
 
-		zbx_vector_uint64_append(&master->dep_itemids, itemid);
+		zbx_vector_uint64_pair_append(&master->dep_itemids, pair);
 	}
 
 	zbx_vector_ptr_destroy(&dep_items);
@@ -3404,6 +3411,21 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		/* process function information */
 
 		function = (ZBX_DC_FUNCTION *)DCfind_id(&config->functions, functionid, sizeof(ZBX_DC_FUNCTION), &found);
+
+		if (1 == found && function->itemid != itemid)
+		{
+			ZBX_DC_ITEM	*item_last;
+
+			if (NULL != (item_last = zbx_hashset_search(&config->items, &function->itemid)))
+			{
+				item_last->update_triggers = 1;
+				if (NULL != item_last->triggers)
+				{
+					config->items.mem_free_func(item_last->triggers);
+					item_last->triggers = NULL;
+				}
+			}
+		}
 
 		function->triggerid = triggerid;
 		function->itemid = itemid;
@@ -5233,7 +5255,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	update_sec = zbx_time() - sec;
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
 				action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
@@ -5511,7 +5533,7 @@ out:
 
 	zbx_dbsync_free_env();
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -6211,6 +6233,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
@@ -6220,6 +6243,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
+#endif
 	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
 	{
 		*error = zbx_strdup(*error, "internal error: invalid connection type");
@@ -6270,6 +6294,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (NULL != dc_host->tls_dc_psk)
@@ -6291,6 +6316,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
+#endif
 #endif
 	*hostid = dc_host->hostid;
 
@@ -6959,9 +6985,12 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 		}
 
 		item->dep_itemids_num = dc_masteritem->dep_itemids.values_num;
-		item->dep_itemids = (zbx_uint64_t *)zbx_malloc(NULL, sizeof(zbx_uint64_t) * item->dep_itemids_num);
+
+		item->dep_itemids = (zbx_uint64_pair_t *)zbx_malloc(NULL,
+				sizeof(zbx_uint64_pair_t) * item->dep_itemids_num);
+
 		memcpy(item->dep_itemids, dc_masteritem->dep_itemids.values,
-				sizeof(zbx_uint64_t) * item->dep_itemids_num);
+				sizeof(zbx_uint64_pair_t) * item->dep_itemids_num);
 	}
 
 	zbx_hashset_iter_reset(&config->items, &iter);
@@ -8976,51 +9005,6 @@ void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 
 		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR))
 			DCstrpool_replace(1, &dc_trigger->error, diff->error);
-	}
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_set_maintenance                                         *
- *                                                                            *
- * Purpose: set host maintenance status                                       *
- *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
-		int maintenance_type, int maintenance_from)
-{
-	int		i, now;
-	ZBX_DC_HOST	*dc_host;
-
-	now = time(NULL);
-
-	WRLOCK_CACHE;
-
-	for (i = 0; i < hostids_num; i++)
-	{
-		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostids[i])))
-			continue;
-
-		if (HOST_STATUS_MONITORED != dc_host->status && HOST_STATUS_NOT_MONITORED != dc_host->status)
-			continue;
-
-		if (dc_host->maintenance_status != maintenance_status)
-			dc_host->maintenance_from = maintenance_from;
-
-		if (MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type && MAINTENANCE_TYPE_NODATA != maintenance_type)
-		{
-			/* Store time at which no-data maintenance ended for the host (either */
-			/* because no-data maintenance ended or because maintenance type was */
-			/* changed to normal), this is needed for nodata() trigger function. */
-			dc_host->data_expected_from = now;
-		}
-
-		dc_host->maintenance_status = maintenance_status;
-		dc_host->maintenance_type = maintenance_type;
 	}
 
 	UNLOCK_CACHE;

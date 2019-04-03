@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.2.0rc1])
+AC_INIT([Zabbix],[4.4.0alpha1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1593,6 +1593,10 @@ if test "x$server" = "xyes"; then
 	have_ipcservice="yes"
 fi
 
+if test "x$proxy" = "xyes"; then
+	have_ipcservice="yes"
+fi
+
 AM_CONDITIONAL(PROXY_IPCSERVICE, [test "x$have_ipmi" = "xyes"])
 
 dnl Check for libevent, used by Zabbix IPC services
@@ -1607,10 +1611,8 @@ if test "x$have_ipcservice" = "xyes"; then
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBEVENT_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $LIBEVENT_LIBS"
 
-	if test "x$have_ipmi" = "xyes"; then
-		PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBEVENT_LDFLAGS"
-		PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
-	fi
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBEVENT_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
 fi
 
 dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]
@@ -1658,12 +1660,12 @@ if test "x$want_openssl" = "xyes"; then
 		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
 	fi
 
-	if test "x$found_openssl" != "xyes"; then
+	if test "x$found_openssl" != "xOpenSSL" -a "x$found_openssl" != "xOpenSSL (PSK not supported)"; then
 		AC_MSG_ERROR([OpenSSL library libssl or libcrypto not found])
 	elif test "x$accept_openssl_version" != "xyes"; then
 		AC_MSG_ERROR([OpenSSL library version requirement not met (>= 1.0.1)])
 	else
-		have_tls="OpenSSL"
+		have_tls=$found_openssl
 	fi
 	TLS_CFLAGS="$OPENSSL_CFLAGS"
 	TLS_LDFLAGS="$OPENSSL_LDFLAGS"
@@ -1895,6 +1897,7 @@ AC_OUTPUT([
 	src/libs/zbxhistory/Makefile
 	src/libs/zbxcompress/Makefile
 	src/libs/zbxembed/Makefile
+	src/libs/zbxprometheus/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile

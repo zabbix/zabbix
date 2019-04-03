@@ -17,15 +17,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYHOSTS_H
-#define ZABBIX_PROXYHOSTS_H
+#include "common.h"
+#include "db.h"
+#include "dbupgrade.h"
 
-#include "comms.h"
-#include "zbxjson.h"
+/*
+ * 4.4 development database patches
+ */
 
-extern int	CONFIG_TIMEOUT;
+#ifndef HAVE_SQLITE3
 
-void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp);
-void	send_host_availability(zbx_socket_t *sock);
+/*static int	DBpatch_4030000(void)
+{
+}*/
 
 #endif
+
+DBPATCH_START(4030)
+
+/* version, duplicates flag, mandatory flag */
+
+/*DBPATCH_ADD(4030000, 0, 1)*/
+
+DBPATCH_END()

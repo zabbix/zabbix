@@ -22,6 +22,7 @@
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 #include "lld_protocol.h"
+#include "sysinfo.h"
 
 /******************************************************************************
  *                                                                            *
@@ -121,6 +122,42 @@ void	zbx_lld_process_value(zbx_uint64_t itemid, const char *value, const zbx_tim
 	}
 
 	zbx_free(data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_lld_process_agent_result                                     *
+ *                                                                            *
+ * Purpose: process low level discovery agent result                          *
+ *                                                                            *
+ * Parameters: itemid - [IN] the LLD rule id                                  *
+ *             result - [IN] the agent result                                 *
+ *             ts     - [IN] the value timestamp                              *
+ *             error  - [IN] the error message (can be NULL)                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_lld_process_agent_result(zbx_uint64_t itemid, AGENT_RESULT *result, zbx_timespec_t *ts, char *error)
+{
+	const char	*value = NULL;
+	unsigned char	meta = 0;
+	zbx_uint64_t	lastlogsize = 0;
+	int		mtime = 0;
+
+	if (NULL != result)
+	{
+		if (NULL != GET_TEXT_RESULT(result))
+			value = *(GET_TEXT_RESULT(result));
+
+		if (0 != ISSET_META(result))
+		{
+			meta = 1;
+			lastlogsize = result->lastlogsize;
+			mtime = result->mtime;
+		}
+	}
+
+	if (NULL != value || NULL != error || 0 != meta)
+		zbx_lld_process_value(itemid, value, ts, meta, lastlogsize, mtime, error);
 }
 
 /******************************************************************************
