@@ -1731,8 +1731,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 
 	if (0 == access(*cmd, X_OK))
 	{
-		char	*pstart, *pend, *param = NULL;
-		size_t	param_alloc = 0, param_offset;
+		char	*pstart, *pend;
 
 		db_alert.sendto = alert->sendto;
 		db_alert.subject = alert->subject;
@@ -1740,9 +1739,8 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 
 		for (pstart = mediatype->exec_params; NULL != (pend = strchr(pstart, '\n')); pstart = pend + 1)
 		{
-			char	*param_esc;
-
-			param_offset = 0;
+			char	*param_esc, *param = NULL;
+			size_t	param_alloc = 0, param_offset = 0;
 
 			zbx_strncpy_alloc(&param, &param_alloc, &param_offset, pstart, pend - pstart);
 
@@ -1753,9 +1751,8 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 			zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, " '%s'", param_esc);
 
 			zbx_free(param_esc);
+			zbx_free(param);
 		}
-
-		zbx_free(param);
 
 		ret = SUCCEED;
 	}
