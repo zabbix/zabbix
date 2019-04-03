@@ -2551,7 +2551,7 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 	zbx_timespec_t	client_timediff;
 	int		sec, ns;
 
-	if (SUCCEED != zabbix_check_log_level(level))
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
