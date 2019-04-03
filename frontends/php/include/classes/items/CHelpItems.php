@@ -342,7 +342,11 @@ class CHelpItems {
 				],
 				[
 					'key' => 'zabbix.stats[<ip>,<port>]',
-					'description' => _('Returns a JSON object containing Zabbix server or Proxy internal metrics.')
+					'description' => _('Returns a JSON object containing Zabbix server or proxy internal metrics.')
+				],
+				[
+					'key' => 'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
+					'description' => _('Number of items in the queue which are delayed in Zabbix server or proxy by "from" till "to" seconds, inclusive.')
 				]
 			],
 			ITEM_TYPE_ZABBIX_ACTIVE => [
@@ -645,6 +649,14 @@ class CHelpItems {
 				[
 					'key' => 'wmi.get[<namespace>,<query>]',
 					'description' => _('Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)')
+				],
+				[
+					'key' => 'zabbix.stats[<ip>,<port>]',
+					'description' => _('Returns a JSON object containing Zabbix server or proxy internal metrics.')
+				],
+				[
+					'key' => 'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
+					'description' => _('Number of items in the queue which are delayed in Zabbix server or proxy by "from" till "to" seconds, inclusive.')
 				]
 			],
 			ITEM_TYPE_AGGREGATE => [
@@ -984,7 +996,11 @@ class CHelpItems {
 				],
 				[
 					'key' => 'zabbix[stats,<ip>,<port>]',
-					'description' => _('Returns a JSON object containing Zabbix server or Proxy internal metrics.')
+					'description' => _('Returns a JSON object containing Zabbix server or proxy internal metrics.')
+				],
+				[
+					'key' => 'zabbix[stats,<ip>,<port>,queue,<from>,<to>]',
+					'description' => _('Number of items in the queue which are delayed in Zabbix server or proxy by "from" till "to" seconds, inclusive.')
 				],
 				[
 					'key' => 'zabbix[trends]',
