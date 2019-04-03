@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15769] fixed new widget placeholder being shown outside maximum allowed dashboard height area (gcalenko)
 ..F....... [ZBX-15708] fixed browser build in autofill for passwords field on media type form on authentication ldap form and on user edit form (gcalenko)
 ..F....... [ZBX-10392] fixed application filter persistence when navigating from  maps page to triggers views page or latest data page (gcalenko)
 ..F....... [ZBX-15754] removed unnecessary request for non-existing map background and fixed undefined index when creating default image (Ivo)
