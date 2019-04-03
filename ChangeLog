@@ -10,6 +10,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15831] fixed slow request of vmware configuration update (MVekslers)
 ........S. [ZBX-15920] fixed nodata() function triggering after maintenances with no data collection without waiting for the nodata period (wiper)
 .........T [ZBX-13478] fixed item prototype update intervals to eliminate trigger status flapping (viktors, vitaly)
 ...G...PS. [ZBX-10611] fixed changing process user owner on startup in foreground when AllowRoot disabled (viktors)
@@ -271,6 +272,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15831] fixed slow request of vmware configuration update (MVekslers)
 ........S. [ZBX-15920] fixed nodata() function triggering after maintenances with no data collection without waiting for the nodata period (wiper)
 .........T [ZBX-13478] fixed item prototype update intervals to eliminate trigger status flapping (viktors, vitaly)
 ...G...PS. [ZBX-10611] fixed changing process user owner on startup in foreground when AllowRoot disabled (viktors)
