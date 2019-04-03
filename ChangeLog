@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15754] removed unnecessary request for non-existing map background and fixed undefined index when creating default image (Ivo)
 ..F....... [ZBX-15715] added missing keys "zabbix.stats[<ip>,<port>]", "zabbix.stats[<ip>,<port>,queue,<from>,<to>]" and "zabbix[stats,<ip>,<port>,queue,<from>,<to>]" in item key helper (Ivo)
 ..F....... [ZBX-15672] fixed positioning of the overlay dialogue window in map constructor (ashubin, Ivo)
 ..F....... [ZBX-15609] added missing optional parameter "<regex_excl_dir>" for "vfs.dir.count" and "vfs.dir.size" item keys in item helper (Ivo)
@@ -274,6 +275,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15754] removed unnecessary request for non-existing map background (Ivo)
 ..F....... [ZBX-15715] added missing keys "zabbix.stats[<ip>,<port>]", "zabbix.stats[<ip>,<port>,queue,<from>,<to>]" and "zabbix[stats,<ip>,<port>,queue,<from>,<to>]" in item key helper (Ivo)
 ..F....... [ZBX-15672] fixed positioning of the overlay dialogue window in map constructor (ashubin, Ivo)
 ..F....... [ZBX-15609] added missing optional parameter "<regex_excl_dir>" for "vfs.dir.count" and "vfs.dir.size" item keys in item helper (Ivo)
