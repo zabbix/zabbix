@@ -2735,6 +2735,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		require_numeric = 0;
 		N_functionid = 1;
 		raw_value = 0;
+		pos = token.loc.l;
 
 		switch (token.type)
 		{
