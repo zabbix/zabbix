@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15872] fixed possible deadlock on host table when processing auto registration contents from Zabbix proxy (vso)
 ....I..PS. [ZBX-11203] added blocking of SIGINT and SIGTERM signals on each step of automatic upgrade to avoid interruption of statements that cannot be rolled back (vso)
 ..F....... [ZBX-8451] fixed global regular expression testing not matching actual behavior of Zabbix components due to missing multiline flag (vso)
 ........S. [ZBX-13347] fixed possible crash in history syncer process when processing discovered item value (vso)
@@ -268,6 +269,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15872] fixed possible deadlock on host table when processing auto registration contents from Zabbix proxy (vso)
 ....I..PS. [ZBX-11203] added blocking of SIGINT and SIGTERM signals on each step of automatic upgrade to avoid interruption of statements that cannot be rolled back (vso)
 ..F....... [ZBX-8451] fixed global regular expression testing not matching actual behavior of Zabbix components due to missing multiline flag (vso)
 ........S. [ZBX-13347] fixed possible crash in history syncer process when processing discovered item value (vso)
