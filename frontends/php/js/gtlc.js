@@ -130,7 +130,9 @@ jQuery(function ($){
 			increment: data.can_increment,
 			zoomout: data.can_zoomout
 		}, function (elm, state) {
-			element[elm].prop('disabled', !state);
+			if (typeof state !== 'undefined') {
+				element[elm].prop('disabled', !state);
+			}
 			element[elm].removeClass('disabled');
 		});
 
