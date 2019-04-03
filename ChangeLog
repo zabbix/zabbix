@@ -3,9 +3,9 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
-.......PS. [ZBX-15826] fixed unsupported macros parsing optimization with cursor moving to left position of the token (akozlovs)
-.......PS. [ZBX-15742] fixed network discovery reacting to the changes in agent configuration if uniqueness criteria is value (akozlovs)
-.......PS. [ZBX-15634] fixed NULL username and password are used instead of blank in ODBC monitoring (akozlovs)
+.......PS. [ZBX-15826] optimized unsupported macros parsing (akozlovs)
+.......PS. [ZBX-15742] fixed network discovery is not reacting to the changes in agent configuration if uniqueness criteria is value (akozlovs)
+.......PS. [ZBX-15634] fixed database monitor item does not use stored credentials (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.6
