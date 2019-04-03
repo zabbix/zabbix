@@ -32,7 +32,7 @@ static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 static char		log_filename[MAX_STRING_LEN];
 static int		log_type = LOG_TYPE_UNDEFINED;
 static zbx_mutex_t	log_access = ZBX_MUTEX_NULL;
-static int		log_level = LOG_LEVEL_WARNING;
+int			zbx_log_level = LOG_LEVEL_WARNING;
 
 #ifdef _WINDOWS
 #	define LOCK_LOG		zbx_mutex_lock(log_access)
@@ -43,9 +43,6 @@ static int		log_level = LOG_LEVEL_WARNING;
 #endif
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
-
-#define ZBX_CHECK_LOG_LEVEL(level)	\
-		((LOG_LEVEL_INFORMATION != level && (level > log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
 
 #ifdef _WINDOWS
 #	define STDIN_FILENO	_fileno(stdin)
@@ -62,7 +59,7 @@ static int		log_level = LOG_LEVEL_WARNING;
 #ifndef _WINDOWS
 const char	*zabbix_get_log_level_string(void)
 {
-	switch (log_level)
+	switch (zbx_log_level)
 	{
 		case LOG_LEVEL_EMPTY:
 			return "0 (none)";
@@ -84,20 +81,20 @@ const char	*zabbix_get_log_level_string(void)
 
 int	zabbix_increase_log_level(void)
 {
-	if (LOG_LEVEL_TRACE == log_level)
+	if (LOG_LEVEL_TRACE == zbx_log_level)
 		return FAIL;
 
-	log_level = log_level + 1;
+	zbx_log_level = zbx_log_level + 1;
 
 	return SUCCEED;
 }
 
 int	zabbix_decrease_log_level(void)
 {
-	if (LOG_LEVEL_EMPTY == log_level)
+	if (LOG_LEVEL_EMPTY == zbx_log_level)
 		return FAIL;
 
-	log_level = log_level - 1;
+	zbx_log_level = zbx_log_level - 1;
 
 	return SUCCEED;
 }
@@ -286,7 +283,7 @@ void	zbx_handle_log(void)
 int	zabbix_open_log(int type, int level, const char *filename, char **error)
 {
 	log_type = type;
-	log_level = level;
+	zbx_log_level = level;
 
 	if (LOG_TYPE_SYSTEM == type)
 	{
@@ -360,21 +357,6 @@ void	zabbix_close_log(void)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zabbix_check_log_level                                           *
- *                                                                            *
- * Purpose: checks if the specified log level must be logged                  *
- *                                                                            *
- * Return value: SUCCEED - the log level must be logged                       *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zabbix_check_log_level(int level)
-{
-	return ZBX_CHECK_LOG_LEVEL(level);
-}
-
 void	__zbx_zabbix_log(int level, const char *fmt, ...)
 {
 	char		message[MAX_BUFFER_LEN];
@@ -383,9 +365,11 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	WORD		wType;
 	wchar_t		thread_id[20], *strings[2];
 #endif
+
+#ifndef ZBX_ZABBIX_LOG_CHECK
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
-
+#endif
 	if (LOG_TYPE_FILE == log_type)
 	{
 		FILE	*log_file;
