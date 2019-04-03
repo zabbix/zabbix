@@ -327,7 +327,7 @@
 			markAffected(widgets, w, false);
 		});
 
-		$.each(widgets, function (_, w) {
+		$.each(widgets, function(_, w) {
 			if ('affected_by_draggable' in w) {
 				var pos = $.extend({}, w.pos),
 					overlaps = false;
@@ -341,7 +341,7 @@
 					if (overlaps) {
 						pos.y = b.pos.y + b.pos.height;
 						pos.height -= w.pos.y - pos.y;
-						overlaps = pos.height < w.pos.height || pos.y >= w.pos.y;
+						overlaps = (pos.height < w.pos.height || pos.y >= w.pos.y);
 					}
 
 					return !overlaps;
