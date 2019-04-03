@@ -3,6 +3,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15742] fixed network discovery reacting to the changes in agent configuration if uniqueness criteria is value (akozlovs)
 .......PS. [ZBX-15634] fixed NULL username and password are used instead of blank in ODBC monitoring (akozlovs)
 
 --------------------------------------------------------------------------------
