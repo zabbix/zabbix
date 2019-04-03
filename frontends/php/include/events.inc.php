@@ -812,26 +812,25 @@ function getTagString(array $tag, $tag_name_format = PROBLEMS_TAG_NAME_FULL) {
 /**
  * Selects recent problems.
  *
- * @param array $options  Variate selection set using options. All fields are mandatory.
+ * @param array  $options  Variate selection set using options. All fields are mandatory.
  * @param string $options['time_from']
- * @param bool $options['show_recovered']
- * @param bool $options['show_suppressed']
- * @param array $options['severities']
- * @param int $options['limit']
+ * @param bool   $options['show_recovered']
+ * @param bool   $options['show_suppressed']
+ * @param array  $options['severities']
+ * @param int    $options['limit']
  *
  * @return array
  */
-function getLastEvents(array $options) {
+function getLastProblems(array $options) {
 	$problem_options = [
-		'output' => ['suppressed', 'eventid', 'r_eventid', 'name', 'objectid', 'severity', 'clock', 'r_clock'],
+		'output' => ['eventid', 'r_eventid', 'objectid', 'severity', 'clock', 'r_clock'],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'severities' => $options['severities'],
 		'time_from' => $options['time_from'],
 		'sortorder' => ZBX_SORT_DOWN,
 		'sortfield' => ['eventid'],
-		'limit' => $options['limit'],
-		'editable' => true
+		'limit' => $options['limit']
 	];
 
 	if ($options['show_recovered']) {
@@ -842,23 +841,26 @@ function getLastEvents(array $options) {
 		$problem_options['suppressed'] = false;
 	}
 
-	$problems = API::Problem()->get($problem_options);
-	$triggers = API::Trigger()->get([
-		'output' => ['triggerid', 'description'],
-		'selectHosts' => ['hostid', 'name'],
-		'triggerid' => zbx_objectValues($problems, 'objectid'),
-		'lastChangeSince' => $options['time_from'],
-		'preservekeys' => true
-	]);
-	$events = [];
+	$db_problems = API::Problem()->get($problem_options);
+	$triggers = $db_problems
+		? API::Trigger()->get([
+			'output' => ['triggerid', 'description'],
+			'selectHosts' => ['hostid', 'name'],
+			'triggerid' => zbx_objectValues($db_problems, 'objectid'),
+			'lastChangeSince' => $options['time_from'],
+			'preservekeys' => true
+		])
+		: [];
 
-	foreach ($problems as $problem) {
+	$problems = [];
+
+	foreach ($db_problems as $problem) {
 		$resolved = ($problem['r_eventid'] != 0);
 		if (!array_key_exists($problem['objectid'], $triggers)) {
 			continue;
 		}
 		$trigger = $triggers[$problem['objectid']];
-		$events[] = [
+		$problems[] = [
 			'resolved' => $resolved,
 			'triggerid' => $problem['objectid'],
 			'objectid' => $problem['objectid'],
@@ -870,5 +872,5 @@ function getLastEvents(array $options) {
 		];
 	}
 
-	return $events;
+	return $problems;
 }

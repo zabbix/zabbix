@@ -95,16 +95,16 @@ switch ($data['method']) {
 			$lastMsgTime = $data['params']['messageLast']['events']['time'];
 		}
 
-		$events = getLastEvents([
+		$problems = getLastProblems([
 			'time_from'       => max([$lastMsgTime, $msgsettings['last.clock'], $timeout]),
 			'show_recovered'  => $msgsettings['triggers.recovery'],
 			'show_suppressed' => $msgsettings['show_suppressed'],
 			'severities'      => array_keys($msgsettings['triggers.severities']),
-			'limit'           => 15,
+			'limit'           => 15
 		]);
 
 		$used_triggers = [];
-		foreach ($events as $problem) {
+		foreach ($problems as $problem) {
 			if (array_key_exists($problem['triggerid'], $used_triggers)) {
 				continue;
 			}
@@ -151,12 +151,7 @@ switch ($data['method']) {
 			];
 		}
 
-		usort($result, function ($a, $b) {
-			if ($a['time'] === $b['time']) {
-				return $a['priority'] > $b['priority'];
-			}
-			return $a['time'] > $b['time'];
-		});
+		CArrayHelper::sort($result, ['time', 'priority']);
 
 		break;
 
