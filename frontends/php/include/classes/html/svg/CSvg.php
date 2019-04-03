@@ -26,8 +26,8 @@ class CSvg extends CSvgTag {
 
 		$this
 			->setAttribute('id', str_replace('.', '', uniqid('svg_', true)))
-			->setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-			->setAttribute('version', '1.1');
+			->setAttribute('version', '1.1')
+			->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 	}
 
 	protected function startToString() {
