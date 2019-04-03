@@ -72,34 +72,17 @@ class CScreenActions extends CScreenBase {
 				break;
 		}
 
-		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,a.alerttype,'.
-					'a.userid,a.actionid,a.mediatypeid,mt.description,mt.maxattempts'.
-				' FROM events e,alerts a'.
-					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
-				' WHERE e.eventid=a.eventid'.
-					' AND alerttype='.ALERT_TYPE_MESSAGE;
-
-		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$userid = CWebUser::$data['userid'];
-			$userGroups = getUserGroupsByUserId($userid);
-			$sql .= ' AND EXISTS ('.
-					'SELECT NULL'.
-					' FROM functions f,items i,hosts_groups hgg'.
-					' JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE e.objectid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND i.hostid=hgg.hostid'.
-					' GROUP BY f.triggerid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-					')';
-		}
-
-		$sql .= ' ORDER BY '.$sortfield.' '.$sortorder;
-		$alerts = DBfetchArray(DBselect($sql, $this->screenitem['elements']));
-
-		order_result($alerts, $sortfield, $sortorder);
+		$alerts = API::Alert()->get([
+			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
+				'mediatypeid', 'alerttype'
+			],
+			'selectMediatypes' => ['description', 'maxattempts'],
+			'filter' => [
+				'alerttype' => ALERT_TYPE_MESSAGE
+			],
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder
+		]);
 
 		$userids = [];
 
@@ -146,10 +129,20 @@ class CScreenActions extends CScreenBase {
 
 			$alert['action_type'] = ZBX_EVENT_HISTORY_ALERT;
 
+			$action_type = '';
+			if ($alert['mediatypeid'] != 0 && array_key_exists(0, $alert['mediatypes'])) {
+				$action_type = $alert['mediatypes'][0]['description'];
+			}
+
+			$action_name = '';
+			if (array_key_exists($alert['actionid'], $actions)) {
+				$action_name = $actions[$alert['actionid']]['name'];
+			}
+
 			$table->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-				array_key_exists($alert['actionid'], $actions) ? $actions[$alert['actionid']]['name'] : '',
-				$alert['mediatypeid'] == 0 ? '' : $alert['description'],
+				$action_name,
+				$action_type,
 				makeEventDetailsTableUser($alert, $db_users),
 				[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
 				makeActionTableStatus($alert),
