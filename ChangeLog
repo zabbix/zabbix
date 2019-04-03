@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-15404] fixed action condition type and operator integrity (Ivo)
 ........S. [ZBX-15913] fixed possible crash when sending custom alerts (vso)
 ........S. [ZBX-15872] fixed possible deadlock on host table when processing auto registration contents from Zabbix proxy (vso)
 ....I..PS. [ZBX-11203] added blocking of SIGINT and SIGTERM signals on each step of automatic upgrade to avoid interruption of statements that cannot be rolled back (vso)
@@ -270,6 +271,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-15404] fixed action condition type and operator integrity (Ivo)
 ........S. [ZBX-15913] fixed possible crash when sending custom alerts (vso)
 ........S. [ZBX-15872] fixed possible deadlock on host table when processing auto registration contents from Zabbix proxy (vso)
 ....I..PS. [ZBX-11203] added blocking of SIGINT and SIGTERM signals on each step of automatic upgrade to avoid interruption of statements that cannot be rolled back (vso)
