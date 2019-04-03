@@ -22,7 +22,7 @@
 jQuery(function ($){
 	var container = $('.filter-space').first(),
 		xhr = null,
-		endpoint = new Curl('zabbix.php'),
+		endpoint = new Curl('zabbix.php', false),
 		element = {
 			from: container.find('[name=from]'),
 			to: container.find('[name=to]'),

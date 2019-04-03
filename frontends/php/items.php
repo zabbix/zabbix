@@ -571,6 +571,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
 				case ZBX_PREPROC_MULTIPLIER:
+					$step['params'] = trim($step['params'][0]);
+					break;
+
 				case ZBX_PREPROC_RTRIM:
 				case ZBX_PREPROC_LTRIM:
 				case ZBX_PREPROC_TRIM:
@@ -1105,6 +1108,9 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					foreach ($preprocessing as &$step) {
 						switch ($step['type']) {
 							case ZBX_PREPROC_MULTIPLIER:
+								$step['params'] = trim($step['params'][0]);
+								break;
+
 							case ZBX_PREPROC_RTRIM:
 							case ZBX_PREPROC_LTRIM:
 							case ZBX_PREPROC_TRIM:
@@ -1953,16 +1959,6 @@ else {
 	]);
 
 	$data['trigger_parent_templates'] = getTriggerParentTemplates($data['itemTriggers'], ZBX_FLAG_DISCOVERY_NORMAL);
-
-	// determine, show or not column of errors
-	if (isset($hosts)) {
-		$host = reset($hosts);
-
-		$data['showInfoColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
-	}
-	else {
-		$data['showInfoColumn'] = true;
-	}
 
 	// render view
 	$itemView = new CView('configuration.item.list', $data);

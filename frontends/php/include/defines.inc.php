@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.6rc1');
-define('ZABBIX_API_VERSION',	'4.0.6');
+define('ZABBIX_VERSION',		'4.0.7rc1');
+define('ZABBIX_API_VERSION',	'4.0.7');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -754,8 +754,9 @@ define('ZBX_MIN_WIDGET_LINES', 1);
 define('ZBX_MAX_WIDGET_LINES', 100);
 
 // dashboards
-define('DASHBOARD_MAX_ROWS', 64);
-define('DASHBOARD_MAX_COLUMNS', 12);
+define('DASHBOARD_MAX_COLUMNS',		12);
+define('DASHBOARD_MAX_ROWS',		64);
+define('DASHBOARD_WIDGET_MAX_ROWS',	32);
 
 // alignments
 define('HALIGN_DEFAULT',	0);
