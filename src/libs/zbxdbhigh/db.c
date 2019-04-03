@@ -2493,7 +2493,7 @@ retry_oracle:
 		}
 	}
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		for (i = 0; i < self->rows.values_num; i++)
 		{
