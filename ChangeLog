@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-13347] fixed possible crash in history syncer process when processing discovered item value (vso)
 .......PS. [ZBX-15831] fixed slow request of vmware configuration update (MVekslers)
 ........S. [ZBX-15920] fixed nodata() function triggering after maintenances with no data collection without waiting for the nodata period (wiper)
 .........T [ZBX-13478] fixed item prototype update intervals to eliminate trigger status flapping (viktors, vitaly)
@@ -265,6 +266,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-13347] fixed possible crash in history syncer process when processing discovered item value (vso)
 .......PS. [ZBX-15831] fixed slow request of vmware configuration update (MVekslers)
 ........S. [ZBX-15920] fixed nodata() function triggering after maintenances with no data collection without waiting for the nodata period (wiper)
 .........T [ZBX-13478] fixed item prototype update intervals to eliminate trigger status flapping (viktors, vitaly)
@@ -2585,6 +2587,7 @@ Changes for 3.0.27rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-13347] fixed possible crash in history syncer process when processing discovered item value (vso)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.26
