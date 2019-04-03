@@ -266,7 +266,7 @@ ZABBIX.apps.map = (function($) {
 			expand_sources: [],
 
 			save: function() {
-				var url = new Curl(location.href);
+				var url = new Curl();
 
 				$.ajax({
 					url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
@@ -301,7 +301,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			expandMacros: function(source) {
-				var url = new Curl(location.href);
+				var url = new Curl();
 
 				if (source !== null) {
 					if (/\{.+\}/.test(source.getLabel(false))) {
