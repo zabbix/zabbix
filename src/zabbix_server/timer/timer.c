@@ -164,7 +164,7 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			break;
 
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 			log_host_maintenance_update(diff);
 	}
 

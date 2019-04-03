@@ -3,6 +3,19 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-15404] fixed action condition type and operator integrity (Ivo)
+........S. [ZBX-15913] fixed possible crash when sending custom alerts (vso)
+........S. [ZBX-15872] fixed possible deadlock on host table when processing auto registration contents from Zabbix proxy (vso)
+....I..PS. [ZBX-11203] added blocking of SIGINT and SIGTERM signals on each step of automatic upgrade to avoid interruption of statements that cannot be rolled back (vso)
+..F....... [ZBX-8451] fixed global regular expression testing not matching actual behavior of Zabbix components due to missing multiline flag (vso)
+........S. [ZBX-13347] fixed possible crash in history syncer process when processing discovered item value (vso)
+.......PS. [ZBX-15831] fixed slow request of vmware configuration update (MVekslers)
+........S. [ZBX-15920] fixed nodata() function triggering after maintenances with no data collection without waiting for the nodata period (wiper)
+.........T [ZBX-13478] fixed item prototype update intervals to eliminate trigger status flapping (viktors, vitaly)
+...G...PS. [ZBX-10611] fixed changing process user owner on startup in foreground when AllowRoot disabled (viktors)
+.......PS. [ZBX-15826] optimized unsupported macros parsing (akozlovs)
+.......PS. [ZBX-15742] fixed network discovery is not reacting to the changes in agent configuration if uniqueness criteria is value (akozlovs)
+.......PS. [ZBX-15634] fixed database monitor item does not use stored credentials; thanks to Jose Deniz for the patch (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.6
@@ -2316,6 +2329,8 @@ Changes for 3.0.27rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15913] fixed possible crash when sending custom alerts (vso)
+........S. [ZBX-13347] fixed possible crash in history syncer process when processing discovered item value (vso)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.26

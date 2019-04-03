@@ -1284,7 +1284,7 @@ int	zbx_ipc_socket_read(zbx_ipc_socket_t *csocket, zbx_ipc_message_t *message)
 	message->size = header[ZBX_IPC_MESSAGE_SIZE];
 	message->data = data;
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
 		char	*msg = NULL;
 
@@ -1664,7 +1664,7 @@ int	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client
 	{
 		if (NULL != (*message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&(*client)->rx_queue)))
 		{
-			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+			if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			{
 				char	*data = NULL;
 
@@ -1951,7 +1951,7 @@ int	zbx_ipc_async_socket_recv(zbx_ipc_async_socket_t *asocket, int timeout, zbx_
 
 	if (NULL != (*message = (zbx_ipc_message_t *)zbx_queue_ptr_pop(&asocket->client->rx_queue)))
 	{
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		{
 			char	*data = NULL;
 
