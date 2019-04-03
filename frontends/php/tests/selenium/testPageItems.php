@@ -69,10 +69,10 @@ class testPageItems extends CLegacyWebTest {
 					'Trends',
 					'Type',
 					'Applications',
-					'Status'
+					'Status',
+					'Info'
 				]
 			);
-			$this->zbxTestTextNotPresent('Info');
 		}
 
 		$this->zbxTestAssertElementText("//button[@value='item.masscheck_now'][@disabled]", 'Check now');

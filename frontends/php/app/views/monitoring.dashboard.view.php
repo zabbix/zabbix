@@ -125,7 +125,7 @@ else {
 
 	$widget
 		->addItem($timeline)
-		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
+		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
 		->show();
 
 	/*
@@ -148,6 +148,7 @@ else {
 	$dashboard_options = [
 		'max-rows' => DASHBOARD_MAX_ROWS,
 		'max-columns' => DASHBOARD_MAX_COLUMNS,
+		'widget-max-rows' => DASHBOARD_WIDGET_MAX_ROWS,
 		'editable' => $data['dashboard']['editable'],
 		'edit_mode' => $data['dashboard_edit_mode']
 	];
@@ -175,7 +176,7 @@ else {
 
 	// Initialize dashboard grid.
 	$this->addPostJS(
-		'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER.'")'.
+		'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
 			'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
 			'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
 			'.dashboardGrid("setWidgetDefaults", '.CJs::encodeJson($data['widget_defaults']).')'.

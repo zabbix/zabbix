@@ -652,20 +652,24 @@ class CTrigger extends CTriggerGeneral {
 	 * @throws APIException if the given dependencies are invalid
 	 *
 	 * @param array $triggersData
+	 * @param bool  $inherited
 	 */
-	protected function validateAddDependencies(array $triggersData) {
+	protected function validateAddDependencies(array $triggersData, $inherited = false) {
 		if (!$triggersData) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		$triggerids = array_unique(zbx_objectValues($triggersData, 'triggerid'));
 
+		$permission_check = $inherited
+			? ['nopermissions' => true]
+			: ['editable' => true];
+
 		$triggers = $this->get([
 			'output' => ['triggerid', 'description', 'flags'],
 			'triggerids' => $triggerids,
-			'editable' => true,
 			'preservekeys' => true
-		]);
+		] + $permission_check);
 
 		foreach ($triggerids as $triggerid) {
 			if (!array_key_exists($triggerid, $triggers)) {
@@ -698,7 +702,7 @@ class CTrigger extends CTriggerGeneral {
 			$depTtriggerIds[$dep['dependsOnTriggerid']] = $dep['dependsOnTriggerid'];
 		}
 
-		if ($depTtriggerIds) {
+		if (!$inherited && $depTtriggerIds) {
 			$count = $this->get([
 				'countOutput' => true,
 				'triggerids' => $depTtriggerIds
@@ -721,13 +725,15 @@ class CTrigger extends CTriggerGeneral {
 	 *
 	 * @param array $triggersData   an array of trigger dependency pairs, each pair in the form of
 	 *                              array('triggerid' => 1, 'dependsOnTriggerid' => 2)
+	 * @param bool  $inherited      Determines either to check permissions for added dependencies. Permissions are not
+	 *                              validated for inherited triggers.
 	 *
 	 * @return array
 	 */
-	public function addDependencies(array $triggersData) {
+	public function addDependencies(array $triggersData, $inherited = false) {
 		$triggersData = zbx_toArray($triggersData);
 
-		$this->validateAddDependencies($triggersData);
+		$this->validateAddDependencies($triggersData, $inherited);
 
 		foreach ($triggersData as $dep) {
 			$triggerId = $dep['triggerid'];
@@ -755,7 +761,7 @@ class CTrigger extends CTriggerGeneral {
 						$this->addDependencies([[
 							'triggerid' => $childTrigger['triggerid'],
 							'dependsOnTriggerid' => $newDep[$childTrigger['triggerid']]
-						]]);
+						]], true);
 					}
 				}
 			}
@@ -770,20 +776,24 @@ class CTrigger extends CTriggerGeneral {
 	 * @throws APIException if the given input is invalid
 	 *
 	 * @param array $triggers
+	 * @param bool  $inherited
 	 */
-	protected function validateDeleteDependencies(array $triggers) {
+	protected function validateDeleteDependencies(array $triggers, $inherited) {
 		if (!$triggers) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		$triggerids = array_unique(zbx_objectValues($triggers, 'triggerid'));
 
+		$permission_check = $inherited
+			? ['nopermissions' => true]
+			: ['editable' => true];
+
 		$triggers = $this->get([
 			'output' => ['triggerid', 'description', 'flags'],
 			'triggerids' => $triggerids,
-			'editable' => true,
 			'preservekeys' => true
-		]);
+		] + $permission_check);
 
 		foreach ($triggerids as $triggerid) {
 			if (!array_key_exists($triggerid, $triggers)) {
@@ -806,13 +816,15 @@ class CTrigger extends CTriggerGeneral {
 	 * Deletes all trigger dependencies from the given triggers and their children.
 	 *
 	 * @param array $triggers   an array of triggers with the 'triggerid' field defined
+	 * @param bool  $inherited  Determines either to check permissions for deleted dependencies. Permissions are not
+	 *                          validated for inherited triggers.
 	 *
 	 * @return array
 	 */
-	public function deleteDependencies(array $triggers) {
+	public function deleteDependencies(array $triggers, $inherited = false) {
 		$triggers = zbx_toArray($triggers);
 
-		$this->validateDeleteDependencies($triggers);
+		$this->validateDeleteDependencies($triggers, $inherited);
 
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
 
@@ -825,7 +837,7 @@ class CTrigger extends CTriggerGeneral {
 				]
 			]);
 			if ($childTriggers) {
-				$this->deleteDependencies($childTriggers);
+				$this->deleteDependencies($childTriggers, true);
 			}
 
 			DB::delete('trigger_depends', [

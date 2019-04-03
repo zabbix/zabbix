@@ -18,35 +18,11 @@
 **/
 
 
-/**
- * jQuery based publish/subscribe handler.
- *
- * - $.subscribe(event_name, callback)
- * - $.unsubscribe(event_name, callback)
- * - $.publish(event_name, data_object)
- *
- */
-(function($) {
-	var pubsub = $({});
-
-	$.subscribe = function() {
-		pubsub.on.apply(pubsub, arguments);
-	};
-
-	$.unsubscribe = function() {
-		pubsub.off.apply(pubsub, arguments);
-	};
-
-	$.publish = function() {
-		pubsub.trigger.apply(pubsub, arguments);
-	};
-}(jQuery));
-
 // Time range selector.
 jQuery(function ($){
 	var container = $('.filter-space').first(),
 		xhr = null,
-		endpoint = new Curl('zabbix.php'),
+		endpoint = new Curl('zabbix.php', false),
 		element = {
 			from: container.find('[name=from]'),
 			to: container.find('[name=to]'),
@@ -330,7 +306,7 @@ jQuery(function ($){
 		})
 		.on('click', 'a', function(e) {
 			// Prevent click on graph image parent <a/> element when clicked inside graph selectable area.
-			if ($(e.target).is('img') && prevent_click) {
+			if ($(e.target).is('img') && prevent_click && $(this).hasClass('dashbrd-widget-graph-link')) {
 				return cancelEvent(e);
 			}
 		});
@@ -539,9 +515,8 @@ var timeControl = {
 
 				// url
 				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
-					var graphUrl = new Curl(obj.src);
-					graphUrl.unsetArgument('sid');
-					graphUrl.setArgument('width', obj.objDims.width - 1);
+					var graphUrl = new Curl(obj.src, false);
+					graphUrl.setArgument('width', Math.floor(obj.objDims.width));
 
 					obj.src = graphUrl.getUrl();
 				}
@@ -620,7 +595,7 @@ var timeControl = {
 				id: img.attr('id'),
 				'class': img.attr('class')
 			})
-			.on('load', function() {
+			.one('load', function() {
 				img.replaceWith(clone);
 				window.flickerfreeScreen.setElementProgressState(obj.id, false);
 			});
@@ -680,13 +655,13 @@ var timeControl = {
 		}
 	},
 
-	removeAllSBox: function() {
+	disableAllSBox: function() {
 		jQuery.each(this.objectList, function(i, obj) {
 			if (obj.loadSBox == 1) {
-				obj.loadSBox = 0;
-				jQuery('#'+obj.id).removeData('zbx_sbox');
+				jQuery('#'+obj.containerid).removeClass('dashbrd-widget-graph-link');
 			}
 		});
+		jQuery(document).off('dblclick mousedown', 'img');
 	},
 
 	/**

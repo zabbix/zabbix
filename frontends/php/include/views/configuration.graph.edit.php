@@ -176,7 +176,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, $readonly))
+		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, true))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired();
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -216,7 +216,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'parent_discoveryid' => $data['parent_discoveryid'],
 						'numeric' => '1'
 					]).', null, this);'
-				);
+				)
+				->setEnabled(!$readonly);
 		}
 	}
 	else {
@@ -257,7 +258,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, $readonly))
+		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, true))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired();
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -297,7 +298,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'parent_discoveryid' => $data['parent_discoveryid'],
 						'numeric' => '1'
 					]).', null, this);'
-				);
+				)
+				->setEnabled(!$readonly);;
 		}
 	}
 	else {

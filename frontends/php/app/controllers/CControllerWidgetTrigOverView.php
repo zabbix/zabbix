@@ -49,14 +49,9 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 			'filter' => ['value' => ($fields['show'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null]
 		];
 
-		$problem_options = [
-			'show_suppressed' => $fields['show_suppressed'],
-			'recent' => ($fields['show'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
-			'any' => ($fields['show'] == TRIGGERS_OPTION_ALL) ? true : null
-		];
-
 		list($data['hosts'], $data['triggers']) = getTriggersOverviewData(getSubGroups($fields['groupids']),
-			$fields['application'], $fields['style'], [], $trigger_options, $problem_options
+			$fields['application'], $fields['style'], [], $trigger_options,
+			['show_suppressed' => $fields['show_suppressed']]
 		);
 
 		$this->setResponse(new CControllerResponseData($data));
