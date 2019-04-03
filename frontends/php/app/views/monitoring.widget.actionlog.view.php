@@ -59,7 +59,7 @@ foreach ($data['alerts'] as $alert) {
 	$table->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 		array_key_exists($alert['actionid'], $data['actions']) ? $data['actions'][$alert['actionid']]['name'] : '',
-		$alert['mediatypeid'] == 0 ? '' : $alert['description'],
+		$alert['description'],
 		makeEventDetailsTableUser($alert, $data['db_users']),
 		[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
 		makeActionTableStatus($alert),

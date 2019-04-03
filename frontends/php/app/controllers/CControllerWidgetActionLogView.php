@@ -68,35 +68,26 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 */
 	private function getAlerts($sortfield, $sortorder, $show_lines)
 	{
-		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,a.alerttype,'.
-			'a.userid,a.actionid,a.mediatypeid,mt.description,mt.maxattempts'.
-			' FROM events e,alerts a'.
-			' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
-			' WHERE e.eventid=a.eventid'.
-			' AND alerttype='.ALERT_TYPE_MESSAGE;
-
-		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$userid = CWebUser::$data['userid'];
-			$userGroups = getUserGroupsByUserId($userid);
-			$sql .= ' AND EXISTS ('.
-				'SELECT NULL'.
-				' FROM functions f,items i,hosts_groups hgg'.
-				' JOIN rights r'.
-				' ON r.id=hgg.groupid'.
-				' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE e.objectid=f.triggerid'.
-				' AND f.itemid=i.itemid'.
-				' AND i.hostid=hgg.hostid'.
-				' GROUP BY f.triggerid'.
-				' HAVING MIN(r.permission)>'.PERM_DENY.
-				')';
-		}
-
-		$sql .= ' ORDER BY '.$sortfield.' '.$sortorder;
-		$alerts = DBfetchArray(DBselect($sql, $show_lines));
-		order_result($alerts, $sortfield, $sortorder);
+		$alerts = API::Alert()->get([
+			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
+				'mediatypeid', 'alerttype'
+			],
+			'selectMediatypes' => ['description', 'maxattempts'],
+			'filter' => [
+				'alerttype' => ALERT_TYPE_MESSAGE
+			],
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'limit' => $show_lines
+		]);
 
 		foreach ($alerts as &$alert) {
+			$alert['description'] = '';
+			if ($alert['mediatypeid'] != 0 && array_key_exists(0, $alert['mediatypes'])) {
+				$alert['description'] = $alert['mediatypes'][0]['description'];
+			}
+			unset($alert['mediatypes']);
+
 			$alert['action_type'] = ZBX_EVENT_HISTORY_ALERT;
 		}
 		unset($alert);
