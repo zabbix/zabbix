@@ -3,6 +3,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15870] fixed redundant jsloader loading in login page (miks)
 ..F....... [ZBX-15858] fixed item filtering by application name; added 'select' button for dashboard widget and screen item application fields (miks)
 ..F....... [ZBX-15851] fixed LLD item displaying in Queue details view (miks)
 ..F....... [ZBX-15639] fixed labels overlapping on classic graph X axis (miks)
