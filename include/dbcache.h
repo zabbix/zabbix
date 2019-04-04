@@ -672,9 +672,6 @@ int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff);
 void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff);
 
-void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
-		int maintenance_type, int maintenance_from);
-
 void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values);
 int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx);
 

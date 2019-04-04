@@ -612,19 +612,9 @@ class CScreenProblem extends CScreenBase {
 
 			// Sort items.
 			if ($filter['show_latest_values'] == 1) {
+				$data['triggers'] = CMacrosResolverHelper::sortItemsByExpressionOrder($data['triggers']);
+
 				foreach ($data['triggers'] as &$trigger) {
-					if (count($trigger['items']) > 1) {
-						$order = [];
-						$pos = 0;
-						foreach ($trigger['expression_html'] as $expression_parts) {
-							if (is_array($expression_parts) && $expression_parts[1] instanceof CLink) {
-								$order[$expression_parts[1]->getAttribute('data-itemid')] = $pos++;
-							}
-						}
-						usort($trigger['items'], function ($a, $b) use ($order) {
-							return ($order[$a['itemid']] > $order[$b['itemid']]) ? 1 : -1;
-						});
-					}
 					$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
 				}
 				unset($trigger);
@@ -632,7 +622,25 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($resolve_comments) {
-			$data['triggers'] = CMacrosResolverHelper::resolveTriggerDescriptions($data['triggers']);
+			foreach ($data['problems'] as &$problem) {
+				$trigger = $data['triggers'][$problem['objectid']];
+				$problem['comments'] = CMacrosResolverHelper::resolveTriggerDescription(
+					[
+						'triggerid' => $problem['objectid'],
+						'expression' => $trigger['expression'],
+						'comments' => $trigger['comments'],
+						'clock' => $problem['clock'],
+						'ns' => $problem['ns']
+					],
+					['events' => true]
+				);
+			}
+			unset($problem);
+
+			foreach ($data['triggers'] as &$trigger) {
+				unset($trigger['comments']);
+			}
+			unset($trigger);
 		}
 
 		if ($resolve_urls) {
@@ -1030,7 +1038,7 @@ class CScreenProblem extends CScreenBase {
 					? makeTriggerDependencies($dependencies[$trigger['triggerid']])
 					: [];
 				$description[] = (new CLinkAction($problem['name']))
-					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid']));
+					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']));
 
 				if ($this->data['filter']['details'] == 1) {
 					$description[] = BR();

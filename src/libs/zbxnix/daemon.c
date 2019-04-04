@@ -300,12 +300,6 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 	if (0 == allow_root && 0 == getuid())	/* running as root? */
 	{
-		if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
-		{
-			zbx_error("cannot run as root!");
-			exit(EXIT_FAILURE);
-		}
-
 		if (NULL == user)
 			user = "zabbix";
 
