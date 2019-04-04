@@ -10,6 +10,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15853] fixed empty parent group not listed in the latest data filter (talbergs)
 ..F....... [ZBX-15553] moved preprocessing steps into separate tab in items and item prototype massupdate form (talbergs)
 .......PS. [ZBX-11025] added "unknown command error" to MySQL recoverable error list (viktors)
 ..F....... [ZBX-15870] fixed redundant jsloader loading in login page (miks)
@@ -293,6 +294,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15853] fixed empty parent group not listed in the latest data filter (talbergs)
 .......PS. [ZBX-11025] added "unknown command error" to MySQL recoverable error list (viktors)
 ..F....... [ZBX-15870] fixed redundant jsloader loading in login page (miks)
 ..F....... [ZBX-15858] fixed item filtering by application name; added 'select' button for dashboard widget and screen item application fields (miks)
