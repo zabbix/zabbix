@@ -445,7 +445,7 @@ SVGMap.prototype.update = function (options, incremental) {
 		}
 	}, this);
 
-	if (options.background) {
+	if (options.background && options.background !== '0') {
 		images[options.background] = this.getImageUrl(options.background);
 	}
 

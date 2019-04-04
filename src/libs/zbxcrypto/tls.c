@@ -378,7 +378,7 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
 	/* (i.e. OPENSSL_NO_SSL3 is defined) then SSL_state_string_long() does not provide descriptions of many */
 	/* states anymore. The idea was dropped but the code is here for debugging hard problems. */
 #if 0
-	if (0 != (where & SSL_CB_LOOP) && SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	if (0 != (where & SSL_CB_LOOP))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "OpenSSL debug: state=0x%x \"%s\"", (unsigned int)SSL_state(ssl),
 				SSL_state_string_long(ssl));
@@ -1254,12 +1254,9 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 
 	ZBX_UNUSED(par);
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		/* special print: psk_identity is not '\0'-terminated */
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%.*s\"", __function_name,
-				(int)psk_identity_len, psk_identity);
-	}
+	/* special print: psk_identity is not '\0'-terminated */
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%.*s\"", __function_name, (int)psk_identity_len,
+			psk_identity);
 
 	/* try PSK from configuration file first (it is already in binary form) */
 
@@ -1297,11 +1294,8 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 		}
 		else
 		{
-			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find requested PSK identity \"%.*s\"",
-						__function_name, (int)psk_identity_len, psk_identity);
-			}
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find requested PSK identity \"%.*s\"", __function_name,
+					(int)psk_identity_len, psk_identity);
 		}
 	}
 
@@ -1353,8 +1347,7 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 
 	ZBX_UNUSED(session);
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __function_name, psk_identity);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __function_name, psk_identity);
 
 	/* try PSK from configuration file first (it is already in binary form) */
 
@@ -1445,11 +1438,7 @@ static unsigned int	zbx_psk_client_cb(SSL *ssl, const char *hint, char *identity
 	ZBX_UNUSED(ssl);
 	ZBX_UNUSED(hint);
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __function_name,
-				psk_identity_for_cb);
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __function_name, psk_identity_for_cb);
 
 	if (max_identity_len < psk_identity_len_for_cb + 1)	/* 1 byte for terminating '\0' */
 	{
@@ -1504,8 +1493,7 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 
 	ZBX_UNUSED(ssl);
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __function_name, identity);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __function_name, identity);
 
 	incoming_connection_has_psk = 1;
 
@@ -1688,7 +1676,7 @@ out:
  ******************************************************************************/
 static void	zbx_log_ciphersuites(const char *title1, const char *title2, const int *cipher_ids)
 {
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		char		*msg = NULL;
 		size_t		msg_alloc = 0, msg_offset = 0;
@@ -1719,7 +1707,7 @@ static void	zbx_log_ciphersuites(const char *title1, const char *title2, const i
  ******************************************************************************/
 static void	zbx_log_ciphersuites(const char *title1, const char *title2, gnutls_priority_t ciphers)
 {
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		char		*msg = NULL;
 		size_t		msg_alloc = 0, msg_offset = 0;
@@ -1765,7 +1753,7 @@ static void	zbx_log_ciphersuites(const char *title1, const char *title2, gnutls_
  ******************************************************************************/
 static void	zbx_log_ciphersuites(const char *title1, const char *title2, SSL_CTX *ciphers)
 {
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		char			*msg = NULL;
 		size_t			msg_alloc = 0, msg_offset = 0;
@@ -2341,7 +2329,7 @@ static void	zbx_log_peer_cert(const char *function_name, const zbx_tls_context_t
 	char			issuer[HOST_TLS_ISSUER_LEN_MAX], subject[HOST_TLS_SUBJECT_LEN_MAX];
 #endif
 
-	if (SUCCEED != zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		return;
 #if defined(HAVE_POLARSSL)
 	if (NULL == (cert = ssl_get_peer_cert(tls_ctx->ctx)))
@@ -3808,7 +3796,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		goto out;
 	}
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
 		/* Set our own debug callback function. The 3rd parameter of ssl_set_dbg() we set to NULL. It will be */
 		/* passed as the 1st parameter to our callback function and will be ignored there. */
@@ -3934,21 +3922,15 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 	}
 	else	/* pre-shared key */
 	{
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		{
-			/* special print: s->tls_ctx->ctx->psk_identity is not '\0'-terminated */
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() PSK identity: \"%.*s\"", __function_name,
-					(int)s->tls_ctx->ctx->psk_identity_len, s->tls_ctx->ctx->psk_identity);
-		}
+		/* special print: s->tls_ctx->ctx->psk_identity is not '\0'-terminated */
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() PSK identity: \"%.*s\"", __function_name,
+				(int)s->tls_ctx->ctx->psk_identity_len, s->tls_ctx->ctx->psk_identity);
 	}
 
 	s->connection_type = tls_connect;
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
-				ssl_get_version(s->tls_ctx->ctx), ssl_get_ciphersuite(s->tls_ctx->ctx));
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
+			ssl_get_version(s->tls_ctx->ctx), ssl_get_ciphersuite(s->tls_ctx->ctx));
 
 	return SUCCEED;
 
@@ -4099,7 +4081,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		}
 	}
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
 		/* set our own debug callback function */
 		gnutls_global_set_log_function(zbx_gnutls_debug_cb);
@@ -4169,7 +4151,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			/* log "peer has closed connection" case with debug level */
 			level = (GNUTLS_E_PREMATURE_TERMINATION == res ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING);
 
-			if (SUCCEED == zabbix_check_log_level(level))
+			if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))
 			{
 				zabbix_log(level, "%s() gnutls_handshake() returned: %d %s",
 						__function_name, res, gnutls_strerror(res));
@@ -4206,16 +4188,12 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 	s->connection_type = tls_connect;
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T ")",
-				__function_name,
-				gnutls_protocol_get_name(gnutls_protocol_get_version(s->tls_ctx->ctx)),
-				gnutls_kx_get_name(gnutls_kx_get(s->tls_ctx->ctx)),
-				gnutls_cipher_get_name(gnutls_cipher_get(s->tls_ctx->ctx)),
-				gnutls_mac_get_name(gnutls_mac_get(s->tls_ctx->ctx)),
-				(zbx_fs_size_t)gnutls_mac_get_key_size(gnutls_mac_get(s->tls_ctx->ctx)));
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T ")", __function_name,
+			gnutls_protocol_get_name(gnutls_protocol_get_version(s->tls_ctx->ctx)),
+			gnutls_kx_get_name(gnutls_kx_get(s->tls_ctx->ctx)),
+			gnutls_cipher_get_name(gnutls_cipher_get(s->tls_ctx->ctx)),
+			gnutls_mac_get_name(gnutls_mac_get(s->tls_ctx->ctx)),
+			(zbx_fs_size_t)gnutls_mac_get_key_size(gnutls_mac_get(s->tls_ctx->ctx)));
 
 	return SUCCEED;
 
@@ -4459,11 +4437,8 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 	s->connection_type = tls_connect;
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
-				SSL_get_version(s->tls_ctx->ctx), SSL_get_cipher(s->tls_ctx->ctx));
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
+			SSL_get_version(s->tls_ctx->ctx), SSL_get_cipher(s->tls_ctx->ctx));
 
 	return SUCCEED;
 
@@ -4531,7 +4506,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		goto out;
 	}
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
 		/* Set our own debug callback function. The 3rd parameter of ssl_set_dbg() we set to NULL. It will be */
 		/* passed as the 1st parameter to our callback function and will be ignored there. */
@@ -4659,12 +4634,9 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
 
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		{
-			/* special print: s->tls_ctx->ctx->psk_identity is not '\0'-terminated */
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() PSK identity: \"%.*s\"", __function_name,
-					(int)s->tls_ctx->ctx->psk_identity_len, s->tls_ctx->ctx->psk_identity);
-		}
+		/* special print: s->tls_ctx->ctx->psk_identity is not '\0'-terminated */
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() PSK identity: \"%.*s\"", __function_name,
+				(int)s->tls_ctx->ctx->psk_identity_len, s->tls_ctx->ctx->psk_identity);
 	}
 	else
 	{
@@ -4678,11 +4650,8 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		/* Issuer and Subject will be verified later, after receiving sender type and host name */
 	}
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
-				ssl_get_version(s->tls_ctx->ctx), ssl_get_ciphersuite(s->tls_ctx->ctx));
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
+			ssl_get_version(s->tls_ctx->ctx), ssl_get_ciphersuite(s->tls_ctx->ctx));
 
 	return SUCCEED;
 
@@ -4818,7 +4787,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		}
 	}
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
 		/* set our own debug callback function */
 		gnutls_global_set_log_function(zbx_gnutls_debug_cb);
@@ -4925,7 +4894,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
 
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		{
 			const char	*psk_identity;
 
@@ -4943,16 +4912,12 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		return FAIL;
 	}
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T ")",
-				__function_name,
-				gnutls_protocol_get_name(gnutls_protocol_get_version(s->tls_ctx->ctx)),
-				gnutls_kx_get_name(gnutls_kx_get(s->tls_ctx->ctx)),
-				gnutls_cipher_get_name(gnutls_cipher_get(s->tls_ctx->ctx)),
-				gnutls_mac_get_name(gnutls_mac_get(s->tls_ctx->ctx)),
-				(zbx_fs_size_t)gnutls_mac_get_key_size(gnutls_mac_get(s->tls_ctx->ctx)));
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T ")", __function_name,
+			gnutls_protocol_get_name(gnutls_protocol_get_version(s->tls_ctx->ctx)),
+			gnutls_kx_get_name(gnutls_kx_get(s->tls_ctx->ctx)),
+			gnutls_cipher_get_name(gnutls_cipher_get(s->tls_ctx->ctx)),
+			gnutls_mac_get_name(gnutls_mac_get(s->tls_ctx->ctx)),
+			(zbx_fs_size_t)gnutls_mac_get_key_size(gnutls_mac_get(s->tls_ctx->ctx)));
 
 	return SUCCEED;
 
@@ -5199,11 +5164,8 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		return FAIL;
 	}
 #endif
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
-				SSL_get_version(s->tls_ctx->ctx), cipher_name);
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
+			SSL_get_version(s->tls_ctx->ctx), cipher_name);
 
 	return SUCCEED;
 
