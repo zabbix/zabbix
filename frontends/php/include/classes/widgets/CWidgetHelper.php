@@ -769,7 +769,7 @@ class CWidgetHelper {
 					'add: "#override-add",'.
 					'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"'.
 				'})'.
-				'.bind("afteradd.dynamicRows", function(event, options) {'.
+				'.bind("afteradd.dynamicRows", function(event) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
 					'container.scrollTop(container[0].scrollHeight);'.
 
@@ -783,11 +783,11 @@ class CWidgetHelper {
 							'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
 						'});'.
 				'})'.
-				'.bind("afterremove.dynamicRows", function(event, options) {'.
+				'.bind("afterremove.dynamicRows", function(event) {'.
 					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
 					'onGraphConfigChange();'.
 				'})'.
-				'.bind("tableupdate.dynamicRows", function(event, options) {'.
+				'.bind("tableupdate.dynamicRows", function(event) {'.
 					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
 					'initializeOverrides();'.
 					'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length > 1) {'.
@@ -1114,10 +1114,10 @@ class CWidgetHelper {
 						'return data;'.
 					'}'.
 				'})'.
-				'.bind("beforeadd.dynamicRows", function(event, options) {'.
+				'.bind("beforeadd.dynamicRows", function(event) {'.
 					'jQuery("#data_sets").zbx_vertical_accordion("collapseAll");'.
 				'})'.
-				'.bind("afteradd.dynamicRows", function(event, options) {'.
+				'.bind("afteradd.dynamicRows", function(event) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
 					'container.scrollTop(container[0].scrollHeight);'.
 
@@ -1135,11 +1135,11 @@ class CWidgetHelper {
 							'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
 						'});'.
 				'})'.
-				'.bind("afterremove.dynamicRows", function(event, options) {'.
+				'.bind("afterremove.dynamicRows", function(event) {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
 					'onGraphConfigChange();'.
 				'})'.
-				'.bind("tableupdate.dynamicRows", function(event, options) {'.
+				'.bind("tableupdate.dynamicRows", function(event) {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
 					'jQuery(".'.ZBX_STYLE_RANGE_CONTROL.'[data-options]").rangeControl();'.
 					'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length > 1) {'.
