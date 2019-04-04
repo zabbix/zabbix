@@ -65,4 +65,17 @@ class CForm extends CTag {
 		}
 		return $this;
 	}
+
+	/**
+	 * Prevent browser from auto fill inputs with type password.
+	 *
+	 * @return CForm
+	 */
+	public function disablePasswordAutofill() {
+		$this->addItem((new CDiv([
+			(new CInput('password', null, null))->setAttribute('tabindex', '-1')->removeId()
+		]))->addStyle('display: none;'));
+
+		return $this;
+	}
 }

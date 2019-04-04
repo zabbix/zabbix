@@ -310,12 +310,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve macros in trigger name.
 	 *
+	 * @param array  $triggers
 	 * @param string $triggers[$triggerid]['expression']
 	 * @param string $triggers[$triggerid]['description']
-	 * @param int    $triggers[$triggerid]['clock']			(optional)
-	 * @param int    $triggers[$triggerid]['ns']			(optional)
 	 * @param array  $options
-	 * @param bool   $options['references_only']			resolve only $1-$9 macros
+	 * @param bool   $options['references_only']           resolve only $1-$9 macros
 	 *
 	 * @return array
 	 */
@@ -438,7 +437,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = $this->transformToPositionTypes($types);
 
 		// Replace macros to value.
-		foreach ($macro_values as $triggerid => $macro) {
+		foreach ($macro_values as $triggerid => $foo) {
 			$trigger = &$triggers[$triggerid];
 
 			$matched_macros = $this->getMacroPositions($trigger['description'], $types);
@@ -459,12 +458,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve macros in trigger description.
 	 *
+	 * @param array  $triggers
 	 * @param string $triggers[$triggerid]['expression']
 	 * @param string $triggers[$triggerid]['comments']
+	 * @param int    $triggers[$triggerid]['clock']       (optional)
+	 * @param int    $triggers[$triggerid]['ns']          (optional)
+	 * @param bool   $options['events']                   Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
 	 *
 	 * @return array
 	 */
-	public function resolveTriggerDescriptions(array $triggers) {
+	public function resolveTriggerDescriptions(array $triggers, array $options) {
 		$macros = [
 			'host' => [],
 			'interface' => [],
@@ -535,7 +538,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Get macro value.
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
-		$macro_values = $this->getItemMacros($macros['item'], $macro_values);
+		$macro_values = $this->getItemMacros($macros['item'], $macro_values, $triggers, $options['events']);
 
 		if ($usermacros) {
 			// Get hosts for triggers.
@@ -564,7 +567,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = $this->transformToPositionTypes($types);
 
 		// Replace macros to value
-		foreach ($macro_values as $triggerid => $macro) {
+		foreach ($macro_values as $triggerid => $foo) {
 			$trigger = &$triggers[$triggerid];
 
 			$matched_macros = $this->getMacroPositions($trigger['comments'], $types);
@@ -1913,5 +1916,76 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		return $label;
+	}
+
+	/**
+	 * Set every trigger items array elements order by item usage order in trigger expression and recovery expression.
+	 *
+	 * @param array  $triggers                            Array of triggers.
+	 * @param string $triggers[]['expression']            Trigger expression used to define order of trigger items.
+	 * @param string $triggers[]['recovery_expression']   Trigger expression used to define order of trigger items.
+	 * @param array  $triggers[]['items]                  Items to be sorted.
+	 * @param string $triggers[]['items][]['itemid']      Item id.
+	 *
+	 * @return array
+	 */
+	public function sortItemsByExpressionOrder(array $triggers) {
+		$functionids = [];
+		$num = 0;
+
+		$types = [
+			'macros' => [
+				'trigger' => ['{TRIGGER.VALUE}']
+			],
+			'functionids' => true,
+			'lldmacros' => true,
+			'usermacros' => true
+		];
+
+		foreach ($triggers as $key => $trigger) {
+			if (count($trigger['items']) < 2) {
+				continue;
+			}
+
+			$matched_macros = $this->extractMacros([$trigger['expression'].$trigger['recovery_expression']], $types);
+
+			foreach (array_keys($matched_macros['functionids']) as $macro) {
+				$functionid = substr($macro, 1, -1); // strip curly braces
+
+				if (!array_key_exists($functionid, $functionids)) {
+					$functionids[$functionid] = ['num' => $num++, 'key' => $key];
+				}
+			}
+		}
+
+		if (!$functionids) {
+			return $triggers;
+		}
+
+		$result = DBselect(
+			'SELECT f.functionid,f.itemid'.
+			' FROM functions f'.
+			' WHERE '.dbConditionInt('f.functionid', array_keys($functionids))
+		);
+
+		$item_order = [];
+
+		while ($row = DBfetch($result)) {
+			$key = $functionids[$row['functionid']]['key'];
+			$num = $functionids[$row['functionid']]['num'];
+			$item_order[$key][$row['itemid']] = $num;
+		}
+
+		foreach ($triggers as $key => &$trigger) {
+			if (count($trigger['items']) > 1) {
+				$key_item_order = $item_order[$key];
+				uasort($trigger['items'], function ($item1, $item2) use ($key_item_order) {
+					return $key_item_order[$item1['itemid']] - $key_item_order[$item2['itemid']];
+				});
+			}
+		}
+		unset($trigger);
+
+		return $triggers;
 	}
 }

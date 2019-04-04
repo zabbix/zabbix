@@ -381,6 +381,10 @@ class CMaintenance extends CApiService {
 				];
 				check_db_fields($dbFields, $timeperiod);
 
+				if ($timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
+					$timeperiod['start_date'] = DB::getDefault('timeperiods', 'start_date');
+				}
+
 				$tid++;
 				$insertTimeperiods[$tid] = $timeperiod;
 				$timeperiods[$tid] = $mnum;
@@ -535,16 +539,18 @@ class CMaintenance extends CApiService {
 		$hostids = [];
 		$groupids = [];
 
-		foreach ($maintenances as $maintenance) {
+		foreach ($maintenances as &$maintenance) {
 			if (!array_key_exists($maintenance['maintenanceid'], $db_maintenances)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
 
+			$db_maintenance = $db_maintenances[$maintenance['maintenanceid']];
+
 			// Check maintenances names and collect for unique checking.
 			if (array_key_exists('name', $maintenance) && $maintenance['name'] !== ''
-					&& $db_maintenances[$maintenance['maintenanceid']]['name'] !== $maintenance['name']) {
+					&& $db_maintenance['name'] !== $maintenance['name']) {
 				if (array_key_exists($maintenance['name'], $changed_names)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Maintenance "%1$s" already exists.', $maintenance['name'])
@@ -565,7 +571,7 @@ class CMaintenance extends CApiService {
 				}
 			}
 			else {
-				$active_since = $db_maintenances[$maintenance['maintenanceid']]['active_since'];
+				$active_since = $db_maintenance['active_since'];
 			}
 
 			// Validate maintenance active till.
@@ -579,7 +585,7 @@ class CMaintenance extends CApiService {
 				}
 			}
 			else {
-				$active_till = $db_maintenances[$maintenance['maintenanceid']]['active_till'];
+				$active_till = $db_maintenance['active_till'];
 			}
 
 			// Validate maintenance active interval.
@@ -595,13 +601,45 @@ class CMaintenance extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 				}
 
-				foreach ($maintenance['timeperiods'] as $timeperiod) {
+				$db_timeperiods = zbx_toHash($db_maintenance['timeperiods'], 'timeperiodid');
+
+				foreach ($maintenance['timeperiods'] as &$timeperiod) {
 					if (!is_array($timeperiod)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_('At least one maintenance period must be created.')
 						);
 					}
+
+					$timeperiod_type = array_key_exists('timeperiod_type', $timeperiod)
+						? $timeperiod['timeperiod_type']
+						: null;
+
+					if (array_key_exists('timeperiodid', $timeperiod)) {
+						$timeperiodid = $timeperiod['timeperiodid'];
+
+						// Validate incorrect "timeperiodid".
+						if (!array_key_exists($timeperiodid, $db_timeperiods)) {
+							self::exception(ZBX_API_ERROR_PERMISSIONS,
+								_('No permissions to referred object or it does not exist!')
+							);
+						}
+
+						if ($timeperiod_type === null) {
+							$timeperiod_type = $db_timeperiods[$timeperiodid]['timeperiod_type'];
+						}
+					}
+
+					// Without "timeperiod_type" it resolves to default TIMEPERIOD_TYPE_ONETIME. But will it be forever?
+					if ($timeperiod_type === null) {
+						$timeperiod_type = DB::getDefault('timeperiods', 'timeperiod_type');
+					}
+
+					// Reset "start_date" to default value in case "timeperiod_type" is not one time only.
+					if ($timeperiod_type != TIMEPERIOD_TYPE_ONETIME) {
+						$timeperiod['start_date'] = DB::getDefault('timeperiods', 'start_date');
+					}
 				}
+				unset($timeperiod);
 			}
 
 			// Collect hostids for permission checking.
@@ -638,6 +676,7 @@ class CMaintenance extends CApiService {
 				);
 			}
 		}
+		unset($maintenance);
 
 		// Check if maintenance already exists.
 		if ($changed_names) {

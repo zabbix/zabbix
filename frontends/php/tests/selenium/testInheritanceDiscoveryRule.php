@@ -32,7 +32,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
 
-	// returns list of discovery rules from a template
+	// Returns list of discovery rules from a template.
 	public static function update() {
 		return CDBHelper::getDataProvider(
 			'SELECT itemid'.
@@ -58,7 +58,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 
 	}
 
-	// Returns create data
+	// Returns create data.
 	public static function create() {
 		return [
 			[
@@ -99,7 +99,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 
 				$itemId = 0;
 
-				// template
+				// Template DB check.
 				$dbResult = DBselect(
 					'SELECT itemid,name,templateid'.
 					' FROM items'.
@@ -115,7 +115,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 
 				$this->assertNotEquals($itemId, 0);
 
-				// host
+				// Host DB check.
 				$dbResult = DBselect(
 					'SELECT key_,name'.
 					' FROM items'.
@@ -127,6 +127,13 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 					$this->assertEquals($dbRow['key_'], $data['key']);
 					$this->assertEquals($dbRow['name'], $data['name']);
 				}
+
+				// Host form check.
+				$this->zbxTestLogin('host_discovery.php?hostid='.$this->hostid);
+				$this->zbxTestClickLinkText($data['name']);
+				$this->zbxTestWaitForPageToLoad();
+				$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@value="'.$data['name'].'"][@readonly]');
+				$this->zbxTestAssertElementPresentXpath('//input[@id="key"][@value="'.$data['key'].'"][@readonly]');
 				break;
 
 			case TEST_BAD:

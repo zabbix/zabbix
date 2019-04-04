@@ -159,7 +159,7 @@ void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression)
 				is_uint64_n(expression + token.loc.l + 1, token.loc.r - token.loc.l - 1,
 						&functionid);
 				zbx_vector_uint64_append(functionids, functionid);
-				/* break; is not missing here */
+				ZBX_FALLTHROUGH;
 			case ZBX_TOKEN_USER_MACRO:
 			case ZBX_TOKEN_SIMPLE_MACRO:
 			case ZBX_TOKEN_MACRO:
@@ -2712,6 +2712,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		require_numeric = 0;
 		N_functionid = 1;
 		raw_value = 0;
+		pos = token.loc.l;
 
 		switch (token.type)
 		{
@@ -5057,7 +5058,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 	zbx_vector_ptr_clear_ext(&unknown_msgs, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&unknown_msgs);
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		for (i = 0; i < triggers->values_num; i++)
 		{

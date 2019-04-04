@@ -206,6 +206,22 @@ class CElementQuery implements IWaitable {
 	}
 
 	/**
+	 * Apply chained element query.
+	 *
+	 * @param mixed  $type     selector type (method) or selector
+	 * @param string $locator  locator part of selector
+	 *
+	 * @return $this
+	 */
+	public function query($type, $locator = null) {
+		$prefix = CXPathHelper::fromWebDriverBy($this->by);
+		$suffix = CXPathHelper::fromSelector($type, $locator);
+		$this->by = static::getSelector('xpath', './'.$prefix.'/'.$suffix);
+
+		return $this;
+	}
+
+	/**
 	 * Get wait instance.
 	 *
 	 * @return WebDriverWait
