@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15850] fixed problems by severity filter ignoring host group filter (talbergs)
 ..F....... [ZBX-15853] fixed empty parent group not listed in the latest data filter (talbergs)
 ..F....... [ZBX-15553] moved preprocessing steps into separate tab in items and item prototype massupdate form (talbergs)
 .......PS. [ZBX-11025] added "unknown command error" to MySQL recoverable error list (viktors)
@@ -287,6 +288,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15850] fixed problems by severity filter ignoring host group filter (talbergs)
 ..F....... [ZBX-15853] fixed empty parent group not listed in the latest data filter (talbergs)
 .......PS. [ZBX-11025] added "unknown command error" to MySQL recoverable error list (viktors)
 ..F....... [ZBX-15870] fixed redundant jsloader loading in login page (miks)
