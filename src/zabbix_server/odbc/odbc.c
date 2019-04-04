@@ -157,7 +157,7 @@ static int	zbx_odbc_diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN rc, char **d
  ******************************************************************************/
 static void	zbx_log_odbc_connection_info(const char *function, SQLHDBC hdbc)
 {
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		char		driver_name[MAX_STRING_LEN + 1], driver_ver[MAX_STRING_LEN + 1],
 				db_name[MAX_STRING_LEN + 1], db_ver[MAX_STRING_LEN + 1], *diag = NULL;
@@ -245,6 +245,14 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *user, cons
 
 				if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_DBC, data_source->hdbc, rc, &diag))
 				{
+					/* look for user in data source instead of no user */
+					if ('\0' == *user)
+						user = NULL;
+
+					/* look for password in data source instead of no password */
+					if ('\0' == *pass)
+						pass = NULL;
+
 					rc = SQLConnect(data_source->hdbc, (SQLCHAR *)dsn, SQL_NTS, (SQLCHAR *)user,
 							SQL_NTS, (SQLCHAR *)pass, SQL_NTS);
 
