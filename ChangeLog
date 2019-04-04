@@ -3,6 +3,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15481] fixed showing wrench icon for hosts that are in maintenance, but maintenance is inaccessible due to insufficient permissions (Ivo)
 ..F....... [ZBX-15629] fixed trigger wizard form re-submit (talbergs)
 ..F....... [ZBX-15850] fixed problems by severity filter ignoring host group filter (talbergs)
 ..F....... [ZBX-15853] fixed empty parent group not listed in the latest data filter (talbergs)
