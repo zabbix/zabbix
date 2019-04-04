@@ -702,7 +702,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 		$applications = API::Application()->get([
 			'output' => [],
 			'hostids' => $hostids,
-			'search' => ['name' => $application],
+			'filter' => ['name' => $application],
 			'preservekeys' => true
 		]);
 		$trigger_options['applicationids'] = array_keys($applications);

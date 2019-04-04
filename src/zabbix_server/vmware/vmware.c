@@ -175,6 +175,9 @@ ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
  */
 #define	ZBX_XML_HEADER1		"Soapaction:urn:vim25/4.1"
 #define ZBX_XML_HEADER2		"Content-Type:text/xml; charset=utf-8"
+/* cURL specific atribute to prevent the use of "Expect" derective */
+/* acording RFC 7231/5.1.1 if xml request with a size is large than 1k */
+#define ZBX_XML_HEADER3		"Expect:"
 
 #define ZBX_POST_VSPHERE_HEADER									\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"					\
@@ -4224,6 +4227,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER3);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
 	{
@@ -4753,6 +4757,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER3);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
 	{
