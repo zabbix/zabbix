@@ -2341,6 +2341,7 @@ Changes for 3.0.27rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15870] fixed redundant jsloader loading in login page (miks)
 ........S. [ZBX-15913] fixed possible crash when sending custom alerts (vso)
 ........S. [ZBX-13347] fixed possible crash in history syncer process when processing discovered item value (vso)
 
