@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Search');
 $page['file'] = 'search.php';
-$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -251,7 +251,7 @@ foreach ($hosts as $hnum => $host) {
 $widgets = [];
 $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTS, $table))
 	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state', true))
-	->setHeader(_('Hosts'), [], false, 'search.php')
+	->setHeader(_('Hosts'), [], 'search.php')
 	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
 
 // Find Host groups
@@ -350,7 +350,7 @@ foreach ($hostGroups as $hnum => $group) {
 
 $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
 	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state', true))
-	->setHeader(_('Host groups'), [], false, 'search.php')
+	->setHeader(_('Host groups'), [], 'search.php')
 	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
 
 // FIND Templates
@@ -491,7 +491,7 @@ if ($admin) {
 
 	$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_TEMPLATES, $table))
 		->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state', true))
-		->setHeader(_('Templates'), [], false, 'search.php')
+		->setHeader(_('Templates'), [], 'search.php')
 		->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
 }
 
