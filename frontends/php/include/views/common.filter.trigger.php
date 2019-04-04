@@ -40,15 +40,6 @@ $column1 = (new CFormList())
 			->setModern(true)
 	);
 
-// ack status
-$column1->addRow(_('Acknowledge status'),
-	new CComboBox('ack_status', $filter['ackStatus'], null, [
-		ZBX_ACK_STS_ANY => _('Any'),
-		ZBX_ACK_STS_WITH_UNACK => _('With unacknowledged events'),
-		ZBX_ACK_STS_WITH_LAST_UNACK => _('With last event unacknowledged')
-	])
-);
-
 // min severity
 $severityNames = [];
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
@@ -81,23 +72,22 @@ $column1->addRow(_('Name'),
 );
 
 // application
-$column2 = (new CFormList())
-	->addRow(_('Application'), [
-		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('application_name', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
-					'srctbl' => 'applications',
-					'srcfld1' => 'name',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'application',
-					'real_hosts' => '1',
-					'with_applications' => '1'
-				]).', null, this);'
-			)
-	]);
+$column1->addRow(_('Application'), [
+	(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	(new CButton('application_name', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
+				'srctbl' => 'applications',
+				'srcfld1' => 'name',
+				'dstfrm' => 'zbx_filter',
+				'dstfld1' => 'application',
+				'real_hosts' => '1',
+				'with_applications' => '1'
+			]).', null, this);'
+		)
+]);
 
 // inventory filter
 $inventoryFilters = $filter['inventory'];
@@ -134,7 +124,12 @@ $inventoryFilterTable->addRow(
 			->addClass('element-table-add')
 	))->setColSpan(2)
 );
-$column2->addRow(_('Host inventory'), $inventoryFilterTable);
+$column2 = (new CFormList())->addRow(_('Host inventory'), $inventoryFilterTable);
+
+// ack status
+$column2->addRow(_('Show unacknowledged only'),
+	(new CCheckBox('ack_status'))->setChecked($filter['ackStatus'] == 1)
+);
 
 // suppressed problem filter
 $column2->addRow(_('Show suppressed problems'),

@@ -750,6 +750,9 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'objectids' => $problem_triggerids,
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 			'recent' => array_key_exists('show_recent', $problem_options) ? $problem_options['show_recent'] : null,
+			'acknowledged' => (array_key_exists('acknowledged', $problem_options) && $problem_options['acknowledged'])
+				? false
+				: null,
 			'time_from' => $problem_options['time_from']
 		]);
 
@@ -765,17 +768,16 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 		}
 
 		foreach ($triggers as $triggerid => $trigger) {
-			if (!array_key_exists($triggerid, $objectids)) {
-				if (!array_key_exists('only_true', $trigger_options)
-						|| ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null)) {
-					// Overview type = 'Data', Maps, Dasboard or Overview 'show any' mode.
-					$triggers[$triggerid]['value'] = TRIGGER_VALUE_FALSE;
-				}
-				else {
-					unset($triggers[$triggerid]);
-				}
+			if (array_key_exists($triggerid, $objectids) && $trigger['priority'] >= $problem_options['min_severity']) {
+				continue;
 			}
-			elseif ($trigger['priority'] < $problem_options['min_severity']) {
+
+			if (!array_key_exists('only_true', $trigger_options)
+					|| ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null)) {
+				// Overview type = 'Data', Maps, Dasboard or Overview 'show any' mode.
+				$triggers[$triggerid]['value'] = TRIGGER_VALUE_FALSE;
+			}
+			else {
 				unset($triggers[$triggerid]);
 			}
 		}

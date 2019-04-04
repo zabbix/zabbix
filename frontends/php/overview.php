@@ -48,7 +48,7 @@ $fields = [
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'ack_status' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
+	'ack_status' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	'show_severity' =>		[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'show_suppressed' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
 	'status_change_days' =>	[T_ZBX_INT, O_OPT, null,	BETWEEN(1, DAY_IN_YEAR * 2), null],
@@ -83,7 +83,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.overview.filter.application', getRequest('application'), PROFILE_TYPE_STR);
 
 	// ack status
-	CProfile::update('web.overview.filter.ack_status', getRequest('ack_status', ZBX_ACK_STS_ANY), PROFILE_TYPE_INT);
+	CProfile::update('web.overview.filter.ack_status', getRequest('ack_status', 0), PROFILE_TYPE_INT);
 
 	// update host inventory filter
 	$inventoryFields = [];
@@ -192,13 +192,12 @@ if ($type == SHOW_TRIGGERS) {
 			'filter' => [
 				'value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
 			],
-			'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
-			'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null
 		];
 
 		$problem_options = [
 			'show_recent' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
 			'show_suppressed' => $filter['show_suppressed'],
+			'acknowledged' => $filter['ackStatus'],
 			'min_severity' => $filter['showSeverity'],
 			'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null
 		];
