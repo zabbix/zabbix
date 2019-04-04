@@ -235,7 +235,7 @@ class CScreenProblem extends CScreenBase {
 				'output' => [],
 				'groupids' => $filter_groupids,
 				'hostids' => $filter_hostids,
-				'search' => ['name' => $filter['application']],
+				'filter' => ['name' => $filter['application']],
 				'preservekeys' => true
 			]));
 			$filter_groupids = null;
