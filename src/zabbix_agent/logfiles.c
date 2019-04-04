@@ -1203,11 +1203,8 @@ static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *ol
 					return NULL;
 			}
 
-			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): is_same_file(%s, %s) = %c", __function_name,
-						old_files[i].filename, new_files[j].filename, p[j]);
-			}
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): is_same_file(%s, %s) = %c", __function_name,
+					old_files[i].filename, new_files[j].filename, p[j]);
 		}
 
 		p += (size_t)num_new;
@@ -2152,13 +2149,10 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 	if (SUCCEED != close_file_helper(f, filename, err_msg))
 		ret = FAIL;
 out:
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d ret:%s"
-				" processed_bytes:" ZBX_FS_UI64, __function_name, filename, *lastlogsize,
-				NULL != mtime ? *mtime : 0, zbx_result_string(ret),
-				SUCCEED == ret ? *processed_bytes : (zbx_uint64_t)0);
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d ret:%s"
+			" processed_bytes:" ZBX_FS_UI64, __function_name, filename, *lastlogsize,
+			NULL != mtime ? *mtime : 0, zbx_result_string(ret),
+			SUCCEED == ret ? *processed_bytes : (zbx_uint64_t)0);
 
 	return ret;
 }
@@ -2451,14 +2445,10 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
 	{
 		delay = (double)remaining_bytes * t_proc / (double)processed_bytes;
 
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "calculate_delay(): processed bytes:" ZBX_FS_UI64
-					" remaining bytes:" ZBX_FS_UI64 " t_proc:%e s speed:%e B/s"
-					" remaining full checks:" ZBX_FS_UI64 " delay:%e s", processed_bytes,
-					remaining_bytes, t_proc, (double)processed_bytes / t_proc,
-					remaining_bytes / processed_bytes, delay);
-		}
+		zabbix_log(LOG_LEVEL_DEBUG, "calculate_delay(): processed bytes:" ZBX_FS_UI64
+				" remaining bytes:" ZBX_FS_UI64 " t_proc:%e s speed:%e B/s remaining full checks:"
+				ZBX_FS_UI64 " delay:%e s", processed_bytes, remaining_bytes, t_proc,
+				(double)processed_bytes / t_proc, remaining_bytes / processed_bytes, delay);
 	}
 
 	return delay;
@@ -2662,7 +2652,7 @@ out:
 	if (SUCCEED != close_file_helper(fd, logfile->filename, err_msg))
 		ret = FAIL;
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		const char	*dbg_msg;
 
@@ -3022,7 +3012,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 1 < logfiles_num)
 		ensure_order_if_mtimes_equal(*logfiles_old, logfiles, logfiles_num, *use_ino, &start_idx);
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() old file list:", __function_name);
 		if (NULL != *logfiles_old)
