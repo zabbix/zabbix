@@ -84,11 +84,11 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	for (;;)
 	{
-		sec = zbx_time();
-		zbx_update_env(sec);
-
 		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, syncing configuration]",
 				get_process_type_string(process_type), sec);
+
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		DCsync_configuration(ZBX_DBSYNC_UPDATE);
 		DCupdate_hosts_availability();
