@@ -36,8 +36,8 @@ class CAssetsFileCache {
 	}
 
 	/**
-	 * Check existence of cache directory. If directory for current cache_tag does not exist will call coldBoot.
-	 * Return true when cache is booted and ready to be used, false otherwise.
+	 * Will check existence of cache directory. If directory for current cache_tag does not exist will call cold boot.
+	 * Returns true when cache is booted and ready to be used, false otherwise.
 	 *
 	 * @return bool
 	 */
@@ -52,7 +52,7 @@ class CAssetsFileCache {
 	}
 
 	/**
-	 * Scan and remove old cache entires. Will be called after successful cold boot.
+	 * Scan and remove old cached entries. Will be called after successful cold boot.
 	 */
 	public function maintenance() {
 		$entries = array_diff(scandir($this->root_dir.DIRECTORY_SEPARATOR.ZBX_WEBCACHE_PATH),
@@ -68,8 +68,8 @@ class CAssetsFileCache {
 	}
 
 	/**
-	 * Initialize cache directory for cache_tag by copy cacheable files to cache_tag sub directory.
-	 * Return true when cache is initialized and ready to be used, false otherwise.
+	 * Initializes cache directory for cache_tag by copy cacheable files to cache_tag sub directory.
+	 * Returns true when cache is initialized and ready to be used, false otherwise.
 	 *
 	 * @param string $cache_dir    Path to cache_tag directory.
 	 * @return bool
@@ -96,7 +96,6 @@ class CAssetsFileCache {
 			$this->maintenance();
 		}
 		else {
-			die('#1');
 			$this->invalidate($this->cache_tag);
 		}
 
@@ -104,7 +103,7 @@ class CAssetsFileCache {
 	}
 
 	/**
-	 * Remove cache_tag folder and it content.
+	 * Removes cache_tag folder and it content.
 	 *
 	 * @return bool
 	 */
@@ -130,7 +129,7 @@ class CAssetsFileCache {
 	}
 
 	/**
-	 * Remove directory and it content recursively.
+	 * Removes directory and it content recursively.
 	 *
 	 * @param string $dir    Path to directory.
 	 */
