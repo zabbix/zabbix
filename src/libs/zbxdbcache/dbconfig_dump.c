@@ -668,14 +668,12 @@ static void	DCdump_template_items(void)
 
 static void	DCdump_master_items(void)
 {
-	const char		*__function_name = "DCdump_master_items";
-
 	ZBX_DC_MASTERITEM	*master_item;
 	zbx_hashset_iter_t	iter;
 	int			i, j;
 	zbx_vector_ptr_t	index;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&index);
 	zbx_hashset_iter_reset(&config->masteritems, &iter);
@@ -700,7 +698,7 @@ static void	DCdump_master_items(void)
 
 	zbx_vector_ptr_destroy(&index);
 
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
 static void	DCdump_prototype_items(void)

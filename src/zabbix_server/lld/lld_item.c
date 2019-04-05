@@ -4441,13 +4441,12 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths, zbx_vector_ptr_t *applications,
 		zbx_hashset_t *applications_index)
 {
-	const char			*__function_name = "lld_application_make";
 	zbx_lld_application_t		*application;
 	zbx_lld_application_index_t	*application_index, application_index_local;
 	struct zbx_json_parse		*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
 	char				*buffer = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), proto %s", __function_name, application_prototype->name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), proto %s", __func__, application_prototype->name);
 
 	application_index_local.application_prototypeid = application_prototype->application_prototypeid;
 	application_index_local.lld_row = lld_row;
@@ -4474,7 +4473,7 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		application_index_local.application = application;
 		zbx_hashset_insert(applications_index, &application_index_local, sizeof(zbx_lld_application_index_t));
 
-		zabbix_log(LOG_LEVEL_TRACE, "%s(): created new application, proto %s, name %s", __function_name,
+		zabbix_log(LOG_LEVEL_TRACE, "%s(): created new application, proto %s, name %s", __func__,
 				application_prototype->name, application->name);
 	}
 	else
@@ -4492,7 +4491,7 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 				application->name_orig = application->name;
 				application->name = buffer;
 				application->flags |= ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME;
-				zabbix_log(LOG_LEVEL_TRACE, "%s(): updated application name to %s", __function_name,
+				zabbix_log(LOG_LEVEL_TRACE, "%s(): updated application name to %s", __func__,
 						application->name);
 			}
 			else
@@ -4502,7 +4501,7 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 
 	application->flags |= ZBX_FLAG_LLD_APPLICATION_DISCOVERED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************

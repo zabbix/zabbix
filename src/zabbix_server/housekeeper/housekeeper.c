@@ -1108,18 +1108,16 @@ static int	housekeeping_problems(int now)
 
 static int	housekeeping_proxy_dhistory(int now)
 {
-	const char	*__function_name = "housekeeping_proxy_dhistory";
+	int	deleted = 0, rc;
 
-	int		deleted = 0, rc;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
 	rc = DBexecute("delete from proxy_dhistory where clock<%d", now - SEC_PER_DAY);
 
 	if (ZBX_DB_OK <= rc)
 		deleted = rc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
 
 	return deleted;
 }
