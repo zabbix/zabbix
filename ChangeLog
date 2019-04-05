@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15479] fixed cookie presentation in HTTP header (asestakovs)
 ........S. [ZBX-15516] fixed trapper process title to not update time in case of interruption (asestakovs)
 ...G...PS. [ZBX-15588] fixed function names that are written to the log file when using LOG_LEVEL_DEBUG (asitals)
 .........T [ZBX-9150] fixed update intervals of items in VMware templates (MVekslers)
@@ -293,6 +294,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15479] fixed cookie presentation in HTTP header (asestakovs)
 ........S. [ZBX-15516] fixed trapper process title to not update time in case of interruption (asestakovs)
 ...G...PS. [ZBX-15588] fixed function names that are written to the log file when using LOG_LEVEL_DEBUG (asitals)
 .........T [ZBX-9150] fixed update intervals of items in VMware templates (MVekslers)
