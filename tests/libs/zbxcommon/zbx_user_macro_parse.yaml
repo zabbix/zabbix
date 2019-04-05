@@ -1,22 +1,4 @@
 ---
-test case: "empty user macro"
-in:
-  macro: ''
-out:
-  return: 'FAIL'
----
-test case: "single opening brace"
-in:
-  macro: '{'
-out:
-  return: 'FAIL'
----
-test case: "single closing brace"
-in:
-  macro: '}'
-out:
-  return: 'FAIL'
----
 test case: "space after single-character macro name"
 in:
   macro: '{$A }'
@@ -29,21 +11,9 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "space before $"
-in:
-  macro: '{ $A}'
-out:
-  return: 'FAIL'
----
 test case: "macro without closing brace"
 in:
   macro: '{$A'
-out:
-  return: 'FAIL'
----
-test case: "macro without opening brace"
-in:
-  macro: '$A}'
 out:
   return: 'FAIL'
 ---
@@ -62,18 +32,6 @@ out:
 test case: capitalized macro name"
 in:
   macro: '{$Ab}'
-out:
-  return: 'FAIL'
----
-test case: "macro with extra character before {"
-in:
-  macro: 'B{$Ab}'
-out:
-  return: 'FAIL'
----
-test case: "extra characters before and after braces"
-in:
-  macro: 'B{$Ab}C'
 out:
   return: 'FAIL'
 ---
