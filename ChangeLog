@@ -1,6 +1,7 @@
 Changes for 4.4.0alpha1
 
 New features:
+...G...... [ZBXNEXT-1302] added low-level discovery of block devices (asestakovs)
 
 Bug fixes:
 
