@@ -279,7 +279,7 @@ A......... [ZBX-15146] fixed SQL error occurred when too long IP address is atte
 ..F....... [ZBX-14800] fixed resolving of functional macros in graph widget name (Ivo)
 ...G....S. [ZBX-15178] fixed wrong behaviour when referencing unexisting capture groups in item regexp preprocessing, general pcre code improvements (Andris, kalimulin)
 
-------------------svn commit -m "........S. [ZBX-15516] fixed trapper process title to not update time in case of interruption"--------------------------------------------------------------
+--------------------------------------------------------------------------------
 Changes for 4.2.0alpha1
 
 New features:
