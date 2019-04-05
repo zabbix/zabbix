@@ -269,11 +269,11 @@ class CHelpItems {
 					'description' => _('Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps')
 				],
 				[
-					'key' => 'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>]',
+					'key' => 'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
 					'description' => _('Count of directory entries, recursively. Returns integer')
 				],
 				[
-					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>]',
+					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>,<regex_excl_dir>]',
 					'description' => _('Directory size (in bytes). Returns integer')
 				],
 				[
@@ -342,7 +342,11 @@ class CHelpItems {
 				],
 				[
 					'key' => 'zabbix.stats[<ip>,<port>]',
-					'description' => _('Returns a JSON object containing Zabbix server or Proxy internal metrics.')
+					'description' => _('Returns a JSON object containing Zabbix server or proxy internal metrics.')
+				],
+				[
+					'key' => 'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
+					'description' => _('Number of items in the queue which are delayed in Zabbix server or proxy by "from" till "to" seconds, inclusive.')
 				]
 			],
 			ITEM_TYPE_ZABBIX_ACTIVE => [
@@ -575,11 +579,11 @@ class CHelpItems {
 					'description' => _('Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps')
 				],
 				[
-					'key' => 'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>]',
+					'key' => 'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
 					'description' => _('Count of directory entries, recursively. Returns integer')
 				],
 				[
-					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>]',
+					'key' => 'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>,<regex_excl_dir>]',
 					'description' => _('Directory size (in bytes). Returns integer')
 				],
 				[
@@ -645,6 +649,14 @@ class CHelpItems {
 				[
 					'key' => 'wmi.get[<namespace>,<query>]',
 					'description' => _('Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)')
+				],
+				[
+					'key' => 'zabbix.stats[<ip>,<port>]',
+					'description' => _('Returns a JSON object containing Zabbix server or proxy internal metrics.')
+				],
+				[
+					'key' => 'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
+					'description' => _('Number of items in the queue which are delayed in Zabbix server or proxy by "from" till "to" seconds, inclusive.')
 				]
 			],
 			ITEM_TYPE_AGGREGATE => [
@@ -984,7 +996,11 @@ class CHelpItems {
 				],
 				[
 					'key' => 'zabbix[stats,<ip>,<port>]',
-					'description' => _('Returns a JSON object containing Zabbix server or Proxy internal metrics.')
+					'description' => _('Returns a JSON object containing Zabbix server or proxy internal metrics.')
+				],
+				[
+					'key' => 'zabbix[stats,<ip>,<port>,queue,<from>,<to>]',
+					'description' => _('Number of items in the queue which are delayed in Zabbix server or proxy by "from" till "to" seconds, inclusive.')
 				],
 				[
 					'key' => 'zabbix[trends]',
@@ -1021,11 +1037,11 @@ class CHelpItems {
 			],
 			ITEM_TYPE_DB_MONITOR => [
 				[
-					'key' => 'db.odbc.select[<unique short description>,<dsn>]',
+					'key' => 'db.odbc.select[<unique short description>,dsn]',
 					'description' => _('Return first column of the first row of the SQL query result.')
 				],
 				[
-					'key' => 'db.odbc.discovery[<unique short description>,<dsn>]',
+					'key' => 'db.odbc.discovery[<unique short description>,dsn]',
 					'description' => _('Transform SQL query result into a JSON object for low-level discovery.')
 				]
 			],

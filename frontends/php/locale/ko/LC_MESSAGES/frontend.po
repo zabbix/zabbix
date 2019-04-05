@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 11:18+0200\n"
+"POT-Creation-Date: 2019-03-25 10:16+0200\n"
 "PO-Revision-Date: 2018-12-04 06:36+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -315,7 +315,7 @@ msgstr[0] "어카운트가 %1$s초 블록되었습니다."
 
 #: app/views/monitoring.widget.problems.view.php:62
 #: include/actions.inc.php:155 include/actions.inc.php:335
-#: include/blocks.inc.php:558
+#: include/blocks.inc.php:560
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:916
@@ -467,7 +467,7 @@ msgid "Action updated"
 msgstr "액션을 갱신하였습니다"
 
 #: app/views/monitoring.dashboard.view.php:86
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:559
+#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:561
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:894
 #: include/classes/screens/CScreenProblem.php:917
@@ -2514,15 +2514,15 @@ msgstr "인터페이스를 위한 호스트를 변경할 수 없습니다."
 msgid "Cannot unblock users"
 msgstr "사용자의 블록을 해제할 수 없습니다"
 
-#: include/classes/api/services/CHostGeneral.php:559
+#: include/classes/api/services/CHostGeneral.php:555
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Web시나리오의 링크삭제와 삭제를 할 수 없습니다."
 
-#: include/classes/api/services/CHostGeneral.php:620
+#: include/classes/api/services/CHostGeneral.php:616
 msgid "Cannot unlink and clear applications."
 msgstr "어플리케이션의 삭제와 링크 삭제를 할 수 없습니다."
 
-#: include/classes/api/services/CHostGeneral.php:363
+#: include/classes/api/services/CHostGeneral.php:427
 msgid "Cannot unlink and clear discovery rules"
 msgstr "디스커버리 규칙의 삭제와 링크 삭제를 할 수 없습니다."
 
@@ -4700,7 +4700,7 @@ msgstr "이름"
 msgid "Description updated"
 msgstr "설명를 갱신하였습니다"
 
-#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:434
+#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:436
 #: include/func.inc.php:1886
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:439
@@ -5183,7 +5183,7 @@ msgstr "맵 \"%2$s\"를 위한 유저 그룹 내의 usrgrpid \"%1$s\"가 중복�
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "스크린 \"%2$s\"을 위한 유저그룹 내의 usrgrpid \"%1$s\"가 중복되었습니다."
 
-#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:557
+#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:559
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:915
 #: include/classes/screens/CScreenProblem.php:1126 include/events.inc.php:249
@@ -6798,7 +6798,7 @@ msgstr "가로 위치"
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
 #: app/views/popup.generic.php:137 httpconf.php:191 httpconf.php:495
 #: include/actions.inc.php:48 include/audit.inc.php:27
-#: include/blocks.inc.php:554 include/classes/screens/CScreenEvents.php:32
+#: include/blocks.inc.php:556 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
@@ -6906,7 +6906,7 @@ msgstr[0] "호스트를 활성화 하였습니다"
 #: app/views/administration.script.list.php:61
 #: app/views/monitoring.widget.problemhosts.view.php:27
 #: app/views/monitoring.widget.web.view.php:26 include/actions.inc.php:46
-#: include/audit.inc.php:37 include/blocks.inc.php:340
+#: include/audit.inc.php:37 include/blocks.inc.php:342
 #: include/forms.inc.php:329 include/maps.inc.php:25
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:183
@@ -8567,7 +8567,7 @@ msgstr "인도네시아어 (id_ID)"
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/monitoring.widget.problems.view.php:53
 #: include/actions.inc.php:1904 include/actions.inc.php:1988
-#: include/blocks.inc.php:553 include/classes/screens/CScreenActions.php:132
+#: include/blocks.inc.php:555 include/classes/screens/CScreenActions.php:132
 #: include/classes/screens/CScreenHostTriggers.php:240
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:911
@@ -9598,7 +9598,7 @@ msgstr "최근 1주일의 그래프"
 msgid "Latest data"
 msgstr "최근 데이터"
 
-#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:556
+#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:558
 #: include/classes/screens/CScreenProblem.php:914 jsLoader.php:254
 msgid "Latest values"
 msgstr "최근 값"
@@ -10822,8 +10822,8 @@ msgid "Next step"
 msgstr "다음 스텝"
 
 #: app/views/monitoring.widget.problems.view.php:221
-#: include/actions.inc.php:33 include/blocks.inc.php:441
-#: include/blocks.inc.php:632
+#: include/actions.inc.php:33 include/blocks.inc.php:443
+#: include/blocks.inc.php:634
 #: include/classes/screens/CScreenHostTriggers.php:300
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
@@ -11514,11 +11514,11 @@ msgstr "CPU 수. integer를 리턴."
 msgid "Number of enabled items on the host."
 msgstr "호스트상의 유효 아이템 수."
 
-#: include/blocks.inc.php:445
+#: include/blocks.inc.php:447
 msgid "Number of hosts (enabled/disabled/templates)"
 msgstr "호스트수 (활성/비활성/템플릿)"
 
-#: include/blocks.inc.php:455
+#: include/blocks.inc.php:457
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "아이템수 (활성/비활성/습득불가)"
 
@@ -11580,7 +11580,7 @@ msgstr "상태 변경 횟수"
 msgid "Number of steps"
 msgstr "스텝 수"
 
-#: include/blocks.inc.php:466
+#: include/blocks.inc.php:468
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "트리거 수 (활성/비활성 [장애/정상])"
 
@@ -11596,7 +11596,7 @@ msgstr "Zabbix데이터베이스 내의 습득불가 아이템 수."
 msgid "Number of unsupported items on the host."
 msgstr "호스트 상의 습득불가 아이템 수."
 
-#: include/blocks.inc.php:478
+#: include/blocks.inc.php:480
 msgid "Number of users (online)"
 msgstr "유저 수 (온라인)"
 
@@ -11836,7 +11836,7 @@ msgstr "관리자만 스크린의 소유자를 설정할 수 있습니다."
 msgid "Only administrators can set slide show owner."
 msgstr "관리자만 슬라이드쇼의 소유자를 설정할 수 있습니다."
 
-#: include/blocks.inc.php:456
+#: include/blocks.inc.php:458
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "활성화된 호스트의 아이템만 카운트"
 
@@ -11882,7 +11882,7 @@ msgstr "최고관리자만 값의 맵을 갱신할 수 있습니다."
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "상위 20%%의 영역이 표시되어 있습니다."
 
-#: include/blocks.inc.php:467
+#: include/blocks.inc.php:469
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "활성화된 호스트와 아이템의 트리거만 카운트"
 
@@ -12296,7 +12296,7 @@ msgstr "PSK가 너무 짧습니다. %1$s 자리의 16진수로 설정해 주십�
 msgid "Page received incorrect data"
 msgstr "잘못된 데이터를 수신하였습니다"
 
-#: app/views/administration.mediatype.edit.php:102 include/blocks.inc.php:434
+#: app/views/administration.mediatype.edit.php:102 include/blocks.inc.php:436
 msgid "Parameter"
 msgstr "파라미터"
 
@@ -12706,7 +12706,7 @@ msgid "Privilege level"
 msgstr "특권 레벨"
 
 #: app/views/monitoring.problem.view.php:163
-#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:555
+#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:557
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:913
 #: include/classes/screens/CScreenProblem.php:1047
@@ -13359,7 +13359,7 @@ msgstr "요구 퍼포먼스 (vps)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Zabbix서버의 요구 퍼포먼스를 1초간격으로 기대되는 값을 취득"
 
-#: include/blocks.inc.php:482
+#: include/blocks.inc.php:484
 msgid "Required server performance, new values per second"
 msgstr "1초간의 감시항목수(Zabbix서버의 요구 퍼포먼스)"
 
@@ -15199,7 +15199,7 @@ msgid "Tag value"
 msgstr "태그 값"
 
 #: app/views/monitoring.problem.view.php:283
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:560
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:562
 #: include/classes/screens/CScreenProblem.php:864
 #: include/classes/screens/CScreenProblem.php:918
 #: include/classes/screens/CScreenProblem.php:1129
@@ -15580,7 +15580,7 @@ msgstr "종료"
 #: app/views/popup.triggerexpr.php:128 app/views/popup.triggerexpr.php:132
 #: include/actions.inc.php:1769 include/actions.inc.php:1823
 #: include/actions.inc.php:1904 include/actions.inc.php:1988
-#: include/actions.inc.php:2038 include/blocks.inc.php:535
+#: include/actions.inc.php:2038 include/blocks.inc.php:537
 #: include/classes/screens/CScreenActions.php:126
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:841
@@ -16360,42 +16360,32 @@ msgstr "템플릿과의 링크 삭제"
 msgid "Unlink from templates"
 msgstr "템플릿과의 링크를 해제"
 
-#: include/classes/api/services/CHostGeneral.php:626
+#: include/classes/api/services/CHostGeneral.php:622
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "링크삭제: \"%2$s\"의 어플리케이션\"%1$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:372
+#: include/classes/api/services/CHostGeneral.php:436
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "링크삭제: \"%2$s\"의 디스커버리 규칙\"%1$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:529
-#, c-format
-msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
-msgstr "링크삭제: \"%2$s\"의 그래프\"%1$s\"."
-
-#: include/classes/api/services/CHostGeneral.php:513
-#, c-format
-msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
-msgstr "링크삭제: \"%2$s\"의 그래프 프로토타입\"%1$s\"."
-
-#: include/classes/api/services/CHostGeneral.php:462
+#: include/classes/api/services/CHostGeneral.php:526
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "링크삭제: \"%2$s\"의 호스트 프로토타입\"%1$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:388
+#: include/classes/api/services/CHostGeneral.php:452
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "링크삭제: \"%2$s\"의 아이템\"%1$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:407
+#: include/classes/api/services/CHostGeneral.php:471
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "링크삭제: \"%2$s\"의 아이템 프로토타입\"%1$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:568
+#: include/classes/api/services/CHostGeneral.php:564
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "링크삭제: \"%2$s\"의 Web시나리오\"%1$s\"."
@@ -17055,7 +17045,7 @@ msgstr "VMware가상머신 가동시간, <url> - VMware서비스 URL, <uuid> - V
 
 #: app/views/monitoring.widget.plaintext.view.php:46
 #: app/views/popup.httpstep.php:109 app/views/popup.testtriggerexpr.php:30
-#: include/blocks.inc.php:434 include/classes/graphdraw/CPieGraphDraw.php:343
+#: include/blocks.inc.php:436 include/classes/graphdraw/CPieGraphDraw.php:343
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHistory.php:264
 #: include/classes/screens/CScreenHistory.php:361
@@ -17627,8 +17617,8 @@ msgid "Yearly"
 msgstr "연간"
 
 #: app/views/monitoring.widget.problems.view.php:221
-#: include/actions.inc.php:32 include/blocks.inc.php:441
-#: include/blocks.inc.php:632
+#: include/actions.inc.php:32 include/blocks.inc.php:443
+#: include/blocks.inc.php:634
 #: include/classes/screens/CScreenHostTriggers.php:300
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
@@ -17823,7 +17813,7 @@ msgstr "Zabbix서버 상세정보"
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix 서버가 동작하지 않습니다. (화면을 재시작하여 스테이터스를 다시 확인해주세요)"
 
-#: include/blocks.inc.php:440
+#: include/blocks.inc.php:442
 msgid "Zabbix server is running"
 msgstr "Zabbix 서버 가동 중"
 
@@ -17934,7 +17924,7 @@ msgstr "에이전트"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1870
 #: include/classes/html/CSeverity.php:49
-#: include/classes/pagefilter/CPageFilter.php:875
+#: include/classes/pagefilter/CPageFilter.php:885
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -18191,7 +18181,7 @@ msgstr "dayofweek() - 요일 (월요일 - 1, 일요일 - 7)"
 msgid "days"
 msgstr "일"
 
-#: include/classes/pagefilter/CPageFilter.php:749
+#: include/classes/pagefilter/CPageFilter.php:759
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/widgets/CWidgetHelper.php:53
 #: include/views/js/monitoring.slideconf.edit.js.php:14
@@ -18638,8 +18628,8 @@ msgstr "범위 밖"
 
 #: app/controllers/CControllerDashboardView.php:134
 #: hostinventoriesoverview.php:76
-#: include/classes/pagefilter/CPageFilter.php:808
-#: include/classes/pagefilter/CPageFilter.php:875 include/forms.inc.php:1128
+#: include/classes/pagefilter/CPageFilter.php:818
+#: include/classes/pagefilter/CPageFilter.php:885 include/forms.inc.php:1128
 #: include/views/monitoring.screen.php:63 slides.php:187
 msgid "not selected"
 msgstr "선택되지 않음"
@@ -18658,7 +18648,7 @@ msgid "number"
 msgstr "수치"
 
 #: app/views/monitoring.widget.problemhosts.view.php:116
-#: include/blocks.inc.php:407
+#: include/blocks.inc.php:409
 msgid "of"
 msgstr "of"
 
