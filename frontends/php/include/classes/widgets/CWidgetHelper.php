@@ -353,11 +353,11 @@ class CWidgetHelper {
 	 * @return CList
 	 */
 	public static function getSeverities($field, $config) {
-		$class = ($field->getOrientation() == CWidgetFieldSeverities::ORIENTATION_VERTICAL)
-			? ZBX_STYLE_LIST_CHECK_RADIO
-			: ZBX_STYLE_LIST_HOR_CHECK_RADIO;
+		$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
-		$severities = (new CList())->addClass($class);
+		if ($field->getOrientation() == CWidgetFieldSeverities::ORIENTATION_HORIZONTAL) {
+			$severities->addClass(ZBX_STYLE_HOR_LIST);
+		}
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severities->addItem(

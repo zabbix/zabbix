@@ -110,10 +110,8 @@ class CRadioButtonList extends CList {
 			$this->addClass(static::ZBX_STYLE_CLASS);
 		}
 		else {
-			$this->addClass($this->orientation == self::ORIENTATION_HORIZONTAL
-				? ZBX_STYLE_LIST_HOR_CHECK_RADIO
-				: ZBX_STYLE_LIST_CHECK_RADIO
-			);
+			$this->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+			$this->addClass($this->orientation === self::ORIENTATION_HORIZONTAL ? ZBX_STYLE_HOR_LIST : null);
 		}
 
 		if ($this->readonly) {
