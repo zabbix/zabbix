@@ -41,6 +41,7 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 	$.widget('zbx.sortable_tree', $.extend({}, $.ui.sortable.prototype, {
 		options: {
 			// jQuery UI sortable options:
+			cursor: IE ? 'move' : 'grabbing',
 			placeholder: 'placeholder',
 			forcePlaceholderSize: true,
 			toleranceElement: '> div',

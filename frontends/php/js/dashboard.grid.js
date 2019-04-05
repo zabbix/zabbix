@@ -895,10 +895,8 @@
 	}
 
 	function makeDraggable($obj, data, widget) {
-		widget['content_header']
-			.addClass('cursor-move');
-
 		widget['div'].draggable({
+			cursor: IE ? 'move' : 'grabbing',
 			handle: widget['content_header'],
 			scroll: true,
 			scrollSensitivity: data.options['widget-height'],

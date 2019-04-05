@@ -843,7 +843,7 @@ class CWidgetHelper {
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
 				'scroll: false,'.
-				'cursor: "move",'.
+				'cursor: IE ? "move" : "grabbing",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disabled: function() {'.
@@ -1215,7 +1215,7 @@ class CWidgetHelper {
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
 				'scroll: false,'.
-				'cursor: "move",'.
+				'cursor: IE ? "move" : "grabbing",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disabled: function() {'.
