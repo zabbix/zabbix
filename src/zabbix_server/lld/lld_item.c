@@ -23,6 +23,7 @@
 #include "zbxalgo.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
+#include "zbxprometheus.h"
 
 typedef struct
 {
@@ -1342,7 +1343,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 {
 	int		ret = SUCCEED;
 	zbx_token_t	token;
-	char		err[MAX_STRING_LEN];
+	char		err[MAX_STRING_LEN], *errmsg = NULL;
 	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2;
 	const char*	regexp_err = NULL;
 	zbx_uint64_t	value_ui64;
@@ -1449,6 +1450,40 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 				ret = FAIL;
 			}
 			break;
+		case ZBX_PREPROC_PROMETHEUS_PATTERN:
+			zbx_strlcpy(param1, pp->params, sizeof(param1));
+			if (NULL == (param2 = strchr(param1, '\n')))
+			{
+				zbx_snprintf(err, sizeof(err), "cannot find second parameter: %s", pp->params);
+				ret = FAIL;
+				break;
+			}
+			*param2++ = '\0';
+
+			if (FAIL == zbx_prometheus_validate_filter(param1, &errmsg))
+			{
+				zbx_snprintf(err, sizeof(err), "invalid pattern: %s", param1);
+				zbx_free(errmsg);
+				ret = FAIL;
+				break;
+			}
+
+			if (FAIL == zbx_prometheus_validate_label(param2))
+			{
+				zbx_snprintf(err, sizeof(err), "invalid label name: %s", param2);
+				ret = FAIL;
+				break;
+			}
+
+			break;
+		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+			if (FAIL == zbx_prometheus_validate_filter(pp->params, &errmsg))
+			{
+				zbx_snprintf(err, sizeof(err), "invalid pattern: %s", pp->params);
+				zbx_free(errmsg);
+				ret = FAIL;
+				break;
+			}
 	}
 
 	if (SUCCEED != ret)
@@ -1783,9 +1818,7 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
 		tmp_offset = strlen(tmp);
 		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_offset);
 
-		if (++tmp_offset > tmp_alloc)
-			tmp_alloc = tmp_offset;
-
+		tmp_alloc = tmp_offset + 1;
 		tmp_offset = 0;
 
 		/* substitute LLD macros in function parameters */
@@ -2470,16 +2503,43 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
  *             sub_params      - [IN/OUT] the preprocessing parameters        *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_t *lld_row,
+static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_t *lld_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **sub_params)
 {
-	if (ZBX_PREPROC_REGSUB == type ||
-			ZBX_PREPROC_VALIDATE_REGEX == type ||
-			ZBX_PREPROC_VALIDATE_NOT_REGEX == type ||
-			ZBX_PREPROC_ERROR_FIELD_REGEX == type)
+	int	params_num = 1, flags1, flags2;
+
+	switch (type)
 	{
-		char	*param1 = NULL, *param2 = NULL;
-		size_t	sub_params_size;
+		case ZBX_PREPROC_REGSUB:
+		case ZBX_PREPROC_ERROR_FIELD_REGEX:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP;
+			flags2 = ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT;
+			params_num = 2;
+			break;
+		case ZBX_PREPROC_VALIDATE_REGEX:
+		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP;
+			params_num = 1;
+			break;
+		case ZBX_PREPROC_XPATH:
+		case ZBX_PREPROC_ERROR_FIELD_XML:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_XPATH;
+			params_num = 1;
+			break;
+		case ZBX_PREPROC_PROMETHEUS_PATTERN:
+		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_PROMETHEUS;
+			params_num = 1;
+			break;
+		default:
+			flags1 = ZBX_MACRO_ANY;
+			params_num = 1;
+	}
+
+	if (2 == params_num)
+	{
+		char	*param1, *param2;
+		size_t	params_alloc, params_offset = 0;
 
 		zbx_strsplit(*sub_params, '\n', &param1, &param2);
 
@@ -2491,30 +2551,21 @@ static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_
 			return;
 		}
 
-		substitute_lld_macros(&param1, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP,
-				NULL, 0);
-		substitute_lld_macros(&param2, &lld_row->jp_row, lld_macro_paths,
-				ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT, NULL, 0);
+		substitute_lld_macros(&param1, &lld_row->jp_row, lld_macro_paths, flags1, NULL, 0);
+		substitute_lld_macros(&param2, &lld_row->jp_row, lld_macro_paths, flags2, NULL, 0);
 
-		sub_params_size = strlen(param1) + strlen(param2) + 2;
-		*sub_params = (char*)zbx_realloc(*sub_params, sub_params_size);
+		params_alloc = strlen(param1) + strlen(param2) + 2;
+		*sub_params = (char*)zbx_realloc(*sub_params, params_alloc);
 
-		zbx_snprintf(*sub_params, sub_params_size, "%s\n%s", param1, param2);
+		zbx_strcpy_alloc(sub_params, &params_alloc, &params_offset, param1);
+		zbx_chrcpy_alloc(sub_params, &params_alloc, &params_offset, '\n');
+		zbx_strcpy_alloc(sub_params, &params_alloc, &params_offset, param2);
 
 		zbx_free(param1);
 		zbx_free(param2);
 	}
 	else
-	{
-		int	token_type = ZBX_MACRO_ANY;
-
-		if (ZBX_PREPROC_XPATH == type || ZBX_PREPROC_ERROR_FIELD_XML == type)
-		{
-			token_type |= ZBX_TOKEN_XPATH;
-		}
-
-		substitute_lld_macros(sub_params, &lld_row->jp_row, lld_macro_paths, token_type, NULL, 0);
-	}
+		substitute_lld_macros(sub_params, &lld_row->jp_row, lld_macro_paths, flags1, NULL, 0);
 }
 
 /******************************************************************************
@@ -2572,7 +2623,7 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
 				ppdst->error_handler = ppsrc->error_handler;
 				ppdst->error_handler_params = zbx_strdup(NULL, ppsrc->error_handler_params);
 
-				substitute_lld_macors_in_preproc_params(ppsrc->type, item->lld_row, lld_macro_paths,
+				substitute_lld_macros_in_preproc_params(ppsrc->type, item->lld_row, lld_macro_paths,
 						&ppdst->params);
 				substitute_lld_macros(&ppdst->error_handler_params, &item->lld_row->jp_row,
 						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
@@ -2600,7 +2651,7 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
 			}
 
 			buffer = zbx_strdup(buffer, ppsrc->params);
-			substitute_lld_macors_in_preproc_params(ppsrc->type, item->lld_row, lld_macro_paths, &buffer);
+			substitute_lld_macros_in_preproc_params(ppsrc->type, item->lld_row, lld_macro_paths, &buffer);
 
 			if (0 != strcmp(ppdst->params, buffer))
 			{
@@ -2717,8 +2768,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
  *                                                                            *
  * Purpose: prepare sql to update LLD item                                    *
  *                                                                            *
- * Parameters: hostid               - [IN] parent host id                     *
- *             item_prototypes      - [IN] item prototypes                    *
+ * Parameters: item_prototype       - [IN] item prototype                     *
  *             item                 - [IN] item to be updated                 *
  *             sql                  - [IN/OUT] sql buffer pointer used for    *
  *                                             update operations              *
@@ -2728,25 +2778,11 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
  *                                             buffer                         *
  *                                                                            *
  ******************************************************************************/
-static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, const zbx_lld_item_t *item, char **sql,
-		size_t *sql_alloc, size_t *sql_offset)
+static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_item_t *item,
+		char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
-	const zbx_lld_item_prototype_t	*item_prototype;
 	char				*value_esc;
 	const char			*d = "";
-	int				index;
-
-	if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED) || 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
-		return;
-
-	if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &item->parent_itemid,
-			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return;
-	}
-
-	item_prototype = item_prototypes->values[index];
 
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update items set ");
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_NAME))
@@ -3085,6 +3121,30 @@ static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, con
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 
+	DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_item_discovery_prepare_update                                *
+ *                                                                            *
+ * Purpose: prepare sql to update key in LLD item discovery                   *
+ *                                                                            *
+ * Parameters: item_prototype       - [IN] item prototype                     *
+ *             item                 - [IN] item to be updated                 *
+ *             sql                  - [IN/OUT] sql buffer pointer used for    *
+ *                                             update operations              *
+ *             sql_alloc            - [IN/OUT] sql buffer already allocated   *
+ *                                             memory                         *
+ *             sql_offset           - [IN/OUT] offset for writing within sql  *
+ *                                             buffer                         *
+ *                                                                            *
+ ******************************************************************************/
+static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *item_prototype,
+		const zbx_lld_item_t *item, char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+	char	*value_esc;
+
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 	{
 		value_esc = DBdyn_escape_string(item_prototype->key);
@@ -3094,8 +3154,11 @@ static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, con
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				value_esc, item->itemid);
 		zbx_free(value_esc);
+
+		DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
 	}
 }
+
 
 /******************************************************************************
  *                                                                            *
@@ -3214,8 +3277,10 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 	if (0 != upd_items)
 	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
+		char				*sql = NULL;
+		size_t				sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
+		zbx_lld_item_prototype_t	*item_prototype;
+		int				index;
 
 		sql = (char*)zbx_malloc(NULL, sql_alloc);
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -3224,8 +3289,23 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		{
 			item = (zbx_lld_item_t *)items->values[i];
 
-			lld_item_prepare_update(item_prototypes, item, &sql, &sql_alloc, &sql_offset);
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED) ||
+					0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
+			{
+				continue;
+			}
+
+			if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &item->parent_itemid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			item_prototype = item_prototypes->values[index];
+
+			lld_item_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
+			lld_item_discovery_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
 		}
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -3503,9 +3583,6 @@ static int	lld_applications_save(zbx_uint64_t hostid, zbx_vector_ptr_t *applicat
 
 	for (i = 0; i < applications->values_num; i++)
 	{
-		DBexecute_overflowed_sql(&sql_a, &sql_a_alloc, &sql_a_offset);
-		DBexecute_overflowed_sql(&sql_ad, &sql_ad_alloc, &sql_ad_offset);
-
 		application = (zbx_lld_application_t *)applications->values[i];
 
 		if (0 != (application->flags & ZBX_FLAG_LLD_APPLICATION_REMOVE_DISCOVERY))
@@ -3535,6 +3612,11 @@ static int	lld_applications_save(zbx_uint64_t hostid, zbx_vector_ptr_t *applicat
 
 		if (0 != (application->flags & ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME))
 		{
+			if (NULL == sql_a)
+				DBbegin_multiple_update(&sql_a, &sql_a_alloc, &sql_a_offset);
+			if (NULL == sql_ad)
+				DBbegin_multiple_update(&sql_ad, &sql_ad_alloc, &sql_ad_offset);
+
 			name = DBdyn_escape_string(application->name);
 			zbx_snprintf_alloc(&sql_a, &sql_a_alloc, &sql_a_offset,
 					"update applications set name='%s'"
@@ -3548,6 +3630,10 @@ static int	lld_applications_save(zbx_uint64_t hostid, zbx_vector_ptr_t *applicat
 					" where application_discoveryid=" ZBX_FS_UI64 ";\n",
 					name, application->application_discoveryid);
 			zbx_free(name);
+
+			DBexecute_overflowed_sql(&sql_a, &sql_a_alloc, &sql_a_offset);
+			DBexecute_overflowed_sql(&sql_ad, &sql_ad_alloc, &sql_ad_offset);
+
 			continue;
 		}
 
@@ -3560,33 +3646,48 @@ static int	lld_applications_save(zbx_uint64_t hostid, zbx_vector_ptr_t *applicat
 				application_prototype->name);
 	}
 
-	if (0 != del_applicationids.values_num)
-	{
-		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "delete from applications where");
-		DBadd_condition_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "applicationid", del_applicationids.values,
-				del_applicationids.values_num);
-		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, ";\n");
-	}
-
-	if (0 != del_discoveryids.values_num)
-	{
-		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "delete from application_discovery where");
-		DBadd_condition_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "application_discoveryid",
-				del_discoveryids.values, del_discoveryids.values_num);
-		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, ";\n");
-	}
-
 	if (NULL != sql_a)
 	{
-		DBexecute("%s", sql_a);
-		zbx_free(sql_a);
+		DBend_multiple_update(&sql_a, &sql_a_alloc, &sql_a_offset);
+
+		if (16 < sql_a_offset)	/* in ORACLE always present begin..end; */
+			DBexecute("%s", sql_a);
 	}
 
 	if (NULL != sql_ad)
 	{
-		DBexecute("%s", sql_ad);
-		zbx_free(sql_ad);
+		DBend_multiple_update(&sql_ad, &sql_ad_alloc, &sql_ad_offset);
+
+		if (16 < sql_ad_offset)
+			DBexecute("%s", sql_ad);
 	}
+
+	if (0 != del_applicationids.values_num)
+	{
+		sql_a_offset = 0;
+
+		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "delete from applications where");
+		DBadd_condition_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "applicationid", del_applicationids.values,
+				del_applicationids.values_num);
+		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, ";\n");
+
+		DBexecute("%s", sql_a);
+	}
+
+	if (0 != del_discoveryids.values_num)
+	{
+		sql_ad_offset = 0;
+
+		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "delete from application_discovery where");
+		DBadd_condition_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "application_discoveryid",
+				del_discoveryids.values, del_discoveryids.values_num);
+		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, ";\n");
+
+		DBexecute("%s", sql_ad);
+	}
+
+	zbx_free(sql_a);
+	zbx_free(sql_ad);
 
 	if (0 != new_applications)
 	{
@@ -3861,6 +3962,8 @@ static void	lld_remove_lost_items(const zbx_vector_ptr_t *items, int lifetime, i
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid",
 				ts_itemids.values, ts_itemids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -4050,6 +4153,8 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", del_applicationids.values,
 				del_applicationids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -4336,10 +4441,13 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths, zbx_vector_ptr_t *applications,
 		zbx_hashset_t *applications_index)
 {
+	const char			*__function_name = "lld_application_make";
 	zbx_lld_application_t		*application;
 	zbx_lld_application_index_t	*application_index, application_index_local;
 	struct zbx_json_parse		*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
 	char				*buffer = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), proto %s", __function_name, application_prototype->name);
 
 	application_index_local.application_prototypeid = application_prototype->application_prototypeid;
 	application_index_local.lld_row = lld_row;
@@ -4365,6 +4473,9 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 
 		application_index_local.application = application;
 		zbx_hashset_insert(applications_index, &application_index_local, sizeof(zbx_lld_application_index_t));
+
+		zabbix_log(LOG_LEVEL_TRACE, "%s(): created new application, proto %s, name %s", __function_name,
+				application_prototype->name, application->name);
 	}
 	else
 	{
@@ -4381,6 +4492,8 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 				application->name_orig = application->name;
 				application->name = buffer;
 				application->flags |= ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME;
+				zabbix_log(LOG_LEVEL_TRACE, "%s(): updated application name to %s", __function_name,
+						application->name);
 			}
 			else
 				zbx_free(buffer);
@@ -4388,6 +4501,8 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 	}
 
 	application->flags |= ZBX_FLAG_LLD_APPLICATION_DISCOVERED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************

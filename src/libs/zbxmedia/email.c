@@ -711,7 +711,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 			goto error;
 	}
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_VERBOSE, 1L)))
 			goto error;

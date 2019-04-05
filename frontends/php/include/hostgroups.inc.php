@@ -216,19 +216,16 @@ function getSubGroups(array $groupids, array &$ms_groups = null) {
 	}
 
 	if ($db_groups_names) {
-		$child_groups = API::HostGroup()->get([
+		$db_groups += API::HostGroup()->get([
 			'output' => ['groupid'],
 			'search' => ['name' => $db_groups_names],
 			'searchByAny' => true,
-			'startSearch' => true
+			'startSearch' => true,
+			'preservekeys' => true
 		]);
-
-		foreach ($child_groups as $child_group) {
-			$groupids[] = $child_group['groupid'];
-		}
 	}
 
-	return $groupids;
+	return array_keys($db_groups);
 }
 
 /*
@@ -280,12 +277,19 @@ function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
 		$url->setArgument('filter_hostids', [$hostid]);
 		$host_name = new CLink($host_data['host'], $url->getUrl());
 
-		if ($host_data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-				&& array_key_exists($host_data['maintenanceid'], $db_maintenances)) {
-			$maintenance = $db_maintenances[$host_data['maintenanceid']];
-			$maintenance_icon = makeMaintenanceIcon($host_data['maintenance_type'], $maintenance['name'],
-				$maintenance['description']
-			);
+		if ($host_data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+			if (array_key_exists($host_data['maintenanceid'], $db_maintenances)) {
+				$maintenance = $db_maintenances[$host_data['maintenanceid']];
+				$maintenance_icon = makeMaintenanceIcon($host_data['maintenance_type'], $maintenance['name'],
+					$maintenance['description']
+				);
+			}
+			else {
+				$maintenance_icon = makeMaintenanceIcon($host_data['maintenance_type'], _('Inaccessible maintenance'),
+					''
+				);
+			}
+
 			$host_name = [$host_name, $maintenance_icon];
 		}
 

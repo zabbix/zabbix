@@ -29,6 +29,7 @@
 typedef struct
 {
 	zbx_uint64_t	autoreg_hostid;
+	zbx_uint64_t	hostid;
 	char		*host;
 	char		*ip;
 	char		*dns;
@@ -1271,7 +1272,7 @@ void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, 
 	}
 
 	autoreg_host = (zbx_autoreg_host_t *)zbx_malloc(NULL, sizeof(zbx_autoreg_host_t));
-	autoreg_host->autoreg_hostid = 0;
+	autoreg_host->autoreg_hostid = autoreg_host->hostid = 0;
 	autoreg_host->host = zbx_strdup(NULL, host);
 	autoreg_host->ip = zbx_strdup(NULL, ip);
 	autoreg_host->dns = zbx_strdup(NULL, dns);
@@ -1299,6 +1300,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_str_t	hosts;
+	zbx_uint64_t		current_proxy_hostid;
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
 	zbx_autoreg_host_t	*autoreg_host;
@@ -1314,13 +1316,11 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 		/* delete from vector if already exist in hosts table */
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select h.host,a.host_metadata"
+				"select h.host,h.hostid,h.proxy_hostid,a.host_metadata"
 				" from hosts h"
 				" left join autoreg_host a"
 					" on a.proxy_hostid=h.proxy_hostid and a.host=h.host"
-				" where h.proxy_hostid=" ZBX_FS_UI64
-					" and",
-				proxy_hostid);
+				" where");
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.host",
 				(const char **)hosts.values, hosts.values_num);
 
@@ -1335,8 +1335,14 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 				if (0 != strcmp(autoreg_host->host, row[0]))
 					continue;
 
-				if (SUCCEED == DBis_null(row[1]) || 0 != strcmp(autoreg_host->host_metadata, row[1]))
+				ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
+				ZBX_DBROW2UINT64(current_proxy_hostid, row[2]);
+
+				if (current_proxy_hostid != proxy_hostid || SUCCEED == DBis_null(row[3]) ||
+						0 != strcmp(autoreg_host->host_metadata, row[3]))
+				{
 					break;
+				}
 
 				zbx_vector_ptr_remove(autoreg_hosts, i);
 				autoreg_host_free(autoreg_host);
@@ -1385,6 +1391,16 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 
 	zbx_vector_str_destroy(&hosts);
 	zbx_free(sql);
+}
+
+static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
+{
+	const zbx_autoreg_host_t	*p1 = *(const zbx_autoreg_host_t **)d1;
+	const zbx_autoreg_host_t	*p2 = *(const zbx_autoreg_host_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->hostid, p2->hostid);
+
+	return 0;
 }
 
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
@@ -1461,11 +1477,6 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 			zbx_free(dns_esc);
 			zbx_free(ip_esc);
 		}
-
-		ts.sec = autoreg_host->now;
-
-		zbx_add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
-				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
 	}
 
 	if (0 != create)
@@ -1479,6 +1490,17 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
 		zbx_free(sql);
+	}
+
+	zbx_vector_ptr_sort(autoreg_hosts, compare_autoreg_host_by_hostid);
+
+	for (i = 0; i < autoreg_hosts->values_num; i++)
+	{
+		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+
+		ts.sec = autoreg_host->now;
+		zbx_add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
+				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
 	}
 
 	zbx_process_events(NULL, NULL);
@@ -1538,7 +1560,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	int	ret = SUCCEED;
 
-	if (ZBX_MAX_SQL_SIZE < *sql_offset)
+	if (ZBX_MAX_OVERFLOW_SQL_SIZE < *sql_offset)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		if (',' == (*sql)[*sql_offset - 1])
@@ -1547,10 +1569,25 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
 #endif
-		DBend_multiple_update(sql, sql_alloc, sql_offset);
+#if defined(HAVE_ORACLE) && 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
+		/* make sure we are not called twice without */
+		/* putting a new sql into the buffer first */
+		if (*sql_offset <= ZBX_SQL_EXEC_FROM)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			return ret;
+		}
 
-		if (ZBX_DB_OK > DBexecute("%s", *sql))
+		/* Oracle fails with ORA-00911 if it encounters ';' w/o PL/SQL block */
+		zbx_rtrim(*sql, ZBX_WHITESPACE ";");
+#else
+		DBend_multiple_update(sql, sql_alloc, sql_offset);
+#endif
+		/* For Oracle with max_overflow_sql_size == 0, jump over "begin\n" */
+		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */
+		if (ZBX_DB_OK > DBexecute("%s", *sql + ZBX_SQL_EXEC_FROM))
 			ret = FAIL;
+
 		*sql_offset = 0;
 
 		DBbegin_multiple_update(sql, sql_alloc, sql_offset);
@@ -1566,6 +1603,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
  * Purpose: construct a unique host name by the given sample                  *
  *                                                                            *
  * Parameters: host_name_sample - a host name to start constructing from      *
+ *             field_name       - field name for host or host visible name    *
  *                                                                            *
  * Return value: unique host name which does not exist in the database        *
  *                                                                            *
@@ -1577,7 +1615,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
  *           host_name_sample is not modified, allocates new memory!          *
  *                                                                            *
  ******************************************************************************/
-char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
+char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *field_name)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1598,12 +1636,12 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 	host_name_sample_esc = DBdyn_escape_like_pattern(host_name_sample);
 
 	result = DBselect(
-			"select host"
+			"select %s"
 			" from hosts"
-			" where host like '%s%%' escape '%c'"
+			" where %s like '%s%%' escape '%c'"
 				" and flags<>%d"
 				" and status in (%d,%d,%d)",
-			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR,
+				field_name, field_name, host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE);
 
@@ -2462,7 +2500,7 @@ retry_oracle:
 		}
 	}
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		for (i = 0; i < self->rows.values_num; i++)
 		{
@@ -2782,6 +2820,55 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBlock_ids                                                       *
+ *                                                                            *
+ * Purpose: locks a records in a table by field name                          *
+ *                                                                            *
+ * Parameters: table      - [IN] the target table                             *
+ *             field_name - [IN] field name                                   *
+ *             ids        - [IN/OUT] IN - sorted array of IDs to lock         *
+ *                                   OUT - resulting array of locked IDs      *
+ *                                                                            *
+ * Return value: SUCCEED - one or more of the specified records were          *
+ *                         successfully locked                                *
+ *               FAIL    - no records were locked                             *
+ *                                                                            *
+ ******************************************************************************/
+int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64_t *ids)
+{
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t	id;
+	int		i;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (0 == ids->values_num)
+		return FAIL;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s from %s where", field_name, table_name);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name, ids->values, ids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by %s" ZBX_FOR_UPDATE, field_name);
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	for (i = 0; NULL != (row = DBfetch(result)); i++)
+	{
+		ZBX_STR2UINT64(id, row[0]);
+
+		while (id != ids->values[i])
+			zbx_vector_uint64_remove(ids, i);
+	}
+	DBfree_result(result);
+
+	while (i != ids->values_num)
+		zbx_vector_uint64_remove_noorder(ids, i);
+
+	return (0 != ids->values_num ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_sql_add_host_availability                                    *
  *                                                                            *
  * Purpose: adds host availability update to sql statement                    *
@@ -2895,4 +2982,81 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_mock_field_init                                           *
+ *                                                                            *
+ * Purpose: initializes mock field                                            *
+ *                                                                            *
+ * Parameters: field      - [OUT] the field data                              *
+ *             field_type - [IN] the field type in database schema            *
+ *             field_len  - [IN] the field size in database schema            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len)
+{
+	switch (field_type)
+	{
+		case ZBX_TYPE_CHAR:
+#if defined(HAVE_ORACLE)
+			field->chars_num = field_len;
+			field->bytes_num = 4000;
+#elif defined(HAVE_IBM_DB2)
+			field->chars_num = -1;
+			field->bytes_num = field_len;
+#else
+			field->chars_num = field_len;
+			field->bytes_num = -1;
+#endif
+			return;
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+
+	field->chars_num = 0;
+	field->bytes_num = 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_mock_field_append                                         *
+ *                                                                            *
+ * Purpose: 'appends' text to the field, if successful the character/byte     *
+ *           limits are updated                                               *
+ *                                                                            *
+ * Parameters: field - [IN/OUT] the mock field                                *
+ *             text  - [IN] the text to append                                *
+ *                                                                            *
+ * Return value: SUCCEED - the field had enough space to append the text      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text)
+{
+	int	bytes_num, chars_num;
+
+	if (-1 != field->bytes_num)
+	{
+		bytes_num = strlen(text);
+		if (bytes_num > field->bytes_num)
+			return FAIL;
+	}
+	else
+		bytes_num = 0;
+
+	if (-1 != field->chars_num)
+	{
+		chars_num = zbx_strlen_utf8(text);
+		if (chars_num > field->chars_num)
+			return FAIL;
+	}
+	else
+		chars_num = 0;
+
+	field->bytes_num -= bytes_num;
+	field->chars_num -= chars_num;
+
+	return SUCCEED;
 }

@@ -42,7 +42,9 @@ $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $fie
 $scripts = [$field_groupids->getPostJS()];
 
 // Application.
-$form_list->addRow(CWidgetHelper::getLabel($fields['application']), CWidgetHelper::getTextBox($fields['application']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['application']),
+	CWidgetHelper::getApplicationSelector($fields['application'])
+);
 
 // Show suppressed problems.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),

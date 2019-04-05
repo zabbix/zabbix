@@ -232,8 +232,8 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 }
 
 function getItemFilterForm(&$items) {
-	$filter_groupId				= $_REQUEST['filter_groupid'];
-	$filter_hostId				= $_REQUEST['filter_hostid'];
+	$filter_groupids			= $_REQUEST['filter_groupids'];
+	$filter_hostids				= $_REQUEST['filter_hostids'];
 	$filter_application			= $_REQUEST['filter_application'];
 	$filter_name				= $_REQUEST['filter_name'];
 	$filter_type				= $_REQUEST['filter_type'];
@@ -319,25 +319,25 @@ function getItemFilterForm(&$items) {
 	zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($fTypeVisibility, true).');');
 
 	// row 1
-	$group_filter = !empty($filter_groupId)
+	$group_filter = !empty($filter_groupids)
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
-			'groupids' => $filter_groupId
+			'groupids' => $filter_groupids,
+			'editable' => true
 		]), ['groupid' => 'id'])
 		: [];
 
-	$filterColumn1->addRow((new CLabel(_('Host group'), 'filter_groupid_ms')),
+	$filterColumn1->addRow((new CLabel(_('Host groups'), 'filter_groupid_ms')),
 		(new CMultiSelect([
-			'name' => 'filter_groupid',
+			'name' => 'filter_groupids[]',
 			'object_name' => 'hostGroup',
-			'multiple' => false,
 			'data' => $group_filter,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $filter->getName(),
-					'dstfld1' => 'filter_groupid',
+					'dstfld1' => 'filter_groupids_',
 					'editable' => true
 				]
 			]
@@ -364,26 +364,26 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 2
-	$host_filter = !empty($filter_hostId)
+	$host_filter = !empty($filter_hostids)
 		? CArrayHelper::renameObjectsKeys(API::Host()->get([
 			'output' => ['hostid', 'name'],
-			'hostids' => $filter_hostId,
-			'templated_hosts' => true
+			'hostids' => $filter_hostids,
+			'templated_hosts' => true,
+			'editable' => true
 		]), ['hostid' => 'id'])
 		: [];
 
-	$filterColumn1->addRow((new CLabel(_('Host'), 'filter_hostid_ms')),
+	$filterColumn1->addRow((new CLabel(_('Hosts'), 'filter_hostid_ms')),
 		(new CMultiSelect([
-			'name' => 'filter_hostid',
+			'name' => 'filter_hostids[]',
 			'object_name' => 'hosts',
-			'multiple' => false,
 			'data' => $host_filter,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_templates',
 					'srcfld1' => 'hostid',
 					'dstfrm' => $filter->getName(),
-					'dstfld1' => 'filter_hostid',
+					'dstfld1' => 'filter_hostids_',
 					'editable' => true,
 					'templated_hosts' => true
 				]
@@ -418,8 +418,8 @@ function getItemFilterForm(&$items) {
 						'dstfld1' => 'filter_application',
 						'with_applications' => '1'
 					]).
-					',(jQuery("input[name=\'filter_hostid\']").length > 0)'.
-						' ? {hostid: jQuery("input[name=\'filter_hostid\']").val()}'.
+					',(jQuery("input[name=\'filter_hostids\']").length > 0)'.
+						' ? {hostid: jQuery("input[name=\'filter_hostids\']").val()}'.
 						' : {}'.
 					'), null, this);'
 				)
@@ -460,8 +460,8 @@ function getItemFilterForm(&$items) {
 	$filterColumn4->addRow(_('Template'),
 		new CComboBox('filter_templated_items', $filter_templated_items, null, [
 			-1 => _('all'),
-			1 => _('Templated items'),
-			0 => _('Not Templated items'),
+			1 => _('Inherited items'),
+			0 => _('Not inherited items'),
 		])
 	);
 
@@ -511,7 +511,7 @@ function getItemFilterForm(&$items) {
 	// generate array with values for subfilters of selected items
 	foreach ($items as $item) {
 		// hosts
-		if (zbx_empty($filter_hostId)) {
+		if ($filter_hostids) {
 			$host = reset($item['hosts']);
 
 			if (!isset($item_params['hosts'][$host['hostid']])) {
@@ -642,10 +642,10 @@ function getItemFilterForm(&$items) {
 		// template
 		if ($filter_templated_items == -1) {
 			if ($item['templateid'] == 0 && !isset($item_params['templated_items'][0])) {
-				$item_params['templated_items'][0] = ['name' => _('Not Templated items'), 'count' => 0];
+				$item_params['templated_items'][0] = ['name' => _('Not inherited items'), 'count' => 0];
 			}
 			elseif ($item['templateid'] > 0 && !isset($item_params['templated_items'][1])) {
-				$item_params['templated_items'][1] = ['name' => _('Templated items'), 'count' => 0];
+				$item_params['templated_items'][1] = ['name' => _('Inherited items'), 'count' => 0];
 			}
 			$show_item = true;
 			foreach ($item['subfilters'] as $name => $value) {
@@ -823,9 +823,9 @@ function getItemFilterForm(&$items) {
 	}
 
 	// output
-	if (zbx_empty($filter_hostId) && count($item_params['hosts']) > 1) {
+	if ($filter_hostids && count($item_params['hosts']) > 1) {
 		$hosts_output = prepareSubfilterOutput(_('Hosts'), $item_params['hosts'], $subfilter_hosts, 'subfilter_hosts');
-		$table_subfilter->addRow($hosts_output);
+		$table_subfilter->addRow([$hosts_output]);
 	}
 
 	if (!empty($item_params['applications']) && count($item_params['applications']) > 1) {
@@ -941,8 +941,9 @@ function prepareItemHttpAgentFormData(array $item) {
 /**
  * Get data for item edit page.
  *
- * @param array	$item							Item, item prototype, LLD rule or LLD item to take the data from.
- * @param bool $options['is_discovery_rule']
+ * @param array $item                          Item, item prototype, LLD rule or LLD item to take the data from.
+ * @param array $options
+ * @param bool  $options['is_discovery_rule']
  *
  * @return array
  */
@@ -1001,7 +1002,9 @@ function getItemFormData(array $item = [], array $options = []) {
 		'query_fields' => getRequest('query_fields', []),
 		'posts' => getRequest('posts'),
 		'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-		'follow_redirects' => (int) getRequest('follow_redirects'),
+		'follow_redirects' => hasRequest('form_refresh')
+			? (int) getRequest('follow_redirects')
+			: getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
 		'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
 		'http_proxy' => getRequest('http_proxy'),
 		'headers' => getRequest('headers', []),
@@ -1079,11 +1082,10 @@ function getItemFormData(array $item = [], array $options = []) {
 	// types, http items only for internal processes
 	$data['types'] = item_type2str();
 	unset($data['types'][ITEM_TYPE_HTTPTEST]);
-	if (!empty($options['is_discovery_rule'])) {
+	if ($data['is_discovery_rule']) {
 		unset($data['types'][ITEM_TYPE_AGGREGATE],
 			$data['types'][ITEM_TYPE_CALCULATED],
-			$data['types'][ITEM_TYPE_SNMPTRAP],
-			$data['types'][ITEM_TYPE_DEPENDENT]
+			$data['types'][ITEM_TYPE_SNMPTRAP]
 		);
 	}
 
@@ -1110,7 +1112,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	// caption
-	if (!empty($data['is_discovery_rule'])) {
+	if ($data['is_discovery_rule']) {
 		$data['caption'] = _('Discovery rule');
 	}
 	else {
@@ -1394,17 +1396,12 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		->addClass('preprocessing-list')
 		->addClass('list-numbered')
 		->addItem(
-			(new CListItem(
-				(new CDiv([
-					(new CDiv(_('Name')))->addClass(ZBX_STYLE_COLUMN_35),
-					(new CDiv(_('Parameters')))->addClass(ZBX_STYLE_COLUMN_20),
-					(new CDiv())->addClass(ZBX_STYLE_COLUMN_20),
-					(new CDiv(_('Custom on fail')))
-						->addClass(ZBX_STYLE_COLUMN_15)
-						->addClass(ZBX_STYLE_COLUMN_CENTER),
-					(new CDiv(_('Action')))->addClass(ZBX_STYLE_COLUMN_10)
-				]))->addClass(ZBX_STYLE_COLUMNS)
-			))
+			(new CListItem([
+				(new CDiv(_('Name')))->addClass('step-name'),
+				(new CDiv(_('Parameters')))->addClass('step-parameters'),
+				(new CDiv(_('Custom on fail')))->addClass('step-on-fail'),
+				(new CDiv(_('Actions')))->addClass('step-action')
+			]))
 				->addClass('preprocessing-list-head')
 				->addStyle(!$preprocessing ? 'display: none;' : null)
 		);
@@ -1415,114 +1412,114 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 
 	foreach ($preprocessing as $step) {
 		// Create a combo box with preprocessing types.
-		if ($readonly) {
-			$preproc_types_cbbox = (new CTextBox('preprocessing['.$i.'][type_name]',
-				get_preprocessing_types($step['type'], false, $types))
-			)->setReadonly(true);
+		$preproc_types_cbbox = (new CComboBox('preprocessing['.$i.'][type]', $step['type']))->setReadonly($readonly);
 
-			$form->addVar('preprocessing['.$i.'][type]', $step['type']);
-		}
-		else {
-			$preproc_types_cbbox = new CComboBox('preprocessing['.$i.'][type]', $step['type']);
+		foreach (get_preprocessing_types(null, true, $types) as $group) {
+			$cb_group = new COptGroup($group['label']);
 
-			foreach (get_preprocessing_types(null, true, $types) as $group) {
-				$cb_group = new COptGroup($group['label']);
-
-				foreach ($group['types'] as $type => $label) {
-					$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
-				}
-
-				$preproc_types_cbbox->addItem($cb_group);
+			foreach ($group['types'] as $type => $label) {
+				$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
 			}
+
+			$preproc_types_cbbox->addItem($cb_group);
 		}
 
 		// Depending on preprocessing type, display corresponding params field and placeholders.
-		$params = [];
+		$params = '';
 
 		// Create a primary param text box, so it can be hidden if necessary.
-		$step_param_0 = array_key_exists('params', $step) ? $step['params'][0] : '';
-		$params[] = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0))
-			->setTitle($step_param_0)
+		$step_param_0_value = array_key_exists('params', $step) ? $step['params'][0] : '';
+		$step_param_0 = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0_value))
+			->setTitle($step_param_0_value)
 			->setReadonly($readonly);
 
 		// Create a secondary param text box, so it can be hidden if necessary.
-		$step_param_1 = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
-				? $step['params'][1]
-				: '';
-		$params[] = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1))
-			->setTitle($step_param_1)
+		$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
+			? $step['params'][1]
+			: '';
+		$step_param_1 = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1_value))
+			->setTitle($step_param_1_value)
 			->setReadonly($readonly);
 
 		// Add corresponding placeholders and show or hide text boxes.
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
-				$params[0]->setAttribute('placeholder', _('number'));
-				$params[1]->addStyle('display: none;');
+				$params = $step_param_0
+					->setAttribute('placeholder', _('number'))
+					->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH);
 				break;
 
 			case ZBX_PREPROC_RTRIM:
 			case ZBX_PREPROC_LTRIM:
 			case ZBX_PREPROC_TRIM:
-				$params[0]->setAttribute('placeholder', _('list of characters'));
-				$params[1]->addStyle('display: none;');
+				$params = $step_param_0
+					->setAttribute('placeholder', _('list of characters'))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 				break;
 
 			case ZBX_PREPROC_XPATH:
 			case ZBX_PREPROC_ERROR_FIELD_XML:
-				$params[0]->setAttribute('placeholder', _('XPath'));
-				$params[1]->addStyle('display: none;');
+				$params = $step_param_0->setAttribute('placeholder', _('XPath'));
 				break;
 
 			case ZBX_PREPROC_JSONPATH:
 			case ZBX_PREPROC_ERROR_FIELD_JSON:
-				$params[0]->setAttribute('placeholder', _('$.path.to.node'));
-				$params[1]->addStyle('display: none;');
+				$params = $step_param_0->setAttribute('placeholder', _('$.path.to.node'));
 				break;
 
 			case ZBX_PREPROC_REGSUB:
 			case ZBX_PREPROC_ERROR_FIELD_REGEX:
-				$params[0]->setAttribute('placeholder', _('pattern'));
-				$params[1]->setAttribute('placeholder', _('output'));
-				break;
-
-			case ZBX_PREPROC_BOOL2DEC:
-			case ZBX_PREPROC_OCT2DEC:
-			case ZBX_PREPROC_HEX2DEC:
-			case ZBX_PREPROC_DELTA_VALUE:
-			case ZBX_PREPROC_DELTA_SPEED:
-			case ZBX_PREPROC_THROTTLE_VALUE:
-				$params[0]->addStyle('display: none;');
-				$params[1]->addStyle('display: none;');
+				$params = [
+					$step_param_0->setAttribute('placeholder', _('pattern')),
+					$step_param_1->setAttribute('placeholder', _('output'))
+				];
 				break;
 
 			case ZBX_PREPROC_VALIDATE_RANGE:
-				$params[0]->setAttribute('placeholder', _('min'));
-				$params[1]->setAttribute('placeholder', _('max'));
+				$params = [
+					$step_param_0->setAttribute('placeholder', _('min')),
+					$step_param_1->setAttribute('placeholder', _('max'))
+				];
 				break;
 
 			case ZBX_PREPROC_VALIDATE_REGEX:
 			case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-				$params[0]->setAttribute('placeholder', _('pattern'));
-				$params[1]->addStyle('display: none;');
+				$params = $step_param_0->setAttribute('placeholder', _('pattern'));
 				break;
 
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-				$params[0]->setAttribute('placeholder', _('seconds'));
-				$params[1]->addStyle('display: none;');
+				$params = $step_param_0
+					->setAttribute('placeholder', _('seconds'))
+					->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH);
 				break;
 
 			case ZBX_PREPROC_SCRIPT:
-				$params[0]
-					->removeId()
-					->setAttribute('value', explode("\n", trim($step_param_0))[0])
-					->setAttribute('placeholder', _('script'))
-					->setAttribute('maxlength', $script_maxlength)
-					->setAttribute('title', _('Click to view or edit code'))
-					->addClass('open-modal-code-editor');
-				if (!$readonly) {
-					$params[0]->addClass('editable');
-				}
-				$params[1]->addStyle('display: none;');
+				$params = new CMultilineInput($step_param_0->getName(), $step_param_0_value, [
+					'title' => _('JavaScript'),
+					'placeholder' => _('script'),
+					'placeholder_textarea' => 'return value',
+					'label_before' => 'function (value) {',
+					'label_after' => '}',
+					'grow' => 'auto',
+					'rows' => 0,
+					'maxlength' => $script_maxlength,
+					'readonly' => $readonly
+				]);
+				break;
+
+			case ZBX_PREPROC_PROMETHEUS_PATTERN:
+				$params = [
+					$step_param_0->setAttribute('placeholder',
+						_('<metric name>{<label name>="<label value>", ...} == <value>')
+					),
+					$step_param_1->setAttribute('placeholder', _('<label name>'))
+				];
+				break;
+
+			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+				$params = $step_param_0->setAttribute('placeholder',
+					_('<metric name>{<label name>="<label value>", ...} == <value>')
+				);
 				break;
 		}
 
@@ -1577,16 +1574,10 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		}
 
 		$on_fail_options = (new CDiv([
-			(new CDiv([
-				new CDiv(new CLabel(_('Custom on fail'))),
-				new CDiv($error_handler->setReadonly($readonly)),
-				new CDiv($error_handler_params->setReadonly($readonly))
-			]))
-				->addClass(ZBX_STYLE_COLUMN_75)
-				->addClass(ZBX_STYLE_COLUMN_MIDDLE)
-		]))
-			->addClass(ZBX_STYLE_COLUMNS)
-			->addClass('on-fail-options');
+			new CLabel(_('Custom on fail')),
+			$error_handler->setReadonly($readonly),
+			$error_handler_params->setReadonly($readonly)
+		]))->addClass('on-fail-options');
 
 		if ($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT) {
 			$on_fail_options->addStyle('display: none;');
@@ -1599,46 +1590,46 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 						->addClass(ZBX_STYLE_DRAG_ICON)
 						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
 					(new CDiv($preproc_types_cbbox))
-						->addClass(ZBX_STYLE_COLUMN_35)
-						->addClass('list-numbered-item'),
+						->addClass('list-numbered-item')
+						->addClass('step-name'),
+					(new CDiv($params))->addClass('step-parameters'),
+					(new CDiv($on_fail))->addClass('step-on-fail'),
 					(new CDiv([
-						$params[0],
-						($step['type'] == ZBX_PREPROC_SCRIPT)
-							? new CInput('hidden', $params[0]->getName(), trim(implode($step['params'])))
-							: null
-					]))->addClass(ZBX_STYLE_COLUMN_20),
-					(new CDiv($params[1]))->addClass(ZBX_STYLE_COLUMN_20),
-					(new CDiv($on_fail))
-						->addClass(ZBX_STYLE_COLUMN_15)
-						->addClass(ZBX_STYLE_COLUMN_MIDDLE)
-						->addClass(ZBX_STYLE_COLUMN_CENTER),
-					(new CDiv((new CButton('preprocessing['.$i.'][remove]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
-						->setEnabled(!$readonly)
-						->removeId()
-					))
-						->addClass(ZBX_STYLE_COLUMN_10)
-						->addClass(ZBX_STYLE_COLUMN_MIDDLE),
-				]))
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass('preprocessing-step'),
+						(new CButton('preprocessing['.$i.'][test]', _('Test')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('preprocessing-step-test')
+							->removeId(),
+						(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-remove')
+							->setEnabled(!$readonly)
+							->removeId()
+					]))->addClass('step-action'),
+				]))->addClass('preprocessing-step'),
 				$on_fail_options
 			]))
 				->addClass('preprocessing-list-item')
 				->addClass('sortable')
+				->setAttribute('data-step', $i)
 		);
 
 		$i++;
 	}
 
 	$preprocessing_list->addItem(
-		(new CListItem(new CDiv(
-			(new CButton('param_add', _('Add')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-add')
-				->setEnabled(!$readonly)
-		)))->addClass('preprocessing-list-foot')
+		(new CListItem([
+			(new CDiv(
+				(new CButton('param_add', _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-add')
+					->setEnabled(!$readonly)
+			))->addClass('step-action'),
+			(new CDiv(
+				(new CButton('preproc_test_all', _('Test all steps')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled(($i > 0) ? true : false)
+			))->addClass('step-action')
+		]))->addClass('preprocessing-list-foot')
 	);
 
 	return $preprocessing_list;

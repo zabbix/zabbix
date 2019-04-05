@@ -71,6 +71,7 @@ class CProblem extends CApiService {
 			'any'						=> null,	// (internal) true if need not filtred by r_eventid
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
+			'recent'					=> null,
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
@@ -292,7 +293,7 @@ class CProblem extends CApiService {
 
 			$sqlParts['where'][] = '(p.r_eventid IS NULL OR p.r_clock>'.$ok_events_from.')';
 		}
-		elseif ($options['any'] === null) {
+		else {
 			$sqlParts['where'][] = 'p.r_eventid IS NULL';
 		}
 

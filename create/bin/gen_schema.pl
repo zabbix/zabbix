@@ -240,9 +240,10 @@ sub process_table
 
 		for ($flags)
 		{
-			# do not output ZBX_DATA and ZBX_TEMPLATE, remove it
+			# do not output ZBX_DATA ZBX_DASHBOARD and ZBX_TEMPLATE, remove it
 			s/ZBX_DATA//;
 			s/ZBX_TEMPLATE//;
+			s/ZBX_DASHBOARD//;
 			s/,+$//;
 			s/^,+//;
 			s/,+/ \| /g;
@@ -630,7 +631,6 @@ sub timescaledb
 	{
 		print<<EOF
 SELECT create_hypertable('$_', 'clock', chunk_time_interval => 86400, migrate_data => true);
-SELECT set_adaptive_chunking('$_', chunk_target_size => 'estimate');
 EOF
 		;
 	}

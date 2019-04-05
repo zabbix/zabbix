@@ -28,7 +28,7 @@ void	zbx_preproc_op_history_free(zbx_preproc_op_history_t *ophistory)
 	zbx_free(ophistory);
 }
 
-zbx_preproc_op_history_t	*zbx_preproc_history_get_value(zbx_vector_ptr_t *history, int index)
+void	zbx_preproc_history_pop_value(zbx_vector_ptr_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts)
 {
 	int				i;
 	zbx_preproc_op_history_t	*ophistory;
@@ -38,10 +38,18 @@ zbx_preproc_op_history_t	*zbx_preproc_history_get_value(zbx_vector_ptr_t *histor
 		ophistory = (zbx_preproc_op_history_t *)history->values[i];
 
 		if (ophistory->index == index)
-			return ophistory;
+		{
+			*value = ophistory->value;
+			*ts = ophistory->ts;
+			zbx_free(history->values[i]);
+			zbx_vector_ptr_remove_noorder(history, i);
+			return;
+		}
 	}
 
-	return NULL;
+	zbx_variant_set_none(value);
+	ts->sec = 0;
+	ts->ns = 0;
 }
 
 void	zbx_preproc_history_add_value(zbx_vector_ptr_t *history, int index, zbx_variant_t *data,

@@ -333,6 +333,39 @@ $form_list
 			DB::getFieldLength('items', 'ssl_key_password')
 		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'ssl_key_password_row'
+	)
+	// Append master item select to form list.
+	->addRow(
+		(new CLabel(_('Master item'), 'master_itemid_ms'))->setAsteriskMark(),
+		(new CMultiSelect([
+			'name' => 'master_itemid',
+			'object_name' => 'items',
+			'multiple' => false,
+			'disabled' => $data['limited'],
+			'data' => ($data['master_itemid'] > 0)
+				? [
+					[
+						'id' => $data['master_itemid'],
+						'prefix' => $data['host']['name'].NAME_DELIMITER,
+						'name' => $data['master_itemname']
+					]
+				]
+				: [],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'items',
+					'srcfld1' => 'itemid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'master_itemid',
+					'hostid' => $data['hostid'],
+					'webitems' => true,
+					'normal_only' => true
+				]
+			]
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(),
+		'row_master_item'
 	);
 
 // Append interfaces to form list.

@@ -172,16 +172,6 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			goto out;
 		}
 	}
-	else if (0 == strcmp(param1, "preprocessing_queue"))
-	{
-		if (1 != nparams)
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-			goto out;
-		}
-
-		SET_UI64_RESULT(result, zbx_preprocessor_get_queue_size());
-	}
 	else if (0 == strcmp(param1, "lld_queue"))
 	{
 		zbx_uint64_t	value;

@@ -189,6 +189,7 @@ struct	_DC_TRIGGER;
 #define GRAPH_ITEM_COLOR_LEN_MAX	(GRAPH_ITEM_COLOR_LEN + 1)
 
 #define DSERVICE_VALUE_LEN		255
+#define MAX_DISCOVERED_VALUE_SIZE	(DSERVICE_VALUE_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1)
 
 #define HTTPTEST_HTTP_USER_LEN		64
 #define HTTPTEST_HTTP_PASSWORD_LEN	64
@@ -209,23 +210,37 @@ struct	_DC_TRIGGER;
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
 #ifdef HAVE_ORACLE
-#define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "begin\n")
-#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;")
+#	define ZBX_PLSQL_BEGIN	"begin\n"
+#	define ZBX_PLSQL_END	"end;"
+#	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)			\
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_BEGIN)
+#	define	DBend_multiple_update(sql, sql_alloc, sql_offset)			\
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_END)
+#	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
+#		define	ZBX_SQL_EXEC_FROM	ZBX_CONST_STRLEN(ZBX_PLSQL_BEGIN)
+#	else
+#		define	ZBX_SQL_EXEC_FROM	0
+#	endif
 
-#define	ZBX_SQL_STRCMP		"%s%s%s"
-#define	ZBX_SQL_STRVAL_EQ(str)	'\0' != *str ? "='"  : "",		\
-				'\0' != *str ? str   : " is null",	\
-				'\0' != *str ? "'"   : ""
-#define	ZBX_SQL_STRVAL_NE(str)	'\0' != *str ? "<>'" : "",		\
-				'\0' != *str ? str   : " is not null",	\
-				'\0' != *str ? "'"   : ""
+#	define	ZBX_SQL_STRCMP		"%s%s%s"
+#	define	ZBX_SQL_STRVAL_EQ(str)				\
+			'\0' != *str ? "='"  : "",		\
+			'\0' != *str ? str   : " is null",	\
+			'\0' != *str ? "'"   : ""
+#	define	ZBX_SQL_STRVAL_NE(str)				\
+			'\0' != *str ? "<>'" : "",		\
+			'\0' != *str ? str   : " is not null",	\
+			'\0' != *str ? "'"   : ""
+
 #else
-#define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)
-#define	DBend_multiple_update(sql, sql_alloc, sql_offset)
+#	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
+#	define	DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 
-#define	ZBX_SQL_STRCMP		"%s'%s'"
-#define	ZBX_SQL_STRVAL_EQ(str)	"=", str
-#define	ZBX_SQL_STRVAL_NE(str)	"<>", str
+#	define	ZBX_SQL_EXEC_FROM	0
+
+#	define	ZBX_SQL_STRCMP		"%s'%s'"
+#	define	ZBX_SQL_STRVAL_EQ(str)	"=", str
+#	define	ZBX_SQL_STRVAL_NE(str)	"<>", str
 #endif
 
 #define ZBX_SQL_NULLCMP(f1, f2)	"((" f1 " is null and " f2 " is null) or " f1 "=" f2 ")"
@@ -609,7 +624,7 @@ void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts);
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		const char *host_metadata);
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
-char	*DBget_unique_hostname_by_sample(const char *host_name_sample);
+char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
 const char	*DBsql_id_ins(zbx_uint64_t id);
 const char	*DBsql_id_cmp(zbx_uint64_t id);
@@ -634,6 +649,7 @@ int	DBindex_exists(const char *table_name, const char *index_name);
 int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
 int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id);
 int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids);
+int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64_t *ids);
 
 #define DBlock_hostid(id)			DBlock_record("hosts", id, NULL, 0)
 #define DBlock_druleid(id)			DBlock_record("drules", id, NULL, 0)
@@ -769,5 +785,18 @@ zbx_proxy_diff_t;
 int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
 void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff);
+
+/* mock field to estimate how much data can be stored in characters, bytes or both, */
+/* depending on database backend                                                    */
+
+typedef struct
+{
+	int	bytes_num;
+	int	chars_num;
+}
+zbx_db_mock_field_t;
+
+void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len);
+int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
 
 #endif

@@ -17,15 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYHOSTS_H
-#define ZABBIX_PROXYHOSTS_H
+#ifndef ZABBIX_TRAPPER_PREPROC_H
+#define ZABBIX_TRAPPER_PREPROC_H
 
 #include "comms.h"
 #include "zbxjson.h"
 
-extern int	CONFIG_TIMEOUT;
-
-void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp);
-void	send_host_availability(zbx_socket_t *sock);
+int	zbx_trapper_preproc_test(zbx_socket_t *sock, const struct zbx_json_parse *jp);
 
 #endif

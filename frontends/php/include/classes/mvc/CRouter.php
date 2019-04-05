@@ -126,12 +126,16 @@ class CRouter {
 		'popup.generic'					=> ['CControllerPopupGeneric',				'layout.json',			'popup.generic'],
 		'popup.httpstep'				=> ['CControllerPopupHttpStep',				'layout.json',			'popup.httpstep'],
 		'popup.media'					=> ['CControllerPopupMedia',				'layout.json',			'popup.media'],
+		'popup.preproctest.edit'		=> ['CControllerPopupPreprocTestEdit',		'layout.json',			'popup.preproctestedit.view'],
+		'popup.preproctest.send'		=> ['CControllerPopupPreprocTestSend',		'layout.json',			null],
 		'popup.scriptexec'				=> ['CControllerPopupScriptExec',			'layout.json',			'popup.scriptexec'],
 		'popup.triggerexpr'				=> ['CControllerPopupTriggerExpr',			'layout.json',			'popup.triggerexpr'],
 		'popup.services'				=> ['CControllerPopupServices',				'layout.json',			'popup.services'],
 		'popup.testtriggerexpr'			=> ['CControllerPopupTestTriggerExpr',		'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerwizard'			=> ['CControllerPopupTriggerWizard',		'layout.json',			'popup.triggerwizard'],
 		'popup.trigdesc.view'			=> ['CControllerPopupTrigDescView',			'layout.json',			'popup.trigdesc.view'],
+		'popup.mediatypetest.edit'		=> ['CControllerPopupMediatypeTestEdit',	'layout.json',			'popup.mediatypetest.edit'],
+		'popup.mediatypetest.send'		=> ['CControllerPopupMediatypeTestSend',	'layout.json',			null],
 		'trigdesc.update'				=> ['CControllerTrigDescUpdate',			'layout.json',			null],
 		'search'						=> ['CControllerSearch',					'layout.htmlpage',		'search']
 	];

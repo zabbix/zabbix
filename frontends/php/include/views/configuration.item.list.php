@@ -37,20 +37,18 @@ $widget = (new CWidget())
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
-if (!empty($this->data['hostid'])) {
-	$widget->addItem(get_header_host_table('items', $this->data['hostid']));
+if ($data['hostid'] != 0) {
+	$widget->addItem(get_header_host_table('items', $data['hostid']));
 }
-$widget->addItem($this->data['flicker']);
+$widget->addItem($data['main_filter']);
 
 // create form
 $itemForm = (new CForm())->setName('items');
-if (!empty($this->data['hostid'])) {
-	$itemForm->addVar('hostid', $this->data['hostid']);
+if (!empty($data['hostid'])) {
+	$itemForm->addVar('hostid', $data['hostid']);
 }
 
-$url = (new CUrl('items.php'))
-	->setArgument('hostid', $data['hostid'])
-	->getUrl();
+$url = (new CUrl('items.php'))->getUrl();
 
 // create table
 $itemTable = (new CTableInfo())
@@ -59,7 +57,7 @@ $itemTable = (new CTableInfo())
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Wizard'),
-		empty($this->data['filter_hostid']) ? _('Host') : null,
+		($data['hostid'] == 0) ? _('Host') : null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Triggers'),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
@@ -69,16 +67,12 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Applications'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-		$data['showInfoColumn'] ? _('Info') : null
+		_('Info')
 	]);
-
-if (!$this->data['filterSet']) {
-	$itemTable->setNoDataMessage(_('Specify some filter condition to see the items.'));
-}
 
 $current_time = time();
 
-$this->data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['itemTriggers'], [
+$data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['itemTriggers'], [
 	'html' => true,
 	'sources' => ['expression', 'recovery_expression']
 ]);
@@ -130,24 +124,22 @@ foreach ($data['items'] as $item) {
 	);
 
 	// info
-	if ($data['showInfoColumn']) {
-		$info_icons = [];
+	$info_icons = [];
 
-		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
-			$info_icons[] = makeErrorIcon($item['error']);
-		}
+	if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
+		$info_icons[] = makeErrorIcon($item['error']);
+	}
 
-		// discovered item lifetime indicator
-		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
-			$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
-		}
+	// discovered item lifetime indicator
+	if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
+		$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
 	}
 
 	// triggers info
 	$triggerHintTable = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
 
 	foreach ($item['triggers'] as $num => &$trigger) {
-		$trigger = $this->data['itemTriggers'][$trigger['triggerid']];
+		$trigger = $data['itemTriggers'][$trigger['triggerid']];
 
 		$trigger_description = [];
 		$trigger_description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates'],
@@ -181,7 +173,7 @@ foreach ($data['items'] as $item) {
 		}
 
 		$triggerHintTable->addRow([
-			getSeverityCell($trigger['priority'], $this->data['config']),
+			getSeverityCell($trigger['priority'], $data['config']),
 			$trigger_description,
 			$expression,
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
@@ -201,8 +193,17 @@ foreach ($data['items'] as $item) {
 		$triggerInfo = '';
 	}
 
+	$wizard = (new CSpan(
+		(new CButton(null))
+			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getItem($item['itemid']))
+	))->addClass(ZBX_STYLE_REL_CONTAINER);
+
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
+	}
+	else if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		$wizard = '';
 	}
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
@@ -214,16 +215,10 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
-	$wizard = (new CSpan(
-		(new CButton(null))
-			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getItem($item['itemid']))
-	))->addClass(ZBX_STYLE_REL_CONTAINER);
-
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
-		empty($this->data['filter_hostid']) ? $item['host'] : null,
+		($data['hostid'] == 0) ? $item['host'] : null,
 		$description,
 		$triggerInfo,
 		CHtml::encode($item['key_']),
@@ -233,16 +228,16 @@ foreach ($data['items'] as $item) {
 		item_type2str($item['type']),
 		CHtml::encode($item['applications_list']),
 		$status,
-		$data['showInfoColumn'] ? makeInformationList($info_icons) : null
+		makeInformationList($info_icons)
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$data['hostid'].'";');
 
 // append table to form
 $itemForm->addItem([
 	$itemTable,
-	$this->data['paging'],
+	$data['paging'],
 	new CActionButtonList('action', 'group_itemid',
 		[
 			'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
@@ -255,7 +250,7 @@ $itemForm->addItem([
 			'item.massupdateform' => ['name' => _('Mass update')],
 			'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
 		],
-		$this->data['hostid']
+		$data['hostid']
 	)
 ]);
 
