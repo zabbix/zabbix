@@ -58,8 +58,6 @@ extern int		server_num, process_num;
  ******************************************************************************/
 static int	proxy_data_sender(int *more, int now)
 {
-	const char		*__function_name = "proxy_data_sender";
-
 	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
 
 	zbx_socket_t		sock;
@@ -72,7 +70,7 @@ static int	proxy_data_sender(int *more, int now)
 	char			*error = NULL;
 	zbx_vector_ptr_t	tasks;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	*more = ZBX_PROXY_DATA_DONE;
 	zbx_json_init(&j, 16 * ZBX_KIBIBYTE);
@@ -194,7 +192,7 @@ static int	proxy_data_sender(int *more, int now)
 
 	zbx_json_free(&j);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d flags:0x" ZBX_FS_UX64, __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d flags:0x" ZBX_FS_UX64, __func__,
 			zbx_result_string(upload_state), *more, flags);
 
 	return history_records + discovery_records + areg_records;

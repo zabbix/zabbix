@@ -53,7 +53,6 @@ class testInheritanceTrigger extends CLegacyWebTest {
 	/**
 	 * @dataProvider update
 	 */
-
 	public function testInheritanceTrigger_SimpleUpdate($data) {
 		$sqlTriggers = 'SELECT * FROM triggers ORDER BY triggerid';
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
@@ -92,7 +91,8 @@ class testInheritanceTrigger extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceTrigger_SimpleCreate($data) {
-		$this->zbxTestLogin('triggers.php?form=Create+trigger&hostid='.$this->templateid);
+		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$this->templateid);
+		$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 
 		$this->zbxTestInputType('description', $data['description']);
 		$this->zbxTestInputType('expression', $data['expression']);

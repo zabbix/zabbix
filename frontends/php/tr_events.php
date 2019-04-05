@@ -41,12 +41,8 @@ $fields = [
 	'triggerid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
 	'eventid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
 	// Ajax
-	'widget' =>	[T_ZBX_STR, O_OPT, P_ACT,
-		IN('"'.WIDGET_HAT_EVENTACK.'","'.WIDGET_HAT_EVENTACTIONMSGS.'","'.WIDGET_HAT_EVENTACTIONMCMDS.'","'.
-			WIDGET_HAT_EVENTLIST.'"'),
-		null
-	],
-	'state'=>	[T_ZBX_INT, O_OPT, P_ACT, IN('0,1'), null]
+	'widget' =>		[T_ZBX_STR, O_OPT, P_ACT,	IN('"'.WIDGET_HAT_EVENTACTIONS.'","'.WIDGET_HAT_EVENTLIST.'"'), null],
+	'state' =>		[T_ZBX_INT, O_OPT, P_ACT,	IN('0,1'), null]
 ];
 check_fields($fields);
 
@@ -143,11 +139,11 @@ $eventTab = (new CTable())
 			))->setHeader(_('Event details'))
 		]),
 		new CDiv([
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK,
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONS,
 				makeEventDetailsActionsTable($actions, $users, $mediatypes, $severity_config)
 			))
-				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
-				->setHeader(_('Actions'), [], false, 'web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state'),
+				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state', true))
+				->setHeader(_('Actions'), [], false, 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state'),
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,
 				make_small_eventlist($event,
 					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')

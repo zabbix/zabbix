@@ -313,15 +313,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define ITEM_SNMPV3_PRIVPROTOCOL_DES		0
 #define ITEM_SNMPV3_PRIVPROTOCOL_AES		1
 
-/* item multiplier types */
-#define ITEM_MULTIPLIER_DO_NOT_USE		0
-#define ITEM_MULTIPLIER_USE			1
-
-/* item delta types */
-#define ITEM_STORE_AS_IS			0
-#define ITEM_STORE_SPEED_PER_SECOND		1
-#define ITEM_STORE_SIMPLE_CHANGE		2
-
 /* condition evaluation types */
 #define CONDITION_EVAL_TYPE_AND_OR		0
 #define CONDITION_EVAL_TYPE_AND			1
@@ -863,9 +854,6 @@ do														\
 }														\
 while (0)
 
-#define MIN_ZABBIX_PORT 1024u
-#define MAX_ZABBIX_PORT 65535u
-
 extern const char	*progname;
 extern const char	title_message[];
 extern const char	syslog_app_name[];
@@ -1043,19 +1031,13 @@ void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
 void	zbx_strarr_free(char **arr);
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_setproctitle __zbx_zbx_setproctitle
-#endif
-
 #if defined(__GNUC__) || defined(__clang__)
 #	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
 #else
 #	define __zbx_attr_format_printf(idx1, idx2)
 #endif
 
-void	__zbx_zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
@@ -1083,22 +1065,11 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
 int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
 int	zbx_day_in_month(int year, int mon);
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#	define zbx_snprintf(str, count, fmt, ...) __zbx_zbx_snprintf(str, count, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#	define zbx_snprintf_alloc(str, alloc_len, offset, fmt, ...) \
-       			__zbx_zbx_snprintf_alloc(str, alloc_len, offset, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_error __zbx_zbx_error
-#	define zbx_snprintf __zbx_zbx_snprintf
-#	define zbx_snprintf_alloc __zbx_zbx_snprintf_alloc
-#endif
+void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
-void	__zbx_zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_format_printf(3, 4);
 
-size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_format_printf(3, 4);
-
-void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
+void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
 
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
@@ -1119,16 +1090,9 @@ size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size);
 
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_dsprintf(dest, fmt, ...) __zbx_zbx_dsprintf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#	define zbx_strdcatf(dest, fmt, ...) __zbx_zbx_strdcatf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_dsprintf __zbx_zbx_dsprintf
-#	define zbx_strdcatf __zbx_zbx_strdcatf
-#endif
-char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
+char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 char	*zbx_strdcat(char *dest, const char *src);
-char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
+char	*zbx_strdcatf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
@@ -1364,6 +1328,7 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_REGEXP	0x040000
 #define ZBX_TOKEN_XPATH		0x080000
 #define ZBX_TOKEN_REGEXP_OUTPUT	0x100000
+#define ZBX_TOKEN_PROMETHEUS	0x200000
 
 /* location of a substring */
 typedef struct
@@ -1465,7 +1430,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 #define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
 #define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
-#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFF)
+#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFFFF)
 
 #define ZBX_PREPROC_MULTIPLIER			1
 #define ZBX_PREPROC_RTRIM			2
@@ -1488,11 +1453,17 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_THROTTLE_VALUE		19
 #define ZBX_PREPROC_THROTTLE_TIMED_VALUE	20
 #define ZBX_PREPROC_SCRIPT			21
+#define ZBX_PREPROC_PROMETHEUS_PATTERN		22
+#define ZBX_PREPROC_PROMETHEUS_TO_JSON		23
 
+/* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0
 #define ZBX_PREPROC_FAIL_DISCARD_VALUE	1
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
+
+/* internal on fail actions */
+#define ZBX_PREPROC_FAIL_FORCE_ERROR	4
 
 #define ZBX_HTTPFIELD_HEADER		0
 #define ZBX_HTTPFIELD_VARIABLE		1
@@ -1548,6 +1519,7 @@ void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source);
 int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);
 
 int	zbx_variant_convert(zbx_variant_t *value, int type);
+const char	*zbx_get_variant_type_desc(unsigned char type);
 const char	*zbx_variant_value_desc(const zbx_variant_t *value);
 const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 

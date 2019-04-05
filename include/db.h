@@ -189,6 +189,7 @@ struct	_DC_TRIGGER;
 #define GRAPH_ITEM_COLOR_LEN_MAX	(GRAPH_ITEM_COLOR_LEN + 1)
 
 #define DSERVICE_VALUE_LEN		255
+#define MAX_DISCOVERED_VALUE_SIZE	(DSERVICE_VALUE_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1)
 
 #define HTTPTEST_HTTP_USER_LEN		64
 #define HTTPTEST_HTTP_PASSWORD_LEN	64
@@ -483,26 +484,10 @@ void	DBclose(void);
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
 #endif
-#ifdef HAVE___VA_ARGS__
-#	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#	define DBexecute_once(fmt, ...) __zbx_DBexecute_once(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define DBexecute __zbx_DBexecute
-#	define DBexecute_once __zbx_DBexecute_once
-#endif
-int	__zbx_DBexecute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-int	__zbx_DBexecute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-
-#ifdef HAVE___VA_ARGS__
-#	define DBselect_once(fmt, ...)	__zbx_DBselect_once(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#	define DBselect(fmt, ...)	__zbx_DBselect(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define DBselect_once	__zbx_DBselect_once
-#	define DBselect		__zbx_DBselect
-#endif
-DB_RESULT	__zbx_DBselect_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-DB_RESULT	__zbx_DBselect(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-
+int		DBexecute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+int		DBexecute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+DB_RESULT	DBselect_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+DB_RESULT	DBselect(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(const char *field);
@@ -623,7 +608,7 @@ void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts);
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		const char *host_metadata);
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
-char	*DBget_unique_hostname_by_sample(const char *host_name_sample);
+char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
 const char	*DBsql_id_ins(zbx_uint64_t id);
 const char	*DBsql_id_cmp(zbx_uint64_t id);
@@ -648,6 +633,7 @@ int	DBindex_exists(const char *table_name, const char *index_name);
 int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
 int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id);
 int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids);
+int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64_t *ids);
 
 #define DBlock_hostid(id)			DBlock_record("hosts", id, NULL, 0)
 #define DBlock_druleid(id)			DBlock_record("drules", id, NULL, 0)
@@ -783,5 +769,18 @@ zbx_proxy_diff_t;
 int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
 void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff);
+
+/* mock field to estimate how much data can be stored in characters, bytes or both, */
+/* depending on database backend                                                    */
+
+typedef struct
+{
+	int	bytes_num;
+	int	chars_num;
+}
+zbx_db_mock_field_t;
+
+void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len);
+int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
 
 #endif

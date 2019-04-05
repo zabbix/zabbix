@@ -1399,7 +1399,7 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (50008, 'Host
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50008, 50008, 4);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 50008, 50021);
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,lastlogsize,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,mtime,flags,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname,posts,headers) VALUES (40065,0,'','',50008,'Item-layout-test-zbx6840','item-layout-test-002','30s','90d','365d',0,3,'','','',0,'','','',0,'',NULL,NULL,'','',0,'','','','',0,0,50021,'','',0,'30',0,0,0,'','','');
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100026,'{100026}=0&{100027}=0','Trigger-map-test-zbx6840','',0,1,0,0,'','',NULL,0,0,0);
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100026,'{100026}=0 and {100027}=0','Trigger-map-test-zbx6840','',0,0,0,0,'','',NULL,0,0,0);
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100026,40065,100026,'last','0');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100027,23287,100026,'last','0');
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, grid_size, grid_show, grid_align, label_format, label_type_host, label_type_hostgroup, label_type_trigger, label_type_map, label_type_image, label_string_host, label_string_hostgroup, label_string_trigger, label_string_map, label_string_image, iconmapid, expand_macros, severity_min, userid, private) VALUES (5, 'testZBX6840', 800, 600, NULL, 0, 0, 0, 0, 0, 0, 50, 1, 1, 0, 2, 2, 2, 2, 2, '', '', '', '', '', NULL, 0, 0, 1, 0);
@@ -2124,6 +2124,12 @@ INSERT INTO triggers (triggerid, description, expression, value, comments, templ
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (100067, 100066, 99093, 'last', '');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (148, 'server','selenium', 100066);
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (149, 'Street','Dzelzavas', 100066);
+INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (9008, 0, 0, 100066, 1535012391, 445429746,1, 'Inheritance trigger with tags', 3);
+INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES (116, 9008, 'server', 'selenium');
+INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES (117, 9008, 'Street', 'Dzelzavas');
+INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (9008, 0, 0, 100066, 1535012391, 445429746, 'Inheritance trigger with tags', 3);
+INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (116, 9008, 'server', 'selenium');
+INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (117, 9008, 'Street', 'Dzelzavas');
 INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state) VALUES (100067, 'Trigger disabled with tags', '{100067}>0', 1, 0, 3, '', 0);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100068, 99094, 100067, 'last', '');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (150, 'Street','Dzelzavas', 100067);

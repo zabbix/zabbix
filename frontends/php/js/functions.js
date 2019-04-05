@@ -515,6 +515,7 @@ function getOverlayDialogueId() {
  * @param {object} params                                   Modal window params.
  * @param {string} params.title                             Modal window title.
  * @param {object} params.content                           Window content.
+ * @param {object} params.footer                           	Window footer content.
  * @param {object} params.controls                          Window controls.
  * @param {array}  params.buttons                           Window buttons.
  * @param {string} params.debug                             Debug HTML displayed in modal window.
@@ -529,8 +530,8 @@ function getOverlayDialogueId() {
  * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
  *                                                          or create a new one if value is not set.
  * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
- * @param {object} trigger_elmnt				(optional) UI element which triggered opening of overlay dialogue.
- * @param {object} xhr							(optional) XHR request used to load content. Used to abort loading.
+ * @param {object} trigger_elmnt				(optional)  UI element which triggered opening of overlay dialogue.
+ * @param {object} xhr							(optional)  XHR request used to load content. Used to abort loading.
  *
  * @return {bool}
  */
@@ -550,13 +551,14 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	}
 
 	if (typeof params.script_inline !== 'undefined') {
-		jQuery(overlay_dialogue_footer).append(jQuery('<script>').text(params.script_inline));
+		overlay_dialogue_footer.append(jQuery('<script>').text(params.script_inline));
 	}
 
 	headerid = 'dashbrd-widget-head-title-'+params.dialogueid;
 
 	if (jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]').length) {
 		overlay_dialogue = jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]');
+		overlay_bg = jQuery('.overlay-bg[data-dialogueid="' + params.dialogueid + '"]') || null;
 
 		jQuery(overlay_dialogue)
 			.attr('class', 'overlay-dialogue modal')
@@ -596,17 +598,20 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 			center_overlay_dialog();
 		});
 
+	if (typeof params.footer !== 'undefined') {
+		overlay_dialogue_footer.append(params.footer);
+	}
+
 	jQuery.each(params.buttons, function(index, obj) {
+		if (typeof obj.action === 'string') {
+			obj.action = new Function(obj.action);
+		}
+
 		var button = jQuery('<button>', {
 			type: 'button',
 			text: obj.title
 		}).click(function(e) {
-			if (typeof obj.action === 'string') {
-				obj.action = new Function(obj.action);
-			}
-			var res = obj.action();
-
-			if (res !== false) {
+			if (obj.action() !== false) {
 				cancel_action = null;
 
 				if (!('keepOpen' in obj) || obj.keepOpen === false) {
@@ -672,20 +677,19 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		.append(overlay_dialogue_footer)
 		.append(typeof params.debug !== 'undefined' ? params.debug : null);
 
-	if (overlay_bg !== null) {
-		jQuery(overlay_bg).on('remove', function(event) {
-			body_mutation_observer.disconnect();
-			if (cancel_action !== null) {
-				cancel_action();
-			}
+	jQuery(overlay_bg).on('remove', function(event) {
+		body_mutation_observer.disconnect();
+		if (cancel_action !== null) {
+			cancel_action();
+		}
 
-			setTimeout(function() {
-				overlayDialogueDestroy(params.dialogueid, xhr);
-			});
-
-			return false;
+		setTimeout(function() {
+			jQuery(overlay_bg).off('remove'); // Remove to avoid repeated execution.
+			overlayDialogueDestroy(params.dialogueid, xhr);
 		});
-	}
+
+		return false;
+	});
 
 	if (submit_btn) {
 		jQuery('.overlay-dialogue-body form', overlay_dialogue).on('submit', function(event) {

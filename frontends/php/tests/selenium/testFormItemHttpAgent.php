@@ -321,7 +321,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * Test form validation.
 	 */
 	private function executeValidation($data, $action) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]'.self::HOSTID);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
 
 		switch ($action) {
 			case 'create':
@@ -1009,7 +1009,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * @dataProvider getCreataData
 	 */
 	public function testFormItemHttpAgent_Create($data) {
-		$this->zbxTestLogin('items.php?form=create&hostid='.self::HOSTID);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestContentControlButtonClickTextWait('Create item');
 		$this->zbxTestDropdownSelectWait('type', 'HTTP agent');
 
 		if (array_key_exists('request_type', $data)) {
@@ -1064,7 +1065,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				'Request type' => 'GET',
 				'Timeout' => '3s',
 				'Required status codes' => '200',
-				'Follow redirects' => false,
+				'Follow redirects' => true,
 				'Convert to JSON' => false,
 				'HTTP authentication' => 'None',
 				'SSL verify peer' => false,

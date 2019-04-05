@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of item prototypes');
 $page['file'] = 'disc_prototypes.php';
-$page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'codeeditor.js', 'multiselect.js', 'items.js'];
+$page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -457,6 +457,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
 				case ZBX_PREPROC_MULTIPLIER:
+				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+					$step['params'] = trim($step['params'][0]);
+					break;
+
 				case ZBX_PREPROC_RTRIM:
 				case ZBX_PREPROC_LTRIM:
 				case ZBX_PREPROC_TRIM:
@@ -471,8 +475,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					$step['params'] = $step['params'][0];
 					break;
 
-				case ZBX_PREPROC_REGSUB:
 				case ZBX_PREPROC_VALIDATE_RANGE:
+				case ZBX_PREPROC_PROMETHEUS_PATTERN:
+					foreach ($step['params'] as &$param) {
+						$param = trim($param);
+					}
+					unset($param);
+
+					$step['params'] = implode("\n", $step['params']);
+					break;
+
+				case ZBX_PREPROC_REGSUB:
 				case ZBX_PREPROC_ERROR_FIELD_REGEX:
 					$step['params'] = implode("\n", $step['params']);
 					break;
@@ -912,6 +925,10 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					foreach ($preprocessing as &$step) {
 						switch ($step['type']) {
 							case ZBX_PREPROC_MULTIPLIER:
+							case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+								$step['params'] = trim($step['params'][0]);
+								break;
+
 							case ZBX_PREPROC_RTRIM:
 							case ZBX_PREPROC_LTRIM:
 							case ZBX_PREPROC_TRIM:
@@ -926,8 +943,17 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 								$step['params'] = $step['params'][0];
 								break;
 
-							case ZBX_PREPROC_REGSUB:
 							case ZBX_PREPROC_VALIDATE_RANGE:
+							case ZBX_PREPROC_PROMETHEUS_PATTERN:
+								foreach ($step['params'] as &$param) {
+									$param = trim($param);
+								}
+								unset($param);
+
+								$step['params'] = implode("\n", $step['params']);
+								break;
+
+							case ZBX_PREPROC_REGSUB:
 							case ZBX_PREPROC_ERROR_FIELD_REGEX:
 								$step['params'] = implode("\n", $step['params']);
 								break;
@@ -1166,10 +1192,10 @@ if (isset($_REQUEST['form'])) {
 			$itemPrototype['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
-		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
+		if (getRequest('type', $itemPrototype['type']) == ITEM_TYPE_DEPENDENT) {
 			$master_prototypes = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'itemids' => [$itemPrototype['master_itemid']],
+				'itemids' => [getRequest('master_itemid', $itemPrototype['master_itemid'])],
 				'hostids' => [$itemPrototype['hostid']],
 				'webitems' => true
 			])
@@ -1206,6 +1232,7 @@ if (isset($_REQUEST['form'])) {
 	$data = getItemFormData($itemPrototype);
 	$data['config'] = select_config();
 	$data['trends_default'] = DB::getDefault('items', 'trends');
+	$data['preprocessing_test_type'] = CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
 	$data['preprocessing_types'] = CItemPrototype::$supported_preprocessing_types;
 
 	// Sort interfaces to be listed starting with one selected as 'main'.
@@ -1270,6 +1297,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
 		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_ACTION_ADD),
+		'preprocessing_test_type' => CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
 		'preprocessing_types' => CItemPrototype::$supported_preprocessing_types,
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];

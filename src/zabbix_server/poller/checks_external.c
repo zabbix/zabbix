@@ -42,14 +42,12 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  ******************************************************************************/
 int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 {
-	const char	*__function_name = "get_value_external";
-
 	char		error[ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 	int		i, ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key);
 
 	init_request(&request);
 
@@ -96,7 +94,7 @@ out:
 
 	free_request(&request);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

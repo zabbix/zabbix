@@ -26,12 +26,11 @@ static char	prompt_char = '\0';
 
 static int	telnet_waitsocket(ZBX_SOCKET socket_fd, int mode)
 {
-	const char	*__function_name = "telnet_waitsocket";
 	struct timeval	tv;
 	int		rc;
 	fd_set		fd, *readfd = NULL, *writefd = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	tv.tv_sec = 0;
 	tv.tv_usec = 100000;	/* 1/10 sec */
@@ -48,28 +47,27 @@ static int	telnet_waitsocket(ZBX_SOCKET socket_fd, int mode)
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc,
-				zbx_socket_last_error(), strerror_from_system(zbx_socket_last_error()));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __func__, rc, zbx_socket_last_error(),
+				strerror_from_system(zbx_socket_last_error()));
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, rc);
 
 	return rc;
 }
 
 static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
 {
-	const char	*__function_name = "telnet_socket_read";
-	ssize_t		rc;
-	int		error;
+	ssize_t	rc;
+	int	error;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (ZBX_PROTO_ERROR == (rc = ZBX_TCP_READ(socket_fd, buf, count)))
 	{
 		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%ld errno:%d error:[%s]",
-				__function_name, (long int)rc, error, strerror_from_system(error));
+				__func__, (long int)rc, error, strerror_from_system(error));
 #ifdef _WINDOWS
 		if (WSAEWOULDBLOCK == error)
 #else
@@ -92,24 +90,23 @@ static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
 	if (0 == rc)
 		rc = ZBX_PROTO_ERROR;
 ret:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%ld", __function_name, (long int)rc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%ld", __func__, (long int)rc);
 
 	return rc;
 }
 
 static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t count)
 {
-	const char	*__function_name = "telnet_socket_write";
-	ssize_t		rc;
-	int		error;
+	ssize_t	rc;
+	int	error;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (ZBX_PROTO_ERROR == (rc = ZBX_TCP_WRITE(socket_fd, buf, count)))
 	{
 		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%ld errno:%d error:[%s]",
-				__function_name, (long int)rc, error, strerror_from_system(error));
+				__func__, (long int)rc, error, strerror_from_system(error));
 #ifdef _WINDOWS
 		if (WSAEWOULDBLOCK == error)
 #else
@@ -123,25 +120,24 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 		break;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%ld", __function_name, (long int)rc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%ld", __func__, (long int)rc);
 
 	return rc;
 }
 
 static ssize_t	telnet_read(ZBX_SOCKET socket_fd, char *buf, size_t *buf_left, size_t *buf_offset)
 {
-	const char	*__function_name = "telnet_read";
 	unsigned char	c, c1, c2, c3;
 	ssize_t		rc = ZBX_PROTO_ERROR;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (;;)
 	{
 		if (1 > (rc = telnet_socket_read(socket_fd, &c1, 1)))
 			break;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() c1:[%x=%c]", __function_name, c1, isprint(c1) ? c1 : ' ');
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() c1:[%x=%c]", __func__, c1, isprint(c1) ? c1 : ' ');
 
 		switch (c1)
 		{
@@ -152,7 +148,7 @@ static ssize_t	telnet_read(ZBX_SOCKET socket_fd, char *buf, size_t *buf_left, si
 				if (ZBX_PROTO_ERROR == rc)
 					goto end;
 
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() c2:%x", __function_name, c2);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() c2:%x", __func__, c2);
 
 				switch (c2)
 				{
@@ -173,7 +169,7 @@ static ssize_t	telnet_read(ZBX_SOCKET socket_fd, char *buf, size_t *buf_left, si
 						if (ZBX_PROTO_ERROR == rc)
 							goto end;
 
-						zabbix_log(LOG_LEVEL_DEBUG, "%s() c3:%x", __function_name, c3);
+						zabbix_log(LOG_LEVEL_DEBUG, "%s() c3:%x", __func__, c3);
 
 						/* reply to all options with "WONT" or "DONT", */
 						/* unless it is Suppress Go Ahead (SGA)        */
@@ -207,7 +203,7 @@ static ssize_t	telnet_read(ZBX_SOCKET socket_fd, char *buf, size_t *buf_left, si
 		}
 	}
 end:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, (int)rc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, (int)rc);
 
 	return rc;
 }
@@ -311,12 +307,11 @@ static void	telnet_rm_prompt(const char *buf, size_t *offset)
 
 int	telnet_test_login(ZBX_SOCKET socket_fd)
 {
-	const char	*__function_name = "telnet_test_login";
-	char		buf[MAX_BUFFER_LEN];
-	size_t		sz, offset;
-	int		rc, ret = FAIL;
+	char	buf[MAX_BUFFER_LEN];
+	size_t	sz, offset;
+	int	rc, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	sz = sizeof(buf);
 	offset = 0;
@@ -327,24 +322,23 @@ int	telnet_test_login(ZBX_SOCKET socket_fd)
 	}
 
 	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'", __function_name, (int)offset, buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'", __func__, (int)offset, buf);
 
 	if (ZBX_PROTO_ERROR != rc)
 		ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result)
 {
-	const char	*__function_name = "telnet_login";
-	char		buf[MAX_BUFFER_LEN], c;
-	size_t		sz, offset;
-	int		rc, ret = FAIL;
+	char	buf[MAX_BUFFER_LEN], c;
+	size_t	sz, offset;
+	int	rc, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	sz = sizeof(buf);
 	offset = 0;
@@ -355,7 +349,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 	}
 
 	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'", __function_name, (int)offset, buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'", __func__, (int)offset, buf);
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
@@ -375,7 +369,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 	}
 
 	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() password prompt:'%.*s'", __function_name, (int)offset, buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() password prompt:'%.*s'", __func__, (int)offset, buf);
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
@@ -398,7 +392,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 	}
 
 	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() prompt:'%.*s'", __function_name, (int)offset, buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() prompt:'%.*s'", __func__, (int)offset, buf);
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
@@ -408,21 +402,20 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 
 	ret = SUCCEED;
 fail:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding)
 {
-	const char	*__function_name = "telnet_execute";
-	char		buf[MAX_BUFFER_LEN];
-	size_t		sz, offset;
-	int		rc, ret = FAIL;
-	char		*command_lf = NULL, *command_crlf = NULL;
-	size_t		i, offset_lf, offset_crlf;
+	char	buf[MAX_BUFFER_LEN];
+	size_t	sz, offset;
+	int	rc, ret = FAIL;
+	char	*command_lf = NULL, *command_crlf = NULL;
+	size_t	i, offset_lf, offset_crlf;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* `command' with multiple lines may contain CR+LF from the browser;	*/
 	/* it should be converted to plain LF to remove echo later on properly	*/
@@ -447,7 +440,7 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 	}
 
 	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() command output:'%.*s'", __function_name, (int)offset, buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() command output:'%.*s'", __func__, (int)offset, buf);
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
@@ -480,7 +473,7 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 	telnet_rm_echo(buf, &offset, "\n", 1);
 	telnet_rm_prompt(buf, &offset);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() stripped command output:'%.*s'", __function_name, (int)offset, buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() stripped command output:'%.*s'", __func__, (int)offset, buf);
 
 	if (MAX_BUFFER_LEN == offset)
 		offset--;
@@ -492,7 +485,7 @@ fail:
 	zbx_free(command_lf);
 	zbx_free(command_crlf);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

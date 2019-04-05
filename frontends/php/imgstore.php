@@ -82,6 +82,14 @@ elseif (isset($_REQUEST['iconid'])) {
 		$image = get_image_by_imageid($iconid);
 
 		$source = $image['image'] ? imageFromString($image['image']) : get_default_image();
+
+		list(,, $img_type) = getimagesizefromstring($image['image']);
+
+		$img_types = [
+			IMAGETYPE_GIF => IMAGE_FORMAT_GIF,
+			IMAGETYPE_JPEG => IMAGE_FORMAT_JPEG,
+			IMAGETYPE_PNG => IMAGE_FORMAT_PNG
+		];
 	}
 	else {
 		$source = get_default_image();
@@ -96,14 +104,7 @@ elseif (isset($_REQUEST['iconid'])) {
 		imagefilter($source, IMG_FILTER_BRIGHTNESS, 75);
 	}
 
-	list(,, $img_type) = getimagesizefromstring($image['image']);
-	$img_types = [
-		IMAGETYPE_GIF => IMAGE_FORMAT_GIF,
-		IMAGETYPE_JPEG => IMAGE_FORMAT_JPEG,
-		IMAGETYPE_PNG => IMAGE_FORMAT_PNG
-	];
-
-	if (!$resize && $unavailable != 1 && array_key_exists($img_type, $img_types)) {
+	if ($iconid > 0 && !$resize && $unavailable != 1 && array_key_exists($img_type, $img_types)) {
 		set_image_header($img_types[$img_type]);
 
 		echo $image['image'];

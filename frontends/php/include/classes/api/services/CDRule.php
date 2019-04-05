@@ -457,6 +457,10 @@ class CDRule extends CApiService {
 	protected function validateDChecks(array $dchecks) {
 		$uniq = 0;
 		$item_key_parser = new CItemKey();
+		$source_values = [
+			'name_source' => [ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE],
+			'host_source' => [ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE]
+		];
 
 		if (!is_array($dchecks)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -483,6 +487,30 @@ class CDRule extends CApiService {
 
 			if (array_key_exists('ports', $dcheck) && !validate_port_list($dcheck['ports'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect port range.'));
+			}
+
+			foreach ($source_values as $field => $values) {
+				if (!array_key_exists($field, $dcheck)) {
+					continue;
+				}
+
+				if (!in_array($dcheck['type'], [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3])
+						&& $dcheck[$field] == ZBX_DISCOVERY_VALUE) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', $field, $dcheck[$field])
+					);
+				}
+
+				if (!in_array($dcheck[$field], $values)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', $field, $dcheck[$field])
+					);
+				}
+
+				// Only one check can be equal ZBX_DISCOVERY_VALUE for 'host_source' and 'name_source' fields.
+				if ($dcheck[$field] == ZBX_DISCOVERY_VALUE) {
+					array_pop($source_values[$field]);
+				}
 			}
 
 			$dcheck_types = [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
@@ -710,7 +738,7 @@ class CDRule extends CApiService {
 			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'status'],
 			'selectDChecks' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
-				'snmpv3_privprotocol', 'snmpv3_contextname'
+				'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source'
 			],
 			'druleids' => $druleids,
 			'editable' => true,

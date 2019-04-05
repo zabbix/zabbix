@@ -83,13 +83,11 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
  ******************************************************************************/
 void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
-	const char	*__function_name = "zbx_recv_proxy_data";
-
 	int		ret = FAIL, status;
 	char		*error = NULL;
 	DC_PROXY	proxy;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != (status = get_active_proxy_from_request(jp, &proxy, &error)))
 	{
@@ -107,6 +105,16 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
 			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
+
+	/* don't accept pre 4.2 data */
+	if (ZBX_COMPONENT_VERSION(4, 2) > proxy.version)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy \"%s\":"
+				" protocol version %d.%d is not supported anymore",
+				proxy.host, ZBX_COMPONENT_VERSION_MAJOR(proxy.version),
+				ZBX_COMPONENT_VERSION_MINOR(proxy.version));
+		goto out;
+	}
 
 	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, &error)))
 	{
@@ -130,7 +138,7 @@ out:
 
 	zbx_free(error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
 /******************************************************************************
@@ -170,8 +178,6 @@ static int	send_data_to_server(zbx_socket_t *sock, const char *data, char **erro
  ******************************************************************************/
 void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 {
-	const char		*__function_name = "zbx_send_proxy_data";
-
 	struct zbx_json		j;
 	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
 	char			*error = NULL;
@@ -179,7 +185,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	zbx_vector_ptr_t	tasks;
 	struct zbx_json_parse	jp, jp_tasks;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request"))
 	{
@@ -256,7 +262,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	zbx_json_free(&j);
 	UNLOCK_PROXY_HISTORY;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 
@@ -272,14 +278,12 @@ out:
  ******************************************************************************/
 void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 {
-	const char		*__function_name = "zbx_send_task_data";
-
 	struct zbx_json		j;
 	char			*error = NULL;
 	zbx_vector_ptr_t	tasks;
 	struct zbx_json_parse	jp, jp_tasks;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request"))
 	{
@@ -331,7 +335,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 
 	zbx_json_free(&j);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 int	init_proxy_history_lock(char **error)

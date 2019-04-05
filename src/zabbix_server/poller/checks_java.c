@@ -126,14 +126,12 @@ int	get_value_java(unsigned char request, const DC_ITEM *item, AGENT_RESULT *res
 
 void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num)
 {
-	const char	*__function_name = "get_values_java";
-
 	zbx_socket_t	s;
 	struct zbx_json	json;
 	char		error[MAX_STRING_LEN];
 	int		i, j, err = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jmx_endpoint:'%s' num:%d", __function_name, items[0].jmx_endpoint, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jmx_endpoint:'%s' num:%d", __func__, items[0].jmx_endpoint, num);
 
 	for (j = 0; j < num; j++)	/* locate first supported item to use as a reference */
 	{
@@ -244,5 +242,5 @@ exit:
 		}
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
