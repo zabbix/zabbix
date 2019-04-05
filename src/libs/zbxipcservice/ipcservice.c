@@ -1772,8 +1772,6 @@ out:
  ******************************************************************************/
 void	zbx_ipc_client_close(zbx_ipc_client_t *client)
 {
-	const char	*__func__ = "zbx_ipc_client_close";
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ipc_client_free_events(client);
