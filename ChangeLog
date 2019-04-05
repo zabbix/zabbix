@@ -3,6 +3,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13014] fixed map on screen is not centered (agriscenko)
 ...G...... [ZBX-9229] fixed sending first value of the log as separate message (asestakovs)
 ........S. [ZBX-15479] fixed cookie presentation in HTTP header (asestakovs)
 ........S. [ZBX-15516] fixed trapper process title to not update time in case of interruption (asestakovs)
