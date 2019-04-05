@@ -506,7 +506,7 @@ var hintBox = {
 		}
 
 		if (!empty(className)) {
-			box.append(jQuery('<span></span>').addClass(className).html(hintText));
+			box.append(jQuery('<div></div>').addClass(className).html(hintText));
 		}
 		else {
 			box.html(hintText);

@@ -134,7 +134,7 @@ $templates = [
 			(new CDiv(
 				(new CSpan('#{result}'))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setHint('#{result}', '', true, 'max-width:'.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;')
+					->setHint('#{result}', 'hintbox-scrollable', true, 'max-width:'.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;')
 			))
 				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
@@ -163,6 +163,7 @@ $output = [
 	'header' => $data['title'],
 	'script_inline' => require 'app/views/popup.preproctestedit.view.js.php',
 	'body' => (new CDiv([$form, $templates]))->toString(),
+	'cancel_action' => 'return savePreprocessingTestInputs();',
 	'buttons' => [
 		[
 			'title' => _('Test'),

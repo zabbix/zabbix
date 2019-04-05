@@ -27,7 +27,7 @@
 /* alerter -> manager */
 #define ZBX_IPC_ALERTER_REGISTER	1000
 #define ZBX_IPC_ALERTER_RESULT		1001
-
+#define ZBX_IPC_ALERTER_ALERT		1002
 
 /* manager -> alerter */
 #define ZBX_IPC_ALERTER_EMAIL		1100
@@ -72,5 +72,11 @@ void	zbx_alerter_deserialize_eztexting(const unsigned char *data, zbx_uint64_t *
 zbx_uint32_t	zbx_alerter_serialize_exec(unsigned char **data, zbx_uint64_t alertid, const char *command);
 
 void	zbx_alerter_deserialize_exec(const unsigned char *data, zbx_uint64_t *alertid, char **command);
+
+zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t mediatypeid, const char *sendto,
+		const char *subject, const char *message);
+
+void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t *mediatypeid, char **sendto,
+		char **subject, char **message);
 
 #endif

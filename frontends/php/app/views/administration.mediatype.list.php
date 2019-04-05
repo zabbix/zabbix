@@ -65,7 +65,8 @@ $mediaTypeTable = (new CTableInfo())
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder']),
 		_('Status'),
 		_('Used in actions'),
-		_('Details')
+		_('Details'),
+		_('Action')
 	]);
 
 foreach ($data['mediatypes'] as $mediaType) {
@@ -130,6 +131,13 @@ foreach ($data['mediatypes'] as $mediaType) {
 			->addClass(ZBX_STYLE_RED)
 			->addSID();
 
+	$test_link = (new CButton('mediatypetest_edit', _('Test')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->setEnabled(MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
+		->onClick('return PopUp("popup.mediatypetest.edit",'.CJs::encodeJson([
+			'mediatypeid' => $mediaType['mediatypeid']
+		]).', "mediatypetest_edit", this);');
+
 	$name = new CLink($mediaType['description'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']);
 
 	// append row
@@ -139,7 +147,8 @@ foreach ($data['mediatypes'] as $mediaType) {
 		media_type2str($mediaType['typeid']),
 		$status,
 		$actionColumn,
-		$details
+		$details,
+		$test_link
 	]);
 }
 

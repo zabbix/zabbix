@@ -66,13 +66,12 @@ zbx_sysinfo_proc_t;
  ******************************************************************************/
 static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *minor_version)
 {
-	const char	*__function_name = "zbx_solaris_version_get";
 	int		res;
 	struct utsname	name;
 
 	if (-1 == (res = uname(&name)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): uname() failed: %s", __function_name, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): uname() failed: %s", __func__, zbx_strerror(errno));
 
 		return FAIL;
 	}
@@ -81,7 +80,7 @@ static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *mi
 
 	if (2 != sscanf(name.release, "%u.%u", major_version, minor_version))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): sscanf() failed on: \"%s\"", __function_name, name.release);
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): sscanf() failed on: \"%s\"", __func__, name.release);
 		THIS_SHOULD_NEVER_HAPPEN;
 
 		return FAIL;
@@ -640,15 +639,14 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
  ******************************************************************************/
 void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 {
-	const char	*__function_name = "zbx_proc_get_process_stats";
-	int		i;
+	int	i;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() procs_num:%d", __function_name, procs_num);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() procs_num:%d", __func__, procs_num);
 
 	for (i = 0; i < procs_num; i++)
 		procs[i].error = proc_read_cpu_util(&procs[i]);
 
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -667,8 +665,6 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
  ******************************************************************************/
 int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 {
-	const char		*__function_name = "zbx_proc_get_processes";
-
 	DIR			*dir;
 	struct dirent		*entries;
 	char			tmp[MAX_STRING_LEN];
@@ -676,7 +672,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 	zbx_sysinfo_proc_t	*proc;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
 	if (NULL == (dir = opendir("/proc")))
 		goto out;
@@ -723,7 +719,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s(): %s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s(): %s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -761,7 +757,6 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
 void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *procname, const char *username,
 		const char *cmdline, zbx_uint64_t flags, zbx_vector_uint64_t *pids)
 {
-	const char		*__function_name = "zbx_proc_get_matching_pids";
 	struct passwd		*usrinfo;
 	int			i;
 	zbx_sysinfo_proc_t	*proc;
@@ -769,7 +764,7 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	zoneid_t		zoneid;
 #endif
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%d", __function_name,
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%d", __func__,
 			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline), flags);
 
 	if (NULL != username)
@@ -806,7 +801,7 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 		zbx_vector_uint64_append(pids, (zbx_uint64_t)proc->pid);
 	}
 out:
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
 int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)

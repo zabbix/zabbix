@@ -277,6 +277,7 @@ static int	DBpatch_4010027(void)
 
 	return DBadd_field("triggers", &field);
 }
+
 #endif
 
 DBPATCH_START(4010)

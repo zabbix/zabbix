@@ -209,12 +209,11 @@ close_query:
 
 wchar_t	*get_counter_name(DWORD pdhIndex)
 {
-	const char		*__function_name = "get_counter_name";
 	zbx_perf_counter_id_t	*counterName;
 	DWORD			dwSize;
 	PDH_STATUS		pdh_status;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pdhIndex:%u", __function_name, pdhIndex);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pdhIndex:%u", __func__, pdhIndex);
 
 	counterName = PerfCounterList;
 	while (NULL != counterName)
@@ -240,19 +239,18 @@ wchar_t	*get_counter_name(DWORD pdhIndex)
 			zabbix_log(LOG_LEVEL_ERR, "PdhLookupPerfNameByIndex() failed: %s",
 					strerror_from_module(pdh_status, L"PDH.DLL"));
 			zbx_free(counterName);
-			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():FAIL", __function_name);
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():FAIL", __func__);
 			return L"UnknownPerformanceCounter";
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED", __func__);
 
 	return counterName->name;
 }
 
 int	check_counter_path(char *counterPath)
 {
-	const char			*__function_name = "check_counter_path";
 	PDH_COUNTER_PATH_ELEMENTS	*cpe = NULL;
 	PDH_STATUS			status;
 	int				is_numeric, ret = FAIL;
@@ -290,7 +288,7 @@ int	check_counter_path(char *counterPath)
 		if (0x02 & is_numeric)
 			cpe->szCounterName = get_counter_name(_wtoi(cpe->szCounterName));
 
-		if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, cpe, counterPath))
+		if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, cpe, counterPath))
 			goto clean;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "counter path converted to '%s'", counterPath);

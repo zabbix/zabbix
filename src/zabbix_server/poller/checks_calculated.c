@@ -86,13 +86,11 @@ static int	calcitem_add_function(expression_t *exp, char *host, char *key, char 
 
 static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *error, int max_error_len)
 {
-	const char	*__function_name = "calcitem_parse_expression";
+	char	*e, *buf = NULL;
+	size_t	exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
+	int	ret = NOTSUPPORTED;
 
-	char		*e, *buf = NULL;
-	size_t		exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
-	int		ret = NOTSUPPORTED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, dc_item->params);
 
 	exp->exp = (char *)zbx_malloc(exp->exp, exp_alloc);
 
@@ -140,7 +138,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 		functionid = calcitem_add_function(exp, host, key, func, params);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:%d function:'%s:%s.%s(%s)'",
-				__function_name, functionid, host, key, func, params);
+				__func__, functionid, host, key, func, params);
 
 		/* substitute function with id in curly brackets */
 		zbx_snprintf_alloc(&exp->exp, &exp_alloc, &exp_offset, "{%d}", functionid);
@@ -152,7 +150,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 	/* copy the remaining part */
 	zbx_strcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __function_name, exp->exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __func__, exp->exp);
 
 	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL, NULL, NULL,
 			&exp->exp, MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len))
@@ -162,7 +160,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 out:
 	zbx_free(buf);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -170,7 +168,6 @@ out:
 static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t max_error_len,
 		zbx_vector_ptr_t *unknown_msgs)
 {
-	const char	*__function_name = "calcitem_evaluate_expression";
 	function_t	*f = NULL;
 	char		*buf, replace[16], *errstr = NULL;
 	int		i, ret = SUCCEED;
@@ -179,7 +176,7 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 	int		*errcodes = NULL;
 	zbx_timespec_t	ts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == exp->functions_num)
 		return ret;
@@ -309,22 +306,20 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 	zbx_free(items);
 	zbx_free(keys);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 {
-	const char		*__function_name = "get_value_calculated";
 	expression_t		exp;
 	int			ret;
 	char			error[MAX_STRING_LEN];
 	double			value;
 	zbx_vector_ptr_t	unknown_msgs;		/* pointers to messages about origins of 'unknown' values */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' expression:'%s'", __function_name,
-			dc_item->key_orig, dc_item->params);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' expression:'%s'", __func__, dc_item->key_orig, dc_item->params);
 
 	memset(&exp, 0, sizeof(exp));
 
@@ -351,7 +346,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() value:" ZBX_FS_DBL, __function_name, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() value:" ZBX_FS_DBL, __func__, value);
 
 	if (ITEM_VALUE_TYPE_UINT64 == dc_item->value_type && 0 > value)
 	{
@@ -369,7 +364,7 @@ clean:
 clean1:
 	free_expression(&exp);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

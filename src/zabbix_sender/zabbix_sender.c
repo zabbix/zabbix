@@ -463,7 +463,7 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
  * Comments: active agent has almost the same function!                       *
  *                                                                            *
  ******************************************************************************/
-static int	check_response(char *response)
+static int	check_response(char *response, const char *server, unsigned short port)
 {
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN];
@@ -482,7 +482,7 @@ static int	check_response(char *response)
 	{
 		int	failed;
 
-		printf("info from server: \"%s\"\n", info);
+		printf("Response from \"%s:%hu\": \"%s\"\n", server, port, info);
 		fflush(stdout);
 
 		if (1 == sscanf(info, "processed: %*d; failed: %d", &failed) && 0 < failed)
@@ -552,8 +552,13 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "answer [%s]", sock.buffer);
-				if (NULL == sock.buffer || FAIL == (ret = check_response(sock.buffer)))
-					zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from server [%s]", sock.buffer);
+
+				if (FAIL == (ret = check_response(sock.buffer, sendval_args->server,
+						sendval_args->port)))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from \"%s:%hu\": [%s]",
+							sendval_args->server, sendval_args->port, sock.buffer);
+				}
 			}
 		}
 

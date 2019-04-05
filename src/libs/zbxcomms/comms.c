@@ -71,14 +71,8 @@ const char	*zbx_socket_strerror(void)
 	return zbx_socket_strerror_message;
 }
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_set_socket_strerror(fmt, ...) __zbx_zbx_set_socket_strerror(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_set_socket_strerror __zbx_zbx_set_socket_strerror
-#endif
-
 __zbx_attr_format_printf(1, 2)
-static void	__zbx_zbx_set_socket_strerror(const char *fmt, ...)
+static void	zbx_set_socket_strerror(const char *fmt, ...)
 {
 	va_list args;
 
@@ -1665,8 +1659,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 #define ZBX_TCP_EXPECT_LENGTH		4
 #define ZBX_TCP_EXPECT_SIZE		5
 
-	const char	*__function_name = "zbx_tcp_recv_ext";
-
 	ssize_t		nbytes;
 	size_t		buf_dyn_bytes = 0, buf_stat_bytes = 0, offset = 0;
 	zbx_uint32_t	expected_len = 16 * ZBX_MEBIBYTE, reserved = 0;
@@ -1828,7 +1820,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 				s->read_bytes = reserved;
 
 				zabbix_log(LOG_LEVEL_TRACE, "%s(): received " ZBX_FS_SIZE_T " bytes with"
-						" compression ratio %.1f", __function_name,
+						" compression ratio %.1f", __func__,
 						(zbx_fs_size_t)(buf_stat_bytes + buf_dyn_bytes),
 						(double)reserved / (buf_stat_bytes + buf_dyn_bytes));
 			}

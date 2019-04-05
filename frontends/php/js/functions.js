@@ -530,8 +530,8 @@ function getOverlayDialogueId() {
  * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
  *                                                          or create a new one if value is not set.
  * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
- * @param {object} trigger_elmnt				(optional) UI element which triggered opening of overlay dialogue.
- * @param {object} xhr							(optional) XHR request used to load content. Used to abort loading.
+ * @param {object} trigger_elmnt				(optional)  UI element which triggered opening of overlay dialogue.
+ * @param {object} xhr							(optional)  XHR request used to load content. Used to abort loading.
  *
  * @return {bool}
  */
@@ -558,6 +558,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 
 	if (jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]').length) {
 		overlay_dialogue = jQuery('.overlay-dialogue[data-dialogueid="' + params.dialogueid + '"]');
+		overlay_bg = jQuery('.overlay-bg[data-dialogueid="' + params.dialogueid + '"]') || null;
 
 		jQuery(overlay_dialogue)
 			.attr('class', 'overlay-dialogue modal')
@@ -602,16 +603,15 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	}
 
 	jQuery.each(params.buttons, function(index, obj) {
+		if (typeof obj.action === 'string') {
+			obj.action = new Function(obj.action);
+		}
+
 		var button = jQuery('<button>', {
 			type: 'button',
 			text: obj.title
 		}).click(function(e) {
-			if (typeof obj.action === 'string') {
-				obj.action = new Function(obj.action);
-			}
-			var res = obj.action();
-
-			if (res !== false) {
+			if (obj.action() !== false) {
 				cancel_action = null;
 
 				if (!('keepOpen' in obj) || obj.keepOpen === false) {
@@ -677,20 +677,19 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		.append(overlay_dialogue_footer)
 		.append(typeof params.debug !== 'undefined' ? params.debug : null);
 
-	if (overlay_bg !== null) {
-		jQuery(overlay_bg).on('remove', function(event) {
-			body_mutation_observer.disconnect();
-			if (cancel_action !== null) {
-				cancel_action();
-			}
+	jQuery(overlay_bg).on('remove', function(event) {
+		body_mutation_observer.disconnect();
+		if (cancel_action !== null) {
+			cancel_action();
+		}
 
-			setTimeout(function() {
-				overlayDialogueDestroy(params.dialogueid, xhr);
-			});
-
-			return false;
+		setTimeout(function() {
+			jQuery(overlay_bg).off('remove'); // Remove to avoid repeated execution.
+			overlayDialogueDestroy(params.dialogueid, xhr);
 		});
-	}
+
+		return false;
+	});
 
 	if (submit_btn) {
 		jQuery('.overlay-dialogue-body form', overlay_dialogue).on('submit', function(event) {

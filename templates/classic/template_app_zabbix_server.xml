@@ -2998,7 +2998,7 @@
             <url/>
             <status>0</status>
             <priority>2</priority>
-            <description>zabbix[queue,10m] item is collecting data about how many items are missing data for more than 10 minutes (next parameter)</description>
+            <description>zabbix[queue,10m] item is collecting data about how many items are missing data for more than 10 minutes</description>
             <type>0</type>
             <manual_close>0</manual_close>
             <dependencies/>

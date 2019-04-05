@@ -192,15 +192,13 @@ static int		jabber_error_len = 0;
 
 static int	on_result(jabber_session_p sess, ikspak *pak)
 {
-	const char	*__function_name = "on_result";
-
 	ZBX_UNUSED(pak);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __func__);
 
 	sess->status = JABBER_READY;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s()", __module_name, __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s()", __module_name, __func__);
 
 	return IKS_FILTER_EAT;
 }
@@ -216,12 +214,11 @@ static int	on_result(jabber_session_p sess, ikspak *pak)
  ******************************************************************************/
 static void	lookup_jabber(const char *server, int port, char *real_server, size_t real_server_len, int *real_port)
 {
-	const char	*__function_name = "lookup_jabber";
 	char		buffer[MAX_STRING_LEN], command[MAX_STRING_LEN];
 	AGENT_RESULT	result;
 	int		ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s() server:'%s' port:%d", __module_name, __function_name, server, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s() server:'%s' port:%d", __module_name, __func__, server, port);
 
 	init_result(&result);
 
@@ -270,7 +267,7 @@ static void	lookup_jabber(const char *server, int port, char *real_server, size_
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s() real_server:'%s' real_port:%d",
-			__module_name, __function_name, real_server, *real_port);
+			__module_name, __func__, real_server, *real_port);
 }
 
 /******************************************************************************
@@ -286,9 +283,7 @@ static void	lookup_jabber(const char *server, int port, char *real_server, size_
  ******************************************************************************/
 static int	disconnect_jabber()
 {
-	const char	*__function_name = "disconnect_jabber";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __func__);
 
 	if (JABBER_DISCONNECTED != jsess->status)
 		iks_disconnect(jsess->prs);
@@ -311,19 +306,18 @@ static int	disconnect_jabber()
 
 	jsess->status = JABBER_DISCONNECTED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s()", __module_name, __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s()", __module_name, __func__);
 
 	return SUCCEED;
 }
 
 static int	on_stream(jabber_session_p sess, int type, iks *node)
 {
-	const char	*__function_name = "on_stream";
-	iks		*x = NULL;
-	ikspak		*pak = NULL;
-	int		ret = IKS_OK;
+	iks	*x = NULL;
+	ikspak	*pak = NULL;
+	int	ret = IKS_OK;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __func__);
 
 	switch (type)
 	{
@@ -399,7 +393,7 @@ static int	on_stream(jabber_session_p sess, int type, iks *node)
 	if (NULL != node)
 		iks_delete(node);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s()", __module_name, __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s()", __module_name, __func__);
 
 	return ret;
 }
@@ -438,12 +432,11 @@ static void	on_log(jabber_session_p sess, const char *data, size_t size, int is_
  ******************************************************************************/
 static int	connect_jabber(const char *jabber_id, const char *password, int use_sasl, int port)
 {
-	const char	*__function_name = "connect_jabber";
-	char		*buf = NULL;
-	char		real_server[MAX_STRING_LEN];
-	int		real_port = 0, iks_error, timeout, ret = FAIL;
+	char	*buf = NULL;
+	char	real_server[MAX_STRING_LEN];
+	int	real_port = 0, iks_error, timeout, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s() jabber_id:'%s'", __module_name, __function_name, jabber_id);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s() jabber_id:'%s'", __module_name, __func__, jabber_id);
 
 	if (NULL == jsess)
 	{
@@ -544,7 +537,7 @@ static int	connect_jabber(const char *jabber_id, const char *password, int use_s
 	if (JABBER_READY == jsess->status)
 		ret = SUCCEED;
 lbl_fail:
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s():%s", __module_name, __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s():%s", __module_name, __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -564,13 +557,12 @@ lbl_fail:
 int	send_jabber(const char *username, const char *password, const char *sendto,
 		const char *subject, const char *message, char *error, int max_error_len)
 {
-	const char	*__function_name = "send_jabber";
-	iks		*x;
-	int		ret = FAIL, iks_error = IKS_OK;
+	iks	*x;
+	int	ret = FAIL, iks_error = IKS_OK;
 
 	assert(error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __func__);
 
 	*error = '\0';
 
@@ -612,7 +604,7 @@ lbl_fail:
 	if ('\0' != *error)
 		zabbix_log(LOG_LEVEL_WARNING, "%s: [%s] %s", __module_name, username, error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s():%s", __module_name, __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s():%s", __module_name, __func__, zbx_result_string(ret));
 
 	return ret;
 }

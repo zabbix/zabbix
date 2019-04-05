@@ -31,7 +31,7 @@ $form = (new CForm())
 	->addVar('parent_discoveryid', $data['parent_discoveryid'])
 	->addVar('action', $data['action']);
 
-$form_list = (new CFormList('item_form_list'))
+$item_form_list = (new CFormList('item-form-list'))
 	->addRow(
 		(new CVisibilityBox('visible[type]', 'type', _('Original')))
 			->setLabel(_('Type'))
@@ -75,7 +75,7 @@ if ($data['display_interfaces']) {
 		->addClass(ZBX_STYLE_RED)
 		->setId('interface_not_defined')
 		->addStyle('display: none;');
-	$form_list->addRow(
+	$item_form_list->addRow(
 		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
 			->setLabel(_('Host interface'))
 			->setChecked(array_key_exists('interfaceid', $data['visible']))
@@ -86,7 +86,7 @@ if ($data['display_interfaces']) {
 	$form->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 
-$form_list
+$item_form_list
 	// Append JMX endpoint to form list.
 	->addRow(
 		(new CVisibilityBox('visible[jmx_endpoint]', 'jmx_endpoint', _('Original')))
@@ -137,7 +137,7 @@ else {
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
 $headers->items = [CJs::encodeJson($headers_data)];
 
-$form_list
+$item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[headers]', 'headers_pairs', _('Original')))
 			->setLabel(_('Headers'))
@@ -308,7 +308,10 @@ $form_list
 			->setLabel(_('Password'))
 			->setChecked(array_key_exists('password', $data['visible'])),
 		(new CTextBox('password', $data['password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	)
+	);
+
+// Create preprocessing form list.
+$preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	// Append item pre-processing to form list.
 	->addRow(
 		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
@@ -383,7 +386,7 @@ $update_interval->addRow(
 );
 
 // Append update interval to form list.
-$form_list
+$item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[delay]', 'update_interval_div', _('Original')))
 			->setLabel(_('Update interval'))
@@ -412,7 +415,7 @@ foreach ([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED] as $status) {
 	$status_combo_box->addItem($status, item_status2str($status));
 }
 
-$form_list
+$item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[status]', 'status', _('Original')))
 			->setLabel(_('Create enabled'))
@@ -435,7 +438,7 @@ foreach ($data['valuemaps'] as $valuemap) {
 	$valuemaps_combo_box->addItem($valuemap['valuemapid'], $valuemap['name']);
 }
 
-$form_list
+$item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))
 			->setLabel(_('Show value'))
@@ -531,7 +534,7 @@ $master_item[] = (new CButton('button', _('Select prototype')))
 		]).', null, this);'
 	);
 
-$form_list
+$item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[applicationPrototypes]', 'application_prototypes_div', _('Original')))
 			->setLabel(_('Application prototypes'))
@@ -581,15 +584,21 @@ $form_list
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-$form->addItem(
-	(new CTabView())
-		->addTab('item_tab', _('Mass update'), $form_list)
-		// Append buttons to form.
-		->setFooter(makeFormFooter(
-			new CSubmit('massupdate', _('Update')),
-			[new CButtonCancel(url_params(['hostid', 'parent_discoveryid']))]
-		))
-);
+$tabs = (new CTabView())
+	->addTab('item_tab', _('Item prototype'), $item_form_list)
+	->addTab('preprocessing_tab', _('Preprocessing'), $preprocessing_form_list)
+	// Append buttons to form.
+	->setFooter(makeFormFooter(
+		new CSubmit('massupdate', _('Update')),
+		[new CButtonCancel(url_params(['hostid', 'parent_discoveryid']))]
+	));
+
+if (!hasRequest('massupdate')) {
+	$tabs->setSelected(0);
+}
+
+$form->addItem($tabs);
+
 $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';

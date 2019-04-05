@@ -563,7 +563,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($type == 'Database monitor' && !isset($itemid)) {
-			$this->zbxTestAssertElementValue('key', 'db.odbc.select[<unique short description>,<dsn>]');
+			$this->zbxTestAssertElementValue('key', 'db.odbc.select[<unique short description>,dsn]');
 		}
 
 		if ($type == 'SSH agent' && !isset($itemid)) {

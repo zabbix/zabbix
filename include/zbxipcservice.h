@@ -102,9 +102,11 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service);
 int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsigned char *data, zbx_uint32_t size);
 void	zbx_ipc_client_close(zbx_ipc_client_t *client);
 
-void	zbx_ipc_client_addref(zbx_ipc_client_t *client);
-void	zbx_ipc_client_release(zbx_ipc_client_t *client);
-int	zbx_ipc_client_connected(zbx_ipc_client_t *client);
+void			zbx_ipc_client_addref(zbx_ipc_client_t *client);
+void			zbx_ipc_client_release(zbx_ipc_client_t *client);
+int			zbx_ipc_client_connected(zbx_ipc_client_t *client);
+zbx_uint64_t		zbx_ipc_client_id(const zbx_ipc_client_t *client);
+zbx_ipc_client_t	*zbx_ipc_client_by_id(const zbx_ipc_service_t *service, zbx_uint64_t id);
 
 int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int timeout, char **error);
 void	zbx_ipc_socket_close(zbx_ipc_socket_t *csocket);
@@ -119,6 +121,8 @@ int	zbx_ipc_async_socket_send(zbx_ipc_async_socket_t *asocket, zbx_uint32_t code
 int	zbx_ipc_async_socket_recv(zbx_ipc_async_socket_t *asocket, int timeout, zbx_ipc_message_t **message);
 int	zbx_ipc_async_socket_flush(zbx_ipc_async_socket_t *asocket, int timeout);
 int	zbx_ipc_async_socket_check_unsent(zbx_ipc_async_socket_t *asocket);
+int	zbx_ipc_async_exchange(const char *service_name, zbx_uint32_t code, int timeout, const unsigned char *data,
+		zbx_uint32_t size, unsigned char **out, char **error);
 
 
 void	zbx_ipc_message_free(zbx_ipc_message_t *message);

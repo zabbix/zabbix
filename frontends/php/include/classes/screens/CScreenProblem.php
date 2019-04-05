@@ -235,7 +235,7 @@ class CScreenProblem extends CScreenBase {
 				'output' => [],
 				'groupids' => $filter_groupids,
 				'hostids' => $filter_hostids,
-				'search' => ['name' => $filter['application']],
+				'filter' => ['name' => $filter['application']],
 				'preservekeys' => true
 			]));
 			$filter_groupids = null;
@@ -1248,7 +1248,7 @@ class CScreenProblem extends CScreenBase {
 		array_pop($tooltip);
 		array_unshift($tooltip, (new CDiv())
 			->addClass('main-hint')
-			->setHint($hint_table, '', true)
+			->setHint($hint_table)
 		);
 
 		return (new CCol($tooltip))->addClass('latest-value');

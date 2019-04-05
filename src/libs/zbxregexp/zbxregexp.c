@@ -202,7 +202,6 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 {
 #define MATCHES_BUFF_SIZE	(ZBX_REGEXP_GROUPS_MAX * 3)		/* see pcre_exec() in "man pcreapi" why 3 */
 
-	const char			*__function_name = "regexp_exec";
 	int				result, r;
 	ZBX_THREAD_LOCAL static int	matches_buff[MATCHES_BUFF_SIZE];
 	int				*ovector = NULL;
@@ -240,7 +239,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() failed with error %d", __function_name, r);
+		zabbix_log(LOG_LEVEL_WARNING, "%s() failed with error %d", __func__, r);
 		result = FAIL;
 	}
 
