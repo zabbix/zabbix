@@ -73,21 +73,22 @@ function getMenuPopupHistory(options) {
 /**
  * Get menu popup host section data.
  *
- * @param string options['hostid']           Host ID.
- * @param array  options['scripts']          Host scripts (optional).
- * @param string options[]['name']           Script name.
- * @param string options[]['scriptid']       Script ID.
- * @param string options[]['confirmation']   Confirmation text.
- * @param bool   options['showGraphs']       Link to host graphs page.
- * @param bool   options['showScreens']      Link to host screen page.
- * @param bool   options['showTriggers']     Link to Monitoring->Problems page.
- * @param bool   options['hasGoTo']          "Go to" block in popup.
- * @param int    options['severity_min']     (optional)
- * @param bool   options['show_suppressed']  (optional)
- * @param array  options['urls']             (optional)
- * @param string options['url'][]['label']
- * @param string options['url'][]['url']
- * @param {object} trigger_elmnt             UI element which triggered opening of overlay dialogue.
+ * @param {string} options['hostid']             Host ID.
+ * @param {array}  options['scripts']            Host scripts (optional).
+ * @param {string} options[]['name']             Script name.
+ * @param {string} options[]['scriptid']         Script ID.
+ * @param {string} options[]['confirmation']     Confirmation text.
+ * @param {bool}   options['showGraphs']         Link to host graphs page.
+ * @param {bool}   options['showScreens']        Link to host screen page.
+ * @param {bool}   options['showTriggers']       Link to Monitoring->Problems page.
+ * @param {bool}   options['hasGoTo']            "Go to" block in popup.
+ * @param {int}    options['severity_min']       (optional)
+ * @param {bool}   options['show_suppressed']    (optional)
+ * @param {array}  options['urls']               (optional)
+ * @param {string} options['url'][]['label']
+ * @param {string} options['url'][]['url']
+ * @param {string} options['filter_application'] (optional) Application name for filter by application.
+ * @param {object} trigger_elmnt                 UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
@@ -132,6 +133,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		host_inventory.url = host_inventory_url.getUrl();
 
 		// latest data link
+		if (typeof options.filter_application !== 'undefined') {
+			latest_data_url.setArgument('application', options.filter_application);
+		}
 		latest_data_url.setArgument('hostids[]', options.hostid);
 		latest_data_url.setArgument('filter_set', '1');
 		latest_data.url = latest_data_url.getUrl();
@@ -148,6 +152,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			}
 			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 				url.setArgument('filter_show_suppressed', '1');
+			}
+			if (typeof options.filter_application !== 'undefined') {
+				url.setArgument('filter_application', options.filter_application);
 			}
 			url.setArgument('filter_set', '1');
 			problems.url = url.getUrl();
@@ -240,11 +247,12 @@ function getMenuPopupMapElementSubmap(options) {
  * Get menu popup host group map element section data.
  *
  * @param {string} options['groupid']
- * @param {int}    options['severity_min']     (optional)
- * @param {bool}   options['show_suppressed']  (optional)
- * @param {array}  options['urls']             (optional)
+ * @param {int}    options['severity_min']       (optional)
+ * @param {bool}   options['show_suppressed']    (optional)
+ * @param {array}  options['urls']               (optional)
  * @param {string} options['url'][]['label']
  * @param {string} options['url'][]['url']
+ * @param {string} options['filter_application'] (optional) Application name for filter by application.
  *
  * @return array
  */
@@ -259,6 +267,9 @@ function getMenuPopupMapElementGroup(options) {
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 		problems_url.setArgument('filter_show_suppressed', '1');
+	}
+	if (typeof options.filter_application !== 'undefined') {
+		problems_url.setArgument('filter_application', options.filter_application);
 	}
 	problems_url.setArgument('filter_set', '1');
 

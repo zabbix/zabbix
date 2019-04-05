@@ -98,6 +98,7 @@ if (!$data['is_profile']) {
 
 // append password to form list
 if ($data['userid'] == 0 || $data['change_password']) {
+	$userForm->disablePasswordAutofill();
 	$password_box = new CPassBox('password1', $data['password1']);
 
 	if (!$form_autofocus) {

@@ -160,7 +160,7 @@ void	help(void)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_zbx_error(const char *fmt, ...)
+void	zbx_error(const char *fmt, ...)
 {
 	va_list	args;
 
@@ -190,7 +190,7 @@ void	__zbx_zbx_error(const char *fmt, ...)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
+size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 {
 	size_t	written_len;
 	va_list	args;
@@ -220,7 +220,7 @@ size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
+void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 {
 	va_list	args;
 	size_t	avail_len, written_len;
@@ -703,7 +703,7 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
  * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
  ******************************************************************************/
-char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
+char	*zbx_dsprintf(char *dest, const char *f, ...)
 {
 	char	*string;
 	va_list args;
@@ -764,7 +764,7 @@ char	*zbx_strdcat(char *dest, const char *src)
  * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
  ******************************************************************************/
-char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
+char	*zbx_strdcatf(char *dest, const char *f, ...)
 {
 	char	*string, *result;
 	va_list	args;
