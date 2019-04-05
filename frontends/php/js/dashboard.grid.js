@@ -1680,7 +1680,10 @@
 						return;
 					}
 
-					if (data.add_widget_dimension.y < pos.y) {
+					if ((pos.y + pos.height) > data['options']['max-rows']) {
+						pos.y = data['options']['max-rows'] - pos.height;
+					}
+					else if (data.add_widget_dimension.y < pos.y) {
 						--pos.y;
 					}
 

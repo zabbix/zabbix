@@ -3302,6 +3302,21 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 
 		function = (ZBX_DC_FUNCTION *)DCfind_id(&config->functions, functionid, sizeof(ZBX_DC_FUNCTION), &found);
 
+		if (1 == found && function->itemid != itemid)
+		{
+			ZBX_DC_ITEM	*item_last;
+
+			if (NULL != (item_last = zbx_hashset_search(&config->items, &function->itemid)))
+			{
+				item_last->update_triggers = 1;
+				if (NULL != item_last->triggers)
+				{
+					config->items.mem_free_func(item_last->triggers);
+					item_last->triggers = NULL;
+				}
+			}
+		}
+
 		function->triggerid = triggerid;
 		function->itemid = itemid;
 		DCstrpool_replace(found, &function->function, row[2]);
@@ -3543,7 +3558,7 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
  ******************************************************************************/
 static void	DCsync_action_ops(zbx_dbsync_t *sync)
 {
-	const char	*__function_name = "DCsync_action_opss";
+	const char	*__function_name = "DCsync_action_ops";
 
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -5002,7 +5017,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	update_sec = zbx_time() - sec;
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
 				action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
@@ -5265,7 +5280,7 @@ out:
 
 	zbx_dbsync_free_env();
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -5966,6 +5981,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
@@ -5975,6 +5991,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
+#endif
 	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
 	{
 		*error = zbx_strdup(*error, "internal error: invalid connection type");
@@ -6025,6 +6042,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (NULL != dc_host->tls_dc_psk)
@@ -6046,6 +6064,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			return FAIL;
 		}
 	}
+#endif
 #endif
 	*hostid = dc_host->hostid;
 
@@ -7870,7 +7889,7 @@ unlock:
  ******************************************************************************/
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
 {
-	const char			*__function_name = "DCconfig_get_snmp_items_by_interface";
+	const char			*__function_name = "DCconfig_get_snmp_items_by_interfaceid";
 
 	size_t				items_num = 0, items_alloc = 8;
 	int				i;
@@ -8775,51 +8794,6 @@ void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 
 		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR))
 			DCstrpool_replace(1, &dc_trigger->error, diff->error);
-	}
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_set_maintenance                                         *
- *                                                                            *
- * Purpose: set host maintenance status                                       *
- *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
-		int maintenance_type, int maintenance_from)
-{
-	int		i, now;
-	ZBX_DC_HOST	*dc_host;
-
-	now = time(NULL);
-
-	WRLOCK_CACHE;
-
-	for (i = 0; i < hostids_num; i++)
-	{
-		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostids[i])))
-			continue;
-
-		if (HOST_STATUS_MONITORED != dc_host->status && HOST_STATUS_NOT_MONITORED != dc_host->status)
-			continue;
-
-		if (dc_host->maintenance_status != maintenance_status)
-			dc_host->maintenance_from = maintenance_from;
-
-		if (MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type && MAINTENANCE_TYPE_NODATA != maintenance_type)
-		{
-			/* Store time at which no-data maintenance ended for the host (either */
-			/* because no-data maintenance ended or because maintenance type was */
-			/* changed to normal), this is needed for nodata() trigger function. */
-			dc_host->data_expected_from = now;
-		}
-
-		dc_host->maintenance_status = maintenance_status;
-		dc_host->maintenance_type = maintenance_type;
 	}
 
 	UNLOCK_CACHE;
