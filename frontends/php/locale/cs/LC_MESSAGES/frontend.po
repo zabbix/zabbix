@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-25 10:16+0200\n"
-"PO-Revision-Date: 2019-03-25 08:15+0300\n"
+"PO-Revision-Date: 2019-03-25 09:16+0300\n"
 "Last-Translator: martinds <kotyk@datasys.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1553494520.000000\n"
+"X-POOTLE-MTIME: 1553498206.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1757,7 +1757,7 @@ msgstr "Není možné se anonymně navázat na LDAP server."
 
 #: include/classes/validators/CLdapAuthValidator.php:71
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "Není možné se navázat na LDAP server."
 
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
@@ -1793,7 +1793,7 @@ msgstr "Nelze uzavřít problém: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:70
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "Není možné připojení na LDAP server."
 
 #: include/classes/setup/CSetupWizard.php:255
 msgid "Cannot connect to the database."
@@ -1952,17 +1952,17 @@ msgstr "Nelze smazat hostitele"
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Není možné smazat hosta, protože údržba \"%1$s\" musí obsahovat minimálně jednoho hosta či skupinu hostů."
+msgstr[1] "Není možné smazat vybrané hosty, protože údržba \"%1$s\" musí obsahovat minimálně jednoho hosta či skupinu hostů."
+msgstr[2] "Není možné smazat vybrané hosty, protože údržba \"%1$s\" musí obsahovat minimálně jednoho hosta či skupinu hostů."
 
 #: include/classes/api/services/CHostGroup.php:1503
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Není možné smazat hosta, protože údržba \"%1$s\" musí obsahovat minimálně jednoho hosta či skupinu hostů. "
+msgstr[1] "Není možné smazat vybrané hosty, protože údržba \"%1$s\" musí obsahovat minimálně jednoho hosta či skupinu hostů. "
+msgstr[2] "Není možné smazat vybrané hosty, protože údržba \"%1$s\" musí obsahovat minimálně jednoho hosta či skupinu hostů. "
 
 #: include/classes/api/services/CDiscoveryRule.php:532
 msgid "Cannot delete host prototype."
@@ -2071,11 +2071,11 @@ msgstr "Není možné smazat aplikaci patřící šabloně."
 
 #: include/classes/api/services/CGraphPrototype.php:575
 msgid "Cannot delete templated graph prototype."
-msgstr ""
+msgstr "Není možné odstranit prototyp šablony grafu."
 
 #: include/classes/api/services/CGraph.php:559
 msgid "Cannot delete templated graph."
-msgstr ""
+msgstr "Není možné odstranit šablonu grafu. "
 
 #: include/classes/api/services/CHostPrototype.php:1071
 msgid "Cannot delete templated host prototype."
@@ -2083,7 +2083,7 @@ msgstr "Není možné smazat prototyp hosta patřícího šabloně."
 
 #: include/classes/api/services/CItemPrototype.php:875
 msgid "Cannot delete templated item prototype."
-msgstr ""
+msgstr "Prototyp položky šablony nelze odstranit."
 
 #: include/classes/api/services/CItem.php:704
 msgid "Cannot delete templated item."
@@ -2101,7 +2101,7 @@ msgstr "Není možné smazat spouštěč \"%1$s:%2$s\" patřící šabloně."
 #: include/classes/api/services/CTriggerPrototype.php:541
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr ""
+msgstr "Není možné smazat šablonu prototypu spouštěče \"%1$s:%2$s\"."
 
 #: include/classes/api/services/CHttpTest.php:549
 #, c-format
@@ -3191,7 +3191,7 @@ msgstr "Pročistit při odpojování"
 
 #: jsLoader.php:118
 msgid "Click and drag to desired size."
-msgstr ""
+msgstr "Kliknout a přetáhnout do požadované velikosti."
 
 #: include/classes/widgets/CWidgetConfig.php:34 include/screens.inc.php:28
 msgid "Clock"
@@ -5163,7 +5163,7 @@ msgstr "Zobrazení %1$s do %2$s od %3$s nalezeno"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:252
 msgid "Displaying options"
-msgstr ""
+msgstr "Zobrazení možností"
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -7615,7 +7615,7 @@ msgstr "Nepřístupná položka"
 
 #: include/classes/screens/CScreenProblem.php:414
 msgid "Inaccessible maintenance"
-msgstr ""
+msgstr "Nedostupná údržba"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:103
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:84
@@ -8517,7 +8517,7 @@ msgstr "Neplatná hodnota \"%1$s\" v poli \"%2$s\" pro typ média \"%3$s\"."
 #: include/validate.inc.php:358
 #, c-format
 msgid "Incorrect value for \"%1$s\" field."
-msgstr ""
+msgstr "Neplatná hodnota pro pole \"%1$s\"."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:95
 #: app/controllers/CControllerPopupHttpStep.php:103
@@ -13305,7 +13305,7 @@ msgstr "Normální položky"
 
 #: jsLoader.php:117
 msgid "Release to create a new widget."
-msgstr ""
+msgstr "Uvolněno pro vytvoření nového prvku."
 
 #: include/views/general.login.php:67
 msgid "Remember me for 30 days"
@@ -13686,7 +13686,7 @@ msgstr "Vráti ICMP ping čas v sekundách. Příklad: 0.02"
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:987
 msgid "Returns a JSON object containing Zabbix server or Proxy internal metrics."
-msgstr ""
+msgstr "Vrátí JSON objekt, který obsahuje Zabbix server nebo interní metriky Proxy."
 
 #: include/classes/items/CHelpItems.php:939
 msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
@@ -14550,15 +14550,15 @@ msgstr "Nastavení hostitelského inventáře"
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Setting LDAP dereferencing mode failed."
-msgstr ""
+msgstr "Nastavení LDAP režimu dereferencování selhalo."
 
 #: include/classes/validators/CLdapAuthValidator.php:74
 msgid "Setting LDAP protocol failed."
-msgstr ""
+msgstr "Nastavení LDAP protokolu selhalo."
 
 #: include/classes/validators/CLdapAuthValidator.php:76
 msgid "Setting LDAP referrals to \"Off\" failed."
-msgstr ""
+msgstr "Nastavení LDAP doporučení na \"Off\" selhalo."
 
 #: app/controllers/CControllerPopupGeneric.php:145
 #: app/controllers/CControllerPopupGeneric.php:159
@@ -14671,7 +14671,7 @@ msgstr "Zobrazit i položky bez údajů"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:95
 #: include/classes/widgets/forms/CWidgetFormProblems.php:178
 msgid "Show latest values"
-msgstr ""
+msgstr "Ukázat poslední hodnoty"
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:73
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:275
@@ -15018,7 +15018,7 @@ msgstr "Začátek v"
 
 #: include/classes/validators/CLdapAuthValidator.php:75
 msgid "Starting TLS failed."
-msgstr ""
+msgstr "Spuštění TLS selhalo."
 
 #: include/classes/items/CHelpItems.php:903
 msgid "Startup time of Zabbix server, Unix timestamp."
@@ -17062,7 +17062,7 @@ msgstr "VMware statistika datového úložiště kapacity v bytech nebo v procen
 
 #: include/classes/items/CHelpItems.php:691
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
-msgstr ""
+msgstr "VMware event log, <url> - VMware service URL, <mode> - vše ((výchozí), přeskočit - přeskočit zpracování starších dat"
 
 #: include/classes/items/CHelpItems.php:747
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -17751,7 +17751,7 @@ msgstr "Maximální hodnota na ose Y"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:515
 msgid "Y axis MAX value must be greater than Y axis MIN value"
-msgstr ""
+msgstr "MAX hodnota osy Y musí být větší než MIN hodnota osy Y"
 
 #: include/classes/api/services/CGraphGeneral.php:314
 #: include/classes/graphdraw/CLineGraphDraw.php:709
@@ -18478,7 +18478,7 @@ msgstr "čtvrtý"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:338
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
-msgstr ""
+msgstr "časová nejasnost () - Rozdíl mezi hodnotou položky (časová značky) a časové značky Zabbix serveru je menší nebo rovný T vteřinám (1 - ano, 0 - ne)"
 
 #: include/views/configuration.item.edit.php:773
 #: include/views/configuration.item.edit.php:778
@@ -19120,7 +19120,7 @@ msgstr "timeleft() - Odhad čas pro dosažení limitu je založen na periodě T"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:504
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:508
 msgid "too many decimal places"
-msgstr ""
+msgstr "příliš mnoho desetinných míst"
 
 #: include/classes/api/services/CMap.php:849
 #: include/classes/api/services/CMap.php:1302 include/events.inc.php:34
