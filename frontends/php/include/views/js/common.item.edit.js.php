@@ -129,7 +129,7 @@
 					if ($preprocessing.find('tr.sortable').length < 2) {
 						$preprocessing
 							.sortable('disable')
-							.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');;
+							.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 					}
 				})
 				.on('change', 'select[name*="type"]', function() {

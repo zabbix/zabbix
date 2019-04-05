@@ -354,7 +354,7 @@ function getItemFilterForm(&$items) {
 			ITEM_VALUE_TYPE_LOG => _('Log'),
 			ITEM_VALUE_TYPE_TEXT => _('Text')
 		])
-	);;
+	);
 	$filterColumn4->addRow(_('State'),
 		new CComboBox('filter_state', $filter_state, null, [
 			-1 => _('all'),

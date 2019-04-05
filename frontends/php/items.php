@@ -734,7 +734,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['snmpv3_securityname'] !== getRequest('snmpv3_securityname', '')) {
 					$item['snmpv3_securityname'] = getRequest('snmpv3_securityname', '');
 				}
-				$snmpv3_securitylevel = getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);;
+				$snmpv3_securitylevel = getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
 				if ($db_item['snmpv3_securitylevel'] != $snmpv3_securitylevel) {
 					$item['snmpv3_securitylevel'] = $snmpv3_securitylevel;
 				}

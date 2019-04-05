@@ -1957,7 +1957,6 @@ ZABBIX.apps.map = (function($) {
 								return this.sysmap.dragGroupPlaceholder();
 							}, this),
 							start: $.proxy(function() {
-								console.log(this);
 								this.domNode
 									.addClass(IE ? 'cursor-move' : 'cursor-dragging')
 									.removeClass('cursor-pointer');
