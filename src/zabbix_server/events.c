@@ -2439,7 +2439,7 @@ static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_
  ******************************************************************************/
 int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
 {
-	const char		*__function_name = "process_events";
+	const char		*__function_name = "zbx_process_events";
 	size_t			i, processed_num = 0;
 	zbx_uint64_t		eventid;
 	zbx_vector_ptr_t	internal_ok_events, trigger_events;
