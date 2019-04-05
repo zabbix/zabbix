@@ -903,28 +903,38 @@ function getConditionFormula(conditions, evalType) {
 	 * @param options
 	 */
 	$.fn.dynamicRows = function(options) {
-		options = $.extend({}, {
+		var defaultOpts = {
 			template: '',
 			row: '.form_row',
 			add: '.element-table-add',
 			remove: '.element-table-remove',
 			counter: null,
 			beforeRow: null,
+			keepMinRows: 0,
 			dataCallback: function(data) {
 				return {};
 			}
-		}, options);
+		}
 
 		return this.each(function() {
 			var $table = $(this);
-			if (!$table.data('dynamicRows')) {
-				$table.data('dynamicRows', new DynamicRows($table, options));
+			if ($table.data('dynamicRows')) {
+				return;
 			}
+
+			var dataRows = $table.data('dynamicRowsData');
+			var dataOpts = $table.data('dynamicRowsOpts');
+			var opts = $.extend({}, defaultOpts, options, dataOpts);
+
+			$table.removeAttr('data-dynamic-rows-data');
+			$table.removeAttr('data-dynamic-rows-opts');
+
+			$table.data('dynamicRows', new DynamicRows($table, opts, dataRows));
 		});
 	};
 
 
-	function DynamicRows($element, options) {
+	function DynamicRows($element, options, initialRows) {
 		this.options = options;
 		this.$element = $element;
 		this.length = 0;
@@ -932,6 +942,18 @@ function getConditionFormula(conditions, evalType) {
 		this.rows = {};
 
 		this.$element.on('click', options.add, this.addRow.bind(this));
+		if (initialRows) {
+			initialRows.forEach(this.addRow.bind(this));
+		}
+		this.ensureMinRows();
+	}
+
+	DynamicRows.prototype.ensureMinRows = function() {
+		var rowsToAdd = this.options.keepMinRows - this.length;
+		while (rowsToAdd > 0) {
+			rowsToAdd--;
+			this.addRow();
+		}
 	}
 
 	/**
@@ -968,7 +990,7 @@ function getConditionFormula(conditions, evalType) {
 		this.counter++;
 		this.length++;
 
-		this.$element.trigger('tableupdate.dynamicRows',this);
+		this.$element.trigger('tableupdate.dynamicRows', this);
 		this.$element.trigger('afteradd.dynamicRows', this);
 	}
 
@@ -987,6 +1009,8 @@ function getConditionFormula(conditions, evalType) {
 
 		this.$element.trigger('tableupdate.dynamicRows', this);
 		this.$element.trigger('afterremove.dynamicRows', this);
+
+		this.ensureMinRows();
 	}
 }(jQuery));
 
