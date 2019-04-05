@@ -104,8 +104,8 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 	if (!SIG_PARENT_PROCESS)
 	{
-		zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) || SIGINT == sig ?
-				LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
+		zabbix_log((sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) || SIGINT == sig ?
+				LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING),
 				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
 				"reason:%d]. %s ...",
 				sig, get_signal_name(sig),
@@ -126,8 +126,8 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		if (0 == sig_exiting)
 		{
 			sig_exiting = 1;
-			zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
-					LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
+			zabbix_log((sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
+					LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING),
 					"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
 					"reason:%d]. Exiting ...",
 					sig, get_signal_name(sig),

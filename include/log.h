@@ -40,6 +40,11 @@
 
 #define LOG_ENTRY_INTERVAL_DELAY	60	/* seconds */
 
+extern int	zbx_log_level;
+#define ZBX_CHECK_LOG_LEVEL(level)			\
+		((LOG_LEVEL_INFORMATION != level &&	\
+		(level > zbx_log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
+
 typedef enum
 {
 	ERR_Z3001 = 3001,
@@ -53,7 +58,15 @@ typedef enum
 zbx_err_codes_t;
 
 #ifdef HAVE___VA_ARGS__
-#	define zabbix_log(level, fmt, ...) __zbx_zabbix_log(level, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define ZBX_ZABBIX_LOG_CHECK
+#	define zabbix_log(level, fmt, ...)								\
+													\
+	do												\
+	{												\
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))						\
+			__zbx_zabbix_log(level, ZBX_CONST_STRING(fmt), ##__VA_ARGS__);			\
+	}												\
+	while (0)
 #else
 #	define zabbix_log __zbx_zabbix_log
 #endif
@@ -67,7 +80,6 @@ int		zabbix_increase_log_level(void);
 int		zabbix_decrease_log_level(void);
 const char	*zabbix_get_log_level_string(void);
 #endif
-int		zabbix_check_log_level(int level);
 
 char		*zbx_strerror(int errnum);
 char		*strerror_from_system(unsigned long error);
