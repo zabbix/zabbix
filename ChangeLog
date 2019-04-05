@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15516] fixed trapper process title to not update time in case of interruption (asestakovs)
 .........T [ZBX-9150] fixed update intervals of items in VMware templates (MVekslers)
 ..F....... [ZBX-15481] fixed showing wrench icon for hosts that are in maintenance, but maintenance is inaccessible due to insufficient permissions (Ivo)
 ..F....... [ZBX-15629] fixed trigger wizard form re-submit (talbergs)
@@ -244,7 +245,7 @@ Bug fixes:
 ...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
 ........S. [ZBX-15279] fixed handling of LLD processing errors that should have resulted in not supported LLD rule state (wiper)
 ..F....... [ZBX-14604] fixed displaying of the graph name on screens (miks)
-..F....... [ZBXNEXT-4588] renamed 'display options' tab to 'displaying options'; fixed multiple layout issues, footnote in hint-box, field value handling, calculation of mouse position, multiple issues related with Y axis and problem styling (miks)
+..F....... [ZBXNEXT-4588] refixed trapper named 'display options' tab to 'displaying options'; fixed multiple layout issues, footnote in hint-box, field value handling, calculation of mouse position, multiple issues related with Y axis and problem styling (miks)
 ..F....... [ZBX-15159] fixed existing context menu closing when new one is opened (miks)
 ..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
 ...G...... [ZBX-12801] excluded zabbix_sender.dll from MS Windows builds with TLS (viktors)
@@ -278,7 +279,7 @@ A......... [ZBX-15146] fixed SQL error occurred when too long IP address is atte
 ..F....... [ZBX-14800] fixed resolving of functional macros in graph widget name (Ivo)
 ...G....S. [ZBX-15178] fixed wrong behaviour when referencing unexisting capture groups in item regexp preprocessing, general pcre code improvements (Andris, kalimulin)
 
---------------------------------------------------------------------------------
+------------------svn commit -m "........S. [ZBX-15516] fixed trapper process title to not update time in case of interruption"--------------------------------------------------------------
 Changes for 4.2.0alpha1
 
 New features:
@@ -288,9 +289,11 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.7rc1
 
-New features:
+New features:svn commit -m "........S. [ZBX-15516] fixed trapper process title to not update time in case of interruption"
 
 Bug fixes:
+........S. [ZBX-15516] fixed trapper process title to not update time in case of interruption (asestakovs)
+...G...PS. [ZBX-15588] fixed function names that are written to the log file when using LOG_LEVEL_DEBUG (asitals)
 .........T [ZBX-9150] fixed update intervals of items in VMware templates (MVekslers)
 ..F....... [ZBX-15481] fixed showing wrench icon for hosts that are in maintenance, but maintenance is inaccessible due to insufficient permissions (Ivo)
 ..F....... [ZBX-15629] fixed trigger wizard form re-submit (talbergs)
