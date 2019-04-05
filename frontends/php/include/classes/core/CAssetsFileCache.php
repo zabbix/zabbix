@@ -134,7 +134,7 @@ class CAssetsFileCache {
 	 * @param string $dir    Path to directory.
 	 */
 	private function rmdir($dir) {
-		$entries = array_diff(scandir($dir), array('.','..'));
+		$entries = array_diff(scandir($dir), ['.', '..']);
 
 		foreach ($entries as $entry) {
 			$path = $dir.$entry;
