@@ -739,9 +739,8 @@ static int	DBcreate_dbversion_table(void)
 			ret = FAIL;
 		}
 	}
-	DBend(ret);
 
-	return ret;
+	return DBend(ret);
 }
 
 static int	DBset_version(int version, unsigned char mandatory)
@@ -925,8 +924,18 @@ int	DBcheck_version(void)
 
 		for (i = 0; 0 != patches[i].version; i++)
 		{
+			static sigset_t	orig_mask, mask;
+
 			if (db_optional >= patches[i].version)
 				continue;
+
+			/* block SIGTERM, SIGINT to prevent interruption of statements that cause an implicit commit */
+			sigemptyset(&mask);
+			sigaddset(&mask, SIGTERM);
+			sigaddset(&mask, SIGINT);
+
+			if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+				zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the user signal");
 
 			DBbegin();
 
@@ -937,7 +946,10 @@ int	DBcheck_version(void)
 				ret = DBset_version(patches[i].version, patches[i].mandatory);
 			}
 
-			DBend(ret);
+			ret = DBend(ret);
+
+			if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+				zabbix_log(LOG_LEVEL_WARNING,"cannot restore sigprocmask");
 
 			if (SUCCEED != ret)
 				break;

@@ -1315,6 +1315,7 @@ class CLineGraphDraw extends CGraphDraw {
 			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 6],			// 1 day and 6 hours
 			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 12],		// 1 day and 12 hours
 			['main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY],				// 1 week and 1 day
+			['main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY * 3],			// 1 week and 3 days
 			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_WEEK],			// 1 month and 1 week
 			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_WEEK * 2],		// 1 month and 2 weeks
 			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH],			// 1 year and 30 days
@@ -2382,7 +2383,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$y_offsets = $this->shiftY + self::legendOffsetY;
 
 		if (!$this->with_vertical_padding) {
-			$y_offsets -= $this->m_showTriggers
+			$y_offsets -= ($this->m_showTriggers && count($this->triggers) > 0)
 				? static::DEFAULT_TOP_BOTTOM_PADDING / 2
 				: static::DEFAULT_TOP_BOTTOM_PADDING;
 		}
@@ -2517,6 +2518,7 @@ class CLineGraphDraw extends CGraphDraw {
 	public function drawDimensions() {
 		set_image_header();
 
+		$this->calculateTopPadding();
 		$this->selectTriggers();
 		$this->calcDimentions();
 

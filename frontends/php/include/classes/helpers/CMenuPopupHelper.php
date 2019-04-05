@@ -22,126 +22,82 @@
 class CMenuPopupHelper {
 
 	/**
+	 * Prepare data for dashboard popup menu.
+	 *
+	 * @param string $dashboardid
+	 */
+	public static function getDashboard($dashboardid) {
+		return [
+			'type' => 'dashboard',
+			'data' => [
+				'dashboardid' => $dashboardid
+			]
+		];
+	}
+
+	/**
 	 * Prepare data for item history menu popup.
 	 *
-	 * @param array $item                Item data.
-	 * @param int   $item['itemid']      Item ID.
-	 * @param int   $item['value_type']  Item value type.
+	 * @param string $itemid
 	 *
 	 * @return array
 	 */
-	public static function getHistory(array $item) {
-		$data = [
+	public static function getHistory($itemid) {
+		return [
 			'type' => 'history',
-			'itemid' => $item['itemid'],
-			'hasLatestGraphs' => in_array($item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT])
+			'data' => [
+				'itemid' => $itemid
+			]
 		];
-
-		return $data;
 	}
 
 	/**
-	 * Prepare data for host menu popup.
+	 * Prepare data for Ajax host menu popup.
 	 *
-	 * @param array  $host                       Host data.
-	 * @param string $host['hostid']             Host ID.
-	 * @param string $host['status']             Host status.
-	 * @param array  $host['graphs']             Host graphs.
-	 * @param array  $host['screens']            Host screens.
-	 * @param array  $scripts                    Host scripts (optional).
-	 * @param string $scripts[]['name']          Script name.
-	 * @param string $scripts[]['scriptid']      Script ID.
-	 * @param string $scripts[]['confirmation']  Confirmation text.
-	 * @param bool   $has_goto                   "Go to" block in popup.
+	 * @param string $hostid
+	 * @param bool   $has_goto     Show "Go to" block in popup.
 	 *
 	 * @return array
 	 */
-	public static function getHost(array $host, array $scripts = null, $has_goto = true) {
+	public static function getHost($hostid, $has_goto = true) {
 		$data = [
 			'type' => 'host',
-			'hostid' => $host['hostid'],
-			'showGraphs' => (bool) $host['graphs'],
-			'showScreens' => (bool) $host['screens'],
-			'showTriggers' => ($host['status'] == HOST_STATUS_MONITORED),
-			'hasGoTo' => $has_goto
+			'data' => [
+				'hostid' => $hostid
+			]
 		];
 
-		if ($scripts) {
-			foreach ($scripts as &$script) {
-				$script['name'] = trimPath($script['name']);
-			}
-			unset($script);
-
-			CArrayHelper::sort($scripts, ['name']);
-
-			foreach (array_values($scripts) as $script) {
-				$data['scripts'][] = [
-					'name' => $script['name'],
-					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
-				];
-			}
+		if ($has_goto === false) {
+			$data['data']['has_goto'] = '0';
 		}
 
 		return $data;
 	}
 
 	/**
-	 * Prepare data for map menu popup.
+	 * Prepare data for Ajax map element menu popup.
 	 *
-	 * @param string $hostId                     Host ID.
-	 * @param array  $scripts                    Host scripts.
-	 * @param string $scripts[]['name']          Script name.
-	 * @param string $scripts[]['scriptid']      Script ID.
-	 * @param string $scripts[]['confirmation']  Confirmation text.
-	 * @param array  $gotos                      Enable goto links.
-	 * @param array  $gotos['graphs']            Link to host graphs page with url parameters ("name" => "value") (optional).
-	 * @param array  $gotos['screens']           Link to host screen page with url parameters ("name" => "value") (optional).
-	 * @param array  $gotos['triggerStatus']     Link to "Problems" page with url parameters ("name" => "value") (optional).
-	 * @param array  $gotos['submap']            Link to submap page with url parameters ("name" => "value") (optional).
-	 * @param array  $gotos['events']            Link to events page with url parameters ("name" => "value") (optional).
-	 * @param array  $urls                       Local and global map links (optional).
-	 * @param string $urls[]['name']             Link name.
-	 * @param string $urls[]['url']              Link url.
+	 * @param string $sysmapid
+	 * @param string $selementid
+	 * @param int    $severity_min
+	 * @param string $hostid
 	 *
 	 * @return array
 	 */
-	public static function getMap($hostId, array $scripts = null, array $gotos = null, array $urls = null) {
-
+	public static function getMapElement($sysmapid, $selementid, $severity_min, $hostid) {
 		$data = [
-			'type' => 'map'
+			'type' => 'map_element',
+			'data' => [
+				'sysmapid' => $sysmapid,
+				'selementid' => $selementid
+			]
 		];
 
-
-		if ($scripts) {
-			foreach ($scripts as &$script) {
-				$script['name'] = trimPath($script['name']);
-			}
-			unset($script);
-			CArrayHelper::sort($scripts, ['name']);
-
-			$data['hostid'] = $hostId;
-
-			foreach (array_values($scripts) as $script) {
-				$data['scripts'][] = [
-					'name' => $script['name'],
-					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
-				];
-			}
+		if ($severity_min != TRIGGER_SEVERITY_NOT_CLASSIFIED) {
+			$data['data']['severity_min'] = $severity_min;
 		}
-
-		if ($gotos) {
-			$data['gotos'] = $gotos;
-		}
-
-		if ($urls) {
-			foreach ($urls as $url) {
-				$data['urls'][] = [
-					'label' => $url['name'],
-					'url' => $url['url']
-				];
-			}
+		if ($hostid != 0) {
+			$data['data']['hostid'] = $hostid;
 		}
 
 		return $data;
@@ -150,135 +106,62 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for refresh time menu popup.
 	 *
-	 * @param string $widgetName		widget name
-	 * @param string $currentRate		current rate value
-	 * @param bool   $multiplier		multiplier or time mode
-	 * @param array  $params			url parameters (optional)
+	 * @param string $widgetName
+	 * @param string $currentRate
+	 * @param bool   $multiplier   Multiplier or time mode.
+	 * @param array  $params       (optional) URL parameters.
 	 *
 	 * @return array
 	 */
 	public static function getRefresh($widgetName, $currentRate, $multiplier = false, array $params = []) {
-		return [
-			'type' => 'refresh',
-			'widgetName' => $widgetName,
-			'currentRate' => $currentRate,
-			'multiplier' => $multiplier,
-			'params' => $params
-		];
-	}
-
-	/**
-	 * Prepare data for trigger menu popup.
-	 *
-	 * @param array  $trigger                           Trigger data.
-	 * @param string $trigger['triggerid']              Trigger ID.
-	 * @param int    $trigger['flags']                  Trigger flags (TRIGGER_FLAG_DISCOVERY*).
-	 * @param array  $trigger['hosts']                  Hosts, used by trigger expression.
-	 * @param string $trigger['hosts'][]['hostid']      Host ID.
-	 * @param string $trigger['hosts'][]['name']        Host name.
-	 * @param string $trigger['hosts'][]['status']      Host status.
-	 * @param array  $trigger['items']                  Trigger items.
-	 * @param string $trigger['items'][]['itemid']      Item ID.
-	 * @param string $trigger['items'][]['hostid']      Host ID.
-	 * @param string $trigger['items'][]['name']        Item name.
-	 * @param string $trigger['items'][]['key_']        Item key.
-	 * @param string $trigger['items'][]['value_type']  Type of information of the item.
-	 * @param string $trigger['url']                    Trigger URL.
-	 * @param array  $acknowledge                       Acknowledge link parameters (optional).
-	 * @param string $acknowledge['eventid']            Event ID.
-	 * @param string $acknowledge['screenid']           Screen ID (optional).
-	 * @param string $acknowledge['backurl']            Return URL (optional).
-	 * @param array  $options
-	 * @param bool   $options['show_description']       (optional) default: true
-	 * @param bool   $options['description_enabled']    (optional) default: true
-	 *
-	 * @return array
-	 */
-	public static function getTrigger(array $trigger, array $acknowledge = null, array $options = []) {
-		$hosts = [];
-		$showEvents = true;
-
-		foreach ($trigger['hosts'] as $host) {
-			$hosts[$host['hostid']] = $host['name'];
-
-			if ($host['status'] != HOST_STATUS_MONITORED) {
-				$showEvents = false;
-			}
-		}
-
-		$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
-
-		foreach ($trigger['items'] as &$item) {
-			$item['hostname'] = $hosts[$item['hostid']];
-		}
-		unset($item);
-
-		CArrayHelper::sort($trigger['items'], ['name', 'hostname', 'itemid']);
-
-		$hostCount = count($hosts);
-		$items = [];
-
-		foreach ($trigger['items'] as $item) {
-			$items[] = [
-				'name' => ($hostCount > 1)
-					? $hosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded']
-					: $item['name_expanded'],
-				'params' => [
-					'itemid' => $item['itemid'],
-					'action' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
-						? HISTORY_GRAPH
-						: HISTORY_VALUES
-				]
-			];
-		}
-
 		$data = [
-			'type' => 'trigger',
-			'triggerid' => $trigger['triggerid'],
-			'items' => $items,
-			'showEvents' => $showEvents,
-			'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+			'type' => 'refresh',
+			'data' => [
+				'widgetName' => $widgetName,
+				'currentRate' => $currentRate,
+				'multiplier' => $multiplier ? '1' : '0'
+			]
 		];
 
-		if (array_key_exists('show_description', $options) && $options['show_description'] === false) {
-			$data['show_description'] = false;
-		}
-		else if (array_key_exists('description_enabled', $options) && $options['description_enabled'] === false) {
-			$data['description_enabled'] = false;
-		}
-
-		if ($acknowledge !== null) {
-			$data['acknowledge'] = $acknowledge;
-		}
-
-		if ($trigger['url'] !== '') {
-			$data['url'] = CHtmlUrlValidator::validate($trigger['url'])
-				? $trigger['url']
-				: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($trigger['url'], false,
-						false)).'\');';
+		if ($params) {
+			$data['data']['params'] = $params;
 		}
 
 		return $data;
 	}
 
 	/**
-	 * Prepare data for trigger log menu popup.
+	 * Prepare data for Ajax trigger menu popup.
 	 *
-	 * @param string $itemId				item id
-	 * @param string $itemName				item name
-	 * @param array  $triggers				triggers (optional)
-	 * @param string $triggers[n]['id']		trigger id
-	 * @param string $triggers[n]['name']	trigger name
+	 * @param string $triggerid
+	 * @param string $eventid                 (optional) Mandatory for Acknowledge and Description menus.
+	 * @param array  $acknowledge             Acknowledge link parameters (optional).
+	 * @param string $acknowledge['backurl']
+	 * @param bool   $show_description
 	 *
 	 * @return array
 	 */
-	public static function getTriggerLog($itemId, $itemName, $triggers) {
-		return [
-			'type' => 'triggerLog',
-			'itemid' => $itemId,
-			'itemName' => $itemName,
-			'triggers' => $triggers
+	public static function getTrigger($triggerid, $eventid = 0, array $acknowledge = [], $show_description = true) {
+		$data = [
+			'type' => 'trigger',
+			'data' => [
+				'triggerid' => $triggerid
+			]
 		];
+
+		if ($eventid != 0) {
+			$data['data']['eventid'] = $eventid;
+		}
+
+		if ($acknowledge) {
+			$data['data']['acknowledge'] = $acknowledge;
+		}
+
+		if ($show_description === false) {
+			$data['data']['show_description'] = '0';
+		}
+
+		return $data;
 	}
 
 	/**
@@ -288,55 +171,37 @@ class CMenuPopupHelper {
 	 */
 	public static function getTriggerMacro() {
 		return [
-			'type' => 'triggerMacro'
+			'type' => 'trigger_macro'
 		];
 	}
 
 	/**
-	 * Prepare data for dependent item (or item prototype) popup menu.
+	 * Prepare data for item popup menu.
 	 *
-	 * @param string $page        Page name.
-	 * @param string $itemid      Item id.
-	 * @param string $parent      Name of parent object argument (hostid or parent_discoveryid).
-	 * @param string $parentid    Parent object id (host id for hosts or discoveryid for discovery rules)
-	 * @param string $name        Item name.
+	 * @param string $itemid
 	 *
 	 * @return array
 	 */
-	protected static function getDependent($page, $itemid, $parent, $parentid, $name) {
-		$url = (new CUrl($page))
-					->setArgument('form', 'create')->setArgument('type', ITEM_TYPE_DEPENDENT)
-					->setArgument($parent, $parentid)->setArgument('master_itemid', $itemid)
-					->getUrl();
-
+	public static function getItem($itemid) {
 		return [
-			'type' => 'dependent_items',
-			'itemid' => $itemid,
-			'item_name' => $name,
-			'add_label' => _('Create dependent item'),
-			'add_url' => $url
+			'type' => 'item',
+			'data' => [
+				'itemid' => $itemid
+			]
 		];
 	}
 
 	/**
-	 * Prepare data for dependent item popup menu.
+	 * Prepare data for item prototype popup menu.
 	 *
-	 * @param string $itemid    Item id.
-	 * @param string $hostid    Host id.
-	 * @param string $name      Item name.
+	 * @param string $itemid
 	 */
-	public static function getDependentItem($itemid, $hostid, $name) {
-		return self::getDependent('items.php', $itemid, 'hostid', $hostid, $name);
-	}
-
-	/**
-	 * Prepare data for dependent item prototype popup menu.
-	 *
-	 * @param string $itemid                Item id.
-	 * @param string $parent_discoveryid    Parent discovery rule id.
-	 * @param string $name                  Item name.
-	 */
-	public static function getDependentItemPrototype($itemid, $parent_discoveryid, $name) {
-		return self::getDependent('disc_prototypes.php', $itemid, 'parent_discoveryid', $parent_discoveryid, $name);
+	public static function getItemPrototype($itemid) {
+		return [
+			'type' => 'item_prototype',
+			'data' => [
+				'itemid' => $itemid
+			]
+		];
 	}
 }
