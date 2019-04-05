@@ -289,7 +289,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.7rc1
 
-New features:svn commit -m "........S. [ZBX-15516] fixed trapper process title to not update time in case of interruption"
+New features:
 
 Bug fixes:
 ........S. [ZBX-15516] fixed trapper process title to not update time in case of interruption (asestakovs)
