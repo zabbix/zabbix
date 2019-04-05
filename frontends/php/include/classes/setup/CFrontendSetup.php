@@ -91,6 +91,10 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpGettext();
 		$result[] = $this->checkPhpArgSeparatorOutput();
 
+		if (ZBX_WEBCACHE_PATH) {
+			$result[] = $this->checkAssetsCachePermissions();
+		}
+
 		return $result;
 	}
 
@@ -652,6 +656,25 @@ class CFrontendSetup {
 			'error' => _s('PHP option "%1$s" must be set to "%2$s"', 'arg_separator.output',
 				self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT
 			)
+		];
+	}
+
+	/**
+	 * Check is defined assets cache directory writable or not.
+	 *
+	 * @return array
+	 */
+	public function checkAssetsCachePermissions() {
+		$assets_service = new CAssetsFileCache(ZBase::getRootDir());
+		$result = $assets_service->boot() ? self::CHECK_OK : self::CHECK_FATAL;
+		$assets_dir = implode(DIRECTORY_SEPARATOR, [ZBase::getRootDir(), ZBX_WEBCACHE_PATH]);
+
+		return [
+			'name' => _('Assets cache directory permissions'),
+			'current' => $result == self::CHECK_OK ? 'RW' : 'R',
+			'required' => 'RW',
+			'result' => $result,
+			'error' => _s('Directory "%1$s" must be writable', $assets_dir)
 		];
 	}
 }

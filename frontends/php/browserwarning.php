@@ -29,6 +29,21 @@ require_once dirname(__FILE__).'/include/classes/html/CTag.php';
 require_once dirname(__FILE__).'/include/classes/html/CLink.php';
 require_once dirname(__FILE__).'/include/classes/helpers/CBrandHelper.php';
 require_once dirname(__FILE__).'/include/html.inc.php';
+require_once dirname(__FILE__).'/include/classes/core/CAssetsFileCache.php';
 
-$browserWarningForm = new CView('general.browserwarning');
+$assets_prefix = '';
+
+if (ZBX_WEBCACHE_PATH) {
+	$assets_service = new CAssetsFileCache(__DIR__);
+
+	if (!$assets_service->boot()) {
+		header('Location: cachewarning.php');
+
+		exit;
+	}
+
+	$assets_prefix = ZBX_WEBCACHE_PATH.'/'.$assets_service->cache_tag.'/';
+}
+
+$browserWarningForm = new CView('general.browserwarning', compact('assets_prefix'));
 $browserWarningForm->render();
