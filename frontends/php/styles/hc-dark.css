@@ -385,7 +385,7 @@ ul.top-nav-icons {
 
 .header-title {
   border-bottom: 1px solid #444;
-  margin-top: -10px;
+  margin: -10px 0 10px;
   padding: 10px 0 6px;
   width: 100%; }
   .header-title .cell:first-child {
@@ -477,26 +477,40 @@ article, main {
 
 .filter-breadcrumb {
   display: inline-block;
-  z-index: 3; }
+  padding-top: 0;
+  z-index: 3;
+  max-width: calc(100vw - 200px); }
   .filter-breadcrumb li {
     line-height: 14px;
-    vertical-align: top; }
+    vertical-align: top;
+    float: none;
+    display: inline-block; }
     .filter-breadcrumb li .status-container {
       padding-top: 3px; }
     .filter-breadcrumb li > span {
       display: inline-block;
       height: 18px;
-      padding: 4px 7px 0; }
+      padding: 4px 7px 0;
+      line-height: 14px; }
       .filter-breadcrumb li > span a {
+        display: inline-block;
         max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
-        vertical-align: top; }
+        vertical-align: top;
+        margin-bottom: -1px; }
+        .filter-breadcrumb li > span a:focus {
+          margin-bottom: -2px; }
   .filter-breadcrumb > li {
     padding: 1px 0; }
-  .filter-breadcrumb > li:first-child {
-    float: left;
+    .filter-breadcrumb > li > span a {
+      margin-top: 1px;
+      line-height: 13px; }
+  .filter-breadcrumb > li {
+    line-height: 22px;
     white-space: nowrap; }
+    .filter-breadcrumb > li .status-container {
+      line-height: 14px; }
   .filter-breadcrumb + .filter-space {
     margin-top: -29px; }
 
@@ -2175,7 +2189,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 9px 5px;
   width: 100%; }
 
-.dashbrd-grid-widget-container {
+.dashbrd-grid-container {
   position: relative;
   margin: -4px; }
 
@@ -2256,7 +2270,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-widget-content {
   flex: 1;
-  overflow-y: auto; }
+  overflow: auto; }
   .dashbrd-grid-widget-content .list-table {
     border: none; }
     .dashbrd-grid-widget-content .list-table tbody tr:last-child th, .dashbrd-grid-widget-content .list-table tbody tr:last-child td {
@@ -2274,7 +2288,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: flex;
   position: absolute; }
 
-.dashbrd-grid-widget-padding {
+.dashbrd-grid-widget-container {
   display: flex;
   flex-grow: 1;
   flex-direction: column;
@@ -2547,14 +2561,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: block; }
   .dashbrd-widget-graph-link:link {
     border: none; }
-  .dashbrd-widget-graph-link:focus:after {
-    content: "";
-    background: rgba(255, 255, 255, 0.35);
-    height: 2px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -2px; }
 
 .action-menu {
   position: absolute;
@@ -2685,6 +2691,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     min-width: 650px; }
   .overlay-dialogue .msg-bad,
   .overlay-dialogue .msg-good {
+    position: -webkit-sticky;
     position: sticky;
     top: 0;
     z-index: 1000; }
@@ -2969,20 +2976,24 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     top: 0;
     z-index: 999; }
 
+.svg-graph {
+  display: block; }
+
 .svg-single-item-graph-legend,
 .svg-single-two-items-graph-legend,
 .svg-graph-legend {
   overflow-y: hidden;
   white-space: normal;
-  margin: 0 10px; }
+  margin: 0 10px;
+  line-height: 18px; }
   .svg-single-item-graph-legend div,
   .svg-single-two-items-graph-legend div,
   .svg-graph-legend div {
     display: inline-block;
     margin: 0 4px;
     font-size: 12px;
-    line-height: 18px;
-    vertical-align: middle;
+    line-height: 1.1;
+    vertical-align: bottom;
     min-width: 120px;
     overflow: hidden;
     white-space: nowrap;
@@ -3873,7 +3884,8 @@ tr.cursor-move td * {
   text-transform: uppercase; }
 
 .flickerfreescreen {
-  position: relative; }
+  position: relative;
+  overflow: hidden; }
 
 .graph-wrapper {
   display: inline; }
@@ -4486,12 +4498,13 @@ svg {
     margin-left: -5px;
     width: 10px;
     height: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 1px white;
+    border-radius: 50%;
     background: #f8f8f8; }
   .range-control.range-control-focus .range-control-thumb {
+    margin-top: -6.66667px;
+    margin-left: -6.66667px;
     background: #f8f8f8;
-    box-shadow: 0 0 0 2px #fafafa; }
+    border: 2px solid #fafafa; }
   .range-control.range-control-focus .range-control-progress {
     background: #f8f8f8; }
   .range-control.disabled {
@@ -4690,8 +4703,11 @@ ul.top-nav-icons input {
   ul.top-nav-icons input:focus {
     border: 1px solid #e0e0e0 !important; }
 
-.filter-breadcrumb a:focus {
-  margin-bottom: -1px; }
+.filter-breadcrumb li > span a:focus,
+.filter-breadcrumb > li:first-child > span a:focus {
+  margin-bottom: -2px; }
+.filter-breadcrumb > li > span a:focus {
+  line-height: 12px; }
 
 .add-child-btn {
   background: url(../img/icon-sprite.svg) no-repeat -359px -551px !important; }
