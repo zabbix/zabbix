@@ -702,7 +702,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 		$applications = API::Application()->get([
 			'output' => [],
 			'hostids' => $hostids,
-			'search' => ['name' => $application],
+			'filter' => ['name' => $application],
 			'preservekeys' => true
 		]);
 		$trigger_options['applicationids'] = array_keys($applications);
@@ -1177,7 +1177,7 @@ function make_trigger_details($trigger) {
 	]);
 
 	if (count($hosts) > 1) {
-		order_result($hosts, 'name', ZBX_SORT_UP);
+		order_result($hosts, 'name');
 	}
 
 	foreach ($hosts as $host) {
@@ -1193,7 +1193,9 @@ function make_trigger_details($trigger) {
 		])
 		->addRow([
 			new CCol(_('Trigger')),
-			new CCol(CMacrosResolverHelper::resolveTriggerName($trigger))
+			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
+				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid']))
+			)
 		])
 		->addRow([
 			_('Severity'),
@@ -2286,13 +2288,19 @@ function makeTriggersHostsList(array $triggers_hosts) {
 			$host_name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 
-			// Add maintenance icon with hint if host is in maintenance.
-			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-					&& array_key_exists($host['maintenanceid'], $db_maintenances)) {
-				$maintenance = $db_maintenances[$host['maintenanceid']];
-				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
-					$maintenance['description']
-				);
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				if (array_key_exists($host['maintenanceid'], $db_maintenances)) {
+					$maintenance = $db_maintenances[$host['maintenanceid']];
+					$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+						$maintenance['description']
+					);
+				}
+				else {
+					$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], _('Inaccessible maintenance'),
+						''
+					);
+				}
+
 				$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 			}
 

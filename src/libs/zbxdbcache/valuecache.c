@@ -2399,7 +2399,7 @@ void	zbx_vc_destroy(void)
  ******************************************************************************/
 void	zbx_vc_reset(void)
 {
-	const char	*__function_name = "zbx_vc_clean";
+	const char	*__function_name = "zbx_vc_reset";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
