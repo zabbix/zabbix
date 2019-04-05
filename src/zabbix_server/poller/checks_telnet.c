@@ -30,11 +30,10 @@
  */
 static int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
-	const char	*__function_name = "telnet_run";
 	zbx_socket_t	s;
 	int		ret = NOTSUPPORTED, flags;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
@@ -58,7 +57,7 @@ static int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 tcp_close:
 	zbx_tcp_close(&s);
 close:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

@@ -3,6 +3,7 @@ Changes for 4.4.0alpha1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-15588] fixed function names that are written to the log file when using LOG_LEVEL_DEBUG (asitals)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.1rc1
@@ -11,6 +12,7 @@ New features:
 
 Bug fixes:
 ........S. [ZBX-15516] fixed trapper process title to not update time in case of interruption (asestakovs)
+...G...PS. [ZBX-15588] fixed function names that are written to the log file when using LOG_LEVEL_DEBUG (asitals)
 .........T [ZBX-9150] fixed update intervals of items in VMware templates (MVekslers)
 ..F....... [ZBX-15481] fixed showing wrench icon for hosts that are in maintenance, but maintenance is inaccessible due to insufficient permissions (Ivo)
 ..F....... [ZBX-15629] fixed trigger wizard form re-submit (talbergs)
@@ -2646,6 +2648,7 @@ Changes for 3.0.27rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-15588] fixed function names that are written to the log file when using LOG_LEVEL_DEBUG (asitals)
 ..F....... [ZBX-15870] fixed redundant jsloader loading in login page (miks)
 ........S. [ZBX-15913] fixed possible crash when sending custom alerts (vso)
 ........S. [ZBX-13347] fixed possible crash in history syncer process when processing discovered item value (vso)

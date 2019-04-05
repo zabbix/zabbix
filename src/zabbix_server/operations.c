@@ -49,14 +49,12 @@ zbx_dcheck_source_t;
  ******************************************************************************/
 static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 {
-	const char	*__function_name = "select_discovered_host";
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	hostid = 0;
 	char		*sql = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64,
-			__function_name, event->eventid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, event->eventid);
 
 	switch (event->object)
 	{
@@ -114,7 +112,7 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 		ZBX_STR2UINT64(hostid, row[0]);
 	DBfree_result(result);
 exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __function_name, hostid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __func__, hostid);
 
 	return hostid;
 }
@@ -130,8 +128,6 @@ exit:
  ******************************************************************************/
 static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
 {
-	const char	*__function_name = "add_discovered_host_groups";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	groupid;
@@ -139,7 +135,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 	size_t		sql_alloc = 256, sql_offset = 0;
 	int		i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
@@ -189,7 +185,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 		zbx_db_insert_clean(&db_insert);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -207,8 +203,6 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
  ******************************************************************************/
 static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 {
-	const char		*__function_name = "add_discovered_host";
-
 	DB_RESULT		result;
 	DB_RESULT		result2;
 	DB_ROW			row;
@@ -221,7 +215,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 	zbx_config_t		cfg;
 	zbx_db_insert_t		db_insert;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __function_name, event->eventid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, event->eventid);
 
 	zbx_vector_uint64_create(&groupids);
 
@@ -531,7 +525,7 @@ clean:
 
 	zbx_vector_uint64_destroy(&groupids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return hostid;
 }
@@ -574,16 +568,14 @@ static int	is_discovery_or_auto_registration(const DB_EVENT *event)
  ******************************************************************************/
 void	op_host_add(const DB_EVENT *event)
 {
-	const char	*__function_name = "op_host_add";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_auto_registration(event))
 		return;
 
 	add_discovered_host(event);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -597,12 +589,10 @@ void	op_host_add(const DB_EVENT *event)
  ******************************************************************************/
 void	op_host_del(const DB_EVENT *event)
 {
-	const char		*__function_name = "op_host_del";
-
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_auto_registration(event))
 		return;
@@ -618,7 +608,7 @@ void	op_host_del(const DB_EVENT *event)
 
 	zbx_vector_uint64_destroy(&hostids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -632,10 +622,9 @@ void	op_host_del(const DB_EVENT *event)
  ******************************************************************************/
 void	op_host_enable(const DB_EVENT *event)
 {
-	const char	*__function_name = "op_host_enable";
 	zbx_uint64_t	hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_auto_registration(event))
 		return;
@@ -650,7 +639,7 @@ void	op_host_enable(const DB_EVENT *event)
 			HOST_STATUS_MONITORED,
 			hostid);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -664,10 +653,9 @@ void	op_host_enable(const DB_EVENT *event)
  ******************************************************************************/
 void	op_host_disable(const DB_EVENT *event)
 {
-	const char	*__function_name = "op_host_disable";
 	zbx_uint64_t	hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_auto_registration(event))
 		return;
@@ -682,7 +670,7 @@ void	op_host_disable(const DB_EVENT *event)
 			HOST_STATUS_NOT_MONITORED,
 			hostid);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -701,10 +689,9 @@ void	op_host_disable(const DB_EVENT *event)
  ******************************************************************************/
 void	op_host_inventory_mode(const DB_EVENT *event, int inventory_mode)
 {
-	const char	*__function_name = "op_host_inventory_mode";
 	zbx_uint64_t	hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_auto_registration(event))
 		return;
@@ -714,7 +701,7 @@ void	op_host_inventory_mode(const DB_EVENT *event, int inventory_mode)
 
 	DBset_host_inventory(hostid, inventory_mode);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -731,10 +718,9 @@ void	op_host_inventory_mode(const DB_EVENT *event, int inventory_mode)
  ******************************************************************************/
 void	op_groups_add(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 {
-	const char	*__function_name = "op_groups_add";
 	zbx_uint64_t	hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_auto_registration(event))
 		return;
@@ -744,7 +730,7 @@ void	op_groups_add(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	add_discovered_host_groups(hostid, groupids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -761,14 +747,12 @@ void	op_groups_add(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
  ******************************************************************************/
 void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 {
-	const char	*__function_name = "op_groups_del";
-
 	DB_RESULT	result;
 	zbx_uint64_t	hostid;
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_auto_registration(event))
 		return;
@@ -810,7 +794,7 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	zbx_free(sql);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -827,11 +811,10 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
  ******************************************************************************/
 void	op_template_add(const DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids)
 {
-	const char	*__function_name = "op_template_add";
 	zbx_uint64_t	hostid;
 	char		*error;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_auto_registration(event))
 		return;
@@ -845,7 +828,7 @@ void	op_template_add(const DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids
 		zbx_free(error);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -862,11 +845,10 @@ void	op_template_add(const DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids
  ******************************************************************************/
 void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids)
 {
-	const char	*__function_name = "op_template_del";
 	zbx_uint64_t	hostid;
 	char		*error;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_auto_registration(event))
 		return;
@@ -880,5 +862,5 @@ void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids
 		zbx_free(error);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

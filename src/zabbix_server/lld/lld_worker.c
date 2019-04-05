@@ -62,8 +62,6 @@ static void	lld_register_worker(zbx_ipc_socket_t *socket)
  ******************************************************************************/
 static void	lld_process_task(zbx_ipc_message_t *message)
 {
-	const char		*__function_name = "lld_process_task";
-
 	zbx_uint64_t		itemid, lastlogsize;
 	char			*value, *error;
 	zbx_timespec_t		ts;
@@ -72,7 +70,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 	int			errcode, mtime;
 	unsigned char		state, meta;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_lld_deserialize_item_value(message->data, &itemid, &value, &ts, &meta, &lastlogsize, &mtime, &error);
 
@@ -166,7 +164,7 @@ out:
 	zbx_free(value);
 	zbx_free(error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 

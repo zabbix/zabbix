@@ -2298,14 +2298,13 @@ static size_t	vch_item_free_cache(zbx_vc_item_t *item)
  ******************************************************************************/
 int	zbx_vc_init(char **error)
 {
-	const char	*__function_name = "zbx_vc_init";
 	zbx_uint64_t	size_reserved;
 	int		ret = FAIL;
 
 	if (0 == CONFIG_VALUE_CACHE_SIZE)
 		return SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != zbx_mutex_create(&vc_lock, ZBX_MUTEX_VALUECACHE, error))
 		goto out;
@@ -2355,7 +2354,7 @@ int	zbx_vc_init(char **error)
 out:
 	zbx_vc_disable();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
@@ -2369,9 +2368,7 @@ out:
  ******************************************************************************/
 void	zbx_vc_destroy(void)
 {
-	const char	*__function_name = "zbx_vc_destroy";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL != vc_cache)
 	{
@@ -2384,7 +2381,7 @@ void	zbx_vc_destroy(void)
 		vc_cache = NULL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2399,9 +2396,7 @@ void	zbx_vc_destroy(void)
  ******************************************************************************/
 void	zbx_vc_reset(void)
 {
-	const char	*__function_name = "zbx_vc_clean";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL != vc_cache)
 	{
@@ -2427,7 +2422,7 @@ void	zbx_vc_reset(void)
 		vc_try_unlock();
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2522,12 +2517,11 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values, int seconds,
 		int count, const zbx_timespec_t *ts)
 {
-	const char	*__function_name = "zbx_vc_get_values";
 	zbx_vc_item_t	*item = NULL;
 	int 		ret = FAIL, cache_used = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d seconds:%d count:%d sec:%d ns:%d",
-			__function_name, itemid, value_type, seconds, count, ts->sec, ts->ns);
+			__func__, itemid, value_type, seconds, count, ts->sec, ts->ns);
 
 	vc_try_lock();
 
@@ -2580,7 +2574,7 @@ out:
 	vc_try_unlock();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s count:%d cached:%d",
-			__function_name, zbx_result_string(ret), values->values_num, cache_used);
+			__func__, zbx_result_string(ret), values->values_num, cache_used);
 
 	return ret;
 }

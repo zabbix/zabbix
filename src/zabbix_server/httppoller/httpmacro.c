@@ -81,19 +81,18 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
 static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, size_t nkey,
 			const char *pvalue, size_t nvalue, const char *data, char **err_str)
 {
-	const char	*__function_name = "httpmacro_append_pair";
 	char 		*value_str = NULL;
 	size_t		key_size = 0, key_offset = 0, value_size = 0, value_offset = 0;
 	zbx_ptr_pair_t	pair = {NULL, NULL};
 	int		index, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pkey:'%.*s' pvalue:'%.*s'",
-			__function_name, (int)nkey, pkey, (int)nvalue, pvalue);
+			__func__, (int)nkey, pkey, (int)nvalue, pvalue);
 
 	if (0 == nkey && 0 != nvalue)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable name (only value provided): \"%.*s\"",
-				__function_name, (int)nvalue, pvalue);
+				__func__, (int)nvalue, pvalue);
 
 		if (NULL != err_str && NULL == *err_str)
 		{
@@ -106,7 +105,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 	if ('{' != pkey[0] || '}' != pkey[nkey - 1])
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%.*s\" not enclosed in {}", __function_name, (int)nkey, pkey);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%.*s\" not enclosed in {}", __func__, (int)nkey, pkey);
 
 		if (NULL != err_str && NULL == *err_str)
 			*err_str = zbx_dsprintf(*err_str, "\"%.*s\" not enclosed in {}", (int)nkey, pkey);
@@ -129,7 +128,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 		if (SUCCEED != rc || NULL == pair.second)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot extract the value of \"%.*s\" from response",
-					__function_name, (int)nkey, pkey);
+					__func__, (int)nkey, pkey);
 
 			if (NULL != err_str && NULL == *err_str)
 			{
@@ -162,7 +161,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -182,13 +181,12 @@ out:
  ******************************************************************************/
 int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 {
-	const char	*__function_name = "http_substitute_variables";
 	char		replace_char, *substitute;
 	size_t		left, right, len, offset;
 	int		index, ret = SUCCEED;
 	zbx_ptr_pair_t	pair = {NULL, NULL};
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, *data);
 
 	for (left = 0; '\0' != (*data)[left]; left++)
 	{
@@ -261,7 +259,7 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 		left = right;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __func__, *data);
 
 	return ret;
 }
@@ -293,11 +291,10 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 int	http_process_variables(zbx_httptest_t *httptest, zbx_vector_ptr_pair_t *variables, const char *data,
 		char **err_str)
 {
-	const char	*__function_name = "http_process_variables";
-	char		*key, *value;
-	int		i, ret = FAIL;
+	char	*key, *value;
+	int	i, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %d variables", __function_name, variables->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %d variables", __func__, variables->values_num);
 
 	for (i = 0; i < variables->values_num; i++)
 	{
@@ -309,7 +306,7 @@ int	http_process_variables(zbx_httptest_t *httptest, zbx_vector_ptr_pair_t *vari
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

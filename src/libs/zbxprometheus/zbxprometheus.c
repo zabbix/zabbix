@@ -767,13 +767,11 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
  ******************************************************************************/
 static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *data, char **error)
 {
-	const char	*__function_name = "prometheus_filter_init";
-
 	int		ret = FAIL;
 	size_t		pos = 0;
 	zbx_strloc_t	loc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	memset(filter, 0, sizeof(zbx_prometheus_filter_t));
 	zbx_vector_ptr_create(&filter->labels);
@@ -835,10 +833,10 @@ out:
 	if (FAIL == ret)
 	{
 		prometheus_filter_clear(filter);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() Prometheus pattern error: %s", __function_name, *error);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() Prometheus pattern error: %s", __func__, *error);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
@@ -1395,15 +1393,13 @@ static int	prometheus_parse_hint(zbx_prometheus_filter_t *filter, const char *da
 static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *data, zbx_vector_ptr_t *rows,
 		zbx_hashset_t *hints, char **error)
 {
-	const char	*__function_name = "prometheus_parse_rows";
-
 	size_t			pos = 0;
 	int			row_num = 1, ret = FAIL;
 	zbx_prometheus_row_t	*row;
 	char			*errmsg = NULL;
 	zbx_strloc_t		loc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (pos = 0; '\0' != data[pos]; pos = skip_row(data, pos), row_num++)
 	{
@@ -1458,7 +1454,7 @@ out:
 		zbx_free(errmsg);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s rows:%d hints:%d", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s rows:%d hints:%d", __func__, zbx_result_string(ret),
 			rows->values_num, (NULL == hints ? 0 : hints->num_data));
 	return ret;
 }
@@ -1562,14 +1558,12 @@ static int	prometheus_extract_value(zbx_vector_ptr_t *rows, const char *output, 
 int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char *output, char **value,
 		char **error)
 {
-	const char		*__function_name = "zbx_prometheus_pattern";
-
 	zbx_prometheus_filter_t	filter;
 	char			*errmsg = NULL;
 	int			ret = FAIL;
 	zbx_vector_ptr_t	rows;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
 	{
@@ -1590,14 +1584,14 @@ int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char
 		goto cleanup;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): output:%s", __function_name, *value);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): output:%s", __func__, *value);
 	ret = SUCCEED;
 cleanup:
 	zbx_vector_ptr_clear_ext(&rows, (zbx_clean_func_t)prometheus_row_free);
 	zbx_vector_ptr_destroy(&rows);
 	prometheus_filter_clear(&filter);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 	return ret;
 }
 
@@ -1618,7 +1612,6 @@ out:
  ******************************************************************************/
 int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **value, char **error)
 {
-	const char		*__function_name = "zbx_prometheus_to_json";
 	zbx_prometheus_filter_t	filter;
 	char			*errmsg = NULL;
 	int			ret = FAIL, i, j;
@@ -1628,7 +1621,7 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 	zbx_hashset_iter_t	iter;
 	struct zbx_json		json;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
 	{
@@ -1682,7 +1675,7 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 
 	*value = zbx_strdup(NULL, json.buffer);
 	zbx_json_free(&json);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): output:%s", __function_name, *value);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): output:%s", __func__, *value);
 	ret = SUCCEED;
 cleanup:
 	zbx_hashset_iter_reset(&hints, &iter);
@@ -1698,7 +1691,7 @@ cleanup:
 	zbx_vector_ptr_destroy(&rows);
 	prometheus_filter_clear(&filter);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 	return ret;
 }
 
