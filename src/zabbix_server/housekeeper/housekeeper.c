@@ -546,7 +546,7 @@ static int	housekeeping_history_and_trends(int now)
 
 	for (rule = hk_history_rules; NULL != rule->table; rule++)
 	{
-		if (ZBX_HK_OPTION_DISABLED == *rule->poption_mode || FAIL == zbx_history_requires_trends(rule->type))
+		if (ZBX_HK_OPTION_DISABLED == *rule->poption_mode)
 			continue;
 
 		/* process housekeeping rule */

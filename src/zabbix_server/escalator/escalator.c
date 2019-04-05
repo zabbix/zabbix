@@ -1355,7 +1355,6 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	DB_ROW		row;
 	int		next_esc_period = 0, esc_period, default_esc_period;
 	ZBX_USER_MSG	*user_msg = NULL;
-	unsigned char	operations = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1383,8 +1382,6 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	{
 		char		*tmp;
 		zbx_uint64_t	operationid;
-
-		operations = 1;
 
 		ZBX_STR2UINT64(operationid, row[0]);
 
@@ -1449,22 +1446,18 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource || EVENT_SOURCE_INTERNAL == action->eventsource)
 	{
-		if (0 == operations)
-		{
-			result = DBselect(
-					"select null"
-					" from operations"
-					" where actionid=" ZBX_FS_UI64
-						" and esc_step_from>%d"
-						" and recovery=%d",
+		char	*sql;
+
+		sql = zbx_dsprintf(NULL,
+				"select null"
+				" from operations"
+				" where actionid=" ZBX_FS_UI64
+					" and (esc_step_from>%d or esc_step_to=0)"
+					" and recovery=%d",
 					action->actionid, escalation->esc_step, ZBX_OPERATION_MODE_NORMAL);
+		result = DBselectN(sql, 1);
 
-			if (NULL != DBfetch(result))
-				operations = 1;
-			DBfree_result(result);
-		}
-
-		if (1 == operations)
+		if (NULL != DBfetch(result))
 		{
 			next_esc_period = (0 != next_esc_period) ? next_esc_period : default_esc_period;
 			escalation->nextcheck = time(NULL) + next_esc_period;
@@ -1476,6 +1469,9 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 		}
 		else
 			escalation->status = ESCALATION_STATUS_COMPLETED;
+
+		DBfree_result(result);
+		zbx_free(sql);
 	}
 	else
 		escalation->status = ESCALATION_STATUS_COMPLETED;
