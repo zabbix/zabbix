@@ -91,7 +91,6 @@ static int	execute_remote_script(zbx_script_t *script, DC_HOST *host, char **inf
  ******************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char *sessionid, char **result)
 {
-	const char	*__function_name = "execute_script";
 	char		error[MAX_STRING_LEN];
 	int		ret = FAIL, rc;
 	DC_HOST		host;
@@ -99,7 +98,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 	zbx_user_t	user;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " sessionid:%s",
-			__function_name, scriptid, hostid, sessionid);
+			__func__, scriptid, hostid, sessionid);
 
 	*error = '\0';
 
@@ -133,7 +132,7 @@ fail:
 	if (SUCCEED != ret)
 		*result = zbx_strdup(*result, error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

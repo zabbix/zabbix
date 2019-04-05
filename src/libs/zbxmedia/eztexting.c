@@ -98,8 +98,6 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 {
 #ifdef HAVE_LIBCURL
 
-	const char	*__function_name = "send_ez_texting";
-
 	int		ret = FAIL;
 	int		max_message_len;
 	int		i, len;
@@ -110,7 +108,7 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 	CURLoption	opt;
 	CURLcode	err;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sendto:'%s' message:'%s'", __function_name, sendto, message);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sendto:'%s' message:'%s'", __func__, sendto, message);
 
 	assert(error);
 	*error = '\0';
@@ -295,7 +293,7 @@ clean:
 	if (NULL != easy_handle)
 		curl_easy_cleanup(easy_handle);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 

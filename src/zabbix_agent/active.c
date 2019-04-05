@@ -88,10 +88,9 @@ LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
 
 static void	init_active_metrics(void)
 {
-	const char	*__function_name = "init_active_metrics";
-	size_t		sz;
+	size_t	sz;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == buffer.data)
 	{
@@ -108,7 +107,7 @@ static void	init_active_metrics(void)
 	zbx_vector_ptr_create(&active_metrics);
 	zbx_vector_ptr_create(&regexps);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	free_active_metric(ZBX_ACTIVE_METRIC *metric)
@@ -128,9 +127,7 @@ static void	free_active_metric(ZBX_ACTIVE_METRIC *metric)
 #ifdef _WINDOWS
 static void	free_active_metrics(void)
 {
-	const char	*__function_name = "free_active_metrics";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
@@ -138,7 +135,7 @@ static void	free_active_metrics(void)
 	zbx_vector_ptr_clear_ext(&active_metrics, (zbx_clean_func_t)free_active_metric);
 	zbx_vector_ptr_destroy(&active_metrics);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 #endif
 
@@ -152,10 +149,9 @@ static int	metric_ready_to_process(const ZBX_ACTIVE_METRIC *metric)
 
 static int	get_min_nextcheck(void)
 {
-	const char	*__function_name = "get_min_nextcheck";
-	int		i, min = -1;
+	int	i, min = -1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
@@ -171,19 +167,18 @@ static int	get_min_nextcheck(void)
 	if (-1 == min)
 		min = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, min);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, min);
 
 	return min;
 }
 
 static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime)
 {
-	const char		*__function_name = "add_check";
 	ZBX_ACTIVE_METRIC	*metric;
 	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' refresh:%d lastlogsize:" ZBX_FS_UI64 " mtime:%d",
-			__function_name, key, refresh, lastlogsize, mtime);
+			__func__, key, refresh, lastlogsize, mtime);
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
@@ -271,7 +266,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 
 	zbx_vector_ptr_append(&active_metrics, metric);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -334,7 +329,6 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  ******************************************************************************/
 static int	parse_list_of_checks(char *str, const char *host, unsigned short port)
 {
-	const char		*__function_name = "parse_list_of_checks";
 	const char		*p;
 	char			name[MAX_STRING_LEN], key_orig[MAX_STRING_LEN], expression[MAX_STRING_LEN],
 				tmp[MAX_STRING_LEN], exp_delimiter;
@@ -345,7 +339,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	zbx_vector_str_t	received_metrics;
 	int			delay, mtime, expression_type, case_sensitive, i, j, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_str_create(&received_metrics);
 
@@ -526,7 +520,7 @@ out:
 	zbx_vector_str_clear_ext(&received_metrics, zbx_str_free);
 	zbx_vector_str_destroy(&received_metrics);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -550,15 +544,13 @@ out:
  ******************************************************************************/
 static int	refresh_active_checks(const char *host, unsigned short port)
 {
-	const char	*__function_name = "refresh_active_checks";
-
 	ZBX_THREAD_LOCAL static int	last_ret = SUCCEED;
 	int				ret;
 	char				*tls_arg1, *tls_arg2;
 	zbx_socket_t			s;
 	struct zbx_json			json;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%hu", __function_name, host, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%hu", __func__, host, port);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -683,7 +675,7 @@ out:
 
 	zbx_json_free(&json);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -706,14 +698,12 @@ out:
  ******************************************************************************/
 static int	check_response(char *response)
 {
-	const char		*__function_name = "check_response";
-
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN];
 	char			info[MAX_STRING_LEN];
 	int			ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() response:'%s'", __function_name, response);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() response:'%s'", __func__, response);
 
 	ret = zbx_json_open(response, &jp);
 
@@ -726,7 +716,7 @@ static int	check_response(char *response)
 	if (SUCCEED == ret && SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
 		zabbix_log(LOG_LEVEL_DEBUG, "info from server: '%s'", info);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -748,7 +738,6 @@ static int	check_response(char *response)
  ******************************************************************************/
 static int	send_buffer(const char *host, unsigned short port)
 {
-	const char			*__function_name = "send_buffer";
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
 	int				ret = SUCCEED, i, now;
 	char				*tls_arg1, *tls_arg2;
@@ -758,7 +747,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	struct zbx_json 		json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d entries:%d/%d",
-			__function_name, host, port, buffer.count, CONFIG_BUFFER_SIZE);
+			__func__, host, port, buffer.count, CONFIG_BUFFER_SIZE);
 
 	if (0 == buffer.count)
 		goto ret;
@@ -769,7 +758,7 @@ static int	send_buffer(const char *host, unsigned short port)
 			CONFIG_BUFFER_SEND > now - buffer.lastsent)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() now:%d lastsent:%d now-lastsent:%d BufferSend:%d; will not send now",
-				__function_name, now, buffer.lastsent, now - buffer.lastsent, CONFIG_BUFFER_SEND);
+				__func__, now, buffer.lastsent, now - buffer.lastsent, CONFIG_BUFFER_SEND);
 		goto ret;
 	}
 
@@ -914,7 +903,7 @@ out:
 		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s%s", err_send_step, zbx_socket_strerror());
 	}
 ret:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -961,12 +950,11 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
 		unsigned char flags)
 {
-	const char			*__function_name = "process_value";
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
 	int				i, ret = FAIL;
 	size_t				sz;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key, ZBX_NULL2STR(value));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __func__, host, key, ZBX_NULL2STR(value));
 
 	send_buffer(server, port);
 
@@ -1051,7 +1039,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1059,11 +1047,9 @@ out:
 static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
 		unsigned char old_state, zbx_uint64_t lastlogsize_last, int mtime_last)
 {
-	const char	*__function_name = "need_meta_update";
+	int	ret = FAIL;
 
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:%s", __function_name, metric->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:%s", __func__, metric->key);
 
 	if (0 != (ZBX_METRIC_FLAG_LOG & metric->flags))
 	{
@@ -1081,7 +1067,7 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1891,11 +1877,10 @@ out:
 
 static void	process_active_checks(char *server, unsigned short port)
 {
-	const char	*__function_name = "process_active_checks";
-	char		*error = NULL;
-	int		i, now, ret;
+	char	*error = NULL;
+	int	i, now, ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu", __function_name, server, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu", __func__, server, port);
 
 	now = (int)time(NULL);
 
@@ -1984,7 +1969,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		metric->nextcheck = (int)time(NULL) + metric->refresh;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************

@@ -140,13 +140,12 @@ void	collect_stats_diskdevices(void)
 
 ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname)
 {
-	const char			*__function_name = "collector_diskdevice_get";
 	int				i;
 	ZBX_SINGLE_DISKDEVICE_DATA	*device = NULL;
 
 	assert(devname);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() devname:'%s'", __function_name, devname);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() devname:'%s'", __func__, devname);
 
 	LOCK_DISKSTATS;
 	if (0 == DISKDEVICE_COLLECTOR_STARTED(collector))
@@ -160,25 +159,24 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname)
 		{
 			device = &diskdevices->device[i];
 			device->ticks_since_polled = 0;
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() device '%s' found", __function_name, devname);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() device '%s' found", __func__, devname);
 			break;
 		}
 	}
 	UNLOCK_DISKSTATS;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)device);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)device);
 
 	return device;
 }
 
 ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
 {
-	const char			*__function_name = "collector_diskdevice_add";
 	ZBX_SINGLE_DISKDEVICE_DATA	*device = NULL;
 
 	assert(devname);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() devname:'%s'", __function_name, devname);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() devname:'%s'", __func__, devname);
 
 	LOCK_DISKSTATS;
 	if (0 == DISKDEVICE_COLLECTOR_STARTED(collector))
@@ -188,7 +186,7 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
 
 	if (diskdevices->count == MAX_DISKDEVICES)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() collector is full", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() collector is full", __func__);
 		goto end;
 	}
 
@@ -206,7 +204,7 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
 end:
 	UNLOCK_DISKSTATS;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)device);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)device);
 
 	return device;
 }

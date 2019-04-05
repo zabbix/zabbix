@@ -112,8 +112,6 @@ int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 {
-	const char	*__function_name = "EXECUTE_STR";
-
 	int		ret = SYSINFO_RET_FAIL;
 	char		*cmd_result = NULL, error[MAX_STRING_LEN];
 
@@ -127,7 +125,7 @@ int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() command:'%s' len:" ZBX_FS_SIZE_T " cmd_result:'%.20s'",
-			__function_name, command, (zbx_fs_size_t)strlen(cmd_result), cmd_result);
+			__func__, command, (zbx_fs_size_t)strlen(cmd_result), cmd_result);
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, cmd_result));
 

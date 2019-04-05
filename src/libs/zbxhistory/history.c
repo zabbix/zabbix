@@ -100,10 +100,9 @@ void	zbx_history_destroy(void)
  ************************************************************************************/
 int	zbx_history_add_values(const zbx_vector_ptr_t *history)
 {
-	const char	*__function_name = "zbx_history_add_values";
-	int		i, flags = 0, ret = SUCCEED;
+	int	i, flags = 0, ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
 	{
@@ -121,7 +120,7 @@ int	zbx_history_add_values(const zbx_vector_ptr_t *history)
 			ret = writer->flush(writer);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
@@ -149,12 +148,11 @@ int	zbx_history_add_values(const zbx_vector_ptr_t *history)
 int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values)
 {
-	const char		*__function_name = "zbx_history_get_values";
 	int			ret, pos;
 	zbx_history_iface_t	*writer = &history_ifaces[value_type];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d start:%d count:%d end:%d",
-			__function_name, itemid, value_type, start, count, end);
+			__func__, itemid, value_type, start, count, end);
 
 	pos = values->values_num;
 	ret = writer->get_values(writer, itemid, start, count, end, values);
@@ -173,7 +171,7 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s values:%d", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s values:%d", __func__, zbx_result_string(ret),
 			values->values_num - pos);
 
 	return ret;

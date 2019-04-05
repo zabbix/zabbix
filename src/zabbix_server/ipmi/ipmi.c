@@ -84,7 +84,6 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
  ******************************************************************************/
 int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *error, size_t max_error_len)
 {
-	const char		*__function_name = "ipmi_manager_init";
 	zbx_ipc_socket_t	ipmi_socket;
 	zbx_ipc_message_t	message;
 	char			*errmsg = NULL, sensor[ITEM_IPMI_SENSOR_LEN_MAX], *value = NULL;
@@ -94,7 +93,7 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 	DC_INTERFACE		interface;
 	zbx_timespec_t		ts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:\"%s\" command:%s", __function_name, host->host, command);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:\"%s\" command:%s", __func__, host->host, command);
 
 	if (SUCCEED != zbx_parse_ipmi_command(command, sensor, &op, error, max_error_len))
 		goto out;
@@ -154,7 +153,7 @@ cleanup:
 	zbx_ipc_socket_close(&ipmi_socket);
 
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

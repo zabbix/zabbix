@@ -607,8 +607,6 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		const char *password, unsigned char content_type, int timeout, char *error, size_t max_error_len)
 {
 #ifdef HAVE_SMTP_AUTHENTICATION
-	const char		*__function_name = "send_email_curl";
-
 	int			ret = FAIL, i;
 	CURL			*easyhandle;
 	CURLcode		err;
@@ -681,7 +679,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 
 	if (0 >= from_mails->values_num)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() sender's address is not specified", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() sender's address is not specified", __func__);
 	}
 	else if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAIL_FROM,
 			((zbx_mailaddr_t *)from_mails->values[0])->addr)))
@@ -784,13 +782,11 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		unsigned char smtp_authentication, const char *username, const char *password,
 		unsigned char content_type, int timeout, char *error, size_t max_error_len)
 {
-	const char	*__function_name = "send_email";
-
 	int			ret = FAIL;
 	zbx_vector_ptr_t	from_mails, to_mails;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() smtp_server:'%s' smtp_port:%hu smtp_security:%d smtp_authentication:%d",
-			__function_name, smtp_server, smtp_port, (int)smtp_security, (int)smtp_authentication);
+			__func__, smtp_server, smtp_port, (int)smtp_security, (int)smtp_authentication);
 
 	*error = '\0';
 
@@ -828,7 +824,7 @@ clean:
 	if ('\0' != *error)
 		zabbix_log(LOG_LEVEL_WARNING, "failed to send email: %s", error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
