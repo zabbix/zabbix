@@ -423,7 +423,7 @@ function validateTriggerWizard(formname, dialogueid) {
 			}
 			else if (dialogueid) {
 				overlayDialogueDestroy(dialogueid);
-				window.location.reload(true);
+				window.location.replace(window.location.href);
 			}
 		},
 		dataType: 'json',

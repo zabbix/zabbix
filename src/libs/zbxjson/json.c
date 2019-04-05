@@ -41,14 +41,8 @@ const char	*zbx_json_strerror(void)
 	return zbx_json_strerror_message;
 }
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_set_json_strerror(fmt, ...) __zbx_zbx_set_json_strerror(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_set_json_strerror __zbx_zbx_set_json_strerror
-#endif
-
 __zbx_attr_format_printf(1, 2)
-static void	__zbx_zbx_set_json_strerror(const char *fmt, ...)
+static void	zbx_set_json_strerror(const char *fmt, ...)
 {
 	va_list	args;
 

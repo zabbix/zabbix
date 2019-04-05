@@ -195,7 +195,7 @@ out:
 static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids,
 		const DB_EVENT *event)
 {
-	const char		*__function_name = "get_tag_based_permission";
+	const char		*__function_name = "check_tag_based_permission";
 	char			*sql = NULL, hostgroupid[ZBX_MAX_UINT64_LEN + 1];
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;

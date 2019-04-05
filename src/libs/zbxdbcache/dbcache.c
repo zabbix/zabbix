@@ -632,7 +632,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
  ******************************************************************************/
 static void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff)
 {
-	const char	*__function_name = "DCflush_trends";
+	const char	*__function_name = "DBflush_trends";
 	int		num, i, clock, inserts_num = 0, itemids_alloc, itemids_num = 0, trends_to = *trends_num;
 	unsigned char	value_type;
 	zbx_uint64_t	*itemids = NULL;
