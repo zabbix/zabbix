@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15784] fixed multiselect does not support case sensitive auto-complete (agriscenko)
 ..F....... [ZBX-10799] changed placeholder for http proxy input fields (agriscenko)
 ..F....... [ZBX-13014] fixed map on screen is not centered (agriscenko)
 ...G...... [ZBX-9229] fixed sending first value of the log as separate message (asestakovs)
