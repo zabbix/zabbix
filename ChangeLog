@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-1302] added low-level discovery of block devices (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-10574] fixed version calculation (vasilijs)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.1rc1
