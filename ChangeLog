@@ -11,6 +11,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-15898] fixed compilation warning regarding too large integer constant (akozlovs)
 ..F....... [ZBX-15507] fixed item/trigger/graph copy form provides read-only host groups in target list; replaced form elements with multiselect (agriscenko)
 ..F....... [ZBX-15338] fixed last problem name being displayed on map instead of most critical (agriscenko, vmurzins)
 ........S. [ZBX-15929] fixed escalation operation not being send multiple times (akozlovs)
@@ -311,6 +312,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-15898] fixed compilation warning regarding too large integer constant (akozlovs)
 ..F....... [ZBX-15338] fixed last problem name being displayed on map instead of most critical (agriscenko, vmurzins)
 ........S. [ZBX-15929] fixed escalation operation not being send multiple times (akozlovs)
 ...G...PS. [ZBX-15721] fixed escaping of control characters in JSON encoder (Andris, viktors)
