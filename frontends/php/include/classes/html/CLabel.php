@@ -39,4 +39,10 @@ class CLabel extends CTag {
 	public function setAsteriskMark($add_asterisk = true) {
 		return $this->addClass($add_asterisk ? ZBX_STYLE_FIELD_LABEL_ASTERISK : null);
 	}
+
+	public function setWidth($value) {
+		$this->addStyle('width: '.$value.'px;');
+
+		return $this;
+	}
 }

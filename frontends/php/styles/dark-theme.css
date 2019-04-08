@@ -185,6 +185,9 @@ pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
 
+.discovery-checks {
+  word-wrap: break-word; }
+
 .top-nav-container {
   background-color: #2b2b2b;
   height: 45px;

@@ -1,7 +1,8 @@
 <script type="text/x-jquery-tmpl" id="dcheckRowTPL">
 	<?= (new CRow([
 			(new CCol(
-				new CSpan('#{name}')
+				(new CDiv('#{name}'))->addClass('discovery-checks')
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))->setId('dcheckCell_#{dcheckid}'),
 			new CHorList([
 				(new CButton(null, _('Edit')))
@@ -21,7 +22,9 @@
 			(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
 				->setId('uniqueness_criteria_#{dcheckid}'),
-			new CLabel([new CSpan(), '#{name}'], 'uniqueness_criteria_#{dcheckid}')
+			(new CLabel([new CSpan(), '#{name}'], 'uniqueness_criteria_#{dcheckid}'))
+				->addClass('discovery-checks')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		]))
 			->setId('uniqueness_criteria_row_#{dcheckid}')
 			->toString()
@@ -310,7 +313,7 @@
 				}
 
 				// update check name
-				jQuery('#dcheckCell_' + value.dcheckid + ' span').text(value['name']);
+				jQuery('#dcheckCell_' + value.dcheckid + ' .discovery-checks').text(value['name']);
 			}
 
 			// update device uniqueness criteria
@@ -336,6 +339,24 @@
 				}
 			}
 		}
+
+		// Boxes alignment to the right.
+		jQuery('#dcheckListFooter').closest("tbody").children('[id^=dcheckRow_]').each(function () {
+			var $this = jQuery(this),
+				check = $this.find('.discovery-checks');
+
+			if (check.width() == <?=ZBX_TEXTAREA_STANDARD_WIDTH?>) {
+				check.width(check.width() - $this.children(':last-child').width() - 30);
+			}
+		});
+
+		jQuery('label.discovery-checks').each(function () {
+			var $this = jQuery(this);
+		if ($this.width() == <?=ZBX_TEXTAREA_STANDARD_WIDTH?>) {
+				$this.width($this.width() - 30);
+			}
+		});
+
 	}
 
 	function removeDCheckRow(dcheckid) {
