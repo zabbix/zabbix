@@ -33,14 +33,16 @@
 #define	REMOVE_TH	4
 #define	REMOVE_HT	5
 
-#define ZBX_CM_LEAK_CHECK_START()	struct mallinfo zbx_cm_minfo = mallinfo()
+#define ZBX_CM_LEAK_CHECK_START()	zbx_cm_minfo = mallinfo()
 #define ZBX_CM_LEAK_CHECK_END()	{									\
 		struct mallinfo minfo_local;								\
 		minfo_local = mallinfo(); 								\
 		zbx_mock_assert_int_eq("memory leak", minfo_local.uordblks, zbx_cm_minfo.uordblks);	\
 	}
 
-static void	vcmock_read_values(zbx_mock_handle_t hdata, zbx_vector_ptr_t *values)
+static struct mallinfo	zbx_cm_minfo;
+
+static void	mock_read_values(zbx_mock_handle_t hdata, zbx_vector_ptr_t *values)
 {
 	zbx_mock_error_t	err;
 	zbx_mock_handle_t	hvalue;
@@ -83,11 +85,11 @@ static void	test_queue_range_values(int iterations, zbx_vector_ptr_t *values)
 		for (i = 0; i < values->values_num; i++)
 		{
 			ptr = zbx_queue_ptr_pop(&queue);
-			zbx_mock_assert_uint64_eq("value", (zbx_uint64_t)ptr, (zbx_uint64_t)values->values[i]);
+			zbx_mock_assert_ptr_eq("value", ptr, values->values[i]);
 		}
 
-		if (NULL != (ptr = zbx_queue_ptr_pop(&queue)))
-			fail_msg("The pointer in not NULL");
+		ptr = zbx_queue_ptr_pop(&queue);
+		zbx_mock_assert_ptr_eq("value", NULL, ptr);
 	}
 
 	zbx_queue_ptr_destroy(&queue);
@@ -100,7 +102,7 @@ void test_queue_range()
 	zbx_vector_ptr_t	values;
 
 	zbx_vector_ptr_create(&values);
-	vcmock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
+	mock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
 	test_queue_range_values(ZBX_QUEUE_TEST_ITERATIONS, &values);
 	zbx_vector_ptr_destroy(&values);
 }
@@ -113,7 +115,7 @@ void test_queue_ptr_compact_tail_head()
 	int			i;
 
 	zbx_vector_ptr_create(&values);
-	vcmock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
+	mock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
 
 	ZBX_CM_LEAK_CHECK_START();
 
@@ -130,7 +132,7 @@ void test_queue_ptr_compact_tail_head()
 	for (i = 0; i < values.values_num; i++)
 	{
 		ptr = zbx_queue_ptr_pop(&queue);
-		zbx_mock_assert_uint64_eq("value", (zbx_uint64_t)ptr, (zbx_uint64_t)values.values[i]);
+		zbx_mock_assert_ptr_eq("value", ptr, values.values[i]);
 
 		zbx_queue_ptr_compact(&queue);
 		zbx_mock_assert_int_eq("allocated memory", queue.alloc_num, (int)(values.values_num - i));
@@ -151,7 +153,7 @@ void test_queue_ptr_compact_head_tail()
 	int			i;
 
 	zbx_vector_ptr_create(&values);
-	vcmock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
+	mock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
 
 	ZBX_CM_LEAK_CHECK_START();
 
@@ -179,7 +181,7 @@ void test_queue_ptr_compact_head_tail()
 	for (i = 0; i < values.values_num; i++)
 	{
 		ptr = zbx_queue_ptr_pop(&queue);
-		zbx_mock_assert_uint64_eq("value", (zbx_uint64_t)ptr, (zbx_uint64_t)values.values[i]);
+		zbx_mock_assert_ptr_eq("value", ptr, values.values[i]);
 
 		zbx_queue_ptr_compact(&queue);
 		zbx_mock_assert_int_eq("allocated memory", queue.alloc_num, (int)(values.values_num - i));
@@ -207,7 +209,7 @@ static void	test_queue_ptr_remove_value(zbx_queue_ptr_t *queue, void **values, i
 			continue;
 
 		ptr = zbx_queue_ptr_pop(queue);
-		zbx_mock_assert_uint64_eq("remove value", (zbx_uint64_t)ptr, (zbx_uint64_t)values[i]);
+		zbx_mock_assert_ptr_eq("remove value", ptr, values[i]);
 	}
 }
 
@@ -218,7 +220,7 @@ void test_queue_ptr_remove_tail_head()
 	int			i, j;
 
 	zbx_vector_ptr_create(&values);
-	vcmock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
+	mock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
 
 	ZBX_CM_LEAK_CHECK_START();
 
@@ -261,7 +263,7 @@ void test_queue_ptr_remove_head_tail()
 	int			i, j;
 
 	zbx_vector_ptr_create(&values);
-	vcmock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
+	mock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
 
 	ZBX_CM_LEAK_CHECK_START();
 
@@ -322,7 +324,7 @@ void	zbx_mock_test_entry(void **state)
 {
 	ZBX_UNUSED(state);
 
-	switch(get_type(zbx_mock_get_parameter_string("in.type")))
+	switch (get_type(zbx_mock_get_parameter_string("in.type")))
 	{
 		case RANGE:
 			test_queue_range();
