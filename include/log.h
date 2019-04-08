@@ -42,8 +42,8 @@
 
 extern int	zbx_log_level;
 #define ZBX_CHECK_LOG_LEVEL(level)			\
-		((LOG_LEVEL_INFORMATION != level &&	\
-		(level > zbx_log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
+		((LOG_LEVEL_INFORMATION != (level) &&	\
+		((level) > zbx_log_level || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
 
 typedef enum
 {
