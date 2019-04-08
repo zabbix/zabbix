@@ -160,8 +160,6 @@ foreach ($data['discoveries'] as $discovery) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
-
 // append table to form
 $discoveryForm->addItem([
 	$discoveryTable,

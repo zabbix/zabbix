@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15139] fixed element removing from list in different tabs or browsers (vasilijs)
 ..F....... [ZBX-15779] fixed loss of host name in tooltip on trigger overview page (vasilijs)
 ...G...... [ZBX-15898] fixed compilation warning regarding too large integer constant (akozlovs)
 ..F....... [ZBX-15507] fixed item/trigger/graph copy form provides read-only host groups in target list; replaced form elements with multiselect (agriscenko)
@@ -305,6 +306,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15139] fixed element removing from list in different tabs or browsers (vasilijs)
 ..F....... [ZBX-15779] fixed loss of host name in tooltip on trigger overview page (vasilijs)
 ...G...... [ZBX-15898] fixed compilation warning regarding too large integer constant (akozlovs)
 ..F....... [ZBX-15338] fixed last problem name being displayed on map instead of most critical (agriscenko, vmurzins)

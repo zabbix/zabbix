@@ -1153,6 +1153,15 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 	show_messages($result, _('Item prototypes updated'), _('Cannot update item prototypes'));
 }
 
+if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
+	$item_prototypes = API::ItemPrototype()->get([
+		'itemids' => getRequest('group_itemid'),
+		'output' => [],
+		'editable' => true
+	]);
+	uncheckTableRows(getRequest('parent_discoveryid'), array_column($item_prototypes, 'itemid', 'itemid'));
+}
+
 /*
  * Display
  */
