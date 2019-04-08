@@ -483,26 +483,10 @@ void	DBclose(void);
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
 #endif
-#ifdef HAVE___VA_ARGS__
-#	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#	define DBexecute_once(fmt, ...) __zbx_DBexecute_once(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define DBexecute __zbx_DBexecute
-#	define DBexecute_once __zbx_DBexecute_once
-#endif
-int	__zbx_DBexecute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-int	__zbx_DBexecute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-
-#ifdef HAVE___VA_ARGS__
-#	define DBselect_once(fmt, ...)	__zbx_DBselect_once(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#	define DBselect(fmt, ...)	__zbx_DBselect(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define DBselect_once	__zbx_DBselect_once
-#	define DBselect		__zbx_DBselect
-#endif
-DB_RESULT	__zbx_DBselect_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-DB_RESULT	__zbx_DBselect(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-
+int		DBexecute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+int		DBexecute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+DB_RESULT	DBselect_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+DB_RESULT	DBselect(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(const char *field);

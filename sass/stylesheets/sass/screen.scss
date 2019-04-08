@@ -676,6 +676,7 @@ article {
 			display: inline-block;
 			height: 18px;
 			padding: 4px 7px 0;
+			line-height: 14px;
 
 			a {
 				display: inline-block;
@@ -683,16 +684,34 @@ article {
 				overflow: hidden;
 				text-overflow: ellipsis;
 				vertical-align: top;
+				margin-bottom: -1px;
+
+				&:focus {
+					margin-bottom: -2px;
+				}
 			}
 		}
 	}
 
 	> li {
 		padding: 1px 0;
+
+		> span {
+
+			a {
+				margin-top: 1px;
+				line-height: 13px;
+			}
+		}
 	}
 
-	> li:first-child {
+	> li {
+		line-height: 22px;
 		white-space: nowrap;
+
+		.status-container {
+			line-height: 14px;
+		}
 	}
 
 	+ .filter-space {

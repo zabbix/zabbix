@@ -46,7 +46,6 @@ class CScreenMap extends CScreenBase {
 		}
 
 		$div = (new CDiv($output))
-			->addClass('map-container')
 			->addClass('flickerfreescreen')
 			->setId($this->getScreenId())
 			->setAttribute('data-timestamp', $this->timestamp)
