@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.6rc2');
-define('ZABBIX_API_VERSION',	'4.0.6');
+define('ZABBIX_VERSION',		'4.0.7rc1');
+define('ZABBIX_API_VERSION',	'4.0.7');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -480,8 +480,8 @@ define('ITEM_DATA_TYPE_OCTAL',			1);
 define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
 define('ITEM_DATA_TYPE_BOOLEAN',		3);
 
-define('ZBX_DEFAULT_KEY_DB_MONITOR',			'db.odbc.select[<unique short description>,<dsn>]');
-define('ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY',	'db.odbc.discovery[<unique short description>,<dsn>]');
+define('ZBX_DEFAULT_KEY_DB_MONITOR',			'db.odbc.select[<unique short description>,dsn]');
+define('ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY',	'db.odbc.discovery[<unique short description>,dsn]');
 define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
 define('ZBX_DEFAULT_KEY_TELNET',				'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 
@@ -1394,10 +1394,10 @@ define('QUEUE_DETAILS', 2);
 // item count to display in the details queue
 define('QUEUE_DETAIL_ITEM_COUNT', 500);
 
-// constants for element "copy to..." target types
-define('COPY_TYPE_TO_HOST', 0);
-define('COPY_TYPE_TO_TEMPLATE', 2);
-define('COPY_TYPE_TO_HOST_GROUP', 1);
+// target types to copy items/triggers/graphs
+define('COPY_TYPE_TO_HOST_GROUP',	0);
+define('COPY_TYPE_TO_HOST',			1);
+define('COPY_TYPE_TO_TEMPLATE',		2);
 
 define('HISTORY_GRAPH', 'showgraph');
 define('HISTORY_BATCH_GRAPH', 'batchgraph');
