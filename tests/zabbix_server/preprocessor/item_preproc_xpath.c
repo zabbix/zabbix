@@ -31,12 +31,6 @@
 
 #include "item_preproc_test.h"
 
-#if 0
-void	zbx_mock_test_entry(void **state)
-{
-	ZBX_UNUSED(state);
-}
-#else
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_variant_t	value;
@@ -67,4 +61,3 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_variant_clear(&value);
 }
-#endif
