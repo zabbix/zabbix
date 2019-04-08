@@ -96,13 +96,13 @@ if ($correlationid !== null) {
 
 if (hasRequest('action')) {
 	$correlations = API::Correlation()->get([
-		'countOutput' => true,
+		'output' => [],
 		'correlationids' => getRequest('g_correlationid'),
 		'editable' => true
 	]);
 
-	if ($correlations != count(getRequest('g_correlationid'))) {
-		access_deny();
+	if (count($correlations) != count(getRequest('g_correlationid'))) {
+		uncheckTableRows(null, array_column($correlations, 'correlationid', 'correlationid'));
 	}
 }
 
