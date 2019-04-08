@@ -13,6 +13,9 @@
 					id: 'copy_targetids',
 					name: 'copy_targetids[]',
 					data: data.length ? data : [],
+					objectOptions: {
+						editable: true
+					},
 					popup: {
 						parameters: {
 							dstfrm: '<?= $form->getName() ?>',
