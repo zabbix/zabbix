@@ -324,22 +324,22 @@ void	zbx_mock_test_entry(void **state)
 
 	switch(get_type(zbx_mock_get_parameter_string("in.type")))
 	{
-	case RANGE:
-		test_queue_range();
-		break;
-	case COMPACT_TH:
-		test_queue_ptr_compact_tail_head();
-		break;
-	case COMPACT_HT:
-		test_queue_ptr_compact_head_tail();
-		break;
-	case REMOVE_TH:
-		test_queue_ptr_remove_tail_head();
-		break;
-	case REMOVE_HT:
-		test_queue_ptr_remove_head_tail();
-		break;
-	default:
-		fail_msg("unknown cmocka step type: %s", zbx_mock_get_parameter_string("in.type"));
+		case RANGE:
+			test_queue_range();
+			break;
+		case COMPACT_TH:
+			test_queue_ptr_compact_tail_head();
+			break;
+		case COMPACT_HT:
+			test_queue_ptr_compact_head_tail();
+			break;
+		case REMOVE_TH:
+			test_queue_ptr_remove_tail_head();
+			break;
+		case REMOVE_HT:
+			test_queue_ptr_remove_head_tail();
+			break;
+		default:
+			fail_msg("unknown cmocka step type: %s", zbx_mock_get_parameter_string("in.type"));
 	}
 }
