@@ -35,7 +35,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'hostid' =>									[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'triggerid' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'(isset({form}) && ({form} == "update"))'],
-	'copy_type' =>								[T_ZBX_INT, O_OPT, P_SYS,	IN([COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_HOST_GROUP]), 'isset({copy})'],
+	'copy_type' =>								[T_ZBX_INT, O_OPT, P_SYS,
+													IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
+														COPY_TYPE_TO_TEMPLATE
+													]),
+													'isset({copy})'
+												],
 	'copy_mode' =>								[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),		null],
 	'type' =>									[T_ZBX_INT, O_OPT, null,	IN('0,1'),		null],
 	'description' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
@@ -57,8 +62,7 @@ $fields = [
 	'dependencies' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0',	'isset({add_dependency})'],
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'copy_targetid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'copy_groupid' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
+	'copy_targetids' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,			null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,			null],
 	'mass_update_tags'	=>						[T_ZBX_INT, O_OPT, null,
@@ -551,16 +555,16 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('copy')
 		&& hasRequest('g_triggerid')) {
 
-	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
+	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
 
 		// Hosts or templates.
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hosts_ids = getRequest('copy_targetid');
+			$hosts_ids = getRequest('copy_targetids');
 		}
 		// Host groups.
 		else {
 			$hosts_ids = [];
-			$group_ids = getRequest('copy_targetid');
+			$group_ids = getRequest('copy_targetids');
 			$db_hosts = DBselect(
 				'SELECT DISTINCT h.hostid'.
 				' FROM hosts h,hosts_groups hg'.
@@ -658,6 +662,8 @@ elseif (isset($_REQUEST['form'])) {
 elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('g_triggerid')) {
 	$data = getCopyElementsFormData('g_triggerid', _('Triggers'));
 	$data['action'] = 'trigger.masscopyto';
+
+	// render view
 	$triggersView = new CView('configuration.copy.elements', $data);
 	$triggersView->render();
 	$triggersView->show();
