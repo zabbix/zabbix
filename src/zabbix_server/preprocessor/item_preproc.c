@@ -1054,3 +1054,6 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 
 	return FAIL;
 }
+#ifdef HAVE_TESTS
+#	include "../../../tests/zabbix_server/preprocessor/item_preproc_test.c"
+#endif

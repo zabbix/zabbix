@@ -333,7 +333,6 @@ src/zabbix_server/ipmi/ipmi_poller.c -text
 src/zabbix_server/ipmi/ipmi_poller.h -text
 src/zabbix_server/ipmi/ipmi_protocol.c -text
 src/zabbix_server/ipmi/ipmi_protocol.h -text
-src/zabbix_server/preprocessor/item_preproc_test.c -text
 src/zabbix_server/preprocessor/preprocessing.c -text
 src/zabbix_server/scripts/Makefile.am -text
 src/zabbix_server/taskmanager/Makefile.am -text
