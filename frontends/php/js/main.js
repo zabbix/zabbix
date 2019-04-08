@@ -887,18 +887,18 @@ function getConditionFormula(conditions, evalType) {
 	 * Creates a table with dynamic add/remove row buttons.
 	 *
 	 * Supported options:
-	 * - template		- row template selector
-	 * - row			- element row selector
-	 * - add			- add row button selector
-	 * - remove			- remove row button selector
-	 * - counter 		- number to start row enumeration from
-	 * - dataCallback	- function to generate the data passed to the template
+	 * - template - row template selector
+	 * - row - element row selector
+	 * - add - add row button selector
+	 * - remove - remove row button selector
+	 * - counter - number to start row enumeration from
+	 * - dataCallback - function to generate the data passed to the template
 	 *
 	 * Triggered events:
-	 * - tableupdate.dynamicRows 	- after adding or removing a row.
-	 * - beforeadd.dynamicRows 	    - only before adding a new row.
-	 * - afteradd.dynamicRows 	    - only after adding a new row.
-	 * - afterremove.dynamicRows 	- only after removing a row.
+	 * - tableupdate.dynamicRows - after adding or removing a row.
+	 * - beforeadd.dynamicRows - only before adding a new row.
+	 * - afteradd.dynamicRows - only after adding a new row.
+	 * - afterremove.dynamicRows - only after removing a row.
 	 *
 	 * @param options
 	 */
@@ -971,7 +971,12 @@ function getConditionFormula(conditions, evalType) {
 	 * @param {object} data  Data to be passed into template.
 	 */
 	DynamicRows.prototype.addRow = function(data) {
-		this.$element.trigger('beforeadd.dynamicRows', this);
+		var evtBeforeAdd = $.Event('beforeadd.dynamicRows');
+		this.$element.trigger(evtBeforeAdd, this);
+
+		if (evtBeforeAdd.isDefaultPrevented()) {
+			return;
+		}
 
 		var $beforeRow = (this.options['beforeRow'] !== null)
 			? this.$element.find(this.options['beforeRow'])
