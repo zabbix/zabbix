@@ -456,4 +456,10 @@ tests/libs/zbxsysinfo/linux/SYSTEM_CPU_SWITCHES
 tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
+tests/zabbix_server/.deps
+tests/zabbix_server/Makefile
+tests/zabbix_server/Makefile.in
+tests/zabbix_server/preprocessor/.deps
+tests/zabbix_server/preprocessor/Makefile
+tests/zabbix_server/preprocessor/Makefile.in
 /zabbix-*.tar.gz
