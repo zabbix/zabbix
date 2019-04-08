@@ -143,8 +143,6 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$this->data['discovery_rule']['itemid'].'";');
-
 // append table to form
 $itemForm->addItem([
 	$hostTable,
