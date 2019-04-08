@@ -111,12 +111,11 @@ class CScript extends CApiService {
 					'))';
 		}
 
+		$host_groups = null;
 		$host_groups_by_hostids = null;
 		$host_groups_by_groupids = null;
 
-		$host_groups = null;
-		// Hostids and hroupids selection API calls must be made separately because
-		// we must intescect enriched groupids.
+		// Hostids and groupids selection API calls must be made separately because we must intersect enriched groupids.
 		if ($options['hostids'] !== null) {
 			zbx_value2array($options['hostids']);
 			$host_groups_by_hostids = $this->enrichParentGroups(API::HostGroup()->get([
@@ -144,7 +143,6 @@ class CScript extends CApiService {
 			$host_groups = $host_groups_by_groupids;
 		}
 
-		// if any selection attempt
 		if ($host_groups !== null) {
 			$sqlParts['where'][] = '('.dbConditionInt('s.groupid', array_keys($host_groups)).' OR s.groupid IS NULL)';
 			$this->parent_host_groups = $host_groups;
@@ -767,7 +765,7 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Applies relational subselect onto alreadey fetched result.
+	 * Applies relational subselect onto already fetched result.
 	 *
 	 * @param $options array
 	 * @param $result array
@@ -796,6 +794,9 @@ class CScript extends CApiService {
 			}
 
 			if ($group_search_names !== null) {
+				// If scripts were requested by host or group filters, then we have already requested group names
+				// for all groups linked to scripts. And then we can request less groups by adding them as search
+				// condition in hostgroup.get. Otherwise we will need to request all groups, user has access to.
 				if (array_key_exists($script['groupid'], $this->parent_host_groups)) {
 					$group_search_names[] = $this->parent_host_groups[$script['groupid']]['name'];
 				}
@@ -845,11 +846,12 @@ class CScript extends CApiService {
 			$all_hostids = [];
 			$group_to_hosts = [];
 			while ($row = DBFetch($db_group_hosts)) {
-				$all_hostids[] = $row['hostid'];
 				if (!array_key_exists($row['groupid'], $group_to_hosts)) {
 					$group_to_hosts[$row['groupid']] = [];
 				}
+
 				$group_to_hosts[$row['groupid']][$row['hostid']] = true;
+				$all_hostids[] = $row['hostid'];
 			}
 
 			$used_hosts = API::Host()->get([
