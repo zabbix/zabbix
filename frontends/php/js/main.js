@@ -891,6 +891,7 @@ function getConditionFormula(conditions, evalType) {
 	 * - row - element row selector
 	 * - add - add row button selector
 	 * - remove - remove row button selector
+	 * - disabled - if true, do not perform any updates
 	 * - counter - number to start row enumeration from
 	 * - dataCallback - function to generate the data passed to the template
 	 *
@@ -908,6 +909,7 @@ function getConditionFormula(conditions, evalType) {
 			row: '.form_row',
 			add: '.element-table-add',
 			remove: '.element-table-remove',
+			disabled: false,
 			counter: null,
 			beforeRow: null,
 			keepMinRows: 0,
@@ -965,16 +967,23 @@ function getConditionFormula(conditions, evalType) {
 		}, data, this.options.dataCallback(data));
 	}
 
+	DynamicRows.prototype.disabled = function(disable) {
+		this.options.disabled = disable;
+	}
+
 	/**
 	 * Adds a row before the given row.
 	 *
 	 * @param {object} data  Data to be passed into template.
 	 */
 	DynamicRows.prototype.addRow = function(data) {
+		if (this.options.disabled) {
+			return;
+		}
 		var evtBeforeAdd = $.Event('beforeadd.dynamicRows');
 
 		if (data instanceof jQuery.Event) {
-			evtBeforeAdd.originalEvent
+			evtBeforeAdd.originalEvent = data;
 			data = {};
 		}
 
@@ -1011,6 +1020,10 @@ function getConditionFormula(conditions, evalType) {
 	 * @param {int} index
 	 */
 	DynamicRows.prototype.removeRow = function(rowNum) {
+		if (this.options.disabled) {
+			return;
+		}
+
 		var $row = this.rows[rowNum];
 		$row.remove();
 
