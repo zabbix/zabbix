@@ -974,11 +974,11 @@ function getConditionFormula(conditions, evalType) {
 		var evtBeforeAdd = $.Event('beforeadd.dynamicRows');
 
 		if (data instanceof jQuery.Event) {
-			evtBeforeAdd.originalEvent = data;
+			evtBeforeAdd.originalEvent
 			data = {};
 		}
 
-		this.$element.trigger(evtBeforeAdd, this);
+		this.$element.trigger(evtBeforeAdd, {dynamicRows: this});
 
 		if (evtBeforeAdd.isDefaultPrevented()) {
 			return;
@@ -1001,8 +1001,8 @@ function getConditionFormula(conditions, evalType) {
 		this.counter++;
 		this.length++;
 
-		this.$element.trigger('tableupdate.dynamicRows', this);
-		this.$element.trigger('afteradd.dynamicRows', this);
+		this.$element.trigger('tableupdate.dynamicRows', {dynamicRows: this});
+		this.$element.trigger('afteradd.dynamicRows', {dynamicRows: this});
 	}
 
 	/**
@@ -1016,10 +1016,10 @@ function getConditionFormula(conditions, evalType) {
 
 		delete this.rows[rowNum];
 
-		this.length--;
+		this.length --;
 
-		this.$element.trigger('tableupdate.dynamicRows', this);
-		this.$element.trigger('afterremove.dynamicRows', this);
+		this.$element.trigger('tableupdate.dynamicRows', {dynamicRows: this});
+		this.$element.trigger('afterremove.dynamicRows', {dynamicRows: this});
 
 		this.ensureMinRows();
 	}

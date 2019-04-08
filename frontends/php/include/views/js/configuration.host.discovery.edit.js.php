@@ -66,8 +66,8 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 						return data;
 					}
 				})
-				.bind('tableupdate.dynamicRows', function(event, dynamicRows) {
-					$('#conditionRow').toggle(dynamicRows.length > 1);
+				.bind('tableupdate.dynamicRows', function(event, data) {
+					$('#conditionRow').toggle(data.dynamicRows.length > 1);
 
 					if ($('#evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
 						updateExpression();
