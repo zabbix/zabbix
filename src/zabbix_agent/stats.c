@@ -159,11 +159,10 @@ return_one:
  ******************************************************************************/
 int	init_collector_data(char **error)
 {
-	const char	*__function_name = "init_collector_data";
-	int		cpu_count, ret = FAIL;
-	size_t		sz, sz_cpu;
+	int	cpu_count, ret = FAIL;
+	size_t	sz, sz_cpu;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	cpu_count = zbx_get_cpu_num();
 	sz = ZBX_SIZE_T_ALIGN8(sizeof(ZBX_COLLECTOR_DATA));
@@ -217,7 +216,7 @@ int	init_collector_data(char **error)
 #ifndef _WINDOWS
 out:
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
@@ -352,12 +351,11 @@ void	diskstat_shm_reattach(void)
 void	diskstat_shm_extend(void)
 {
 #ifndef _WINDOWS
-	const char		*__function_name = "diskstat_shm_extend";
 	size_t			old_shm_size, new_shm_size;
 	int			old_shmid, new_shmid, old_max, new_max;
 	ZBX_DISKDEVICES_DATA	*new_diskdevices;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* calculate the size of the new shared memory segment */
 	old_max = diskdevices->max_diskdev;
@@ -409,7 +407,7 @@ void	diskstat_shm_extend(void)
 	diskdevices = new_diskdevices;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() extended diskstat shared memory: old_max:%d new_max:%d old_size:"
-			ZBX_FS_SIZE_T " new_size:" ZBX_FS_SIZE_T " old_shmid:%d new_shmid:%d", __function_name, old_max,
+			ZBX_FS_SIZE_T " new_size:" ZBX_FS_SIZE_T " old_shmid:%d new_shmid:%d", __func__, old_max,
 			new_max, (zbx_fs_size_t)old_shm_size, (zbx_fs_size_t)new_shm_size, old_shmid,
 			collector->diskstat_shmid);
 #endif

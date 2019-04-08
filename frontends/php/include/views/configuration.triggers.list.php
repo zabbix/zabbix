@@ -319,8 +319,6 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$data['single_selected_hostid'].'";');
-
 // append table to form
 $triggers_form->addItem([
 	$triggers_table,

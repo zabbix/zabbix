@@ -122,8 +122,8 @@ static int	json_parse_string(const char *start, char **error)
 			}
 		}
 
-		/* found control character in string, failing */
-		if (0 != iscntrl((unsigned char)*ptr))
+		/* Control character U+0000 - U+001F? It should have been escaped according to RFC 8259. */
+		if (0x1f >= (unsigned char)*ptr)
 			return json_error("invalid control character in string data", ptr, error);
 
 		ptr++;

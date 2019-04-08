@@ -65,14 +65,12 @@ static void	zbx_housekeeper_sigusr_handler(int flags)
  ******************************************************************************/
 static int	delete_history(const char *table, const char *fieldname, int now)
 {
-	const char	*__function_name = "delete_history";
 	DB_RESULT       result;
 	DB_ROW          row;
 	int             minclock, records = 0;
 	zbx_uint64_t	lastid, maxid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' now:%d",
-			__function_name, table, now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' now:%d", __func__, table, now);
 
 	DBbegin();
 

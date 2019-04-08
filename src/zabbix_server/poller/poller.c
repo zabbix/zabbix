@@ -228,12 +228,11 @@ static unsigned char	host_availability_agent_by_item_type(unsigned char type)
 
 void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
-	const char		*__function_name = "zbx_activate_item_host";
 	zbx_host_availability_t	in, out;
 	unsigned char		agent_type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
-			__function_name, item->host.hostid, item->itemid, (int)item->type);
+			__func__, item->host.hostid, item->itemid, (int)item->type);
 
 	zbx_host_availability_init(&in, item->host.hostid);
 	zbx_host_availability_init(&out, item->host.hostid);
@@ -266,17 +265,16 @@ out:
 	zbx_host_availability_clean(&out);
 	zbx_host_availability_clean(&in);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 void	zbx_deactivate_item_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
 {
-	const char		*__function_name = "zbx_deactivate_item_host";
 	zbx_host_availability_t	in, out;
 	unsigned char		agent_type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
-			__function_name, item->host.hostid, item->itemid, (int)item->type);
+			__func__, item->host.hostid, item->itemid, (int)item->type);
 
 	zbx_host_availability_init(&in, item->host.hostid);
 	zbx_host_availability_init(&out,item->host.hostid);
@@ -325,13 +323,13 @@ void	zbx_deactivate_item_host(DC_ITEM *item, zbx_timespec_t *ts, const char *err
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __func__,
 			out.agents[agent_type].errors_from, out.agents[agent_type].available);
 out:
 	zbx_host_availability_clean(&out);
 	zbx_host_availability_clean(&in);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	free_result_ptr(AGENT_RESULT *result)
@@ -342,10 +340,9 @@ static void	free_result_ptr(AGENT_RESULT *result)
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
 {
-	const char	*__function_name = "get_value";
-	int		res = FAIL;
+	int	res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key_orig);
 
 	switch (item->type)
 	{
@@ -416,7 +413,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;
 }
@@ -501,7 +498,6 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields)
  ******************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck)
 {
-	const char		*__function_name = "get_values";
 	DC_ITEM			items[MAX_POLLER_ITEMS];
 	AGENT_RESULT		results[MAX_POLLER_ITEMS];
 	int			errcodes[MAX_POLLER_ITEMS];
@@ -510,7 +506,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	int			i, num, last_available = HOST_AVAILABLE_UNKNOWN;
 	zbx_vector_ptr_t	add_results;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	num = DCconfig_get_poller_items(poller_type, items);
 
@@ -873,7 +869,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	DCconfig_clean_items(items, NULL, num);
 exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
 	return num;
 }

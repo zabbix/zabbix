@@ -146,7 +146,6 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 #ifdef HAVE_LIBCURL
 static int	check_https(const char *host, unsigned short port, int timeout, int *value_int)
 {
-	const char	*__function_name = "check_https";
 	CURL		*easyhandle;
 	CURLoption	opt;
 	CURLcode	err;
@@ -156,7 +155,7 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s: could not init cURL library", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could not init cURL library", __func__);
 		goto clean;
 	}
 
@@ -174,7 +173,7 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 		CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)timeout)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set cURL option [%d]: %s",
-				__function_name, (int)opt, curl_easy_strerror(err));
+				__func__, (int)opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
@@ -183,7 +182,7 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set source interface option [%d]: %s",
-					__function_name, (int)opt, curl_easy_strerror(err));
+					__func__, (int)opt, curl_easy_strerror(err));
 			goto clean;
 		}
 	}
@@ -192,7 +191,7 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 		*value_int = 1;
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: curl_easy_perform failed for [%s:%hu]: %s",
-				__function_name, host, port, curl_easy_strerror(err));
+				__func__, host, port, curl_easy_strerror(err));
 clean:
 	curl_easy_cleanup(easyhandle);
 
@@ -202,7 +201,6 @@ clean:
 
 static int	check_telnet(const char *host, unsigned short port, int timeout, int *value_int)
 {
-	const char	*__function_name = "check_telnet";
 	zbx_socket_t	s;
 #ifdef _WINDOWS
 	u_long		argp = 1;
@@ -229,7 +227,7 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 		zbx_tcp_close(&s);
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "%s error: %s", __function_name, zbx_socket_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "%s error: %s", __func__, zbx_socket_strerror());
 
 	return SYSINFO_RET_OK;
 }

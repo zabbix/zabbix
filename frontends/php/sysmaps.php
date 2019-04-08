@@ -279,6 +279,9 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid')) || (hasRequest('action'
 	if ($result) {
 		uncheckTableRows();
 	}
+	else {
+		uncheckTableRows(null, array_column($maps, 'sysmapid', 'sysmapid'));
+	}
 	show_messages($result, _('Network map deleted'), _('Cannot delete network map'));
 }
 

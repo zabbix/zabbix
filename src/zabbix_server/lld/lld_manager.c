@@ -194,11 +194,10 @@ static void	lld_worker_free(zbx_lld_worker_t *worker)
  ******************************************************************************/
 static void	lld_manager_init(zbx_lld_manager_t *manager)
 {
-	const char		*__function_name = "lld_init";
 	int			i;
 	zbx_lld_worker_t	*worker;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __function_name, CONFIG_LLDWORKER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __func__, CONFIG_LLDWORKER_FORKS);
 
 	zbx_vector_ptr_create(&manager->workers);
 	zbx_queue_ptr_create(&manager->free_workers);
@@ -223,7 +222,7 @@ static void	lld_manager_init(zbx_lld_manager_t *manager)
 
 	manager->queued_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -287,11 +286,10 @@ static zbx_lld_worker_t	*lld_get_worker_by_client(zbx_lld_manager_t *manager, zb
 static void	lld_register_worker(zbx_lld_manager_t *manager, zbx_ipc_client_t *client,
 		const zbx_ipc_message_t *message)
 {
-	const char		*__function_name = "lld_register_worker";
 	zbx_lld_worker_t	*worker;
 	pid_t			ppid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	memcpy(&ppid, message->data, sizeof(ppid));
 
@@ -315,7 +313,7 @@ static void	lld_register_worker(zbx_lld_manager_t *manager, zbx_ipc_client_t *cl
 		zbx_queue_ptr_push(&manager->free_workers, worker);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -347,13 +345,11 @@ static void	lld_queue_rule(zbx_lld_manager_t *manager, zbx_lld_rule_t *rule)
  ******************************************************************************/
 static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_t *message)
 {
-	const char	*__function_name = "lld_queue_request";
-
 	zbx_uint64_t	itemid;
 	zbx_lld_rule_t	*rule;
 	zbx_lld_data_t	*data;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	data = (zbx_lld_data_t *)zbx_malloc(NULL, sizeof(zbx_lld_data_t));
 	data->next = NULL;
@@ -377,7 +373,7 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_
 
 	manager->queued_num++;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -442,13 +438,11 @@ static void	lld_process_queue(zbx_lld_manager_t *manager)
  ******************************************************************************/
 static void	lld_process_result(zbx_lld_manager_t *manager, zbx_ipc_client_t *client)
 {
-	const char		*__function_name = "lld_process_result";
-
 	zbx_lld_worker_t	*worker;
 	zbx_lld_rule_t		*rule;
 	zbx_lld_data_t		*data;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	worker = lld_get_worker_by_client(manager, client);
 
@@ -472,7 +466,7 @@ static void	lld_process_result(zbx_lld_manager_t *manager, zbx_ipc_client_t *cli
 	else
 		zbx_queue_ptr_push(&manager->free_workers, worker);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************

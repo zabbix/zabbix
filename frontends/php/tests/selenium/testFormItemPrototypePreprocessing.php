@@ -789,7 +789,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 				case 'Matches regular expression':
 				case 'Does not match regular expression':
 					$this->zbxTestIsEnabled('//input[@id="preprocessing_'.$step_count.'_on_fail"][@type="checkbox"]');
-					$this->zbxTestClickWait('preprocessing_'.$step_count.'_on_fail');
+					$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_on_fail"]');
 
 					switch ($action) {
 						case 'set_value':
@@ -997,7 +997,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 
 		foreach ($preprocessing as $step_count => $options) {
 			$this->selectTypeAndfillParameters($step_count, $options);
-			$this->zbxTestClickWait('preprocessing_'.$step_count.'_on_fail');
+			$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_on_fail"]');
 
 			foreach ($data['custom_on_fail'] as $error_type) {
 				switch ($error_type['option']) {
