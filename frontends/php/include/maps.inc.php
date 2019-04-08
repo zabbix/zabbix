@@ -999,6 +999,9 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 		}
 
 		$critical_problem = [];
+		$trigger_order = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
+			? zbx_objectValues($selement['elements'], 'triggerid')
+			: [];
 		$lately_changed = 0;
 
 		foreach ($selement['triggers'] as $trigger) {
@@ -1015,11 +1018,25 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 						if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
 							$i['problem_unack']++;
 						}
-					}
 
-					if (!$critical_problem || ($critical_problem['severity'] <= $problem['severity']
-							&& $critical_problem['eventid'] < $problem['eventid'])) {
-						$critical_problem = $problem;
+						if (!$critical_problem || $critical_problem['severity'] < $problem['severity']) {
+							$critical_problem = $problem;
+						}
+						elseif ($critical_problem['severity'] === $problem['severity']) {
+							if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+								if ($problem['objectid'] === $critical_problem['objectid']
+										&& $critical_problem['eventid'] < $problem['eventid']) {
+									$critical_problem = $problem;
+								}
+								elseif (array_search($critical_problem['objectid'], $trigger_order)
+										> array_search($problem['objectid'], $trigger_order)) {
+									$critical_problem = $problem;
+								}
+							}
+							elseif ($critical_problem['eventid'] < $problem['eventid']) {
+								$critical_problem = $problem;
+							}
+						}
 					}
 
 					if ($problem['r_clock'] > $lately_changed) {
