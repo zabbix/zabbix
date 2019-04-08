@@ -59,12 +59,12 @@ void	zbx_mock_test_entry(void **state)
 
 	if (FAIL == act_ret)
 	{
-		zbx_variant_clear(&value);
+		zbx_mock_assert_ptr_ne("error message", NULL, errmsg);
 		zbx_free(errmsg);
-		return;
 	}
-	if (0 != strcmp(value.data.str, exp_xml))
-		fail_msg("Got %s instead of %s as output xml string", value.data.str, exp_xml);
+	else
+		zbx_mock_assert_str_eq("result", exp_xml, value.data.str);
+
 	zbx_variant_clear(&value);
 }
 #endif
