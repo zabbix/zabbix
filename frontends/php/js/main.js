@@ -972,6 +972,12 @@ function getConditionFormula(conditions, evalType) {
 	 */
 	DynamicRows.prototype.addRow = function(data) {
 		var evtBeforeAdd = $.Event('beforeadd.dynamicRows');
+
+		if (data instanceof jQuery.Event) {
+			evtBeforeAdd.originalEvent = data;
+			data = {};
+		}
+
 		this.$element.trigger(evtBeforeAdd, this);
 
 		if (evtBeforeAdd.isDefaultPrevented()) {
