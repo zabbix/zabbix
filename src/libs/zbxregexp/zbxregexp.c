@@ -347,6 +347,28 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 	return zbx_regexp(string, pattern, PCRE_MULTILINE, len);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: strncpy_alloc                                                    *
+ *                                                                            *
+ * Purpose: zbx_strncpy_alloc with maximum allocated memory limit.            *
+ *                                                                            *
+ * Parameters: str       - [IN/OUT] destination buffer pointer                *
+ *             alloc_len - [IN/OUT] already allocated memory                  *
+ *             offset    - [IN/OUT] offset for writing                        *
+ *             src       - [IN] copied string                                 *
+ *             n         - [IN] maximum number of bytes to copy               *
+ *             l         - [IN] maximum number of bytes to be allocated       *
+ *                                                                            *
+ ******************************************************************************/
+static void	strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n, size_t limit)
+{
+	if (0 != limit && *offset + n > limit)
+		n = (limit > *offset) ? (limit - *offset) : 0;
+
+	zbx_strncpy_alloc(str, alloc_len, offset, src, n);
+}
+
 /*********************************************************************************
  *                                                                               *
  * Function: regexp_sub_replace                                                  *
@@ -363,11 +385,14 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
  *                                    input string is returned.                  *
  *             match           - [IN] the captured group data                    *
  *             nmatch          - [IN] the number of items in captured group data *
+ *             limit           - [IN] size limit for memory allocation           *
+ *                                    0 means no limit                           *
  *                                                                               *
  * Return value: Allocated string containing output value                        *
  *                                                                               *
  *********************************************************************************/
-static char	*regexp_sub_replace(const char *text, const char *output_template, zbx_regmatch_t *match, int nmatch)
+static char	*regexp_sub_replace(const char *text, const char *output_template, zbx_regmatch_t *match, int nmatch,
+		size_t limit)
 {
 	char		*ptr = NULL;
 	const char	*pstart = output_template, *pgroup;
@@ -382,7 +407,7 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 		switch (*(++pgroup))
 		{
 			case '\\':
-				zbx_strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart);
+				strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart, limit);
 				pstart = pgroup + 1;
 				continue;
 
@@ -396,12 +421,12 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 			case '7':
 			case '8':
 			case '9':
-				zbx_strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart - 1);
+				strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart - 1, limit);
 				group_index = *pgroup - '0';
 				if (group_index < nmatch && -1 != match[group_index].rm_so)
 				{
-					zbx_strncpy_alloc(&ptr, &size, &offset, text + match[group_index].rm_so,
-							match[group_index].rm_eo - match[group_index].rm_so);
+					strncpy_alloc(&ptr, &size, &offset, text + match[group_index].rm_so,
+							match[group_index].rm_eo - match[group_index].rm_so, limit);
 				}
 				pstart = pgroup + 1;
 				continue;
@@ -415,21 +440,40 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 					goto out;
 				}
 
-				zbx_strncpy_alloc(&ptr, &size, &offset, text + match[1].rm_so,
-						match[1].rm_eo - match[1].rm_so);
+				strncpy_alloc(&ptr, &size, &offset, text + match[1].rm_so,
+						match[1].rm_eo - match[1].rm_so, limit);
 
 				pstart = pgroup + 1;
 				continue;
 
 			default:
-				zbx_strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart);
+				strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart, limit);
 				pstart = pgroup;
 		}
+
+		if (0 != limit && offset >= limit)
+			break;
 	}
 
 	if ('\0' != *pstart)
-		zbx_strcpy_alloc(&ptr, &size, &offset, pstart);
+		strncpy_alloc(&ptr, &size, &offset, pstart, strlen(pstart), limit);
 out:
+	if (NULL != ptr && 0 != limit)
+	{
+		size = offset;
+		offset--;
+
+		/* ensure that the string is not cut in the middle of UTF-8 sequence */
+		if (0x80 <= (0xc0 & ptr[offset]))
+		{
+			while (0x80 == (0xc0 & ptr[offset]) && 0 < offset)
+				offset--;
+
+			if (zbx_utf8_char_len(&ptr[offset]) != size - offset)
+				ptr[offset] = '\0';
+		}
+	}
+
 	return ptr;
 }
 
@@ -489,7 +533,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 		match[i].rm_so = match[i].rm_eo = -1;
 
 	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match))
-		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX);
+		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
 
 	return SUCCEED;
 #undef MATCH_SIZE
@@ -512,6 +556,8 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
  *                                    If output template is NULL or contains     *
  *                                    empty string then the whole input string   *
  *                                    is used as output value.                   *
+ *             limit           - [IN] size limit for memory allocation           *
+ *                                    0 means no limit                           *
  *             out             - [OUT] the output value if the input string      *
  *                                     matches the specified regular expression  *
  *                                     or NULL otherwise                         *
@@ -523,7 +569,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
  *                                                                               *
  *********************************************************************************/
 int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, const char *output_template,
-		char **out)
+		size_t limit, char **out)
 {
 	zbx_regmatch_t	match[ZBX_REGEXP_GROUPS_MAX];
 	unsigned int	i;
@@ -536,7 +582,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 
 	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match))
 	{
-		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX);
+		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, limit);
 		return SUCCEED;
 	}
 

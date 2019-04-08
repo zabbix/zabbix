@@ -9,6 +9,8 @@ use IPC::Run3 qw(run3);
 use Time::HiRes qw(time);
 use File::Basename qw(dirname);
 use Getopt::Long qw(GetOptions);
+use Cwd qw(getcwd);
+
 
 use constant TEST_SUITE_ATTRIBUTES	=> ('name', 'tests', 'skipped', 'errors', 'failures', 'time');
 use constant TEST_CASE_ATTRIBUTES	=> ('name', 'assertions', 'time');
@@ -63,7 +65,19 @@ sub launch($$$)
 		my $out;
 		my $err;
 
-		eval {run3($test_exec, \$in, \$out, \$err)};
+		my($path, $filename) = $test_exec =~ m{(.+)/([^/]+)$};
+
+		if ($path ne '.')
+		{
+			my $current_dir = getcwd();
+			chdir $path;
+			eval {run3('./' . $filename, \$in, \$out, \$err)};
+			chdir $current_dir;
+		}
+		else
+		{
+			eval {run3($test_exec, \$in, \$out, \$err)};
+		}
 
 		if ($@)	# something went wrong with run3()
 		{
@@ -107,6 +121,7 @@ while (my $path = $iter->())
 {
 	next unless ($path->is_file());
 	next unless ($path->basename =~ qr/^(.+)\.yaml$/);
+	next if ($path->basename =~ qr/^(.+)\.inc\.yaml$/);
 
 	my $test_suite = {
 		'name'		=> $1,

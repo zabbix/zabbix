@@ -1032,19 +1032,13 @@ void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
 void	zbx_strarr_free(char **arr);
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_setproctitle __zbx_zbx_setproctitle
-#endif
-
 #if defined(__GNUC__) || defined(__clang__)
 #	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
 #else
 #	define __zbx_attr_format_printf(idx1, idx2)
 #endif
 
-void	__zbx_zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
@@ -1072,22 +1066,11 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
 int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
 int	zbx_day_in_month(int year, int mon);
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#	define zbx_snprintf(str, count, fmt, ...) __zbx_zbx_snprintf(str, count, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#	define zbx_snprintf_alloc(str, alloc_len, offset, fmt, ...) \
-       			__zbx_zbx_snprintf_alloc(str, alloc_len, offset, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_error __zbx_zbx_error
-#	define zbx_snprintf __zbx_zbx_snprintf
-#	define zbx_snprintf_alloc __zbx_zbx_snprintf_alloc
-#endif
+void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
-void	__zbx_zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_format_printf(3, 4);
 
-size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_format_printf(3, 4);
-
-void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
+void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
 
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
@@ -1108,16 +1091,9 @@ size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size);
 
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_dsprintf(dest, fmt, ...) __zbx_zbx_dsprintf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#	define zbx_strdcatf(dest, fmt, ...) __zbx_zbx_strdcatf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_dsprintf __zbx_zbx_dsprintf
-#	define zbx_strdcatf __zbx_zbx_strdcatf
-#endif
-char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
+char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 char	*zbx_strdcat(char *dest, const char *src);
-char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
+char	*zbx_strdcatf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);

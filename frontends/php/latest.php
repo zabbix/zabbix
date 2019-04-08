@@ -185,7 +185,7 @@ if ($hosts) {
 		$applications = API::Application()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'hostids' => $hostIds,
-			'search' => ['name' => $filter['application']],
+			'filter' => ['name' => $filter['application']],
 			'preservekeys' => true
 		]);
 	}
@@ -331,7 +331,8 @@ if (in_array($page['web_layout_mode'], [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'groupids_',
-								'real_hosts' => true
+								'real_hosts' => true,
+								'enrich_parent_groups' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
