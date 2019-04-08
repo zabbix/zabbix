@@ -3,6 +3,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15929] fixed escalation operation not being send multiple times (akozlovs)
 ...G...PS. [ZBX-15721] fixed escaping of control characters in JSON encoder (Andris, viktors)
 ..F....... [ZBX-15507] fixed item/trigger/graph copy form provides read-only host groups in target list; replaced form elements with multiselect (agriscenko)
 ..F....... [ZBX-15746] fixed link to pie graph after selecting a time interval on classic graph (agriscenko)
