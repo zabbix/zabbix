@@ -433,18 +433,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->selectGraph($data);
 		$this->zbxTestClickButtonText('Copy');
 
-		$copy_type = 'copy_type_';
-		switch ($data['target_type']) {
-			case 'Host groups':
-				$copy_type .= 0;
-				break;
-			case 'Hosts':
-				$copy_type .= 1;
-				break;
-			case 'Templates':
-				$copy_type .= 2;
-				break;
-		}
+		$copy_type = 'copy_type_'.array_search($data['target_type'], ['Host groups', 'Hosts', 'Templates']);
 		$this->zbxTestClickXpathWait('//label[@for="'.$copy_type.'"][text()="'.$data['target_type'].'"]');
 
 		// Select check boxes of defined targets.
