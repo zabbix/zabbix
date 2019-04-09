@@ -1870,3 +1870,6 @@ int	zbx_item_preproc_handle_error(zbx_variant_t *value, const zbx_preproc_op_t *
 			return FAIL;
 	}
 }
+#ifdef HAVE_TESTS
+#	include "../../../tests/zabbix_server/preprocessor/item_preproc_test.c"
+#endif

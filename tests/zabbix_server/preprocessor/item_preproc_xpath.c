@@ -24,6 +24,9 @@
 #include "common.h"
 
 #include "item_preproc_test.h"
+#include "zbxembed.h"
+
+zbx_es_t	es_engine;
 
 void	zbx_mock_test_entry(void **state)
 {
