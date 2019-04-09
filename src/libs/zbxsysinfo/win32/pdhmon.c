@@ -25,12 +25,11 @@
 
 int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "USER_PERF_COUNTER";
-	int			ret = SYSINFO_RET_FAIL;
-	char			*counter, *error = NULL;
-	double			value;
+	int	ret = SYSINFO_RET_FAIL;
+	char	*counter, *error = NULL;
+	double	value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (1 != request->nparam)
 	{
@@ -54,19 +53,18 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SET_DBL_RESULT(result, value);
 	ret = SYSINFO_RET_OK;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "PERF_COUNTER";
-	char			counterpath[PDH_MAX_COUNTER_PATH], *tmp, *error = NULL;
-	int			interval, ret = SYSINFO_RET_FAIL;
-	double			value;
+	char	counterpath[PDH_MAX_COUNTER_PATH], *tmp, *error = NULL;
+	int	interval, ret = SYSINFO_RET_FAIL;
+	double	value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 < request->nparam)
 	{
@@ -116,7 +114,7 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ret = SYSINFO_RET_OK;
 	SET_DBL_RESULT(result, value);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

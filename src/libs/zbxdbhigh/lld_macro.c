@@ -50,15 +50,13 @@ int	zbx_lld_macro_paths_compare(const void *d1, const void *d2)
  ******************************************************************************/
 int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro_paths, char **error)
 {
-	const char		*__function_name = "lld_macro_paths_get";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_lld_macro_path_t	*lld_macro_path;
 	int			ret = SUCCEED;
 	char			err[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
 			"select lld_macro,path"
@@ -84,7 +82,7 @@ int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }

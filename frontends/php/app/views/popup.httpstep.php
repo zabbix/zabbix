@@ -150,7 +150,9 @@ $http_popup_form_list
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Required string'),
-		(new CTextBox('required', $options['required']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('required', $options['required']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('placeholder', _('pattern'))
 	)
 	->addRow(_('Required status codes'),
 		(new CTextBox('status_codes', $options['status_codes']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

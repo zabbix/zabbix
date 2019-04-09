@@ -263,7 +263,7 @@ $form_list
 		new CLabel(_('HTTP proxy'), 'http_proxy'),
 		(new CTextBox('http_proxy', $data['http_proxy'], $data['limited'], DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'),
+			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'),
 		'http_proxy_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT HTTP authentication to form list.
