@@ -2676,6 +2676,7 @@ Changes for 3.0.27rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10404] fixed password being passed in plain text in media type edit form (gcalenko)
 ...G...PS. [ZBX-15721] fixed escaping of control characters in JSON encoder (Andris, viktors)
 ...G...... [ZBX-15937] fixed agent startup problem in Win 2008 R2 w/o SP1 by merging ZBX-15728 (kalimulin)
 ...G...PS. [ZBX-15588] fixed function names that are written to the log file when using LOG_LEVEL_DEBUG (asitals)
