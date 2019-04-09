@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15734] fixed dashboard widgets incorrect placement while dragged (gcalenko)
 ..F....... [ZBX-15563] fixed svg graph metric generation in situation when metric have big values (gcalenko)
 ..F....... [ZBX-15139] fixed element removing from list in different tabs or browsers (vasilijs)
 ..F....... [ZBX-15779] fixed loss of host name in tooltip on trigger overview page (vasilijs)
