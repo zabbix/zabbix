@@ -703,9 +703,6 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		$preprocessing_itemid = 15094;
 		$original_hostid = 15001;
 
-		$db_hostid = CDBHelper::getRow('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($this->host));
-		$hostid = $db_hostid['hostid'];
-
 		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.$original_hostid);
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
@@ -713,9 +710,11 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('group_itemid_'.$preprocessing_itemid);
 		$this->zbxTestClickButton('item.masscopyto');
 
-		$this->zbxTestDropdownSelectWait('copy_type', 'Hosts');
-		$this->zbxTestDropdownSelectWait('copy_groupid', 'Zabbix servers');
-		$this->zbxTestCheckboxSelect('copy_targetid_'.$hostid);
+		$this->zbxTestClickXpathWait('//label[@for="copy_type_1"][text()="Hosts"]');
+		$this->zbxTestClickButtonMultiselect('copy_targetids');
+		$this->zbxTestLaunchOverlayDialog('Hosts');
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickWait('copy');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item copied');
 
@@ -871,7 +870,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 				case 'Matches regular expression':
 				case 'Does not match regular expression':
 					$this->zbxTestIsEnabled('//input[@id="preprocessing_'.$step_count.'_on_fail"][@type="checkbox"]');
-					$this->zbxTestClickWait('preprocessing_'.$step_count.'_on_fail');
+					$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_on_fail"]');
 
 					switch ($action) {
 						case 'set_value':
@@ -1084,7 +1083,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 
 		foreach ($preprocessing as $step_count => $options) {
 			$this->selectTypeAndfillParameters($step_count, $options);
-			$this->zbxTestClickWait('preprocessing_'.$step_count.'_on_fail');
+			$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_on_fail"]');
 
 			foreach ($data['custom_on_fail'] as $error_type) {
 				switch ($error_type['option']) {
@@ -1142,7 +1141,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 	 * Add new preprocessing, select preprocessing type and parameters if exist.
 	 */
 	private function selectTypeAndfillParameters($step, $options) {
-		$this->zbxTestClickWait('param_add');
+		$this->query('id:param_add')->one()->type("\r");
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('preprocessing_'.$step.'_type'));
 		$this->zbxTestDropdownSelect('preprocessing_'.$step.'_type', $options['type']);
 

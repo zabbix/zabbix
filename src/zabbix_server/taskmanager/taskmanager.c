@@ -50,11 +50,9 @@ extern int		server_num, process_num;
 static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t triggerid, zbx_uint64_t eventid,
 		zbx_uint64_t userid)
 {
-	const char		*__function_name = "tm_execute_task_close_problem";
-
 	DB_RESULT	result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __function_name, eventid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, eventid);
 
 	result = DBselect("select null from problem where eventid=" ZBX_FS_UI64 " and r_eventid is null", eventid);
 
@@ -66,7 +64,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 
 	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -83,15 +81,13 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
  ******************************************************************************/
 static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 {
-	const char		*__function_name = "tm_try_task_close_problem";
-
 	DB_ROW			row;
 	DB_RESULT		result;
 	int			ret = FAIL;
 	zbx_uint64_t		userid, triggerid, eventid;
 	zbx_vector_uint64_t	triggerids, locked_triggerids;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __function_name, taskid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __func__, taskid);
 
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_create(&locked_triggerids);
@@ -127,7 +123,7 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 	zbx_vector_uint64_destroy(&locked_triggerids);
 	zbx_vector_uint64_destroy(&triggerids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -141,14 +137,12 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
  ******************************************************************************/
 static void	tm_expire_remote_command(zbx_uint64_t taskid)
 {
-	const char	*__function_name = "tm_expire_remote_command";
-
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	alertid;
 	char		*error;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __function_name, taskid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __func__, taskid);
 
 	DBbegin();
 
@@ -173,7 +167,7 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
 
 	DBcommit();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -188,8 +182,6 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
  ******************************************************************************/
 static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 {
-	const char	*__function_name = "tm_process_remote_command_result";
-
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	alertid, parent_taskid = 0;
@@ -197,7 +189,7 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 	char		*error, *sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __function_name, taskid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __func__, taskid);
 
 	DBbegin();
 
@@ -247,7 +239,7 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 
 	DBcommit();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -263,8 +255,6 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
  ******************************************************************************/
 static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
 {
-	const char		*__function_name = "tm_process_acknowledgements";
-
 	DB_ROW			row;
 	DB_RESULT		result;
 	int			processed_num = 0;
@@ -273,7 +263,7 @@ static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
 	zbx_vector_ptr_t	ack_tasks;
 	zbx_ack_task_t		*ack_task;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, ack_taskids->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __func__, ack_taskids->values_num);
 
 	zbx_vector_uint64_sort(ack_taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -327,7 +317,7 @@ static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
 	zbx_vector_ptr_clear_ext(&ack_tasks, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&ack_tasks);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __func__, processed_num);
 
 	return processed_num;
 }
@@ -343,8 +333,6 @@ static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
  ******************************************************************************/
 static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 {
-	const char		*__function_name = "tm_process_check_now";
-
 	DB_ROW			row;
 	DB_RESULT		result;
 	int			i, processed_num = 0;
@@ -356,7 +344,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	zbx_tm_task_t		*task;
 	zbx_tm_check_now_t	*data;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, taskids->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __func__, taskids->values_num);
 
 	zbx_vector_ptr_create(&tasks);
 	zbx_vector_uint64_create(&done_taskids);
@@ -475,7 +463,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	zbx_vector_uint64_destroy(&done_taskids);
 	zbx_vector_ptr_destroy(&tasks);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __func__, processed_num);
 
 	return processed_num;
 }

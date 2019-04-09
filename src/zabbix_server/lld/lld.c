@@ -264,12 +264,10 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths)
 {
-	const char	*__function_name = "filter_evaluate_and_or";
+	int	i, ret = SUCCEED, rc = SUCCEED;
+	char	*lastmacro = NULL;
 
-	int		i, ret = SUCCEED, rc = SUCCEED;
-	char		*lastmacro = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
@@ -294,7 +292,7 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
 		lastmacro = condition->macro;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -316,11 +314,9 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
 static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths)
 {
-	const char	*__function_name = "filter_evaluate_and";
+	int	i, ret = SUCCEED;
 
-	int		i, ret = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
@@ -332,7 +328,7 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -354,11 +350,9 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
 static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths)
 {
-	const char	*__function_name = "filter_evaluate_or";
+	int	i, ret = SUCCEED;
 
-	int		i, ret = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
@@ -370,7 +364,7 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -397,13 +391,11 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
 static int	filter_evaluate_expression(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths)
 {
-	const char	*__function_name = "filter_evaluate_expression";
+	int	i, ret = FAIL, id_len;
+	char	*expression, id[ZBX_MAX_UINT64_LEN + 2], *p, error[256];
+	double	result;
 
-	int		i, ret = FAIL, id_len;
-	char		*expression, id[ZBX_MAX_UINT64_LEN + 2], *p, error[256];
-	double		result;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:%s", __function_name, filter->expression);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:%s", __func__, filter->expression);
 
 	expression = zbx_strdup(NULL, filter->expression);
 
@@ -431,7 +423,7 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
 
 	zbx_free(expression);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -522,14 +514,12 @@ static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struc
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, char **info, char **error)
 {
-	const char		*__function_name = "lld_rows_get";
-
 	struct zbx_json_parse	jp, jp_array, jp_row;
 	const char		*p;
 	zbx_lld_row_t		*lld_row;
 	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
@@ -568,7 +558,7 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -600,8 +590,6 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  ******************************************************************************/
 int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error)
 {
-	const char		*__function_name = "lld_process_discovery_rule";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		hostid;
@@ -611,7 +599,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	lld_filter_t		filter;
 	time_t			now;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, lld_ruleid);
 
 	zbx_vector_ptr_create(&lld_rows);
 	zbx_vector_ptr_create(&lld_macro_paths);
@@ -715,7 +703,7 @@ out:
 	zbx_vector_ptr_clear_ext(&lld_macro_paths, (zbx_clean_func_t)zbx_lld_macro_path_free);
 	zbx_vector_ptr_destroy(&lld_macro_paths);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }

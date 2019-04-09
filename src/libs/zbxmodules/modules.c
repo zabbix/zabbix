@@ -334,12 +334,10 @@ fail:
  ******************************************************************************/
 int	zbx_load_modules(const char *path, char **file_names, int timeout, int verbose)
 {
-	const char	*__function_name = "zbx_load_modules";
+	char	**file_name;
+	int	ret = SUCCEED;
 
-	char		**file_name;
-	int		ret = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&modules);
 
@@ -370,7 +368,7 @@ int	zbx_load_modules(const char *path, char **file_names, int timeout, int verbo
 		zbx_free(buffer);
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -410,9 +408,7 @@ static void	zbx_unload_module(void *data)
  ******************************************************************************/
 void	zbx_unload_modules(void)
 {
-	const char	*__function_name = "zbx_unload_modules";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_free(history_float_cbs);
 	zbx_free(history_integer_cbs);
@@ -423,5 +419,5 @@ void	zbx_unload_modules(void)
 	zbx_vector_ptr_clear_ext(&modules, zbx_unload_module);
 	zbx_vector_ptr_destroy(&modules);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

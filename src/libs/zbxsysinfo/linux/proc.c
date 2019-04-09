@@ -1145,15 +1145,14 @@ static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdlin
  ******************************************************************************/
 void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 {
-	const char	*__function_name = "zbx_proc_get_process_stats";
 	int	i;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() procs_num:%d", __function_name, procs_num);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() procs_num:%d", __func__, procs_num);
 
 	for (i = 0; i < procs_num; i++)
 		procs[i].error = proc_read_cpu_util(&procs[i]);
 
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1246,14 +1245,12 @@ out:
  ******************************************************************************/
 int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 {
-	const char		*__function_name = "zbx_proc_get_processes";
-
 	DIR			*dir;
 	struct dirent		*entries;
 	int			ret = FAIL, pid;
 	zbx_sysinfo_proc_t	*proc;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
 	if (NULL == (dir = opendir("/proc")))
 		goto out;
@@ -1274,7 +1271,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s(): %s, processes:%d", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s(): %s, processes:%d", __func__, zbx_result_string(ret),
 			processes->values_num);
 
 	return ret;
@@ -1314,12 +1311,11 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
 void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *procname, const char *username,
 		const char *cmdline, zbx_uint64_t flags, zbx_vector_uint64_t *pids)
 {
-	const char		*__function_name = "zbx_proc_get_matching_pids";
 	struct passwd		*usrinfo;
 	int			i;
 	zbx_sysinfo_proc_t	*proc;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s flags:" ZBX_FS_UI64, __function_name,
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s flags:" ZBX_FS_UI64, __func__,
 			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline), flags);
 
 	if (NULL != username)
@@ -1347,7 +1343,7 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 		zbx_vector_uint64_append(pids, (zbx_uint64_t)proc->pid);
 	}
 out:
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
 int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)

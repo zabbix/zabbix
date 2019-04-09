@@ -143,14 +143,11 @@ static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 
 int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
 {
-	const char	*__function_name = "get_value_simple";
-
 	AGENT_REQUEST	request;
 	vmfunc_t	vmfunc;
 	int		ret = NOTSUPPORTED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'",
-			__function_name, item->key_orig, item->interface.addr);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'", __func__, item->key_orig, item->interface.addr);
 
 	init_request(&request);
 
@@ -211,7 +208,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 out:
 	free_request(&request);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

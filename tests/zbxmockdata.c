@@ -25,6 +25,9 @@
 #include "common.h"
 #include "zbxalgo.h"
 
+FILE	*__real_fopen(const char *path, const char *mode);
+int	__real_fclose(FILE *stream);
+
 static zbx_vector_ptr_t		handle_pool;		/* a place to store handles provided to mock data user */
 static zbx_vector_str_t		string_pool;		/* a place to store strings provided to mock data user */
 static yaml_document_t		test_case;		/* parsed YAML document with test case data */
@@ -100,153 +103,351 @@ static int	zbx_yaml_scalar_ncmp(const char *str, size_t len, const yaml_node_t *
 	return strncmp(str, (const char *)node->data.scalar.value, node->data.scalar.length);
 }
 
+static int	zbx_yaml_add_node(yaml_document_t *dst_doc, yaml_document_t *src_doc, yaml_node_t *src)
+{
+	int			new_node, key, value;
+	yaml_node_pair_t	*pair;
+	yaml_node_item_t	*item;
+
+	switch (src->type)
+	{
+		case YAML_SCALAR_NODE:
+			new_node = yaml_document_add_scalar(dst_doc, src->tag, src->data.scalar.value,
+					src->data.scalar.length, src->data.scalar.style);
+			break;
+
+		case YAML_MAPPING_NODE:
+			new_node = yaml_document_add_mapping(dst_doc, src->tag, src->data.mapping.style);
+			for (pair = src->data.mapping.pairs.start; pair < src->data.mapping.pairs.top; pair++)
+			{
+				key = zbx_yaml_add_node(dst_doc, src_doc, yaml_document_get_node(src_doc, pair->key));
+				value = zbx_yaml_add_node(dst_doc, src_doc, yaml_document_get_node(src_doc, pair->value));
+				yaml_document_append_mapping_pair(dst_doc, new_node, key, value);
+			}
+			break;
+		case YAML_SEQUENCE_NODE:
+			new_node = yaml_document_add_sequence(dst_doc, src->tag, src->data.sequence.style);
+			for (item = src->data.sequence.items.start; item < src->data.sequence.items.top; item++)
+			{
+				value = zbx_yaml_add_node(dst_doc, src_doc, yaml_document_get_node(src_doc, *item));
+				yaml_document_append_sequence_item(dst_doc, new_node, value);
+			}
+			break;
+		case YAML_NO_NODE:
+			return -1;
+	}
+
+	return new_node;
+}
+
+static int	zbx_yaml_include(yaml_document_t *dst_doc, yaml_node_pair_t *dst, const char *filename)
+{
+	yaml_parser_t		parser;
+	yaml_document_t		doc;
+	yaml_node_t		*src_root;
+	FILE			*fp;
+	int			index = -1;
+
+	if (NULL == (fp = __real_fopen(filename, "r")))
+	{
+		printf("Cannot open include file '%s': %s\n", filename, strerror(errno));
+		goto out;
+	}
+
+	yaml_parser_initialize(&parser);
+	yaml_parser_set_input_file(&parser, fp);
+
+	if (0 != yaml_parser_load(&parser, &doc) &&  NULL != (src_root = yaml_document_get_root_node(&doc)))
+	{
+		if (-1 != (index = zbx_yaml_add_node(dst_doc, &doc, src_root)))
+			dst->value = index;
+	}
+
+	__real_fclose(fp);
+
+	yaml_document_delete(&doc);
+	yaml_parser_delete(&parser);
+out:
+	return index;
+}
+
+static void	zbx_yaml_replace_node_rec(yaml_document_t *doc, yaml_node_t *parent, const char *old_value,
+		int new_index)
+{
+	yaml_node_t	*value_node;
+
+	if (YAML_MAPPING_NODE == parent->type)
+	{
+		yaml_node_pair_t	*pair;
+
+		for (pair = parent->data.mapping.pairs.start; pair < parent->data.mapping.pairs.top; pair++)
+		{
+			value_node = yaml_document_get_node(doc, pair->value);
+			if (YAML_SCALAR_NODE == value_node->type && 0 == zbx_yaml_scalar_cmp(old_value, value_node))
+				pair->value = new_index;
+			else
+				zbx_yaml_replace_node_rec(doc, value_node, old_value, new_index);
+		}
+	}
+	else if (YAML_SEQUENCE_NODE == parent->type)
+	{
+		yaml_node_item_t	*item;
+
+		for (item = parent->data.sequence.items.start; item < parent->data.sequence.items.top; item++)
+		{
+			value_node = yaml_document_get_node(doc, *item);
+			if (YAML_SCALAR_NODE == value_node->type && 0 == zbx_yaml_scalar_cmp(old_value, value_node))
+				*item = new_index;
+			else
+				zbx_yaml_replace_node_rec(doc, value_node, old_value, new_index);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_yaml_replace_node                                            *
+ *                                                                            *
+ * Purpose: replaces node occurrences in mappings and sequences with the new  *
+ *          node index                                                        *
+ *                                                                            *
+ * Comments: When the test input data is converted by perl it loses anchor    *
+ *           information. As workaround we try to find the occurrences not by *
+ *           old node index, but by old node value. With including the        *
+ *           possibility of other nodes having 'filename.inc.yaml' value is   *
+ *           practically non-existent.                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_yaml_replace_node(yaml_document_t *doc, int old_index, int new_index)
+{
+	char		*value;
+	yaml_node_t	*node, *parent;
+
+	if (NULL == (node = yaml_document_get_node(doc, old_index)))
+		return;
+
+	if (NULL == (parent = yaml_document_get_root_node(doc)))
+		return;
+
+	value = zbx_malloc(NULL, node->data.scalar.length + 1);
+	memcpy(value, node->data.scalar.value, node->data.scalar.length);
+	value[node->data.scalar.length] = '\0';
+
+	zbx_yaml_replace_node_rec(doc, parent, value, new_index);
+	zbx_free(value);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_yaml_check_include                                           *
+ *                                                                            *
+ * Purpose: includes another yaml document if include tag is set              *
+ *                                                                            *
+ * Comments: The document is included by recursively copying its contents     *
+ *           under include tag, replacing its original value (file name).     *
+ *           The file is included from the working directory.                 *
+ *           After modifying document (so after include) the previously       *
+ *           acquired yaml nodes are not guaranteed to be valid and must be   *
+ *           reinitialized.                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_yaml_check_include(yaml_document_t *doc)
+{
+	yaml_node_pair_t	*pair;
+	int			old_index, new_index;
+	char			filename[MAX_STRING_LEN];
+
+	root = yaml_document_get_root_node(doc);
+
+	if (YAML_MAPPING_NODE != root->type)
+		return -1;
+
+	for (pair = root->data.mapping.pairs.start; pair < root->data.mapping.pairs.top; pair++)
+	{
+		if (0 == zbx_yaml_scalar_cmp("include", yaml_document_get_node(doc, pair->key)))
+		{
+			const yaml_node_t	*node;
+
+			old_index = pair->value;
+			node = yaml_document_get_node(doc, pair->value);
+
+			if (YAML_SCALAR_NODE != node->type)
+				continue;
+
+			memcpy(filename, node->data.scalar.value, node->data.scalar.length);
+			filename[node->data.scalar.length] = '\0';
+
+			if (-1 != (new_index = zbx_yaml_include(doc, pair, filename)))
+			{
+				zbx_yaml_replace_node(doc, old_index, new_index);
+
+				/* re-acquire root node - after changes to the document */
+				/* the previously acquired node pointers are not valid  */
+				root = yaml_document_get_root_node(&test_case);
+			}
+
+			break;
+		}
+	}
+
+	return 0;
+}
+
+static int	zbx_mock_data_load_test_case()
+{
+	const yaml_node_pair_t	*pair;
+
+	if (-1 == zbx_yaml_check_include(&test_case))
+		return -1;
+
+	for (pair = root->data.mapping.pairs.start; pair < root->data.mapping.pairs.top; pair++)
+	{
+		const yaml_node_t	*key;
+
+		key = yaml_document_get_node(&test_case, pair->key);
+
+		if (YAML_SCALAR_NODE == key->type)
+		{
+			if (0 == zbx_yaml_scalar_cmp("in", key))
+			{
+				in = yaml_document_get_node(&test_case, pair->value);
+
+				if (YAML_MAPPING_NODE != in->type)
+				{
+					printf("\"in\" is not a mapping.\n");
+					break;
+				}
+			}
+			else if (0 == zbx_yaml_scalar_cmp("out", key))
+			{
+				out = yaml_document_get_node(&test_case, pair->value);
+
+				if (YAML_MAPPING_NODE != out->type)
+				{
+					printf("\"out\" is not a mapping.\n");
+					break;
+				}
+			}
+			else if (0 == zbx_yaml_scalar_cmp("db data", key))
+			{
+				db_data = yaml_document_get_node(&test_case, pair->value);
+
+				if (YAML_MAPPING_NODE != db_data->type)
+				{
+					printf("\"db data\" is not a mapping.\n");
+					break;
+				}
+			}
+			else if (0 == zbx_yaml_scalar_cmp("files", key))
+			{
+				files = yaml_document_get_node(&test_case, pair->value);
+
+				if (YAML_MAPPING_NODE != files->type)
+				{
+					printf("\"files\" is not a mapping.\n");
+					break;
+				}
+			}
+			else if (0 == zbx_yaml_scalar_cmp("exit code", key))
+			{
+				exit_code = yaml_document_get_node(&test_case, 	pair->value);
+
+				if (YAML_SCALAR_NODE != exit_code->type)
+				{
+					printf("\"exit code\" is not a scalar.\n");
+					break;
+				}
+
+				if (0 != zbx_yaml_scalar_cmp("success", exit_code) &&
+						0 != zbx_yaml_scalar_cmp("failure", exit_code))
+				{
+					printf("Invalid value \"%.*s\" of"
+							" \"exit code\".\n",
+							(int)exit_code->data.scalar.length,
+							exit_code->data.scalar.value);
+					break;
+				}
+			}
+			else if (0 != zbx_yaml_scalar_cmp("test case", key) &&
+					0 != zbx_yaml_scalar_cmp("include", key))
+			{
+				printf("Unexpected key \"%.*s\" in mapping.\n",
+						(int)key->data.scalar.length,
+						key->data.scalar.value);
+				break;
+			}
+
+			continue;
+		}
+		else
+			printf("Non-scalar key in mapping.\n");
+
+		break;
+	}
+
+	if (pair < root->data.mapping.pairs.top)
+		return -1;
+
+	zbx_vector_ptr_create(&handle_pool);
+	zbx_vector_str_create(&string_pool);
+	return 0;
+}
+
+static int	zbx_mock_data_load(yaml_parser_t *parser)
+{
+	yaml_document_t	tmp;
+	int		ret = -1;
+
+	if (NULL == (root = yaml_document_get_root_node(&test_case)))
+	{
+		printf("Stream contains no documents.\n");
+		return -1;
+	}
+
+	if (YAML_MAPPING_NODE != root->type)
+	{
+		printf("Document is not a mapping.\n");
+		return -1;
+	}
+
+	if (0 == yaml_parser_load(parser, &tmp))
+	{
+		printf("Cannot parse input: %s\n", zbx_yaml_error_string(parser->error));
+		return -1;
+	}
+
+	if (NULL == yaml_document_get_root_node(&tmp))
+		ret = zbx_mock_data_load_test_case();
+	else
+		printf("Stream contains multiple documents.\n");
+
+	yaml_document_delete(&tmp);
+
+	return ret;
+}
+
+
 /* TODO: validate that keys in "in", "out", "db data" are scalars; validate "db data" */
 int	zbx_mock_data_init(void **state)
 {
 	yaml_parser_t	parser;
+	int		ret;
 
 	ZBX_UNUSED(state);
 
 	yaml_parser_initialize(&parser);
 	yaml_parser_set_input_file(&parser, stdin);
 
-	if (0 != yaml_parser_load(&parser, &test_case))
+	if (0 == yaml_parser_load(&parser, &test_case))
 	{
-		if (NULL != (root = yaml_document_get_root_node(&test_case)))
-		{
-			yaml_document_t	tmp;
-
-			if (0 != yaml_parser_load(&parser, &tmp))
-			{
-				if (NULL == yaml_document_get_root_node(&tmp))
-				{
-					yaml_document_delete(&tmp);
-
-					if (YAML_MAPPING_NODE == root->type)
-					{
-						const yaml_node_pair_t	*pair;
-
-						for (pair = root->data.mapping.pairs.start;
-								pair < root->data.mapping.pairs.top; pair++)
-						{
-							const yaml_node_t	*key;
-
-							key = yaml_document_get_node(&test_case, pair->key);
-
-							if (YAML_SCALAR_NODE == key->type)
-							{
-								if (0 == zbx_yaml_scalar_cmp("in", key))
-								{
-									in = yaml_document_get_node(&test_case,
-											pair->value);
-
-									if (YAML_MAPPING_NODE != in->type)
-									{
-										printf("\"in\" is not a mapping.\n");
-										break;
-									}
-								}
-								else if (0 == zbx_yaml_scalar_cmp("out", key))
-								{
-									out = yaml_document_get_node(&test_case,
-											pair->value);
-
-									if (YAML_MAPPING_NODE != out->type)
-									{
-										printf("\"out\" is not a mapping.\n");
-										break;
-									}
-								}
-								else if (0 == zbx_yaml_scalar_cmp("db data", key))
-								{
-									db_data = yaml_document_get_node(&test_case,
-											pair->value);
-
-									if (YAML_MAPPING_NODE != db_data->type)
-									{
-										printf("\"db data\" is not a mapping.\n");
-										break;
-									}
-								}
-								else if (0 == zbx_yaml_scalar_cmp("files", key))
-								{
-									files = yaml_document_get_node(&test_case,
-											pair->value);
-
-									if (YAML_MAPPING_NODE != files->type)
-									{
-										printf("\"files\" is not a mapping.\n");
-										break;
-									}
-								}
-								else if (0 == zbx_yaml_scalar_cmp("exit code", key))
-								{
-									exit_code = yaml_document_get_node(&test_case,
-											pair->value);
-
-									if (YAML_SCALAR_NODE != exit_code->type)
-									{
-										printf("\"exit code\" is not a scalar.\n");
-										break;
-									}
-
-									if (0 != zbx_yaml_scalar_cmp("success", exit_code) &&
-											0 != zbx_yaml_scalar_cmp("failure", exit_code))
-									{
-										printf("Invalid value \"%.*s\" of"
-												" \"exit code\".\n",
-												(int)exit_code->data.scalar.length,
-												exit_code->data.scalar.value);
-										break;
-									}
-								}
-								else if (0 != zbx_yaml_scalar_cmp("test case", key))
-								{
-									printf("Unexpected key \"%.*s\" in mapping.\n",
-											(int)key->data.scalar.length,
-											key->data.scalar.value);
-									break;
-								}
-
-								continue;
-							}
-							else
-								printf("Non-scalar key in mapping.\n");
-
-							break;
-						}
-
-						if (pair >= root->data.mapping.pairs.top)
-						{
-							yaml_parser_delete(&parser);
-							zbx_vector_ptr_create(&handle_pool);
-							zbx_vector_str_create(&string_pool);
-							return 0;
-						}
-					}
-					else
-						printf("Document is not a mapping.\n");
-				}
-				else
-				{
-					printf("Stream contains multiple documents.\n");
-					yaml_document_delete(&tmp);
-				}
-			}
-			else
-				printf("Cannot parse input: %s\n", zbx_yaml_error_string(parser.error));
-
-			yaml_document_delete(&test_case);
-		}
-		else
-			printf("Stream contains no documents.\n");
-	}
-	else
 		printf("Cannot parse input: %s\n", zbx_yaml_error_string(parser.error));
+		return -1;
+	}
 
+	ret = zbx_mock_data_load(&parser);
 	yaml_parser_delete(&parser);
-	*state = NULL;
-	return -1;
+
+	return ret;
 }
 
 static zbx_mock_handle_t	zbx_mock_handle_alloc(const yaml_node_t *node)

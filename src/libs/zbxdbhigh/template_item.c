@@ -1436,12 +1436,11 @@ static int	compare_template_items(const void *d1, const void *d2)
  ******************************************************************************/
 static void	link_template_dependent_items(zbx_vector_ptr_t *items)
 {
-	const char			*__function_name = "link_template_dependent_items";
-	zbx_template_item_t		*item, *master, item_local;
-	int				i, index;
-	zbx_vector_ptr_t		template_index;
+	zbx_template_item_t	*item, *master, item_local;
+	int			i, index;
+	zbx_vector_ptr_t	template_index;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&template_index);
 	zbx_vector_ptr_append_array(&template_index, items->values, items->values_num);
@@ -1471,7 +1470,7 @@ static void	link_template_dependent_items(zbx_vector_ptr_t *items)
 
 	zbx_vector_ptr_destroy(&template_index);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1486,12 +1485,10 @@ static void	link_template_dependent_items(zbx_vector_ptr_t *items)
  ******************************************************************************/
 void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
-	const char		*__function_name = "DBcopy_template_items";
-
 	zbx_vector_ptr_t	items, lld_rules;
 	int			new_conditions = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&items);
 	zbx_vector_ptr_create(&lld_rules);
@@ -1520,5 +1517,5 @@ out:
 	zbx_vector_ptr_clear_ext(&items, (zbx_clean_func_t)free_template_item);
 	zbx_vector_ptr_destroy(&items);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

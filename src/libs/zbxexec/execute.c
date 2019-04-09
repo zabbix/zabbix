@@ -138,10 +138,9 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
  ******************************************************************************/
 static int	zbx_popen(pid_t *pid, const char *command)
 {
-	const char	*__function_name = "zbx_popen";
-	int		fd[2], stdout_orig, stderr_orig;
+	int	fd[2], stdout_orig, stderr_orig;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:'%s'", __function_name, command);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:'%s'", __func__, command);
 
 	if (-1 == pipe(fd))
 		return -1;
@@ -157,7 +156,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	{
 		close(fd[1]);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, fd[0]);
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, fd[0]);
 
 		return fd[0];
 	}
@@ -169,12 +168,11 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	/* set the child as the process group leader, otherwise orphans may be left after timeout */
 	if (-1 == setpgid(0, 0))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s",
-				__function_name, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s", __func__, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing script", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing script", __func__);
 
 	/* preserve stdout and stderr to restore them in case execl() fails */
 
@@ -222,10 +220,9 @@ static int	zbx_popen(pid_t *pid, const char *command)
  ******************************************************************************/
 static int	zbx_waitpid(pid_t pid, int *status)
 {
-	const char	*__function_name = "zbx_waitpid";
-	int		rc, result;
+	int	rc, result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	do
 	{
@@ -243,19 +240,19 @@ retry:
 		if (-1 == (rc = waitpid(pid, &result, WUNTRACED)))
 		{
 #endif
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() waitpid failure: %s", __function_name, zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() waitpid failure: %s", __func__, zbx_strerror(errno));
 			goto exit;
 		}
 
 		if (WIFEXITED(result))
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() exited, status:%d", __function_name, WEXITSTATUS(result));
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() exited, status:%d", __func__, WEXITSTATUS(result));
 		else if (WIFSIGNALED(result))
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() killed by signal %d", __function_name, WTERMSIG(result));
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() killed by signal %d", __func__, WTERMSIG(result));
 		else if (WIFSTOPPED(result))
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() stopped by signal %d", __function_name, WSTOPSIG(result));
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() stopped by signal %d", __func__, WSTOPSIG(result));
 #ifdef WIFCONTINUED
 		else if (WIFCONTINUED(result))
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() continued", __function_name);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() continued", __func__);
 #endif
 	}
 	while (!WIFEXITED(result) && !WIFSIGNALED(result));
@@ -263,7 +260,7 @@ exit:
 	if (NULL != status)
 		*status = result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, rc);
 
 	return rc;
 }
@@ -531,8 +528,6 @@ close:
 int	zbx_execute_nowait(const char *command)
 {
 #ifdef _WINDOWS
-	const char	*__function_name = "zbx_execute_nowait";
-
 	char			*full_command;
 	STARTUPINFO		si;
 	PROCESS_INFORMATION	pi;
@@ -546,7 +541,7 @@ int	zbx_execute_nowait(const char *command)
 	si.cb = sizeof(si);
 	GetStartupInfo(&si);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing [%s]", __function_name, full_command);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing [%s]", __func__, full_command);
 
 	if (0 == CreateProcess(
 		NULL,		/* no module name (use command line) */

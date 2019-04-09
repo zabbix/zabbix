@@ -58,12 +58,11 @@ extern int		server_num, process_num;
 static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double *value_dbl,	zbx_timespec_t *ts,
 		int ping_result, char *error)
 {
-	const char	*__function_name = "process_value";
 	DC_ITEM		item;
 	int		errcode;
 	AGENT_RESULT	value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
@@ -100,7 +99,7 @@ clean:
 
 	DCconfig_clean_items(&item, &errcode, 1);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -121,12 +120,11 @@ clean:
 static void	process_values(icmpitem_t *items, int first_index, int last_index, ZBX_FPING_HOST *hosts,
 		int hosts_count, zbx_timespec_t *ts, int ping_result, char *error)
 {
-	const char	*__function_name = "process_values";
 	int		i, h;
 	zbx_uint64_t	value_uint64;
 	double		value_dbl;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (h = 0; h < hosts_count; h++)
 	{
@@ -198,7 +196,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 
 	zbx_preprocessor_flush();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr, int *count,
@@ -358,13 +356,12 @@ static int	get_icmpping_nearestindex(icmpitem_t *items, int items_count, int cou
 static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_count, int count, int interval,
 		int size, int timeout, zbx_uint64_t itemid, char *addr, icmpping_t icmpping, icmppingsec_type_t type)
 {
-	const char	*__function_name = "add_icmpping_item";
 	int		index;
 	icmpitem_t	*item;
 	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s' count:%d interval:%d size:%d timeout:%d",
-			__function_name, addr, count, interval, size, timeout);
+			__func__, addr, count, interval, size, timeout);
 
 	index = get_icmpping_nearestindex(*items, *items_count, count, interval, size, timeout);
 
@@ -389,7 +386,7 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
 
 	(*items_count)++;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -410,14 +407,13 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
  ******************************************************************************/
 static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int *icmp_items_count)
 {
-	const char		*__function_name = "get_pinger_hosts";
 	DC_ITEM			items[MAX_PINGER_ITEMS];
 	int			i, num, count, interval, size, timeout, rc, errcode = SUCCEED;
 	char			error[MAX_STRING_LEN], *addr = NULL;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, items);
 
@@ -458,7 +454,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 	zbx_preprocessor_flush();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, *icmp_items_count);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, *icmp_items_count);
 }
 
 static void	free_hosts(icmpitem_t **items, int *items_count)
@@ -473,13 +469,11 @@ static void	free_hosts(icmpitem_t **items, int *items_count)
 
 static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts_count, char *addr)
 {
-	const char	*__function_name = "add_pinger_host";
-
 	int		i;
 	size_t		sz;
 	ZBX_FPING_HOST	*h;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __function_name, addr);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __func__, addr);
 
 	for (i = 0; i < *hosts_count; i++)
 	{
@@ -500,7 +494,7 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 	memset(h, 0, sizeof(ZBX_FPING_HOST));
 	h->addr = addr;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -520,7 +514,6 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
  ******************************************************************************/
 static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 {
-	const char		*__function_name = "process_pinger_hosts";
 	int			i, first_index = 0, ping_result;
 	char			error[ITEM_ERROR_LEN_MAX];
 	static ZBX_FPING_HOST	*hosts = NULL;
@@ -528,7 +521,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 	int			hosts_count = 0;
 	zbx_timespec_t		ts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == hosts)
 		hosts = (ZBX_FPING_HOST *)zbx_malloc(hosts, sizeof(ZBX_FPING_HOST) * hosts_alloc);
@@ -555,7 +548,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************

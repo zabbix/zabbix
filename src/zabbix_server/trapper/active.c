@@ -84,14 +84,12 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
 		const char *host_metadata, zbx_uint64_t *hostid, char *error)
 {
-	const char	*__function_name = "get_hostid_by_host";
-
 	char		*host_esc, *ch_error, *old_metadata;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __function_name, host, host_metadata);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __func__, host, host_metadata);
 
 	if (FAIL == zbx_check_hostname(host, &ch_error))
 	{
@@ -217,7 +215,7 @@ done:
 
 	zbx_free(host_esc);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -262,15 +260,13 @@ static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_vector_uint64_t *
  ******************************************************************************/
 int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 {
-	const char		*__function_name = "send_list_of_active_checks";
-
 	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
 	size_t			buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
 	int			ret = FAIL, i;
 	zbx_uint64_t		hostid;
 	zbx_vector_uint64_t	itemids;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL != (host = strchr(request, '\n')))
 	{
@@ -315,7 +311,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 			if (SUCCEED != errcodes[i])
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() Item [" ZBX_FS_UI64 "] was not found in the"
-						" server cache. Not sending now.", __function_name, itemids.values[i]);
+						" server cache. Not sending now.", __func__, itemids.values[i]);
 				continue;
 			}
 
@@ -353,7 +349,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, "ZBX_EOF\n");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __function_name, buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, buffer);
 
 	zbx_alarm_on(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send_raw(sock, buffer))
@@ -367,7 +363,7 @@ out:
 	if (FAIL == ret)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send list of active checks to \"%s\": %s", sock->peer, error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -461,8 +457,6 @@ out:
  ******************************************************************************/
 int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	const char		*__function_name = "send_list_of_active_checks_json";
-
 	char			host[HOST_HOST_LEN_MAX], tmp[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL;
 	struct zbx_json		json;
@@ -475,7 +469,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	zbx_vector_ptr_t	regexps;
 	zbx_vector_str_t	names;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&regexps);
 	zbx_vector_str_create(&names);
@@ -543,7 +537,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			if (SUCCEED != errcodes[i])
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() Item [" ZBX_FS_UI64 "] was not found in the"
-						" server cache. Not sending now.", __function_name, itemids.values[i]);
+						" server cache. Not sending now.", __func__, itemids.values[i]);
 				continue;
 			}
 
@@ -630,7 +624,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		zbx_json_close(&json);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __function_name, json.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, json.buffer);
 
 	zbx_alarm_on(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send(sock, json.buffer))
@@ -649,7 +643,7 @@ error:
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, error, ZBX_JSON_TYPE_STRING);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __function_name, json.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, json.buffer);
 
 	ret = zbx_tcp_send(sock, json.buffer);
 
@@ -665,7 +659,7 @@ out:
 
 	zbx_free(host_metadata);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

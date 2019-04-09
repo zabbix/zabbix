@@ -1244,12 +1244,10 @@ static void	correlate_event_by_global_rules(DB_EVENT *event)
  ******************************************************************************/
 static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_events, zbx_vector_ptr_t *trigger_diff)
 {
-	const char		*__function_name = "correlate_events_by_global_rules";
-
 	int			i, index;
 	zbx_trigger_diff_t	*diff;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:%d", __function_name, correlation_cache.num_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:%d", __func__, correlation_cache.num_data);
 
 	zbx_dc_correlation_rules_get(&correlation_rules);
 
@@ -1276,7 +1274,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_events, z
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1289,14 +1287,12 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_events, z
  ******************************************************************************/
 static void	flush_correlation_queue(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
 {
-	const char		*__function_name = "flush_correlation_queue";
-
 	zbx_vector_uint64_t	triggerids, lockids, eventids;
 	zbx_hashset_iter_t	iter;
 	zbx_event_recovery_t	*recovery;
 	int			i, closed_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:%d", __function_name, correlation_cache.num_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:%d", __func__, correlation_cache.num_data);
 
 	if (0 == correlation_cache.num_data)
 		goto out;
@@ -1443,7 +1439,7 @@ static void	flush_correlation_queue(zbx_vector_ptr_t *trigger_diff, zbx_vector_u
 	zbx_vector_uint64_destroy(&lockids);
 	zbx_vector_uint64_destroy(&triggerids);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() closed:%d", __function_name, closed_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() closed:%d", __func__, closed_num);
 }
 
 /******************************************************************************
@@ -1689,8 +1685,6 @@ static void	get_hosts_by_expression(zbx_hashset_t *hosts, const char *expression
  ******************************************************************************/
 void	zbx_export_events(void)
 {
-	const char		*__function_name = "zbx_export_events";
-
 	size_t			i;
 	struct zbx_json		json;
 	size_t			sql_alloc = 256, sql_offset;
@@ -1703,7 +1697,7 @@ void	zbx_export_events(void)
 	zbx_event_recovery_t	*recovery;
 	DB_EVENT		*event;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events_num);
 
 	if (0 == events_num)
 		goto exit;
@@ -1809,7 +1803,7 @@ void	zbx_export_events(void)
 	zbx_free(sql);
 	zbx_json_free(&json);
 exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2500,12 +2494,11 @@ static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_
  ******************************************************************************/
 int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
 {
-	const char		*__function_name = "process_events";
 	size_t			i, processed_num = 0;
 	zbx_uint64_t		eventid;
 	zbx_vector_ptr_t	internal_ok_events, trigger_events;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events_num);
 
 	if (NULL != trigger_diff && 0 != correlation_cache.num_data)
 		flush_correlation_queue(trigger_diff, triggerids_lock);
@@ -2571,7 +2564,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 		zbx_vector_ptr_destroy(&internal_ok_events);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, (int)processed_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __func__, (int)processed_num);
 
 	return processed_num;
 }
