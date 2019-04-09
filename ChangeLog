@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-1302] added low-level discovery of block devices (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-15734] fixed dashboard widgets incorrect placement while dragged (gcalenko)
 ..F....... [ZBX-15563] fixed svg graph metric generation in situation when metric have big values (gcalenko)
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
 ..F....... [ZBX-10574] fixed version calculation (vasilijs)
