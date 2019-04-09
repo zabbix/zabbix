@@ -1,6 +1,10 @@
 if SERVER
-SERVER_tests = \
-	item_preproc_xpath
+
+SERVER_tests =
+
+if HAVE_LIBXML2
+SERVER_tests +=	item_preproc_xpath
+endif
 
 noinst_PROGRAMS = $(SERVER_tests)
 
