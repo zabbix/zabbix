@@ -310,6 +310,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-2494] fixed sorting of items, item prototypes, lld rules and screens to avoid deadlocks in database between server and frontend (ashubin, Sasha)
 ..F....... [ZBX-15768] fixed line length above widgets on global search page (ashubin)
 ..F....... [ZBX-10404] fixed password being passed in plain text in media type edit form (gcalenko)
 ..F....... [ZBX-15734] fixed dashboard widgets incorrect placement while dragged (gcalenko)
