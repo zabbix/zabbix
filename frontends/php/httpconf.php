@@ -112,14 +112,14 @@ if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
 	if ($testIds) {
 		$testIds = array_unique($testIds);
 
-		$count = API::HttpTest()->get([
-			'countOutput' => true,
+		$httptests = API::HttpTest()->get([
+			'output' => [],
 			'httptestids' => $testIds,
 			'editable' => true
 		]);
 
-		if ($count != count($testIds)) {
-			access_deny();
+		if (count($httptests) != count($testIds)) {
+			uncheckTableRows(getRequest('hostid'), array_column($httptests, 'httptestid', 'httptestid'));
 		}
 	}
 }

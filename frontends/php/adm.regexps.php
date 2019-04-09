@@ -101,16 +101,21 @@ if (isset($_REQUEST['regexpid'])) {
 		access_deny();
 	}
 }
+
+$mass_skip = false;
+
 if (hasRequest('action') && !hasRequest('regexpid')) {
 	if (!hasRequest('regexpids') || !is_array(getRequest('regexpids'))) {
 		access_deny();
 	}
 	else {
-		$regExpChk = DBfetch(DBSelect(
-			'SELECT COUNT(*) AS cnt FROM regexps re WHERE '.dbConditionInt('re.regexpid', getRequest('regexpids'))
+		$reg_exps = DBfetchArray(DBSelect(
+			'SELECT regexpid FROM regexps re WHERE '.dbConditionInt('re.regexpid', getRequest('regexpids'))
 		));
-		if ($regExpChk['cnt'] != count(getRequest('regexpids'))) {
-			access_deny();
+		if (count($reg_exps) != count(getRequest('regexpids'))) {
+			uncheckTableRows(null, array_column($reg_exps, 'regexpid', 'regexpid'));
+			show_error_message(_('No permissions to referred object or it does not exist!'));
+			$mass_skip = true;
 		}
 	}
 }
@@ -162,7 +167,7 @@ if (hasRequest('add') || hasRequest('update')) {
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') == 'regexp.massdelete') {
+elseif (hasRequest('action') && getRequest('action') == 'regexp.massdelete' && !$mass_skip) {
 	$regExpIds = getRequest('regexpids', getRequest('regexpid', []));
 
 	zbx_value2array($regExpIds);

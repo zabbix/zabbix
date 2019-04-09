@@ -175,6 +175,9 @@ ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
  */
 #define	ZBX_XML_HEADER1		"Soapaction:urn:vim25/4.1"
 #define ZBX_XML_HEADER2		"Content-Type:text/xml; charset=utf-8"
+/* cURL specific atribute to prevent the use of "Expect" derective */
+/* acording RFC 7231/5.1.1 if xml request with a size is large than 1k */
+#define ZBX_XML_HEADER3		"Expect:"
 
 #define ZBX_POST_VSPHERE_HEADER									\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"					\
@@ -1850,7 +1853,7 @@ static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *ser
 		"</ns0:QueryPerfProviderSummary>"				\
 		ZBX_POST_VSPHERE_FOOTER
 
-	const char	*__function_name = "vmware_service_get_perfcounter_refreshrate";
+	const char	*__function_name = "vmware_service_get_perf_counter_refreshrate";
 
 	char		tmp[MAX_STRING_LEN], *value = NULL, *id_esc;
 	int		ret = FAIL;
@@ -1929,7 +1932,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	const char	*__function_name = "vmware_service_get_perfcounters";
+	const char	*__function_name = "vmware_service_get_perf_counters";
 	char		tmp[MAX_STRING_LEN], *group = NULL, *key = NULL, *rollup = NULL, *stats = NULL,
 			*counterid = NULL;
 	xmlDoc		*doc = NULL;
@@ -2037,7 +2040,7 @@ out:
  ******************************************************************************/
 static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 {
-	const char	*__function_name = "wmware_vm_get_nic_devices";
+	const char	*__function_name = "vmware_vm_get_nic_devices";
 
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -2097,7 +2100,7 @@ clean:
  ******************************************************************************/
 static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 {
-	const char	*__function_name = "wmware_vm_get_disk_devices";
+	const char	*__function_name = "vmware_vm_get_disk_devices";
 
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -4224,6 +4227,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER3);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
 	{
@@ -4753,6 +4757,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER3);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
 	{
@@ -5009,7 +5014,7 @@ int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *
 		zbx_uint64_t *counterid)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	const char		*__function_name = "zbx_vmware_service_get_perfcounterid";
+	const char		*__function_name = "zbx_vmware_service_get_counterid";
 	zbx_vmware_counter_t	*counter;
 	int			ret = FAIL;
 
@@ -5052,7 +5057,7 @@ out:
 int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const char *type, const char *id,
 		zbx_uint64_t counterid, const char *instance)
 {
-	const char			*__function_name = "zbx_vmware_service_start_monitoring";
+	const char			*__function_name = "zbx_vmware_service_add_perf_counter";
 	zbx_vmware_perf_entity_t	*pentity, entity;
 	int				ret = FAIL;
 

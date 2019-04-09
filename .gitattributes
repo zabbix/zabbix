@@ -333,7 +333,6 @@ src/zabbix_server/ipmi/ipmi_poller.c -text
 src/zabbix_server/ipmi/ipmi_poller.h -text
 src/zabbix_server/ipmi/ipmi_protocol.c -text
 src/zabbix_server/ipmi/ipmi_protocol.h -text
-src/zabbix_server/preprocessor/item_preproc_test.c -text
 src/zabbix_server/preprocessor/preprocessing.c -text
 src/zabbix_server/scripts/Makefile.am -text
 src/zabbix_server/taskmanager/Makefile.am -text
@@ -348,5 +347,6 @@ tests/libs/zbxcommshigh/zbx_tcp_recv_ext_zlib.yaml -text
 tests/libs/zbxdbcache/dc_maintenance_match_tags.yaml -text
 tests/libs/zbxdbcache/zbx_vc_add_values.yaml -text
 tests/libs/zbxdbcache/zbx_vc_get_value.yaml -text
+tests/libs/zbxdbcache/zbx_vc_get_values.inc.yaml -text
 tests/libs/zbxdbcache/zbx_vc_get_values.yaml -text
 tests/libs/zbxhistory/zbx_history_get_values.yaml -text
