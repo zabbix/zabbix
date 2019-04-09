@@ -126,6 +126,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
+			'change_passwd' => true,
 			'maxsessions' => $db_defaults['maxsessions'],
 			'maxattempts' => $db_defaults['maxattempts'],
 			'attempt_interval' => $db_defaults['attempt_interval'],
@@ -181,6 +182,8 @@ class CControllerMediatypeEdit extends CController {
 					$data['maxsessions'] = 1;
 					break;
 			}
+
+			$data['change_passwd'] = $this->hasInput('passwd');
 		}
 
 		// overwrite with input variables
