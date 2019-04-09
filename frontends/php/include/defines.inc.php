@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.5rc1');
-define('ZABBIX_API_VERSION',	'4.0.5');
+define('ZABBIX_VERSION',		'4.0.7rc1');
+define('ZABBIX_API_VERSION',	'4.0.7');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -480,8 +480,8 @@ define('ITEM_DATA_TYPE_OCTAL',			1);
 define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
 define('ITEM_DATA_TYPE_BOOLEAN',		3);
 
-define('ZBX_DEFAULT_KEY_DB_MONITOR',			'db.odbc.select[<unique short description>,<dsn>]');
-define('ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY',	'db.odbc.discovery[<unique short description>,<dsn>]');
+define('ZBX_DEFAULT_KEY_DB_MONITOR',			'db.odbc.select[<unique short description>,dsn]');
+define('ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY',	'db.odbc.discovery[<unique short description>,dsn]');
 define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
 define('ZBX_DEFAULT_KEY_TELNET',				'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 
@@ -754,8 +754,9 @@ define('ZBX_MIN_WIDGET_LINES', 1);
 define('ZBX_MAX_WIDGET_LINES', 100);
 
 // dashboards
-define('DASHBOARD_MAX_ROWS', 64);
-define('DASHBOARD_MAX_COLUMNS', 12);
+define('DASHBOARD_MAX_COLUMNS',		12);
+define('DASHBOARD_MAX_ROWS',		64);
+define('DASHBOARD_WIDGET_MAX_ROWS',	32);
 
 // alignments
 define('HALIGN_DEFAULT',	0);
@@ -1329,9 +1330,7 @@ define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
 // event details widgets
 define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
 define('WIDGET_HAT_EVENTDETAILS',		'hat_eventdetails');
-define('WIDGET_HAT_EVENTACK',			'hat_eventack');
-define('WIDGET_HAT_EVENTACTIONMSGS',	'hat_eventactionmsgs');
-define('WIDGET_HAT_EVENTACTIONMCMDS',	'hat_eventactionmcmds');
+define('WIDGET_HAT_EVENTACTIONS',		'hat_eventactions');
 define('WIDGET_HAT_EVENTLIST',			'hat_eventlist');
 // search widget
 define('WIDGET_SEARCH_HOSTS',			'search_hosts');
@@ -1395,10 +1394,10 @@ define('QUEUE_DETAILS', 2);
 // item count to display in the details queue
 define('QUEUE_DETAIL_ITEM_COUNT', 500);
 
-// constants for element "copy to..." target types
-define('COPY_TYPE_TO_HOST', 0);
-define('COPY_TYPE_TO_TEMPLATE', 2);
-define('COPY_TYPE_TO_HOST_GROUP', 1);
+// target types to copy items/triggers/graphs
+define('COPY_TYPE_TO_HOST_GROUP',	0);
+define('COPY_TYPE_TO_HOST',			1);
+define('COPY_TYPE_TO_TEMPLATE',		2);
 
 define('HISTORY_GRAPH', 'showgraph');
 define('HISTORY_BATCH_GRAPH', 'batchgraph');
@@ -1473,7 +1472,9 @@ define('ZBX_STYLE_COLUMN_TAGS_3', 'column-tags-3');
 define('ZBX_STYLE_COMPACT_VIEW', 'compact-view');
 define('ZBX_STYLE_CURSOR_MOVE', 'cursor-move');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
-define('ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER', 'dashbrd-grid-widget-container');
+define('ZBX_STYLE_DASHBRD_GRID_CONTAINER', 'dashbrd-grid-container');
+define('ZBX_STYLE_DASHBRD_WIDGET', 'dashbrd-widget');
+define('ZBX_STYLE_DASHBRD_WIDGET_FLUID', 'dashbrd-widget-fluid');
 define('ZBX_STYLE_DASHBRD_WIDGET_HEAD', 'dashbrd-widget-head');
 define('ZBX_STYLE_DASHBRD_WIDGET_FOOT', 'dashbrd-widget-foot');
 define('ZBX_STYLE_DASHBRD_EDIT', 'dashbrd-edit');
@@ -1636,6 +1637,7 @@ define('ZBX_STYLE_STATUS_NA_BG', 'status-na-bg');
 define('ZBX_STYLE_STATUS_RED', 'status-red');
 define('ZBX_STYLE_STATUS_WARNING_BG', 'status-warning-bg');
 define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
+define('ZBX_STYLE_SVG_GRAPH', 'svg-graph');
 define('ZBX_STYLE_SVG_GRAPH_PREVIEW', 'svg-graph-preview');
 define('ZBX_STYLE_SUBFILTER', 'subfilter');
 define('ZBX_STYLE_SUBFILTER_ENABLED', 'subfilter-enabled');

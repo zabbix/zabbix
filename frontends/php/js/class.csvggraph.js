@@ -50,7 +50,7 @@ jQuery(function ($) {
 
 		if (data) {
 			if (!data.isHintBoxFrozen) {
-				$('.dashbrd-grid-widget-container')
+				$('.dashbrd-grid-container')
 					.dashboardGrid('unpauseWidgetRefresh', graph.data('widget')['uniqueid']);
 			}
 
@@ -67,7 +67,7 @@ jQuery(function ($) {
 	 */
 	function dropDocumentListeners(e, graph) {
 		var widgets_boxing = 0; // Number of widgets with active SBox.
-		$('.dashbrd-grid-widget-container').data('dashboardGrid')['widgets'].forEach(function(w) {
+		$('.dashbrd-grid-container').data('dashboardGrid')['widgets'].forEach(function(w) {
 			if (w !== graph.data('widget') && w['type'] === 'svggraph') {
 				var svg_graph = $('svg', w['content_body']);
 				if (svg_graph.length && svg_graph.data('options')['boxing']) {
@@ -118,10 +118,10 @@ jQuery(function ($) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
 			data.isHintBoxFrozen = true;
-			$('.dashbrd-grid-widget-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
+			$('.dashbrd-grid-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
 
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
-				$('.dashbrd-grid-widget-container')
+				$('.dashbrd-grid-container')
 					.dashboardGrid('unpauseWidgetRefresh', graph.data('widget')['uniqueid']);
 				data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
 				graph.off('mouseup', hintboxSilentMode);
@@ -185,7 +185,7 @@ jQuery(function ($) {
 
 		// If mouse movement detected (SBox has dragged), destroy opened hintbox and pause widget refresh.
 		if (data.start != data.end && !data.boxing) {
-			$('.dashbrd-grid-widget-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
+			$('.dashbrd-grid-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
 			data.isHintBoxFrozen = false;
 			data.boxing = true;
 			destroyHintbox(graph);
@@ -502,8 +502,16 @@ jQuery(function ($) {
 				});
 
 				if (show_hint) {
+					// Calculate time at mouse position.
+					var time = parseInt(data.timeFrom + ((offsetX - data.dimX) * data.spp));
+
 					html = $('<div></div>')
 							.addClass('svg-graph-hintbox')
+							.append(
+								$('<div></div>')
+									.addClass('header')
+									.html(time2str(time))
+							)
 							.append(html)
 							.append(points_total > data.hintMaxRows
 								? makeHintBoxFooter(data.hintMaxRows, points_total)
@@ -575,6 +583,7 @@ jQuery(function ($) {
 						hintMaxRows: options.hint_max_rows,
 						isHintBoxFrozen: false,
 						spp: options.spp || null,
+						timeFrom: options.time_from,
 						minPeriod: options.min_period,
 						boxing: false
 					};

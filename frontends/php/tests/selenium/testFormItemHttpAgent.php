@@ -971,7 +971,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						// inputs
 						'Timeout' => '1m',
 						'Required status codes' => '0, 100-500',
-						'HTTP proxy' => 'http://[user[:password]@]proxy.example.com[:port]',
+						'HTTP proxy' => '[protocol://][user[:password]@]proxy.example.com[:port]',
 						'User name' => 'admin',
 						'Password' => 'zabbix',
 						'SSL certificate file' => 'ssl_file',
@@ -1064,7 +1064,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				'Request type' => 'GET',
 				'Timeout' => '3s',
 				'Required status codes' => '200',
-				'Follow redirects' => false,
+				'Follow redirects' => true,
 				'Convert to JSON' => false,
 				'HTTP authentication' => 'None',
 				'SSL verify peer' => false,
@@ -1143,7 +1143,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Show value' => 'APC Battery Status',
 						// inputs
 						'Timeout' => '1m',
-						'HTTP proxy' => 'http://[user[:password]@]proxy.example.com[:port]',
+						'HTTP proxy' => '[protocol://][user[:password]@]proxy.example.com[:port]',
 						'User name' => 'admin',
 						'Password' => 'zabbix',
 						'SSL certificate file' => 'ssl_file_update',

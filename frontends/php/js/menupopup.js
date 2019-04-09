@@ -73,21 +73,22 @@ function getMenuPopupHistory(options) {
 /**
  * Get menu popup host section data.
  *
- * @param string options['hostid']           Host ID.
- * @param array  options['scripts']          Host scripts (optional).
- * @param string options[]['name']           Script name.
- * @param string options[]['scriptid']       Script ID.
- * @param string options[]['confirmation']   Confirmation text.
- * @param bool   options['showGraphs']       Link to host graphs page.
- * @param bool   options['showScreens']      Link to host screen page.
- * @param bool   options['showTriggers']     Link to Monitoring->Problems page.
- * @param bool   options['hasGoTo']          "Go to" block in popup.
- * @param int    options['severity_min']     (optional)
- * @param bool   options['show_suppressed']  (optional)
- * @param array  options['urls']             (optional)
- * @param string options['url'][]['label']
- * @param string options['url'][]['url']
- * @param {object} trigger_elmnt             UI element which triggered opening of overlay dialogue.
+ * @param {string} options['hostid']             Host ID.
+ * @param {array}  options['scripts']            Host scripts (optional).
+ * @param {string} options[]['name']             Script name.
+ * @param {string} options[]['scriptid']         Script ID.
+ * @param {string} options[]['confirmation']     Confirmation text.
+ * @param {bool}   options['showGraphs']         Link to host graphs page.
+ * @param {bool}   options['showScreens']        Link to host screen page.
+ * @param {bool}   options['showTriggers']       Link to Monitoring->Problems page.
+ * @param {bool}   options['hasGoTo']            "Go to" block in popup.
+ * @param {int}    options['severity_min']       (optional)
+ * @param {bool}   options['show_suppressed']    (optional)
+ * @param {array}  options['urls']               (optional)
+ * @param {string} options['url'][]['label']
+ * @param {string} options['url'][]['url']
+ * @param {string} options['filter_application'] (optional) Application name for filter by application.
+ * @param {object} trigger_elmnt                 UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
@@ -132,6 +133,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		host_inventory.url = host_inventory_url.getUrl();
 
 		// latest data link
+		if (typeof options.filter_application !== 'undefined') {
+			latest_data_url.setArgument('application', options.filter_application);
+		}
 		latest_data_url.setArgument('hostids[]', options.hostid);
 		latest_data_url.setArgument('filter_set', '1');
 		latest_data.url = latest_data_url.getUrl();
@@ -148,6 +152,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			}
 			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 				url.setArgument('filter_show_suppressed', '1');
+			}
+			if (typeof options.filter_application !== 'undefined') {
+				url.setArgument('filter_application', options.filter_application);
 			}
 			url.setArgument('filter_set', '1');
 			problems.url = url.getUrl();
@@ -240,11 +247,12 @@ function getMenuPopupMapElementSubmap(options) {
  * Get menu popup host group map element section data.
  *
  * @param {string} options['groupid']
- * @param {int}    options['severity_min']     (optional)
- * @param {bool}   options['show_suppressed']  (optional)
- * @param {array}  options['urls']             (optional)
+ * @param {int}    options['severity_min']       (optional)
+ * @param {bool}   options['show_suppressed']    (optional)
+ * @param {array}  options['urls']               (optional)
  * @param {string} options['url'][]['label']
  * @param {string} options['url'][]['url']
+ * @param {string} options['filter_application'] (optional) Application name for filter by application.
  *
  * @return array
  */
@@ -259,6 +267,9 @@ function getMenuPopupMapElementGroup(options) {
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 		problems_url.setArgument('filter_show_suppressed', '1');
+	}
+	if (typeof options.filter_application !== 'undefined') {
+		problems_url.setArgument('filter_application', options.filter_application);
 	}
 	problems_url.setArgument('filter_set', '1');
 
@@ -324,6 +335,27 @@ function getMenuPopupMapElementTrigger(options) {
 	}
 
 	return sections;
+}
+
+/**
+ * Get menu popup image map element section data.
+ *
+ * @param {array}  options['urls']             (optional)
+ * @param {string} options['url'][]['label']
+ * @param {string} options['url'][]['url']
+ *
+ * @return array
+ */
+function getMenuPopupMapElementImage(options) {
+	// urls
+	if (typeof options.urls !== 'undefined') {
+		return [{
+			label: t('URLs'),
+			items: options.urls
+		}];
+	}
+
+	return [];
 }
 
 /**
@@ -402,7 +434,6 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 				}
 				else {
 					var url = new Curl('zabbix.php');
-
 					url.setArgument('action', 'dashboard.widget.rfrate');
 
 					jQuery.ajax({
@@ -431,7 +462,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 
 							obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 
-							jQuery('.dashbrd-grid-widget-container')
+							jQuery('.dashbrd-grid-container')
 								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
 						},
 						error: function() {
@@ -525,11 +556,11 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
  * Get menu popup trigger section data.
  *
  * @param {string} options['triggerid']               Trigger ID.
+ * @param {string} options['eventid']                 (optional) Required for Acknowledge and Description sections.
  * @param {object} options['items']                   Link to trigger item history page (optional).
  * @param {string} options['items'][]['name']         Item name.
  * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
  * @param {object} options['acknowledge']             Link to acknowledge page (optional).
- * @param {string} options['acknowledge']['eventid']  Event ID
  * @param {string} options['acknowledge']['backurl']  Return URL.
  * @param {object} options['configuration']           Link to trigger configuration page (optional).
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
@@ -568,7 +599,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		var url = new Curl('zabbix.php', false);
 
 		url.setArgument('action', 'acknowledge.edit');
-		url.setArgument('eventids[]', options.acknowledge.eventid);
+		url.setArgument('eventids[]', options.eventid);
 		url.setArgument('backurl', options.acknowledge.backurl);
 
 		items[items.length] = {
@@ -585,11 +616,15 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 
 		if (typeof options.description_enabled === 'undefined' || options.description_enabled !== false) {
 			trigger_descr.clickCallback = function() {
+				var	popup_options = {triggerid: options.triggerid};
+
+				if (typeof options.eventid !== 'undefined') {
+					popup_options.eventid = options.eventid;
+				}
+
 				jQuery(this).closest('.action-menu').menuPopup('close', null);
 
-				return PopUp('popup.trigdesc.view', {
-					triggerid: options.triggerid
-				}, null, trigger_elmnt);
+				return PopUp('popup.trigdesc.view', popup_options, null, trigger_elmnt);
 			}
 		}
 		else {
