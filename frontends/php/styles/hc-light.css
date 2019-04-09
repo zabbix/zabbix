@@ -164,9 +164,6 @@ pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
 
-.discovery-checks {
-  word-wrap: break-word; }
-
 .top-nav-container {
   background-color: #fff;
   height: 45px;
@@ -873,6 +870,9 @@ output {
 
 .nowrap {
   white-space: nowrap; }
+
+.wordwrap {
+  word-break: break-all; }
 
 .overflow-table {
   overflow-x: auto;

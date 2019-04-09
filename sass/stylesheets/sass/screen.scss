@@ -217,10 +217,6 @@ pre {
 	word-wrap: break-word;
 }
 
-.discovery-checks {
-	word-wrap: break-word;
-}
-
 .top-nav-container {
 	background-color: $main-nav-bg-color;
 	height: 45px;
@@ -1337,6 +1333,10 @@ output {
 
 .nowrap {
 	white-space: nowrap;
+}
+
+.wordwrap {
+	word-break: break-all;
 }
 
 .overflow-table {

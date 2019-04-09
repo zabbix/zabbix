@@ -1,17 +1,16 @@
 <script type="text/x-jquery-tmpl" id="dcheckRowTPL">
 	<?= (new CRow([
 			(new CCol(
-				(new CDiv('#{name}'))->addClass('discovery-checks')
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				(new CDiv('#{name}'))->addClass(ZBX_STYLE_WORDWRAP)
 			))->setId('dcheckCell_#{dcheckid}'),
-			new CHorList([
+			(new CHorList([
 				(new CButton(null, _('Edit')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->onClick("javascript: showNewCheckForm(null, '#{dcheckid}');"),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->onClick("javascript: removeDCheckRow('#{dcheckid}');")
-			])
+			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->setId('dcheckRow_#{dcheckid}')
 			->toString()
@@ -23,8 +22,7 @@
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
 				->setId('uniqueness_criteria_#{dcheckid}'),
 			(new CLabel([new CSpan(), '#{name}'], 'uniqueness_criteria_#{dcheckid}'))
-				->addClass('discovery-checks')
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->addClass(ZBX_STYLE_WORDWRAP)
 		]))
 			->setId('uniqueness_criteria_row_#{dcheckid}')
 			->toString()
@@ -43,24 +41,21 @@
 					(new CLabel(_('Port range'), 'ports'))->setAsteriskMark(),
 					(new CTextBox('ports'))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-						->setAriaRequired()
-						->setAttribute('maxlength', 255),
+						->setAriaRequired(),
 					'newCheckPortsRow'
 				)
 				->addRow(
 					(new CLabel(_('SNMP community'), 'snmp_community'))->setAsteriskMark(),
 					(new CTextBox('snmp_community'))
 						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						->setAriaRequired()
-						->setAttribute('maxlength', 255),
+						->setAriaRequired(),
 					'newCheckCommunityRow'
 				)
 				->addRow(
 					(new CLabel(_('Key'), 'key_'))->setAsteriskMark(),
 					(new CTextBox('key_'))
 						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						->setAriaRequired()
-						->setAttribute('maxlength', 255),
+						->setAriaRequired(),
 					'newCheckKeyRow'
 				)
 				->addRow(
@@ -74,8 +69,7 @@
 				->addRow(
 					(new CLabel(_('Context name'), 'snmpv3_contextname')),
 					(new CTextBox('snmpv3_contextname'))
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						->setAttribute('maxlength', 255),
+						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 					'newCheckContextRow'
 				)
 				->addRow(
@@ -131,7 +125,7 @@
 			]))
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
 	))->setId('new_check_form')
 ?>
 </script>
@@ -313,7 +307,7 @@
 				}
 
 				// update check name
-				jQuery('#dcheckCell_' + value.dcheckid + ' .discovery-checks').text(value['name']);
+				jQuery('#dcheckCell_' + value.dcheckid + ' .wordwrap').text(value['name']);
 			}
 
 			// update device uniqueness criteria
@@ -339,24 +333,6 @@
 				}
 			}
 		}
-
-		// Boxes alignment to the right.
-		jQuery('#dcheckListFooter').closest("tbody").children('[id^=dcheckRow_]').each(function () {
-			var $this = jQuery(this),
-				check = $this.find('.discovery-checks');
-
-			if (check.width() == <?=ZBX_TEXTAREA_STANDARD_WIDTH?>) {
-				check.width(check.width() - $this.children(':last-child').width() - 30);
-			}
-		});
-
-		jQuery('label.discovery-checks').each(function () {
-			var $this = jQuery(this);
-		if ($this.width() == <?=ZBX_TEXTAREA_STANDARD_WIDTH?>) {
-				$this.width($this.width() - 30);
-			}
-		});
-
 	}
 
 	function removeDCheckRow(dcheckid) {
