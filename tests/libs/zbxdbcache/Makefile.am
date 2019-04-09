@@ -118,14 +118,12 @@ zbx_vc_get_value_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/tests
-	
-dc_maintenance_match_tags_SOURCES = \
-	dc_maintenance_match_tags.c
 
 dc_maintenance_match_tags_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/tests
-	
+
+dc_maintenance_match_tags_SOURCES = dc_maintenance_match_tags.c
 dc_maintenance_match_tags_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
 dc_maintenance_match_tags_LDFLAGS = @SERVER_LDFLAGS@
 
