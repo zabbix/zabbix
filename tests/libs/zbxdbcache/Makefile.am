@@ -75,13 +75,11 @@ zbx_vc_get_values_SOURCES = \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 
-zbx_vc_get_values_WRAP_FUNCS = $(COMMON_WRAP_FUNCS)
-
 zbx_vc_get_values_LDADD = $(VALUECACHE_LIBS) @SERVER_LIBS@
 zbx_vc_get_values_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_vc_get_values_CFLAGS = \
-	$(zbx_vc_get_values_WRAP_FUNCS) \
+	$(COMMON_WRAP_FUNCS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory \
@@ -94,13 +92,11 @@ zbx_vc_add_values_SOURCES = \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 
-zbx_vc_add_values_WRAP_FUNCS = $(COMMON_WRAP_FUNCS)
-
 zbx_vc_add_values_LDADD = $(VALUECACHE_LIBS) @SERVER_LIBS@
 zbx_vc_add_values_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_vc_add_values_CFLAGS = \
-	 $(zbx_vc_add_values_WRAP_FUNCS) \
+	 $(COMMON_WRAP_FUNCS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory \
@@ -113,13 +109,11 @@ zbx_vc_get_value_SOURCES = \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 
-zbx_vc_get_value_WRAP_FUNCS = $(COMMON_WRAP_FUNCS)
-
 zbx_vc_get_value_LDADD = $(VALUECACHE_LIBS) @SERVER_LIBS@
 zbx_vc_get_value_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_vc_get_value_CFLAGS = \
-	 $(zbx_vc_get_value_WRAP_FUNCS) \
+	 $(COMMON_WRAP_FUNCS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory \
