@@ -33,7 +33,7 @@ JSON_LIBS = \
 
 zbx_item_preproc_SOURCES = \
 	../../../src/zabbix_server/preprocessor/item_preproc.c \
-	zbx_item_preproc.c \ 
+	zbx_item_preproc.c 
 
 zbx_item_preproc_LDADD = $(JSON_LIBS)
 
