@@ -2766,17 +2766,20 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			if (SUCCEED == is_counted_in_item_queue(item->type, item->key))
 			{
-				zbx_timespec_t	ts = {now, 0};
-				char		*error = NULL;
+				char	*error = NULL;
 
 				if (FAIL == DCitem_nextcheck_update(item, item->state, flags, now, &error))
 				{
-					/* Usual way for an item to become not supported is to receive an error instead of value. */
-					/* Item state and error will be updated by history syncer during history sync following a */
-					/* regular procedure with item update in database and config cache, logging etc. There is */
-					/* no need to set ITEM_STATE_NOTSUPPORTED here. */
+					zbx_timespec_t	ts = {now, 0};
 
-					dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, error);
+					/* Usual way for an item to become not supported is to receive an error     */
+					/* instead of value. Item state and error will be updated by history syncer */
+					/* during history sync following a regular procedure with item update in    */
+					/* database and config cache, logging etc. There is no need to set          */
+					/* ITEM_STATE_NOTSUPPORTED here.                                            */
+
+					dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+							ITEM_STATE_NOTSUPPORTED, error);
 					zbx_free(error);
 				}
 			}
