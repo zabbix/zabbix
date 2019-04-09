@@ -21,12 +21,6 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
-/* LIBXML2 is used */
-#ifdef HAVE_LIBXML2
-#	include <libxml/parser.h>
-#	include <libxml/tree.h>
-#	include <libxml/xpath.h>
-#endif
 #include "common.h"
 
 #include "item_preproc_test.h"
