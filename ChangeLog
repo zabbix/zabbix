@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-1302] added low-level discovery of block devices (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-15642] fixed bigint limit in the user group updating forms (ashubin, Sasha)
 A.F....... [ZBX-2494] fixed sorting of items, item prototypes, lld rules and screens to avoid deadlocks in database between server and frontend (ashubin, Sasha)
 ..F....... [ZBX-10404] fixed password being passed in plain text in media type edit form (gcalenko)
 ..F....... [ZBX-15734] fixed dashboard widgets incorrect placement while dragged (gcalenko)
