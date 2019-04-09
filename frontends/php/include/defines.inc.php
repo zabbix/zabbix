@@ -1473,6 +1473,8 @@ define('ZBX_STYLE_COMPACT_VIEW', 'compact-view');
 define('ZBX_STYLE_CURSOR_MOVE', 'cursor-move');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
 define('ZBX_STYLE_DASHBRD_GRID_CONTAINER', 'dashbrd-grid-container');
+define('ZBX_STYLE_DASHBRD_WIDGET', 'dashbrd-widget');
+define('ZBX_STYLE_DASHBRD_WIDGET_FLUID', 'dashbrd-widget-fluid');
 define('ZBX_STYLE_DASHBRD_WIDGET_HEAD', 'dashbrd-widget-head');
 define('ZBX_STYLE_DASHBRD_WIDGET_FOOT', 'dashbrd-widget-foot');
 define('ZBX_STYLE_DASHBRD_EDIT', 'dashbrd-edit');
