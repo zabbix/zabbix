@@ -71,7 +71,8 @@ if ($isGranted) {
 		]))
 	);
 	$userGroupFormList->addRow(_('Enabled'),
-		(new CCheckBox('users_status'))->setChecked($data['users_status'] == GROUP_STATUS_ENABLED)
+		(new CCheckBox('users_status', GROUP_STATUS_ENABLED))
+			->setChecked($data['users_status'] == GROUP_STATUS_ENABLED)
 	);
 }
 else {
