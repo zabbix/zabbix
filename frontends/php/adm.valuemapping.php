@@ -123,6 +123,13 @@ elseif (getRequest('action') === 'valuemap.delete' && hasRequest('valuemapids'))
 		unset($_REQUEST['form']);
 		uncheckTableRows();
 	}
+	else {
+		$valuemaps = API::ValueMap()->get([
+			'valuemapids' => getRequest('valuemapids'),
+			'output' => []
+		]);
+		uncheckTableRows(null, array_column($valuemaps, 'valuemapid', 'valuemapid'));
+	}
 
 	$deleted = count($valuemapids);
 

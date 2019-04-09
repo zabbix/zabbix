@@ -1928,7 +1928,7 @@ int	zbx_ipc_async_socket_send(zbx_ipc_async_socket_t *asocket, zbx_uint32_t code
  ******************************************************************************/
 int	zbx_ipc_async_socket_recv(zbx_ipc_async_socket_t *asocket, int timeout, zbx_ipc_message_t **message)
 {
-	const char	*__function_name = "zbx_ipc_client_read";
+	const char	*__function_name = "zbx_ipc_async_socket_recv";
 
 	int		ret, flags;
 

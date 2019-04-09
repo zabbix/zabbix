@@ -104,14 +104,13 @@ elseif (hasRequest('action')) {
 		access_deny();
 	}
 	else {
-		$dbUserGroupCount = API::UserGroup()->get([
-			'output' => ['usrgrpid'],
-			'usrgrpids' => getRequest('group_groupid'),
-			'countOutput' => true
+		$group_users = API::UserGroup()->get([
+			'output' => [],
+			'usrgrpids' => getRequest('group_groupid')
 		]);
 
-		if ($dbUserGroupCount != count(getRequest('group_groupid'))) {
-			access_deny();
+		if (count($group_users) != count(getRequest('group_groupid'))) {
+			uncheckTableRows(null, array_column($group_users, 'usrgrpid', 'usrgrpid'));
 		}
 	}
 }
