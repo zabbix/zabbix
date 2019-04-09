@@ -426,7 +426,7 @@ jQuery(function($) {
 							window.setTimeout(function() {
 								values.isWaiting = false;
 
-								var search = $input.val().replace(/^\s+/g, '');
+								var search = $input.val().replace(/^\s+|\s+$/g, '');
 
 								// re-check search after delay
 								if (search !== '' && $input.data('lastSearch') != search) {
@@ -442,7 +442,7 @@ jQuery(function($) {
 									var request_data = {
 										search: values.search,
 										limit: getLimit(values, options)
-									}
+									};
 
 									jqxhr = $.ajax({
 										url: options.url + '&curtime=' + new CDate().getTime(),
@@ -636,16 +636,18 @@ jQuery(function($) {
 		if (options.addNew) {
 			var value = values['search'].replace(/^\s+|\s+$/g, '');
 
-			if (!empty(value)) {
+			if (value.length) {
 				var addNew = false;
 
-				if (!empty(data) || objectLength(values.selected) > 0) {
-					// check if value exist in availables
-					if (!empty(data)) {
-						var names = {};
+				if (data.length || objectLength(values.selected) > 0) {
+					var names = {};
 
+					// check if value exists among available
+					if (data.length) {
 						$.each(data, function(i, item) {
-							names[item.name.toUpperCase()] = true;
+							if (item.name === value) {
+								names[item.name.toUpperCase()] = true;
+							}
 						});
 
 						if (typeof names[value.toUpperCase()] === 'undefined') {
@@ -653,10 +655,8 @@ jQuery(function($) {
 						}
 					}
 
-					// check if value exist in selected
+					// check if value exists among selected
 					if (!addNew && objectLength(values.selected) > 0) {
-						var names = {};
-
 						$.each(values.selected, function(i, item) {
 							if (typeof item.isNew === 'undefined') {
 								names[item.name.toUpperCase()] = true;

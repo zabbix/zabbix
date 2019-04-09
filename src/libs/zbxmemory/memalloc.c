@@ -640,7 +640,7 @@ out:
 
 void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size)
 {
-	const char	*__function_name = "zbx_mem_malloc";
+	const char	*__function_name = "__zbx_mem_malloc";
 
 	void		*chunk;
 
@@ -679,7 +679,7 @@ void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const v
 
 void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size)
 {
-	const char	*__function_name = "zbx_mem_realloc";
+	const char	*__function_name = "__zbx_mem_realloc";
 
 	void		*chunk;
 
@@ -714,7 +714,7 @@ void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *
 
 void	__zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
 {
-	const char	*__function_name = "zbx_mem_free";
+	const char	*__function_name = "__zbx_mem_free";
 
 	if (NULL == ptr)
 	{

@@ -228,6 +228,15 @@ elseif (hasRequest('action') && getRequest('action') == 'drule.massdelete' && ha
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
 
+if (hasRequest('action') && hasRequest('g_druleid') && !$result) {
+	$drules = API::DRule()->get([
+		'output' => [],
+		'druleids' => getRequest('g_druleid'),
+		'editable' => true
+	]);
+	uncheckTableRows(null, array_column($drules, 'druleid', 'druleid'));
+}
+
 /*
  * Display
  */
