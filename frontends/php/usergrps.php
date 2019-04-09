@@ -99,18 +99,18 @@ if (hasRequest('usrgrpid')) {
 	}
 }
 elseif (hasRequest('action')) {
-	if (hasRequest('group_groupid') && is_array(getRequest('group_groupid'))) {
-		$db_user_group_count = API::UserGroup()->get([
-			'countOutput' => true,
+	if (!hasRequest('group_groupid') || !is_array(getRequest('group_groupid'))) {
+		access_deny();
+	}
+	else {
+		$group_users = API::UserGroup()->get([
+			'output' => [],
 			'usrgrpids' => getRequest('group_groupid')
 		]);
 
-		if ($db_user_group_count != count(getRequest('group_groupid'))) {
-			access_deny();
+		if (count($group_users) != count(getRequest('group_groupid'))) {
+			uncheckTableRows(null, array_column($group_users, 'usrgrpid', 'usrgrpid'));
 		}
-	}
-	else {
-		access_deny();
 	}
 }
 

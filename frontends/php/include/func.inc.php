@@ -811,7 +811,7 @@ function convert_units($options = []) {
  *
  * @param string $time
  *
- * @return int
+ * @return null|string
  */
 function timeUnitToSeconds($time) {
 	preg_match('/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/', $time, $matches);
@@ -821,7 +821,8 @@ function timeUnitToSeconds($time) {
 	if (!array_key_exists('number', $matches)) {
 		return null;
 	}
-	elseif (array_key_exists('suffix', $matches)) {
+
+	if (array_key_exists('suffix', $matches)) {
 		$time = $matches['number'];
 
 		switch ($matches['suffix']) {
@@ -2411,12 +2412,18 @@ function hasErrorMesssages() {
 /**
  * Clears table rows selection's cookies.
  *
- * @param string $cookieId		parent ID, is used as cookie suffix
+ * @param string $parentid  parent ID, is used as sessionStorage suffix
+ * @param array  $keepids   checked rows ids [id1 => id1, id2 => id2, ...]
  */
-function uncheckTableRows($cookieId = null) {
-	insert_js('cookie.eraseArray("cb_'.basename($_SERVER['SCRIPT_NAME'], '.php').
-		($cookieId === null ? '' : '_'.$cookieId).'")'
-	);
+function uncheckTableRows($parentid = null, $keepids = []) {
+	$key = implode('_', array_filter(['cb', basename($_SERVER['SCRIPT_NAME'], '.php'), $parentid]));
+
+	if ($keepids) {
+		insert_js('sessionStorage.setItem("'.$key.'", JSON.stringify('.CJs::encodeJson($keepids).'))');
+	}
+	else {
+		insert_js('sessionStorage.removeItem("'.$key.'")');
+	}
 }
 
 /**

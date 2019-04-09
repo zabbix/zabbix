@@ -213,6 +213,14 @@ elseif (hasRequest('delete') || (hasRequest('action') && getRequest('action') ==
 		unset($_REQUEST['form'], $_REQUEST['maintenanceid']);
 		uncheckTableRows();
 	}
+	else {
+		$maintenances = API::Maintenance()->get([
+			'maintenanceids' => getRequest('maintenanceids'),
+			'output' => [],
+			'editable' => true
+		]);
+		uncheckTableRows(null, array_column($maintenances, 'maintenanceid', 'maintenanceid'));
+	}
 
 	show_messages($result, _('Maintenance deleted'), _('Cannot delete maintenance'));
 }

@@ -91,7 +91,6 @@ abstract class CItemGeneral extends CApiService {
 			'lifetime'				=> [],
 			'preprocessing'			=> ['template' => 1],
 			'jmx_endpoint'			=> [],
-			'master_itemid'			=> ['template' => 1],
 			'url'					=> ['template' => 1],
 			'timeout'				=> ['template' => 1],
 			'query_fields'			=> ['template' => 1],
@@ -1414,7 +1413,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if ($item_preproc) {
-			DB::insert('item_preproc', $item_preproc);
+			DB::insertBatch('item_preproc', $item_preproc);
 		}
 	}
 
@@ -1449,7 +1448,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if ($item_preproc) {
-			DB::insert('item_preproc', $item_preproc);
+			DB::insertBatch('item_preproc', $item_preproc);
 		}
 	}
 
@@ -1584,7 +1583,7 @@ abstract class CItemGeneral extends CApiService {
 					'SELECT i.itemid,i.hostid,i.master_itemid'.
 					' FROM items i'.
 					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
-						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL])
 				);
 			}
 			else {

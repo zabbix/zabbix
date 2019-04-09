@@ -400,6 +400,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
 				case ZBX_PREPROC_MULTIPLIER:
+					$step['params'] = trim($step['params'][0]);
+					break;
+
 				case ZBX_PREPROC_RTRIM:
 				case ZBX_PREPROC_LTRIM:
 				case ZBX_PREPROC_TRIM:
@@ -640,6 +643,15 @@ elseif (hasRequest('action') && getRequest('action') == 'itemprototype.massdelet
 	show_messages($result, _('Item prototypes deleted'), _('Cannot delete item prototypes'));
 }
 
+if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
+	$item_prototypes = API::ItemPrototype()->get([
+		'itemids' => getRequest('group_itemid'),
+		'output' => [],
+		'editable' => true
+	]);
+	uncheckTableRows(getRequest('parent_discoveryid'), array_column($item_prototypes, 'itemid', 'itemid'));
+}
+
 /*
  * Display
  */
@@ -673,10 +685,10 @@ if (isset($_REQUEST['form'])) {
 			$itemPrototype['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
-		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
+		if (getRequest('type', $itemPrototype['type']) == ITEM_TYPE_DEPENDENT) {
 			$master_prototypes = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'itemids' => [$itemPrototype['master_itemid']],
+				'itemids' => [getRequest('master_itemid', $itemPrototype['master_itemid'])],
 				'hostids' => [$itemPrototype['hostid']],
 				'webitems' => true
 			])
