@@ -10,7 +10,6 @@ SERVER_tests = \
 	zbx_validate_interval \
 	is_double_suffix \
 	is_double \
-	zbx_variant_compare \
 	zbx_user_macro_parse
 endif
 
