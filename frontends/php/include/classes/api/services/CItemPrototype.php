@@ -497,11 +497,11 @@ class CItemPrototype extends CItemGeneral {
 		$this->createItemPreprocessing($items);
 	}
 
-	protected function updateReal($items) {
-		$items = zbx_toArray($items);
+	protected function updateReal(array $items) {
+		CArrayHelper::sort($items, ['itemid']);
 
 		$data = [];
-		foreach ($items as $inum => $item) {
+		foreach ($items as $item) {
 			$data[] = ['values' => $item, 'where'=> ['itemid' => $item['itemid']]];
 		}
 
@@ -520,7 +520,7 @@ class CItemPrototype extends CItemGeneral {
 			}
 
 			$itemidsWithApplications[] = $item['itemid'];
-			foreach ($item['applications'] as $anum => $appid) {
+			foreach ($item['applications'] as $appid) {
 				$itemApplications[] = [
 					'applicationid' => $appid,
 					'itemid' => $item['itemid']
