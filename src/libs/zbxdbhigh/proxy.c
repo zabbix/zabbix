@@ -1623,7 +1623,6 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	{
 		DCsync_configuration(ZBX_DBSYNC_UPDATE);
 		DCupdate_hosts_availability();
-		dc_flush_history();	/* misconfigured items generate pseudo-historic values to become notsupported */
 	}
 
 	zbx_free(error);

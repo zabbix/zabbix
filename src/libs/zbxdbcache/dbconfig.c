@@ -2778,8 +2778,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 					/* database and config cache, logging etc. There is no need to set          */
 					/* ITEM_STATE_NOTSUPPORTED here.                                            */
 
-					dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-							ITEM_STATE_NOTSUPPORTED, error);
+					if (0 == host->proxy_hostid)
+					{
+						dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+								ITEM_STATE_NOTSUPPORTED, error);
+					}
 					zbx_free(error);
 				}
 			}
@@ -4884,6 +4887,8 @@ void	DCsync_configuration(unsigned char mode)
 	itempp_sec2 = zbx_time() - sec;
 	config->item_sync_ts = time(NULL);
 	FINISH_SYNC;
+
+	dc_flush_history();	/* misconfigured items generate pseudo-historic values to become notsupported */
 
 	/* sync function data to support function lookups when resolving macros during configuration sync */
 
