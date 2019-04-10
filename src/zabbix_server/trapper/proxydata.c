@@ -116,8 +116,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 				proxy.host, ZBX_COMPONENT_VERSION_MAJOR(proxy.version),
 				ZBX_COMPONENT_VERSION_MINOR(proxy.version), ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR);
 
-		if (proxy.version > server_version || (ZBX_COMPONENT_VERSION(4, 2) <= server_version &&
-				ZBX_COMPONENT_VERSION(4, 2) > proxy.version))
+		if (proxy.version > server_version)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy");
 			goto out;

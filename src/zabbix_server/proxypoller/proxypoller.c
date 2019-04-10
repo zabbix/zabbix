@@ -651,8 +651,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 				ZBX_COMPONENT_VERSION_MINOR(proxy->version),
 				ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR);
 
-		if (proxy->version > server_version || (ZBX_COMPONENT_VERSION(4, 2) <= server_version &&
-				ZBX_COMPONENT_VERSION(4, 2) > proxy->version))
+		if (proxy->version > server_version)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy");
 			goto out;
