@@ -2131,6 +2131,7 @@ class CAction extends CApiService {
 			foreach ($result as &$action) {
 				$action['acknowledgeOperations'] = [];
 			}
+			unset($action);
 
 			$ack_operations = $this->getAcknowledgeOperations($ack_operations, $options['selectAcknowledgeOperations']);
 
@@ -2357,7 +2358,8 @@ class CAction extends CApiService {
 		}
 
 		// Adding recovery operations.
-		if ($options['selectRecoveryOperations'] !== null && $options['selectRecoveryOperations'] != API_OUTPUT_COUNT) {
+		if ($options['selectRecoveryOperations'] !== null
+				&& $options['selectRecoveryOperations'] != API_OUTPUT_COUNT) {
 			$recovery_operations = API::getApiService()->select('operations', [
 				'output' => $this->outputExtend($options['selectRecoveryOperations'],
 					['operationid', 'actionid', 'operationtype']
