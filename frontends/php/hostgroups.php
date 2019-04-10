@@ -208,6 +208,15 @@ elseif (hasRequest('action')) {
 			show_messages($result, $messageSuccess, $messageFailed);
 		}
 	}
+
+	if (hasRequest('groups') && !$result) {
+		$groups = API::HostGroup()->get([
+			'groupids' => getRequest('groups'),
+			'output' => []
+		]);
+
+		uncheckTableRows(null, array_column($groups, 'groupid', 'groupid'));
+	}
 }
 
 /*
