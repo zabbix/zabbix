@@ -201,8 +201,8 @@ class CMultiSelect extends CTag {
 				}
 
 				if (array_key_exists('hostid', $parameters) && $parameters['hostid'] > 0) {
-					$popup_parameters['only_hostid'] = $parameters['hostid'];
-					$autocomplete_parameters['hostid'] = $parameters['hostid'];
+					$popup_parameters['only_hostid'] = (string) $parameters['hostid'];
+					$autocomplete_parameters['hostid'] = (string) $parameters['hostid'];
 				}
 
 				if (array_key_exists('numeric', $parameters) && $parameters['numeric']) {

@@ -116,14 +116,13 @@ if (hasRequest('action')) {
 		access_deny();
 	}
 	else {
-		$usersChk = API::User()->get([
-			'output' => ['userid'],
+		$users = API::User()->get([
+			'output' => [],
 			'userids' => getRequest('group_userid'),
-			'countOutput' => true,
 			'editable' => true
 		]);
-		if ($usersChk != count(getRequest('group_userid'))) {
-			access_deny();
+		if (count($users) != count(getRequest('group_userid'))) {
+			uncheckTableRows(null, array_column($users, 'userid', 'userid'));
 		}
 	}
 }
