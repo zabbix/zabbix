@@ -324,17 +324,15 @@ $form_list
 	)
 	// Append ITEM_TYPE_HTTPAGENT User name to form list.
 	->addRow(
-		(new CLabel(_('User name'), 'http_username'))->setAsteriskMark(),
+		new CLabel(_('User name'), 'http_username'),
 		(new CTextBox('http_username', $data['http_username'], $readonly, DB::getFieldLength('items', 'username')))
-			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'http_username_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Password to form list.
 	->addRow(
-		(new CLabel(_('Password'), 'http_password'))->setAsteriskMark(),
+		new CLabel(_('Password'), 'http_password'),
 		(new CTextBox('http_password', $data['http_password'], $readonly, DB::getFieldLength('items', 'password')))
-			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'http_password_row'
 	)
