@@ -646,14 +646,14 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 	/* warn if another proxy version is used and proceed with compatibility rules*/
 	if ((server_version = ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR)) != proxy->version)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, " proxy \"%s\" version %d.%d differs from server version %d.%d",
+		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" version %d.%d differs from server version %d.%d",
 				proxy->host, ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
 				ZBX_COMPONENT_VERSION_MINOR(proxy->version),
 				ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR);
 
 		if (proxy->version > server_version)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy");
+			zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
 			goto out;
 		}
 	}
