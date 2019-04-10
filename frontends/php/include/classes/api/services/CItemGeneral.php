@@ -1413,7 +1413,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if ($item_preproc) {
-			DB::insert('item_preproc', $item_preproc);
+			DB::insertBatch('item_preproc', $item_preproc);
 		}
 	}
 
@@ -1448,7 +1448,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if ($item_preproc) {
-			DB::insert('item_preproc', $item_preproc);
+			DB::insertBatch('item_preproc', $item_preproc);
 		}
 	}
 

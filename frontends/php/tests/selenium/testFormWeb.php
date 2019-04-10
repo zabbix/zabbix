@@ -294,7 +294,7 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestAssertVisibleId('http_proxy');
 		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'maxlength', 255);
 		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'size', 20);
-		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'placeholder', 'http://[user[:password]@]proxy.example.com[:port]');
+		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]');
 
 		$this->zbxTestTextPresent('Variables');
 		$this->zbxTestAssertVisibleId('variables');
