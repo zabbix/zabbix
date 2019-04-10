@@ -88,6 +88,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 	int		ret = FAIL, status;
 	char		*error = NULL;
 	DC_PROXY	proxy;
+	int		server_version;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -108,14 +109,19 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
 			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
-	/* don't accept data from another proxy version*/
-	if (ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR) != proxy.version)
+	/* warn if another proxy version is used and proceed with compatibility rules*/
+	if ((server_version = ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR)) != proxy.version)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy \"%s\":"
-				" proxy version %d.%d differs from server version %d.%d",
+		zabbix_log(LOG_LEVEL_WARNING, " proxy \"%s\" version %d.%d differs from server version %d.%d",
 				proxy.host, ZBX_COMPONENT_VERSION_MAJOR(proxy.version),
 				ZBX_COMPONENT_VERSION_MINOR(proxy.version), ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR);
-		goto out;
+
+		if (proxy.version > server_version || (ZBX_COMPONENT_VERSION(4, 2) <= server_version &&
+				ZBX_COMPONENT_VERSION(4, 2) > proxy.version))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy");
+			goto out;
+		}
 	}
 
 	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, &error)))
