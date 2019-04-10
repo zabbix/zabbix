@@ -62,7 +62,7 @@ define('ELASTICSEARCH_RESPONSE_DOCUMENTS',		2);
 define('ZBX_WIDGET_ROWS', 20);
 
 define('ZBX_WEBCACHE_PATH',			'static');
-define('ZBX_WEBCACHE_PATH_MODE',	0777);
+define('ZBX_WEBCACHE_PATH_MODE',	0755);
 define('ZBX_WEBCACHE_TTL',			10);
 define('ZBX_FONTPATH',				realpath('fonts')); // where to search for font (GD > 2.0.18)
 define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name

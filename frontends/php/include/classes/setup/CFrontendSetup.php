@@ -665,13 +665,13 @@ class CFrontendSetup {
 	 * @return array
 	 */
 	public function checkAssetsCachePermissions() {
-		$assets_service = new CAssetsFileCache(ZBase::getRootDir());
-		$result = $assets_service->boot() ? self::CHECK_OK : self::CHECK_FATAL;
+		$assets = new CAssetsFileCache(ZBase::getRootDir());
+		$result = $assets->build() ? self::CHECK_OK : self::CHECK_FATAL;
 		$assets_dir = implode(DIRECTORY_SEPARATOR, [ZBase::getRootDir(), ZBX_WEBCACHE_PATH]);
 
 		return [
 			'name' => _('Assets cache directory permissions'),
-			'current' => $result == self::CHECK_OK ? 'RW' : 'R',
+			'current' => $result === self::CHECK_OK ? 'RW' : 'R',
 			'required' => 'RW',
 			'result' => $result,
 			'error' => _s('Directory "%1$s" must be writable', $assets_dir)

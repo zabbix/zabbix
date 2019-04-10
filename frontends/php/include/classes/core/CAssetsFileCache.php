@@ -21,28 +21,26 @@
 
 class CAssetsFileCache {
 
-	public $cache_tag = '';
-	private $root_dir = '';
-	private $assets_files = [];
-	private $assets_scan_rules = [
-		'styles/*.css', 'img/*.png', 'img/*.svg'
-	];
+	private $path;
+	private $root_dir;
+	private $assets_files;
+	private $assets_scan_rules = ['styles/*.css', 'img/*.png', 'img/*.svg'];
 
 	public function __construct($root_dir) {
 		// Without ending direcotry separator.
 		$this->root_dir = $root_dir;
 		$this->assets_files = $this->getAssetsFiles();
-		$this->cache_tag = base_convert(max(array_map('filemtime', $this->assets_files)), 10, 24);
+		$this->path = base_convert(max(array_map('filemtime', $this->assets_files)), 10, 24);
 	}
 
 	/**
-	 * Will check existence of cache directory. If directory for current cache_tag does not exist will call cold boot.
+	 * Will check existence of cache directory. If directory for current path does not exist will call cold build.
 	 * Returns true when cache is booted and ready to be used, false otherwise.
 	 *
 	 * @return bool
 	 */
-	public function boot() {
-		$cache_dir = implode(DIRECTORY_SEPARATOR, [$this->root_dir, ZBX_WEBCACHE_PATH, $this->cache_tag, '']);
+	public function build() {
+		$cache_dir = implode(DIRECTORY_SEPARATOR, [$this->root_dir, ZBX_WEBCACHE_PATH, $this->path, '']);
 
 		if (file_exists($cache_dir)) {
 			return true;
@@ -56,7 +54,7 @@ class CAssetsFileCache {
 	 */
 	public function maintenance() {
 		$entries = array_diff(scandir($this->root_dir.DIRECTORY_SEPARATOR.ZBX_WEBCACHE_PATH),
-			['.', '..', $this->cache_tag]
+			['.', '..', $this->path]
 		);
 		$ttl = time() - ZBX_WEBCACHE_TTL;
 
@@ -68,10 +66,10 @@ class CAssetsFileCache {
 	}
 
 	/**
-	 * Initializes cache directory for cache_tag by copy cacheable files to cache_tag sub directory.
+	 * Initializes cache directory for cache by copy cacheable files to cache sub directory.
 	 * Returns true when cache is initialized and ready to be used, false otherwise.
 	 *
-	 * @param string $cache_dir    Path to cache_tag directory.
+	 * @param string $cache_dir    Path to cache directory.
 	 * @return bool
 	 */
 	public function init($cache_dir) {
@@ -84,9 +82,9 @@ class CAssetsFileCache {
 		if ($status) {
 			foreach ($this->assets_files as $file) {
 				$dst_dir = substr($file, -4) === '.css' ? $css_dir : $img_dir;
-				$statuss = copy($file, $dst_dir.basename($file));
+				$status = copy($file, $dst_dir.basename($file));
 
-				if (!$statuss) {
+				if (!$status) {
 					break;
 				}
 			}
@@ -96,21 +94,31 @@ class CAssetsFileCache {
 			$this->maintenance();
 		}
 		else {
-			$this->invalidate($this->cache_tag);
+			$this->invalidate($this->path);
 		}
 
-		return $statuss;
+		return $status;
 	}
 
 	/**
-	 * Removes cache_tag folder and it content.
+	 * Removes cache folder and it content.
 	 *
 	 * @return bool
 	 */
-	public function invalidate($cache_tag) {
-		$cache_dir = implode(DIRECTORY_SEPARATOR, [$this->root_dir, ZBX_WEBCACHE_PATH, $cache_tag, '']);
+	public function invalidate($path) {
+		$cache_dir = implode(DIRECTORY_SEPARATOR, [$this->root_dir, ZBX_WEBCACHE_PATH, $path, '']);
 
 		return $this->rmdir($cache_dir);
+	}
+
+	/**
+	 * Return path to assets
+	 *
+	 * @return string
+	 */
+	public function getAssetsPath()
+	{
+		return $this->path;
 	}
 
 	/**

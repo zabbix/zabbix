@@ -31,19 +31,19 @@ require_once dirname(__FILE__).'/include/classes/helpers/CBrandHelper.php';
 require_once dirname(__FILE__).'/include/html.inc.php';
 require_once dirname(__FILE__).'/include/classes/core/CAssetsFileCache.php';
 
-$assets_prefix = '';
+$assets_path = '';
 
 if (ZBX_WEBCACHE_PATH) {
-	$assets_service = new CAssetsFileCache(__DIR__);
+	$assets = new CAssetsFileCache(__DIR__);
 
-	if (!$assets_service->boot()) {
+	if (!$assets->build()) {
 		header('Location: cachewarning.php');
 
 		exit;
 	}
 
-	$assets_prefix = ZBX_WEBCACHE_PATH.'/'.$assets_service->cache_tag.'/';
+	$assets_path = ZBX_WEBCACHE_PATH.'/'.$assets->getAssetsPath().'/';
 }
 
-$browserWarningForm = new CView('general.browserwarning', compact('assets_prefix'));
-$browserWarningForm->render();
+$browser_warning_form = new CView('general.browserwarning', compact('assets_path'));
+$browser_warning_form->render();
