@@ -1184,10 +1184,9 @@ class CTemplate extends CHostGeneral {
 				]);
 				$templates = zbx_toHash($templates, 'templateid');
 				foreach ($result as $templateid => $template) {
-					if (isset($templates[$templateid]))
-						$result[$templateid]['templates'] = $templates[$templateid]['rowscount'];
-					else
-						$result[$templateid]['templates'] = 0;
+					$result[$templateid]['templates'] = array_key_exists($templateid, $templates)
+						? $templates[$templateid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1214,10 +1213,9 @@ class CTemplate extends CHostGeneral {
 				]);
 				$hosts = zbx_toHash($hosts, 'templateid');
 				foreach ($result as $templateid => $template) {
-					if (isset($hosts[$templateid]))
-						$result[$templateid]['hosts'] = $hosts[$templateid]['rowscount'];
-					else
-						$result[$templateid]['hosts'] = 0;
+					$result[$templateid]['hosts'] = array_key_exists($templateid, $hosts)
+						? $hosts[$templateid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1252,10 +1250,9 @@ class CTemplate extends CHostGeneral {
 				]);
 				$screens = zbx_toHash($screens, 'templateid');
 				foreach ($result as $templateid => $template) {
-					if (isset($screens[$templateid]))
-						$result[$templateid]['screens'] = $screens[$templateid]['rowscount'];
-					else
-						$result[$templateid]['screens'] = 0;
+					$result[$templateid]['screens'] = array_key_exists($templateid, $screens)
+						? $screens[$templateid]['rowscount']
+						: '0';
 				}
 			}
 		}

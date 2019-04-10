@@ -465,7 +465,7 @@ class CTrigger extends CTriggerGeneral {
 
 		// return count for post SQL filtered result sets
 		if ($options['countOutput']) {
-			return count($result);
+			return (string) count($result);
 		}
 
 		if ($result) {

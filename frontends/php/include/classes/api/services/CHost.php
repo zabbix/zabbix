@@ -1442,7 +1442,9 @@ class CHost extends CHostGeneral {
 
 				$interfaces = zbx_toHash($interfaces, 'hostid');
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['interfaces'] = isset($interfaces[$hostid]) ? $interfaces[$hostid]['rowscount'] : 0;
+					$result[$hostid]['interfaces'] = array_key_exists($hostid, $interfaces)
+						? $interfaces[$hostid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1478,7 +1480,9 @@ class CHost extends CHostGeneral {
 				$screens = zbx_toHash($screens, 'hostid');
 
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['screens'] = isset($screens[$hostid]) ? $screens[$hostid]['rowscount'] : 0;
+					$result[$hostid]['screens'] = array_key_exists($hostid, $screens)
+						? $screens[$hostid]['rowscount']
+						: '0';
 				}
 			}
 		}

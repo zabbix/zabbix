@@ -924,10 +924,9 @@ class CDRule extends CApiService {
 				]);
 				$dchecks = zbx_toHash($dchecks, 'druleid');
 				foreach ($result as $druleid => $drule) {
-					if (isset($dchecks[$druleid]))
-						$result[$druleid]['dchecks'] = $dchecks[$druleid]['rowscount'];
-					else
-						$result[$druleid]['dchecks'] = 0;
+					$result[$druleid]['dchecks'] = array_key_exists($druleid, $dchecks)
+						? $dchecks[$druleid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -954,10 +953,9 @@ class CDRule extends CApiService {
 				]);
 				$dhosts = zbx_toHash($dhosts, 'druleid');
 				foreach ($result as $druleid => $drule) {
-					if (isset($dhosts[$druleid]))
-						$result[$druleid]['dhosts'] = $dhosts[$druleid]['rowscount'];
-					else
-						$result[$druleid]['dhosts'] = 0;
+					$result[$druleid]['dhosts'] = array_key_exists($druleid, $dhosts)
+						? $dhosts[$druleid]['rowscount']
+						: '0';
 				}
 			}
 		}
