@@ -3,6 +3,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-10889] improved logging performance when high DebugLevel is used (viktors)
 A......... [ZBX-15762] fixed API returns "countOutput", "select*": "count" results and "suppressed" property as integer (agriscenko)
 ..F....... [ZBX-15642] fixed bigint limit in the user group updating forms (ashubin, Sasha)
 A.F....... [ZBX-2494] fixed sorting of items, item prototypes, lld rules and screens to avoid deadlocks in database between server and frontend (ashubin, Sasha)
