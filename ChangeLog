@@ -15,7 +15,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
-..F....... [ZBX-10937] fixed global search not showing results when host name is being typed not first character and technical name when it differs from visible name (Ivo)
+..F....... [ZBX-10937] fixed top right global search field autocomplete not showing results when host name is being typed not first character and technical name when it differs from visible name (Ivo)
 A.F....... [ZBX-10861] changed user name and password fields from being mandatory to optional in web scenarios and HTTP agent type items (Ivo)
 ...G...PS. [ZBX-10889] improved logging performance when high DebugLevel is used (viktors)
 A......... [ZBX-15762] fixed API returns "countOutput", "select*": "count" results and "suppressed" property as integer (agriscenko)
@@ -328,7 +328,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
-..F....... [ZBX-10937] fixed global search not showing results when host name is being typed not first character and technical name when it differs from visible name (Ivo)
+..F....... [ZBX-10937] fixed top right global search field autocomplete not showing results when host name is being typed not first character and technical name when it differs from visible name (Ivo)
 A.F....... [ZBX-10861] changed user name and password fields from being mandatory to optional in web scenarios and HTTP agent type items (Ivo)
 ...G...PS. [ZBX-10889] improved logging performance when high DebugLevel is used (viktors)
 A......... [ZBX-15762] fixed API returns "countOutput", "select*": "count" results and "suppressed" property as integer (agriscenko)
