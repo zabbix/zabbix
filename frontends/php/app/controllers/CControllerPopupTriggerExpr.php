@@ -496,7 +496,7 @@ class CControllerPopupTriggerExpr extends CController {
 					}
 
 					/*
-					 * Try to find operator and value.
+					 * Try to find an operator and a value.
 					 * The value and operator can be extracted only if they immediately follow the item function macro.
 					 */
 					$tokens = $result->getTokens();
@@ -629,7 +629,9 @@ class CControllerPopupTriggerExpr extends CController {
 					if ($data['paramtype'] == PARAM_TYPE_COUNTS
 							&& array_key_exists('last', $data['params'])
 							&& $data['params']['last'] !== '') {
-						$data['params']['last'] = '#'.$data['params']['last'];
+						$data['params']['last'] = zbx_is_int($data['params']['last'])
+							? '#'.$data['params']['last']
+							: $data['params']['last'];
 					}
 					elseif ($data['paramtype'] == PARAM_TYPE_TIME && in_array($function, ['last', 'band', 'strlen'])) {
 						$data['params']['last'] = '';
