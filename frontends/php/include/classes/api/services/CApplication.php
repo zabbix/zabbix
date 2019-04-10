@@ -621,12 +621,14 @@ class CApplication extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		$applicationids = array_keys($result);
+
 		// add application templates
 		if ($this->outputIsRequested('templateids', $options['output'])) {
 			$query = DBselect(
 				'SELECT at.application_templateid,at.applicationid,at.templateid'.
 					' FROM application_template at'.
-					' WHERE '.dbConditionInt('at.applicationid', array_keys($result))
+					' WHERE '.dbConditionInt('at.applicationid', $applicationids)
 			);
 			$relationMap = new CRelationMap();
 			$templateApplications = [];
@@ -669,7 +671,7 @@ class CApplication extends CApiService {
 			$dbRules = DBselect(
 				'SELECT ad.applicationid,ap.itemid'.
 				' FROM application_discovery ad,application_prototype ap,applications a'.
-				' WHERE '.dbConditionInt('ad.applicationid', array_keys($result)).
+				' WHERE '.dbConditionInt('ad.applicationid', $applicationids).
 					' AND ad.application_prototypeid=ap.application_prototypeid'.
 					' AND a.applicationid=ad.applicationid'.
 					' AND a.flags='.ZBX_FLAG_DISCOVERY_CREATED
@@ -695,7 +697,7 @@ class CApplication extends CApiService {
 				'output' => $this->outputExtend($options['selectApplicationDiscovery'],
 					['application_discoveryid', 'applicationid']
 				),
-				'filter' => ['applicationid' => array_keys($result)],
+				'filter' => ['applicationid' => $applicationids],
 				'preservekeys' => true
 			]);
 
