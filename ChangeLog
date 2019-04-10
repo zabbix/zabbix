@@ -3,6 +3,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+.....J.... [ZBX-15409] improved Zabbix java gateway error logging usability by adding item key to error message (vso)
 ........S. [ZBX-15844] fixed inability to start Zabbix server if alert manager process is late after alerters; thanks to Mikhail Makurov for the patch (akozlovs)
 ..F....... [ZBX-11043] implemented a better network discovery filter (Ivo)
 ..F....... [ZBX-10937] fixed top right global search field autocomplete not showing results when host name is being typed not first character and technical name when it differs from visible name (Ivo)
