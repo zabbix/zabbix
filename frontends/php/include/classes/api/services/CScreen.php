@@ -1050,6 +1050,7 @@ class CScreen extends CApiService {
 	 */
 	protected function updateReal(array $screens, array $db_screens) {
 		$update_screens = [];
+		CArrayHelper::sort($screens, ['screenid']);
 
 		foreach ($screens as $screen) {
 			$screenid = $screen['screenid'];

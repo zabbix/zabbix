@@ -3,6 +3,23 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15642] fixed bigint limit in the user group updating forms (ashubin, Sasha)
+A.F....... [ZBX-2494] fixed sorting of items, item prototypes, lld rules and screens to avoid deadlocks in database between server and frontend (ashubin, Sasha)
+..F....... [ZBX-15768] fixed line length above widgets on global search page (ashubin)
+..F....... [ZBX-10404] fixed password being passed in plain text in media type edit form (gcalenko)
+..F....... [ZBX-15734] fixed dashboard widgets incorrect placement while dragged (gcalenko)
+..F....... [ZBX-15563] fixed svg graph metric generation in situation when metric have big values (gcalenko)
+..F....... [ZBX-15139] fixed element removing from list in different tabs or browsers (vasilijs)
+..F....... [ZBX-15779] fixed loss of host name in tooltip on trigger overview page (vasilijs)
+...G...... [ZBX-15898] fixed compilation warning regarding too large integer constant (akozlovs)
+..F....... [ZBX-15338] fixed last problem name being displayed on map instead of most critical (agriscenko, vmurzins)
+........S. [ZBX-15929] fixed escalation operation not being send multiple times (akozlovs)
+...G...PS. [ZBX-15721] fixed escaping of control characters in JSON encoder (Andris, viktors)
+..F....... [ZBX-15507] fixed item/trigger/graph copy form provides read-only host groups in target list; replaced form elements with multiselect (agriscenko)
+..F....... [ZBX-15746] fixed link to pie graph after selecting a time interval on classic graph (agriscenko)
+..F....... [ZBX-15784] fixed multiselect does not support case sensitive auto-complete (agriscenko)
+..F....... [ZBX-10799] changed placeholder for http proxy input fields (agriscenko)
+..F....... [ZBX-13014] fixed map on screen is not centered (agriscenko)
 ...G...... [ZBX-9229] fixed sending first value of the log as separate message (asestakovs)
 ........S. [ZBX-15479] fixed cookie presentation in HTTP header (asestakovs)
 ........S. [ZBX-15516] fixed trapper process title to not update time in case of interruption (asestakovs)
@@ -2352,6 +2369,10 @@ Changes for 3.0.27rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-2494] fixed sorting of items, item prototypes, lld rules and screens to avoid deadlocks in database between server and frontend (ashubin)
+..F....... [ZBX-10404] fixed password being passed in plain text in media type edit form (gcalenko)
+...G...PS. [ZBX-15721] fixed escaping of control characters in JSON encoder (Andris, viktors)
+...G...... [ZBX-15937] fixed agent startup problem in Win 2008 R2 w/o SP1 by merging ZBX-15728 (kalimulin)
 ...G...PS. [ZBX-15588] fixed function names that are written to the log file when using LOG_LEVEL_DEBUG (asitals)
 ..F....... [ZBX-15870] fixed redundant jsloader loading in login page (miks)
 ........S. [ZBX-15913] fixed possible crash when sending custom alerts (vso)

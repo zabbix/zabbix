@@ -186,8 +186,8 @@ class CClock extends CDiv {
 
 		if ($this->width !== null && $this->height !== null) {
 			$clock
-				->setAttribute('width', (string) $this->width.'px')
-				->setAttribute('height', (string) $this->height.'px');
+				->setAttribute('width', $this->width.'px')
+				->setAttribute('height', $this->height.'px');
 		}
 
 		if ($this->error !== null) {
