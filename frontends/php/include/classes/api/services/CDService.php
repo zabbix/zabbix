@@ -189,12 +189,12 @@ class CDService extends CApiService {
 			$result = $this->unsetExtraFields($result, ['dhostid'], $options['output']);
 		}
 
-// removing keys (hash -> array)
+		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
-	return $result;
+		return $result;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -294,6 +294,12 @@ class CDService extends CApiService {
 							|| count($result[$dserviceid]['hosts']) < $options['limitSelects']) {
 						$result[$dserviceid]['hosts'][] = $db_host;
 					}
+				}
+			}
+
+			if ($options['selectHosts'] == API_OUTPUT_COUNT) {
+				foreach ($result as $dserviceid => $dservice) {
+					$result[$dserviceid]['hosts'] = (string) $dservice['hosts'];
 				}
 			}
 		}

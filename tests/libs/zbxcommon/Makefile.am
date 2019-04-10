@@ -9,7 +9,8 @@ SERVER_tests = \
 	zbx_interval_preproc \
 	zbx_validate_interval \
 	is_double_suffix \
-	is_double
+	is_double \
+	zbx_user_macro_parse
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -223,5 +224,18 @@ is_double_LDADD += @SERVER_LIBS@
 is_double_LDFLAGS = @SERVER_LDFLAGS@
 
 is_double_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+zbx_user_macro_parse_SOURCES = \
+	zbx_user_macro_parse.c \
+	$(COMMON_SRC_FILES)
+
+zbx_user_macro_parse_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_user_macro_parse_LDADD += @SERVER_LIBS@
+
+zbx_user_macro_parse_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_user_macro_parse_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

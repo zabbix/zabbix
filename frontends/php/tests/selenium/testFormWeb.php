@@ -294,7 +294,7 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestAssertVisibleId('http_proxy');
 		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'maxlength', 255);
 		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'size', 20);
-		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'placeholder', 'http://[user[:password]@]proxy.example.com[:port]');
+		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]');
 
 		$this->zbxTestTextPresent('Variables');
 		$this->zbxTestAssertVisibleId('variables');
@@ -534,48 +534,35 @@ class testFormWeb extends CLegacyWebTest {
 			// User/password empty
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'name' => 'User/password empty',
 					'authentication' => 'Basic',
 					'add_step' => [
 						['step' => 'User/password empty']
-					],
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Incorrect value for field "User": cannot be empty.',
-						'Incorrect value for field "Password": cannot be empty.'
 					]
 				]
 			],
 			// User empty
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'name' => 'Password empty',
 					'authentication' => 'Basic',
 					'http_user' => 'zabbix',
 					'add_step' => [
 						['step' => 'Password empty']
-					],
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Incorrect value for field "Password": cannot be empty.'
 					]
 				]
 			],
 			// Password empty
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'name' => 'User empty',
 					'authentication' => 'Basic',
 					'http_password' => 'zabbix',
 					'add_step' => [
 						['step' => 'User empty']
-					],
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Incorrect value for field "User": cannot be empty.'
 					]
 				]
 			],
