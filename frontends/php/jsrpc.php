@@ -53,12 +53,13 @@ if (!is_array($data) || !isset($data['method'])
 }
 
 $result = [];
+
 switch ($data['method']) {
-	case 'host.get':
+	case 'search':
 		$result = API::Host()->get([
-			'startSearch' => true,
-			'search' => $data['params']['search'],
-			'output' => ['hostid', 'host', 'name'],
+			'output' => ['hostid', 'name'],
+			'search' => ['name' => $data['params']['search'], 'host' => $data['params']['search']],
+			'searchByAny' => true,
 			'sortfield' => 'name',
 			'limit' => 15
 		]);

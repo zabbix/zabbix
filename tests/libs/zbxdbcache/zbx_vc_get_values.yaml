@@ -289,56 +289,9 @@ out:
 # TC5
 # Test that the data from current time to the requested interval is properly cached.
 test case: Get values in interval before data values leaving unread values in the middle
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -355,29 +308,47 @@ in:
     end: 2017-01-10 10:00:02.999999999 +00:00
 out:
   values:
-  - *row27
-  - *row25
-  - *row22
+  - value: value 2.7
+    ts: 2017-01-10 10:00:02.700000000 +00:00
+  - value: value 2.5
+    ts: 2017-01-10 10:00:02.500000000 +00:00
+  - value: value 2.2
+    ts: 2017-01-10 10:00:02.200000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row12
-      - *row15
-      - *row17
-      - *row22
-      - *row25
-      - *row27
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 1.2
+        ts: 2017-01-10 10:00:01.200000000 +00:00
+      - value: value 1.5
+        ts: 2017-01-10 10:00:01.500000000 +00:00
+      - value: value 1.7
+        ts: 2017-01-10 10:00:01.700000000 +00:00
+      - value: value 2.2
+        ts: 2017-01-10 10:00:02.200000000 +00:00
+      - value: value 2.5
+        ts: 2017-01-10 10:00:02.500000000 +00:00
+      - value: value 2.7
+        ts: 2017-01-10 10:00:02.700000000 +00:00
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status:
       active_range: 600
       values_total: 15
@@ -389,56 +360,9 @@ out:
 # TC6
 # Test that cached data is returned from cache without database access.
 test case: Get interval of already already data values
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -455,29 +379,47 @@ in:
     end: 2017-01-10 10:00:05.999999999 +00:00
 out:
   values:
-    - *row57
-    - *row55
-    - *row52
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +00:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +00:00
   cache:
     items:
       - itemid: 1
         value type: ITEM_VALUE_TYPE_STR
         data:
-          - *row12
-          - *row15
-          - *row17
-          - *row22
-          - *row25
-          - *row27
-          - *row32
-          - *row35
-          - *row37
-          - *row42
-          - *row45
-          - *row47
-          - *row52
-          - *row55
-          - *row57
+        - value: value 1.2
+          ts: 2017-01-10 10:00:01.200000000 +00:00
+        - value: value 1.5
+          ts: 2017-01-10 10:00:01.500000000 +00:00
+        - value: value 1.7
+          ts: 2017-01-10 10:00:01.700000000 +00:00
+        - value: value 2.2
+          ts: 2017-01-10 10:00:02.200000000 +00:00
+        - value: value 2.5
+          ts: 2017-01-10 10:00:02.500000000 +00:00
+        - value: value 2.7
+          ts: 2017-01-10 10:00:02.700000000 +00:00
+        - value: value 3.2
+          ts: 2017-01-10 10:00:03.200000000 +00:00
+        - value: value 3.5
+          ts: 2017-01-10 10:00:03.500000000 +00:00
+        - value: value 3.7
+          ts: 2017-01-10 10:00:03.700000000 +00:00
+        - value: value 4.2
+          ts: 2017-01-10 10:00:04.200000000 +00:00
+        - value: value 4.5
+          ts: 2017-01-10 10:00:04.500000000 +00:00
+        - value: value 4.7
+          ts: 2017-01-10 10:00:04.700000000 +00:00
+        - value: value 5.2
+          ts: 2017-01-10 10:00:05.200000000 +00:00
+        - value: value 5.5
+          ts: 2017-01-10 10:00:05.500000000 +00:00
+        - value: value 5.7
+          ts: 2017-01-10 10:00:05.700000000 +00:00
         status:
         active_range: 600
         values_total: 15
@@ -489,56 +431,9 @@ out:
 # TC7
 # Test that missing data in cache is properly added if requested interval is larger than cached data.
 test case: Get interval of already cached values ending with the last data value
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -555,32 +450,53 @@ in:
     end: 2017-01-10 10:00:03.999999999 +00:00
 out:
   values:
-    - *row37
-    - *row35
-    - *row32
-    - *row27
-    - *row25
-    - *row22
+  - value: value 3.7
+    ts: 2017-01-10 10:00:03.700000000 +00:00
+  - value: value 3.5
+    ts: 2017-01-10 10:00:03.500000000 +00:00
+  - value: value 3.2
+    ts: 2017-01-10 10:00:03.200000000 +00:00
+  - value: value 2.7
+    ts: 2017-01-10 10:00:02.700000000 +00:00
+  - value: value 2.5
+    ts: 2017-01-10 10:00:02.500000000 +00:00
+  - value: value 2.2
+    ts: 2017-01-10 10:00:02.200000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-        - *row12
-        - *row15
-        - *row17
-        - *row22
-        - *row25
-        - *row27
-        - *row32
-        - *row35
-        - *row37
-        - *row42
-        - *row45
-        - *row47
-        - *row52
-        - *row55
-        - *row57
+      - value: value 1.2
+        ts: 2017-01-10 10:00:01.200000000 +00:00
+      - value: value 1.5
+        ts: 2017-01-10 10:00:01.500000000 +00:00
+      - value: value 1.7
+        ts: 2017-01-10 10:00:01.700000000 +00:00
+      - value: value 2.2
+        ts: 2017-01-10 10:00:02.200000000 +00:00
+      - value: value 2.5
+        ts: 2017-01-10 10:00:02.500000000 +00:00
+      - value: value 2.7
+        ts: 2017-01-10 10:00:02.700000000 +00:00
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status:
       active_range: 600
       values_total: 15
@@ -592,56 +508,9 @@ out:
 # TC8
 # Test that db_cached_from is set according to the requested time interval.
 test case: Get interval of values larger than database history and caching last values
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -658,29 +527,47 @@ in:
     end: 2017-01-10 10:00:01.999999999 +00:00
 out:
   values:
-  - *row17
-  - *row15
-  - *row12
+  - value: value 1.7
+    ts: 2017-01-10 10:00:01.700000000 +00:00
+  - value: value 1.5
+    ts: 2017-01-10 10:00:01.500000000 +00:00
+  - value: value 1.2
+    ts: 2017-01-10 10:00:01.200000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row12
-      - *row15
-      - *row17
-      - *row22
-      - *row25
-      - *row27
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 1.2
+        ts: 2017-01-10 10:00:01.200000000 +00:00
+      - value: value 1.5
+        ts: 2017-01-10 10:00:01.500000000 +00:00
+      - value: value 1.7
+        ts: 2017-01-10 10:00:01.700000000 +00:00
+      - value: value 2.2
+        ts: 2017-01-10 10:00:02.200000000 +00:00
+      - value: value 2.5
+        ts: 2017-01-10 10:00:02.500000000 +00:00
+      - value: value 2.7
+        ts: 2017-01-10 10:00:02.700000000 +00:00
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status:
       active_range: 610
       values_total: 15
@@ -692,56 +579,9 @@ out:
 # TC9
 # Test that database is not accessed if the request data is within db_cached_from limits 
 test case: Get interval of already cached data values larger than database history
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -758,29 +598,47 @@ in:
     end: 2017-01-10 10:00:01.999999999 +00:00
 out:
   values:
-  - *row17
-  - *row15
-  - *row12
+  - value: value 1.7
+    ts: 2017-01-10 10:00:01.700000000 +00:00
+  - value: value 1.5
+    ts: 2017-01-10 10:00:01.500000000 +00:00
+  - value: value 1.2
+    ts: 2017-01-10 10:00:01.200000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row12
-      - *row15
-      - *row17
-      - *row22
-      - *row25
-      - *row27
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 1.2
+        ts: 2017-01-10 10:00:01.200000000 +00:00
+      - value: value 1.5
+        ts: 2017-01-10 10:00:01.500000000 +00:00
+      - value: value 1.7
+        ts: 2017-01-10 10:00:01.700000000 +00:00
+      - value: value 2.2
+        ts: 2017-01-10 10:00:02.200000000 +00:00
+      - value: value 2.5
+        ts: 2017-01-10 10:00:02.500000000 +00:00
+      - value: value 2.7
+        ts: 2017-01-10 10:00:02.700000000 +00:00
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status:
       active_range: 610
       values_total: 15
@@ -792,56 +650,9 @@ out:
 # TC10
 # Test that data is cached and value returned
 test case: Get one value in the middle of uncached data
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -851,18 +662,25 @@ in:
     end: 2017-01-10 10:00:04.999999999 +00:00
 out:
   values:
-  - *row47
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status:
       active_range: 597
       values_total: 6
@@ -874,56 +692,9 @@ out:
 # TC11
 # Test that value returned by using already cached data
 test case: Get one value in the middle of cached data
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -940,18 +711,25 @@ in:
     end: 2017-01-10 10:00:04.999999999 +00:00
 out:
   values:
-  - *row47
+  - value: value 4.7
+    ts: 2017-01-10 10:00:04.700000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status:
       active_range: 597
       values_total: 6
@@ -963,56 +741,9 @@ out:
 # TC12
 # Test that value returned by using already cached data
 test case: Get two values in the middle of cached data
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -1029,19 +760,27 @@ in:
     end: 2017-01-10 10:00:04.999999999 +00:00
 out:
   values:
-  - *row47
-  - *row45
+  - value: value 4.7
+    ts: 2017-01-10 10:00:04.700000000 +00:00
+  - value: value 4.5
+    ts: 2017-01-10 10:00:04.500000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status:
       active_range: 597
       values_total: 6
@@ -1053,56 +792,9 @@ out:
 # TC13
 # Test that all values are cached and the 'cached all' flag set
 test case: Get 4 values when only 3 values exists in database history and are not cached
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -1119,29 +811,47 @@ in:
     end: 2017-01-10 10:00:01.999999999 +00:00
 out:
   values:
-  - *row17
-  - *row15
-  - *row12
+  - value: value 1.7
+    ts: 2017-01-10 10:00:01.700000000 +00:00
+  - value: value 1.5
+    ts: 2017-01-10 10:00:01.500000000 +00:00
+  - value: value 1.2
+    ts: 2017-01-10 10:00:01.200000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row12
-      - *row15
-      - *row17
-      - *row22
-      - *row25
-      - *row27
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 1.2
+        ts: 2017-01-10 10:00:01.200000000 +00:00
+      - value: value 1.5
+        ts: 2017-01-10 10:00:01.500000000 +00:00
+      - value: value 1.7
+        ts: 2017-01-10 10:00:01.700000000 +00:00
+      - value: value 2.2
+        ts: 2017-01-10 10:00:02.200000000 +00:00
+      - value: value 2.5
+        ts: 2017-01-10 10:00:02.500000000 +00:00
+      - value: value 2.7
+        ts: 2017-01-10 10:00:02.700000000 +00:00
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status: ZBX_ITEM_STATUS_CACHED_ALL
       active_range: 0
       values_total: 15
@@ -1153,56 +863,9 @@ out:
 # TC14
 # Test that values are returned from cache
 test case: Get 4 values when only 3 values exists in database history and are cached
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -1219,29 +882,47 @@ in:
     end: 2017-01-10 10:00:01.999999999 +00:00
 out:
   values:
-  - *row17
-  - *row15
-  - *row12
+  - value: value 1.7
+    ts: 2017-01-10 10:00:01.700000000 +00:00
+  - value: value 1.5
+    ts: 2017-01-10 10:00:01.500000000 +00:00
+  - value: value 1.2
+    ts: 2017-01-10 10:00:01.200000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row12
-      - *row15
-      - *row17
-      - *row22
-      - *row25
-      - *row27
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 1.2
+        ts: 2017-01-10 10:00:01.200000000 +00:00
+      - value: value 1.5
+        ts: 2017-01-10 10:00:01.500000000 +00:00
+      - value: value 1.7
+        ts: 2017-01-10 10:00:01.700000000 +00:00
+      - value: value 2.2
+        ts: 2017-01-10 10:00:02.200000000 +00:00
+      - value: value 2.5
+        ts: 2017-01-10 10:00:02.500000000 +00:00
+      - value: value 2.7
+        ts: 2017-01-10 10:00:02.700000000 +00:00
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status: ZBX_ITEM_STATUS_CACHED_ALL
       active_range: 0
       values_total: 15
@@ -1254,56 +935,9 @@ out:
 # Test that no values are returned, 'cached all' flag is not set 
 # and db_cached_from is set to cover the request range 
 test case: Get one value from empty history interval
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -1329,56 +963,9 @@ out:
 # TC16
 # Test that the requested interval is cached and returned, 'cached all' flag is not set
 test case: Get 100 values from 1 second interval with 3 history values
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -1388,20 +975,29 @@ in:
     end: 2017-01-10 10:00:05.999999999 +00:00
 out:
   values: 
-  - *row57
-  - *row55
-  - *row52
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +00:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data: 
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status: 
       active_range: 596
       values_total: 6
@@ -1413,56 +1009,9 @@ out:
 # TC17
 # Test that values are returned from cached data and item properties are not changed
 test case: Get 2 values from already cached 1 second interval with 3 history values
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -1479,19 +1028,27 @@ in:
     end: 2017-01-10 10:00:05.999999999 +00:00
 out:
   values: 
-  - *row57
-  - *row55
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +00:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data: 
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status: 
       active_range: 597
       values_total: 6
@@ -1503,56 +1060,9 @@ out:
 # TC18
 # Test that values are returned from cached data and item properties are not changed
 test case: Get 3 values from already cached 1 second interval with 3 history values
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -1569,20 +1079,29 @@ in:
     end: 2017-01-10 10:00:05.999999999 +00:00
 out:
   values: 
-  - *row57
-  - *row55
-  - *row52
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +00:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data: 
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status: 
       active_range: 597
       values_total: 6
@@ -1594,56 +1113,9 @@ out:
 # TC19
 # Test that values are returned from cached data and item properties are not changed
 test case: Get 4 values from already data 1 second interval with 3 history values
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -1660,20 +1132,29 @@ in:
     end: 2017-01-10 10:00:05.999999999 +00:00
 out:
   values: 
-  - *row57
-  - *row55
-  - *row52
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +00:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status: 
       active_range: 597
       values_total: 6
@@ -1685,56 +1166,9 @@ out:
 # TC20
 # Test that all required data is cached without leaving any gaps in history to current time.
 test case: Get 1 value from 1 second interval with 3 history values past cached data
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -1751,21 +1185,31 @@ in:
     end: 2017-01-10 10:00:03.999999999 +00:00
 out:
   values:
-  - *row37
+  - value: value 3.7
+    ts: 2017-01-10 10:00:03.700000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status: 
       active_range: 598
       values_total: 9
@@ -1777,56 +1221,9 @@ out:
 # TC21
 # Test that the missing data is cached
 test case: Get 4 values from partially cached 2 second interval with 6 history values
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -1843,27 +1240,43 @@ in:
     end: 2017-01-10 10:00:03.999999999 +00:00
 out:
   values:
-  - *row37
-  - *row35
-  - *row32
-  - *row27
+  - value: value 3.7
+    ts: 2017-01-10 10:00:03.700000000 +00:00
+  - value: value 3.5
+    ts: 2017-01-10 10:00:03.500000000 +00:00
+  - value: value 3.2
+    ts: 2017-01-10 10:00:03.200000000 +00:00
+  - value: value 2.7
+    ts: 2017-01-10 10:00:02.700000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row22
-      - *row25
-      - *row27
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 2.2
+        ts: 2017-01-10 10:00:02.200000000 +00:00
+      - value: value 2.5
+        ts: 2017-01-10 10:00:02.500000000 +00:00
+      - value: value 2.7
+        ts: 2017-01-10 10:00:02.700000000 +00:00
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status:
       active_range: 599
       values_total: 12
@@ -1875,56 +1288,9 @@ out:
 # TC22
 # Test that 'cached all' flag is set.
 test case: Get all history values by count when they were already cached by time based request
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -1941,41 +1307,71 @@ in:
     end: 2017-01-10 10:00:05.999999999 +00:00
 out:
   values:
-  - *row57
-  - *row55
-  - *row52
-  - *row47
-  - *row45
-  - *row42
-  - *row37
-  - *row35
-  - *row32
-  - *row27
-  - *row25
-  - *row22
-  - *row17
-  - *row15
-  - *row12
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +00:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +00:00
+  - value: value 4.7
+    ts: 2017-01-10 10:00:04.700000000 +00:00
+  - value: value 4.5
+    ts: 2017-01-10 10:00:04.500000000 +00:00
+  - value: value 4.2
+    ts: 2017-01-10 10:00:04.200000000 +00:00
+  - value: value 3.7
+    ts: 2017-01-10 10:00:03.700000000 +00:00
+  - value: value 3.5
+    ts: 2017-01-10 10:00:03.500000000 +00:00
+  - value: value 3.2
+    ts: 2017-01-10 10:00:03.200000000 +00:00
+  - value: value 2.7
+    ts: 2017-01-10 10:00:02.700000000 +00:00
+  - value: value 2.5
+    ts: 2017-01-10 10:00:02.500000000 +00:00
+  - value: value 2.2
+    ts: 2017-01-10 10:00:02.200000000 +00:00
+  - value: value 1.7
+    ts: 2017-01-10 10:00:01.700000000 +00:00
+  - value: value 1.5
+    ts: 2017-01-10 10:00:01.500000000 +00:00
+  - value: value 1.2
+    ts: 2017-01-10 10:00:01.200000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row12
-      - *row15
-      - *row17
-      - *row22
-      - *row25
-      - *row27
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 1.2
+        ts: 2017-01-10 10:00:01.200000000 +00:00
+      - value: value 1.5
+        ts: 2017-01-10 10:00:01.500000000 +00:00
+      - value: value 1.7
+        ts: 2017-01-10 10:00:01.700000000 +00:00
+      - value: value 2.2
+        ts: 2017-01-10 10:00:02.200000000 +00:00
+      - value: value 2.5
+        ts: 2017-01-10 10:00:02.500000000 +00:00
+      - value: value 2.7
+        ts: 2017-01-10 10:00:02.700000000 +00:00
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status: ZBX_ITEM_STATUS_CACHED_ALL
       active_range: 0
       values_total: 15
@@ -1987,56 +1383,9 @@ out:
 # TC23
 # Test that data is returned and 'cached all' flag is not changed.
 test case: Get all data values from interval when they were already cached by count
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -2053,41 +1402,71 @@ in:
     end: 2017-01-10 10:00:05.999999999 +00:00
 out:
   values:
-  - *row57
-  - *row55
-  - *row52
-  - *row47
-  - *row45
-  - *row42
-  - *row37
-  - *row35
-  - *row32
-  - *row27
-  - *row25
-  - *row22
-  - *row17
-  - *row15
-  - *row12
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +00:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +00:00
+  - value: value 4.7
+    ts: 2017-01-10 10:00:04.700000000 +00:00
+  - value: value 4.5
+    ts: 2017-01-10 10:00:04.500000000 +00:00
+  - value: value 4.2
+    ts: 2017-01-10 10:00:04.200000000 +00:00
+  - value: value 3.7
+    ts: 2017-01-10 10:00:03.700000000 +00:00
+  - value: value 3.5
+    ts: 2017-01-10 10:00:03.500000000 +00:00
+  - value: value 3.2
+    ts: 2017-01-10 10:00:03.200000000 +00:00
+  - value: value 2.7
+    ts: 2017-01-10 10:00:02.700000000 +00:00
+  - value: value 2.5
+    ts: 2017-01-10 10:00:02.500000000 +00:00
+  - value: value 2.2
+    ts: 2017-01-10 10:00:02.200000000 +00:00
+  - value: value 1.7
+    ts: 2017-01-10 10:00:01.700000000 +00:00
+  - value: value 1.5
+    ts: 2017-01-10 10:00:01.500000000 +00:00
+  - value: value 1.2
+    ts: 2017-01-10 10:00:01.200000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row12
-      - *row15
-      - *row17
-      - *row22
-      - *row25
-      - *row27
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 1.2
+        ts: 2017-01-10 10:00:01.200000000 +00:00
+      - value: value 1.5
+        ts: 2017-01-10 10:00:01.500000000 +00:00
+      - value: value 1.7
+        ts: 2017-01-10 10:00:01.700000000 +00:00
+      - value: value 2.2
+        ts: 2017-01-10 10:00:02.200000000 +00:00
+      - value: value 2.5
+        ts: 2017-01-10 10:00:02.500000000 +00:00
+      - value: value 2.7
+        ts: 2017-01-10 10:00:02.700000000 +00:00
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status: ZBX_ITEM_STATUS_CACHED_ALL
       active_range: 0
       values_total: 15
@@ -2190,56 +1569,9 @@ out:
 # when requesting other value type than data the item is marked for removal
 # and values are retrieved directly from database
 test case: Get interval of values when item value type has been changed
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -2256,9 +1588,12 @@ in:
     end: 2017-01-10 10:00:05.999999999 +00:00
 out:
   values:
-  - *row57
-  - *row55
-  - *row52
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +00:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +00:00
   cache:
     items: []
     mode: ZBX_VC_MODE_NORMAL
@@ -2269,56 +1604,9 @@ out:
 # when requesting other value type than data the item is marked for removal
 # and values are retrieved directly from database
 test case: Get number of values when item value type has been changed
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -2335,8 +1623,10 @@ in:
     end: 2017-01-10 10:00:05.999999999 +00:00
 out:
   values:
-  - *row57
-  - *row55
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +00:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
   cache:
     items: []
     mode: ZBX_VC_MODE_NORMAL
@@ -2346,56 +1636,9 @@ out:
 # TC29
 # Test that values are returned, but item is not cached.
 test case: Get number of uncached item values when cache working in low memory mode
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     cache mode: ZBX_VC_MODE_LOWMEM
     time: 2017-01-10 10:10:00.000000000 +00:00
@@ -2406,8 +1649,10 @@ in:
     end: 2017-01-10 10:00:05.999999999 +00:00
 out:
   values:
-  - *row57
-  - *row55
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +00:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
   cache:
     items:
     - itemid: 1
@@ -2418,56 +1663,9 @@ out:
 # TC30
 # Test that values are returned, but item is not cached.
 test case: Get interval of uncached item values when cache working in low memory mode
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     cache mode: ZBX_VC_MODE_LOWMEM
     time: 2017-01-10 10:10:00.000000000 +00:00
@@ -2478,9 +1676,12 @@ in:
     end: 2017-01-10 10:00:05.999999999 +00:00
 out:
   values:
-  - *row57
-  - *row55
-  - *row52
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +00:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +00:00
   cache:
     items:
     - itemid: 1
@@ -2491,56 +1692,9 @@ out:
 # TC31
 # Test that values are returned, but item is not cached.
 test case: Get number of uncached item values from interval when cache working in low memory mode
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     cache mode: ZBX_VC_MODE_LOWMEM
     time: 2017-01-10 10:10:00.000000000 +00:00
@@ -2551,9 +1705,12 @@ in:
     end: 2017-01-10 10:00:05.999999999 +00:00
 out:
   values:
-  - *row57
-  - *row55
-  - *row52
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +00:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +00:00
   cache:
     items:
     - itemid: 1
@@ -2564,56 +1721,9 @@ out:
 # TC32
 # Test that items in cache are continued to be cached in low memory mode.
 test case: Get number of data item values when cache working in low memory mode
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -2631,22 +1741,33 @@ in:
     end: 2017-01-10 10:00:03.999999999 +00:00
 out:
   values:
-    - *row37
-    - *row35
+  - value: value 3.7
+    ts: 2017-01-10 10:00:03.700000000 +00:00
+  - value: value 3.5
+    ts: 2017-01-10 10:00:03.500000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status:
       active_range: 598
       values_total: 9
@@ -2658,56 +1779,9 @@ out:
 # TC33
 # Test that items in cache are continued to be cached in low memory mode.
 test case: Get interval of data item values when cache working in low memory mode
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -2725,26 +1799,41 @@ in:
     end: 2017-01-10 10:00:03.999999999 +00:00
 out:
   values:
-  - *row37
-  - *row35
-  - *row32
+  - value: value 3.7
+    ts: 2017-01-10 10:00:03.700000000 +00:00
+  - value: value 3.5
+    ts: 2017-01-10 10:00:03.500000000 +00:00
+  - value: value 3.2
+    ts: 2017-01-10 10:00:03.200000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row22
-      - *row25
-      - *row27
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 2.2
+        ts: 2017-01-10 10:00:02.200000000 +00:00
+      - value: value 2.5
+        ts: 2017-01-10 10:00:02.500000000 +00:00
+      - value: value 2.7
+        ts: 2017-01-10 10:00:02.700000000 +00:00
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status: 
       active_range: 599
       values_total: 12
@@ -2756,56 +1845,9 @@ out:
 # TC34
 # Test that items in cache are continued to be cached in low memory mode.
 test case: Get number of data item values from interval when cache working in low memory mode
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -2823,27 +1865,43 @@ in:
     end: 2017-01-10 10:00:03.999999999 +00:00
 out:
   values:
-  - *row37
-  - *row35
-  - *row32
-  - *row27
+  - value: value 3.7
+    ts: 2017-01-10 10:00:03.700000000 +00:00
+  - value: value 3.5
+    ts: 2017-01-10 10:00:03.500000000 +00:00
+  - value: value 3.2
+    ts: 2017-01-10 10:00:03.200000000 +00:00
+  - value: value 2.7
+    ts: 2017-01-10 10:00:02.700000000 +00:00
   cache:
     items:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
-      - *row22
-      - *row25
-      - *row27
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 2.2
+        ts: 2017-01-10 10:00:02.200000000 +00:00
+      - value: value 2.5
+        ts: 2017-01-10 10:00:02.500000000 +00:00
+      - value: value 2.7
+        ts: 2017-01-10 10:00:02.700000000 +00:00
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status:
       active_range: 599
       values_total: 12
@@ -2855,89 +1913,38 @@ out:
 # TC35
 # Test that old item is dropped to free space and cache put in low memory mode.
 test case: Get values with not enough space in cache
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: 
+  - *include
   - itemid: 2
     value type: ITEM_VALUE_TYPE_LOG
     data:
-    - &row1
-      value: value 1
+    - value: value 1
       source: log source 1
       logeventid: 1000001
       severity: 1
       timestamp: 1001 
       ts: 2017-01-10 10:00:01.000000000 +00:00
-    - &row2
-      value: value 2
+    - value: value 2
       source: log source 2
       logeventid: 1000002
       severity: 2
       timestamp: 1002 
       ts: 2017-01-10 10:00:02.000000000 +00:00
-    - &row3
-      value: value 3
+    - value: value 3
       source: log source 3
       logeventid: 1000003
       severity: 3
       timestamp: 1003 
       ts: 2017-01-10 10:00:03.000000000 +00:00
-    - &row4
-      value: value 4
+    - value: value 4
       source: log source 4
       logeventid: 1000004
       severity: 4
       timestamp: 1004 
       ts: 2017-01-10 10:00:04.000000000 +00:00
-    - &row5
-      value: value 5
+    - value: value 5
       source: log source 5
       logeventid: 1000005
       severity: 5
@@ -2960,29 +1967,47 @@ in:
     end: 2017-01-10 10:00:01.999999999 +00:00
 out:
   values:
-  - *row17
-  - *row15
-  - *row12
+  - value: value 1.7
+    ts: 2017-01-10 10:00:01.700000000 +00:00
+  - value: value 1.5
+    ts: 2017-01-10 10:00:01.500000000 +00:00
+  - value: value 1.2
+    ts: 2017-01-10 10:00:01.200000000 +00:00
   cache:
     items: 
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data: 
-      - *row12
-      - *row15
-      - *row17
-      - *row22
-      - *row25
-      - *row27
-      - *row32
-      - *row35
-      - *row37
-      - *row42
-      - *row45
-      - *row47
-      - *row52
-      - *row55
-      - *row57
+      - value: value 1.2
+        ts: 2017-01-10 10:00:01.200000000 +00:00
+      - value: value 1.5
+        ts: 2017-01-10 10:00:01.500000000 +00:00
+      - value: value 1.7
+        ts: 2017-01-10 10:00:01.700000000 +00:00
+      - value: value 2.2
+        ts: 2017-01-10 10:00:02.200000000 +00:00
+      - value: value 2.5
+        ts: 2017-01-10 10:00:02.500000000 +00:00
+      - value: value 2.7
+        ts: 2017-01-10 10:00:02.700000000 +00:00
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
       status:
       active_range: 601
       values_total: 15
@@ -3135,56 +2160,9 @@ out:
 # TC37
 # Test that item's active range is not decreased during a day.
 test case: Active range tracking during day 
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -3206,21 +2184,36 @@ out:
       - itemid: 1
         value type: ITEM_VALUE_TYPE_STR
         data:
-          - *row12
-          - *row15
-          - *row17
-          - *row22
-          - *row25
-          - *row27
-          - *row32
-          - *row35
-          - *row37
-          - *row42
-          - *row45
-          - *row47
-          - *row52
-          - *row55
-          - *row57
+        - value: value 1.2
+          ts: 2017-01-10 10:00:01.200000000 +00:00
+        - value: value 1.5
+          ts: 2017-01-10 10:00:01.500000000 +00:00
+        - value: value 1.7
+          ts: 2017-01-10 10:00:01.700000000 +00:00
+        - value: value 2.2
+          ts: 2017-01-10 10:00:02.200000000 +00:00
+        - value: value 2.5
+          ts: 2017-01-10 10:00:02.500000000 +00:00
+        - value: value 2.7
+          ts: 2017-01-10 10:00:02.700000000 +00:00
+        - value: value 3.2
+          ts: 2017-01-10 10:00:03.200000000 +00:00
+        - value: value 3.5
+          ts: 2017-01-10 10:00:03.500000000 +00:00
+        - value: value 3.7
+          ts: 2017-01-10 10:00:03.700000000 +00:00
+        - value: value 4.2
+          ts: 2017-01-10 10:00:04.200000000 +00:00
+        - value: value 4.5
+          ts: 2017-01-10 10:00:04.500000000 +00:00
+        - value: value 4.7
+          ts: 2017-01-10 10:00:04.700000000 +00:00
+        - value: value 5.2
+          ts: 2017-01-10 10:00:05.200000000 +00:00
+        - value: value 5.5
+          ts: 2017-01-10 10:00:05.500000000 +00:00
+        - value: value 5.7
+          ts: 2017-01-10 10:00:05.700000000 +00:00
         status:
         active_range: 1200
         values_total: 15
@@ -3232,56 +2225,9 @@ out:
 # TC38
 # Test if the active range ir properly reduced to the daily range each day
 test case: Active range change in next few days
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -3309,21 +2255,36 @@ out:
       - itemid: 1
         value type: ITEM_VALUE_TYPE_STR
         data:
-          - *row12
-          - *row15
-          - *row17
-          - *row22
-          - *row25
-          - *row27
-          - *row32
-          - *row35
-          - *row37
-          - *row42
-          - *row45
-          - *row47
-          - *row52
-          - *row55
-          - *row57
+        - value: value 1.2
+          ts: 2017-01-10 10:00:01.200000000 +00:00
+        - value: value 1.5
+          ts: 2017-01-10 10:00:01.500000000 +00:00
+        - value: value 1.7
+          ts: 2017-01-10 10:00:01.700000000 +00:00
+        - value: value 2.2
+          ts: 2017-01-10 10:00:02.200000000 +00:00
+        - value: value 2.5
+          ts: 2017-01-10 10:00:02.500000000 +00:00
+        - value: value 2.7
+          ts: 2017-01-10 10:00:02.700000000 +00:00
+        - value: value 3.2
+          ts: 2017-01-10 10:00:03.200000000 +00:00
+        - value: value 3.5
+          ts: 2017-01-10 10:00:03.500000000 +00:00
+        - value: value 3.7
+          ts: 2017-01-10 10:00:03.700000000 +00:00
+        - value: value 4.2
+          ts: 2017-01-10 10:00:04.200000000 +00:00
+        - value: value 4.5
+          ts: 2017-01-10 10:00:04.500000000 +00:00
+        - value: value 4.7
+          ts: 2017-01-10 10:00:04.700000000 +00:00
+        - value: value 5.2
+          ts: 2017-01-10 10:00:05.200000000 +00:00
+        - value: value 5.5
+          ts: 2017-01-10 10:00:05.500000000 +00:00
+        - value: value 5.7
+          ts: 2017-01-10 10:00:05.700000000 +00:00
         status:
         active_range: 101
         values_total: 15
@@ -3335,56 +2296,9 @@ out:
 # TC39
 # Test that value cache attempts to switch back to normal mode after running a day in low memory mode.
 test case: Switch back to normal mode after working a day in low memory mode
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -3417,56 +2331,9 @@ out:
 # TC40
 # Test that all data from end timestamp second is cached and the required data is returned */ 
 test case: Get interval of values when using nanoseconds in end time 
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -3476,23 +2343,35 @@ in:
     end: 2017-01-10 10:00:04.500000000 +00:00
 out:
   values:
-  - *row45
-  - *row42 
-  - *row37
+  - value: value 4.5
+    ts: 2017-01-10 10:00:04.500000000 +00:00
+  - value: value 4.2
+    ts: 2017-01-10 10:00:04.200000000 +00:00
+  - value: value 3.7
+    ts: 2017-01-10 10:00:03.700000000 +00:00
   cache:
     items:
       - itemid: 1
         value type: ITEM_VALUE_TYPE_STR
         data:
-          - *row32
-          - *row35
-          - *row37
-          - *row42
-          - *row45
-          - *row47
-          - *row52
-          - *row55
-          - *row57
+        - value: value 3.2
+          ts: 2017-01-10 10:00:03.200000000 +00:00
+        - value: value 3.5
+          ts: 2017-01-10 10:00:03.500000000 +00:00
+        - value: value 3.7
+          ts: 2017-01-10 10:00:03.700000000 +00:00
+        - value: value 4.2
+          ts: 2017-01-10 10:00:04.200000000 +00:00
+        - value: value 4.5
+          ts: 2017-01-10 10:00:04.500000000 +00:00
+        - value: value 4.7
+          ts: 2017-01-10 10:00:04.700000000 +00:00
+        - value: value 5.2
+          ts: 2017-01-10 10:00:05.200000000 +00:00
+        - value: value 5.5
+          ts: 2017-01-10 10:00:05.500000000 +00:00
+        - value: value 5.7
+          ts: 2017-01-10 10:00:05.700000000 +00:00
         status:
         active_range: 598
         values_total: 9
@@ -3504,56 +2383,9 @@ out:
 # TC41
 # Test that all data from end timestamp second is cached and the required data is returned */ 
 test case: Get number of values when using nanoseconds in end time 
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -3563,80 +2395,41 @@ in:
     end: 2017-01-10 10:00:04.500000000 +00:00
 out:
   values:
-  - *row45
-  - *row42 
+  - value: value 4.5
+    ts: 2017-01-10 10:00:04.500000000 +00:00
+  - value: value 4.2
+    ts: 2017-01-10 10:00:04.200000000 +00:00
   cache:
     items:
-      - itemid: 1
-        value type: ITEM_VALUE_TYPE_STR
-        data:
-          - *row42
-          - *row45
-          - *row47
-          - *row52
-          - *row55
-          - *row57
-        status:
-        active_range: 597
-        values_total: 6
-        db_cached_from: 2017-01-10 10:00:04.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
+      status:
+      active_range: 597
+      values_total: 6
+      db_cached_from: 2017-01-10 10:00:04.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
     hits: 0
     misses: 2
 ---
 # TC42
 # Test that all data from end timestamp second is cached and the required data is returned */ 
-test case: Get number of values during interval when using nanoseconds in end time 
+test case: Get number of values during interval when using nanoseconds in end time
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -3646,23 +2439,31 @@ in:
     end: 2017-01-10 10:00:04.500000000 +00:00
 out:
   values:
-  - *row45
-  - *row42 
+  - value: value 4.5
+    ts: 2017-01-10 10:00:04.500000000 +00:00
+  - value: value 4.2
+    ts: 2017-01-10 10:00:04.200000000 +00:00
   cache:
     items:
-      - itemid: 1
-        value type: ITEM_VALUE_TYPE_STR
-        data:
-          - *row42
-          - *row45
-          - *row47
-          - *row52
-          - *row55
-          - *row57
-        status:
-        active_range: 597
-        values_total: 6
-        db_cached_from: 2017-01-10 10:00:04.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
+      status:
+      active_range: 597
+      values_total: 6
+      db_cached_from: 2017-01-10 10:00:04.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
     hits: 0
     misses: 2
@@ -3670,56 +2471,9 @@ out:
 # TC43
 # Test that all data from end timestamp second is cached and the required data is returned */ 
 test case: Get number of values during interval when using nanoseconds in end time and not enough data
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -3729,27 +2483,39 @@ in:
     end: 2017-01-10 10:00:04.500000000 +00:00
 out:
   values:
-  - *row45
-  - *row42 
-  - *row37 
+  - value: value 4.5
+    ts: 2017-01-10 10:00:04.500000000 +00:00
+  - value: value 4.2
+    ts: 2017-01-10 10:00:04.200000000 +00:00
+  - value: value 3.7
+    ts: 2017-01-10 10:00:03.700000000 +00:00
   cache:
     items:
-      - itemid: 1
-        value type: ITEM_VALUE_TYPE_STR
-        data:
-          - *row32
-          - *row35
-          - *row37
-          - *row42
-          - *row45
-          - *row47
-          - *row52
-          - *row55
-          - *row57
-        status:
-        active_range: 597
-        values_total: 9
-        db_cached_from: 2017-01-10 10:00:03.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
+      status:
+      active_range: 597
+      values_total: 9
+      db_cached_from: 2017-01-10 10:00:03.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
     hits: 0
     misses: 3
@@ -3757,56 +2523,9 @@ out:
 # TC44
 # Test that all data from end timestamp second is cached and the required data is returned */ 
 test case: Get 1 value during interval when using nanoseconds in end time 
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -3816,22 +2535,29 @@ in:
     end: 2017-01-10 10:00:04.500000000 +00:00
 out:
   values:
-  - *row45
+  - value: value 4.5
+    ts: 2017-01-10 10:00:04.500000000 +00:00
   cache:
     items:
-      - itemid: 1
-        value type: ITEM_VALUE_TYPE_STR
-        data:
-          - *row42
-          - *row45
-          - *row47
-          - *row52
-          - *row55
-          - *row57
-        status:
-        active_range: 597
-        values_total: 6
-        db_cached_from: 2017-01-10 10:00:04.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
+      status:
+      active_range: 597
+      values_total: 6
+      db_cached_from: 2017-01-10 10:00:04.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
     hits: 0
     misses: 1
@@ -3839,56 +2565,9 @@ out:
 # TC45
 # Test that values withing the interval end second but not matching nanoseconds are not returned */ 
 test case: Get 1 value during interval when using nanoseconds in end time (2) 
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -3898,25 +2577,35 @@ in:
     end: 2017-01-10 10:00:04.100000000 +00:00
 out:
   values:
-  - *row37
+  - value: value 3.7
+    ts: 2017-01-10 10:00:03.700000000 +00:00
   cache:
     items:
-      - itemid: 1
-        value type: ITEM_VALUE_TYPE_STR
-        data:
-          - *row32
-          - *row35
-          - *row37
-          - *row42
-          - *row45
-          - *row47
-          - *row52
-          - *row55
-          - *row57
-        status:
-        active_range: 598
-        values_total: 9
-        db_cached_from: 2017-01-10 10:00:03.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
+      status:
+      active_range: 598
+      values_total: 9
+      db_cached_from: 2017-01-10 10:00:03.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
     hits: 0
     misses: 1
@@ -3924,56 +2613,9 @@ out:
 # TC46
 # Test that values withing the interval end second but not matching nanoseconds are not returned */ 
 test case: Get 10 values during interval when using nanoseconds in end time 
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   precache:
   - time: 2017-01-10 10:10:00.000000000 +00:00
     itemid: 1
@@ -3990,27 +2632,39 @@ in:
     end: 2017-01-10 10:00:04.500000000 +00:00
 out:
   values:
-  - *row45
-  - *row42
-  - *row37
+  - value: value 4.5
+    ts: 2017-01-10 10:00:04.500000000 +00:00
+  - value: value 4.2
+    ts: 2017-01-10 10:00:04.200000000 +00:00
+  - value: value 3.7
+    ts: 2017-01-10 10:00:03.700000000 +00:00
   cache:
     items:
-      - itemid: 1
-        value type: ITEM_VALUE_TYPE_STR
-        data:
-          - *row32
-          - *row35
-          - *row37
-          - *row42
-          - *row45
-          - *row47
-          - *row52
-          - *row55
-          - *row57
-        status:
-        active_range: 598
-        values_total: 9
-        db_cached_from: 2017-01-10 10:00:03.000000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - value: value 3.2
+        ts: 2017-01-10 10:00:03.200000000 +00:00
+      - value: value 3.5
+        ts: 2017-01-10 10:00:03.500000000 +00:00
+      - value: value 3.7
+        ts: 2017-01-10 10:00:03.700000000 +00:00
+      - value: value 4.2
+        ts: 2017-01-10 10:00:04.200000000 +00:00
+      - value: value 4.5
+        ts: 2017-01-10 10:00:04.500000000 +00:00
+      - value: value 4.7
+        ts: 2017-01-10 10:00:04.700000000 +00:00
+      - value: value 5.2
+        ts: 2017-01-10 10:00:05.200000000 +00:00
+      - value: value 5.5
+        ts: 2017-01-10 10:00:05.500000000 +00:00
+      - value: value 5.7
+        ts: 2017-01-10 10:00:05.700000000 +00:00
+      status:
+      active_range: 598
+      values_total: 9
+      db_cached_from: 2017-01-10 10:00:03.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
     hits: 3
     misses: 0
@@ -4023,17 +2677,13 @@ in:
   - itemid: 1
     value type: ITEM_VALUE_TYPE_STR
     data:
-    - &row52
-      value: value 5.2
+    - value: value 5.2
       ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row55
-      value: value 5.5
+    - value: value 5.5
       ts: 2017-01-10 10:00:06.500000000 +00:00
-    - &row57
-      value: value 5.7
+    - value: value 5.7
       ts: 2017-01-10 10:00:07.700000000 +00:00
-    - &row58
-      value: value 5.7
+    - value: value 5.7
       ts: 2017-01-10 10:00:08.800000000 +00:00
   test:
     cache mode: ZBX_VC_MODE_LOWMEM
@@ -4052,59 +2702,12 @@ out:
     hits: 0
     misses: 0
 ---
-# TC29
+# TC48
 # Test that value in a middle of second interval is returned.
 test case: Get 1 item value when cache working in low memory mode
+include: &include zbx_vc_get_values.inc.yaml
 in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_STR
-    data:
-    - &row12
-      value: value 1.2
-      ts: 2017-01-10 10:00:01.200000000 +00:00
-    - &row15
-      value: value 1.5
-      ts: 2017-01-10 10:00:01.500000000 +00:00
-    - &row17
-      value: value 1.7
-      ts: 2017-01-10 10:00:01.700000000 +00:00
-    - &row22
-      value: value 2.2
-      ts: 2017-01-10 10:00:02.200000000 +00:00
-    - &row25
-      value: value 2.5
-      ts: 2017-01-10 10:00:02.500000000 +00:00
-    - &row27
-      value: value 2.7
-      ts: 2017-01-10 10:00:02.700000000 +00:00
-    - &row32
-      value: value 3.2
-      ts: 2017-01-10 10:00:03.200000000 +00:00
-    - &row35
-      value: value 3.5
-      ts: 2017-01-10 10:00:03.500000000 +00:00
-    - &row37
-      value: value 3.7
-      ts: 2017-01-10 10:00:03.700000000 +00:00
-    - &row42
-      value: value 4.2
-      ts: 2017-01-10 10:00:04.200000000 +00:00
-    - &row45
-      value: value 4.5
-      ts: 2017-01-10 10:00:04.500000000 +00:00
-    - &row47
-      value: value 4.7
-      ts: 2017-01-10 10:00:04.700000000 +00:00
-    - &row52
-      value: value 5.2
-      ts: 2017-01-10 10:00:05.200000000 +00:00
-    - &row55
-      value: value 5.5
-      ts: 2017-01-10 10:00:05.500000000 +00:00
-    - &row57
-      value: value 5.7
-      ts: 2017-01-10 10:00:05.700000000 +00:00
+  history: [*include]
   test:
     cache mode: ZBX_VC_MODE_LOWMEM
     time: 2017-01-10 10:10:00.000000000 +00:00
@@ -4115,7 +2718,8 @@ in:
     end: 2017-01-10 10:00:05.600000000 +00:00
 out:
   values:
-  - *row55
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +00:00
   cache:
     items:
     - itemid: 1

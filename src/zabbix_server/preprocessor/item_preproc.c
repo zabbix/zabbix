@@ -754,7 +754,7 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 		return FAIL;
 	}
 
-	if (FAIL == zbx_mregexp_sub_precompiled(value->data.str, regex, output, &new_value))
+	if (FAIL == zbx_mregexp_sub_precompiled(value->data.str, regex, output, ZBX_MAX_RECV_DATA_SIZE, &new_value))
 	{
 		*errmsg = zbx_strdup(*errmsg, "pattern does not match");
 		zbx_regexp_free(regex);
@@ -1054,3 +1054,6 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 
 	return FAIL;
 }
+#ifdef HAVE_TESTS
+#	include "../../../tests/zabbix_server/preprocessor/item_preproc_test.c"
+#endif
