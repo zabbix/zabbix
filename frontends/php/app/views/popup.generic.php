@@ -160,6 +160,7 @@ switch ($data['popup_type']) {
 	case 'templates':
 	case 'applications':
 	case 'application_prototypes':
+	case 'drules':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
@@ -358,19 +359,6 @@ switch ($data['popup_type']) {
 
 			$name = (new CLink($item['key'], 'javascript:void(0);'))->onClick($action.$js_action_onclick);
 			$table->addRow([$name, $item['description']]);
-		}
-		unset($data['table_records']);
-		break;
-
-	case 'drules':
-		foreach ($data['table_records'] as $item) {
-			$action = get_window_opener($options['dstfrm'], $options['dstfld1'], $item[$options['srcfld1']]);
-			$action .= $options['srcfld2']
-				? get_window_opener($options['dstfrm'], $options['dstfld2'], $item[$options['srcfld2']])
-				: '';
-
-			$name = (new CLink($item['name'], 'javascript:void(0);'))->onClick($action.$js_action_onclick);
-			$table->addRow($name);
 		}
 		unset($data['table_records']);
 		break;
