@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15844] fixed inability to start Zabbix server if alert manager process is late after alerters; thanks to Mikhail Makurov for the patch (akozlovs)
 ..F....... [ZBX-11043] implemented a better network discovery filter (Ivo)
 ..F....... [ZBX-10937] fixed top right global search field autocomplete not showing results when host name is being typed not first character and technical name when it differs from visible name (Ivo)
 A.F....... [ZBX-10861] changed user name and password fields from being mandatory to optional in web scenarios and HTTP agent type items (Ivo)
@@ -317,6 +318,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15844] fixed inability to start Zabbix server if alert manager process is late after alerters; thanks to Mikhail Makurov for the patch (akozlovs)
 ..F....... [ZBX-11043] implemented a better network discovery filter (Ivo)
 ..F....... [ZBX-10937] fixed top right global search field autocomplete not showing results when host name is being typed not first character and technical name when it differs from visible name (Ivo)
 A.F....... [ZBX-10861] changed user name and password fields from being mandatory to optional in web scenarios and HTTP agent type items (Ivo)
