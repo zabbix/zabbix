@@ -123,7 +123,7 @@ class CMap extends CMapElement {
 		}
 
 		if ($count_output) {
-			return count($result);
+			return (string) count($result);
 		}
 
 		if ($limit !== null) {

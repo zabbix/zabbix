@@ -271,7 +271,7 @@ $itemFormList->addRow(
 	new CLabel(_('HTTP proxy'), 'http_proxy'),
 	(new CTextBox('http_proxy', $data['http_proxy'], $data['limited'], DB::getFieldLength('items', 'http_proxy')))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'),
+		->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'),
 	'http_proxy_row'
 );
 
@@ -291,18 +291,16 @@ $itemFormList->addRow(
 
 // ITEM_TYPE_HTTPAGENT User name.
 $itemFormList->addRow(
-	(new CLabel(_('User name'), 'http_username'))->setAsteriskMark(),
+	new CLabel(_('User name'), 'http_username'),
 	(new CTextBox('http_username', $data['http_username'], $data['limited'], DB::getFieldLength('items', 'username')))
-		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'http_username_row'
 );
 
 // ITEM_TYPE_HTTPAGENT Password.
 $itemFormList->addRow(
-	(new CLabel(_('Password'), 'http_password'))->setAsteriskMark(),
+	new CLabel(_('Password'), 'http_password'),
 	(new CTextBox('http_password', $data['http_password'], $data['limited'], DB::getFieldLength('items', 'password')))
-		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'http_password_row'
 );
