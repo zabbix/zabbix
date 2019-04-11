@@ -72,4 +72,109 @@ in:
   family: 'AF_INET6'
 out:
   return: FAIL
+# Expected is IPv4 but connected is IPv6
+---
+test case: IPv6 compatible peer is connected
+in:
+  allowed_peers: '127.2.0.1'
+  peer: '::127.2.0.1'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: IPv6 compatible expanded peer is connected
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '0:0:0:0:0:0:7F00:0001'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: IPv6 mapped peer is connected
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '::ffff:127.0.0.1'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: IPv6 mapped peer expanded is connected
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '0:0:0:0:0:FFFF:7F00:0001'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: IPv6 compatible peer mismatch IP
+in:
+  allowed_peers: '127.1.0.1'
+  peer: '::127.2.0.1'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 compatible expanded mismatch
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '0:0:0:0:0:0:7F02:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 mapped peer mismatch IP
+in:
+  allowed_peers: '127.1.0.1'
+  peer: '::ffff:127.0.0.1'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 mapped peer expanded mismatch IP
+in:
+  allowed_peers: '127.1.0.1'
+  peer: '0:0:0:0:0:FFFF:7F00:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 peer partially compatible
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '::fffe:127.0.0.1'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 peer does not match IPv6
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 compatible expanded peer is connected, not in list
+in:
+  allowed_peers: '127.0.0.1'
+  peer: 'F000:0:0:0:0:0:7F00:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 compatible expanded peer is connected mismatch
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '0000:0001:0:0:0:0:7F00:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 mapped expanded is connected mismatch
+in:
+  allowed_peers: '127.0.0.1'
+  peer: 'FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:7F00:0001'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
 ...
