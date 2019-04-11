@@ -340,6 +340,22 @@ in:
 out:
   return: FAIL
 ---
+test case: IPv4 does not match address that is not compatible or mapped 2
+in:
+  allowed_peers: '127.0.0.0/0'
+  peer: '0:0:0:0:0:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv4 match address that is compatible or mapped
+in:
+  allowed_peers: '127.0.0.0/0'
+  peer: '0:0:0:0:0:0:FFFF:FFFF'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
 test case: Compare only first 96 bits
 in:
   allowed_peers: '0:0:0:0:0:0:ffff:ffff/96'
@@ -371,4 +387,36 @@ in:
   family: 'AF_INET6'
 out:
   return: FAIL
+---
+test case: IPv4 in list
+in:
+  allowed_peers: '128.0.0.0/24,127.0.0.1'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: IPv6 in list
+in:
+  allowed_peers: '1000:0000:0000:0000:0000:0000:FFFF:FFFF/96,::1'
+  peer: '::1'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: Any IPv4
+in:
+  allowed_peers: '128.0.0.0/0'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: Any IPv4
+in:
+  allowed_peers: '128.0.0.0/0'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
 ...
