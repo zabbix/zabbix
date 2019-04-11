@@ -355,4 +355,20 @@ in:
   family: 'AF_INET6'
 out:
   return: FAIL
+---
+test case: Compare only first 3 octets where first one mismatch
+in:
+  allowed_peers: '127.0.0.1/24'
+  peer: '128.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: Compare only first 96 bits where first mismatch
+in:
+  allowed_peers: '0:0:0:0:0:0:ffff:ffff/96'
+  peer: '1:0:0:0:0:0:0:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
 ...
