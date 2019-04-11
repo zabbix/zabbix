@@ -10,6 +10,8 @@ SERVER_tests = \
 	zbx_validate_interval \
 	is_double_suffix \
 	is_double \
+	zbx_trim_float \
+	zbx_trim_integer \
 	zbx_variant_compare \
 	zbx_user_macro_parse
 endif
@@ -226,6 +228,35 @@ is_double_LDFLAGS = @SERVER_LDFLAGS@
 
 is_double_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
+
+zbx_trim_float_SOURCES = \
+	zbx_trim_float.c \
+	$(COMMON_SRC_FILES)
+
+zbx_trim_float_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_trim_float_LDADD += @SERVER_LIBS@
+
+zbx_trim_float_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_trim_float_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_trim_integer_SOURCES = \
+	zbx_trim_integer.c \
+	$(COMMON_SRC_FILES)
+
+zbx_trim_integer_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_trim_integer_LDADD += @SERVER_LIBS@
+
+zbx_trim_integer_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_trim_integer_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
 zbx_variant_compare_SOURCES = \
 	zbx_variant_compare.c \
 	$(COMMON_SRC_FILES)
@@ -238,6 +269,7 @@ zbx_variant_compare_LDADD += @SERVER_LIBS@
 zbx_variant_compare_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_variant_compare_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
 
 zbx_user_macro_parse_SOURCES = \
 	zbx_user_macro_parse.c \
