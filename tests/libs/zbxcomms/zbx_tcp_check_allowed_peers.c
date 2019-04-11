@@ -49,16 +49,12 @@ static void	mock_accept(zbx_socket_t *s)
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_socket_t	s;
-	int		ret;
 
 	ZBX_UNUSED(state);
 
 	mock_accept(&s);
 
-	ret = zbx_tcp_check_allowed_peers(&s, zbx_mock_get_parameter_string("in.allowed_peers"));
-
-	if (FAIL == zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")))
-		zbx_mock_assert_result_eq("zbx_tcp_check_allowed_peers() return code", FAIL, ret);
-	else
-		zbx_mock_assert_result_eq("zbx_tcp_check_allowed_peers() return code", SUCCEED, ret);
+	zbx_mock_assert_result_eq("zbx_tcp_check_allowed_peers() return code",
+			zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")),
+			zbx_tcp_check_allowed_peers(&s, zbx_mock_get_parameter_string("in.allowed_peers")));
 }
