@@ -3044,14 +3044,6 @@ $form-icon-btn: (
 .ui-draggable .dashbrd-widget-head,
 .ui-draggable .dashbrd-grid-widget-head {
 	@extend %cursor-drag;
-
-	&:active {
-		@extend %cursor-dragging;
-	}
-}
-
-.ui-draggable.cursor-pointer:active {
-	@extend %cursor-dragging;
 }
 
 .ui-draggable-dragging {

@@ -3889,9 +3889,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   /* fallback if grab cursor is unsupported */
   cursor: grab; }
 
-.drag-icon:active,
-.ui-draggable .dashbrd-widget-head:active,
-.ui-draggable .dashbrd-grid-widget-head:active, .ui-draggable.cursor-pointer:active, .ui-draggable-dragging .drag-icon,
+.ui-draggable-dragging .drag-icon,
 .ui-draggable-dragging .dashbrd-widget-head,
 .ui-draggable-dragging .dashbrd-grid-widget-head, .cursor-dragging {
   cursor: move;
