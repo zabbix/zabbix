@@ -1,6 +1,15 @@
 * text=auto !eol
 /build-backend.xml -text
 database/elasticsearch/elasticsearch.map -text
+frontends/php/assets/fonts/DejaVuSans.ttf -text svneol=unset#application/x-font-ttf
+frontends/php/assets/img/apple-touch-icon-120x120-precomposed.png -text svneol=unset#image/png
+frontends/php/assets/img/apple-touch-icon-152x152-precomposed.png -text svneol=unset#image/png
+frontends/php/assets/img/apple-touch-icon-180x180-precomposed.png -text svneol=unset#image/png
+frontends/php/assets/img/apple-touch-icon-76x76-precomposed.png -text svneol=unset#image/png
+frontends/php/assets/img/browser-sprite.png -text svneol=unset#image/png
+frontends/php/assets/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
+frontends/php/assets/img/ms-tile-144x144.png -text svneol=unset#image/png
+frontends/php/assets/img/touch-icon-192x192.png -text svneol=unset#image/png
 frontends/php/audio/alarm_average.wav -text svneol=unset#audio/x-wav
 frontends/php/audio/alarm_disaster.wav -text svneol=unset#audio/x-wav
 frontends/php/audio/alarm_high.wav -text svneol=unset#audio/x-wav
@@ -9,7 +18,6 @@ frontends/php/audio/alarm_ok.wav -text svneol=unset#audio/x-wav
 frontends/php/audio/alarm_warning.wav -text svneol=unset#audio/x-wav
 frontends/php/audio/no_sound.wav -text svneol=unset#audio/x-wav
 frontends/php/favicon.ico -text svneol=unset#image/x-icon
-frontends/php/fonts/DejaVuSans.ttf -text svneol=unset#application/x-font-ttf
 frontends/php/images/general/arrow_down.png -text svneol=unset#image/png
 frontends/php/images/general/arrow_up.png -text svneol=unset#image/png
 frontends/php/images/general/no_icon.png -text svneol=unset#image/png
@@ -18,14 +26,6 @@ frontends/php/images/general/tr_top_bottom.gif -text svneol=unset#image/gif
 frontends/php/images/general/tr_top_right.gif -text svneol=unset#image/gif
 frontends/php/images/general/tr_top_right_bottom.gif -text svneol=unset#image/gif
 frontends/php/images/general/tree/zero.gif -text svneol=unset#image/gif
-frontends/php/img/apple-touch-icon-120x120-precomposed.png -text svneol=unset#image/png
-frontends/php/img/apple-touch-icon-152x152-precomposed.png -text svneol=unset#image/png
-frontends/php/img/apple-touch-icon-180x180-precomposed.png -text svneol=unset#image/png
-frontends/php/img/apple-touch-icon-76x76-precomposed.png -text svneol=unset#image/png
-frontends/php/img/browser-sprite.png -text svneol=unset#image/png
-frontends/php/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
-frontends/php/img/ms-tile-144x144.png -text svneol=unset#image/png
-frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
 frontends/php/locale/ca/LC_MESSAGES/frontend.po -text
 frontends/php/locale/he/LC_MESSAGES/frontend.po -text
 frontends/php/locale/nb/LC_MESSAGES/frontend.po -text
