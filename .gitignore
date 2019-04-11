@@ -401,9 +401,7 @@ tests/libs/zbxalgo/Makefile
 tests/libs/zbxalgo/Makefile.in
 tests/libs/zbxalgo/evaluate
 tests/libs/zbxalgo/queue
-tests/libs/zbxcommon/..........[!!-~][ZBXNEXT-4724]
 tests/libs/zbxcommon/.deps
-tests/libs/zbxcommon/ADFGIJLPST
 tests/libs/zbxcommon/Makefile
 tests/libs/zbxcommon/Makefile.in
 tests/libs/zbxcommon/calculate_item_nextcheck
