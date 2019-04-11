@@ -610,7 +610,7 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_zbx_setproctitle(const char *fmt, ...)
+void	zbx_setproctitle(const char *fmt, ...)
 {
 #if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	const char	*__function_name = "__zbx_zbx_setproctitle";

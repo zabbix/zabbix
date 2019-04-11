@@ -50,6 +50,8 @@ class CTest extends PHPUnit_Framework_TestCase {
 	protected $annotations = null;
 	// Test case warnings.
 	protected static $warnings = [];
+	// Skip test suite execution.
+	protected static $skip_suite = false;
 
 	/**
 	 * Overriden constructor for collecting data on data sets from dataProvider annotations.
@@ -123,6 +125,8 @@ class CTest extends PHPUnit_Framework_TestCase {
 			self::$suite_backup = $suite_backup;
 			CDBHelper::backupTables(self::$suite_backup);
 		}
+
+		self::$skip_suite = false;
 	}
 
 	/**
@@ -190,16 +194,20 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 		// Class name change is used to determine suite change.
 		if ($suite !== $class_name) {
+			$suite = $class_name;
 			$this->onBeforeTestSuite();
 		}
 
-		$suite = $class_name;
 		self::$last_test_case = $case_name;
 
 		// Mark excessive test cases as skipped.
 		if (array_key_exists($case_name, self::$test_data_sets)
 				&& !in_array($this->data_key, self::$test_data_sets[$case_name])) {
 			self::markTestSkipped('Test case skipped by data provider limit check.');
+		}
+
+		if (self::$skip_suite) {
+			self::markTestSkipped();
 		}
 	}
 
@@ -260,5 +268,12 @@ class CTest extends PHPUnit_Framework_TestCase {
 		if (defined('PHPUNIT_REPORT_WARNINGS') && PHPUNIT_REPORT_WARNINGS && !in_array($warning, self::$warnings)) {
 			self::$warnings[] = $warning;
 		}
+	}
+
+	/**
+	 * Mark test suite skipped.
+	 */
+	public static function markTestSuiteSkipped() {
+		self::$skip_suite = true;
 	}
 }

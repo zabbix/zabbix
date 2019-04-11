@@ -406,7 +406,7 @@ ul.top-nav-icons {
 
 .header-title {
   border-bottom: 1px solid #303030;
-  margin-top: -10px;
+  margin: -10px 0 10px;
   padding: 10px 0 6px;
   width: 100%; }
   .header-title .cell:first-child {
@@ -498,26 +498,40 @@ article, main {
 
 .filter-breadcrumb {
   display: inline-block;
-  z-index: 3; }
+  padding-top: 0;
+  z-index: 3;
+  max-width: calc(100vw - 200px); }
   .filter-breadcrumb li {
     line-height: 14px;
-    vertical-align: top; }
+    vertical-align: top;
+    float: none;
+    display: inline-block; }
     .filter-breadcrumb li .status-container {
       padding-top: 3px; }
     .filter-breadcrumb li > span {
       display: inline-block;
       height: 18px;
-      padding: 4px 7px 0; }
+      padding: 4px 7px 0;
+      line-height: 14px; }
       .filter-breadcrumb li > span a {
+        display: inline-block;
         max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
-        vertical-align: top; }
+        vertical-align: top;
+        margin-bottom: -1px; }
+        .filter-breadcrumb li > span a:focus {
+          margin-bottom: -2px; }
   .filter-breadcrumb > li {
     padding: 1px 0; }
-  .filter-breadcrumb > li:first-child {
-    float: left;
+    .filter-breadcrumb > li > span a {
+      margin-top: 1px;
+      line-height: 13px; }
+  .filter-breadcrumb > li {
+    line-height: 22px;
     white-space: nowrap; }
+    .filter-breadcrumb > li .status-container {
+      line-height: 14px; }
   .filter-breadcrumb + .filter-space {
     margin-top: -29px; }
 
@@ -1028,7 +1042,7 @@ output {
     padding: 0 5px 5px 0;
     vertical-align: middle; }
 
-.multiselect-wrapper {
+.multiselect-control {
   position: relative;
   vertical-align: top;
   display: inline-block;
@@ -1226,59 +1240,57 @@ output {
   -moz-border-radius: 2px;
   border-radius: 2px; }
 
-.list-check-radio li, .list-hor-check-radio li {
+.list-check-radio li {
   display: block;
   padding: .3em 0; }
-.list-check-radio label, .list-hor-check-radio label {
+.list-check-radio.hor-list li {
+  margin-right: 15px;
+  padding: .3em 0 0 0; }
+  .list-check-radio.hor-list li:last-child {
+    margin-right: 0; }
+.list-check-radio label {
   padding: 0 0 0 18px;
   display: inline-block;
   text-indent: -18px;
   max-width: 600px; }
-  .list-check-radio label input[type="checkbox"], .list-hor-check-radio label input[type="checkbox"] {
+  .list-check-radio label input[type="checkbox"] {
     left: -3px;
     margin: 0; }
-  .list-check-radio label input[type="radio"], .list-hor-check-radio label input[type="radio"] {
+  .list-check-radio label input[type="radio"] {
     left: -3px;
     margin: 0; }
 
-.list-hor-check-radio li {
-  display: inline-block;
-  margin-right: 15px;
-  padding: .3em 0 0 0; }
-  .list-hor-check-radio li:last-child {
-    margin-right: 0; }
-
-.radio-segmented {
+.radio-list-control {
   white-space: nowrap; }
-  .radio-segmented li {
+  .radio-list-control li {
     position: relative;
     display: inline-block;
     margin: 0 -1px 0 0; }
-    .radio-segmented li:first-child {
+    .radio-list-control li:first-child {
       -webkit-border-radius: 3px 0 0 3px;
       -moz-border-radius: 3px 0 0 3px;
       border-radius: 3px 0 0 3px; }
-      .radio-segmented li:first-child label {
+      .radio-list-control li:first-child label {
         -webkit-border-radius: 2px 0 0 2px;
         -moz-border-radius: 2px 0 0 2px;
         border-radius: 2px 0 0 2px; }
-    .radio-segmented li:last-child {
+    .radio-list-control li:last-child {
       -webkit-border-radius: 0 3px 3px 0;
       -moz-border-radius: 0 3px 3px 0;
       border-radius: 0 3px 3px 0; }
-      .radio-segmented li:last-child label {
+      .radio-list-control li:last-child label {
         -webkit-border-radius: 0 2px 2px 0;
         -moz-border-radius: 0 2px 2px 0;
         border-radius: 0 2px 2px 0; }
-    .radio-segmented li:only-child {
+    .radio-list-control li:only-child {
       -webkit-border-radius: 3px;
       -moz-border-radius: 3px;
       border-radius: 3px; }
-      .radio-segmented li:only-child label {
+      .radio-list-control li:only-child label {
         -webkit-border-radius: 2px;
         -moz-border-radius: 2px;
         border-radius: 2px; }
-  .radio-segmented label {
+  .radio-list-control label {
     padding: 4px 11px;
     border: 1px solid #4f4f4f;
     -webkit-transition: background-color 0.2s ease-out;
@@ -1286,45 +1298,45 @@ output {
     transition: background-color 0.2s ease-out;
     line-height: 1.2em;
     display: inline-block; }
-  .radio-segmented input[type="radio"] {
+  .radio-list-control input[type="radio"] {
     position: absolute !important;
     top: auto !important;
     width: 1px !important;
     height: 1px !important;
     opacity: 0;
     filter: alpha(opacity=0); }
-    .radio-segmented input[type="radio"] + label {
+    .radio-list-control input[type="radio"] + label {
       color: #f2f2f2;
       border-color: #4f4f4f;
       background-color: #383838; }
-      .radio-segmented input[type="radio"] + label:hover {
+      .radio-list-control input[type="radio"] + label:hover {
         background-color: #414141; }
-      .radio-segmented input[type="radio"] + label:active {
+      .radio-list-control input[type="radio"] + label:active {
         border-color: #4f4f4f;
         background-color: #414141; }
-    .radio-segmented input[type="radio"]:focus + label {
+    .radio-list-control input[type="radio"]:focus + label {
       border-color: #768d99;
       background-color: #414141;
       position: relative;
       z-index: 2; }
-    .radio-segmented input[type="radio"]:checked + label {
+    .radio-list-control input[type="radio"]:checked + label {
       color: #fff;
       border-color: #4f4f4f;
       background-color: #4f4f4f;
       position: relative;
       z-index: 1; }
-    .radio-segmented input[type="radio"]:checked:focus + label {
+    .radio-list-control input[type="radio"]:checked:focus + label {
       -webkit-box-shadow: 0 0 0 2px rgba(66, 154, 227, 0.35);
       -moz-box-shadow: 0 0 0 2px rgba(66, 154, 227, 0.35);
       box-shadow: 0 0 0 2px rgba(66, 154, 227, 0.35);
       position: relative;
       z-index: 2; }
-    .radio-segmented input[type="radio"]:checked[disabled] + label {
+    .radio-list-control input[type="radio"]:checked[disabled] + label {
       background-color: #a3a3a3 !important;
       -webkit-transition: none;
       -moz-transition: none;
       transition: none; }
-    .radio-segmented input[type="radio"][disabled] + label {
+    .radio-list-control input[type="radio"][disabled] + label {
       -webkit-transition: none;
       -moz-transition: none;
       transition: none; }
@@ -1938,7 +1950,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: 0.3;
     background-color: transparent; }
 
-.multiselect[aria-disabled], .radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
+.multiselect[aria-disabled], .radio-list-control input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
   color: #525252;
   background-color: #2b2b2b !important;
   border-color: #3d3d3d; }
@@ -2212,7 +2224,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 9px 5px;
   width: 100%; }
 
-.dashbrd-grid-widget-container {
+.dashbrd-grid-container {
   position: relative;
   margin: -4px; }
 
@@ -2293,7 +2305,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-widget-content {
   flex: 1;
-  overflow-y: auto; }
+  overflow: auto; }
   .dashbrd-grid-widget-content .list-table {
     border: none; }
     .dashbrd-grid-widget-content .list-table tbody tr:last-child th, .dashbrd-grid-widget-content .list-table tbody tr:last-child td {
@@ -2311,7 +2323,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: flex;
   position: absolute; }
 
-.dashbrd-grid-widget-padding {
+.dashbrd-grid-widget-container {
   display: flex;
   flex-grow: 1;
   flex-direction: column;
@@ -2540,6 +2552,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border-color: #383838; }
   .dashbrd-widget .msg-good, .dashbrd-widget .msg-bad {
     margin: 0 10px; }
+  .dashbrd-widget.dashbrd-widget-fluid {
+    margin-right: 0; }
 
 .list-table tbody tr.nothing-to-show {
   text-align: center;
@@ -2584,14 +2598,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: block; }
   .dashbrd-widget-graph-link:link {
     border: none; }
-  .dashbrd-widget-graph-link:focus:after {
-    content: "";
-    background: rgba(66, 154, 227, 0.35);
-    height: 2px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -2px; }
 
 .action-menu {
   position: absolute;
@@ -2722,6 +2728,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     min-width: 650px; }
   .overlay-dialogue .msg-bad,
   .overlay-dialogue .msg-good {
+    position: -webkit-sticky;
     position: sticky;
     top: 0;
     z-index: 1000; }
@@ -3006,20 +3013,24 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     top: 0;
     z-index: 999; }
 
+.svg-graph {
+  display: block; }
+
 .svg-single-item-graph-legend,
 .svg-single-two-items-graph-legend,
 .svg-graph-legend {
   overflow-y: hidden;
   white-space: normal;
-  margin: 0 10px; }
+  margin: 0 10px;
+  line-height: 18px; }
   .svg-single-item-graph-legend div,
   .svg-single-two-items-graph-legend div,
   .svg-graph-legend div {
     display: inline-block;
     margin: 0 4px;
     font-size: 12px;
-    line-height: 18px;
-    vertical-align: middle;
+    line-height: 1.1;
+    vertical-align: bottom;
     min-width: 120px;
     overflow: hidden;
     white-space: nowrap;
@@ -3068,6 +3079,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       height: 10px;
       float: left;
       display: block; }
+  .svg-graph-hintbox .header {
+    margin: 0 0 10px 3px; }
 
 .ui-selectable-helper {
   position: absolute;
@@ -3908,7 +3921,8 @@ tr.cursor-move td * {
   text-transform: uppercase; }
 
 .flickerfreescreen {
-  position: relative; }
+  position: relative;
+  overflow: hidden; }
 
 .graph-wrapper {
   display: inline; }
@@ -4521,12 +4535,13 @@ svg {
     margin-left: -5px;
     width: 10px;
     height: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 1px white;
+    border-radius: 50%;
     background: #4796c4; }
   .range-control.range-control-focus .range-control-thumb {
+    margin-top: -6.66667px;
+    margin-left: -6.66667px;
     background: #4796c4;
-    box-shadow: 0 0 0 2px #8599a4; }
+    border: 2px solid #8599a4; }
   .range-control.range-control-focus .range-control-progress {
     background: #4796c4; }
   .range-control.disabled {

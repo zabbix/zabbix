@@ -563,7 +563,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($type == 'Database monitor' && !isset($itemid)) {
-			$this->zbxTestAssertElementValue('key', 'db.odbc.select[<unique short description>,<dsn>]');
+			$this->zbxTestAssertElementValue('key', 'db.odbc.select[<unique short description>,dsn]');
 		}
 
 		if ($type == 'SSH agent' && !isset($itemid)) {
@@ -1678,7 +1678,7 @@ class testFormItem extends CLegacyWebTest {
 					'history' => 3599,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "history": must be between "3600" and "788400000".'
+						'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -1691,7 +1691,7 @@ class testFormItem extends CLegacyWebTest {
 					'history' => 788400001,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "history": must be between "3600" and "788400000".'
+						'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -1743,7 +1743,7 @@ class testFormItem extends CLegacyWebTest {
 					'trends' => 788400001,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-							'Incorrect value for field "trends": must be between "86400" and "788400000".'
+						'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
 					]
 				]
 			],
@@ -1756,7 +1756,7 @@ class testFormItem extends CLegacyWebTest {
 					'trends' => 86399,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-							'Incorrect value for field "trends": must be between "86400" and "788400000".'
+						'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
 					]
 				]
 			],
@@ -1970,7 +1970,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-ipmi-agent-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "IPMI sensor": cannot be empty.'
+						'Incorrect value for field "IPMI sensor": cannot be empty.'
 					]
 				]
 			],
@@ -1994,8 +1994,8 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-ssh-agent-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "User name": cannot be empty.',
-							'Incorrect value for field "Executed script": cannot be empty.'
+						'Incorrect value for field "User name": cannot be empty.',
+						'Incorrect value for field "Executed script": cannot be empty.'
 					]
 				]
 			],
@@ -2007,8 +2007,8 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-telnet-agent-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "User name": cannot be empty.',
-							'Incorrect value for field "Executed script": cannot be empty.'
+						'Incorrect value for field "User name": cannot be empty.',
+						'Incorrect value for field "Executed script": cannot be empty.'
 					]
 				]
 			],
@@ -2052,7 +2052,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-calculated',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "Formula": cannot be empty.'
+						'Incorrect value for field "Formula": cannot be empty.'
 					]
 				]
 			],
@@ -2065,7 +2065,7 @@ class testFormItem extends CLegacyWebTest {
 					'params_ap' => 'query',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+						'Check the key, please. Default example was passed.'
 					]
 				]
 			],
@@ -2079,7 +2079,7 @@ class testFormItem extends CLegacyWebTest {
 					'params_es' => 'script to be executed',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+						'Check the key, please. Default example was passed.'
 					]
 				]
 			],
@@ -2093,7 +2093,7 @@ class testFormItem extends CLegacyWebTest {
 					'params_es' => 'script to be executed',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-							'Check the key, please. Default example was passed.'
+						'Check the key, please. Default example was passed.'
 					]
 				]
 			],
@@ -2106,7 +2106,7 @@ class testFormItem extends CLegacyWebTest {
 					'username' => 'zabbix',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "Key": cannot be empty.'
+						'Incorrect value for field "Key": cannot be empty.'
 					]
 				]
 			]
@@ -2729,9 +2729,6 @@ class testFormItem extends CLegacyWebTest {
 
 	public function testFormItem_CopyItemPreprocessing() {
 		$preprocessingItemId = '15094';
-		$dbResultHost = DBselect("SELECT hostid FROM hosts WHERE host='".$this->host."'");
-		$dbRowHost = DBfetch($dbResultHost);
-		$hostid = $dbRowHost['hostid'];
 
 		$this->zbxTestLogin('items.php?filter_set=1&hostid=15001');
 		$this->zbxTestCheckTitle('Configuration of items');
@@ -2740,9 +2737,11 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('group_itemid_'.$preprocessingItemId);
 		$this->zbxTestClickButton('item.masscopyto');
 
-		$this->zbxTestDropdownSelectWait('copy_type', 'Hosts');
-		$this->zbxTestDropdownSelectWait('copy_groupid', 'Zabbix servers');
-		$this->zbxTestCheckboxSelect('copy_targetid_'.$hostid);
+		$this->zbxTestClickXpathWait('//label[@for="copy_type_1"][text()="Hosts"]');
+		$this->zbxTestClickButtonMultiselect('copy_targetids');
+		$this->zbxTestLaunchOverlayDialog('Hosts');
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickWait('copy');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item copied');
 
