@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15970] fixed invalid update intervals being reported on Zabbix server when monitored through Zabbix proxy (vso)
 ........S. [ZBX-15643] fixed invalid to valid numbers conversion by del_zeros (asestakovs)
 .......PS. [ZBX-15444] fixed trimming allowed characters from numeric values (asitals)
 .....J.... [ZBX-15409] improved Zabbix java gateway error logging usability by adding item key to error message (vso)
@@ -321,6 +322,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15970] fixed invalid update intervals being reported on Zabbix server when monitored through Zabbix proxy (vso)
 ........S. [ZBX-15643] fixed invalid to valid numbers conversion by del_zeros (asestakovs)
 .......PS. [ZBX-15444] fixed trimming allowed characters from numeric values (asitals)
 .....J.... [ZBX-15409] improved Zabbix java gateway error logging usability by adding item key to error message (vso)
