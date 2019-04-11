@@ -356,6 +356,12 @@ static int	proxy_get_host_availability(DC_PROXY *proxy)
 
 	proxy->version = zbx_get_protocol_version(&jp);
 
+	if (SUCCEED != zbx_check_protocol_version(proxy))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
+		goto out;
+	}
+
 	if (SUCCEED != proxy_check_error_response(&jp, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
@@ -419,6 +425,12 @@ static int	proxy_get_history_data(DC_PROXY *proxy)
 		}
 
 		proxy->version = zbx_get_protocol_version(&jp);
+
+		if (SUCCEED != zbx_check_protocol_version(proxy))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
+			break;
+		}
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
@@ -493,6 +505,12 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy)
 
 		proxy->version = zbx_get_protocol_version(&jp);
 
+		if (SUCCEED != zbx_check_protocol_version(proxy))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
+			break;
+		}
+
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid discovery data:"
@@ -566,6 +584,12 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
 
 		proxy->version = zbx_get_protocol_version(&jp);
 
+		if (SUCCEED != zbx_check_protocol_version(proxy))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
+			break;
+		}
+
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid auto registration data:"
@@ -622,7 +646,6 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 	struct zbx_json_parse	jp;
 	char			*error = NULL;
 	int			ret = FAIL;
-	int			server_version;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -643,19 +666,11 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 	}
 
 	proxy->version = zbx_get_protocol_version(&jp);
-	/* warn if another proxy version is used and proceed with compatibility rules*/
-	if ((server_version = ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR)) != proxy->version)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" version %d.%d differs from server version %d.%d",
-				proxy->host, ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
-				ZBX_COMPONENT_VERSION_MINOR(proxy->version),
-				ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR);
 
-		if (proxy->version > server_version)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
-			goto out;
-		}
+	if (SUCCEED != zbx_check_protocol_version(proxy))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
+		goto out;
 	}
 
 	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, &error)))
