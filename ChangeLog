@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
 .......PS. [ZBX-15970] fixed invalid update intervals being reported on Zabbix server when monitored through Zabbix proxy (vso)
 ........S. [ZBX-15643] fixed invalid to valid numbers conversion by del_zeros (asestakovs)
 .......PS. [ZBX-15444] fixed trimming allowed characters from numeric values (asitals)
@@ -322,6 +323,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
 .......PS. [ZBX-15970] fixed invalid update intervals being reported on Zabbix server when monitored through Zabbix proxy (vso)
 ........S. [ZBX-15643] fixed invalid to valid numbers conversion by del_zeros (asestakovs)
 .......PS. [ZBX-15444] fixed trimming allowed characters from numeric values (asitals)
@@ -2698,6 +2700,7 @@ Changes for 3.0.27rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
 A.F....... [ZBX-2494] fixed sorting of items, item prototypes, lld rules and screens to avoid deadlocks in database between server and frontend (ashubin)
 ..F....... [ZBX-10404] fixed password being passed in plain text in media type edit form (gcalenko)
 ...G...PS. [ZBX-15721] fixed escaping of control characters in JSON encoder (Andris, viktors)
