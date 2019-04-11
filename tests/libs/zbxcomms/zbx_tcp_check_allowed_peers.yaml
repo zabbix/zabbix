@@ -23,4 +23,12 @@ in:
   family: 'AF_INET'
 out:
   return: FAIL
+---
+test case: Peer IP is different
+in:
+  allowed_peers: '127.0.0.1,127.0.0.2'
+  peer: '126.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
 ...
