@@ -412,9 +412,17 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Any IPv4
+test case: Any IPv6
 in:
-  allowed_peers: '128.0.0.0/0'
+  allowed_peers: '1000:0000:0000:0000:0000:0000:FFFF:FFFF/0'
+  peer: '::1'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: Any IPv6 2
+in:
+  allowed_peers: '1000:0000:0000:0000:0000:0000:FFFF:FFFF/0'
   peer: '127.0.0.1'
   family: 'AF_INET'
 out:
