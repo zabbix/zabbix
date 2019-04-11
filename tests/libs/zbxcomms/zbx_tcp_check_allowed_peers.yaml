@@ -31,4 +31,45 @@ in:
   family: 'AF_INET'
 out:
   return: FAIL
+# Both expected and peer is IPv6
+---
+test case: IPv6 match
+in:
+  allowed_peers: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: IPv6 from list matches
+in:
+  allowed_peers: '2001:0db8:0000:0000:0000:ff00:0042:8330,127.0.0.1,2001:0db8:0000:0000:0000:ff00:0042:8329'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: Peer IPv6 is different
+in:
+  allowed_peers: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8330'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: Peer IPv6 is different at start
+in:
+  allowed_peers: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  peer: '3001:0db8:0000:0000:0000:ff00:0042:8330'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: Peer IP is not in list
+in:
+  allowed_peers: '3001:0db8:0000:0000:0000:ff00:0042:8329,2101:0db8:0000:0000:0000:ff00:0042:8329,2001:0db9:0000:0000:0000:ff00:0042:8329,2001:0db8:0100:0000:0000:ff00:0042:8329,2001:0db8:0000:0001:0000:ff00:0042:8329,2001:0db8:0000:0000:0000:ff10:0042:8329,2001:0db8:0000:0000:0000:ff00:0043:8329'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: FAIL
 ...
