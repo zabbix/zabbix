@@ -146,7 +146,7 @@ in:
 out:
   return: FAIL
 ---
-test case: IPv6 peer does not match IPv6
+test case: IPv6 peer does not match IPv4
 in:
   allowed_peers: '127.0.0.1'
   peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
@@ -176,5 +176,38 @@ in:
   peer: 'FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:7F00:0001'
   family: 'AF_INET6'
 out:
-  return: SUCCEED
+  return: FAIL
+---
+test case: IPv6 local ip mismatch IPv4 local IP
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '::1'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+# Expected is IPv6 but connected is IPv4
+test case: IPv6 expected, but IPv4 connected
+in:
+  allowed_peers: '::1'
+  peer: '192.0.2.235'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv6 expected expanded, but IPv4 connected
+in:
+  allowed_peers: '0:0:0:0:0:0:0:0001'
+  peer: '192.0.2.235'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv6 expected, but IPv4 connected
+in:
+  allowed_peers: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
 ...
