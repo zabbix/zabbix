@@ -187,23 +187,23 @@ out:
   return: FAIL
 ---
 # Expected is IPv6 but connected is IPv4
-test case: IPv6 expected, but IPv4 connected
+test case: IPv6 local IP expected, but IPv4 local IP connected mismatch
 in:
   allowed_peers: '::1'
-  peer: '192.0.2.235'
+  peer: '127.0.0.1'
   family: 'AF_INET'
 out:
   return: FAIL
 ---
-test case: IPv6 expected expanded, but IPv4 connected
+test case: IPv6 expanded local IP expected, but IPv4 local IP connected mismatch
 in:
   allowed_peers: '0:0:0:0:0:0:0:0001'
-  peer: '192.0.2.235'
+  peer: '127.0.0.1'
   family: 'AF_INET'
 out:
   return: FAIL
 ---
-test case: IPv6 expected, but IPv4 connected
+test case: IPv6 IP expected, but IPv4 local IP connected mismatch
 in:
   allowed_peers: '2001:0db8:0000:0000:0000:ff00:0042:8329'
   peer: '127.0.0.1'
