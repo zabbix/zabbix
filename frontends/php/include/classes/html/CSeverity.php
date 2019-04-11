@@ -19,50 +19,71 @@
 **/
 
 
-class CSeverity extends CList {
+class CSeverity extends CRadioButtonList {
+	/**
+	 * Options array.
+	 *
+	 * string $options['name']   HTML element name.
+	 * int    $options['value']  Default selected value, default TRIGGER_SEVERITY_NOT_CLASSIFIED.
+	 * bool   $options['all']    Is option 'All' available, default false.
+	 * @property array
+	 */
+	private $options = [
+		'all'	=> false,
+		'value' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+	];
 
 	/**
-	 * @param string $options['name']
-	 * @param int    $options['value']		(optional) Default: TRIGGER_SEVERITY_NOT_CLASSIFIED
-	 * @param bool   $options['all']		(optional)
-	 * @param bool	 $enabled				If set to false, radio buttons (severities) are marked as disabled.
+	 * @param array $options    Array of options.
+	 * @param bool  $enabled    If set to false, radio buttons (severities) are marked as disabled.
 	 */
 	public function __construct(array $options = [], $enabled = true) {
-		parent::__construct();
+		$this->options = $options + $this->options;
 
-		$id = zbx_formatDomId($options['name']);
+		parent::__construct($this->options['name'], $this->options['value']);
 
-		$this->addClass(ZBX_STYLE_RADIO_SEGMENTED);
-		$this->setId($id);
+		$this->setModern(true);
+		$this->setEnabled($enabled);
+	}
 
-		if (!array_key_exists('value', $options)) {
-			$options['value'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-		}
+	/**
+	 * Add value.
+	 *
+	 * @param string $label      Input element label.
+	 * @param string $value      Input element value.
+	 * @param string $class      List item class name.
+	 * @param string $on_change  Javascript handler for onchange event.
+	 *
+	 * @return CSeverity
+	 */
+	public function addValue($label, $value, $class = null, $on_change = null) {
+		$this->values[] = [
+			'name' => $label,
+			'value' => $value,
+			'id' => null,
+			'class' => $class,
+			'on_change' => $on_change
+		];
 
-		$severity_from = (array_key_exists('all', $options) && $options['all'])
-			? -1
-			: TRIGGER_SEVERITY_NOT_CLASSIFIED;
+		return $this;
+	}
 
+	public function toString($destroy = true) {
 		$config = select_config();
 
-		for ($severity = $severity_from; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$name = ($severity == -1) ? _('all') : getSeverityName($severity, $config);
-			$class = ($severity == -1) ? null : getSeverityStyle($severity);
+		$severities = [
+			TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
+			TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER
+		];
 
-			$radio = (new CInput('radio', $options['name'], $severity))
-				->setId(zbx_formatDomId($options['name'].'_'.$severity));
-
-			if ($severity === $options['value']) {
-				$radio->setAttribute('checked', 'checked');
-			}
-
-			$enabled ? $radio->removeAttribute('disabled') : $radio->setAttribute('disabled', 'disabled');
-
-			parent::addItem(
-				(new CListItem([
-					$radio, new CLabel($name, $options['name'].'_'.$severity)
-				]))->addClass($class)
-			);
+		if ($this->options['all']) {
+			$this->addValue(_('all'), -1);
 		}
+
+		foreach ($severities as $severity) {
+			$this->addValue(getSeverityName($severity, $config), $severity, getSeverityStyle($severity));
+		}
+
+		return parent::toString($destroy);
 	}
 }

@@ -20,6 +20,10 @@
 
 
 class CMultiSelect extends CTag {
+	/**
+	 * Default CSS class name for HTML root element.
+	 */
+	const ZBX_STYLE_CLASS = 'multiselect-control';
 
 	/**
 	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
