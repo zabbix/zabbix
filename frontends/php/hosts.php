@@ -808,6 +808,14 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massdelete' && has
 	if ($result) {
 		uncheckTableRows();
 	}
+	else {
+		$hostids = API::Host()->get([
+			'output' => [],
+			'hostids' => getRequest('hosts'),
+			'editable' => true
+		]);
+		uncheckTableRows(getRequest('hostid'), array_column($hostids, 'hostid', 'hostid'));
+	}
 	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['host.massenable', 'host.massdisable']) && hasRequest('hosts')) {

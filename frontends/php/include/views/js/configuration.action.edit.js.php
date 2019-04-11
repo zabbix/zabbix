@@ -397,7 +397,7 @@
 			opCmdTargetVal = opCmdTarget.val();
 
 		if (jQuery('#opCmdTargetObject').length > 0) {
-			jQuery('.multiselect-wrapper').remove();
+			jQuery('.<?= CMultiSelect::ZBX_STYLE_CLASS ?>').remove();
 		}
 
 		// multiselect

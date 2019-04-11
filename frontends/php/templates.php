@@ -430,6 +430,14 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['template.ma
 	if ($result) {
 		uncheckTableRows();
 	}
+	else {
+		$templateids = API::Template()->get([
+			'output' => [],
+			'templateids' => $templates,
+			'editable' => true
+		]);
+		uncheckTableRows(null, array_column($templateids, 'templateid', 'templateid'));
+	}
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 

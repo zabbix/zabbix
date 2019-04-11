@@ -299,7 +299,6 @@ sass/img_source/icons-sprite.ai -text
 sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxalgo/queue.c -text
-src/libs/zbxalgo/queue_test.c -text
 src/libs/zbxcommon/variant.c -text
 src/libs/zbxcunit/zbxcunit.c -text
 src/libs/zbxcunit/zbxcunit.h -text
@@ -333,7 +332,6 @@ src/zabbix_server/ipmi/ipmi_poller.c -text
 src/zabbix_server/ipmi/ipmi_poller.h -text
 src/zabbix_server/ipmi/ipmi_protocol.c -text
 src/zabbix_server/ipmi/ipmi_protocol.h -text
-src/zabbix_server/preprocessor/item_preproc_test.c -text
 src/zabbix_server/preprocessor/preprocessing.c -text
 src/zabbix_server/scripts/Makefile.am -text
 src/zabbix_server/taskmanager/Makefile.am -text

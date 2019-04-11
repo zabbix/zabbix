@@ -128,16 +128,13 @@ if ($triggerPrototypeId !== null) {
 
 if ($triggerPrototypeIds) {
 	$triggerPrototypes = API::TriggerPrototype()->get([
-		'output' => ['triggerid'],
+		'output' => [],
 		'triggerids' => $triggerPrototypeIds,
-		'editable' => true,
-		'preservekeys' => true
+		'editable' => true
 	]);
 
-	foreach ($triggerPrototypeIds as $triggerPrototypeId) {
-		if (!array_key_exists($triggerPrototypeId, $triggerPrototypes)) {
-			access_deny();
-		}
+	if (count($triggerPrototypeId) != count($triggerPrototypes)) {
+		uncheckTableRows(getRequest('parent_discoveryid'), array_column($triggerPrototypes, 'triggerid', 'triggerid'));
 	}
 }
 
