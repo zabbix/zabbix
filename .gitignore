@@ -38,8 +38,6 @@ database/oracle/Makefile
 database/oracle/Makefile.in
 database/oracle/data.sql
 database/oracle/schema.sql
-database/postgresql/..........[!!-~][ZBXNEXT-4868]
-database/postgresql/ADFGIJLPST
 database/postgresql/Makefile
 database/postgresql/Makefile.in
 database/postgresql/data.sql
