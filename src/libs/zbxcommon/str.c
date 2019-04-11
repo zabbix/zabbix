@@ -435,6 +435,13 @@ void	del_zeros(char *s)
 		if ('.' == s[len])
 		{
 			/* number has decimal part */
+
+			if (1 == trim)
+			{
+				/* don't touch invalid numbers with more than one decimal seprator */
+				return;
+			}
+
 			trim = 1;
 		}
 
