@@ -160,6 +160,9 @@ pre {
   font-family: "Courier New", Courier, monospace;
   font-size: 1em; }
 
+.hidden {
+  display: none !important; }
+
 pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }

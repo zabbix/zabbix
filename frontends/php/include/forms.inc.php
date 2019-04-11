@@ -427,12 +427,14 @@ function getItemFilterForm(&$items) {
 	);
 	$filterColumn2->addRow(_('SNMP community'),
 		(new CTextBox('filter_snmp_community', $filter_snmp_community))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		'filter_snmp_community_row'
+		'filter_snmp_community_row',
+		ZBX_STYLE_HIDDEN
 	);
 	$filterColumn2->addRow(_('Security name'),
 		(new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		'filter_snmpv3_securityname_row'
+		'filter_snmpv3_securityname_row',
+		ZBX_STYLE_HIDDEN
 	);
 
 	$filterColumn3->addRow(_('History'),
@@ -452,7 +454,8 @@ function getItemFilterForm(&$items) {
 	);
 	$filterColumn2->addRow(_('SNMP OID'),
 		(new CTextBox('filter_snmp_oid', $filter_snmp_oid, '', 255))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		'filter_snmp_oid_row'
+		'filter_snmp_oid_row',
+		ZBX_STYLE_HIDDEN
 	);
 	$filterColumn3->addRow(_('Trends'),
 		(new CTextBox('filter_trends', $filter_trends))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -471,7 +474,8 @@ function getItemFilterForm(&$items) {
 	);
 	$filterColumn2->addRow(_('Port'),
 		(new CNumericBox('filter_port', $filter_port, 5, false, true))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-		'filter_port_row'
+		'filter_port_row',
+		ZBX_STYLE_HIDDEN
 	);
 	$filterColumn4->addRow(_('Discovery'),
 		new CComboBox('filter_discovery', $filter_discovery, null, [
