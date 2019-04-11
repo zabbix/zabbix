@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBX-10574] automated documentation link update upon release of new major version (vasilijs)
 
 Bug fixes:
+.......PS. [ZBX-15444] fixed trimming allowed characters from numeric values (asitals)
 ..F....... [ZBX-15563] fixed svg graph metric generation in situation when metric have big values (gcalenko)
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
 
@@ -14,6 +15,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15444] fixed trimming allowed characters from numeric values (asitals)
 .....J.... [ZBX-15409] improved Zabbix java gateway error logging usability by adding item key to error message (vso)
 ........S. [ZBX-15844] fixed inability to start Zabbix server if alert manager process is late after alerters; thanks to Mikhail Makurov for the patch (akozlovs)
 ..F....... [ZBX-11043] implemented a better network discovery filter (Ivo)
@@ -330,6 +332,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15444] fixed trimming allowed characters from numeric values (asitals)
 .....J.... [ZBX-15409] improved Zabbix java gateway error logging usability by adding item key to error message (vso)
 ........S. [ZBX-15844] fixed inability to start Zabbix server if alert manager process is late after alerters; thanks to Mikhail Makurov for the patch (akozlovs)
 ..F....... [ZBX-11043] implemented a better network discovery filter (Ivo)
