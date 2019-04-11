@@ -3,6 +3,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15643] fixed invalid to valid numbers conversion by del_zeros (asestakovs)
 .......PS. [ZBX-15444] fixed trimming allowed characters from numeric values (asitals)
 .....J.... [ZBX-15409] improved Zabbix java gateway error logging usability by adding item key to error message (vso)
 ........S. [ZBX-15844] fixed inability to start Zabbix server if alert manager process is late after alerters; thanks to Mikhail Makurov for the patch (akozlovs)
