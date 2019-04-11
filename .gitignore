@@ -38,8 +38,6 @@ database/oracle/Makefile
 database/oracle/Makefile.in
 database/oracle/data.sql
 database/oracle/schema.sql
-database/postgresql/..........[!!-~][ZBXNEXT-4868]
-database/postgresql/ADFGIJLPST
 database/postgresql/Makefile
 database/postgresql/Makefile.in
 database/postgresql/data.sql
@@ -401,9 +399,7 @@ tests/libs/zbxalgo/Makefile
 tests/libs/zbxalgo/Makefile.in
 tests/libs/zbxalgo/evaluate
 tests/libs/zbxalgo/queue
-tests/libs/zbxcommon/..........[!!-~][ZBXNEXT-4724]
 tests/libs/zbxcommon/.deps
-tests/libs/zbxcommon/ADFGIJLPST
 tests/libs/zbxcommon/Makefile
 tests/libs/zbxcommon/Makefile.in
 tests/libs/zbxcommon/calculate_item_nextcheck
@@ -415,6 +411,8 @@ tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommon/zbx_function_get_param_dyn
 tests/libs/zbxcommon/zbx_interval_preproc
 tests/libs/zbxcommon/zbx_token_find
+tests/libs/zbxcommon/zbx_trim_float
+tests/libs/zbxcommon/zbx_trim_integer
 tests/libs/zbxcommon/zbx_validate_interval
 tests/libs/zbxcommon/zbx_variant_compare
 tests/libs/zbxcommshigh/.deps
@@ -482,9 +480,7 @@ tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
 tests/zabbix_server/Makefile
 tests/zabbix_server/Makefile.in
-tests/zabbix_server/preprocessor/..........[!!-~][ZBXNEXT-4724]
 tests/zabbix_server/preprocessor/.deps
-tests/zabbix_server/preprocessor/ADFGIJLPST
 tests/zabbix_server/preprocessor/Makefile
 tests/zabbix_server/preprocessor/Makefile.in
 tests/zabbix_server/preprocessor/item_preproc_xpath

@@ -667,8 +667,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_UINT64:
-			zbx_rtrim(c, " \"");
-			zbx_ltrim(c, " \"+");
+			zbx_trim_integer(c);
 			del_zeros(c);
 
 			if (SUCCEED == is_uint64(c, &value_uint64))
@@ -678,8 +677,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 			}
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_rtrim(c, " \"");
-			zbx_ltrim(c, " \"+");
+			zbx_trim_float(c);
 
 			if (SUCCEED == is_double(c))
 			{
@@ -730,8 +728,7 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 	}
 	else if (0 != ISSET_STR(result))
 	{
-		zbx_rtrim(result->str, " \"");
-		zbx_ltrim(result->str, " \"+");
+		zbx_trim_integer(result->str);
 		del_zeros(result->str);
 
 		if (SUCCEED != is_uint64(result->str, &value))
@@ -741,8 +738,7 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 	}
 	else if (0 != ISSET_TEXT(result))
 	{
-		zbx_rtrim(result->text, " \"");
-		zbx_ltrim(result->text, " \"+");
+		zbx_trim_integer(result->text);
 		del_zeros(result->text);
 
 		if (SUCCEED != is_uint64(result->text, &value))
@@ -774,22 +770,22 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 	}
 	else if (0 != ISSET_STR(result))
 	{
-		zbx_rtrim(result->str, " \"");
-		zbx_ltrim(result->str, " \"+");
+		zbx_trim_float(result->str);
 
 		if (SUCCEED != is_double(result->str))
 			return NULL;
+
 		value = atof(result->str);
 
 		SET_DBL_RESULT(result, value);
 	}
 	else if (0 != ISSET_TEXT(result))
 	{
-		zbx_rtrim(result->text, " \"");
-		zbx_ltrim(result->text, " \"+");
+		zbx_trim_float(result->text);
 
 		if (SUCCEED != is_double(result->text))
 			return NULL;
+
 		value = atof(result->text);
 
 		SET_DBL_RESULT(result, value);
