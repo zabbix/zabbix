@@ -58,10 +58,7 @@ void	zbx_mock_test_entry(void **state)
 	ret = zbx_tcp_check_allowed_peers(&s, zbx_mock_get_parameter_string("in.allowed_peers"));
 
 	if (FAIL == zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")))
-	{
 		zbx_mock_assert_result_eq("zbx_tcp_check_allowed_peers() return code", FAIL, ret);
-		return;
-	}
-
-	zbx_mock_assert_result_eq("zbx_tcp_check_allowed_peers() return code", SUCCEED, ret);
+	else
+		zbx_mock_assert_result_eq("zbx_tcp_check_allowed_peers() return code", SUCCEED, ret);
 }

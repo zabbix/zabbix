@@ -1,9 +1,26 @@
+# Both expected and peer is IPv4
 ---
-test case: Single IPv4 connection
+test case: IPv4 match
 in:
   allowed_peers: '127.0.0.1'
   peer: '127.0.0.1'
   family: 'AF_INET'
 out:
   return: SUCCEED
+---
+test case: Second IPv4 from list matches
+in:
+  allowed_peers: '127.0.0.1,127.0.0.2'
+  peer: '127.0.0.2'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: Peer IP is different
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '127.0.0.2'
+  family: 'AF_INET'
+out:
+  return: FAIL
 ...
