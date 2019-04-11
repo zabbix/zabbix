@@ -53,6 +53,8 @@ typedef struct
 }
 zbx_event_suppress_data_t;
 
+void	zbx_event_suppress_data_free(zbx_event_suppress_data_t *data);
+
 /******************************************************************************
  *                                                                            *
  * Function: log_host_maintenance_update                                      *
