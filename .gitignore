@@ -478,9 +478,7 @@ tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
 tests/zabbix_server/Makefile
 tests/zabbix_server/Makefile.in
-tests/zabbix_server/preprocessor/..........[!!-~][ZBXNEXT-4724]
 tests/zabbix_server/preprocessor/.deps
-tests/zabbix_server/preprocessor/ADFGIJLPST
 tests/zabbix_server/preprocessor/Makefile
 tests/zabbix_server/preprocessor/Makefile.in
 tests/zabbix_server/preprocessor/item_preproc_xpath
