@@ -31,19 +31,6 @@ require_once dirname(__FILE__).'/include/classes/helpers/CBrandHelper.php';
 require_once dirname(__FILE__).'/include/html.inc.php';
 require_once dirname(__FILE__).'/include/classes/core/CAssetsFileCache.php';
 
-$assets_path = '';
-
-if (ZBX_WEBCACHE_PATH) {
-	$assets = new CAssetsFileCache(__DIR__);
-
-	if (!$assets->build()) {
-		header('Location: cachewarning.php');
-
-		exit;
-	}
-
-	$assets_path = ZBX_WEBCACHE_PATH.'/'.$assets->getAssetsPath().'/';
-}
-
-$browser_warning_form = new CView('general.browserwarning', compact('assets_path'));
-$browser_warning_form->render();
+(new CView('general.browserwarning', [
+	'assets_path' => (new CAssetsFileCache(__DIR__))->getAssetsUrl()
+]))->render();

@@ -20,47 +20,57 @@
 
 
 class CAssetsFileCache {
+	// Root directory.
+	const WEBCACHE_PATH = 'assets';
+	// Directory permissions on created version folder and sub folders.
+	const WEBCACHE_PATH_MODE = 0755;
+	// TTL seconds for old assets versions.
+	const WEBCACHE_OLD_TTL = 10;
 
-	private $path;
-	private $root_dir;
+	private $version;
+	private $cache_dir;
+	private $assets_dir;
 	private $assets_files;
 	private $assets_scan_rules = ['styles/*.css', 'img/*.png', 'img/*.svg'];
 
+	/**
+	 * @param string $root_dir    Path to web root directory, ending directory separator should be omited.
+	 * @return CAssetsFileCache
+	 */
 	public function __construct($root_dir) {
-		// Without ending direcotry separator.
-		$this->root_dir = $root_dir;
+		$this->assets_dir = $root_dir.DIRECTORY_SEPARATOR.static::WEBCACHE_PATH;
+
 		$this->assets_files = $this->getAssetsFiles();
-		$this->path = base_convert(max(array_map('filemtime', $this->assets_files)), 10, 24);
+
+		$this->version = base_convert(max(array_map('filemtime', $this->assets_files)), 10, 34);
+
+		$this->cache_dir = $this->assets_dir.DIRECTORY_SEPARATOR.$this->version;
 	}
 
 	/**
-	 * Will check existence of cache directory. If directory for current path does not exist will call cold build.
-	 * Returns true when cache is booted and ready to be used, false otherwise.
+	 * Will check existence of cache directory. If directory for current path does not exist will call init.
+	 * Returns true when cache is ready to be used, false otherwise.
 	 *
 	 * @return bool
 	 */
 	public function build() {
-		$cache_dir = implode(DIRECTORY_SEPARATOR, [$this->root_dir, ZBX_WEBCACHE_PATH, $this->path, '']);
+		// Do not check is the cache dir writeable to allow after assets being build remove directory write permissions.
 
-		if (file_exists($cache_dir)) {
-			return true;
-		}
-
-		return $this->init($cache_dir);
+		return file_exists($this->cache_dir) || $this->init();
 	}
 
 	/**
 	 * Scan and remove old cached entries. Will be called after successful cold boot.
 	 */
 	public function maintenance() {
-		$entries = array_diff(scandir($this->root_dir.DIRECTORY_SEPARATOR.ZBX_WEBCACHE_PATH),
-			['.', '..', $this->path]
-		);
-		$ttl = time() - ZBX_WEBCACHE_TTL;
+		$ttl = time() - static::WEBCACHE_OLD_TTL;
+		$skip = [$this->version, 'img', 'styles', 'fonts', '.', '..'];
 
-		foreach ($entries as $entry) {
-			if (base_convert($entry, 24, 10) < $ttl) {
-				$this->invalidate($entry);
+		foreach (new DirectoryIterator($this->assets_dir) as $entry) {
+			$name = $entry->getFilename();
+
+			if ($entry->isDir() && !in_array($name, $skip) && base_convert($name, 34, 10) < $ttl) {
+				$this->rmdir($this->assets_dir.DIRECTORY_SEPARATOR.$name);
 			}
 		}
 	}
@@ -69,15 +79,16 @@ class CAssetsFileCache {
 	 * Initializes cache directory for cache by copy cacheable files to cache sub directory.
 	 * Returns true when cache is initialized and ready to be used, false otherwise.
 	 *
-	 * @param string $cache_dir    Path to cache directory.
 	 * @return bool
 	 */
-	public function init($cache_dir) {
-		$css_dir = $cache_dir.'styles'.DIRECTORY_SEPARATOR;
-		$img_dir = $cache_dir.'img'.DIRECTORY_SEPARATOR;
-		$status = mkdir($cache_dir, ZBX_WEBCACHE_PATH_MODE, true)
-			&& mkdir($css_dir, ZBX_WEBCACHE_PATH_MODE, true)
-			&& mkdir($img_dir, ZBX_WEBCACHE_PATH_MODE, true);
+	public function init() {
+		$css_dir = $this->cache_dir.DIRECTORY_SEPARATOR.'styles'.DIRECTORY_SEPARATOR;
+
+		$img_dir = $this->cache_dir.DIRECTORY_SEPARATOR.'img'.DIRECTORY_SEPARATOR;
+
+		$status = mkdir($this->cache_dir, static::WEBCACHE_PATH_MODE, true)
+			&& mkdir($css_dir, static::WEBCACHE_PATH_MODE, true)
+			&& mkdir($img_dir, static::WEBCACHE_PATH_MODE, true);
 
 		if ($status) {
 			foreach ($this->assets_files as $file) {
@@ -93,32 +104,30 @@ class CAssetsFileCache {
 		if ($status) {
 			$this->maintenance();
 		}
-		else {
-			$this->invalidate($this->path);
+		else if (file_exists($this->cache_dir)) {
+			$this->rmdir($this->cache_dir);
 		}
 
 		return $status;
 	}
 
 	/**
-	 * Removes cache folder and it content.
-	 *
-	 * @return bool
-	 */
-	public function invalidate($path) {
-		$cache_dir = implode(DIRECTORY_SEPARATOR, [$this->root_dir, ZBX_WEBCACHE_PATH, $path, '']);
-
-		return $this->rmdir($cache_dir);
-	}
-
-	/**
-	 * Return path to assets
+	 * Return URL path to assets.
 	 *
 	 * @return string
 	 */
-	public function getAssetsPath()
+	public function getAssetsUrl()
 	{
-		return $this->path;
+		return file_exists($this->cache_dir) ? static::WEBCACHE_PATH.'/'.$this->version.'/' : static::WEBCACHE_PATH.'/';
+	}
+
+	/**
+	 * Return absolute path to main assets directory.
+	 *
+	 * @return string
+	 */
+	public function getAssetsDirectory() {
+		return $this->assets_dir;
 	}
 
 	/**
@@ -130,7 +139,7 @@ class CAssetsFileCache {
 		$paths = [];
 
 		foreach ($this->assets_scan_rules as $rule) {
-			$paths = array_merge($paths, glob($this->root_dir.DIRECTORY_SEPARATOR.$rule));
+			$paths = array_merge($paths, glob($this->assets_dir.DIRECTORY_SEPARATOR.$rule));
 		}
 
 		return $paths;
@@ -142,16 +151,12 @@ class CAssetsFileCache {
 	 * @param string $dir    Path to directory.
 	 */
 	private function rmdir($dir) {
-		$entries = array_diff(scandir($dir), ['.', '..']);
-
-		foreach ($entries as $entry) {
-			$path = $dir.$entry;
-
-			if (is_dir($path)) {
-				$this->rmdir($path.DIRECTORY_SEPARATOR);
+		foreach (new DirectoryIterator($dir) as $entry) {
+			if (!$entry->isDot() && $entry->isDir()) {
+				$this->rmdir($entry->getPathname());
 			}
-			else {
-				unlink($path);
+			elseif ($entry->isFile()) {
+				unlink($entry->getPathname());
 			}
 		}
 

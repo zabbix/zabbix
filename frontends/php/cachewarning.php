@@ -26,10 +26,9 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('ZABBIX');
-$page['file'] = 'index.php';
-$assets = new CAssetsFileCache(ZBase::getRootDir());
+$page['file'] = 'cachewarning.php';
 
-if (!ZBX_WEBCACHE_PATH || $assets->build()) {
+if ((new CAssetsFileCache(ZBase::getRootDir()))->build()) {
 	redirect('index.php');
 
 	exit;

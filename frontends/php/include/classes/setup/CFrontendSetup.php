@@ -90,10 +90,7 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpSessionAutoStart();
 		$result[] = $this->checkPhpGettext();
 		$result[] = $this->checkPhpArgSeparatorOutput();
-
-		if (ZBX_WEBCACHE_PATH) {
-			$result[] = $this->checkAssetsCachePermissions();
-		}
+		$result[] = $this->checkAssetsCachePermissions();
 
 		return $result;
 	}
@@ -667,14 +664,13 @@ class CFrontendSetup {
 	public function checkAssetsCachePermissions() {
 		$assets = new CAssetsFileCache(ZBase::getRootDir());
 		$result = $assets->build() ? self::CHECK_OK : self::CHECK_FATAL;
-		$assets_dir = implode(DIRECTORY_SEPARATOR, [ZBase::getRootDir(), ZBX_WEBCACHE_PATH]);
 
 		return [
 			'name' => _('Assets cache directory permissions'),
 			'current' => $result === self::CHECK_OK ? 'RW' : 'R',
 			'required' => 'RW',
 			'result' => $result,
-			'error' => _s('Directory "%1$s" must be writable', $assets_dir)
+			'error' => _s('Directory "%1$s" must be writable', $assets->getAssetsDirectory())
 		];
 	}
 }

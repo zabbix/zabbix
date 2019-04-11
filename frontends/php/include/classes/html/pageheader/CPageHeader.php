@@ -121,19 +121,7 @@ class CPageHeader {
 	 * Display page head html.
 	 */
 	public function display() {
-		$assets_path = '';
-
-		if (ZBX_WEBCACHE_PATH) {
-			$assets = new CAssetsFileCache(ZBase::getRootDir());
-
-			if (!$assets->build()) {
-				redirect('cachewarning.php');
-
-				exit;
-			}
-
-			$assets_path = ZBX_WEBCACHE_PATH.'/'.$assets->getAssetsPath().'/';
-		}
+		$assets_path = (new CAssetsFileCache(ZBase::getRootDir()))->getAssetsUrl();
 
 		echo <<<HTML
 <!DOCTYPE html>
