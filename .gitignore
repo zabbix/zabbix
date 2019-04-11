@@ -400,6 +400,10 @@ tests/libs/zbxcommon/zbx_function_get_param_dyn
 tests/libs/zbxcommon/zbx_interval_preproc
 tests/libs/zbxcommon/zbx_token_find
 tests/libs/zbxcommon/zbx_validate_interval
+tests/libs/zbxcomms/.deps
+tests/libs/zbxcomms/Makefile
+tests/libs/zbxcomms/Makefile.in
+tests/libs/zbxcomms/zbx_tcp_check_allowed_peers
 tests/libs/zbxcommshigh/.deps
 tests/libs/zbxcommshigh/Makefile
 tests/libs/zbxcommshigh/Makefile.in

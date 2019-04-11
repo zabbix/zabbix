@@ -1,0 +1,9 @@
+---
+test case: Single IPv4 connection
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+...
