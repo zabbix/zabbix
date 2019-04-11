@@ -178,7 +178,6 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	if (SUCCEED != zbx_check_protocol_version(&proxy))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
 		goto out;
 	}
 

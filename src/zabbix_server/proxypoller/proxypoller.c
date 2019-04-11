@@ -358,7 +358,6 @@ static int	proxy_get_host_availability(DC_PROXY *proxy)
 
 	if (SUCCEED != zbx_check_protocol_version(proxy))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
 		goto out;
 	}
 
@@ -428,7 +427,6 @@ static int	proxy_get_history_data(DC_PROXY *proxy)
 
 		if (SUCCEED != zbx_check_protocol_version(proxy))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
 			break;
 		}
 
@@ -507,7 +505,6 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy)
 
 		if (SUCCEED != zbx_check_protocol_version(proxy))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
 			break;
 		}
 
@@ -586,7 +583,6 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
 
 		if (SUCCEED != zbx_check_protocol_version(proxy))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
 			break;
 		}
 
@@ -669,7 +665,6 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 
 	if (SUCCEED != zbx_check_protocol_version(proxy))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
 		goto out;
 	}
 

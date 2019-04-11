@@ -4052,7 +4052,10 @@ int	zbx_check_protocol_version(DC_PROXY *proxy)
 				ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR);
 
 		if (proxy->version > server_version)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
 			ret = FAIL;
+		}
 	}
 
 	return ret;
