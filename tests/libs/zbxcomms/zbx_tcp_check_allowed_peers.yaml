@@ -314,4 +314,45 @@ in:
   family: 'AF_INET'
 out:
   return: FAIL
+---
+# Additional tests
+test case: Compare only first 3 octets
+in:
+  allowed_peers: '127.0.0.0/24'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: Compare all 4 octets sanity check
+in:
+  allowed_peers: '127.0.0.0/32'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv4 does not match address that is not compatible or mapped
+in:
+  allowed_peers: '127.0.0.0/0'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: Compare only first 96 bits
+in:
+  allowed_peers: '0:0:0:0:0:0:ffff:ffff/96'
+  peer: '0:0:0:0:0:0:0:0001'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: Compare 128 bits
+in:
+  allowed_peers: '0:0:0:0:0:0:ffff:ffff/128'
+  peer: '0:0:0:0:0:0:0:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
 ...
