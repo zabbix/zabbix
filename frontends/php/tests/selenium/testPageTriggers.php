@@ -416,14 +416,14 @@ class testPageTriggers extends CLegacyWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$tag_table = $form->getField('Tags');
 
-		$tag_table->getRow(0)->query('class:radio-segmented')->asSegmentedRadio()->one()->select($data['operator']);
+		$tag_table->getRow(0)->query('class:radio-list-control')->asSegmentedRadio()->one()->select($data['operator']);
 
 		$button = $tag_table->query('button:Add')->one();
 		$last = count($data['tags']) - 1;
 		foreach ($data['tags'] as $i => $tag) {
 			$tag_row = $tag_table->getRow($i+1);
 			$tag_row->getColumn(0)->query('tag:input')->one()->fill($tag['name']);
-			$tag_row->getColumn(1)->query('class:radio-segmented')->asSegmentedRadio()->one()->select($tag['type']);
+			$tag_row->getColumn(1)->query('class:radio-list-control')->asSegmentedRadio()->one()->select($tag['type']);
 			$tag_row->getColumn(2)->query('tag:input')->one()->fill($tag['value']);
 
 			if ($i !== $last) {
