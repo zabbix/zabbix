@@ -134,7 +134,7 @@ if ($triggerPrototypeIds) {
 	]);
 
 	if (count($triggerPrototypeId) != count($triggerPrototypes)) {
-		uncheckTableRows(getRequest('parent_discoveryid'), array_column($triggerPrototypes, 'triggerid', 'triggerid'));
+		uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($triggerPrototypes, 'triggerid'));
 	}
 }
 

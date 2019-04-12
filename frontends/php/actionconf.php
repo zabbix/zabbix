@@ -530,7 +530,7 @@ if (hasRequest('action') && hasRequest('g_actionid') && !$result) {
 		'output' => [],
 		'editable' => true
 	]);
-	uncheckTableRows(null, array_column($actions, 'actionid', 'actionid'));
+	uncheckTableRows(null, zbx_objectValues($actions, 'actionid'));
 }
 
 /*

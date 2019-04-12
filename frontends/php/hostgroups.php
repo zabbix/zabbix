@@ -215,7 +215,7 @@ elseif (hasRequest('action')) {
 			'output' => []
 		]);
 
-		uncheckTableRows(null, array_column($groups, 'groupid', 'groupid'));
+		uncheckTableRows(null, zbx_objectValues($groups, 'groupid'));
 	}
 }
 
