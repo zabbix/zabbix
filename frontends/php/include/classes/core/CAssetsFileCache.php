@@ -20,14 +20,18 @@
 
 
 class CAssetsFileCache {
+
 	// Root directory.
 	const WEBCACHE_PATH = 'assets';
+
 	// Directory permissions on created version folder and sub folders.
 	const WEBCACHE_PATH_MODE = 0755;
+
 	// TTL seconds for old assets versions.
 	const WEBCACHE_OLD_TTL = 10;
 
 	private $version;
+
 	private $cache_dir;
 	private $assets_dir;
 	private $assets_files;
@@ -35,6 +39,7 @@ class CAssetsFileCache {
 
 	/**
 	 * @param string $root_dir    Path to web root directory, ending directory separator should be omited.
+	 *
 	 * @return CAssetsFileCache
 	 */
 	public function __construct($root_dir) {
@@ -55,7 +60,6 @@ class CAssetsFileCache {
 	 */
 	public function build() {
 		// Do not check is the cache dir writeable to allow after assets being build remove directory write permissions.
-
 		return file_exists($this->cache_dir) || $this->init();
 	}
 
@@ -118,7 +122,7 @@ class CAssetsFileCache {
 	 */
 	public function getAssetsUrl()
 	{
-		return file_exists($this->cache_dir) ? static::WEBCACHE_PATH.'/'.$this->version.'/' : static::WEBCACHE_PATH.'/';
+		return static::WEBCACHE_PATH.'/'.(file_exists($this->cache_dir) ? $this->version.'/' : '');
 	}
 
 	/**

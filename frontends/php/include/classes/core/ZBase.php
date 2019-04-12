@@ -172,13 +172,11 @@ class ZBase {
 	 * Redirect user to cachewarning.php page if assets cache is not ready.
 	 */
 	public function checkAssetsCache() {
-		if ((new CAssetsFileCache(ZBase::getRootDir()))->build()) {
-			return;
+		if ((new CAssetsFileCache(ZBase::getRootDir()))->build() === false) {
+			redirect('cachewarning.php');
+
+			exit;
 		}
-
-		redirect('cachewarning.php');
-
-		exit;
 	}
 
 	/**
