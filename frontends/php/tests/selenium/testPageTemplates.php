@@ -19,10 +19,15 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 class testPageTemplates extends CLegacyWebTest {
 
 	public $templateName = 'Template OS Linux';
+
+	use FilterTrait;
+	use TableTrait;
 
 	public static function allTemplates() {
 		return CDBHelper::getDataProvider("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
@@ -142,28 +147,26 @@ public static function getFilterByTagsData() {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-							['name'=>'tag', 'operator' => 'Contains', 'value'=>'template'],
-							['name'=>'test', 'operator' => 'Contains', 'value'=>'test_tag']
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'template'],
+						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
 					],
 					'expected_templates' => [
-						['Form test template']
-					],
-					'expected_result_count' => 1
+						'Form test template'
+					]
 				]
 			],
 			[
 				[
 					'evaluation_type' => 'Or',
 					'tags' => [
-							['name'=>'tag', 'operator' => 'Contains', 'value'=>'template'],
-							['name'=>'test', 'operator' => 'Contains', 'value'=>'test_tag']
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'template'],
+						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
 					],
 					'expected_templates' => [
-						['Form test template'],
-						['Template with tags for cloning'],
-						['Template with tags for updating']
-					],
-					'expected_result_count' => 3
+						'Form test template',
+						'Template with tags for cloning',
+						'Template with tags for updating'
+					]
 				]
 			],
 			// "Contains" and "Equals" checks.
@@ -171,60 +174,54 @@ public static function getFilterByTagsData() {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-							['name'=>'tag', 'operator' => 'Contains', 'value'=>'TEMPLATE'],
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'TEMPLATE'],
 					],
 					'expected_templates' => [
-						['Form test template'],
-						['Template with tags for cloning'],
-						['Template with tags for updating']
-					],
-					'expected_result_count' => 3
+						'Form test template',
+						'Template with tags for cloning',
+						'Template with tags for updating'
+					]
 				]
 			],
 			[
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-							['name'=>'tag', 'operator' => 'Equals', 'value'=>'TEMPLATE'],
+						['name' => 'tag', 'operator' => 'Equals', 'value' => 'TEMPLATE'],
 					],
 					'expected_templates' => [
-						['Form test template']
-					],
-					'expected_result_count' => 1
+						'Form test template'
+					]
 				]
 			],
 			[
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-							['name'=>'action', 'operator' => 'Contains', 'value'=>''],
+						['name' => 'action', 'operator' => 'Contains'],
 					],
 					'expected_templates' => [
-						['Form test template'],
-						['Template with tags for cloning'],
-						['Template with tags for updating']
-					],
-					'expected_result_count' => 3
+						'Form test template',
+						'Template with tags for cloning',
+						'Template with tags for updating'
+					]
 				]
 			],
 			[
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-							['name'=>'action', 'operator' => 'Equals', 'value'=>''],
-					],
-					'expected_templates' => [],
-					'expected_result_count' => 0
+						['name' => 'action', 'operator' => 'Equals'],
+					]
 				]
 			]
 		];
 	}
 
 	/**
-	 * Test filtering templates by tags
+	 * Test filtering templates by tags.
 	 *
 	 * @dataProvider getFilterByTagsData
-	 *
 	 */
 	public function testPageTemplates_FilterByTags($data) {
 		$this->page->login()->open('templates.php?groupid=0');
@@ -232,40 +229,12 @@ public static function getFilterByTagsData() {
 		// Reset filter from possible previous scenario.
 		$form->query('button:Reset')->one()->click();
 
-		$tags_filter = $form->getFieldContainer('Tags')->asTable();
-		$tags_filter->query('id:filter_evaltype')->asSegmentedRadio()->one()->select($data['evaluation_type']);
-
-		$button = $tags_filter ->query('button:Add')->one();
-		$last = count($data['tags']) - 1;
-
-		foreach ($data['tags'] as $i => $tag){
-			$row = $tags_filter->getRows()->get($i+1);
-			$row->query('id:filter_tags_'.$i.'_tag')->one()->type($tag['name']);
-			$row->query('id:filter_tags_'.$i.'_operator')->asSegmentedRadio()->one()->select($tag['operator']);
-			$row->query('id:filter_tags_'.$i.'_value')->one()->type($tag['value']);
-			if ($i !== $last) {
-				$button->click();
-			}
-		}
+		$this->setTags($data['evaluation_type'], $data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Check filtered result.
-		$templates_table = $this->query('class:list-table')->asTable()->one();
-		$display_text = $this->query('xpath://div[@class="table-stats"]')->waitUntilVisible()->one()->getText();
-		$this->assertEquals('Displaying '.$data['expected_result_count'].' of '.$data['expected_result_count'].' found', $display_text);
+		$this->checkTableRows(array_key_exists('expected_templates', $data) ? $data['expected_templates'] : []);
 
-		if($data['expected_result_count'] === 0){
-				$text = $templates_table->getRows()->get(0)->getText();
-				$this->assertEquals('No data found.', $text);
-		}
-		else{
-			foreach ($templates_table->getRows()->asArray() as $i => $row) {
-				$filtered_template_names[] =[
-					$templates_table->getRows()->get($i)->getColumn('Name')->getText()
-				];
-			}
-			$this->assertEquals($data['expected_templates'], $filtered_template_names);
-		}
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();
 	}

@@ -19,9 +19,15 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 class testPageTriggers extends CLegacyWebTest {
+
 	public $hostid = 99050;
+
+	use FilterTrait;
+	use TableTrait;
 
 	public static function data() {
 		return CDBHelper::getDataProvider(
@@ -32,8 +38,8 @@ class testPageTriggers extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider data
-	*/
+	 * @dataProvider data
+	 */
 	public function testPageTriggers_CheckLayout($data) {
 		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of triggers');
@@ -77,10 +83,10 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'tag_options' => [
-						'operator' => 'And/Or',
+						'type' => 'And/Or',
 						'tags' => [
-							['name' => 'TagA', 'value' => 'a', 'type' => 'Equals'],
-							['name' => 'TagK', 'value' => 'K', 'type' => 'Contains']
+							['name' => 'TagA', 'value' => 'a', 'operator' => 'Equals'],
+							['name' => 'TagK', 'value' => 'K', 'operator' => 'Contains']
 						]
 					],
 					'result' => [
@@ -91,10 +97,10 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'tag_options' => [
-						'operator' => 'And/Or',
+						'type' => 'And/Or',
 						'tags' => [
-							['name' => 'TagA', 'value' => 'A', 'type' => 'Contains'],
-							['name' => 'TagK', 'value' => 'K', 'type' => 'Contains']
+							['name' => 'TagA', 'value' => 'A', 'operator' => 'Contains'],
+							['name' => 'TagK', 'value' => 'K', 'operator' => 'Contains']
 						]
 					],
 					'result' => [
@@ -105,10 +111,10 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'tag_options' => [
-						'operator' => 'Or',
+						'type' => 'Or',
 						'tags' => [
-							['name' => 'TagA', 'value' => 'A', 'type' => 'Contains'],
-							['name' => 'TagK', 'value' => 'K', 'type' => 'Contains']
+							['name' => 'TagA', 'value' => 'A', 'operator' => 'Contains'],
+							['name' => 'TagK', 'value' => 'K', 'operator' => 'Contains']
 						]
 					],
 					'result' => [
@@ -120,10 +126,10 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'tag_options' => [
-						'operator' => 'Or',
+						'type' => 'Or',
 						'tags' => [
-							['name' => 'TagZ', 'value' => 'Z', 'type' => 'Equals'],
-							['name' => 'TagI', 'value' => 'I', 'type' => 'Equals']
+							['name' => 'TagZ', 'value' => 'Z', 'operator' => 'Equals'],
+							['name' => 'TagI', 'value' => 'I', 'operator' => 'Equals']
 						]
 					]
 				]
@@ -131,14 +137,38 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'tag_options' => [
-						'operator' => 'Or',
+						'type' => 'Or',
 						'tags' => [
-							['name' => 'TagZ', 'value' => 'z', 'type' => 'Equals'],
-							['name' => 'TagI', 'value' => 'i', 'type' => 'Equals']
+							['name' => 'TagZ', 'value' => 'z', 'operator' => 'Equals'],
+							['name' => 'TagI', 'value' => 'i', 'operator' => 'Equals']
 						]
 					],
 					'result' => [
 						'Second trigger for tag filtering',
+						'Third trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'operator' => 'Equals']
+						]
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'operator' => 'Contains']
+						]
+					],
+					'result' => [
+						'First trigger for tag filtering',
 						'Third trigger for tag filtering'
 					]
 				]
@@ -147,27 +177,23 @@ class testPageTriggers extends CLegacyWebTest {
 	}
 
 	/**
-	 *
 	 * @dataProvider getTagsFilterData
 	 */
 	public function testPageTriggers_TagsFilter($data) {
 		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid);
-		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->setTags($data['tag_options']);
+		$form = $this->setTags($data['tag_options']['type'], $data['tag_options']['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->checkFilterResults($data);
+		$this->checkTableRows(array_key_exists('result', $data) ? $data['result'] : []);
 	}
 
 	public function testPageTriggers_ResetTagsFilter() {
-		$data = [
-			'result' => [
-				'Fifth trigger for tag filtering (no tags)',
-				'First trigger for tag filtering',
-				'Fourth trigger for tag filtering',
-				'Second trigger for tag filtering',
-				'Third trigger for tag filtering'
-			]
+		$result = [
+			'Fifth trigger for tag filtering (no tags)',
+			'First trigger for tag filtering',
+			'Fourth trigger for tag filtering',
+			'Second trigger for tag filtering',
+			'Third trigger for tag filtering'
 		];
 
 		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid);
@@ -175,12 +201,11 @@ class testPageTriggers extends CLegacyWebTest {
 		$form->getField('Tags')->query('id:filter_tags_0_tag')->one()->fill('Tag1234');
 		$form->submit();
 		$this->page->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertEquals(['No data found.'], $table->getRows()->asText());
+		$this->checkTableRows();
 
 		$form->query('button:Reset')->one()->click();
 		$this->page->waitUntilReady();
-		$this->checkFilterResults($data);
+		$this->checkTableRows($result);
 	}
 
 	public static function getFilterData() {
@@ -331,10 +356,10 @@ class testPageTriggers extends CLegacyWebTest {
 						'With dependencies' =>'Yes',
 					],
 					'tag_options' => [
-						'operator' => 'Or',
+						'type' => 'Or',
 						'tags' => [
-							['name' => 'server', 'value' => 'selenium', 'type' => 'Equals'],
-							['name' => 'Street', 'value' => 'dzelzavas', 'type' => 'Contains']
+							['name' => 'server', 'value' => 'selenium', 'operator' => 'Equals'],
+							['name' => 'Street', 'value' => 'dzelzavas', 'operator' => 'Contains']
 						]
 					],
 					'result' => [
@@ -404,47 +429,12 @@ class testPageTriggers extends CLegacyWebTest {
 		$form->fill($data['filter_options']);
 
 		if (array_key_exists('tag_options', $data)) {
-			$this->setTags($data['tag_options']);
+			$this->setTags($data['tag_options']['type'], $data['tag_options']['tags']);
 		}
 
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->checkFilterResults($data);
-	}
-
-	private function setTags($data) {
-		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$tag_table = $form->getField('Tags');
-
-		$tag_table->getRow(0)->query('class:radio-segmented')->asSegmentedRadio()->one()->select($data['operator']);
-
-		$button = $tag_table->query('button:Add')->one();
-		$last = count($data['tags']) - 1;
-		foreach ($data['tags'] as $i => $tag) {
-			$tag_row = $tag_table->getRow($i+1);
-			$tag_row->getColumn(0)->query('tag:input')->one()->fill($tag['name']);
-			$tag_row->getColumn(1)->query('class:radio-segmented')->asSegmentedRadio()->one()->select($tag['type']);
-			$tag_row->getColumn(2)->query('tag:input')->one()->fill($tag['value']);
-
-			if ($i !== $last) {
-				$button->click();
-			}
-		}
-	}
-
-	private function checkFilterResults($data) {
-		$table = $this->query('class:list-table')->asTable()->one();
-		if (array_key_exists('result', $data)) {
-			foreach ($table->getRows() as $i => $row) {
-				$host_name = $row->getColumn('Name')->query('xpath:./a[not(@class)]')->one()->getText();
-				$this->assertEquals($data['result'][$i], $host_name);
-			}
-			$this->assertEquals(count($data['result']), $table->getRows()->count());
-		}
-		else {
-			// Check that table contain one row with text "No data found."
-			$this->assertEquals(['No data found.'], $table->getRows()->asText());
-		}
+		$this->checkTableRows(array_key_exists('result', $data) ? $data['result'] : []);
 	}
 
 	public static function getHostAndGroupData() {
@@ -565,141 +555,5 @@ class testPageTriggers extends CLegacyWebTest {
 			}
 		}
 		$this->assertEquals(count($data['result']), $table->getRows()->count());
-	}
-
-	public static function getFilterByTagsData() {
-		return [
-			// "And" and "And/Or" checks.
-			[
-				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-							['name'=>'tag', 'operator' => 'Contains', 'value'=>'trigger'],
-							['name'=>'test', 'operator' => 'Contains', 'value'=>'test_tag']
-					],
-					'expected_triggers' => [
-						['testFormTrigger4']
-					],
-					'expected_result_count' => 1
-				]
-			],
-			[
-				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-							['name'=>'tag', 'operator' => 'Contains', 'value'=>'trigger'],
-							['name'=>'test', 'operator' => 'Contains', 'value'=>'test_tag']
-					],
-					'expected_triggers' => [
-						['testFormTrigger4'],
-						['Trigger with tags for cloning'],
-						['Trigger with tags for updating'],
-					],
-					'expected_result_count' => 3
-				]
-			],
-			// "Contains" and "Equals" checks.
-			[
-				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-							['name'=>'tag', 'operator' => 'Contains', 'value'=>'TRIGGER'],
-					],
-					'expected_triggers' => [
-						['testFormTrigger4'],
-						['Trigger with tags for cloning'],
-						['Trigger with tags for updating']
-					],
-					'expected_result_count' => 3
-				]
-			],
-			[
-				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-							['name'=>'tag', 'operator' => 'Equals', 'value'=>'TRIGGER'],
-					],
-					'expected_triggers' => [
-						['testFormTrigger4']
-					],
-					'expected_result_count' => 1
-				]
-			],
-			[
-				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-							['name'=>'action', 'operator' => 'Contains', 'value'=>''],
-					],
-					'expected_triggers' => [
-						['testFormTrigger4'],
-						['Trigger with tags for cloning'],
-						['Trigger with tags for updating']
-					],
-					'expected_result_count' => 3
-				]
-			],
-			[
-				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-							['name'=>'action', 'operator' => 'Equals', 'value'=>''],
-					],
-					'expected_triggers' => [],
-					'expected_result_count' => 0
-				]
-			]
-		];
-	}
-
-	/**
-	 * Test filtering triggers by tags
-	 *
-	 * @dataProvider getFilterByTagsData
-	 *
-	 */
-	public function testPageTriggers_FilterByTags($data) {
-		$hostid_for_filtering = 40001;
-
-		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]='.$hostid_for_filtering);
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		// Reset filter from possible previous scenario.
-		$form->query('button:Reset')->one()->click();
-
-		$tags_filter = $form->getFieldContainer('Tags')->asTable();
-		$tags_filter->query('id:filter_evaltype')->asSegmentedRadio()->one()->select($data['evaluation_type']);
-
-		$button = $tags_filter ->query('button:Add')->one();
-		$last = count($data['tags']) - 1;
-
-		foreach ($data['tags'] as $i => $tag){
-			$row = $tags_filter->getRows()->get($i+1);;
-			$row->query('id:filter_tags_'.$i.'_tag')->one()->type($tag['name']);
-			$row->query('id:filter_tags_'.$i.'_operator')->asSegmentedRadio()->one()->select($tag['operator']);
-			$row->query('id:filter_tags_'.$i.'_value')->one()->type($tag['value']);
-			if ($i !== $last) {
-				$button->click();
-			}
-		}
-		$form->submit();
-		// Check filtered result.
-		$triggers_table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
-		$display_text = $this->query('xpath://div[@class="table-stats"]')->waitUntilVisible()->one()->getText();
-		$this->assertEquals($display_text, 'Displaying '.$data['expected_result_count'].' of '.$data['expected_result_count'].' found');
-
-		if($data['expected_result_count'] === 0){
-				$text = $triggers_table->getRows()->get(0)->getText();
-				$this->assertEquals('No data found.', $text);
-		}
-		else{
-			foreach ($triggers_table->getRows()->asArray() as $i => $row) {
-				$filtered_trigger_names[] =[
-					$triggers_table->getRows()->get($i)->getColumn('Name')->getText()
-				];
-			}
-			$this->assertEquals($data['expected_triggers'], $filtered_trigger_names);
-		}
-		// Reset filter due to not influence further tests.
-		$form->query('button:Reset')->one()->click();
 	}
 }

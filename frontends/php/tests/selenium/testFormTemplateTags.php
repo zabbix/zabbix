@@ -19,11 +19,14 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 
 /**
  * @backup hosts
  */
 class testFormTemplateTags extends CWebTest {
+
+	use TagTrait;
 
 	/**
 	 * The name of the template for cloning in the test data set.
@@ -46,12 +49,30 @@ class testFormTemplateTags extends CWebTest {
 					'expected' => TEST_GOOD,
 					'template_name' => 'Template with tags',
 					'tags' => [
-						['name'=>'!@#$%^&*()_+<>,.\/', 'value'=>'!@#$%^&*()_+<>,.\/'],
-						['name'=>'tag1', 'value'=>'value1'],
-						['name'=>'tag2', 'value'=>''],
-						['name'=>'{$MACRO:A}', 'value'=>'{$MACRO:A}'],
-						['name'=>'{$MACRO}', 'value'=>'{$MACRO}'],
-						['name'=>'Таг', 'value'=>'Значение']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '!@#$%^&*()_+<>,.\/',
+							'value' => '!@#$%^&*()_+<>,.\/'
+						],
+						[
+							'name' => 'tag1',
+							'value' => 'value1'
+						],
+						[
+							'name' => 'tag2'
+						],
+						[
+							'name' => '{$MACRO:A}',
+							'value' => '{$MACRO:A}'
+						],
+						[
+							'name' => '{$MACRO}',
+							'value' => '{$MACRO}'],
+						[
+							'name' => 'Таг',
+							'value' => 'Значение'
+						]
 					]
 				]
 			],
@@ -60,9 +81,16 @@ class testFormTemplateTags extends CWebTest {
 					'expected' => TEST_GOOD,
 					'template_name' => 'Template with equal tag names',
 					'tags' => [
-						['name'=>'tag3', 'value'=>'3'],
-						['name'=>'tag3', 'value'=>'4'],
-
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => 'tag3',
+							'value' => '3'
+						],
+						[
+							'name' => 'tag3',
+							'value' => '4'
+						]
 					]
 				]
 			],
@@ -71,9 +99,16 @@ class testFormTemplateTags extends CWebTest {
 					'expected' => TEST_GOOD,
 					'template_name' => 'Template with equal tag values',
 					'tags' => [
-						['name'=>'tag4', 'value'=>'5'],
-						['name'=>'tag5', 'value'=>'5'],
-
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => 'tag4',
+							'value' => '5'
+						],
+						[
+							'name' => 'tag5',
+							'value' => '5'
+						]
 					]
 				]
 			],
@@ -82,7 +117,11 @@ class testFormTemplateTags extends CWebTest {
 					'expected' => TEST_BAD,
 					'template_name' => 'Template with empty tag name',
 					'tags' => [
-						['name'=>'', 'value'=>'value1']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'value' => 'value1'
+						]
 					],
 					'error'=>'Cannot add template',
 					'error_details'=>'Invalid parameter "/tags/1/tag": cannot be empty.'
@@ -93,8 +132,16 @@ class testFormTemplateTags extends CWebTest {
 					'expected' => TEST_BAD,
 					'template_name' => 'Template with equal tags',
 					'tags' => [
-						['name'=>'tag', 'value'=>'value'],
-						['name'=>'tag', 'value'=>'value']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => 'tag',
+							'value' => 'value'
+						],
+						[
+							'name' => 'tag',
+							'value' => 'value'
+						]
 					],
 					'error'=>'Cannot add template',
 					'error_details'=>'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.'
@@ -117,21 +164,10 @@ class testFormTemplateTags extends CWebTest {
 		$this->query('button:Create template')->waitUntilPresent()->one()->click();
 		$form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
 		$form->getLabel('Template name')->fill($data['template_name']);
-		$groups = $form->getField('Groups')->asMultiselect()->select('Zabbix servers');
+		$form->getField('Groups')->asMultiselect()->select('Zabbix servers');
+
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-		$button = $tags_table ->query('button:Add')->one();
-		$last = count($data['tags']) - 1;
-
-		foreach ($data['tags'] as $count => $tag){
-			$row = $tags_table->getRows()->get($count);
-			$row->getColumn('Name')->query('tag:input')->one()->fill($tag['name']);
-			$row->getColumn('Value')->query('tag:input')->one()->fill($tag['value']);
-			if ($count !== $last) {
-				$button->click();
-			}
-		}
-
+		$this->fillTags($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -140,19 +176,14 @@ class testFormTemplateTags extends CWebTest {
 
 		switch ($data['expected']){
 			case TEST_GOOD:
-				// Check if message is positive.
 				$this->assertTrue($message->isGood());
-				// Check message title.
 				$this->assertEquals('Template added', $message->getTitle());
-				// Check the results in DB.
 				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['template_name'])));
 				// Check the results in form.
-				$this->checkFormFields($data);
+				$this->checkTagFields($data);
 				break;
 			case TEST_BAD:
-				// Check if message is negative.
 				$this->assertTrue($message->isBad());
-				// Check message title.
 				$this->assertEquals($data['error'], $message->getTitle());
 				$this->assertTrue($message->hasLine($data['error_details']));
 				// Check that DB hash is not changed.
@@ -166,9 +197,13 @@ class testFormTemplateTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'template_name' => 'Updated template with empty tag name',
 					'tags' => [
-						['name'=>'', 'value'=>'value1']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '',
+							'value' => 'value1'
+						]
 					],
 					'error'=>'Cannot update template',
 					'error_details'=>'Invalid parameter "/tags/1/tag": cannot be empty.'
@@ -177,26 +212,48 @@ class testFormTemplateTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'template_name' => ' Updated template with equal tags',
 					'tags' => [
-						['name'=>'tag', 'value'=>'value'],
-						['name'=>'tag', 'value'=>'value']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'name' => 'action', 'value' => 'update'
+						]
 					],
 					'error'=>'Cannot update template',
-					'error_details'=>'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.'
+					'error_details'=>'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
-					'template_name' => 'Updated template with tags',
 					'tags' => [
-						['name'=>'!@#$%^&*()_+<>,.\/', 'value'=>'!@#$%^&*()_+<>,.\/'],
-						['name'=>'tag1', 'value'=>'value1'],
-						['name'=>'tag2', 'value'=>''],
-						['name'=>'{$MACRO:A}', 'value'=>'{$MACRO:A}'],
-						['name'=>'{$MACRO}', 'value'=>'{$MACRO}'],
-						['name'=>'Таг', 'value'=>'Значение']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '!@#$%^&*()_+<>,.\/',
+							'value' => '!@#$%^&*()_+<>,.\/'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'name' => 'tag1',
+							'value' => 'value1'
+						],
+						[
+							'name' => 'tag2'
+						],
+						[
+							'name' => '{$MACRO:A}',
+							'value' => '{$MACRO:A}'
+						],
+						[
+							'name' => '{$MACRO}',
+							'value' => '{$MACRO}'
+						],
+						[
+							'name' => 'Таг',
+							'value' => 'Значение'
+						]
 					]
 				]
 			]
@@ -212,27 +269,14 @@ class testFormTemplateTags extends CWebTest {
 	public function testFormTemplateTags_Update($data) {
 		$sql_hosts = "SELECT * FROM hosts ORDER BY hostid";
 		$old_hash = CDBHelper::getHash($sql_hosts);
+		$data['template_name'] = $this->update_template;
 
 		$this->page->login()->open('templates.php');
 		$this->query('link:'.$this->update_template)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
 
-		$form->getField('Template name')->clear()->type($data['template_name']);
-
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-
-		$button = $tags_table ->query('button:Add')->one();
-		$last = count($data['tags']) - 1;
-
-		foreach ($data['tags'] as $count => $tag){
-			$row = $tags_table->getRows()->get($count);
-			$row->getColumn('Name')->query('tag:input')->one()->clear()->fill($tag['name']);
-			$row->getColumn('Value')->query('tag:input')->one()->clear()->fill($tag['value']);
-			if ($count !== $last) {
-				$button->click();
-			}
-		}
+		$this->fillTags($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -241,15 +285,11 @@ class testFormTemplateTags extends CWebTest {
 
 		switch ($data['expected']){
 			case TEST_GOOD:
-				// Check if message is positive.
 				$this->assertTrue($message->isGood());
-				// Check message title.
 				$this->assertEquals('Template updated', $message->getTitle());
-				// Check the results in DB.
-				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->update_template)));
 				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['template_name'])));
 				// Check the results in form.
-				$this->checkFormFields($data);
+				$this->checkTagFields($data);
 				break;
 			case TEST_BAD:
 				// Check if message is negative.
@@ -275,34 +315,23 @@ class testFormTemplateTags extends CWebTest {
 	 * Test cloning of template with tags
 	 */
 	private function executeCloning($action) {
+		$new_name = 'Template with tags for cloning - '.$action;
+
 		$this->page->login()->open('templates.php?groupid=4');
 		$this->query('link:'.$this->clone_template)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
+		$form->getField('Template name')->fill($new_name);
 
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-
-		$tags = [];
-		foreach ($tags_table->getRows()->slice(0, -1) as $row) {
-			$tags[] = [
-				'name' => $row->getColumn('Name')->children()->one()->getAttribute('value'),
-				'value' => $row->getColumn('Value')->children()->one()->getAttribute('value')
-			];
-		}
-		$form->selectTab('Template');
+		$tags = $this->getTags();
 
 		$this->query('button:'.$action)->one()->click();
 
-		$new_name = 'Template with tags for cloning - '.$action;
-		$form->getField('Template name')->clear()->type($new_name);
-
 		$form->submit();
 		$this->page->waitUntilReady();
-		// Get global message.
+
 		$message = CMessageElement::find()->one();
-		// Check if message is positive.
 		$this->assertTrue($message->isGood());
-		// Check message title.
 		$this->assertEquals('Template added', $message->getTitle());
 		// Check the results in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_template)));
@@ -310,35 +339,19 @@ class testFormTemplateTags extends CWebTest {
 
 		// Check created clone.
 		$this->query('link:'.$new_name)->one()->click();
-		$form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
+		$form->invalidate();
 		$name = $form->getField('Template name')->getAttribute('value');
-		$this->assertEquals($name, $new_name);
+		$this->assertEquals($new_name, $name);
 
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-
-		foreach ($tags_table->getRows()->slice(0, -1) as $i => $row) { // Slice rows to cut off Add button.
-			$this->assertEquals($tags[$i], [
-				'name' => $row->getColumn('Name')->children()->one()->getAttribute('value'),
-				'value' => $row->getColumn('Value')->children()->one()->getAttribute('value')
-			]);
-		}
+		$this->assertTags($tags);
 	}
 
-	private function checkFormFields($data) {
+	private function checkTagFields($data) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['template_name']));
 		$this->page->open('templates.php?form=update&templateid='.$id.'&groupid=4');
 		$form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');
-
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-
-		foreach ($data['tags'] as $i => $tag) {
-			$row = $tags_table->getRows()->get($i);
-			$tag_name = $row->getColumn('Name')->query('tag:input')->one()->getAttribute('value');
-			$this->assertEquals($tag['name'], $tag_name);
-			$tag_value = $row->getColumn('Value')->query('tag:input')->one()->getAttribute('value');
-			$this->assertEquals($tag['value'], $tag_value);
-		}
+		$this->assertTags($data['tags']);
 	}
 }

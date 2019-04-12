@@ -19,11 +19,15 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 
 /**
  * @backup triggers
  */
 class testFormTriggerTags extends CWebTest {
+
+	use TagTrait;
+
 	/**
 	 * The name of the host for creating the trigger.
 	 *
@@ -53,12 +57,30 @@ class testFormTriggerTags extends CWebTest {
 					'trigger_name' => 'Trigger with tags',
 					'expression' => '{Simple form test host:test-item-reuse.last()}=0',
 					'tags' => [
-						['name'=>'!@#$%^&*()_+<>,.\/', 'value'=>'!@#$%^&*()_+<>,.\/'],
-						['name'=>'tag1', 'value'=>'value1'],
-						['name'=>'tag2', 'value'=>''],
-						['name'=>'{$MACRO:A}', 'value'=>'{$MACRO:A}'],
-						['name'=>'{$MACRO}', 'value'=>'{$MACRO}'],
-						['name'=>'Таг', 'value'=>'Значение']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '!@#$%^&*()_+<>,.\/',
+							'value' => '!@#$%^&*()_+<>,.\/'
+						],
+						[
+							'name' => 'tag1',
+							'value' => 'value1'
+						],
+						[
+							'name' => 'tag2'
+						],
+						[
+							'name' => '{$MACRO:A}',
+							'value' => '{$MACRO:A}'
+						],
+						[
+							'name' => '{$MACRO}',
+							'value' => '{$MACRO}'],
+						[
+							'name' => 'Таг',
+							'value' => 'Значение'
+						]
 					]
 				]
 			],
@@ -68,9 +90,16 @@ class testFormTriggerTags extends CWebTest {
 					'trigger_name' => 'Trigger with equal tag names',
 					'expression' => '{Simple form test host:test-item-reuse.last()}=0',
 					'tags' => [
-						['name'=>'tag3', 'value'=>'3'],
-						['name'=>'tag3', 'value'=>'4'],
-
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => 'tag3',
+							'value' => '3'
+						],
+						[
+							'name' => 'tag3',
+							'value' => '4'
+						]
 					]
 				]
 			],
@@ -80,9 +109,16 @@ class testFormTriggerTags extends CWebTest {
 					'trigger_name' => 'Trigger with equal tag values',
 					'expression' => '{Simple form test host:test-item-reuse.last()}=0',
 					'tags' => [
-						['name'=>'tag4', 'value'=>'5'],
-						['name'=>'tag5', 'value'=>'5'],
-
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => 'tag4',
+							'value' => '5'
+						],
+						[
+							'name' => 'tag5',
+							'value' => '5'
+						]
 					]
 				]
 			],
@@ -92,7 +128,11 @@ class testFormTriggerTags extends CWebTest {
 					'trigger_name' => 'Trigger with empty tag name',
 					'expression' => '{Simple form test host:test-item-reuse.last()}=0',
 					'tags' => [
-						['name'=>'', 'value'=>'value1']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'value' => 'value1'
+						]
 					],
 					'error'=>'Cannot add trigger',
 					'error_details'=>'Incorrect value for field "tag": cannot be empty.'
@@ -104,8 +144,16 @@ class testFormTriggerTags extends CWebTest {
 					'trigger_name' => 'Trigger with equal tags',
 					'expression' => '{Simple form test host:test-item-reuse.last()}=0',
 					'tags' => [
-						['name'=>'tag', 'value'=>'value'],
-						['name'=>'tag', 'value'=>'value']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => 'tag',
+							'value' => 'value'
+						],
+						[
+							'name' => 'tag',
+							'value' => 'value'
+						]
 					],
 					'error'=>'Cannot add trigger',
 					'error_details'=>'Tag "tag" with value "value" already exists.'
@@ -115,7 +163,7 @@ class testFormTriggerTags extends CWebTest {
 	}
 
 	/**
-	 * Test creating of trigger with tags
+	 * Test creating of trigger with tags.
 	 *
 	 * @dataProvider getCreateData
 	 *
@@ -134,20 +182,7 @@ class testFormTriggerTags extends CWebTest {
 		$form->getLabel('Expression')->fill($data['expression']);
 
 		$form->selectTab('Tags');
-
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-		$button = $tags_table ->query('button:Add')->one();
-		$last = count($data['tags']) - 1;
-
-		foreach ($data['tags'] as $count => $tag){
-			$row = $tags_table->getRows()->get($count);
-			$row->getColumn('Name')->query('tag:input')->one()->fill($tag['name']);
-			$row->getColumn('Value')->query('tag:input')->one()->fill($tag['value']);
-			if ($count !== $last) {
-				$button->click();
-			}
-		}
-
+		$this->fillTags($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -156,19 +191,14 @@ class testFormTriggerTags extends CWebTest {
 
 		switch ($data['expected']){
 			case TEST_GOOD:
-				// Check if message is positive.
 				$this->assertTrue($message->isGood());
-				// Check message title.
 				$this->assertEquals('Trigger added', $message->getTitle());
-				// Check the results in DB.
 				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['trigger_name'])));
 				// Check the results in form.
-				$this->checkFormFields($data);
+				$this->checkTagFields($data);
 				break;
 			case TEST_BAD:
-				// Check if message is negative.
 				$this->assertTrue($message->isBad());
-				// Check message title.
 				$this->assertEquals($data['error'], $message->getTitle());
 				$this->assertTrue($message->hasLine($data['error_details']));
 				// Check that DB hash is not changed.
@@ -182,9 +212,13 @@ class testFormTriggerTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'trigger_name' => 'Updated trigger with empty tag name',
 					'tags' => [
-						['name'=>'', 'value'=>'value1']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '',
+							'value' => 'value1'
+						]
 					],
 					'error'=>'Cannot update trigger',
 					'error_details'=>'Incorrect value for field "tag": cannot be empty.'
@@ -193,26 +227,48 @@ class testFormTriggerTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'trigger_name' => ' Updated trigger with equal tags',
 					'tags' => [
-						['name'=>'tag', 'value'=>'value'],
-						['name'=>'tag', 'value'=>'value']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'name' => 'action', 'value' => 'update'
+						]
 					],
 					'error'=>'Cannot update trigger',
-					'error_details'=>'Tag "tag" with value "value" already exists.'
+					'error_details'=>'Tag "action" with value "update" already exists.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
-					'trigger_name' => 'Updated trigger with tags',
 					'tags' => [
-						['name'=>'!@#$%^&*()_+<>,.\/', 'value'=>'!@#$%^&*()_+<>,.\/'],
-						['name'=>'tag1', 'value'=>'value1'],
-						['name'=>'tag2', 'value'=>''],
-						['name'=>'{$MACRO:A}', 'value'=>'{$MACRO:A}'],
-						['name'=>'{$MACRO}', 'value'=>'{$MACRO}'],
-						['name'=>'Таг', 'value'=>'Значение']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '!@#$%^&*()_+<>,.\/',
+							'value' => '!@#$%^&*()_+<>,.\/'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'name' => 'tag1',
+							'value' => 'value1'
+						],
+						[
+							'name' => 'tag2'
+						],
+						[
+							'name' => '{$MACRO:A}',
+							'value' => '{$MACRO:A}'
+						],
+						[
+							'name' => '{$MACRO}',
+							'value' => '{$MACRO}'
+						],
+						[
+							'name' => 'Таг',
+							'value' => 'Значение'
+						]
 					]
 				]
 			]
@@ -220,7 +276,7 @@ class testFormTriggerTags extends CWebTest {
 	}
 
 	/**
-	 * Test update of trigger with tags
+	 * Test update of trigger with tags.
 	 *
 	 * @dataProvider getUpdateData
 	 *
@@ -228,6 +284,7 @@ class testFormTriggerTags extends CWebTest {
 	public function testFormTriggerTags_Update($data) {
 		$sql_triggers = "SELECT * FROM triggers ORDER BY triggerid";
 		$old_hash = CDBHelper::getHash($sql_triggers);
+		$data['trigger_name'] = 'Trigger with tags for updating';
 
 		$this->page->login()->open('hosts.php?groupid=4');
 		$this->query('link:'.$this->host)->waitUntilPresent()->one()->click();
@@ -235,22 +292,8 @@ class testFormTriggerTags extends CWebTest {
 		$this->query('link:'.$this->update_trigger)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 
-		$form->getField('Name')->clear()->type($data['trigger_name']);
-
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-
-		$button = $tags_table ->query('button:Add')->one();
-		$last = count($data['tags']) - 1;
-
-		foreach ($data['tags'] as $count => $tag){
-			$row = $tags_table->getRows()->get($count);
-			$row->getColumn('Name')->query('tag:input')->one()->clear()->fill($tag['name']);
-			$row->getColumn('Value')->query('tag:input')->one()->clear()->fill($tag['value']);
-			if ($count !== $last) {
-				$button->click();
-			}
-		}
+		$this->fillTags($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -259,20 +302,14 @@ class testFormTriggerTags extends CWebTest {
 
 		switch ($data['expected']){
 			case TEST_GOOD:
-				// Check if message is positive.
 				$this->assertTrue($message->isGood());
-				// Check message title.
 				$this->assertEquals('Trigger updated', $message->getTitle());
-				// Check the results in DB.
-				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM triggers WHERE description='.zbx_dbstr($this->update_trigger)));
 				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['trigger_name'])));
 				// Check the results in form.
-				$this->checkFormFields($data);
+				$this->checkTagFields($data);
 				break;
 			case TEST_BAD:
-				// Check if message is negative.
 				$this->assertTrue($message->isBad());
-				// Check message title.
 				$this->assertEquals($data['error'], $message->getTitle());
 				$this->assertTrue($message->hasLine($data['error_details']));
 				// Check that DB hash is not changed.
@@ -282,37 +319,27 @@ class testFormTriggerTags extends CWebTest {
 	}
 
 	/**
-	 * Test cloning of trigger with tags
+	 * Test cloning of trigger with tags.
 	 */
 	public function testFormTriggerTags_Clone() {
+		$new_name = 'Trigger with tags for cloning - Clone';
+
 		$this->page->login()->open('hosts.php?groupid=4');
 		$this->query('link:'.$this->host)->waitUntilPresent()->one()->click();
 		$this->query('link:Triggers')->waitUntilPresent()->one()->click();
 		$this->query('link:'.$this->clone_trigger)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 
-		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-
-		$tags = [];
-		foreach ($tags_table->getRows()->slice(0, -1) as $row) {
-			$tags[] = [
-				'name' => $row->getColumn('Name')->children()->one()->getAttribute('value'),
-				'value' => $row->getColumn('Value')->children()->one()->getAttribute('value')
-			];
-		}
-		$form->selectTab('Trigger');
-		$this->query('button:Clone')->one()->click();
-		$new_name = 'Trigger with tags for cloning - Clone';
 		$form->getField('Name')->clear()->type($new_name);
-
+		$form->selectTab('Tags');
+		$tags = $this->getTags();
+		$this->query('button:Clone')->one()->click();
 		$form->submit();
 		$this->page->waitUntilReady();
+
 		// Get global message.
 		$message = CMessageElement::find()->one();
-		// Check if message is positive.
 		$this->assertTrue($message->isGood());
-		// Check message title.
 		$this->assertEquals('Trigger added', $message->getTitle());
 		// Check the results in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM triggers WHERE description='.zbx_dbstr($this->clone_trigger)));
@@ -320,35 +347,19 @@ class testFormTriggerTags extends CWebTest {
 
 		// Check created clone.
 		$this->query('link:'.$new_name)->one()->click();
-		$form = $this->query('name:triggersForm')->asForm()->one();
+		$form->invalidate();
 		$name = $form->getField('Name')->getAttribute('value');
-		$this->assertEquals($name, $new_name);
+		$this->assertEquals($new_name, $name);
 
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-
-		foreach ($tags_table->getRows()->slice(0, -1) as $i => $row) {
-			$this->assertEquals($tags[$i], [
-				'name' => $row->getColumn('Name')->children()->one()->getAttribute('value'),
-				'value' => $row->getColumn('Value')->children()->one()->getAttribute('value')
-			]);
-		}
+		$this->assertTags($tags);
 	}
 
-	private function checkFormFields($data) {
+	private function checkTagFields($data) {
 		$id = CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr($data['trigger_name']));
 		$this->page->open('triggers.php?form=update&triggerid='.$id.'&groupid=0');
 		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');
-
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-
-		foreach ($data['tags'] as $i => $tag) {
-			$row = $tags_table->getRows()->get($i);
-			$tag_name = $row->getColumn('Name')->query('tag:input')->one()->getAttribute('value');
-			$this->assertEquals($tag['name'], $tag_name);
-			$tag_value = $row->getColumn('Value')->query('tag:input')->one()->getAttribute('value');
-			$this->assertEquals($tag['value'], $tag_value);
-		}
+		$this->assertTags($data['tags']);
 	}
 }
