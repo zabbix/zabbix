@@ -184,10 +184,8 @@ var CViewSwitcher = Class.create({
 				break;
 			case 'img':
 			case 'div':
-				obj.style.display = '';
-				break;
 			case 'li':
-				obj.removeClassName('hidden');
+				obj.style.display = '';
 				break;
 			default:
 				obj.style.display = 'inline';
@@ -209,12 +207,7 @@ var CViewSwitcher = Class.create({
 			return true;
 		}
 		this.disableObj($(data.id), true);
-		if ($(data.id).tagName.toLowerCase() === 'li') {
-			$(data.id).className = 'hidden';
-		}
-		else {
-			$(data.id).style.display = 'none';
-		}
+		$(data.id).style.display = 'none';
 	},
 
 	showObj: function(data) {
