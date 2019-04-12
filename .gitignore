@@ -404,6 +404,7 @@ tests/libs/zbxcomms/.deps
 tests/libs/zbxcomms/Makefile
 tests/libs/zbxcomms/Makefile.in
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers
+tests/libs/zbxcomms/zbx_tcp_check_allowed_peers_ipv4
 tests/libs/zbxcommshigh/.deps
 tests/libs/zbxcommshigh/Makefile
 tests/libs/zbxcommshigh/Makefile.in
