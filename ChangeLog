@@ -11,6 +11,7 @@ Bug fixes:
 Changes for 4.2.1rc1
 
 New features:
+..F....... [ZBXNEXT-5144] increased socket response size limit (vasilijs)
 
 Bug fixes:
 A.F....... [ZBX-15464] fixed error message for image uploads (talbergs)

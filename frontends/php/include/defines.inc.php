@@ -1183,8 +1183,8 @@ define('IPMI_PRIVILEGE_OEM',		5);
 define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
-define('ZBX_SOCKET_TIMEOUT',        3);            // socket timeout limit
-define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE); // socket response size limit
+define('ZBX_SOCKET_TIMEOUT',        3);                 // socket timeout limit
+define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE * 16); // socket response size limit
 
 // value is also used in servercheck.js file
 define('SERVER_CHECK_INTERVAL', 10);
