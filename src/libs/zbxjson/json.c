@@ -20,7 +20,6 @@
 #include "common.h"
 #include "zbxjson.h"
 #include "json_parser.h"
-#include "json.h"
 
 /******************************************************************************
  *                                                                            *
@@ -35,6 +34,7 @@
  ******************************************************************************/
 #define ZBX_JSON_MAX_STRERROR	255
 
+int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type);
 static char	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR];
 
 const char	*zbx_json_strerror(void)
