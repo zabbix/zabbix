@@ -1,7 +1,8 @@
 if IPV6
-IPV6_tests = zbx_tcp_check_allowed_peers
-
-noinst_PROGRAMS = $(IPV6_tests)
+noinst_PROGRAMS = zbx_tcp_check_allowed_peers
+else
+noinst_PROGRAMS = zbx_tcp_check_allowed_peers_ipv4
+endif
 
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
@@ -35,7 +36,7 @@ COMMON_LIB_FILES = \
 
 COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests
 
-
+if IPV6
 zbx_tcp_check_allowed_peers_SOURCES = \
 	zbx_tcp_check_allowed_peers.c \
 	$(COMMON_SRC_FILES)
@@ -48,5 +49,18 @@ zbx_tcp_check_allowed_peers_LDADD += @AGENT_LIBS@
 zbx_tcp_check_allowed_peers_LDFLAGS = @AGENT_LDFLAGS@
 
 zbx_tcp_check_allowed_peers_CFLAGS = $(COMMON_COMPILER_FLAGS)
+else
+zbx_tcp_check_allowed_peers_ipv4_SOURCES = \
+	zbx_tcp_check_allowed_peers_ipv4.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tcp_check_allowed_peers_ipv4_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_tcp_check_allowed_peers_ipv4_LDADD += @AGENT_LIBS@
+
+zbx_tcp_check_allowed_peers_ipv4_LDFLAGS = @AGENT_LDFLAGS@
+
+zbx_tcp_check_allowed_peers_ipv4_CFLAGS = $(COMMON_COMPILER_FLAGS)
 endif
 
