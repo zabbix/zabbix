@@ -35,7 +35,7 @@ trait PreprocessingTrait {
 			[
 				'name'		=> 'type',
 				'selector'	=> 'xpath:.//select[contains(@id, "_type")]',
-				'class'		=> CDropdownElement::class,
+				'class'		=> 'CDropdownElement',
 				'value'		=> ['getText']
 			],
 			[
@@ -56,13 +56,13 @@ trait PreprocessingTrait {
 			[
 				'name'		=> 'on_fail',
 				'selector'	=> 'xpath:.//input[contains(@id, "_on_fail")]',
-				'class'		=> CCheckboxElement::class,
+				'class'		=> 'CCheckboxElement',
 				'value'		=> ['isChecked']
 			],
 			[
 				'name'		=> 'error_handler',
 				'selector'	=> 'xpath:.//ul[contains(@id, "_error_handler")]',
-				'class'		=> CSegmentedRadioElement::class,
+				'class'		=> 'CSegmentedRadioElement',
 				'value'		=> ['getText']
 			],
 			[
