@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10243] fixed not encoded ampersand for in URL parameter (talbergs)
 ...G...... [ZBX-15972] fixed possible crash of the windows agent when used "net.dns" item key (MVekslers)
 ..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
 .......PS. [ZBX-15970] fixed invalid update intervals being reported on Zabbix server when monitored through Zabbix proxy (vso)
@@ -324,6 +325,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10243] fixed not encoded ampersand for in URL parameter (talbergs)
 ...G...... [ZBX-15972] fixed possible crash of the windows agent when used "net.dns" item key (MVekslers)
 ..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
 .......PS. [ZBX-15970] fixed invalid update intervals being reported on Zabbix server when monitored through Zabbix proxy (vso)
