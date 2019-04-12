@@ -3,6 +3,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-15972] fixed possible crash of the windows agent when used "net.dns" item key (MVekslers)
 ..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
 .......PS. [ZBX-15970] fixed invalid update intervals being reported on Zabbix server when monitored through Zabbix proxy (vso)
 ........S. [ZBX-15643] fixed invalid to valid numbers conversion by del_zeros (asestakovs)
@@ -323,6 +324,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-15972] fixed possible crash of the windows agent when used "net.dns" item key (MVekslers)
 ..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
 .......PS. [ZBX-15970] fixed invalid update intervals being reported on Zabbix server when monitored through Zabbix proxy (vso)
 ........S. [ZBX-15643] fixed invalid to valid numbers conversion by del_zeros (asestakovs)
