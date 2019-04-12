@@ -23,7 +23,6 @@
 #include "log.h"
 #include "stats.h"
 #include "proc.h"
-#include "../../../zabbix_agent/procstat.h"
 
 extern int	CONFIG_TIMEOUT;
 
