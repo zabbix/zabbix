@@ -13,6 +13,7 @@ Changes for 4.2.1rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-15464] fixed error message for image uploads (talbergs)
 ..F....... [ZBX-10243] fixed not encoded ampersand for in URL parameter (talbergs)
 ...G...... [ZBX-15972] fixed possible crash of the windows agent when used "net.dns" item key (MVekslers)
 ..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
@@ -335,6 +336,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-15464] fixed error message for image uploads (talbergs)
 ..F....... [ZBX-10243] fixed not encoded ampersand for in URL parameter (talbergs)
 ...G...... [ZBX-15972] fixed possible crash of the windows agent when used "net.dns" item key (MVekslers)
 ..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
