@@ -53,10 +53,7 @@ $pageHeader
 		'var PHP_TZ_OFFSET = '.date('Z').','.
 			'PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";'
 	)
-	->addJsFile((new CUrl('js/browsers.js'))
-		->setArgument('ver', ZABBIX_VERSION)
-		->getUrl()
-	)
+	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('lang', $data['user']['lang'])
 		->setArgument('ver', ZABBIX_VERSION)

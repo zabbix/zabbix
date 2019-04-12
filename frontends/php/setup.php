@@ -100,10 +100,7 @@ if (!CWebUser::$data) {
 // page title
 (new CPageHeader(_('Installation')))
 	->addCssFile('styles/'.CHtml::encode($theme).'.css')
-	->addJsFile((new CUrl('js/browsers.js'))
-		->setArgument('ver', ZABBIX_VERSION)
-		->getUrl()
-	)
+	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)
 		->setArgument('lang', CWebUser::$data['lang'])
