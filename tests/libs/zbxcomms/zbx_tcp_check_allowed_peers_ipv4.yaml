@@ -49,7 +49,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Compare only first 3 octets where first one mismatch
+test case: Compare only the first 3 octets where the first one does not match
 in:
   allowed_peers: '127.0.0.1/24'
   peer: '128.0.0.1'

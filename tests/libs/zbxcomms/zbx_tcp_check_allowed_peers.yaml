@@ -194,7 +194,7 @@ in:
 out:
   return: FAIL
 ---
-# Eexpected is IPv6 but connected is IPv4, Mirror of the Eexpected is IPv4 but connected is IPv6
+# Expected is IPv6 but connected is IPv4 (mirror of the previous test "Expected is IPv4 but connected is IPv6")
 test case: IPv4 compatible peer is connected
 in:
   allowed_peers: '::127.2.0.1'
@@ -267,7 +267,7 @@ in:
 out:
   return: FAIL
 ---
-test case: IPv4 peer does not match IPv4
+test case: IPv4 peer does not match IPv6
 in:
   allowed_peers: '2001:0db8:0000:0000:0000:ff00:0042:8329'
   peer: '127.0.0.1'
@@ -299,7 +299,7 @@ in:
 out:
   return: FAIL
 ---
-test case: IPv4 local ip mismatch IPv6 local IP
+test case: IPv4 local IP mismatch IPv6 local IP
 in:
   allowed_peers: '::1'
   peer: '127.0.0.1'
@@ -307,7 +307,7 @@ in:
 out:
   return: FAIL
 ---
-test case: IPv6 local IP expected, but IPv4 local IP expanded connected
+test case: IPv6 local expanded IP expected, but IPv4 local IP connected
 in:
   allowed_peers: '0:0:0:0:0:0:0:0001'
   peer: '127.0.0.1'
@@ -372,7 +372,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Compare only first 3 octets where first one mismatch
+test case: Compare only the first 3 octets where the first one does not match
 in:
   allowed_peers: '127.0.0.1/24'
   peer: '128.0.0.1'
@@ -380,7 +380,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Compare only first 96 bits where first mismatch
+test case: Compare only the first 96 bits where the first one does not match
 in:
   allowed_peers: '0:0:0:0:0:0:ffff:ffff/96'
   peer: '1:0:0:0:0:0:0:0001'
@@ -420,7 +420,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Any IPv6 2
+test case: Any IPv6 allows also any IPv4
 in:
   allowed_peers: '1000:0000:0000:0000:0000:0000:FFFF:FFFF/0'
   peer: '127.0.0.1'
