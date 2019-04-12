@@ -655,7 +655,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 						ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC, ZBX_PREPROC_VALIDATE_RANGE,
 						ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON,
 						ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_VALUE,
-						ZBX_PREPROC_THROTTLE_TIMED_VALUE
+						ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON
 					]);
 					$this->assertEquals($options['type'], $dbType);
 
@@ -789,7 +789,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 				case 'Matches regular expression':
 				case 'Does not match regular expression':
 					$this->zbxTestIsEnabled('//input[@id="preprocessing_'.$step_count.'_on_fail"][@type="checkbox"]');
-					$this->zbxTestClickWait('preprocessing_'.$step_count.'_on_fail');
+					$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_on_fail"]');
 
 					switch ($action) {
 						case 'set_value':
@@ -997,7 +997,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 
 		foreach ($preprocessing as $step_count => $options) {
 			$this->selectTypeAndfillParameters($step_count, $options);
-			$this->zbxTestClickWait('preprocessing_'.$step_count.'_on_fail');
+			$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_on_fail"]');
 
 			foreach ($data['custom_on_fail'] as $error_type) {
 				switch ($error_type['option']) {
@@ -1056,6 +1056,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 	 */
 	private function selectTypeAndfillParameters($step, $options) {
 		$this->zbxTestClickWait('param_add');
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('preprocessing_'.$step.'_type'));
 		$this->zbxTestDropdownSelect('preprocessing_'.$step.'_type', $options['type']);
 
 		if (array_key_exists('parameter_1', $options) && array_key_exists('parameter_2', $options)) {

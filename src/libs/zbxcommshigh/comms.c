@@ -46,13 +46,11 @@
 int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
 		int timeout)
 {
-	const char	*__function_name = "zbx_send_response";
-
 	struct zbx_json	json;
 	const char	*resp;
 	int		ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -66,7 +64,7 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 	if (NULL != version)
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_VERSION, version, ZBX_JSON_TYPE_STRING);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __function_name, json.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __func__, json.buffer);
 
 	if (FAIL == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), protocol, timeout)))
 	{
@@ -76,7 +74,7 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 
 	zbx_json_free(&json);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -111,13 +109,11 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
  ******************************************************************************/
 int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error)
 {
-	const char		*__function_name = "zbx_recv_response";
-
 	struct zbx_json_parse	jp;
 	char			value[16];
 	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != zbx_tcp_recv_to(sock, timeout))
 	{
@@ -127,7 +123,7 @@ int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error)
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __function_name, sock->buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __func__, sock->buffer);
 
 	/* deal with empty string here because zbx_json_open() does not produce an error message in this case */
 	if ('\0' == *sock->buffer)
@@ -163,7 +159,7 @@ int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

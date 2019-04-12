@@ -208,8 +208,6 @@ static void	http_output_json(unsigned char retrieve_mode, char **buffer, zbx_htt
 
 int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 {
-	const char		*__function_name = "get_value_http";
-
 	CURL			*easyhandle;
 	CURLcode		err;
 	char			url[ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *error = NULL, *headers, *line, *buffer;
@@ -223,7 +221,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	char			application_xml[] = {"Content-Type: application/xml"};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request method '%s' URL '%s%s' headers '%s' message body '%s'",
-			__function_name, zbx_request_string(item->request_method), item->url, item->query_fields,
+			__func__, zbx_request_string(item->request_method), item->url, item->query_fields,
 			item->headers, item->posts);
 
 	if (NULL == (easyhandle = curl_easy_init()))
@@ -471,7 +469,7 @@ clean:
 	curl_easy_cleanup(easyhandle);
 	zbx_free(body.data);
 	zbx_free(header.data);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

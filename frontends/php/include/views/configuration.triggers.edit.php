@@ -597,6 +597,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						'srcfld1' => 'triggerid',
 						'reference' => 'deptrigger',
 						'hostid' => $data['hostid'],
+						'groupid' => $data['groupid'],
 						'multiselect' => '1',
 						'with_triggers' => '1',
 						'noempty' => '1'

@@ -26,10 +26,9 @@
 
 static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 {
-	const char	*__function_name = "write_gsm";
-	int		i, wlen, len, ret = SUCCEED;
+	int	i, wlen, len, ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s'", __function_name, str);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s'", __func__, str);
 
 	len = strlen(str);
 
@@ -51,7 +50,7 @@ static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -59,11 +58,10 @@ static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char *expect, char *error,
 		int max_error_len)
 {
-	const char	*__function_name = "check_modem_result";
-	char		rcv[0xff];
-	int		i, len, ret = SUCCEED;
+	char	rcv[0xff];
+	int	i, len, ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_strlcpy(rcv, *sbuf, sizeof(rcv));
 
@@ -92,7 +90,7 @@ static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char
 	if (FAIL == ret && NULL != error)
 		zbx_snprintf(error, max_error_len, "Expected [%s] received [%s]", expect, rcv);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -101,13 +99,12 @@ static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char
 
 static int	read_gsm(int fd, const char *expect, char *error, int max_error_len, int timeout_sec)
 {
-	const char	*__function_name = "read_gsm";
 	static char	buffer[0xff], *ebuf = buffer, *sbuf = buffer;
 	fd_set		fdset;
 	struct timeval  tv;
 	int		i, nbytes, nbytes_total, rc, ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s] [%s] [%s] [%s]", __function_name, expect,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s] [%s] [%s] [%s]", __func__, expect,
 			ebuf != buffer ? buffer : "NULL", ebuf != buffer ? ebuf : "NULL", ebuf != buffer ? sbuf : "NULL");
 
 	if ('\0' != *expect && ebuf != buffer &&
@@ -200,7 +197,7 @@ check_result:
 
 	ret = check_modem_result(buffer, &ebuf, &sbuf, expect, error, max_error_len);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -215,7 +212,6 @@ zbx_sms_scenario;
 
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len)
 {
-	const char	*__function_name = "send_sms";
 #define	ZBX_AT_ESC	"\x1B"
 #define ZBX_AT_CTRL_Z	"\x1A"
 
@@ -239,7 +235,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	struct termios		options, old_options;
 	int			f, ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (-1 == (f = open(device, O_RDWR | O_NOCTTY | O_NDELAY)))
 	{
@@ -304,7 +300,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	tcsetattr(f, TCSANOW, &old_options);
 	close(f);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

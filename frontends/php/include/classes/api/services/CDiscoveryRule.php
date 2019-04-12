@@ -37,7 +37,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	public static $supported_preprocessing_types = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
 		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-		ZBX_PREPROC_SCRIPT
+		ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON
 	];
 
 	public function __construct() {
@@ -338,11 +338,12 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 
 			// Option 'Convert to JSON' is not supported for discovery rule.
-			unset($item['output_format']);
+			unset($item['itemid'], $item['output_format']);
 		}
 		unset($item);
 
 		$this->validateCreateLLDMacroPaths($items);
+		$this->validateDependentItems($items);
 		$this->createReal($items);
 		$this->inherit($items);
 
@@ -360,7 +361,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$db_items = $this->get([
-			'output' => ['itemid', 'name', 'type', 'authtype', 'allow_traps', 'retrieve_mode'],
+			'output' => ['itemid', 'name', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'preservekeys' => true
@@ -369,7 +370,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->checkInput($items, true, $db_items);
 		$this->validateUpdateLLDMacroPaths($items);
 
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type']);
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type', 'master_itemid']);
+		$this->validateDependentItems($items);
 
 		$defaults = DB::getDefaults('items');
 		$clean = [
@@ -608,8 +610,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * the user doesn't have the necessary permissions.
 	 *
 	 * @param array $data
-	 * @param array $data['discoveryruleids']	An array of item ids to be cloned
-	 * @param array $data['hostids']			An array of host ids were the items should be cloned to
+	 * @param array $data['discoveryids']  An array of item ids to be cloned.
+	 * @param array $data['hostids']       An array of host ids were the items should be cloned to.
 	 *
 	 * @return bool
 	 */
@@ -942,8 +944,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->createItemPreprocessing($items);
 	}
 
-	protected function updateReal($items) {
-		$items = zbx_toArray($items);
+	protected function updateReal(array $items) {
+		CArrayHelper::sort($items, ['itemid']);
 
 		$ruleIds = zbx_objectValues($items, 'itemid');
 
@@ -1175,12 +1177,6 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
-
-			if (array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_DEPENDENT) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-					ITEM_TYPE_DEPENDENT, 'type'
-				));
-			}
 
 			// unset fields that are updated using the 'filter' parameter
 			unset($item['evaltype']);
@@ -1510,13 +1506,13 @@ class CDiscoveryRule extends CItemGeneral {
 			'itemids' => $discoveryid,
 			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
-				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'lastlogsize', 'logtimefmt',
+				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'lastlogsize', 'logtimefmt',
 				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'mtime', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
 				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'url',
 				'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
 				'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-				'verify_peer', 'verify_host', 'allow_traps'
+				'verify_peer', 'verify_host', 'allow_traps', 'master_itemid'
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
@@ -1565,6 +1561,25 @@ class CDiscoveryRule extends CItemGeneral {
 					$dstDiscovery['key_']
 				));
 			}
+		}
+
+		// Master item should exists for LLD rule with type dependent item.
+		if ($srcDiscovery['type'] == ITEM_TYPE_DEPENDENT) {
+			$master_items = DBfetchArray(DBselect(
+				'SELECT i1.itemid'.
+				' FROM items i1,items i2'.
+				' WHERE i1.key_=i2.key_'.
+					' AND i1.hostid='.zbx_dbstr($dstDiscovery['hostid']).
+					' AND i2.itemid='.zbx_dbstr($srcDiscovery['master_itemid'])
+			));
+
+			if (!$master_items) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Discovery rule "%1$s" cannot be copied without its master item.', $srcDiscovery['name'])
+				);
+			}
+
+			$dstDiscovery['master_itemid'] = $master_items[0]['itemid'];
 		}
 
 		// save new discovery
@@ -1997,7 +2012,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$items = zbx_toHash($items, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
-					$result[$itemid]['items'] = isset($items[$itemid]) ? $items[$itemid]['rowscount'] : 0;
+					$result[$itemid]['items'] = array_key_exists($itemid, $items) ? $items[$itemid]['rowscount'] : '0';
 				}
 			}
 		}
@@ -2033,7 +2048,9 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$triggers = zbx_toHash($triggers, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
-					$result[$itemid]['triggers'] = isset($triggers[$itemid]) ? $triggers[$itemid]['rowscount'] : 0;
+					$result[$itemid]['triggers'] = array_key_exists($itemid, $triggers)
+						? $triggers[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -2069,7 +2086,9 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
-					$result[$itemid]['graphs'] = isset($graphs[$itemid]) ? $graphs[$itemid]['rowscount'] : 0;
+					$result[$itemid]['graphs'] = array_key_exists($itemid, $graphs)
+						? $graphs[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -2096,7 +2115,9 @@ class CDiscoveryRule extends CItemGeneral {
 				$hostPrototypes = zbx_toHash($hostPrototypes, 'parent_itemid');
 
 				foreach ($result as $itemid => $item) {
-					$result[$itemid]['hostPrototypes'] = isset($hostPrototypes[$itemid]) ? $hostPrototypes[$itemid]['rowscount'] : 0;
+					$result[$itemid]['hostPrototypes'] = array_key_exists($itemid, $hostPrototypes)
+						? $hostPrototypes[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}

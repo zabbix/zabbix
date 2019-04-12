@@ -94,7 +94,7 @@ static void	alerter_send_result(zbx_ipc_socket_t *socket, int errcode, const cha
 	unsigned char	*data;
 	zbx_uint32_t	data_len;
 
-	data_len = zbx_alerter_serialize_result(&data,  errcode, errmsg);
+	data_len = zbx_alerter_serialize_result(&data, errcode, errmsg);
 	zbx_ipc_socket_write(socket, ZBX_IPC_ALERTER_RESULT, data, data_len);
 
 	zbx_free(data);
@@ -296,7 +296,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	zbx_ipc_message_init(&message);
 
-	if (FAIL == zbx_ipc_socket_open(&alerter_socket, ZBX_IPC_SERVICE_ALERTER, 10, &error))
+	if (FAIL == zbx_ipc_socket_open(&alerter_socket, ZBX_IPC_SERVICE_ALERTER, SEC_PER_MIN, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to alert manager service: %s", error);
 		zbx_free(error);

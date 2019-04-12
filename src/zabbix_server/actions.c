@@ -111,14 +111,13 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *
  ******************************************************************************/
 static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *condition)
 {
-	const char	*__function_name = "check_trigger_condition";
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	condition_value;
 	char		*tmp_str = NULL;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
 	{
@@ -189,7 +188,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 
 					zabbix_log(LOG_LEVEL_DEBUG, "%s() check host template condition,"
 							" selecting parent triggerid:" ZBX_FS_UI64,
-							__function_name, triggerid);
+							__func__, triggerid);
 				}
 				DBfree_result(result);
 
@@ -489,7 +488,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 		ret = FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -511,13 +510,12 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
  ******************************************************************************/
 static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condition)
 {
-	const char	*__function_name = "check_discovery_condition";
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	condition_value;
 	int		tmp_int, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (CONDITION_TYPE_DRULE == condition->conditiontype)
 	{
@@ -867,7 +865,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 		ret = FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -889,14 +887,13 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
  ******************************************************************************/
 static int	check_auto_registration_condition(const DB_EVENT *event, DB_CONDITION *condition)
 {
-	const char	*__function_name = "check_auto_registration_condition";
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	condition_value, id;
 	int		ret = FAIL;
 	const char	*condition_field;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	switch (condition->conditiontype)
 	{
@@ -982,7 +979,7 @@ static int	check_auto_registration_condition(const DB_EVENT *event, DB_CONDITION
 		ret = FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1001,14 +998,13 @@ static int	check_auto_registration_condition(const DB_EVENT *event, DB_CONDITION
  ******************************************************************************/
 static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *condition)
 {
-	const char	*__function_name = "check_internal_condition";
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	condition_value;
 	int		ret = FAIL;
 	char		sql[256];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (EVENT_OBJECT_TRIGGER != event->object && EVENT_OBJECT_ITEM != event->object &&
 			EVENT_OBJECT_LLDRULE != event->object)
@@ -1136,8 +1132,7 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 					ZBX_STR2UINT64(objectid, row[0]);
 
 					zabbix_log(LOG_LEVEL_DEBUG, "%s() check host template condition,"
-							" selecting parent objectid:" ZBX_FS_UI64,
-							__function_name, objectid);
+							" selecting parent objectid:" ZBX_FS_UI64, __func__, objectid);
 				}
 				DBfree_result(result);
 
@@ -1303,7 +1298,7 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 		ret = FAIL;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1324,11 +1319,10 @@ out:
  ******************************************************************************/
 int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 {
-	const char	*__function_name = "check_action_condition";
-	int		ret = FAIL;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
-			" cond.value2:'%s'", __function_name, condition->actionid, condition->conditionid,
+			" cond.value2:'%s'", __func__, condition->actionid, condition->conditionid,
 			ZBX_NULL2STR(condition->value), ZBX_NULL2STR(condition->value2));
 
 	switch (event->source)
@@ -1350,7 +1344,7 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 					event->source, condition->conditionid);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1371,15 +1365,13 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
  ******************************************************************************/
 static int	check_action_conditions(zbx_action_eval_t *action)
 {
-	const char	*__function_name = "check_action_conditions";
-
 	DB_CONDITION	*condition;
 	int		condition_result, ret = SUCCEED, id_len, i;
 	unsigned char	old_type = 0xff;
 	char		*expression = NULL, tmp[ZBX_MAX_UINT64_LEN + 2], *ptr, error[256];
 	double		eval_result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, action->actionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __func__, action->actionid);
 
 	if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 		expression = zbx_strdup(expression, action->formula);
@@ -1457,7 +1449,7 @@ static int	check_action_conditions(zbx_action_eval_t *action)
 	}
 clean:
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1479,15 +1471,13 @@ clean:
  ******************************************************************************/
 static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 {
-	const char		*__function_name = "execute_operations";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		groupid, templateid;
 	zbx_vector_uint64_t	lnk_templateids, del_templateids,
 				new_groupids, del_groupids;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __func__, actionid);
 
 	zbx_vector_uint64_create(&lnk_templateids);
 	zbx_vector_uint64_create(&del_templateids);
@@ -1585,7 +1575,7 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 	zbx_vector_uint64_destroy(&del_templateids);
 	zbx_vector_uint64_destroy(&lnk_templateids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /* data structures used to create new and recover existing escalations */
@@ -1736,15 +1726,13 @@ static int	check_event_conditions(const DB_EVENT *event, zbx_hashset_t *uniq_con
  ******************************************************************************/
 void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint64_pair_t *closed_events)
 {
-	const char			*__function_name = "process_actions";
-
 	size_t				i;
 	zbx_vector_ptr_t		actions;
 	zbx_vector_ptr_t 		new_escalations;
 	zbx_vector_uint64_pair_t	rec_escalations;
 	zbx_hashset_t			uniq_conditions[EVENT_SOURCE_COUNT];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events_num);
 
 	zbx_vector_ptr_create(&new_escalations);
 	zbx_vector_uint64_pair_create(&rec_escalations);
@@ -1937,7 +1925,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 	zbx_vector_uint64_pair_destroy(&rec_escalations);
 	zbx_vector_ptr_destroy(&new_escalations);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1951,8 +1939,6 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
  ******************************************************************************/
 int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 {
-	const char		*__function_name = "process_actions_by_acknowledgements";
-
 	zbx_vector_ptr_t	actions;
 	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];
 	int			i, j, k, processed_num = 0, knext = 0;
@@ -1961,7 +1947,7 @@ int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 	zbx_vector_ptr_t	ack_escalations, events;
 	zbx_ack_escalation_t	*ack_escalation;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&ack_escalations);
 
@@ -2075,7 +2061,7 @@ out:
 	zbx_vector_ptr_clear_ext(&ack_escalations, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&ack_escalations);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed_num:%d", __function_name, processed_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed_num:%d", __func__, processed_num);
 
 	return processed_num;
 }

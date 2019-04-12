@@ -42,38 +42,38 @@ class testPageItems extends CLegacyWebTest {
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
 			$this->zbxTestTextPresent('All hosts');
 			$this->zbxTestTextPresent(
-					[
-						'Wizard',
-						'Name',
-						'Triggers',
-						'Key',
-						'Interval',
-						'History',
-						'Trends',
-						'Type',
-						'Applications',
-						'Status',
-						'Info'
-					]
+				[
+					'Wizard',
+					'Name',
+					'Triggers',
+					'Key',
+					'Interval',
+					'History',
+					'Trends',
+					'Type',
+					'Applications',
+					'Status',
+					'Info'
+				]
 			);
 		}
 		elseif ($data['status'] == HOST_STATUS_TEMPLATE) {
 			$this->zbxTestTextPresent('All templates');
 			$this->zbxTestTextPresent(
-					[
-						'Wizard',
-						'Name',
-						'Triggers',
-						'Key',
-						'Interval',
-						'History',
-						'Trends',
-						'Type',
-						'Applications',
-						'Status'
-					]
+				[
+					'Wizard',
+					'Name',
+					'Triggers',
+					'Key',
+					'Interval',
+					'History',
+					'Trends',
+					'Type',
+					'Applications',
+					'Status',
+					'Info'
+				]
 			);
-			$this->zbxTestTextNotPresent('Info');
 		}
 
 		$this->zbxTestAssertElementText("//button[@value='item.masscheck_now'][@disabled]", 'Check now');

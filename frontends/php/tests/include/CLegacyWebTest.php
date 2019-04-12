@@ -188,7 +188,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestClickWait($id) {
-		$this->query('id:'.$id)->waitUntilPresent()->one()->click();
+		$this->query('id:'.$id)->waitUntilClickable()->one()->click();
 	}
 
 	public function zbxTestDoubleClick($click_id, $id) {

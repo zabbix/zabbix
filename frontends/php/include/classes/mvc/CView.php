@@ -52,25 +52,34 @@ class CView {
 	private $scripts;
 
 	/**
-	 * Java code for inclusions on page.
+	 * Javascript code for inclusions on page.
 	 *
 	 * @var array
 	 */
 	private $jsIncludePost = [];
 
 	/**
-	 * Java Script files for inclusions on page, pre-processed by PHP.
+	 * Javascript files for inclusions on page, pre-processed by PHP.
 	 *
 	 * @var array
 	 */
 	private $jsIncludeFiles = [];
 
 	/**
-	 * Java Script files for inclusions on page, included as <script src="..."></script>.
+	 * Javascript files for inclusions on page, included as <script src="..."></script>.
 	 *
 	 * @var array
 	 */
 	private $jsFiles = [];
+
+	/**
+	 * Don't include jsLoader to the page.
+	 *
+	 * @static
+	 *
+	 * @var bool
+	 */
+	public static $js_loader_disabled = false;
 
 	/**
 	 * Directories where views are stored, ordered by priority include/views should be removed once fully move to MVC.
@@ -310,5 +319,16 @@ class CView {
 	 */
 	public static function setLayoutMode($layout_mode) {
 		CProfile::update('web.layout.mode', $layout_mode, PROFILE_TYPE_INT);
+	}
+
+	/**
+	 * Don't include jsLoader to the page.
+	 *
+	 * @return CView
+	 */
+	public function disableJsLoader() {
+		self::$js_loader_disabled = true;
+
+		return $this;
 	}
 }

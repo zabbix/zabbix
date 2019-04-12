@@ -217,14 +217,13 @@ int	get_process_type_forks(unsigned char proc_type)
  ******************************************************************************/
 int	init_selfmon_collector(char **error)
 {
-	const char	*__function_name = "init_selfmon_collector";
 	size_t		sz, sz_array, sz_process[ZBX_PROCESS_TYPE_COUNT], sz_total;
 	char		*p;
 	struct tms	buf;
 	unsigned char	proc_type;
 	int		proc_num, process_forks, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	sz_total = sz = sizeof(zbx_selfmon_collector_t);
 	sz_total += sz_array = sizeof(zbx_stat_process_t *) * ZBX_PROCESS_TYPE_COUNT;
@@ -232,7 +231,7 @@ int	init_selfmon_collector(char **error)
 	for (proc_type = 0; ZBX_PROCESS_TYPE_COUNT > proc_type; proc_type++)
 		sz_total += sz_process[proc_type] = sizeof(zbx_stat_process_t) * get_process_type_forks(proc_type);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)sz_total);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)sz_total);
 
 	if (SUCCEED != zbx_mutex_create(&sm_lock, ZBX_MUTEX_SELFMON, error))
 	{
@@ -277,7 +276,7 @@ int	init_selfmon_collector(char **error)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() collector:%p", __function_name, (void *)collector);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() collector:%p", __func__, (void *)collector);
 
 	return ret;
 }
@@ -293,9 +292,7 @@ out:
  ******************************************************************************/
 void	free_selfmon_collector(void)
 {
-	const char	*__function_name = "free_selfmon_collector";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() collector:%p", __function_name, (void *)collector);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() collector:%p", __func__, (void *)collector);
 
 	if (NULL == collector)
 		return;
@@ -314,7 +311,7 @@ void	free_selfmon_collector(void)
 
 	zbx_mutex_destroy(&sm_lock);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -383,14 +380,13 @@ void	update_selfmon_counter(unsigned char state)
  ******************************************************************************/
 void	collect_selfmon_stats(void)
 {
-	const char		*__function_name = "collect_selfmon_stats";
 	zbx_stat_process_t	*process;
 	clock_t			ticks, ticks_done;
 	struct tms		buf;
 	unsigned char		proc_type, i;
 	int			proc_num, process_forks, index, last;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (MAX_HISTORY <= (index = collector->first + collector->count))
 		index -= MAX_HISTORY;
@@ -442,7 +438,7 @@ void	collect_selfmon_stats(void)
 
 	UNLOCK_SM;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -465,12 +461,11 @@ void	collect_selfmon_stats(void)
 void	get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num,
 		unsigned char state, double *value)
 {
-	const char	*__function_name = "get_selfmon_stats";
 	unsigned int	total = 0, counter = 0;
 	unsigned char	s;
 	int		process_forks, current;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	process_forks = get_process_type_forks(proc_type);
 
@@ -538,7 +533,7 @@ unlock:
 
 	*value = (0 == total ? 0 : 100. * (double)counter / (double)total);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -553,11 +548,10 @@ unlock:
  ******************************************************************************/
 int	zbx_get_all_process_stats(zbx_process_info_t *stats)
 {
-	const char	*__function_name = "zbx_get_all_process_stats";
 	int		current, ret = FAIL;
 	unsigned char	proc_type;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	LOCK_SM;
 
@@ -635,7 +629,7 @@ int	zbx_get_all_process_stats(zbx_process_info_t *stats)
 unlock:
 	UNLOCK_SM;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

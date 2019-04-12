@@ -17,15 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYHOSTS_H
-#define ZABBIX_PROXYHOSTS_H
+#ifndef __zbxprometheus_h__
+#define __zbxprometheus_h__
 
-#include "comms.h"
-#include "zbxjson.h"
+int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char *output,
+						char **value, char **err);
+int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **value, char **err);
 
-extern int	CONFIG_TIMEOUT;
+int	zbx_prometheus_validate_filter(const char *pattern, char **error);
+int	zbx_prometheus_validate_label(const char *label);
 
-void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp);
-void	send_host_availability(zbx_socket_t *sock);
-
-#endif
+#endif /* __zbxprometheus_h__ */

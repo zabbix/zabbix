@@ -16,16 +16,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+#ifndef ITEM_PREPROC_TEST_H
+#define ITEM_PREPROC_TEST_H
 
-#ifndef ZABBIX_PROXYAUTOREG_H
-#define ZABBIX_PROXYAUTOREG_H
-
-#include "comms.h"
-#include "zbxjson.h"
-
-extern int	CONFIG_TIMEOUT;
-
-void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts);
-void	send_areg_data(zbx_socket_t *sock);
+int	zbx_item_preproc_xpath(zbx_variant_t *value, const char *params, char **errmsg);
 
 #endif

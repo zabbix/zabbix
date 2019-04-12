@@ -263,7 +263,7 @@ $form_list
 		new CLabel(_('HTTP proxy'), 'http_proxy'),
 		(new CTextBox('http_proxy', $data['http_proxy'], $data['limited'], DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'),
+			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'),
 		'http_proxy_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT HTTP authentication to form list.
@@ -281,18 +281,18 @@ $form_list
 	)
 	// Append ITEM_TYPE_HTTPAGENT User name to form list.
 	->addRow(
-		(new CLabel(_('User name'), 'http_username'))->setAsteriskMark(),
-		(new CTextBox('http_username', $data['http_username'], $data['limited'], DB::getFieldLength('items', 'username')))
-			->setAriaRequired()
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		new CLabel(_('User name'), 'http_username'),
+		(new CTextBox('http_username', $data['http_username'], $data['limited'],
+			DB::getFieldLength('items', 'username')
+		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'http_username_row'
-	)
+		)
 	// Append ITEM_TYPE_HTTPAGENT Password to form list.
 	->addRow(
-		(new CLabel(_('Password'), 'http_password'))->setAsteriskMark(),
-		(new CTextBox('http_password', $data['http_password'], $data['limited'], DB::getFieldLength('items', 'password')))
-			->setAriaRequired()
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		new CLabel(_('Password'), 'http_password'),
+		(new CTextBox('http_password', $data['http_password'], $data['limited'],
+				DB::getFieldLength('items', 'password')
+		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'http_password_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT SSL verify peer to form list.
@@ -333,6 +333,39 @@ $form_list
 			DB::getFieldLength('items', 'ssl_key_password')
 		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'ssl_key_password_row'
+	)
+	// Append master item select to form list.
+	->addRow(
+		(new CLabel(_('Master item'), 'master_itemid_ms'))->setAsteriskMark(),
+		(new CMultiSelect([
+			'name' => 'master_itemid',
+			'object_name' => 'items',
+			'multiple' => false,
+			'disabled' => $data['limited'],
+			'data' => ($data['master_itemid'] > 0)
+				? [
+					[
+						'id' => $data['master_itemid'],
+						'prefix' => $data['host']['name'].NAME_DELIMITER,
+						'name' => $data['master_itemname']
+					]
+				]
+				: [],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'items',
+					'srcfld1' => 'itemid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'master_itemid',
+					'hostid' => $data['hostid'],
+					'webitems' => true,
+					'normal_only' => true
+				]
+			]
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(),
+		'row_master_item'
 	);
 
 // Append interfaces to form list.

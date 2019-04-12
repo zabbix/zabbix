@@ -138,8 +138,8 @@ static int	variant_to_dbl(zbx_variant_t *value)
 			return FAIL;
 	}
 
-	zbx_ltrim(buffer, " \"+");
-	zbx_rtrim(buffer, " \"\n\r");
+	zbx_rtrim(buffer, "\n\r"); /* trim newline for historical reasons / backwards compatibility */
+	zbx_trim_float(buffer);
 
 	if (SUCCEED != is_double(buffer))
 		return FAIL;
@@ -174,8 +174,8 @@ static int	variant_to_ui64(zbx_variant_t *value)
 			return FAIL;
 	}
 
-	zbx_ltrim(buffer, " \"+");
-	zbx_rtrim(buffer, " \"\n\r");
+	zbx_rtrim(buffer, "\n\r"); /* trim newline for historical reasons / backwards compatibility */
+	zbx_trim_integer(buffer);
 	del_zeros(buffer);
 
 	if (SUCCEED != is_uint64(buffer, &value_ui64))
@@ -237,9 +237,15 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 
 	zbx_strlcpy(buffer, text, sizeof(buffer));
 
-	zbx_ltrim(buffer, " \"+");
-	zbx_rtrim(buffer, " \"\n\r");
+	zbx_rtrim(buffer, "\n\r"); /* trim newline for historical reasons / backwards compatibility */
+	zbx_trim_integer(buffer);
 	del_zeros(buffer);
+
+	if ('+' == buffer[0])
+	{
+		/* zbx_trim_integer() stripped one '+' sign, so there's more than one '+' sign in the 'text' argument */
+		return FAIL;
+	}
 
 	if (SUCCEED == is_uint64(buffer, &value_ui64))
 	{
@@ -295,9 +301,9 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 	}
 }
 
-const char	*zbx_variant_type_desc(const zbx_variant_t *value)
+const char	*zbx_get_variant_type_desc(unsigned char type)
 {
-	switch (value->type)
+	switch (type)
 	{
 		case ZBX_VARIANT_DBL:
 			return "double";
@@ -313,6 +319,11 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value)
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_UNKNOWN_STR;
 	}
+}
+
+const char	*zbx_variant_type_desc(const zbx_variant_t *value)
+{
+	return zbx_get_variant_type_desc(value->type);
 }
 
 int	zbx_validate_value_dbl(double value)

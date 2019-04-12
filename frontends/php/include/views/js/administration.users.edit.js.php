@@ -33,8 +33,9 @@
 
 		<?php if ($this->data['is_profile']): ?>
 			jQuery('#messages_enabled').on('change', function() {
-				jQuery('#messagingTab input, #messagingTab button, #messagingTab select').prop('disabled', !this.checked);
-				jQuery('#messages_enabled').prop('disabled', false);
+				jQuery('#messagingTab input, #messagingTab button, #messagingTab select')
+					.not('[name="messages[enabled]"]')
+					.prop('disabled', !this.checked);
 			});
 
 			jQuery('#messages_enabled').trigger('change');

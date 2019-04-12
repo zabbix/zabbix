@@ -17,15 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYDISCOVERY_H
-#define ZABBIX_PROXYDISCOVERY_H
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+#include "zbxmockutil.h"
 
-#include "comms.h"
-#include "zbxjson.h"
+#include "common.h"
 
-extern int	CONFIG_TIMEOUT;
+void	zbx_mock_test_entry(void **state)
+{
+	const char	*in_str;
+	const char	*expected;
+	char		buffer[256];
 
-void	recv_discovery_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts);
-void	send_discovery_data(zbx_socket_t *sock);
+	ZBX_UNUSED(state);
 
-#endif
+	in_str = zbx_mock_get_parameter_string("in.str");
+	expected = zbx_mock_get_parameter_string("out.str");
+
+	zbx_strlcpy(buffer, in_str, sizeof(buffer));
+
+	zbx_trim_integer(buffer);
+
+	if (0 != strcmp(expected, buffer))
+	{
+		fail_msg("Got '%s' instead of '%s'.", buffer, expected);
+	}
+}

@@ -667,8 +667,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_UINT64:
-			zbx_rtrim(c, " \"");
-			zbx_ltrim(c, " \"+");
+			zbx_trim_integer(c);
 			del_zeros(c);
 
 			if (SUCCEED == is_uint64(c, &value_uint64))
@@ -678,8 +677,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 			}
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_rtrim(c, " \"");
-			zbx_ltrim(c, " \"+");
+			zbx_trim_float(c);
 
 			if (SUCCEED == is_double(c))
 			{
@@ -730,8 +728,7 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 	}
 	else if (0 != ISSET_STR(result))
 	{
-		zbx_rtrim(result->str, " \"");
-		zbx_ltrim(result->str, " \"+");
+		zbx_trim_integer(result->str);
 		del_zeros(result->str);
 
 		if (SUCCEED != is_uint64(result->str, &value))
@@ -741,8 +738,7 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 	}
 	else if (0 != ISSET_TEXT(result))
 	{
-		zbx_rtrim(result->text, " \"");
-		zbx_ltrim(result->text, " \"+");
+		zbx_trim_integer(result->text);
 		del_zeros(result->text);
 
 		if (SUCCEED != is_uint64(result->text, &value))
@@ -774,22 +770,22 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 	}
 	else if (0 != ISSET_STR(result))
 	{
-		zbx_rtrim(result->str, " \"");
-		zbx_ltrim(result->str, " \"+");
+		zbx_trim_float(result->str);
 
 		if (SUCCEED != is_double(result->str))
 			return NULL;
+
 		value = atof(result->str);
 
 		SET_DBL_RESULT(result, value);
 	}
 	else if (0 != ISSET_TEXT(result))
 	{
-		zbx_rtrim(result->text, " \"");
-		zbx_ltrim(result->text, " \"+");
+		zbx_trim_float(result->text);
 
 		if (SUCCEED != is_double(result->text))
 			return NULL;
+
 		value = atof(result->text);
 
 		SET_DBL_RESULT(result, value);
@@ -1232,15 +1228,13 @@ static int	write_all(int fd, const char *buf, size_t n)
  ******************************************************************************/
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char	*__function_name = "zbx_execute_threaded_metric";
+	int	ret = SYSINFO_RET_OK;
+	pid_t	pid;
+	int	fds[2], n, status;
+	char	buffer[MAX_STRING_LEN], *data;
+	size_t	data_alloc = MAX_STRING_LEN, data_offset = 0;
 
-	int		ret = SYSINFO_RET_OK;
-	pid_t		pid;
-	int		fds[2], n, status;
-	char		buffer[MAX_STRING_LEN], *data;
-	size_t		data_alloc = MAX_STRING_LEN, data_offset = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, request->key);
 
 	if (-1 == pipe(fds))
 	{
@@ -1319,7 +1313,16 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	zbx_alarm_off();
 
 	close(fds[0]);
-	waitpid(pid, &status, 0);
+
+	while (-1 == waitpid(pid, &status, 0))
+	{
+		if (EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			ret = SYSINFO_RET_FAIL;
+			break;
+		}
+	}
 
 	if (SYSINFO_RET_OK == ret)
 	{
@@ -1342,7 +1345,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	zbx_free(data);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __function_name, zbx_sysinfo_ret_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __func__, zbx_sysinfo_ret_string(ret),
 			ISSET_MSG(result) ? result->msg : "");
 	return ret;
 }
@@ -1399,8 +1402,6 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
  ******************************************************************************/
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char			*__function_name = "zbx_execute_threaded_metric";
-
 	ZBX_THREAD_HANDLE		thread;
 	zbx_thread_args_t		thread_args;
 	zbx_metric_thread_args_t	metric_args = {metric_func, request, result, ZBX_MUTEX_THREAD_DENIED |
@@ -1408,7 +1409,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	DWORD				rc;
 	BOOL				terminate_thread = FALSE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, request->key);
 
 	if (NULL == (metric_args.timeout_event = CreateEvent(NULL, TRUE, FALSE, NULL)))
 	{
@@ -1472,13 +1473,13 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	{
 		if (FALSE != TerminateThread(thread, 0))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "%s(): TerminateThread() for %s[%s%s] succeeded", __function_name,
+			zabbix_log(LOG_LEVEL_ERR, "%s(): TerminateThread() for %s[%s%s] succeeded", __func__,
 					request->key, (0 < request->nparam) ? request->params[0] : "",
 					(1 < request->nparam) ? ",..." : "");
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_ERR, "%s(): TerminateThread() for %s[%s%s] failed: %s", __function_name,
+			zabbix_log(LOG_LEVEL_ERR, "%s(): TerminateThread() for %s[%s%s] failed: %s", __func__,
 					request->key, (0 < request->nparam) ? request->params[0] : "",
 					(1 < request->nparam) ? ",..." : "",
 					strerror_from_system(GetLastError()));
@@ -1488,7 +1489,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	CloseHandle(thread);
 	CloseHandle(metric_args.timeout_event);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __func__,
 			zbx_sysinfo_ret_string(metric_args.agent_ret), ISSET_MSG(result) ? result->msg : "");
 
 	return WAIT_OBJECT_0 == rc ? metric_args.agent_ret : SYSINFO_RET_FAIL;

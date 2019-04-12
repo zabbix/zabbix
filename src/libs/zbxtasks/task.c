@@ -449,13 +449,11 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
  ******************************************************************************/
 void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
 {
-	const char	*__function_name = "zbx_tm_save_tasks";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __function_name, tasks->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __func__, tasks->values_num);
 
 	tm_save_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -472,14 +470,13 @@ void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
  ******************************************************************************/
 int	zbx_tm_save_task(zbx_tm_task_t *task)
 {
-	const char	*__function_name = "zbx_tm_save_task";
-	int		ret;
+	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = tm_save_tasks(&task, 1);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -496,13 +493,12 @@ int	zbx_tm_save_task(zbx_tm_task_t *task)
  ******************************************************************************/
 void	zbx_tm_update_task_status(zbx_vector_ptr_t *tasks, int status)
 {
-	const char		*__function_name = "zbx_tm_update_task_status";
 	zbx_vector_uint64_t	taskids;
 	int			i;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&taskids);
 
@@ -521,7 +517,7 @@ void	zbx_tm_update_task_status(zbx_vector_ptr_t *tasks, int status)
 
 	zbx_vector_uint64_destroy(&taskids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************

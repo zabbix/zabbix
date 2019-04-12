@@ -228,8 +228,6 @@ static void	zbx_status_update_free(zbx_status_update_t *update)
  ******************************************************************************/
 static void	its_itservices_load_children(zbx_itservices_t *itservices)
 {
-	const char		*__function_name = "its_itservices_load_children";
-
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
@@ -239,7 +237,7 @@ static void	its_itservices_load_children(zbx_itservices_t *itservices)
 	zbx_vector_uint64_t	serviceids;
 	zbx_hashset_iter_t	iter;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&serviceids);
 
@@ -290,7 +288,7 @@ static void	its_itservices_load_children(zbx_itservices_t *itservices)
 
 	zbx_vector_uint64_destroy(&serviceids);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -307,8 +305,6 @@ out:
  ******************************************************************************/
 static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector_uint64_t *serviceids)
 {
-	const char	*__function_name = "its_itservices_load_parents";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
@@ -316,7 +312,7 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
 	zbx_itservice_t	*parent, *itservice;
 	zbx_uint64_t	parentid, serviceid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_sort(serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -363,7 +359,7 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
 	if (0 != serviceids->values_num)
 		its_itservices_load_parents(itservices, serviceids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -379,8 +375,6 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
  ******************************************************************************/
 static void	its_load_services_by_triggerids(zbx_itservices_t *itservices, const zbx_vector_uint64_t *triggerids)
 {
-	const char		*__function_name = "its_load_services_by_triggerids";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		serviceid, triggerid;
@@ -389,7 +383,7 @@ static void	its_load_services_by_triggerids(zbx_itservices_t *itservices, const 
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	serviceids;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&serviceids);
 
@@ -422,7 +416,7 @@ static void	its_load_services_by_triggerids(zbx_itservices_t *itservices, const 
 
 	zbx_vector_uint64_destroy(&serviceids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -623,8 +617,6 @@ out:
  ******************************************************************************/
 static int	its_flush_updates(const zbx_vector_ptr_t *updates)
 {
-	const char			*__function_name = "its_flush_updates";
-
 	int				i, j, k, ret = FAIL;
 	const zbx_status_update_t	*update;
 	zbx_itservices_t		itservices;
@@ -632,7 +624,7 @@ static int	its_flush_updates(const zbx_vector_ptr_t *updates)
 	zbx_itservice_index_t		*index;
 	zbx_vector_uint64_t		triggerids;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	its_itservices_init(&itservices);
 
@@ -699,7 +691,7 @@ static int	its_flush_updates(const zbx_vector_ptr_t *updates)
 out:
 	its_itservices_clean(&itservices);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -720,14 +712,12 @@ out:
  ******************************************************************************/
 int	DBupdate_itservices(const zbx_vector_ptr_t *trigger_diff)
 {
-	const char			*__function_name = "DBupdate_itservices";
-
 	int				ret = SUCCEED;
 	zbx_vector_ptr_t		updates;
 	int				i;
 	const zbx_trigger_diff_t	*diff;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&updates);
 
@@ -761,7 +751,7 @@ int	DBupdate_itservices(const zbx_vector_ptr_t *trigger_diff)
 
 	zbx_vector_ptr_destroy(&updates);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

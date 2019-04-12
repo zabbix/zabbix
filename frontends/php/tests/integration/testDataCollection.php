@@ -27,6 +27,160 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testDataCollection extends CIntegrationTest {
 
+	private static $hostids = [];
+	private static $itemids = [];
+
+	/**
+	 * @inheritdoc
+	 */
+	public function prepareData() {
+		// Create proxy "proxy".
+		$response = $this->call('proxy.create', [
+			'host' => 'proxy',
+			'status' => HOST_STATUS_PROXY_ACTIVE
+		]);
+
+		$this->assertArrayHasKey('proxyids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['proxyids']);
+		$proxyid = $response['result']['proxyids'][0];
+
+		// Create host "agent", "custom_agent" and "proxy agent".
+		$interfaces = [
+			[
+				'type' => 1,
+				'main' => 1,
+				'useip' => 1,
+				'ip' => '127.0.0.1',
+				'dns' => '',
+				'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
+			]
+		];
+
+		$groups = [
+			[
+				'groupid' => 4
+			]
+		];
+
+		$response = $this->call('host.create', [
+			[
+				'host' => 'agent',
+				'interfaces' => $interfaces,
+				'groups' => $groups,
+				'status' => HOST_STATUS_NOT_MONITORED
+			],
+			[
+				'host' => 'custom_agent',
+				'interfaces' => $interfaces,
+				'groups' => $groups,
+				'status' => HOST_STATUS_NOT_MONITORED
+			],
+			[
+				'host' => 'proxy_agent',
+				'interfaces' => $interfaces,
+				'groups' => $groups,
+				'proxy_hostid' => $proxyid,
+				'status' => HOST_STATUS_NOT_MONITORED
+			]
+		]);
+
+		$this->assertArrayHasKey('hostids', $response['result']);
+		foreach (['agent', 'custom_agent', 'proxy_agent'] as $i => $name) {
+			$this->assertArrayHasKey($i, $response['result']['hostids']);
+			self::$hostids[$name] = $response['result']['hostids'][$i];
+		}
+
+		// Get host interface ids.
+		$response = $this->call('host.get', [
+			'output' => ['host'],
+			'hostids' => array_values(self::$hostids),
+			'selectInterfaces' => ['interfaceid']
+		]);
+
+		$interfaceids = [];
+		foreach ($response['result'] as $host) {
+			$interfaceids[$host['host']] = $host['interfaces'][0]['interfaceid'];
+		}
+
+		// Create items.
+		$response = $this->call('item.create', [
+			[
+				'hostid' => self::$hostids['agent'],
+				'name' => 'Agent ping',
+				'key_' => 'agent.ping',
+				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'delay' => '1s',
+				'interfaceid' => $interfaceids['agent']
+			],
+			[
+				'hostid' => self::$hostids['agent'],
+				'name' => 'Agent hostname',
+				'key_' => 'agent.hostname',
+				'type' => ITEM_TYPE_ZABBIX,
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'delay' => '1s',
+				'interfaceid' => $interfaceids['agent']
+
+			],
+			[
+				'hostid' => self::$hostids['custom_agent'],
+				'name' => 'Custom metric 1',
+				'key_' => 'custom.metric',
+				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'delay' => '5s',
+				'interfaceid' => $interfaceids['custom_agent']
+			],
+			[
+				'hostid' => self::$hostids['custom_agent'],
+				'name' => 'Custom metric 2',
+				'key_' => 'custom.metric[custom]',
+				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'delay' => '10s',
+				'interfaceid' => $interfaceids['custom_agent']
+			],
+			[
+				'hostid' => self::$hostids['proxy_agent'],
+				'name' => 'Agent ping',
+				'key_' => 'agent.ping',
+				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'delay' => '1s',
+				'interfaceid' => $interfaceids['proxy_agent']
+			],
+			[
+				'hostid' => self::$hostids['proxy_agent'],
+				'name' => 'Agent hostname',
+				'key_' => 'agent.hostname',
+				'type' => ITEM_TYPE_ZABBIX,
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'delay' => '1s',
+				'interfaceid' => $interfaceids['proxy_agent']
+			]
+		]);
+
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(6, count($response['result']['itemids']));
+
+		$items = [
+			'agent:agent.ping',
+			'agent:agent.hostname',
+			'custom_agent:custom.metric',
+			'custom_agent:custom.metric[custom]',
+			'proxy_agent:agent.ping',
+			'proxy_agent:agent.hostname'
+		];
+
+		self::$itemids = [];
+		foreach ($items as $i => $name) {
+			self::$itemids[$name] = $response['result']['itemids'][$i];
+		}
+
+		return true;
+	}
+
 	/**
 	 * Component configuration provider for agent related tests.
 	 *
@@ -59,7 +213,7 @@ class testDataCollection extends CIntegrationTest {
 		);
 
 		$data = $this->call('host.get', [
-			'hostids'	=> 20002,
+			'hostids'	=> self::$hostids['agent'],
 			'output'	=> ['available']
 		]);
 
@@ -82,7 +236,7 @@ class testDataCollection extends CIntegrationTest {
 		]);
 
 		$passive_data = $this->call('history.get', [
-			'itemids'	=> 80003,
+			'itemids'	=> self::$itemids['agent:agent.ping'],
 			'history'	=> ITEM_VALUE_TYPE_UINT64
 		]);
 
@@ -92,7 +246,7 @@ class testDataCollection extends CIntegrationTest {
 
 		// Retrieve history data from API as soon it is available.
 		$active_data = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=> 80004,
+			'itemids'	=> self::$itemids['agent:agent.hostname'],
 			'history'	=> ITEM_VALUE_TYPE_TEXT
 		]);
 
@@ -113,7 +267,7 @@ class testDataCollection extends CIntegrationTest {
 
 		// Retrieve item data from API.
 		$response = $this->call('item.get', [
-			'hostids'	=> 20003,
+			'hostids'	=> self::$hostids['custom_agent'],
 			'output'	=> ['itemid', 'name', 'key_', 'type', 'value_type']
 		]);
 
@@ -173,14 +327,14 @@ class testDataCollection extends CIntegrationTest {
 		return array_merge($this->agentConfigurationProvider(), [
 			self::COMPONENT_AGENT => [
 				'Hostname'		=> 'proxy_agent',
-				'ServerActive'	=> '127.0.0.1:10052'
+				'ServerActive'	=> '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort')
 			],
 			self::COMPONENT_PROXY => [
 				'UnreachablePeriod'	=> 5,
 				'UnavailableDelay'	=> 5,
 				'UnreachableDelay'	=> 1,
 				'Hostname'			=> 'proxy',
-				'ListenPort'		=> 10052
+				'ServerPort'		=> self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
 			]
 		]);
 	}
@@ -201,7 +355,7 @@ class testDataCollection extends CIntegrationTest {
 		]);
 
 		$passive_data = $this->call('history.get', [
-			'itemids'	=> 80007,
+			'itemids'	=> self::$itemids['proxy_agent:agent.ping'],
 			'history'	=> ITEM_VALUE_TYPE_UINT64
 		]);
 
@@ -211,7 +365,7 @@ class testDataCollection extends CIntegrationTest {
 
 		// Retrieve history data from API as soon it is available.
 		$active_data = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=> 80008,
+			'itemids'	=> self::$itemids['proxy_agent:agent.hostname'],
 			'history'	=> ITEM_VALUE_TYPE_TEXT
 		]);
 

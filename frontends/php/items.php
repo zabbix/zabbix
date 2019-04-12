@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'codeeditor.js', 'multiselect.js', 'items.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -37,7 +37,10 @@ $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 $fields = [
 	'hostid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
 	'interfaceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
-	'copy_type' =>					[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), 'isset({copy})'],
+	'copy_type' =>					[T_ZBX_INT, O_OPT, P_SYS,
+										IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
+										'isset({copy})'
+									],
 	'copy_mode' =>					[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
 	'itemid' =>						[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'name' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})',
@@ -185,10 +188,7 @@ $fields = [
 									],
 	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_targetid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_groupid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,
-										'isset({copy}) && isset({copy_type}) && {copy_type} == 0'
-									],
+	'copy_targetids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -248,13 +248,13 @@ $fields = [
 										IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
 										null
 									],
-	'http_username' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'http_username' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
 										_('Username')
 									],
-	'http_password' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'http_password' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
@@ -618,6 +618,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
 				case ZBX_PREPROC_MULTIPLIER:
+				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+					$step['params'] = trim($step['params'][0]);
+					break;
+
 				case ZBX_PREPROC_RTRIM:
 				case ZBX_PREPROC_LTRIM:
 				case ZBX_PREPROC_TRIM:
@@ -632,8 +636,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					$step['params'] = $step['params'][0];
 					break;
 
-				case ZBX_PREPROC_REGSUB:
 				case ZBX_PREPROC_VALIDATE_RANGE:
+				case ZBX_PREPROC_PROMETHEUS_PATTERN:
+					foreach ($step['params'] as &$param) {
+						$param = trim($param);
+					}
+					unset($param);
+
+					$step['params'] = implode("\n", $step['params']);
+					break;
+
+				case ZBX_PREPROC_REGSUB:
 				case ZBX_PREPROC_ERROR_FIELD_REGEX:
 					$step['params'] = implode("\n", $step['params']);
 					break;
@@ -1139,6 +1152,10 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					foreach ($preprocessing as &$step) {
 						switch ($step['type']) {
 							case ZBX_PREPROC_MULTIPLIER:
+							case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+								$step['params'] = trim($step['params'][0]);
+								break;
+
 							case ZBX_PREPROC_RTRIM:
 							case ZBX_PREPROC_LTRIM:
 							case ZBX_PREPROC_TRIM:
@@ -1153,8 +1170,17 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 								$step['params'] = $step['params'][0];
 								break;
 
-							case ZBX_PREPROC_REGSUB:
 							case ZBX_PREPROC_VALIDATE_RANGE:
+							case ZBX_PREPROC_PROMETHEUS_PATTERN:
+								foreach ($step['params'] as &$param) {
+									$param = trim($param);
+								}
+								unset($param);
+
+								$step['params'] = implode("\n", $step['params']);
+								break;
+
+							case ZBX_PREPROC_REGSUB:
 							case ZBX_PREPROC_ERROR_FIELD_REGEX:
 								$step['params'] = implode("\n", $step['params']);
 								break;
@@ -1282,15 +1308,15 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
 		&& hasRequest('group_itemid')) {
-	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
+	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
 		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hosts_ids = getRequest('copy_targetid');
+			$hosts_ids = getRequest('copy_targetids');
 		}
 		// host groups
 		else {
 			$hosts_ids = [];
-			$group_ids = getRequest('copy_targetid');
+			$group_ids = getRequest('copy_targetids');
 
 			$db_hosts = DBselect(
 				'SELECT DISTINCT h.hostid'.
@@ -1385,6 +1411,15 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' &&
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 
+if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
+	$itemids = API::Item()->get([
+		'output' => [],
+		'itemids' => getRequest('group_itemid'),
+		'editable' => true
+	]);
+	uncheckTableRows(getRequest('hostid'), array_column($itemids, 'itemid', 'itemid'));
+}
+
 /*
  * Display
  */
@@ -1428,11 +1463,17 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		}
 
 		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT) {
-			$master_item_options = [
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'itemids' => getRequest('master_itemid', $item['master_itemid']),
-				'webitems' => true
-			];
+			// Unset master item if submitted form has no master_itemid set.
+			if (hasRequest('form_refresh') && !hasRequest('master_itemid')) {
+				$item['master_itemid'] = 0;
+			}
+			else {
+				$master_item_options = [
+					'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+					'itemids' => getRequest('master_itemid', $item['master_itemid']),
+					'webitems' => true
+				];
+			}
 		}
 	}
 	else {
@@ -1470,6 +1511,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	$data['config'] = select_config();
 	$data['host'] = $host;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
+	$data['preprocessing_test_type'] = CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_ITEM;
 	$data['preprocessing_types'] = CItem::$supported_preprocessing_types;
 
 	// Sort interfaces to be listed starting with one selected as 'main'.
@@ -1535,6 +1577,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'headers' => getRequest('headers', []),
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
+		'preprocessing_test_type' => CControllerPopupPreprocTestEdit::ZBX_TEST_TYPE_ITEM,
 		'preprocessing_types' => CItem::$supported_preprocessing_types,
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];
@@ -1682,12 +1725,13 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	$itemView->show();
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('group_itemid')) {
-	// render view
 	$data = getCopyElementsFormData('group_itemid', _('Items'));
 	$data['action'] = 'item.masscopyto';
-	$graphView = new CView('configuration.copy.elements', $data);
-	$graphView->render();
-	$graphView->show();
+
+	// render view
+	$itemView = new CView('configuration.copy.elements', $data);
+	$itemView->render();
+	$itemView->show();
 }
 // list of items
 else {
@@ -2008,14 +2052,6 @@ else {
 	]);
 
 	$data['trigger_parent_templates'] = getTriggerParentTemplates($data['itemTriggers'], ZBX_FLAG_DISCOVERY_NORMAL);
-
-	// determine, show or not column of errors
-	if ($data['hostid'] != 0 && array_key_exists('templateid', $host)) {
-		$data['showInfoColumn'] = false;
-	}
-	else {
-		$data['showInfoColumn'] = true;
-	}
 
 	// render view
 	$itemView = new CView('configuration.item.list', $data);

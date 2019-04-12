@@ -113,12 +113,13 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['hostid']
-	 * @param bool   $data['has_goto']        (optional) Can be used to hide "GO TO" menu section. Default: true.
-	 * @param int    $data['severity_min']    (optional)
-	 * @param bool   $data['show_suppressed'] (optional)
-	 * @param array  $data['urls']            (optional)
+	 * @param bool   $data['has_goto']           (optional) Can be used to hide "GO TO" menu section. Default: true.
+	 * @param int    $data['severity_min']       (optional)
+	 * @param bool   $data['show_suppressed']    (optional)
+	 * @param array  $data['urls']               (optional)
 	 * @param string $data['urls']['label']
 	 * @param string $data['urls']['url']
+	 * @param string $data['filter_application'] (optional) Application name for filter by application.
 	 *
 	 * @return mixed
 	 */
@@ -179,6 +180,10 @@ class CControllerMenuPopup extends CController {
 				$menu_data['urls'] = $data['urls'];
 			}
 
+			if (array_key_exists('filter_application', $data)) {
+				$menu_data['filter_application'] = $data['filter_application'];
+			}
+
 			return $menu_data;
 		}
 
@@ -197,7 +202,7 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataItem(array $data) {
 		$db_items = API::Item()->get([
-			'output' => ['hostid', 'name', 'value_type'],
+			'output' => ['hostid', 'name', 'value_type', 'flags'],
 			'itemids' => $data['itemid'],
 			'webitems' => true
 		]);
@@ -208,7 +213,9 @@ class CControllerMenuPopup extends CController {
 				'type' => 'item',
 				'itemid' => $data['itemid'],
 				'hostid' => $db_item['hostid'],
-				'name' => $db_item['name']
+				'name' => $db_item['name'],
+				'create_dependent_item' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
+				'create_dependent_discovery' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			];
 
 			if (in_array($db_item['value_type'], [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
@@ -279,6 +286,49 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
+	 * Combines map URLs with element's URLs and performs other modifications with the URLs.
+	 *
+	 * @param array  $selement
+	 * @param array  $map_urls
+	 *
+	 * @return array
+	 */
+	private static function prepareMapElementUrls(array $selement, array $map_urls) {
+		// Remove unused selement url data.
+		foreach ($selement['urls'] as &$url) {
+			unset($url['sysmapelementurlid'], $url['selementid']);
+		}
+		unset($url);
+
+		// Add map urls to element's urls based on their type.
+		foreach ($map_urls as $map_url) {
+			if ($selement['elementtype'] == $map_url['elementtype']) {
+				unset($map_url['elementtype']);
+				$selement['urls'][] = $map_url;
+			}
+		}
+
+		$selement = CMacrosResolverHelper::resolveMacrosInMapElements([$selement], ['resolve_element_urls' => true])[0];
+
+		// Unset URLs with empty name or value.
+		foreach ($selement['urls'] as $url_nr => $url) {
+			if ($url['name'] === '' || $url['url'] === '') {
+				unset($selement['urls'][$url_nr]);
+			}
+			elseif (CHtmlUrlValidator::validate($url['url']) === false) {
+				$selement['urls'][$url_nr]['url'] = 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.',
+					zbx_jsvalue($url['url'], false, false)).'\');';
+			}
+		}
+
+		CArrayHelper::sort($selement['urls'], ['name']);
+		// Prepare urls for processing in menupopup.js.
+		$selement['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
+
+		return $selement;
+	}
+
+	/**
 	 * Prepare data for map element context menu popup.
 	 *
 	 * @param array  $data
@@ -293,9 +343,9 @@ class CControllerMenuPopup extends CController {
 	private static function getMenuDataMapElement(array $data) {
 		$db_maps = API::Map()->get([
 			'output' => ['show_suppressed'],
-			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls'],
-			'sysmapids' => $data['sysmapid'],
-			'expandUrls' => true
+			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls', 'application'],
+			'selectUrls' => ['name', 'url', 'elementtype'],
+			'sysmapids' => $data['sysmapid']
 		]);
 
 		if ($db_maps) {
@@ -310,25 +360,15 @@ class CControllerMenuPopup extends CController {
 			}
 
 			if ($selement !== null) {
-				CArrayHelper::sort($selement['urls'], ['name']);
-				$selement['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
-
 				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
 						&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS
 						&& array_key_exists('hostid', $data) && $data['hostid'] != 0) {
 					$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_HOST;
 					$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
 					$selement['elements'][0]['hostid'] = $data['hostid'];
-
-					/*
-					 * Expanding host URL macros again as some hosts were added from hostgroup areas and automatic
-					 * expanding only happens for elements that are defined for map in DB.
-					 */
-					foreach ($selement['urls'] as &$url) {
-						$url['url'] = str_replace('{HOST.ID}', $data['hostid'], $url['url']);
-					}
-					unset($url);
 				}
+
+				$selement = self::prepareMapElementUrls($selement, $db_map['urls']);
 
 				switch ($selement['elementtype']) {
 					case SYSMAP_ELEMENT_TYPE_MAP:
@@ -358,6 +398,9 @@ class CControllerMenuPopup extends CController {
 						if ($selement['urls']) {
 							$menu_data['urls'] = $selement['urls'];
 						}
+						if ($selement['application'] !== '') {
+							$menu_data['filter_application'] = $selement['application'];
+						}
 						return $menu_data;
 
 					case SYSMAP_ELEMENT_TYPE_HOST:
@@ -372,6 +415,9 @@ class CControllerMenuPopup extends CController {
 						}
 						if ($selement['urls']) {
 							$host_data['urls'] = $selement['urls'];
+						}
+						if ($selement['application'] !== '') {
+							$host_data['filter_application'] = $selement['application'];
 						}
 						return self::getMenuDataHost($host_data);
 
@@ -439,8 +485,8 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['triggerid']
+	 * @param string $data['eventid']                 (optional) Mandatory for Acknowledge and Description menus.
 	 * @param array  $data['acknowledge']             (optional) Acknowledge link parameters.
-	 * @param string $data['acknowledge']['eventid']
 	 * @param string $data['acknowledge']['backurl']
 	 * @param int    $data['severity_min']            (optional)
 	 * @param bool   $data['show_suppressed']         (optional)
@@ -491,7 +537,7 @@ class CControllerMenuPopup extends CController {
 			foreach ($db_trigger['items'] as $item) {
 				$items[] = [
 					'name' => $with_hostname
-						? $$item['hostname'].NAME_DELIMITER.$item['name_expanded']
+						? $item['hostname'].NAME_DELIMITER.$item['name_expanded']
 						: $item['name_expanded'],
 					'params' => [
 						'itemid' => $item['itemid'],
@@ -531,6 +577,10 @@ class CControllerMenuPopup extends CController {
 			}
 			else if (!$options['description_enabled']) {
 				$menu_data['description_enabled'] = false;
+			}
+
+			if (array_key_exists('eventid', $data)) {
+				$menu_data['eventid'] = $data['eventid'];
 			}
 
 			if (array_key_exists('acknowledge', $data)) {

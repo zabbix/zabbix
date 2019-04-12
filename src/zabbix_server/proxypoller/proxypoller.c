@@ -37,12 +37,10 @@ extern int		server_num, process_num;
 
 static int	connect_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 {
-	const char	*__function_name = "connect_to_proxy";
-
 	int		ret = FAIL;
 	const char	*tls_arg1, *tls_arg2;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() address:%s port:%hu timeout:%d conn:%u", __function_name, proxy->addr,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() address:%s port:%hu timeout:%d conn:%u", __func__, proxy->addr,
 			proxy->port, timeout, (unsigned int)proxy->tls_connect);
 
 	switch (proxy->tls_connect)
@@ -81,18 +79,16 @@ static int	connect_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, int timeo
 		ret = NETWORK_ERROR;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const char *data, size_t size)
 {
-	const char	*__function_name = "send_data_to_proxy";
+	int	ret, flags = ZBX_TCP_PROTOCOL;
 
-	int		ret, flags = ZBX_TCP_PROTOCOL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, data);
 
 	if (0 != proxy->auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
@@ -104,17 +100,16 @@ static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const c
 		ret = NETWORK_ERROR;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 static int	recv_data_from_proxy(const DC_PROXY *proxy, zbx_socket_t *sock)
 {
-	const char	*__function_name = "recv_data_from_proxy";
-	int		ret;
+	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == (ret = zbx_tcp_recv(sock)))
 	{
@@ -124,20 +119,18 @@ static int	recv_data_from_proxy(const DC_PROXY *proxy, zbx_socket_t *sock)
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "obtained data from proxy \"%s\": [%s]", proxy->host, sock->buffer);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
 static void	disconnect_proxy(zbx_socket_t *sock)
 {
-	const char	*__function_name = "disconnect_proxy";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_tcp_close(sock);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -162,13 +155,11 @@ static void	disconnect_proxy(zbx_socket_t *sock)
  ******************************************************************************/
 static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data, zbx_timespec_t *ts)
 {
-	const char	*__function_name = "get_data_from_proxy";
-
 	zbx_socket_t	s;
 	struct zbx_json	j;
 	int		ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request:'%s'", __function_name, request);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request:'%s'", __func__, request);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
@@ -199,7 +190,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 
 	zbx_json_free(&j);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -279,325 +270,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_check_error_response                                       *
- *                                                                            *
- * Purpose: checks proxy response for error message                           *
- *                                                                            *
- * Parameters: jp    - [IN] the json data received form proxy                 *
- *             error - [OUT] the error message                                *
- *                                                                            *
- * Return value: SUCCEED - proxy response doesn't have error message          *
- *               FAIL - otherwise                                             *
- *                                                                            *
- ******************************************************************************/
-static int	proxy_check_error_response(const struct zbx_json_parse *jp, char **error)
-{
-	char	response[MAX_STRING_LEN], *info = NULL;
-	size_t	info_alloc = 0;
-
-	/* response tag will be set only in the case of errors */
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_RESPONSE, response, sizeof(response)))
-		return SUCCEED;
-
-	if (0 != strcmp(response, ZBX_PROTO_VALUE_FAILED))
-		return SUCCEED;
-
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc))
-	{
-		zbx_free(*error);
-		*error = info;
-	}
-	else
-		*error = zbx_strdup(*error, "Unknown error");
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: proxy_get_host_availability                                      *
- *                                                                            *
- * Purpose: gets host availability data from proxy                            *
- *          ('host availability' request)                                     *
- *                                                                            *
- * Parameters: proxy - [IN/OUT] proxy data                                    *
- *                                                                            *
- * Return value: SUCCEED - data were received and processed successfully      *
- *               other code - an error occurred                               *
- *                                                                            *
- * Comments: The proxy->version property is updated with the version number   *
- *           sent by proxy.                                                   *
- *                                                                            *
- ******************************************************************************/
-static int	proxy_get_host_availability(DC_PROXY *proxy)
-{
-	char			*answer = NULL, *error = NULL;
-	struct zbx_json_parse	jp;
-	int			ret = FAIL;
-
-	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_HOST_AVAILABILITY, &answer, NULL)))
-	{
-		goto out;
-	}
-
-	if ('\0' == *answer)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no host availability data:"
-				" check allowed connection types and access rights", proxy->host, proxy->addr);
-		goto out;
-	}
-
-	if (SUCCEED != zbx_json_open(answer, &jp))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
-				" %s", proxy->host, proxy->addr, zbx_json_strerror());
-		goto out;
-	}
-
-	proxy->version = zbx_get_protocol_version(&jp);
-
-	if (SUCCEED != proxy_check_error_response(&jp, &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
-				" %s", proxy->host, proxy->addr, error);
-		goto out;
-	}
-
-	if (SUCCEED != process_host_availability(&jp, &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
-				" %s", proxy->host, proxy->addr, error);
-		goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	zbx_free(error);
-	zbx_free(answer);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: proxy_get_history_data                                           *
- *                                                                            *
- * Purpose: gets historical data from proxy                                   *
- *          ('history data' request)                                          *
- *                                                                            *
- * Parameters: proxy - [IN/OUT] proxy data                                    *
- *                                                                            *
- * Return value: SUCCEED - data were received and processed successfully      *
- *               other code - an error occurred                               *
- *                                                                            *
- * Comments: The proxy->version property is updated with the version number   *
- *           sent by proxy.                                                   *
- *                                                                            *
- ******************************************************************************/
-static int	proxy_get_history_data(DC_PROXY *proxy)
-{
-	char			*answer = NULL, *error = NULL;
-	struct zbx_json_parse	jp, jp_data;
-	int			ret = FAIL;
-	zbx_timespec_t		ts;
-
-	while (SUCCEED == (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_HISTORY_DATA, &answer, &ts)))
-	{
-		if ('\0' == *answer)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no history"
-					" data: check allowed connection types and access rights",
-					proxy->host, proxy->addr);
-			break;
-		}
-
-		if (SUCCEED != zbx_json_open(answer, &jp))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
-					" history data: %s", proxy->host, proxy->addr, zbx_json_strerror());
-			break;
-		}
-
-		proxy->version = zbx_get_protocol_version(&jp);
-
-		if (SUCCEED != proxy_check_error_response(&jp, &error))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid history data:"
-					" %s", proxy->host, proxy->addr, error);
-			break;
-		}
-
-		if (SUCCEED != process_proxy_history_data(proxy, &jp, &ts, &error))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
-					" history data: %s", proxy->host, proxy->addr, error);
-			break;
-		}
-
-		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
-		{
-			if (ZBX_MAX_HRECORDS > zbx_json_count(&jp_data))
-			{
-				ret = SUCCEED;
-				break;
-			}
-		}
-	}
-
-	zbx_free(error);
-	zbx_free(answer);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: proxy_get_discovery_data                                         *
- *                                                                            *
- * Purpose: gets discovery data from proxy                                    *
- *          ('discovery data' request)                                        *
- *                                                                            *
- * Parameters: proxy - [IN/OUT] proxy data                                    *
- *                                                                            *
- * Return value: SUCCEED - data were received and processed successfully      *
- *               other code - an error occurred                               *
- *                                                                            *
- * Comments: The proxy->version property is updated with the version number   *
- *           sent by proxy.                                                   *
- *                                                                            *
- ******************************************************************************/
-static int	proxy_get_discovery_data(DC_PROXY *proxy)
-{
-	char			*answer = NULL, *error = NULL;
-	struct zbx_json_parse	jp, jp_data;
-	int			ret = FAIL;
-	zbx_timespec_t		ts;
-
-	while (SUCCEED == (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_DISCOVERY_DATA, &answer, &ts)))
-	{
-		if ('\0' == *answer)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no discovery"
-					" data: check allowed connection types and access rights",
-					proxy->host, proxy->addr);
-			break;
-		}
-
-		if (SUCCEED != zbx_json_open(answer, &jp))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
-					" discovery data: %s", proxy->host, proxy->addr,
-					zbx_json_strerror());
-			break;
-		}
-
-		proxy->version = zbx_get_protocol_version(&jp);
-
-		if (SUCCEED != proxy_check_error_response(&jp, &error))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid discovery data:"
-					" %s", proxy->host, proxy->addr, error);
-			break;
-		}
-
-		if (SUCCEED != process_discovery_data(&jp, &ts, &error))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
-					" discovery data: %s", proxy->host, proxy->addr, error);
-			break;
-		}
-
-		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
-		{
-			if (ZBX_MAX_HRECORDS > zbx_json_count(&jp_data))
-			{
-				ret = SUCCEED;
-				break;
-			}
-		}
-	}
-
-	zbx_free(error);
-	zbx_free(answer);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: proxy_get_auto_registration                                      *
- *                                                                            *
- * Purpose: gets auto registration data from proxy                            *
- *          ('auto registration' request)                                     *
- *                                                                            *
- * Parameters: proxy - [IN/OUT] proxy data                                    *
- *                                                                            *
- * Return value: SUCCEED - data were received and processed successfully      *
- *               other code - an error occurred                               *
- *                                                                            *
- * Comments: The proxy->version property is updated with the version number   *
- *           sent by proxy.                                                   *
- *                                                                            *
- ******************************************************************************/
-static int	proxy_get_auto_registration(DC_PROXY *proxy)
-{
-	char			*answer = NULL, *error = NULL;
-	struct zbx_json_parse	jp, jp_data;
-	int			ret = FAIL;
-	zbx_timespec_t		ts;
-
-	while (SUCCEED == (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, &answer, &ts)))
-	{
-		if ('\0' == *answer)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no auto"
-					" registration data: check allowed connection types and"
-					" access rights", proxy->host, proxy->addr);
-			break;
-		}
-
-		if (SUCCEED != zbx_json_open(answer, &jp))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
-					" auto registration data: %s", proxy->host, proxy->addr,
-					zbx_json_strerror());
-			break;
-		}
-
-		proxy->version = zbx_get_protocol_version(&jp);
-
-		if (SUCCEED != proxy_check_error_response(&jp, &error))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid auto registration data:"
-					" %s", proxy->host, proxy->addr, error);
-			break;
-		}
-
-		if (SUCCEED != process_auto_registration(&jp, proxy->hostid, &ts, &error))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
-					" auto registration data: %s", proxy->host, proxy->addr, error);
-			break;
-		}
-
-		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
-		{
-			if (ZBX_MAX_HRECORDS > zbx_json_count(&jp_data))
-			{
-				ret = SUCCEED;
-				break;
-			}
-		}
-	}
-
-	zbx_free(error);
-	zbx_free(answer);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: proxy_process_proxy_data                                         *
  *                                                                            *
  * Purpose: processes proxy data request                                      *
@@ -617,13 +289,11 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
  ******************************************************************************/
 static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_timespec_t *ts, int *more)
 {
-	const char		*__function_name = "proxy_process_proxy_data";
-
 	struct zbx_json_parse	jp;
 	char			*error = NULL;
 	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	*more = ZBX_PROXY_DATA_DONE;
 
@@ -643,6 +313,16 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 
 	proxy->version = zbx_get_protocol_version(&jp);
 
+	/* don't accept pre 4.2 data */
+	if (ZBX_COMPONENT_VERSION(4, 2) > proxy->version)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy \"%s\" at \"%s\":"
+				" protocol version %d.%d is not supported anymore",
+				proxy->host, proxy->addr, ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
+				ZBX_COMPONENT_VERSION_MINOR(proxy->version));
+		goto out;
+	}
+
 	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
@@ -658,7 +338,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 out:
 	zbx_free(error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -681,66 +361,32 @@ out:
  ******************************************************************************/
 static int	proxy_get_data(DC_PROXY *proxy, int *more)
 {
-	const char	*__function_name = "proxy_get_data";
-
 	char		*answer = NULL;
 	int		ret;
 	zbx_timespec_t	ts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 == proxy->version)
+	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts)))
+		goto out;
+
+	/* handle pre 3.4 proxies that did not support proxy data request */
+	if ('\0' == *answer)
 	{
-		if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts)))
-			goto out;
-
-		if ('\0' == *answer)
-		{
-			proxy->version = ZBX_COMPONENT_VERSION(3, 2);
-			zbx_free(answer);
-		}
-	}
-
-	if (ZBX_COMPONENT_VERSION(3, 2) == proxy->version)
-	{
-		if (SUCCEED != (ret = proxy_get_host_availability(proxy)))
-			goto out;
-
-		proxy->lastaccess = time(NULL);
-
-		if (SUCCEED != (ret = proxy_get_history_data(proxy)))
-			goto out;
-
-		proxy->lastaccess = time(NULL);
-
-		if (SUCCEED != (ret = proxy_get_discovery_data(proxy)))
-			goto out;
-
-		proxy->lastaccess = time(NULL);
-
-		if (SUCCEED != (ret = proxy_get_auto_registration(proxy)))
-			goto out;
-
-		proxy->lastaccess = time(NULL);
-
-		/* the above functions will retrieve all available data for 3.2 and older proxies */
-		*more = ZBX_PROXY_DATA_DONE;
+		proxy->version = ZBX_COMPONENT_VERSION(3, 2);
+		zbx_free(answer);
+		ret = FAIL;
 		goto out;
 	}
-
-	if (NULL == answer && SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, &answer, &ts)))
-		goto out;
 
 	proxy->lastaccess = time(NULL);
-
 	ret = proxy_process_proxy_data(proxy, answer, &ts, more);
-
 	zbx_free(answer);
 out:
 	if (SUCCEED == ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d", __function_name, zbx_result_string(ret), *more);
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d", __func__, zbx_result_string(ret), *more);
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -762,13 +408,11 @@ out:
  ******************************************************************************/
 static int	proxy_get_tasks(DC_PROXY *proxy)
 {
-	const char	*__function_name = "proxy_get_tasks";
-
 	char		*answer = NULL;
 	int		ret = FAIL, more;
 	zbx_timespec_t	ts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (ZBX_COMPONENT_VERSION(3, 2) >= proxy->version)
 		goto out;
@@ -782,7 +426,7 @@ static int	proxy_get_tasks(DC_PROXY *proxy)
 
 	zbx_free(answer);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -804,13 +448,11 @@ out:
  ******************************************************************************/
 static int	process_proxy(void)
 {
-	const char	*__function_name = "process_proxy";
-
 	DC_PROXY	proxy, proxy_old;
 	int		num, i;
 	time_t		now;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == (num = DCconfig_get_proxypoller_hosts(&proxy, 1)))
 		goto exit;
@@ -885,7 +527,7 @@ error:
 		DCrequeue_proxy(proxy.hostid, update_nextcheck, ret);
 	}
 exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return num;
 }
