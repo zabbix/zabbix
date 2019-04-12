@@ -32,6 +32,10 @@ define('ZBX_LOGIN_BLOCK',		30); // sec
 
 define('ZBX_SESSION_NAME', 'zbx_sessionid'); // Session cookie name for Zabbix front-end.
 
+define('ZBX_KIBIBYTE',	'1024');
+define('ZBX_MEBIBYTE',	'1048576');
+define('ZBX_GIBIBYTE',	'1073741824');
+
 define('ZBX_MIN_PERIOD',		60); // 1 minute
 define('ZBX_MAX_PERIOD',		63158400); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400
 define('ZBX_MIN_INT32',			-2147483648);
@@ -69,7 +73,7 @@ define('ZBX_SCRIPT_TIMEOUT',		60); // in seconds
 
 define('GRAPH_YAXIS_SIDE_DEFAULT', 0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
 
-define('ZBX_MAX_IMAGE_SIZE', 1048576); // 1024 * 1024
+define('ZBX_MAX_IMAGE_SIZE', ZBX_MEBIBYTE);
 
 define('ZBX_UNITS_ROUNDOFF_THRESHOLD',		0.01);
 define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT',	2);
@@ -1149,8 +1153,8 @@ define('IPMI_PRIVILEGE_OEM',		5);
 define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
-define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit
-define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1048576 is 1MB in bytes
+define('ZBX_SOCKET_TIMEOUT',        3);            // socket timeout limit
+define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE); // socket response size limit
 
 // value is also used in servercheck.js file
 define('SERVER_CHECK_INTERVAL', 10);
