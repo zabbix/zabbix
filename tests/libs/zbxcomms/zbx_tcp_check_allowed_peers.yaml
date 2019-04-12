@@ -467,4 +467,20 @@ in:
   family: 'AF_INET6'
 out:
   return: SUCCEED
+---
+test case: IPv6 unspecified address in list, connection from IPv6
+in:
+  allowed_peers: '::'
+  peer: '::1'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 unspecified address in list, connection from IPv4
+in:
+  allowed_peers: '::'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
 ...
