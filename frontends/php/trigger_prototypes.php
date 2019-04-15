@@ -116,28 +116,33 @@ if (!$discoveryRule) {
 	access_deny();
 }
 
-$triggerPrototypeIds = getRequest('g_triggerid', []);
-if (!is_array($triggerPrototypeIds)) {
-	$triggerPrototypeIds = zbx_toArray($triggerPrototypeIds);
-}
-
-$triggerPrototypeId = getRequest('triggerid');
-if ($triggerPrototypeId !== null) {
-	$triggerPrototypeIds[] = $triggerPrototypeId;
-}
-
-if ($triggerPrototypeIds) {
+if (hasRequest('triggerid')) {
 	$triggerPrototypes = API::TriggerPrototype()->get([
 		'output' => [],
-		'triggerids' => $triggerPrototypeIds,
+		'triggerids' => getRequest('triggerid'),
 		'editable' => true
 	]);
 
-	if (count($triggerPrototypeIds) != count($triggerPrototypes)) {
-		uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($triggerPrototypes, 'triggerid'));
+	if (!$triggerPrototypes) {
+		access_deny();
 	}
 }
 
+if (hasRequest('g_triggerid')) {
+	$triggerPrototypeIds = array_keys(array_flip(zbx_toArray(getRequest('g_triggerid'))));
+
+	if ($triggerPrototypeIds) {
+		$triggerPrototypes = API::TriggerPrototype()->get([
+			'output' => [],
+			'triggerids' => $triggerPrototypeIds,
+			'editable' => true
+		]);
+
+		if (count($triggerPrototypeIds) != count($triggerPrototypes)) {
+			uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($triggerPrototypes, 'triggerid'));
+		}
+	}
+}
 /*
  * Actions
  */
