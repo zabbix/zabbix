@@ -14,6 +14,7 @@ New features:
 ..F....... [ZBXNEXT-5144] increased socket response size limit (vasilijs)
 
 Bug fixes:
+..F....... [ZBX-11393] fixed when long snmp oid expands screen dimensions (ashubin, vasilijs)
 A.F....... [ZBX-15464] fixed error message for image uploads (talbergs)
 ..F....... [ZBX-10243] fixed not encoded ampersand for in URL parameter (talbergs)
 ...G...... [ZBX-15972] fixed possible crash of the windows agent when used "net.dns" item key (MVekslers)
@@ -338,6 +339,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11393] fixed when long snmp oid expands screen dimensions (ashubin, vasilijs)
 A.F....... [ZBX-15464] fixed error message for image uploads (talbergs)
 ..F....... [ZBX-10243] fixed not encoded ampersand for in URL parameter (talbergs)
 ...G...... [ZBX-15972] fixed possible crash of the windows agent when used "net.dns" item key (MVekslers)
