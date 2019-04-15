@@ -65,6 +65,7 @@ class CMapHelper {
 				'height' => 150,
 				'backgroundid' => null,
 				'severity_min' => 0,
+				'show_unack' => EXTACK_OPTION_ALL,
 				'label_location' => MAP_LABEL_LOC_BOTTOM,
 				'selements' => [],
 				'links' => [],
@@ -270,7 +271,6 @@ class CMapHelper {
 				$linktriggers = $link['linktriggers'];
 				order_result($linktriggers, 'triggerid');
 				$max_severity = $options['severity_min'];
-				$triggers = [];
 
 				foreach ($linktriggers as $link_trigger) {
 					if ($link_trigger['triggerid'] == 0
@@ -278,16 +278,14 @@ class CMapHelper {
 						continue;
 					}
 
-					$id = $link_trigger['linktriggerid'];
+					$trigger = zbx_array_merge($link_trigger, $linktrigger_info[$link_trigger['triggerid']]);
 
-					$triggers[$id] = zbx_array_merge($link_trigger, $linktrigger_info[$link_trigger['triggerid']]);
-
-					if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED
-							&& $triggers[$id]['value'] == TRIGGER_VALUE_TRUE
-							&& $triggers[$id]['priority'] >= $max_severity) {
-						$drawtype = $triggers[$id]['drawtype'];
-						$color = $triggers[$id]['color'];
-						$max_severity = $triggers[$id]['priority'];
+					if ($trigger['status'] == TRIGGER_STATUS_ENABLED
+							&& $trigger['value'] == TRIGGER_VALUE_TRUE
+							&& $trigger['priority'] >= $max_severity) {
+						$drawtype = $trigger['drawtype'];
+						$color = $trigger['color'];
+						$max_severity = $trigger['priority'];
 					}
 				}
 
