@@ -2714,8 +2714,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.27rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
 A.F....... [ZBX-2494] fixed sorting of items, item prototypes, lld rules and screens to avoid deadlocks in database between server and frontend (ashubin)
