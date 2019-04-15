@@ -1,0 +1,99 @@
+# Both expected and peer is IPv4
+---
+test case: IPv4 match
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: Second IPv4 from list matches
+in:
+  allowed_peers: '127.0.0.1,127.0.0.2'
+  peer: '127.0.0.2'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: Peer IP is different
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '127.0.0.2'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: Peer IP is different
+in:
+  allowed_peers: '127.0.0.1,127.0.0.2'
+  peer: '126.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+# Additional tests
+test case: Compare only first 3 octets
+in:
+  allowed_peers: '127.0.0.0/24'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: Compare all 4 octets sanity check
+in:
+  allowed_peers: '127.0.0.0/32'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: Compare only the first 3 octets where the first one does not match
+in:
+  allowed_peers: '127.0.0.1/24'
+  peer: '128.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv4 in list
+in:
+  allowed_peers: '128.0.0.0/24,127.0.0.1'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: Any IPv4
+in:
+  allowed_peers: '128.0.0.0/0'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: IPv4 first CIDR value is not saved on next value in list
+in:
+  allowed_peers: '127.0.0.0/24,128.0.0.2'
+  peer: '128.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: Long list of allowed peers and no match
+in:
+  allowed_peers: 'localhost,127.0.0.2,127.0.0.0/24'
+  peer: '127.2.1.5'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: Long list of allowed peers but there is match
+in:
+  allowed_peers: 'localhost,127.0.0.2,127.0.0.0/24,0.0.0.0/0'
+  peer: '127.2.1.5'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+...
