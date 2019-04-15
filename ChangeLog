@@ -340,6 +340,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-15977] fixed validation of host interface when multiple interfaces set as main interface (gcalenko, vmurzins)
 ...G...PS. [ZBX-15955] fixed security vulnerability - accepting connections from not allowed addresses (Andris, vso)
 ..F....... [ZBX-11393] fixed when long snmp oid expands screen dimensions (ashubin, vasilijs)
 A.F....... [ZBX-15464] fixed error message for image uploads (talbergs)
