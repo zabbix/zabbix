@@ -2142,6 +2142,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
 int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 {
 	char	*start = NULL, *end = NULL, *cidr_sep, tmp[MAX_STRING_LEN];
+	int	prefix_size;
 
 	/* examine list of allowed peers which may include DNS names, IPv4/6 addresses and addresses in CIDR notation */
 
@@ -2150,17 +2151,12 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 	for (start = tmp; '\0' != *start;)
 	{
 #ifdef HAVE_IPV6
-#ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
-		int	ai_family = s->peer_info.ss_family;
-#else
-		int	ai_family = s->peer_info.__ss_family;
-#endif
-		unsigned int	prefix_size = (ai_family == AF_INET ? IPV4_MAX_CIDR_PREFIX : IPV6_MAX_CIDR_PREFIX);
 		struct addrinfo	hints, *ai = NULL, *current_ai;
 #else
-		unsigned int	prefix_size = IPV4_MAX_CIDR_PREFIX;
 		struct hostent	*hp;
 #endif /* HAVE_IPV6 */
+
+		prefix_size = -1;
 
 		if (NULL != (end = strchr(start, ',')))
 			*end = '\0';
@@ -2188,7 +2184,15 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 		{
 			for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
 			{
-				if (SUCCEED == zbx_ip_cmp(prefix_size, current_ai, s->peer_info))
+				int	prefix_size_current = prefix_size;
+
+				if (-1 == prefix_size_current)
+				{
+					prefix_size_current = (current_ai->ai_family == AF_INET ?
+							IPV4_MAX_CIDR_PREFIX : IPV6_MAX_CIDR_PREFIX);
+				}
+
+				if (SUCCEED == zbx_ip_cmp(prefix_size_current, current_ai, s->peer_info))
 				{
 					freeaddrinfo(ai);
 					return SUCCEED;
@@ -2203,6 +2207,9 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 
 			for (i = 0; NULL != hp->h_addr_list[i]; i++)
 			{
+				if (-1 == prefix_size)
+					prefix_size = IPV4_MAX_CIDR_PREFIX;
+
 				if (SUCCEED == subnet_match(AF_INET, prefix_size,
 						&((struct in_addr *)hp->h_addr_list[i])->s_addr,
 						&s->peer_info.sin_addr.s_addr))

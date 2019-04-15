@@ -311,3 +311,22 @@ int	zbx_mock_str_to_return_code(const char *str)
 	fail_msg("Unknown return code  \"%s\"", str);
 	return 0;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mock_str_to_value_type                                       *
+ *                                                                            *
+ * Purpose: converts item value type from text format                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_mock_str_to_family(const char *str)
+{
+	if (0 == strcmp(str, "AF_INET"))
+		return AF_INET;
+
+	if (0 == strcmp(str, "AF_INET6"))
+		return AF_INET6;
+
+	fail_msg("Unknown family \"%s\"", str);
+	return AF_UNSPEC;
+}

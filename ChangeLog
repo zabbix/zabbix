@@ -14,6 +14,7 @@ New features:
 ..F....... [ZBXNEXT-5144] increased socket response size limit (vasilijs)
 
 Bug fixes:
+...G...PS. [ZBX-15955] fixed security vulnerability - accepting connections from not allowed addresses (Andris, vso)
 ..F....... [ZBX-11393] fixed when long snmp oid expands screen dimensions (ashubin, vasilijs)
 A.F....... [ZBX-15464] fixed error message for image uploads (talbergs)
 ..F....... [ZBX-10243] fixed not encoded ampersand for in URL parameter (talbergs)
@@ -339,6 +340,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-15955] fixed security vulnerability - accepting connections from not allowed addresses (Andris, vso)
 ..F....... [ZBX-11393] fixed when long snmp oid expands screen dimensions (ashubin, vasilijs)
 A.F....... [ZBX-15464] fixed error message for image uploads (talbergs)
 ..F....... [ZBX-10243] fixed not encoded ampersand for in URL parameter (talbergs)
