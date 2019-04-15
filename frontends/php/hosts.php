@@ -814,7 +814,7 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massdelete' && has
 			'hostids' => getRequest('hosts'),
 			'editable' => true
 		]);
-		uncheckTableRows(getRequest('hostid'), array_column($hostids, 'hostid', 'hostid'));
+		uncheckTableRows(getRequest('hostid'), zbx_objectValues($hostids, 'hostid'));
 	}
 	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }

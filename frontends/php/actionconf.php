@@ -501,7 +501,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['action.mass
 			? _n('Action enabled', 'Actions enabled', $actions_count)
 			: _n('Action disabled', 'Actions disabled', $actions_count);
 
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $response['actionids']).'] '.
+		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $result['actionids']).'] '.
 			($status == ACTION_STATUS_ENABLED ? 'enabled' : 'disabled')
 		);
 		show_messages(true, $message);
@@ -530,7 +530,7 @@ if (hasRequest('action') && hasRequest('g_actionid') && !$result) {
 		'output' => [],
 		'editable' => true
 	]);
-	uncheckTableRows(null, array_column($actions, 'actionid', 'actionid'));
+	uncheckTableRows(null, zbx_objectValues($actions, 'actionid'));
 }
 
 /*
