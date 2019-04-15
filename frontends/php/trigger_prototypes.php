@@ -129,7 +129,7 @@ if (hasRequest('triggerid')) {
 }
 
 if (hasRequest('g_triggerid')) {
-	$triggerPrototypeIds = array_keys(array_flip(zbx_toArray(getRequest('g_triggerid'))));
+	$triggerPrototypeIds = zbx_toArray(getRequest('g_triggerid'));
 
 	if ($triggerPrototypeIds) {
 		$triggerPrototypes = API::TriggerPrototype()->get([
