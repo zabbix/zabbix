@@ -912,7 +912,7 @@ function getConditionFormula(conditions, evalType) {
 			disabled: false,
 			counter: null,
 			beforeRow: null,
-			keepMinRows: 0,
+			keep_min_rows: 0,
 			dataCallback: function(data) {
 				return {};
 			}
@@ -945,13 +945,33 @@ function getConditionFormula(conditions, evalType) {
 
 		this.$element.on('click', options.add, this.addRow.bind(this));
 		if (initialRows) {
-			initialRows.forEach(this.addRow.bind(this));
+			this.setData(initialRows);
 		}
+	}
+
+	/**
+	* Replaces current data with new one.
+	* Be aware that min rows are ensured and events are triggered only for add.
+	* Removing happens outside this api, to not to call ensureMinRows method.
+	*
+	* @param {array} dataRows  Array of data for row templates.
+	*/
+	DynamicRows.prototype.setData = function(dataRows) {
+		if (this.length > 0) {
+			this.length = 0;
+			for (var counter in this.rows) {
+				this.rows[counter].remove();
+				delete this.rows[counter];
+			}
+		}
+		dataRows.forEach(this.addRow.bind(this));
 		this.ensureMinRows();
+
+		return this;
 	}
 
 	DynamicRows.prototype.ensureMinRows = function() {
-		var rowsToAdd = this.options.keepMinRows - this.length;
+		var rowsToAdd = this.options.keep_min_rows - this.length;
 		while (rowsToAdd > 0) {
 			rowsToAdd--;
 			this.addRow();
@@ -965,6 +985,10 @@ function getConditionFormula(conditions, evalType) {
 		return $.extend({
 			rowNum: this.counter
 		}, data, this.options.dataCallback(data));
+	}
+
+	DynamicRows.prototype.eachRow = function(callable) {
+		this.$element.find(this.options.row).each(callable);
 	}
 
 	DynamicRows.prototype.disabled = function(disable) {
@@ -1000,11 +1024,15 @@ function getConditionFormula(conditions, evalType) {
 
 		var template = new Template($(this.options.template).html());
 		var $row = $(template.evaluate(this.getTemplateData(data)));
+		$row.data('dynamicRowData', data);
 
 		$row.find(this.options['remove'])
 			.on('click', this.removeRow.bind(this, this.counter));
 
 		this.rows[this.counter] = $row;
+		if ($beforeRow.length == 0) {
+			throw null;
+		}
 		$beforeRow.before($row);
 
 		this.counter++;
