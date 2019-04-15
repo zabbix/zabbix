@@ -721,12 +721,11 @@ class CHostInterface extends CApiService {
 	}
 
 	/**
-	 * Validate count of main interfaces for every type. Throws exception if there will be more than one main
-	 * host interface of same type.
+	 * Prepares data to validate main interface for every interface type. Executes main interface validation.
 	 *
 	 * @param array $interfaces                     Array of interfaces to validate.
-	 * @param int   $interfaces[]['hostid']         updated interface hostid.
-	 * @param int   $interfaces[]['interfaceid']    Updated interfaceid.
+	 * @param int   $interfaces[]['hostid']         Updated interface's hostid.
+	 * @param int   $interfaces[]['interfaceid']    Updated interface's interfaceid.
 	 *
 	 * @throws APIException
 	 */
