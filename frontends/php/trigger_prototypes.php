@@ -128,21 +128,6 @@ if (hasRequest('triggerid')) {
 	}
 }
 
-if (hasRequest('g_triggerid')) {
-	$triggerPrototypeIds = zbx_toArray(getRequest('g_triggerid'));
-
-	if ($triggerPrototypeIds) {
-		$triggerPrototypes = API::TriggerPrototype()->get([
-			'output' => [],
-			'triggerids' => $triggerPrototypeIds,
-			'editable' => true
-		]);
-
-		if (count($triggerPrototypeIds) != count($triggerPrototypes)) {
-			uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($triggerPrototypes, 'triggerid'));
-		}
-	}
-}
 /*
  * Actions
  */
@@ -465,6 +450,17 @@ elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massde
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 	show_messages($result, _('Trigger prototypes deleted'), _('Cannot delete trigger prototypes'));
+}
+
+if (hasRequest('action') && getRequest('action') !== 'triggerprototype.massupdateform' && hasRequest('g_triggerid')
+		&& !$result) {
+	$triggerPrototypes = API::TriggerPrototype()->get([
+			'output' => [],
+			'triggerids' => getRequest('g_triggerid'),
+			'editable' => true
+		]);
+
+	uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($triggerPrototypes, 'triggerid'));
 }
 
 $config = select_config();
