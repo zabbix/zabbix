@@ -66,20 +66,20 @@
 
 	jQuery(function($) {
 		window.httpconf = {
-			templated: <?= $data['templated'] ? 1 : 0 ?>,
-			ZBX_POSTTYPE_RAW: <?= ZBX_POSTTYPE_RAW ?>,
-			ZBX_POSTTYPE_FORM: <?= ZBX_POSTTYPE_FORM ?>,
-			ZBX_STYLE_DRAG_ICON: <?= zbx_jsvalue(ZBX_STYLE_DRAG_ICON) ?>,
+			templated:                           <?= $data['templated'] ? 1 : 0 ?>,
+			ZBX_POSTTYPE_RAW:                    <?= ZBX_POSTTYPE_RAW ?>,
+			ZBX_POSTTYPE_FORM:                   <?= ZBX_POSTTYPE_FORM ?>,
+			ZBX_STYLE_DRAG_ICON:                 <?= zbx_jsvalue(ZBX_STYLE_DRAG_ICON) ?>,
 			HTTPTEST_STEP_RETRIEVE_MODE_HEADERS: <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>,
 			msg: {
-				data_not_encoded: <?= CJs::encodeJson(_('Data is not properly encoded.')); ?>,
+				data_not_encoded:           <?= CJs::encodeJson(_('Data is not properly encoded.')); ?>,
 				name_filed_length_exceeded: <?= CJs::encodeJson(_('Name of the form field should not exceed 255 characters.')); ?>,
-				value_without_name: <?= CJs::encodeJson(_('Values without names are not allowed in form fields.')); ?>,
-				failed_to_parse_url: <?= CJs::encodeJson(_('Failed to parse URL.')); ?>,
-				ok: <?= CJs::encodeJson(_('Ok')); ?>,
-				error: <?= CJs::encodeJson(_('Error')); ?>,
-				url_not_encoded_properly: <?= CJs::encodeJson(_('URL is not properly encoded.')); ?>,
-				cannot_convert_into_raw: <?= CJs::encodeJson(_('Cannot convert POST data from raw data format to form field data format.')); ?>
+				value_without_name:         <?= CJs::encodeJson(_('Values without names are not allowed in form fields.')); ?>,
+				failed_to_parse_url:        <?= CJs::encodeJson(_('Failed to parse URL.')); ?>,
+				ok:                         <?= CJs::encodeJson(_('Ok')); ?>,
+				error:                      <?= CJs::encodeJson(_('Error')); ?>,
+				url_not_encoded_properly:   <?= CJs::encodeJson(_('URL is not properly encoded.')); ?>,
+				cannot_convert_into_raw:    <?= CJs::encodeJson(_('Cannot convert POST data from raw data format to form field data format.')); ?>
 			}
 		};
 

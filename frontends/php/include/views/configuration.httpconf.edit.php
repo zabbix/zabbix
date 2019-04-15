@@ -33,7 +33,6 @@ $httpForm = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
-	->addVar('steps', $this->data['steps'])
 	->addVar('templated', $this->data['templated']);
 
 if (!empty($this->data['httptestid'])) {
@@ -112,43 +111,59 @@ $httpFormList
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'));
 
-$pair_tables = [
-	['id' => 'variables', 'label' => _('Variables'), 'class' => 'pair-container'],
-	['id' => 'headers', 'label' => _('Headers'), 'class' => 'pair-container pair-container-sortable']
+$pairs_grouped = [
+	'variables' => [],
+	'headers' => []
 ];
 
-foreach ($pair_tables as $pair_table){
-	$pair_tab = (new CTable())
-		->setId($pair_table['id'])
-		->addClass($pair_table['class'])
+foreach ($data['pairs'] as $field) {
+	$pairs_grouped[$field['type']][] = $field;
+}
+
+$httpFormList->addRow(_('Variables'), (new CDiv(
+	(new CTable())
+		->addClass('httpconf-dynamic-row')
+		->setAttribute('data-dynamic-rows-data', CJs::encodeJson($pairs_grouped['variables']))
+		->setAttribute('data-type', 'variables')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader(['', _('Name'), '', _('Value'), ''])
 		->addRow((new CRow([
 			(new CCol(
 				(new CButton(null, _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('pairs-control-add')
-					->setAttribute('data-type', $pair_table['id'])
+					->addClass('element-table-add')
 			))->setColSpan(5)
-		]))->setId($pair_table['id'].'_footer'));
+		])))
+))
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+);
 
-	$httpFormList->addRow($pair_table['label'],
-		(new CDiv($pair_tab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', $pair_table['id'])
-			->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
-	);
-}
+$httpFormList->addRow(_('Headers'), (new CDiv(
+	(new CTable())
+		->addClass('httpconf-dynamic-row')
+		->setAttribute('data-dynamic-rows-data', CJs::encodeJson($pairs_grouped['headers']))
+		->setAttribute('data-type', 'headers')
+		->setAttribute('style', 'width: 100%;')
+		->setHeader(['', _('Name'), '', _('Value'), ''])
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton(null, _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-add')
+			))->setColSpan(5)
+		])))
+))
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+);
 
 $httpFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
-
-zbx_add_post_js('pairManager.add("'.$httpForm->getId().'",'.CJs::encodeJson($this->data['pairs']).');');
-zbx_add_post_js('pairManager.initControls("'.$httpForm->getId().'");');
 
 /*
  * Authentication tab
  */
-$httpAuthenticationFormList = new CFormList('httpAuthenticationFormList');
+$httpAuthenticationFormList = new CFormList();
 
 // Authentication type
 $httpAuthenticationFormList->addRow(_('HTTP authentication'),
@@ -186,9 +201,9 @@ $httpAuthenticationFormList
 /*
  * Step tab
  */
-$httpStepFormList = new CFormList('httpFormList');
+$httpStepFormList = new CFormList();
 $steps_table = (new CTable())
-	->setId('httpStepTable')
+	->addClass('httpconf-steps-dynamic-row')
 	->setHeader([
 		(new CColHeader())->setWidth('15'),
 		(new CColHeader())->setWidth('15'),
@@ -202,71 +217,18 @@ $steps_table = (new CTable())
 		(new CColHeader(_('Action')))->setWidth('50')
 	]);
 
-$i = 1;
-foreach ($this->data['steps'] as $stepid => $step) {
-	if (!isset($step['name'])) {
-		$step['name'] = '';
-	}
-	if (!isset($step['timeout'])) {
-		$step['timeout'] = DB::getDefault('httpstep', 'timeout');
-	}
-	if (!isset($step['url'])) {
-		$step['url'] = '';
-	}
-
-	$numSpan = (new CSpan($i++.':'))
-		->addClass('rowNum')
-		->setId('current_step_'.$stepid);
-
-	$name = (new CLink($step['name'], 'javascript:void(0);'))
-		->setId('name_'.$stepid)
-		->setAttribute('name_step', $stepid);
-
-	if (mb_strlen($step['url']) > 70) {
-		$start = mb_substr($step['url'], 0, 35);
-		$end = mb_substr($step['url'], mb_strlen($step['url']) - 25, 25);
-		$url = (new CSpan($start.SPACE.'...'.SPACE.$end))
-			->setHint($step['url']);
-	}
-	else {
-		$url = $step['url'];
-	}
-
-	if ($this->data['templated']) {
-		$dragHandler = '';
-		$removeButton = '';
-	}
-	else {
-		$dragHandler = (new CCol(
-			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-		))->addClass(ZBX_STYLE_TD_DRAG_ICON);
-		$removeButton = (new CButton('remove_'.$stepid, _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->onClick('javascript: removeStep(this);')
-			->setAttribute('remove_step', $stepid);
-	}
-
-	$steps_table->addRow(
-		(new CRow([
-			$dragHandler,
-			$numSpan,
-			$name,
-			$step['timeout'],
-			$url,
-			htmlspecialchars($step['required']),
-			$step['status_codes'],
-			(new CCol($removeButton))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('sortable')
-			->setId('steps_'.$stepid)
-	);
-}
-
 if (!$this->data['templated']) {
 	$steps_table->addRow(
 		(new CCol(
-			(new CButton('add_step', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+			(new CButton(null, _('Add')))
+				->addClass('element-table-add')
+				->addClass(ZBX_STYLE_BTN_LINK)
 		))->setColSpan(8)
+	);
+}
+else {
+	$steps_table->addRow(
+		(new CCol(null))->setColSpan(8)->addClass('element-table-add')
 	);
 }
 
