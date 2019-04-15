@@ -902,8 +902,10 @@ class CHostInterface extends CApiService {
 					'groupCount' => true
 				]);
 				$items = zbx_toHash($items, 'interfaceid');
-				foreach ($result as $interfaceId => $interface) {
-					$result[$interfaceId]['items'] = isset($items[$interfaceId]) ? $items[$interfaceId]['rowscount'] : 0;
+				foreach ($result as $interfaceid => $interface) {
+					$result[$interfaceid]['items'] = array_key_exists($interfaceid, $items)
+						? $items[$interfaceid]['rowscount']
+						: '0';
 				}
 			}
 		}

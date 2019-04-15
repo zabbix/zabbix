@@ -494,14 +494,14 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['action.mass
 		$actions[] = ['actionid' => $actionid, 'status' => $status];
 	}
 
-	$response = API::Action()->update($actions);
+	$result = API::Action()->update($actions);
 
-	if ($response && array_key_exists('actionids', $response)) {
+	if ($result && array_key_exists('actionids', $result)) {
 		$message = $status == ACTION_STATUS_ENABLED
 			? _n('Action enabled', 'Actions enabled', $actions_count)
 			: _n('Action disabled', 'Actions disabled', $actions_count);
 
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $response['actionids']).'] '.
+		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $result['actionids']).'] '.
 			($status == ACTION_STATUS_ENABLED ? 'enabled' : 'disabled')
 		);
 		show_messages(true, $message);
@@ -522,6 +522,15 @@ elseif (hasRequest('action') && getRequest('action') == 'action.massdelete' && h
 		uncheckTableRows();
 	}
 	show_messages($result, _('Selected actions deleted'), _('Cannot delete selected actions'));
+}
+
+if (hasRequest('action') && hasRequest('g_actionid') && !$result) {
+	$actions = API::Action()->get([
+		'actionids' => getRequest('g_actionid'),
+		'output' => [],
+		'editable' => true
+	]);
+	uncheckTableRows(null, zbx_objectValues($actions, 'actionid'));
 }
 
 /*

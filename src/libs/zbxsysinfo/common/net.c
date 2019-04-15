@@ -403,7 +403,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	{
 		SET_UI64_RESULT(result, DNS_RCODE_NOERROR != res ? 0 : 1);
 		ret = SYSINFO_RET_OK;
-		goto clean;
+		goto clean_dns;
 	}
 
 	if (DNS_RCODE_NOERROR != res)
@@ -968,12 +968,13 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	ret = SYSINFO_RET_OK;
 
 clean:
+	zbx_vector_str_clear_ext(&answers, zbx_str_free);
+	zbx_vector_str_destroy(&answers);
 #ifdef _WINDOWS
+clean_dns:
 	if (DNS_RCODE_NOERROR == res)
 		DnsRecordListFree(pQueryResults, DnsFreeRecordList);
 #endif
-	zbx_vector_str_clear_ext(&answers, zbx_str_free);
-	zbx_vector_str_destroy(&answers);
 
 	return ret;
 

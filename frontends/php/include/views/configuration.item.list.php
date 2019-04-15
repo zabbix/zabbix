@@ -235,8 +235,6 @@ foreach ($data['items'] as $item) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
-
 // append table to form
 $itemForm->addItem([
 	$itemTable,

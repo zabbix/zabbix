@@ -42,8 +42,8 @@
 
 extern int	zbx_log_level;
 #define ZBX_CHECK_LOG_LEVEL(level)			\
-		((LOG_LEVEL_INFORMATION != level &&	\
-		(level > zbx_log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
+		((LOG_LEVEL_INFORMATION != (level) &&	\
+		((level) > zbx_log_level || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
 
 typedef enum
 {
@@ -59,12 +59,12 @@ zbx_err_codes_t;
 
 #ifdef HAVE___VA_ARGS__
 #	define ZBX_ZABBIX_LOG_CHECK
-#	define zabbix_log(level, fmt, ...)								\
+#	define zabbix_log(level, ...)									\
 													\
 	do												\
 	{												\
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))						\
-			__zbx_zabbix_log(level, ZBX_CONST_STRING(fmt), ##__VA_ARGS__);			\
+			__zbx_zabbix_log(level, __VA_ARGS__);						\
 	}												\
 	while (0)
 #else
