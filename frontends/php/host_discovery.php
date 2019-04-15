@@ -640,7 +640,7 @@ if (hasRequest('action') && hasRequest('g_hostdruleid') && !$result) {
 		'itemids' => getRequest('g_hostdruleid'),
 		'editable' => true
 	]);
-	uncheckTableRows(getRequest('hostid'), array_column($hostdrules, 'itemid', 'itemid'));
+	uncheckTableRows(getRequest('hostid'), zbx_objectValues($hostdrules, 'itemid'));
 }
 
 /*

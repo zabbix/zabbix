@@ -2398,12 +2398,15 @@ function hasErrorMesssages() {
  * Clears table rows selection's cookies.
  *
  * @param string $parentid  parent ID, is used as sessionStorage suffix
- * @param array  $keepids   checked rows ids [id1 => id1, id2 => id2, ...]
+ * @param array  $keepids   checked rows ids
  */
 function uncheckTableRows($parentid = null, $keepids = []) {
 	$key = implode('_', array_filter(['cb', basename($_SERVER['SCRIPT_NAME'], '.php'), $parentid]));
 
 	if ($keepids) {
+		// If $keepids will not have same key as value, it will create mess, when new checkbox will be checked.
+		$keepids = array_combine($keepids, $keepids);
+
 		insert_js('sessionStorage.setItem("'.$key.'", JSON.stringify('.CJs::encodeJson($keepids).'))');
 	}
 	else {

@@ -265,7 +265,7 @@ if (hasRequest('action') && hasRequest('group_hostid') && !$result) {
 		'hostids' => getRequest('group_hostid'),
 		'editable' => true
 	]);
-	uncheckTableRows($discoveryRule['itemid'], array_column($host_prototypes, 'hostid', 'hostid'));
+	uncheckTableRows($discoveryRule['itemid'], zbx_objectValues($host_prototypes, 'hostid'));
 }
 
 $config = select_config();

@@ -177,7 +177,7 @@ if ($triggerIds) {
 	]);
 
 	if (count($triggers) != count($triggerIds)) {
-		uncheckTableRows(getRequest('hostid'), array_column($triggers, 'triggerid', 'triggerid'));
+		uncheckTableRows(getRequest('hostid'), zbx_objectValues($triggers, 'triggerid'));
 	}
 }
 
