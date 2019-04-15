@@ -3,6 +3,8 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-15955] fixed security vulnerability - accepting connections from not allowed addresses (Andris, vso)
+..F....... [ZBX-11393] fixed when long snmp oid expands screen dimensions (ashubin, vasilijs)
 A.F....... [ZBX-15464] fixed error message for image uploads (talbergs)
 ..F....... [ZBX-10243] fixed not encoded ampersand for in URL parameter (talbergs)
 ...G...... [ZBX-15972] fixed possible crash of the windows agent when used "net.dns" item key (MVekslers)
@@ -2379,8 +2381,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 
 --------------------------------------------------------------------------------
 Changes for 3.0.27rc1
-
-New features:
 
 Bug fixes:
 ..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
