@@ -331,7 +331,7 @@ int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 				{
 					FILE	*f;
 
-					zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%d:%d/uevent",
+					zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/uevent",
 							major(stat_buf.st_rdev), minor(stat_buf.st_rdev));
 
 					if (NULL != (f = fopen(tmp, "r")))
