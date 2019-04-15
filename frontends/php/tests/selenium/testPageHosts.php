@@ -306,7 +306,13 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
 					],
 					'expected_hosts' => [
-						'Simple form test host'
+						[
+							'Name' => 'Simple form test host',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
+							]
+						]
 					]
 				]
 			],
@@ -318,9 +324,27 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
 					],
 					'expected_hosts' => [
-						'Host with tags for cloning',
-						'Host with tags for updating',
-						'Simple form test host'
+						[
+							'Name' => 'Host with tags for cloning',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: host', 'action: clone']
+							]
+						],
+						[
+							'Name' => 'Host with tags for updating',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: host', 'action: update']
+							]
+						],
+						[
+							'Name' => 'Simple form test host',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
+							]
+						]
 					]
 				]
 			],
@@ -332,9 +356,9 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Contains', 'value' => 'HOST'],
 					],
 					'expected_hosts' => [
-						'Host with tags for cloning',
-						'Host with tags for updating',
-						'Simple form test host'
+						['Name' => 'Host with tags for cloning', 'Templates' => ''],
+						['Name' => 'Host with tags for updating', 'Templates' => ''],
+						['Name' => 'Simple form test host', 'Templates' => 'Form test template']
 					]
 				]
 			],
@@ -345,7 +369,7 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Equals', 'value' => 'HOST'],
 					],
 					'expected_hosts' => [
-						'Simple form test host'
+						['Name' => 'Simple form test host']
 					]
 				]
 			],
@@ -356,9 +380,9 @@ class testPageHosts extends CLegacyWebTest {
 							['name' => 'action', 'operator' => 'Contains'],
 					],
 					'expected_hosts' => [
-						'Host with tags for cloning',
-						'Host with tags for updating',
-						'Simple form test host'
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'Simple form test host']
 					]
 				]
 			],
@@ -388,7 +412,7 @@ class testPageHosts extends CLegacyWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Check filtered result.
-		$this->checkTableRows(array_key_exists('expected_hosts', $data) ? $data['expected_hosts'] : []);
+		$this->checkTableData(array_key_exists('expected_hosts', $data) ? $data['expected_hosts'] : []);
 
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();

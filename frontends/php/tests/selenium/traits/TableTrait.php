@@ -26,25 +26,67 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 trait TableTrait {
 
 	/**
-	 * Check if values in table rows by one column match data from data provider.
+	 * Check if values in table rows match data from data provider.
 	 *
-	 * @param array   $results        data array to be match with result in table
-	 * @param string  $field          table column name
+	 * @param array   $data     data array to be match with result in table
+	 * @param string  $field    table column name
 	 */
-	public function checkTableRows($results = [], $field = 'Name') {
+	public function checkTableData($data = []) {
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
-		if (!$results) {
+		if (!$data) {
 			// Check that table contain one row with text "No data found."
 			$this->assertEquals(['No data found.'], $rows->asText());
 
 			return;
 		}
 
-		$this->assertEquals(count($results), $rows->count(), 'Rows count does not match results count in data provider.');
-		foreach ($rows as $i => $row) {
-			// Get name in row excluding inherited, dependent or master element names.
-			$row_data = $row->getColumn($field)->query('xpath:./a[not(@class)]')->one()->getText();
-			$this->assertEquals($results[$i], $row_data);
+		$this->assertEquals(count($data), $rows->count(), 'Rows count does not match results count in data provider.');
+		$this->assertEquals(array_keys($data), array_keys($rows->asArray()),
+				'Row indices don\'t not match indices in data provider.'
+		);
+
+		foreach ($data as $i => $values) {
+			$row = $rows->get($i);
+
+			foreach ($values as $name => $value) {
+				if (!is_array($value)) {
+					$value = ['text' => $value];
+				}
+
+				if (!array_key_exists('text', $value)) {
+					// There is only support for text (currently).
+					continue;
+				}
+
+				if (array_key_exists('selector', $value)) {
+					$text = (!is_array($value['text']))
+							? $row->getColumn($name)->query($value['selector'])->one()->getText()
+							: $row->getColumn($name)->query($value['selector'])->all()->asText();
+				}
+				else {
+					$text = $row->getColumn($name)->getText();
+					if (is_array($value['text'])) {
+						$text = [$text];
+					}
+				}
+
+				$this->assertEquals($value['text'], $text);
+			}
 		}
+	}
+
+	/**
+	 * Check if values in table column match data from data provider.
+	 *
+	 * @param array   $rows        data array to be match with result in table
+	 * @param string  $field          table column name
+	 */
+	public function checkTableDataColumn($rows = [], $field = 'Name') {
+		$data = [];
+		foreach ($rows as $row) {
+			$data[] = [$field => $row];
+		}
+
+		$this->checkTableData($data);
 	}
 }
