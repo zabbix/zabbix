@@ -211,13 +211,13 @@ $fields = [
 										IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
 										null
 									],
-	'http_username' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'http_username' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
 										_('Username')
 									],
-	'http_password' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'http_password' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
@@ -649,7 +649,7 @@ if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
 		'output' => [],
 		'editable' => true
 	]);
-	uncheckTableRows(getRequest('parent_discoveryid'), array_column($item_prototypes, 'itemid', 'itemid'));
+	uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($item_prototypes, 'itemid'));
 }
 
 /*

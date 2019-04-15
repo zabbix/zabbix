@@ -1638,7 +1638,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$items = zbx_toHash($items, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
-					$result[$itemid]['items'] = isset($items[$itemid]) ? $items[$itemid]['rowscount'] : 0;
+					$result[$itemid]['items'] = array_key_exists($itemid, $items) ? $items[$itemid]['rowscount'] : '0';
 				}
 			}
 		}
@@ -1674,7 +1674,9 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$triggers = zbx_toHash($triggers, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
-					$result[$itemid]['triggers'] = isset($triggers[$itemid]) ? $triggers[$itemid]['rowscount'] : 0;
+					$result[$itemid]['triggers'] = array_key_exists($itemid, $triggers)
+						? $triggers[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1710,7 +1712,9 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
-					$result[$itemid]['graphs'] = isset($graphs[$itemid]) ? $graphs[$itemid]['rowscount'] : 0;
+					$result[$itemid]['graphs'] = array_key_exists($itemid, $graphs)
+						? $graphs[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1737,7 +1741,9 @@ class CDiscoveryRule extends CItemGeneral {
 				$hostPrototypes = zbx_toHash($hostPrototypes, 'parent_itemid');
 
 				foreach ($result as $itemid => $item) {
-					$result[$itemid]['hostPrototypes'] = isset($hostPrototypes[$itemid]) ? $hostPrototypes[$itemid]['rowscount'] : 0;
+					$result[$itemid]['hostPrototypes'] = array_key_exists($itemid, $hostPrototypes)
+						? $hostPrototypes[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}

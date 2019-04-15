@@ -307,7 +307,7 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 				'editable' => true
 			]);
 
-			uncheckTableRows(getRequest('parent_discoveryid'), array_column($graphs, 'graphid', 'graphid'));
+			uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($graphs, 'graphid'));
 		}
 		show_messages($result, _('Graph prototypes deleted'), _('Cannot delete graph prototypes'));
 	}
@@ -324,7 +324,7 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 				'editable' => true
 			]);
 
-			uncheckTableRows($hostId, array_column($graphs, 'graphid', 'graphid'));
+			uncheckTableRows($hostId, zbx_objectValues($graphs, 'graphid'));
 		}
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}

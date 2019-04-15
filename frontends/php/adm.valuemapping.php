@@ -128,7 +128,7 @@ elseif (getRequest('action') === 'valuemap.delete' && hasRequest('valuemapids'))
 			'valuemapids' => getRequest('valuemapids'),
 			'output' => []
 		]);
-		uncheckTableRows(null, array_column($valuemaps, 'valuemapid', 'valuemapid'));
+		uncheckTableRows(null, zbx_objectValues($valuemaps, 'valuemapid'));
 	}
 
 	$deleted = count($valuemapids);

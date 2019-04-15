@@ -122,7 +122,7 @@ if (hasRequest('action')) {
 			'editable' => true
 		]);
 		if (count($users) != count(getRequest('group_userid'))) {
-			uncheckTableRows(null, array_column($users, 'userid', 'userid'));
+			uncheckTableRows(null, zbx_objectValues($users, 'userid'));
 		}
 	}
 }

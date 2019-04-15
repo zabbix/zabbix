@@ -388,9 +388,8 @@ class CScreen extends CApiService {
 			if ($options['groupCount']) {
 				return [['rowscount' => count($result)]];
 			}
-			else {
-				return count($result);
-			}
+
+			return (string) count($result);
 		}
 
 		if ($result) {
