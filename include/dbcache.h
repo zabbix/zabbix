@@ -279,6 +279,7 @@ typedef struct
 	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
 	char		proxy_address[HOST_PROXY_ADDRESS_LEN_MAX];
+	int		last_version_error_time;
 }
 DC_PROXY;
 
