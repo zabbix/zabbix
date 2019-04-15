@@ -1335,6 +1335,10 @@ output {
 	white-space: nowrap;
 }
 
+.wordwrap {
+	word-break: break-all;
+}
+
 .overflow-table {
 	overflow-x: auto;
 	position: relative;
