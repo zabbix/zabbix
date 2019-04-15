@@ -754,7 +754,7 @@ else {
 
 	// Skip empty tags.
 	$filter_tags = array_filter($filter_tags, function ($v) {
-		return boolval($v['tag']);
+		return (bool) $v['tag'];
 	});
 
 	$sort = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
