@@ -1417,7 +1417,7 @@ if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
 		'itemids' => getRequest('group_itemid'),
 		'editable' => true
 	]);
-	uncheckTableRows(getRequest('hostid'), array_column($itemids, 'itemid', 'itemid'));
+	uncheckTableRows(getRequest('hostid'), zbx_objectValues($itemids, 'itemid'));
 }
 
 /*

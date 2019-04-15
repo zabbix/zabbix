@@ -1159,7 +1159,7 @@ if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
 		'output' => [],
 		'editable' => true
 	]);
-	uncheckTableRows(getRequest('parent_discoveryid'), array_column($item_prototypes, 'itemid', 'itemid'));
+	uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($item_prototypes, 'itemid'));
 }
 
 /*

@@ -648,7 +648,7 @@ elseif (hasRequest('templates') && hasRequest('action') && str_in_array(getReque
 			'templateids' => $templates,
 			'editable' => true
 		]);
-		uncheckTableRows(null, array_column($templateids, 'templateid', 'templateid'));
+		uncheckTableRows(null, zbx_objectValues($templateids, 'templateid'));
 	}
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }

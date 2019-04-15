@@ -127,7 +127,7 @@ if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
 		]);
 
 		if (count($httptests) != count($testIds)) {
-			uncheckTableRows(getRequest('hostid'), array_column($httptests, 'httptestid', 'httptestid'));
+			uncheckTableRows(getRequest('hostid'), zbx_objectValues($httptests, 'httptestid'));
 		}
 	}
 }

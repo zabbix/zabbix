@@ -236,7 +236,7 @@ if (hasRequest('action') && hasRequest('g_druleid') && !$result) {
 		'druleids' => getRequest('g_druleid'),
 		'editable' => true
 	]);
-	uncheckTableRows(null, array_column($drules, 'druleid', 'druleid'));
+	uncheckTableRows(null, zbx_objectValues($drules, 'druleid'));
 }
 
 /*

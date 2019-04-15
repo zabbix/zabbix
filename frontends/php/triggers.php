@@ -177,7 +177,7 @@ if ($triggerIds) {
 	]);
 
 	if (count($triggers) != count($triggerIds)) {
-		uncheckTableRows(getRequest('hostid'), array_column($triggers, 'triggerid', 'triggerid'));
+		uncheckTableRows(getRequest('hostid'), zbx_objectValues($triggers, 'triggerid'));
 	}
 }
 
@@ -754,7 +754,7 @@ else {
 
 	// Skip empty tags.
 	$filter_tags = array_filter($filter_tags, function ($v) {
-		return boolval($v['tag']);
+		return (bool) $v['tag'];
 	});
 
 	$sort = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));

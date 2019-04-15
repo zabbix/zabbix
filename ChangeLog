@@ -11,8 +11,13 @@ Bug fixes:
 Changes for 4.2.1rc1
 
 New features:
+..F....... [ZBXNEXT-5144] increased socket response size limit (vasilijs)
 
 Bug fixes:
+..F....... [ZBX-11393] fixed when long snmp oid expands screen dimensions (ashubin, vasilijs)
+A.F....... [ZBX-15464] fixed error message for image uploads (talbergs)
+..F....... [ZBX-10243] fixed not encoded ampersand for in URL parameter (talbergs)
+...G...... [ZBX-15972] fixed possible crash of the windows agent when used "net.dns" item key (MVekslers)
 ..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
 .......PS. [ZBX-15970] fixed invalid update intervals being reported on Zabbix server when monitored through Zabbix proxy (vso)
 ........S. [ZBX-15643] fixed invalid to valid numbers conversion by del_zeros (asestakovs)
@@ -94,6 +99,7 @@ New features:
 ...G...... [ZBXNEXT-5123] added server address and port to the Zabbix sender output (wiper)
 
 Bug fixes:
+..F....... [ZBX-15931] fixed triggers filter for php 5.4 (talbergs)
 ..F....... [ZBX-15839] fixed broken layout of the breadcrumbs in Safari browser (ashubin)
 ........S. [ZBX-15867] fixed invalid DNS being accepted when receiving discovery contents from Zabbix proxy (vso)
 A......... [ZBX-15821] fixed SQL statement performance used in template.unlink() method (Sasha)
@@ -333,6 +339,10 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11393] fixed when long snmp oid expands screen dimensions (ashubin, vasilijs)
+A.F....... [ZBX-15464] fixed error message for image uploads (talbergs)
+..F....... [ZBX-10243] fixed not encoded ampersand for in URL parameter (talbergs)
+...G...... [ZBX-15972] fixed possible crash of the windows agent when used "net.dns" item key (MVekslers)
 ..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
 .......PS. [ZBX-15970] fixed invalid update intervals being reported on Zabbix server when monitored through Zabbix proxy (vso)
 ........S. [ZBX-15643] fixed invalid to valid numbers conversion by del_zeros (asestakovs)
@@ -2706,8 +2716,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 
 --------------------------------------------------------------------------------
 Changes for 3.0.27rc1
-
-New features:
 
 Bug fixes:
 ..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)

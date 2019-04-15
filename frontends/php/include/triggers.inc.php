@@ -2073,6 +2073,13 @@ function evalExpressionData($expression, $replaceFunctionMacros) {
 	return $result;
 }
 
+/**
+ * Converts a string representation of various time and byte measures into corresponding SI unit value.
+ *
+ * @param string $value  String value with byte or time suffix.
+ *
+ * @return string|int  Corresponding SI unit value.
+ */
 function convert($value) {
 	$value = trim($value);
 
@@ -2084,16 +2091,16 @@ function convert($value) {
 	$value = $arr['value'];
 	switch ($arr['mult']) {
 		case 'T':
-			$value *= 1024 * 1024 * 1024 * 1024;
+			$value = bcmul($value, bcmul(ZBX_KIBIBYTE, ZBX_GIBIBYTE));
 			break;
 		case 'G':
-			$value *= 1024 * 1024 * 1024;
+			$value = bcmul($value, ZBX_GIBIBYTE);
 			break;
 		case 'M':
-			$value *= 1024 * 1024;
+			$value = bcmul($value, ZBX_MEBIBYTE);
 			break;
 		case 'K':
-			$value *= 1024;
+			$value = bcmul($value, ZBX_KIBIBYTE);
 			break;
 		case 'm':
 			$value *= 60;
