@@ -720,32 +720,21 @@ class CHostInterface extends CApiService {
 		$this->checkMainInterfaces($interfaces);
 	}
 
+	/**
+	 * Validate count of main interfaces for every type. Throws exception if there will be more than one main
+	 * host interface of same type.
+	 *
+	 * @param array $interfaces                     Array of interfaces to validate.
+	 * @param int   $interfaces[]['hostid']         updated interface hostid.
+	 * @param int   $interfaces[]['interfaceid']    Updated interfaceid.
+	 *
+	 * @throws APIException
+	 */
 	private function checkMainInterfacesOnUpdate(array $interfaces) {
-		$interfaceidsWithoutHostIds = [];
-
-		// gather all hostids where interfaces should be checked
-		foreach ($interfaces as $interface) {
-			if (isset($interface ['type']) || isset($interface['main'])) {
-				if (isset($interface['hostid'])) {
-					$hostids[$interface['hostid']] = $interface['hostid'];
-				}
-				else {
-					$interfaceidsWithoutHostIds[] = $interface['interfaceid'];
-				}
-			}
-		}
-
-		// gather missing host ids
-		$hostIds = [];
-		if ($interfaceidsWithoutHostIds) {
-			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.dbConditionInt('i.interfaceid', $interfaceidsWithoutHostIds));
-			while ($hostData = DBfetch($dbResult)) {
-				$hostIds[$hostData['hostid']] = $hostData['hostid'];
-			}
-		}
+		$hostids = array_keys(array_flip(zbx_objectValues($interfaces, 'hostid')));
 
 		$dbInterfaces = API::HostInterface()->get([
-			'hostids' => $hostIds,
+			'hostids' => $hostids,
 			'output' => ['hostid', 'main', 'type'],
 			'preservekeys' => true,
 			'nopermissions' => true
@@ -756,7 +745,7 @@ class CHostInterface extends CApiService {
 			if (isset($dbInterfaces[$interface['interfaceid']])) {
 				$dbInterfaces[$interface['interfaceid']] = array_merge(
 					$dbInterfaces[$interface['interfaceid']],
-					$interfaces[$interface['interfaceid']]
+					$interface
 				);
 			}
 		}
