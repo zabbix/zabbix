@@ -303,6 +303,7 @@ class CUser extends CApiService {
 		unset($user);
 
 		$this->checkDuplicates(zbx_objectValues($users, 'alias'));
+		$this->checkLanguages(zbx_objectValues($users, 'lang'));
 		$this->checkUserGroups($users, []);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -447,6 +448,7 @@ class CUser extends CApiService {
 		if ($aliases) {
 			$this->checkDuplicates($aliases);
 		}
+		$this->checkLanguages(zbx_objectValues($users, 'lang'));
 		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -534,6 +536,21 @@ class CUser extends CApiService {
 						_s('Incorrect value for field "%1$s": %2$s.', 'passwd', _('cannot be empty'))
 					);
 				}
+			}
+		}
+	}
+
+	/**
+	 * Check if specified language has dependent locale installed.
+	 *
+	 * @param array $languages
+	 *
+	 * @throws APIException if language locale is not installed.
+	 */
+	private function checkLanguages(array $languages) {
+		foreach ($languages as $lang) {
+			if ($lang !== 'en_GB' && !setlocale(LC_MONETARY , zbx_locale_variants($lang))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Language "%1$s" is not supported.', $lang));
 			}
 		}
 	}
