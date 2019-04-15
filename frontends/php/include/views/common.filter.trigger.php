@@ -128,7 +128,9 @@ $column2 = (new CFormList())->addRow(_('Host inventory'), $inventoryFilterTable)
 
 // ack status
 $column2->addRow(_('Show unacknowledged only'),
-	(new CCheckBox('ack_status'))->setChecked($filter['ackStatus'] == 1)
+	(new CCheckBox('ack_status'))
+		->setChecked($filter['ackStatus'] == 1)
+		->setUncheckedValue(0)
 );
 
 // suppressed problem filter
