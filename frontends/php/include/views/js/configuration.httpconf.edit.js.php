@@ -1,791 +1,802 @@
-<script type="text/x-jquery-tmpl" id="scenarioPairRow">
+<script type="text/x-jquery-tmpl" id="scenario-step-row-templated">
+	<?= (new CRow([
+			'',
+			(new CSpan('1:'))->addClass('rowNum'),
+			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{httpstepid});')),
+			'#{timeout}',
+			(new CSpan('#{url_short}'))->setTitle('#{url}'),
+			'#{required}',
+			'#{status_codes}',
+			''
+		]))
+			->setAttribute('data-step-id', '#{httpstepid}')
+			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="scenario-step-row">
+	<?= (new CRow([
+			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CSpan('1:'))->addClass('rowNum'),
+			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{httpstepid});')),
+			'#{timeout}',
+			(new CSpan('#{url_short}'))->setTitle('#{url}'),
+			'#{required}',
+			'#{status_codes}',
+			(new CCol((new CButton(null, _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->setAttribute('data-step-id', '#{httpstepid}')
+			->addClass('sortable')
+			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="scenario-pair-row">
 	<?= (new CRow([
 			(new CCol([
-				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-				new CInput('hidden', 'pairs[#{pair.id}][isNew]', '#{pair.isNew}'),
-				new CInput('hidden', 'pairs[#{pair.id}][id]', '#{pair.id}'),
-				(new CInput('hidden', 'pairs[#{pair.id}][type]', '#{pair.type}'))->setId('pair_type_#{pair.id}'),
+				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			]))
-				->addClass('pair-drag-control')
 				->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CTextBox('pairs[#{pair.id}][name]', '#{pair.name}'))
-				->setAttribute('data-type', 'name')
+			(new CTextBox(null, '#{name}'))
 				->setAttribute('placeholder', _('name'))
+				->setAttribute('data-type', 'name')
 				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 			'&rArr;',
-			(new CTextBox('pairs[#{pair.id}][value]', '#{pair.value}'))
-				->setAttribute('data-type', 'value')
+			(new CTextBox(null, '#{value}'))
 				->setAttribute('placeholder', _('value'))
+				->setAttribute('data-type', 'value')
 				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 			(new CCol(
-				(new CButton('removePair_#{pair.id}', _('Remove')))
+				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('remove')
-					->setAttribute('data-pairid', '#{pair.id}')
+					->addClass('element-table-remove')
 			))
 				->addClass(ZBX_STYLE_NOWRAP)
-				->addClass('pair-control')
 		]))
-			->setId('pairRow_#{pair.id}')
-			->addClass('pairRow')
+			->addClass('form_row')
 			->addClass('sortable')
-			->setAttribute('data-pairid', '#{pair.id}')
 			->toString()
 	?>
 </script>
 
 <script type="text/javascript">
-	var pairManager = (function() {
-		'use strict';
-
-		var rowTemplate = new Template(jQuery('#scenarioPairRow').html()),
-			allPairs = {};
-
-		/**
-		 * Creates HTML for pair, inserts it in page.
-		 *
-		 * @param {string}	formid	Id of current form HTML form element.
-		 * @param {object}	pair	Object with pair data.
-		 */
-		function renderPairRow(formid, pair) {
-			var parent,
-				target = jQuery(getDomTargetIdForRowInsert(pair.type), jQuery('#'+formid)),
-				pair_row = jQuery(rowTemplate.evaluate({'pair': pair}));
-
-			if (!target.parents('.pair-container').hasClass('pair-container-sortable')) {
-				pair_row.find('.<?= ZBX_STYLE_DRAG_ICON ?>').remove();
-			}
-
-			target.before(pair_row);
-			parent = jQuery('#pairRow_' + pair.id);
-			parent.find('input[data-type]').on('change', function() {
-				var	target = jQuery(this),
-					parent = target.parents('.pairRow'),
-					id = parent.data('pairid'),
-					pair = allPairs[id];
-
-				pair[target.data('type')] = target.val();
-				allPairs[id] = pair;
-			});
-		}
-
-		/**
-		 * Prepares ID for block, at the end of which new pair will be added.
-		 *
-		 * @param {string}	type	Type of pair to be added.
-		 *
-		 * @return {string}
-		 */
-		function getDomTargetIdForRowInsert(type) {
-			return '#' + type.toLowerCase().trim() + '_footer';
-		}
-
-		/**
-		 * Add pair in allPairs array.
-		 *
-		 * @param {object}	pair	Object with pair data. Should contain id.
-		 *
-		 * @return {object}
-		 */
-		function addPair(pair) {
-			if (pair.isNew === 'true') {
-				pair.isNew = true;
-			}
-			allPairs[pair.id] = pair;
-			return pair;
-		}
-
-		/**
-		 * Creates new pair object from provided data.
-		 *
-		 * @param {object}	options		Object with pair options that are different from default. Should contain type.
-		 *
-		 * @return {object}
-		 */
-		function createNewPair(options) {
-			var newPair = jQuery.extend({
-				formid: '',
-				isNew: true,
-				type: '',
-				name: '',
-				value: ''
-			}, options);
-
-			newPair.id = 1;
-			while (allPairs[newPair.id] !== void(0)) {
-				newPair.id++;
-			}
-
-			return addPair(newPair);
-		}
-
-		/**
-		 * Makes sortable handler inactive, if nothing to sort.
-		 */
-		function refreshContainers() {
-			jQuery('.pair-container-sortable').each(function() {
-				jQuery(this).sortable({
-					disabled: (jQuery(this).find('tr.sortable').length < 2)
-				});
-			});
-		}
-
-		return {
-			/**
-			 * Add pair when form is being created.
-			 *
-			 * @param {string}	formid	Id of current form HTML form element.
-			 * @param {object}	pairs	Object with pair objects.
-			 */
-			add: function(formid, pairs) {
-				for (var i = 0; i < pairs.length; i++) {
-					pairs[i]['formid'] = formid;
-					renderPairRow(formid, addPair(pairs[i]));
-				}
-
-				jQuery('.pair-container', jQuery('#'+formid)).each(function() {
-					var rows = jQuery(this).find('.pairRow').length;
-					if (rows === 0) {
-						renderPairRow(formid, createNewPair({formid: formid, type: this.id}));
-					}
-				});
-
-				refreshContainers();
-			},
-
-			/**
-			 * Add empty pair at the block of pair's type.
-			 *
-			 * @param {string}	formid		Id of current form HTML form element.
-			 * @param {object}	options		Object with new pair options, that are different from default.
-			 *								Should contain type.
-			 */
-			addNew: function(formid, options) {
-				options.formid = formid;
-				renderPairRow(formid, createNewPair(options));
-				refreshContainers();
-			},
-
-			/**
-			 * Delete pair with given ID from allPairs.
-			 *
-			 * @param {number}	pairId		Id of pair, that should be removed.
-			 */
-			remove: function(pairId) {
-				delete allPairs[pairId];
-				refreshContainers();
-			},
-
-			/**
-			 * Add listeners to HTML elements in web scenario and web step forms.
-			 *
-			 * @param {string}	formid		Id of current form HTML form element.
-			 */
-			initControls: function(formid) {
-				var $form = jQuery('#'+formid);
-				$form.on('click', 'button.remove', function() {
-					var pairId = jQuery(this).data('pairid');
-					jQuery('#pairRow_' + pairId).remove();
-					pairManager.remove(pairId);
-				});
-
-				jQuery('.pair-container-sortable', $form).sortable({
-					disabled: (jQuery(this).find('tr.sortable').length < 2),
-					items: 'tr.sortable',
-					axis: 'y',
-					cursor: 'move',
-					containment: 'parent',
-					handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-					tolerance: 'pointer',
-					opacity: 0.6,
-					helper: function(e, ui) {
-						return ui;
-					},
-					start: function(e, ui) {
-						$(ui.placeholder).height($(ui.helper).height());
-					}
-				});
-
-				jQuery('.pairs-control-add', $form).on('click', function() {
-					pairManager.addNew(formid, {type:jQuery(this).data('type')});
-				});
-
-				jQuery('#retrieve_mode', $form)
-					.on('change', function() {
-						jQuery('#post_fields', $form).toggleClass('disabled',this.checked);
-						jQuery('#required, #posts, #post_fields input[type="text"], #post_fields .btn-link,' +
-								'#post_type input', $form)
-							.attr('disabled', this.checked);
-
-						if (this.checked === false) {
-							pairManager.refresh();
-						}
-					})
-					.trigger('change');
-			},
-
-			/**
-			 * Makes sortable handler inactive, if nothing to sort.
-			 *
-			 * @param {string} formid  Id of current form HTML element.
-			 */
-			refresh: function(formid) {
-				if (formid) {
-					jQuery('.pair-container').each(function() {
-						if (jQuery(this).find('.pairRow').length == 0) {
-							renderPairRow(formid, createNewPair({formid: formid, type: this.id}));
-						}
-					});
-				}
-				refreshContainers();
-			},
-
-			/**
-			 * Removes all new pairs with empty name and value (of given type withing given form).
-			 *
-			 * @param {string}	formid	Id of current form HTML element.
-			 * @param {string}	type	Type of pairs that should be cleaned.
-			 */
-			cleanup: function(formid, type) {
-				var pairs = this.getPairsByType(formid, type);
-
-				for (var p = 0; p < pairs.length; p++) {
-					if (pairs[p].isNew === true && pairs[p].name === '' && pairs[p].value === '') {
-						jQuery('#pairRow_' + pairs[p].id).remove();
-						delete allPairs[pairs[p].id];
-					}
-				}
-			},
-
-			/**
-			 * Finds all pairs of given type within given form.
-			 *
-			 * @param {string}	formid	Id of current form HTML element.
-			 * @param {string}	type	Type of pairs that should be found.
-			 */
-			getPairsByType: function(formid, type) {
-				var	pairs = [],
-					existingPairs = Object.keys(allPairs);
-
-				for (var p = 0; p < existingPairs.length; p++) {
-					if (allPairs[existingPairs[p]].type === type && allPairs[existingPairs[p]].formid === formid) {
-						pairs.push(allPairs[existingPairs[p]]);
-					}
-				}
-
-				return pairs;
-			},
-
-			/**
-			 * Removes all pairs and their fields of given type in given form.
-			 *
-			 * @param {string}	formid	Id of current form HTML element.
-			 * @param {string}	type	String with type of pair, or '', if all pairs for the form should be removed.
-			 */
-			removeAll: function(formid, type) {
-				var pairs = Object.keys(allPairs);
-
-				for (var p = 0; p < pairs.length; p++) {
-					if (allPairs[pairs[p]].formid === formid
-							&& (type === '' || allPairs[pairs[p]].type === type)) {
-						jQuery('#'+formid+' [id="pairRow_'+pairs[p]+'"]').remove();
-						delete allPairs[pairs[p]];
-					}
-				}
-			}
-		};
-	}());
-
-	/**
-	 * Removes step, when Remove button in step is clicked.
-	 *
-	 * @param {obj}	obj	Step remove button object.
-	 */
-	function removeStep(obj) {
-		var step = obj.getAttribute('remove_step'),
-			table = jQuery('#httpStepTable');
-
-		jQuery('#steps_' + step).remove();
-
-		jQuery('input[id^=steps_' + step + '_]').each( function() {
-			this.remove();
-		});
-
-		if (table.find('tr.sortable').length <= 1) {
-			table.sortable('disable');
-		}
-
-		recalculateSortOrder();
-	}
-
-	/**
-	 * Changes ID's of steps in table (data in row and all hidden fields with step data),
-	 * after one of existing steps is deleted.
-	 */
-	function recalculateSortOrder() {
-		var i = 0;
-
-		jQuery('#httpStepTable tr.sortable .rowNum').each(function() {
-			var step = (i == 0) ? '0' : i;
-
-			// Rewrite ids to temp.
-			jQuery('#remove_' + step).attr('id', 'tmp_remove_' + step);
-			jQuery('#name_' + step).attr('id', 'tmp_name_' + step);
-			jQuery('#steps_' + step).attr('id', 'tmp_steps_' + step);
-			jQuery('#current_step_' + step).attr('id', 'tmp_current_step_' + step);
-
-			jQuery('input[id^=steps_' + step + '_]').each( function() {
-				var input = jQuery(this),
-					id = input.attr('id').replace(/^steps_[0-9]+_/, 'tmp_steps_' + step + '_');
-
-				input.attr('id', id);
-			});
-
-			// Set order number.
-			jQuery(this)
-				.attr('new_step', i)
-				.text((i + 1) + ':');
-			i++;
-		});
-
-		// Rewrite ids in new order.
-		for (var n = 0; n < i; n++) {
-			var currStep = jQuery('#tmp_current_step_' + n),
-				newStep = currStep.attr('new_step');
-
-			jQuery('#tmp_remove_' + n).attr('id', 'remove_' + newStep);
-			jQuery('#tmp_name_' + n).attr('id', 'name_' + newStep);
-			jQuery('#tmp_steps_' + n).attr('id', 'steps_' + newStep);
-			jQuery('#remove_' + newStep).attr('remove_step', newStep);
-			jQuery('#name_' + newStep).attr('name_step', newStep);
-
-			jQuery('input[id^=tmp_steps_' + n + '_]').each( function() {
-				var	input = jQuery(this),
-					id = input.attr('id').replace(/^tmp_steps_[0-9]+_/, 'steps_' + newStep + '_'),
-					name = input.attr('name').replace(/^steps\[[0-9]+\]/, 'steps[' + newStep + ']');
-
-				input.attr('id', id);
-				input.attr('name', name);
-			});
-
-			jQuery('#steps_' + newStep + '_no').val(parseInt(newStep) + 1);
-
-			// Set new step order position.
-			currStep.attr('id', 'current_step_' + newStep);
-		}
-	}
 
 	jQuery(function($) {
-		var stepTable = $('#httpStepTable'),
-			stepTableWidth = stepTable.width(),
-			stepTableColumns = $('#httpStepTable .header td'),
-			stepTableColumnWidths = [];
-
-		stepTableColumns.each(function() {
-			stepTableColumnWidths[stepTableColumnWidths.length] = $(this).width();
-		});
-
-		stepTable.sortable({
-			disabled: (stepTable.find('tr.sortable').length < 2),
-			items: 'tbody tr.sortable',
-			axis: 'y',
-			cursor: 'move',
-			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-			tolerance: 'pointer',
-			opacity: 0.6,
-			update: recalculateSortOrder,
-			create: function () {
-				// Force not to change table width.
-				stepTable.width(stepTableWidth);
-			},
-			helper: function(e, ui) {
-				ui.children().each(function(i) {
-					var td = $(this);
-
-					td.width(stepTableColumnWidths[i]);
-				});
-
-				// When dragging element on safari, it jumps out of the table.
-				if (SF) {
-					// Move back draggable element to proper position.
-					ui.css('left', (ui.offset().left - 2) + 'px');
-				}
-
-				stepTableColumns.each(function(i) {
-					$(this).width(stepTableColumnWidths[i]);
-				});
-
-				return ui;
-			},
-			start: function(e, ui) {
-				// Fix placeholder not to change height while object is being dragged.
-				$(ui.placeholder).height($(ui.helper).height());
+		window.httpconf = {
+			templated: <?= $data['templated'] ? 1 : 0 ?>,
+			ZBX_POSTTYPE_RAW: <?= ZBX_POSTTYPE_RAW ?>,
+			ZBX_POSTTYPE_FORM: <?= ZBX_POSTTYPE_FORM ?>,
+			ZBX_STYLE_DRAG_ICON: <?= zbx_jsvalue(ZBX_STYLE_DRAG_ICON) ?>,
+			HTTPTEST_STEP_RETRIEVE_MODE_HEADERS: <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>,
+			msg: {
+				data_not_encoded: <?= CJs::encodeJson(_('Data is not properly encoded.')); ?>,
+				name_filed_length_exceeded: <?= CJs::encodeJson(_('Name of the form field should not exceed 255 characters.')); ?>,
+				value_without_name: <?= CJs::encodeJson(_('Values without names are not allowed in form fields.')); ?>,
+				failed_to_parse_url: <?= CJs::encodeJson(_('Failed to parse URL.')); ?>,
+				ok: <?= CJs::encodeJson(_('Ok')); ?>,
+				error: <?= CJs::encodeJson(_('Error')); ?>,
+				url_not_encoded_properly: <?= CJs::encodeJson(_('URL is not properly encoded.')); ?>,
+				cannot_convert_into_raw: <?= CJs::encodeJson(_('Cannot convert POST data from raw data format to form field data format.')); ?>
 			}
+		};
+
+		window.httpconf.scenario = new Scenario(
+			$('#scenarioTab'), <?= zbx_jsvalue($this->data['agentVisibility'], true) ?>);
+		window.httpconf.steps = new Steps(
+			$('#stepTab'), <?= CJs::encodeJson(array_values($data['steps'])) ?>);
+		window.httpconf.authentication = new Authentication(
+			$('#authenticationTab'), <?= HTTPTEST_AUTH_NONE ?>);
+
+		window.httpconf.$form = $('#httpForm').on('submit', function(e) {
+			this.append(httpconf.scenario.toFragment());
+			this.append(httpconf.steps.toFragment());
 		});
-
-		// Http step add pop up.
-		<?php if (!$this->data['templated']) : ?>
-			$('#add_step').click(function(event) {
-				var form = $(this).parents('form');
-
-				// Append existing step names.
-				var step_names = [];
-				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, step) {
-					step_names.push($(step).val());
-				});
-
-				var popup_options = {dstfrm: 'httpForm'};
-				if (step_names.length > 0) {
-					popup_options['steps_names'] = step_names;
-				}
-
-				return PopUp('popup.httpstep', popup_options, null, event.target);
-			});
-		<?php endif ?>
-
-		// Http step edit pop up.
-		<?php foreach ($this->data['steps'] as $i => $step): ?>
-			$('#name_<?= $i ?>').click(function(event) {
-				// Append existing step names.
-				var step_names = [];
-				var form = $(this).parents('form');
-				form.find('input[name^=steps]').filter('input[name*=name]:not([name*=pairs])').each(function(i, step) {
-					step_names.push($(step).val());
-				});
-
-				var popup_options = <?= CJs::encodeJson([
-					'dstfrm' => 'httpForm',
-					'templated' => $this->data['templated'] ? 1 : 0,
-					'list_name' => 'steps',
-					'name' => $step['name'],
-					'url' => $step['url'],
-					'posts' => $step['posts'],
-					'pairs' => (array_key_exists('pairs', $step)) ? $step['pairs'] : [],
-					'post_type' => $step['post_type'],
-					'timeout' => $step['timeout'],
-					'required' => $step['required'],
-					'status_codes' => $step['status_codes'],
-					'old_name' => $step['name'],
-					'retrieve_mode' => $step['retrieve_mode'],
-					'follow_redirects' => $step['follow_redirects']
-				]) ?>
-
-				if (step_names.length > 0) {
-					popup_options['steps_names'] = step_names;
-				}
-
-				return PopUp('popup.httpstep',jQuery.extend(popup_options,{
-					stepid: jQuery(this).attr('name_step')
-				}), null, event.target);
-			});
-		<?php endforeach ?>
-
-		$('#authentication').on('change', function() {
-			var httpFieldsDisabled = ($(this).val() == <?= HTTPTEST_AUTH_NONE ?>);
-
-			$('#http_user')
-				.attr('disabled', httpFieldsDisabled)
-				.closest('li').toggle(!httpFieldsDisabled);
-			$('#http_password')
-				.attr('disabled', httpFieldsDisabled)
-				.closest('li').toggle(!httpFieldsDisabled);
-		});
-
-		<?php if (isset($this->data['agentVisibility']) && $this->data['agentVisibility']): ?>
-			new CViewSwitcher('agent', 'change', <?= zbx_jsvalue($this->data['agentVisibility'], true) ?>);
-		<?php endif ?>
-
-		$('#agent').trigger('change');
-		$('#authentication').trigger('change');
 	});
 
 	/**
-	 * Inital post type selection for "Post type" field.
+	 * Represents authentication tab in web layout.
 	 *
-	 * @param {string}	formid	Id of current form HTML element.
-	 * @param {int}		type	Value for "Post type" field.
+	 * @param {jQuery} $tab
+	 * @param {integer} disabled_value  Dropdown value that should hide credentials input.
 	 */
-	function setPostType(formid, type) {
-		var $form = jQuery('#'+formid);
-		if (type == <?= ZBX_POSTTYPE_FORM ?>) {
-			jQuery('#post_fields_row', $form).css('display', 'table-row');
-			jQuery('#post_raw_row', $form).css('display', 'none');
-		}
-		else {
-			jQuery('#post_fields_row', $form).css('display', 'none');
-			jQuery('#post_raw_row', $form).css('display', 'table-row');
-		}
+	function Authentication($tab, disabled_value) {
+		this.$type_select = jQuery('select#authentication', $tab);
+		this.$user = jQuery('#http_user', $tab);
+		this.$password = jQuery('#http_password', $tab);
 
-		jQuery('input[name="post_type"][value="' + type + '"]', $form).prop('checked', true);
+		this.$type_select.on('change', function(e) {
+			var http_fields_disabled = (e.target.value == disabled_value);
+			this.$user.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
+			this.$password.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
+		}.bind(this));
+		this.$type_select.trigger('change');
 	}
 
 	/**
-	 * Converts "Form data" pairs to "Raw data" text and vice versa for post values.
+	 * Represents scenario tab in web layout.
 	 *
-	 * @param {string}	formid	Id of current form HTML element.
-	 * @param {int}		type	New value for "Post type" field.
+	 * @param {jQuery} $tab
+	 * @param {object} switcher_conf  CViewSwitcher configuration.
 	 */
-	function switchToPostType(formid, type, trigger_elmnt) {
-		if (type == <?= ZBX_POSTTYPE_FORM ?>) {
-			var	posts = jQuery('#posts', jQuery('#'+formid)).val(),
-				fields,
-				parts,
-				pair,
-				pairs = [];
+	function Scenario($tab, switcher_conf) {
+		new CViewSwitcher('agent', 'change', switcher_conf);
+		this.pairs = {
+			'variables': null,
+			'headers': null
+		};
 
-			if (posts !== '') {
-				fields = posts.split('&');
+		jQuery('.httpconf-dynamic-row', $tab).each(function(index, table) {
+			var $table = jQuery(table),
+				type = $table.data('type');
 
-				try {
-					for (var i = 0; i < fields.length; i++) {
-						parts = fields[i].split('=');
-						if (parts.length === 1) {
-							parts.push('');
-						}
-
-						pair = {};
-						try {
-							if (parts.length > 2) {
-								throw null;
-							}
-
-							if (/%[01]/.match(parts[0]) || /%[01]/.match(parts[1]) ) {
-								// Non-printable characters in data.
-								throw null;
-							}
-
-							pair.name = decodeURIComponent(parts[0].replace(/\+/g, ' '));
-							pair.value = decodeURIComponent(parts[1].replace(/\+/g, ' '));
-						}
-						catch(e) {
-							throw <?= CJs::encodeJson(_('Data is not properly encoded.')); ?>;
-						}
-
-						if (pair.name === '') {
-							throw <?= CJs::encodeJson(_('Values without names are not allowed in form fields.')); ?>;
-						}
-
-						if (pair.name.length > 255) {
-							throw <?= CJs::encodeJson(_('Name of the form field should not exceed 255 characters.')); ?>;
-						}
-
-						pairs.push(pair);
+			this.pairs[type] = $table
+				.dynamicRows({
+					keep_min_rows: 1,
+					template: '#scenario-pair-row'
+				})
+				.sortable({
+					items: 'tbody tr.sortable',
+					axis: 'y',
+					cursor: 'move',
+					containment: 'parent',
+					handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
+					tolerance: 'pointer',
+					opacity: 0.6,
+					start: function(e, ui) {
+						ui.placeholder.height(ui.item.height());
 					}
-				}
-				catch(e) {
-					jQuery('input[name="post_type"][value="<?= ZBX_POSTTYPE_RAW ?>"]', jQuery('#'+formid))
-						.prop('checked', true);
+				})
+				.on('tableupdate.dynamicRows', function(e, data) {
+					data.dynamicRows.$element.sortable('option','disabled', data.dynamicRows.length < 2);
+				}).data('dynamicRows');
 
-					overlayDialogue({
-						'title': <?= CJs::encodeJson(_('Error')); ?>,
-						'content': jQuery('<span>').html(<?=
-							CJs::encodeJson(
-								_('Cannot convert POST data from raw data format to form field data format.').'<br><br>'
-							); ?> + e),
-						'buttons': [
-							{
-								title: <?= CJs::encodeJson(_('Ok')); ?>,
-								class: 'btn-alt',
-								focused: true,
-								action: function() {}
-							}
-						]
-					}, trigger_elmnt);
-
-					return false;
-				}
-			}
-
-			pairManager.removeAll(formid, 'post_fields');
-			for (var i = 0; i < pairs.length; i++) {
-				pairManager.addNew(formid, {
-					type: 'post_fields',
-					name: pairs[i].name,
-					value: pairs[i].value
-				});
-			}
-			pairManager.refresh(formid);
-
-		}
-		else {
-			var fields = [],
-				parts,
-				pairs = pairManager.getPairsByType(formid, 'post_fields');
-
-			for (var p = 0; p < pairs.length; p++) {
-				parts = [];
-				if (pairs[p].name !== '') {
-					parts.push(encodeURIComponent(pairs[p].name.replace(/'/g,'%27').replace(/"/g,'%22')));
-				}
-				if (pairs[p].value !== '') {
-					parts.push(encodeURIComponent(pairs[p].value.replace(/'/g,'%27').replace(/"/g,'%22')));
-				}
-				if (parts.length > 0) {
-					fields.push(parts.join('='));
-				}
-			}
-
-			jQuery('#posts').val(fields.join('&'));
-		}
-
-		setPostType(formid, type);
+			$table.sortable('option','disabled', $table.data('dynamicRows').length < 2);
+		}.bind(this));
 	}
 
 	/**
-	 * Parse action for URL field. Parses "URL" field string to "Query fields" pairs.
+	 * The parts of form that are easier to maintain in functional objects are transformed into hidden input fields.
 	 *
-	 * @param {string}	formid	Id of current form HTML element.
+	 * @return {DocumentFragment}
 	 */
-	function parseUrl(formid) {
-		var target = jQuery('#url', jQuery('#'+formid)),
-			url = parseUrlString(target.val());
+	Scenario.prototype.toFragment = function() {
+		var frag = new DocumentFragment(),
+			iter = 0;
 
-		if (typeof url === 'object') {
-			if (url.pairs.length > 0) {
-				jQuery.each(url.pairs, function(i, pair) {
-					pair.type = 'query_fields';
-					pairManager.addNew(formid, pair);
-				});
-				pairManager.cleanup(formid, 'query_fields');
+		this.pairs.headers.eachRow(function(i, node) {
+			var name = node.querySelector('[data-type="name"]').value,
+				value = node.querySelector('[data-type="value"]').value,
+				prefix = 'pairs[' + (iter ++) + ']';
+
+			frag.append(hiddenInput('type',  'headers', prefix));
+			frag.append(hiddenInput('name',  name,      prefix));
+			frag.append(hiddenInput('value', value,     prefix));
+		});
+
+		this.pairs.variables.eachRow(function(i, node) {
+			var name = node.querySelector('[data-type="name"]').value,
+				value = node.querySelector('[data-type="value"]').value,
+				prefix = 'pairs[' + (iter ++) + ']';
+
+			frag.append(hiddenInput('type',  'variables', prefix));
+			frag.append(hiddenInput('name',  name,        prefix));
+			frag.append(hiddenInput('value', value,       prefix));
+		});
+
+		return frag;
+	};
+
+	/**
+	 * Represents steps tab in web layout.
+	 *
+	 * @param {jQuery} $tab
+	 * @param {array} steps  Initial step objects data array.
+	 */
+	function Steps($tab, steps) {
+		this.new_stepid = 0;
+		this.steps = {};
+		this.steps_sort_order = [];
+
+		var that = this;
+		steps.forEach(function(step) {
+			that.steps[step.httpstepid] = new Step(step);
+		});
+
+		this.$container = jQuery('.httpconf-steps-dynamic-row', $tab);
+		this.$container.dynamicRows({
+			template: httpconf.templated ? '#scenario-step-row-templated' : '#scenario-step-row',
+			dataCallback(data) {
+				return jQuery.extend({
+					url_short: midEllipsis(data.url, 65),
+				}, data);
 			}
+		})
 
-			target.val(url.url);
+		if (!httpconf.templated) {
+			this.$container.sortable({
+				items: 'tbody tr.sortable',
+				axis: 'y',
+				cursor: 'move',
+				containment: 'parent',
+				handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
+				tolerance: 'pointer',
+				update: this.onSortOrderChange.bind(this),
+				opacity: 0.6,
+				start: function(e, ui) {
+					ui.placeholder.height(ui.item.height());
+				}
+			})
 		}
-		else {
-			overlayDialogue({
-				'title': <?= CJs::encodeJson(_('Error')); ?>,
-				'content': jQuery('<span>').html(<?=
-					CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
-				?>),
-				'buttons': [
-					{
-						title: <?= CJs::encodeJson(_('Ok')); ?>,
-						class: 'btn-alt',
-						focused: true,
-						action: function() {}
-					}
-				]
+
+		this.dynamicRows = this.$container.data('dynamicRows');
+
+		this.dynamicRows.setData(steps)
+
+		if (!httpconf.templated) {
+			this.$container.each(function(index, el) {
+				$el = jQuery(el);
+				$el.sortable('option','disabled', $el.data('dynamicRows').length < 2);
 			});
 
-			return false;
+			this.$container.on('beforeadd.dynamicRows', function(e) {
+				if (!e.originalEvent) {
+					// If event is not triggered by click, but invoked programmatically.
+					return;
+				}
+				e.preventDefault();
+				that.openNew();
+			});
+
+			this.$container.on('tableupdate.dynamicRows', function(e, data) {
+				data.dynamicRows.$element.sortable('option','disabled', data.dynamicRows.length < 2);
+				that.onSortOrderChange();
+			});
 		}
+
+		this.onSortOrderChange();
 	}
 
 	/**
-	 * Adds new step to web scenario form with data from popup.
+	 * A helper method for truncating string in middle.
 	 *
-	 * @param {string}	formname	Web monitoring scenario form name.
-	 * @param {obj}		httpstep	Object with web scenario step values.
+	 * @param {string} str  String to be shortened into mid-elliptic.
+	 * @param {int} max     Max length of resulting string.
 	 */
-	function add_httpstep(formname, httpstep) {
-		var form = window.document.forms[formname];
-		if (!form) {
-			return false;
+	function midEllipsis(str, max) {
+		if (str.length < max) {
+			return str;
 		}
 
-		add_var_to_opener_obj(form, 'new_httpstep[name]', httpstep.name);
-		add_var_to_opener_obj(form, 'new_httpstep[timeout]', httpstep.timeout);
-		add_var_to_opener_obj(form, 'new_httpstep[url]', httpstep.url);
-		add_var_to_opener_obj(form, 'new_httpstep[posts]', httpstep.posts);
-		add_var_to_opener_obj(form, 'new_httpstep[post_type]', httpstep.post_type);
-		add_var_to_opener_obj(form, 'new_httpstep[required]', httpstep.required);
-		add_var_to_opener_obj(form, 'new_httpstep[status_codes]', httpstep.status_codes);
-		add_var_to_opener_obj(form, 'new_httpstep[follow_redirects]', httpstep.follow_redirects);
-		add_var_to_opener_obj(form, 'new_httpstep[retrieve_mode]', httpstep.retrieve_mode);
+		var sep = '...',
+			max = max - sep.length,
+			len = max / 2,
+			pt1 = str.slice(0, Math.floor(len)),
+			pt2 = str.slice(- Math.ceil(len));
 
-		addPairsToOpenerObject(form, 'new_httpstep', httpstep.pairs);
-
-		form.submit();
-		return true;
+		return pt1 + sep + pt2;
 	}
 
 	/**
-	 * Updates existing step in web scenario form with data from popup.
+	 * A helper method for creating hidden input nodes.
 	 *
-	 * @param {string}	formname	Web monitoring scenario form name.
-	 * @param {string}	list_name	List name.
-	 * @param {obj}		httpstep	Object with web scenario step values.
-	 */
-	function update_httpstep(formname, list_name, httpstep) {
-		var prefix,
-			form = window.document.forms[formname];
-
-		if (!form) {
-			return false;
-		}
-
-		prefix = list_name + '[' + httpstep.stepid + ']';
-
-		add_var_to_opener_obj(form, prefix + '[name]', httpstep.name);
-		add_var_to_opener_obj(form, prefix + '[timeout]', httpstep.timeout);
-		add_var_to_opener_obj(form, prefix + '[url]', httpstep.url);
-		add_var_to_opener_obj(form, prefix + '[posts]', httpstep.posts);
-		add_var_to_opener_obj(form, prefix + '[post_type]', httpstep.post_type);
-		add_var_to_opener_obj(form, prefix + '[required]', httpstep.required);
-		add_var_to_opener_obj(form, prefix + '[status_codes]', httpstep.status_codes);
-		add_var_to_opener_obj(form, prefix + '[follow_redirects]', httpstep.follow_redirects);
-		add_var_to_opener_obj(form, prefix + '[retrieve_mode]', httpstep.retrieve_mode);
-
-		addPairsToOpenerObject(form, prefix, httpstep.pairs);
-		form.submit();
-		return true;
-	}
-
-	/**
-	 * Adds step value as hidden field to web scenario form.
+	 * @param {string} name
+	 * @param {string} value
+	 * @param {string?} prefix
 	 *
-	 * @param {obj}		obj		Web monitoring scenario form name.
-	 * @param {string}	name	Field or single pair name.
-	 * @param {mixed}	value	Value that will be added for field with given name.
+	 * @return {Node}
 	 */
-	function add_var_to_opener_obj(obj, name, value) {
+	function hiddenInput(name, value, prefix) {
 		var input = window.document.createElement('input');
 
-		input.value = value;
 		input.type = 'hidden';
-		input.name = name;
-		obj.appendChild(input);
+		input.value = value;
+		input.name = prefix ? prefix + '[' + name + ']' : name;
+
+		return input;
 	}
 
 	/**
-	 * Prepares names for web scenario step pairs to be added to web scenario form.
-	 * Removes all previous steps, before adding new.
+	 * The parts of form that are easier to maintain in functional objects are transformed into hidden input fields.
 	 *
-	 * @param {obj}		obj			Web monitoring scenario form name.
-	 * @param {string}	name		Field name.
-	 * @param {obj}		stepPairs	Object with web scenario step values.
+	 * @return {DocumentFragment}
 	 */
-	function addPairsToOpenerObject(obj, name, stepPairs) {
-		var prefix,
-			keys,
-			pairs,
-			inputs;
+	Steps.prototype.toFragment = function() {
+		var frag = new DocumentFragment()
+			iter_step = 0;
 
-		name += '[pairs]';
-		inputs = jQuery(window.document).find('input[name^="' + name + '"]');
-		for (var i = 0; i < inputs.length; i++) {
-			inputs[i].remove();
+		this.steps_sort_order.forEach(function(id) {
+			var iter_pair = 0,
+				step = this.steps[id],
+				prefix_step = 'steps[' + (iter_step ++) + ']';
+
+			frag.append(hiddenInput('follow_redirects', step.data.follow_redirects, prefix_step));
+			frag.append(hiddenInput('httpstepid',       step.data.httpstepid,       prefix_step));
+			frag.append(hiddenInput('name',             step.data.name,             prefix_step));
+			frag.append(hiddenInput('post_type',        step.data.post_type,        prefix_step));
+			frag.append(hiddenInput('required',         step.data.required,         prefix_step));
+			frag.append(hiddenInput('retrieve_mode',    step.data.retrieve_mode,    prefix_step));
+			frag.append(hiddenInput('status_codes',     step.data.status_codes,     prefix_step));
+			frag.append(hiddenInput('timeout',          step.data.timeout,          prefix_step));
+			frag.append(hiddenInput('url',              step.data.url,              prefix_step));
+
+			if (step.data.retrieve_mode != httpconf.HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
+				if (step.data.post_type != httpconf.ZBX_POSTTYPE_FORM) {
+					frag.append(hiddenInput('posts', step.data.posts, prefix_step));
+				}
+				else {
+					step.data.pairs.post_fields.forEach(function(pair) {
+						var prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
+						frag.append(hiddenInput('type',  'post_fields', prefix_pair));
+						frag.append(hiddenInput('name',  pair.name,     prefix_pair));
+						frag.append(hiddenInput('value', pair.value,    prefix_pair));
+					});
+				}
+			}
+
+			step.data.pairs.query_fields.forEach(function(pair) {
+				var prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
+				frag.append(hiddenInput('type',  'query_fields', prefix_pair));
+				frag.append(hiddenInput('name',  pair.name,      prefix_pair));
+				frag.append(hiddenInput('value', pair.value,     prefix_pair));
+			});
+
+			step.data.pairs.variables.forEach(function(pair) {
+				var prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
+				frag.append(hiddenInput('type',  'variables', prefix_pair));
+				frag.append(hiddenInput('name',  pair.name,   prefix_pair));
+				frag.append(hiddenInput('value', pair.value,  prefix_pair));
+			});
+			step.data.pairs.headers.forEach(function(pair) {
+				var prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
+				frag.append(hiddenInput('type',  'headers',  prefix_pair));
+				frag.append(hiddenInput('name',  pair.name,  prefix_pair));
+				frag.append(hiddenInput('value', pair.value, prefix_pair));
+			});
+
+		}.bind(this));
+
+		return frag;
+	};
+
+	/**
+	 * This method maintains property for iterating steps in order, and updates visual counter in DOM.
+	 */
+	Steps.prototype.onSortOrderChange = function() {
+		var order = [];
+		this.$container.find('[data-step-id]').each(function(index) {
+			this.querySelector('.rowNum').innerText = (index + 1) + ':';
+			order.push(this.attributes.getNamedItem('data-step-id').value)
+		})
+		this.steps_sort_order = order;
+	};
+
+	/**
+	 * Updates step data with Steps object.
+	 *
+	 * @param {object} step  Step data, that holds accurate httpstepid filed.
+	 */
+	Steps.prototype.updateStep = function(step) {
+		jQuery.extend(this.steps[step.httpstepid].data, step);
+		this.dynamicRows.setData([]);
+		this.steps_sort_order.forEach(function(httpstepid) {
+			this.dynamicRows.addRow(this.steps[httpstepid].data);
+		}.bind(this));
+	};
+
+	/**
+	 * Adds or updates newly created step data with Steps object.
+	 *
+	 * @param {object} step  Step data, that holds accurate httpstepid filed.
+	 */
+	Steps.prototype.addStep = function(step) {
+		if (this.steps_sort_order.indexOf(step.httpstepid) === -1) {
+			this.steps_sort_order.push(step.httpstepid);
+		}
+		this.updateStep(step);
+	};
+
+	/**
+	 * Used to validate step names with server, on PopUp form validate event.
+	 *
+	 * @return {array}  Array of strings.
+	 */
+	Steps.prototype.getStepNames = function() {
+		var names = [];
+
+		for (var httpstepid in this.steps) {
+			names.push(this.steps[httpstepid].data.name);
 		}
 
-		pairs = Object.keys(stepPairs);
-		for (var i = 0; i < pairs.length; i++) {
-			if (!/[0-9]+/.match(pairs[i])) {
-				continue;
-			}
+		return names;
+	};
 
-			var pair = stepPairs[pairs[i]];
-			prefix = name + '[' + pair.id + ']';
+	/**
+	 * This method hydrates the parsed html PopUp form with data from specific step.
+	 *
+	 * @param {integer} httpstepid
+	 */
+	Steps.prototype.onStepOverlayReadyCb = function(httpstepid) {
+		this.edit_form = new StepEditForm(jQuery('#http_step'), this.steps[httpstepid]);
+	};
 
-			// Empty values are ignored.
-			if (typeof pair.name === 'undefined'
-					|| (typeof pair.isNew !== 'undefined' && pair.name === '' && pair.value === '')) {
-				continue;
-			}
+	/**
+	 * Creates new step id and opens form for it.
+	 */
+	Steps.prototype.openNew = function() {
+		this.new_stepid -= 1;
+		this.steps[this.new_stepid] = new Step({httpstepid: this.new_stepid});
+		this.open(this.new_stepid);
+	};
 
-			keys = Object.keys(pair);
-			for (var p = 0; p < keys.length; p++) {
-				add_var_to_opener_obj(obj, prefix + '[' + keys[p] + ']', pair[keys[p]]);
+	/**
+	 * Opens popup for a step.
+	 *
+	 * @param {integer} httpstepid
+	 */
+	Steps.prototype.open = function(httpstepid) {
+		var refocus = (httpstepid != this.new_stepid)
+			? this.$container.find('[data-step-id="' + httpstepid + '"] a')
+			: this.$container.find('.element-table-add');
+
+		this.steps[httpstepid].open(refocus);
+	};
+
+	/**
+	 * This object represents a step of web scenario.
+	 *
+	 * @param {object} data  Optional step initial data.
+	 */
+	function Step(data) {
+		var defaults = {
+			pairs: {
+				query_fields: [],
+				post_fields: [],
+				variables: [],
+				headers: []
 			}
+		};
+		this.data = jQuery.extend(true, data, defaults);
+	}
+
+	/**
+	 * Opens step popup edit or create form.
+	 * Note: a callback this.onStepOverlayReadyCb is called from within popup form once it is parsed.
+	 *
+	 * @param {Node} refocus
+	 */
+	Step.prototype.open = function(refocus) {
+		return PopUp('popup.httpstep', {
+			httpstepid:       this.data.httpstepid,
+			templated:        httpconf.templated,
+			name:             this.data.name,
+			url:              this.data.url,
+			posts:            this.data.posts,
+			post_type:        this.data.post_type,
+			timeout:          this.data.timeout,
+			required:         this.data.required,
+			status_codes:     this.data.status_codes,
+			old_name:         this.data.name,
+			retrieve_mode:    this.data.retrieve_mode,
+			follow_redirects: this.data.follow_redirect,
+			steps_names:      httpconf.steps.getStepNames()
+		}, null, refocus);
+	};
+
+	/**
+	 * @param {jQuery} $form
+	 * @param {Step} step_ref  Reference to step instance from Steps object.
+	 */
+	function StepEditForm($form, step_ref) {
+		this.$form = $form;
+		this.step = step_ref;
+
+		var $pairs = jQuery('.httpconf-dynamic-row', $form);
+
+		$pairs
+			.sortable({
+				items: 'tbody tr.sortable',
+				axis: 'y',
+				cursor: 'move',
+				containment: 'parent',
+				handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
+				tolerance: 'pointer',
+				opacity: 0.6,
+				start: function(e, ui) {
+					ui.placeholder.height(ui.item.height());
+				}
+			});
+
+		this.pairs = {
+			query_fields: null,
+			post_fields: null,
+			variables: null,
+			headers: null
+		}
+
+		$pairs.each(function(index, node) {
+			var $node = jQuery(node),
+				type = $node.data('type');
+
+			this.pairs[type] = $node.dynamicRows({
+				keep_min_rows: 1,
+				template: '#scenario-pair-row'
+			})
+			.data('dynamicRows')
+			.setData(this.step.data.pairs[type]);
+		}.bind(this));
+
+		$pairs.each(function(index, el) {
+			$el = jQuery(el);
+			$el.sortable('option','disabled', $el.data('dynamicRows').length < 2);
+		});
+
+		$pairs.on('tableupdate.dynamicRows', function(e, data) {
+			data.dynamicRows.$element.sortable('option','disabled', data.dynamicRows.length < 2);
+		});
+
+		this.$checkbox_retrieve_mode = jQuery('#retrieve_mode', $form);
+
+		this.$input_required_string = jQuery('#required', $form);
+		this.$textarea_raw_post = jQuery('#posts', $form);
+		this.$radio_post_type = jQuery('#post_type input', $form);
+
+		this.$radio_post_type.val = function(value) {
+			if (typeof value === 'undefined') {
+				return this.filter(':checked').val();
+			}
+			this.filter('[value="' + value + '"]').get(0).checked = true;
+		};
+
+		this.$radio_post_type.on('change', this.onPostTypeChange.bind(this));
+
+		this.togglePostTypeForm(this.$radio_post_type.val() == httpconf.ZBX_POSTTYPE_RAW);
+		this.$checkbox_retrieve_mode.on('change', this.onRetrieveModeChange.bind(this)).trigger('change');
+		this.$input_url = jQuery('#url', $form);
+	}
+
+	/**
+	 * Retrieve mode changed event handler.
+	 */
+	StepEditForm.prototype.onRetrieveModeChange = function() {
+		var disable = this.$checkbox_retrieve_mode.prop('checked');
+
+		this.$input_required_string.prop('disabled', disable);
+		this.$textarea_raw_post.prop('disabled', disable);
+		this.$radio_post_type.prop('disabled', disable);
+		this.pairs.post_fields.$element.sortable('option', 'disabled', disable);
+		this.pairs.post_fields.$element.toggleClass('disabled', disable);
+		this.pairs.post_fields.$element.find('input').prop('disabled', disable);
+		this.pairs.post_fields.disabled(disable);
+	}
+
+	/**
+	 * Post type changed event handler.
+	 */
+	StepEditForm.prototype.onPostTypeChange = function(e) {
+		var is_raw = (this.$radio_post_type.val() == httpconf.ZBX_POSTTYPE_RAW);
+
+		try {
+			this.setPostTypeRaw(!is_raw);
+		}
+		catch(err) {
+			this.$radio_post_type.val(is_raw ? httpconf.ZBX_POSTTYPE_FORM : httpconf.ZBX_POSTTYPE_RAW);
+			this.showPostTypeError(err, e.target);
 		}
 	}
+
+	/**
+	 * Appends to query fields dynamic rows based on url field.
+	 */
+	StepEditForm.prototype.parseUrl = function() {
+		var url = parseUrlString(this.$input_url.val());
+
+		if (url === false) {
+			var html_msg = httpconf.msg.failed_to_parse_url + '<br><br>' + httpconf.msg.url_not_encoded_properly;
+
+			return this.errorDialog(html_msg, this.$input_url);
+		}
+
+		// We add one by one instead of using setData, because we append to preexisting dynamic pairs.
+		url.pairs.forEach(function(pair) {
+			this.pairs.query_fields.addRow(pair);
+		}.bind(this));
+
+		this.$input_url.val(url.url);
+	};
+
+	/**
+	 * @param {string} msg  Error message.
+	 * @param {Node|jQuery} trigger_elmnt  An element that the focus will be retuned to.
+	 */
+	StepEditForm.prototype.errorDialog = function(msg, trigger_elmnt) {
+		overlayDialogue({
+			'title': httpconf.msg.error,
+			'content': jQuery('<span>').html(msg),
+			'buttons': [{
+				title: httpconf.msg.ok,
+				class: 'btn-alt',
+				focused: true,
+				action: function() {}
+			}]
+		}, trigger_elmnt);
+	}
+
+	/**
+	 * @param {string} msg
+	 * @param {Node|jQuery} trigger_elmnt  An element that the focus will be retuned to.
+	 */
+	StepEditForm.prototype.showPostTypeError = function(msg, trigger_elmnt) {
+		this.errorDialog(httpconf.msg.cannot_convert_into_raw + '<br><br>' + msg, trigger_elmnt);
+	};
+
+	/**
+	 * This method builds query string from pairs given.
+	 *
+	 * @throws
+	 *
+	 * @param {array} pairs  Array of pair objects. Pair is an object with two keys - name and value.
+	 *
+	 * @return {string}
+	 */
+	StepEditForm.prototype.parsePostPairsToRaw = function(pairs) {
+		var fields = [];
+
+		pairs.forEach(function(pair) {
+			var parts = [];
+			if (pair.name === '') {
+				throw httpconf.msg.value_without_name;
+			}
+			parts.push(encodeURIComponent(pair.name.replace(/'/g,'%27').replace(/"/g,'%22')));
+			if (pair.value !== '') {
+				parts.push(encodeURIComponent(pair.value.replace(/'/g,'%27').replace(/"/g,'%22')));
+			}
+			fields.push(parts.join('='));
+		});
+
+		return fields.join('&');
+	};
+
+	/**
+	 * This method parses query string into pairs.
+	 *
+	 * @throws
+	 *
+	 * @param {string} raw_txt  Query string that will be parsed into pairs.
+	 *
+	 * @return {array}  Array of pair objects. Pair is an object with two keys - name and value.
+	 */
+	StepEditForm.prototype.parsePostRawToPairs = function(raw_txt) {
+		var pairs = [];
+
+		if (!raw_txt) {
+			return pairs;
+		}
+
+		raw_txt.split('&').forEach(function(pair) {
+			var fields = pair.split('=');
+
+			if (fields[0] === '') {
+				throw httpconf.msg.value_without_name;
+			}
+
+			if (fields[0].length > 255) {
+				throw httpconf.msg.name_filed_length_exceeded;
+			}
+
+			if (fields.length == 1) {
+				fields.push('');
+			}
+
+			var malformed = fields.length > 2,
+				non_printable_chars = (/%[01]/.match(fields[0]) || /%[01]/.match(fields[1]));
+
+			if (malformed || non_printable_chars) {
+				throw httpconf.msg.data_not_encoded;
+			}
+
+			pairs.push({
+				name: decodeURIComponent(fields[0].replace(/\+/g, ' ')),
+				value: decodeURIComponent(fields[1].replace(/\+/g, ' '))
+			});
+		});
+
+		return pairs;
+	};
+
+	/**
+	 * This method switches between textarea and dynamic field layouts.
+	 *
+	 * @param {bool} set_raw
+	 */
+	StepEditForm.prototype.togglePostTypeForm = function(set_raw) {
+		this.$textarea_raw_post.closest('#post-raw-row').css('display', set_raw ? 'table-row' : 'none');
+		this.pairs.post_fields.$element.closest('#post-fields-row').css('display', !set_raw ? 'table-row' : 'none');
+	};
+
+	/**
+	 * This method tries to parse and populate textarea contents into dynamic fields
+	 * or populates dynamic fields into text. On success it updates layout.
+	 *
+	 * @throws
+	 *
+	 * @param {bool} set_raw
+	 */
+	StepEditForm.prototype.setPostTypeRaw = function(set_raw) {
+		if (set_raw) {
+			var pairs = this.parsePostRawToPairs(this.$textarea_raw_post.val());
+			this.pairs.post_fields.setData(pairs);
+		}
+		else {
+			var pairs = [];
+			// This way sortable order is preserved.
+			this.pairs.post_fields.eachRow(function(i, node) {
+				var name = node.querySelector('[data-type="name"]').value,
+					value = node.querySelector('[data-type="value"]').value;
+
+				if (name || value) {
+					pairs.push({name: name, value: value});
+				}
+			});
+			this.$textarea_raw_post.val(this.parsePostPairsToRaw(pairs));
+		}
+
+		this.togglePostTypeForm(!set_raw);
+	};
+
+	/**
+	 * Current state is always rendered form httpconf.steps object.  This method collects data from form fields
+	 * and writes it in httpconf.steps object. Note that sort order is read from DOM.
+	 */
+	StepEditForm.prototype.formToData = function() {
+		for (var type in this.pairs) {
+			this.step.data.pairs[type] = [];
+			this.pairs[type].eachRow(function(index, row) {
+				var name = row.querySelector('[data-type="name"]').value,
+					value = row.querySelector('[data-type="value"]').value;
+				if (name || value) {
+					this.push({name: name, value: value});
+				}
+			}.bind(this.step.data.pairs[type]));
+		}
+	};
+
+	/**
+	 * This method is bound via popup button attribute. It posts serialized version of current form to be validated.
+	 * Note that we do not bother posting dynamic fields, since they are not validated at this point.
+	 */
+	StepEditForm.prototype.validate = function() {
+		var url = new Curl(this.$form.attr('action')),
+			dialogueid = this.$form.closest("[data-dialogueid]").attr("data-dialogueid");
+
+		this.$form.trimValues(['#step_name', '#url', '#timeout', '#required', '#status_codes']);
+
+		url.setArgument('validate', 1);
+		this.$form.parent().find('.msg-bad, .msg-good').remove();
+
+		return jQuery.ajax({
+			url: url.getUrl(),
+			data: this.$form.serialize(),
+			dataType: 'json',
+			type: 'post'
+		})
+		.done(function(ret) {
+			if (typeof ret.errors !== 'undefined') {
+				return jQuery(ret.errors).insertBefore(this.$form);
+			}
+
+			this.formToData();
+			if (ret.params.httpstepid < 0) {
+				httpconf.steps.addStep(ret.params);
+			}
+			else {
+				httpconf.steps.updateStep(ret.params);
+			}
+
+			overlayDialogueDestroy(dialogueid);
+		}.bind(this));
+	};
+
 </script>
