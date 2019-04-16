@@ -386,7 +386,7 @@ class CPageFilter {
 		$parents = [];
 		foreach ($groups as $group) {
 			$parent = explode('/', $group['name']);
-			for (array_pop($parent); $parent; array_pop($parent)) {
+			while (array_pop($parent) && $parent) {
 				$parents[implode('/', $parent)] = true;
 			}
 		}
