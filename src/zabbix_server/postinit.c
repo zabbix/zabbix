@@ -121,7 +121,7 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 {
 	int		pos = 0, macro_len, macro_type;
 	zbx_token_t	token;
-	size_t		name_alloc, name_len, replace_alloc = 64, replace_offset;
+	size_t		name_alloc, name_len, replace_alloc = 64, replace_offset, r, l;
 	char		*replace;
 	const char	*macro;
 	DB_EVENT	event;
@@ -136,8 +136,6 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 	{
 		if (ZBX_TOKEN_MACRO == token.type || ZBX_TOKEN_FUNC_MACRO == token.type)
 		{
-			size_t	l, r;
-
 			/* the macro excluding the opening and closing brackets {}, for example: ITEM.VALUE */
 			if (ZBX_TOKEN_MACRO == token.type)
 			{
@@ -186,8 +184,6 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 		{
 			if (ZBX_TOKEN_LLD_MACRO == token.type || ZBX_TOKEN_LLD_FUNC_MACRO == token.type)
 			{
-				size_t	l, r;
-
 				if (ZBX_TOKEN_LLD_MACRO == token.type)
 				{
 					l = token.data.lld_macro.name.l;
@@ -208,8 +204,7 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 					zbx_strncpy_alloc(&replace, &replace_alloc, &replace_offset, macro, macro_len);
 
 					token.loc.r += zbx_replace_mem_dyn(&trigger->description, &name_alloc,
-							&name_len, l - 1, macro_len + 1, replace,
-							replace_offset);
+							&name_len, l - 1, macro_len + 1, replace, replace_offset);
 				}
 			}
 			pos = token.loc.r;
