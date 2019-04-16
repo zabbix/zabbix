@@ -940,8 +940,12 @@ function getConditionFormula(conditions, evalType) {
 		this.options = options;
 		this.$element = $element;
 		this.length = 0;
-		this.counter = (options.counter !== null) ? options.counter : $element.find(options.row).length;
+		this.counter = 0;
 		this.rows = {};
+
+		this.$element.find(this.options.row).each(function(index, element) {
+			this.addRow(element);
+		}.bind(this));
 
 		this.$element.on('click', options.add, this.addRow.bind(this));
 		if (initialRows) {
@@ -995,10 +999,33 @@ function getConditionFormula(conditions, evalType) {
 		this.options.disabled = disable;
 	}
 
+
+	/*
+	 * @param {object|HTMLElement} data  Data to be passed into template or row element to be hydrated.
+	 *
+	 * @return {jQuery}  Element with bound events.
+	 */
+	DynamicRows.prototype.getRowElem = function(data) {
+		var $row;
+
+		if (data instanceof HTMLElement) {
+			$row = $(data);
+		}
+		else {
+			var template = new Template($(this.options.template).html());
+			$row = $(template.evaluate(this.getTemplateData(data)));
+		}
+
+		$row.find(this.options.remove)
+			.on('click', this.removeRow.bind(this, this.counter));
+
+		return $row;
+	}
+
 	/**
 	 * Adds a row before the given row.
 	 *
-	 * @param {object} data  Data to be passed into template.
+	 * @param {object|HTMLElement} data  Data to be passed into template or row element to be hydrated.
 	 */
 	DynamicRows.prototype.addRow = function(data) {
 		if (this.options.disabled) {
@@ -1017,17 +1044,11 @@ function getConditionFormula(conditions, evalType) {
 			return;
 		}
 
-		var $beforeRow = (this.options['beforeRow'] !== null)
-			? this.$element.find(this.options['beforeRow'])
-			: this.$element.find(this.options['add']).closest('tr');
+		var $beforeRow = (this.options.beforeRow !== null)
+			? this.$element.find(this.options.beforeRow)
+			: this.$element.find(this.options.add).closest('tr');
 
-
-		var template = new Template($(this.options.template).html());
-		var $row = $(template.evaluate(this.getTemplateData(data)));
-		$row.data('dynamicRowData', data);
-
-		$row.find(this.options['remove'])
-			.on('click', this.removeRow.bind(this, this.counter));
+		var $row = this.getRowElem(data);
 
 		this.rows[this.counter] = $row;
 		if ($beforeRow.length == 0) {
