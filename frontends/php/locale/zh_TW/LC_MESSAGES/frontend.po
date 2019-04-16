@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-14 01:44+0300\n"
+"POT-Creation-Date: 2019-04-16 17:24+0300\n"
 "PO-Revision-Date: 2019-03-23 23:45+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -287,7 +287,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:571
 #: include/views/configuration.item.massupdate.php:248
 #: include/views/configuration.item.prototype.edit.php:516
-#: include/views/js/configuration.discovery.edit.js.php:113
+#: include/views/js/configuration.discovery.edit.js.php:110
 msgid "AES"
 msgstr "AES"
 
@@ -625,8 +625,8 @@ msgstr "作用中直到"
 #: include/views/js/configuration.action.edit.js.php:268
 #: include/views/js/configuration.action.edit.js.php:654
 #: include/views/js/configuration.correlation.edit.js.php:47
-#: include/views/js/configuration.discovery.edit.js.php:126
-#: include/views/js/configuration.discovery.edit.js.php:707
+#: include/views/js/configuration.discovery.edit.js.php:123
+#: include/views/js/configuration.discovery.edit.js.php:704
 #: include/views/js/monitoring.screen.edit.js.php:83
 #: include/views/js/monitoring.slideconf.edit.js.php:99
 #: include/views/js/monitoring.sysmap.edit.js.php:101
@@ -948,7 +948,7 @@ msgstr "包括任何字元字串"
 msgid "Application"
 msgstr "應用集"
 
-#: httpconf.php:324 include/classes/api/services/CApplication.php:266
+#: httpconf.php:314 include/classes/api/services/CApplication.php:266
 #, c-format
 msgid "Application \"%1$s\" already exists."
 msgstr "應用集 \"%1$s\"已存在."
@@ -1221,7 +1221,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:553
 #: include/views/configuration.item.massupdate.php:234
 #: include/views/configuration.item.prototype.edit.php:508
-#: include/views/js/configuration.discovery.edit.js.php:103
+#: include/views/js/configuration.discovery.edit.js.php:100
 msgid "Authentication passphrase"
 msgstr "驗證密碼"
 
@@ -1229,7 +1229,7 @@ msgstr "驗證密碼"
 #: include/views/configuration.item.edit.php:547
 #: include/views/configuration.item.massupdate.php:221
 #: include/views/configuration.item.prototype.edit.php:501
-#: include/views/js/configuration.discovery.edit.js.php:95
+#: include/views/js/configuration.discovery.edit.js.php:92
 msgid "Authentication protocol"
 msgstr "驗證協定"
 
@@ -1509,10 +1509,10 @@ msgstr "加拿大 (136 字元)"
 #: include/views/js/administration.general.trigger.options.js.php:21
 #: include/views/js/administration.general.triggerSeverity.js.php:13
 #: include/views/js/configuration.action.edit.js.php:76
-#: include/views/js/configuration.discovery.edit.js.php:127
-#: include/views/js/configuration.discovery.edit.js.php:569
-#: include/views/js/configuration.discovery.edit.js.php:640
-#: include/views/js/configuration.discovery.edit.js.php:670
+#: include/views/js/configuration.discovery.edit.js.php:124
+#: include/views/js/configuration.discovery.edit.js.php:566
+#: include/views/js/configuration.discovery.edit.js.php:637
+#: include/views/js/configuration.discovery.edit.js.php:667
 #: include/views/js/conf.import.js.php:16
 #: include/views/monitoring.slideconf.edit.php:277 jsLoader.php:111
 #: jsLoader.php:122 jsLoader.php:286 jsLoader.php:298
@@ -1646,7 +1646,7 @@ msgstr ""
 msgid "Cannot add network map"
 msgstr "無法新增網路拓墣圖"
 
-#: httpconf.php:339
+#: httpconf.php:329
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
 msgstr "無法新增新應用集 \"%1$s\""
@@ -1689,7 +1689,7 @@ msgstr "無法新增模板"
 msgid "Cannot add trigger"
 msgstr "無法新增觸發器"
 
-#: trigger_prototypes.php:239
+#: trigger_prototypes.php:229
 msgid "Cannot add trigger prototype"
 msgstr "無法新增原型觸發器"
 
@@ -1705,7 +1705,7 @@ msgstr "無法新增用户. 兩次輸入的密碼必須一致."
 msgid "Cannot add value map"
 msgstr "無法新增值對應"
 
-#: httpconf.php:215
+#: httpconf.php:205
 msgid "Cannot add web scenario"
 msgstr "無法新增網頁檢測"
 
@@ -1726,7 +1726,7 @@ msgstr ""
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
 msgstr ""
 
-#: httpconf.php:206 httpconf.php:515 items.php:912 items.php:1294
+#: httpconf.php:196 httpconf.php:505 items.php:912 items.php:1294
 msgid "Cannot clear history"
 msgstr "無法清除歷史"
 
@@ -1815,7 +1815,7 @@ msgstr "無法創建探索規則"
 msgid "Cannot create icon map"
 msgstr "無法創建圖示對應"
 
-#: httpconf.php:224
+#: httpconf.php:214
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "無法創建新應用集，網頁檢測已指定到另一應用集"
 
@@ -2052,11 +2052,11 @@ msgstr "無法刪除範本的網頁檢測 \"%1$s\""
 msgid "Cannot delete trigger"
 msgstr "無法删除觸發器"
 
-#: trigger_prototypes.php:347
+#: trigger_prototypes.php:337
 msgid "Cannot delete trigger prototype"
 msgstr "無法刪除觸發器原型"
 
-#: trigger_prototypes.php:462
+#: trigger_prototypes.php:452
 msgid "Cannot delete trigger prototypes"
 msgstr "無法刪除原型觸發器"
 
@@ -2073,7 +2073,7 @@ msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "無法刪除值對應"
 
-#: httpconf.php:166 httpconf.php:524
+#: httpconf.php:156 httpconf.php:514
 msgid "Cannot delete web scenario"
 msgstr "無法刪除網頁檢測"
 
@@ -2119,7 +2119,7 @@ msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
 msgstr[0] "無法停用 用戶群組"
 
-#: httpconf.php:468
+#: httpconf.php:458
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "無法停用網頁檢測"
@@ -2174,7 +2174,7 @@ msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
 msgstr[0] "無法啟用 用戶群組"
 
-#: httpconf.php:467
+#: httpconf.php:457
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "無法啟用網頁檢測"
@@ -2824,7 +2824,7 @@ msgstr "無法更新觸發器"
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr ""
 
-#: trigger_prototypes.php:332 trigger_prototypes.php:452
+#: trigger_prototypes.php:322 trigger_prototypes.php:442
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] ""
@@ -2834,7 +2834,7 @@ msgstr[0] ""
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr ""
 
-#: trigger_prototypes.php:416
+#: trigger_prototypes.php:406
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
@@ -2850,11 +2850,11 @@ msgstr "無法更新用户. 兩次輸入的密碼必須一致."
 msgid "Cannot update value map"
 msgstr "無法更新值對應"
 
-#: httpconf.php:211
+#: httpconf.php:201
 msgid "Cannot update web scenario"
 msgstr ""
 
-#: include/views/js/configuration.discovery.edit.js.php:636
+#: include/views/js/configuration.discovery.edit.js.php:633
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr ""
 
@@ -2947,7 +2947,7 @@ msgstr "機殼"
 msgid "Chassis information. Returns string"
 msgstr ""
 
-#: include/views/js/configuration.discovery.edit.js.php:566
+#: include/views/js/configuration.discovery.edit.js.php:563
 msgid "Check already exists."
 msgstr "檢查已存在."
 
@@ -2974,7 +2974,7 @@ msgstr ""
 msgid "Check the key, please. Default example was passed."
 msgstr "請檢查鍵值. 用的是預設的例子."
 
-#: include/views/js/configuration.discovery.edit.js.php:36
+#: include/views/js/configuration.discovery.edit.js.php:37
 msgid "Check type"
 msgstr "檢查類型"
 
@@ -3630,7 +3630,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:494
 #: include/views/configuration.item.massupdate.php:193
 #: include/views/configuration.item.prototype.edit.php:477
-#: include/views/js/configuration.discovery.edit.js.php:72
+#: include/views/js/configuration.discovery.edit.js.php:70
 msgid "Context name"
 msgstr ""
 
@@ -4002,7 +4002,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:570
 #: include/views/configuration.item.massupdate.php:247
 #: include/views/configuration.item.prototype.edit.php:515
-#: include/views/js/configuration.discovery.edit.js.php:112
+#: include/views/js/configuration.discovery.edit.js.php:109
 msgid "DES"
 msgstr ""
 
@@ -4186,7 +4186,7 @@ msgstr "硬體購買日期"
 msgid "Day"
 msgstr "日"
 
-#: include/func.inc.php:2694
+#: include/func.inc.php:2697
 msgid "Day before yesterday"
 msgstr ""
 
@@ -4897,9 +4897,9 @@ msgstr "由系統代理程式探索"
 msgid "Discovery check"
 msgstr "探索檢查"
 
-#: include/views/js/configuration.discovery.edit.js.php:565
-#: include/views/js/configuration.discovery.edit.js.php:634
-#: include/views/js/configuration.discovery.edit.js.php:666
+#: include/views/js/configuration.discovery.edit.js.php:562
+#: include/views/js/configuration.discovery.edit.js.php:631
+#: include/views/js/configuration.discovery.edit.js.php:663
 msgid "Discovery check error"
 msgstr "探索檢查錯誤"
 
@@ -5848,7 +5848,7 @@ msgid "FALSE"
 msgstr "偽"
 
 #: include/discovery.inc.php:50
-#: include/views/js/configuration.discovery.edit.js.php:183
+#: include/views/js/configuration.discovery.edit.js.php:180
 msgid "FTP"
 msgstr "FTP"
 
@@ -6619,7 +6619,7 @@ msgid "H:i:s"
 msgstr "H:i:s"
 
 #: include/discovery.inc.php:51
-#: include/views/js/configuration.discovery.edit.js.php:184
+#: include/views/js/configuration.discovery.edit.js.php:181
 msgid "HTTP"
 msgstr "HTTP"
 
@@ -6651,7 +6651,7 @@ msgid "HTTP settings"
 msgstr ""
 
 #: include/discovery.inc.php:62
-#: include/views/js/configuration.discovery.edit.js.php:185
+#: include/views/js/configuration.discovery.edit.js.php:182
 msgid "HTTPS"
 msgstr "HTTPS"
 
@@ -6761,7 +6761,7 @@ msgstr ""
 msgid "History"
 msgstr "歷史記錄"
 
-#: httpconf.php:199 httpconf.php:206 httpconf.php:503 httpconf.php:515
+#: httpconf.php:189 httpconf.php:196 httpconf.php:493 httpconf.php:505
 #: items.php:905 items.php:912 items.php:1282 items.php:1294
 msgid "History cleared"
 msgstr "歷史已清除"
@@ -6808,7 +6808,7 @@ msgstr "横向對齊"
 #: app/views/monitoring.web.view.php:41
 #: app/views/monitoring.widget.problems.view.php:54
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
-#: app/views/popup.generic.php:137 httpconf.php:199 httpconf.php:503
+#: app/views/popup.generic.php:137 httpconf.php:189 httpconf.php:493
 #: include/actions.inc.php:48 include/audit.inc.php:27
 #: include/blocks.inc.php:547 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
@@ -6891,7 +6891,7 @@ msgstr "主機存取"
 msgid "Host added"
 msgstr "已新增主機"
 
-#: include/classes/api/services/CHostInterface.php:831
+#: include/classes/api/services/CHostInterface.php:819
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "主機不能有超過一個同類型的預設介面."
 
@@ -7201,7 +7201,7 @@ msgid "Hungarian (hu_HU)"
 msgstr "匈牙利(hu_HU)"
 
 #: include/discovery.inc.php:60
-#: include/views/js/configuration.discovery.edit.js.php:186
+#: include/views/js/configuration.discovery.edit.js.php:183
 msgid "ICMP ping"
 msgstr "ICMP ping"
 
@@ -7210,7 +7210,7 @@ msgid "ID"
 msgstr "ID"
 
 #: include/discovery.inc.php:54
-#: include/views/js/configuration.discovery.edit.js.php:187
+#: include/views/js/configuration.discovery.edit.js.php:184
 msgid "IMAP"
 msgstr "IMAP"
 
@@ -7598,12 +7598,12 @@ msgid "Incorrect API \"%1$s\"."
 msgstr "不正確的 API \"%1$s\""
 
 #: include/classes/api/services/CDRule.php:543
-#: include/views/js/configuration.discovery.edit.js.php:603
+#: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Incorrect SNMP OID."
 msgstr "不正確的SNMP OID"
 
 #: include/classes/api/services/CDRule.php:537
-#: include/views/js/configuration.discovery.edit.js.php:599
+#: include/views/js/configuration.discovery.edit.js.php:596
 msgid "Incorrect SNMP community."
 msgstr "不正確的SNMP community."
 
@@ -8651,7 +8651,7 @@ msgstr "安裝名稱"
 msgid "Interface"
 msgstr "介面"
 
-#: include/classes/api/services/CHostInterface.php:851
+#: include/classes/api/services/CHostInterface.php:839
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "介面是連結到\"%2$s\"上的項目\"%1$s\"."
@@ -9436,7 +9436,7 @@ msgstr ""
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.prototype.edit.php:93
 #: include/views/configuration.item.prototype.list.php:53
-#: include/views/js/configuration.discovery.edit.js.php:56 items.php:48
+#: include/views/js/configuration.discovery.edit.js.php:55 items.php:48
 msgid "Key"
 msgstr "鍵值"
 
@@ -9466,7 +9466,7 @@ msgstr "韓語 (ko_KR)"
 
 #: app/views/administration.authentication.edit.php:30
 #: include/discovery.inc.php:48 include/users.inc.php:85
-#: include/views/js/configuration.discovery.edit.js.php:189
+#: include/views/js/configuration.discovery.edit.js.php:186
 msgid "LDAP"
 msgstr "LDAP"
 
@@ -9514,37 +9514,37 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "末"
 
-#: include/func.inc.php:2747
+#: include/func.inc.php:2750
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] ""
 
-#: include/func.inc.php:2741
+#: include/func.inc.php:2744
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] ""
 
-#: include/func.inc.php:2734
+#: include/func.inc.php:2737
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] ""
 
-#: include/func.inc.php:2750
+#: include/func.inc.php:2753
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] ""
 
-#: include/func.inc.php:2727
+#: include/func.inc.php:2730
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] ""
 
-#: include/func.inc.php:2753
+#: include/func.inc.php:2756
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -9901,7 +9901,7 @@ msgstr "MD2"
 #: include/views/configuration.item.edit.php:542
 #: include/views/configuration.item.massupdate.php:225
 #: include/views/configuration.item.prototype.edit.php:503
-#: include/views/js/configuration.discovery.edit.js.php:97
+#: include/views/js/configuration.discovery.edit.js.php:94
 msgid "MD5"
 msgstr "MD5"
 
@@ -10572,7 +10572,7 @@ msgid "Mute"
 msgstr "靜音"
 
 #: include/discovery.inc.php:53
-#: include/views/js/configuration.discovery.edit.js.php:190
+#: include/views/js/configuration.discovery.edit.js.php:187
 msgid "NNTP"
 msgstr "NNTP"
 
@@ -11024,7 +11024,7 @@ msgstr ""
 msgid "No data."
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:827
+#: include/classes/api/services/CHostInterface.php:815
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "\"%2$s\"上之\"%1$s\"類型無預設介面."
@@ -12265,7 +12265,7 @@ msgid "PHP xmlwriter extension missing."
 msgstr ""
 
 #: include/discovery.inc.php:52
-#: include/views/js/configuration.discovery.edit.js.php:191
+#: include/views/js/configuration.discovery.edit.js.php:188
 msgid "POP"
 msgstr "POP"
 
@@ -12606,7 +12606,7 @@ msgstr "埠"
 msgid "Port cannot be empty for host interface."
 msgstr "主機介面的埠不能是空白."
 
-#: include/views/js/configuration.discovery.edit.js.php:40
+#: include/views/js/configuration.discovery.edit.js.php:41
 msgid "Port range"
 msgstr "埠範圍"
 
@@ -12653,15 +12653,15 @@ msgstr ""
 msgid "Preview"
 msgstr "預覽"
 
-#: include/func.inc.php:2697
+#: include/func.inc.php:2700
 msgid "Previous month"
 msgstr ""
 
-#: include/func.inc.php:2696
+#: include/func.inc.php:2699
 msgid "Previous week"
 msgstr ""
 
-#: include/func.inc.php:2698
+#: include/func.inc.php:2701
 msgid "Previous year"
 msgstr ""
 
@@ -12697,7 +12697,7 @@ msgstr "主要的POC代稱"
 #: include/views/configuration.item.edit.php:580
 #: include/views/configuration.item.massupdate.php:257
 #: include/views/configuration.item.prototype.edit.php:520
-#: include/views/js/configuration.discovery.edit.js.php:118
+#: include/views/js/configuration.discovery.edit.js.php:115
 msgid "Privacy passphrase"
 msgstr ""
 
@@ -12705,7 +12705,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:574
 #: include/views/configuration.item.massupdate.php:243
 #: include/views/configuration.item.prototype.edit.php:513
-#: include/views/js/configuration.discovery.edit.js.php:110
+#: include/views/js/configuration.discovery.edit.js.php:107
 msgid "Privacy protocol"
 msgstr ""
 
@@ -13666,7 +13666,7 @@ msgstr "S"
 #: include/views/configuration.item.edit.php:543
 #: include/views/configuration.item.massupdate.php:226
 #: include/views/configuration.item.prototype.edit.php:504
-#: include/views/js/configuration.discovery.edit.js.php:98
+#: include/views/js/configuration.discovery.edit.js.php:95
 msgid "SHA"
 msgstr ""
 
@@ -13681,7 +13681,7 @@ msgid "SMS"
 msgstr "短信"
 
 #: include/discovery.inc.php:49
-#: include/views/js/configuration.discovery.edit.js.php:195
+#: include/views/js/configuration.discovery.edit.js.php:192
 msgid "SMTP"
 msgstr "SMTP"
 
@@ -13712,7 +13712,7 @@ msgstr "SNMP"
 #: include/views/configuration.host.discovery.edit.php:391
 #: include/views/configuration.item.edit.php:487
 #: include/views/configuration.item.prototype.edit.php:470
-#: include/views/js/configuration.discovery.edit.js.php:64 items.php:96
+#: include/views/js/configuration.discovery.edit.js.php:62 items.php:96
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
@@ -13741,17 +13741,17 @@ msgid "SNMP trap key is invalid."
 msgstr "SNMP捉捕鍵值是無效的"
 
 #: include/discovery.inc.php:57 include/items.inc.php:88
-#: include/views/js/configuration.discovery.edit.js.php:192
+#: include/views/js/configuration.discovery.edit.js.php:189
 msgid "SNMPv1 agent"
 msgstr "SNMPv1 端點代理程式"
 
 #: include/discovery.inc.php:58 include/items.inc.php:89
-#: include/views/js/configuration.discovery.edit.js.php:193
+#: include/views/js/configuration.discovery.edit.js.php:190
 msgid "SNMPv2 agent"
 msgstr "SNMPv2 端點代理程式"
 
 #: include/discovery.inc.php:59 include/items.inc.php:90
-#: include/views/js/configuration.discovery.edit.js.php:194
+#: include/views/js/configuration.discovery.edit.js.php:191
 msgid "SNMPv3 agent"
 msgstr "SNMPv3 端點代理程式"
 
@@ -13782,7 +13782,7 @@ msgstr "SQL陳述式執行已失敗: \"%1$s\"."
 #: include/views/configuration.action.edit.php:922
 #: include/views/configuration.action.edit.php:1682
 #: include/views/configuration.action.edit.php:2158
-#: include/views/js/configuration.discovery.edit.js.php:196
+#: include/views/js/configuration.discovery.edit.js.php:193
 msgid "SSH"
 msgstr "SSH"
 
@@ -14092,7 +14092,7 @@ msgstr "秒"
 #: include/views/configuration.item.edit.php:529
 #: include/views/configuration.item.massupdate.php:209
 #: include/views/configuration.item.prototype.edit.php:500
-#: include/views/js/configuration.discovery.edit.js.php:86
+#: include/views/js/configuration.discovery.edit.js.php:83
 msgid "Security level"
 msgstr ""
 
@@ -14101,7 +14101,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:506
 #: include/views/configuration.item.massupdate.php:201
 #: include/views/configuration.item.prototype.edit.php:488
-#: include/views/js/configuration.discovery.edit.js.php:79
+#: include/views/js/configuration.discovery.edit.js.php:76
 msgid "Security name"
 msgstr ""
 
@@ -15165,7 +15165,7 @@ msgid "T"
 msgstr "T"
 
 #: include/discovery.inc.php:55
-#: include/views/js/configuration.discovery.edit.js.php:188
+#: include/views/js/configuration.discovery.edit.js.php:185
 msgid "TCP"
 msgstr "TCP"
 
@@ -15272,7 +15272,7 @@ msgstr "目標類型"
 #: include/views/configuration.action.edit.php:923
 #: include/views/configuration.action.edit.php:1683
 #: include/views/configuration.action.edit.php:2159
-#: include/views/js/configuration.discovery.edit.js.php:197
+#: include/views/js/configuration.discovery.edit.js.php:194
 msgid "Telnet"
 msgstr "Telnet"
 
@@ -15540,7 +15540,7 @@ msgstr ""
 msgid "Theme"
 msgstr "背景主題"
 
-#: include/func.inc.php:2695
+#: include/func.inc.php:2698
 msgid "This day last week"
 msgstr ""
 
@@ -15549,11 +15549,11 @@ msgstr ""
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "這欄位是由項目\"%s\"自動填入的."
 
-#: include/func.inc.php:2703 srv_status.php:41
+#: include/func.inc.php:2706 srv_status.php:41
 msgid "This month"
 msgstr "本月"
 
-#: include/func.inc.php:2704
+#: include/func.inc.php:2707
 msgid "This month so far"
 msgstr ""
 
@@ -15565,19 +15565,19 @@ msgstr "這篩選-列不是空白. 刪除它?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "這篩選-行不是空白. 刪除它?"
 
-#: include/func.inc.php:2701 srv_status.php:40
+#: include/func.inc.php:2704 srv_status.php:40
 msgid "This week"
 msgstr "本周"
 
-#: include/func.inc.php:2702
+#: include/func.inc.php:2705
 msgid "This week so far"
 msgstr ""
 
-#: include/func.inc.php:2705 srv_status.php:42
+#: include/func.inc.php:2708 srv_status.php:42
 msgid "This year"
 msgstr "本年"
 
-#: include/func.inc.php:2706
+#: include/func.inc.php:2709
 msgid "This year so far"
 msgstr ""
 
@@ -15697,12 +15697,12 @@ msgstr "到"
 msgid "To set a host interface select a single item type for all items"
 msgstr "要設定一個主機介面, 選擇一個單一的項目類型給所有的項目"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2699
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2702
 #: srv_status.php:39
 msgid "Today"
 msgstr "今天"
 
-#: include/func.inc.php:2700
+#: include/func.inc.php:2703
 msgid "Today so far"
 msgstr ""
 
@@ -15951,7 +15951,7 @@ msgstr ""
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr ""
 
-#: trigger_prototypes.php:239
+#: trigger_prototypes.php:229
 msgid "Trigger prototype added"
 msgstr ""
 
@@ -15959,11 +15959,11 @@ msgstr ""
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
-#: trigger_prototypes.php:347
+#: trigger_prototypes.php:337
 msgid "Trigger prototype deleted"
 msgstr ""
 
-#: trigger_prototypes.php:332 trigger_prototypes.php:451
+#: trigger_prototypes.php:322 trigger_prototypes.php:441
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] ""
@@ -15978,11 +15978,11 @@ msgstr[0] ""
 msgid "Trigger prototypes"
 msgstr "觸發器類型"
 
-#: trigger_prototypes.php:462
+#: trigger_prototypes.php:452
 msgid "Trigger prototypes deleted"
 msgstr ""
 
-#: trigger_prototypes.php:416
+#: trigger_prototypes.php:406
 msgid "Trigger prototypes updated"
 msgstr ""
 
@@ -16316,7 +16316,7 @@ msgstr "單位"
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.triggers.list.php:43
-#: include/views/js/configuration.discovery.edit.js.php:206
+#: include/views/js/configuration.discovery.edit.js.php:203
 msgid "Unknown"
 msgstr "未知的"
 
@@ -16509,7 +16509,7 @@ msgstr "上"
 #: include/views/configuration.trigger.prototype.massupdate.php:188
 #: include/views/configuration.triggers.edit.php:643
 #: include/views/configuration.triggers.massupdate.php:171
-#: include/views/js/configuration.discovery.edit.js.php:384
+#: include/views/js/configuration.discovery.edit.js.php:381
 #: include/views/monitoring.screen.constructor.edit.php:934
 #: include/views/monitoring.screen.edit.php:220
 #: include/views/monitoring.slideconf.edit.php:273
@@ -17311,7 +17311,7 @@ msgstr "Web"
 msgid "Web monitoring"
 msgstr "Web監測"
 
-#: httpconf.php:198 httpconf.php:502 include/audit.inc.php:45
+#: httpconf.php:188 httpconf.php:492 include/audit.inc.php:45
 msgid "Web scenario"
 msgstr ""
 
@@ -17331,25 +17331,25 @@ msgstr "網頁監測情境 \"%1$s\" 已存在了。"
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr ""
 
-#: httpconf.php:214
+#: httpconf.php:204
 msgid "Web scenario added"
 msgstr ""
 
-#: httpconf.php:166 httpconf.php:524
+#: httpconf.php:156 httpconf.php:514
 msgid "Web scenario deleted"
 msgstr "網頁監測情境已刪除"
 
-#: httpconf.php:465
+#: httpconf.php:455
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "網頁監測情境已停用"
 
-#: httpconf.php:464
+#: httpconf.php:454
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] "網頁監測情境已啟用"
 
-#: httpconf.php:210
+#: httpconf.php:200
 msgid "Web scenario updated"
 msgstr ""
 
@@ -17658,7 +17658,7 @@ msgstr "每年"
 msgid "Yes"
 msgstr "是"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2693
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2696
 msgid "Yesterday"
 msgstr ""
 
@@ -17773,7 +17773,7 @@ msgstr "用戶"
 #: include/views/configuration.action.edit.php:938
 #: include/views/configuration.action.edit.php:1716
 #: include/views/configuration.action.edit.php:2184
-#: include/views/js/configuration.discovery.edit.js.php:198
+#: include/views/js/configuration.discovery.edit.js.php:195
 msgid "Zabbix agent"
 msgstr "Zabbix端點代理程式(被動式)"
 
