@@ -341,6 +341,7 @@ Changes for 4.0.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15911] fixed guest sign in visibility for disabled guest user group in login page (gcalenko)
 A......... [ZBX-15977] fixed validation of host interface when multiple interfaces set as main interface (gcalenko, vmurzins)
 ...G...PS. [ZBX-15955] fixed security vulnerability - accepting connections from not allowed addresses (Andris, vso)
 ..F....... [ZBX-11393] fixed when long snmp oid expands screen dimensions (ashubin, vasilijs)
