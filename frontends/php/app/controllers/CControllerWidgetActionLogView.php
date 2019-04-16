@@ -140,10 +140,10 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 				return ['clock', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_TYPE_ASC:
-				return ['description', ZBX_SORT_UP];
+				return ['mediatypeid', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_TYPE_DESC:
-				return ['description', ZBX_SORT_DOWN];
+				return ['mediatypeid', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_STATUS_ASC:
 				return ['status', ZBX_SORT_UP];

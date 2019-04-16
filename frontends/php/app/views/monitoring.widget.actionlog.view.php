@@ -28,7 +28,7 @@ $table = (new CTableInfo())
 	->setHeader([
 		($data['sortfield'] === 'clock') ? [_('Time'), $sort_div] : _('Time'),
 		_('Action'),
-		($data['sortfield'] === 'description') ? [_('Type'), $sort_div] : _('Type'),
+		($data['sortfield'] === 'mediatypeid') ? [_('Type'), $sort_div] : _('Type'),
 		($data['sortfield'] === 'sendto') ? [_('Recipient'), $sort_div] : _('Recipient'),
 		_('Message'),
 		($data['sortfield'] === 'status') ? [_('Status'), $sort_div] : _('Status'),

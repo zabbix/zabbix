@@ -42,12 +42,12 @@ class CScreenActions extends CScreenBase {
 				break;
 
 			case SCREEN_SORT_TRIGGERS_TYPE_ASC:
-				$sortfield = 'description';
+				$sortfield = 'mediatypeid';
 				$sortorder = ZBX_SORT_UP;
 				break;
 
 			case SCREEN_SORT_TRIGGERS_TYPE_DESC:
-				$sortfield = 'description';
+				$sortfield = 'mediatypeid';
 				$sortorder = ZBX_SORT_DOWN;
 				break;
 
@@ -108,7 +108,7 @@ class CScreenActions extends CScreenBase {
 			->setHeader([
 				($sortfield === 'clock') ? [('Time'), $sort_div] : _('Time'),
 				_('Action'),
-				($sortfield === 'description') ? [_('Type'), $sort_div] : _('Type'),
+				($sortfield === 'mediatypeid') ? [_('Type'), $sort_div] : _('Type'),
 				($sortfield === 'sendto') ? [_('Recipient'), $sort_div] : _('Recipient'),
 				_('Message'),
 				($sortfield === 'status') ? [_('Status'), $sort_div] : _('Status'),
