@@ -214,10 +214,9 @@ foreach ($data['hosts'] as $host) {
 			->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER;
 	}
-	else if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	elseif ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 		// Discovered host which does not contain info about parent discovery rule is inaccessible for current user.
-		$description[] = (new CSpan(_('Inaccessible discovery rule')))
-			->addClass(ZBX_STYLE_ORANGE);
+		$description[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER;
 	}
 
