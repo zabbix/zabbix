@@ -765,7 +765,7 @@ class CScript extends CApiService {
 		}
 
 		$select_groups = ['name', 'groupid'];
-		if ($options['selectGroups'] !== API_OUTPUT_EXTEND && is_array($options['selectGroups'])) {
+		if ($options['selectGroups'] !== API_OUTPUT_COUNT) {
 			$select_groups = $this->outputExtend($options['selectGroups'], $select_groups);
 		}
 
