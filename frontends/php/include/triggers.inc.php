@@ -702,7 +702,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 		$applications = API::Application()->get([
 			'output' => [],
 			'hostids' => $hostids,
-			'search' => ['name' => $application],
+			'filter' => ['name' => $application],
 			'preservekeys' => true
 		]);
 		$trigger_options['applicationids'] = array_keys($applications);
@@ -2073,6 +2073,13 @@ function evalExpressionData($expression, $replaceFunctionMacros) {
 	return $result;
 }
 
+/**
+ * Converts a string representation of various time and byte measures into corresponding SI unit value.
+ *
+ * @param string $value  String value with byte or time suffix.
+ *
+ * @return string|int  Corresponding SI unit value.
+ */
 function convert($value) {
 	$value = trim($value);
 
@@ -2084,16 +2091,16 @@ function convert($value) {
 	$value = $arr['value'];
 	switch ($arr['mult']) {
 		case 'T':
-			$value *= 1024 * 1024 * 1024 * 1024;
+			$value = bcmul($value, bcmul(ZBX_KIBIBYTE, ZBX_GIBIBYTE));
 			break;
 		case 'G':
-			$value *= 1024 * 1024 * 1024;
+			$value = bcmul($value, ZBX_GIBIBYTE);
 			break;
 		case 'M':
-			$value *= 1024 * 1024;
+			$value = bcmul($value, ZBX_MEBIBYTE);
 			break;
 		case 'K':
-			$value *= 1024;
+			$value = bcmul($value, ZBX_KIBIBYTE);
 			break;
 		case 'm':
 			$value *= 60;
@@ -2288,13 +2295,19 @@ function makeTriggersHostsList(array $triggers_hosts) {
 			$host_name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 
-			// Add maintenance icon with hint if host is in maintenance.
-			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-					&& array_key_exists($host['maintenanceid'], $db_maintenances)) {
-				$maintenance = $db_maintenances[$host['maintenanceid']];
-				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
-					$maintenance['description']
-				);
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				if (array_key_exists($host['maintenanceid'], $db_maintenances)) {
+					$maintenance = $db_maintenances[$host['maintenanceid']];
+					$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+						$maintenance['description']
+					);
+				}
+				else {
+					$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], _('Inaccessible maintenance'),
+						''
+					);
+				}
+
 				$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 			}
 

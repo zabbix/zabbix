@@ -1,0 +1,190 @@
+---
+test case: "space after single-character macro name"
+in:
+  macro: '{$A }'
+out:
+  return: 'FAIL'
+---
+test case: "space before single-character macro name"
+in:
+  macro: '{$ A}'
+out:
+  return: 'FAIL'
+---
+test case: "macro without closing brace"
+in:
+  macro: '{$A'
+out:
+  return: 'FAIL'
+---
+test case: "macro without name"
+in:
+  macro: '{$}'
+out:
+  return: 'FAIL'
+---
+test case: "lower case single-character macro name"
+in:
+  macro: '{$a}'
+out:
+  return: 'FAIL'
+---
+test case: capitalized macro name"
+in:
+  macro: '{$Ab}'
+out:
+  return: 'FAIL'
+---
+test case: "no closing brace, empty context"
+in:
+  macro: '{$A:'
+out:
+  return: 'FAIL'
+---
+test case: "no closing brace, one opening quote in context"
+in:
+  macro: '{$A: "'
+out:
+  return: 'FAIL'
+---
+test case: "one opening quote in context"
+in:
+  macro: '{$A: "}'
+out:
+  return: 'FAIL'
+---
+test case: "one opening quote in before 1-digit context"
+in:
+  macro: '{$A:"1}'
+out:
+  return: 'FAIL'
+---
+test case: "quoted context with extra character after"
+in:
+  macro: '{$A:"1"2}'
+out:
+  return: 'FAIL'
+---
+test case: "one opening quote in before 1-digit context with space"
+in:
+  macro: '{$A:"1 }'
+out:
+  return: 'FAIL'
+---
+test case: "valid single-character macro"
+in:
+  macro: '{$A}'
+out:
+  return: 'SUCCEED'
+  macro_r: 3
+  context_l: 0
+  context_r: 0
+---
+test case: "valid multi-character macro"
+in:
+  macro: '{$ABCD}'
+out:
+  return: 'SUCCEED'
+  macro_r: 6
+  context_l: 0
+  context_r: 0
+---
+test case: "extra character after }"
+in:
+  macro: '{$ABC}D'
+out:
+  return: 'SUCCEED'
+  macro_r: 5
+  context_l: 0
+  context_r: 0
+---
+test case: "1-digit context"
+in:
+  macro: '{$A:1}'
+out:
+  return: 'SUCCEED'
+  macro_r: 5
+  context_l: 4
+  context_r: 4
+---
+test case: "multi-digit context"
+in:
+  macro: '{$A:1234}'
+out:
+  return: 'SUCCEED'
+  macro_r: 8
+  context_l: 4
+  context_r: 7
+---
+test case: "1-digit context and space"
+in:
+  macro: '{$A:1 }'
+out:
+  return: 'SUCCEED'
+  macro_r: 6
+  context_l: 4
+  context_r: 5
+---
+test case: "space before 1-digit context"
+in:
+  macro: '{$A: 1}'
+out:
+  return: 'SUCCEED'
+  macro_r: 6
+  context_l: 5
+  context_r: 5
+---
+test case: "space before and after 1-digit context"
+in:
+  macro: '{$A: 1 }'
+out:
+  return: 'SUCCEED'
+  macro_r: 7
+  context_l: 5
+  context_r: 6
+---
+test case: "quoted 1-digit context with 2 spaces before"
+in:
+  macro: '{$A:  "1"}'
+out:
+  return: 'SUCCEED'
+  macro_r: 9
+  context_l: 6
+  context_r: 8
+---
+test case: "quoted 1-digit context with 2 spaces before and after"
+in:
+  macro: '{$A:  "1"  }'
+out:
+  return: 'SUCCEED'
+  macro_r: 11
+  context_l: 6
+  context_r: 8
+---
+test case: "two spaces before quoted context with escaped quotes"
+in:
+  macro: '{$A:  "\"1\""}'
+out:
+  return: 'SUCCEED'
+  macro_r: 13
+  context_l: 6
+  context_r: 12
+---
+test case: "two spaces around quoted context with escaped quotes"
+in:
+  macro: '{$A:  "\"1\""  }'
+out:
+  return: 'SUCCEED'
+  macro_r: 15
+  context_l: 6
+  context_r: 12
+---
+test case: "quoted context with macro look-alike string, spaces around quotes"
+in:
+  macro: '{$A: "{$B}" }'
+out:
+  return: 'SUCCEED'
+  macro_r: 12
+  context_l: 5
+  context_r: 10
+...

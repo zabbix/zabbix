@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testUrlParameters extends CLegacyWebTest {
@@ -891,13 +892,21 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?action=discovery.view&druleid=3',
+						'url' => 'zabbix.php?action=discovery.view&filter_druleids[]=3&filter_set=1',
+						'text_present' => 'Status of discovery'
+					],
+					[
+						'url' => 'zabbix.php?action=discovery.view&filter_druleids[]=3',
 						'text_present' => 'Status of discovery'
 					],
 					[
 						'url' => 'zabbix.php?action=discovery.view',
 						'text_present' => 'Status of discovery'
-					]
+					],
+					[
+						'url' => 'zabbix.php?action=discovery.view&filter_rst=1',
+						'text_present' => 'Status of discovery'
+					],
 				]
 			],
 			[
@@ -906,15 +915,7 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?action=discovery.view&druleid=abc',
-						'text_not_present' => 'Status of discovery',
-						'text_present' => [
-							'Fatal error, please report to the Zabbix team',
-							'Controller: discovery.view'
-							]
-					],
-					[
-						'url' => 'zabbix.php?action=discovery.view&druleid=',
+						'url' => 'zabbix.php?action=discovery.view&filter_druleids[]=abc',
 						'text_not_present' => 'Status of discovery',
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
@@ -922,27 +923,27 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=discovery.view&druleid=-1',
+						'url' => 'zabbix.php?action=discovery.view&filter_druleids[]=-123',
 						'text_not_present' => 'Status of discovery',
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
 							'Controller: discovery.view'
 						]
 					],
-				]
-			],
-			[
-				'title' => 'Warning [refreshed every 30 sec.]',
-				'check_server_name' => false,
-				'server_name_on_page' => false,
-				'test_cases' => [
 					[
-						'url' => 'zabbix.php?action=discovery.view&druleid=9999999',
+						'url' => 'zabbix.php?action=discovery.view&filter_druleids=123',
 						'text_not_present' => 'Status of discovery',
 						'text_present' => [
-							'Access denied',
-							'You are logged in as "Admin". You have no permissions to access this page.',
-							'If you think this message is wrong, please consult your administrators about getting the necessary permissions.'
+							'Fatal error, please report to the Zabbix team',
+							'Controller: discovery.view'
+						]
+					],
+					[
+						'url' => 'zabbix.php?action=discovery.view&filter_druleids=',
+						'text_not_present' => 'Status of discovery',
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Controller: discovery.view'
 						]
 					]
 				]

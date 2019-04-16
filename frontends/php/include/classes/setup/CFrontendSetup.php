@@ -26,9 +26,9 @@
 class CFrontendSetup {
 
 	const MIN_PHP_VERSION = '5.4.0';
-	const MIN_PHP_MEMORY_LIMIT = 134217728; // 128*1024*1024
-	const MIN_PHP_POST_MAX_SIZE = 16777216; // 16*1024*1024
-	const MIN_PHP_UPLOAD_MAX_FILESIZE = 2097152; // 2*1024*1024
+	const MIN_PHP_MEMORY_LIMIT = '134217728'; // 128 * ZBX_MEBIBYTE;
+	const MIN_PHP_POST_MAX_SIZE = '16777216'; // 16 * ZBX_MEBIBYTE;
+	const MIN_PHP_UPLOAD_MAX_FILESIZE = '2097152'; // 2 * ZBX_MEBIBYTE;
 	const MIN_PHP_MAX_EXECUTION_TIME = 300;
 	const MIN_PHP_MAX_INPUT_TIME = 300;
 	const MIN_PHP_GD_VERSION = '2.0';
@@ -118,14 +118,16 @@ class CFrontendSetup {
 	 */
 	public function checkPhpMemoryLimit() {
 		$current = ini_get('memory_limit');
-		$check = ($current == '-1' || str2mem($current) >= self::MIN_PHP_MEMORY_LIMIT);
+		$check = ($current == '-1' || bccomp(str2mem($current), self::MIN_PHP_MEMORY_LIMIT) >= 0);
 
 		return [
 			'name' => _s('PHP option "%1$s"', 'memory_limit'),
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_MEMORY_LIMIT),
 			'result' => $check ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required PHP memory limit is %s (configuration option "memory_limit").', mem2str(self::MIN_PHP_MEMORY_LIMIT))
+			'error' => _s('Minimum required PHP memory limit is %s (configuration option "memory_limit").',
+				mem2str(self::MIN_PHP_MEMORY_LIMIT)
+			)
 		];
 	}
 
@@ -141,8 +143,12 @@ class CFrontendSetup {
 			'name' => _s('PHP option "%1$s"', 'post_max_size'),
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_POST_MAX_SIZE),
-			'result' => (str2mem($current) >= self::MIN_PHP_POST_MAX_SIZE) ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required size of PHP post is %s (configuration option "post_max_size").', mem2str(self::MIN_PHP_POST_MAX_SIZE))
+			'result' => (bccomp(str2mem($current), self::MIN_PHP_POST_MAX_SIZE) >= 0)
+				? self::CHECK_OK
+				: self::CHECK_FATAL,
+			'error' => _s('Minimum required size of PHP post is %s (configuration option "post_max_size").',
+				mem2str(self::MIN_PHP_POST_MAX_SIZE)
+			)
 		];
 	}
 
@@ -158,8 +164,12 @@ class CFrontendSetup {
 			'name' => _s('PHP option "%1$s"', 'upload_max_filesize'),
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE),
-			'result' => (str2mem($current) >= self::MIN_PHP_UPLOAD_MAX_FILESIZE) ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required PHP upload filesize is %s (configuration option "upload_max_filesize").', mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE))
+			'result' => (bccomp(str2mem($current), self::MIN_PHP_UPLOAD_MAX_FILESIZE) >= 0)
+				? self::CHECK_OK
+				: self::CHECK_FATAL,
+			'error' => _s('Minimum required PHP upload filesize is %s (configuration option "upload_max_filesize").',
+				mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE)
+			)
 		];
 	}
 

@@ -327,15 +327,31 @@
 			markAffected(widgets, w, false);
 		});
 
-		widgets.forEach(function(w) {
+		$.each(widgets, function(_, w) {
 			if ('affected_by_draggable' in w) {
-				w.pos.y -= widget.pos.height;
+				var pos = $.extend({}, w.pos),
+					overlaps = false;
 
-				widgets.each(function(b) {
-					if (b.uniqueid !== w.uniqueid && b.uniqueid !== widget.uniqueid && rectOverlap(b.pos, w.pos)) {
-						w.pos.y = Math.max(w.pos.y, b.pos.y + b.pos.height);
+				pos.y -= widget.pos.height;
+				pos.height += widget.pos.height;
+
+				$.each(widgets, function(_, b) {
+					overlaps = (b.uniqueid !== w.uniqueid && b.uniqueid !== widget.uniqueid && rectOverlap(b.pos, pos));
+
+					if (overlaps) {
+						pos.y = b.pos.y + b.pos.height;
+						pos.height -= w.pos.y - pos.y;
+						overlaps = (pos.height < w.pos.height || pos.y >= w.pos.y);
 					}
+
+					return !overlaps;
 				});
+
+				if (overlaps) {
+					return false;
+				}
+
+				w.pos.y = pos.y;
 			}
 		});
 	}
@@ -913,6 +929,7 @@
 				setResizableState('disable', data.widgets, '');
 				dragPrepare(data.widgets, widget, data['options']['max-rows']);
 				startWidgetPositioning(ui.helper, data, 'drag');
+				realignWidget(data.widgets, widget, data.options['max-rows']);
 
 				widget.current_pos = $.extend({}, widget.pos);
 				data.undo_pos = {};
@@ -1680,7 +1697,10 @@
 						return;
 					}
 
-					if (data.add_widget_dimension.y < pos.y) {
+					if ((pos.y + pos.height) > data['options']['max-rows']) {
+						pos.y = data['options']['max-rows'] - pos.height;
+					}
+					else if (data.add_widget_dimension.y < pos.y) {
 						--pos.y;
 					}
 

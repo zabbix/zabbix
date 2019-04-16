@@ -184,8 +184,7 @@ $tab_axes = (new CFormList())->addRow('',
 			->addRow(CWidgetHelper::getLabel($fields['lefty_min']), CWidgetHelper::getNumericBox($fields['lefty_min']))
 			->addRow(CWidgetHelper::getLabel($fields['lefty_max']), CWidgetHelper::getNumericBox($fields['lefty_max']))
 			->addRow(CWidgetHelper::getLabel($fields['lefty_units']), [
-				CWidgetHelper::getComboBox($fields['lefty_units']),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				CWidgetHelper::getComboBox($fields['lefty_units'])->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				CWidgetHelper::getTextBox($fields['lefty_static_units'])
 			])
 			->addClass(ZBX_STYLE_COLUMN_33),
@@ -199,8 +198,7 @@ $tab_axes = (new CFormList())->addRow('',
 				CWidgetHelper::getNumericBox($fields['righty_max'])
 			)
 			->addRow(CWidgetHelper::getLabel($fields['righty_units']), [
-				CWidgetHelper::getComboBox($fields['righty_units']),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				CWidgetHelper::getComboBox($fields['righty_units'])->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				CWidgetHelper::getTextBox($fields['righty_static_units'])
 			])
 			->addClass(ZBX_STYLE_COLUMN_33),
