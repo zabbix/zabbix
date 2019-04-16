@@ -87,32 +87,6 @@ static void init_test(void)
 
 #define _ZBX_MKMAP(c) { c,#c }
 
-static zbx_item_type_t str2itemtype(const char *str)
-{
-	str_map_t map[] =
-	{
-		_ZBX_MKMAP(ITEM_TYPE_ZABBIX),		_ZBX_MKMAP(ITEM_TYPE_SNMPv1),
-		_ZBX_MKMAP(ITEM_TYPE_TRAPPER),		_ZBX_MKMAP(ITEM_TYPE_SIMPLE),
-		_ZBX_MKMAP(ITEM_TYPE_SNMPv2c),		_ZBX_MKMAP(ITEM_TYPE_INTERNAL),
-		_ZBX_MKMAP(ITEM_TYPE_SNMPv3),		_ZBX_MKMAP(ITEM_TYPE_ZABBIX_ACTIVE),
-		_ZBX_MKMAP(ITEM_TYPE_AGGREGATE),	_ZBX_MKMAP(ITEM_TYPE_HTTPTEST),
-		_ZBX_MKMAP(ITEM_TYPE_EXTERNAL),		_ZBX_MKMAP(ITEM_TYPE_DB_MONITOR),
-		_ZBX_MKMAP(ITEM_TYPE_IPMI),		_ZBX_MKMAP(ITEM_TYPE_SSH),
-		_ZBX_MKMAP(ITEM_TYPE_TELNET),		_ZBX_MKMAP(ITEM_TYPE_CALCULATED),
-		_ZBX_MKMAP(ITEM_TYPE_JMX),		_ZBX_MKMAP(ITEM_TYPE_SNMPTRAP),
-		_ZBX_MKMAP(ITEM_TYPE_DEPENDENT),
-		{ 0 }
-	};
-
-	for (str_map_t *e = &map[0]; NULL != e->str; e++)
-		if (0 == strcmp(e->str, str))
-			return e->val;
-
-	fail_msg("Cannot find string %s", str);
-
-	return 0;
-}
-
 static unsigned char str2pollertype(const char *str)
 {
 	str_map_t map[] =
@@ -141,7 +115,7 @@ static int str2flags(const char *str)
 		{ 0, "0" },
 		_ZBX_MKMAP(ZBX_ITEM_COLLECTED),
 		_ZBX_MKMAP(ZBX_HOST_UNREACHABLE),
-		0
+		{ 0 }
 	};
 
 	for (str_map_t *e = &map[0]; NULL != e->str; e++)
@@ -171,32 +145,32 @@ static const char	*read_string(const zbx_mock_handle_t *handle, const char *read
 	return str;
 }
 
-static void	read_test(const zbx_mock_handle_t *handle, test_config_t *config)
+static void	read_test(const zbx_mock_handle_t *handle, test_config_t *test_config)
 {
 	const char *str;
 
 	str = read_string(handle, PARAM_MONITORED);
-	config->monitored = 0 == strcmp(str, "DIRECT") ? DIRECT : PROXY;
+	test_config->monitored = 0 == strcmp(str, "DIRECT") ? DIRECT : PROXY;
 
 	str = read_string(handle, PARAM_TYPE);
-	config->type = str2itemtype(str);
+	test_config->type = zbx_mock_str_to_item_type(str);
 
 	str = read_string(handle, PARAM_KEY);
-	config->key = str;
+	test_config->key = str;
 
 	str = read_string(handle, PARAM_POLLER);
-	config->poller_type = str2pollertype(str);
+	test_config->poller_type = str2pollertype(str);
 
 	/* only ZBX_HOST_UNREACHABLE and ZBX_ITEM_COLLECTED flags are used */
 	str = read_string(handle, PARAM_FLAGS);
-	config->flags = str2flags(str);
+	test_config->flags = str2flags(str);
 
 	str = read_string(handle, PARAM_RESULT);
-	config->result_poller_type = str2pollertype(str);
+	test_config->result_poller_type = str2pollertype(str);
 
 	/* test number is for reference only */
 	str = read_string(handle, PARAM_REF);
-	config->test_number = (zbx_uint32_t)strtol(str, NULL, 10);
+	test_config->test_number = (zbx_uint32_t)strtol(str, NULL, 10);
 }
 
 /******************************************************************************
@@ -207,8 +181,8 @@ static void	read_test(const zbx_mock_handle_t *handle, test_config_t *config)
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_error_t mock_error;
-	zbx_mock_handle_t handle, elem_handle, string_handle;
-	test_config_t config;
+	zbx_mock_handle_t handle, elem_handle;
+	test_config_t test_config;
 	ZBX_DC_ITEM item;
 	ZBX_DC_HOST host;
 	char buffer[MAX_STRING_LEN];
@@ -223,28 +197,28 @@ void	zbx_mock_test_entry(void **state)
 
 	while (ZBX_MOCK_SUCCESS == (mock_error = zbx_mock_vector_element(handle, &elem_handle)))
 	{
-		read_test(&elem_handle, &config);
+		read_test(&elem_handle, &test_config);
 
 		memset((void*)&host, 0, sizeof(host));
 		memset((void*)&item, 0, sizeof(item));
 
-		item.type		= config.type;
-		item.key		= config.key;
-		item.poller_type	= config.poller_type;
+		item.type		= test_config.type;
+		item.key		= test_config.key;
+		item.poller_type	= test_config.poller_type;
 
-		if (PROXY == config.monitored)
+		if (PROXY == test_config.monitored)
 			while (0 == host.proxy_hostid)
 				host.proxy_hostid = rand();
 
 		zbx_snprintf(buffer, sizeof(buffer), "host is monitored %s and is %sreachable, item type is %d, "
 				"item key is %s, poller type is %d, flags %d, ref %d",
-				PROXY == config.monitored ? "by proxy" : "directly",
-				config.flags & ZBX_HOST_UNREACHABLE ? "un" : "",
-				(int)config.type, config.key, (int)config.poller_type, (int)config.flags,
-				(int)config.test_number);
+				PROXY == test_config.monitored ? "by proxy" : "directly",
+				test_config.flags & ZBX_HOST_UNREACHABLE ? "un" : "",
+				(int)test_config.type, test_config.key, (int)test_config.poller_type,
+				(int)test_config.flags, (int)test_config.test_number);
 
-		DCitem_poller_type_update_test(&item, &host, config.flags);
+		DCitem_poller_type_update_test(&item, &host, test_config.flags);
 
-		zbx_mock_assert_int_eq(buffer, config.result_poller_type, item.poller_type);
+		zbx_mock_assert_int_eq(buffer, test_config.result_poller_type, item.poller_type);
 	}
 }
