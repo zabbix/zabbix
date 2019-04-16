@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-14 01:47+0300\n"
+"POT-Creation-Date: 2019-04-16 17:26+0300\n"
 "PO-Revision-Date: 2014-10-03 08:43+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -337,7 +337,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:239
 #: include/views/configuration.item.prototype.edit.php:502
 #: include/views/configuration.item.prototype.massupdate.php:235
-#: include/views/js/configuration.discovery.edit.js.php:137
+#: include/views/js/configuration.discovery.edit.js.php:134
 msgid "AES"
 msgstr "AES"
 
@@ -692,8 +692,8 @@ msgstr "Ενεργό έως"
 #: include/views/js/configuration.action.edit.js.php:268
 #: include/views/js/configuration.action.edit.js.php:654
 #: include/views/js/configuration.correlation.edit.js.php:47
-#: include/views/js/configuration.discovery.edit.js.php:150
-#: include/views/js/configuration.discovery.edit.js.php:752
+#: include/views/js/configuration.discovery.edit.js.php:147
+#: include/views/js/configuration.discovery.edit.js.php:749
 #: include/views/js/monitoring.screen.edit.js.php:83
 #: include/views/js/monitoring.slideconf.edit.js.php:99
 #: include/views/js/monitoring.sysmap.edit.js.php:101
@@ -1010,7 +1010,7 @@ msgstr "Οποιαδήποτε στοιχειοσειρά χαρακτήρων �
 msgid "Application"
 msgstr "Κατηγορία"
 
-#: httpconf.php:321 include/classes/api/services/CApplication.php:266
+#: httpconf.php:311 include/classes/api/services/CApplication.php:266
 #, c-format
 msgid "Application \"%1$s\" already exists."
 msgstr "Η Κατηγορία \"%1$s\" υπάρχει ήδη."
@@ -1291,7 +1291,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:226
 #: include/views/configuration.item.prototype.edit.php:494
 #: include/views/configuration.item.prototype.massupdate.php:222
-#: include/views/js/configuration.discovery.edit.js.php:127
+#: include/views/js/configuration.discovery.edit.js.php:124
 msgid "Authentication passphrase"
 msgstr "Σύνθημα ταυτοποίησης"
 
@@ -1300,7 +1300,7 @@ msgstr "Σύνθημα ταυτοποίησης"
 #: include/views/configuration.item.massupdate.php:214
 #: include/views/configuration.item.prototype.edit.php:487
 #: include/views/configuration.item.prototype.massupdate.php:210
-#: include/views/js/configuration.discovery.edit.js.php:119
+#: include/views/js/configuration.discovery.edit.js.php:116
 msgid "Authentication protocol"
 msgstr "Πρωτόκολλο ταυτοποίησης"
 
@@ -1582,10 +1582,10 @@ msgstr "Καναδάς (136 χαρακτήρες)"
 #: include/views/js/administration.general.trigger.options.js.php:21
 #: include/views/js/administration.general.triggerSeverity.js.php:13
 #: include/views/js/configuration.action.edit.js.php:76
-#: include/views/js/configuration.discovery.edit.js.php:151
-#: include/views/js/configuration.discovery.edit.js.php:611
-#: include/views/js/configuration.discovery.edit.js.php:682
-#: include/views/js/configuration.discovery.edit.js.php:712
+#: include/views/js/configuration.discovery.edit.js.php:148
+#: include/views/js/configuration.discovery.edit.js.php:608
+#: include/views/js/configuration.discovery.edit.js.php:679
+#: include/views/js/configuration.discovery.edit.js.php:709
 #: include/views/js/conf.import.js.php:16
 #: include/views/monitoring.slideconf.edit.php:277 jsLoader.php:112
 #: jsLoader.php:123 jsLoader.php:220 jsLoader.php:294 jsLoader.php:306
@@ -1719,7 +1719,7 @@ msgstr "Αδύνατη η προσθήκη πλέον του ενός συλλέ
 msgid "Cannot add network map"
 msgstr "Αδύνατη η προσθήκη χάρτη δικτύου"
 
-#: httpconf.php:336
+#: httpconf.php:326
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
 msgstr "Αδύνατη η προσθήκη νέας κατηγορίας \"%1$s\"."
@@ -1762,7 +1762,7 @@ msgstr "Αδύνατη η προσθήκη σχεδιότυπου"
 msgid "Cannot add trigger"
 msgstr "Αδύνατη η προσθήκη εναύσματος"
 
-#: trigger_prototypes.php:252
+#: trigger_prototypes.php:243
 msgid "Cannot add trigger prototype"
 msgstr "Αδύνατη η προσθήκη πρωτότυπου εναύσματος"
 
@@ -1778,7 +1778,7 @@ msgstr "Αδύνατη η προσθήκη χρήστη. Αμφότερα συν
 msgid "Cannot add value map"
 msgstr "Αδύνατη η προσθήκη αντιστοιχίας τιμής"
 
-#: httpconf.php:215
+#: httpconf.php:205
 msgid "Cannot add web scenario"
 msgstr "Αδύνατη η προσθήκη σενάριου ιστού"
 
@@ -1799,7 +1799,7 @@ msgstr ""
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
 msgstr ""
 
-#: httpconf.php:206 httpconf.php:512 items.php:980 items.php:1389
+#: httpconf.php:196 httpconf.php:502 items.php:980 items.php:1389
 msgid "Cannot clear history"
 msgstr "Αδύνατη η εκκαθάριση ιστορικού"
 
@@ -1891,7 +1891,7 @@ msgstr "Αδύνατη η δημιουργία κανόνα εντοπισμού
 msgid "Cannot create icon map"
 msgstr "Αδύνατη η δημιουργία αντιστοίχισης εικονιδίου"
 
-#: httpconf.php:224
+#: httpconf.php:214
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Αδύνατη η δημιουργία νέας κατηγορίας, σενάριο ιστού ήδη ανατέθηκε σε κατηγορία."
 
@@ -2138,11 +2138,11 @@ msgstr "Αδύνατη η διαγραφή σχεδιότυπου σενάριο
 msgid "Cannot delete trigger"
 msgstr "Αδύνατη η διαγραφή εναύσματος"
 
-#: trigger_prototypes.php:360
+#: trigger_prototypes.php:351
 msgid "Cannot delete trigger prototype"
 msgstr "Αδύνατη η διαγραφή πρωτότυπου εναύσματος"
 
-#: trigger_prototypes.php:510
+#: trigger_prototypes.php:501
 msgid "Cannot delete trigger prototypes"
 msgstr "Αδύνατη η διαγραφή πρωτότυπων εναυσμάτων"
 
@@ -2161,7 +2161,7 @@ msgid_plural "Cannot delete value maps"
 msgstr[0] "Αδύνατη η διαγραφή αντιστοίχισης τιμών"
 msgstr[1] "Αδύνατη η διαγραφή αντιστοίχισης τιμών"
 
-#: httpconf.php:166 httpconf.php:521
+#: httpconf.php:156 httpconf.php:511
 msgid "Cannot delete web scenario"
 msgstr "Αδύνατη η διαγραφή σενάριου ιστού"
 
@@ -2214,7 +2214,7 @@ msgid_plural "Cannot disable user groups"
 msgstr[0] "Αδύνατη η απενεργοποίηση ομάδος χρήστη"
 msgstr[1] "Αδύνατη η απενεργοποίηση ομάδων χρήστη"
 
-#: httpconf.php:465
+#: httpconf.php:455
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Αδύνατη η απενεργοποίηση σενάριου ιστού"
@@ -2277,7 +2277,7 @@ msgid_plural "Cannot enable user groups"
 msgstr[0] "Αδύνατη η ενεργοποίηση ομάδος χρήστη"
 msgstr[1] "Αδύνατη η ενεργοποίηση ομάδων χρήστη"
 
-#: httpconf.php:464
+#: httpconf.php:454
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Αδύνατη η ενεργοποίηση σενάριου ιστού"
@@ -2948,7 +2948,7 @@ msgstr "Αδύνατη η ενημέρωση εναύσματος"
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr ""
 
-#: trigger_prototypes.php:345 trigger_prototypes.php:500
+#: trigger_prototypes.php:336 trigger_prototypes.php:491
 #, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
@@ -2960,7 +2960,7 @@ msgstr[1] "Αδύνατη η ενημέρωση πρωτότυπου εναύσ�
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr ""
 
-#: trigger_prototypes.php:464
+#: trigger_prototypes.php:455
 msgid "Cannot update trigger prototypes"
 msgstr "Αδύνατη η ενημέρωση πρωτότυπων εναυσμάτων"
 
@@ -2976,11 +2976,11 @@ msgstr "Αδύνατη η ενημέρωση χρήστη. Αμφότερα συ
 msgid "Cannot update value map"
 msgstr "Αδύνατη η ενημέρωση αντιστοίχισης τιμών"
 
-#: httpconf.php:211
+#: httpconf.php:201
 msgid "Cannot update web scenario"
 msgstr "Αδύνατη η ενημέρωση σενάριου ιστού"
 
-#: include/views/js/configuration.discovery.edit.js.php:678
+#: include/views/js/configuration.discovery.edit.js.php:675
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr "Αδύνατη η επικύρωση ελέγχου εντοπισμού: άκυρη αίτηση ή σύνδεση με εξυπηρετητή Zabbix."
 
@@ -3075,7 +3075,7 @@ msgstr "Πλαίσιο"
 msgid "Chassis information. Returns string"
 msgstr ""
 
-#: include/views/js/configuration.discovery.edit.js.php:608
+#: include/views/js/configuration.discovery.edit.js.php:605
 msgid "Check already exists."
 msgstr "Ο Έλεγχος υπάρχει ήδη."
 
@@ -3114,7 +3114,7 @@ msgstr ""
 msgid "Check the key, please. Default example was passed."
 msgstr "Ελέγξτε το κλειδί, παρακαλώ. Προκαθορισμένο παράδειγμα πέρασε."
 
-#: include/views/js/configuration.discovery.edit.js.php:60
+#: include/views/js/configuration.discovery.edit.js.php:61
 msgid "Check type"
 msgstr "Ελέγξτε τον τύπο"
 
@@ -3780,7 +3780,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:189
 #: include/views/configuration.item.prototype.edit.php:462
 #: include/views/configuration.item.prototype.massupdate.php:185
-#: include/views/js/configuration.discovery.edit.js.php:96
+#: include/views/js/configuration.discovery.edit.js.php:94
 msgid "Context name"
 msgstr "Όνομα πλαισίου"
 
@@ -4168,7 +4168,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:238
 #: include/views/configuration.item.prototype.edit.php:501
 #: include/views/configuration.item.prototype.massupdate.php:234
-#: include/views/js/configuration.discovery.edit.js.php:136
+#: include/views/js/configuration.discovery.edit.js.php:133
 msgid "DES"
 msgstr "DES"
 
@@ -4355,7 +4355,7 @@ msgstr "Ημερομηνία αγοράς HW"
 msgid "Day"
 msgstr "Ημέρα"
 
-#: include/func.inc.php:2668
+#: include/func.inc.php:2671
 msgid "Day before yesterday"
 msgstr ""
 
@@ -5087,9 +5087,9 @@ msgstr "Εντοπισμός με διαμεσολαβητή"
 msgid "Discovery check"
 msgstr "Έλεγχος εντοπισμού"
 
-#: include/views/js/configuration.discovery.edit.js.php:607
-#: include/views/js/configuration.discovery.edit.js.php:676
-#: include/views/js/configuration.discovery.edit.js.php:708
+#: include/views/js/configuration.discovery.edit.js.php:604
+#: include/views/js/configuration.discovery.edit.js.php:673
+#: include/views/js/configuration.discovery.edit.js.php:705
 msgid "Discovery check error"
 msgstr "Σφάλμα ελέγχου εντοπισμού"
 
@@ -6058,7 +6058,7 @@ msgid "FALSE"
 msgstr "ΨΕΥΔΕΣ"
 
 #: include/discovery.inc.php:50
-#: include/views/js/configuration.discovery.edit.js.php:207
+#: include/views/js/configuration.discovery.edit.js.php:204
 msgid "FTP"
 msgstr "FTP"
 
@@ -6835,7 +6835,7 @@ msgid "HTML"
 msgstr ""
 
 #: include/discovery.inc.php:51
-#: include/views/js/configuration.discovery.edit.js.php:208
+#: include/views/js/configuration.discovery.edit.js.php:205
 msgid "HTTP"
 msgstr "HTTP"
 
@@ -6867,7 +6867,7 @@ msgid "HTTP settings"
 msgstr ""
 
 #: include/discovery.inc.php:62
-#: include/views/js/configuration.discovery.edit.js.php:209
+#: include/views/js/configuration.discovery.edit.js.php:206
 msgid "HTTPS"
 msgstr "HTTPS"
 
@@ -6978,7 +6978,7 @@ msgstr ""
 msgid "History"
 msgstr "Ιστορικό"
 
-#: httpconf.php:199 httpconf.php:206 httpconf.php:500 httpconf.php:512
+#: httpconf.php:189 httpconf.php:196 httpconf.php:490 httpconf.php:502
 #: items.php:973 items.php:980 items.php:1377 items.php:1389
 msgid "History cleared"
 msgstr "Ιστορικό καθαρίστηκε"
@@ -7026,8 +7026,8 @@ msgstr "Οριζόντια ευθυγράμμιση"
 #: app/views/monitoring.web.view.php:41
 #: app/views/monitoring.widget.problems.view.php:54
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
-#: app/views/popup.generic.php:137 app/views/search.php:26 httpconf.php:199
-#: httpconf.php:500 include/actions.inc.php:50 include/audit.inc.php:27
+#: app/views/popup.generic.php:137 app/views/search.php:26 httpconf.php:189
+#: httpconf.php:490 include/actions.inc.php:50 include/audit.inc.php:27
 #: include/blocks.inc.php:547 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
@@ -7108,7 +7108,7 @@ msgstr "Πρόσβαση ξενιστή"
 msgid "Host added"
 msgstr "Ξενιστής προστέθηκε"
 
-#: include/classes/api/services/CHostInterface.php:831
+#: include/classes/api/services/CHostInterface.php:819
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "Ο ξενιστής δεν μπορεί να έχει πλέον της μιάς προκαθορισμένες διεπαφές ίδιου τύπου."
 
@@ -7429,7 +7429,7 @@ msgid "Hungarian (hu_HU)"
 msgstr "Ουγγρικά (hu_HU)"
 
 #: include/discovery.inc.php:60
-#: include/views/js/configuration.discovery.edit.js.php:210
+#: include/views/js/configuration.discovery.edit.js.php:207
 msgid "ICMP ping"
 msgstr "ICMP ping"
 
@@ -7438,7 +7438,7 @@ msgid "ID"
 msgstr "ID"
 
 #: include/discovery.inc.php:54
-#: include/views/js/configuration.discovery.edit.js.php:211
+#: include/views/js/configuration.discovery.edit.js.php:208
 msgid "IMAP"
 msgstr "IMAP"
 
@@ -7816,12 +7816,12 @@ msgid "Incorrect API \"%1$s\"."
 msgstr "Λανθασμένο API \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:571
-#: include/views/js/configuration.discovery.edit.js.php:645
+#: include/views/js/configuration.discovery.edit.js.php:642
 msgid "Incorrect SNMP OID."
 msgstr "Λανθασμένο SNMP OID."
 
 #: include/classes/api/services/CDRule.php:565
-#: include/views/js/configuration.discovery.edit.js.php:641
+#: include/views/js/configuration.discovery.edit.js.php:638
 msgid "Incorrect SNMP community."
 msgstr "Λανθασμένο SNMP community."
 
@@ -8908,7 +8908,7 @@ msgstr "Όνομα εγκαταστάτη"
 msgid "Interface"
 msgstr "Διεπαφή"
 
-#: include/classes/api/services/CHostInterface.php:851
+#: include/classes/api/services/CHostInterface.php:839
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Η διεπαφή είναι συνδεδεμένη στο συλλέκτη \"%1$s\" επί \"%2$s\"."
@@ -9720,7 +9720,7 @@ msgstr ""
 #: include/views/configuration.item.list.php:63
 #: include/views/configuration.item.prototype.edit.php:92
 #: include/views/configuration.item.prototype.list.php:53
-#: include/views/js/configuration.discovery.edit.js.php:80 items.php:50
+#: include/views/js/configuration.discovery.edit.js.php:79 items.php:50
 msgid "Key"
 msgstr "Κλειδί"
 
@@ -9750,7 +9750,7 @@ msgstr "Κορεάτικα (ko_KR)"
 
 #: app/views/administration.authentication.edit.php:30
 #: include/discovery.inc.php:48 include/users.inc.php:85
-#: include/views/js/configuration.discovery.edit.js.php:213
+#: include/views/js/configuration.discovery.edit.js.php:210
 msgid "LDAP"
 msgstr "LDAP"
 
@@ -9807,42 +9807,42 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Τελευταίο"
 
-#: include/func.inc.php:2721
+#: include/func.inc.php:2724
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2715
+#: include/func.inc.php:2718
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2708
+#: include/func.inc.php:2711
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2724
+#: include/func.inc.php:2727
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2701
+#: include/func.inc.php:2704
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2727
+#: include/func.inc.php:2730
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -10206,7 +10206,7 @@ msgstr "MD2"
 #: include/views/configuration.item.massupdate.php:218
 #: include/views/configuration.item.prototype.edit.php:489
 #: include/views/configuration.item.prototype.massupdate.php:214
-#: include/views/js/configuration.discovery.edit.js.php:121
+#: include/views/js/configuration.discovery.edit.js.php:118
 msgid "MD5"
 msgstr "MD5"
 
@@ -10900,7 +10900,7 @@ msgid "Mute"
 msgstr "Σίγαση"
 
 #: include/discovery.inc.php:53
-#: include/views/js/configuration.discovery.edit.js.php:214
+#: include/views/js/configuration.discovery.edit.js.php:211
 msgid "NNTP"
 msgstr "NNTP"
 
@@ -11357,7 +11357,7 @@ msgstr ""
 msgid "No data."
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:827
+#: include/classes/api/services/CHostInterface.php:815
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Όχι προεπιλεγμένη διεπαφή για \"%1$s\" τύπου σε \"%2$s\"."
@@ -11539,8 +11539,8 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
 #: app/controllers/CControllerWidgetMapView.php:68
 #: app/controllers/CControllerWidgetPlainTextView.php:78
-#: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:1236
-#: disc_prototypes.php:1463 host_discovery.php:664
+#: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:1237
+#: disc_prototypes.php:1464 host_discovery.php:664
 #: include/classes/api/services/CAction.php:1615
 #: include/classes/api/services/CAction.php:1992
 #: include/classes/api/services/CAction.php:2969
@@ -12669,7 +12669,7 @@ msgid "PHP xmlwriter extension missing."
 msgstr "Απουσία επέκτασης PHP xmlwriter."
 
 #: include/discovery.inc.php:52
-#: include/views/js/configuration.discovery.edit.js.php:215
+#: include/views/js/configuration.discovery.edit.js.php:212
 msgid "POP"
 msgstr "POP"
 
@@ -13017,7 +13017,7 @@ msgstr "Θύρα"
 msgid "Port cannot be empty for host interface."
 msgstr "Η θύρα δεν μπορεί να είναι κενή για διεπαφή ξενιστή."
 
-#: include/views/js/configuration.discovery.edit.js.php:64
+#: include/views/js/configuration.discovery.edit.js.php:65
 msgid "Port range"
 msgstr "Περιοχή θύρας"
 
@@ -13079,7 +13079,7 @@ msgstr ""
 msgid "Preview"
 msgstr "Προεπισκόπηση"
 
-#: include/func.inc.php:2671
+#: include/func.inc.php:2674
 msgid "Previous month"
 msgstr ""
 
@@ -13087,11 +13087,11 @@ msgstr ""
 msgid "Previous value"
 msgstr ""
 
-#: include/func.inc.php:2670
+#: include/func.inc.php:2673
 msgid "Previous week"
 msgstr ""
 
-#: include/func.inc.php:2672
+#: include/func.inc.php:2675
 msgid "Previous year"
 msgstr ""
 
@@ -13129,7 +13129,7 @@ msgstr "Καλλιτεχνικό όνομα Πρώτης Επαφής"
 #: include/views/configuration.item.massupdate.php:247
 #: include/views/configuration.item.prototype.edit.php:506
 #: include/views/configuration.item.prototype.massupdate.php:242
-#: include/views/js/configuration.discovery.edit.js.php:142
+#: include/views/js/configuration.discovery.edit.js.php:139
 msgid "Privacy passphrase"
 msgstr "Ιδιωτικό συνθηματικό"
 
@@ -13138,7 +13138,7 @@ msgstr "Ιδιωτικό συνθηματικό"
 #: include/views/configuration.item.massupdate.php:234
 #: include/views/configuration.item.prototype.edit.php:499
 #: include/views/configuration.item.prototype.massupdate.php:230
-#: include/views/js/configuration.discovery.edit.js.php:134
+#: include/views/js/configuration.discovery.edit.js.php:131
 msgid "Privacy protocol"
 msgstr "Ιδιωτικό πρωτόκολλο"
 
@@ -14125,7 +14125,7 @@ msgstr "Κ"
 #: include/views/configuration.item.massupdate.php:219
 #: include/views/configuration.item.prototype.edit.php:490
 #: include/views/configuration.item.prototype.massupdate.php:215
-#: include/views/js/configuration.discovery.edit.js.php:122
+#: include/views/js/configuration.discovery.edit.js.php:119
 msgid "SHA"
 msgstr "SHA"
 
@@ -14140,7 +14140,7 @@ msgid "SMS"
 msgstr "SMS"
 
 #: include/discovery.inc.php:49
-#: include/views/js/configuration.discovery.edit.js.php:219
+#: include/views/js/configuration.discovery.edit.js.php:216
 msgid "SMTP"
 msgstr "SMTP"
 
@@ -14171,7 +14171,7 @@ msgstr "SNMP"
 #: include/views/configuration.host.discovery.edit.php:411
 #: include/views/configuration.item.edit.php:473
 #: include/views/configuration.item.prototype.edit.php:455
-#: include/views/js/configuration.discovery.edit.js.php:88 items.php:127
+#: include/views/js/configuration.discovery.edit.js.php:86 items.php:127
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
@@ -14201,17 +14201,17 @@ msgid "SNMP trap key is invalid."
 msgstr "SNMP άκυρο κλειδί παγίδας."
 
 #: include/discovery.inc.php:57 include/items.inc.php:89
-#: include/views/js/configuration.discovery.edit.js.php:216
+#: include/views/js/configuration.discovery.edit.js.php:213
 msgid "SNMPv1 agent"
 msgstr "Αντιπρόσωπος SNMPv1"
 
 #: include/discovery.inc.php:58 include/items.inc.php:90
-#: include/views/js/configuration.discovery.edit.js.php:217
+#: include/views/js/configuration.discovery.edit.js.php:214
 msgid "SNMPv2 agent"
 msgstr "Αντιπρόσωπος SNMPv2"
 
 #: include/discovery.inc.php:59 include/items.inc.php:91
-#: include/views/js/configuration.discovery.edit.js.php:218
+#: include/views/js/configuration.discovery.edit.js.php:215
 msgid "SNMPv3 agent"
 msgstr "Αντιπρόσωπος SNMPv3"
 
@@ -14242,7 +14242,7 @@ msgstr "Αποτυχία εκτέλεσης δήλωσης SQL \"%1$s\"."
 #: include/views/configuration.action.edit.php:922
 #: include/views/configuration.action.edit.php:1682
 #: include/views/configuration.action.edit.php:2158
-#: include/views/js/configuration.discovery.edit.js.php:220
+#: include/views/js/configuration.discovery.edit.js.php:217
 msgid "SSH"
 msgstr "SSH"
 
@@ -14558,7 +14558,7 @@ msgstr "Δευτερόλεπτα"
 #: include/views/configuration.item.massupdate.php:203
 #: include/views/configuration.item.prototype.edit.php:479
 #: include/views/configuration.item.prototype.massupdate.php:199
-#: include/views/js/configuration.discovery.edit.js.php:110
+#: include/views/js/configuration.discovery.edit.js.php:107
 msgid "Security level"
 msgstr "Επίπεδο ασφάλειας"
 
@@ -14568,7 +14568,7 @@ msgstr "Επίπεδο ασφάλειας"
 #: include/views/configuration.item.massupdate.php:196
 #: include/views/configuration.item.prototype.edit.php:473
 #: include/views/configuration.item.prototype.massupdate.php:192
-#: include/views/js/configuration.discovery.edit.js.php:103
+#: include/views/js/configuration.discovery.edit.js.php:100
 msgid "Security name"
 msgstr "Όνομα ασφάλειας"
 
@@ -15643,7 +15643,7 @@ msgid "T"
 msgstr "Τ"
 
 #: include/discovery.inc.php:55
-#: include/views/js/configuration.discovery.edit.js.php:212
+#: include/views/js/configuration.discovery.edit.js.php:209
 msgid "TCP"
 msgstr "TCP"
 
@@ -15764,7 +15764,7 @@ msgstr "Τύπος στόχου"
 #: include/views/configuration.action.edit.php:923
 #: include/views/configuration.action.edit.php:1683
 #: include/views/configuration.action.edit.php:2159
-#: include/views/js/configuration.discovery.edit.js.php:221
+#: include/views/js/configuration.discovery.edit.js.php:218
 msgid "Telnet"
 msgstr "Telnet"
 
@@ -16059,7 +16059,7 @@ msgstr "Η κατηγορία σενάριο ιστού ανήκει σε δια
 msgid "Theme"
 msgstr "Θέμα"
 
-#: include/func.inc.php:2669
+#: include/func.inc.php:2672
 msgid "This day last week"
 msgstr ""
 
@@ -16072,11 +16072,11 @@ msgstr "Το πεδίο αυτό συμπληρώνεται αυτόματα α�
 msgid "This is the test message from Zabbix"
 msgstr ""
 
-#: include/func.inc.php:2677 srv_status.php:41
+#: include/func.inc.php:2680 srv_status.php:41
 msgid "This month"
 msgstr "Αυτό το μήνα"
 
-#: include/func.inc.php:2678
+#: include/func.inc.php:2681
 msgid "This month so far"
 msgstr ""
 
@@ -16088,19 +16088,19 @@ msgstr "Αυτή η στήλη οθόνης δεν είναι κενή. Να δ�
 msgid "This screen row is not empty. Delete it?"
 msgstr "Αυτή η γραμμή οθόνης δεν είναι κενή. Να διαγραφεί;"
 
-#: include/func.inc.php:2675 srv_status.php:40
+#: include/func.inc.php:2678 srv_status.php:40
 msgid "This week"
 msgstr "Αυτή την εβδομάδα"
 
-#: include/func.inc.php:2676
+#: include/func.inc.php:2679
 msgid "This week so far"
 msgstr ""
 
-#: include/func.inc.php:2679 srv_status.php:42
+#: include/func.inc.php:2682 srv_status.php:42
 msgid "This year"
 msgstr "Αυτό το έτος"
 
-#: include/func.inc.php:2680
+#: include/func.inc.php:2683
 msgid "This year so far"
 msgstr ""
 
@@ -16225,12 +16225,12 @@ msgstr "Σε"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Για να ορίσετε διεπαφή ξενιστή επιλέξτε απλό τύπο στοιχείου για όλα τα στοιχεία"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2673
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2676
 #: srv_status.php:39
 msgid "Today"
 msgstr "Σήμερα"
 
-#: include/func.inc.php:2674
+#: include/func.inc.php:2677
 msgid "Today so far"
 msgstr ""
 
@@ -16485,7 +16485,7 @@ msgstr ""
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr "Πρωτότυπο έναυσμα \"%1$s\" να περιέχει τουλάχιστον ένα πρωτότυπο συλλέκτη."
 
-#: trigger_prototypes.php:252
+#: trigger_prototypes.php:243
 msgid "Trigger prototype added"
 msgstr "Πρωτότυπο έναυσμα προστέθηκε"
 
@@ -16493,11 +16493,11 @@ msgstr "Πρωτότυπο έναυσμα προστέθηκε"
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
-#: trigger_prototypes.php:360
+#: trigger_prototypes.php:351
 msgid "Trigger prototype deleted"
 msgstr "Πρωτότυπο έναυσμα διεγράφη"
 
-#: trigger_prototypes.php:345 trigger_prototypes.php:499
+#: trigger_prototypes.php:336 trigger_prototypes.php:490
 #, fuzzy
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
@@ -16514,11 +16514,11 @@ msgstr[1] "Πρωτότυπο έναυσμα ενημερώθηκε"
 msgid "Trigger prototypes"
 msgstr "Πρωτότυπα εναύσματα"
 
-#: trigger_prototypes.php:510
+#: trigger_prototypes.php:501
 msgid "Trigger prototypes deleted"
 msgstr "Πρωτότυπα εναύσματα διεγράφησαν"
 
-#: trigger_prototypes.php:464
+#: trigger_prototypes.php:455
 msgid "Trigger prototypes updated"
 msgstr "Πρωτότυπα εναύσματα ενημερώθηκαν"
 
@@ -16861,7 +16861,7 @@ msgstr "Μονάδες"
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.triggers.list.php:71
-#: include/views/js/configuration.discovery.edit.js.php:230
+#: include/views/js/configuration.discovery.edit.js.php:227
 msgid "Unknown"
 msgstr "Άγνωστο"
 
@@ -17056,7 +17056,7 @@ msgstr "Ανοικτά"
 #: include/views/configuration.trigger.prototype.massupdate.php:189
 #: include/views/configuration.triggers.edit.php:616
 #: include/views/configuration.triggers.massupdate.php:169
-#: include/views/js/configuration.discovery.edit.js.php:423
+#: include/views/js/configuration.discovery.edit.js.php:420
 #: include/views/monitoring.screen.constructor.edit.php:934
 #: include/views/monitoring.screen.edit.php:220
 #: include/views/monitoring.slideconf.edit.php:273
@@ -17883,7 +17883,7 @@ msgstr "Ιστός"
 msgid "Web monitoring"
 msgstr "Εποπτεία Ιστού"
 
-#: httpconf.php:198 httpconf.php:499 include/audit.inc.php:45
+#: httpconf.php:188 httpconf.php:489 include/audit.inc.php:45
 msgid "Web scenario"
 msgstr ""
 
@@ -17903,27 +17903,27 @@ msgstr "Σενάριο ιστού \"%1$s\" υπάρχει ήδη."
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr ""
 
-#: httpconf.php:214
+#: httpconf.php:204
 msgid "Web scenario added"
 msgstr ""
 
-#: httpconf.php:166 httpconf.php:521
+#: httpconf.php:156 httpconf.php:511
 msgid "Web scenario deleted"
 msgstr "Σενάριο ιστού διεγράφη"
 
-#: httpconf.php:462
+#: httpconf.php:452
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Σενάριο ιστού απενεργοποιημένο"
 msgstr[1] "Σενάρια ιστού απενεργοποιημένα"
 
-#: httpconf.php:461
+#: httpconf.php:451
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] "Σενάριο ιστού ενεργοποιημένο"
 msgstr[1] "Σενάρια ιστού ενεργοποιημένα"
 
-#: httpconf.php:210
+#: httpconf.php:200
 msgid "Web scenario updated"
 msgstr ""
 
@@ -18245,7 +18245,7 @@ msgstr "Ετησίως"
 msgid "Yes"
 msgstr "Ναί"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2667
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2670
 msgid "Yesterday"
 msgstr ""
 
@@ -18360,7 +18360,7 @@ msgstr "Zabbix Χρήστης"
 #: include/views/configuration.action.edit.php:938
 #: include/views/configuration.action.edit.php:1716
 #: include/views/configuration.action.edit.php:2184
-#: include/views/js/configuration.discovery.edit.js.php:222
+#: include/views/js/configuration.discovery.edit.js.php:219
 msgid "Zabbix agent"
 msgstr "Αντιπρόσωπος Zabbix"
 
@@ -19242,7 +19242,7 @@ msgstr ""
 msgid "new"
 msgstr "νέο"
 
-#: disc_prototypes.php:1329 disc_prototypes.php:1353 hosts.php:1268
+#: disc_prototypes.php:1330 disc_prototypes.php:1354 hosts.php:1268
 #: include/views/configuration.item.massupdate.php:475 templates.php:813
 msgctxt "new element in multiselect"
 msgid "new"
