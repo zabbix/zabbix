@@ -36,6 +36,7 @@ AC_DEFUN([CONF_TESTS],[
 		tests/libs/zbxprometheus/Makefile
 		tests/zabbix_server/Makefile
 		tests/zabbix_server/preprocessor/Makefile
+		tests/libs/zbxcomms/Makefile
 		])
 		AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
 	])

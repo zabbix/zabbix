@@ -301,6 +301,10 @@ class CControllerPopupGeneric extends CController {
 				'title' => _('Discovery rules'),
 				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
 				'allowed_src_fields' => 'druleid,name',
+				'form' => [
+					'name' => 'druleform',
+					'id' => 'drules'
+				],
 				'table_columns' => [
 					_('Name')
 				]
@@ -987,10 +991,13 @@ class CControllerPopupGeneric extends CController {
 
 			case 'drules':
 				$records = API::DRule()->get([
-					'output' => ['druleid', 'name']
+					'output' => ['druleid', 'name'],
+					'filter' => ['status' => DRULE_STATUS_ACTIVE],
+					'preservekeys' => true
 				]);
 
 				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['druleid' => 'id']);
 				break;
 
 			case 'dchecks':

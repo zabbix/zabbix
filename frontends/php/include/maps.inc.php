@@ -513,17 +513,6 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 		];
 		$hasStatus = true;
 	}
-	elseif ($i['disabled']) {
-		if (!$hasProblem) {
-			$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
-			$info['iconid'] = $selement['iconid_disabled'];
-		}
-		$info['info']['disabled'] = [
-			'msg' => _('DISABLED'),
-			'color' => '960000'
-		];
-		$hasStatus = true;
-	}
 
 	if (!$hasStatus && !$hasProblem) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
@@ -610,17 +599,6 @@ function getMapsInfo($selement, $i, $show_unack) {
 		$info['info']['maintenance'] = [
 			'msg' => $i['maintenance'].' '._('Maintenance'),
 			'color' => 'EE9600'
-		];
-		$hasStatus = true;
-	}
-	elseif ($i['disabled']) {
-		if (!$hasProblem) {
-			$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
-			$info['iconid'] = $selement['iconid_disabled'];
-		}
-		$info['info']['disabled'] = [
-			'msg' => _('DISABLED'),
-			'color' => '960000'
 		];
 		$hasStatus = true;
 	}
@@ -999,6 +977,9 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 		}
 
 		$critical_problem = [];
+		$trigger_order = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
+			? zbx_objectValues($selement['elements'], 'triggerid')
+			: [];
 		$lately_changed = 0;
 
 		foreach ($selement['triggers'] as $trigger) {
@@ -1015,11 +996,25 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 						if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
 							$i['problem_unack']++;
 						}
-					}
 
-					if (!$critical_problem || ($critical_problem['severity'] <= $problem['severity']
-							&& $critical_problem['eventid'] < $problem['eventid'])) {
-						$critical_problem = $problem;
+						if (!$critical_problem || $critical_problem['severity'] < $problem['severity']) {
+							$critical_problem = $problem;
+						}
+						elseif ($critical_problem['severity'] === $problem['severity']) {
+							if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+								if ($problem['objectid'] === $critical_problem['objectid']
+										&& $critical_problem['eventid'] < $problem['eventid']) {
+									$critical_problem = $problem;
+								}
+								elseif (array_search($critical_problem['objectid'], $trigger_order)
+										> array_search($problem['objectid'], $trigger_order)) {
+									$critical_problem = $problem;
+								}
+							}
+							elseif ($critical_problem['eventid'] < $problem['eventid']) {
+								$critical_problem = $problem;
+							}
+						}
 					}
 
 					if ($problem['r_clock'] > $lately_changed) {

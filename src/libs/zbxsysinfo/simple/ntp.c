@@ -79,12 +79,10 @@ static int	unpack_ntp(ntp_data *data, const unsigned char *request, const unsign
 	/* Unpack the essential data from an NTP packet, bypassing struct layout */
 	/* and endian problems. Note that it ignores fields irrelevant to SNTP.  */
 
-	const char	*__function_name = "unpack_ntp";
+	int	i, ret = FAIL;
+	double	d;
 
-	int		i, ret = FAIL;
-	double		d;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NTP_PACKET_SIZE != length)
 	{
@@ -138,7 +136,7 @@ static int	unpack_ntp(ntp_data *data, const unsigned char *request, const unsign
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

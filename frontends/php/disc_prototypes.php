@@ -251,14 +251,14 @@ $fields = [
 										IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
 										null
 									],
-	'http_username' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'http_username' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
 											')',
 										_('Username')
 									],
-	'http_password' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'http_password' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
@@ -1151,6 +1151,15 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 	show_messages($result, _('Item prototypes updated'), _('Cannot update item prototypes'));
+}
+
+if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
+	$item_prototypes = API::ItemPrototype()->get([
+		'itemids' => getRequest('group_itemid'),
+		'output' => [],
+		'editable' => true
+	]);
+	uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($item_prototypes, 'itemid'));
 }
 
 /*

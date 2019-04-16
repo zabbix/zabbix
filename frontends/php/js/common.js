@@ -202,7 +202,7 @@ function checkAll(form_name, chkMain, shkName) {
 
 	chkbxRange.checkObjectAll(shkName, value);
 	chkbxRange.update(shkName);
-	chkbxRange.saveCookies(shkName);
+	chkbxRange.saveSessionStorage(shkName);
 
 	return true;
 }

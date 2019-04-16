@@ -262,15 +262,13 @@ static void	elastic_close(zbx_history_iface_t *hist)
  ******************************************************************************/
 static int	elastic_is_error_present(zbx_httppage_t *page, char **err)
 {
-	const char		*__function_name = "elastic_is_error_present";
-
 	struct zbx_json_parse	jp, jp_values, jp_index, jp_error, jp_items, jp_item;
 	const char		*errors, *p = NULL;
 	char			*index = NULL, *status = NULL, *type = NULL, *reason = NULL;
 	size_t			index_alloc = 0, status_alloc = 0, type_alloc = 0, reason_alloc = 0;
 	int			rc_js = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_TRACE, "%s() raw json: %s", __function_name, ZBX_NULL2EMPTY_STR(page->data));
+	zabbix_log(LOG_LEVEL_TRACE, "%s() raw json: %s", __func__, ZBX_NULL2EMPTY_STR(page->data));
 
 	if (SUCCEED != zbx_json_open(page->data, &jp) || SUCCEED != zbx_json_brackets_open(jp.start, &jp_values))
 		return FAIL;
@@ -418,14 +416,12 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
  ************************************************************************************/
 static int	elastic_writer_flush(void)
 {
-	const char		*__function_name = "elastic_writer_flush";
-
 	struct curl_slist	*curl_headers = NULL;
 	int			i, running, previous, msgnum;
 	CURLMsg			*msg;
 	zbx_vector_ptr_t	retries;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* The writer might be uninitialized only if the history */
 	/* was already flushed. In that case, return SUCCEED */
@@ -528,7 +524,7 @@ try_again:
 					&& SUCCEED == elastic_is_error_present(&curl_page->page, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "%s() cannot send data to elasticsearch: %s",
-						__function_name, error);
+						__func__, error);
 				zbx_free(error);
 
 				/* If the error is due to elastic internal problems (for example an index */
@@ -563,7 +559,7 @@ try_again:
 
 	elastic_writer_release();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return SUCCEED;
 }
@@ -616,8 +612,6 @@ static void	elastic_destroy(zbx_history_iface_t *hist)
 static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int start, int count, int end,
 		zbx_vector_history_record_t *values)
 {
-	const char		*__function_name = "elastic_get_values";
-
 	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
 	size_t			url_alloc = 0, url_offset = 0, id_alloc = 0, scroll_alloc = 0, scroll_offset = 0;
 	int			total, empty, ret;
@@ -626,7 +620,7 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 	struct curl_slist	*curl_headers = NULL;
 	char			*scroll_id = NULL, *scroll_query = NULL, errbuf[CURL_ERROR_SIZE];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = FAIL;
 
@@ -815,7 +809,7 @@ out:
 
 	zbx_vector_history_record_sort(values, (zbx_compare_func_t)zbx_history_record_compare_desc_func);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
@@ -832,8 +826,6 @@ out:
  ************************************************************************************/
 static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history)
 {
-	const char	*__function_name = "elastic_add_values";
-
 	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
 	int			i, num = 0;
 	ZBX_DC_HISTORY		*h;
@@ -841,7 +833,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 	size_t			buf_alloc = 0, buf_offset = 0;
 	char			pipeline[14]; /* index name length + suffix "-pipeline" */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_json_init(&json_idx, ZBX_IDX_JSON_ALLOCATE);
 
@@ -904,7 +896,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 
 	zbx_json_free(&json_idx);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return num;
 }

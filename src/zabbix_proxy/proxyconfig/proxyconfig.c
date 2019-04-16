@@ -54,13 +54,11 @@ static void	zbx_proxyconfig_sigusr_handler(int flags)
  ******************************************************************************/
 static void	process_configuration_sync(size_t *data_size)
 {
-	const char	*__function_name = "process_configuration_sync";
-
 	zbx_socket_t	sock;
 	struct		zbx_json_parse jp;
 	char		value[16], *error = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* reset the performance metric */
 	*data_size = 0;
@@ -116,7 +114,7 @@ out:
 
 	zbx_free(error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************

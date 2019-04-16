@@ -351,12 +351,11 @@ static void	ipmi_poller_free(zbx_ipmi_poller_t *poller)
  ******************************************************************************/
 static void	ipmi_manager_init(zbx_ipmi_manager_t *manager)
 {
-	const char		*__function_name = "ipmi_manager_init";
 	int			i;
 	zbx_ipmi_poller_t	*poller;
 	zbx_binary_heap_elem_t	elem = {0};
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __function_name, CONFIG_IPMIPOLLER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, CONFIG_IPMIPOLLER_FORKS);
 
 	zbx_vector_ptr_create(&manager->pollers);
 	zbx_hashset_create(&manager->pollers_client, 0, poller_hash_func, poller_compare_func);
@@ -383,7 +382,7 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager)
 
 	zbx_hashset_create(&manager->hosts, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -416,13 +415,12 @@ static void	ipmi_manager_destroy(zbx_ipmi_manager_t *manager)
  ******************************************************************************/
 static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now)
 {
-	const char		*__function_name = "ipmi_manager_host_cleanup";
 	zbx_hashset_iter_t	iter;
 	zbx_ipmi_manager_host_t	*host;
 	zbx_ipmi_poller_t	*poller;
 	int			i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __function_name, CONFIG_IPMIPOLLER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, CONFIG_IPMIPOLLER_FORKS);
 
 	zbx_hashset_iter_reset(&manager->hosts, &iter);
 	while (NULL != (host = (zbx_ipmi_manager_host_t *)zbx_hashset_iter_next(&iter)))
@@ -442,7 +440,7 @@ static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now)
 			zbx_ipc_client_send(poller->client, ZBX_IPC_IPMI_CLEANUP_REQUEST, NULL, 0);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -458,11 +456,10 @@ static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now)
 static zbx_ipmi_poller_t	*ipmi_manager_register_poller(zbx_ipmi_manager_t *manager, zbx_ipc_client_t *client,
 		zbx_ipc_message_t *message)
 {
-	const char		*__function_name = "ipmi_manager_register_poller";
 	zbx_ipmi_poller_t	*poller = NULL;
 	pid_t			ppid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	memcpy(&ppid, message->data, sizeof(ppid));
 
@@ -485,7 +482,7 @@ static zbx_ipmi_poller_t	*ipmi_manager_register_poller(zbx_ipmi_manager_t *manag
 		zbx_hashset_insert(&manager->pollers_client, &poller, sizeof(zbx_ipmi_poller_t *));
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return poller;
 }

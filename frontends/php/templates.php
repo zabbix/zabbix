@@ -642,6 +642,14 @@ elseif (hasRequest('templates') && hasRequest('action') && str_in_array(getReque
 	if ($result) {
 		uncheckTableRows();
 	}
+	else {
+		$templateids = API::Template()->get([
+			'output' => [],
+			'templateids' => $templates,
+			'editable' => true
+		]);
+		uncheckTableRows(null, zbx_objectValues($templateids, 'templateid'));
+	}
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 

@@ -285,17 +285,16 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
  ******************************************************************************/
 static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
 {
-	const char			*__function_name = "worker_preprocess_value";
-	zbx_uint32_t			size = 0;
-	unsigned char			*data = NULL, value_type;
-	zbx_uint64_t			itemid;
-	zbx_variant_t			value, value_start;
-	int				i, steps_num, results_num, ret;
-	char				*errmsg = NULL, *error = NULL;
-	zbx_timespec_t			*ts;
-	zbx_preproc_op_t		*steps;
-	zbx_vector_ptr_t		history_in, history_out;
-	zbx_preproc_result_t		*results;
+	zbx_uint32_t		size = 0;
+	unsigned char		*data = NULL, value_type;
+	zbx_uint64_t		itemid;
+	zbx_variant_t		value, value_start;
+	int			i, steps_num, results_num, ret;
+	char			*errmsg = NULL, *error = NULL;
+	zbx_timespec_t		*ts;
+	zbx_preproc_op_t	*steps;
+	zbx_vector_ptr_t	history_in, history_out;
+	zbx_preproc_result_t	*results;
 
 	zbx_vector_ptr_create(&history_in);
 	zbx_vector_ptr_create(&history_out);
@@ -326,8 +325,8 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 		const char	*result;
 
 		result = (SUCCEED == ret ? zbx_variant_value_desc(&value) : error);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): %s", __function_name, zbx_variant_value_desc(&value_start));
-		zabbix_log(LOG_LEVEL_DEBUG, "%s: %s %s",__function_name,  zbx_result_string(ret), result);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): %s", __func__, zbx_variant_value_desc(&value_start));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: %s %s",__func__,  zbx_result_string(ret), result);
 	}
 
 	size = zbx_preprocessor_pack_result(&data, &value, &history_out, error);
@@ -514,7 +513,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 	zbx_ipc_message_init(&message);
 
-	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_PREPROCESSING, 10, &error))
+	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_PREPROCESSING, SEC_PER_MIN, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannozbx_item_preproct connect to preprocessing service: %s", error);
 		zbx_free(error);

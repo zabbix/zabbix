@@ -1667,7 +1667,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if ($item_preproc) {
-			DB::insert('item_preproc', $item_preproc);
+			DB::insertBatch('item_preproc', $item_preproc);
 		}
 	}
 
@@ -1704,7 +1704,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if ($item_preproc) {
-			DB::insert('item_preproc', $item_preproc);
+			DB::insertBatch('item_preproc', $item_preproc);
 		}
 	}
 
@@ -1768,6 +1768,7 @@ abstract class CItemGeneral extends CApiService {
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
+		// adding preprocessing
 		if ($options['selectPreprocessing'] !== null && $options['selectPreprocessing'] != API_OUTPUT_COUNT) {
 			$db_item_preproc = API::getApiService()->select('item_preproc', [
 				'output' => $this->outputExtend($options['selectPreprocessing'], ['itemid', 'step']),
@@ -2152,14 +2153,8 @@ abstract class CItemGeneral extends CApiService {
 		if (array_key_exists('authtype', $data)
 				&& ($data['authtype'] == HTTPTEST_AUTH_BASIC || $data['authtype'] == HTTPTEST_AUTH_NTLM)) {
 			$rules += [
-				'username' => [
-					'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength('items', 'username')
-				],
-				'password' => [
-					'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength('items', 'password')
-				]
+				'username' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
+				'password' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')]
 			];
 		}
 

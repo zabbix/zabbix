@@ -9,6 +9,6 @@ SUBDIRS = \
 	zbxcommshigh \
 	zbxcommon \
 	zbxalgo \
-	zbxprometheus
-	
+	zbxprometheus \
+	zbxcomms
 

@@ -296,6 +296,7 @@ class CItemPrototype extends CItemGeneral {
 				$item['headers'] = $this->headersStringToArray($item['headers']);
 			}
 		}
+		unset($item);
 
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
@@ -497,11 +498,11 @@ class CItemPrototype extends CItemGeneral {
 		$this->createItemPreprocessing($items);
 	}
 
-	protected function updateReal($items) {
-		$items = zbx_toArray($items);
+	protected function updateReal(array $items) {
+		CArrayHelper::sort($items, ['itemid']);
 
 		$data = [];
-		foreach ($items as $inum => $item) {
+		foreach ($items as $item) {
 			$data[] = ['values' => $item, 'where'=> ['itemid' => $item['itemid']]];
 		}
 
@@ -520,7 +521,7 @@ class CItemPrototype extends CItemGeneral {
 			}
 
 			$itemidsWithApplications[] = $item['itemid'];
-			foreach ($item['applications'] as $anum => $appid) {
+			foreach ($item['applications'] as $appid) {
 				$itemApplications[] = [
 					'applicationid' => $appid,
 					'itemid' => $item['itemid']
@@ -1057,12 +1058,9 @@ class CItemPrototype extends CItemGeneral {
 				$triggers = zbx_toHash($triggers, 'itemid');
 
 				foreach ($result as $itemid => $item) {
-					if (isset($triggers[$itemid])) {
-						$result[$itemid]['triggers'] = $triggers[$itemid]['rowscount'];
-					}
-					else {
-						$result[$itemid]['triggers'] = 0;
-					}
+					$result[$itemid]['triggers'] = array_key_exists($itemid, $triggers)
+						? $triggers[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1091,12 +1089,9 @@ class CItemPrototype extends CItemGeneral {
 				$graphs = zbx_toHash($graphs, 'itemid');
 
 				foreach ($result as $itemid => $item) {
-					if (isset($graphs[$itemid])) {
-						$result[$itemid]['graphs'] = $graphs[$itemid]['rowscount'];
-					}
-					else {
-						$result[$itemid]['graphs'] = 0;
-					}
+					$result[$itemid]['graphs'] = array_key_exists($itemid, $graphs)
+						? $graphs[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}

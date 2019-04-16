@@ -873,6 +873,14 @@ elseif (hasRequest('hosts') && hasRequest('action') && getRequest('action') === 
 	if ($result) {
 		uncheckTableRows();
 	}
+	else {
+		$hostids = API::Host()->get([
+			'output' => [],
+			'hostids' => getRequest('hosts'),
+			'editable' => true
+		]);
+		uncheckTableRows(getRequest('hostid'), zbx_objectValues($hostids, 'hostid'));
+	}
 	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }
 elseif (hasRequest('hosts') && hasRequest('action') && str_in_array(getRequest('action'), ['host.massenable', 'host.massdisable'])) {
