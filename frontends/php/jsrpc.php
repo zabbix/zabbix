@@ -152,6 +152,7 @@ switch ($data['method']) {
 		}
 
 		CArrayHelper::sort($result, ['time', 'priority']);
+		$result = array_values($result);
 
 		break;
 
