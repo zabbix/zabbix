@@ -274,7 +274,7 @@ out:
   result: succeed
   value: "A"
 ---
-test case: ZBX-13782, escaped Unicode character \u00e4 which translates into 1 byte UTF-8
+test case: ZBX-13782, escaped Unicode character \u00e4 which translates into 2 byte UTF-8
 in:
   json: '{"DeviceLog": "AB-\u00e4-C"}'
   path: $.DeviceLog

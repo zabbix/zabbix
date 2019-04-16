@@ -19,17 +19,18 @@
 
 
 jQuery(function($) {
-	var KEY = {
-		ARROW_DOWN: 40,
-		ARROW_LEFT: 37,
-		ARROW_RIGHT: 39,
-		ARROW_UP: 38,
-		BACKSPACE: 8,
-		DELETE: 46,
-		ENTER: 13,
-		ESCAPE: 27,
-		TAB: 9
-	};
+	var ZBX_STYLE_CLASS = 'multiselect-control',
+		KEY = {
+			ARROW_DOWN: 40,
+			ARROW_LEFT: 37,
+			ARROW_RIGHT: 39,
+			ARROW_UP: 38,
+			BACKSPACE: 8,
+			DELETE: 46,
+			ENTER: 13,
+			ESCAPE: 27,
+			TAB: 9
+		};
 
 	/**
 	 * Multi select helper.
@@ -158,7 +159,7 @@ jQuery(function($) {
 		disable: function() {
 			return this.each(function() {
 				var $obj = $(this),
-					$wrapper = $obj.parent('.multiselect-wrapper'),
+					$wrapper = $obj.parent('.'+ZBX_STYLE_CLASS),
 					ms = $obj.data('multiSelect');
 
 				if (ms.options.disabled === false) {
@@ -182,7 +183,7 @@ jQuery(function($) {
 		enable: function() {
 			return this.each(function() {
 				var $obj = $(this),
-					$wrapper = $obj.parent('.multiselect-wrapper'),
+					$wrapper = $obj.parent('.'+ZBX_STYLE_CLASS),
 					ms = $(this).data('multiSelect');
 
 				if (ms.options.disabled === true) {
@@ -227,7 +228,7 @@ jQuery(function($) {
 	 * @param string options['popup']['parameters']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
-	 * @param string options['styles']				additional style for .multiselect-wrapper (optional)
+	 * @param string options['styles']				additional style for multiselect wrapper HTML element (optional)
 	 * @param string options['styles']['property']
 	 * @param string options['styles']['value']
 	 *
@@ -292,7 +293,7 @@ jQuery(function($) {
 
 			// add wrap
 			obj.wrap(jQuery('<div>', {
-				'class': 'multiselect-wrapper',
+				'class': ZBX_STYLE_CLASS,
 				css: options.styles
 			}));
 
@@ -426,7 +427,7 @@ jQuery(function($) {
 							window.setTimeout(function() {
 								values.isWaiting = false;
 
-								var search = $input.val().replace(/^\s+/g, '');
+								var search = $input.val().replace(/^\s+|\s+$/g, '');
 
 								// re-check search after delay
 								if (search !== '' && $input.data('lastSearch') != search) {
@@ -442,7 +443,7 @@ jQuery(function($) {
 									var request_data = {
 										search: values.search,
 										limit: getLimit(values, options)
-									}
+									};
 
 									jqxhr = $.ajax({
 										url: options.url + '&curtime=' + new CDate().getTime(),
@@ -636,16 +637,18 @@ jQuery(function($) {
 		if (options.addNew) {
 			var value = values['search'].replace(/^\s+|\s+$/g, '');
 
-			if (!empty(value)) {
+			if (value.length) {
 				var addNew = false;
 
-				if (!empty(data) || objectLength(values.selected) > 0) {
-					// check if value exist in availables
-					if (!empty(data)) {
-						var names = {};
+				if (data.length || objectLength(values.selected) > 0) {
+					var names = {};
 
+					// check if value exists among available
+					if (data.length) {
 						$.each(data, function(i, item) {
-							names[item.name.toUpperCase()] = true;
+							if (item.name === value) {
+								names[item.name.toUpperCase()] = true;
+							}
 						});
 
 						if (typeof names[value.toUpperCase()] === 'undefined') {
@@ -653,10 +656,8 @@ jQuery(function($) {
 						}
 					}
 
-					// check if value exist in selected
+					// check if value exists among selected
 					if (!addNew && objectLength(values.selected) > 0) {
-						var names = {};
-
 						$.each(values.selected, function(i, item) {
 							if (typeof item.isNew === 'undefined') {
 								names[item.name.toUpperCase()] = true;
