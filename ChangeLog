@@ -1,7 +1,5 @@
 Changes for 4.0.7rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-15911] fixed guest sign in visibility for disabled guest user group in login page (gcalenko)
 A......... [ZBX-15977] fixed validation of host interface when multiple interfaces set as main interface (gcalenko, vmurzins)
