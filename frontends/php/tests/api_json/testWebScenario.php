@@ -696,37 +696,6 @@ class testWebScenario extends CAPITest {
 			// Check web password used for basic HTTP authentication.
 			[
 				'httptest' => [
-					'name' => 'Api web without http_password',
-					'authentication' => '1',
-					'http_user' => '☺',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_password": cannot be empty.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with empty http_password',
-					'authentication' => '1',
-					'http_user' => 'admin',
-					'http_password' => '',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_password": cannot be empty.'
-			],
-			[
-				'httptest' => [
 					'name' => 'Api web with long http_password',
 					'authentication' => '1',
 					'http_user' => 'admin',
@@ -757,37 +726,6 @@ class testWebScenario extends CAPITest {
 				'expected_error' => 'Incorrect value for field "http_password": should be empty.'
 			],
 			// Check web password used for NTLM  authentication.
-			[
-				'httptest' => [
-					'name' => 'Api web without http_password',
-					'authentication' => '2',
-					'http_user' => 'admin',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_password": cannot be empty.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with empty http_password',
-					'authentication' => '2',
-					'http_user' => 'admin',
-					'http_password' => '',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_password": cannot be empty.'
-			],
 			[
 				'httptest' => [
 					'name' => 'Api web with long http_password',
@@ -822,35 +760,6 @@ class testWebScenario extends CAPITest {
 			],
 			[
 				'httptest' => [
-					'name' => 'Api web without http_user',
-					'authentication' => '1',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_user": cannot be empty.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with empty http_user',
-					'authentication' => '1',
-					'http_user' => '',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_user": cannot be empty.'
-			],
-			[
-				'httptest' => [
 					'name' => 'Api web with long http_user',
 					'authentication' => '1',
 					'http_user' => 'Phasellus imperdiet sapien sed justo elementum, quis maximuslpi65',
@@ -858,35 +767,6 @@ class testWebScenario extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/http_user": value is too long.'
 			],
 			// Check web user name used for NTLM authentication .
-			[
-				'httptest' => [
-					'name' => 'Api web without http_user',
-					'authentication' => '2',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_user": cannot be empty.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with empty http_user',
-					'authentication' => '2',
-					'http_user' => '',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_user": cannot be empty.'
-			],
 			[
 				'httptest' => [
 					'name' => 'Api web with long http_user',

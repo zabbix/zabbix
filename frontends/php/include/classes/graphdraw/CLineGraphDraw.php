@@ -1569,9 +1569,9 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$newPow = false;
 			if ($byteStep) {
-				$maxYPow = convertToBase1024($maxY, 1024);
-				$minYPow = convertToBase1024($minY, 1024);
-				$powStep = 1024;
+				$maxYPow = convertToBase1024($maxY, ZBX_KIBIBYTE);
+				$minYPow = convertToBase1024($minY, ZBX_KIBIBYTE);
+				$powStep = ZBX_KIBIBYTE;
 			} else {
 				$maxYPow = convertToBase1024($maxY);
 				$minYPow = convertToBase1024($minY);

@@ -179,13 +179,13 @@ $fields = [
 									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
 									null
 								],
-	'http_username' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'http_username' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
 										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
 									_('Username')
 								],
-	'http_password' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'http_password' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
 										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
@@ -1314,6 +1314,15 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' &&
 	}
 
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
+}
+
+if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
+	$itemids = API::Item()->get([
+		'output' => [],
+		'itemids' => getRequest('group_itemid'),
+		'editable' => true
+	]);
+	uncheckTableRows(getRequest('hostid'), zbx_objectValues($itemids, 'itemid'));
 }
 
 /*
