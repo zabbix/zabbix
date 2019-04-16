@@ -827,7 +827,7 @@ class CScript extends CApiService {
 			$host_groups_with_write_access, ['name', 'groupid'], $options['selectGroups']
 		);
 
-		foreach ($result as $scriptid => &$script) {
+		foreach ($result as &$script) {
 			if ($script['groupid'] === '0') {
 				$script_groups = ($script['host_access'] == PERM_READ_WRITE)
 					? $host_groups_with_write_access
