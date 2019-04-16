@@ -118,7 +118,7 @@ class CScript extends CApiService {
 		// Hostids and groupids selection API calls must be made separately because we must intersect enriched groupids.
 		if ($options['hostids'] !== null) {
 			zbx_value2array($options['hostids']);
-			$host_groups_by_hostids = $this->enrichParentGroups(API::HostGroup()->get([
+			$host_groups_by_hostids = enrichParentGroups(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'hostids' => $options['hostids'],
 				'preservekeys' => true
@@ -126,7 +126,7 @@ class CScript extends CApiService {
 		}
 		if ($options['groupids'] !== null) {
 			zbx_value2array($options['groupids']);
-			$host_groups_by_groupids = $this->enrichParentGroups(API::HostGroup()->get([
+			$host_groups_by_groupids = enrichParentGroups(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $options['groupids'],
 				'preservekeys' => true
@@ -205,45 +205,6 @@ class CScript extends CApiService {
 
 		return $result;
 	}
-
-	/**
-	 * Enriches host groups array by parent groups.
-	 *
-	 * @param array  $groups
-	 * @param string $groups[<groupid>]['groupid']
-	 * @param string $groups[<groupid>]['name']
-	 *
-	 * @return array
-	 */
-	public function enrichParentGroups(array $groups) {
-		$parents = [];
-		foreach ($groups as $group) {
-			$parent = explode('/', $group['name']);
-			while (array_pop($parent) && $parent) {
-				$parents[implode('/', $parent)] = true;
-			}
-		}
-
-		if ($parents) {
-			foreach ($groups as $group) {
-				if (array_key_exists($group['name'], $parents)) {
-					unset($parents[$group['name']]);
-				}
-			}
-		}
-
-		if ($parents) {
-			$group = API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'filter' => ['name' => array_keys($parents)],
-				'preservekeys' => true
-			]);
-			$groups += $group;
-		}
-
-		return $groups;
-	}
-
 
 	/**
 	 * @param array $scripts

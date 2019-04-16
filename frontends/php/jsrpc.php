@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/include/func.inc.php';
+require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/defines.inc.php';
 require_once dirname(__FILE__).'/include/classes/json/CJson.php';
 require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
@@ -265,7 +266,7 @@ switch ($data['method']) {
 
 				if ($hostGroups) {
 					if (array_key_exists('enrich_parent_groups', $data)) {
-						$hostGroups = CPageFilter::enrichParentGroups($hostGroups, [
+						$hostGroups = enrichParentGroups($hostGroups, [
 							'real_hosts' => null
 						] + $options);
 					}
