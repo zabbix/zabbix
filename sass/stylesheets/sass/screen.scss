@@ -6278,6 +6278,10 @@ svg {
 	}
 }
 
+#expressions_list .ui-sortable-helper {
+	display: table;
+}
+
 // RANGE CONTROL
 $range-track-color: silver;
 $range-progress-color: $link-color;

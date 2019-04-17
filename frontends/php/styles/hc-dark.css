@@ -4447,6 +4447,9 @@ svg {
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
 
+#expressions_list .ui-sortable-helper {
+  display: table; }
+
 .range-control {
   position: relative;
   display: inline-block;

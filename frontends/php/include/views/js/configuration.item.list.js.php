@@ -42,7 +42,7 @@
 			(new CButton(null, _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
 		]))->addClass(ZBX_STYLE_NOWRAP)
 	]))
-		->addClass('sortable')
+		->addClass('sortable form_row')
 ?>
 </script>
 <script type="text/x-jquery-tmpl" id="tmpl_expressions_part_list_row">
@@ -56,5 +56,6 @@
 			(new CButton(null, _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
 		]))->addClass(ZBX_STYLE_NOWRAP)
 	]))
+		->addClass('form_row')
 ?>
 </script>
