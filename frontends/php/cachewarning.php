@@ -35,9 +35,9 @@ if ((new CAssetsFileCache(ZBase::getRootDir()))->build()) {
 }
 
 (new CView('general.warning', [
-	'header' => _('Insufficient file system permissions'),
+	'header' => _('Insufficient file system permissions.'),
 	'messages' => [
-		_('Assets cache directory is not writable!')
+		_('Assets cache directory is not writable.')
 	],
 	'theme' => ZBX_DEFAULT_THEME
 ]))->render();

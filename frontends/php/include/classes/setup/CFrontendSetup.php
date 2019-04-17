@@ -670,7 +670,7 @@ class CFrontendSetup {
 			'current' => $result === self::CHECK_OK ? 'RW' : 'R',
 			'required' => 'RW',
 			'result' => $result,
-			'error' => _s('Directory "%1$s" must be writable', $assets->getAssetsDirectory())
+			'error' => _s('Directory "%1$s" must be writable.', $assets->getAssetsDirectory())
 		];
 	}
 }
