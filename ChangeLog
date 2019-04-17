@@ -1,6 +1,7 @@
 Changes for 4.0.7rc1
 
 Bug fixes:
+........S. [ZBX-16020] fixed uncontrolled memory allocation in regex preprocessing steps (vjaceslavs)
 ..F....... [ZBX-15911] fixed guest sign in visibility for disabled guest user group in login page (gcalenko)
 A......... [ZBX-15977] fixed validation of host interface when multiple interfaces set as main interface (gcalenko, vmurzins)
 ...G...PS. [ZBX-15955] fixed security vulnerability - accepting connections from not allowed addresses (Andris, vso)
