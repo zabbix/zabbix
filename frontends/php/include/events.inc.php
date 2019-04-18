@@ -827,7 +827,6 @@ function getLastProblems(array $options) {
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'severities' => $options['severities'],
-		'time_from' => $options['time_from'],
 		'sortorder' => ZBX_SORT_DOWN,
 		'sortfield' => ['eventid'],
 		'limit' => $options['limit']
@@ -835,6 +834,9 @@ function getLastProblems(array $options) {
 
 	if ($options['show_recovered']) {
 		$problem_options['recent'] = true;
+	}
+	else {
+		$problem_options['time_from'] = $options['time_from'];
 	}
 
 	if (!$options['show_suppressed']) {
