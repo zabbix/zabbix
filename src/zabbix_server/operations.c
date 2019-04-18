@@ -54,13 +54,13 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 		case EVENT_OBJECT_DHOST:
 		case EVENT_OBJECT_DSERVICE:
 			result = DBselect(
-				"select dr.proxy_hostid,ds.ip"
-				" from drules dr,dchecks dc,dservices ds"
-				" where dc.druleid=dr.druleid"
-					" and ds.dcheckid=dc.dcheckid"
-					" and ds.%s=" ZBX_FS_UI64,
-					EVENT_OBJECT_DSERVICE == event->object ? "dserviceid" : "dhostid",
-					event->objectid);
+					"select dr.proxy_hostid,ds.ip"
+					" from drules dr,dchecks dc,dservices ds"
+					" where dc.druleid=dr.druleid"
+						" and ds.dcheckid=dc.dcheckid"
+						" and ds.%s=" ZBX_FS_UI64,
+						EVENT_OBJECT_DSERVICE == event->object ? "dserviceid" : "dhostid",
+						event->objectid);
 
 			if (NULL == (row = DBfetch(result)))
 			{
@@ -73,17 +73,17 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 			DBfree_result(result);
 
 			sql = zbx_dsprintf(sql,
-				"select h.hostid,h.status"
-				" from hosts h,interface i"
-				" where h.hostid=i.hostid"
-					" and i.ip='%s'"
-					" and h.status in (%d,%d)"
-					" and h.proxy_hostid=%s"
-					" and i.useip=1"
-				" order by i.hostid",
-				ip_esc,
-				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-				DBsql_id_ins(proxy_hostid));
+					"select h.hostid,h.status"
+					" from hosts h,interface i"
+					" where h.hostid=i.hostid"
+						" and i.ip='%s'"
+						" and h.status in (%d,%d)"
+						" and h.proxy_hostid=%s"
+						" and i.useip=1"
+					" order by i.hostid",
+					ip_esc,
+					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+					DBsql_id_ins(proxy_hostid));
 
 			zbx_free(ip_esc);
 			break;
