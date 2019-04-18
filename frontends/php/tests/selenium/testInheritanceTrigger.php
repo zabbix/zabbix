@@ -171,7 +171,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$host_triggers_table->query('link:'.$inherited_trigger)->one()->click();
 		// Check trigger name.
 		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
-		$name = $form->getField('Name')->getAttribute('value');
+		$name = $form->getField('Name')->getValue();
 		$this->assertEquals($name, $inherited_trigger);
 		// Check tags.
 		$form->selectTab('Tags');
@@ -211,8 +211,8 @@ class testInheritanceTrigger extends CLegacyWebTest {
 	private function checkTags($slice, $array) {
 		foreach ($slice as $i => $row) {
 			$this->assertEquals($array[$i], [
-				'name' => $row->getColumn('Name')->children()->one()->getAttribute('value'),
-				'value' => $row->getColumn('Value')->children()->one()->getAttribute('value')
+				'name' => $row->getColumn('Name')->children()->one()->getValue(),
+				'value' => $row->getColumn('Value')->children()->one()->getValue()
 			]);
 		}
 	}

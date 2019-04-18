@@ -30,6 +30,7 @@ require_once dirname(__FILE__).'/../../../include/classes/debug/CProfiler.php';
 require_once dirname(__FILE__).'/../../../include/classes/db/DbBackend.php';
 require_once dirname(__FILE__).'/../../../include/classes/db/MysqlDbBackend.php';
 require_once dirname(__FILE__).'/../../../include/classes/db/PostgresqlDbBackend.php';
+require_once dirname(__FILE__).'/CTestArrayHelper.php';
 
 /**
  * Database helper.
@@ -382,11 +383,9 @@ class CDBHelper {
 				'value' => $value,
 				'name' => $trigger['description'],
 				'severity' => $trigger['priority'],
-				'clock' => array_key_exists('clock', $event_fields) ? $event_fields['clock'] : time(),
-				'ns' => array_key_exists('ns', $event_fields) ? $event_fields['ns'] : 0,
-				'acknowledged' => array_key_exists('acknowledged', $event_fields)
-					? $event_fields['acknowledged']
-					: EVENT_NOT_ACKNOWLEDGED
+				'clock' => CTestArrayHelper::get($event_fields, 'clock', time),
+				'ns' => CTestArrayHelper::get($event_fields, 'ns', 0),
+				'acknowledged' => CTestArrayHelper::get($event_fields, 'acknowledged', EVENT_NOT_ACKNOWLEDGED)
 			];
 
 			$eventid = DB::insert('events', [$fields]);
@@ -399,7 +398,7 @@ class CDBHelper {
 					DB::update('triggers', [
 						'values' => [
 							'value' => TRIGGER_VALUE_TRUE,
-							'lastchange' => array_key_exists('clock', $event_fields) ? $event_fields['clock'] : time(),
+							'lastchange' => CTestArrayHelper::get($event_fields, 'clock', time)
 						],
 						'where' => ['triggerid' => $trigger['triggerid']]
 					]);
@@ -416,7 +415,7 @@ class CDBHelper {
 						DB::update('triggers', [
 							'values' => [
 								'value' => TRIGGER_VALUE_FALSE,
-								'lastchange' => array_key_exists('clock', $event_fields) ? $event_fields['clock'] : time(),
+								'lastchange' => CTestArrayHelper::get($event_fields, 'clock', time)
 							],
 							'where' => ['triggerid' => $trigger['triggerid']]
 						]);

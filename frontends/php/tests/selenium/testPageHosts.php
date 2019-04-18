@@ -412,7 +412,7 @@ class testPageHosts extends CLegacyWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Check filtered result.
-		$this->checkTableData(array_key_exists('expected_hosts', $data) ? $data['expected_hosts'] : []);
+		$this->checkTableData(CTestArrayHelper::get($data, 'expected_hosts', []));
 
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();

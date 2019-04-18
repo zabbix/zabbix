@@ -340,7 +340,7 @@ class testFormTemplateTags extends CWebTest {
 		// Check created clone.
 		$this->query('link:'.$new_name)->one()->click();
 		$form->invalidate();
-		$name = $form->getField('Template name')->getAttribute('value');
+		$name = $form->getField('Template name')->getValue();
 		$this->assertEquals($new_name, $name);
 
 		$form->selectTab('Tags');

@@ -348,7 +348,7 @@ class testFormTriggerTags extends CWebTest {
 		// Check created clone.
 		$this->query('link:'.$new_name)->one()->click();
 		$form->invalidate();
-		$name = $form->getField('Name')->getAttribute('value');
+		$name = $form->getField('Name')->getValue();
 		$this->assertEquals($new_name, $name);
 
 		$form->selectTab('Tags');

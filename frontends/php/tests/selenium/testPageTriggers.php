@@ -184,7 +184,7 @@ class testPageTriggers extends CLegacyWebTest {
 		$form = $this->setTags($data['tag_options']['type'], $data['tag_options']['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->checkTableDataColumn(array_key_exists('result', $data) ? $data['result'] : []);
+		$this->checkTableDataColumn(CTestArrayHelper::get($data, 'result', []));
 	}
 
 	public function testPageTriggers_ResetTagsFilter() {
@@ -434,7 +434,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->checkTableDataColumn(array_key_exists('result', $data) ? $data['result'] : []);
+		$this->checkTableDataColumn(CTestArrayHelper::get($data, 'result', []));
 	}
 
 	public static function getHostAndGroupData() {

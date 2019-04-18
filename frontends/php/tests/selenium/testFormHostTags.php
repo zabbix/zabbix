@@ -162,8 +162,10 @@ class testFormHostTags extends CWebTest {
 		$this->page->login()->open('hosts.php');
 		$this->query('button:Create host')->waitUntilPresent()->one()->click();
 		$form = $this->query('id:hostForm')->waitUntilPresent()->asForm()->one();
-		$form->getField('Host name')->fill($data['host_name']);
-		$form->getField('Groups')->fill('Zabbix servers');
+		$form->fill([
+			'Host name' => $data['host_name'],
+			'Groups' => 'Zabbix servers'
+		]);
 
 		$form->selectTab('Tags');
 		$this->fillTags($data['tags']);
@@ -334,7 +336,7 @@ class testFormHostTags extends CWebTest {
 		// Check created clone.
 		$this->query('link:'.$new_name)->one()->click();
 		$form->invalidate();
-		$name = $form->getField('Host name')->getAttribute('value');
+		$name = $form->getField('Host name')->getValue();
 		$this->assertEquals($new_name, $name);
 
 		$form->selectTab('Tags');

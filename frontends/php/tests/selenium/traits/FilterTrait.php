@@ -33,24 +33,34 @@ trait FilterTrait {
 	 */
 	public function setTags($type, $tags) {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $form->getField('Tags');
+		$table = $form->getField('Tags')->asMultifieldTable([
+			'mapping' => [
+				[
+					'name' => 'name',
+					'selector' => 'xpath:./input',
+					'class' => 'CElement'
+				],
+				[
+					'name' => 'operator',
+					'selector' => 'class:radio-segmented',
+					'class' => 'CSegmentedRadioElement'
+				],
+				[
+					'name' => 'value',
+					'selector' => 'xpath:./input',
+					'class' => 'CElement'
+				]
+			]
+		]);
 
-		$table->getRow(0)->query('class:radio-segmented')->asSegmentedRadio()->one()->select($type);
+		$table->query('id:filter_evaltype')->asSegmentedRadio()->one()->select($type);
 
-		$last = count($tags) - 1;
 		foreach ($tags as $i => $tag) {
-			$tag_row = $table->getRow($i + 1);
-			if (array_key_exists('name', $tag)) {
-				$tag_row->getColumn(0)->query('tag:input')->one()->fill($tag['name']);
+			if ($i === 0) {
+				$table->updateRow($i, $tag);
 			}
-			$tag_row->getColumn(1)->query('class:radio-segmented')->asSegmentedRadio()->one()->select($tag['operator']);
-
-			if (array_key_exists('value', $tag)) {
-				$tag_row->getColumn(2)->query('tag:input')->one()->fill($tag['value']);
-			}
-
-			if ($i !== $last) {
-				$table->query('button:Add')->one()->click();
+			else {
+				$table->addRow($tag);
 			}
 		}
 

@@ -93,9 +93,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	private function processPairFields($rows, $id_part) {
 		foreach ($rows as $i => $field_pair) {
 			$i++;
-			$action = (array_key_exists('action', $field_pair) ? $field_pair['action'] : 'add');
 
-			switch ($action) {
+			switch (CTestArrayHelper::get($field_pair, 'action', 'add')) {
 				case 'add':
 					if (!$this->zbxTestElementPresentId($id_part.'_name_'.$i)) {
 						$this->zbxTestClickXpathWait('//div[contains(@id, "'.$id_part.'")]//button[@data-row-action="add_row"]');
