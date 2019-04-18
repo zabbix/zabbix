@@ -8,6 +8,11 @@ Bug fixes:
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
 
 --------------------------------------------------------------------------------
+Changes for 4.2.1
+
+4.2.1rc1 was released as 4.2.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.2.1rc1
 
 New features:
