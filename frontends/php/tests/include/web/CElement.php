@@ -248,12 +248,12 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
-	 * Get value of the "value" attribute.
+	 * Get element value.
 	 *
-	 * @return string
+	 * @return type
 	 */
 	public function getValue() {
-		return parent::getAttribute('value');
+		return CElementQuery::getDriver()->executeScript('return arguments[0].value;', [$this]);
 	}
 
 	/**
@@ -275,6 +275,10 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return $this
 	 */
 	public function overwrite($text) {
+		if ($text === '' || $text === null) {
+			$text = WebDriverKeys::DELETE;
+		}
+
 		return $this->selectValue()->type($text);
 	}
 

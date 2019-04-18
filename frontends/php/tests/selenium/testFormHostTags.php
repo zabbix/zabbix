@@ -19,11 +19,14 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 
 /**
  * @backup hosts
  */
 class testFormHostTags extends CWebTest {
+
+	use TagTrait;
 
 	/**
 	 * The name of the host for cloning in the test data set.
@@ -46,12 +49,30 @@ class testFormHostTags extends CWebTest {
 					'expected' => TEST_GOOD,
 					'host_name' => 'Host with tags',
 					'tags' => [
-						['name'=>'!@#$%^&*()_+<>,.\/', 'value'=>'!@#$%^&*()_+<>,.\/'],
-						['name'=>'tag1', 'value'=>'value1'],
-						['name'=>'tag2', 'value'=>''],
-						['name'=>'{$MACRO:A}', 'value'=>'{$MACRO:A}'],
-						['name'=>'{$MACRO}', 'value'=>'{$MACRO}'],
-						['name'=>'Таг', 'value'=>'Значение']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '!@#$%^&*()_+<>,.\/',
+							'value' => '!@#$%^&*()_+<>,.\/'
+						],
+						[
+							'name' => 'tag1',
+							'value' => 'value1'
+						],
+						[
+							'name' => 'tag2'
+						],
+						[
+							'name' => '{$MACRO:A}',
+							'value' => '{$MACRO:A}'
+						],
+						[
+							'name' => '{$MACRO}',
+							'value' => '{$MACRO}'],
+						[
+							'name' => 'Таг',
+							'value' => 'Значение'
+						]
 					]
 				]
 			],
@@ -60,9 +81,16 @@ class testFormHostTags extends CWebTest {
 					'expected' => TEST_GOOD,
 					'host_name' => 'Host with equal tag names',
 					'tags' => [
-						['name'=>'tag3', 'value'=>'3'],
-						['name'=>'tag3', 'value'=>'4'],
-
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => 'tag3',
+							'value' => '3'
+						],
+						[
+							'name' => 'tag3',
+							'value' => '4'
+						]
 					]
 				]
 			],
@@ -71,9 +99,16 @@ class testFormHostTags extends CWebTest {
 					'expected' => TEST_GOOD,
 					'host_name' => 'Host with equal tag values',
 					'tags' => [
-						['name'=>'tag4', 'value'=>'5'],
-						['name'=>'tag5', 'value'=>'5'],
-
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => 'tag4',
+							'value' => '5'
+						],
+						[
+							'name' => 'tag5',
+							'value' => '5'
+						]
 					]
 				]
 			],
@@ -82,10 +117,14 @@ class testFormHostTags extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_name' => 'Host with empty tag name',
 					'tags' => [
-						['name'=>'', 'value'=>'value1']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'value' => 'value1'
+						]
 					],
-					'error'=>'Cannot add host',
-					'error_details'=>'Invalid parameter "/tags/1/tag": cannot be empty.'
+					'error' => 'Cannot add host',
+					'error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.'
 				]
 			],
 			[
@@ -93,21 +132,28 @@ class testFormHostTags extends CWebTest {
 					'expected' => TEST_BAD,
 					'host_name' => 'Host with equal tags',
 					'tags' => [
-						['name'=>'tag', 'value'=>'value'],
-						['name'=>'tag', 'value'=>'value']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => 'tag',
+							'value' => 'value'
+						],
+						[
+							'name' => 'tag',
+							'value' => 'value'
+						]
 					],
-					'error'=>'Cannot add host',
-					'error_details'=>'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.'
+					'error' => 'Cannot add host',
+					'error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.'
 				]
 			]
 		];
 	}
 
 	/**
-	 * Test creating of host with tags
+	 * Test creating of host with tags.
 	 *
 	 * @dataProvider getCreateData
-	 *
 	 */
 	public function testFormHostTags_Create($data) {
 		$sql_hosts = "SELECT * FROM hosts ORDER BY hostid";
@@ -116,44 +162,28 @@ class testFormHostTags extends CWebTest {
 		$this->page->login()->open('hosts.php');
 		$this->query('button:Create host')->waitUntilPresent()->one()->click();
 		$form = $this->query('id:hostForm')->waitUntilPresent()->asForm()->one();
-		$form->getLabel('Host name')->fill($data['host_name']);
-		$groups = $form->getField('Groups')->asMultiselect()->select('Zabbix servers');
+		$form->fill([
+			'Host name' => $data['host_name'],
+			'Groups' => 'Zabbix servers'
+		]);
+
 		$form->selectTab('Tags');
-
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-		$button = $tags_table ->query('button:Add')->one();
-		$last = count($data['tags']) - 1;
-
-		foreach ($data['tags'] as $count => $tag){
-			$row = $tags_table->getRows()->get($count);
-			$row->getColumn('Name')->query('tag:input')->one()->fill($tag['name']);
-			$row->getColumn('Value')->query('tag:input')->one()->fill($tag['value']);
-			if ($count !== $last) {
-				$button->click();
-			}
-		}
-
+		$this->fillTags($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		// Get global message.
 		$message = CMessageElement::find()->one();
 
-		switch ($data['expected']){
+		switch ($data['expected']) {
 			case TEST_GOOD:
-				// Check if message is positive.
 				$this->assertTrue($message->isGood());
-				// Check message title.
 				$this->assertEquals('Host added', $message->getTitle());
-				// Check the results in DB.
 				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['host_name'])));
 				// Check the results in form.
-				$this->checkFormFields($data);
+				$this->checkTagFields($data);
 				break;
 			case TEST_BAD:
-				// Check if message is negative.
 				$this->assertTrue($message->isBad());
-				// Check message title.
 				$this->assertEquals($data['error'], $message->getTitle());
 				$this->assertTrue($message->hasLine($data['error_details']));
 				// Check that DB hash is not changed.
@@ -167,37 +197,63 @@ class testFormHostTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'host_name' => 'Updated Host with empty tag name',
 					'tags' => [
-						['name'=>'', 'value'=>'value1']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '',
+							'value' => 'value1'
+						]
 					],
-					'error'=>'Cannot update host',
-					'error_details'=>'Invalid parameter "/tags/1/tag": cannot be empty.'
+					'error' => 'Cannot update host',
+					'error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'host_name' => ' Updated Host with equal tags',
 					'tags' => [
-						['name'=>'tag', 'value'=>'value'],
-						['name'=>'tag', 'value'=>'value']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'name' => 'action', 'value' => 'update'
+						]
 					],
-					'error'=>'Cannot update host',
-					'error_details'=>'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.'
+					'error' => 'Cannot update host',
+					'error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
-					'host_name' => 'Updated Host with tags',
 					'tags' => [
-						['name'=>'!@#$%^&*()_+<>,.\/', 'value'=>'!@#$%^&*()_+<>,.\/'],
-						['name'=>'tag1', 'value'=>'value1'],
-						['name'=>'tag2', 'value'=>''],
-						['name'=>'{$MACRO:A}', 'value'=>'{$MACRO:A}'],
-						['name'=>'{$MACRO}', 'value'=>'{$MACRO}'],
-						['name'=>'Таг', 'value'=>'Значение']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '!@#$%^&*()_+<>,.\/',
+							'value' => '!@#$%^&*()_+<>,.\/'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'name' => 'tag1',
+							'value' => 'value1'
+						],
+						[
+							'name' => 'tag2'
+						],
+						[
+							'name' => '{$MACRO:A}',
+							'value' => '{$MACRO:A}'
+						],
+						[
+							'name' => '{$MACRO}',
+							'value' => '{$MACRO}'
+						],
+						[
+							'name' => 'Таг',
+							'value' => 'Значение'
+						]
 					]
 				]
 			]
@@ -205,57 +261,37 @@ class testFormHostTags extends CWebTest {
 	}
 
 	/**
-	 * Test update of host with tags
+	 * Test update of host with tags.
 	 *
 	 * @dataProvider getUpdateData
-	 *
 	 */
 	public function testFormHostTags_Update($data) {
 		$sql_hosts = "SELECT * FROM hosts ORDER BY hostid";
 		$old_hash = CDBHelper::getHash($sql_hosts);
+		$data['host_name'] = $this->update_host;
 
 		$this->page->login()->open('hosts.php');
 		$this->query('link:'.$this->update_host)->waitUntilPresent()->one()->click();
 		$form = $this->query('id:hostForm')->waitUntilPresent()->asForm()->one();
 
-		$form->getField('Host name')->clear()->type($data['host_name']);
-
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-
-		$button = $tags_table ->query('button:Add')->one();
-		$last = count($data['tags']) - 1;
-
-		foreach ($data['tags'] as $count => $tag){
-			$row = $tags_table->getRows()->get($count);
-			$row->getColumn('Name')->query('tag:input')->one()->clear()->fill($tag['name']);
-			$row->getColumn('Value')->query('tag:input')->one()->clear()->fill($tag['value']);
-			if ($count !== $last) {
-				$button->click();
-			}
-		}
+		$this->fillTags($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
 		// Get global message.
 		$message = CMessageElement::find()->one();
 
-		switch ($data['expected']){
+		switch ($data['expected']) {
 			case TEST_GOOD:
-				// Check if message is positive.
 				$this->assertTrue($message->isGood());
-				// Check message title.
 				$this->assertEquals('Host updated', $message->getTitle());
-				// Check the results in DB.
-				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->update_host)));
-				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['host_name'])));
+				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->update_host)));
 				// Check the results in form.
-				$this->checkFormFields($data);
+				$this->checkTagFields($data);
 				break;
 			case TEST_BAD:
-				// Check if message is negative.
 				$this->assertTrue($message->isBad());
-				// Check message title.
 				$this->assertEquals($data['error'], $message->getTitle());
 				$this->assertTrue($message->hasLine($data['error_details']));
 				// Check that DB hash is not changed.
@@ -276,34 +312,22 @@ class testFormHostTags extends CWebTest {
 	 * Test cloning of host with tags
 	 */
 	private function executeCloning($action) {
+		$new_name = 'Host with tags for cloning - '.$action;
+
 		$this->page->login()->open('hosts.php');
 		$this->query('link:'.$this->clone_host)->waitUntilPresent()->one()->click();
 		$form = $this->query('id:hostForm')->waitUntilPresent()->asForm()->one();
+		$form->getField('Host name')->fill($new_name);
 
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-
-		$tags = [];
-		foreach ($tags_table->getRows()->slice(0, -1) as $row) {
-			$tags[] = [
-				'name' => $row->getColumn('Name')->children()->one()->getAttribute('value'),
-				'value' => $row->getColumn('Value')->children()->one()->getAttribute('value')
-			];
-		}
-		$form->selectTab('Host');
+		$tags = $this->getTags();
 
 		$this->query('button:'.$action)->one()->click();
-
-		$new_name = 'Host with tags for cloning - '.$action;
-		$form->getField('Host name')->clear()->type($new_name);
-
 		$form->submit();
 		$this->page->waitUntilReady();
-		// Get global message.
+
 		$message = CMessageElement::find()->one();
-		// Check if message is positive.
 		$this->assertTrue($message->isGood());
-		// Check message title.
 		$this->assertEquals('Host added', $message->getTitle());
 		// Check the results in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_host)));
@@ -311,35 +335,19 @@ class testFormHostTags extends CWebTest {
 
 		// Check created clone.
 		$this->query('link:'.$new_name)->one()->click();
-		$form = $this->query('id:hostForm')->asForm()->one();
-		$name = $form->getField('Host name')->getAttribute('value');
-		$this->assertEquals($name, $new_name);
+		$form->invalidate();
+		$name = $form->getField('Host name')->getValue();
+		$this->assertEquals($new_name, $name);
 
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-
-		foreach ($tags_table->getRows()->slice(0, -1) as $i => $row) { // Slice rows to cut off Add button.
-			$this->assertEquals($tags[$i], [
-				'name' => $row->getColumn('Name')->children()->one()->getAttribute('value'),
-				'value' => $row->getColumn('Value')->children()->one()->getAttribute('value')
-			]);
-		}
+		$this->assertTags($tags);
 	}
 
-	private function checkFormFields($data) {
+	private function checkTagFields($data) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host_name']));
 		$this->page->open('hosts.php?form=update&hostid='.$id.'&groupid=0');
 		$form = $this->query('id:hostForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');
-
-		$tags_table = $this->query('id:tags-table')->asTable()->one();
-
-		foreach ($data['tags'] as $i => $tag) {
-			$row = $tags_table->getRows()->get($i);
-			$tag_name = $row->getColumn('Name')->query('tag:input')->one()->getAttribute('value');
-			$this->assertEquals($tag['name'], $tag_name);
-			$tag_value = $row->getColumn('Value')->query('tag:input')->one()->getAttribute('value');
-			$this->assertEquals($tag['value'], $tag_value);
-		}
+		$this->assertTags($data['tags']);
 	}
 }

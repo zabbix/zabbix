@@ -831,7 +831,7 @@ class testFormWebStep extends CLegacyWebTest {
 			$pair = [];
 			$inputs = $row->findElements(WebDriverBy::xpath('.//input[@data-type]'));
 			foreach ($inputs as $input) {
-				$pair[$input->getAttribute('data-type')] = $input->getAttribute('value');
+				$pair[$input->getAttribute('data-type')] = $input->getValue();
 			}
 
 			$pairs[] = $pair;
