@@ -77,13 +77,13 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 					" from hosts h,interface i"
 					" where h.hostid=i.hostid"
 						" and i.ip='%s'"
-						" and h.status in (%d,%d)"
-						" and h.proxy_hostid=%s"
 						" and i.useip=1"
+						" and h.status in (%d,%d)"
+						" and h.proxy_hostid%s"
 					" order by i.hostid",
 					ip_esc,
 					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-					DBsql_id_ins(proxy_hostid));
+					DBsql_id_cmp(proxy_hostid));
 
 			zbx_free(ip_esc);
 			break;
