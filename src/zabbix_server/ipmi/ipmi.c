@@ -84,7 +84,7 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
  ******************************************************************************/
 int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *error, size_t max_error_len)
 {
-	const char		*__function_name = "ipmi_manager_init";
+	const char		*__function_name = "zbx_ipmi_execute_command";
 	zbx_ipc_socket_t	ipmi_socket;
 	zbx_ipc_message_t	message;
 	char			*errmsg = NULL, sensor[ITEM_IPMI_SENSOR_LEN_MAX], *value = NULL;

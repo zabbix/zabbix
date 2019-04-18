@@ -644,8 +644,8 @@ class CApiService {
 	 * Adds the related objects requested by "select*" options to the resulting object set.
 	 *
 	 * @param array $options
-	 * @param array $result		an object hash with PKs as keys
-
+	 * @param array $result   An object hash with PKs as keys.
+	 *
 	 * @return array mixed
 	 */
 	protected function addRelatedObjects(array $options, array $result) {
