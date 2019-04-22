@@ -26,6 +26,8 @@ frontend.mo
 /nbproject
 /install-sh
 /tags
+*.a
+*.o
 build/win32/examples/zabbix_sender/sender.exe
 build/win32/examples/zabbix_sender/sender.obj
 build/win32/project/*.idb
