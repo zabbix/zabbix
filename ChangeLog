@@ -26,6 +26,7 @@ New features:
 ..F....... [ZBXNEXT-5144] increased socket response size limit (vasilijs)
 
 Bug fixes:
+..F....... [ZBX-11284] removed sid from URL for form cancel button (gcalenko)
 ........S. [ZBX-16019] fixed HOST.CONN, HOST.IP, IPADDRESS and HOST.DNS macros expansion in global scripts (akozlovs)
 ........S. [ZBX-16020] fixed uncontrolled memory allocation in regex preprocessing steps (vjaceslavs)
 ..F....... [ZBX-15911] fixed guest sign in visibility for disabled guest user group in login page (gcalenko)
@@ -366,6 +367,7 @@ Changes for 4.0.7
 Changes for 4.0.7rc1
 
 Bug fixes:
+..F....... [ZBX-11284] removed sid from URL for form cancel button (gcalenko)
 ........S. [ZBX-16019] fixed HOST.CONN, HOST.IP, IPADDRESS and HOST.DNS macros expansion in global scripts (akozlovs)
 ........S. [ZBX-16020] fixed uncontrolled memory allocation in regex preprocessing steps (vjaceslavs)
 ..F....... [ZBX-15911] fixed guest sign in visibility for disabled guest user group in login page (gcalenko)
