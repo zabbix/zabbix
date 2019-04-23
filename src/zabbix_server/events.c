@@ -2417,7 +2417,7 @@ static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_
 
 /******************************************************************************
  *                                                                            *
- * Function: process_internal_unknown_events                                  *
+ * Function: process_internal_events_dependency                               *
  *                                                                            *
  * Purpose: process internal unknown trigger events                           *
  *          to avoid trigger dependency                                       *
@@ -2425,7 +2425,7 @@ static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_
  * Parameters: unknown_events - [IN] the recovery events to process           *
  *                                                                            *
  ******************************************************************************/
-static void	process_internal_unknown_events(zbx_vector_ptr_t *unknown_events)
+static void	process_internal_events_dependency(zbx_vector_ptr_t *unknown_events)
 {
 	int			i, index;
 	DB_EVENT		*event;
@@ -2497,7 +2497,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 	const char		*__function_name = "zbx_process_events";
 	size_t			i, processed_num = 0;
 	zbx_uint64_t		eventid;
-	zbx_vector_ptr_t	internal_ok_events, trigger_events, internal_unknown_events;
+	zbx_vector_ptr_t	internal_ok_events, trigger_events, internal_events;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
@@ -2512,8 +2512,8 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 		zbx_vector_ptr_create(&trigger_events);
 		zbx_vector_ptr_reserve(&trigger_events, events_num);
 
-		zbx_vector_ptr_create(&internal_unknown_events);
-		zbx_vector_ptr_reserve(&internal_unknown_events, events_num);
+		zbx_vector_ptr_create(&internal_events);
+		zbx_vector_ptr_reserve(&internal_events, events_num);
 
 		/* assign event identifiers - they are required to set correlation event ids */
 		eventid = DBget_maxid_num("events", events_num);
@@ -2536,8 +2536,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 					case EVENT_OBJECT_TRIGGER:
 						if (TRIGGER_STATE_NORMAL == event->value)
 							zbx_vector_ptr_append(&internal_ok_events, event);
-						else
-							zbx_vector_ptr_append(&internal_unknown_events, event);
+						zbx_vector_ptr_append(&internal_events, event);
 						break;
 					case EVENT_OBJECT_ITEM:
 						if (ITEM_STATE_NORMAL == event->value)
@@ -2551,11 +2550,11 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 			}
 		}
 
+		if (0 != internal_events.values_num)
+			process_internal_events_dependency(&internal_events);
+
 		if (0 != internal_ok_events.values_num)
 			process_internal_ok_events(&internal_ok_events);
-
-		if (0 != internal_unknown_events.values_num)
-			process_internal_unknown_events(&internal_unknown_events);
 
 		if (0 != trigger_events.values_num)
 		{
@@ -2571,7 +2570,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 		zbx_vector_ptr_destroy(&trigger_events);
 		zbx_vector_ptr_destroy(&internal_ok_events);
-		zbx_vector_ptr_destroy(&internal_unknown_events);
+		zbx_vector_ptr_destroy(&internal_events);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, (int)processed_num);
