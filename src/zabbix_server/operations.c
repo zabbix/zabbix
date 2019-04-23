@@ -73,7 +73,7 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 			DBfree_result(result);
 
 			sql = zbx_dsprintf(sql,
-					"select h.hostid,h.status"
+					"select h.hostid"
 					" from hosts h,interface i"
 					" where h.hostid=i.hostid"
 						" and i.ip='%s'"
