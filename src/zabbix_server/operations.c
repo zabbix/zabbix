@@ -46,8 +46,7 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 	zbx_uint64_t	hostid = 0, proxy_hostid;
 	char		*sql = NULL, *ip_esc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64,
-			__function_name, event->eventid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __function_name, event->eventid);
 
 	switch (event->object)
 	{
@@ -59,8 +58,8 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
 						" and ds.%s=" ZBX_FS_UI64,
-						EVENT_OBJECT_DSERVICE == event->object ? "dserviceid" : "dhostid",
-						event->objectid);
+					EVENT_OBJECT_DSERVICE == event->object ? "dserviceid" : "dhostid",
+					event->objectid);
 
 			if (NULL == (row = DBfetch(result)))
 			{
@@ -94,7 +93,7 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 					" where h.host=a.host"
 						" and a.autoreg_hostid=" ZBX_FS_UI64
 						" and h.status in (%d,%d)",
-						event->objectid,
+					event->objectid,
 					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 			break;
 		default:
