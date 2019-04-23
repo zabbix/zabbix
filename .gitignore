@@ -147,4 +147,3 @@ tests/libs/zbxsysinfo/process
 tests/zabbix_server/preprocessor/item_preproc_xpath
 tests/zabbix_server/preprocessor/zbx_item_preproc
 /zabbix-*.tar.gz
-.vscode

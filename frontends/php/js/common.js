@@ -811,12 +811,13 @@ function validate_trigger_expression(formname, dialogueid) {
 }
 
 function redirect(uri, method, needle, invert_needle, add_sid) {
-	method = (method || 'get').toLowerCase();
-	add_sid = (method !== 'get' && (typeof add_sid === 'undefined' || add_sid));
-
+	if (typeof add_sid === 'undefined') {
+		add_sid = true;
+	}
+	method = method || 'get';
 	var url = new Curl(uri, add_sid);
 
-	if (method == 'get') {
+	if (method.toLowerCase() == 'get') {
 		window.location = url.getUrl();
 	}
 	else {
