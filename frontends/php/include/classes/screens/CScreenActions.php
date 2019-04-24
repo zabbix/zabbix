@@ -85,7 +85,6 @@ class CScreenActions extends CScreenBase {
 		]);
 
 		$userids = [];
-
 		foreach ($alerts as $alert) {
 			if ($alert['userid'] != 0) {
 				$userids[$alert['userid']] = true;
@@ -137,6 +136,10 @@ class CScreenActions extends CScreenBase {
 			$action_name = '';
 			if (array_key_exists($alert['actionid'], $actions)) {
 				$action_name = $actions[$alert['actionid']]['name'];
+			}
+
+			if ($alert['mediatypeid'] != 0 && array_key_exists(0, $alert['mediatypes'])) {
+				$alert['maxattempts'] = $alert['mediatypes'][0]['maxattempts'];
 			}
 
 			$table->addRow([

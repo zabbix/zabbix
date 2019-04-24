@@ -85,6 +85,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 			$alert['description'] = '';
 			if ($alert['mediatypeid'] != 0 && array_key_exists(0, $alert['mediatypes'])) {
 				$alert['description'] = $alert['mediatypes'][0]['description'];
+				$alert['maxattempts'] = $alert['mediatypes'][0]['maxattempts'];
 			}
 			unset($alert['mediatypes']);
 

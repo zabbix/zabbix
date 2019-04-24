@@ -36,21 +36,6 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['alerts'] as $alert) {
-	if ($alert['status'] == ALERT_STATUS_SENT) {
-		$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
-	}
-	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW) {
-		$status = (new CSpan([
-			_('In progress').':',
-			BR(),
-			_n('%1$s retry left', '%1$s retries left', $alert['maxattempts'] - $alert['retries'])])
-		)
-			->addClass(ZBX_STYLE_YELLOW);
-	}
-	else {
-		$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
-	}
-
 	$info_icons = [];
 	if ($alert['error'] !== '') {
 		$info_icons[] = makeErrorIcon($alert['error']);
