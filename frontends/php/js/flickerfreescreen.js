@@ -129,7 +129,7 @@
 					self.refreshImg(id, function() {
 						$('a', '#flickerfreescreen_' + id).each(function() {
 								var obj = $(this),
-								url = new Curl(obj.attr('href'));
+								url = new Curl(obj.attr('href'), false);
 
 								url.setArgument('from', screen.timeline.from);
 								url.setArgument('to', screen.timeline.to);
