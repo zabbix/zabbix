@@ -47,20 +47,21 @@ zbx_http_response_t;
 
 #endif
 
+static const char URI_PROHIBIT_CHARS[] = {0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xA,0xB,0xC,0xD,0xE,0xF,0x10,0x11,0x12,\
+	0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x7F,0};
+
 static int	detect_url(const char *host)
 {
 	char	*p;
+	int	ret = FAIL;
 
-	if (NULL != strpbrk(host, "/@#?"))
+	if (NULL != strpbrk(host, "/@#?[]"))
 		return SUCCEED;
 
-	if (NULL != (p = strchr(host, ':')))
-	{
-		if (NULL != strchr(p, ':'))
-			return FAIL;
-	}
+	if (NULL != (p = strchr(host, ':')) && NULL == strchr(++p, ':'))
+		ret = SUCCEED;
 
-	return SUCCEED;
+	return ret;
 }
 
 static int	process_url(const char *host, const char *port, const char *path, char **url, char **error)
@@ -184,12 +185,27 @@ out:
 
 static int	get_http_page(const char *host, const char *path, const char *port, char **buffer, char **error)
 {
-	char	*url = NULL;
-	int	ret;
+	char		*url = NULL;
+	const char	*wrong_chr;
+	int		ret;
 
 	if (NULL == host || '\0' == *host)
 	{
 		*error = zbx_strdup(*error, "Invalid first parameter.");
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != (wrong_chr = strpbrk(host, URI_PROHIBIT_CHARS)))
+	{
+		*error = zbx_dsprintf(NULL, "Incorrect hostname expression. Check hostname part after: %.*s.",
+				(int)(wrong_chr - host), host);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != path && NULL != (wrong_chr = strpbrk(path, URI_PROHIBIT_CHARS)))
+	{
+		*error = zbx_dsprintf(NULL, "Incorrect path expression. Check path part after: %.*s.",
+				(int)(wrong_chr - path), path);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -203,32 +219,29 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 	{
 		/* URL is not detected - compose URL using host, port and path */
 
-		unsigned short	port_num = ZBX_DEFAULT_HTTP_PORT;
+		unsigned short	port_n = ZBX_DEFAULT_HTTP_PORT;
+		char		*host_loc = NULL;
 
 		if (NULL != port && '\0' != *port)
 		{
-			if (SUCCEED != is_ushort(port, &port_num))
+			if (SUCCEED != is_ushort(port, &port_n))
 			{
-				*error = zbx_strdup(*error, "Invalid second parameter.");
+				*error = zbx_strdup(*error, "Invalid third parameter.");
 				return SYSINFO_RET_FAIL;
 			}
 		}
 
-		if (NULL != path)
-		{
-			if (NULL == strchr(host, ':'))
-			{
-				url = zbx_dsprintf(url, "http://%s:%u%s%s", host, port_num,
-						('/' != *path ? "/" : ""), path);
-			}
-			else
-			{
-				url = zbx_dsprintf(url, "http://[%s]:%u%s%s", host, port_num,
-						('/' != *path ? "/" : ""), path);
-			}
-		}
+		if (NULL != strchr(host, ':'))
+			host_loc = zbx_dsprintf(host_loc, "[%s]", host);
 		else
-			url = zbx_dsprintf(url, "http://%s:%u", host, port_num);
+			host_loc = zbx_strdup(host_loc, host);
+
+		if (NULL != path)
+			url = zbx_dsprintf(url, "http://%s:%u%s%s", host_loc, port_n, ('/' != *path ? "/" : ""), path);
+		else
+			url = zbx_dsprintf(url, "http://%s:%u/", host_loc, port_n);
+
+		zbx_free(host_loc);
 	}
 
 	ret = curl_page_get(url, buffer, error);
@@ -237,9 +250,9 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 	return ret;
 }
 #else
-static const char	*find_port_sep(const char *host)
+static char	*find_port_sep(char *host)
 {
-	const char	*p;
+	char	*p;
 	int	in_ipv6 = 0;
 
 	for (p = host; '\0' != *p; p++)
@@ -261,6 +274,7 @@ static const char	*find_port_sep(const char *host)
 static int	get_http_page(const char *host, const char *path, const char *port, char **buffer, char **error)
 {
 	char		*url = NULL, *hostname = NULL, *path_loc = NULL, *p_host;
+	const char	*wrong_chr;
 	int		ret = SYSINFO_RET_OK;
 	unsigned short	port_num;
 	zbx_socket_t	s;
@@ -271,11 +285,25 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		return SYSINFO_RET_FAIL;
 	}
 
+	if (NULL != (wrong_chr = strpbrk(host, URI_PROHIBIT_CHARS)))
+	{
+		*error = zbx_dsprintf(NULL, "Incorrect hostname expression. Check hostname part after: %.*s.",
+				(int)(wrong_chr - host), host);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != path && NULL != (wrong_chr = strpbrk(path, URI_PROHIBIT_CHARS)))
+	{
+		*error = zbx_dsprintf(NULL, "Incorrect path expression. Check path part after: %.*s.",
+				(int)(wrong_chr - path), path);
+		return SYSINFO_RET_FAIL;
+	}
+
 	if (SUCCEED == detect_url(host))
 	{
 		/* URL detected */
 
-		const char	*p;
+		char	*p;
 
 		if (SYSINFO_RET_OK != process_url(host, port, path, &url, error))
 			return SYSINFO_RET_FAIL;
@@ -291,17 +319,17 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 
 		if (NULL != (p = find_port_sep(p_host)))
 		{
-			if (1 < strlen(p))
+			if ('\0' != *(++p))
 			{
 				char	*port_str;
-				size_t	alloc_len = 0, offset = 0;
+				size_t	len = 0, offset = 0;
 
-				zbx_strsplit(++p, '/', &port_str, &path_loc);
+				zbx_strsplit(p, '/', &port_str, &path_loc);
 
 				if (SUCCEED != is_ushort(port_str, &port_num))
 					ret = SYSINFO_RET_FAIL;
 				else
-					zbx_strncpy_alloc(&hostname, &alloc_len, &offset, p_host, (size_t)(p - p_host));
+					zbx_strncpy_alloc(&hostname, &len, &offset, p_host, (size_t)(p - p_host - 1));
 
 				zbx_free(port_str);
 			}
