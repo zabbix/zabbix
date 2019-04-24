@@ -4,7 +4,7 @@ New features:
 
 Bug fixes:
 ........S. [ZBX-15935] fixed infinite loop and 100% CPU usage when using OpenIPMI 2.0.26 or newer (asitals)
-........S. [ZBX-16005] fixed "{{ITEM.VALUE}.regsub(<pattern>,<output>}" and {"{ITEM.LASTVALUE}.regsub(<pattern>,<output>}" being resolved to *UNKNOWN* during upgrade (vso)
+........S. [ZBX-16005] fixed "{{ITEM.VALUE}.regsub(<pattern>,<output>}" and "{{ITEM.LASTVALUE}.regsub(<pattern>,<output>}" being resolved to *UNKNOWN* during upgrade (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.7
