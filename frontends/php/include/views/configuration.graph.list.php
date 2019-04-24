@@ -114,7 +114,9 @@ foreach ($data['graphs'] as $graph) {
 
 	if ($graph['discoveryRule'] && $data['parent_discoveryid'] === null) {
 		$name[] = (new CLink(CHtml::encode($graph['discoveryRule']['name']),
-			(new CUrl('graphs.php'))->setArgument('parent_discoveryid', $graph['discoveryRule']['itemid'])
+			(new CUrl('host_discovery.php'))
+				->setArgument('form', 'update')
+				->setArgument('itemid', $graph['discoveryRule']['itemid'])	
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
