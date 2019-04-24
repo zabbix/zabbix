@@ -13,6 +13,7 @@ Changes for 4.2.2rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15935] fixed infinite loop and 100% CPU usage when using OpenIPMI 2.0.26 or newer (asitals)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.1
@@ -356,6 +357,7 @@ Changes for 4.0.8rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15935] fixed infinite loop and 100% CPU usage when using OpenIPMI 2.0.26 or newer (asitals)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.7
