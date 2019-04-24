@@ -66,6 +66,12 @@ class CPage {
 		}
 
 		$this->driver->manage()->deleteAllCookies();
+		try {
+			$this->driver->executeScript('sessionStorage.clear();');
+		} catch (Exception $exeption) {
+			// Code is not missing here.
+		}
+
 		$windows = $this->driver->getWindowHandles();
 		if (count($windows) <= 1) {
 			return true;

@@ -1452,7 +1452,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 				"select null"
 				" from operations"
 				" where actionid=" ZBX_FS_UI64
-					" and (esc_step_from>%d or esc_step_to=0)"
+					" and (esc_step_to>%d or esc_step_to=0)"
 					" and recovery=%d",
 					action->actionid, escalation->esc_step, ZBX_OPERATION_MODE_NORMAL);
 		result = DBselectN(sql, 1);

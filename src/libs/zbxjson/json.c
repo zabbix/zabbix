@@ -166,6 +166,8 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 		{
 			case '"':  /* quotation mark */
 			case '\\': /* reverse solidus */
+			/* We do not escape '/' (solidus). https://www.rfc-editor.org/errata_search.php?rfc=4627 */
+			/* says: "/" and "\/" are both allowed and both produce the same result. */
 			case '\b': /* backspace */
 			case '\f': /* formfeed */
 			case '\n': /* newline */
@@ -174,7 +176,8 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 				len += 2;
 				break;
 			default:
-				if (0 != iscntrl(*sptr))
+				/* RFC 8259 requires escaping control characters U+0000 - U+001F */
+				if (0x1f >= (unsigned char)*sptr)
 					len += 6;
 				else
 					len++;
@@ -230,6 +233,8 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 				*p++ = '\\';
 				*p++ = '\\';
 				break;
+			/* We do not escape '/' (solidus). https://www.rfc-editor.org/errata_search.php?rfc=4627 */
+			/* says: "/" and "\/" are both allowed and both produce the same result. */
 			case '\b':		/* backspace */
 				*p++ = '\\';
 				*p++ = 'b';
@@ -251,14 +256,15 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 				*p++ = 't';
 				break;
 			default:
-				if (0 != iscntrl(*sptr))
+				/* RFC 8259 requires escaping control characters U+0000 - U+001F */
+				if (0x1f >= (unsigned char)*sptr)
 				{
 					*p++ = '\\';
 					*p++ = 'u';
 					*p++ = '0';
 					*p++ = '0';
-					*p++ = zbx_num2hex((*sptr >> 4) & 0xf);
-					*p++ = zbx_num2hex(*sptr & 0xf);
+					*p++ = zbx_num2hex((((unsigned char)*sptr) >> 4) & 0xf);
+					*p++ = zbx_num2hex(((unsigned char)*sptr) & 0xf);
 				}
 				else
 					*p++ = *sptr;
