@@ -50,7 +50,7 @@ if ($data['clone_hostid'] != 0) {
 $hostList = new CFormList('hostlist');
 
 // LLD rule link
-if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+if ($data['discoveryRule']) {
 	$hostList->addRow(_('Discovered by'),
 		new CLink($data['discoveryRule']['name'],
 			(new CUrl('host_prototypes.php'))
@@ -59,6 +59,9 @@ if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 				->setArgument('hostid', $data['hostDiscovery']['parent_hostid'])
 		)
 	);
+}
+else if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	$hostList->addRow(_('Discovered by'), (new CSpan(_('Inaccessible discovery rule'))));
 }
 
 $hostList
