@@ -116,7 +116,7 @@ foreach ($data['graphs'] as $graph) {
 		$name[] = (new CLink(CHtml::encode($graph['discoveryRule']['name']),
 			(new CUrl('host_discovery.php'))
 				->setArgument('form', 'update')
-				->setArgument('itemid', $graph['discoveryRule']['itemid'])	
+				->setArgument('itemid', $graph['discoveryRule']['itemid'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
