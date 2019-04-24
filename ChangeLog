@@ -3,6 +3,7 @@ Changes for 4.0.8rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-16005] fixed "{{ITEM.VALUE}.regsub(<pattern>,<output>}" and {"{ITEM.LASTVALUE}.regsub(<pattern>,<output>}" being resolved to *UNKNOWN* during upgrade (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.7
