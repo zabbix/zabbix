@@ -457,3 +457,4 @@ tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
 /zabbix-*.tar.gz
+.vscode
