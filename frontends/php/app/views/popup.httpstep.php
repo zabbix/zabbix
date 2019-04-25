@@ -56,7 +56,7 @@ $http_popup_form_list = (new CFormList())
 		])
 	);
 
-$http_popup_form_list->addRow(_('Query fields'), 
+$http_popup_form_list->addRow(_('Query fields'),
 	(new CDiv(
 		(new CTable())
 			->addClass('httpconf-dynamic-row')
@@ -82,7 +82,7 @@ $http_popup_form_list->addRow(_('Post type'), (new CRadioButtonList('post_type',
 	->setModern(true)
 );
 
-$http_popup_form_list->addRow(_('Post fields'), 
+$http_popup_form_list->addRow(_('Post fields'),
 	(new CDiv(
 		(new CTable())
 			->addClass('httpconf-dynamic-row')
