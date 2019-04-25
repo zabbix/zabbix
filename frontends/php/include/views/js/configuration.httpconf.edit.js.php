@@ -38,8 +38,7 @@
 	<?= (new CRow([
 			(new CCol([
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-			]))
-				->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CTextBox(null, '#{name}'))
 				->setAttribute('placeholder', _('name'))
 				->setAttribute('data-type', 'name')
@@ -53,8 +52,7 @@
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
-			))
-				->addClass(ZBX_STYLE_NOWRAP)
+			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('form_row')
 			->addClass('sortable')
@@ -63,14 +61,10 @@
 </script>
 
 <script type="text/javascript">
-
 	jQuery(function($) {
 		window.httpconf = {
 			templated:                           <?= $data['templated'] ? 1 : 0 ?>,
-			ZBX_POSTTYPE_RAW:                    <?= ZBX_POSTTYPE_RAW ?>,
-			ZBX_POSTTYPE_FORM:                   <?= ZBX_POSTTYPE_FORM ?>,
 			ZBX_STYLE_DRAG_ICON:                 <?= zbx_jsvalue(ZBX_STYLE_DRAG_ICON) ?>,
-			HTTPTEST_STEP_RETRIEVE_MODE_HEADERS: <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>,
 			msg: {
 				data_not_encoded:           <?= CJs::encodeJson(_('Data is not properly encoded.')); ?>,
 				name_filed_length_exceeded: <?= CJs::encodeJson(_('Name of the form field should not exceed 255 characters.')); ?>,
@@ -85,12 +79,10 @@
 
 		window.httpconf.scenario = new Scenario(
 			$('#scenarioTab'), <?= zbx_jsvalue($this->data['agentVisibility'], true) ?>);
-		window.httpconf.steps = new Steps(
-			$('#stepTab'), <?= CJs::encodeJson(array_values($data['steps'])) ?>);
-		window.httpconf.authentication = new Authentication(
-			$('#authenticationTab'), <?= HTTPTEST_AUTH_NONE ?>);
+		window.httpconf.steps = new Steps($('#stepTab'), <?= CJs::encodeJson(array_values($data['steps'])) ?>);
+		window.httpconf.authentication = new Authentication($('#authenticationTab'));
 
-		window.httpconf.$form = $('#httpForm').on('submit', function(e) {
+		window.httpconf.$form = $('#httpForm').on('submit', function() {
 			this.append(httpconf.scenario.toFragment());
 			this.append(httpconf.steps.toFragment());
 		});
@@ -100,15 +92,14 @@
 	 * Represents authentication tab in web layout.
 	 *
 	 * @param {jQuery} $tab
-	 * @param {integer} disabled_value  Dropdown value that should hide credentials input.
 	 */
-	function Authentication($tab, disabled_value) {
-		this.$type_select = jQuery('select#authentication', $tab);
+	function Authentication($tab) {
+		this.$type_select = jQuery('#authentication', $tab);
 		this.$user = jQuery('#http_user', $tab);
 		this.$password = jQuery('#http_password', $tab);
 
 		this.$type_select.on('change', function(e) {
-			var http_fields_disabled = (e.target.value == disabled_value);
+			var http_fields_disabled = (e.target.value == <?= HTTPTEST_AUTH_NONE ?>);
 			this.$user.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
 			this.$password.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
 		}.bind(this));
@@ -151,7 +142,8 @@
 				})
 				.on('tableupdate.dynamicRows', function(e, data) {
 					data.dynamicRows.$element.sortable('option','disabled', data.dynamicRows.length < 2);
-				}).data('dynamicRows');
+				})
+				.data('dynamicRows');
 
 			$table.sortable('option','disabled', $table.data('dynamicRows').length < 2);
 		}.bind(this));
@@ -210,10 +202,10 @@
 			template: httpconf.templated ? '#scenario-step-row-templated' : '#scenario-step-row',
 			dataCallback(data) {
 				return jQuery.extend({
-					url_short: midEllipsis(data.url, 65),
+					url_short: midEllipsis(data.url, 65)
 				}, data);
 			}
-		})
+		});
 
 		if (!httpconf.templated) {
 			this.$container.sortable({
@@ -228,12 +220,12 @@
 				start: function(e, ui) {
 					ui.placeholder.height(ui.item.height());
 				}
-			})
+			});
 		}
 
 		this.dynamicRows = this.$container.data('dynamicRows');
 
-		this.dynamicRows.setData(steps)
+		this.dynamicRows.setData(steps);
 
 		if (!httpconf.templated) {
 			this.$container.each(function(index, el) {
@@ -266,7 +258,7 @@
 	 * @param {int} max     Max length of resulting string.
 	 */
 	function midEllipsis(str, max) {
-		if (str.length < max) {
+		if (str.length <= max) {
 			return str;
 		}
 
@@ -304,7 +296,7 @@
 	 * @return {DocumentFragment}
 	 */
 	Steps.prototype.toFragment = function() {
-		var frag = new DocumentFragment()
+		var frag = new DocumentFragment(),
 			iter_step = 0;
 
 		this.steps_sort_order.forEach(function(id) {
@@ -322,8 +314,8 @@
 			frag.append(hiddenInput('timeout',          step.data.timeout,          prefix_step));
 			frag.append(hiddenInput('url',              step.data.url,              prefix_step));
 
-			if (step.data.retrieve_mode != httpconf.HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
-				if (step.data.post_type != httpconf.ZBX_POSTTYPE_FORM) {
+			if (step.data.retrieve_mode != <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>) {
+				if (step.data.post_type != <?= ZBX_POSTTYPE_FORM ?>) {
 					frag.append(hiddenInput('posts', step.data.posts, prefix_step));
 				}
 				else {
@@ -368,8 +360,8 @@
 		var order = [];
 		this.$container.find('[data-step-id]').each(function(index) {
 			this.querySelector('.rowNum').innerText = (index + 1) + ':';
-			order.push(this.attributes.getNamedItem('data-step-id').value)
-		})
+			order.push(this.attributes.getNamedItem('data-step-id').value);
+		});
 		this.steps_sort_order = order;
 	};
 
@@ -392,7 +384,7 @@
 	 * @param {object} step  Step data, that holds accurate httpstepid filed.
 	 */
 	Steps.prototype.addStep = function(step) {
-		if (this.steps_sort_order.indexOf(step.httpstepid) === -1) {
+		if (this.steps_sort_order.indexOf(step.httpstepid) == -1) {
 			this.steps_sort_order.push(step.httpstepid);
 		}
 		this.updateStep(step);
@@ -437,11 +429,11 @@
 	 * @param {integer} httpstepid
 	 */
 	Steps.prototype.open = function(httpstepid) {
-		var refocus = (httpstepid != this.new_stepid)
+		var $refocus = (httpstepid != this.new_stepid)
 			? this.$container.find('[data-step-id="' + httpstepid + '"] a')
 			: this.$container.find('.element-table-add');
 
-		this.steps[httpstepid].open(refocus);
+		this.steps[httpstepid].open($refocus);
 	};
 
 	/**
@@ -458,7 +450,7 @@
 				headers: []
 			}
 		};
-		this.data = jQuery.extend(true, data, defaults);
+		this.data = jQuery.extend(true, data, defaults); // ?
 	}
 
 	/**
@@ -495,26 +487,25 @@
 
 		var $pairs = jQuery('.httpconf-dynamic-row', $form);
 
-		$pairs
-			.sortable({
-				items: 'tbody tr.sortable',
-				axis: 'y',
-				cursor: 'move',
-				containment: 'parent',
-				handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
-				tolerance: 'pointer',
-				opacity: 0.6,
-				start: function(e, ui) {
-					ui.placeholder.height(ui.item.height());
-				}
-			});
+		$pairs.sortable({
+			items: 'tbody tr.sortable',
+			axis: 'y',
+			cursor: 'move',
+			containment: 'parent',
+			handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
+			tolerance: 'pointer',
+			opacity: 0.6,
+			start: function(e, ui) {
+				ui.placeholder.height(ui.item.height());
+			}
+		});
 
 		this.pairs = {
 			query_fields: null,
 			post_fields: null,
 			variables: null,
 			headers: null
-		}
+		};
 
 		$pairs.each(function(index, node) {
 			var $node = jQuery(node),
@@ -538,7 +529,6 @@
 		});
 
 		this.$checkbox_retrieve_mode = jQuery('#retrieve_mode', $form);
-
 		this.$input_required_string = jQuery('#required', $form);
 		this.$textarea_raw_post = jQuery('#posts', $form);
 		this.$radio_post_type = jQuery('#post_type input', $form);
@@ -552,7 +542,7 @@
 
 		this.$radio_post_type.on('change', this.onPostTypeChange.bind(this));
 
-		this.togglePostTypeForm(this.$radio_post_type.val() == httpconf.ZBX_POSTTYPE_RAW);
+		this.togglePostTypeForm(this.$radio_post_type.val() == <?= ZBX_POSTTYPE_RAW ?>);
 		this.$checkbox_retrieve_mode.on('change', this.onRetrieveModeChange.bind(this)).trigger('change');
 		this.$input_url = jQuery('#url', $form);
 	}
@@ -570,22 +560,22 @@
 		this.pairs.post_fields.$element.toggleClass('disabled', disable);
 		this.pairs.post_fields.$element.find('input').prop('disabled', disable);
 		this.pairs.post_fields.disabled(disable);
-	}
+	};
 
 	/**
 	 * Post type changed event handler.
 	 */
 	StepEditForm.prototype.onPostTypeChange = function(e) {
-		var is_raw = (this.$radio_post_type.val() == httpconf.ZBX_POSTTYPE_RAW);
+		var is_raw = (this.$radio_post_type.val() == <?= ZBX_POSTTYPE_RAW ?>);
 
 		try {
 			this.setPostTypeRaw(!is_raw);
 		}
-		catch(err) {
-			this.$radio_post_type.val(is_raw ? httpconf.ZBX_POSTTYPE_FORM : httpconf.ZBX_POSTTYPE_RAW);
-			this.showPostTypeError(err, e.target);
+		catch (err) {
+			this.$radio_post_type.val(is_raw ? <?= ZBX_POSTTYPE_FORM ?> : <?= ZBX_POSTTYPE_RAW ?>);
+			this.errorDialog(httpconf.msg.cannot_convert_into_raw + '<br><br>' + err, e.target);
 		}
-	}
+	};
 
 	/**
 	 * Appends to query fields dynamic rows based on url field.
@@ -608,7 +598,7 @@
 	};
 
 	/**
-	 * @param {string} msg  Error message.
+	 * @param {string} msg                 Error message.
 	 * @param {Node|jQuery} trigger_elmnt  An element that the focus will be retuned to.
 	 */
 	StepEditForm.prototype.errorDialog = function(msg, trigger_elmnt) {
@@ -622,14 +612,6 @@
 				action: function() {}
 			}]
 		}, trigger_elmnt);
-	}
-
-	/**
-	 * @param {string} msg
-	 * @param {Node|jQuery} trigger_elmnt  An element that the focus will be retuned to.
-	 */
-	StepEditForm.prototype.showPostTypeError = function(msg, trigger_elmnt) {
-		this.errorDialog(httpconf.msg.cannot_convert_into_raw + '<br><br>' + msg, trigger_elmnt);
 	};
 
 	/**
@@ -690,7 +672,7 @@
 				fields.push('');
 			}
 
-			var malformed = fields.length > 2,
+			var malformed = (fields.length > 2),
 				non_printable_chars = (/%[01]/.match(fields[0]) || /%[01]/.match(fields[1]));
 
 			if (malformed || non_printable_chars) {
@@ -713,7 +695,7 @@
 	 */
 	StepEditForm.prototype.togglePostTypeForm = function(set_raw) {
 		this.$textarea_raw_post.closest('#post-raw-row').css('display', set_raw ? 'table-row' : 'none');
-		this.pairs.post_fields.$element.closest('#post-fields-row').css('display', !set_raw ? 'table-row' : 'none');
+		this.pairs.post_fields.$element.closest('#post-fields-row').css('display', set_raw ? 'none' : 'table-row');
 	};
 
 	/**
@@ -747,7 +729,7 @@
 	};
 
 	/**
-	 * Current state is always rendered form httpconf.steps object.  This method collects data from form fields
+	 * Current state is always rendered form httpconf.steps object. This method collects data from form fields
 	 * and writes it in httpconf.steps object. Note that sort order is read from DOM.
 	 */
 	StepEditForm.prototype.formToData = function() {
@@ -769,7 +751,7 @@
 	 */
 	StepEditForm.prototype.validate = function() {
 		var url = new Curl(this.$form.attr('action')),
-			dialogueid = this.$form.closest("[data-dialogueid]").attr("data-dialogueid");
+			dialogueid = this.$form.closest('[data-dialogueid]').attr('data-dialogueid');
 
 		this.$form.trimValues(['#step_name', '#url', '#timeout', '#required', '#status_codes']);
 

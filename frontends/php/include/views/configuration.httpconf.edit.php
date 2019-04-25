@@ -172,10 +172,10 @@ $http_authentication_form_list->addRow(_('HTTP authentication'),
 
 $http_authentication_form_list
 	->addRow(new CLabel(_('User'), 'http_user'),
-		(new CTextBox('http_user', $this->data['http_user'], false, 64)) ->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('http_user', $this->data['http_user'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('Password'), 'http_password'),
-		(new CTextBox('http_password', $this->data['http_password'], false, 64)) ->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('http_password', $this->data['http_password'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('SSL verify peer'),
 		(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)

@@ -924,12 +924,10 @@ function getConditionFormula(conditions, evalType) {
 				return;
 			}
 
-			var dataRows = $table.data('dynamicRowsData');
-			var dataOpts = $table.data('dynamicRowsOpts');
-			var opts = $.extend({}, defaultOpts, options, dataOpts);
+			var dataRows = $table.data('dynamicRowsData'),
+				opts = $.extend({}, defaultOpts, options);
 
 			$table.removeAttr('data-dynamic-rows-data');
-			$table.removeAttr('data-dynamic-rows-opts');
 
 			$table.data('dynamicRows', new DynamicRows($table, opts, dataRows));
 		});
@@ -945,7 +943,7 @@ function getConditionFormula(conditions, evalType) {
 
 		this.$element.find(this.options.row).each(function(index, element) {
 			this.addRow(element);
-		}.bind(this));
+		}.bind(this)); // ?
 
 		this.$element.on('click', options.add, this.addRow.bind(this));
 		if (initialRows) {
@@ -972,7 +970,7 @@ function getConditionFormula(conditions, evalType) {
 		this.ensureMinRows();
 
 		return this;
-	}
+	};
 
 	DynamicRows.prototype.ensureMinRows = function() {
 		var rowsToAdd = this.options.keep_min_rows - this.length;
@@ -980,7 +978,7 @@ function getConditionFormula(conditions, evalType) {
 			rowsToAdd--;
 			this.addRow();
 		}
-	}
+	};
 
 	/**
 	 * @retun {object}
@@ -989,16 +987,15 @@ function getConditionFormula(conditions, evalType) {
 		return $.extend({
 			rowNum: this.counter
 		}, data, this.options.dataCallback(data));
-	}
+	};
 
 	DynamicRows.prototype.eachRow = function(callable) {
 		this.$element.find(this.options.row).each(callable);
-	}
+	};
 
 	DynamicRows.prototype.disabled = function(disable) {
 		this.options.disabled = disable;
-	}
-
+	};
 
 	/*
 	 * @param {object|HTMLElement} data  Data to be passed into template or row element to be hydrated.
@@ -1020,7 +1017,7 @@ function getConditionFormula(conditions, evalType) {
 			.on('click', this.removeRow.bind(this, this.counter));
 
 		return $row;
-	}
+	};
 
 	/**
 	 * Adds a row before the given row.
@@ -1061,7 +1058,7 @@ function getConditionFormula(conditions, evalType) {
 
 		this.$element.trigger('tableupdate.dynamicRows', {dynamicRows: this});
 		this.$element.trigger('afteradd.dynamicRows', {dynamicRows: this});
-	}
+	};
 
 	/**
 	 * Removes the given row.
@@ -1084,7 +1081,7 @@ function getConditionFormula(conditions, evalType) {
 		this.$element.trigger('afterremove.dynamicRows', {dynamicRows: this});
 
 		this.ensureMinRows();
-	}
+	};
 }(jQuery));
 
 jQuery(function ($) {

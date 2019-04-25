@@ -56,23 +56,24 @@ $http_popup_form_list = (new CFormList())
 		])
 	);
 
-$http_popup_form_list->addRow(_('Query fields'), (new CDiv(
-	(new CTable())
-		->addClass('httpconf-dynamic-row')
-		->setAttribute('style', 'width: 100%;')
-		->setAttribute('data-type', 'query_fields')
-		->setHeader(['', _('Name'), '', _('Value'), ''])
-		->addRow((new CRow([
-			(new CCol(
-				(new CButton(null, _('Add')))
-					->addClass('element-table-add')
-					->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(5)
-		])))
-))
-	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
-	'query-fields-row'
+$http_popup_form_list->addRow(_('Query fields'), 
+	(new CDiv(
+		(new CTable())
+			->addClass('httpconf-dynamic-row')
+			->addStyle('width: 100%;')
+			->setAttribute('data-type', 'query_fields')
+			->setHeader(['', _('Name'), '', _('Value'), ''])
+			->addRow((new CRow([
+				(new CCol(
+					(new CButton(null, _('Add')))
+						->addClass('element-table-add')
+						->addClass(ZBX_STYLE_BTN_LINK)
+				))->setColSpan(5)
+			])))
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
+		'query-fields-row'
 );
 
 $http_popup_form_list->addRow(_('Post type'), (new CRadioButtonList('post_type', (int) $options['post_type']))
@@ -81,63 +82,66 @@ $http_popup_form_list->addRow(_('Post type'), (new CRadioButtonList('post_type',
 	->setModern(true)
 );
 
-$http_popup_form_list->addRow(_('Post fields'), (new CDiv(
-	(new CTable())
-		->addClass('httpconf-dynamic-row')
-		->setAttribute('style', 'width: 100%;')
-		->setAttribute('data-type', 'post_fields')
-		->setHeader(['', _('Name'), '', _('Value'), ''])
-		->addRow((new CRow([
-			(new CCol(
-				(new CButton(null, _('Add')))
-					->addClass('element-table-add')
-					->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(5)
-		])))
-))
-	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
-	'post-fields-row'
+$http_popup_form_list->addRow(_('Post fields'), 
+	(new CDiv(
+		(new CTable())
+			->addClass('httpconf-dynamic-row')
+			->addStyle('width: 100%;')
+			->setAttribute('data-type', 'post_fields')
+			->setHeader(['', _('Name'), '', _('Value'), ''])
+			->addRow((new CRow([
+				(new CCol(
+					(new CButton(null, _('Add')))
+						->addClass('element-table-add')
+						->addClass(ZBX_STYLE_BTN_LINK)
+				))->setColSpan(5)
+			])))
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
+		'post-fields-row'
 );
 
 $http_popup_form_list->addRow(_('Raw post'), (new CTextArea('posts', $options['posts']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'post-raw-row'
 );
 
-$http_popup_form_list->addRow(_('Variables'), (new CDiv(
-	(new CTable())
-		->addClass('httpconf-dynamic-row')
-		->setAttribute('data-type', 'variables')
-		->setAttribute('style', 'width: 100%;')
-		->setHeader(['', _('Name'), '', _('Value'), ''])
-		->addRow((new CRow([
-			(new CCol(
-				(new CButton(null, _('Add')))
-					->addClass('element-table-add')
-					->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(5)
-		])))
-))
-	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+$http_popup_form_list->addRow(_('Variables'),
+	(new CDiv(
+		(new CTable())
+			->addClass('httpconf-dynamic-row')
+			->setAttribute('data-type', 'variables')
+			->addStyle('width: 100%;')
+			->setHeader(['', _('Name'), '', _('Value'), ''])
+			->addRow((new CRow([
+				(new CCol(
+					(new CButton(null, _('Add')))
+						->addClass('element-table-add')
+						->addClass(ZBX_STYLE_BTN_LINK)
+				))->setColSpan(5)
+			])))
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
 );
 
-$http_popup_form_list->addRow(_('Headers'), (new CDiv(
-	(new CTable())
-		->addClass('httpconf-dynamic-row')
-		->setAttribute('data-type', 'headers')
-		->setAttribute('style', 'width: 100%;')
-		->setHeader(['', _('Name'), '', _('Value'), ''])
-		->addRow((new CRow([
-			(new CCol(
-				(new CButton(null, _('Add')))
-					->addClass('element-table-add')
-					->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(5)
-		])))
-))
-	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+$http_popup_form_list->addRow(_('Headers'),
+	(new CDiv(
+		(new CTable())
+			->addClass('httpconf-dynamic-row')
+			->setAttribute('data-type', 'headers')
+			->addStyle('width: 100%;')
+			->setHeader(['', _('Name'), '', _('Value'), ''])
+			->addRow((new CRow([
+				(new CCol(
+					(new CButton(null, _('Add')))
+						->addClass('element-table-add')
+						->addClass(ZBX_STYLE_BTN_LINK)
+				))->setColSpan(5)
+			])))
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
 );
 
 $http_popup_form_list
@@ -175,7 +179,7 @@ $http_popup_form->addItem($http_popup_form_list);
 
 // HTTP test step editing form.
 $output['body'] = (new CDiv($http_popup_form))->toString();
-$output['script_inline'] = 'httpconf.steps.onStepOverlayReadyCb('.$options['httpstepid'].')';
+$output['script_inline'] = 'httpconf.steps.onStepOverlayReadyCb('.$options['httpstepid'].');';
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
