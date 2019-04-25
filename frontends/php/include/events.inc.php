@@ -823,7 +823,7 @@ function getTagString(array $tag, $tag_name_format = PROBLEMS_TAG_NAME_FULL) {
  */
 function getLastProblems(array $options) {
 	$problem_options = [
-		'output' => ['eventid', 'r_eventid', 'objectid', 'severity', 'clock', 'r_clock'],
+		'output' => ['eventid', 'r_eventid', 'objectid', 'severity', 'clock', 'r_clock', 'name'],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'severities' => $options['severities'],
@@ -867,7 +867,7 @@ function getLastProblems(array $options) {
 			'triggerid' => $problem['objectid'],
 			'objectid' => $problem['objectid'],
 			'eventid' => $resolved ? $problem['r_eventid'] : $problem['eventid'],
-			'description' => $trigger['description'],
+			'description' => $problem['name'],
 			'host' => reset($trigger['hosts']),
 			'severity' => $problem['severity'],
 			'clock' => $resolved ? $problem['r_clock'] : $problem['clock']
