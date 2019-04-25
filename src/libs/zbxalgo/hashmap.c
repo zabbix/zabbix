@@ -241,14 +241,7 @@ void	zbx_hashmap_clear(zbx_hashmap_t *hm)
 	for (i = 0; i < hm->num_slots; i++)
 	{
 		slot = &hm->slots[i];
-
-		if (NULL != slot->entries)
-		{
-			hm->mem_free_func(slot->entries);
-			slot->entries = NULL;
-			slot->entries_num = 0;
-			slot->entries_alloc = 0;
-		}
+		slot->entries_num = 0;
 	}
 
 	hm->num_data = 0;
