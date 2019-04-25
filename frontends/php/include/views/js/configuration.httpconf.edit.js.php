@@ -450,7 +450,7 @@
 				headers: []
 			}
 		};
-		this.data = jQuery.extend(true, data, defaults); // ?
+		this.data = jQuery.extend(true, data, defaults);
 	}
 
 	/**

@@ -943,7 +943,7 @@ function getConditionFormula(conditions, evalType) {
 
 		this.$element.find(this.options.row).each(function(index, element) {
 			this.addRow(element);
-		}.bind(this)); // ?
+		}.bind(this));
 
 		this.$element.on('click', options.add, this.addRow.bind(this));
 		if (initialRows) {
