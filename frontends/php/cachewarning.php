@@ -19,23 +19,25 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
+CWebUser::disableSessionCookie();
 
-class testAPIInfo extends CAPITest {
-	public function testAPIInfo_VersionWithAuth() {
-		$error = [
-			'code' => -32602,
-			'message' => 'Invalid params.',
-			'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
-		];
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
-		$this->call('apiinfo.version', [], $error);
-	}
+$page['title'] = _('ZABBIX');
+$page['file'] = 'cachewarning.php';
 
-	public function testAPIInfo_VersionWithoutAuth() {
-		$this->disableAuthorization();
-		$result = $this->call('apiinfo.version', []);
+if ((new CAssetsFileCache(ZBase::getRootDir()))->build()) {
+	redirect('index.php');
 
-		$this->assertSame('4.0.8', $result['result']);
-	}
+	exit;
 }
+
+(new CView('general.warning', [
+	'header' => _('Insufficient file system permissions.'),
+	'messages' => [
+		_('Assets cache directory is not writable.')
+	],
+	'theme' => ZBX_DEFAULT_THEME
+]))->render();
