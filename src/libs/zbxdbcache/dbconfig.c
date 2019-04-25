@@ -319,7 +319,7 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x20
 
-static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now)
+static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now, char **error)
 {
 	zbx_uint64_t	seed;
 
@@ -329,7 +329,7 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, 
 			(ITEM_STATE_NOTSUPPORTED == new_state && 0 == (flags & (0 == item->schedulable ?
 					ZBX_ITEM_DELAY_CHANGED : ZBX_REFRESH_UNSUPPORTED_CHANGED)))))
 	{
-		return;	/* avoid unnecessary nextcheck updates when syncing items in cache */
+		return SUCCEED;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
@@ -340,20 +340,9 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, 
 	{
 		int			simple_interval;
 		zbx_custom_interval_t	*custom_intervals;
-		char			*error = NULL;
 
-		if (SUCCEED != zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals, &error))
+		if (SUCCEED != zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals, error))
 		{
-			zbx_timespec_t	ts = {now, 0};
-
-			/* Usual way for an item to become not supported is to receive an error instead of value. */
-			/* Item state and error will be updated by history syncer during history sync following a */
-			/* regular procedure with item update in database and config cache, logging etc. There is */
-			/* no need to set ITEM_STATE_NOTSUPPORTED here. */
-
-			dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, error);
-			zbx_free(error);
-
 			/* Polling items with invalid update intervals repeatedly does not make sense because they */
 			/* can only be healed by editing configuration (either update interval or macros involved) */
 			/* and such changes will be detected during configuration synchronization. DCsync_items()  */
@@ -361,7 +350,7 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, 
 
 			item->nextcheck = ZBX_JAN_2038;
 			item->schedulable = 0;
-			return;
+			return FAIL;
 		}
 
 		if (ITEM_STATE_NORMAL == new_state || 0 == item->schedulable)
@@ -388,6 +377,8 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, 
 	}
 
 	item->schedulable = 1;
+
+	return SUCCEED;
 }
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
@@ -1901,7 +1892,8 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 			addr = zbx_strdup(NULL, interface->ip);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			DCstrpool_replace(1, &interface->ip, addr);
+			if (SUCCEED == is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
+				DCstrpool_replace(1, &interface->ip, addr);
 			zbx_free(addr);
 		}
 
@@ -1910,7 +1902,8 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 			addr = zbx_strdup(NULL, interface->dns);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			DCstrpool_replace(1, &interface->dns, addr);
+			if (SUCCEED == is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
+				DCstrpool_replace(1, &interface->dns, addr);
 			zbx_free(addr);
 		}
 	}
@@ -2774,7 +2767,27 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			DCitem_poller_type_update(item, host, flags);
 
 			if (SUCCEED == is_counted_in_item_queue(item->type, item->key))
-				DCitem_nextcheck_update(item, item->state, flags, now);
+			{
+				char	*error = NULL;
+
+				if (FAIL == DCitem_nextcheck_update(item, item->state, flags, now, &error))
+				{
+					zbx_timespec_t	ts = {now, 0};
+
+					/* Usual way for an item to become not supported is to receive an error     */
+					/* instead of value. Item state and error will be updated by history syncer */
+					/* during history sync following a regular procedure with item update in    */
+					/* database and config cache, logging etc. There is no need to set          */
+					/* ITEM_STATE_NOTSUPPORTED here.                                            */
+
+					if (0 == host->proxy_hostid)
+					{
+						dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+								ITEM_STATE_NOTSUPPORTED, error);
+					}
+					zbx_free(error);
+				}
+			}
 		}
 		else
 		{
@@ -3558,7 +3571,7 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
  ******************************************************************************/
 static void	DCsync_action_ops(zbx_dbsync_t *sync)
 {
-	const char	*__function_name = "DCsync_action_opss";
+	const char	*__function_name = "DCsync_action_ops";
 
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -4876,6 +4889,8 @@ void	DCsync_configuration(unsigned char mode)
 	itempp_sec2 = zbx_time() - sec;
 	config->item_sync_ts = time(NULL);
 	FINISH_SYNC;
+
+	dc_flush_history();	/* misconfigured items generate pseudo-historic values to become notsupported */
 
 	/* sync function data to support function lookups when resolving macros during configuration sync */
 
@@ -7555,7 +7570,7 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, un
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock);
+	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock, NULL);
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, flags);
@@ -7889,7 +7904,7 @@ unlock:
  ******************************************************************************/
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
 {
-	const char			*__function_name = "DCconfig_get_snmp_items_by_interface";
+	const char			*__function_name = "DCconfig_get_snmp_items_by_interfaceid";
 
 	size_t				items_num = 0, items_alloc = 8;
 	int				i;
@@ -11295,7 +11310,7 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec);
+			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec, NULL);
 	}
 
 	UNLOCK_CACHE;

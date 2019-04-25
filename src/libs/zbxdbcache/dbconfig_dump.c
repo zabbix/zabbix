@@ -284,7 +284,7 @@ static void	DCdump_htmpls(void)
 
 static void	DCdump_gmacros(void)
 {
-	const char		*__function_name = "DCdump_gmacro";
+	const char		*__function_name = "DCdump_gmacros";
 
 	ZBX_DC_GMACRO		*gmacro;
 	zbx_hashset_iter_t	iter;

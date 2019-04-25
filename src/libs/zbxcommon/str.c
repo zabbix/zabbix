@@ -160,7 +160,7 @@ void	help(void)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_zbx_error(const char *fmt, ...)
+void	zbx_error(const char *fmt, ...)
 {
 	va_list	args;
 
@@ -190,7 +190,7 @@ void	__zbx_zbx_error(const char *fmt, ...)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
+size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 {
 	size_t	written_len;
 	va_list	args;
@@ -220,7 +220,7 @@ size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
+void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 {
 	va_list	args;
 	size_t	avail_len, written_len;
@@ -435,6 +435,13 @@ void	del_zeros(char *s)
 		if ('.' == s[len])
 		{
 			/* number has decimal part */
+
+			if (1 == trim)
+			{
+				/* don't touch invalid numbers with more than one decimal seprator */
+				return;
+			}
+
 			trim = 1;
 		}
 
@@ -703,7 +710,7 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
  * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
  ******************************************************************************/
-char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
+char	*zbx_dsprintf(char *dest, const char *f, ...)
 {
 	char	*string;
 	va_list args;
@@ -764,7 +771,7 @@ char	*zbx_strdcat(char *dest, const char *src)
  * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
  ******************************************************************************/
-char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
+char	*zbx_strdcatf(char *dest, const char *f, ...)
 {
 	char	*string, *result;
 	va_list	args;
@@ -5005,4 +5012,117 @@ void	zbx_strsplit(const char *src, char delimiter, char **left, char **right)
 		(*left)[left_size - 1] = '\0';
 		memcpy(*right, delimiter_ptr + 1, right_size);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_trim_number                                                  *
+ *                                                                            *
+ * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
+ *          double quotation mark is present on both ends of the string. If   *
+ *          strip_plus_sign is non-zero, then removes single "+" sign from    *
+ *          the beginning of the trimmed and unquoted string.                 *
+ *                                                                            *
+ *          This function does not guarantee that the resulting string        *
+ *          contains numeric value. It is meant to be used for removing       *
+ *          "valid" characters from the value that is expected to be numeric  *
+ *          before checking if value is numeric.                              *
+ *                                                                            *
+ * Parameters: str             - [IN/OUT] string for processing               *
+ *             strip_plus_sign - [IN] non-zero if "+" should be stripped      *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_trim_number(char *str, int strip_plus_sign)
+{
+	char	*left = str;			/* pointer to the first character */
+	char	*right = strchr(str, '\0') - 1; /* pointer to the last character, not including terminating null-char */
+
+	if (left > right)
+	{
+		/* string is empty before any trimming */
+		return;
+	}
+
+	while (' ' == *left)
+	{
+		left++;
+	}
+
+	while (' ' == *right && left < right)
+	{
+		right--;
+	}
+
+	if ('"' == *left && '"' == *right && left < right)
+	{
+		left++;
+		right--;
+	}
+
+	if (0 != strip_plus_sign && '+' == *left)
+	{
+		left++;
+	}
+
+	if (left > right)
+	{
+		/* string is empty after trimming */
+		*str = '\0';
+		return;
+	}
+
+	if (str < left)
+	{
+		while (left <= right)
+		{
+			*str++ = *left++;
+		}
+		*str = '\0';
+	}
+	else
+	{
+		*(right + 1) = '\0';
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_trim_integer                                                 *
+ *                                                                            *
+ * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
+ *          double quotation mark is present on both ends of the string, then *
+ *          removes single "+" sign from the beginning of the trimmed and     *
+ *          unquoted string.                                                  *
+ *                                                                            *
+ *          This function does not guarantee that the resulting string        *
+ *          contains integer value. It is meant to be used for removing       *
+ *          "valid" characters from the value that is expected to be numeric  *
+ *          before checking if value is numeric.                              *
+ *                                                                            *
+ * Parameters: str - [IN/OUT] string for processing                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_trim_integer(char *str)
+{
+	zbx_trim_number(str, 1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_trim_float                                                   *
+ *                                                                            *
+ * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
+ *          double quotation mark is present on both ends of the string.      *
+ *                                                                            *
+ *          This function does not guarantee that the resulting string        *
+ *          contains floating-point number. It is meant to be used for        *
+ *          removing "valid" characters from the value that is expected to be *
+ *          numeric before checking if value is numeric.                      *
+ *                                                                            *
+ * Parameters: str - [IN/OUT] string for processing                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_trim_float(char *str)
+{
+	zbx_trim_number(str, 0);
 }
