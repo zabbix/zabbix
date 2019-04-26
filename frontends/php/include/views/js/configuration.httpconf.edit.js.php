@@ -65,6 +65,10 @@
 		window.httpconf = {
 			templated:                           <?= $data['templated'] ? 1 : 0 ?>,
 			ZBX_STYLE_DRAG_ICON:                 <?= zbx_jsvalue(ZBX_STYLE_DRAG_ICON) ?>,
+			HTTPTEST_AUTH_NONE:                  <?= HTTPTEST_AUTH_NONE ?>,
+			ZBX_POSTTYPE_FORM:                   <?= ZBX_POSTTYPE_FORM ?>,
+			HTTPTEST_STEP_RETRIEVE_MODE_HEADERS: <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>,
+			ZBX_POSTTYPE_RAW:                    <?= ZBX_POSTTYPE_RAW ?>,
 			msg: {
 				data_not_encoded:           <?= CJs::encodeJson(_('Data is not properly encoded.')); ?>,
 				name_filed_length_exceeded: <?= CJs::encodeJson(_('Name of the form field should not exceed 255 characters.')); ?>,
@@ -108,7 +112,7 @@
 		this.$password = jQuery('#http_password', $tab);
 
 		this.$type_select.on('change', function(e) {
-			var http_fields_disabled = (e.target.value == <?= HTTPTEST_AUTH_NONE ?>);
+			var http_fields_disabled = (e.target.value == httpconf.HTTPTEST_AUTH_NONE);
 			this.$user.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
 			this.$password.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
 		}.bind(this));
@@ -264,10 +268,10 @@
 	 * A helper method for truncating string in middle.
 	 *
 	 * @param {string} str  String to be shortened into mid-elliptic.
-	 * @param {int} max     Max length of resulting string.
+	 * @param {int} max     Max length of resulting string (inclusive).
 	 */
 	function midEllipsis(str, max) {
-		if (str.length <= max) {
+		if (str.length < max) {
 			return str;
 		}
 
@@ -323,8 +327,8 @@
 			frag.append(hiddenInput('timeout',          step.data.timeout,          prefix_step));
 			frag.append(hiddenInput('url',              step.data.url,              prefix_step));
 
-			if (step.data.retrieve_mode != <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>) {
-				if (step.data.post_type != <?= ZBX_POSTTYPE_FORM ?>) {
+			if (step.data.retrieve_mode != httpconf.HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
+				if (step.data.post_type != httpconf.ZBX_POSTTYPE_FORM) {
 					frag.append(hiddenInput('posts', step.data.posts, prefix_step));
 				}
 				else {
@@ -551,7 +555,7 @@
 
 		this.$radio_post_type.on('change', this.onPostTypeChange.bind(this));
 
-		this.togglePostTypeForm(this.$radio_post_type.val() == <?= ZBX_POSTTYPE_RAW ?>);
+		this.togglePostTypeForm(this.$radio_post_type.val() == httpconf.ZBX_POSTTYPE_RAW);
 		this.$checkbox_retrieve_mode.on('change', this.onRetrieveModeChange.bind(this)).trigger('change');
 		this.$input_url = jQuery('#url', $form);
 	}
@@ -575,13 +579,13 @@
 	 * Post type changed event handler.
 	 */
 	StepEditForm.prototype.onPostTypeChange = function(e) {
-		var is_raw = (this.$radio_post_type.val() == <?= ZBX_POSTTYPE_RAW ?>);
+		var is_raw = (this.$radio_post_type.val() == httpconf.ZBX_POSTTYPE_RAW);
 
 		try {
 			this.setPostTypeRaw(!is_raw);
 		}
 		catch (err) {
-			this.$radio_post_type.val(is_raw ? <?= ZBX_POSTTYPE_FORM ?> : <?= ZBX_POSTTYPE_RAW ?>);
+			this.$radio_post_type.val(is_raw ? httpconf.ZBX_POSTTYPE_FORM : httpconf.ZBX_POSTTYPE_RAW);
 			this.errorDialog(httpconf.msg.cannot_convert_into_raw + '<br><br>' + err, e.target);
 		}
 	};
@@ -789,5 +793,4 @@
 			overlayDialogueDestroy(dialogueid);
 		}.bind(this));
 	};
-
 </script>
