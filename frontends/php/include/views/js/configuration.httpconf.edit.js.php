@@ -83,8 +83,17 @@
 		window.httpconf.authentication = new Authentication($('#authenticationTab'));
 
 		window.httpconf.$form = $('#httpForm').on('submit', function() {
-			this.append(httpconf.scenario.toFragment());
-			this.append(httpconf.steps.toFragment());
+			var hidden_form = this.querySelector('div#hidden-form');
+
+			hidden_form && hidden_form.remove();
+			hidden_form = document.createElement('div');
+			hidden_form.id = 'hidden-form';
+			hidden_form.className = 'hidden';
+
+			hidden_form.append(httpconf.scenario.toFragment());
+			hidden_form.append(httpconf.steps.toFragment());
+
+			this.append(hidden_form);
 		});
 	});
 
