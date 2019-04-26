@@ -220,7 +220,6 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		/* URL is not detected - compose URL using host, port and path */
 
 		unsigned short	port_n = ZBX_DEFAULT_HTTP_PORT;
-		char		*host_loc = NULL;
 
 		if (NULL != port && '\0' != *port)
 		{
@@ -232,16 +231,17 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		}
 
 		if (NULL != strchr(host, ':'))
-			host_loc = zbx_dsprintf(host_loc, "[%s]", host);
+			url = zbx_dsprintf(url, HTTP_SCHEME_STR "[%s]:%u/", host, port_n);
 		else
-			host_loc = zbx_strdup(host_loc, host);
+			url = zbx_dsprintf(url, HTTP_SCHEME_STR "%s:%u/", host, port_n);
 
 		if (NULL != path)
-			url = zbx_dsprintf(url, "http://%s:%u%s%s", host_loc, port_n, ('/' != *path ? "/" : ""), path);
-		else
-			url = zbx_dsprintf(url, "http://%s:%u/", host_loc, port_n);
-
-		zbx_free(host_loc);
+		{
+			if ('/' == *path)
+				url = zbx_strdcat(url, path + 1);
+			else
+				url = zbx_strdcat(url, path);
+		}
 	}
 
 	ret = curl_page_get(url, buffer, error);
@@ -352,7 +352,8 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 			path_loc = zbx_strdup(path_loc, "/");
 		}
 
-		zbx_lrtrim(hostname, "[]");
+		zbx_ltrim(hostname, "[");
+		zbx_rtrim(hostname, "]");
 	}
 	else
 	{
