@@ -639,7 +639,7 @@ class CSvgGraph extends CSvg {
 
 			if (!array_key_exists(0, $grid_values) && $lowest > 25) {
 				$grid_values[0] = convert_units([
-					'value' => $grid_values[$lowest] - ($lowest * ($max_value - $min_value) / $this->canvas_height),
+					'value' => (float) $grid_values[$lowest] - ($lowest * ($max_value - $min_value) / $this->canvas_height),
 					'units' => $units,
 					'convert' => ITEM_CONVERT_NO_UNITS
 				]);
