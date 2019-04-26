@@ -606,10 +606,10 @@
 			return this.errorDialog(html_msg, this.$input_url);
 		}
 
-		// We add one by one instead of using setData, because we append to preexisting dynamic pairs.
-		url.pairs.forEach(function(pair) {
-			this.pairs.query_fields.addRow(pair);
-		}.bind(this));
+		var rows = this.pairs.query_fields.getCurrentData();
+
+		rows = rows.concat(url.pairs);
+		this.pairs.query_fields.setData(rows);
 
 		this.$input_url.val(url.url);
 	};
