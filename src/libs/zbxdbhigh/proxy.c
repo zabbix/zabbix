@@ -4063,18 +4063,18 @@ int	zbx_check_protocol_version(DC_PROXY *proxy)
 	int	now;
 	int	print_log = 0;
 
-	now = (int)time(NULL);
-
-	if (proxy->last_version_error_time <= now)
-	{
-		print_log = 1;
-		proxy->last_version_error_time = now + 5 * SEC_PER_MIN;
-		zbx_update_proxy_lasterror(proxy);
-	}
-
 	/* warn if another proxy version is used and proceed with compatibility rules*/
 	if ((server_version = ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR)) != proxy->version)
 	{
+		now = (int)time(NULL);
+
+		if (proxy->last_version_error_time <= now)
+		{
+			print_log = 1;
+			proxy->last_version_error_time = now + 5 * SEC_PER_MIN;
+			zbx_update_proxy_lasterror(proxy);
+		}
+
 		if (1 == print_log)
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" protocol version %d.%d differs from server version"
 					" %d.%d", proxy->host, ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
