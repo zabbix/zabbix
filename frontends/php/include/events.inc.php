@@ -846,7 +846,7 @@ function getLastProblems(array $options) {
 	$db_problems = API::Problem()->get($problem_options);
 	$triggers = $db_problems
 		? API::Trigger()->get([
-			'output' => ['triggerid', 'description'],
+			'output' => [],
 			'selectHosts' => ['hostid', 'name'],
 			'triggerid' => zbx_objectValues($db_problems, 'objectid'),
 			'lastChangeSince' => $options['time_from'],
