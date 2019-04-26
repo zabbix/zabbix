@@ -20,10 +20,7 @@
 #ifndef ZABBIX_MODULE_H
 #define ZABBIX_MODULE_H
 
-#ifndef zbx_uint64_t
-#	include <stdint.h>
-#	define zbx_uint64_t uint64_t
-#endif
+#include "zbxtypes.h"
 
 #define ZBX_MODULE_OK	0
 #define ZBX_MODULE_FAIL	-1
