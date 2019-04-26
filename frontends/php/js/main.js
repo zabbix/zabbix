@@ -887,201 +887,95 @@ function getConditionFormula(conditions, evalType) {
 	 * Creates a table with dynamic add/remove row buttons.
 	 *
 	 * Supported options:
-	 * - template - row template selector
-	 * - row - element row selector
-	 * - add - add row button selector
-	 * - remove - remove row button selector
-	 * - disabled - if true, do not perform any updates
-	 * - counter - number to start row enumeration from
-	 * - dataCallback - function to generate the data passed to the template
+	 * - template		- row template selector
+	 * - row			- element row selector
+	 * - add			- add row button selector
+	 * - remove			- remove row button selector
+	 * - counter 		- number to start row enumeration from
+	 * - dataCallback	- function to generate the data passed to the template
 	 *
 	 * Triggered events:
-	 * - tableupdate.dynamicRows - after adding or removing a row.
-	 * - beforeadd.dynamicRows - only before adding a new row.
-	 * - afteradd.dynamicRows - only after adding a new row.
-	 * - afterremove.dynamicRows - only after removing a row.
+	 * - tableupdate.dynamicRows 	- after adding or removing a row.
+	 * - beforeadd.dynamicRows 	    - only before adding a new row.
+	 * - afteradd.dynamicRows 	    - only after adding a new row.
+	 * - afterremove.dynamicRows 	- only after removing a row.
 	 *
 	 * @param options
 	 */
 	$.fn.dynamicRows = function(options) {
-		var defaultOpts = {
+		options = $.extend({}, {
 			template: '',
 			row: '.form_row',
 			add: '.element-table-add',
 			remove: '.element-table-remove',
-			disabled: false,
 			counter: null,
 			beforeRow: null,
-			keep_min_rows: 0,
 			dataCallback: function(data) {
 				return {};
 			}
-		}
+		}, options);
 
 		return this.each(function() {
-			var $table = $(this);
-			if ($table.data('dynamicRows')) {
-				return;
-			}
+			var table = $(this);
 
-			var dataRows = $table.data('dynamicRowsData'),
-				opts = $.extend({}, defaultOpts, options);
+			table.data('dynamicRows', {
+				counter: (options.counter !== null) ? options.counter : $(options.row, table).length
+			});
 
-			$table.removeAttr('data-dynamic-rows-data');
+			// add buttons
+			table.on('click', options.add, function() {
+				table.trigger('beforeadd.dynamicRows', options);
 
-			$table.data('dynamicRows', new DynamicRows($table, opts, dataRows));
+				// add the new row before the row with the "Add" button
+				var beforeRow = (options['beforeRow'] !== null)
+					? $(options['beforeRow'], table)
+					:  $(this).closest('tr');
+				addRow(table, beforeRow, options);
+
+				table.trigger('afteradd.dynamicRows', options);
+			});
+
+			// remove buttons
+			table.on('click', options.remove, function() {
+				// remove the parent row
+				removeRow(table, $(this).closest(options.row), options);
+			});
 		});
-	};
-
-
-	function DynamicRows($element, options, initialRows) {
-		this.options = options;
-		this.$element = $element;
-		this.length = 0;
-		this.counter = 0;
-		this.rows = {};
-
-		this.$element.find(this.options.row).each(function(index, element) {
-			this.addRow(element);
-		}.bind(this));
-
-		this.$element.on('click', options.add, this.addRow.bind(this));
-		if (initialRows) {
-			this.setData(initialRows);
-		}
-	}
-
-	/**
-	* Replaces current data with new one.
-	* Be aware that min rows are ensured and events are triggered only for add.
-	* Removing happens outside this api, to not to call ensureMinRows method.
-	*
-	* @param {array} dataRows  Array of data for row templates.
-	*/
-	DynamicRows.prototype.setData = function(dataRows) {
-		if (this.length > 0) {
-			this.length = 0;
-			for (var counter in this.rows) {
-				this.rows[counter].remove();
-				delete this.rows[counter];
-			}
-		}
-		dataRows.forEach(this.addRow.bind(this));
-		this.ensureMinRows();
-
-		return this;
-	};
-
-	DynamicRows.prototype.ensureMinRows = function() {
-		var rowsToAdd = this.options.keep_min_rows - this.length;
-		while (rowsToAdd > 0) {
-			rowsToAdd--;
-			this.addRow();
-		}
-	};
-
-	/**
-	 * @retun {object}
-	 */
-	DynamicRows.prototype.getTemplateData = function(data) {
-		return $.extend({
-			rowNum: this.counter
-		}, data, this.options.dataCallback(data));
-	};
-
-	DynamicRows.prototype.eachRow = function(callable) {
-		this.$element.find(this.options.row).each(callable);
-	};
-
-	DynamicRows.prototype.disabled = function(disable) {
-		this.options.disabled = disable;
-	};
-
-	/*
-	 * @param {object|HTMLElement} data  Data to be passed into template or row element to be hydrated.
-	 *
-	 * @return {jQuery}  Element with bound events.
-	 */
-	DynamicRows.prototype.getRowElem = function(data) {
-		var $row;
-
-		if (data instanceof HTMLElement) {
-			$row = $(data);
-		}
-		else {
-			var template = new Template($(this.options.template).html());
-			$row = $(template.evaluate(this.getTemplateData(data)));
-		}
-
-		$row.find(this.options.remove)
-			.on('click', this.removeRow.bind(this, this.counter));
-
-		return $row;
 	};
 
 	/**
 	 * Adds a row before the given row.
 	 *
-	 * @param {object|HTMLElement} data  Data to be passed into template or row element to be hydrated.
+	 * @param {jQuery} table
+	 * @param {jQuery} beforeRow
+	 * @param {object} options
 	 */
-	DynamicRows.prototype.addRow = function(data) {
-		if (this.options.disabled) {
-			return;
-		}
-		var evtBeforeAdd = $.Event('beforeadd.dynamicRows');
+	function addRow(table, beforeRow, options) {
+		var data = {
+			rowNum: table.data('dynamicRows').counter
+		};
+		data = $.extend(data, options.dataCallback(data));
 
-		if (data instanceof jQuery.Event) {
-			evtBeforeAdd.originalEvent = data;
-			data = {};
-		}
+		var template = new Template($(options.template).html());
+		beforeRow.before(template.evaluate(data));
+		table.data('dynamicRows').counter++;
 
-		this.$element.trigger(evtBeforeAdd, {dynamicRows: this});
-
-		if (evtBeforeAdd.isDefaultPrevented()) {
-			return;
-		}
-
-		var $beforeRow = (this.options.beforeRow !== null)
-			? this.$element.find(this.options.beforeRow)
-			: this.$element.find(this.options.add).closest('tr');
-
-		var $row = this.getRowElem(data);
-
-		this.rows[this.counter] = $row;
-		if ($beforeRow.length == 0) {
-			throw null;
-		}
-		$beforeRow.before($row);
-
-		this.counter++;
-		this.length++;
-
-		this.$element.trigger('tableupdate.dynamicRows', {dynamicRows: this});
-		this.$element.trigger('afteradd.dynamicRows', {dynamicRows: this});
-	};
+		table.trigger('tableupdate.dynamicRows', options);
+	}
 
 	/**
 	 * Removes the given row.
 	 *
-	 * @param {int} index
+	 * @param {jQuery} table
+	 * @param {jQuery} row
+	 * @param {object} options
 	 */
-	DynamicRows.prototype.removeRow = function(rowNum) {
-		if (this.options.disabled) {
-			return;
-		}
+	function removeRow(table, row, options) {
+		row.remove();
 
-		var $row = this.rows[rowNum];
-		$row.remove();
-
-		delete this.rows[rowNum];
-
-		this.length --;
-
-		this.$element.trigger('tableupdate.dynamicRows', {dynamicRows: this});
-		this.$element.trigger('afterremove.dynamicRows', {dynamicRows: this});
-
-		this.ensureMinRows();
-	};
+		table.trigger('tableupdate.dynamicRows', options);
+		table.trigger('afterremove.dynamicRows', options);
+	}
 }(jQuery));
 
 jQuery(function ($) {
