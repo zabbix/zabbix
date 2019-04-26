@@ -481,7 +481,7 @@
 			status_codes:     this.data.status_codes,
 			old_name:         this.data.name,
 			retrieve_mode:    this.data.retrieve_mode,
-			follow_redirects: this.data.follow_redirects,
+			follow_redirects: this.data.follow_redirect,
 			steps_names:      httpconf.steps.getStepNames()
 		}, null, refocus);
 	};
