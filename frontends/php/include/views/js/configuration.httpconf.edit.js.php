@@ -255,6 +255,10 @@
 				that.openNew();
 			});
 
+			this.$container.on('afterremove.dynamicRows', function(e, data) {
+				delete this.steps[data.rowData.stepId];
+			}.bind(this));
+
 			this.$container.on('tableupdate.dynamicRows', function(e, data) {
 				data.dynamicRows.$element.sortable('option','disabled', data.dynamicRows.length < 2);
 				that.onSortOrderChange();
