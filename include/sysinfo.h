@@ -22,7 +22,6 @@
 
 #include "common.h"
 #include "module.h"
-#include "zbxalgo.h"
 
 /* CHECK RESULT */
 
@@ -314,32 +313,5 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 #define ZBX_MUTEX_LOGGING_DENIED	2
 zbx_uint32_t get_thread_global_mutex_flag(void);
 #endif
-
-#if ZBX_PROCSTAT_COLLECTOR
-/* process cpu utilization data */
-typedef struct
-{
-	pid_t		pid;
-
-	/* errno error code */
-	int		error;
-
-	zbx_uint64_t	utime;
-	zbx_uint64_t	stime;
-
-	/* process start time, used to validate if the old */
-	/* snapshot data belongs to the same process       */
-	zbx_uint64_t	starttime;
-}
-zbx_procstat_util_t;
-
-/* external functions used by procstat collector */
-int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags);
-void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *procname, const char *username,
-		const char *cmdline, zbx_uint64_t flags, zbx_vector_uint64_t *pids);
-void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num);
-void	zbx_proc_free_processes(zbx_vector_ptr_t *processes);
-
-#endif	/* ZBX_PROCSTAT_COLLECTOR */
 
 #endif

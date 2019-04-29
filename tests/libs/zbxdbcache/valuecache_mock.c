@@ -214,7 +214,7 @@ void	zbx_vcmock_read_values(zbx_mock_handle_t hdata, unsigned char value_type, z
  * Comments: History data storage is used to emulate history storage backend. *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vcmock_ds_init()
+void	zbx_vcmock_ds_init(void)
 {
 	zbx_mock_handle_t	hitems, hitem;
 	zbx_mock_error_t	err;
@@ -249,7 +249,7 @@ void	zbx_vcmock_ds_init()
  * Purpose: destroys history data storage                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vcmock_ds_destroy()
+void	zbx_vcmock_ds_destroy(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_vcmock_ds_item_t	*item;
@@ -291,7 +291,7 @@ static void	zbx_vcmock_history_dump(unsigned char value_type, const zbx_vector_h
  * Purpose: dumps history data store to standard output                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vcmock_ds_dump()
+void	zbx_vcmock_ds_dump(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_vcmock_ds_item_t	*item;
@@ -472,6 +472,7 @@ zbx_mem_info_t		*vc_meminfo = NULL;
 
 static size_t		vcmock_mem = ZBX_MEBIBYTE * 1024;
 
+int	__wrap_zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error);
 int	__wrap_zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error)
 {
 	vc_mutex = mutex;
@@ -481,11 +482,14 @@ int	__wrap_zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **er
 	return SUCCEED;
 }
 
+void	__wrap_zbx_mutex_destroy(zbx_mutex_t *mutex);
 void	__wrap_zbx_mutex_destroy(zbx_mutex_t *mutex)
 {
 	zbx_mock_assert_ptr_eq("Attempting to destroy unknown mutex", vc_mutex, mutex);
 }
 
+int	__wrap_zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
+		int allow_oom, char **error);
 int	__wrap_zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
 		int allow_oom, char **error)
 {
@@ -499,6 +503,7 @@ int	__wrap_zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *
 	return SUCCEED;
 }
 
+void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size);
 void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size)
 {
 	size_t	*psize;
@@ -519,6 +524,7 @@ void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, 
 	return (void *)(psize + 1);
 }
 
+void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size);
 void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size)
 {
 	size_t	*psize;
@@ -540,6 +546,7 @@ void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info,
 	return (void *)(psize + 1);
 }
 
+void	__wrap___zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr);
 void	__wrap___zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
 {
 	size_t	*psize;
@@ -559,6 +566,8 @@ void	__wrap___zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, voi
 	zbx_free(psize);
 }
 
+int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
+		zbx_vector_history_record_t *values);
 int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values)
 {
@@ -594,6 +603,7 @@ int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start
 	return SUCCEED;
 }
 
+int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
 int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history)
 {
 	int			i;
@@ -625,6 +635,7 @@ int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history)
 	return SUCCEED;
 }
 
+int	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 int	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
 {
 	ZBX_UNUSED(hist);
@@ -634,6 +645,7 @@ int	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_t
 	return SUCCEED;
 }
 
+int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
 {
 	ZBX_UNUSED(hist);
@@ -666,7 +678,7 @@ void	zbx_vcmock_set_available_mem(size_t size)
  * Purpose:  retrieves the memory available in the wrapped memory allocator   *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_vcmock_get_available_mem()
+size_t	zbx_vcmock_get_available_mem(void)
 {
 	return vcmock_mem;
 }
@@ -750,6 +762,7 @@ void	zbx_vcmock_set_mode(zbx_mock_handle_t hitem, const char *key)
 
 static time_t	vcmock_time;
 
+time_t	__wrap_time(time_t *ptr);
 time_t	__wrap_time(time_t *ptr)
 {
 	if (NULL != ptr)

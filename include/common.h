@@ -1503,7 +1503,4 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
-/* free resources allocated by MAIN_ZABBIX_ENTRY() */
-void	zbx_free_service_resources(void);
-
 #endif

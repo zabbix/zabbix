@@ -1108,6 +1108,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
  * Purpose: free service resources allocated by main thread                   *
  *                                                                            *
  ******************************************************************************/
+void	zbx_free_service_resources(void);
 void	zbx_free_service_resources(void)
 {
 	if (NULL != threads)

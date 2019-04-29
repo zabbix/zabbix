@@ -34,7 +34,7 @@
  ******************************************************************************/
 #define ZBX_JSON_MAX_STRERROR	255
 
-int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type);
+static int	jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type);
 static char	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR];
 
 const char	*zbx_json_strerror(void)
@@ -1238,7 +1238,7 @@ static int	zbx_jsonpath_error(const char *path)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_jsonpath_next                                                *
+ * Function: jsonpath_next                                                *
  *                                                                            *
  * Purpose: returns next component of json path                               *
  *                                                                            *
@@ -1252,7 +1252,7 @@ static int	zbx_jsonpath_error(const char *path)
  *               FAIL    - json path parsing error                            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type)
+static int	jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type)
 {
 	const char	*next = *pnext;
 	size_t		pos;
@@ -1359,7 +1359,7 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
 
 	do
 	{
-		if (FAIL == zbx_jsonpath_next(path, &next, &loc, &type))
+		if (FAIL == jsonpath_next(path, &next, &loc, &type))
 			return FAIL;
 
 		if (ZBX_JSONPATH_ARRAY_INDEX == type)
@@ -1448,7 +1448,7 @@ int	zbx_json_path_check(const char *path, char * error, size_t errlen)
 
 	do
 	{
-		if (SUCCEED != zbx_jsonpath_next(path, &next, &loc, &type))
+		if (SUCCEED != jsonpath_next(path, &next, &loc, &type))
 		{
 			zbx_snprintf(error, errlen, "json path not valid: %s", zbx_json_strerror());
 			return FAIL;
@@ -1458,3 +1458,6 @@ int	zbx_json_path_check(const char *path, char * error, size_t errlen)
 
 	return SUCCEED;
 }
+#ifdef HAVE_TESTS
+#	include "../../../tests/libs/zbxjson/jsonpath_next_test.c"
+#endif
