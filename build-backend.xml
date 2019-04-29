@@ -98,7 +98,6 @@
 			<sequential>
 				<delete file="@{file}"/>
 				<echoxml file="@{file}" append="true">
-					<!DOCTYPE html>
 					<html>
 						<head>
 							<title>duktape.c</title>
