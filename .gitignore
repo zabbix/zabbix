@@ -435,7 +435,6 @@ tests/libs/zbxjson/Makefile
 tests/libs/zbxjson/Makefile.in
 tests/libs/zbxjson/zbx_json_path_open
 tests/libs/zbxjson/zbx_jsonpath_next
-tests/libs/zbxjson/jsonpath_next
 tests/libs/zbxsysinfo/.deps
 tests/libs/zbxsysinfo/Makefile
 tests/libs/zbxsysinfo/Makefile.in
