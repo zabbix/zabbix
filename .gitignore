@@ -125,6 +125,7 @@ tests/libs/zbxdbhigh/DBselect_uint64
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxjson/zbx_json_path_open
 tests/libs/zbxjson/zbx_jsonpath_next
+tests/libs/zbxjson/jsonpath_next
 tests/libs/zbxprometheus/prometheus_filter_init
 tests/libs/zbxprometheus/prometheus_parse_row
 tests/libs/zbxprometheus/zbx_prometheus_pattern
