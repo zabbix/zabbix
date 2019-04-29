@@ -33,8 +33,6 @@
 #define	REMOVE_TH	4
 #define	REMOVE_HT	5
 
-static struct mallinfo	zbx_cm_minfo;
-
 static void	mock_read_values(zbx_mock_handle_t hdata, zbx_vector_ptr_t *values)
 {
 	zbx_mock_error_t	err;
