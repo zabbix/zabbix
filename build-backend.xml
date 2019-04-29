@@ -90,6 +90,29 @@
 				</trycatch>
 			</sequential>
 		</for>
+
+		<!-- remove content of report files related to Duktape -->
+		<fileset id="filesref" dir="." includes="clang-scan-build-reports/**/report-duktape.c*.html"/>
+		<property name="files" refid="filesref"/>
+		<for list="${files}" delimiter=";" param="file" >
+			<sequential>
+				<delete file="@{file}"/>
+				<echoxml file="@{file}" append="true">
+					<!DOCTYPE html>
+					<html>
+						<head>
+							<title>duktape.c</title>
+							<style type="text/css">
+								.comment { color: green; font-style: oblique }
+							</style>
+						</head>
+						<body>
+							<span class="comment">Reports showing errors in the external Duktape library have been removed.</span>
+						</body>
+					</html>
+				</echoxml>
+			</sequential>
+		</for>
 	</target>
 
 	<target name="init">
