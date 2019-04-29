@@ -203,7 +203,7 @@ class CIPRangeParser {
 			return false;
 		}
 
-		$ip_count = bcpow(2, 32 - $parts[1]);
+		$ip_count = bcpow(2, 32 - $parts[1], 0);
 
 		if (bccomp($this->max_ip_count, $ip_count) < 0) {
 			$this->max_ip_count = $ip_count;
@@ -239,7 +239,7 @@ class CIPRangeParser {
 			return false;
 		}
 
-		$ip_count = bcpow(2, 128 - $parts[1]);
+		$ip_count = bcpow(2, 128 - $parts[1], 0);
 
 		if (bccomp($this->max_ip_count, $ip_count) < 0) {
 			$this->max_ip_count = $ip_count;
@@ -279,7 +279,7 @@ class CIPRangeParser {
 					return false;
 				}
 
-				$ip_count = bcmul($ip_count, $matches[2] - $matches[1] + 1);
+				$ip_count = bcmul($ip_count, $matches[2] - $matches[1] + 1, 0);
 				$ip_parts[] = $matches[2];
 			}
 			else {
@@ -325,7 +325,7 @@ class CIPRangeParser {
 					return false;
 				}
 
-				$ip_count = bcmul($ip_count, $to - $from + 1);
+				$ip_count = bcmul($ip_count, $to - $from + 1, 0);
 				$ip_parts[] = $matches[1];
 			}
 			else {

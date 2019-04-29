@@ -648,54 +648,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Incorrect value "test" for "status_codes" field.'
 					]
 				]
-			],
-			// Check HTTP authentication required fields
-			[
-				[
-					'fields' => [
-						'Name' => 'Basic authentication',
-						'Key' => 'item-basic-authentication',
-						'URL' => 'zabbix.com',
-						'HTTP authentication' => 'Basic'
-					],
-					'error' => 'Page received incorrect data',
-					'error_details' => [
-						'Incorrect value for field "Username": cannot be empty.',
-						'Incorrect value for field "Password": cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'NTLM authentication',
-						'Key' => 'item-ntlm-authentication',
-						'URL' => 'zabbix.com',
-						'HTTP authentication' => 'NTLM'
-					],
-					'error' => 'Page received incorrect data',
-					'error_details' => [
-						'Incorrect value for field "Username": cannot be empty.',
-						'Incorrect value for field "Password": cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'NTLM authentication with space in input',
-						'Key' => 'item-space-authentication',
-						'URL' => 'zabbix.com',
-						'HTTP authentication' => 'NTLM',
-						'User name' => ' ',
-						'Password' => ' '
-					],
-					'error' => 'Page received incorrect data',
-					'error_details' => [
-						'Incorrect value for field "Username": cannot be empty.',
-						'Incorrect value for field "Password": cannot be empty.'
-					]
-				]
 			]
 		];
 	}
@@ -840,31 +792,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Incorrect value "test" for "status_codes" field.'
 					]
 				]
-			],
-			// Check HTTP authentication required fields.
-			[
-				[
-					'fields' => [
-						'HTTP authentication' => 'Basic'
-					],
-					'error' => 'Page received incorrect data',
-					'error_details' => [
-						'Incorrect value for field "Username": cannot be empty.',
-						'Incorrect value for field "Password": cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'HTTP authentication' => 'NTLM'
-					],
-					'error' => 'Page received incorrect data',
-					'error_details' => [
-						'Incorrect value for field "Username": cannot be empty.',
-						'Incorrect value for field "Password": cannot be empty.'
-					]
-				]
 			]
 		];
 	}
@@ -999,6 +926,30 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'JSON data',
 					'check_form' => true
 				]
+			],
+			// Empty Basic authentication user/password
+			[
+				[
+					'fields' => [
+						'Name' => 'Empty Basic User/Password',
+						'Key' => 'basic.empty.user.pass',
+						'URL' => 'zabbix.com',
+						'HTTP authentication' => 'Basic',
+					],
+					'check_form' => true
+				]
+			],
+			// Empty NTLM authentication user/password
+			[
+				[
+					'fields' => [
+						'Name' => 'Empty NTLM User/Password',
+						'Key' => 'ntlm.empty.user.pass',
+						'URL' => 'zabbix.com',
+						'HTTP authentication' => 'NTLM',
+					],
+					'check_form' => true
+				]
 			]
 		];
 	}
@@ -1125,6 +1076,24 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Request body' => '<data><macro>{$MACRO}</macro><![CDATA[{$MACRO}<foo></bar>]]></data>'
 					],
 					'request_type' => 'XML data',
+					'check_form' => true
+				]
+			],
+			// Empty Basic authentication user/password
+			[
+				[
+					'fields' => [
+						'HTTP authentication' => 'Basic',
+					],
+					'check_form' => true
+				]
+			],
+			// Empty NTLM authentication user/password
+			[
+				[
+					'fields' => [
+						'HTTP authentication' => 'NTLM',
+					],
 					'check_form' => true
 				]
 			],

@@ -89,7 +89,7 @@ if (hasRequest('action')) {
 		));
 
 		if (count($slideshows) != count(getRequest('shows'))) {
-			uncheckTableRows(null, array_column($slideshows, 'slideshowid', 'slideshowid'));
+			uncheckTableRows(null, zbx_objectValues($slideshows, 'slideshowid'));
 		}
 	}
 }
