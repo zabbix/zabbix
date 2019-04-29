@@ -73,6 +73,8 @@
 				<trycatch>
 					<try>
 						<exec executable="scan-build" failonerror="on">
+							<arg line="-analyzer-config"/>
+							<arg line="stable-report-filename=true"/>
 							<arg line="-o"/>
 							<arg line="./clang-scan-build-reports"/>
 							<arg line="make"/>
