@@ -981,7 +981,9 @@
 		}
 		else {
 			var pairs = [];
-			eachPair.call(this.pairs.post_fields, pairs.push.bind(pairs));
+			eachPair.call(this.pairs.post_fields, function(pair) {
+				pairs.push(pair);
+			});
 			this.$textarea_raw_post.val(this.parsePostPairsToRaw(pairs));
 		}
 
