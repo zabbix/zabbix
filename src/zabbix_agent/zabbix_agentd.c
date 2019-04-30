@@ -275,6 +275,7 @@ void	zbx_co_uninitialize();
 #endif
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
+void	zbx_free_service_resources(void);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
 {
@@ -1108,7 +1109,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
  * Purpose: free service resources allocated by main thread                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_free_service_resources(void);
 void	zbx_free_service_resources(void)
 {
 	if (NULL != threads)
