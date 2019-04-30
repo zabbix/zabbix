@@ -92,7 +92,7 @@
 		</for>
 
 		<!-- remove content of report files related to Duktape -->
-		<fileset id="filesref" dir="." includes="clang-scan-build-reports/report-??????.html">
+		<fileset id="filesref" dir="." includes="clang-scan-build-reports/**/report-??????.html">
 			<containsregexp expression="^.title.duktape.c..title.$"/>
 		</fileset>
 		<property name="files" refid="filesref"/>
