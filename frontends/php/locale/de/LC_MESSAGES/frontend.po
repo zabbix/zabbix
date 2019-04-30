@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-14 01:47+0300\n"
+"POT-Creation-Date: 2019-04-16 17:26+0300\n"
 "PO-Revision-Date: 2018-01-01 00:41+0300\n"
 "Last-Translator: Daniel <mail@dlaube.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -333,7 +333,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:239
 #: include/views/configuration.item.prototype.edit.php:502
 #: include/views/configuration.item.prototype.massupdate.php:235
-#: include/views/js/configuration.discovery.edit.js.php:137
+#: include/views/js/configuration.discovery.edit.js.php:134
 msgid "AES"
 msgstr "AES"
 
@@ -689,8 +689,8 @@ msgstr "Aktiv bis"
 #: include/views/js/configuration.action.edit.js.php:268
 #: include/views/js/configuration.action.edit.js.php:654
 #: include/views/js/configuration.correlation.edit.js.php:47
-#: include/views/js/configuration.discovery.edit.js.php:150
-#: include/views/js/configuration.discovery.edit.js.php:752
+#: include/views/js/configuration.discovery.edit.js.php:147
+#: include/views/js/configuration.discovery.edit.js.php:749
 #: include/views/js/monitoring.screen.edit.js.php:83
 #: include/views/js/monitoring.slideconf.edit.js.php:99
 #: include/views/js/monitoring.sysmap.edit.js.php:101
@@ -1007,7 +1007,7 @@ msgstr "Beliebige Zeichenfolge enthalten"
 msgid "Application"
 msgstr "Kategorie"
 
-#: httpconf.php:321 include/classes/api/services/CApplication.php:266
+#: httpconf.php:311 include/classes/api/services/CApplication.php:266
 #, c-format
 msgid "Application \"%1$s\" already exists."
 msgstr "Kategorie \"%1$s\" existiert bereits."
@@ -1290,7 +1290,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:226
 #: include/views/configuration.item.prototype.edit.php:494
 #: include/views/configuration.item.prototype.massupdate.php:222
-#: include/views/js/configuration.discovery.edit.js.php:127
+#: include/views/js/configuration.discovery.edit.js.php:124
 msgid "Authentication passphrase"
 msgstr "Passwort zur Authentifizierung"
 
@@ -1299,7 +1299,7 @@ msgstr "Passwort zur Authentifizierung"
 #: include/views/configuration.item.massupdate.php:214
 #: include/views/configuration.item.prototype.edit.php:487
 #: include/views/configuration.item.prototype.massupdate.php:210
-#: include/views/js/configuration.discovery.edit.js.php:119
+#: include/views/js/configuration.discovery.edit.js.php:116
 msgid "Authentication protocol"
 msgstr "Authenthifizierungsprotokoll"
 
@@ -1583,10 +1583,10 @@ msgstr "Kanada (136 Zeichen)"
 #: include/views/js/administration.general.trigger.options.js.php:21
 #: include/views/js/administration.general.triggerSeverity.js.php:13
 #: include/views/js/configuration.action.edit.js.php:76
-#: include/views/js/configuration.discovery.edit.js.php:151
-#: include/views/js/configuration.discovery.edit.js.php:611
-#: include/views/js/configuration.discovery.edit.js.php:682
-#: include/views/js/configuration.discovery.edit.js.php:712
+#: include/views/js/configuration.discovery.edit.js.php:148
+#: include/views/js/configuration.discovery.edit.js.php:608
+#: include/views/js/configuration.discovery.edit.js.php:679
+#: include/views/js/configuration.discovery.edit.js.php:709
 #: include/views/js/conf.import.js.php:16
 #: include/views/monitoring.slideconf.edit.php:277 jsLoader.php:112
 #: jsLoader.php:123 jsLoader.php:220 jsLoader.php:294 jsLoader.php:306
@@ -1720,7 +1720,7 @@ msgstr "Diagrammprototyp \"%1$s\" darf nicht mehr als einen Datenpunkt vom Typ \
 msgid "Cannot add network map"
 msgstr "Kann Netzwerkkarte nicht hinzufügen"
 
-#: httpconf.php:336
+#: httpconf.php:326
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
 msgstr "Kann die neue Kategorie \"%1$s\" nicht hinzufügen."
@@ -1763,7 +1763,7 @@ msgstr "Kann Vorlage nicht hinzufügen"
 msgid "Cannot add trigger"
 msgstr "Kann Auslöser nicht hinzufügen"
 
-#: trigger_prototypes.php:252
+#: trigger_prototypes.php:243
 msgid "Cannot add trigger prototype"
 msgstr "Kann Auslöserprototyp nicht hinzufügen"
 
@@ -1779,7 +1779,7 @@ msgstr "Kann Benutzer nicht hinzufügen. Passwörter müssen übereinstimmen."
 msgid "Cannot add value map"
 msgstr "Kann Wertezuordnung nicht hinzufügen"
 
-#: httpconf.php:215
+#: httpconf.php:205
 msgid "Cannot add web scenario"
 msgstr "Kann Web-Szenario nicht hinzufügen"
 
@@ -1801,7 +1801,7 @@ msgid "Cannot call method \"%1$s.%2$s\" without parameters."
 msgstr "Kann Methode \"%1$s.%2$s\"  nicht ohne Parameter aufrufen."
 
 # Das heißt sonst nirgends "Verlauf", oder?
-#: httpconf.php:206 httpconf.php:512 items.php:980 items.php:1389
+#: httpconf.php:196 httpconf.php:502 items.php:980 items.php:1389
 msgid "Cannot clear history"
 msgstr "Kann Verlauf nicht leeren"
 
@@ -1893,7 +1893,7 @@ msgstr "Kann Suchlauf nicht erstellen"
 msgid "Cannot create icon map"
 msgstr "Kann Symbolzuordnung nicht erstellen"
 
-#: httpconf.php:224
+#: httpconf.php:214
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Kann keine neue Kategorie anlegen. Web-Szenario ist schon einer Kategorie zugewiesen."
 
@@ -2137,11 +2137,11 @@ msgstr "Kann vorlagenbasiertes Web-Szenario \"%1$s\" nicht löschen."
 msgid "Cannot delete trigger"
 msgstr "Kann Auslöser nicht löschen"
 
-#: trigger_prototypes.php:360
+#: trigger_prototypes.php:351
 msgid "Cannot delete trigger prototype"
 msgstr "Kann Auslöserprototyp nicht löschen"
 
-#: trigger_prototypes.php:510
+#: trigger_prototypes.php:501
 msgid "Cannot delete trigger prototypes"
 msgstr "Kann Auslöserprototypen nicht löschen"
 
@@ -2159,7 +2159,7 @@ msgid_plural "Cannot delete value maps"
 msgstr[0] "Kann Wertezuordnung nicht löschen"
 msgstr[1] "Kann Wertezuordnung nicht löschen"
 
-#: httpconf.php:166 httpconf.php:521
+#: httpconf.php:156 httpconf.php:511
 msgid "Cannot delete web scenario"
 msgstr "Kann Web-Szenario nicht löschen"
 
@@ -2212,7 +2212,7 @@ msgid_plural "Cannot disable user groups"
 msgstr[0] "Kann Nutzergruppe nicht deaktivieren"
 msgstr[1] "Kann Nutzergruppen nicht deaktivieren"
 
-#: httpconf.php:465
+#: httpconf.php:455
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Kann Web-Szenario nicht deaktivieren"
@@ -2275,7 +2275,7 @@ msgid_plural "Cannot enable user groups"
 msgstr[0] "Kann Nutzergruppe nicht aktivieren"
 msgstr[1] "Kann Nutzergruppen nicht aktivieren"
 
-#: httpconf.php:464
+#: httpconf.php:454
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Kann Webszenario nicht aktivieren"
@@ -2944,7 +2944,7 @@ msgstr "Kann Auslöser nicht ändern"
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "Kann Auslöser nicht aktualisieren \"%1$s\":%2$s."
 
-#: trigger_prototypes.php:345 trigger_prototypes.php:500
+#: trigger_prototypes.php:336 trigger_prototypes.php:491
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "Kann Auslöser-Prototyp nicht aktualisieren"
@@ -2955,7 +2955,7 @@ msgstr[1] "Kann Auslöser-Prototypen nicht aktualisieren"
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr "Kann Auslöser Prototyp nicht aktualisieren \"%1$s\": %2$s."
 
-#: trigger_prototypes.php:464
+#: trigger_prototypes.php:455
 msgid "Cannot update trigger prototypes"
 msgstr "Kann Auslöser Prototypen nicht aktualisieren"
 
@@ -2972,11 +2972,11 @@ msgstr "Kann Benutzer nicht ändern. Die angegebenen Kennwörter stimmen nicht �
 msgid "Cannot update value map"
 msgstr "Kann Wertezuordnung nicht ändern"
 
-#: httpconf.php:211
+#: httpconf.php:201
 msgid "Cannot update web scenario"
 msgstr "Kann Web-Szenario nicht ändern"
 
-#: include/views/js/configuration.discovery.edit.js.php:678
+#: include/views/js/configuration.discovery.edit.js.php:675
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr "Kann Suchlaufprüfung nicht validieren: ungültige Anfrage oder Verbindung zum Zabbix-Server fehlgeschlagen."
 
@@ -3071,7 +3071,7 @@ msgstr "Gehäuse"
 msgid "Chassis information. Returns string"
 msgstr "Gehäuse Information. Liefert Zeichefolge"
 
-#: include/views/js/configuration.discovery.edit.js.php:608
+#: include/views/js/configuration.discovery.edit.js.php:605
 msgid "Check already exists."
 msgstr "Prüfung existiert bereits."
 
@@ -3110,7 +3110,7 @@ msgstr "Voraussetzungen werden geprüft"
 msgid "Check the key, please. Default example was passed."
 msgstr "Bitte überprüfen Sie den Schlüssel. Standard-Beispiel wurde absolviert."
 
-#: include/views/js/configuration.discovery.edit.js.php:60
+#: include/views/js/configuration.discovery.edit.js.php:61
 msgid "Check type"
 msgstr "Typ prüfen"
 
@@ -3776,7 +3776,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:189
 #: include/views/configuration.item.prototype.edit.php:462
 #: include/views/configuration.item.prototype.massupdate.php:185
-#: include/views/js/configuration.discovery.edit.js.php:96
+#: include/views/js/configuration.discovery.edit.js.php:94
 msgid "Context name"
 msgstr "Kontext Name"
 
@@ -4167,7 +4167,7 @@ msgstr "TT.MM.JJ"
 #: include/views/configuration.item.massupdate.php:238
 #: include/views/configuration.item.prototype.edit.php:501
 #: include/views/configuration.item.prototype.massupdate.php:234
-#: include/views/js/configuration.discovery.edit.js.php:136
+#: include/views/js/configuration.discovery.edit.js.php:133
 msgid "DES"
 msgstr "DES (Verschlüsselungsalgorithmus)"
 
@@ -4355,7 +4355,7 @@ msgstr "HW-Anschaffungsdatum"
 msgid "Day"
 msgstr "Tag"
 
-#: include/func.inc.php:2668
+#: include/func.inc.php:2671
 msgid "Day before yesterday"
 msgstr ""
 
@@ -5088,9 +5088,9 @@ msgstr "Suchlauf durch Proxy"
 msgid "Discovery check"
 msgstr "Suchlaufprüfung"
 
-#: include/views/js/configuration.discovery.edit.js.php:607
-#: include/views/js/configuration.discovery.edit.js.php:676
-#: include/views/js/configuration.discovery.edit.js.php:708
+#: include/views/js/configuration.discovery.edit.js.php:604
+#: include/views/js/configuration.discovery.edit.js.php:673
+#: include/views/js/configuration.discovery.edit.js.php:705
 msgid "Discovery check error"
 msgstr "Fehler bei Suchlaufprüfung"
 
@@ -6061,7 +6061,7 @@ msgid "FALSE"
 msgstr "FALSCH"
 
 #: include/discovery.inc.php:50
-#: include/views/js/configuration.discovery.edit.js.php:207
+#: include/views/js/configuration.discovery.edit.js.php:204
 msgid "FTP"
 msgstr "FTP"
 
@@ -6842,7 +6842,7 @@ msgid "HTML"
 msgstr ""
 
 #: include/discovery.inc.php:51
-#: include/views/js/configuration.discovery.edit.js.php:208
+#: include/views/js/configuration.discovery.edit.js.php:205
 msgid "HTTP"
 msgstr "HTTP"
 
@@ -6874,7 +6874,7 @@ msgid "HTTP settings"
 msgstr ""
 
 #: include/discovery.inc.php:62
-#: include/views/js/configuration.discovery.edit.js.php:209
+#: include/views/js/configuration.discovery.edit.js.php:206
 msgid "HTTPS"
 msgstr "HTTPS"
 
@@ -6986,7 +6986,7 @@ msgstr ""
 msgid "History"
 msgstr "Verlauf"
 
-#: httpconf.php:199 httpconf.php:206 httpconf.php:500 httpconf.php:512
+#: httpconf.php:189 httpconf.php:196 httpconf.php:490 httpconf.php:502
 #: items.php:973 items.php:980 items.php:1377 items.php:1389
 msgid "History cleared"
 msgstr "Verlauf geleert"
@@ -7034,8 +7034,8 @@ msgstr "Horizontale Ausrichtung"
 #: app/views/monitoring.web.view.php:41
 #: app/views/monitoring.widget.problems.view.php:54
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
-#: app/views/popup.generic.php:137 app/views/search.php:26 httpconf.php:199
-#: httpconf.php:500 include/actions.inc.php:50 include/audit.inc.php:27
+#: app/views/popup.generic.php:137 app/views/search.php:26 httpconf.php:189
+#: httpconf.php:490 include/actions.inc.php:50 include/audit.inc.php:27
 #: include/blocks.inc.php:547 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
@@ -7117,7 +7117,7 @@ msgstr "Zugriffstyp"
 msgid "Host added"
 msgstr "Hosts hinzugefügt"
 
-#: include/classes/api/services/CHostInterface.php:831
+#: include/classes/api/services/CHostInterface.php:819
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "Host kann nicht mehr als eine Standardschnittstelle gleichen Typs haben."
 
@@ -7437,7 +7437,7 @@ msgid "Hungarian (hu_HU)"
 msgstr "Ungarisch (hu_HU)"
 
 #: include/discovery.inc.php:60
-#: include/views/js/configuration.discovery.edit.js.php:210
+#: include/views/js/configuration.discovery.edit.js.php:207
 msgid "ICMP ping"
 msgstr "ICMP-Ping"
 
@@ -7446,7 +7446,7 @@ msgid "ID"
 msgstr "ID"
 
 #: include/discovery.inc.php:54
-#: include/views/js/configuration.discovery.edit.js.php:211
+#: include/views/js/configuration.discovery.edit.js.php:208
 msgid "IMAP"
 msgstr "IMAP"
 
@@ -7824,12 +7824,12 @@ msgid "Incorrect API \"%1$s\"."
 msgstr "Falsche API \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:571
-#: include/views/js/configuration.discovery.edit.js.php:645
+#: include/views/js/configuration.discovery.edit.js.php:642
 msgid "Incorrect SNMP OID."
 msgstr "Falsche SNMP-OID."
 
 #: include/classes/api/services/CDRule.php:565
-#: include/views/js/configuration.discovery.edit.js.php:641
+#: include/views/js/configuration.discovery.edit.js.php:638
 msgid "Incorrect SNMP community."
 msgstr "Falsche SNMP-Community."
 
@@ -8916,7 +8916,7 @@ msgstr "Installiert von"
 msgid "Interface"
 msgstr "Schnittstelle"
 
-#: include/classes/api/services/CHostInterface.php:851
+#: include/classes/api/services/CHostInterface.php:839
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Schnittstelle ist verknüpft mit Datenpunkt \"%1$s\" auf \"%2$s\"."
@@ -9727,7 +9727,7 @@ msgstr ""
 #: include/views/configuration.item.list.php:63
 #: include/views/configuration.item.prototype.edit.php:92
 #: include/views/configuration.item.prototype.list.php:53
-#: include/views/js/configuration.discovery.edit.js.php:80 items.php:50
+#: include/views/js/configuration.discovery.edit.js.php:79 items.php:50
 msgid "Key"
 msgstr "Schlüssel"
 
@@ -9757,7 +9757,7 @@ msgstr "Koreanisch (ko_KR)"
 
 #: app/views/administration.authentication.edit.php:30
 #: include/discovery.inc.php:48 include/users.inc.php:85
-#: include/views/js/configuration.discovery.edit.js.php:213
+#: include/views/js/configuration.discovery.edit.js.php:210
 msgid "LDAP"
 msgstr "LDAP"
 
@@ -9815,42 +9815,42 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Letzte"
 
-#: include/func.inc.php:2721
+#: include/func.inc.php:2724
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2715
+#: include/func.inc.php:2718
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2708
+#: include/func.inc.php:2711
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2724
+#: include/func.inc.php:2727
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2701
+#: include/func.inc.php:2704
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2727
+#: include/func.inc.php:2730
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -10214,7 +10214,7 @@ msgstr "MD2"
 #: include/views/configuration.item.massupdate.php:218
 #: include/views/configuration.item.prototype.edit.php:489
 #: include/views/configuration.item.prototype.massupdate.php:214
-#: include/views/js/configuration.discovery.edit.js.php:121
+#: include/views/js/configuration.discovery.edit.js.php:118
 msgid "MD5"
 msgstr "MD5"
 
@@ -10908,7 +10908,7 @@ msgid "Mute"
 msgstr "Stumm"
 
 #: include/discovery.inc.php:53
-#: include/views/js/configuration.discovery.edit.js.php:214
+#: include/views/js/configuration.discovery.edit.js.php:211
 msgid "NNTP"
 msgstr "NNTP"
 
@@ -11366,7 +11366,7 @@ msgstr "Keine Daten gefunden."
 msgid "No data."
 msgstr "Keine Daten."
 
-#: include/classes/api/services/CHostInterface.php:827
+#: include/classes/api/services/CHostInterface.php:815
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Keine Standardschnittstelle für Typ \"%1$s\" bei \"%2$s\"."
@@ -11548,8 +11548,8 @@ msgstr "Keine Berechtigung zum Zugriff auf die Oberfläche."
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
 #: app/controllers/CControllerWidgetMapView.php:68
 #: app/controllers/CControllerWidgetPlainTextView.php:78
-#: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:1236
-#: disc_prototypes.php:1463 host_discovery.php:664
+#: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:1237
+#: disc_prototypes.php:1464 host_discovery.php:664
 #: include/classes/api/services/CAction.php:1615
 #: include/classes/api/services/CAction.php:1992
 #: include/classes/api/services/CAction.php:2969
@@ -12683,7 +12683,7 @@ msgid "PHP xmlwriter extension missing."
 msgstr ""
 
 #: include/discovery.inc.php:52
-#: include/views/js/configuration.discovery.edit.js.php:215
+#: include/views/js/configuration.discovery.edit.js.php:212
 msgid "POP"
 msgstr "POP"
 
@@ -13032,7 +13032,7 @@ msgstr "Port"
 msgid "Port cannot be empty for host interface."
 msgstr "Port einer Hostschnittstelle darf nicht leer sein."
 
-#: include/views/js/configuration.discovery.edit.js.php:64
+#: include/views/js/configuration.discovery.edit.js.php:65
 msgid "Port range"
 msgstr "Port-Bereich"
 
@@ -13094,7 +13094,7 @@ msgstr ""
 msgid "Preview"
 msgstr "Vorschau"
 
-#: include/func.inc.php:2671
+#: include/func.inc.php:2674
 msgid "Previous month"
 msgstr ""
 
@@ -13102,11 +13102,11 @@ msgstr ""
 msgid "Previous value"
 msgstr ""
 
-#: include/func.inc.php:2670
+#: include/func.inc.php:2673
 msgid "Previous week"
 msgstr ""
 
-#: include/func.inc.php:2672
+#: include/func.inc.php:2675
 msgid "Previous year"
 msgstr ""
 
@@ -13143,7 +13143,7 @@ msgstr "Anzeigename für Primärkontakt"
 #: include/views/configuration.item.massupdate.php:247
 #: include/views/configuration.item.prototype.edit.php:506
 #: include/views/configuration.item.prototype.massupdate.php:242
-#: include/views/js/configuration.discovery.edit.js.php:142
+#: include/views/js/configuration.discovery.edit.js.php:139
 msgid "Privacy passphrase"
 msgstr ""
 
@@ -13152,7 +13152,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:234
 #: include/views/configuration.item.prototype.edit.php:499
 #: include/views/configuration.item.prototype.massupdate.php:230
-#: include/views/js/configuration.discovery.edit.js.php:134
+#: include/views/js/configuration.discovery.edit.js.php:131
 msgid "Privacy protocol"
 msgstr ""
 
@@ -14144,7 +14144,7 @@ msgstr "So"
 #: include/views/configuration.item.massupdate.php:219
 #: include/views/configuration.item.prototype.edit.php:490
 #: include/views/configuration.item.prototype.massupdate.php:215
-#: include/views/js/configuration.discovery.edit.js.php:122
+#: include/views/js/configuration.discovery.edit.js.php:119
 msgid "SHA"
 msgstr "SHA"
 
@@ -14159,7 +14159,7 @@ msgid "SMS"
 msgstr "SMS"
 
 #: include/discovery.inc.php:49
-#: include/views/js/configuration.discovery.edit.js.php:219
+#: include/views/js/configuration.discovery.edit.js.php:216
 msgid "SMTP"
 msgstr "SMTP"
 
@@ -14190,7 +14190,7 @@ msgstr "SNMP"
 #: include/views/configuration.host.discovery.edit.php:411
 #: include/views/configuration.item.edit.php:473
 #: include/views/configuration.item.prototype.edit.php:455
-#: include/views/js/configuration.discovery.edit.js.php:88 items.php:127
+#: include/views/js/configuration.discovery.edit.js.php:86 items.php:127
 msgid "SNMP OID"
 msgstr "SNMP-OID"
 
@@ -14220,17 +14220,17 @@ msgid "SNMP trap key is invalid."
 msgstr "Schlüssel für SNMP-Trap ist unzulässig."
 
 #: include/discovery.inc.php:57 include/items.inc.php:89
-#: include/views/js/configuration.discovery.edit.js.php:216
+#: include/views/js/configuration.discovery.edit.js.php:213
 msgid "SNMPv1 agent"
 msgstr "SNMPv1-Agent"
 
 #: include/discovery.inc.php:58 include/items.inc.php:90
-#: include/views/js/configuration.discovery.edit.js.php:217
+#: include/views/js/configuration.discovery.edit.js.php:214
 msgid "SNMPv2 agent"
 msgstr "SNMPv2-Agent"
 
 #: include/discovery.inc.php:59 include/items.inc.php:91
-#: include/views/js/configuration.discovery.edit.js.php:218
+#: include/views/js/configuration.discovery.edit.js.php:215
 msgid "SNMPv3 agent"
 msgstr "SNMPv3-Agent"
 
@@ -14261,7 +14261,7 @@ msgstr "Fehler beim Ausführen der SQL-Anweisung \"%1$s\"."
 #: include/views/configuration.action.edit.php:922
 #: include/views/configuration.action.edit.php:1682
 #: include/views/configuration.action.edit.php:2158
-#: include/views/js/configuration.discovery.edit.js.php:220
+#: include/views/js/configuration.discovery.edit.js.php:217
 msgid "SSH"
 msgstr "SSH"
 
@@ -14576,7 +14576,7 @@ msgstr "Sekunden"
 #: include/views/configuration.item.massupdate.php:203
 #: include/views/configuration.item.prototype.edit.php:479
 #: include/views/configuration.item.prototype.massupdate.php:199
-#: include/views/js/configuration.discovery.edit.js.php:110
+#: include/views/js/configuration.discovery.edit.js.php:107
 msgid "Security level"
 msgstr "Sicherheitsstufe"
 
@@ -14586,7 +14586,7 @@ msgstr "Sicherheitsstufe"
 #: include/views/configuration.item.massupdate.php:196
 #: include/views/configuration.item.prototype.edit.php:473
 #: include/views/configuration.item.prototype.massupdate.php:192
-#: include/views/js/configuration.discovery.edit.js.php:103
+#: include/views/js/configuration.discovery.edit.js.php:100
 msgid "Security name"
 msgstr ""
 
@@ -15669,7 +15669,7 @@ msgid "T"
 msgstr "Di"
 
 #: include/discovery.inc.php:55
-#: include/views/js/configuration.discovery.edit.js.php:212
+#: include/views/js/configuration.discovery.edit.js.php:209
 msgid "TCP"
 msgstr "TCP"
 
@@ -15790,7 +15790,7 @@ msgstr "Zieltyp"
 #: include/views/configuration.action.edit.php:923
 #: include/views/configuration.action.edit.php:1683
 #: include/views/configuration.action.edit.php:2159
-#: include/views/js/configuration.discovery.edit.js.php:221
+#: include/views/js/configuration.discovery.edit.js.php:218
 msgid "Telnet"
 msgstr "Telnet"
 
@@ -16085,7 +16085,7 @@ msgstr "Die Web-Szenario Anwendung, gehört zu einem anderen Host, als den Web-S
 msgid "Theme"
 msgstr "Thema"
 
-#: include/func.inc.php:2669
+#: include/func.inc.php:2672
 msgid "This day last week"
 msgstr ""
 
@@ -16098,11 +16098,11 @@ msgstr "Dieses Feld wird automatisch befüllt aus dem Datenpunkt \"%s\"."
 msgid "This is the test message from Zabbix"
 msgstr ""
 
-#: include/func.inc.php:2677 srv_status.php:41
+#: include/func.inc.php:2680 srv_status.php:41
 msgid "This month"
 msgstr "Diesen Monat"
 
-#: include/func.inc.php:2678
+#: include/func.inc.php:2681
 msgid "This month so far"
 msgstr ""
 
@@ -16114,19 +16114,19 @@ msgstr "Diese Tafelspalte ist nicht leer. Löschen?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "Diese Tafelzeile ist nicht leer. Löschen?"
 
-#: include/func.inc.php:2675 srv_status.php:40
+#: include/func.inc.php:2678 srv_status.php:40
 msgid "This week"
 msgstr "Diese Woche"
 
-#: include/func.inc.php:2676
+#: include/func.inc.php:2679
 msgid "This week so far"
 msgstr ""
 
-#: include/func.inc.php:2679 srv_status.php:42
+#: include/func.inc.php:2682 srv_status.php:42
 msgid "This year"
 msgstr "Dieses Jahr"
 
-#: include/func.inc.php:2680
+#: include/func.inc.php:2683
 msgid "This year so far"
 msgstr ""
 
@@ -16251,12 +16251,12 @@ msgstr "Bis"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Zur Festlegung der Hostschnittstelle wählen Sie nur Datenpunkt eines Typs"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2673
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2676
 #: srv_status.php:39
 msgid "Today"
 msgstr "Heute"
 
-#: include/func.inc.php:2674
+#: include/func.inc.php:2677
 msgid "Today so far"
 msgstr ""
 
@@ -16511,7 +16511,7 @@ msgstr ""
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr ""
 
-#: trigger_prototypes.php:252
+#: trigger_prototypes.php:243
 msgid "Trigger prototype added"
 msgstr ""
 
@@ -16519,11 +16519,11 @@ msgstr ""
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
-#: trigger_prototypes.php:360
+#: trigger_prototypes.php:351
 msgid "Trigger prototype deleted"
 msgstr ""
 
-#: trigger_prototypes.php:345 trigger_prototypes.php:499
+#: trigger_prototypes.php:336 trigger_prototypes.php:490
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] "Auslöser-Prototyp aktualisiert"
@@ -16539,11 +16539,11 @@ msgstr[1] "Auslöser-Prototypen aktualisiert"
 msgid "Trigger prototypes"
 msgstr "Auslöser-Prototypen"
 
-#: trigger_prototypes.php:510
+#: trigger_prototypes.php:501
 msgid "Trigger prototypes deleted"
 msgstr ""
 
-#: trigger_prototypes.php:464
+#: trigger_prototypes.php:455
 msgid "Trigger prototypes updated"
 msgstr ""
 
@@ -16886,7 +16886,7 @@ msgstr "Einheit"
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.triggers.list.php:71
-#: include/views/js/configuration.discovery.edit.js.php:230
+#: include/views/js/configuration.discovery.edit.js.php:227
 msgid "Unknown"
 msgstr "Unbekannt"
 
@@ -17082,7 +17082,7 @@ msgstr "Erreichbar"
 #: include/views/configuration.trigger.prototype.massupdate.php:189
 #: include/views/configuration.triggers.edit.php:616
 #: include/views/configuration.triggers.massupdate.php:169
-#: include/views/js/configuration.discovery.edit.js.php:423
+#: include/views/js/configuration.discovery.edit.js.php:420
 #: include/views/monitoring.screen.constructor.edit.php:934
 #: include/views/monitoring.screen.edit.php:220
 #: include/views/monitoring.slideconf.edit.php:273
@@ -17908,7 +17908,7 @@ msgstr "Web"
 msgid "Web monitoring"
 msgstr "Web-Überwachung"
 
-#: httpconf.php:198 httpconf.php:499 include/audit.inc.php:45
+#: httpconf.php:188 httpconf.php:489 include/audit.inc.php:45
 msgid "Web scenario"
 msgstr ""
 
@@ -17928,27 +17928,27 @@ msgstr ""
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr ""
 
-#: httpconf.php:214
+#: httpconf.php:204
 msgid "Web scenario added"
 msgstr "Web-Szenario hinzugefügt"
 
-#: httpconf.php:166 httpconf.php:521
+#: httpconf.php:156 httpconf.php:511
 msgid "Web scenario deleted"
 msgstr "Web-Szenario gelöscht"
 
-#: httpconf.php:462
+#: httpconf.php:452
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Web-Szenario deaktiviert"
 msgstr[1] "Web-Szenarios deaktiviert"
 
-#: httpconf.php:461
+#: httpconf.php:451
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] "Web-Szenario aktiviert"
 msgstr[1] "Web-Szenarios aktiviert"
 
-#: httpconf.php:210
+#: httpconf.php:200
 msgid "Web scenario updated"
 msgstr "Web-Szenario aktualisiert"
 
@@ -18270,7 +18270,7 @@ msgstr "jährlich"
 msgid "Yes"
 msgstr "Ja"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2667
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2670
 msgid "Yesterday"
 msgstr "Gestern"
 
@@ -18385,7 +18385,7 @@ msgstr "Zabbix-Benutzer"
 #: include/views/configuration.action.edit.php:938
 #: include/views/configuration.action.edit.php:1716
 #: include/views/configuration.action.edit.php:2184
-#: include/views/js/configuration.discovery.edit.js.php:222
+#: include/views/js/configuration.discovery.edit.js.php:219
 msgid "Zabbix agent"
 msgstr "Zabbix-Agent"
 
@@ -19266,7 +19266,7 @@ msgstr "Name"
 msgid "new"
 msgstr "neu"
 
-#: disc_prototypes.php:1329 disc_prototypes.php:1353 hosts.php:1268
+#: disc_prototypes.php:1330 disc_prototypes.php:1354 hosts.php:1268
 #: include/views/configuration.item.massupdate.php:475 templates.php:813
 msgctxt "new element in multiselect"
 msgid "new"

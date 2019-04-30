@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-14 01:47+0300\n"
+"POT-Creation-Date: 2019-04-16 17:26+0300\n"
 "PO-Revision-Date: 2018-12-04 06:16+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -318,7 +318,7 @@ msgstr "오버라이드 추가"
 #: include/views/configuration.item.massupdate.php:239
 #: include/views/configuration.item.prototype.edit.php:502
 #: include/views/configuration.item.prototype.massupdate.php:235
-#: include/views/js/configuration.discovery.edit.js.php:137
+#: include/views/js/configuration.discovery.edit.js.php:134
 msgid "AES"
 msgstr "AES"
 
@@ -670,8 +670,8 @@ msgstr "종료시간"
 #: include/views/js/configuration.action.edit.js.php:268
 #: include/views/js/configuration.action.edit.js.php:654
 #: include/views/js/configuration.correlation.edit.js.php:47
-#: include/views/js/configuration.discovery.edit.js.php:150
-#: include/views/js/configuration.discovery.edit.js.php:752
+#: include/views/js/configuration.discovery.edit.js.php:147
+#: include/views/js/configuration.discovery.edit.js.php:749
 #: include/views/js/monitoring.screen.edit.js.php:83
 #: include/views/js/monitoring.slideconf.edit.js.php:99
 #: include/views/js/monitoring.sysmap.edit.js.php:101
@@ -988,7 +988,7 @@ msgstr "어떤 문자열이 포함됨"
 msgid "Application"
 msgstr "어플리케이션"
 
-#: httpconf.php:321 include/classes/api/services/CApplication.php:266
+#: httpconf.php:311 include/classes/api/services/CApplication.php:266
 #, c-format
 msgid "Application \"%1$s\" already exists."
 msgstr "어플리케이션 \"%1$s\"는 이미 존재합니다."
@@ -1268,7 +1268,7 @@ msgstr "인증 방식을 갱신하였습니다."
 #: include/views/configuration.item.massupdate.php:226
 #: include/views/configuration.item.prototype.edit.php:494
 #: include/views/configuration.item.prototype.massupdate.php:222
-#: include/views/js/configuration.discovery.edit.js.php:127
+#: include/views/js/configuration.discovery.edit.js.php:124
 msgid "Authentication passphrase"
 msgstr "인증 패스 프레이즈"
 
@@ -1277,7 +1277,7 @@ msgstr "인증 패스 프레이즈"
 #: include/views/configuration.item.massupdate.php:214
 #: include/views/configuration.item.prototype.edit.php:487
 #: include/views/configuration.item.prototype.massupdate.php:210
-#: include/views/js/configuration.discovery.edit.js.php:119
+#: include/views/js/configuration.discovery.edit.js.php:116
 msgid "Authentication protocol"
 msgstr "인증 프로토콜"
 
@@ -1559,10 +1559,10 @@ msgstr "캐나다 (136 글자 수)"
 #: include/views/js/administration.general.trigger.options.js.php:21
 #: include/views/js/administration.general.triggerSeverity.js.php:13
 #: include/views/js/configuration.action.edit.js.php:76
-#: include/views/js/configuration.discovery.edit.js.php:151
-#: include/views/js/configuration.discovery.edit.js.php:611
-#: include/views/js/configuration.discovery.edit.js.php:682
-#: include/views/js/configuration.discovery.edit.js.php:712
+#: include/views/js/configuration.discovery.edit.js.php:148
+#: include/views/js/configuration.discovery.edit.js.php:608
+#: include/views/js/configuration.discovery.edit.js.php:679
+#: include/views/js/configuration.discovery.edit.js.php:709
 #: include/views/js/conf.import.js.php:16
 #: include/views/monitoring.slideconf.edit.php:277 jsLoader.php:112
 #: jsLoader.php:123 jsLoader.php:220 jsLoader.php:294 jsLoader.php:306
@@ -1696,7 +1696,7 @@ msgstr "그래프 프로토타입 \"%1$s\"에 \"그래프 합계값\" 은 두 �
 msgid "Cannot add network map"
 msgstr "네트워크 맵을 추가할 수 없습니다"
 
-#: httpconf.php:336
+#: httpconf.php:326
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
 msgstr "새 어플리케이션 \"%1$s\"을 추가할 수 없습니다."
@@ -1739,7 +1739,7 @@ msgstr "템플릿을 추가할 수 없습니다"
 msgid "Cannot add trigger"
 msgstr "트리거를 추가할 수 없습니다"
 
-#: trigger_prototypes.php:252
+#: trigger_prototypes.php:243
 msgid "Cannot add trigger prototype"
 msgstr "트리거 프로토타입을 추가할 수 없습니다"
 
@@ -1755,7 +1755,7 @@ msgstr "사용자를 추가할 수 없습니다. 암호가 일치하지 않습�
 msgid "Cannot add value map"
 msgstr "값 매핑을 추가할 수 없습니다"
 
-#: httpconf.php:215
+#: httpconf.php:205
 msgid "Cannot add web scenario"
 msgstr "Web시나리오를 추가할 수 없습니다"
 
@@ -1776,7 +1776,7 @@ msgstr "LDAP서버에 바인드 할 수 없습니다."
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
 msgstr "파라미터 없이는 메소드 \"%1$s.%2$s\"를 불러올 수 없습니다."
 
-#: httpconf.php:206 httpconf.php:512 items.php:980 items.php:1389
+#: httpconf.php:196 httpconf.php:502 items.php:980 items.php:1389
 msgid "Cannot clear history"
 msgstr "히스토리를 정리할 수 없습니다"
 
@@ -1865,7 +1865,7 @@ msgstr "디스커버리 규칙을 작성할 수 없습니다"
 msgid "Cannot create icon map"
 msgstr "아이콘 맵을 작성할 수 없습니다"
 
-#: httpconf.php:224
+#: httpconf.php:214
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "신규 어플리케이션을 작성할 수 없습니다. Web시나리오가 어플리케이션에 할당되어 있습니다."
 
@@ -2100,11 +2100,11 @@ msgstr "템플릿의 Web시나리오 \"%1$s\"을 삭제할 수 없습니다."
 msgid "Cannot delete trigger"
 msgstr "트리거를 삭제할 수 없습니다"
 
-#: trigger_prototypes.php:360
+#: trigger_prototypes.php:351
 msgid "Cannot delete trigger prototype"
 msgstr "트리거 프로토타입을 삭제할 수 없습니다"
 
-#: trigger_prototypes.php:510
+#: trigger_prototypes.php:501
 msgid "Cannot delete trigger prototypes"
 msgstr "트리거의 프로토타입을 삭제할 수 없습니다"
 
@@ -2121,7 +2121,7 @@ msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "값 매핑을 삭제할 수 없습니다"
 
-#: httpconf.php:166 httpconf.php:521
+#: httpconf.php:156 httpconf.php:511
 msgid "Cannot delete web scenario"
 msgstr "Web시나리오를 삭제할 수 없습니다"
 
@@ -2166,7 +2166,7 @@ msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
 msgstr[0] "유저 그룹을 비활성화 할 수 없습니다"
 
-#: httpconf.php:465
+#: httpconf.php:455
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Web 시나리오를 비활성화 할 수 없습니다"
@@ -2220,7 +2220,7 @@ msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
 msgstr[0] "유저 그룹을 활성화 할 수 없습니다."
 
-#: httpconf.php:464
+#: httpconf.php:454
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Web 시나리오를 활성화 할 수 없습니다."
@@ -2883,7 +2883,7 @@ msgstr "트리거를 갱신할 수 없습니다"
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "트리거 \"%1$s\"을 갱신할 수 없습니다: %2$s"
 
-#: trigger_prototypes.php:345 trigger_prototypes.php:500
+#: trigger_prototypes.php:336 trigger_prototypes.php:491
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "트리거 프로토타입을 갱신할 수 없습니다"
@@ -2893,7 +2893,7 @@ msgstr[0] "트리거 프로토타입을 갱신할 수 없습니다"
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr "트리거 프로토타입 \"%1$s\"을 갱신할 수 없습니다: %2$s"
 
-#: trigger_prototypes.php:464
+#: trigger_prototypes.php:455
 msgid "Cannot update trigger prototypes"
 msgstr "트리거 프로토타입을 갱신할 수 없습니다"
 
@@ -2909,11 +2909,11 @@ msgstr "사용자를 갱신할 수 없습니다. 암호가 일치하지 않습�
 msgid "Cannot update value map"
 msgstr "값 매핑을 갱신할 수 없습니다"
 
-#: httpconf.php:211
+#: httpconf.php:201
 msgid "Cannot update web scenario"
 msgstr "Web시나리오를 갱신할 수 없습니다"
 
-#: include/views/js/configuration.discovery.edit.js.php:678
+#: include/views/js/configuration.discovery.edit.js.php:675
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr "디스커버리 체크를 검증할 수 없습니다：리퀘스트가 올바르지 않거나 Zabbix 서버에 접속할 수 없습니다."
 
@@ -3008,7 +3008,7 @@ msgstr "섀시"
 msgid "Chassis information. Returns string"
 msgstr "섀시 정보. string 값을 리턴."
 
-#: include/views/js/configuration.discovery.edit.js.php:608
+#: include/views/js/configuration.discovery.edit.js.php:605
 msgid "Check already exists."
 msgstr "이미 존재합니다"
 
@@ -3047,7 +3047,7 @@ msgstr "전제조건의 체크"
 msgid "Check the key, please. Default example was passed."
 msgstr "키를 확인해주십시오. 디폴트 예제는 이용되었습니다."
 
-#: include/views/js/configuration.discovery.edit.js.php:60
+#: include/views/js/configuration.discovery.edit.js.php:61
 msgid "Check type"
 msgstr "검사 타입"
 
@@ -3713,7 +3713,7 @@ msgstr "컨텐츠 메뉴"
 #: include/views/configuration.item.massupdate.php:189
 #: include/views/configuration.item.prototype.edit.php:462
 #: include/views/configuration.item.prototype.massupdate.php:185
-#: include/views/js/configuration.discovery.edit.js.php:96
+#: include/views/js/configuration.discovery.edit.js.php:94
 msgid "Context name"
 msgstr "컨텍스트 이름"
 
@@ -4099,7 +4099,7 @@ msgstr "DD.MM.YY"
 #: include/views/configuration.item.massupdate.php:238
 #: include/views/configuration.item.prototype.edit.php:501
 #: include/views/configuration.item.prototype.massupdate.php:234
-#: include/views/js/configuration.discovery.edit.js.php:136
+#: include/views/js/configuration.discovery.edit.js.php:133
 msgid "DES"
 msgstr "DES"
 
@@ -4285,7 +4285,7 @@ msgstr "하드웨어 구입일"
 msgid "Day"
 msgstr "일"
 
-#: include/func.inc.php:2668
+#: include/func.inc.php:2671
 msgid "Day before yesterday"
 msgstr "그저께"
 
@@ -5016,9 +5016,9 @@ msgstr "프록시에 의한 디스커버리"
 msgid "Discovery check"
 msgstr "디스커버리 체크"
 
-#: include/views/js/configuration.discovery.edit.js.php:607
-#: include/views/js/configuration.discovery.edit.js.php:676
-#: include/views/js/configuration.discovery.edit.js.php:708
+#: include/views/js/configuration.discovery.edit.js.php:604
+#: include/views/js/configuration.discovery.edit.js.php:673
+#: include/views/js/configuration.discovery.edit.js.php:705
 msgid "Discovery check error"
 msgstr "디스커버리 체크에러"
 
@@ -5983,7 +5983,7 @@ msgid "FALSE"
 msgstr "정상"
 
 #: include/discovery.inc.php:50
-#: include/views/js/configuration.discovery.edit.js.php:207
+#: include/views/js/configuration.discovery.edit.js.php:204
 msgid "FTP"
 msgstr "FTP"
 
@@ -6758,7 +6758,7 @@ msgid "HTML"
 msgstr ""
 
 #: include/discovery.inc.php:51
-#: include/views/js/configuration.discovery.edit.js.php:208
+#: include/views/js/configuration.discovery.edit.js.php:205
 msgid "HTTP"
 msgstr "HTTP"
 
@@ -6790,7 +6790,7 @@ msgid "HTTP settings"
 msgstr "HTTP인증의 설정"
 
 #: include/discovery.inc.php:62
-#: include/views/js/configuration.discovery.edit.js.php:209
+#: include/views/js/configuration.discovery.edit.js.php:206
 msgid "HTTPS"
 msgstr "HTTPS"
 
@@ -6901,7 +6901,7 @@ msgstr "행을 강조표시"
 msgid "History"
 msgstr "이력"
 
-#: httpconf.php:199 httpconf.php:206 httpconf.php:500 httpconf.php:512
+#: httpconf.php:189 httpconf.php:196 httpconf.php:490 httpconf.php:502
 #: items.php:973 items.php:980 items.php:1377 items.php:1389
 msgid "History cleared"
 msgstr "이력이 삭제되었습니다"
@@ -6949,8 +6949,8 @@ msgstr "가로 위치"
 #: app/views/monitoring.web.view.php:41
 #: app/views/monitoring.widget.problems.view.php:54
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
-#: app/views/popup.generic.php:137 app/views/search.php:26 httpconf.php:199
-#: httpconf.php:500 include/actions.inc.php:50 include/audit.inc.php:27
+#: app/views/popup.generic.php:137 app/views/search.php:26 httpconf.php:189
+#: httpconf.php:490 include/actions.inc.php:50 include/audit.inc.php:27
 #: include/blocks.inc.php:547 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
@@ -7030,7 +7030,7 @@ msgstr "호스트 접속"
 msgid "Host added"
 msgstr "호스트를 추가하였습니다"
 
-#: include/classes/api/services/CHostInterface.php:831
+#: include/classes/api/services/CHostInterface.php:819
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "호스트에 같은 타입의 기본 인터페이스는 2개 이상 설정할 수 없습니다."
 
@@ -7347,7 +7347,7 @@ msgid "Hungarian (hu_HU)"
 msgstr "헝가리어 (hu_HU)"
 
 #: include/discovery.inc.php:60
-#: include/views/js/configuration.discovery.edit.js.php:210
+#: include/views/js/configuration.discovery.edit.js.php:207
 msgid "ICMP ping"
 msgstr "ICMP ping"
 
@@ -7356,7 +7356,7 @@ msgid "ID"
 msgstr "ID"
 
 #: include/discovery.inc.php:54
-#: include/views/js/configuration.discovery.edit.js.php:211
+#: include/views/js/configuration.discovery.edit.js.php:208
 msgid "IMAP"
 msgstr "IMAP"
 
@@ -7734,12 +7734,12 @@ msgid "Incorrect API \"%1$s\"."
 msgstr "API\"%1$s\"가 올바르지 않습니다."
 
 #: include/classes/api/services/CDRule.php:571
-#: include/views/js/configuration.discovery.edit.js.php:645
+#: include/views/js/configuration.discovery.edit.js.php:642
 msgid "Incorrect SNMP OID."
 msgstr "SNMP OID의 값이 올바르지 않습니다."
 
 #: include/classes/api/services/CDRule.php:565
-#: include/views/js/configuration.discovery.edit.js.php:641
+#: include/views/js/configuration.discovery.edit.js.php:638
 msgid "Incorrect SNMP community."
 msgstr "SNMP커뮤니티의 값이 올바르지 않습니다."
 
@@ -8826,7 +8826,7 @@ msgstr "인스톨러 이름"
 msgid "Interface"
 msgstr "인터페이스"
 
-#: include/classes/api/services/CHostInterface.php:851
+#: include/classes/api/services/CHostInterface.php:839
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "인터페이스는 \"%2$s\"의 아이템\"%1$s\"에 링크되어 있습니다."
@@ -9633,7 +9633,7 @@ msgstr "lost된 리소스의 보존기간"
 #: include/views/configuration.item.list.php:63
 #: include/views/configuration.item.prototype.edit.php:92
 #: include/views/configuration.item.prototype.list.php:53
-#: include/views/js/configuration.discovery.edit.js.php:80 items.php:50
+#: include/views/js/configuration.discovery.edit.js.php:79 items.php:50
 msgid "Key"
 msgstr "키"
 
@@ -9663,7 +9663,7 @@ msgstr "한국어 (ko_KR)"
 
 #: app/views/administration.authentication.edit.php:30
 #: include/discovery.inc.php:48 include/users.inc.php:85
-#: include/views/js/configuration.discovery.edit.js.php:213
+#: include/views/js/configuration.discovery.edit.js.php:210
 msgid "LDAP"
 msgstr "LDAP"
 
@@ -9720,37 +9720,37 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "최근"
 
-#: include/func.inc.php:2721
+#: include/func.inc.php:2724
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "최신 %1$d 일간"
 
-#: include/func.inc.php:2715
+#: include/func.inc.php:2718
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] "최신 %1$d 시간"
 
-#: include/func.inc.php:2708
+#: include/func.inc.php:2711
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] "최신 %1$d 분간"
 
-#: include/func.inc.php:2724
+#: include/func.inc.php:2727
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] "최신 %1$d 개월간"
 
-#: include/func.inc.php:2701
+#: include/func.inc.php:2704
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] "최신 %1$d 초간"
 
-#: include/func.inc.php:2727
+#: include/func.inc.php:2730
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -10113,7 +10113,7 @@ msgstr "MD2"
 #: include/views/configuration.item.massupdate.php:218
 #: include/views/configuration.item.prototype.edit.php:489
 #: include/views/configuration.item.prototype.massupdate.php:214
-#: include/views/js/configuration.discovery.edit.js.php:121
+#: include/views/js/configuration.discovery.edit.js.php:118
 msgid "MD5"
 msgstr "MD5"
 
@@ -10801,7 +10801,7 @@ msgid "Mute"
 msgstr "음소거"
 
 #: include/discovery.inc.php:53
-#: include/views/js/configuration.discovery.edit.js.php:214
+#: include/views/js/configuration.discovery.edit.js.php:211
 msgid "NNTP"
 msgstr "NNTP"
 
@@ -11258,7 +11258,7 @@ msgstr "데이터를 찾을 수 없음."
 msgid "No data."
 msgstr "데이터가 없습니다."
 
-#: include/classes/api/services/CHostInterface.php:827
+#: include/classes/api/services/CHostInterface.php:815
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "\"%2$s\"상의 \"%1$s\"타입의 디폴트인터페이스가 설정되어 있지 않습니다"
@@ -11440,8 +11440,8 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
 #: app/controllers/CControllerWidgetMapView.php:68
 #: app/controllers/CControllerWidgetPlainTextView.php:78
-#: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:1236
-#: disc_prototypes.php:1463 host_discovery.php:664
+#: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:1237
+#: disc_prototypes.php:1464 host_discovery.php:664
 #: include/classes/api/services/CAction.php:1615
 #: include/classes/api/services/CAction.php:1992
 #: include/classes/api/services/CAction.php:2969
@@ -12569,7 +12569,7 @@ msgid "PHP xmlwriter extension missing."
 msgstr "PHP xmlwriter 모듈이 존재하지 않습니다."
 
 #: include/discovery.inc.php:52
-#: include/views/js/configuration.discovery.edit.js.php:215
+#: include/views/js/configuration.discovery.edit.js.php:212
 msgid "POP"
 msgstr "POP"
 
@@ -12917,7 +12917,7 @@ msgstr "포트"
 msgid "Port cannot be empty for host interface."
 msgstr "호스트 인터페이스의 포트는 필수항목입니다."
 
-#: include/views/js/configuration.discovery.edit.js.php:64
+#: include/views/js/configuration.discovery.edit.js.php:65
 msgid "Port range"
 msgstr "포트 범위"
 
@@ -12979,7 +12979,7 @@ msgstr ""
 msgid "Preview"
 msgstr "미리보기"
 
-#: include/func.inc.php:2671
+#: include/func.inc.php:2674
 msgid "Previous month"
 msgstr "저번 달"
 
@@ -12987,11 +12987,11 @@ msgstr "저번 달"
 msgid "Previous value"
 msgstr ""
 
-#: include/func.inc.php:2670
+#: include/func.inc.php:2673
 msgid "Previous week"
 msgstr "저번 주"
 
-#: include/func.inc.php:2672
+#: include/func.inc.php:2675
 msgid "Previous year"
 msgstr "작년"
 
@@ -13028,7 +13028,7 @@ msgstr "Primary POC 스크린명"
 #: include/views/configuration.item.massupdate.php:247
 #: include/views/configuration.item.prototype.edit.php:506
 #: include/views/configuration.item.prototype.massupdate.php:242
-#: include/views/js/configuration.discovery.edit.js.php:142
+#: include/views/js/configuration.discovery.edit.js.php:139
 msgid "Privacy passphrase"
 msgstr "프라이버시 패스프레이즈"
 
@@ -13037,7 +13037,7 @@ msgstr "프라이버시 패스프레이즈"
 #: include/views/configuration.item.massupdate.php:234
 #: include/views/configuration.item.prototype.edit.php:499
 #: include/views/configuration.item.prototype.massupdate.php:230
-#: include/views/js/configuration.discovery.edit.js.php:134
+#: include/views/js/configuration.discovery.edit.js.php:131
 msgid "Privacy protocol"
 msgstr "프라이버시 프로토콜"
 
@@ -14021,7 +14021,7 @@ msgstr "S"
 #: include/views/configuration.item.massupdate.php:219
 #: include/views/configuration.item.prototype.edit.php:490
 #: include/views/configuration.item.prototype.massupdate.php:215
-#: include/views/js/configuration.discovery.edit.js.php:122
+#: include/views/js/configuration.discovery.edit.js.php:119
 msgid "SHA"
 msgstr "SHA"
 
@@ -14036,7 +14036,7 @@ msgid "SMS"
 msgstr "SMS"
 
 #: include/discovery.inc.php:49
-#: include/views/js/configuration.discovery.edit.js.php:219
+#: include/views/js/configuration.discovery.edit.js.php:216
 msgid "SMTP"
 msgstr "SMTP"
 
@@ -14067,7 +14067,7 @@ msgstr "SNMP"
 #: include/views/configuration.host.discovery.edit.php:411
 #: include/views/configuration.item.edit.php:473
 #: include/views/configuration.item.prototype.edit.php:455
-#: include/views/js/configuration.discovery.edit.js.php:88 items.php:127
+#: include/views/js/configuration.discovery.edit.js.php:86 items.php:127
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
@@ -14097,17 +14097,17 @@ msgid "SNMP trap key is invalid."
 msgstr "SNMP 트랩키가 올바르지 않습니다."
 
 #: include/discovery.inc.php:57 include/items.inc.php:89
-#: include/views/js/configuration.discovery.edit.js.php:216
+#: include/views/js/configuration.discovery.edit.js.php:213
 msgid "SNMPv1 agent"
 msgstr "SNMPv1 에이전트"
 
 #: include/discovery.inc.php:58 include/items.inc.php:90
-#: include/views/js/configuration.discovery.edit.js.php:217
+#: include/views/js/configuration.discovery.edit.js.php:214
 msgid "SNMPv2 agent"
 msgstr "SNMPv2 에이전트"
 
 #: include/discovery.inc.php:59 include/items.inc.php:91
-#: include/views/js/configuration.discovery.edit.js.php:218
+#: include/views/js/configuration.discovery.edit.js.php:215
 msgid "SNMPv3 agent"
 msgstr "SNMPv3 에이전트"
 
@@ -14138,7 +14138,7 @@ msgstr "SQL의 실행에 실패하였습니다 \"%1$s\"."
 #: include/views/configuration.action.edit.php:922
 #: include/views/configuration.action.edit.php:1682
 #: include/views/configuration.action.edit.php:2158
-#: include/views/js/configuration.discovery.edit.js.php:220
+#: include/views/js/configuration.discovery.edit.js.php:217
 msgid "SSH"
 msgstr "SSH"
 
@@ -14452,7 +14452,7 @@ msgstr "초"
 #: include/views/configuration.item.massupdate.php:203
 #: include/views/configuration.item.prototype.edit.php:479
 #: include/views/configuration.item.prototype.massupdate.php:199
-#: include/views/js/configuration.discovery.edit.js.php:110
+#: include/views/js/configuration.discovery.edit.js.php:107
 msgid "Security level"
 msgstr "보안 레벨"
 
@@ -14462,7 +14462,7 @@ msgstr "보안 레벨"
 #: include/views/configuration.item.massupdate.php:196
 #: include/views/configuration.item.prototype.edit.php:473
 #: include/views/configuration.item.prototype.massupdate.php:192
-#: include/views/js/configuration.discovery.edit.js.php:103
+#: include/views/js/configuration.discovery.edit.js.php:100
 msgid "Security name"
 msgstr "보안 이름"
 
@@ -15537,7 +15537,7 @@ msgid "T"
 msgstr "T"
 
 #: include/discovery.inc.php:55
-#: include/views/js/configuration.discovery.edit.js.php:212
+#: include/views/js/configuration.discovery.edit.js.php:209
 msgid "TCP"
 msgstr "TCP"
 
@@ -15658,7 +15658,7 @@ msgstr "대상 종류"
 #: include/views/configuration.action.edit.php:923
 #: include/views/configuration.action.edit.php:1683
 #: include/views/configuration.action.edit.php:2159
-#: include/views/js/configuration.discovery.edit.js.php:221
+#: include/views/js/configuration.discovery.edit.js.php:218
 msgid "Telnet"
 msgstr "Telnet"
 
@@ -15951,7 +15951,7 @@ msgstr "Web시나리오가 설정되어있는 호스트와 다른 호스트에 �
 msgid "Theme"
 msgstr "테마"
 
-#: include/func.inc.php:2669
+#: include/func.inc.php:2672
 msgid "This day last week"
 msgstr "저번주의 오늘"
 
@@ -15964,11 +15964,11 @@ msgstr "이 항목은 아이템 \"%s\"에 의해 자동적으로 설정됩니다
 msgid "This is the test message from Zabbix"
 msgstr ""
 
-#: include/func.inc.php:2677 srv_status.php:41
+#: include/func.inc.php:2680 srv_status.php:41
 msgid "This month"
 msgstr "이번 달"
 
-#: include/func.inc.php:2678
+#: include/func.inc.php:2681
 msgid "This month so far"
 msgstr "이번 달의 지금까지"
 
@@ -15980,19 +15980,19 @@ msgstr "스크린의 열은 공백이 아닙니다. 삭제합니까?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "스크린의 행은 공백이 아닙니다. 삭제합니까?"
 
-#: include/func.inc.php:2675 srv_status.php:40
+#: include/func.inc.php:2678 srv_status.php:40
 msgid "This week"
 msgstr "이번주"
 
-#: include/func.inc.php:2676
+#: include/func.inc.php:2679
 msgid "This week so far"
 msgstr "저번주의 지금까지"
 
-#: include/func.inc.php:2679 srv_status.php:42
+#: include/func.inc.php:2682 srv_status.php:42
 msgid "This year"
 msgstr "올해"
 
-#: include/func.inc.php:2680
+#: include/func.inc.php:2683
 msgid "This year so far"
 msgstr "올해의 지금까지"
 
@@ -16117,12 +16117,12 @@ msgstr "종료"
 msgid "To set a host interface select a single item type for all items"
 msgstr "모든 아이템은 하나의 호스트 인터페이스를 선택할 필요가 있습니다"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2673
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2676
 #: srv_status.php:39
 msgid "Today"
 msgstr "오늘"
 
-#: include/func.inc.php:2674
+#: include/func.inc.php:2677
 msgid "Today so far"
 msgstr "오늘의 지금까지"
 
@@ -16374,7 +16374,7 @@ msgstr "트리거 프로토타입 \"%1$s\"는 트리거 \"%2$s\"에 의존하지
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr "트리거 프로토타입\"%1$s\"은 적어도 하나 이상의 아이템 프로토타입을 설정할 필요가 있습니다."
 
-#: trigger_prototypes.php:252
+#: trigger_prototypes.php:243
 msgid "Trigger prototype added"
 msgstr "트리거 프로토타입을 추가하였습니다"
 
@@ -16382,11 +16382,11 @@ msgstr "트리거 프로토타입을 추가하였습니다"
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "트리거 프로토타입은 자신을 계승한 트리거에 의존할 수 없습니다."
 
-#: trigger_prototypes.php:360
+#: trigger_prototypes.php:351
 msgid "Trigger prototype deleted"
 msgstr "트리거 프로토타입을 삭제하였습니다"
 
-#: trigger_prototypes.php:345 trigger_prototypes.php:499
+#: trigger_prototypes.php:336 trigger_prototypes.php:490
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] "트리거 프로토타입을 갱신하였습니다"
@@ -16401,11 +16401,11 @@ msgstr[0] "트리거 프로토타입을 갱신하였습니다"
 msgid "Trigger prototypes"
 msgstr "트리거 프로토타입"
 
-#: trigger_prototypes.php:510
+#: trigger_prototypes.php:501
 msgid "Trigger prototypes deleted"
 msgstr "트리거 프로토타입을 삭제하였습니다"
 
-#: trigger_prototypes.php:464
+#: trigger_prototypes.php:455
 msgid "Trigger prototypes updated"
 msgstr "트리거 프로토타입을 갱신하였습니다"
 
@@ -16748,7 +16748,7 @@ msgstr "단위"
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.triggers.list.php:71
-#: include/views/js/configuration.discovery.edit.js.php:230
+#: include/views/js/configuration.discovery.edit.js.php:227
 msgid "Unknown"
 msgstr "알 수 없음"
 
@@ -16943,7 +16943,7 @@ msgstr "Up"
 #: include/views/configuration.trigger.prototype.massupdate.php:189
 #: include/views/configuration.triggers.edit.php:616
 #: include/views/configuration.triggers.massupdate.php:169
-#: include/views/js/configuration.discovery.edit.js.php:423
+#: include/views/js/configuration.discovery.edit.js.php:420
 #: include/views/monitoring.screen.constructor.edit.php:934
 #: include/views/monitoring.screen.edit.php:220
 #: include/views/monitoring.slideconf.edit.php:273
@@ -17765,7 +17765,7 @@ msgstr "웹"
 msgid "Web monitoring"
 msgstr "웹 감시"
 
-#: httpconf.php:198 httpconf.php:499 include/audit.inc.php:45
+#: httpconf.php:188 httpconf.php:489 include/audit.inc.php:45
 msgid "Web scenario"
 msgstr "Web시나리오"
 
@@ -17785,25 +17785,25 @@ msgstr "Web시나리오\"%1$s\"는 이미 존재합니다."
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"상의 Web시나리오 \"%1$s\": 어플리케이션 \"%3$s\"이 존재하지 않습니다."
 
-#: httpconf.php:214
+#: httpconf.php:204
 msgid "Web scenario added"
 msgstr "Web시나리오를 추가했습니다."
 
-#: httpconf.php:166 httpconf.php:521
+#: httpconf.php:156 httpconf.php:511
 msgid "Web scenario deleted"
 msgstr "Web시나리오를 삭제했습니다."
 
-#: httpconf.php:462
+#: httpconf.php:452
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Web시나리오를 비활성화 하였습니다"
 
-#: httpconf.php:461
+#: httpconf.php:451
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] "Web시나리오를 활성화 하였습니다"
 
-#: httpconf.php:210
+#: httpconf.php:200
 msgid "Web scenario updated"
 msgstr "Web시나리오를 갱신했습니다."
 
@@ -18125,7 +18125,7 @@ msgstr "연간"
 msgid "Yes"
 msgstr "예"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2667
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2670
 msgid "Yesterday"
 msgstr "어제"
 
@@ -18240,7 +18240,7 @@ msgstr "ZABBIX 유저"
 #: include/views/configuration.action.edit.php:938
 #: include/views/configuration.action.edit.php:1716
 #: include/views/configuration.action.edit.php:2184
-#: include/views/js/configuration.discovery.edit.js.php:222
+#: include/views/js/configuration.discovery.edit.js.php:219
 msgid "Zabbix agent"
 msgstr "ZABBIX 에이전트"
 
@@ -19122,7 +19122,7 @@ msgstr "이름"
 msgid "new"
 msgstr "신규"
 
-#: disc_prototypes.php:1329 disc_prototypes.php:1353 hosts.php:1268
+#: disc_prototypes.php:1330 disc_prototypes.php:1354 hosts.php:1268
 #: include/views/configuration.item.massupdate.php:475 templates.php:813
 msgctxt "new element in multiselect"
 msgid "new"

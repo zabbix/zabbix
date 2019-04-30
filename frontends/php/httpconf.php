@@ -109,28 +109,18 @@ if (!empty($_REQUEST['steps'])) {
  * Permissions
  */
 //*
-if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
-	$testIds = [];
-	if (isset($_REQUEST['httptestid'])) {
-		$testIds[] = $_REQUEST['httptestid'];
-	}
-	if (!empty($_REQUEST['group_httptestid'])) {
-		$testIds = array_merge($testIds, $_REQUEST['group_httptestid']);
-	}
-	if ($testIds) {
-		$testIds = array_unique($testIds);
+if (hasRequest('httptestid')) {
+	$httptests = API::HttpTest()->get([
+		'output' => [],
+		'httptestids' => getRequest('httptestid'),
+		'editable' => true
+	]);
 
-		$httptests = API::HttpTest()->get([
-			'output' => [],
-			'httptestids' => $testIds,
-			'editable' => true
-		]);
-
-		if (count($httptests) != count($testIds)) {
-			uncheckTableRows(getRequest('hostid'), zbx_objectValues($httptests, 'httptestid'));
-		}
+	if (!$httptests) {
+		access_deny();
 	}
 }
+
 if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 	access_deny();
 }
@@ -519,6 +509,16 @@ elseif (hasRequest('action') && getRequest('action') === 'httptest.massdelete'
 		uncheckTableRows(getRequest('hostid'));
 	}
 	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
+}
+
+if (hasRequest('action') && hasRequest('group_httptestid') && !$result) {
+	$httptests = API::HttpTest()->get([
+		'output' => [],
+		'httptestids' => getRequest('group_httptestid'),
+		'editable' => true
+	]);
+
+	uncheckTableRows(getRequest('hostid'), zbx_objectValues($httptests, 'httptestid'));
 }
 
 show_messages();
