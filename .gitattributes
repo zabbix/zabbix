@@ -18,3 +18,4 @@
 /build-backend.xml -text
 database/elasticsearch/elasticsearch.map -text
 frontends/php/tests/api_json/data/data_test.sql eol=lf
+

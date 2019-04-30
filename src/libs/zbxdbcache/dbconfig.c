@@ -11801,3 +11801,7 @@ void	zbx_dc_cleanup_data_sessions(void)
 
 	UNLOCK_CACHE;
 }
+
+#ifdef HAVE_TESTS
+#	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
+#endif
