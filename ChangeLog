@@ -13,6 +13,7 @@ Changes for 4.2.2rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-16036] fixed items being stuck in unsupported state under some conditions when "Discard unchanged" preprocessing step is used (vso)
 ...G...PS. [ZBX-15677] fixed the process of compiling the dummy.c module (MVekslers)
 .......PS. [ZBX-15981] fixed invalid xpath for vmware "eventlog" key with "skip" option (MVekslers)
 ...G...... [ZBX-15704] fixed sending log meta information without obvious needs (asestakovs)
