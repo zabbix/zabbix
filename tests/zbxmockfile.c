@@ -39,6 +39,10 @@ struct zbx_mock_IO_FILE
 	const char	*contents;
 };
 
+FILE	*__wrap_fopen(const char *path, const char *mode);
+int	__wrap_fclose(FILE *stream);
+char	*__wrap_fgets(char *s, int size, FILE *stream);
+
 static int	is_profiler_path(const char *path)
 {
 	size_t	len;

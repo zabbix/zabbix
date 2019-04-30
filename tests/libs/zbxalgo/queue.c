@@ -33,6 +33,13 @@
 #define	REMOVE_TH	4
 #define	REMOVE_HT	5
 
+int get_type(const char *str);
+void test_queue_range(void);
+void test_queue_ptr_compact_tail_head(void);
+void test_queue_ptr_compact_head_tail(void);
+void test_queue_ptr_remove_tail_head(void);
+void test_queue_ptr_remove_head_tail(void);
+
 #define ZBX_CM_LEAK_CHECK_START()	zbx_cm_minfo = mallinfo()
 #define ZBX_CM_LEAK_CHECK_END()	{									\
 		struct mallinfo minfo_local;								\
@@ -97,7 +104,7 @@ static void	test_queue_range_values(int iterations, zbx_vector_ptr_t *values)
 	ZBX_CM_LEAK_CHECK_END();
 }
 
-void test_queue_range()
+void test_queue_range(void)
 {
 	zbx_vector_ptr_t	values;
 
@@ -107,7 +114,7 @@ void test_queue_range()
 	zbx_vector_ptr_destroy(&values);
 }
 
-void test_queue_ptr_compact_tail_head()
+void test_queue_ptr_compact_tail_head(void)
 {
 	zbx_vector_ptr_t	values;
 	zbx_queue_ptr_t		queue;
@@ -145,7 +152,7 @@ void test_queue_ptr_compact_tail_head()
 	zbx_vector_ptr_destroy(&values);
 }
 
-void test_queue_ptr_compact_head_tail()
+void test_queue_ptr_compact_head_tail(void)
 {
 	zbx_vector_ptr_t	values;
 	zbx_queue_ptr_t		queue;
@@ -213,7 +220,7 @@ static void	test_queue_ptr_remove_value(zbx_queue_ptr_t *queue, void **values, i
 	}
 }
 
-void test_queue_ptr_remove_tail_head()
+void test_queue_ptr_remove_tail_head(void)
 {
 	zbx_vector_ptr_t	values;
 	zbx_queue_ptr_t		queue;
@@ -256,7 +263,7 @@ void test_queue_ptr_remove_tail_head()
 	zbx_vector_ptr_destroy(&values);
 }
 
-void test_queue_ptr_remove_head_tail()
+void test_queue_ptr_remove_head_tail(void)
 {
 	zbx_vector_ptr_t	values;
 	zbx_queue_ptr_t		queue;
