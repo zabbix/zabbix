@@ -4,7 +4,8 @@
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
 			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{httpstepid});')),
 			'#{timeout}',
-			(new CSpan('#{url_short}'))->setTitle('#{url}'),
+			(new CSpan('#{url_short}'))->setHint('#{url}', '', true, 'word-break: break-all;')
+				->setAttribute('data-hintbox', '#{enabled_hint}'),
 			'#{required}',
 			'#{status_codes}',
 			''
@@ -13,12 +14,14 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="scenario-step-row">
+
 	<?= (new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
 			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{httpstepid});')),
 			'#{timeout}',
-			(new CSpan('#{url_short}'))->setTitle('#{url}'),
+			(new CSpan('#{url_short}'))->setHint('#{url}', '', true, 'word-break: break-all;')
+				->setAttribute('data-hintbox', '#{enabled_hint}'),
 			'#{required}',
 			'#{status_codes}',
 			(new CCol((new CButton(null, _('Remove')))
@@ -513,6 +516,7 @@
 
 		this.$container.on('dynamic_rows.beforerender', function(e, dynamic_rows) {
 			e.view_data.url_short = midEllipsis(e.view_data.url, 65);
+			e.view_data.enabled_hint = (e.view_data.url.length < 65) ? 0 : 1;
 		});
 
 		this.steps_dynamic_rows = new DynamicRows(this.$container, {
