@@ -162,6 +162,53 @@
 	}
 
 	/**
+	 * Writes data index as new nodes attribute. Bind remove event.
+	 */
+	function dynamicRowsBindNewRow($el) {
+		$table.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
+			e.new_node.setAttribute('data-index', e.data_index);
+			e.new_node.querySelector('.element-table-remove')
+				.addEventListener('click', dynamic_rows.removeRow.bind(dynamic_rows, e.data_index));
+		});
+	}
+
+	/**
+	 * Implements disabling remove button if last pair is considered empty.
+	 */
+	function dynamicRowsBindRemoveDisable($el) {
+		$el.on('dynamic_rows.updated', function(e, dynamic_rows) {
+			if (dynamic_rows.length > 1) {
+				dynamic_rows.$element.find('.element-table-remove').prop('disabled', false);
+				return;
+			}
+
+			eachPair.call(dynamic_rows, function(pair) {
+				if (!pair.name && !pair.value) {
+					dynamic_rows.$element.find('.element-table-remove').prop('disabled', true);
+				}
+			}, true);
+		});
+	}
+
+	/**
+	 * Implements disabling sortable if less than two data rows.
+	 */
+	function dynamicRowsBindSortableDisable($el) {
+		$el.on('dynamic_rows.updated', function(e, dynamic_rows) {
+			if (dynamic_rows.length < 2) {
+				dynamic_rows.$element.sortable('option', 'disabled', true);
+				dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
+					.addClass(httpconf.ZBX_STYLE_DISABLED);
+			}
+			else {
+				dynamic_rows.$element.sortable('option', 'disabled', false);
+				dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
+					.removeClass(httpconf.ZBX_STYLE_DISABLED);
+			}
+		});
+	}
+
+	/**
 	 * A helper method for creating hidden input nodes.
 	 *
 	 * @param {string} name
@@ -396,34 +443,15 @@
 				type = $table.data('type');
 
 			$table.sortable(sortableOpts());
-			$table.on('dynamic_rows.updated', function(e, dynamic_rows) {
-				if (dynamic_rows.length < 2) {
-					eachPair.call(dynamic_rows, function(pair) {
-						if (!pair.name && !pair.value) {
-							dynamic_rows.$element.find('.element-table-remove').prop('disabled', true);
-						}
-					}, true);
 
-					dynamic_rows.$element.sortable('option', 'disabled', true);
-					dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
-						.addClass(httpconf.ZBX_STYLE_DISABLED);
-				}
-				else {
-					dynamic_rows.$element.find('.element-table-remove').prop('disabled', false);
-					dynamic_rows.$element.sortable('option', 'disabled', false);
-					dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
-						.removeClass(httpconf.ZBX_STYLE_DISABLED);
-				}
-			});
+			dynamicRowsBindSortableDisable($table);
+			dynamicRowsBindRemoveDisable($table);
+			dynamicRowsBindNewRow($table);
 
 			$table.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
 				if (type === 'variables') {
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
 				}
-
-				e.new_node.setAttribute('data-index', e.data_index);
-				e.new_node.querySelector('.element-table-remove')
-					.addEventListener('click', dynamic_rows.removeRow.bind(dynamic_rows, e.data_index));
 			});
 
 			this.pairs[type] = new DynamicRows($table, {
@@ -487,6 +515,13 @@
 			e.view_data.url_short = midEllipsis(e.view_data.url, 65);
 		});
 
+		this.steps_dynamic_rows = new DynamicRows(this.$container, {
+			add_before: this.$container.find('.element-table-add').closest('tr')[0],
+			template: httpconf.step_row_template,
+			data_index: 'httpstepid'
+		});
+
+
 		if (!httpconf.templated) {
 			this.$container.sortable(sortableOpts());
 			this.$container.sortable('option', 'update', this.onSortOrderChange.bind(this));
@@ -494,35 +529,15 @@
 				delete this.data[e.data_index];
 				this.onSortOrderChange();
 			}.bind(this));
-			this.$container.on('dynamic_rows.updated', function(e, dynamic_rows) {
-				if (dynamic_rows.length < 2) {
-					dynamic_rows.$element.sortable('option', 'disabled', true);
-					dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
-						.addClass(httpconf.ZBX_STYLE_DISABLED);
-				}
-				else {
-					dynamic_rows.$element.sortable('option', 'disabled', false);
-					dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
-						.removeClass(httpconf.ZBX_STYLE_DISABLED);
-				}
-			});
-			this.$container.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
-				e.new_node.setAttribute('data-index', e.data_index);
-				e.new_node.querySelector('.element-table-remove')
-					.addEventListener('click', dynamic_rows.removeRow.bind(dynamic_rows, e.data_index));
-			});
+
+			dynamicRowsBindSortableDisable(this.$container);
+			dynamicRowsBindNewRow(this.$container);
 		}
 		else {
 			this.$container.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
 				e.new_node.setAttribute('data-index', e.data_index);
 			});
 		}
-
-		this.steps_dynamic_rows = new DynamicRows(this.$container, {
-			add_before: this.$container.find('.element-table-add').closest('tr')[0],
-			template: httpconf.step_row_template,
-			data_index: 'httpstepid'
-		});
 
 		this.renderData();
 	}
@@ -735,31 +750,9 @@
 		var $pairs = jQuery('.httpconf-dynamic-row', $form);
 		$pairs.sortable(sortableOpts());
 
-		$pairs.on('dynamic_rows.updated', function(e, dynamic_rows) {
-			if (dynamic_rows.length < 2) {
-				eachPair.call(dynamic_rows, function(pair) {
-					if (!pair.name && !pair.value) {
-						dynamic_rows.$element.find('.element-table-remove').prop('disabled', true);
-					}
-				}, true);
-
-				dynamic_rows.$element.sortable('option', 'disabled', true);
-				dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
-					.addClass(httpconf.ZBX_STYLE_DISABLED);
-			}
-			else {
-				dynamic_rows.$element.find('.element-table-remove').prop('disabled', false);
-
-				dynamic_rows.$element.sortable('option', 'disabled', false);
-				dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
-					.removeClass(httpconf.ZBX_STYLE_DISABLED);
-			}
-		});
-		$pairs.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
-			e.new_node.setAttribute('data-index', e.data_index);
-			e.new_node.querySelector('.element-table-remove')
-				.addEventListener('click', dynamic_rows.removeRow.bind(dynamic_rows, e.data_index));
-		});
+		dynamicRowsBindSortableDisable($pairs);
+		dynamicRowsBindRemoveDisable($pairs);
+		dynamicRowsBindNewRow($pairs);
 
 		this.pairs = {
 			query_fields: null,
