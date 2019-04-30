@@ -35,6 +35,7 @@ $mediaTypeForm = (new CForm())
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
+	->disablePasswordAutofill()
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 // Create form list.
@@ -132,11 +133,11 @@ $mediatype_formlist->addRow((new CLabel(_('GSM modem'), 'gsm_modem'))->setAsteri
 );
 
 // Create password field.
-if ($data['passwd'] !== '') {
+if ($data['passwd'] !== '' && !$data['change_passwd']) {
 	// Disabling 'passwd' field prevents stored passwords autofill by browser.
 	$passwd_field = [
 		(new CButton('chPass_btn', _('Change password'))),
-		(new CPassBox('passwd', $data['passwd']))
+		(new CPassBox('passwd', ''))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 			->addStyle('display: none;')
@@ -144,7 +145,7 @@ if ($data['passwd'] !== '') {
 	];
 }
 else {
-	$passwd_field = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+	$passwd_field = (new CPassBox('passwd', $data['passwd']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
 // append password field to form list
