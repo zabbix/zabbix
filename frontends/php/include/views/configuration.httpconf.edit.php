@@ -111,19 +111,9 @@ $http_form_list
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'));
 
-$pairs_grouped = [
-	'variables' => [],
-	'headers' => []
-];
-
-foreach ($data['pairs'] as $field) {
-	$pairs_grouped[$field['type']][] = $field;
-}
-
 $http_form_list->addRow(_('Variables'), (new CDiv(
 	(new CTable())
 		->addClass('httpconf-dynamic-row')
-		->setAttribute('data-dynamic-rows-data', CJs::encodeJson($pairs_grouped['variables']))
 		->setAttribute('data-type', 'variables')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader(['', _('Name'), '', _('Value'), ''])
@@ -142,7 +132,6 @@ $http_form_list->addRow(_('Variables'), (new CDiv(
 $http_form_list->addRow(_('Headers'), (new CDiv(
 	(new CTable())
 		->addClass('httpconf-dynamic-row')
-		->setAttribute('data-dynamic-rows-data', CJs::encodeJson($pairs_grouped['headers']))
 		->setAttribute('data-type', 'headers')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader(['', _('Name'), '', _('Value'), ''])
@@ -273,9 +262,20 @@ else {
 $http_form->addItem($http_tab);
 $widget->addItem($http_form);
 
-$this->data['agentVisibility'] = [];
-zbx_subarray_push($this->data['agentVisibility'], ZBX_AGENT_OTHER, 'agent_other');
-zbx_subarray_push($this->data['agentVisibility'], ZBX_AGENT_OTHER, 'row_agent_other');
+$this->data['scenario_tab_data'] = [
+	'agent_visibility' => [],
+	'pairs' => [
+		'variables' => [],
+		'headers' => []
+	]
+];
+
+foreach ($data['pairs'] as $field) {
+	zbx_subarray_push($this->data['scenario_tab_data']['pairs'], $field['type'], $field);
+}
+
+zbx_subarray_push($this->data['scenario_tab_data']['agent_visibility'], ZBX_AGENT_OTHER, 'agent_other');
+zbx_subarray_push($this->data['scenario_tab_data']['agent_visibility'], ZBX_AGENT_OTHER, 'row_agent_other');
 
 require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 

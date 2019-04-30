@@ -1,23 +1,21 @@
 <script type="text/x-jquery-tmpl" id="scenario-step-row-templated">
 	<?= (new CRow([
 			'',
-			(new CSpan('1:'))->addClass('rowNum'),
+			(new CSpan('1:'))->setAttribute('data-row-num', ''),
 			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{httpstepid});')),
 			'#{timeout}',
 			(new CSpan('#{url_short}'))->setTitle('#{url}'),
 			'#{required}',
 			'#{status_codes}',
 			''
-		]))
-			->setAttribute('data-step-id', '#{httpstepid}')
-			->toString()
+		]))->toString()
 	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="scenario-step-row">
 	<?= (new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CSpan('1:'))->addClass('rowNum'),
+			(new CSpan('1:'))->setAttribute('data-row-num', ''),
 			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{httpstepid});')),
 			'#{timeout}',
 			(new CSpan('#{url_short}'))->setTitle('#{url}'),
@@ -27,10 +25,7 @@
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->setAttribute('data-step-id', '#{httpstepid}')
-			->addClass('sortable')
-			->toString()
+		]))->addClass('sortable')->toString()
 	?>
 </script>
 
@@ -54,7 +49,6 @@
 					->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
-			->addClass('form_row')
 			->addClass('sortable')
 			->toString()
 	?>
@@ -65,28 +59,36 @@
 		window.httpconf = {
 			templated:                           <?= $data['templated'] ? 1 : 0 ?>,
 			ZBX_STYLE_DRAG_ICON:                 <?= zbx_jsvalue(ZBX_STYLE_DRAG_ICON) ?>,
+			ZBX_STYLE_TD_DRAG_ICON:              <?= zbx_jsvalue(ZBX_STYLE_TD_DRAG_ICON) ?>,
+			ZBX_STYLE_DISABLED:                  <?= zbx_jsvalue(ZBX_STYLE_DISABLED) ?>,
 			HTTPTEST_AUTH_NONE:                  <?= HTTPTEST_AUTH_NONE ?>,
 			ZBX_POSTTYPE_FORM:                   <?= ZBX_POSTTYPE_FORM ?>,
 			HTTPTEST_STEP_RETRIEVE_MODE_HEADERS: <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>,
 			ZBX_POSTTYPE_RAW:                    <?= ZBX_POSTTYPE_RAW ?>,
 			msg: {
-				data_not_encoded:           <?= CJs::encodeJson(_('Data is not properly encoded.')); ?>,
-				name_filed_length_exceeded: <?= CJs::encodeJson(_('Name of the form field should not exceed 255 characters.')); ?>,
-				value_without_name:         <?= CJs::encodeJson(_('Values without names are not allowed in form fields.')); ?>,
-				failed_to_parse_url:        <?= CJs::encodeJson(_('Failed to parse URL.')); ?>,
-				ok:                         <?= CJs::encodeJson(_('Ok')); ?>,
-				error:                      <?= CJs::encodeJson(_('Error')); ?>,
-				url_not_encoded_properly:   <?= CJs::encodeJson(_('URL is not properly encoded.')); ?>,
-				cannot_convert_into_raw:    <?= CJs::encodeJson(_('Cannot convert POST data from raw data format to form field data format.')); ?>
+				data_not_encoded:           <?= CJs::encodeJson(_('Data is not properly encoded.')) ?>,
+				name_filed_length_exceeded: <?= CJs::encodeJson(_('Name of the form field should not exceed 255 characters.')) ?>,
+				value_without_name:         <?= CJs::encodeJson(_('Values without names are not allowed in form fields.')) ?>,
+				failed_to_parse_url:        <?= CJs::encodeJson(_('Failed to parse URL.')) ?>,
+				ok:                         <?= CJs::encodeJson(_('Ok')) ?>,
+				error:                      <?= CJs::encodeJson(_('Error')) ?>,
+				url_not_encoded_properly:   <?= CJs::encodeJson(_('URL is not properly encoded.')) ?>,
+				cannot_convert_into_raw:    <?= CJs::encodeJson(_('Cannot convert POST data from raw data format to form field data format.')) ?>
 			}
 		};
 
+		window.httpconf.step_row_template = new Template(jQuery(httpconf.templated
+			? '#scenario-step-row-templated'
+			: '#scenario-step-row'
+		).html());
+
+		window.httpconf.pair_row_template = new Template(jQuery('#scenario-pair-row').html());
 		window.httpconf.scenario = new Scenario(
-			$('#scenarioTab'), <?= zbx_jsvalue($this->data['agentVisibility'], true) ?>);
+			$('#scenarioTab'), <?= CJs::encodeJson($this->data['scenario_tab_data']) ?>);
 		window.httpconf.steps = new Steps($('#stepTab'), <?= CJs::encodeJson(array_values($data['steps'])) ?>);
 		window.httpconf.authentication = new Authentication($('#authenticationTab'));
 
-		window.httpconf.$form = $('#httpForm').on('submit', function() {
+		window.httpconf.$form = $('#httpForm').on('submit', function(e) {
 			var hidden_form = this.querySelector('hidden-form');
 
 			hidden_form && hidden_form.remove();
@@ -102,177 +104,30 @@
 	});
 
 	/**
-	 * Represents authentication tab in web layout.
+	 * Returns common $.sortable options.
 	 *
-	 * @param {jQuery} $tab
+	 * @return {object}
 	 */
-	function Authentication($tab) {
-		this.$type_select = jQuery('#authentication', $tab);
-		this.$user = jQuery('#http_user', $tab);
-		this.$password = jQuery('#http_password', $tab);
-
-		this.$type_select.on('change', function(e) {
-			var http_fields_disabled = (e.target.value == httpconf.HTTPTEST_AUTH_NONE);
-			this.$user.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
-			this.$password.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
-		}.bind(this));
-		this.$type_select.trigger('change');
-	}
-
-	/**
-	 * Represents scenario tab in web layout.
-	 *
-	 * @param {jQuery} $tab
-	 * @param {object} switcher_conf  CViewSwitcher configuration.
-	 */
-	function Scenario($tab, switcher_conf) {
-		new CViewSwitcher('agent', 'change', switcher_conf);
-		this.pairs = {
-			'variables': null,
-			'headers': null
-		};
-
-		jQuery('.httpconf-dynamic-row', $tab).each(function(index, table) {
-			var $table = jQuery(table),
-				type = $table.data('type');
-
-			this.pairs[type] = $table
-				.dynamicRows({
-					keep_min_rows: 1,
-					template: '#scenario-pair-row'
-				})
-				.sortable({
-					items: 'tbody tr.sortable',
-					axis: 'y',
-					cursor: 'move',
-					containment: 'parent',
-					handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
-					tolerance: 'pointer',
-					opacity: 0.6,
-					start: function(e, ui) {
-						ui.placeholder.height(ui.item.height());
-					}
-				})
-				.on('tableupdate.dynamicRows', function(e, data) {
-					data.dynamicRows.$element.sortable('option','disabled', data.dynamicRows.length < 2);
-				})
-				.data('dynamicRows');
-
-			$table.sortable('option','disabled', $table.data('dynamicRows').length < 2);
-		}.bind(this));
-	}
-
-	/**
-	 * The parts of form that are easier to maintain in functional objects are transformed into hidden input fields.
-	 *
-	 * @return {DocumentFragment}
-	 */
-	Scenario.prototype.toFragment = function() {
-		var frag = new DocumentFragment(),
-			iter = 0;
-
-		this.pairs.headers.eachRow(function(i, node) {
-			var name = node.querySelector('[data-type="name"]').value,
-				value = node.querySelector('[data-type="value"]').value,
-				prefix = 'pairs[' + (iter ++) + ']';
-
-			frag.append(hiddenInput('type',  'headers', prefix));
-			frag.append(hiddenInput('name',  name,      prefix));
-			frag.append(hiddenInput('value', value,     prefix));
-		});
-
-		this.pairs.variables.eachRow(function(i, node) {
-			var name = node.querySelector('[data-type="name"]').value,
-				value = node.querySelector('[data-type="value"]').value,
-				prefix = 'pairs[' + (iter ++) + ']';
-
-			frag.append(hiddenInput('type',  'variables', prefix));
-			frag.append(hiddenInput('name',  name,        prefix));
-			frag.append(hiddenInput('value', value,       prefix));
-		});
-
-		return frag;
-	};
-
-	/**
-	 * Represents steps tab in web layout.
-	 *
-	 * @param {jQuery} $tab
-	 * @param {array} steps  Initial step objects data array.
-	 */
-	function Steps($tab, steps) {
-		this.new_stepid = 0;
-		this.steps = {};
-		this.steps_sort_order = [];
-
-		var that = this;
-		steps.forEach(function(step) {
-			that.steps[step.httpstepid] = new Step(step);
-		});
-
-		this.$container = jQuery('.httpconf-steps-dynamic-row', $tab);
-		this.$container.dynamicRows({
-			template: httpconf.templated ? '#scenario-step-row-templated' : '#scenario-step-row',
-			dataCallback(data) {
-				return jQuery.extend({
-					url_short: midEllipsis(data.url, 65)
-				}, data);
+	function sortableOpts() {
+		return {
+			items: 'tbody tr.sortable',
+			axis: 'y',
+			cursor: 'move',
+			containment: 'parent',
+			handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
+			tolerance: 'pointer',
+			opacity: 0.6,
+			start: function(e, ui) {
+				ui.placeholder.height(ui.item.height());
 			}
-		});
-
-		if (!httpconf.templated) {
-			this.$container.sortable({
-				items: 'tbody tr.sortable',
-				axis: 'y',
-				cursor: 'move',
-				containment: 'parent',
-				handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
-				tolerance: 'pointer',
-				update: this.onSortOrderChange.bind(this),
-				opacity: 0.6,
-				start: function(e, ui) {
-					ui.placeholder.height(ui.item.height());
-				}
-			});
-		}
-
-		this.dynamicRows = this.$container.data('dynamicRows');
-
-		this.dynamicRows.setData(steps);
-
-		if (!httpconf.templated) {
-			this.$container.each(function(index, el) {
-				$el = jQuery(el);
-				$el.sortable('option','disabled', $el.data('dynamicRows').length < 2);
-			});
-
-			this.$container.on('beforeadd.dynamicRows', function(e) {
-				if (!e.originalEvent) {
-					// If event is not triggered by click, but invoked programmatically.
-					return;
-				}
-				e.preventDefault();
-				that.openNew();
-			});
-
-			this.$container.on('afterremove.dynamicRows', function(e, data) {
-				delete this.steps[data.rowData.stepId];
-			}.bind(this));
-
-			this.$container.on('tableupdate.dynamicRows', function(e, data) {
-				data.dynamicRows.$element.sortable('option','disabled', data.dynamicRows.length < 2);
-				that.onSortOrderChange();
-			});
-		}
-
-		this.onSortOrderChange();
+		};
 	}
 
 	/**
 	 * A helper method for truncating string in middle.
 	 *
 	 * @param {string} str  String to be shortened into mid-elliptic.
-	 * @param {int} max     Max length of resulting string (inclusive).
+	 * @param {int}    max  Max length of resulting string (inclusive).
 	 */
 	function midEllipsis(str, max) {
 		if (str.length < max) {
@@ -308,6 +163,361 @@
 	}
 
 	/**
+	 * @param {jQuery} $element
+	 * @param {Object} options
+	 * @param {Array} data
+	 */
+	function DynamicRows($element, options, data) {
+		if (!(options.add_before instanceof Node)) {
+			throw 'Error: options.add_before must be instanceof Node.';
+		}
+
+		if (!(options.template instanceof Template)) {
+			throw 'Error: options.template must be instanceof Template.';
+		}
+
+		this.data = {};
+		this.$element = $element;
+		this.options = jQuery.extend({}, {
+			// Please note, this option does not work if data_index option is in use.
+			ensure_min_rows: 0,
+			// If this option is used, it represents key of data object whose value will be used as data_index.
+			data_index: null
+		}, options);
+
+		this.data_index = 0;
+		this.length = 0;
+		data && this.setData(data);
+	}
+
+	/**
+	 * All events are dispatched on $element. Second argument is instance, first argument is event object.
+	 *
+	 * @param {string} evt_key
+	 * @param {object} evt_data  Optional object to be merged into event data.
+	 *
+	 * @return {jQuery.Event}
+	 */
+	DynamicRows.prototype.dispatch = function(evt_key, evt_data) {
+		var evt = jQuery.Event('dynamic_rows.' + evt_key, evt_data);
+
+		this.$element.trigger(evt, [this]);
+
+		return evt;
+	}
+
+	/**
+	 * Adds a row before the given row.
+	 *
+	 * @param {object} data          Data to be passed into template.
+	 * @param {integer?} data_index  Optional index, if data with given index exists, then in place update will happen.
+	 *                               In case of update all events dispatched as if add new was performed.
+	 */
+	DynamicRows.prototype.addRow = function(row_data, data_index) {
+		if (this.options.disabled) {
+			return;
+		}
+
+		if (!data_index) {
+			data_index = this.options.data_index
+				? row_data[this.options.data_index]
+				: ++this.data_index;
+		}
+
+		var new_row = {
+			node: this.createRowNode(row_data),
+			data: row_data || {}
+		};
+
+		var evt_before_add = this.dispatch('beforeadd', {
+			new_data: new_row.data,
+			new_node: new_row.node,
+			add_before: this.options.add_before,
+			data_index: data_index
+		});
+
+		if (evt_before_add.isDefaultPrevented()) {
+			return;
+		}
+
+		if (this.data[data_index]) {
+			evt_before_add.add_before.parentNode.replaceChild(evt_before_add.new_node, this.data[data_index].node);
+		}
+		else {
+			evt_before_add.add_before.parentNode.insertBefore(evt_before_add.new_node, evt_before_add.add_before);
+			this.length ++;
+		}
+
+		this.data[data_index] = new_row;
+
+		this.dispatch('updated');
+	};
+
+	/**
+	* Replaces current data with new one.
+	* Be aware that min rows are ensured and events are triggered only for add.
+	* Removing happens outside this API, to not to call.
+	*
+	* @param {array} data  Array of data for row templates.
+	*
+	* @return {DynamicRows}
+	*/
+	DynamicRows.prototype.setData = function(data) {
+		if (!(data  instanceof Array)) {
+			throw 'Expected Array.';
+		}
+
+		for (var i in this.data) {
+			this.unlinkIndex(i);
+		}
+
+		data.forEach(function(obj) {
+			this.addRow(obj);
+		}.bind(this));
+
+		this.ensureMinRows();
+
+		return this;
+	};
+
+	/**
+	 * Adds empty rows if needed.
+	 */
+	DynamicRows.prototype.ensureMinRows = function() {
+		var rows_to_add = this.options.ensure_min_rows - this.length;
+		while (rows_to_add > 0) {
+			rows_to_add--;
+			this.addRow();
+		}
+	};
+
+	/**
+	 * Renders Node from template.
+	 *
+	 * @param {object} data  Data to be passed into template.
+	 *
+	 * @return {Node}
+	 */
+	DynamicRows.prototype.createRowNode = function(data) {
+		var evt = this.dispatch('beforerender', {view_data: data});
+		var html_str = this.options.template.evaluate(evt.view_data);
+
+		return jQuery(html_str).get(0);
+	};
+
+
+	/**
+	 * Removes data at given index. Method is to be used by plugin internally, does not dispatch events.
+	 *
+	 * @param {int} data_index
+	 *
+	 * @return {object}  Object that just got removed.
+	 */
+	DynamicRows.prototype.unlinkIndex = function(data_index) {
+		this.data[data_index].node.remove();
+		var ref = this.data[data_index];
+
+		delete this.data[data_index];
+		this.length --;
+
+		return ref;
+	}
+
+	/**
+	 * Removes the given row.
+	 *
+	 * @param {int} data_index
+	 */
+	DynamicRows.prototype.removeRow = function(data_index) {
+		if (this.options.disabled) {
+			return;
+		}
+
+		var removed_row = this.unlinkIndex(data_index);
+
+		this.dispatch('afterremove', {removed_row: removed_row, data_index: data_index});
+		this.dispatch('updated');
+
+		this.ensureMinRows();
+	};
+
+	/**
+	 * Represents authentication tab in web layout.
+	 *
+	 * @param {jQuery} $tab
+	 */
+	function Authentication($tab) {
+		this.$type_select = jQuery('#authentication', $tab);
+		this.$user = jQuery('#http_user', $tab);
+		this.$password = jQuery('#http_password', $tab);
+
+		this.$type_select.on('change', function(e) {
+			var http_fields_disabled = (e.target.value == httpconf.HTTPTEST_AUTH_NONE);
+			this.$user.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
+			this.$password.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
+		}.bind(this));
+		this.$type_select.trigger('change');
+	}
+
+	/**
+	 * Represents scenario tab in web layout.
+	 *
+	 * @param {jQuery} $tab
+	 * @param {object} config
+	 */
+	function Scenario($tab, config) {
+		new CViewSwitcher('agent', 'change', config.agent_visibility);
+		this.pairs = {
+			'variables': null,
+			'headers': null
+		};
+
+		jQuery('.httpconf-dynamic-row', $tab).each(function(index, table) {
+
+			var $table = jQuery(table),
+				type = $table.data('type');
+
+			$table.sortable(sortableOpts());
+			$table.on('dynamic_rows.updated', function(e, dynamic_rows) {
+				if (dynamic_rows.length < 2) {
+					dynamic_rows.$element.find('[data-index]').each(function(i, node) {
+						var name = node.querySelector('[data-type="name"]').value,
+							value = node.querySelector('[data-type="value"]').value;
+
+						if (!name && !value) {
+							dynamic_rows.$element.find('.element-table-remove').prop('disabled', true);
+						}
+					});
+
+					dynamic_rows.$element.sortable('option', 'disabled', true);
+					dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
+						.addClass(httpconf.ZBX_STYLE_DISABLED);
+				}
+				else {
+					dynamic_rows.$element.find('.element-table-remove').prop('disabled', false);
+					dynamic_rows.$element.sortable('option', 'disabled', false);
+					dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
+						.removeClass(httpconf.ZBX_STYLE_DISABLED);
+				}
+			});
+
+			$table.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
+				if (type === 'variables') {
+					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
+				}
+
+				e.new_node.setAttribute('data-index', e.data_index);
+				e.new_node.querySelector('.element-table-remove')
+					.addEventListener('click', dynamic_rows.removeRow.bind(dynamic_rows, e.data_index));
+			});
+
+			this.pairs[type] = new DynamicRows($table, {
+				add_before: $table.find('.element-table-add').closest('tr')[0],
+				template: httpconf.pair_row_template,
+				ensure_min_rows: 1
+			}, config.pairs[type]);
+
+			$table.find('.element-table-add')
+				.on('click', this.pairs[type].addRow.bind(this.pairs[type], {}, null));
+		}.bind(this));
+	}
+
+	/**
+	 * The parts of form that are easier to maintain in functional objects are transformed into hidden input fields.
+	 *
+	 * @return {DocumentFragment}
+	 */
+	Scenario.prototype.toFragment = function() {
+		var frag = new DocumentFragment(),
+			iter = 0;
+
+		this.pairs.headers.$element.find('[data-index]').each(function(i, node) {
+			var name = node.querySelector('[data-type="name"]').value,
+				value = node.querySelector('[data-type="value"]').value,
+				prefix = 'pairs[' + (iter ++) + ']';
+
+			frag.append(hiddenInput('type',  'headers', prefix));
+			frag.append(hiddenInput('name',  name,      prefix));
+			frag.append(hiddenInput('value', value,     prefix));
+		});
+
+		this.pairs.variables.$element.find('[data-index]').each(function(i, node) {
+			var name = node.querySelector('[data-type="name"]').value,
+				value = node.querySelector('[data-type="value"]').value,
+				prefix = 'pairs[' + (iter ++) + ']';
+
+			frag.append(hiddenInput('type',  'variables', prefix));
+			frag.append(hiddenInput('name',  name,        prefix));
+			frag.append(hiddenInput('value', value,       prefix));
+		});
+
+		return frag;
+	};
+
+	/**
+	 * Represents steps tab in web layout.
+	 *
+	 * @param {jQuery} $tab
+	 * @param {array}  steps  Initial step objects data array.
+	 */
+	function Steps($tab, steps) {
+		this.data = {};
+		this.new_stepid = 0;
+		this.sort_index = [];
+
+		steps.forEach(function(step) {
+			this.data[step.httpstepid] = new Step(step);
+			this.sort_index.push(step.httpstepid);
+		}.bind(this));
+
+		this.$container = jQuery('.httpconf-steps-dynamic-row', $tab);
+		this.$container.find('.element-table-add').on('click', this.openNew.bind(this));
+
+		this.$container.on('dynamic_rows.beforerender', function(e, dynamic_rows) {
+			e.view_data.url_short = midEllipsis(e.view_data.url, 65);
+		});
+
+		if (!httpconf.templated) {
+			this.$container.sortable(sortableOpts());
+			this.$container.sortable('option', 'update', this.onSortOrderChange.bind(this));
+			this.$container.on('dynamic_rows.afterremove', function(e, dynamic_rows) {
+				delete this.data[e.data_index];
+				this.onSortOrderChange();
+			}.bind(this));
+			this.$container.on('dynamic_rows.updated', function(e, dynamic_rows) {
+				if (dynamic_rows.length < 2) {
+					dynamic_rows.$element.sortable('option', 'disabled', true);
+					dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
+						.addClass(httpconf.ZBX_STYLE_DISABLED);
+				}
+				else {
+					dynamic_rows.$element.sortable('option', 'disabled', false);
+					dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
+						.removeClass(httpconf.ZBX_STYLE_DISABLED);
+				}
+			});
+			this.$container.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
+				e.new_node.setAttribute('data-index', e.data_index);
+				e.new_node.querySelector('.element-table-remove')
+					.addEventListener('click', dynamic_rows.removeRow.bind(dynamic_rows, e.data_index));
+			});
+		}
+		else {
+			this.$container.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
+				e.new_node.setAttribute('data-index', e.data_index);
+			});
+		}
+
+		this.steps_dynamic_rows = new DynamicRows(this.$container, {
+			add_before: this.$container.find('.element-table-add').closest('tr')[0],
+			template: httpconf.step_row_template,
+			data_index: 'httpstepid'
+		});
+
+		this.renderData();
+	}
+
+	/**
 	 * The parts of form that are easier to maintain in functional objects are transformed into hidden input fields.
 	 *
 	 * @return {DocumentFragment}
@@ -316,10 +526,11 @@
 		var frag = new DocumentFragment(),
 			iter_step = 0;
 
-		this.steps_sort_order.forEach(function(id) {
+		this.sort_index.forEach(function(id) {
 			var iter_pair = 0,
-				step = this.steps[id],
-				prefix_step = 'steps[' + (iter_step ++) + ']';
+				step = this.data[id],
+				prefix_step = 'steps[' + (iter_step ++) + ']',
+				prefix_pair;
 
 			frag.append(hiddenInput('follow_redirects', step.data.follow_redirects, prefix_step));
 			frag.append(hiddenInput('httpstepid',       step.data.httpstepid,       prefix_step));
@@ -337,7 +548,7 @@
 				}
 				else {
 					step.data.pairs.post_fields.forEach(function(pair) {
-						var prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
+						prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
 						frag.append(hiddenInput('type',  'post_fields', prefix_pair));
 						frag.append(hiddenInput('name',  pair.name,     prefix_pair));
 						frag.append(hiddenInput('value', pair.value,    prefix_pair));
@@ -346,20 +557,21 @@
 			}
 
 			step.data.pairs.query_fields.forEach(function(pair) {
-				var prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
+				prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
 				frag.append(hiddenInput('type',  'query_fields', prefix_pair));
 				frag.append(hiddenInput('name',  pair.name,      prefix_pair));
 				frag.append(hiddenInput('value', pair.value,     prefix_pair));
 			});
 
 			step.data.pairs.variables.forEach(function(pair) {
-				var prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
+				prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
 				frag.append(hiddenInput('type',  'variables', prefix_pair));
 				frag.append(hiddenInput('name',  pair.name,   prefix_pair));
 				frag.append(hiddenInput('value', pair.value,  prefix_pair));
 			});
+
 			step.data.pairs.headers.forEach(function(pair) {
-				var prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
+				prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
 				frag.append(hiddenInput('type',  'headers',  prefix_pair));
 				frag.append(hiddenInput('name',  pair.name,  prefix_pair));
 				frag.append(hiddenInput('value', pair.value, prefix_pair));
@@ -371,40 +583,29 @@
 	};
 
 	/**
-	 * This method maintains property for iterating steps in order, and updates visual counter in DOM.
+	 * This method maintains property for iterating steps in the order that rows have in DOM at the moment,
+	 * also updates visual counter in DOM for step rows.
 	 */
 	Steps.prototype.onSortOrderChange = function() {
 		var order = [];
-		this.$container.find('[data-step-id]').each(function(index) {
-			this.querySelector('.rowNum').innerText = (index + 1) + ':';
-			order.push(this.attributes.getNamedItem('data-step-id').value);
+		this.$container.find('[data-index]').each(function(index) {
+			this.querySelector('[data-row-num]').innerText = (index + 1) + ':';
+			order.push(this.attributes.getNamedItem('data-index').value);
 		});
-		this.steps_sort_order = order;
-	};
-
-	/**
-	 * Updates step data with Steps object.
-	 *
-	 * @param {object} step  Step data, that holds accurate httpstepid filed.
-	 */
-	Steps.prototype.updateStep = function(step) {
-		jQuery.extend(this.steps[step.httpstepid].data, step);
-		this.dynamicRows.setData([]);
-		this.steps_sort_order.forEach(function(httpstepid) {
-			this.dynamicRows.addRow(this.steps[httpstepid].data);
-		}.bind(this));
+		this.sort_index = order;
 	};
 
 	/**
 	 * Adds or updates newly created step data with Steps object.
 	 *
-	 * @param {object} step  Step data, that holds accurate httpstepid filed.
+	 * @param {object} data  Step data, that holds accurate httpstepid filed.
 	 */
-	Steps.prototype.addStep = function(step) {
-		if (this.steps_sort_order.indexOf(step.httpstepid) == -1) {
-			this.steps_sort_order.push(step.httpstepid);
+	Steps.prototype.addStep = function(data) {
+		if (this.sort_index.indexOf(data.httpstepid) == -1) {
+			this.sort_index.push(data.httpstepid);
 		}
-		this.updateStep(step);
+
+		this.steps[data.httpstepid] = new Step(data);
 	};
 
 	/**
@@ -415,8 +616,8 @@
 	Steps.prototype.getStepNames = function() {
 		var names = [];
 
-		for (var httpstepid in this.steps) {
-			names.push(this.steps[httpstepid].data.name);
+		for (var httpstepid in this.data) {
+			names.push(this.data[httpstepid].data.name);
 		}
 
 		return names;
@@ -428,7 +629,8 @@
 	 * @param {integer} httpstepid
 	 */
 	Steps.prototype.onStepOverlayReadyCb = function(httpstepid) {
-		this.edit_form = new StepEditForm(jQuery('#http_step'), this.steps[httpstepid]);
+		var step_ref = this.data[httpstepid] ? this.data[httpstepid] : this.new_step;
+		this.edit_form = new StepEditForm(jQuery('#http_step'), step_ref);
 	};
 
 	/**
@@ -436,9 +638,21 @@
 	 */
 	Steps.prototype.openNew = function() {
 		this.new_stepid -= 1;
-		this.steps[this.new_stepid] = new Step({httpstepid: this.new_stepid});
-		this.open(this.new_stepid);
+
+		this.new_step = new Step({httpstepid: this.new_stepid});
+		this.new_step.open(this.$container.find('.element-table-add'));
 	};
+
+	/**
+	 * Renders steps in DOM.
+	 */
+	Steps.prototype.renderData = function() {
+		this.sort_index.forEach(function(data_index) {
+			this.steps_dynamic_rows.addRow(this.data[data_index].data);
+		}.bind(this));
+
+		this.onSortOrderChange();
+	}
 
 	/**
 	 * Opens popup for a step.
@@ -446,11 +660,8 @@
 	 * @param {integer} httpstepid
 	 */
 	Steps.prototype.open = function(httpstepid) {
-		var $refocus = (httpstepid != this.new_stepid)
-			? this.$container.find('[data-step-id="' + httpstepid + '"] a')
-			: this.$container.find('.element-table-add');
-
-		this.steps[httpstepid].open($refocus);
+		this.data[httpstepid]
+			.open(this.$container.find('[data-index="' + httpstepid + '"] a'));
 	};
 
 	/**
@@ -471,10 +682,17 @@
 	}
 
 	/**
-	 * Opens step popup edit or create form.
+	 * Merges old data with new data.
+	 */
+	Step.prototype.update = function(data) {
+		jQuery.extend(this.data, data);
+	};
+
+	/**
+	 * Opens step popup - edit or create form.
 	 * Note: a callback this.onStepOverlayReadyCb is called from within popup form once it is parsed.
 	 *
-	 * @param {Node} refocus
+	 * @param {Node} refocus  A node to set focus to, when popup is closed.
 	 */
 	Step.prototype.open = function(refocus) {
 		return PopUp('popup.httpstep', {
@@ -495,26 +713,44 @@
 	};
 
 	/**
+	 * Represents popup form.
+	 *
 	 * @param {jQuery} $form
 	 * @param {Step} step_ref  Reference to step instance from Steps object.
 	 */
 	function StepEditForm($form, step_ref) {
-		this.$form = $form;
+		this.$form = $form
 		this.step = step_ref;
 
 		var $pairs = jQuery('.httpconf-dynamic-row', $form);
+		$pairs.sortable(sortableOpts());
 
-		$pairs.sortable({
-			items: 'tbody tr.sortable',
-			axis: 'y',
-			cursor: 'move',
-			containment: 'parent',
-			handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
-			tolerance: 'pointer',
-			opacity: 0.6,
-			start: function(e, ui) {
-				ui.placeholder.height(ui.item.height());
+		$pairs.on('dynamic_rows.updated', function(e, dynamic_rows) {
+			if (dynamic_rows.length < 2) {
+				dynamic_rows.$element.find('[data-index]').each(function(i, node) {
+					var name = node.querySelector('[data-type="name"]').value,
+						value = node.querySelector('[data-type="value"]').value;
+
+					if (!name && !value) {
+						dynamic_rows.$element.find('.element-table-remove').prop('disabled', true);
+					}
+				});
+				dynamic_rows.$element.sortable('option', 'disabled', true);
+				dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
+					.addClass(httpconf.ZBX_STYLE_DISABLED);
 			}
+			else {
+				dynamic_rows.$element.find('.element-table-remove').prop('disabled', false);
+
+				dynamic_rows.$element.sortable('option', 'disabled', false);
+				dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
+					.removeClass(httpconf.ZBX_STYLE_DISABLED);
+			}
+		});
+		$pairs.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
+			e.new_node.setAttribute('data-index', e.data_index);
+			e.new_node.querySelector('.element-table-remove')
+				.addEventListener('click', dynamic_rows.removeRow.bind(dynamic_rows, e.data_index));
 		});
 
 		this.pairs = {
@@ -526,24 +762,26 @@
 
 		$pairs.each(function(index, node) {
 			var $node = jQuery(node),
-				type = $node.data('type');
+				type = $node.data('type'),
+				data = this.step.data.pairs[type];
 
-			this.pairs[type] = $node.dynamicRows({
-				keep_min_rows: 1,
-				template: '#scenario-pair-row'
-			})
-			.data('dynamicRows')
-			.setData(this.step.data.pairs[type]);
+			if (type === 'variables') {
+				$node.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
+					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
+				});
+			}
+
+			var dynamic_rows = new DynamicRows($node, {
+					add_before: $node.find('.element-table-add').closest('tr')[0],
+					template: httpconf.pair_row_template,
+					ensure_min_rows: 1
+				}, data);
+
+			$node.find('.element-table-add').on('click', dynamic_rows.addRow.bind(dynamic_rows, {}, null));
+
+			this.pairs[type] = dynamic_rows;
 		}.bind(this));
 
-		$pairs.each(function(index, el) {
-			$el = jQuery(el);
-			$el.sortable('option','disabled', $el.data('dynamicRows').length < 2);
-		});
-
-		$pairs.on('tableupdate.dynamicRows', function(e, data) {
-			data.dynamicRows.$element.sortable('option','disabled', data.dynamicRows.length < 2);
-		});
 
 		this.$checkbox_retrieve_mode = jQuery('#retrieve_mode', $form);
 		this.$input_required_string = jQuery('#required', $form);
@@ -605,13 +843,22 @@
 
 			return this.errorDialog(html_msg, this.$input_url);
 		}
-
-		var rows = this.pairs.query_fields.getCurrentData();
-
-		rows = rows.concat(url.pairs);
-		this.pairs.query_fields.setData(rows);
-
 		this.$input_url.val(url.url);
+
+		// Here we exhaust query parameters to fill any empty pair inputs first.
+		for (var data_index in this.pairs.query_fields.data) {
+			var data_row = this.pairs.query_fields.data[data_index],
+				name_inp = data_row.node.querySelector('[data-type="name"]'),
+				value_inp = data_row.node.querySelector('[data-type="value"]');
+
+			if (!name_inp.value && !value_inp.value) {
+				var pair = url.pairs.shift();
+				this.pairs.query_fields.addRow(pair, data_index);
+			}
+		}
+
+		// Appends remaining query parameters, if any.
+		url.pairs.forEach(this.pairs.query_fields.addRow.bind(this.pairs.query_fields));
 	};
 
 	/**
@@ -632,7 +879,7 @@
 	};
 
 	/**
-	 * This method builds query string from pairs given.
+	 * This method builds query string from given pairs.
 	 *
 	 * @throws
 	 *
@@ -706,7 +953,7 @@
 	};
 
 	/**
-	 * This method switches between textarea and dynamic field layouts.
+	 * This method switches view between textarea and dynamic field layouts.
 	 *
 	 * @param {bool} set_raw
 	 */
@@ -731,7 +978,7 @@
 		else {
 			var pairs = [];
 			// This way sortable order is preserved.
-			this.pairs.post_fields.eachRow(function(i, node) {
+			this.pairs.post_fields.$element.find('[data-index]').each(function(i, node) {
 				var name = node.querySelector('[data-type="name"]').value,
 					value = node.querySelector('[data-type="value"]').value;
 
@@ -752,9 +999,10 @@
 	StepEditForm.prototype.formToData = function() {
 		for (var type in this.pairs) {
 			this.step.data.pairs[type] = [];
-			this.pairs[type].eachRow(function(index, row) {
-				var name = row.querySelector('[data-type="name"]').value,
-					value = row.querySelector('[data-type="value"]').value;
+
+			this.pairs[type].$element.find('[data-index]').each(function(i, node) {
+				var name = node.querySelector('[data-type="name"]').value,
+					value = node.querySelector('[data-type="value"]').value;
 				if (name || value) {
 					this.push({name: name, value: value});
 				}
@@ -775,6 +1023,8 @@
 		url.setArgument('validate', 1);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
+		this.formToData();
+
 		return jQuery.ajax({
 			url: url.getUrl(),
 			data: this.$form.serialize(),
@@ -786,13 +1036,13 @@
 				return jQuery(ret.errors).insertBefore(this.$form);
 			}
 
-			this.formToData();
-			if (ret.params.httpstepid < 0) {
-				httpconf.steps.addStep(ret.params);
+			if (!httpconf.steps.data[ret.params.httpstepid]) {
+				httpconf.steps.sort_index.push(ret.params.httpstepid);
+				httpconf.steps.data[ret.params.httpstepid] = this.step;
 			}
-			else {
-				httpconf.steps.updateStep(ret.params);
-			}
+
+			httpconf.steps.data[ret.params.httpstepid].update(ret.params);
+			httpconf.steps.renderData();
 
 			overlayDialogueDestroy(dialogueid);
 		}.bind(this));
