@@ -3,6 +3,7 @@ Changes for 4.0.8rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-15677] fixed the process of compiling the dummy.c module (MVekslers)
 .......PS. [ZBX-15981] fixed invalid xpath for vmware "eventlog" key with "skip" option (MVekslers)
 ...G...... [ZBX-15704] fixed sending log meta information without obvious needs (asestakovs)
 ........S. [ZBX-15956] reduced configuration cache fragmentation when reloading time based triggers (vso)
