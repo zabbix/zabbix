@@ -65,6 +65,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.dashbrd.filter.active':
+				case 'web.discovery.filter.active':
 					$ret = true;
 					break;
 

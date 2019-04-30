@@ -119,7 +119,11 @@ if (!$data['templateid']) {
 $buttons['screen.massdelete'] = ['name' => _('Delete'), 'confirm' => _('Delete selected screens?')];
 
 // append table to form
-$screenForm->addItem([$screenTable, $data['paging'], new CActionButtonList('action', 'screens', $buttons)]);
+$screenForm->addItem([
+	$screenTable,
+	$data['paging'],
+	new CActionButtonList('action', 'screens', $buttons, $data['templateid'] ? $data['templateid'] : null)
+]);
 
 // append form to widget
 $widget->addItem($screenForm);

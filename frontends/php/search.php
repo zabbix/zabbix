@@ -250,6 +250,7 @@ foreach ($hosts as $hnum => $host) {
 
 $widgets = [];
 $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTS, $table))
+	->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID)
 	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state', true))
 	->setHeader(_('Hosts'), [], false, 'search.php')
 	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
@@ -349,6 +350,7 @@ foreach ($hostGroups as $hnum => $group) {
 }
 
 $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
+	->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID)
 	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state', true))
 	->setHeader(_('Host groups'), [], false, 'search.php')
 	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
@@ -490,6 +492,7 @@ if ($admin) {
 	}
 
 	$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_TEMPLATES, $table))
+		->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID)
 		->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state', true))
 		->setHeader(_('Templates'), [], false, 'search.php')
 		->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
