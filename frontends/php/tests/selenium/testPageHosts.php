@@ -305,7 +305,7 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Contains', 'value' => 'host'],
 						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
 					],
-					'expected_hosts' => [
+					'result' => [
 						[
 							'Name' => 'Simple form test host',
 							'Tags' => [
@@ -323,7 +323,7 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Contains', 'value' => 'host'],
 						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
 					],
-					'expected_hosts' => [
+					'result' => [
 						[
 							'Name' => 'Host with tags for cloning',
 							'Tags' => [
@@ -355,7 +355,7 @@ class testPageHosts extends CLegacyWebTest {
 					'tags' => [
 						['name' => 'tag', 'operator' => 'Contains', 'value' => 'HOST'],
 					],
-					'expected_hosts' => [
+					'result' => [
 						['Name' => 'Host with tags for cloning', 'Templates' => ''],
 						['Name' => 'Host with tags for updating', 'Templates' => ''],
 						['Name' => 'Simple form test host', 'Templates' => 'Form test template']
@@ -368,7 +368,7 @@ class testPageHosts extends CLegacyWebTest {
 					'tags' => [
 						['name' => 'tag', 'operator' => 'Equals', 'value' => 'HOST'],
 					],
-					'expected_hosts' => [
+					'result' => [
 						['Name' => 'Simple form test host']
 					]
 				]
@@ -379,7 +379,7 @@ class testPageHosts extends CLegacyWebTest {
 					'tags' => [
 							['name' => 'action', 'operator' => 'Contains'],
 					],
-					'expected_hosts' => [
+					'result' => [
 						['Name' => 'Host with tags for cloning'],
 						['Name' => 'Host with tags for updating'],
 						['Name' => 'Simple form test host']
@@ -412,7 +412,7 @@ class testPageHosts extends CLegacyWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Check filtered result.
-		$this->checkTableData(CTestArrayHelper::get($data, 'expected_hosts', []));
+		$this->checkTableData(CTestArrayHelper::get($data, 'result', []));
 
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();

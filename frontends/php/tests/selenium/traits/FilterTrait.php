@@ -26,10 +26,12 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 trait FilterTrait {
 
 	/**
-	 * Select tag type. Add new tag, select operator, name and value.
+	 * Select type of tags. Add new tag, select tag operator, name and value.
 	 *
-	 * @param string  $type        tag type And/Or, Or
+	 * @param string  $type        type of tags And/Or, Or
 	 * @param array   $tags        tag operator, name and value
+	 *
+	 * @return CFormElement
 	 */
 	public function setTags($type, $tags) {
 		$form = $this->query('name:zbx_filter')->asForm()->one();

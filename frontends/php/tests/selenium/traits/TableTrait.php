@@ -29,7 +29,6 @@ trait TableTrait {
 	 * Check if values in table rows match data from data provider.
 	 *
 	 * @param array   $data     data array to be match with result in table
-	 * @param string  $field    table column name
 	 */
 	public function checkTableData($data = []) {
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
@@ -79,7 +78,7 @@ trait TableTrait {
 	 * Check if values in table column match data from data provider.
 	 *
 	 * @param array   $rows        data array to be match with result in table
-	 * @param string  $field          table column name
+	 * @param string  $field       table column name
 	 */
 	public function checkTableDataColumn($rows = [], $field = 'Name') {
 		$data = [];
