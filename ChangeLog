@@ -14,6 +14,7 @@ New features:
 
 Bug fixes:
 .......PS. [ZBX-15981] fixed invalid xpath for vmware "eventlog" key with "skip" option (MVekslers)
+...G...... [ZBX-15704] fixed sending log meta information without obvious needs (asestakovs)
 ..F....... [ZBX-15905] added versioning of browser cached files (ashubin, gcalenko)
 ........S. [ZBX-15956] reduced configuration cache fragmentation when reloading time based triggers (vso)
 ........S. [ZBX-15998] improved performance of "Remove host", "Remove from host group", "Unlink from template" operations when processing network discovery events and using MySQL database (vso)
@@ -364,6 +365,7 @@ New features:
 
 Bug fixes:
 .......PS. [ZBX-15981] fixed invalid xpath for vmware "eventlog" key with "skip" option (MVekslers)
+...G...... [ZBX-15704] fixed sending log meta information without obvious needs (asestakovs)
 ........S. [ZBX-15956] reduced configuration cache fragmentation when reloading time based triggers (vso)
 ........S. [ZBX-15998] improved performance of "Remove host", "Remove from host group", "Unlink from template" operations when processing network discovery events and using MySQL database (vso)
 ........S. [ZBX-15935] fixed infinite loop and 100% CPU usage when using OpenIPMI 2.0.26 or newer (asitals)
