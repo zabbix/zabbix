@@ -47,7 +47,35 @@ if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
 	$height = getRequest('height', 0);
 }
 
-if (hasRequest('iconid')) {
+if (isset($_REQUEST['css'])) {
+	$css = 'div.sysmap_iconid_0 {'.
+			' height: 50px;'.
+			' width: 50px;'.
+			' background-image: url("images/general/no_icon.png"); }'."\n";
+
+	$images = API::Image()->get([
+		'output' => ['imageid'],
+		'filter' => ['imagetype' => IMAGE_TYPE_ICON],
+		'select_image' => true
+	]);
+	foreach ($images as $image) {
+		$image['image'] = base64_decode($image['image']);
+		$ico = imagecreatefromstring($image['image']);
+
+		if ($resize) {
+			$ico = imageThumb($ico, $width, $height);
+		}
+		$w = imagesx($ico);
+		$h = imagesy($ico);
+
+		$css .= 'div.sysmap_iconid_'.$image['imageid'].'{'.
+					' height: '.$h.'px;'.
+					' width: '.$w.'px;'.
+					' background: url("imgstore.php?iconid='.$image['imageid'].'&width='.$w.'&height='.$h.'") no-repeat center center;}'."\n";
+	}
+	echo $css;
+}
+elseif (isset($_REQUEST['iconid'])) {
 	$iconid = getRequest('iconid', 0);
 	$unavailable = getRequest('unavailable', 0);
 

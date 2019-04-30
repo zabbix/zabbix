@@ -2539,6 +2539,21 @@ ZABBIX.apps.map = (function($) {
 			 * Updates element icon and height/witdh in case element is area type.
 			 */
 			updateIcon: function() {
+				var oldIconClass = this.domNode.get(0).className.match(/sysmap_iconid_\d+/);
+
+				if (oldIconClass !== null) {
+					this.domNode.removeClass(oldIconClass[0]);
+				}
+
+				if ((this.data.use_iconmap === '1' && this.sysmap.data.iconmapid !== '0')
+						&& (this.data.elementtype === '0'
+							|| (this.data.elementtype === '3' && this.data.elementsubtype === '1'))) {
+					this.domNode.addClass('sysmap_iconid_' + this.sysmap.defaultAutoIconId);
+				}
+				else {
+					this.domNode.addClass('sysmap_iconid_' + this.data.iconid_off);
+				}
+
 				if (this.data.elementtype === '3' && this.data.elementsubtype === '1') {
 					if (this.data.areatype === '1') {
 						this.domNode

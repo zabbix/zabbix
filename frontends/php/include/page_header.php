@@ -180,8 +180,13 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			}
 		}
 	}
+	$pageHeader->addCssFile('styles/'.CHtml::encode($theme).'.css');
+
+	if ($page['file'] == 'sysmap.php') {
+		$pageHeader->addCssFile('imgstore.php?css=1&output=css');
+	}
+
 	$pageHeader
-		->addCssFile('styles/'.CHtml::encode($theme).'.css')
 		->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 		->addJsBeforeScripts(
 			'var PHP_TZ_OFFSET = '.date('Z').','.

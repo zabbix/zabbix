@@ -701,12 +701,6 @@ SVGMapElement.prototype.updateImage = function() {
 			var image = this.map.layers.elements.add('image', options);
 			this.removeItem('image');
 			this.image = image;
-
-			// Set div draggable placeholder dimensions of selement.
-			jQuery(`[data-id="${this.options.selementid}"]`).css({
-				width: this.width + 'px',
-				height: this.height + 'px'
-			}, this.map.container);
 		}
 		else {
 			this.image.update(options);
