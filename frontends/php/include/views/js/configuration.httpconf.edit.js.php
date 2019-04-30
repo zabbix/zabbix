@@ -144,6 +144,24 @@
 	}
 
 	/**
+	 * Helper that drys up repetitive code. Extracts pair objects from rows, in the order they are in DOM.
+	 * Not a part of DynamicRows plugin as this method follows tight conventions with templates.
+	 *
+	 * @param {callable} cb  Callback will get passed pair object, and it's data index as second argument.
+	 * @param {bool} allowed_empty  This can be set to true, to return empty pairs also.
+	 */
+	function eachPair(cb, allow_empty) {
+		this.$element.find('[data-index]').each(function(i, node) {
+			var name = node.querySelector('[data-type="name"]').value,
+				value = node.querySelector('[data-type="value"]').value;
+
+			if (name || value || allow_empty) {
+				cb({name: name, value: value}, node.getAttribute('data-index'));
+			}
+		});
+	}
+
+	/**
 	 * A helper method for creating hidden input nodes.
 	 *
 	 * @param {string} name
@@ -380,14 +398,11 @@
 			$table.sortable(sortableOpts());
 			$table.on('dynamic_rows.updated', function(e, dynamic_rows) {
 				if (dynamic_rows.length < 2) {
-					dynamic_rows.$element.find('[data-index]').each(function(i, node) {
-						var name = node.querySelector('[data-type="name"]').value,
-							value = node.querySelector('[data-type="value"]').value;
-
-						if (!name && !value) {
+					eachPair.call(dynamic_rows, function(pair) {
+						if (!pair.name && !pair.value) {
 							dynamic_rows.$element.find('.element-table-remove').prop('disabled', true);
 						}
-					});
+					}, true);
 
 					dynamic_rows.$element.sortable('option', 'disabled', true);
 					dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
@@ -429,26 +444,21 @@
 	 */
 	Scenario.prototype.toFragment = function() {
 		var frag = new DocumentFragment(),
-			iter = 0;
+			iter = 0,
+			prefix;
 
-		this.pairs.headers.$element.find('[data-index]').each(function(i, node) {
-			var name = node.querySelector('[data-type="name"]').value,
-				value = node.querySelector('[data-type="value"]').value,
-				prefix = 'pairs[' + (iter ++) + ']';
-
-			frag.append(hiddenInput('type',  'headers', prefix));
-			frag.append(hiddenInput('name',  name,      prefix));
-			frag.append(hiddenInput('value', value,     prefix));
+		eachPair.call(this.pairs.headers, function(pair) {
+			prefix = 'pairs[' + (iter ++) + ']';
+			frag.append(hiddenInput('type', 'headers', prefix));
+			frag.append(hiddenInput('name', pair.name, prefix));
+			frag.append(hiddenInput('value', pair.value, prefix));
 		});
 
-		this.pairs.variables.$element.find('[data-index]').each(function(i, node) {
-			var name = node.querySelector('[data-type="name"]').value,
-				value = node.querySelector('[data-type="value"]').value,
-				prefix = 'pairs[' + (iter ++) + ']';
-
-			frag.append(hiddenInput('type',  'variables', prefix));
-			frag.append(hiddenInput('name',  name,        prefix));
-			frag.append(hiddenInput('value', value,       prefix));
+		eachPair.call(this.pairs.variables, function(pair) {
+			prefix = 'pairs[' + (iter ++) + ']';
+			frag.append(hiddenInput('type', 'variables', prefix));
+			frag.append(hiddenInput('name', pair.name, prefix));
+			frag.append(hiddenInput('value', pair.value, prefix));
 		});
 
 		return frag;
@@ -727,14 +737,12 @@
 
 		$pairs.on('dynamic_rows.updated', function(e, dynamic_rows) {
 			if (dynamic_rows.length < 2) {
-				dynamic_rows.$element.find('[data-index]').each(function(i, node) {
-					var name = node.querySelector('[data-type="name"]').value,
-						value = node.querySelector('[data-type="value"]').value;
-
-					if (!name && !value) {
+				eachPair.call(dynamic_rows, function(pair) {
+					if (!pair.name && !pair.value) {
 						dynamic_rows.$element.find('.element-table-remove').prop('disabled', true);
 					}
-				});
+				}, true);
+
 				dynamic_rows.$element.sortable('option', 'disabled', true);
 				dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
 					.addClass(httpconf.ZBX_STYLE_DISABLED);
@@ -814,7 +822,7 @@
 		this.pairs.post_fields.$element.sortable('option', 'disabled', disable);
 		this.pairs.post_fields.$element.toggleClass('disabled', disable);
 		this.pairs.post_fields.$element.find('input').prop('disabled', disable);
-		this.pairs.post_fields.disabled(disable);
+		this.pairs.post_fields.options.disabled = disable;
 	};
 
 	/**
@@ -846,16 +854,12 @@
 		this.$input_url.val(url.url);
 
 		// Here we exhaust query parameters to fill any empty pair inputs first.
-		for (var data_index in this.pairs.query_fields.data) {
-			var data_row = this.pairs.query_fields.data[data_index],
-				name_inp = data_row.node.querySelector('[data-type="name"]'),
-				value_inp = data_row.node.querySelector('[data-type="value"]');
-
-			if (!name_inp.value && !value_inp.value) {
+		eachPair.call(this.pairs.query_fields, function(pair, data_index) {
+			if (!pair.value && !pair.name) {
 				var pair = url.pairs.shift();
-				this.pairs.query_fields.addRow(pair, data_index);
+				pair && this.addRow(pair, data_index);
 			}
-		}
+		}.bind(this.pairs.query_fields), true);
 
 		// Appends remaining query parameters, if any.
 		url.pairs.forEach(this.pairs.query_fields.addRow.bind(this.pairs.query_fields));
@@ -977,15 +981,7 @@
 		}
 		else {
 			var pairs = [];
-			// This way sortable order is preserved.
-			this.pairs.post_fields.$element.find('[data-index]').each(function(i, node) {
-				var name = node.querySelector('[data-type="name"]').value,
-					value = node.querySelector('[data-type="value"]').value;
-
-				if (name || value) {
-					pairs.push({name: name, value: value});
-				}
-			});
+			eachPair.call(this.pairs.post_fields, pairs.push.bind(pairs));
 			this.$textarea_raw_post.val(this.parsePostPairsToRaw(pairs));
 		}
 
@@ -1000,13 +996,9 @@
 		for (var type in this.pairs) {
 			this.step.data.pairs[type] = [];
 
-			this.pairs[type].$element.find('[data-index]').each(function(i, node) {
-				var name = node.querySelector('[data-type="name"]').value,
-					value = node.querySelector('[data-type="value"]').value;
-				if (name || value) {
-					this.push({name: name, value: value});
-				}
-			}.bind(this.step.data.pairs[type]));
+			eachPair.call(this.pairs[type], function(pair) {
+				this.data.pairs[type].push(pair);
+			}.bind(this.step));
 		}
 	};
 
