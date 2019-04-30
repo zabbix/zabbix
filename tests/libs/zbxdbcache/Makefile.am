@@ -7,7 +7,6 @@ SERVER_tests = \
 	is_item_processed_by_server \
 	dc_item_poller_type_update
 endif
-#dc_item_poller_type_update
 
 noinst_PROGRAMS = $(SERVER_tests)
 

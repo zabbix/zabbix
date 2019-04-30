@@ -111,13 +111,16 @@ tests/libs/zbxcommon/zbx_trim_float
 tests/libs/zbxcommon/zbx_trim_integer
 tests/libs/zbxcommon/zbx_validate_interval
 tests/libs/zbxcommon/zbx_variant_compare
+tests/libs/zbxcommon/zbx_user_macro_parse
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers_ipv4
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext_zlib
 tests/libs/zbxcommshigh/zbx_tcp_recv_raw_ext
 tests/libs/zbxconf/parse_cfg_file
+tests/libs/zbxdbcache/dc_item_poller_type_update
 tests/libs/zbxdbcache/dc_maintenance_match_tags
+tests/libs/zbxdbcache/is_item_processed_by_server
 tests/libs/zbxdbcache/zbx_vc_add_values
 tests/libs/zbxdbcache/zbx_vc_get_value
 tests/libs/zbxdbcache/zbx_vc_get_values
