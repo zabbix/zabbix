@@ -165,7 +165,7 @@
 	 * Writes data index as new nodes attribute. Bind remove event.
 	 */
 	function dynamicRowsBindNewRow($el) {
-		$table.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
+		$el.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
 			e.new_node.setAttribute('data-index', e.data_index);
 			e.new_node.querySelector('.element-table-remove')
 				.addEventListener('click', dynamic_rows.removeRow.bind(dynamic_rows, e.data_index));
@@ -987,14 +987,18 @@
 	 * Current state is always rendered form httpconf.steps object. This method collects data from form fields
 	 * and writes it in httpconf.steps object. Note that sort order is read from DOM.
 	 */
-	StepEditForm.prototype.formToData = function() {
+	StepEditForm.prototype.stepPairsData = function() {
+		var curr_pairs = {};
+
 		for (var type in this.pairs) {
-			this.step.data.pairs[type] = [];
+			curr_pairs[type] = [];
 
 			eachPair.call(this.pairs[type], function(pair) {
-				this.data.pairs[type].push(pair);
-			}.bind(this.step));
+				curr_pairs[type].push(pair);
+			});
 		}
+
+		return curr_pairs;
 	};
 
 	/**
@@ -1010,7 +1014,7 @@
 		url.setArgument('validate', 1);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
-		this.formToData();
+		var curr_pairs = this.stepPairsData();
 
 		return jQuery.ajax({
 			url: url.getUrl(),
@@ -1028,6 +1032,7 @@
 				httpconf.steps.data[ret.params.httpstepid] = this.step;
 			}
 
+			ret.params.pairs = curr_pairs;
 			httpconf.steps.data[ret.params.httpstepid].update(ret.params);
 			httpconf.steps.renderData();
 
