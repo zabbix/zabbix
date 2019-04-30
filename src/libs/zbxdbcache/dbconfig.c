@@ -12070,3 +12070,7 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
 
 	UNLOCK_CACHE;
 }
+
+#ifdef HAVE_TESTS
+#	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
+#endif
