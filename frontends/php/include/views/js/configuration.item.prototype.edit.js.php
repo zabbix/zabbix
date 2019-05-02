@@ -79,5 +79,27 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'v
 				trends.val('<?= $this->data['trends_default'] ?>');
 			}
 		});
+
+		$('#history_mode')
+			.change(function() {
+				if ($('[name="history_mode"][value='+<?= ITEM_STORAGE_OFF ?>+']').is(':checked')) {
+					$('#history').prop('disabled', true).hide();
+				}
+				else {
+					$('#history').prop('disabled', false).show();
+				}
+			})
+			.trigger('change');
+
+		$('#trends_mode')
+			.change(function() {
+				if ($('[name="trends_mode"][value='+<?= ITEM_STORAGE_OFF ?>+']').is(':checked')) {
+					$('#trends').prop('disabled', true).hide();
+				}
+				else {
+					$('#trends').prop('disabled', false).show();
+				}
+			})
+			.trigger('change');
 	});
 </script>
