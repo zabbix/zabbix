@@ -3,6 +3,8 @@ Changes for 4.0.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-16069] Version upgrade: jQuery v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
+..F....... [ZBX-15816] increased header value input field max length (talbergs)
 ...G...PS. [ZBX-15677] fixed the process of compiling the dummy.c module (MVekslers)
 .......PS. [ZBX-15981] fixed invalid xpath for vmware "eventlog" key with "skip" option (MVekslers)
 ...G...... [ZBX-15704] fixed sending log meta information without obvious needs (asestakovs)
