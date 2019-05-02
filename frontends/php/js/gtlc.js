@@ -123,20 +123,16 @@ jQuery(function ($){
 			element.label.text(data.label);
 		}
 
-		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', false);
+		$([element.from[0], element.to[0], element.apply[0]]).prop('disabled', false);
 
 		$.each({
 			decrement: data.can_decrement,
 			increment: data.can_increment,
 			zoomout: data.can_zoomout
 		}, function (elm, state) {
-			if (state === true) {
-				element[elm].removeAttr('disabled');
+			if (typeof state !== 'undefined') {
+				element[elm].prop('disabled', !state);
 			}
-			else if (state === false) {
-				element[elm].attr('disabled', true);
-			}
-
 			element[elm].removeClass('disabled');
 		});
 
@@ -156,7 +152,7 @@ jQuery(function ($){
 		}
 
 		element.apply.closest('.ui-tabs-panel').addClass('in-progress');
-		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', true);
+		$([element.from[0], element.to[0], element.apply[0]]).prop('disabled', true);
 		$([element.decrement[0], element.zoomout[0], element.increment[0]]).addClass('disabled');
 
 		ui_disabled = true;
