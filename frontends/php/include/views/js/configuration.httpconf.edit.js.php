@@ -147,6 +147,23 @@
 	}
 
 	/**
+	 * Trait method for DynamicRows, that renders disabled state.
+	 *
+	 * @param {bool} disable
+	 */
+	function dynamicRowsToggleDisable(disable) {
+		this.options.disabled = disable;
+
+		this.$element.sortable('option', 'disabled', disable);
+		this.$element.toggleClass('disabled', disable);
+		this.$element.find('input, button').prop('disabled', disable);
+
+		if (!disable) {
+			this.$element.trigger('dynamic_rows.updated', this);
+		}
+	}
+
+	/**
 	 * Helper that drys up repetitive code. Extracts pair objects from rows, in the order they are in DOM.
 	 * Not a part of DynamicRows plugin as this method follows tight conventions with templates.
 	 *
@@ -816,10 +833,8 @@
 		this.$input_required_string.prop('disabled', disable);
 		this.$textarea_raw_post.prop('disabled', disable);
 		this.$radio_post_type.prop('disabled', disable);
-		this.pairs.post_fields.$element.sortable('option', 'disabled', disable);
-		this.pairs.post_fields.$element.toggleClass('disabled', disable);
-		this.pairs.post_fields.$element.find('input').prop('disabled', disable);
-		this.pairs.post_fields.options.disabled = disable;
+
+		dynamicRowsToggleDisable.call(this.pairs.post_fields, disable);
 	};
 
 	/**
