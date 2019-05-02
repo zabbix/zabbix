@@ -19,10 +19,15 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 class testPageTemplates extends CLegacyWebTest {
 
 	public $templateName = 'Template OS Linux';
+
+	use FilterTrait;
+	use TableTrait;
 
 	public static function allTemplates() {
 		return CDBHelper::getDataProvider("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
@@ -133,5 +138,104 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+	}
+
+public static function getFilterByTagsData() {
+		return [
+			// "And" and "And/Or" checks.
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'template'],
+						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
+					],
+					'expected_templates' => [
+						'Form test template'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'template'],
+						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
+					],
+					'expected_templates' => [
+						'Form test template',
+						'Template with tags for cloning',
+						'Template with tags for updating'
+					]
+				]
+			],
+			// "Contains" and "Equals" checks.
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'TEMPLATE'],
+					],
+					'expected_templates' => [
+						'Form test template',
+						'Template with tags for cloning',
+						'Template with tags for updating'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'tag', 'operator' => 'Equals', 'value' => 'TEMPLATE'],
+					],
+					'expected_templates' => [
+						'Form test template'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'action', 'operator' => 'Contains'],
+					],
+					'expected_templates' => [
+						'Form test template',
+						'Template with tags for cloning',
+						'Template with tags for updating'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'action', 'operator' => 'Equals'],
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test filtering templates by tags.
+	 *
+	 * @dataProvider getFilterByTagsData
+	 */
+	public function testPageTemplates_FilterByTags($data) {
+		$this->page->login()->open('templates.php?groupid=0');
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		// Reset filter from possible previous scenario.
+		$form->query('button:Reset')->one()->click();
+
+		$this->setTags($data['evaluation_type'], $data['tags']);
+		$form->submit();
+		$this->page->waitUntilReady();
+		// Check filtered result.
+		$this->checkTableDataColumn(CTestArrayHelper::get($data, 'expected_templates', []));
+
+		// Reset filter due to not influence further tests.
+		$form->query('button:Reset')->one()->click();
 	}
 }

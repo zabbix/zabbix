@@ -120,7 +120,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			// Effective value.
 			$this->assertEquals($macro['value'], $element->findElement(
 					WebDriverBy::xpath('./td[3]/input[@type="text"][@readonly]')
-			)->getAttribute('value'));
+			)->getValue());
 
 			// Template value.
 			$this->assertEquals('', $element->findElement(WebDriverBy::xpath('./td[5]/div'))->getText());

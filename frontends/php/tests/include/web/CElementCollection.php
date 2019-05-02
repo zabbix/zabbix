@@ -291,6 +291,24 @@ class CElementCollection implements Iterator {
 	}
 
 	/**
+	 * Get elements as array.
+	 *
+	 * @return array
+	 */
+	public function asArray() {
+		return $this->elements;
+	}
+
+	/**
+	 * Get sliced collection of elements.
+	 *
+	 * @return CElementCollection
+	 */
+	public function slice($offset, $length = null) {
+		return new CElementCollection(array_slice($this->elements, $offset, $length), $this->element_class);
+	}
+
+	/**
 	 * Get attribute of elements as array of strings.
 	 *
 	 * @return array

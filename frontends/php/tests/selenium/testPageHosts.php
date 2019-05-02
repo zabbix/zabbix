@@ -19,12 +19,17 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 class testPageHosts extends CLegacyWebTest {
 	public $HostName = 'ЗАББИКС Сервер';
 	public $HostGroup = 'Zabbix servers';
 	public $HostIp = '127.0.0.1';
 	public $HostPort = '10050';
+
+	use FilterTrait;
+	use TableTrait;
 
 	public static function allHosts() {
 		return CDBHelper::getDataProvider(
@@ -288,5 +293,128 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+	}
+
+	public static function getFilterByTagsData() {
+		return [
+			// "And" and "And/Or" checks.
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'host'],
+						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
+					],
+					'result' => [
+						[
+							'Name' => 'Simple form test host',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'host'],
+						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
+					],
+					'result' => [
+						[
+							'Name' => 'Host with tags for cloning',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: host', 'action: clone']
+							]
+						],
+						[
+							'Name' => 'Host with tags for updating',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: host', 'action: update']
+							]
+						],
+						[
+							'Name' => 'Simple form test host',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
+							]
+						]
+					]
+				]
+			],
+			// "Contains" and "Equals" checks.
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'HOST'],
+					],
+					'result' => [
+						['Name' => 'Host with tags for cloning', 'Templates' => ''],
+						['Name' => 'Host with tags for updating', 'Templates' => ''],
+						['Name' => 'Simple form test host', 'Templates' => 'Form test template']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'tag', 'operator' => 'Equals', 'value' => 'HOST'],
+					],
+					'result' => [
+						['Name' => 'Simple form test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+							['name' => 'action', 'operator' => 'Contains'],
+					],
+					'result' => [
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'Simple form test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'action', 'operator' => 'Equals'],
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test filtering hosts by tags.
+	 *
+	 * @dataProvider getFilterByTagsData
+	 */
+	public function testPageHosts_FilterByTags($data) {
+		$this->page->login()->open('hosts.php?groupid=0');
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		// Reset filter from possible previous scenario.
+		$form->query('button:Reset')->one()->click();
+
+		$this->setTags($data['evaluation_type'], $data['tags']);
+		$form->submit();
+		$this->page->waitUntilReady();
+		// Check filtered result.
+		$this->checkTableData(CTestArrayHelper::get($data, 'result', []));
+
+		// Reset filter due to not influence further tests.
+		$form->query('button:Reset')->one()->click();
 	}
 }
