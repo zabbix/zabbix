@@ -89,7 +89,8 @@ static void init_test(void)
 
 static unsigned char str2pollertype(const char *str)
 {
-	str_map_t map[] =
+	str_map_t	*e;
+	str_map_t	map[] =
 	{
 		_ZBX_MKMAP(ZBX_NO_POLLER),			_ZBX_MKMAP(ZBX_POLLER_TYPE_NORMAL),
 		_ZBX_MKMAP(ZBX_POLLER_TYPE_UNREACHABLE),	_ZBX_MKMAP(ZBX_POLLER_TYPE_IPMI),
@@ -97,9 +98,11 @@ static unsigned char str2pollertype(const char *str)
 		{ 0 }
 	};
 
-	for (str_map_t *e = &map[0]; NULL != e->str; e++)
+	for (e = &map[0]; NULL != e->str; e++)
+	{
 		if (0 == strcmp(e->str, str))
 			return (unsigned char)e->val;
+	}
 
 	fail_msg("Cannot find string %s", str);
 
@@ -108,7 +111,8 @@ static unsigned char str2pollertype(const char *str)
 
 static int str2flags(const char *str)
 {
-	int flags = 0;
+	int		flags = 0;
+	str_map_t	*e;
 
 	str_map_t map[] =
 	{
@@ -118,9 +122,11 @@ static int str2flags(const char *str)
 		{ 0 }
 	};
 
-	for (str_map_t *e = &map[0]; NULL != e->str; e++)
+	for (e = &map[0]; NULL != e->str; e++)
+	{
 		if (0 == strcmp(e->str, str))
 			return e->val;
+	}
 
 	if (NULL != strstr(str, "ZBX_ITEM_COLLECTED"))
 		flags |= ZBX_ITEM_COLLECTED;
@@ -133,8 +139,8 @@ static int str2flags(const char *str)
 
 static const char	*read_string(const zbx_mock_handle_t *handle, const char *read_str)
 {
-	const char *str;
-	zbx_mock_handle_t string_handle;
+	const char		*str;
+	zbx_mock_handle_t	string_handle;
 
 	zbx_mock_assert_int_eq("Failed to access object member", ZBX_MOCK_SUCCESS,
 			zbx_mock_object_member(*handle, read_str, &string_handle));
@@ -147,7 +153,7 @@ static const char	*read_string(const zbx_mock_handle_t *handle, const char *read
 
 static void	read_test(const zbx_mock_handle_t *handle, test_config_t *test_config)
 {
-	const char *str;
+	const char	*str;
 
 	str = read_string(handle, PARAM_MONITORED);
 	test_config->monitored = 0 == strcmp(str, "DIRECT") ? DIRECT : PROXY;
@@ -180,12 +186,12 @@ static void	read_test(const zbx_mock_handle_t *handle, test_config_t *test_confi
  ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_mock_error_t mock_error;
-	zbx_mock_handle_t handle, elem_handle;
-	test_config_t test_config;
-	ZBX_DC_ITEM item;
-	ZBX_DC_HOST host;
-	char buffer[MAX_STRING_LEN];
+	zbx_mock_error_t	mock_error;
+	zbx_mock_handle_t	handle, elem_handle;
+	test_config_t		test_config;
+	ZBX_DC_ITEM		item;
+	ZBX_DC_HOST		host;
+	char			buffer[MAX_STRING_LEN];
 
 	ZBX_UNUSED(state);
 
@@ -202,13 +208,15 @@ void	zbx_mock_test_entry(void **state)
 		memset((void*)&host, 0, sizeof(host));
 		memset((void*)&item, 0, sizeof(item));
 
-		item.type		= test_config.type;
-		item.key		= test_config.key;
-		item.poller_type	= test_config.poller_type;
+		item.type = test_config.type;
+		item.key = test_config.key;
+		item.poller_type = test_config.poller_type;
 
 		if (PROXY == test_config.monitored)
+		{
 			while (0 == host.proxy_hostid)
 				host.proxy_hostid = rand();
+		}
 
 		zbx_snprintf(buffer, sizeof(buffer), "host is monitored %s and is %sreachable, item type is %d, "
 				"item key is %s, poller type is %d, flags %d, ref %d",
