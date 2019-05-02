@@ -216,7 +216,7 @@ $form_list
 						->setAttribute('placeholder', _('name'))
 						->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 					'&rArr;',
-					(new CTextBox('headers[value][#{index}]', '#{value}', $data['limited']))
+					(new CTextBox('headers[value][#{index}]', '#{value}', $data['limited'], 1000))
 						->setAttribute('placeholder', _('value'))
 						->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 					(new CButton(null, _('Remove')))
