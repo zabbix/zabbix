@@ -101,10 +101,8 @@ class testInheritanceApplication extends CLegacyWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testInheritanceApplication_Create($data) {
-		$result = array_key_exists('template', $data) ? $data['template'] : $data['host'];
-
 		// Add application.
-		$this->openApplicationsPage($result);
+		$this->openApplicationsPage(CTestArrayHelper::get($data, 'template', $data['host']));
 		$this->zbxTestContentControlButtonClickText('Create application');
 		$this->zbxTestInputTypeWait('appname', $data['application']);
 		$this->zbxTestClick('add');
@@ -242,9 +240,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 	 * @dataProvider getDeleteData
 	 */
 	public function testInheritanceApplication_Delete($data) {
-		$result = array_key_exists('template', $data) ? $data['template'] : $data['host'];
-
-		$this->openApplicationsPage($result);
+		$this->openApplicationsPage(CTestArrayHelper::get($data, 'template', $data['host']));
 
 		if (array_key_exists('template', $data)) {
 			// Delete application.
