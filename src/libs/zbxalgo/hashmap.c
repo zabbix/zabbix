@@ -235,14 +235,10 @@ void	zbx_hashmap_remove(zbx_hashmap_t *hm, zbx_uint64_t key)
 
 void	zbx_hashmap_clear(zbx_hashmap_t *hm)
 {
-	int			i;
-	ZBX_HASHMAP_SLOT_T	*slot;
+	int	i;
 
 	for (i = 0; i < hm->num_slots; i++)
-	{
-		slot = &hm->slots[i];
-		slot->entries_num = 0;
-	}
+		hm->slots[i].entries_num = 0;
 
 	hm->num_data = 0;
 }
