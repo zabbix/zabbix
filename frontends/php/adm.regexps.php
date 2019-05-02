@@ -113,7 +113,7 @@ if (hasRequest('action') && !hasRequest('regexpid')) {
 			'SELECT regexpid FROM regexps re WHERE '.dbConditionInt('re.regexpid', getRequest('regexpids'))
 		));
 		if (count($reg_exps) != count(getRequest('regexpids'))) {
-			uncheckTableRows(null, array_column($reg_exps, 'regexpid', 'regexpid'));
+			uncheckTableRows(null, zbx_objectValues($reg_exps, 'regexpid'));
 			show_error_message(_('No permissions to referred object or it does not exist!'));
 			$mass_skip = true;
 		}

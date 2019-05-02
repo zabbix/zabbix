@@ -33,15 +33,6 @@
 #define	REMOVE_TH	4
 #define	REMOVE_HT	5
 
-#define ZBX_CM_LEAK_CHECK_START()	zbx_cm_minfo = mallinfo()
-#define ZBX_CM_LEAK_CHECK_END()	{									\
-		struct mallinfo minfo_local;								\
-		minfo_local = mallinfo(); 								\
-		zbx_mock_assert_int_eq("memory leak", minfo_local.uordblks, zbx_cm_minfo.uordblks);	\
-	}
-
-static struct mallinfo	zbx_cm_minfo;
-
 static void	mock_read_values(zbx_mock_handle_t hdata, zbx_vector_ptr_t *values)
 {
 	zbx_mock_error_t	err;
@@ -65,8 +56,6 @@ static void	test_queue_range_values(int iterations, zbx_vector_ptr_t *values)
 	zbx_queue_ptr_t	queue;
 	void		*ptr;
 	int		i, j;
-
-	ZBX_CM_LEAK_CHECK_START();
 
 	zbx_queue_ptr_create(&queue);
 
@@ -93,8 +82,6 @@ static void	test_queue_range_values(int iterations, zbx_vector_ptr_t *values)
 	}
 
 	zbx_queue_ptr_destroy(&queue);
-
-	ZBX_CM_LEAK_CHECK_END();
 }
 
 void test_queue_range()
@@ -117,8 +104,6 @@ void test_queue_ptr_compact_tail_head()
 	zbx_vector_ptr_create(&values);
 	mock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
 
-	ZBX_CM_LEAK_CHECK_START();
-
 	zbx_queue_ptr_create(&queue);
 
 	/* fill the queue */
@@ -139,9 +124,6 @@ void test_queue_ptr_compact_tail_head()
 	}
 
 	zbx_queue_ptr_destroy(&queue);
-
-	ZBX_CM_LEAK_CHECK_END();
-
 	zbx_vector_ptr_destroy(&values);
 }
 
@@ -154,8 +136,6 @@ void test_queue_ptr_compact_head_tail()
 
 	zbx_vector_ptr_create(&values);
 	mock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
-
-	ZBX_CM_LEAK_CHECK_START();
 
 	zbx_queue_ptr_create(&queue);
 	zbx_queue_ptr_reserve(&queue, values.values_num * 1.5);
@@ -188,9 +168,6 @@ void test_queue_ptr_compact_head_tail()
 	}
 
 	zbx_queue_ptr_destroy(&queue);
-
-	ZBX_CM_LEAK_CHECK_END();
-
 	zbx_vector_ptr_destroy(&values);
 }
 
@@ -222,8 +199,6 @@ void test_queue_ptr_remove_tail_head()
 	zbx_vector_ptr_create(&values);
 	mock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
 
-	ZBX_CM_LEAK_CHECK_START();
-
 	zbx_queue_ptr_create(&queue);
 
 	/* try removing value that is not in queue */
@@ -251,8 +226,6 @@ void test_queue_ptr_remove_tail_head()
 		zbx_queue_ptr_destroy(&queue);
 	}
 
-	ZBX_CM_LEAK_CHECK_END();
-
 	zbx_vector_ptr_destroy(&values);
 }
 
@@ -264,8 +237,6 @@ void test_queue_ptr_remove_head_tail()
 
 	zbx_vector_ptr_create(&values);
 	mock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
-
-	ZBX_CM_LEAK_CHECK_START();
 
 	/* try removing value that is not in queue */
 
@@ -297,8 +268,6 @@ void test_queue_ptr_remove_head_tail()
 
 		zbx_queue_ptr_destroy(&queue);
 	}
-
-	ZBX_CM_LEAK_CHECK_END();
 
 	zbx_vector_ptr_destroy(&values);
 }
