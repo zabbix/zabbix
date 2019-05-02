@@ -47,9 +47,6 @@ zbx_http_response_t;
 
 #endif
 
-static const char URI_PROHIBIT_CHARS[] = {0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xA,0xB,0xC,0xD,0xE,0xF,0x10,0x11,0x12,\
-	0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x7F,0};
-
 static int	detect_url(const char *host)
 {
 	char	*p;
@@ -66,56 +63,78 @@ static int	detect_url(const char *host)
 
 static int	process_url(const char *host, const char *port, const char *path, char **url, char **error)
 {
-	char	*host_lcase = NULL, *p;
-	int	ret = SYSINFO_RET_OK;
+	char	*p;
+	char	scheme[9];	/* string capable to hold "https://" (null-terminated) */
+	int	scheme_found = 0;
 
 	/* port and path parameters must be empty */
 	if ((NULL != port && '\0' != *port) || (NULL != path && '\0' != *path))
 	{
 		*error = zbx_strdup(*error,
-				"Parameters 'path' and 'port' must be empty if URL is specified in 'host'.");
-		return SYSINFO_RET_FAIL;
+				"Parameters \"path\" and \"port\" must be empty if URL is specified in \"host\".");
+		return FAIL;
 	}
 
-	host_lcase = zbx_strdup(host_lcase, host);
-	zbx_strlower(host_lcase);
+	zbx_strlcpy(scheme, host, 9);
+	zbx_strlower(scheme);
 
 	/* allow HTTP(S) scheme only */
 #ifdef HAVE_LIBCURL
-	if (0 == strncmp(host_lcase, HTTP_SCHEME_STR, ZBX_CONST_STRLEN(HTTP_SCHEME_STR)) ||
-			0 == strncmp(host_lcase, HTTPS_SCHEME_STR, ZBX_CONST_STRLEN(HTTPS_SCHEME_STR)))
+	if (0 == strncmp(scheme, HTTP_SCHEME_STR, ZBX_CONST_STRLEN(HTTP_SCHEME_STR)) ||
+			0 == strncmp(scheme, HTTPS_SCHEME_STR, ZBX_CONST_STRLEN(HTTPS_SCHEME_STR)))
 #else
-	if (0 == strncmp(host_lcase, HTTP_SCHEME_STR, ZBX_CONST_STRLEN(HTTP_SCHEME_STR)))
+	if (0 == strncmp(scheme, HTTP_SCHEME_STR, ZBX_CONST_STRLEN(HTTP_SCHEME_STR)))
 #endif
 	{
-		*url = zbx_strdup(*url, host);
+		scheme_found = 1;
 	}
 	else if (NULL != (p = strstr(host, "://")))
 	{
-		size_t	len = (size_t)(p + 1 - host);
-
-		p = (char*)zbx_malloc(NULL, len);
-		zbx_strlcpy(p, host, len);
-		*error = zbx_dsprintf(*error, "Unsupported scheme: %s.", p);
-		zbx_free(p);
-		ret = SYSINFO_RET_FAIL;
+		*error = zbx_dsprintf(*error, "Unsupported scheme: %.*s.", (int)(p - host), host);
+		return FAIL;
 	}
+
+	if (NULL != (p = strchr(host, '#')))
+		*url = zbx_dsprintf(*url, "%s%.*s", (0 == scheme_found ? HTTP_SCHEME_STR : ""), (int)(p - host), host);
 	else
-		*url = zbx_dsprintf(*url, HTTP_SCHEME_STR "%s", host);
+		*url = zbx_dsprintf(*url, "%s%s", (0 == scheme_found ? HTTP_SCHEME_STR : ""), host);
 
-	if (SYSINFO_RET_OK == ret)
+	if (SUCCEED != zbx_http_punycode_encode_url(url))
 	{
-		if (SUCCEED != zbx_http_punycode_encode_url(url))
-		{
-			*error = zbx_strdup(*error, "Cannot encode domain name into punycode.");
-			zbx_free(*url);
-			ret = SYSINFO_RET_FAIL;
-		}
+		*error = zbx_strdup(*error, "Cannot encode domain name into punycode.");
+		zbx_free(*url);
+		return FAIL;
 	}
 
-	zbx_free(host_lcase);
+	return SUCCEED;
+}
 
-	return ret;
+static int	check_common_params(const char *host, const char *path, char **error)
+{
+	const char	*wrong_chr, URI_PROHIBIT_CHARS[] = {0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xA,0xB,0xC,0xD,0xE,\
+			0xF,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x7F,0};
+
+	if (NULL == host || '\0' == *host)
+	{
+		*error = zbx_strdup(*error, "Invalid first parameter.");
+		return FAIL;
+	}
+
+	if (NULL != (wrong_chr = strpbrk(host, URI_PROHIBIT_CHARS)))
+	{
+		*error = zbx_dsprintf(NULL, "Incorrect hostname expression. Check hostname part after: %.*s.",
+				(int)(wrong_chr - host), host);
+		return FAIL;
+	}
+
+	if (NULL != path && NULL != (wrong_chr = strpbrk(path, URI_PROHIBIT_CHARS)))
+	{
+		*error = zbx_dsprintf(NULL, "Incorrect path expression. Check path part after: %.*s.",
+				(int)(wrong_chr - path), path);
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 #ifdef HAVE_LIBCURL
@@ -185,34 +204,16 @@ out:
 
 static int	get_http_page(const char *host, const char *path, const char *port, char **buffer, char **error)
 {
-	char		*url = NULL;
-	const char	*wrong_chr;
-	int		ret;
+	char	*url = NULL;
+	int	ret;
 
-	if (NULL == host || '\0' == *host)
-	{
-		*error = zbx_strdup(*error, "Invalid first parameter.");
+	if (SUCCEED != check_common_params(host, path, error))
 		return SYSINFO_RET_FAIL;
-	}
-
-	if (NULL != (wrong_chr = strpbrk(host, URI_PROHIBIT_CHARS)))
-	{
-		*error = zbx_dsprintf(NULL, "Incorrect hostname expression. Check hostname part after: %.*s.",
-				(int)(wrong_chr - host), host);
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (NULL != path && NULL != (wrong_chr = strpbrk(path, URI_PROHIBIT_CHARS)))
-	{
-		*error = zbx_dsprintf(NULL, "Incorrect path expression. Check path part after: %.*s.",
-				(int)(wrong_chr - path), path);
-		return SYSINFO_RET_FAIL;
-	}
 
 	if (SUCCEED == detect_url(host))
 	{
 		/* URL detected */
-		if (SYSINFO_RET_OK != process_url(host, port, path, &url, error))
+		if (SUCCEED != process_url(host, port, path, &url, error))
 			return SYSINFO_RET_FAIL;
 	}
 	else
@@ -236,12 +237,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 			url = zbx_dsprintf(url, HTTP_SCHEME_STR "%s:%u/", host, port_n);
 
 		if (NULL != path)
-		{
-			if ('/' == *path)
-				url = zbx_strdcat(url, path + 1);
-			else
-				url = zbx_strdcat(url, path);
-		}
+			url = zbx_strdcat(url, path + ('/' == *path ? 1 : 0));
 	}
 
 	ret = curl_page_get(url, buffer, error);
@@ -255,7 +251,7 @@ static char	*find_port_sep(char *host)
 	char	*p;
 	int	in_ipv6 = 0;
 
-	for (p = host; '\0' != *p; p++)
+	for (p = host; '\0' != *p && '/' != *p; p++)
 	{
 		if (0 == in_ipv6)
 		{
@@ -274,30 +270,12 @@ static char	*find_port_sep(char *host)
 static int	get_http_page(const char *host, const char *path, const char *port, char **buffer, char **error)
 {
 	char		*url = NULL, *hostname = NULL, *path_loc = NULL, *p_host;
-	const char	*wrong_chr;
-	int		ret = SYSINFO_RET_OK;
+	int		ret = SYSINFO_RET_OK, ipv6_host_found = 0;
 	unsigned short	port_num;
 	zbx_socket_t	s;
 
-	if (NULL == host || '\0' == *host)
-	{
-		*error = zbx_strdup(*error, "Invalid first parameter.");
+	if (SUCCEED != check_common_params(host, path, error))
 		return SYSINFO_RET_FAIL;
-	}
-
-	if (NULL != (wrong_chr = strpbrk(host, URI_PROHIBIT_CHARS)))
-	{
-		*error = zbx_dsprintf(NULL, "Incorrect hostname expression. Check hostname part after: %.*s.",
-				(int)(wrong_chr - host), host);
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (NULL != path && NULL != (wrong_chr = strpbrk(path, URI_PROHIBIT_CHARS)))
-	{
-		*error = zbx_dsprintf(NULL, "Incorrect path expression. Check path part after: %.*s.",
-				(int)(wrong_chr - path), path);
-		return SYSINFO_RET_FAIL;
-	}
 
 	if (SUCCEED == detect_url(host))
 	{
@@ -305,12 +283,12 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 
 		char	*p;
 
-		if (SYSINFO_RET_OK != process_url(host, port, path, &url, error))
+		if (SUCCEED != process_url(host, port, path, &url, error))
 			return SYSINFO_RET_FAIL;
 
 		if (NULL != (p = strchr(url, '@')))
 		{
-			*error = zbx_dsprintf(*error, "Unsupported URL: %s.", url);
+			*error = zbx_dsprintf(*error, "Unsupported URL format: %s.", url);
 			ret = SYSINFO_RET_FAIL;
 			goto out;
 		}
@@ -344,7 +322,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 
 		if (SYSINFO_RET_OK != ret)
 		{
-			*error = zbx_dsprintf(*error, "Invalid port in URL: %s.", url);
+			*error = zbx_dsprintf(*error, "URL using bad/illegal format.");
 			goto out;
 		}
 		else if (NULL == path_loc)
@@ -352,8 +330,20 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 			path_loc = zbx_strdup(path_loc, "/");
 		}
 
-		zbx_ltrim(hostname, "[");
-		zbx_rtrim(hostname, "]");
+		if ('[' == *hostname)
+		{
+			zbx_ltrim(hostname, "[");
+			zbx_rtrim(hostname, "]");
+
+			if ('\0' == *hostname)
+			{
+				*error = zbx_dsprintf(*error, "Invalid host in URL.");
+				ret = SYSINFO_RET_FAIL;
+				goto out;
+			}
+
+			ipv6_host_found = 1;
+		}
 	}
 	else
 	{
@@ -371,20 +361,23 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		}
 
 		path_loc = zbx_strdup(path_loc, (NULL != path ? path : "/"));
-		hostname = zbx_strdup(hostname, host);
+
+		if (NULL != strchr(host, ':'))
+			ipv6_host_found = 1;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, hostname, port_num, CONFIG_TIMEOUT,
-			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, (hostname != NULL ? hostname : host), port_num,
+			CONFIG_TIMEOUT, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		char	*request = NULL;
 
 		request = zbx_dsprintf(request,
 				"GET %s%s HTTP/1.1\r\n"
-				"Host: %s\r\n"
+				"Host: %s%s%s\r\n"
 				"Connection: close\r\n"
 				"\r\n",
-				('/' != *path_loc ? "/" : ""), path_loc, hostname);
+				('/' != *path_loc ? "/" : ""), path_loc, (1 == ipv6_host_found ? "[" : ""),
+				(hostname != NULL ? hostname : host), (1 == ipv6_host_found ? "]" : ""));
 
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{
@@ -402,11 +395,13 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		zbx_tcp_close(&s);
 	}
 
-	if (FAIL == ret)
+	if (SUCCEED != ret)
 	{
 		*error = zbx_dsprintf(NULL, "HTTP get error: %s", zbx_socket_strerror());
 		ret = SYSINFO_RET_FAIL;
 	}
+	else
+		ret = SYSINFO_RET_OK;
 
 out:
 	zbx_free(url);
