@@ -113,12 +113,13 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['hostid']
-	 * @param bool   $data['has_goto']        (optional) Can be used to hide "GO TO" menu section. Default: true.
-	 * @param int    $data['severity_min']    (optional)
-	 * @param bool   $data['show_suppressed'] (optional)
-	 * @param array  $data['urls']            (optional)
+	 * @param bool   $data['has_goto']           (optional) Can be used to hide "GO TO" menu section. Default: true.
+	 * @param int    $data['severity_min']       (optional)
+	 * @param bool   $data['show_suppressed']    (optional)
+	 * @param array  $data['urls']               (optional)
 	 * @param string $data['urls']['label']
 	 * @param string $data['urls']['url']
+	 * @param string $data['filter_application'] (optional) Application name for filter by application.
 	 *
 	 * @return mixed
 	 */
@@ -177,6 +178,10 @@ class CControllerMenuPopup extends CController {
 
 			if (array_key_exists('urls', $data)) {
 				$menu_data['urls'] = $data['urls'];
+			}
+
+			if (array_key_exists('filter_application', $data)) {
+				$menu_data['filter_application'] = $data['filter_application'];
 			}
 
 			return $menu_data;
@@ -293,7 +298,7 @@ class CControllerMenuPopup extends CController {
 	private static function getMenuDataMapElement(array $data) {
 		$db_maps = API::Map()->get([
 			'output' => ['show_suppressed'],
-			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls'],
+			'selectSelements' => ['selementid', 'elementtype', 'elementsubtype', 'elements', 'urls', 'application'],
 			'sysmapids' => $data['sysmapid'],
 			'expandUrls' => true
 		]);
@@ -358,6 +363,9 @@ class CControllerMenuPopup extends CController {
 						if ($selement['urls']) {
 							$menu_data['urls'] = $selement['urls'];
 						}
+						if ($selement['application'] !== '') {
+							$menu_data['filter_application'] = $selement['application'];
+						}
 						return $menu_data;
 
 					case SYSMAP_ELEMENT_TYPE_HOST:
@@ -372,6 +380,9 @@ class CControllerMenuPopup extends CController {
 						}
 						if ($selement['urls']) {
 							$host_data['urls'] = $selement['urls'];
+						}
+						if ($selement['application'] !== '') {
+							$host_data['filter_application'] = $selement['application'];
 						}
 						return self::getMenuDataHost($host_data);
 
@@ -491,7 +502,7 @@ class CControllerMenuPopup extends CController {
 			foreach ($db_trigger['items'] as $item) {
 				$items[] = [
 					'name' => $with_hostname
-						? $$item['hostname'].NAME_DELIMITER.$item['name_expanded']
+						? $item['hostname'].NAME_DELIMITER.$item['name_expanded']
 						: $item['name_expanded'],
 					'params' => [
 						'itemid' => $item['itemid'],

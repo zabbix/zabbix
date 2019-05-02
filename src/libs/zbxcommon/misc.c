@@ -610,7 +610,7 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_zbx_setproctitle(const char *fmt, ...)
+void	zbx_setproctitle(const char *fmt, ...)
 {
 #if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	const char	*__function_name = "__zbx_zbx_setproctitle";
@@ -2634,9 +2634,6 @@ int	is_double(const char *str)
 {
 	int	len;
 
-	while (' ' == *str)			/* trim left spaces */
-		str++;
-
 	if ('-' == *str || '+' == *str)		/* check leading sign */
 		str++;
 
@@ -2658,9 +2655,6 @@ int	is_double(const char *str)
 		while (0 != isdigit(*str))
 			str++;
 	}
-
-	while (' ' == *str)			/* trim right spaces */
-		str++;
 
 	return '\0' == *str ? SUCCEED : FAIL;
 }

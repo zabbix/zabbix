@@ -1,0 +1,294 @@
+---
+test case: "123"
+in:
+  str: "123"
+out:
+  str: "123"
+---
+test case: " 123"
+in:
+  str: " 123"
+out:
+  str: "123"
+---
+test case: "123 "
+in:
+  str: "123 "
+out:
+  str: "123"
+---
+test case: " 123 "
+in:
+  str: " 123 "
+out:
+  str: "123"
+---
+test case: "  123"
+in:
+  str: "  123"
+out:
+  str: "123"
+---
+test case: "123  "
+in:
+  str: "123  "
+out:
+  str: "123"
+---
+test case: "  123  "
+in:
+  str: "  123  "
+out:
+  str: "123"
+---
+test case: "\"123\""
+in:
+  str: "\"123\""
+out:
+  str: "123"
+---
+test case: " \"123\""
+in:
+  str: " \"123\""
+out:
+  str: "123"
+---
+test case: "\"123\" "
+in:
+  str: "\"123\" "
+out:
+  str: "123"
+---
+test case: " \"123\" "
+in:
+  str: " \"123\" "
+out:
+  str: "123"
+---
+test case: "  \"123\""
+in:
+  str: "  \"123\""
+out:
+  str: "123"
+---
+test case: "\"123\"  "
+in:
+  str: "\"123\"  "
+out:
+  str: "123"
+---
+test case: "  \"123\"  "
+in:
+  str: "  \"123\"  "
+out:
+  str: "123"
+---
+test case: ""
+in:
+  str: ""
+out:
+  str: ""
+---
+test case: "\""
+in:
+  str: "\""
+out:
+  str: "\""
+---
+test case: "\"\""
+in:
+  str: "\"\""
+out:
+  str: ""
+---
+test case: "\" \""
+in:
+  str: "\" \""
+out:
+  str: " "
+---
+test case: " \""
+in:
+  str: " \""
+out:
+  str: "\""
+---
+test case: " \"\""
+in:
+  str: " \"\""
+out:
+  str: ""
+---
+test case: " \" \""
+in:
+  str: " \" \""
+out:
+  str: " "
+---
+test case: "\" "
+in:
+  str: "\" "
+out:
+  str: "\""
+---
+test case: "\"\" "
+in:
+  str: "\"\" "
+out:
+  str: ""
+---
+test case: "\" \" "
+in:
+  str: "\" \" "
+out:
+  str: " "
+---
+test case: " \" "
+in:
+  str: " \" "
+out:
+  str: "\""
+---
+test case: " \"\" "
+in:
+  str: " \"\" "
+out:
+  str: ""
+---
+test case: " \" \" "
+in:
+  str: " \" \" "
+out:
+  str: " "
+---
+test case: "\"123 \""
+in:
+  str: "\"123 \""
+out:
+  str: "123 "
+---
+test case: "\" 123\""
+in:
+  str: "\" 123\""
+out:
+  str: " 123"
+---
+test case: "\" 123 \""
+in:
+  str: "\" 123 \""
+out:
+  str: " 123 "
+---
+test case: " \"123 \""
+in:
+  str: " \"123 \""
+out:
+  str: "123 "
+---
+test case: " \" 123\""
+in:
+  str: " \" 123\""
+out:
+  str: " 123"
+---
+test case: " \" 123 \""
+in:
+  str: " \" 123 \""
+out:
+  str: " 123 "
+---
+test case: "\"123 \" "
+in:
+  str: "\"123 \" "
+out:
+  str: "123 "
+---
+test case: "\" 123\" "
+in:
+  str: "\" 123\" "
+out:
+  str: " 123"
+---
+test case: "\" 123 \" "
+in:
+  str: "\" 123 \" "
+out:
+  str: " 123 "
+---
+test case: " \"123 \" "
+in:
+  str: " \"123 \" "
+out:
+  str: "123 "
+---
+test case: " \" 123\" "
+in:
+  str: " \" 123\" "
+out:
+  str: " 123"
+---
+test case: " \" 123 \" "
+in:
+  str: " \" 123 \" "
+out:
+  str: " 123 "
+---
+test case: "+"
+in:
+  str: "+"
+out:
+  str: ""
+---
+test case: "++"
+in:
+  str: "++"
+out:
+  str: "+"
+---
+test case: "+123"
+in:
+  str: "+123"
+out:
+  str: "123"
+---
+test case: "++123"
+in:
+  str: "++123"
+out:
+  str: "+123"
+---
+test case: "+\"123\""
+in:
+  str: "+\"123\""
+out:
+  str: "\"123\""
+---
+test case: " \"+123\" "
+in:
+  str: " \"+123\" "
+out:
+  str: "123"
+---
+test case: " \"+\" "
+in:
+  str: " \"+\" "
+out:
+  str: ""
+---
+test case: " \"+ \" "
+in:
+  str: " \"+ \" "
+out:
+  str: " "
+---
+test case: " \" +\" "
+in:
+  str: " \" +\" "
+out:
+  str: " +"
+---
+test case: " \" + \" "
+in:
+  str: " \" + \" "
+out:
+  str: " + "

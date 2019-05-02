@@ -84,6 +84,7 @@ class CControllerAuthenticationEdit extends CController {
 		];
 
 		if ($this->hasInput('form_refresh')) {
+			$data['ldap_bind_password'] = '';
 			$this->getInputs($data, [
 				'form_refresh',
 				'change_bind_password',

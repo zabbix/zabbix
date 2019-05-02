@@ -198,13 +198,21 @@ ZABBIX.apps.map = (function($) {
 			}
 
 			// create container for forms
-			this.formContainer = $('<div></div>', {
+			this.formContainer = $('<div>', {
 					id: 'map-window',
 					class: 'overlay-dialogue',
-					style: 'display:none; top: 50px; left: 500px'})
+					style: 'display: none; top: 0; left: 0;'
+				})
 				.appendTo('body')
 				.draggable({
-					containment: [0, 0, 3200, 3200]
+					containment: [0, 0, 3200, 3200],
+					start: function(){
+						$(this).data("scroll", {top: window.pageYOffset, left: window.pageXOffset});
+					},
+					drag: function(event, ui){
+						ui.position.top -= parseInt($(this).data("scroll").top);
+						ui.position.left -= parseInt($(this).data("scroll").left);
+					}
 				});
 
 			this.updateImage();
@@ -2785,6 +2793,8 @@ ZABBIX.apps.map = (function($) {
 				this.formContainer.draggable('option', 'handle', '#formDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
+				// Element must first be visible so that outerWidth() and outerHeight() are correct.
+				this.formContainer.positionOverlayDialogue();
 				this.active = true;
 			},
 
@@ -3223,6 +3233,8 @@ ZABBIX.apps.map = (function($) {
 				this.formContainer.draggable('option', 'handle', '#massDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
+				// Element must first be visible so that outerWidth() and outerHeight() are correct.
+				this.formContainer.positionOverlayDialogue();
 				this.updateList();
 			},
 
@@ -3354,6 +3366,8 @@ ZABBIX.apps.map = (function($) {
 				this.formContainer.draggable('option', 'handle', '#shapeDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
+				// Element must first be visible so that outerWidth() and outerHeight() are correct.
+				this.formContainer.positionOverlayDialogue();
 				this.active = true;
 			},
 
@@ -3482,6 +3496,8 @@ ZABBIX.apps.map = (function($) {
 				this.formContainer.draggable('option', 'handle', '#massShapeDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
+				// Element must first be visible so that outerWidth() and outerHeight() are correct.
+				this.formContainer.positionOverlayDialogue();
 				this.active = true;
 			},
 
@@ -3931,3 +3947,31 @@ ZABBIX.apps.map = (function($) {
 		}
 	};
 }(jQuery));
+
+jQuery(function ($) {
+	/*
+	 * Reposition the overlay dialogue window. The previous position is remembered using offset(). Each time overlay
+	 * dialogue is opened, it could have different content (shape form, element form etc) and different size, so the
+	 * new top and left position must be calculated. If the overlay dialogue is opened for the first time, position is
+	 * set depending on map size and canvas top position. This makes map more visible at first. In case popup window is
+	 * dragged outside visible view port or window is resized, popup will again be repositioned so it doesn't go outside
+	 * the viewport. In case the popup is too large, position it with a small margin depenging on whether is too long
+	 * or too wide.
+	 */
+	$.fn.positionOverlayDialogue = function () {
+		var $map = $('#map-area'),
+			map_margin = 10,
+			obj_pos = this.offset(),
+			obj_size = {width: this.outerWidth(), height: this.outerHeight()},
+			scroll_pos = {left: $(window).scrollLeft(), top: $(window).scrollTop()};
+
+		if (obj_pos.left == 0 && obj_pos.top == 0) {
+			obj_pos = {left: $map.offset().left + $map.width(), top: $map.offset().top - map_margin};
+		}
+
+		return this.css({
+			left: Math.max(0, Math.min(obj_pos.left, $(window).width() - obj_size.width)) + scroll_pos.left,
+			top: Math.max(scroll_pos.top, Math.min(obj_pos.top, $(window).height() - obj_size.height + scroll_pos.top))
+		});
+	};
+});
