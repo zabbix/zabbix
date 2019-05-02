@@ -54,12 +54,12 @@
 
 		$('#filter_compact_view').change(function() {
 			if ($(this).is(':checked')) {
-				$('#filter_show_timeline, #filter_details, #filter_show_latest_values').attr('disabled', true);
-				$('#filter_highlight_row').removeAttr('disabled');
+				$('#filter_show_timeline, #filter_details, #filter_show_latest_values').prop('disabled', true);
+				$('#filter_highlight_row').prop('disabled', false);
 			}
 			else {
-				$('#filter_show_timeline, #filter_details, #filter_show_latest_values').removeAttr('disabled');
-				$('#filter_highlight_row').attr('disabled', true);
+				$('#filter_show_timeline, #filter_details, #filter_show_latest_values').prop('disabled', false);
+				$('#filter_highlight_row').prop('disabled', true);
 			}
 		});
 

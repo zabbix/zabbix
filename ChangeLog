@@ -13,6 +13,7 @@ Changes for 4.2.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-16069] Version upgrade: jQuery v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 ..F....... [ZBX-15816] increased header value input field max length (talbergs)
 .......PS. [ZBX-16036] fixed items being stuck in unsupported state under some conditions when "Discard unchanged" preprocessing step is used (vso)
 ...G...PS. [ZBX-15677] fixed the process of compiling the dummy.c module (MVekslers)
@@ -316,7 +317,6 @@ A.F.....S. [ZBXNEXT-4724] added validation and throttling preprocessing rules, a
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
-..F....... [ZBX-15816] increased header value input field max length (talbergs)
 .......PS. [ZBX-15224] fixed failed query errors when receiving non UTF-8 history values (vso)
 ...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
 ........S. [ZBX-15279] fixed handling of LLD processing errors that should have resulted in not supported LLD rule state (wiper)
@@ -368,6 +368,8 @@ Changes for 4.0.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-16069] Version upgrade: jQuery v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
+..F....... [ZBX-15816] increased header value input field max length (talbergs)
 ...G...PS. [ZBX-15677] fixed the process of compiling the dummy.c module (MVekslers)
 .......PS. [ZBX-15981] fixed invalid xpath for vmware "eventlog" key with "skip" option (MVekslers)
 ...G...... [ZBX-15704] fixed sending log meta information without obvious needs (asestakovs)

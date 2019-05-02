@@ -46,7 +46,7 @@ function mediatypeTestSend(formname) {
 		});
 
 	$submit_btn
-		.attr('disabled', true)
+		.prop('disabled', true)
 		.hide();
 
 	jQuery.ajax({
@@ -64,7 +64,7 @@ function mediatypeTestSend(formname) {
 
 			jQuery('.preloader').remove();
 			$submit_btn
-				.attr('disabled', false)
+				.prop('disabled', false)
 				.show();
 		},
 		error: function(request, status, error) {

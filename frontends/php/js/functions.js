@@ -631,7 +631,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		}
 
 		if ('enabled' in obj && obj.enabled === false) {
-			button.attr('disabled', 'disabled');
+			button.prop('disabled', true);
 		}
 
 		if ('focused' in obj && obj.focused === true) {
