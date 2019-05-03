@@ -19,12 +19,17 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 class testPageHosts extends CLegacyWebTest {
 	public $HostName = 'ЗАББИКС Сервер';
 	public $HostGroup = 'Zabbix servers';
 	public $HostIp = '127.0.0.1';
 	public $HostPort = '10050';
+
+	use FilterTrait;
+	use TableTrait;
 
 	public static function allHosts() {
 		return CDBHelper::getDataProvider(
@@ -297,28 +302,50 @@ class testPageHosts extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-							['name'=>'tag', 'operator' => 'Contains', 'value'=>'host'],
-							['name'=>'test', 'operator' => 'Contains', 'value'=>'test_tag']
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'host'],
+						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
 					],
-					'expected_hosts' => [
-						['Simple form test host']
-					],
-					'expected_result_count' => 1
+					'result' => [
+						[
+							'Name' => 'Simple form test host',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
+							]
+						]
+					]
 				]
 			],
 			[
 				[
 					'evaluation_type' => 'Or',
 					'tags' => [
-							['name'=>'tag', 'operator' => 'Contains', 'value'=>'host'],
-							['name'=>'test', 'operator' => 'Contains', 'value'=>'test_tag']
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'host'],
+						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
 					],
-					'expected_hosts' => [
-						['Host with tags for cloning'],
-						['Host with tags for updating'],
-						['Simple form test host']
-					],
-					'expected_result_count' => 3
+					'result' => [
+						[
+							'Name' => 'Host with tags for cloning',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: host', 'action: clone']
+							]
+						],
+						[
+							'Name' => 'Host with tags for updating',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: host', 'action: update']
+							]
+						],
+						[
+							'Name' => 'Simple form test host',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
+							]
+						]
+					]
 				]
 			],
 			// "Contains" and "Equals" checks.
@@ -326,60 +353,54 @@ class testPageHosts extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-							['name'=>'tag', 'operator' => 'Contains', 'value'=>'HOST'],
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'HOST'],
 					],
-					'expected_hosts' => [
-						['Host with tags for cloning'],
-						['Host with tags for updating'],
-						['Simple form test host']
-					],
-					'expected_result_count' => 3
+					'result' => [
+						['Name' => 'Host with tags for cloning', 'Templates' => ''],
+						['Name' => 'Host with tags for updating', 'Templates' => ''],
+						['Name' => 'Simple form test host', 'Templates' => 'Form test template']
+					]
 				]
 			],
 			[
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-							['name'=>'tag', 'operator' => 'Equals', 'value'=>'HOST'],
+						['name' => 'tag', 'operator' => 'Equals', 'value' => 'HOST'],
 					],
-					'expected_hosts' => [
-						['Simple form test host']
-					],
-					'expected_result_count' => 1
+					'result' => [
+						['Name' => 'Simple form test host']
+					]
 				]
 			],
 			[
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-							['name'=>'action', 'operator' => 'Contains', 'value'=>''],
+							['name' => 'action', 'operator' => 'Contains'],
 					],
-					'expected_hosts' => [
-						['Host with tags for cloning'],
-						['Host with tags for updating'],
-						['Simple form test host']
-					],
-					'expected_result_count' => 3
+					'result' => [
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'Simple form test host']
+					]
 				]
 			],
 			[
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-							['name'=>'action', 'operator' => 'Equals', 'value'=>''],
-					],
-					'expected_hosts' => [],
-					'expected_result_count' => 0
+						['name' => 'action', 'operator' => 'Equals'],
+					]
 				]
 			]
 		];
 	}
 
 	/**
-	 * Test filtering hosts by tags
+	 * Test filtering hosts by tags.
 	 *
 	 * @dataProvider getFilterByTagsData
-	 *
 	 */
 	public function testPageHosts_FilterByTags($data) {
 		$this->page->login()->open('hosts.php?groupid=0');
@@ -387,40 +408,12 @@ class testPageHosts extends CLegacyWebTest {
 		// Reset filter from possible previous scenario.
 		$form->query('button:Reset')->one()->click();
 
-		$tags_filter = $form->getFieldContainer('Tags')->asTable();
-		$tags_filter->query('id:filter_evaltype')->asSegmentedRadio()->one()->select($data['evaluation_type']);
-
-		$button = $tags_filter ->query('button:Add')->one();
-		$last = count($data['tags']) - 1;
-
-		foreach ($data['tags'] as $i => $tag){
-			$row = $tags_filter->getRows()->get($i+1);;
-			$row->query('id:filter_tags_'.$i.'_tag')->one()->type($tag['name']);
-			$row->query('id:filter_tags_'.$i.'_operator')->asSegmentedRadio()->one()->select($tag['operator']);
-			$row->query('id:filter_tags_'.$i.'_value')->one()->type($tag['value']);
-			if ($i !== $last) {
-				$button->click();
-			}
-		}
+		$this->setTags($data['evaluation_type'], $data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Check filtered result.
-		$hosts_table = $this->query('class:list-table')->asTable()->one();
-		$display_text = $this->query('xpath://div[@class="table-stats"]')->waitUntilVisible()->one()->getText();
-		$this->assertEquals($display_text, 'Displaying '.$data['expected_result_count'].' of '.$data['expected_result_count'].' found');
+		$this->checkTableData(CTestArrayHelper::get($data, 'result', []));
 
-		if($data['expected_result_count'] === 0){
-				$text = $hosts_table->getRows()->get(0)->getText();
-				$this->assertEquals('No data found.', $text);
-		}
-		else{
-			foreach ($hosts_table->getRows()->asArray() as $i => $row) {
-				$filtered_host_names[] =[
-					$hosts_table->getRows()->get($i)->getColumn('Name')->getText()
-				];
-			}
-			$this->assertEquals($data['expected_hosts'], $filtered_host_names);
-		}
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();
 	}
