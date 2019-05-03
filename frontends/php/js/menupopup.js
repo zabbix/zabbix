@@ -203,6 +203,29 @@ function getMenuPopupHost(options, trigger_elmnt) {
 	return sections;
 }
 
+
+/**
+ * @param {object}  options
+ * @param {object}  widget_context
+ *
+ * @return array
+ */
+function getMenuPopupMapElementSubmapWidget(options, widget_context) {
+	var sections = [],
+		submap_url = new Curl('javascript: navigateToSubmap(' + options.sysmapid +
+			', "' + widget_context.uniqueid + '");', false);
+
+	sections.push({
+		label: t('Go to'),
+		items: [{
+			label: t('Submap'),
+			url: submap_url.getUrl()
+		}]
+	});
+
+	return sections;
+}
+
 /**
  * Get menu popup submap map element section data.
  *
