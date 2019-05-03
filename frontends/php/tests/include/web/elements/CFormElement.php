@@ -108,9 +108,39 @@ class CFormElement extends CElement {
 	 */
 	public function getFieldByLabelElement($label) {
 		$prefix = './../../div[@class="table-forms-td-right"]';
+		$classes = [
+			'CElement'					=> [
+				'/input[@name][not(@type) or @type="text" or @type="password"]',
+				'/textarea[@name]'
+			],
+			'CDropdownElement'			=> '/select[@name]',
+			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
+			'CMultiselectElement'		=> '/div[@class="multiselect-control"]',
+			'CSegmentedRadioElement'	=> [
+				'/ul[@class="radio-list-control"]',
+				'/div/ul[@class="radio-list-control"]',
+			],
+			'CCheckboxListElement'		=> '/ul[@class="checkbox-list col-3"]',
+			'CTableElement'				=> [
+				'/table',
+				'/*[@class="table-forms-separator"]/table'
+			],
+			'CRangeControlElement'		=> '/div[@class="range-control"]'
+		];
 
-		if (($element = CElementQuery::getInputElement($label, $prefix)) !== null) {
-			return $element;
+		foreach ($classes as $class => $selectors) {
+			if (!is_array($selectors)) {
+				$selectors = [$selectors];
+			}
+
+			$xpaths = [];
+			foreach ($selectors as $selector) {
+				$xpaths[] = $prefix.$selector;
+			}
+
+			if (($element = $label->query('xpath', implode('|', $xpaths))->cast($class)->one(false)) !== null) {
+				return $element;
+			}
 		}
 
 		// Nested table forms.

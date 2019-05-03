@@ -118,8 +118,8 @@ class CTableElement extends CElement {
 		foreach ($this->getRows() as $row) {
 			$data = [];
 
-			foreach ($row->query('xpath:./td|./th')->all() as $i => $column) {
-				$data[CTestArrayHelper::get($headers, $i, $i)] = $column;
+			foreach ($row->query('xpath:./*')->all() as $i => $column) {
+				$data[$headers[$i]] = $column;
 			}
 
 			$table[] = new CElementCollection($data);

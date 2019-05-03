@@ -26,11 +26,6 @@ require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/helpers/CDBHelper.php';
 require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
 require_once dirname(__FILE__).'/helpers/CExceptionHelper.php';
-require_once dirname(__FILE__).'/helpers/CTestArrayHelper.php';
-
-define('USER_ACTION_ADD', 'add');
-define('USER_ACTION_UPDATE', 'update');
-define('USER_ACTION_REMOVE', 'remove');
 
 /**
  * Base class of php unit tests.

@@ -2227,11 +2227,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		foreach ($data['macros'] as $i => $lld_macro) {
 			$row = $table->getRows()->get($i);
+			$macro = $row->getColumn('LLD macro')->query('tag:input')->one()->getAttribute('value');
+			$this->assertEquals($lld_macro['macro'], $macro);
 
-			$this->assertEquals($lld_macro['macro'],
-					$row->getColumn('LLD macro')->query('tag:input')->one()->getValue()
-			);
-			$this->assertEquals($lld_macro['path'], $row->getColumn('JSONPath')->query('tag:input')->one()->getValue());
+			$path = $row->getColumn('JSONPath')->query('tag:input')->one()->getAttribute('value');
+			$this->assertEquals($lld_macro['path'], $path);
 		}
 	}
 }

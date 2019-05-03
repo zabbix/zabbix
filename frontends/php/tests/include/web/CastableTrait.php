@@ -178,17 +178,6 @@ trait CastableTrait {
 	}
 
 	/**
-	 * Cast object to MultifieldTable element.
-	 *
-	 * @param array $options    additional casting options
-	 *
-	 * @return CMultifieldTableElement
-	 */
-	public function asMultifieldTable($options = []) {
-		return $this->cast('CMultifieldTableElement', $options);
-	}
-
-	/**
 	 * Cast object to base RemoteWebElement.
 	 *
 	 * @param array $options    additional casting options

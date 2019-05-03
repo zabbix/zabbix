@@ -903,7 +903,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 	private function processExpressionRows($rows) {
 		foreach ($rows as $i => $mapping_row) {
-			switch (CTestArrayHelper::get($mapping_row, 'action', 'add')) {
+			$action = (array_key_exists('action', $mapping_row) ? $mapping_row['action'] : 'add');
+
+			switch ($action) {
 				case 'add':
 					if (!$this->zbxTestElementPresentId('iconmap_mappings_new'.$i.'_expression')) {
 						$this->zbxTestClick('addMapping');
