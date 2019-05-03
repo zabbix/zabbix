@@ -102,7 +102,7 @@ if (hasRequest('action')) {
 	]);
 
 	if (count($correlations) != count(getRequest('g_correlationid'))) {
-		uncheckTableRows(null, array_column($correlations, 'correlationid', 'correlationid'));
+		uncheckTableRows(null, zbx_objectValues($correlations, 'correlationid'));
 	}
 }
 

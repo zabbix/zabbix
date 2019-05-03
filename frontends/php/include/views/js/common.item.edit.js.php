@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="delayFlexRow">
 	<tr class="form_row">
 		<td>
-			<ul class="<?= ZBX_STYLE_RADIO_SEGMENTED ?>" id="delay_flex_#{rowNum}_type">
+			<ul class="<?= CRadioButtonList::ZBX_STYLE_CLASS ?>" id="delay_flex_#{rowNum}_type">
 				<li>
 					<input type="radio" id="delay_flex_#{rowNum}_type_0" name="delay_flex[#{rowNum}][type]" value="0" checked="checked">
 					<label for="delay_flex_#{rowNum}_type_0"><?= _('Flexible') ?></label>
@@ -613,10 +613,10 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				$(':radio', '#retrieve_mode')
 					.filter('[value=<?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>]').click()
 					.end()
-					.attr('disabled', 'disabled');
+					.prop('disabled', true);
 			}
 			else {
-				$(':radio', '#retrieve_mode').removeAttr('disabled');
+				$(':radio', '#retrieve_mode').prop('disabled', false);
 			}
 		});
 	});

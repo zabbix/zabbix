@@ -19,17 +19,18 @@
 
 
 jQuery(function($) {
-	var KEY = {
-		ARROW_DOWN: 40,
-		ARROW_LEFT: 37,
-		ARROW_RIGHT: 39,
-		ARROW_UP: 38,
-		BACKSPACE: 8,
-		DELETE: 46,
-		ENTER: 13,
-		ESCAPE: 27,
-		TAB: 9
-	};
+	var ZBX_STYLE_CLASS = 'multiselect-control',
+		KEY = {
+			ARROW_DOWN: 40,
+			ARROW_LEFT: 37,
+			ARROW_RIGHT: 39,
+			ARROW_UP: 38,
+			BACKSPACE: 8,
+			DELETE: 46,
+			ENTER: 13,
+			ESCAPE: 27,
+			TAB: 9
+		};
 
 	/**
 	 * Multi select helper.
@@ -158,13 +159,13 @@ jQuery(function($) {
 		disable: function() {
 			return this.each(function() {
 				var $obj = $(this),
-					$wrapper = $obj.parent('.multiselect-wrapper'),
+					$wrapper = $obj.parent('.'+ZBX_STYLE_CLASS),
 					ms = $obj.data('multiSelect');
 
 				if (ms.options.disabled === false) {
 					$obj.attr('aria-disabled', true);
 					$('.multiselect-list', $obj).addClass('disabled');
-					$('.multiselect-button > button', $wrapper).attr('disabled', 'disabled');
+					$('.multiselect-button > button', $wrapper).prop('disabled', true);
 					$('input[type=text]', $wrapper).remove();
 					cleanAvailable($obj, ms.values);
 					$('.available', $wrapper).remove();
@@ -182,14 +183,14 @@ jQuery(function($) {
 		enable: function() {
 			return this.each(function() {
 				var $obj = $(this),
-					$wrapper = $obj.parent('.multiselect-wrapper'),
+					$wrapper = $obj.parent('.'+ZBX_STYLE_CLASS),
 					ms = $(this).data('multiSelect');
 
 				if (ms.options.disabled === true) {
 					var $input = makeMultiSelectInput($obj);
 					$obj.removeAttr('aria-disabled');
 					$('.multiselect-list', $obj).removeClass('disabled');
-					$('.multiselect-button > button', $wrapper).removeAttr('disabled');
+					$('.multiselect-button > button', $wrapper).prop('disabled', false);
 					$obj.append($input);
 					makeSuggsetionsBlock($obj);
 
@@ -227,7 +228,7 @@ jQuery(function($) {
 	 * @param string options['popup']['parameters']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
-	 * @param string options['styles']				additional style for .multiselect-wrapper (optional)
+	 * @param string options['styles']				additional style for multiselect wrapper HTML element (optional)
 	 * @param string options['styles']['property']
 	 * @param string options['styles']['value']
 	 *
@@ -292,7 +293,7 @@ jQuery(function($) {
 
 			// add wrap
 			obj.wrap(jQuery('<div>', {
-				'class': 'multiselect-wrapper',
+				'class': ZBX_STYLE_CLASS,
 				css: options.styles
 			}));
 
@@ -343,7 +344,7 @@ jQuery(function($) {
 				});
 
 				if (options.disabled) {
-					popupButton.attr('disabled', true);
+					popupButton.prop('disabled', true);
 				}
 
 				popupButton.click(function(event) {
