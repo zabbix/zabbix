@@ -185,15 +185,17 @@
 			 * @param {string}	formid		Id of current form HTML form element.
 			 */
 			initControls: function(formid) {
-				var $form = jQuery('#'+formid);
+				var $form = jQuery('#'+formid),
+					$pair_container = $form.find('.pair-container-sortable');
+
 				$form.on('click', 'button.remove', function() {
 					var pairId = jQuery(this).data('pairid');
 					jQuery('#pairRow_' + pairId).remove();
 					pairManager.remove(pairId);
 				});
 
-				jQuery('.pair-container-sortable', $form).sortable({
-					disabled: (jQuery(this).find('tr.sortable').length < 2),
+				$pair_container.sortable({
+					disabled: ($pair_container.find('tr.sortable').length < 2),
 					items: 'tr.sortable',
 					axis: 'y',
 					containment: 'parent',
