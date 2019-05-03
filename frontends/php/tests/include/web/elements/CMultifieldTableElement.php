@@ -27,8 +27,7 @@ require_once dirname(__FILE__).'/../CElement.php';
  */
 class CMultifieldTableElement extends CTableElement {
 
-	const ROW_SELECTOR = 'xpath:./tbody/tr[contains(@class, "form_row") or contains(@class, "pairRow")'.
-			' or contains(@class, "editable_table_row")]';
+	const ROW_SELECTOR = 'xpath:./tbody/tr[contains(@class, "form_row") or contains(@class, "pairRow") or contains(@class, "editable_table_row")]';
 
 	/**
 	 * Field mapping.
