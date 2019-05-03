@@ -182,7 +182,7 @@
 			/**
 			 * Add listeners to HTML elements in web scenario and web step forms.
 			 *
-			 * @param {string}	formid		Id of current form HTML form element.
+			 * @param {string} formid  ID of the current form HTML element.
 			 */
 			initControls: function(formid) {
 				var $form = jQuery('#'+formid),
