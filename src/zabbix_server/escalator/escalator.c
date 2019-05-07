@@ -280,7 +280,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
  *                   or permission otherwise                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event)
+static int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event)
 {
 	const char		*__function_name = "get_trigger_permission";
 	int			perm = PERM_DENY;
@@ -338,7 +338,7 @@ out:
  *                   or permission otherwise                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
+static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
 {
 	const char		*__function_name = "get_item_permission";
 	DB_RESULT		result;

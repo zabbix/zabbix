@@ -17,11 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MOCK_DB_H
-#define ZABBIX_MOCK_DB_H
+#include "jsonpath_next_test.h"
 
-
-void	zbx_mockdb_init(void);
-void	zbx_mockdb_destroy(void);
-
-#endif /* BUILD_TESTS_ZBXMOCKDB_H_ */
+int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type)
+{
+	return jsonpath_next(path, pnext, loc, type);
+}
