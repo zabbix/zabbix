@@ -127,9 +127,11 @@
 		 */
 		function refreshContainers() {
 			jQuery('.pair-container-sortable').each(function() {
-				jQuery(this).sortable({
-					disabled: (jQuery(this).find('tr.sortable').length < 2)
-				});
+				var disabled = (jQuery(this).find('tr.sortable').length < 2);
+
+				jQuery(this)
+					.sortable({disabled: disabled})
+					.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').toggleClass('<?= ZBX_STYLE_DISABLED ?>', disabled);
 			});
 		}
 
