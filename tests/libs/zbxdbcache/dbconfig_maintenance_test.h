@@ -16,8 +16,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-#ifndef ITEM_PREPROC_TEST_H
-#define ITEM_PREPROC_TEST_H
+
+#ifndef DBCONFIG_MAINTENANCE_TEST_H
+#define DBCONFIG_MAINTENANCE_TEST_H
 
 int	dc_maintenance_match_tags_test(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags);
 

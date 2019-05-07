@@ -192,7 +192,7 @@ static void	db_remove_expired_event_suppress_data(int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: event_suppress_data_free                                     *
+ * Function: event_suppress_data_free                                         *
  *                                                                            *
  * Purpose: free event suppress data structure                                *
  *                                                                            *

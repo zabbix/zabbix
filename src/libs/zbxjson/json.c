@@ -1237,7 +1237,7 @@ static int	zbx_jsonpath_error(const char *path)
 
 /******************************************************************************
  *                                                                            *
- * Function: jsonpath_next                                                *
+ * Function: jsonpath_next                                                    *
  *                                                                            *
  * Purpose: returns next component of json path                               *
  *                                                                            *

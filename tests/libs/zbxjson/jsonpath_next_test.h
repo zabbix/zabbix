@@ -16,8 +16,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-#ifndef ITEM_PREPROC_TEST_H
-#define ITEM_PREPROC_TEST_H
+
+#ifndef JSONPATH_NEXT_TEST_H
+#define JSONPATH_NEXT_TEST_H
 
 int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type);
 
