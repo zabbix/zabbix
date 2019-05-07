@@ -622,8 +622,11 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 	zbx_vector_uint64_create(&del_dhostids);
 	zbx_vector_uint64_create(&del_dserviceids);
 
-	result = DBselect("select dh.dhostid,ds.dserviceid,ds.ip,ds.dhostid"
-			" from dhosts dh left join dservices ds on dh.dhostid=ds.dhostid"
+	result = DBselect(
+			"select dh.dhostid,ds.dserviceid,ds.ip"
+			" from dhosts dh"
+				" left join dservices ds"
+					" on dh.dhostid=ds.dhostid"
 			" where dh.druleid=" ZBX_FS_UI64,
 			druleid);
 
@@ -631,7 +634,7 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 	{
 		ZBX_STR2UINT64(dhostid, row[0]);
 
-		if (SUCCEED == DBis_null(row[3]))
+		if (SUCCEED == DBis_null(row[1]))
 		{
 			zbx_vector_uint64_append(&del_dhostids, dhostid);
 		}
@@ -679,9 +682,8 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 			if (FAIL != zbx_vector_uint64_bsearch(&keep_dhostids, dhostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 				zbx_vector_uint64_remove_noorder(&del_dhostids, i--);
 		}
-
-		zbx_free(sql);
 	}
+
 	if (0 != del_dhostids.values_num)
 	{
 		zbx_vector_uint64_sort(&del_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -692,8 +694,9 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 				del_dhostids.values, del_dhostids.values_num);
 
 		DBexecute("%s", sql);
-		zbx_free(sql);
 	}
+
+	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&del_dserviceids);
 	zbx_vector_uint64_destroy(&del_dhostids);
