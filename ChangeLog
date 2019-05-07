@@ -14,6 +14,7 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+...G...PS. [ZBX-10550] added warnings when Zabbix components have different versions (akozlovs)
 ..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
 ..F....... [ZBX-11429] fixed macro not being retained in trigger expression editing wizard (agriscenko)
 ..F....... [ZBX-15816] increased header value input field max length (talbergs)
@@ -371,6 +372,7 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+...G...PS. [ZBX-10550] added warnings when Zabbix components have different versions (akozlovs)
 ..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
 ..F....... [ZBX-11429] fixed macro not being retained in trigger expression editing wizard (agriscenko)
 ..F....... [ZBX-15816] increased header value input field max length (talbergs)

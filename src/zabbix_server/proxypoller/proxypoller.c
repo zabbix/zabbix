@@ -313,13 +313,8 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 
 	proxy->version = zbx_get_protocol_version(&jp);
 
-	/* don't accept pre 4.2 data */
-	if (ZBX_COMPONENT_VERSION(4, 2) > proxy->version)
+	if (SUCCEED != zbx_check_protocol_version(proxy))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy \"%s\" at \"%s\":"
-				" protocol version %d.%d is not supported anymore",
-				proxy->host, proxy->addr, ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
-				ZBX_COMPONENT_VERSION_MINOR(proxy->version));
 		goto out;
 	}
 
