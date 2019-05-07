@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "log.h"
+#include "zbxhttp.h"
 
 #ifdef HAVE_LIBCURL
 
