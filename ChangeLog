@@ -14,6 +14,7 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
 ..F....... [ZBX-11429] fixed macro not being retained in trigger expression editing wizard (agriscenko)
 ..F....... [ZBX-15816] increased header value input field max length (talbergs)
 .......PS. [ZBX-16036] fixed items being stuck in unsupported state under some conditions when "Discard unchanged" preprocessing step is used (vso)
