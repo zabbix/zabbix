@@ -82,9 +82,6 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
 		zbx_uint64_t ackid);
 
-static int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event);
-static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid);
-
 /******************************************************************************
  *                                                                            *
  * Function: check_perm2system                                                *
