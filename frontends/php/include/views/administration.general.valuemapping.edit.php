@@ -105,8 +105,7 @@ if ($data['valuemapid'] != 0) {
 		new CSubmit('update', _('Update')),
 		[
 			new CButton('clone', _('Clone')),
-			(new CButtonDelete(_('Delete'), '&action=valuemap.delete&valuemapids[]='.$data['valuemapid']))
-				->setMessage($confirm_message),
+			new CButtonDelete($confirm_message, '&action=valuemap.delete&valuemapids[]='.$data['valuemapid']),
 			new CButtonCancel()
 		]
 	));
