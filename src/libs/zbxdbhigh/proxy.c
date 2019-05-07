@@ -4076,10 +4076,12 @@ int	zbx_check_protocol_version(DC_PROXY *proxy)
 		}
 
 		if (1 == print_log)
+		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" protocol version %d.%d differs from server version"
 					" %d.%d", proxy->host, ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
 					ZBX_COMPONENT_VERSION_MINOR(proxy->version),
 					ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR);
+		}
 
 		if (proxy->version > server_version)
 		{
