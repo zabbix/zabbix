@@ -39,10 +39,6 @@ libzbxserver_a_CFLAGS = \
 
 zabbix_server_SOURCES = server.c
 
-if ZBXCUNIT
-nodist_zabbix_server_SOURCES = ../libs/zbxcunit/zbxcunit.c ../libs/zbxcunit/zbxcunit.h
-endif
-
 zabbix_server_LDADD = \
 	alerter/libzbxalerter.a \
 	dbsyncer/libzbxdbsyncer.a \
@@ -104,7 +100,7 @@ if HAVE_IPMI
 zabbix_server_LDADD += ipmi/libipmi.a
 endif
 
-zabbix_server_LDADD += @SERVER_LIBS@ $(CUNIT_LDADD)
+zabbix_server_LDADD += @SERVER_LIBS@
 
 zabbix_server_LDFLAGS = @SERVER_LDFLAGS@
 
