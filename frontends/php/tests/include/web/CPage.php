@@ -21,11 +21,19 @@
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CElementQuery.php';
+require_once dirname(__FILE__).'/CommandExecutor.php';
 
 /**
  * Web page implementation.
  */
 class CPage {
+
+	/**
+	 * Page defaults.
+	 */
+	const DEFAULT_PAGE_WIDTH = 1280;
+	const DEFAULT_PAGE_HEIGHT = 1024;
+
 	/**
 	 * Web driver instance.
 	 *
@@ -44,10 +52,13 @@ class CPage {
 	 * Web driver and CElementQuery initialization.
 	 */
 	public function __construct() {
+		$options = new ChromeOptions();
+		$options->addArguments(['--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT]);
+
 		$this->driver = RemoteWebDriver::create('http://localhost:4444/wd/hub',
-				DesiredCapabilities::firefox()->setCapability('loggingPrefs', ['browser' => 'SEVERE'])
+				DesiredCapabilities::chrome()->setCapability(ChromeOptions::CAPABILITY, $options)
 		);
-		$this->driver->manage()->window()->setSize(new WebDriverDimension(1280, 1024));
+
 		CElementQuery::setDriver($this->driver);
 	}
 
@@ -173,6 +184,31 @@ class CPage {
 	 * @return string
 	 */
 	public function takeScreenshot() {
+		try {
+			if (!$this->driver->executeScript('return !!window.chrome;')) {
+				throw new Exception();
+			}
+		}catch (Exception $exception) {
+			return $this->driver->takeScreenshot();
+		}
+
+		try {
+			// Screenshot is 1px smaller to ensure that scroll is still present.
+			$height = (int)$this->driver->executeScript('return document.documentElement.getHeight();') - 1;
+
+			if ($height > self::DEFAULT_PAGE_HEIGHT) {
+				CommandExecutor::executeCustom($this->driver, [
+					'cmd' => 'Emulation.setVisibleSize',
+					'params' => [
+						'width' => self::DEFAULT_PAGE_WIDTH,
+						'height' => $height
+					]
+				]);
+			}
+		}catch (Exception $exception) {
+			// Code is not missing here.
+		}
+
 		return $this->driver->takeScreenshot();
 	}
 
