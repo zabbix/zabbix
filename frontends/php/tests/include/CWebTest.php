@@ -84,14 +84,14 @@ class CWebTest extends CTest {
 	protected function tearDown() {
 		// Check for JS errors.
 		if (!$this->hasFailed()) {
-			if (!$this->supress_case_errors && self::$shared_page !== null) {
+			if (self::$shared_page !== null) {
 				$errors = [];
 
 				foreach (self::$shared_page->getBrowserLog() as $log) {
 					$errors[] = $log['message'];
 				}
 
-				if ($errors) {
+				if (!$this->supress_case_errors && $errors) {
 					$this->captureScreenshot();
 					$this->fail("Severe browser errors:\n" . implode("\n", array_unique($errors)));
 				}
