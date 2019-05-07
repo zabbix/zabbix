@@ -216,7 +216,8 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 
 	CURL			*easyhandle;
 	CURLcode		err;
-	char			url[ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *error = NULL, *headers, *line, *buffer;
+	char			url[ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *error = NULL, *headers, *line, *buffer,
+				*scheme_end, *delim;
 	int			ret = NOTSUPPORTED, timeout_seconds, found = FAIL;
 	long			response_code;
 	struct curl_slist	*headers_slist = NULL;
@@ -358,6 +359,21 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err)));
 		goto clean;
+	}
+
+	if (NULL != (scheme_end = strstr(item->url, "://")) &&
+			(NULL == (delim = strpbrk(item->url, "#?")) || delim > scheme_end))
+	{
+		zbx_strlcpy(url, item->url, ZBX_CONST_STRLEN("https://") + 1);
+		zbx_strlower(url);
+
+		if (0 != strncmp(url, "http://", ZBX_CONST_STRLEN("http://")) &&
+				0 != strncmp(url, "https://", ZBX_CONST_STRLEN("https://")))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unsupported scheme: %.*s.",
+					(int)(scheme_end - item->url), item->url));
+			goto clean;
+		}
 	}
 
 	zbx_snprintf(url, sizeof(url),"%s%s", item->url, item->query_fields);
