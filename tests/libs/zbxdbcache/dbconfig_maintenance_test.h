@@ -17,11 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MOCK_DB_H
-#define ZABBIX_MOCK_DB_H
+#ifndef DBCONFIG_MAINTENANCE_TEST_H
+#define DBCONFIG_MAINTENANCE_TEST_H
 
+int	dc_maintenance_match_tags_test(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags);
 
-void	zbx_mockdb_init(void);
-void	zbx_mockdb_destroy(void);
-
-#endif /* BUILD_TESTS_ZBXMOCKDB_H_ */
+#endif

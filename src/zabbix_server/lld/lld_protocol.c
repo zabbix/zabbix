@@ -23,6 +23,7 @@
 #include "zbxipcservice.h"
 #include "lld_protocol.h"
 #include "sysinfo.h"
+#include "zbxlld.h"
 
 /******************************************************************************
  *                                                                            *
