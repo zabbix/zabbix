@@ -53,7 +53,7 @@ class CPage {
 	 */
 	public function __construct() {
 		$options = new ChromeOptions();
-		$options->addArguments(['--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT]);
+		$options->addArguments(['--no-sandbox', '--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT]);
 
 		$this->driver = RemoteWebDriver::create('http://localhost:4444/wd/hub',
 				DesiredCapabilities::chrome()->setCapability(ChromeOptions::CAPABILITY, $options)
