@@ -527,8 +527,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 */
 	public function testFormHostPrototype_Update($data) {
 		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID);
-		$host = array_key_exists('old_visible_name', $data) ? $data['old_visible_name'] : $data['old_name'];
-		$this->zbxTestClickLinkTextWait($host);
+		$this->zbxTestClickLinkTextWait(array_key_exists('old_visible_name', $data) ? $data['old_visible_name'] : $data['old_name']);
 
 		// Change name and visible name.
 		if (array_key_exists('name', $data)) {
