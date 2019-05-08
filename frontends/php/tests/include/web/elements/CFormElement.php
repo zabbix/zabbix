@@ -45,7 +45,7 @@ class CFormElement extends CElement {
 	 */
 	protected function normalize() {
 		if ($this->getTagName() !== 'form') {
-			$this->setElement($this->query('xpath:.//form')->one());
+			$this->setElement($this->query('xpath:.//form')->waitUntilPresent()->one());
 		}
 	}
 
