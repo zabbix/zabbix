@@ -141,7 +141,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Template updated', $message->getTitle());
-		//Go to Trigger form on Template.
+		// Go to Trigger form on Template.
 		$updated_templates_table = $this->query('class:list-table')->asTable()->one();
 		$updated_templates_table->findRow('Name', $this->template)->getColumn('Triggers')->query('tag:a')->one()->click();
 		$updated_templates_table->waitUntilReloaded();
