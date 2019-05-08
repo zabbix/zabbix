@@ -217,9 +217,9 @@ class testPageTriggers extends CLegacyWebTest {
 						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Discovered trigger one',
-						'Inheritance trigger with tags',
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -231,7 +231,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Severity' => ['Average', 'Disaster'],
 					],
 					'result' => [
-						'Discovered trigger one',
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -243,8 +243,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'Inherited' =>'No'
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Discovered trigger one',
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -256,7 +256,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Discovered' => 'Yes'
 					],
 					'result' => [
-						'Discovered trigger one'
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -267,8 +267,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'With dependencies' => 'Yes'
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Inheritance trigger with tags'
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -279,8 +279,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'Name' => 'One'
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Discovered trigger one'
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -291,8 +291,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'State' => 'Normal'
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Discovered trigger one'
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -303,9 +303,9 @@ class testPageTriggers extends CLegacyWebTest {
 						'Status' => 'Enabled'
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Discovered trigger one',
-						'Inheritance trigger with tags'
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -326,8 +326,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'Value' => 'Ok'
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Discovered trigger one',
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -338,7 +338,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Value' => 'Problem'
 					],
 					'result' => [
-						'Inheritance trigger with tags'
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -363,7 +363,7 @@ class testPageTriggers extends CLegacyWebTest {
 						]
 					],
 					'result' => [
-						'Inheritance trigger with tags'
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],

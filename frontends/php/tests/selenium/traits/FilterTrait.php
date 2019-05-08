@@ -44,7 +44,7 @@ trait FilterTrait {
 				],
 				[
 					'name' => 'operator',
-					'selector' => 'class:radio-segmented',
+					'selector' => 'class:radio-list-control',
 					'class' => 'CSegmentedRadioElement'
 				],
 				[

@@ -27,8 +27,7 @@ require_once dirname(__FILE__).'/../CElement.php';
  */
 class CMultifieldTableElement extends CTableElement {
 
-	const ROW_SELECTOR = 'xpath:./tbody/tr[contains(@class, "form_row") or contains(@class, "pairRow")'.
-			' or contains(@class, "editable_table_row")]';
+	const ROW_SELECTOR = 'xpath:./tbody/tr[contains(@class, "form_row") or contains(@class, "pairRow") or contains(@class, "editable_table_row")]';
 
 	/**
 	 * Field mapping.
@@ -66,7 +65,7 @@ class CMultifieldTableElement extends CTableElement {
 	 *        This will set names and expected control types for the fields (CElement is generic input).
 	 *     4. [
 	 *            ['name' => 'tag', 'selector' => 'xpath:./input', 'class' => 'CElement'],
-	 *            ['name' => 'operator', 'selector' => 'class:radio-segmented', 'class' => 'CSegmentedRadioElement'],
+	 *            ['name' => 'operator', 'selector' => 'class:radio-list-control', 'class' => 'CSegmentedRadioElement'],
 	 *            ['name' => 'value', 'selector' => 'xpath:./input', 'class' => 'CElement']
 	 *        ]
 	 *        This will set names, selectors and expected control types for the fields.
