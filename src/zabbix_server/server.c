@@ -69,10 +69,6 @@
 #include "postinit.h"
 #include "export.h"
 
-#ifdef ZBX_CUNIT
-#include "../libs/zbxcunit/zbxcunit.h"
-#endif
-
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
 #include "ipmi/ipmi_poller.h"
@@ -308,11 +304,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_IPMIMANAGER;
 		*local_process_num = local_server_num - server_count + CONFIG_TASKMANAGER_FORKS;
 	}
-	else if (local_server_num <= (server_count += CONFIG_ALERTER_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_ALERTER;
-		*local_process_num = local_server_num - server_count + CONFIG_ALERTER_FORKS;
-	}
 	else if (local_server_num <= (server_count += CONFIG_HOUSEKEEPER_FORKS))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_HOUSEKEEPER;
@@ -402,6 +393,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_ALERTMANAGER;
 		*local_process_num = local_server_num - server_count + CONFIG_ALERTMANAGER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_ALERTER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_ALERTER;
+		*local_process_num = local_server_num - server_count + CONFIG_ALERTER_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_PREPROCMAN_FORKS))
 	{
@@ -793,10 +789,6 @@ int	main(int argc, char **argv)
 #endif
 
 	progname = get_program_name(argv[0]);
-
-#ifdef ZBX_CUNIT
-	zbx_cu_run(argc, argv);
-#endif
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))

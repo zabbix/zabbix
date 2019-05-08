@@ -193,11 +193,16 @@ static int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant
 static int	item_preproc_multiplier(unsigned char value_type, zbx_variant_t *value, const char *params,
 		char **errmsg)
 {
+	char	buffer[MAX_STRING_LEN];
 	char	*err = NULL;
 
-	if (FAIL == is_double(params))
+	zbx_strlcpy(buffer, params, sizeof(buffer));
+
+	zbx_trim_float(buffer);
+
+	if (FAIL == is_double(buffer))
 		err = zbx_dsprintf(NULL, "a numerical value is expected");
-	else if (SUCCEED == item_preproc_multiplier_variant(value_type, value, params, &err))
+	else if (SUCCEED == item_preproc_multiplier_variant(value_type, value, buffer, &err))
 		return SUCCEED;
 
 	*errmsg = zbx_dsprintf(*errmsg, "cannot apply multiplier \"%s\" to value \"%s\" of type \"%s\": %s",
@@ -754,7 +759,7 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 		return FAIL;
 	}
 
-	if (FAIL == zbx_mregexp_sub_precompiled(value->data.str, regex, output, &new_value))
+	if (FAIL == zbx_mregexp_sub_precompiled(value->data.str, regex, output, ZBX_MAX_RECV_DATA_SIZE, &new_value))
 	{
 		*errmsg = zbx_strdup(*errmsg, "pattern does not match");
 		zbx_regexp_free(regex);
@@ -1054,3 +1059,6 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 
 	return FAIL;
 }
+#ifdef HAVE_TESTS
+#	include "../../../tests/zabbix_server/preprocessor/item_preproc_test.c"
+#endif

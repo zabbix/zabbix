@@ -36,7 +36,7 @@ class CCheckboxElement extends CElement {
 	 */
 	public function set($checked) {
 		if ($checked !== $this->isSelected()) {
-			$this->click();
+			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
 		}
 
 		return $this;

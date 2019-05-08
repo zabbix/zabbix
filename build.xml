@@ -38,6 +38,12 @@
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
+
+		<!-- Set RW acces to the assets -->
+		<exec executable="chmod">
+			<arg line="g+w"/>
+			<arg line="frontends/php/assets"/>
+		</exec>
 	</target>
 
 	<target name="make-dbschema">
@@ -79,7 +85,6 @@
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
-			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="-c 'drop database if exists ${dbname}'"/>
 		</exec>
@@ -87,7 +92,6 @@
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
-			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="-c 'create database ${dbname}'"/>
 		</exec>

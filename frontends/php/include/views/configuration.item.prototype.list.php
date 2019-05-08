@@ -157,8 +157,6 @@ foreach ($data['items'] as $item) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
-
 // append table to form
 $itemForm->addItem([
 	$itemTable,

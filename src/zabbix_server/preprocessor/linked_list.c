@@ -124,7 +124,7 @@ void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value
  ******************************************************************************/
 void	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted)
 {
-	return zbx_list_insert_after(list, NULL, value, inserted);
+	zbx_list_insert_after(list, NULL, value, inserted);
 }
 
 /******************************************************************************

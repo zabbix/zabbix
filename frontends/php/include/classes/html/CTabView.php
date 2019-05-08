@@ -122,7 +122,7 @@ class CTabView extends CDiv {
 
 	public function makeJavascript() {
 		if ($this->selectedTab === null) {
-			$active_tab = get_cookie('tab', 0);
+			$active_tab = (int) get_cookie('tab', 0);
 			$create_event = '';
 		}
 		else {

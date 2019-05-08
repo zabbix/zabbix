@@ -18,7 +18,7 @@ EXTRA_DIST = \
 
 ## "dist-hook" run after the distribution directory is filled, but before the actual tar (or shar) file is created.
 dist-hook:
-	@zabbix_revision=`svn info $(top_srcdir)|sed -n -e "/Last Changed Rev:/s/.*: \([[0-9]]*\)/\1/p"`; \
+	@zabbix_revision=`git -C $(top_srcdir) rev-parse --short HEAD`; \
 	cat $(top_distdir)/include/version.h|sed "s/{ZABBIX_REVISION}/$$zabbix_revision/g" > $(top_distdir)/include/version.h.new; \
 	mv $(top_distdir)/include/version.h.new $(top_distdir)/include/version.h; \
 	cat $(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java|sed "s/{ZABBIX_REVISION}/$$zabbix_revision/g" > \
@@ -27,7 +27,7 @@ dist-hook:
 		$(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java; \
 	rm -f $(top_distdir)/conf_tests.m4
 
-	rm -rf `find $(top_distdir) -name ".svn"`
+	rm -rf `find $(top_distdir) -name ".gitignore" -o -name ".gitattributes"`
 	rm -f $(top_distdir)/include/config.h
 	rm -f $(top_distdir)/frontends/php/conf/zabbix.conf.php
 	rm -rf $(top_distdir)/frontends/php/tests
@@ -71,39 +71,33 @@ gettext:
 	frontends/php/locale/make_mo.sh
 
 css_theme_blue:
-	sass --no-cache --sourcemap=none sass/stylesheets/sass/screen.scss frontends/php/styles/blue-theme.css
-	cp frontends/php/styles/blue-theme.css sass/stylesheets/screen.css
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/screen.scss frontends/php/assets/styles/blue-theme.css
+	cp frontends/php/assets/styles/blue-theme.css sass/stylesheets/screen.css
 
 css_theme_dark:
-	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-theme.scss frontends/php/styles/dark-theme.css
-	cp frontends/php/styles/dark-theme.css sass/stylesheets/dark-theme.css
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-theme.scss frontends/php/assets/styles/dark-theme.css
+	cp frontends/php/assets/styles/dark-theme.css sass/stylesheets/dark-theme.css
 
 css_hc_light:
-	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-light.scss frontends/php/styles/hc-light.css
-	cp frontends/php/styles/hc-light.css sass/stylesheets/hc-light.css
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-light.scss frontends/php/assets/styles/hc-light.css
+	cp frontends/php/assets/styles/hc-light.css sass/stylesheets/hc-light.css
 
 css_hc_dark:
-	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-dark.scss frontends/php/styles/hc-dark.css
-	cp frontends/php/styles/hc-dark.css sass/stylesheets/hc-dark.css
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-dark.scss frontends/php/assets/styles/hc-dark.css
+	cp frontends/php/assets/styles/hc-dark.css sass/stylesheets/hc-dark.css
 
 css_icons:
-	cp sass/img/icon-sprite.svg frontends/php/img/
-	cp sass/img/browser-sprite.png frontends/php/img/
-	cp sass/apple-touch-icon-120x120-precomposed.png frontends/php/img/
-	cp sass/apple-touch-icon-152x152-precomposed.png frontends/php/img/
-	cp sass/apple-touch-icon-180x180-precomposed.png frontends/php/img/
-	cp sass/apple-touch-icon-76x76-precomposed.png frontends/php/img/
-	cp sass/ms-tile-144x144.png frontends/php/img/
-	cp sass/touch-icon-192x192.png frontends/php/img/
+	cp sass/img/icon-sprite.svg frontends/php/assets/img/
+	cp sass/img/browser-sprite.png frontends/php/assets/img/
+	cp sass/apple-touch-icon-120x120-precomposed.png frontends/php/assets/img/
+	cp sass/apple-touch-icon-152x152-precomposed.png frontends/php/assets/img/
+	cp sass/apple-touch-icon-180x180-precomposed.png frontends/php/assets/img/
+	cp sass/apple-touch-icon-76x76-precomposed.png frontends/php/assets/img/
+	cp sass/ms-tile-144x144.png frontends/php/assets/img/
+	cp sass/touch-icon-192x192.png frontends/php/assets/img/
 	cp sass/favicon.ico frontends/php/
 
 css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
-
-## CUnit test support
-TESTDIR = src
-
-test:
-	cd $(TESTDIR) && $(MAKE) $(AM_MAKEFLAGS) test
 
 ## cmocka test support
 if ZBXCMOCKA
