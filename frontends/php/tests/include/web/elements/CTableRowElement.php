@@ -94,9 +94,11 @@ class CTableRowElement extends CElement {
 	 * Check if table row is selected.
 	 * For tables with checkboxes.
 	 *
-	 * @return $this
+	 * @param boolean $selected    if it is expected for row to be selected or not
+	 *
+	 * @return boolean
 	 */
-	public function isSelected() {
-		return $this->query('xpath:.//input[@type="checkbox"]')->one()->isSelected();
+	public function isSelected($selected = true) {
+		return $this->query('xpath:.//input[@type="checkbox"]')->one()->isSelected($selected);
 	}
 }

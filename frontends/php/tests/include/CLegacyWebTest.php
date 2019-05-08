@@ -192,7 +192,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestClickWait($id) {
-		$this->query('id:'.$id)->waitUntilPresent()->one()->click();
+		$this->query('id:'.$id)->waitUntilClickable()->one()->click();
 	}
 
 	public function zbxTestDoubleClick($click_id, $id) {
@@ -230,10 +230,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestCheckboxSelect($id, $select = true) {
-		$checkbox = $this->query('id:'.$id)->waitUntilPresent()->one();
-		if ($select != $checkbox->isSelected()) {
-			$checkbox->click();
-		}
+		$this->query('id:'.$id)->waitUntilPresent()->asCheckbox()->one()->set($select);
 	}
 
 	public function zbxTestCheckboxSelected($id) {

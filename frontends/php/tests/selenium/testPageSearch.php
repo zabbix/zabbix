@@ -24,7 +24,7 @@ class testPageSearch extends CLegacyWebTest {
 	public function testPageSearch_FindZabbixServer() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestInputTypeWait('search', 'ЗАББИКС Сервер');
-		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
+		$this->zbxTestClickXpath('//button[@class="btn-search"]');
 		$this->zbxTestCheckTitle('Search');
 		$this->zbxTestCheckHeader('Search: ЗАББИКС Сервер');
 		$this->zbxTestTextPresent(['Hosts', 'Host groups', 'Templates']);
@@ -39,7 +39,7 @@ class testPageSearch extends CLegacyWebTest {
 	public function testPageSearch_FindNotExistingHost() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestInputTypeWait('search', 'Not existing host');
-		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
+		$this->zbxTestClickXpath('//button[@class="btn-search"]');
 		$this->zbxTestCheckTitle('Search');
 		$this->zbxTestCheckHeader('Search: Not existing host');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
@@ -55,13 +55,13 @@ class testPageSearch extends CLegacyWebTest {
 
 		// Do not search if the search field is empty.
 		$this->zbxTestInputTypeWait('search', '');
-		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
+		$this->zbxTestClickXpath('//button[@class="btn-search"]');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestCheckHeader('Global view');
 
 		// Do not search if search string consists only of whitespace characters.
 		$this->zbxTestInputTypeWait('search', '   ');
-		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
+		$this->zbxTestClickXpath('//button[@class="btn-search"]');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestCheckHeader('Global view');
 	}
