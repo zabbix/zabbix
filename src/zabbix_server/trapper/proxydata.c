@@ -106,13 +106,8 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
 			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
-	/* don't accept pre 4.2 data */
-	if (ZBX_COMPONENT_VERSION(4, 2) > proxy.version)
+	if (SUCCEED != zbx_check_protocol_version(&proxy))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy \"%s\":"
-				" protocol version %d.%d is not supported anymore",
-				proxy.host, ZBX_COMPONENT_VERSION_MAJOR(proxy.version),
-				ZBX_COMPONENT_VERSION_MINOR(proxy.version));
 		goto out;
 	}
 

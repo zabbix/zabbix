@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "../zabbix_server/alerter/alerter_protocol.h"
 
 zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t mediatypeid, const char *sendto,
 		const char *subject, const char *message)

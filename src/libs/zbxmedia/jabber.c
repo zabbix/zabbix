@@ -281,7 +281,7 @@ static void	lookup_jabber(const char *server, int port, char *real_server, size_
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	disconnect_jabber()
+static int	disconnect_jabber(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __func__);
 

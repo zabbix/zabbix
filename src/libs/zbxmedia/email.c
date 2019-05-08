@@ -21,6 +21,7 @@
 #include "log.h"
 #include "comms.h"
 #include "base64.h"
+#include "zbxalgo.h"
 
 #include "zbxmedia.h"
 

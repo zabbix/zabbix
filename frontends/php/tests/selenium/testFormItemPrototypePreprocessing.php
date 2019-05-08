@@ -789,15 +789,15 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 				case 'Matches regular expression':
 				case 'Does not match regular expression':
 					$this->zbxTestIsEnabled('//input[@id="preprocessing_'.$step_count.'_on_fail"][@type="checkbox"]');
-					$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_on_fail"]');
+					$this->zbxTestCheckboxSelect('preprocessing_'.$step_count.'_on_fail');
 
 					switch ($action) {
 						case 'set_value':
-							$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_error_handler_1"]');
+							$this->zbxTestCheckboxSelect('preprocessing_'.$step_count.'_error_handler_1');
 							$this->zbxTestInputTypeWait('preprocessing_'.$step_count.'_error_handler_params', $custom_value);
 							break;
 						case 'set_error':
-							$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_error_handler_2"]');
+							$this->zbxTestCheckboxSelect('preprocessing_'.$step_count.'_error_handler_2');
 							$this->zbxTestInputTypeWait('preprocessing_'.$step_count.'_error_handler_params', $custom_error);
 							break;
 					}
@@ -997,16 +997,16 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 
 		foreach ($preprocessing as $step_count => $options) {
 			$this->selectTypeAndfillParameters($step_count, $options);
-			$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_on_fail"]');
+			$this->zbxTestCheckboxSelect('preprocessing_'.$step_count.'_on_fail');
 
 			foreach ($data['custom_on_fail'] as $error_type) {
 				switch ($error_type['option']) {
 					case 'Set value to':
-						$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_error_handler_1"]');
+						$this->zbxTestCheckboxSelect('preprocessing_'.$step_count.'_error_handler_1');
 						$this->zbxTestInputType('preprocessing_'.$step_count.'_error_handler_params', $error_type['input']);
 						break;
 					case 'Set error to':
-						$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_error_handler_2"]');
+						$this->zbxTestCheckboxSelect('preprocessing_'.$step_count.'_error_handler_2');
 						$this->zbxTestInputType('preprocessing_'.$step_count.'_error_handler_params', $error_type['input']);
 						break;
 				}

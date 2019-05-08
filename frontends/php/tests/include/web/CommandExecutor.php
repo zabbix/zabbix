@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -17,11 +18,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MOCK_DB_H
-#define ZABBIX_MOCK_DB_H
+require_once 'vendor/autoload.php';
 
+/**
+ * Helper class that allows custom command execution.
+ */
+class CommandExecutor extends HttpCommandExecutor {
 
-void	zbx_mockdb_init(void);
-void	zbx_mockdb_destroy(void);
+	/**
+	 * Execute custom command for WebDriver.
+	 *
+	 * @param RemoteWebDriver $driver    WebDriver instance
+	 * @param array           $params    command parameters
+	 *
+	 * @return mixed
+	 */
+	public static function executeCustom(RemoteWebDriver $driver, array $params = []) {
+		if (!isset(HttpCommandExecutor::$commands['custom'])) {
+			HttpCommandExecutor::$commands['custom'] = [
+				'method' => 'POST',
+				'url' => '/session/:sessionId/chromium/send_command_and_get_result'
+			];
+		}
 
-#endif /* BUILD_TESTS_ZBXMOCKDB_H_ */
+		return $driver->execute('custom', $params);
+	}
+}

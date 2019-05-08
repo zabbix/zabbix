@@ -28,6 +28,12 @@
 static const char	*http_req;
 static size_t		http_len;
 
+int	__wrap_zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port,
+		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
+int	__wrap_zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned char flags, int timeout);
+ssize_t	__wrap_zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
+void	__wrap_zbx_tcp_close(zbx_socket_t *s);
+
 void	zbx_mock_test_entry(void **state)
 {
 	AGENT_REQUEST	request;
