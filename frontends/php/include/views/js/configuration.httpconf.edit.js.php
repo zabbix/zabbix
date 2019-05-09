@@ -188,6 +188,13 @@
 			e.new_node.setAttribute('data-index', e.data_index);
 			e.new_node.querySelector('.element-table-remove')
 				.addEventListener('click', dynamic_rows.removeRow.bind(dynamic_rows, e.data_index));
+
+			// Because IE does not have NodeList.prototype.forEach method.
+			Array.prototype.forEach.call(e.new_node.querySelectorAll('input'), function(input_node) {
+				input_node.addEventListener('keyup', function(e) {
+					$el.trigger('dynamic_rows.updated', dynamic_rows);
+				});
+			});
 		});
 	}
 
@@ -196,16 +203,15 @@
 	 */
 	function dynamicRowsBindRemoveDisable($el) {
 		$el.on('dynamic_rows.updated', function(e, dynamic_rows) {
-			if (dynamic_rows.length > 1) {
-				dynamic_rows.$element.find('.element-table-remove').prop('disabled', false);
-				return;
+			var $remove_btns = dynamic_rows.$element.find('.element-table-remove');
+
+			if (dynamic_rows.length == 1) {
+				return eachPair.call(dynamic_rows, function(pair) {
+					$remove_btns.prop('disabled', !pair.name && !pair.value);
+				}, true);
 			}
 
-			eachPair.call(dynamic_rows, function(pair) {
-				if (!pair.name && !pair.value) {
-					dynamic_rows.$element.find('.element-table-remove').prop('disabled', true);
-				}
-			}, true);
+			$remove_btns.prop('disabled', false);
 		});
 	}
 
