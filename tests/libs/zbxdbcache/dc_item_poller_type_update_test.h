@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef DC_ITEM_POLLER_TYPE_UPDATE_H
-#define DC_ITEM_POLLER_TYPE_UPDATE_H
+#ifndef DC_ITEM_POLLER_TYPE_UPDATE_TEST_H
+#define DC_ITEM_POLLER_TYPE_UPDATE_TEST_H
 
 void	DCitem_poller_type_update_test(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags);
 
-#endif /* DC_ITEM_POLLER_TYPE_UPDATE_H */
+#endif /* DC_ITEM_POLLER_TYPE_UPDATE_TEST_H */
