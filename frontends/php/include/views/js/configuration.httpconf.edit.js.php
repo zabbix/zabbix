@@ -92,7 +92,6 @@
 		window.httpconf.authentication = new Authentication($('#authenticationTab'));
 
 		window.httpconf.$form = $('#httpForm').on('submit', function(e) {
-			e.preventDefault();
 			var hidden_form = this.querySelector('#hidden-form');
 
 			hidden_form && hidden_form.remove();
