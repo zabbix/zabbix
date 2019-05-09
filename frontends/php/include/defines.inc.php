@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.7rc1');
-define('ZABBIX_API_VERSION',	'4.0.7');
+define('ZABBIX_VERSION',		'4.0.8rc1');
+define('ZABBIX_API_VERSION',	'4.0.8');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -65,7 +65,7 @@ define('ELASTICSEARCH_RESPONSE_DOCUMENTS',		2);
 
 define('ZBX_WIDGET_ROWS', 20);
 
-define('ZBX_FONTPATH',				realpath('fonts')); // where to search for font (GD > 2.0.18)
+define('ZBX_FONTPATH',				realpath('assets/fonts')); // where to search for font (GD > 2.0.18)
 define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
 define('ZBX_GRAPH_LEGEND_HEIGHT',	120); // when graph height is less then this value, some legend will not show up
 

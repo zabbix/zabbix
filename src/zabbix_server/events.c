@@ -1989,6 +1989,9 @@ static void	process_internal_ok_events(zbx_vector_ptr_t *ok_events)
 	{
 		event = (DB_EVENT *)ok_events->values[i];
 
+		if (ZBX_FLAGS_DB_EVENT_UNSET == event->flags)
+			continue;
+
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
@@ -2002,6 +2005,9 @@ static void	process_internal_ok_events(zbx_vector_ptr_t *ok_events)
 				break;
 		}
 	}
+
+	if (0 == triggerids.values_num && 0 == itemids.values_num && 0 == lldruleids.values_num)
+		goto out;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select eventid,object,objectid from problem"
@@ -2053,6 +2059,7 @@ static void	process_internal_ok_events(zbx_vector_ptr_t *ok_events)
 	DBfree_result(result);
 	zbx_free(sql);
 
+out:
 	zbx_vector_uint64_destroy(&lldruleids);
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_uint64_destroy(&triggerids);
@@ -2425,23 +2432,30 @@ static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_
  * Parameters: unknown_events - [IN] the recovery events to process           *
  *                                                                            *
  ******************************************************************************/
-static void	process_internal_events_dependency(zbx_vector_ptr_t *unknown_events)
+static void	process_internal_events_dependency(zbx_vector_ptr_t *unknown_events, zbx_vector_ptr_t *trigger_events,
+		zbx_vector_ptr_t *trigger_diff)
 {
 	int			i, index;
 	DB_EVENT		*event;
 	zbx_vector_uint64_t	triggerids;
 	zbx_vector_ptr_t	deps;
-	zbx_trigger_dep_t	*dep;
-
+	zbx_trigger_diff_t	*diff;
+;
 	zbx_vector_uint64_create(&triggerids);
-	zbx_vector_uint64_reserve(&triggerids, unknown_events->values_num);
+	zbx_vector_uint64_reserve(&triggerids, unknown_events->values_num + trigger_events->values_num);
 
 	zbx_vector_ptr_create(&deps);
-	zbx_vector_ptr_reserve(&deps, unknown_events->values_num);
+	zbx_vector_ptr_reserve(&deps, unknown_events->values_num + trigger_events->values_num);
 
 	for (i = 0; i < unknown_events->values_num; i++)
 	{
 		event = (DB_EVENT *)unknown_events->values[i];
+		zbx_vector_uint64_append(&triggerids, event->objectid);
+	}
+
+	for (i = 0; i < trigger_events->values_num; i++)
+	{
+		event = (DB_EVENT *)trigger_events->values[i];
 		zbx_vector_uint64_append(&triggerids, event->objectid);
 	}
 
@@ -2451,16 +2465,22 @@ static void	process_internal_events_dependency(zbx_vector_ptr_t *unknown_events)
 	for (i = 0; i < unknown_events->values_num; i++)
 	{
 		event = (DB_EVENT *)unknown_events->values[i];
-		if (FAIL != (index = zbx_vector_ptr_bsearch(&deps, &event->objectid,
+
+		if (FAIL == (index = zbx_vector_ptr_search(trigger_diff, &event->objectid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
-			dep = (zbx_trigger_dep_t *)deps.values[index];
-			if (ZBX_TRIGGER_DEPENDENCY_FAIL == dep->status)
-			{
-				/* reset event data/trigger changeset if dependency check failed */
-				event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
-			}
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
 
+		diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
+
+		if (FAIL == (event_check_dependency(event, &deps, trigger_diff)))
+		{
+			/* reset event data/trigger changeset if dependency check failed */
+			event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
+			diff->flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET;
+			continue;
 		}
 	}
 
@@ -2551,7 +2571,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 		}
 
 		if (0 != internal_events.values_num)
-			process_internal_events_dependency(&internal_events);
+			process_internal_events_dependency(&internal_events, &trigger_events, trigger_diff);
 
 		if (0 != internal_ok_events.values_num)
 			process_internal_ok_events(&internal_ok_events);

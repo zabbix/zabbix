@@ -46,7 +46,7 @@ class CTableElement extends CElement {
 	 */
 	protected function normalize() {
 		if ($this->getTagName() !== 'table') {
-			$this->setElement($this->query('xpath:.//table')->one());
+			$this->setElement($this->query('xpath:.//table')->waitUntilPresent()->one());
 		}
 	}
 

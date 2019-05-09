@@ -3559,7 +3559,7 @@ ZABBIX.apps.map = (function($) {
 			 */
 			show: function() {
 				this.domNode.show();
-				$('.element-edit-control').attr('disabled', true);
+				$('.element-edit-control').prop('disabled', true);
 			},
 
 			/**
@@ -3567,7 +3567,7 @@ ZABBIX.apps.map = (function($) {
 			 */
 			hide: function() {
 				$('#linkForm').hide();
-				$('.element-edit-control').attr('disabled', false);
+				$('.element-edit-control').prop('disabled', false);
 			},
 
 			/**
