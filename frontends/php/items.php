@@ -55,7 +55,7 @@ $fields = [
 	],
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
 	'history_mode' =>			[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
-	'history' =>				[T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	null,
+	'history' =>				[T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({history_mode}) && {history_mode}=='.ITEM_STORAGE_CUSTOM,
 		_('History storage period')
 	],
@@ -792,13 +792,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$def_item_history = (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
 					? ITEM_NO_STORAGE_VALUE
 					: DB::getDefault('items', 'history');
-				if ($db_item['history'] != getRequest('history', $def_item_history)) {
+				if ((string) $db_item['history'] !== (string) getRequest('history', $def_item_history)) {
 					$item['history'] = getRequest('history', $def_item_history);
 				}
 				$def_item_trends = (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
 					? ITEM_NO_STORAGE_VALUE
 					: DB::getDefault('items', 'trends');
-				if ($db_item['trends'] != getRequest('trends', $def_item_trends)) {
+				if ((string) $db_item['trends'] !== (string) getRequest('trends', $def_item_trends)) {
 					$item['trends'] = getRequest('trends', $def_item_trends);
 				}
 				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
