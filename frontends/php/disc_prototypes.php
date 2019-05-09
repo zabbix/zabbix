@@ -733,7 +733,7 @@ if (isset($_REQUEST['form'])) {
 	$data['config'] = select_config();
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
-	if ($data['history'] == ITEM_NO_STORAGE_VALUE) {
+	if ((string) $data['history'] === (string) ITEM_NO_STORAGE_VALUE) {
 		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_OFF);
 		$data['history'] = DB::getDefault('items', 'history');
 	}
@@ -741,7 +741,7 @@ if (isset($_REQUEST['form'])) {
 		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_CUSTOM);
 	}
 
-	if ($data['trends'] == ITEM_NO_STORAGE_VALUE) {
+	if ((string) $data['trends'] === (string) ITEM_NO_STORAGE_VALUE) {
 		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_OFF);
 		$data['trends'] = DB::getDefault('items', 'trends');
 	}
