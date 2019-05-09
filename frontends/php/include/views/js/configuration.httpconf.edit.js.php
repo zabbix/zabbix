@@ -92,12 +92,12 @@
 		window.httpconf.authentication = new Authentication($('#authenticationTab'));
 
 		window.httpconf.$form = $('#httpForm').on('submit', function(e) {
+			e.preventDefault();
 			var hidden_form = this.querySelector('#hidden-form');
 
 			hidden_form && hidden_form.remove();
 			hidden_form = document.createElement('div');
 			hidden_form.id = 'hidden-form';
-			hidden_form.className = 'hidden';
 
 			hidden_form.append(httpconf.scenario.toFragment());
 			hidden_form.append(httpconf.steps.toFragment());
