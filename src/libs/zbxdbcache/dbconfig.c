@@ -2366,16 +2366,12 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		item->flags = (unsigned char)atoi(row[24]);
 		ZBX_DBROW2UINT64(item->interfaceid, row[25]);
 
-		if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
-		{
+		is_time_suffix(row[31], &item->history_sec, ZBX_LENGTH_UNLIMITED);
+
+		if (0 != item->history_sec && ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
 			item->history_sec = config->config->hk.history;
-			item->history = (0 != config->config->hk.history);
-		}
-		else
-		{
-			is_time_suffix(row[31], &(item->history_sec), ZBX_LENGTH_UNLIMITED);
-			item->history = zbx_time2bool(row[31]);
-		}
+
+		item->history = (0 != item->history_sec);
 
 		ZBX_STR2UCHAR(item->inventory_link, row[33]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[34]);
@@ -2442,12 +2438,14 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
+			int	trends_sec;
+
 			numitem = (ZBX_DC_NUMITEM *)DCfind_id(&config->numitems, itemid, sizeof(ZBX_DC_NUMITEM), &found);
 
-			if (ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
-				numitem->trends = (0 != config->config->hk.trends);
-			else
-				numitem->trends = zbx_time2bool(row[32]);
+			is_time_suffix(row[32], &trends_sec, ZBX_LENGTH_UNLIMITED);
+			if (0 != trends_sec && ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
+				trends_sec = config->config->hk.trends;
+			numitem->trends = (0 != trends_sec);
 
 			DCstrpool_replace(found, &numitem->units, row[35]);
 		}
