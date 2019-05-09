@@ -76,7 +76,7 @@
 				ok:                         <?= CJs::encodeJson(_('Ok')) ?>,
 				error:                      <?= CJs::encodeJson(_('Error')) ?>,
 				url_not_encoded_properly:   <?= CJs::encodeJson(_('URL is not properly encoded.')) ?>,
-				cannot_convert_into_raw:    <?= CJs::encodeJson(_('Cannot convert POST data from raw data format to form field data format.')) ?>
+				cannot_convert_post_data:    <?= CJs::encodeJson(_('Cannot convert POST data:')) ?>
 			}
 		};
 
@@ -848,7 +848,7 @@
 		}
 		catch (err) {
 			this.$radio_post_type.val(is_raw ? httpconf.ZBX_POSTTYPE_FORM : httpconf.ZBX_POSTTYPE_RAW);
-			this.errorDialog(httpconf.msg.cannot_convert_into_raw + '<br><br>' + err, e.target);
+			this.errorDialog(httpconf.msg.cannot_convert_post_data + '<br><br>' + err, e.target);
 		}
 	};
 
