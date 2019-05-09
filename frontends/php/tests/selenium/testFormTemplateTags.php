@@ -47,7 +47,10 @@ class testFormTemplateTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'template_name' => 'Template with tags',
+					'fields' => [
+							'Template name' => 'Template with tags',
+							'Groups' => 'Zabbix servers'
+						],
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -79,7 +82,10 @@ class testFormTemplateTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'template_name' => 'Template with equal tag names',
+					'fields' => [
+							'Template name' => 'Template with equal tag names',
+							'Groups' => 'Zabbix servers'
+						],
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -97,7 +103,10 @@ class testFormTemplateTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'template_name' => 'Template with equal tag values',
+					'fields' => [
+							'Template name' => 'Template with equal tag values',
+							'Groups' => 'Zabbix servers'
+						],
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -115,7 +124,10 @@ class testFormTemplateTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'template_name' => 'Template with empty tag name',
+					'fields' => [
+							'Template name' => 'Template with empty tag name',
+							'Groups' => 'Zabbix servers'
+						],
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -130,7 +142,10 @@ class testFormTemplateTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'template_name' => 'Template with equal tags',
+					'fields' => [
+							'Template name' => 'Template with equal tags',
+							'Groups' => 'Zabbix servers'
+						],
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -163,9 +178,7 @@ class testFormTemplateTags extends CWebTest {
 		$this->page->login()->open('templates.php');
 		$this->query('button:Create template')->waitUntilPresent()->one()->click();
 		$form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
-		$form->getLabel('Template name')->fill($data['template_name']);
-		$form->getField('Groups')->asMultiselect()->select('Zabbix servers');
-
+		$form->fill($data['fields']);
 		$form->selectTab('Tags');
 		$this->fillTags($data['tags']);
 		$form->submit();
@@ -178,7 +191,7 @@ class testFormTemplateTags extends CWebTest {
 			case TEST_GOOD:
 				$this->assertTrue($message->isGood());
 				$this->assertEquals('Template added', $message->getTitle());
-				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['template_name'])));
+				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['fields']['Template name'])));
 				// Check the results in form.
 				$this->checkTagFields($data);
 				break;
@@ -348,7 +361,7 @@ class testFormTemplateTags extends CWebTest {
 	}
 
 	private function checkTagFields($data) {
-		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['template_name']));
+		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['fields']['Template name']));
 		$this->page->open('templates.php?form=update&templateid='.$id.'&groupid=4');
 		$form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');

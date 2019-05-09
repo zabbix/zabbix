@@ -54,8 +54,10 @@ class testFormTriggerTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'trigger_name' => 'Trigger with tags',
-					'expression' => '{Simple form test host:test-item-reuse.last()}=0',
+					'fields' => [
+						'Name' => 'Trigger with tags',
+						'Expression' => '{Simple form test host:test-item-reuse.last()}=0',
+					],
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -87,8 +89,10 @@ class testFormTriggerTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'trigger_name' => 'Trigger with equal tag names',
-					'expression' => '{Simple form test host:test-item-reuse.last()}=0',
+					'fields' => [
+						'Name' => 'Trigger with equal tag names',
+						'Expression' => '{Simple form test host:test-item-reuse.last()}=0',
+					],
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -106,8 +110,10 @@ class testFormTriggerTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'trigger_name' => 'Trigger with equal tag values',
-					'expression' => '{Simple form test host:test-item-reuse.last()}=0',
+					'fields' => [
+						'Name' => 'Trigger with equal tag values',
+						'Expression' => '{Simple form test host:test-item-reuse.last()}=0',
+					],
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -125,8 +131,10 @@ class testFormTriggerTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'trigger_name' => 'Trigger with empty tag name',
-					'expression' => '{Simple form test host:test-item-reuse.last()}=0',
+					'fields' => [
+						'Name' => 'Trigger with empty tag name',
+						'Expression' => '{Simple form test host:test-item-reuse.last()}=0',
+					],
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -141,8 +149,10 @@ class testFormTriggerTags extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'trigger_name' => 'Trigger with equal tags',
-					'expression' => '{Simple form test host:test-item-reuse.last()}=0',
+					'fields' => [
+						'Name' => 'Trigger with equal tags',
+						'Expression' => '{Simple form test host:test-item-reuse.last()}=0',
+					],
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -178,8 +188,11 @@ class testFormTriggerTags extends CWebTest {
 
 		$this->query('button:Create trigger')->waitUntilPresent()->one()->click();
 		$form = $this->query('name:triggersForm')->asForm()->one();
-		$form->getLabel('Name')->fill($data['trigger_name']);
-		$form->getLabel('Expression')->fill($data['expression']);
+
+		$form->fill($data['fields']);
+
+//		$form->getLabel('Name')->fill($data['trigger_name']);
+//		$form->getLabel('Expression')->fill($data['expression']);
 
 		$form->selectTab('Tags');
 		$this->fillTags($data['tags']);
@@ -193,7 +206,7 @@ class testFormTriggerTags extends CWebTest {
 			case TEST_GOOD:
 				$this->assertTrue($message->isGood());
 				$this->assertEquals('Trigger added', $message->getTitle());
-				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['trigger_name'])));
+				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['fields']['Name'])));
 				// Check the results in form.
 				$this->checkTagFields($data);
 				break;
@@ -284,7 +297,7 @@ class testFormTriggerTags extends CWebTest {
 	public function testFormTriggerTags_Update($data) {
 		$sql_triggers = "SELECT * FROM triggers ORDER BY triggerid";
 		$old_hash = CDBHelper::getHash($sql_triggers);
-		$data['trigger_name'] = 'Trigger with tags for updating';
+		$data['fields']['Name'] = 'Trigger with tags for updating';
 
 		$this->page->login()->open('hosts.php?groupid=4');
 		$this->query('link:'.$this->host)->waitUntilPresent()->one()->click();
@@ -304,7 +317,7 @@ class testFormTriggerTags extends CWebTest {
 			case TEST_GOOD:
 				$this->assertTrue($message->isGood());
 				$this->assertEquals('Trigger updated', $message->getTitle());
-				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['trigger_name'])));
+				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['fields']['Name'])));
 				// Check the results in form.
 				$this->checkTagFields($data);
 				break;
@@ -356,7 +369,7 @@ class testFormTriggerTags extends CWebTest {
 	}
 
 	private function checkTagFields($data) {
-		$id = CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr($data['trigger_name']));
+		$id = CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr($data['fields']['Name']));
 		$this->page->open('triggers.php?form=update&triggerid='.$id.'&groupid=0');
 		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');
