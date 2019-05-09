@@ -47,11 +47,13 @@ class CXmlValidator {
 	/**
 	 * Base validation function.
 	 *
-	 * @param array  $data    import data
-	 * @param string $format  format of import source
+	 * @param array  $data    Import data.
+	 * @param string $format  Format of import source.
 	 *
-	 * @return array		Validator does some manipulation for the incoming data. For example, converts empty tags to
-	 *						an array, if desired. Converted array is returned.
+	 * @throws Exception if $data does not correspond to validation rules.
+	 *
+	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
+	 *                array, if desired. Converted array is returned.
 	 */
 	public function validate(array $data, $format) {
 		$rules = ['type' => XML_ARRAY, 'rules' => [
