@@ -15,20 +15,22 @@
 	}
 
 	jQuery(document).ready(function() {
-		jQuery('#autologout_visible').bind('click', function() {
+		var autologout_cbx = document.getElementById('autologout_visible'),
+			autologin_cbx = document.getElementById('autologin'),
+			autologout_txt = document.getElementById('autologout');
+
+		jQuery(autologin_cbx).bind('change', function() {
 			if (this.checked) {
-				jQuery('#autologout').prop('disabled', false);
-				jQuery('#autologin').attr('checked', false);
+				autologout_cbx.checked = false;
 			}
-			else {
-				jQuery('#autologout').prop('disabled', true);
-			}
+			autologout_txt.disabled = (this.checked || !autologin_cbx.checked);
 		});
-		jQuery('#autologin').bind('click', function() {
+
+		jQuery(autologout_cbx).bind('change', function() {
 			if (this.checked) {
-				jQuery('#autologout').prop('disabled', true);
-				jQuery('#autologout_visible').attr('checked', false);
+				autologin_cbx.checked = false;
 			}
+			autologout_txt.disabled = !this.checked;
 		});
 
 		<?php if ($this->data['is_profile']): ?>
