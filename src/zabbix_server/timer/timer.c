@@ -192,12 +192,12 @@ static void	db_remove_expired_event_suppress_data(int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_event_suppress_data_free                                     *
+ * Function: event_suppress_data_free                                         *
  *                                                                            *
  * Purpose: free event suppress data structure                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_event_suppress_data_free(zbx_event_suppress_data_t *data)
+static void	event_suppress_data_free(zbx_event_suppress_data_t *data)
 {
 	zbx_vector_uint64_pair_destroy(&data->maintenances);
 	zbx_free(data);
@@ -614,7 +614,7 @@ cleanup:
 		zbx_vector_uint64_destroy(&maintenanceids);
 	}
 
-	zbx_vector_ptr_clear_ext(&event_data, (zbx_clean_func_t)zbx_event_suppress_data_free);
+	zbx_vector_ptr_clear_ext(&event_data, (zbx_clean_func_t)event_suppress_data_free);
 	zbx_vector_ptr_destroy(&event_data);
 
 	zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);

@@ -22,6 +22,9 @@
 
 #include "common.h"
 
+int	__wrap_stat(const char *pathname, struct stat *buf);
+int	__wrap___xstat(int ver, const char *pathname, struct stat *buf);
+
 int	__wrap_stat(const char *pathname, struct stat *buf)
 {
 	zbx_mock_error_t	error;
