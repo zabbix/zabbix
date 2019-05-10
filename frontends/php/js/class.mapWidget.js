@@ -118,6 +118,7 @@ jQuery(function($) {
 
 							var url = new Curl(widget_data['map_instance'].options.refresh);
 							url.setArgument('curtime', new CDate().getTime());
+							url.setArgument('uniqueid', widget['uniqueid']);
 
 							$.ajax({
 								'url': url.getUrl()
@@ -145,7 +146,6 @@ jQuery(function($) {
 
 						options['map_options']['canvas']['useViewBox'] = !IE;
 						options['map_options']['show_timestamp'] = false;
-						options['map_options']['widget_context'] = JSON.stringify({uniqueid: widget_data.uniqueid});
 						widget_data['map_instance'] = new SVGMap(options['map_options']);
 						widget_data['is_refreshing'] = false;
 						$this.data('widgetData', widget_data);

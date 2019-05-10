@@ -103,14 +103,7 @@ jQuery(function($) {
 				break;
 
 			case 'map_element_submap':
-				var widget_context = $obj.data('widget-context');
-
-				if (widget_context) {
-					data = getMenuPopupMapElementSubmapWidget(data, widget_context);
-				}
-				else {
-					data = getMenuPopupMapElementSubmap(data);
-				}
+				data = getMenuPopupMapElementSubmap(data);
 				break;
 
 			case 'map_element_group':

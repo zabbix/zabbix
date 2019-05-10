@@ -685,9 +685,6 @@ SVGMapElement.prototype.updateImage = function() {
 
 	if (this.options.actions !== null && this.options.actions !== 'null') {
 		options['data-menu-popup'] = this.options.actions;
-		if (this.map.options.widget_context) {
-			options['data-widget-context'] = this.map.options.widget_context;
-		}
 		options['style'] = 'cursor: pointer';
 	}
 
