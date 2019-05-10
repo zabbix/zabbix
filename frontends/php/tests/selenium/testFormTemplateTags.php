@@ -282,7 +282,7 @@ class testFormTemplateTags extends CWebTest {
 	public function testFormTemplateTags_Update($data) {
 		$sql_hosts = "SELECT * FROM hosts ORDER BY hostid";
 		$old_hash = CDBHelper::getHash($sql_hosts);
-		$data['template_name'] = $this->update_template;
+		$data['fields']['Template name'] = $this->update_template;
 
 		$this->page->login()->open('templates.php');
 		$this->query('link:'.$this->update_template)->waitUntilPresent()->one()->click();
@@ -300,7 +300,7 @@ class testFormTemplateTags extends CWebTest {
 			case TEST_GOOD:
 				$this->assertTrue($message->isGood());
 				$this->assertEquals('Template updated', $message->getTitle());
-				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['template_name'])));
+				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['fields']['Template name'])));
 				// Check the results in form.
 				$this->checkTagFields($data);
 				break;
