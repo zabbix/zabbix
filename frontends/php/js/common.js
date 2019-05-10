@@ -810,13 +810,12 @@ function validate_trigger_expression(formname, dialogueid) {
 }
 
 function redirect(uri, method, needle, invert_needle, add_sid) {
-	if (typeof add_sid === 'undefined') {
-		add_sid = true;
-	}
-	method = method || 'get';
+	method = (method || 'get').toLowerCase();
+	add_sid = (method !== 'get' && (typeof add_sid === 'undefined' || add_sid));
+
 	var url = new Curl(uri, add_sid);
 
-	if (method.toLowerCase() == 'get') {
+	if (method == 'get') {
 		window.location = url.getUrl();
 	}
 	else {

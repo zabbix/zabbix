@@ -69,9 +69,7 @@ class CCheckboxListElement extends CElement {
 				throw new Exception('Failed to find checkbox element by label name: "'.$labels.'".');
 			}
 
-			if ($checked !== $element->isSelected()) {
-				$label->click();
-			}
+			$element->set($checked);
 		}
 
 		return $this;

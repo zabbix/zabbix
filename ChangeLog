@@ -5,6 +5,8 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-15797] fixed dashboard map widget sub-map link behaviour (talbergs)
+...G...PS. [ZBX-10550] added warnings when Zabbix components have different versions (akozlovs)
+..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
 ..F....... [ZBX-11429] fixed macro not being retained in trigger expression editing wizard (agriscenko)
 ..F....... [ZBX-15816] increased header value input field max length (talbergs)
 ...G...PS. [ZBX-15677] fixed the process of compiling the dummy.c module (MVekslers)
