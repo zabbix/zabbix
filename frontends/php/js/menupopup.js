@@ -223,6 +223,14 @@ function getMenuPopupMapElementSubmapWidget(options, widget_context) {
 		}]
 	});
 
+	// urls
+	if (typeof options.urls !== 'undefined') {
+		sections.push({
+			label: t('URLs'),
+			items: options.urls
+		});
+	}
+
 	return sections;
 }
 
