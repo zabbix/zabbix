@@ -291,38 +291,21 @@ class CElementCollection implements Iterator {
 	}
 
 	/**
-	 * Get attribute of elements as array of strings.
+	 * Get elements as array.
 	 *
 	 * @return array
 	 */
-	public function asAttributeValue($attribute) {
-		$values = [];
-
-		foreach ($this->elements as $key => $element) {
-			$values[$key] = $element->getAttribute($attribute);
-		}
-
-		return $values;
+	public function asArray() {
+		return $this->elements;
 	}
 
 	/**
-	 * Index collection by value of the attribute.
+	 * Get sliced collection of elements.
 	 *
-	 * @return array
+	 * @return CElementCollection
 	 */
-	public function indexByAttribute($attribute) {
-		$elements = [];
-
-		foreach ($this->elements as $element) {
-			$key = $element->getAttribute($attribute);
-			if (array_key_exists($key, $elements)) {
-				CTest::addWarning('Attribute values of attribute "'.$attribute.'" is not unique within collection.');
-			}
-
-			$elements[$key] = $element;
-		}
-
-		return new CElementCollection($elements, $this->element_class);
+	public function slice($offset, $length = null) {
+		return new CElementCollection(array_slice($this->elements, $offset, $length), $this->element_class);
 	}
 
 	/**

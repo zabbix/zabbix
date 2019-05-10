@@ -83,4 +83,14 @@ class CDropdownElement extends CElement {
 	public function fill($text) {
 		return $this->select($text);
 	}
+
+	/**
+	 * Alias for getText.
+	 * @see self::getText
+	 *
+	 * @return string
+	 */
+	public function getValue() {
+		return $this->getText();
+	}
 }

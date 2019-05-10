@@ -29,6 +29,7 @@
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
+#include "dbconfig_maintenance_test.h"
 
 static int	dc_compare_maintenance_tags(const void *d1, const void *d2)
 {
@@ -113,8 +114,6 @@ static void	get_maintenance(zbx_dc_maintenance_t *maintenance)
 
 	get_maintenance_tags(zbx_mock_get_parameter_handle("in.maintenance.tags"), &maintenance->tags);
 }
-
-int	dc_maintenance_match_tags_test(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags);
 
 /******************************************************************************
  *                                                                            *

@@ -22,6 +22,7 @@
 #include "zbxregexp.h"
 #include "log.h"
 #include "stats.h"
+#include "proc.h"
 
 extern int	CONFIG_TIMEOUT;
 

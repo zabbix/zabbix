@@ -474,8 +474,13 @@
 			dynamicRowsBindNewRow($table);
 
 			$table.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
+
 				if (type === 'variables') {
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
+				}
+
+				if (type === 'headers') {
+					e.new_node.querySelector('[data-type="value"]').setAttribute('maxlength', 1000);
 				}
 			});
 
@@ -795,6 +800,12 @@
 			if (type === 'variables') {
 				$node.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
+				});
+			}
+
+			if (type === 'headers') {
+				$node.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
+					e.new_node.querySelector('[data-type="value"]').setAttribute('maxlength', 1000);
 				});
 			}
 

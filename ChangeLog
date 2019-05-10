@@ -1,9 +1,18 @@
 Changes for 4.0.8rc1
 
 New features:
+..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
 ..F....... [ZBX-15585] fixed web scenarios pair manager issue when fields are duplicating on post type toggle (talbergs)
+...G...PS. [ZBX-10550] added warnings when Zabbix components have different versions (akozlovs)
+..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
+..F....... [ZBX-11429] fixed macro not being retained in trigger expression editing wizard (agriscenko)
+..F....... [ZBX-15816] increased header value input field max length (talbergs)
+...G...PS. [ZBX-15677] fixed the process of compiling the dummy.c module (MVekslers)
+.......PS. [ZBX-15981] fixed invalid xpath for vmware "eventlog" key with "skip" option (MVekslers)
+...G...... [ZBX-15704] fixed sending log meta information without obvious needs (asestakovs)
+..F....... [ZBX-15905] added versioning of browser cached files (ashubin, gcalenko)
 ........S. [ZBX-15956] reduced configuration cache fragmentation when reloading time based triggers (vso)
 ........S. [ZBX-15998] improved performance of "Remove host", "Remove from host group", "Unlink from template" operations when processing network discovery events and using MySQL database (vso)
 ........S. [ZBX-15935] fixed infinite loop and 100% CPU usage when using OpenIPMI 2.0.26 or newer (asitals)
@@ -18,7 +27,6 @@ Changes for 4.0.7
 Changes for 4.0.7rc1
 
 Bug fixes:
-..F....... [ZBX-15905] added versioning of browser cached files (ashubin, gcalenko)
 ........S. [ZBX-16019] fixed HOST.CONN, HOST.IP, IPADDRESS and HOST.DNS macros expansion in global scripts (akozlovs)
 ........S. [ZBX-16020] fixed uncontrolled memory allocation in regex preprocessing steps (vjaceslavs)
 ..F....... [ZBX-15911] fixed guest sign in visibility for disabled guest user group in login page (gcalenko)
