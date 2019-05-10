@@ -26,11 +26,61 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 trait TableTrait {
 
 	/**
+	 * Perform data array normalization.
+	 *
+	 * @param array $data
+	 * @return array
+	 */
+	protected function normalizeData($data) {
+		foreach ($data as &$values) {
+			foreach ($values as &$value) {
+				if (!is_array($value)) {
+					$value = ['text' => $value];
+				}
+			}
+			unset($value);
+		}
+		unset($values);
+
+		return $data;
+	}
+
+	/**
+	 * Get value from table column.
+	 *
+	 * @param CElement $row		row element
+	 * @param string $name		table column name
+	 * @param string $value		value from data provider
+	 *
+	 * @return string
+	 */
+	protected function getColumnData($row, $name, $value) {
+		if (!array_key_exists('text', $value)) {
+			// There is only support for text (currently).
+			throw new Exception('Only text selector is supported by TableTrait.'); // TODO: better message
+		}
+
+		if (array_key_exists('selector', $value)) {
+			$text = (!is_array($value['text']))
+					? $row->getColumn($name)->query($value['selector'])->one()->getText()
+					: $row->getColumn($name)->query($value['selector'])->all()->asText();
+		}
+		else {
+			$text = $row->getColumn($name)->getText();
+			if (is_array($value['text'])) {
+				$text = [$text];
+			}
+		}
+
+		return $text;
+	}
+
+	/**
 	 * Check if values in table rows match data from data provider.
 	 *
 	 * @param array   $data     data array to be match with result in table
 	 */
-	public function checkTableData($data = []) {
+	public function assertTableData($data = []) {
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
 		if (!$data) {
 			// Check that table contain one row with text "No data found."
@@ -44,29 +94,13 @@ trait TableTrait {
 				'Row indices don\'t not match indices in data provider.'
 		);
 
-		foreach ($data as $i => $values) {
+		foreach ($this->normalizeData($data) as $i => $values) {
 			$row = $rows->get($i);
 
 			foreach ($values as $name => $value) {
-				if (!is_array($value)) {
-					$value = ['text' => $value];
-				}
-
-				if (!array_key_exists('text', $value)) {
-					// There is only support for text (currently).
+				$text = $this->getColumnData($row, $name, $value);
+				if ($text === null) {
 					continue;
-				}
-
-				if (array_key_exists('selector', $value)) {
-					$text = (!is_array($value['text']))
-							? $row->getColumn($name)->query($value['selector'])->one()->getText()
-							: $row->getColumn($name)->query($value['selector'])->all()->asText();
-				}
-				else {
-					$text = $row->getColumn($name)->getText();
-					if (is_array($value['text'])) {
-						$text = [$text];
-					}
 				}
 
 				$this->assertEquals($value['text'], $text);
@@ -80,12 +114,54 @@ trait TableTrait {
 	 * @param array   $rows        data array to be match with result in table
 	 * @param string  $field       table column name
 	 */
-	public function checkTableDataColumn($rows = [], $field = 'Name') {
+	public function assertTableDataColumn($rows = [], $field = 'Name') {
 		$data = [];
 		foreach ($rows as $row) {
 			$data[] = [$field => $row];
 		}
 
-		$this->checkTableData($data);
+		$this->assertTableData($data);
+	}
+
+	/**
+	 * Select table rows.
+	 *
+	 * @param mixed $data		rows to be selected
+	 */
+	public function selectTableRows($data = []) {
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		if (!$data) {
+			// Select all rows in table.
+			$table->query('id:all_media_types')->asCheckbox()->one()->check();
+
+			return;
+		}
+
+		if (CTestArrayHelper::isAssociative($data)) {
+			$data = [$data];
+		}
+
+		$data = $this->normalizeData($data);
+
+		foreach ($table->getRows() as $row) {
+			foreach ($data as $values) {
+				$match = true;
+
+				foreach ($values as $name => $value) {
+					if ($value['text'] !== $this->getColumnData($row, $name, $value)) {
+						$match = false;
+						break;
+					}
+				}
+
+				if ($match) {
+					$row->select();
+					break;
+				}
+			}
+		}
+		// Check number of selected element.
+		$this->assertEquals(count($data).' selected', $this->query('id:selected_count')->one()->getText());
 	}
 }

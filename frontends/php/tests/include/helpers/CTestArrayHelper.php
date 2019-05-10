@@ -47,4 +47,35 @@ class CTestArrayHelper {
 
 		return $default;
 	}
+
+	/**
+	 * Check if array is associative.
+	 *
+	 * @param array $array
+	 *
+	 * @return boolean
+	 */
+	public static function isAssociative($array) {
+		return array_keys($array) !== range(0, count($array) - 1);
+	}
+
+	/**
+	 * Escapes value to be used in SQL query.
+	 *
+	 * @param mixed $value    value to be escaped
+	 *
+	 * @return string
+	 */
+	public static function escape($value) {
+		if (!is_array($value)) {
+			return zbx_dbstr($value);
+		}
+
+		$result = [];
+		foreach ($value as $part) {
+			$result[] = zbx_dbstr($part);
+		}
+
+		return implode(',', $result);
+	}
 }
