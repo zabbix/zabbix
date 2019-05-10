@@ -449,6 +449,7 @@ function zbx_num2bitstr($num, $rev = false) {
  */
 function str2mem($val) {
 	$unit = strtolower(substr($val, -1));
+	$val = (int) substr($val, 0, -1);
 
 	switch ($unit) {
 		case 'g':
@@ -458,7 +459,7 @@ function str2mem($val) {
 			$val *= ZBX_MEBIBYTE;
 			break;
 		case 'k':
-			$val = ZBX_KIBIBYTE;
+			$val *= ZBX_KIBIBYTE;
 			break;
 	}
 
