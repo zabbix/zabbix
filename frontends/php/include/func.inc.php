@@ -441,26 +441,25 @@ function zbx_num2bitstr($num, $rev = false) {
 }
 
 /**
- * Converts strings like 2M or 5k to bytes
+ * Converts strings like 2M or 5k to bytes.
  *
  * @param string $val
  *
  * @return int
  */
 function str2mem($val) {
-	$val = trim($val);
-	$last = strtolower(substr($val, -1));
-	$val = (int) $val;
+	$unit = strtolower(substr($val, -1));
 
-	switch ($last) {
+	switch ($unit) {
 		case 'g':
-			$val *= 1024;
-			// break; is not missing here
+			$val *= ZBX_GIBIBYTE;
+			break;
 		case 'm':
-			$val *= 1024;
-			// break; is not missing here
+			$val *= ZBX_MEBIBYTE;
+			break;
 		case 'k':
-			$val *= 1024;
+			$val = ZBX_KIBIBYTE;
+			break;
 	}
 
 	return $val;
@@ -468,12 +467,12 @@ function str2mem($val) {
 
 function mem2str($size) {
 	$prefix = 'B';
-	if ($size > 1048576) {
-		$size = $size / 1048576;
+	if ($size > ZBX_MEBIBYTE) {
+		$size = $size / ZBX_MEBIBYTE;
 		$prefix = 'M';
 	}
-	elseif ($size > 1024) {
-		$size = $size / 1024;
+	elseif ($size > ZBX_KIBIBYTE) {
+		$size = $size / ZBX_KIBIBYTE;
 		$prefix = 'K';
 	}
 
