@@ -203,7 +203,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
 	return sections;
 }
 
-
 /**
  * @param {object}  options
  * @param {object}  widget_context
