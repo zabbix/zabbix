@@ -35,6 +35,7 @@
 #define ZBX_DBCONFIG_IMPL
 #include "dbcache.h"
 #include "dbconfig.h"
+#include "dc_item_poller_type_update_test.h"
 
 /* defines from dbconfig.c */
 #define ZBX_ITEM_COLLECTED		0x01
@@ -67,8 +68,6 @@ typedef struct
 	const char	*str;
 }
 str_map_t;
-
-void	DCitem_poller_type_update_test(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags);
 
 static void init_test(void)
 {
