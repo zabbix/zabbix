@@ -441,54 +441,43 @@ function zbx_num2bitstr($num, $rev = false) {
 }
 
 /**
- * Converts strings like 2M or 5k to bytes.
+ * Converts strings like 2M or 5k to bytes
  *
  * @param string $val
  *
- * @return string
+ * @return int
  */
 function str2mem($val) {
-	$unit = strtolower(substr($val, -1));
+	$val = trim($val);
+	$last = strtolower(substr($val, -1));
+	$val = (int) $val;
 
-	switch ($unit) {
+	switch ($last) {
 		case 'g':
-			$val = bcmul(substr($val, 0, -1), ZBX_GIBIBYTE, 0);
-			break;
+			$val *= 1024;
+			// break; is not missing here
 		case 'm':
-			$val = bcmul(substr($val, 0, -1), ZBX_MEBIBYTE, 0);
-			break;
+			$val *= 1024;
+			// break; is not missing here
 		case 'k':
-			$val = bcmul(substr($val, 0, -1), ZBX_KIBIBYTE, 0);
-			break;
+			$val *= 1024;
 	}
 
 	return $val;
 }
 
-/**
- * Converts bytes into human-readable form.
- *
- * @param string|int $size
- *
- * @return string
- */
 function mem2str($size) {
 	$prefix = 'B';
-	if (bccomp($size, ZBX_MEBIBYTE) == 1) {
-		$size = bcdiv($size, ZBX_MEBIBYTE, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+	if ($size > 1048576) {
+		$size = $size / 1048576;
 		$prefix = 'M';
 	}
-	elseif (bccomp($size, ZBX_KIBIBYTE) == 1) {
-		$size = bcdiv($size, ZBX_KIBIBYTE, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+	elseif ($size > 1024) {
+		$size = $size / 1024;
 		$prefix = 'K';
 	}
 
-	if (strpos($size, '.') !== false) {
-		$size = rtrim($size, '0');
-		$size = rtrim($size, '.');
-	}
-
-	return $size.$prefix;
+	return round($size, 6).$prefix;
 }
 
 function convertUnitsUptime($value) {
