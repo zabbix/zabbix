@@ -1309,7 +1309,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		return FAIL;
 
 	if (SUCCEED != is_time_suffix(dbrow[31], &history_sec, ZBX_LENGTH_UNLIMITED))
-		history_sec = 0;
+		history_sec = ZBX_HK_PERIOD_MAX;
 
 	if (0 != history_sec && ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.history_global)
 		history_sec = dbsync_env.cache->config->hk.history;
@@ -1343,7 +1343,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 
 		if (SUCCEED != is_time_suffix(dbrow[32], &trends_sec, ZBX_LENGTH_UNLIMITED))
-			trends_sec = 0;
+			trends_sec = ZBX_HK_PERIOD_MAX;
 
 		if (0 != trends_sec && ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.trends_global)
 			trends_sec = dbsync_env.cache->config->hk.trends;
