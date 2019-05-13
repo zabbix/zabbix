@@ -5,6 +5,8 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-15797] fixed dashboard map widget sub-map link behaviour (talbergs)
+.......PS. [ZBX-16050] fixed HTTP poller crashes (asestakovs)
+..F....... [ZBX-15871] fixed problem events to be filtered by "suppressed" instead of "related to maintenance" (talbergs)
 ...G...PS. [ZBX-10550] added warnings when Zabbix components have different versions (akozlovs)
 ..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
 ..F....... [ZBX-11429] fixed macro not being retained in trigger expression editing wizard (agriscenko)
@@ -110,6 +112,7 @@ Changes for 4.0.6
 Changes for 4.0.6rc2
 
 Bug fixes:
+..F....... [ZBX-10729] fixed map element link coloring when linked problem is acknowledged (miks)
 ..F....... [ZBX-15839] fixed broken layout of the breadcrumbs in Safari browser (ashubin)
 ........S. [ZBX-15867] fixed invalid DNS being accepted when receiving discovery contents from Zabbix proxy (vso)
 A......... [ZBX-15821] fixed SQL statement performance used in template.unlink() method (Sasha)
