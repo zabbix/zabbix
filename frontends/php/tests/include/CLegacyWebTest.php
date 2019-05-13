@@ -22,10 +22,6 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CWebTest.php';
 
-define('TEST_GOOD', 0);
-define('TEST_BAD', 1);
-define('TEST_ERROR', 2);
-
 /**
  * Base class for legacy Selenium tests.
  */
@@ -247,7 +243,7 @@ class CLegacyWebTest extends CWebTest {
 	 * @param string $id  ID of the multiselect.
 	 */
 	public function zbxTestClickButtonMultiselect($id) {
-		$this->zbxTestClickXpath(
+		$this->zbxTestClickXpathWait(
 			"//div[contains(@class, 'multiselect') and @id='$id']/../div[@class='multiselect-button']/button"
 		);
 	}

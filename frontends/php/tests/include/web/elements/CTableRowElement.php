@@ -38,7 +38,7 @@ class CTableRowElement extends CElement {
 	 */
 	public function normalize() {
 		if ($this->parent === null) {
-			$this->parent = $this->parents('tag:table')->one();
+			$this->parent = $this->parents('tag:table')->asTable()->one();
 		}
 	}
 

@@ -28,6 +28,14 @@ require_once dirname(__FILE__).'/../CElement.php';
 class CCheckboxElement extends CElement {
 
 	/**
+	 * Alias for isSelected.
+	 * @see self::isSelected
+	 */
+	public function isChecked($checked = true) {
+		return $this->isSelected($checked);
+	}
+
+	/**
 	 * Set checkbox state.
 	 *
 	 * @param boolean $checked    checked or not
