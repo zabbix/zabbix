@@ -1114,6 +1114,10 @@ define('NAME_DELIMITER', ': ');
 
 define('UNKNOWN_VALUE', '');
 
+// End of line sequence.
+define('ZBX_EOL_LF',	0);
+define('ZBX_EOL_CRLF',	1);
+
 // suffixes
 define('ZBX_BYTE_SUFFIXES', 'KMGT');
 define('ZBX_TIME_SUFFIXES', 'smhdw');
