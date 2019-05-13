@@ -1151,7 +1151,7 @@ INDEX		|2		|clock
 TABLE|autoreg_host|autoreg_hostid|0
 FIELD		|autoreg_hostid	|t_id		|	|NOT NULL	|0
 FIELD		|proxy_hostid	|t_id		|	|NULL		|0			|1|hosts	|hostid
-FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|listen_dns	|t_varchar(255)	|''	|NOT NULL	|0
@@ -1162,7 +1162,7 @@ INDEX		|2		|proxy_hostid
 TABLE|proxy_autoreg_host|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
-FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|listen_dns	|t_varchar(255)	|''	|NOT NULL	|0
@@ -1318,7 +1318,7 @@ TABLE|host_discovery|hostid|ZBX_TEMPLATE
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|parent_hostid	|t_id		|	|NULL		|0			|2|hosts	|hostid		|RESTRICT
 FIELD		|parent_itemid	|t_id		|	|NULL		|0			|3|items	|itemid		|RESTRICT
-FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 
@@ -1673,4 +1673,4 @@ INDEX		|1		|hostid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4020000	|4020000
+ROW		|4030002	|4030002
