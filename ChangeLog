@@ -14,6 +14,7 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+..F....... [ZBX-16007] fixed trigger list checkboxes when filtering by single host (talbergs)
 ..F....... [ZBX-15871] fixed problem events to be filtered by "suppressed" instead of "related to maintenance" (talbergs)
 ..F....... [ZBX-16011] made "Test all steps" button be available only when at least 2 preprocessing steps are created (miks)
 ...G...PS. [ZBX-10550] added warnings when Zabbix components have different versions (akozlovs)

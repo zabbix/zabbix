@@ -526,7 +526,7 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	}
 
 	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows();
 	}
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 	show_messages($result, _('Item deleted'), _('Cannot delete item'));
@@ -936,7 +936,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows();
 	}
 }
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
@@ -1276,7 +1276,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 	if ($result) {
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['form']);
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows();
 	}
 	show_messages($result, _('Items updated'), _('Cannot update items'));
 }
@@ -1292,7 +1292,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 	$result = (bool) API::Item()->update($items);
 
 	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows();
 	}
 
 	$updated = count($itemids);
@@ -1337,7 +1337,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 		$items_count = count(getRequest('group_itemid'));
 
 		if ($result) {
-			uncheckTableRows(getRequest('hostid'));
+			uncheckTableRows();
 			unset($_REQUEST['group_itemid']);
 		}
 		show_messages($result,
@@ -1382,7 +1382,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		$result = DBend($result);
 
 		if ($result) {
-			uncheckTableRows(getRequest('hostid'));
+			uncheckTableRows();
 		}
 	}
 
@@ -1394,7 +1394,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 	$result = API::Item()->delete($group_itemid);
 
 	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows();
 	}
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
 }
@@ -1405,7 +1405,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' &&
 	]);
 
 	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows();
 	}
 
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
@@ -1417,7 +1417,7 @@ if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
 		'itemids' => getRequest('group_itemid'),
 		'editable' => true
 	]);
-	uncheckTableRows(getRequest('hostid'), zbx_objectValues($itemids, 'itemid'));
+	uncheckTableRows(null, zbx_objectValues($itemids, 'itemid'));
 }
 
 /*
