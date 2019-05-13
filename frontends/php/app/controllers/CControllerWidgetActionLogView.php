@@ -66,8 +66,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 *
 	 * @return array
 	 */
-	private function getAlerts($sortfield, $sortorder, $show_lines)
-	{
+	private function getAlerts($sortfield, $sortorder, $show_lines)	{
 		$alerts = API::Alert()->get([
 			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
 				'mediatypeid', 'alerttype'
@@ -103,8 +102,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 *
 	 * @return array
 	 */
-	private function getDbUsers(array $alerts)
-	{
+	private function getDbUsers(array $alerts) {
 		$userids = [];
 
 		foreach ($alerts as $alert) {
@@ -130,8 +128,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 *
 	 * @return array
 	 */
-	private static function getSorting($sort_triggers)
-	{
+	private static function getSorting($sort_triggers) {
 		switch ($sort_triggers) {
 			case SCREEN_SORT_TRIGGERS_TIME_ASC:
 				return ['clock', ZBX_SORT_UP];
