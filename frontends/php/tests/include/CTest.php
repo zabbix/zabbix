@@ -130,7 +130,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 */
 	protected static function executeCallbacks($context, $callbacks) {
 		if (!$callbacks) {
-			return;
+			return true;
 		}
 
 		$class = new ReflectionClass($context);
