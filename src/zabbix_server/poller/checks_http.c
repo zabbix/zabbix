@@ -216,8 +216,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 
 	CURL			*easyhandle;
 	CURLcode		err;
-	char			url[ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *error = NULL, *headers, *line, *buffer,
-				*scheme_end, *delim;
+	char			url[ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *error = NULL, *headers, *line, *buffer;
 	int			ret = NOTSUPPORTED, timeout_seconds, found = FAIL;
 	long			response_code;
 	struct curl_slist	*headers_slist = NULL;
@@ -361,19 +360,10 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (NULL != (scheme_end = strstr(item->url, "://")) &&
-			(NULL == (delim = strpbrk(item->url, "#?")) || delim > scheme_end))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
 	{
-		zbx_strlcpy(url, item->url, ZBX_CONST_STRLEN("https://") + 1);
-		zbx_strlower(url);
-
-		if (0 != strncmp(url, "http://", ZBX_CONST_STRLEN("http://")) &&
-				0 != strncmp(url, "https://", ZBX_CONST_STRLEN("https://")))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unsupported scheme: %.*s.",
-					(int)(scheme_end - item->url), item->url));
-			goto clean;
-		}
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set allowed protocols: %s", curl_easy_strerror(err)));
+		goto clean;
 	}
 
 	zbx_snprintf(url, sizeof(url),"%s%s", item->url, item->query_fields);
