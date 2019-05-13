@@ -1605,8 +1605,6 @@ button {
     background-color: transparent; }
     .btn-link[disabled]:hover {
       background-color: transparent; }
-  .btn-link.hidden {
-    display: none; }
 
 .btn-search {
   background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
