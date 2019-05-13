@@ -24,9 +24,7 @@
 
 #include "common.h"
 #include "zbxjson.h"
-
-/* 'internal' jsonpath support function prototype */
-int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type);
+#include "jsonpath_next_test.h"
 
 void	zbx_mock_test_entry(void **state)
 {

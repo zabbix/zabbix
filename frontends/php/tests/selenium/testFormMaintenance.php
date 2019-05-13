@@ -181,7 +181,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('new_timeperiod_month_sep');
 		$this->zbxTestCheckboxSelect('new_timeperiod_month_jun');
 		$this->zbxTestClickXpath('//label[contains(text(), \'Day of week\')]');
-		$this->zbxTestClickXpathWait('//label[contains(text(), \'Wednesday\')]');
+		$this->zbxTestCheckboxSelect('new_timeperiod_dayofweek_we');
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_timeperiod\')]');
 		$this->zbxTestWaitForPageToLoad();
 		$text = $this->zbxTestGetText('//ul[@id=\'maintenancePeriodFormList\']//tbody/tr[3]/td[2]');

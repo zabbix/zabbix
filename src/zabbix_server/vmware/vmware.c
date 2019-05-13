@@ -3559,7 +3559,7 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)"/*/*/*"ZBX_XPATH_LN("returnval"), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_PROP_NAME("latestEvent"), xpathCtx)))
 	{
 		*error = zbx_strdup(*error, "Cannot make lastevenlog list parsing query.");
 		goto clean;

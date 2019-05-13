@@ -18,12 +18,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../include/CTest.php';
+/**
+ * Helper class that allows custom command execution.
+ */
+class CommandExecutor extends HttpCommandExecutor {
 
-class function_DBstart extends CTest {
-	public function test_DBstart() {
-		// TODO
-		$this->markTestIncomplete();
+	/**
+	 * Execute custom command for WebDriver.
+	 *
+	 * @param RemoteWebDriver $driver    WebDriver instance
+	 * @param array           $params    command parameters
+	 *
+	 * @return mixed
+	 */
+	public static function executeCustom(RemoteWebDriver $driver, array $params = []) {
+		if (!isset(HttpCommandExecutor::$commands['custom'])) {
+			HttpCommandExecutor::$commands['custom'] = [
+				'method' => 'POST',
+				'url' => '/session/:sessionId/chromium/send_command_and_get_result'
+			];
+		}
+
+		return $driver->execute('custom', $params);
 	}
 }

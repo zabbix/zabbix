@@ -40,6 +40,21 @@
  * data source
  */
 static zbx_vcmock_ds_t	vc_ds;
+static time_t	vcmock_time;
+
+int	__wrap_zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error);
+void	__wrap_zbx_mutex_destroy(zbx_mutex_t *mutex);
+int	__wrap_zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
+		int allow_oom, char **error);
+void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size);
+void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size);
+void	__wrap___zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr);
+int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
+		zbx_vector_history_record_t *values);
+int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
+int	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
+int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
+time_t	__wrap_time(time_t *ptr);
 
 /* comparison function to sort history record vector by timestamps in ascending order */
 static int	history_compare(const void *d1, const void *d2)
@@ -214,7 +229,7 @@ void	zbx_vcmock_read_values(zbx_mock_handle_t hdata, unsigned char value_type, z
  * Comments: History data storage is used to emulate history storage backend. *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vcmock_ds_init()
+void	zbx_vcmock_ds_init(void)
 {
 	zbx_mock_handle_t	hitems, hitem;
 	zbx_mock_error_t	err;
@@ -249,7 +264,7 @@ void	zbx_vcmock_ds_init()
  * Purpose: destroys history data storage                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vcmock_ds_destroy()
+void	zbx_vcmock_ds_destroy(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_vcmock_ds_item_t	*item;
@@ -291,7 +306,7 @@ static void	zbx_vcmock_history_dump(unsigned char value_type, const zbx_vector_h
  * Purpose: dumps history data store to standard output                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vcmock_ds_dump()
+void	zbx_vcmock_ds_dump(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_vcmock_ds_item_t	*item;
@@ -666,7 +681,7 @@ void	zbx_vcmock_set_available_mem(size_t size)
  * Purpose:  retrieves the memory available in the wrapped memory allocator   *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_vcmock_get_available_mem()
+size_t	zbx_vcmock_get_available_mem(void)
 {
 	return vcmock_mem;
 }
@@ -747,8 +762,6 @@ void	zbx_vcmock_set_mode(zbx_mock_handle_t hitem, const char *key)
 /*
  * time() emulation
  */
-
-static time_t	vcmock_time;
 
 time_t	__wrap_time(time_t *ptr)
 {
