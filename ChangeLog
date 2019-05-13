@@ -110,6 +110,7 @@ Changes for 4.0.6
 Changes for 4.0.6rc2
 
 Bug fixes:
+..F....... [ZBX-10729] fixed map element link coloring when linked problem is acknowledged (miks)
 ..F....... [ZBX-15839] fixed broken layout of the breadcrumbs in Safari browser (ashubin)
 ........S. [ZBX-15867] fixed invalid DNS being accepted when receiving discovery contents from Zabbix proxy (vso)
 A......... [ZBX-15821] fixed SQL statement performance used in template.unlink() method (Sasha)
