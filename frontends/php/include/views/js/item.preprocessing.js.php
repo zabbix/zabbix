@@ -253,9 +253,9 @@
 
 				if (sortable_count == 1) {
 					$preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
-					$('#preproc_test_all').prop('disabled', false);
 				}
 				else if (sortable_count > 1) {
+					$('#preproc_test_all').show();
 					$preprocessing
 						.sortable('enable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').removeClass('<?= ZBX_STYLE_DISABLED ?>');
@@ -285,9 +285,9 @@
 
 				if (sortable_count == 0) {
 					$('.preprocessing-list-head').hide();
-					$('#preproc_test_all').prop('disabled', true);
 				}
 				else if (sortable_count == 1) {
+					$('#preproc_test_all').hide();
 					$preprocessing
 						.sortable('disable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
