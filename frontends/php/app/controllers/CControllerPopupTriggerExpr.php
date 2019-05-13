@@ -420,7 +420,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'dstfld1' =>			'string|not_empty',
 			'expression' =>			'string',
 			'itemid' =>				'db items.itemid',
-			'parent_discoveryid' =>	'int32',
+			'parent_discoveryid' =>	'db items.itemid',
 			'function' =>			'in '.implode(',', array_keys($this->functions)),
 			'operator' =>			'in '.implode(',', array_keys($this->operators)),
 			'params' =>				'',
