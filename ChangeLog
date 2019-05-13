@@ -5,6 +5,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-15101] fixed several object IDs allowing them to be 64 bit integers, added asterisk for map navigation tree name field and changed the error message to more generic one (Ivo)
+.......PS. [ZBX-16050] fixed HTTP poller crashes (asestakovs)
 ..F....... [ZBX-15871] fixed problem events to be filtered by "suppressed" instead of "related to maintenance" (talbergs)
 ...G...PS. [ZBX-10550] added warnings when Zabbix components have different versions (akozlovs)
 ..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
