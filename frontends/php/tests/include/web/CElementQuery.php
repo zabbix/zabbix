@@ -35,6 +35,7 @@ require_once dirname(__FILE__).'/elements/CMultiselectElement.php';
 require_once dirname(__FILE__).'/elements/CSegmentedRadioElement.php';
 require_once dirname(__FILE__).'/elements/CRangeControlElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxListElement.php';
+require_once dirname(__FILE__).'/elements/CMultifieldTableElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -420,5 +421,68 @@ class CElementQuery implements IWaitable {
 		return function () use ($target) {
 			return $target->one()->isVisible();
 		};
+	}
+
+	/**
+	 * Get input element from container.
+	 *
+	 * @param CElement     $target    container element
+	 * @param string       $prefix    xpath prefix
+	 * @param array|string $class     element classes to look for
+	 *
+	 * @return CElement|null
+	 */
+	public static function getInputElement($target, $prefix = './', $class = null) {
+		$classes = [
+			'CElement'					=> [
+				'/input[@name][not(@type) or @type="text" or @type="password"]',
+				'/textarea[@name]'
+			],
+			'CDropdownElement'			=> '/select[@name]',
+			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
+			'CMultiselectElement'		=> [
+				'/div[@class="multiselect-control"]',
+				'/div/div[@class="multiselect-control"]' // TODO: remove after fix DEV-1071.
+			],
+			'CSegmentedRadioElement'	=> [
+				'/ul[@class="radio-list-control"]',
+				'/div/ul[@class="radio-list-control"]' // TODO: remove after fix DEV-1071.
+			],
+			'CCheckboxListElement'		=> '/ul[@class="checkbox-list col-3"]',
+			'CTableElement'				=> [
+				'/table',
+				'/*[@class="table-forms-separator"]/table'
+			],
+			'CRangeControlElement'		=> '/div[@class="range-control"]'
+		];
+
+		if ($class !== null) {
+			if (!is_array($class)) {
+				$class = [$class];
+			}
+
+			foreach (array_keys($classes) as $name) {
+				if (!in_array($name, $class)) {
+					unset($classes[$name]);
+				}
+			}
+		}
+
+		foreach ($classes as $class => $selectors) {
+			if (!is_array($selectors)) {
+				$selectors = [$selectors];
+			}
+
+			$xpaths = [];
+			foreach ($selectors as $selector) {
+				$xpaths[] = $prefix.$selector;
+			}
+
+			if (($element = $target->query('xpath', implode('|', $xpaths))->cast($class)->one(false)) !== null) {
+				return $element;
+			}
+		}
+
+		return null;
 	}
 }

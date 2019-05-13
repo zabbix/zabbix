@@ -1124,6 +1124,7 @@ class testUrlParameters extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider data
+	 * @ignore-browser-errors
 	 */
 	public function testUrlParameters_UrlLoad($title, $check_server_name, $server_name_on_page, $test_cases) {
 		foreach ($test_cases as $test_case) {

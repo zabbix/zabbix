@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "item_preproc_test.h"
+
 int	zbx_item_preproc_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 {
 	return item_preproc_xpath(value, params, errmsg);
