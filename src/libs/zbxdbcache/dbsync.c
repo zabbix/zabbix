@@ -1281,7 +1281,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_HOST		*host;
 	ZBX_DC_HTTPITEM		*httpitem;
 	unsigned char		value_type, type;
-	int			history_sec, trends_sec;
+	int			history_sec = 0, trends_sec = 0;	/* disable history for invalid storage period */
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
 		return FAIL;
