@@ -293,7 +293,7 @@ static int	zbx_yaml_check_include(yaml_document_t *doc)
 	return 0;
 }
 
-static int	zbx_mock_data_load_test_case()
+static int	zbx_mock_data_load_test_case(void)
 {
 	const yaml_node_pair_t	*pair;
 

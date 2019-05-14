@@ -121,7 +121,7 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 {
 	int		pos = 0, macro_len, macro_type;
 	zbx_token_t	token;
-	size_t		name_alloc, name_len, replace_alloc = 64, replace_offset;
+	size_t		name_alloc, name_len, replace_alloc = 64, replace_offset, r, l;
 	char		*replace;
 	const char	*macro;
 	DB_EVENT	event;
@@ -134,21 +134,33 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 
 	while (SUCCEED == zbx_token_find(trigger->description, pos, &token, ZBX_TOKEN_SEARCH_BASIC))
 	{
-		if (ZBX_TOKEN_MACRO == token.type)
+		if (ZBX_TOKEN_MACRO == token.type || ZBX_TOKEN_FUNC_MACRO == token.type)
 		{
-			macro = trigger->description + token.data.macro.name.l;
+			/* the macro excluding the opening and closing brackets {}, for example: ITEM.VALUE */
+			if (ZBX_TOKEN_MACRO == token.type)
+			{
+				l = token.data.macro.name.l;
+				r = token.data.macro.name.r;
+			}
+			else
+			{
+				l = token.data.func_macro.macro.l + 1;
+				r = token.data.func_macro.macro.r - 1;
+			}
+
+			macro = trigger->description + l;
 
 			if (ZBX_HIST_MACRO_NONE != (macro_type = is_historical_macro(macro)))
 			{
-				if (0 != isdigit(*(trigger->description + token.loc.r - 1)))
-					macro_len = token.data.macro.name.r - token.data.macro.name.l;
+				if (0 != isdigit(*(trigger->description + r)))
+					macro_len = r - l;
 				else
-					macro_len = token.data.macro.name.r - token.data.macro.name.l + 1;
+					macro_len = r - l + 1;
 
 				macro = convert_historical_macro(macro_type);
 
-				token.loc.r += zbx_replace_mem_dyn(&trigger->description, &name_alloc, &name_len,
-						token.data.macro.name.l, macro_len, macro, strlen(macro));
+				token.loc.r += zbx_replace_mem_dyn(&trigger->description, &name_alloc, &name_len, l,
+						macro_len, macro, strlen(macro));
 				*historical = SUCCEED;
 			}
 		}
@@ -170,19 +182,29 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 
 		while (SUCCEED == zbx_token_find(trigger->description, pos, &token, ZBX_TOKEN_SEARCH_BASIC))
 		{
-			if (ZBX_TOKEN_LLD_MACRO == token.type)
+			if (ZBX_TOKEN_LLD_MACRO == token.type || ZBX_TOKEN_LLD_FUNC_MACRO == token.type)
 			{
-				macro = trigger->description + token.data.lld_macro.name.l;
+				if (ZBX_TOKEN_LLD_MACRO == token.type)
+				{
+					l = token.data.lld_macro.name.l;
+					r = token.data.lld_macro.name.r;
+				}
+				else
+				{
+					l = token.data.lld_func_macro.macro.l + 2;
+					r = token.data.lld_func_macro.macro.r - 1;
+				}
+
+				macro = trigger->description + l;
 
 				if (ZBX_HIST_MACRO_NONE != is_historical_macro(macro))
 				{
-					macro_len = token.data.lld_macro.name.r - token.data.lld_macro.name.l + 1;
+					macro_len = r - l + 1;
 					replace_offset = 0;
 					zbx_strncpy_alloc(&replace, &replace_alloc, &replace_offset, macro, macro_len);
 
 					token.loc.r += zbx_replace_mem_dyn(&trigger->description, &name_alloc,
-							&name_len, token.loc.l + 1, macro_len + 1, replace,
-							replace_offset);
+							&name_len, l - 1, macro_len + 1, replace, replace_offset);
 				}
 			}
 			pos = token.loc.r;

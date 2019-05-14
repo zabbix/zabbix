@@ -18,12 +18,33 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/**
+ * Helper for array related operations.
+ */
+class CTestArrayHelper {
 
-require_once dirname(__FILE__).'/../include/CTest.php';
+	/**
+	 * Get value from array by key.
+	 *
+	 * @param mixed $array      array
+	 * @param mixed $key        key to look for
+	 * @param mixed $default    default value to be returned if array key doesn't exist (or if non-array is passed)
+	 *
+	 * @return mixed
+	 */
+	public static function get($array, $key, $default = null) {
+		if (!is_array($array)) {
+			return $default;
+		}
 
-class function_DBfetch extends CTest {
-	public function test_DBfetch() {
-		// TODO
-		$this->markTestIncomplete();
+		if (array_key_exists($key, $array)) {
+			return $array[$key];
+		}
+
+		if (($pos = strrpos($key, '.')) !== false) {
+			return static::get(static::get($array, substr($key, 0, $pos)), substr($key, $pos + 1), $default);
+		}
+
+		return $default;
 	}
 }
