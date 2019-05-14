@@ -75,7 +75,7 @@
 
 		$('#history_mode')
 			.change(function() {
-				if ($('[name="history_mode"][value='+<?= ITEM_STORAGE_OFF ?>+']').is(':checked')) {
+				if ($('[name="history_mode"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
 					$('#history').prop('disabled', true).hide();
 				}
 				else {
@@ -86,7 +86,7 @@
 
 		$('#trends_mode')
 			.change(function() {
-				if ($('[name="trends_mode"][value='+<?= ITEM_STORAGE_OFF ?>+']').is(':checked')) {
+				if ($('[name="trends_mode"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
 					$('#trends').prop('disabled', true).hide();
 				}
 				else {
