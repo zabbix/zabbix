@@ -299,7 +299,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'numeric' => '1'
 					]).', null, this);'
 				)
-				->setEnabled(!$readonly);;
+				->setEnabled(!$readonly);
 		}
 	}
 	else {
