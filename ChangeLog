@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+..F....... [ZBX-11325] fixed transparency of draggable interfaces; changed cursor type for all draggable and sortable elements (agriscenko)
 ..F....... [ZBX-16048] fixed global search box loosing the search phrase after searching (averza)
 ..F....... [ZBX-15101] fixed several object IDs allowing them to be 64 bit integers, added asterisk for map navigation tree name field and changed the error message to more generic one (Ivo)
 .......PS. [ZBX-16050] fixed HTTP poller crashes (asestakovs)
