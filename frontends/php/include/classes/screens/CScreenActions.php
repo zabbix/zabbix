@@ -81,7 +81,8 @@ class CScreenActions extends CScreenBase {
 				'alerttype' => ALERT_TYPE_MESSAGE
 			],
 			'sortfield' => $sortfield,
-			'sortorder' => $sortorder
+			'sortorder' => $sortorder,
+			'limit' => $this->screenitem['elements']
 		]);
 
 		$userids = [];
