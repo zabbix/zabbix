@@ -127,7 +127,7 @@ class CPage {
 	 * @return $this
 	 */
 	public function login($sessionid = '09e7d4286dfdca4ba7be15e0f3b2b55a', $user_id = 1) {
-		if (!CDBHelper::getRow('select null from sessions where sessionid='.zbx_dbstr($sessionid))) {
+		if (!CDBHelper::getRow('select null from sessions where status=0 AND sessionid='.zbx_dbstr($sessionid))) {
 			DBexecute('insert into sessions (sessionid, userid) values ('.zbx_dbstr($sessionid).', '.$user_id.')');
 		}
 
