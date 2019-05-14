@@ -154,10 +154,6 @@ class CDashboardWidgetMap extends CDiv {
 					'linkedto: "'.$this->filter_widget_reference.'",'.
 					'data_name: "selected_mapid",'.
 					'callback: function(widget, data) {'.
-						'if (data[0].mapid !== +data[0].mapid) {'.
-							'return;'.
-						'}'.
-
 						'jQuery(".dashbrd-grid-container").dashboardGrid(\'setWidgetStorageValue\', '.
 							'widget.uniqueid, \'current_sysmapid\', data[0].mapid'.
 						');'.
