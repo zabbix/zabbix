@@ -2426,13 +2426,15 @@ static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_
  *                                                                            *
  * Function: process_internal_events_dependency                               *
  *                                                                            *
- * Purpose: process internal unknown trigger events                           *
+ * Purpose: process internal trigger events                                   *
  *          to avoid trigger dependency                                       *
  *                                                                            *
- * Parameters: unknown_events - [IN] the recovery events to process           *
+ * Parameters: internal_events - [IN] the internal events to process          *
+ *             trigger_events  - [IN] the trigger events used for dependency  *
+ *             trigger_diff   -  [IN] the trigger changeset                   *
  *                                                                            *
  ******************************************************************************/
-static void	process_internal_events_dependency(zbx_vector_ptr_t *unknown_events, zbx_vector_ptr_t *trigger_events,
+static void	process_internal_events_dependency(zbx_vector_ptr_t *internal_events, zbx_vector_ptr_t *trigger_events,
 		zbx_vector_ptr_t *trigger_diff)
 {
 	int			i, index;
@@ -2440,16 +2442,16 @@ static void	process_internal_events_dependency(zbx_vector_ptr_t *unknown_events,
 	zbx_vector_uint64_t	triggerids;
 	zbx_vector_ptr_t	deps;
 	zbx_trigger_diff_t	*diff;
-;
+
 	zbx_vector_uint64_create(&triggerids);
-	zbx_vector_uint64_reserve(&triggerids, unknown_events->values_num + trigger_events->values_num);
+	zbx_vector_uint64_reserve(&triggerids, internal_events->values_num + trigger_events->values_num);
 
 	zbx_vector_ptr_create(&deps);
-	zbx_vector_ptr_reserve(&deps, unknown_events->values_num + trigger_events->values_num);
+	zbx_vector_ptr_reserve(&deps, internal_events->values_num + trigger_events->values_num);
 
-	for (i = 0; i < unknown_events->values_num; i++)
+	for (i = 0; i < internal_events->values_num; i++)
 	{
-		event = (DB_EVENT *)unknown_events->values[i];
+		event = (DB_EVENT *)internal_events->values[i];
 		zbx_vector_uint64_append(&triggerids, event->objectid);
 	}
 
@@ -2460,11 +2462,12 @@ static void	process_internal_events_dependency(zbx_vector_ptr_t *unknown_events,
 	}
 
 	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_dc_get_trigger_dependencies(&triggerids, &deps);
 
-	for (i = 0; i < unknown_events->values_num; i++)
+	for (i = 0; i < internal_events->values_num; i++)
 	{
-		event = (DB_EVENT *)unknown_events->values[i];
+		event = (DB_EVENT *)internal_events->values[i];
 
 		if (FAIL == (index = zbx_vector_ptr_search(trigger_diff, &event->objectid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
