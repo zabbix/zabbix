@@ -755,9 +755,11 @@ class CScript extends CApiService {
 			}
 
 			if ($group_search_names !== null) {
-				// If scripts were requested by host or group filters, then we have already requested group names
-				// for all groups linked to scripts. And then we can request less groups by adding them as search
-				// condition in hostgroup.get. Otherwise we will need to request all groups, user has access to.
+				/*
+				 * If scripts were requested by host or group filters, then we have already requested group names
+				 * for all groups linked to scripts. And then we can request less groups by adding them as search
+				 * condition in hostgroup.get. Otherwise we will need to request all groups, user has access to.
+				 */
 				if (array_key_exists($script['groupid'], $this->parent_host_groups)) {
 					$group_search_names[] = $this->parent_host_groups[$script['groupid']]['name'];
 				}
