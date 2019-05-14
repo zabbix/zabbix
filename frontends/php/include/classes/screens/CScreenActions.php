@@ -124,9 +124,17 @@ class CScreenActions extends CScreenBase {
 		]);
 
 		foreach ($alerts as $alert) {
-			$info_icons = [];
-			if ($alert['error'] !== '') {
-				$info_icons[] = makeErrorIcon($alert['error']);
+			if ($alert['alerttype'] == ALERT_TYPE_MESSAGE && array_key_exists(0, $alert['mediatypes'])
+					&& ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW)) {
+				$info_icons = makeWarningIcon(_n('%1$s retry left', '%1$s retries left',
+					$alert['mediatypes'][0]['maxattempts'] - $alert['retries'])
+				);
+			}
+			elseif ($alert['error'] !== '') {
+				$info_icons = makeErrorIcon($alert['error']);
+			}
+			else {
+				$info_icons = null;
 			}
 
 			$alert['action_type'] = ZBX_EVENT_HISTORY_ALERT;
