@@ -34,6 +34,7 @@ Changes for 4.0.7
 Changes for 4.0.7rc1
 
 Bug fixes:
+A......... [ZBX-13029] fixed api validation messages for linktrigger (vasilijs)
 ........S. [ZBX-16019] fixed HOST.CONN, HOST.IP, IPADDRESS and HOST.DNS macros expansion in global scripts (akozlovs)
 ........S. [ZBX-16020] fixed uncontrolled memory allocation in regex preprocessing steps (vjaceslavs)
 ..F....... [ZBX-15911] fixed guest sign in visibility for disabled guest user group in login page (gcalenko)
