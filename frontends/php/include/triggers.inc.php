@@ -1508,10 +1508,10 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 					}
 					break;
 				case '{':
-					// skip any previously found tokens starting with brace
+					// Skip any previously found tokens starting with brace.
 					foreach ($expressionData->result->getTokens() as $expression_token) {
 						if ($expression_token['pos'] == $i) {
-							$i += strlen($expression_token['value']) - 1;
+							$i += $expression_token['length'] - 1;
 							break;
 						}
 					}
