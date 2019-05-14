@@ -715,11 +715,9 @@ class CScript extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['output'] != API_OUTPUT_COUNT) {
-			if ($options['selectGroups'] !== null || $options['selectHosts'] !== null) {
-				$sqlParts = $this->addQuerySelect($this->fieldId('groupid'), $sqlParts);
-				$sqlParts = $this->addQuerySelect($this->fieldId('host_access'), $sqlParts);
-			}
+		if ($options['selectGroups'] !== null || $options['selectHosts'] !== null) {
+			$sqlParts = $this->addQuerySelect($this->fieldId('groupid'), $sqlParts);
+			$sqlParts = $this->addQuerySelect($this->fieldId('host_access'), $sqlParts);
 		}
 
 		return $sqlParts;
@@ -735,8 +733,8 @@ class CScript extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$is_groups_select = $options['selectGroups'] !== null && $options['selectGroups'] !== API_OUTPUT_COUNT;
-		$is_hosts_select = $options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT;
+		$is_groups_select = $options['selectGroups'] !== null && $options['selectGroups'];
+		$is_hosts_select = $options['selectHosts'] !== null && $options['selectHosts'];
 
 		if (!$is_groups_select && !$is_hosts_select) {
 			return $result;
