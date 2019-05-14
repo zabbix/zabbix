@@ -142,15 +142,12 @@ class CScreenActions extends CScreenBase {
 			$action_type = '';
 			if ($alert['mediatypeid'] != 0 && array_key_exists(0, $alert['mediatypes'])) {
 				$action_type = $alert['mediatypes'][0]['description'];
+				$alert['maxattempts'] = $alert['mediatypes'][0]['maxattempts'];
 			}
 
 			$action_name = '';
 			if (array_key_exists($alert['actionid'], $actions)) {
 				$action_name = $actions[$alert['actionid']]['name'];
-			}
-
-			if ($alert['mediatypeid'] != 0 && array_key_exists(0, $alert['mediatypes'])) {
-				$alert['maxattempts'] = $alert['mediatypes'][0]['maxattempts'];
 			}
 
 			$table->addRow([
