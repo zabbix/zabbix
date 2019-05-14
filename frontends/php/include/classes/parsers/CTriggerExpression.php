@@ -155,10 +155,10 @@ class CTriggerExpression {
 
 	/**
 	 * @param array $options
-	 * @param bool $options['lldmacros']
+	 * @param bool  $options['lldmacros']
 	 */
-	public function __construct($options = []) {
-		if (isset($options['lldmacros'])) {
+	public function __construct(array $options = []) {
+		if (array_key_exists('lldmacros', $options)) {
 			$this->options['lldmacros'] = $options['lldmacros'];
 		}
 

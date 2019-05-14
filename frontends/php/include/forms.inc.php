@@ -1368,67 +1368,54 @@ function getItemFormData(array $item = [], array $options = []) {
 	return $data;
 }
 
-function getCopyElementsFormData($elementsField, $title = null) {
+/**
+ * Prepares data to copy items/triggers/graphs.
+ *
+ * @param string      $elements_field
+ * @param null|string $title
+ *
+ * @return array
+ */
+function getCopyElementsFormData($elements_field, $title = null) {
 	$data = [
 		'title' => $title,
-		'elements_field' => $elementsField,
-		'elements' => getRequest($elementsField, []),
+		'elements_field' => $elements_field,
+		'elements' => getRequest($elements_field, []),
 		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_HOST_GROUP),
-		'copy_groupid' => getRequest('copy_groupid', 0),
-		'copy_targetid' => getRequest('copy_targetid', []),
-		'hostid' => getRequest('hostid', 0),
-		'groups' => [],
-		'hosts' => [],
-		'templates' => []
+		'copy_targetids' => getRequest('copy_targetids', []),
+		'hostid' => getRequest('hostid', 0)
 	];
 
-	// validate elements
-	if (empty($data['elements']) || !is_array($data['elements'])) {
-		error(_('Incorrect list of items.'));
+	if (!$data['elements'] || !is_array($data['elements'])) {
+		show_error_message(_('Incorrect list of items.'));
 
-		return null;
+		return $data;
 	}
 
-	if ($data['copy_type'] == COPY_TYPE_TO_HOST_GROUP) {
-		// get groups
-		$data['groups'] = API::HostGroup()->get([
-			'output' => ['groupid', 'name']
-		]);
-		order_result($data['groups'], 'name');
-	}
-	else {
-		// hosts or templates
-		$params = ['output' => ['name', 'groupid']];
+	if ($data['copy_targetids']) {
+		switch ($data['copy_type']) {
+			case COPY_TYPE_TO_HOST_GROUP:
+				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+					'output' => ['groupid', 'name'],
+					'groupids' => $data['copy_targetids'],
+					'editable' => true
+				]), ['groupid' => 'id']);
+				break;
 
-		if ($data['copy_type'] == COPY_TYPE_TO_HOST) {
-			$params['real_hosts'] = true;
-		}
-		else {
-			$params['templated_hosts'] = true;
-		}
+			case COPY_TYPE_TO_HOST:
+				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
+					'output' => ['hostid', 'name'],
+					'hostids' => $data['copy_targetids'],
+					'editable' => true
+				]), ['hostid' => 'id']);
+				break;
 
-		$data['groups'] = API::HostGroup()->get($params);
-		order_result($data['groups'], 'name');
-
-		$groupIds = zbx_objectValues($data['groups'], 'groupid');
-
-		if (!in_array($data['copy_groupid'], $groupIds) || $data['copy_groupid'] == 0) {
-			$data['copy_groupid'] = reset($groupIds);
-		}
-
-		if ($data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
-			$data['templates'] = API::Template()->get([
-				'output' => ['name', 'templateid'],
-				'groupids' => $data['copy_groupid']
-			]);
-			order_result($data['templates'], 'name');
-		}
-		elseif ($data['copy_type'] == COPY_TYPE_TO_HOST) {
-			$data['hosts'] = API::Host()->get([
-				'output' => ['name', 'hostid'],
-				'groupids' => $data['copy_groupid']
-			]);
-			order_result($data['hosts'], 'name');
+			case COPY_TYPE_TO_TEMPLATE:
+				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::Template()->get([
+					'output' => ['templateid', 'name'],
+					'templateids' => $data['copy_targetids'],
+					'editable' => true
+				]), ['templateid' => 'id']);
 		}
 	}
 
@@ -1625,27 +1612,33 @@ function getTriggerFormData(array $data) {
 	// Trigger expression constructor.
 	if ($data['expression_constructor'] == IM_TREE) {
 		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
+
 		if ($analyze !== false) {
 			list($data['expression_formula'], $data['expression_tree']) = $analyze;
+
 			if ($data['expression_action'] !== '' && $data['expression_tree'] !== null) {
 				$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
 					$data['expression_action'], $data['expr_temp']
 				);
+
 				if ($new_expr !== false) {
 					$data['expression'] = $new_expr;
 					$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
+
 					if ($analyze !== false) {
 						list($data['expression_formula'], $data['expression_tree']) = $analyze;
 					}
 					else {
 						show_messages(false, '', _('Expression syntax error.'));
 					}
+
 					$data['expr_temp'] = '';
 				}
 				else {
 					show_messages(false, '', _('Expression syntax error.'));
 				}
 			}
+
 			$data['expression_field_name'] = 'expr_temp';
 			$data['expression_field_value'] = $data['expr_temp'];
 			$data['expression_field_readonly'] = true;
@@ -1667,8 +1660,10 @@ function getTriggerFormData(array $data) {
 	// Trigger recovery expression constructor.
 	if ($data['recovery_expression_constructor'] == IM_TREE) {
 		$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
+
 		if ($analyze !== false) {
 			list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
+
 			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] !== null) {
 				$new_expr = remakeExpression($data['recovery_expression'], $_REQUEST['recovery_expr_target_single'],
 					$data['recovery_expression_action'], $data['recovery_expr_temp']
@@ -1677,18 +1672,21 @@ function getTriggerFormData(array $data) {
 				if ($new_expr !== false) {
 					$data['recovery_expression'] = $new_expr;
 					$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
+
 					if ($analyze !== false) {
 						list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
 					}
 					else {
 						show_messages(false, '', _('Recovery expression syntax error.'));
 					}
+
 					$data['recovery_expr_temp'] = '';
 				}
 				else {
 					show_messages(false, '', _('Recovery expression syntax error.'));
 				}
 			}
+
 			$data['recovery_expression_field_name'] = 'recovery_expr_temp';
 			$data['recovery_expression_field_value'] = $data['recovery_expr_temp'];
 			$data['recovery_expression_field_readonly'] = true;

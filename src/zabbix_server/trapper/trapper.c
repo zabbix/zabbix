@@ -176,6 +176,11 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
 			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
+	if (SUCCEED != zbx_check_protocol_version(&proxy))
+	{
+		goto out;
+	}
+
 	if (SUCCEED != (ret = process_proxy_history_data(&proxy, jp, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid history data from proxy \"%s\" at \"%s\": %s",
@@ -1256,8 +1261,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		/* Only after receiving data it is known who has sent them and one can decide to accept or discard */
 		/* the data. */
 		ret = zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED);
-		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(zbx_time());
 
 		if (SUCCEED == ret)
 		{
@@ -1271,6 +1275,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
 					process_num);
 
+			sec = zbx_time();
 			process_trapper_child(&s, &ts);
 			sec = zbx_time() - sec;
 

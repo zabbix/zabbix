@@ -21,7 +21,6 @@
 #define ZABBIX_ZBXMEDIA_H
 
 #include "sysinc.h" /* using "config.h" would be better, but it causes warnings when compiled with Net-SNMP */
-#include "zbxalgo.h"
 
 extern char	*CONFIG_SOURCE_IP;
 

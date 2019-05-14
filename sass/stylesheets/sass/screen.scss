@@ -1335,6 +1335,10 @@ output {
 	white-space: nowrap;
 }
 
+.wordwrap {
+	word-break: break-all;
+}
+
 .overflow-table {
 	overflow-x: auto;
 	position: relative;
@@ -1529,7 +1533,7 @@ output {
 	}
 }
 
-.multiselect-wrapper {
+.multiselect-control {
 	position: relative;
 	vertical-align: top;
 	display: inline-block;
@@ -1836,6 +1840,15 @@ output {
 		padding: .3em 0;
 	}
 
+	&.hor-list li {
+		margin-right: 15px;
+		padding: .3em 0 0 0;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
 	label {
 		padding: 0 0 0 18px;
 		display: inline-block;
@@ -1854,21 +1867,7 @@ output {
 	}
 }
 
-.list-hor-check-radio {
-	@extend .list-check-radio;
-
-	li {
-		display: inline-block;
-		margin-right: 15px;
-		padding: .3em 0 0 0;
-
-		&:last-child {
-			margin-right: 0;
-		}
-	}
-}
-
-.radio-segmented {
+.radio-list-control {
 	white-space: nowrap;
 
 	li {
@@ -3670,6 +3669,10 @@ $form-icon-btn: (
 
 	.msg-good, .msg-bad {
 		margin: 0 10px;
+	}
+
+	&.dashbrd-widget-fluid {
+		margin-right: 0;
 	}
 }
 
@@ -6842,7 +6845,7 @@ Text on html5 input types
 
 ```html_example
 <p>
-<ul class="radio-segmented">
+<ul class="radio-list-control">
    <li><input type="radio" id="RadioSegm1"><label for="RadioSegm1">Radio 1</label></li><li><input type="radio" id="RadioSegm2"><label for="RadioSegm2">Radio 2</label></li><li><input type="radio" id="RadioSegm3" disabled><label for="RadioSegm3">Radio 3</label></li>
 </ul>
 </p>

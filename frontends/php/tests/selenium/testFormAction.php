@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 define('ACTION_GOOD', 0);
@@ -692,10 +693,11 @@ class testFormAction extends CLegacyWebTest {
 			case 'Service port':
 				$this->zbxTestAssertElementPresentXpath('//input[@id=\'new_condition_value\']');
 				break;
-			case 'Discovery rule':
+
 			case 'Discovery check':
 				$this->zbxTestAssertNotVisibleXpath('//input[@id=\'new_condition_value\']');
 				break;
+
 			default:
 				$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'new_condition_value\']');
 				break;
@@ -746,6 +748,7 @@ class testFormAction extends CLegacyWebTest {
 			case 'Template':
 			case 'Host':
 			case 'Trigger':
+			case 'Discovery rule':
 				$this->zbxTestAssertElementPresentXpath('//div[@id=\'new_condition_value_\']/input[@placeholder]');
 				break;
 
@@ -842,17 +845,7 @@ class testFormAction extends CLegacyWebTest {
 				break;
 		}
 
-		switch ($new_condition_conditiontype) {
-			case 'Discovery rule':
-				$this->zbxTestAssertElementPresentXpath('//input[@id=\'drule\']');
-				$this->zbxTestAssertAttribute('//input[@id=\'drule\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'drule\']', 'size', 20);
-				$this->zbxTestAssertAttribute('//input[@id=\'drule\']', 'readonly');
-				break;
-			default:
-				$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'drule\']');
-				break;
-		}
+		$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'drule\']');
 
 		switch ($new_condition_conditiontype) {
 			case 'Discovery check':
@@ -860,19 +853,12 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestAssertAttribute('//input[@id=\'dcheck\']', 'maxlength', 255);
 				$this->zbxTestAssertAttribute('//input[@id=\'dcheck\']', 'size', 20);
 				$this->zbxTestAssertAttribute('//input[@id=\'dcheck\']', 'readonly');
-				break;
-			default:
-				$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'dcheck\']');
-				break;
-		}
-
-		switch ($new_condition_conditiontype) {
-			case 'Discovery rule':
-			case 'Discovery check':
 				$this->zbxTestAssertElementPresentXpath('//button[@id=\'btn1\']');
 				$this->zbxTestAssertElementText('//button[@id=\'btn1\']', 'Select');
 				break;
+
 			default:
+				$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'dcheck\']');
 				$this->zbxTestAssertElementNotPresentXpath('//button[@id=\'btn1\']');
 				break;
 		}

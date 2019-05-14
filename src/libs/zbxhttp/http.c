@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "log.h"
+#include "zbxhttp.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -206,17 +207,6 @@ char	*zbx_http_get_header(char **headers)
 	}
 
 	return NULL;
-}
-
-void	zbx_http_add_headers(char *headers, struct curl_slist **headers_slist)
-{
-	char	*line;
-
-	while (NULL != (line = zbx_http_get_header(&headers)))
-	{
-		*headers_slist = curl_slist_append(*headers_slist, line);
-		zbx_free(line);
-	}
 }
 
 #endif
