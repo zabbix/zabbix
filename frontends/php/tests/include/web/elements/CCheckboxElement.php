@@ -43,12 +43,8 @@ class CCheckboxElement extends CElement {
 	 * @return $this
 	 */
 	public function set($checked) {
-		if (!$this->isEnabled()) {
-			throw new Exception('Cannot interact with the disabled checkbox element.');
-		}
-
-		if ($checked !== $this->isChecked()) {
-			$this->click();
+		if ($checked !== $this->isSelected()) {
+			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
 		}
 
 		return $this;

@@ -722,13 +722,15 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
  * @param int   $problem_options['show_suppressed']  Whether to show triggers with suppressed problems.
  * @param int   $problem_options['min_severity']     (optional) Minimal problem severity.
  * @param int   $problem_options['time_from']        (optional) The time starting from which the problems were created.
+ * @param bool  $problem_options['acknowledged']     (optional) Whether to show triggers with acknowledged problems.
  *
  * @return array
  */
 function getTriggersWithActualSeverity(array $trigger_options, array $problem_options) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-		'time_from' => null
+		'time_from' => null,
+		'acknowledged' => null
 	];
 
 	$triggers = API::Trigger()->get($trigger_options);
@@ -748,6 +750,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity'],
 			'objectids' => $problem_triggerids,
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
+			'acknowledged' => $problem_options['acknowledged'],
 			'time_from' => $problem_options['time_from']
 		]);
 

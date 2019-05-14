@@ -3988,6 +3988,20 @@ td[class] + td.disaster-bg {
 .overflow-table::-webkit-scrollbar {
   height: 9px; }
 
+.drag-icon,
+.ui-draggable .dashbrd-widget-head,
+.ui-draggable .dashbrd-grid-widget-head {
+  cursor: move;
+  /* fallback if grab cursor is unsupported */
+  cursor: grab; }
+
+.ui-draggable-dragging .drag-icon,
+.ui-draggable-dragging .dashbrd-widget-head,
+.ui-draggable-dragging .dashbrd-grid-widget-head, .cursor-dragging {
+  cursor: move;
+  /* fallback if grabbing cursor is unsupported */
+  cursor: grabbing; }
+
 .cursor-move {
   cursor: move; }
 
@@ -4541,8 +4555,7 @@ ul.checkbox-list.col-3 > li {
         .navtree .tree .tree-item > .tree-row > .content > .arrow > .treeview {
           display: none; }
       .navtree .tree .tree-item > .tree-row > .content > .drag-icon {
-        min-width: 24px;
-        cursor: move; }
+        min-width: 24px; }
       .navtree .tree .tree-item > .tree-row > .content > .item-name {
         flex: 0 1 auto;
         white-space: nowrap;

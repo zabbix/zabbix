@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Event details');
 $page['file'] = 'tr_events.php';
-$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['type'] = detect_page_type();
 $page['scripts'] = ['layout.mode.js'];
 
 CView::$has_web_layout_mode = true;
@@ -143,16 +143,14 @@ $eventTab = (new CTable())
 				makeEventDetailsActionsTable($actions, $users, $mediatypes, $severity_config)
 			))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state', true))
-				->setHeader(_('Actions'), [], false, 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state'),
+				->setHeader(_('Actions'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state'),
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,
 				make_small_eventlist($event,
 					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
 				)
 			))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state', true))
-				->setHeader(_('Event list [previous 20]'), [], false,
-					'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state'
-				)
+				->setHeader(_('Event list [previous 20]'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state')
 		])
 	]);
 

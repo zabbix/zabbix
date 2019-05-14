@@ -226,10 +226,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestCheckboxSelect($id, $select = true) {
-		$checkbox = $this->query('id:'.$id)->waitUntilPresent()->one();
-		if ($select != $checkbox->isSelected()) {
-			$checkbox->click();
-		}
+		$this->query('id:'.$id)->waitUntilPresent()->asCheckbox()->one()->set($select);
 	}
 
 	public function zbxTestCheckboxSelected($id) {
@@ -246,7 +243,7 @@ class CLegacyWebTest extends CWebTest {
 	 * @param string $id  ID of the multiselect.
 	 */
 	public function zbxTestClickButtonMultiselect($id) {
-		$this->zbxTestClickXpath(
+		$this->zbxTestClickXpathWait(
 			"//div[contains(@class, 'multiselect') and @id='$id']/../div[@class='multiselect-button']/button"
 		);
 	}

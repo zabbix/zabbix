@@ -84,7 +84,7 @@ static void	test_queue_range_values(int iterations, zbx_vector_ptr_t *values)
 	zbx_queue_ptr_destroy(&queue);
 }
 
-void test_queue_range()
+static void test_queue_range(void)
 {
 	zbx_vector_ptr_t	values;
 
@@ -94,7 +94,7 @@ void test_queue_range()
 	zbx_vector_ptr_destroy(&values);
 }
 
-void test_queue_ptr_compact_tail_head()
+static void test_queue_ptr_compact_tail_head(void)
 {
 	zbx_vector_ptr_t	values;
 	zbx_queue_ptr_t		queue;
@@ -127,7 +127,7 @@ void test_queue_ptr_compact_tail_head()
 	zbx_vector_ptr_destroy(&values);
 }
 
-void test_queue_ptr_compact_head_tail()
+static void test_queue_ptr_compact_head_tail(void)
 {
 	zbx_vector_ptr_t	values;
 	zbx_queue_ptr_t		queue;
@@ -190,7 +190,7 @@ static void	test_queue_ptr_remove_value(zbx_queue_ptr_t *queue, void **values, i
 	}
 }
 
-void test_queue_ptr_remove_tail_head()
+static void test_queue_ptr_remove_tail_head(void)
 {
 	zbx_vector_ptr_t	values;
 	zbx_queue_ptr_t		queue;
@@ -229,7 +229,7 @@ void test_queue_ptr_remove_tail_head()
 	zbx_vector_ptr_destroy(&values);
 }
 
-void test_queue_ptr_remove_head_tail()
+static void test_queue_ptr_remove_head_tail(void)
 {
 	zbx_vector_ptr_t	values;
 	zbx_queue_ptr_t		queue;
@@ -272,7 +272,7 @@ void test_queue_ptr_remove_head_tail()
 	zbx_vector_ptr_destroy(&values);
 }
 
-int get_type(const char *str)
+static int get_type(const char *str)
 {
 	if (0 == strcmp(str, "RANGE"))
 		return RANGE;

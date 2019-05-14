@@ -140,6 +140,7 @@
 		function addDraggableIcon(domElement) {
 			domElement.draggable({
 				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				opacity: 0.6,
 				revert: 'invalid',
 				helper: function(event) {
 					var hostInterfaceId = jQuery(this).data('interfaceid');

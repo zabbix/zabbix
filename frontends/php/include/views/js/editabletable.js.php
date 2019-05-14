@@ -12,7 +12,7 @@
 					items: 'tbody tr.sortable',
 					axis: 'y',
 					containment: 'parent',
-					cursor: 'move',
+					cursor: IE ? 'move' : 'grabbing',
 					handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 					tolerance: 'pointer',
 					opacity: 0.6,

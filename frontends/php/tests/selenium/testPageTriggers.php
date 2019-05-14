@@ -19,9 +19,15 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 class testPageTriggers extends CLegacyWebTest {
+
 	public $hostid = 99050;
+
+	use FilterTrait;
+	use TableTrait;
 
 	public static function data() {
 		return CDBHelper::getDataProvider(
@@ -32,8 +38,8 @@ class testPageTriggers extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider data
-	*/
+	 * @dataProvider data
+	 */
 	public function testPageTriggers_CheckLayout($data) {
 		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of triggers');
@@ -77,10 +83,10 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'tag_options' => [
-						'operator' => 'And/Or',
+						'type' => 'And/Or',
 						'tags' => [
-							['name' => 'TagA', 'value' => 'a', 'type' => 'Equals'],
-							['name' => 'TagK', 'value' => 'K', 'type' => 'Contains']
+							['name' => 'TagA', 'value' => 'a', 'operator' => 'Equals'],
+							['name' => 'TagK', 'value' => 'K', 'operator' => 'Contains']
 						]
 					],
 					'result' => [
@@ -91,10 +97,10 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'tag_options' => [
-						'operator' => 'And/Or',
+						'type' => 'And/Or',
 						'tags' => [
-							['name' => 'TagA', 'value' => 'A', 'type' => 'Contains'],
-							['name' => 'TagK', 'value' => 'K', 'type' => 'Contains']
+							['name' => 'TagA', 'value' => 'A', 'operator' => 'Contains'],
+							['name' => 'TagK', 'value' => 'K', 'operator' => 'Contains']
 						]
 					],
 					'result' => [
@@ -105,10 +111,10 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'tag_options' => [
-						'operator' => 'Or',
+						'type' => 'Or',
 						'tags' => [
-							['name' => 'TagA', 'value' => 'A', 'type' => 'Contains'],
-							['name' => 'TagK', 'value' => 'K', 'type' => 'Contains']
+							['name' => 'TagA', 'value' => 'A', 'operator' => 'Contains'],
+							['name' => 'TagK', 'value' => 'K', 'operator' => 'Contains']
 						]
 					],
 					'result' => [
@@ -120,10 +126,10 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'tag_options' => [
-						'operator' => 'Or',
+						'type' => 'Or',
 						'tags' => [
-							['name' => 'TagZ', 'value' => 'Z', 'type' => 'Equals'],
-							['name' => 'TagI', 'value' => 'I', 'type' => 'Equals']
+							['name' => 'TagZ', 'value' => 'Z', 'operator' => 'Equals'],
+							['name' => 'TagI', 'value' => 'I', 'operator' => 'Equals']
 						]
 					]
 				]
@@ -131,14 +137,38 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'tag_options' => [
-						'operator' => 'Or',
+						'type' => 'Or',
 						'tags' => [
-							['name' => 'TagZ', 'value' => 'z', 'type' => 'Equals'],
-							['name' => 'TagI', 'value' => 'i', 'type' => 'Equals']
+							['name' => 'TagZ', 'value' => 'z', 'operator' => 'Equals'],
+							['name' => 'TagI', 'value' => 'i', 'operator' => 'Equals']
 						]
 					],
 					'result' => [
 						'Second trigger for tag filtering',
+						'Third trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'operator' => 'Equals']
+						]
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'operator' => 'Contains']
+						]
+					],
+					'result' => [
+						'First trigger for tag filtering',
 						'Third trigger for tag filtering'
 					]
 				]
@@ -147,27 +177,23 @@ class testPageTriggers extends CLegacyWebTest {
 	}
 
 	/**
-	 *
 	 * @dataProvider getTagsFilterData
 	 */
 	public function testPageTriggers_TagsFilter($data) {
 		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid);
-		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->setTags($data['tag_options']);
+		$form = $this->setTags($data['tag_options']['type'], $data['tag_options']['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->checkFilterResults($data);
+		$this->checkTableDataColumn(CTestArrayHelper::get($data, 'result', []));
 	}
 
 	public function testPageTriggers_ResetTagsFilter() {
-		$data = [
-			'result' => [
-				'Fifth trigger for tag filtering (no tags)',
-				'First trigger for tag filtering',
-				'Fourth trigger for tag filtering',
-				'Second trigger for tag filtering',
-				'Third trigger for tag filtering'
-			]
+		$result = [
+			'Fifth trigger for tag filtering (no tags)',
+			'First trigger for tag filtering',
+			'Fourth trigger for tag filtering',
+			'Second trigger for tag filtering',
+			'Third trigger for tag filtering'
 		];
 
 		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid);
@@ -175,12 +201,11 @@ class testPageTriggers extends CLegacyWebTest {
 		$form->getField('Tags')->query('id:filter_tags_0_tag')->one()->fill('Tag1234');
 		$form->submit();
 		$this->page->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertEquals(['No data found.'], $table->getRows()->asText());
+		$this->checkTableDataColumn();
 
 		$form->query('button:Reset')->one()->click();
 		$this->page->waitUntilReady();
-		$this->checkFilterResults($data);
+		$this->checkTableDataColumn($result);
 	}
 
 	public static function getFilterData() {
@@ -192,9 +217,9 @@ class testPageTriggers extends CLegacyWebTest {
 						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Discovered trigger one',
-						'Inheritance trigger with tags',
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -206,7 +231,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Severity' => ['Average', 'Disaster'],
 					],
 					'result' => [
-						'Discovered trigger one',
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -218,8 +243,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'Inherited' =>'No'
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Discovered trigger one',
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -231,7 +256,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Discovered' => 'Yes'
 					],
 					'result' => [
-						'Discovered trigger one'
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -242,8 +267,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'With dependencies' => 'Yes'
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Inheritance trigger with tags'
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -254,8 +279,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'Name' => 'One'
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Discovered trigger one'
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -266,8 +291,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'State' => 'Normal'
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Discovered trigger one'
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -278,9 +303,9 @@ class testPageTriggers extends CLegacyWebTest {
 						'Status' => 'Enabled'
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Discovered trigger one',
-						'Inheritance trigger with tags'
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -301,8 +326,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'Value' => 'Ok'
 					],
 					'result' => [
-						'Dependent trigger ONE',
-						'Discovered trigger one',
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -313,7 +338,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Value' => 'Problem'
 					],
 					'result' => [
-						'Inheritance trigger with tags'
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -331,14 +356,14 @@ class testPageTriggers extends CLegacyWebTest {
 						'With dependencies' =>'Yes',
 					],
 					'tag_options' => [
-						'operator' => 'Or',
+						'type' => 'Or',
 						'tags' => [
-							['name' => 'server', 'value' => 'selenium', 'type' => 'Equals'],
-							['name' => 'Street', 'value' => 'dzelzavas', 'type' => 'Contains']
+							['name' => 'server', 'value' => 'selenium', 'operator' => 'Equals'],
+							['name' => 'Street', 'value' => 'dzelzavas', 'operator' => 'Contains']
 						]
 					],
 					'result' => [
-						'Inheritance trigger with tags'
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
 					]
 				]
 			],
@@ -404,47 +429,12 @@ class testPageTriggers extends CLegacyWebTest {
 		$form->fill($data['filter_options']);
 
 		if (array_key_exists('tag_options', $data)) {
-			$this->setTags($data['tag_options']);
+			$this->setTags($data['tag_options']['type'], $data['tag_options']['tags']);
 		}
 
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->checkFilterResults($data);
-	}
-
-	private function setTags($data) {
-		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$tag_table = $form->getField('Tags');
-
-		$tag_table->getRow(0)->query('class:radio-list-control')->asSegmentedRadio()->one()->select($data['operator']);
-
-		$button = $tag_table->query('button:Add')->one();
-		$last = count($data['tags']) - 1;
-		foreach ($data['tags'] as $i => $tag) {
-			$tag_row = $tag_table->getRow($i+1);
-			$tag_row->getColumn(0)->query('tag:input')->one()->fill($tag['name']);
-			$tag_row->getColumn(1)->query('class:radio-list-control')->asSegmentedRadio()->one()->select($tag['type']);
-			$tag_row->getColumn(2)->query('tag:input')->one()->fill($tag['value']);
-
-			if ($i !== $last) {
-				$button->click();
-			}
-		}
-	}
-
-	private function checkFilterResults($data) {
-		$table = $this->query('class:list-table')->asTable()->one();
-		if (array_key_exists('result', $data)) {
-			foreach ($table->getRows() as $i => $row) {
-				$host_name = $row->getColumn('Name')->query('xpath:./a[not(@class)]')->one()->getText();
-				$this->assertEquals($data['result'][$i], $host_name);
-			}
-			$this->assertEquals(count($data['result']), $table->getRows()->count());
-		}
-		else {
-			// Check that table contain one row with text "No data found."
-			$this->assertEquals(['No data found.'], $table->getRows()->asText());
-		}
+		$this->checkTableDataColumn(CTestArrayHelper::get($data, 'result', []));
 	}
 
 	public static function getHostAndGroupData() {
@@ -456,10 +446,22 @@ class testPageTriggers extends CLegacyWebTest {
 						'Host groups' => 'Group to check triggers filtering'
 					],
 					'result' => [
-						['Host for triggers filtering' => 'Dependent trigger ONE'],
-						['Host for triggers filtering' => 'Discovered trigger one'],
-						['Host for triggers filtering' => 'Inheritance trigger with tags'],
-						['Host for triggers filtering' => 'Trigger disabled with tags']
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]']
+						],
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => ['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
+						],
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => ['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
+						],
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => 'Trigger disabled with tags'
+						]
 					]
 				]
 			],
@@ -472,9 +474,18 @@ class testPageTriggers extends CLegacyWebTest {
 						'Name' => 'tag'
 					],
 					'result' => [
-						['ЗАББИКС Сервер' => 'Test trigger to check tag filter on problem page'],
-						['Host for trigger tags filtering' => 'Third trigger for tag filtering'],
-						['Host for triggers filtering' => 'Trigger disabled with tags']
+						[
+							'Host' => 'ЗАББИКС Сервер',
+							'Name' => 'Test trigger to check tag filter on problem page'
+						],
+						[
+							'Host' => 'Host for trigger tags filtering',
+							'Name' => 'Third trigger for tag filtering'
+						],
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => 'Trigger disabled with tags'
+						]
 					]
 				]
 			],
@@ -495,8 +506,14 @@ class testPageTriggers extends CLegacyWebTest {
 						]
 					],
 					'result' => [
-						['Host for trigger tags filtering' => 'Third trigger for tag filtering'],
-						['Host for triggers filtering' => 'Trigger disabled with tags']
+						[
+							'Host' => 'Host for trigger tags filtering',
+							'Name' => 'Third trigger for tag filtering'
+						],
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => 'Trigger disabled with tags'
+						]
 					]
 				]
 			],
@@ -517,15 +534,42 @@ class testPageTriggers extends CLegacyWebTest {
 						]
 					],
 					'result' => [
-						['Host for triggers filtering' => 'Dependent trigger ONE'],
-						['Host for triggers filtering' => 'Discovered trigger one'],
-						['Host for trigger tags filtering' => 'Fifth trigger for tag filtering (no tags)'],
-						['Host for trigger tags filtering' => 'First trigger for tag filtering'],
-						['Host for trigger tags filtering' => 'Fourth trigger for tag filtering'],
-						['Host for triggers filtering' => 'Inheritance trigger with tags'],
-						['Host for trigger tags filtering' => 'Second trigger for tag filtering'],
-						['Host for trigger tags filtering' => 'Third trigger for tag filtering'],
-						['Host for triggers filtering' => 'Trigger disabled with tags']
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+						],
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => ['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
+						],
+						[
+							'Host' => 'Host for trigger tags filtering',
+							'Name' => 'Fifth trigger for tag filtering (no tags)'
+						],
+						[
+							'Host' => 'Host for trigger tags filtering',
+							'Name' => 'First trigger for tag filtering'
+						],
+						[
+							'Host' => 'Host for trigger tags filtering',
+							'Name' => 'Fourth trigger for tag filtering'
+						],
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => ['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
+						],
+						[
+							'Host' => 'Host for trigger tags filtering',
+							'Name' => 'Second trigger for tag filtering'
+						],
+						[
+							'Host' => 'Host for trigger tags filtering',
+							'Name' => 'Third trigger for tag filtering'
+						],
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => 'Trigger disabled with tags'
+						]
 					]
 				]
 			]
@@ -555,15 +599,6 @@ class testPageTriggers extends CLegacyWebTest {
 		$this->assertFalse($this->query('button:Create trigger (select host first)')->one()->isEnabled());
 		$this->assertTrue($this->query('class:filter-breadcrumb')->all()->isEmpty());
 		// Check results in table.
-		$table = $this->query('class:list-table')->asTable()->one();
-		foreach ($table->getRows() as $i => $row) {
-			$get_host = $row->getColumn('Name')->query('xpath:./a[not(@class)]')->one()->getText();
-			$get_group = $row->getColumn('Host')->getText();
-			foreach ($data['result'][$i] as $group => $host) {
-				$this->assertEquals($host, $get_host);
-				$this->assertEquals($group, $get_group);
-			}
-		}
-		$this->assertEquals(count($data['result']), $table->getRows()->count());
+		$this->checkTableData(CTestArrayHelper::get($data, 'result', []));
 	}
 }

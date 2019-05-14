@@ -231,8 +231,8 @@
 			disabled: $preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').hasClass('<?= ZBX_STYLE_DISABLED ?>'),
 			items: 'li.sortable',
 			axis: 'y',
-			cursor: 'move',
 			containment: 'parent',
+			cursor: IE ? 'move' : 'grabbing',
 			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6
@@ -252,10 +252,12 @@
 				var sortable_count = $preprocessing.find('li.sortable').length;
 
 				if (sortable_count == 1) {
-					$preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
-					$('#preproc_test_all').prop('disabled', false);
+					$preprocessing
+						.sortable('disable')
+						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 				else if (sortable_count > 1) {
+					$('#preproc_test_all').show();
 					$preprocessing
 						.sortable('enable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').removeClass('<?= ZBX_STYLE_DISABLED ?>');
@@ -285,9 +287,9 @@
 
 				if (sortable_count == 0) {
 					$('.preprocessing-list-head').hide();
-					$('#preproc_test_all').prop('disabled', true);
 				}
 				else if (sortable_count == 1) {
+					$('#preproc_test_all').hide();
 					$preprocessing
 						.sortable('disable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');

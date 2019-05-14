@@ -121,7 +121,7 @@ class CElement extends CBaseElement implements IWaitable {
 			$query->setContext($this->parent);
 		}
 
-		$this->setElement($query->one());
+		$this->setElement($query->waitUntilPresent()->one());
 		if (!$this->normalized) {
 			$this->normalize();
 		}
@@ -248,12 +248,28 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
-	 * Get value of the "value" attribute.
+	 * Get element value.
 	 *
-	 * @return string
+	 * @return type
 	 */
 	public function getValue() {
-		return parent::getAttribute('value');
+		return CElementQuery::getDriver()->executeScript('return arguments[0].value;', [$this]);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function sendKeys($value) {
+		if (is_string($value) && strpos($value, '"') === false) {
+			parent::sendKeys($value);
+		}
+		else {
+			CElementQuery::getDriver()->executeScript('arguments[0].value=arguments[1];arguments[0].focus();',
+					[$this, $value]
+			);
+		}
+
+		return $this;
 	}
 
 	/**
@@ -262,7 +278,7 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return $this
 	 */
 	public function selectValue() {
-		$this->click()->sendKeys([WebDriverKeys::CONTROL, 'a', WebDriverKeys::CONTROL]);
+		CElementQuery::getDriver()->executeScript('arguments[0].focus();arguments[0].select();', [$this]);
 
 		return $this;
 	}
@@ -275,6 +291,10 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return $this
 	 */
 	public function overwrite($text) {
+		if ($text === '' || $text === null) {
+			$text = WebDriverKeys::DELETE;
+		}
+
 		return $this->selectValue()->type($text);
 	}
 

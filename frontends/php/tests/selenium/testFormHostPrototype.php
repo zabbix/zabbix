@@ -432,7 +432,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Groups');
 		$this->zbxTestClickButtonMultiselect('group_links_');
 		$this->zbxTestLaunchOverlayDialog('Host groups');
-		$this->zbxTestClickLinkText($data['hostgroup']);
+		$this->zbxTestClickLinkTextWait($data['hostgroup']);
 
 		if (array_key_exists('group_prototype', $data)) {
 			$this->zbxTestInputTypeByXpath('//*[@name="group_prototypes[0][name]"]', $data['group_prototype']);
@@ -443,7 +443,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-			$this->zbxTestClickLinkText($data['template']);
+			$this->zbxTestClickLinkTextWait($data['template']);
 			$this->zbxTestClickXpath('//button[contains(@onclick, "add_template")]');
 		}
 
@@ -527,8 +527,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 */
 	public function testFormHostPrototype_Update($data) {
 		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID);
-		$host = array_key_exists('old_visible_name', $data) ? $data['old_visible_name'] : $data['old_name'];
-		$this->zbxTestClickLinkTextWait($host);
+		$this->zbxTestClickLinkTextWait(array_key_exists('old_visible_name', $data) ? $data['old_visible_name'] : $data['old_name']);
 
 		// Change name and visible name.
 		if (array_key_exists('name', $data)) {
@@ -816,7 +815,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestMultiselectClear('group_links_');
 			$this->zbxTestClickButtonMultiselect('group_links_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
-			$this->zbxTestClickLinkText($data['hostgroup']);
+			$this->zbxTestClickLinkTextWait($data['hostgroup']);
 		}
 		// Change host group prototype.
 		if (array_key_exists('group_prototype', $data)) {
@@ -830,7 +829,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-			$this->zbxTestClickLinkText($data['template']);
+			$this->zbxTestClickLinkTextWait($data['template']);
 			$this->zbxTestClickXpath('//div[@id="templateTab"]//button[text()="Add"]');
 		}
 

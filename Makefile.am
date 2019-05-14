@@ -100,12 +100,6 @@ css_icons:
 
 css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
 
-## CUnit test support
-TESTDIR = src
-
-test:
-	cd $(TESTDIR) && $(MAKE) $(AM_MAKEFLAGS) test
-
 ## cmocka test support
 if ZBXCMOCKA
 WRAP_DB_FUNCS = \
