@@ -80,6 +80,8 @@ class CScreenActions extends CScreenBase {
 			'filter' => [
 				'alerttype' => ALERT_TYPE_MESSAGE
 			],
+			'time_from' => $this->timeline['from_ts'],
+			'time_till' => $this->timeline['to_ts'],
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => $this->screenitem['elements']
