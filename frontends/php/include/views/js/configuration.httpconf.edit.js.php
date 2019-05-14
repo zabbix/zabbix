@@ -127,9 +127,11 @@
 		 */
 		function refreshContainers() {
 			jQuery('.pair-container-sortable').each(function() {
-				jQuery(this).sortable({
-					disabled: (jQuery(this).find('tr.sortable').length < 2)
-				});
+				var disabled = (jQuery(this).find('tr.sortable').length < 2);
+
+				jQuery(this)
+					.sortable({disabled: disabled})
+					.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').toggleClass('<?= ZBX_STYLE_DISABLED ?>', disabled);
 			});
 		}
 
@@ -182,22 +184,24 @@
 			/**
 			 * Add listeners to HTML elements in web scenario and web step forms.
 			 *
-			 * @param {string}	formid		Id of current form HTML form element.
+			 * @param {string} formid  ID of the current form HTML element.
 			 */
 			initControls: function(formid) {
-				var $form = jQuery('#'+formid);
+				var $form = jQuery('#'+formid),
+					$pair_container = $form.find('.pair-container-sortable');
+
 				$form.on('click', 'button.remove', function() {
 					var pairId = jQuery(this).data('pairid');
 					jQuery('#pairRow_' + pairId).remove();
 					pairManager.remove(pairId);
 				});
 
-				jQuery('.pair-container-sortable', $form).sortable({
-					disabled: (jQuery(this).find('tr.sortable').length < 2),
+				$pair_container.sortable({
+					disabled: ($pair_container.find('tr.sortable').length < 2),
 					items: 'tr.sortable',
 					axis: 'y',
-					cursor: 'move',
 					containment: 'parent',
+					cursor: IE ? 'move' : 'grabbing',
 					handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 					tolerance: 'pointer',
 					opacity: 0.6,
@@ -383,7 +387,8 @@
 			disabled: (stepTable.find('tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
 			axis: 'y',
-			cursor: 'move',
+			containment: 'parent',
+			cursor: IE ? 'move' : 'grabbing',
 			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6,
