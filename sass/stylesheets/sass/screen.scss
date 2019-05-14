@@ -3879,6 +3879,10 @@ $form-icon-btn: (
 			max-width: inherit;
 			margin: 0 0 10px 0;
 			@extend %webkit-scrollbar;
+
+			.table-forms .table-forms-td-right {
+				padding-right: 18px;
+			}
 		}
 		.overlay-dialogue-controls {
 			text-align: right;

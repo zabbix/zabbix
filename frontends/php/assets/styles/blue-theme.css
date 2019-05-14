@@ -2689,6 +2689,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       max-height: calc(100vh - 190px);
       max-width: inherit;
       margin: 0 0 10px 0; }
+      .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
+        padding-right: 18px; }
     .overlay-dialogue.modal .overlay-dialogue-controls {
       text-align: right;
       padding: 0px 0px 10px 0px; }
