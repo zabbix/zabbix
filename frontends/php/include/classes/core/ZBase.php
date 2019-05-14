@@ -98,6 +98,7 @@ class ZBase {
 		require_once $this->getRootDir().'/include/draw.inc.php';
 		require_once $this->getRootDir().'/include/events.inc.php';
 		require_once $this->getRootDir().'/include/graphs.inc.php';
+		require_once $this->getRootDir().'/include/hostgroups.inc.php';
 		require_once $this->getRootDir().'/include/hosts.inc.php';
 		require_once $this->getRootDir().'/include/httptest.inc.php';
 		require_once $this->getRootDir().'/include/ident.inc.php';
@@ -110,7 +111,6 @@ class ZBase {
 		require_once $this->getRootDir().'/include/sounds.inc.php';
 		require_once $this->getRootDir().'/include/triggers.inc.php';
 		require_once $this->getRootDir().'/include/valuemap.inc.php';
-		require_once $this->getRootDir().'/include/hostgroups.inc.php';
 	}
 
 	/**
