@@ -114,8 +114,8 @@
 		return {
 			items: 'tbody tr.sortable',
 			axis: 'y',
-			cursor: 'move',
 			containment: 'parent',
+			cursor: IE ? 'move' : 'grabbing',
 			handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
 			tolerance: 'pointer',
 			opacity: 0.6,
