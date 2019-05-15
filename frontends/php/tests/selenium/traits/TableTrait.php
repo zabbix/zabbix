@@ -29,6 +29,7 @@ trait TableTrait {
 	 * Perform data array normalization.
 	 *
 	 * @param array $data
+	 *
 	 * @return array
 	 */
 	protected function normalizeData($data) {
@@ -57,7 +58,7 @@ trait TableTrait {
 	protected function getColumnData($row, $name, $value) {
 		if (!array_key_exists('text', $value)) {
 			// There is only support for text (currently).
-			throw new Exception('Only text selector is supported by TableTrait.'); // TODO: better message
+			throw new Exception('Failed to find key as "text" in: "'.$value.'".');
 		}
 
 		if (array_key_exists('selector', $value)) {
@@ -80,8 +81,8 @@ trait TableTrait {
 	 *
 	 * @param array   $data     data array to be match with result in table
 	 */
-	public function assertTableData($data = []) {
-		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
+	public function assertTableData($data = [], $selector = 'class:list-table') {
+		$rows = $this->query($selector)->asTable()->one()->getRows();
 		if (!$data) {
 			// Check that table contain one row with text "No data found."
 			$this->assertEquals(['No data found.'], $rows->asText());
@@ -161,7 +162,5 @@ trait TableTrait {
 				}
 			}
 		}
-		// Check number of selected element.
-		$this->assertEquals(count($data).' selected', $this->query('id:selected_count')->one()->getText());
 	}
 }

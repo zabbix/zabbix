@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
  * @backup media_type
  */
-class testPageAdministrationMediaTypes extends CLegacyWebTest {
+class testPageAdministrationMediaTypes extends CWebTest {
 
 	use TableTrait;
 
@@ -108,6 +108,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 	 * Check media types filtering.
 	 *
 	 * @dataProvider getFilterData
+	 * @on-after resetFilter
 	 */
 	public function testPageAdministrationMediaTypes_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
@@ -117,14 +118,16 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
+	}
 
-		// TODO: add annotation for filter reset (DEV-1075)
-		$form->query('button:Reset')->one()->click();
-		$this->page->waitUntilReady();
+	public function resetFilter() {
+		DBexecute('DELETE FROM profiles WHERE idx LIKE \'%web.media_types%\'');
 	}
 
 	/*
 	 * Check sorting of media types by Name column.
+	 *
+	 * @on-after resetFilter
 	 */
 	public function testPageAdministrationMediaTypes_TableSorting() {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
@@ -165,7 +168,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 		$this->assertEquals('Media type disabled', $message->getTitle());
 		// Check result in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_DISABLED.
-				' AND description='.CTestArrayHelper::escape($media_name)
+				' AND description='.CDBHelper::escape($media_name)
 		));
 
 		// Enable media type.
@@ -176,7 +179,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 		$this->assertEquals('Media type enabled', $message->getTitle());
 		// Check result in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_ACTIVE.
-				' AND description='.CTestArrayHelper::escape($media_name)
+				' AND description='.CDBHelper::escape($media_name)
 		));
 	}
 
@@ -221,10 +224,13 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->selectTableRows(CTestArrayHelper::get($data, 'rows', []));
 
+		// Check number of all selected media types.
 		if (array_key_exists('select_all', $data)) {
-			// Check number of all selected media types.
 			$this->assertEquals(CDBHelper::getCount('SELECT NULL FROM media_type').' selected',
 					$this->query('id:selected_count')->one()->getText());
+		}
+		else {
+			$this->assertEquals(count($data['rows']).' selected', $this->query('id:selected_count')->one()->getText());
 		}
 
 		$this->query('button:Disable')->one()->click();
@@ -245,7 +251,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 				'SELECT NULL'.
 				' FROM media_type'.
 				' WHERE status='.MEDIA_TYPE_STATUS_DISABLED.
-					' AND description IN ('.CTestArrayHelper::escape($data['db_description']).')'
+					' AND description IN ('.CDBHelper::escape($data['db_description']).')'
 			));
 		}
 		else {
@@ -267,6 +273,9 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 			$this->assertEquals(CDBHelper::getCount('SELECT NULL FROM media_type').' selected',
 					$this->query('id:selected_count')->one()->getText());
 		}
+		else {
+			$this->assertEquals(count($data['rows']).' selected', $this->query('id:selected_count')->one()->getText());
+		}
 
 		$this->query('button:Enable')->one()->click();
 		$this->page->acceptAlert();
@@ -286,7 +295,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 				'SELECT NULL'.
 				' FROM media_type'.
 				' WHERE status='.MEDIA_TYPE_STATUS_ACTIVE.
-					' AND description IN ('.CTestArrayHelper::escape($data['db_description']).')'
+					' AND description IN ('.CDBHelper::escape($data['db_description']).')'
 			));
 		}
 		else {
@@ -319,8 +328,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 				? 'Cannot delete media type'
 				: 'Cannot delete media types';
 			$this->assertEquals($message_text, $message->getTitle());
-			$this->assertContains('Media types used by action "'.$data['used_by_action'].'"',
-					$message->query('xpath:./div[@class="msg-details"]/ul/li')->one()->getText());
+			$this->assertTrue($message->hasLine('Media types used by action "'.$data['used_by_action']));
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
 		else {
@@ -329,7 +337,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 			$this->assertEquals(0, CDBHelper::getCount(
 				'SELECT NULL'.
 				' FROM media_type'.
-				' WHERE description IN ('.CTestArrayHelper::escape($data['db_description']).')'
+				' WHERE description IN ('.CDBHelper::escape($data['db_description']).')'
 			));
 		}
 	}
