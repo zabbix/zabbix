@@ -46,7 +46,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 
 		if ($fields['itemids']) {
 			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 				'selectHosts' => ['name'],
 				'itemids' => $fields['itemids'],
 				'webitems' => true,
@@ -62,7 +62,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 
 			if ($items && $fields['dynamic'] && $dynamic_hostid) {
 				$items = API::Item()->get([
-					'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+					'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 					'selectHosts' => ['name'],
 					'filter' => [
 						'hostid' => $dynamic_hostid,
@@ -78,35 +78,21 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			$error = _('No permissions to referred object or it does not exist!');
 		}
 		else {
+			// macros
 			$items = CMacrosResolverHelper::resolveItemNames($items);
+
 			$histories = Manager::History()->getLastValues($items, $fields['show_lines']);
 
 			if ($histories) {
 				$histories = call_user_func_array('array_merge', $histories);
 
-				foreach ($histories as &$history) {
-					switch ($items[$history['itemid']]['value_type']) {
-						case ITEM_VALUE_TYPE_FLOAT:
-							sscanf($history['value'], '%f', $history['value']);
-							break;
-						case ITEM_VALUE_TYPE_TEXT:
-						case ITEM_VALUE_TYPE_STR:
-						case ITEM_VALUE_TYPE_LOG:
-							if ($fields['show_as_html']) {
-								$history['value'] = new CJsScript($history['value']);
-							}
-							break;
-					}
-
-					if ($items[$history['itemid']]['valuemapid'] != 0) {
-						$history['value'] = applyValueMap($history['value'], $items[$history['itemid']]['valuemapid']);
-					}
-
-					if (!$fields['show_as_html']) {
+				if (!$fields['show_as_html']) {
+					foreach ($histories as &$history) {
+						$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], false);
 						$history['value'] = new CPre($history['value']);
 					}
+					unset($history);
 				}
-				unset($history);
 			}
 
 			CArrayHelper::sort($histories, [

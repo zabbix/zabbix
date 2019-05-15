@@ -65,6 +65,7 @@ class CMapHelper {
 				'height' => 150,
 				'backgroundid' => null,
 				'severity_min' => 0,
+				'show_unack' => EXTACK_OPTION_ALL,
 				'label_location' => MAP_LABEL_LOC_BOTTOM,
 				'selements' => [],
 				'links' => [],
@@ -120,10 +121,6 @@ class CMapHelper {
 	 * @param array $theme                    Theme used to create missing elements (like hostgroup frame).
 	 */
 	protected static function resolveMapState(array &$sysmap, array $options, array $theme) {
-		$map_info_options = [
-			'severity_min' => array_key_exists('severity_min', $options) ? $options['severity_min'] : null
-		];
-
 		foreach ($sysmap['selements'] as &$selement) {
 			$selement['selementid_orig'] = $selement['selementid'];
 			$selement['elementtype_orig'] = $selement['elementtype'];
@@ -138,7 +135,7 @@ class CMapHelper {
 		unset($selement);
 
 		$areas = populateFromMapAreas($sysmap, $theme);
-		$map_info = getSelementsInfo($sysmap, $map_info_options);
+		$map_info = getSelementsInfo($sysmap, ['severity_min' => $options['severity_min']]);
 		processAreasCoordinates($sysmap, $areas, $map_info);
 		// Adding element names and removing inaccessible triggers from readable elements.
 		addElementNames($sysmap['selements']);
@@ -273,8 +270,7 @@ class CMapHelper {
 				$color = $link['color'];
 				$linktriggers = $link['linktriggers'];
 				order_result($linktriggers, 'triggerid');
-				$max_severity = 0;
-				$triggers = [];
+				$max_severity = $options['severity_min'];
 
 				foreach ($linktriggers as $link_trigger) {
 					if ($link_trigger['triggerid'] == 0
@@ -282,16 +278,14 @@ class CMapHelper {
 						continue;
 					}
 
-					$id = $link_trigger['linktriggerid'];
+					$trigger = zbx_array_merge($link_trigger, $linktrigger_info[$link_trigger['triggerid']]);
 
-					$triggers[$id] = zbx_array_merge($link_trigger, $linktrigger_info[$link_trigger['triggerid']]);
-
-					if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED
-							&& $triggers[$id]['value'] == TRIGGER_VALUE_TRUE
-							&& $triggers[$id]['priority'] >= $max_severity) {
-						$drawtype = $triggers[$id]['drawtype'];
-						$color = $triggers[$id]['color'];
-						$max_severity = $triggers[$id]['priority'];
+					if ($trigger['status'] == TRIGGER_STATUS_ENABLED
+							&& $trigger['value'] == TRIGGER_VALUE_TRUE
+							&& $trigger['priority'] >= $max_severity) {
+						$drawtype = $trigger['drawtype'];
+						$color = $trigger['color'];
+						$max_severity = $trigger['priority'];
 					}
 				}
 
