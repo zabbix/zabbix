@@ -656,6 +656,7 @@ class CAction extends CApiService {
 		// Insert actions into db, get back array with new actionids.
 		$actions = DB::save('actions', $actions);
 		$actions = zbx_toHash($actions, 'actionid');
+		$actionIds = array_keys($actions);
 
 		$conditions_to_create = [];
 		$operations_to_create = [];
@@ -723,6 +724,15 @@ class CAction extends CApiService {
 
 		// Add operations.
 		$this->addOperations($operations_to_create);
+
+		$db_actions = $this->get([
+			'output' => ['actionid', 'name'],
+			'actionids' => $actionIds,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ACTION, $db_actions);
 
 		return ['actionids' => array_keys($actions)];
 	}
@@ -947,6 +957,7 @@ class CAction extends CApiService {
 
 		if ($actionsUpdateData) {
 			DB::update('actions', $actionsUpdateData);
+			$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, $actions, $db_actions);
 		}
 
 		// add, update and delete operations
