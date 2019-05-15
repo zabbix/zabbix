@@ -27,9 +27,26 @@
 
 #ifndef HAVE_SQLITE3
 
-/*static int	DBpatch_4030000(void)
+static int	DBpatch_4030000(void)
 {
-}*/
+	const ZBX_FIELD	field = {"host", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("autoreg_host", &field, NULL);
+}
+
+static int	DBpatch_4030001(void)
+{
+	const ZBX_FIELD	field = {"host", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("proxy_autoreg_host", &field, NULL);
+}
+
+static int	DBpatch_4030002(void)
+{
+	const ZBX_FIELD	field = {"host", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_discovery", &field, NULL);
+}
 
 #endif
 
@@ -37,6 +54,8 @@ DBPATCH_START(4030)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(4030000, 0, 1)*/
+DBPATCH_ADD(4030000, 0, 1)
+DBPATCH_ADD(4030001, 0, 1)
+DBPATCH_ADD(4030002, 0, 1)
 
 DBPATCH_END()
