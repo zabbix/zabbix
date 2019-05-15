@@ -265,6 +265,26 @@ $fields = [
 
 $valid_input = check_fields($fields);
 
+if (getRequest('post_type') == ZBX_POSTTYPE_XML) {
+	libxml_use_internal_errors(true);
+
+	if (simplexml_load_string(getRequest('posts'), null, LIBXML_IMPORT_FLAGS) === false) {
+		libxml_clear_errors();
+		info(_s('Incorrect value for "%1$s" field.', 'Request body'));
+		$valid_input = false;
+	}
+}
+
+if (getRequest('post_type') == ZBX_POSTTYPE_JSON) {
+	$json = new CJson();
+	$json->decode(getRequest('posts'));
+
+	if ($json->hasError() || trim(getRequest('posts'), " \r\n") === '') {
+		info(_s('Incorrect value for "%1$s" field.', 'Request body'));
+		$valid_input = false;
+	}
+}
+
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
