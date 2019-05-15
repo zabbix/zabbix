@@ -247,8 +247,7 @@ $itemForm->addItem([
 			'item.masscopyto' => ['name' => _('Copy')],
 			'item.massupdateform' => ['name' => _('Mass update')],
 			'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
-		],
-		$data['hostid']
+		]
 	)
 ]);
 

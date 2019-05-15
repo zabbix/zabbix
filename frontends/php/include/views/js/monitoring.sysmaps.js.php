@@ -54,7 +54,6 @@ function getFontComboBox($name) {
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Map element'))))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
-			->addClass(ZBX_STYLE_CURSOR_MOVE)
 			->setId('formDragHandler')
 			->toString()
 	?>
@@ -286,7 +285,6 @@ function getFontComboBox($name) {
 <script type="text/x-jquery-tmpl" id="mapShapeFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Map shape'))))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
-			->addClass(ZBX_STYLE_CURSOR_MOVE)
 			->setId('shapeDragHandler')
 			->toString().
 		(new CForm())
@@ -435,7 +433,6 @@ function getFontComboBox($name) {
 <script type="text/x-jquery-tmpl" id="mapMassShapeFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Mass update shapes'))))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
-			->addClass(ZBX_STYLE_CURSOR_MOVE)
 			->setId('massShapeDragHandler')
 			->toString().
 		(new CForm())
@@ -556,7 +553,6 @@ function getFontComboBox($name) {
 <script type="text/x-jquery-tmpl" id="mapMassFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Mass update elements'))))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
-			->addClass(ZBX_STYLE_CURSOR_MOVE)
 			->setId('massDragHandler')
 			->toString()
 	?>

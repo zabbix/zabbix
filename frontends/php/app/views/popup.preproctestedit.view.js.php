@@ -154,7 +154,8 @@ function processItemPreprocessingTestResults(steps) {
 function savePreprocessingTestInputs() {
 	var is_prev_enabled = <?= $data['show_prev'] ? 'true' : 'false' ?>,
 		input_values = {
-			value: jQuery('#value').multilineInput('value')
+			value: jQuery('#value').multilineInput('value'),
+			eol: jQuery('#eol').find(':checked').val()
 		},
 		macros = {};
 

@@ -40,13 +40,4 @@ class function_DBselect extends CTest {
 		$this->assertTrue(false == DBselect('select * from items', 1.5));
 		$this->assertTrue(false == DBselect('select * from items', -1));
 	}
-
-	public function test_DBselectFail() {
-		// TODO
-		$this->markTestIncomplete();
-/* Does not work this way
-		$result=DBselect('select * from users_typo');
-		$this->assertTrue($result == false);
-*/
-	}
 }
