@@ -63,8 +63,7 @@ static int	detect_url(const char *host)
 
 static int	process_url(const char *host, const char *port, const char *path, char **url, char **error)
 {
-	char	*p;
-	char	scheme[9];	/* string capable to hold "https://" (null-terminated) */
+	char	*p, *delim;
 	int	scheme_found = 0;
 
 	/* port and path parameters must be empty */
@@ -75,20 +74,17 @@ static int	process_url(const char *host, const char *port, const char *path, cha
 		return FAIL;
 	}
 
-	zbx_strlcpy(scheme, host, 9);
-	zbx_strlower(scheme);
-
 	/* allow HTTP(S) scheme only */
 #ifdef HAVE_LIBCURL
-	if (0 == strncmp(scheme, HTTP_SCHEME_STR, ZBX_CONST_STRLEN(HTTP_SCHEME_STR)) ||
-			0 == strncmp(scheme, HTTPS_SCHEME_STR, ZBX_CONST_STRLEN(HTTPS_SCHEME_STR)))
+	if (0 == zbx_strncasecmp(host, HTTP_SCHEME_STR, ZBX_CONST_STRLEN(HTTP_SCHEME_STR)) ||
+			0 == zbx_strncasecmp(host, HTTPS_SCHEME_STR, ZBX_CONST_STRLEN(HTTPS_SCHEME_STR)))
 #else
-	if (0 == strncmp(scheme, HTTP_SCHEME_STR, ZBX_CONST_STRLEN(HTTP_SCHEME_STR)))
+	if (0 == zbx_strncasecmp(host, HTTP_SCHEME_STR, ZBX_CONST_STRLEN(HTTP_SCHEME_STR)))
 #endif
 	{
 		scheme_found = 1;
 	}
-	else if (NULL != (p = strstr(host, "://")))
+	else if (NULL != (p = strstr(host, "://")) && (NULL == (delim = strpbrk(host, "/?#")) || delim > p))
 	{
 		*error = zbx_dsprintf(*error, "Unsupported scheme: %.*s.", (int)(p - host), host);
 		return FAIL;
@@ -98,13 +94,6 @@ static int	process_url(const char *host, const char *port, const char *path, cha
 		*url = zbx_dsprintf(*url, "%s%.*s", (0 == scheme_found ? HTTP_SCHEME_STR : ""), (int)(p - host), host);
 	else
 		*url = zbx_dsprintf(*url, "%s%s", (0 == scheme_found ? HTTP_SCHEME_STR : ""), host);
-
-	if (SUCCEED != zbx_http_punycode_encode_url(url))
-	{
-		*error = zbx_strdup(*error, "Cannot encode domain name into punycode.");
-		zbx_free(*url);
-		return FAIL;
-	}
 
 	return SUCCEED;
 }
@@ -240,27 +229,34 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 			url = zbx_strdcat(url, path + ('/' == *path ? 1 : 0));
 	}
 
+	if (SUCCEED != zbx_http_punycode_encode_url(&url))
+	{
+		*error = zbx_strdup(*error, "Cannot encode domain name into punycode.");
+		ret = SYSINFO_RET_FAIL;
+		goto out;
+	}
+
 	ret = curl_page_get(url, buffer, error);
+out:
 	zbx_free(url);
 
 	return ret;
 }
 #else
-static char	*find_port_sep(char *host)
+static char	*find_port_sep(char *host, size_t len)
 {
-	char	*p;
 	int	in_ipv6 = 0;
 
-	for (p = host; '\0' != *p && '/' != *p; p++)
+	for (; 0 < len--; host++)
 	{
 		if (0 == in_ipv6)
 		{
-			if (':' == *p)
-				return p;
-			else if ('[' == *p)
+			if (':' == *host)
+				return host;
+			else if ('[' == *host)
 				in_ipv6 = 1;
 		}
-		else if (']' == *p)
+		else if (']' == *host)
 			in_ipv6 = 0;
 	}
 
@@ -269,7 +265,7 @@ static char	*find_port_sep(char *host)
 
 static int	get_http_page(const char *host, const char *path, const char *port, char **buffer, char **error)
 {
-	char		*url = NULL, *hostname = NULL, *path_loc = NULL, *p_host;
+	char		*url = NULL, *hostname = NULL, *path_loc = NULL;
 	int		ret = SYSINFO_RET_OK, ipv6_host_found = 0;
 	unsigned short	port_num;
 	zbx_socket_t	s;
@@ -281,33 +277,43 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 	{
 		/* URL detected */
 
-		char	*p;
+		char	*p, *p_host, *au_end;
+		size_t	authority_len;
 
 		if (SUCCEED != process_url(host, port, path, &url, error))
 			return SYSINFO_RET_FAIL;
 
-		if (NULL != (p = strchr(url, '@')))
+		p_host = url + ZBX_CONST_STRLEN(HTTP_SCHEME_STR);
+
+		if (0 == (authority_len = strcspn(p_host, "/?")))
 		{
-			*error = zbx_dsprintf(*error, "Unsupported URL format: %s.", url);
+			*error = zbx_dsprintf(*error, "Invalid or missing host in URL.");
 			ret = SYSINFO_RET_FAIL;
 			goto out;
 		}
 
-		p_host = url + ZBX_CONST_STRLEN(HTTP_SCHEME_STR);
-
-		if (NULL != (p = find_port_sep(p_host)))
+		if (NULL != memchr(p_host, '@', authority_len))
 		{
-			if ('\0' != *(++p))
-			{
-				char	*port_str;
-				size_t	len = 0, offset = 0;
+			*error = zbx_strdup(*error, "Unsupported URL format.");
+			ret = SYSINFO_RET_FAIL;
+			goto out;
+		}
 
-				zbx_strsplit(p, '/', &port_str, &path_loc);
+		au_end = &p_host[authority_len - 1];
+
+		if (NULL != (p = find_port_sep(p_host, authority_len)))
+		{
+			char	*port_str;
+			int	port_len = (int)(au_end - p);
+
+			if (0 < port_len)
+			{
+				port_str = zbx_dsprintf(NULL, "%.*s", port_len, p + 1);
 
 				if (SUCCEED != is_ushort(port_str, &port_num))
 					ret = SYSINFO_RET_FAIL;
 				else
-					zbx_strncpy_alloc(&hostname, &len, &offset, p_host, (size_t)(p - p_host - 1));
+					hostname = zbx_dsprintf(hostname, "%.*s", (int)(p - p_host), p_host);
 
 				zbx_free(port_str);
 			}
@@ -317,17 +323,13 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		else
 		{
 			port_num = ZBX_DEFAULT_HTTP_PORT;
-			zbx_strsplit(p_host, '/', &hostname, &path_loc);
+			hostname = zbx_dsprintf(hostname, "%.*s", (int)(au_end - p_host + 1), p_host);
 		}
 
 		if (SYSINFO_RET_OK != ret)
 		{
 			*error = zbx_dsprintf(*error, "URL using bad/illegal format.");
 			goto out;
-		}
-		else if (NULL == path_loc)
-		{
-			path_loc = zbx_strdup(path_loc, "/");
 		}
 
 		if ('[' == *hostname)
@@ -337,13 +339,15 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 
 			if ('\0' == *hostname)
 			{
-				*error = zbx_dsprintf(*error, "Invalid host in URL.");
+				*error = zbx_dsprintf(*error, "Invalid or missing host in URL.");
 				ret = SYSINFO_RET_FAIL;
 				goto out;
 			}
 
 			ipv6_host_found = 1;
 		}
+
+		path_loc = zbx_strdup(path_loc, '\0' != p_host[authority_len] ? &p_host[authority_len] : "/");
 	}
 	else
 	{
@@ -361,13 +365,21 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		}
 
 		path_loc = zbx_strdup(path_loc, (NULL != path ? path : "/"));
+		hostname = zbx_strdup(hostname, host);
 
-		if (NULL != strchr(host, ':'))
+		if (NULL != strchr(hostname, ':'))
 			ipv6_host_found = 1;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, (hostname != NULL ? hostname : host), port_num,
-			CONFIG_TIMEOUT, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+	if (SUCCEED != zbx_http_punycode_encode_url(&hostname))
+	{
+		*error = zbx_strdup(*error, "Cannot encode domain name into punycode.");
+		ret = SYSINFO_RET_FAIL;
+		goto out;
+	}
+
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, hostname, port_num, CONFIG_TIMEOUT,
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		char	*request = NULL;
 
@@ -376,8 +388,8 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 				"Host: %s%s%s\r\n"
 				"Connection: close\r\n"
 				"\r\n",
-				('/' != *path_loc ? "/" : ""), path_loc, (1 == ipv6_host_found ? "[" : ""),
-				(hostname != NULL ? hostname : host), (1 == ipv6_host_found ? "]" : ""));
+				('/' != *path_loc ? "/" : ""), path_loc, (1 == ipv6_host_found ? "[" : ""), hostname,
+				(1 == ipv6_host_found ? "]" : ""));
 
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{
