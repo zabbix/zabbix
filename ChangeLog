@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+A......... [ZBX-13029] fixed api validation messages for linktrigger (vasilijs)
 ...G...... [ZBX-15967] fixed buffer offset for reading hardware info from long DMI files (viktors)
 ..F....... [ZBX-16018] fixed detection of logical functions (or / and) inside the context of user macros (averza)
 ..F....... [ZBX-14782] deliver human friendly uptime in dashbord (talbergs)
@@ -35,7 +36,6 @@ Changes for 4.0.7
 Changes for 4.0.7rc1
 
 Bug fixes:
-A......... [ZBX-13029] fixed api validation messages for linktrigger (vasilijs)
 ........S. [ZBX-16019] fixed HOST.CONN, HOST.IP, IPADDRESS and HOST.DNS macros expansion in global scripts (akozlovs)
 ........S. [ZBX-16020] fixed uncontrolled memory allocation in regex preprocessing steps (vjaceslavs)
 ..F....... [ZBX-15911] fixed guest sign in visibility for disabled guest user group in login page (gcalenko)
