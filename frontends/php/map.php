@@ -38,7 +38,7 @@ if (hasRequest('uniqueid')) {
 	// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
 	foreach ($map_data['elements'] as &$element) {
 		$actions = CJs::decodeJson($element['actions']);
-		$actions['data']['widget_uniqueid'] = $uniqueid;
+		$actions['data']['widget_uniqueid'] = getRequest('uniqueid');
 		$element['actions'] = CJs::encodeJson($actions);
 	}
 	unset($element);
