@@ -3877,11 +3877,20 @@ $form-icon-btn: (
 			width: 100%;
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
-			margin: 0 0 10px 0;
+			margin: 0 -10px 10px -10px;
+			padding: 0 10px;
 			@extend %webkit-scrollbar;
 
 			.table-forms .table-forms-td-right {
-				padding-right: 18px;
+				padding-right: 8px;
+			}
+
+			.columns-wrapper {
+				flex-wrap: nowrap;
+
+				.column-50:last-of-type {
+					margin-left: 10px;
+				}
 			}
 		}
 		.overlay-dialogue-controls {
