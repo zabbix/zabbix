@@ -188,7 +188,7 @@ class CPage {
 			if (!$this->driver->executeScript('return !!window.chrome;')) {
 				throw new Exception();
 			}
-		}catch (Exception $exception) {
+		} catch (Exception $exception) {
 			return $this->driver->takeScreenshot();
 		}
 
@@ -205,7 +205,7 @@ class CPage {
 					]
 				]);
 			}
-		}catch (Exception $exception) {
+		} catch (Exception $exception) {
 			// Code is not missing here.
 		}
 
