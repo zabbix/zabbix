@@ -16,6 +16,7 @@ New features:
 
 Bug fixes:
 A......... [ZBX-13029] fixed api validation messages for linktrigger (vasilijs)
+...G...... [ZBX-15967] fixed buffer offset for reading hardware info from long DMI files (viktors)
 ..F....... [ZBX-16018] fixed detection of logical functions (or / and) inside the context of user macros (averza)
 ..F....... [ZBX-14782] deliver human friendly uptime in dashbord (talbergs)
 ..F....... [ZBX-11325] fixed transparency of draggable interfaces; changed cursor type for all draggable and sortable elements (agriscenko)
@@ -386,6 +387,7 @@ New features:
 
 Bug fixes:
 A......... [ZBX-13029] fixed api validation messages for linktrigger (vasilijs)
+...G...... [ZBX-15967] fixed buffer offset for reading hardware info from long DMI files (viktors)
 ..F....... [ZBX-16018] fixed detection of logical functions (or / and) inside the context of user macros (averza)
 ..F....... [ZBX-14782] deliver human friendly uptime in dashbord (talbergs)
 ..F....... [ZBX-11325] fixed transparency of draggable interfaces; changed cursor type for all draggable and sortable elements (agriscenko)
