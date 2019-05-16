@@ -150,6 +150,16 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 			case HTTPTEST_AUTH_NTLM:
 				curlauth = CURLAUTH_NTLM;
 				break;
+			case HTTPTEST_AUTH_NEGOTIATE:
+#if LIBCURL_VERSION_NUM >= 0x072600
+				curlauth = CURLAUTH_NEGOTIATE;
+				break;
+#else
+				*error = zbx_dsprintf(*error, "Cannot use CURLAUTH_NEGOTIATE authentication method with"
+						"%s version of cURL library, use 7.38.0 or higher",
+						curl_version_info(0)->version);
+				return FAIL;
+#endif
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				break;
