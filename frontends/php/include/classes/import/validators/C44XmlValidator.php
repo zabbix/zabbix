@@ -186,7 +186,36 @@ class C44XmlValidator {
 							'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
 							'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
 							'verify_peer' =>			['type' => XML_STRING | XML_REQUIRED],
-							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED]
+							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED],
+							'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
+								'trigger' =>				['type' => XML_ARRAY, 'rules' => [
+									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+									'recovery_mode' =>			['type' => XML_STRING | XML_REQUIRED],
+									'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED],
+									'correlation_mode' =>		['type' => XML_STRING | XML_REQUIRED],
+									'correlation_tag' =>		['type' => XML_STRING | XML_REQUIRED],
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'url' =>					['type' => XML_STRING | XML_REQUIRED],
+									'status' =>					['type' => XML_STRING | XML_REQUIRED],
+									'priority' =>				['type' => XML_STRING | XML_REQUIRED],
+									'description' =>			['type' => XML_STRING | XML_REQUIRED],
+									'type' =>					['type' => XML_STRING | XML_REQUIRED],
+									'manual_close' =>			['type' => XML_STRING | XML_REQUIRED],
+									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]]
+								]]
+							]]
 						]]
 					]],
 					'discovery_rules' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
@@ -316,7 +345,36 @@ class C44XmlValidator {
 									'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
 									'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
 									'verify_peer' =>			['type' => XML_STRING | XML_REQUIRED],
-									'verify_host' =>			['type' => XML_STRING | XML_REQUIRED]
+									'verify_host' =>			['type' => XML_STRING | XML_REQUIRED],
+									'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
+										'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'recovery_mode' =>			['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED],
+											'correlation_mode' =>		['type' => XML_STRING | XML_REQUIRED],
+											'correlation_tag' =>		['type' => XML_STRING | XML_REQUIRED],
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'url' =>					['type' => XML_STRING | XML_REQUIRED],
+											'status' =>					['type' => XML_STRING | XML_REQUIRED],
+											'priority' =>				['type' => XML_STRING | XML_REQUIRED],
+											'description' =>			['type' => XML_STRING | XML_REQUIRED],
+											'type' =>					['type' => XML_STRING | XML_REQUIRED],
+											'manual_close' =>			['type' => XML_STRING | XML_REQUIRED],
+											'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+												'dependency' =>				['type' => XML_ARRAY, 'rules' => [
+													'name' =>					['type' => XML_STRING | XML_REQUIRED],
+													'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+													'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
+												]]
+											]],
+											'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+												'tag' =>					['type' => XML_ARRAY, 'rules' => [
+													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+													'value' =>					['type' => XML_STRING | XML_REQUIRED]
+												]]
+											]]
+										]]
+									]]
 								]]
 							]],
 							'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'trigger_prototype', 'rules' => [
@@ -708,7 +766,36 @@ class C44XmlValidator {
 							'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
 							'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
 							'verify_peer' =>			['type' => XML_STRING | XML_REQUIRED],
-							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED]
+							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED],
+							'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
+								'trigger' =>				['type' => XML_ARRAY, 'rules' => [
+									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+									'recovery_mode' =>			['type' => XML_STRING | XML_REQUIRED],
+									'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED],
+									'correlation_mode' =>		['type' => XML_STRING | XML_REQUIRED],
+									'correlation_tag' =>		['type' => XML_STRING | XML_REQUIRED],
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'url' =>					['type' => XML_STRING | XML_REQUIRED],
+									'status' =>					['type' => XML_STRING | XML_REQUIRED],
+									'priority' =>				['type' => XML_STRING | XML_REQUIRED],
+									'description' =>			['type' => XML_STRING | XML_REQUIRED],
+									'type' =>					['type' => XML_STRING | XML_REQUIRED],
+									'manual_close' =>			['type' => XML_STRING | XML_REQUIRED],
+									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]]
+								]]
+							]]
 						]]
 					]],
 					'discovery_rules' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
@@ -836,7 +923,36 @@ class C44XmlValidator {
 									'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
 									'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
 									'verify_peer' =>			['type' => XML_STRING | XML_REQUIRED],
-									'verify_host' =>			['type' => XML_STRING | XML_REQUIRED]
+									'verify_host' =>			['type' => XML_STRING | XML_REQUIRED],
+									'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
+										'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'recovery_mode' =>			['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED],
+											'correlation_mode' =>		['type' => XML_STRING | XML_REQUIRED],
+											'correlation_tag' =>		['type' => XML_STRING | XML_REQUIRED],
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'url' =>					['type' => XML_STRING | XML_REQUIRED],
+											'status' =>					['type' => XML_STRING | XML_REQUIRED],
+											'priority' =>				['type' => XML_STRING | XML_REQUIRED],
+											'description' =>			['type' => XML_STRING | XML_REQUIRED],
+											'type' =>					['type' => XML_STRING | XML_REQUIRED],
+											'manual_close' =>			['type' => XML_STRING | XML_REQUIRED],
+											'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+												'dependency' =>				['type' => XML_ARRAY, 'rules' => [
+													'name' =>					['type' => XML_STRING | XML_REQUIRED],
+													'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+													'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
+												]]
+											]],
+											'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+												'tag' =>					['type' => XML_ARRAY, 'rules' => [
+													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+													'value' =>					['type' => XML_STRING | XML_REQUIRED]
+												]]
+											]]
+										]]
+									]]
 								]]
 							]],
 							'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'trigger_prototype', 'rules' => [

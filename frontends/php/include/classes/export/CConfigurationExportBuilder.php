@@ -56,8 +56,9 @@ class CConfigurationExportBuilder {
 	 * Format templates.
 	 *
 	 * @param array $templates
+	 * @param array $simple_triggers
 	 */
-	public function buildTemplates(array $templates) {
+	public function buildTemplates(array $templates, array $simple_triggers) {
 		$this->data['templates'] = [];
 
 		CArrayHelper::sort($templates, ['host']);
@@ -69,7 +70,7 @@ class CConfigurationExportBuilder {
 				'description' => $template['description'],
 				'groups' => $this->formatGroups($template['groups']),
 				'applications' => $this->formatApplications($template['applications']),
-				'items' => $this->formatItems($template['items']),
+				'items' => $this->formatItems($template['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
 				'httptests' => $this->formatHttpTests($template['httptests']),
 				'macros' => $this->formatMacros($template['macros']),
@@ -83,9 +84,10 @@ class CConfigurationExportBuilder {
 	/**
 	 * Format hosts.
 	 *
-	 * @param $hosts
+	 * @param array $hosts
+	 * @param array $simple_triggers
 	 */
-	public function buildHosts(array $hosts) {
+	public function buildHosts(array $hosts, array $simple_triggers) {
 		$this->data['hosts'] = [];
 
 		CArrayHelper::sort($hosts, ['host']);
@@ -113,7 +115,7 @@ class CConfigurationExportBuilder {
 				'groups' => $this->formatGroups($host['groups']),
 				'interfaces' => $this->formatHostInterfaces($host['interfaces']),
 				'applications' => $this->formatApplications($host['applications']),
-				'items' => $this->formatItems($host['items']),
+				'items' => $this->formatItems($host['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
 				'httptests' => $this->formatHttpTests($host['httptests']),
 				'macros' => $this->formatMacros($host['macros']),
@@ -316,7 +318,16 @@ class CConfigurationExportBuilder {
 
 		CArrayHelper::sort($discoveryRules, ['key_']);
 
+		$simple_trigger_prototypes = [];
+
 		foreach ($discoveryRules as $discoveryRule) {
+			foreach ($discoveryRule['triggerPrototypes'] as $idx => $trigger_prototype) {
+				if (count($trigger_prototype['items']) === 1) {
+					$simple_trigger_prototypes[] = $trigger_prototype;
+					unset($discoveryRule['triggerPrototypes'][$idx]);
+				}
+			}
+
 			$data = [
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
@@ -344,7 +355,7 @@ class CConfigurationExportBuilder {
 				'filter' => $discoveryRule['filter'],
 				'lifetime' => $discoveryRule['lifetime'],
 				'description' => $discoveryRule['description'],
-				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes']),
+				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes'], $simple_trigger_prototypes),
 				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),
 				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes']),
 				'host_prototypes' => $this->formatHostPrototypes($discoveryRule['hostPrototypes']),
@@ -702,10 +713,11 @@ class CConfigurationExportBuilder {
 	 * Format items.
 	 *
 	 * @param array $items
+	 * @param array $simple_triggers
 	 *
 	 * @return array
 	 */
-	protected function formatItems(array $items) {
+	protected function formatItems(array $items, array $simple_triggers) {
 		$result = [];
 
 		CArrayHelper::sort($items, ['key_']);
@@ -799,6 +811,26 @@ class CConfigurationExportBuilder {
 				}
 
 				$data['headers'] = $headers;
+			}
+
+			if ($simple_triggers) {
+				$triggers = [];
+				$prefix = $item['host'].':'.$item['key_'].'.';
+
+				foreach ($simple_triggers as $simple_trigger) {
+					if (bccomp($item['itemid'], $simple_trigger['items'][0]['itemid']) == 0) {
+						$simple_trigger['expression'] = str_replace($prefix, '', $simple_trigger['expression']);
+						$simple_trigger['recovery_expression'] = str_replace($prefix, '',
+							$simple_trigger['recovery_expression']
+						);
+						$triggers[] = $simple_trigger;
+					}
+				}
+
+				if ($triggers) {
+					$key = array_key_exists('discoveryRule', $item) ? 'trigger_prototypes' : 'triggers';
+					$data[$key] = $this->formatTriggers($triggers);
+				}
 			}
 
 			$result[] = $data;
