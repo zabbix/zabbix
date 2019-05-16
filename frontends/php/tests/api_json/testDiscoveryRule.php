@@ -2466,7 +2466,7 @@ class testDiscoveryRule extends CAPITest {
 						'i.snmpv3_privprotocol,i.snmpv3_contextname,i.jmx_endpoint,i.url,i.query_fields,i.timeout,'.
 						'i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,'.
 						'i.request_method,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,i.verify_peer,'.
-						'i.verify_host,i.allow_traps,i.master_itemid'.
+						'i.verify_host,i.allow_traps'.
 				' FROM items i'.
 				' WHERE '.dbConditionId('i.itemid', $params['discoveryids'])
 			);

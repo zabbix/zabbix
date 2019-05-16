@@ -1,6 +1,7 @@
 Changes for 4.4.0alpha1
 
 New features:
+....I..PS. [ZBXNEXT-5211] increased the maximum Hosts name character length from 64 to 128 for autoregistration and LLD (akozlovs)
 ...G...... [ZBXNEXT-1302] added low-level discovery of block devices (asestakovs)
 ..F....... [ZBX-10574] automated documentation link update upon release of new major version (vasilijs)
 
@@ -14,6 +15,20 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+........S. [ZBX-15891] fixed trigger dependencies are ignored when changing only trigger state (akozlovs)
+A......... [ZBX-13029] fixed api validation messages for linktrigger (vasilijs)
+...G...... [ZBX-15967] fixed buffer offset for reading hardware info from long DMI files (viktors)
+..F....... [ZBX-16018] fixed detection of logical functions (or / and) inside the context of user macros (averza)
+..F....... [ZBX-14782] deliver human friendly uptime in dashbord (talbergs)
+..F....... [ZBX-11325] fixed transparency of draggable interfaces; changed cursor type for all draggable and sortable elements (agriscenko)
+..F....... [ZBX-16048] fixed global search box loosing the search phrase after searching (averza)
+..F....... [ZBX-15101] fixed several object IDs allowing them to be 64 bit integers, added asterisk for map navigation tree name field and changed the error message to more generic one (Ivo)
+..F....... [ZBX-15933] added state preservation eol (vasilijs)
+..F....... [ZBX-10729] fixed map element link coloring when linked problem is acknowledged (miks)
+.......PS. [ZBX-16050] fixed HTTP poller crashes (asestakovs)
+..F....... [ZBX-16007] fixed trigger list checkboxes when filtering by single host (talbergs)
+..F....... [ZBX-15871] fixed problem events to be filtered by "suppressed" instead of "related to maintenance" (talbergs)
+..F....... [ZBX-16011] made "Test all steps" button be available only when at least 2 preprocessing steps are created (miks)
 ...G...PS. [ZBX-10550] added warnings when Zabbix components have different versions (akozlovs)
 ..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
 ..F....... [ZBX-11429] fixed macro not being retained in trigger expression editing wizard (agriscenko)
@@ -372,6 +387,17 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+........S. [ZBX-15891] fixed trigger dependencies are ignored when changing only trigger state (akozlovs)
+A......... [ZBX-13029] fixed api validation messages for linktrigger (vasilijs)
+...G...... [ZBX-15967] fixed buffer offset for reading hardware info from long DMI files (viktors)
+..F....... [ZBX-16018] fixed detection of logical functions (or / and) inside the context of user macros (averza)
+..F....... [ZBX-14782] deliver human friendly uptime in dashbord (talbergs)
+..F....... [ZBX-11325] fixed transparency of draggable interfaces; changed cursor type for all draggable and sortable elements (agriscenko)
+..F....... [ZBX-16048] fixed global search box loosing the search phrase after searching (averza)
+..F....... [ZBX-10729] fixed map element link coloring when linked problem is acknowledged (miks)
+..F....... [ZBX-15101] fixed several object IDs allowing them to be 64 bit integers, added asterisk for map navigation tree name field and changed the error message to more generic one (Ivo)
+.......PS. [ZBX-16050] fixed HTTP poller crashes (asestakovs)
+..F....... [ZBX-15871] fixed problem events to be filtered by "suppressed" instead of "related to maintenance" (talbergs)
 ...G...PS. [ZBX-10550] added warnings when Zabbix components have different versions (akozlovs)
 ..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
 ..F....... [ZBX-11429] fixed macro not being retained in trigger expression editing wizard (agriscenko)

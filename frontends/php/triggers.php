@@ -177,7 +177,7 @@ if ($triggerIds) {
 	]);
 
 	if (count($triggers) != count($triggerIds)) {
-		uncheckTableRows(getRequest('hostid'), zbx_objectValues($triggers, 'triggerid'));
+		uncheckTableRows(null, zbx_objectValues($triggers, 'triggerid'));
 	}
 }
 
@@ -396,7 +396,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if ($result) {
 		unset($_REQUEST['form']);
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows();
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
@@ -404,7 +404,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows();
 	}
 	show_messages($result, _('Trigger deleted'), _('Cannot delete trigger'));
 }
@@ -507,7 +507,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['g_triggerid']);
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows();
 	}
 	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 }
@@ -546,7 +546,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 		: _n('Cannot disable trigger', 'Cannot disable triggers', $updated);
 
 	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows();
 		unset($_REQUEST['g_triggerid']);
 	}
 
@@ -585,7 +585,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' &&
 		$triggers_count = count(getRequest('g_triggerid'));
 
 		if ($result) {
-			uncheckTableRows(getRequest('hostid'));
+			uncheckTableRows();
 			unset($_REQUEST['g_triggerid']);
 		}
 
@@ -602,7 +602,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' &&
 	$result = API::Trigger()->delete(getRequest('g_triggerid'));
 
 	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows();
 	}
 
 	show_messages($result, _('Triggers deleted'), _('Cannot delete triggers'));

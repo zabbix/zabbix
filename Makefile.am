@@ -121,14 +121,16 @@ WRAP_FS_FUNCS = \
 	-Wl,--wrap=opendir \
 	-Wl,--wrap=readdir \
 	-Wl,--wrap=stat \
-	-Wl,--wrap=__xstat
+	-Wl,--wrap=__xstat \
+	-Wl,--wrap=__fxstat
 
 WRAP_EXIT = \
 	-Wl,--wrap=exit
 
 WRAP_COMM_FUNCS = \
 	-Wl,--wrap=read \
-	-Wl,--wrap=connect
+	-Wl,--wrap=connect \
+	-Wl,--wrap=open
 
 WRAP_LOG = \
 	-Wl,--wrap=__zbx_zabbix_log

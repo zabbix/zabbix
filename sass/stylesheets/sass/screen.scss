@@ -3069,6 +3069,21 @@ $form-icon-btn: (
 	@extend %button-icon-size;
 }
 
+.drag-icon,
+.ui-draggable .dashbrd-widget-head,
+.ui-draggable .dashbrd-grid-widget-head {
+	@extend %cursor-drag;
+}
+
+.ui-draggable-dragging {
+
+	.drag-icon,
+	.dashbrd-widget-head,
+	.dashbrd-grid-widget-head {
+		@extend %cursor-dragging;
+	}
+}
+
 .icon-info {
 	position: relative;
 	width: 8px;
@@ -5662,6 +5677,20 @@ $browser-logos: (
 	@extend %webkit-scrollbar;
 }
 
+%cursor-drag {
+	cursor: move; /* fallback if grab cursor is unsupported */
+	cursor: grab;
+}
+
+%cursor-dragging {
+	cursor: move; /* fallback if grabbing cursor is unsupported */
+	cursor: grabbing;
+}
+
+.cursor-dragging {
+	@extend %cursor-dragging;
+}
+
 .cursor-move {
 	cursor: move;
 }
@@ -6324,7 +6353,6 @@ ul.checkbox-list {
 
 					> .drag-icon {
 						min-width: 24px;
-						cursor: move;
 					}
 
 					> .item-name {

@@ -109,6 +109,7 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 			'title' => _('Test item preprocessing'),
 			'steps' => $preprocessing_steps,
 			'value' => array_key_exists('value', $data) ? $data['value'] : '',
+			'eol' => array_key_exists('eol', $data) ? (int) $data['eol'] : ZBX_EOL_LF,
 			'prev_value' => ($show_prev && array_key_exists('prev_value', $data)) ? $data['prev_value'] : '',
 			'macros' => $usermacros['macros'],
 			'show_prev' => $show_prev,

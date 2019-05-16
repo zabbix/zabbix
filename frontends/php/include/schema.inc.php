@@ -5242,7 +5242,7 @@ return [
 			'host' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 128,
 				'default' => '',
 			],
 			'listen_ip' => [
@@ -5288,7 +5288,7 @@ return [
 			'host' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 128,
 				'default' => '',
 			],
 			'listen_ip' => [
@@ -6078,7 +6078,7 @@ return [
 			'host' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 128,
 				'default' => '',
 			],
 			'lastcheck' => [

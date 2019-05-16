@@ -81,18 +81,15 @@ class CUiWidget extends CDiv {
 	 *
 	 * @param string $caption
 	 * @param array  $controls
-	 * @param bool   $cursor_move
+	 *
+	 * @return $this
 	 */
-	public function setHeader($caption, array $controls = [], $cursor_move = false) {
+	public function setHeader($caption, array $controls = []) {
 		$this->header = (new CDiv())
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
 			->addItem(
 				(new CTag('h4', true, $caption))->setId($this->id.'_header')
 			);
-
-		if ($cursor_move) {
-			$this->header->addClass(ZBX_STYLE_CURSOR_MOVE);
-		}
 
 		if ($controls) {
 			$this->header->addItem(new CList($controls));

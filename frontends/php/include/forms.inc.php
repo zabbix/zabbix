@@ -354,7 +354,7 @@ function getItemFilterForm(&$items) {
 			ITEM_VALUE_TYPE_LOG => _('Log'),
 			ITEM_VALUE_TYPE_TEXT => _('Text')
 		])
-	);;
+	);
 	$filterColumn4->addRow(_('State'),
 		new CComboBox('filter_state', $filter_state, null, [
 			-1 => _('all'),
@@ -1627,7 +1627,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			(new CDiv(
 				(new CButton('preproc_test_all', _('Test all steps')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->setEnabled(($i > 0) ? true : false)
+					->addStyle(($i > 1) ? null : 'display: none')
 			))->addClass('step-action')
 		]))->addClass('preprocessing-list-foot')
 	);
