@@ -19,6 +19,7 @@
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
+#include "zbxmockutil.h"
 
 #include "common.h"
 
@@ -26,6 +27,7 @@ static zbx_mock_handle_t	fragments;
 
 int	__wrap_connect(int fd, __CONST_SOCKADDR_ARG addr, socklen_t len);
 ssize_t	__wrap_read(int fd, void *buf, size_t nbytes);
+int	__wrap_open(int fd, int flags);
 
 int	__wrap_connect(int fd, __CONST_SOCKADDR_ARG addr, socklen_t len)
 {
@@ -37,6 +39,16 @@ int	__wrap_connect(int fd, __CONST_SOCKADDR_ARG addr, socklen_t len)
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("fragments", &fragments)))
 		fail_msg("Cannot get fragments handle: %s", zbx_mock_error_string(error));
+
+	return 0;
+}
+
+int	__wrap_open(int fd, int flags)
+{
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(flags);
+
+	fragments = zbx_mock_get_parameter_handle("in.fragments");
 
 	return 0;
 }
