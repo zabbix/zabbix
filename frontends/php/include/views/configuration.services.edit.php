@@ -202,7 +202,6 @@ foreach ($data['times'] as $service_time) {
 		],
 		$from.' - '.$till,
 		(new CCol($service_time['note']))
-			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 		(new CCol(
 			(new CButton('remove', _('Remove')))
