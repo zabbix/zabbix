@@ -15,6 +15,7 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+A.F....... [ZBX-11272] changed sorting by type, fixed information disclosure and formatting of recipient name in action log screen item and dashboard widget; added new sortfields to alert API (miks)
 A.F....... [ZBX-15416] fixed locale validation in user create and update API methods (miks)
 ..F....... [ZBX-15877] fixed Tab Key navigation for Safari and Edge browsers (vasilijs)
 ........S. [ZBX-15891] fixed trigger dependencies are ignored when changing only trigger state (akozlovs)
@@ -389,6 +390,7 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+A.F....... [ZBX-11272] changed sorting by type, fixed information disclosure and formatting of recipient name in action log screen item and dashboard widget; added new sortfields to alert API (miks)
 A.F....... [ZBX-15416] fixed locale validation in user create and update API methods (miks)
 ..F....... [ZBX-15877] fixed Tab Key navigation for Safari and Edge browsers (vasilijs)
 ........S. [ZBX-15891] fixed trigger dependencies are ignored when changing only trigger state (akozlovs)
