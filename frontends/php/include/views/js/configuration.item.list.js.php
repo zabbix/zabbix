@@ -45,6 +45,7 @@
 		->addClass('sortable form_row')
 ?>
 </script>
+
 <script type="text/x-jquery-tmpl" id="tmpl_expressions_part_list_row">
 <?=
 	(new CRow([

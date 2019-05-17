@@ -19,94 +19,93 @@
 **/
 
 
-return <<<'JAVASCRIPT'
+ob_start(); ?>
+
 (function ($) {
 	var trigger_row_tmpl = new Template($('#tmpl_expressions_list_row').html()),
 		expr_part_row_tmpl = new Template($('#tmpl_expressions_part_list_row').html()),
-		elements = {
-			expressions_table: $('#expressions_list'),
-			expression_part_table: $('#key_list'),
-			input: $('#logexpr'),
-			iregexp: $('#iregexp'),
-			and_button: $('#add_key_and'),
-			or_button: $('#add_key_or'),
-			type: $('#expr_type'),
-			add_button: $('#add_exp')
-		},
-		data = elements.expressions_table.data('rows')||[];
+		$expr_table = $('#expressions_list'),
+		$expr_parts_table = $('#key_list'),
+		$expr_input = $('#logexpr'),
+		$iregexp_checkbox = $('#iregexp'),
+		$and_button = $('#add_key_and'),
+		$or_button = $('#add_key_or'),
+		$expt_type = $('#expr_type'),
+		$add_button = $('#add_exp'),
+		data = $expr_table.data('rows')||[];
 
 	// Expression parts table.
-	elements.expression_part_table.on('click', '.nowrap button', function () {
+	$expr_parts_table.on('click', '.<?= ZBX_STYLE_BTN_LINK ?>', function () {
 		var row = $(this).closest('tr');
 
 		if (!row.siblings().length) {
-			elements.and_button.attr('disabled', false);
-			elements.or_button.attr('disabled', false);
+			$and_button.prop('disabled', false);
+			$or_button.prop('disabled', false);
 		}
 
 		row.remove();
 	});
 
 	// Button AND, OR click handler.
-	elements.and_button.click(addKeywordButtonsClick);
-	elements.or_button.click(addKeywordButtonsClick);
+	$and_button.on('click', addKeywordButtonsClick);
+	$or_button.on('click', addKeywordButtonsClick);
 
 	// Expression sortable table rows initialization.
 	if (data) {
 		data.each(function (row_data) {
-			elements.expressions_table.find('tbody').append(trigger_row_tmpl.evaluate(row_data));
+			$expr_table.find('tbody').append(trigger_row_tmpl.evaluate(row_data));
 		});
 	}
 
 	// Expression sortable table.
-	elements.expressions_table.sortable({
+	$expr_table.sortable({
 		disabled: data.length < 2,
 		items: 'tbody tr.sortable',
 		axis: 'y',
 		cursor: 'move',
-		handle: 'div.drag-icon',
+		handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 		containment: '#expressions_list tbody',
 		tolerance: 'pointer',
 		opacity: 0.6
-	}).on('click', '.nowrap button', function () {
+	}).on('click', '.<?= ZBX_STYLE_BTN_LINK ?>', function () {
 		var row = $(this).closest('tr');
 
 		if (row.siblings().length == 1) {
-			elements.expressions_table.sortable('disable');
+			$expr_table.sortable('disable');
 		}
 
 		row.remove();
 	});
 
 	// Button Add click handler.
-	elements.add_button.click(function () {
+	$add_button.on('click', function () {
 		var expression = [],
-			inputs = $('[name^="keys["]'),
-			keywords = inputs.filter('[name$="[value]"]');
+			$inputs = $('[name^="keys["]'),
+			$keywords = $inputs.filter('[name$="[value]"]');
 
-		inputs.filter('[name$="[type]"]').each(function (i, el) {
-			expression.push(el.value + '(' + keywords[i].value + ')');
+		$inputs.filter('[name$="[type]"]').each(function (i, el) {
+			expression.push(el.value + '(' + $keywords[i].value + ')');
 			$(el).closest('tr').remove();
 		});
 
-		if (elements.input.val() != '') {
-			expression.push((elements.iregexp.is(':checked') ? 'i' : '') + 'regexp(' + elements.input.val() + ')');
-			elements.input.val('');
+		if ($expr_input.val() != '') {
+			expression.push(($iregexp_checkbox.is(':checked') ? 'i' : '') + 'regexp(' + $expr_input.val() + ')');
+			$expr_input.val('');
 		}
 
-		if (elements.expressions_table.find('tbody > tr').length > 0) {
-			elements.expressions_table.sortable('enable');
+		if ($expr_table.find('tbody > tr').length > 0) {
+			$expr_table.sortable('enable');
 		}
 
 		if (expression.length) {
-			elements.expressions_table.find('tbody').append(trigger_row_tmpl.evaluate({
-				expression: expression.join(elements.and_button.is(':enabled') ? ' and ' : ' or '),
-				type_label: $('option:selected', elements.type).text(),
-				type: $('option:selected', elements.type).val()
+			$expr_table.find('tbody').append(trigger_row_tmpl.evaluate({
+				expression: expression.join($and_button.is(':enabled') ? ' and ' : ' or '),
+				type_label: $('option:selected', $expt_type).text(),
+				type: $('option:selected', $expt_type).val()
 			}));
 
-			elements.and_button.attr('disabled', false);
-			elements.or_button.attr('disabled', false);
+			$and_button.prop('disabled', false);
+			$or_button.prop('disabled', false);
 		}
 	});
 
@@ -114,23 +113,23 @@ return <<<'JAVASCRIPT'
 	 * Click handler for 'AND' and 'OR' buttons.
 	 */
 	function addKeywordButtonsClick() {
-		if (elements.input.val() == '') {
+		if ($expr_input.val() == '') {
 			return;
 		}
 
-		elements.expression_part_table.find('tbody').append(expr_part_row_tmpl.evaluate({
-			keyword: elements.input.val(),
-			type_label: (elements.iregexp.is(':checked') ? 'i' : '') + 'regexp'
+		$expr_parts_table.find('tbody').append(expr_part_row_tmpl.evaluate({
+			keyword: $expr_input.val(),
+			type_label: ($iregexp_checkbox.is(':checked') ? 'i' : '') + 'regexp'
 		}));
 
-		if ($(this).is(elements.and_button)) {
-			elements.or_button.attr('disabled', true);
+		if ($(this).is($and_button)) {
+			$or_button.prop('disabled', true);
 		}
 		else {
-			elements.and_button.attr('disabled', true);
+			$and_button.prop('disabled', true);
 		}
 
-		elements.input.val('');
+		$expr_input.val('');
 	}
 })(jQuery);
 
@@ -153,7 +152,7 @@ function validateTriggerWizard(formname, dialogueid) {
 		url: url.getUrl(),
 		data: jQuery(form).serialize(),
 		success: function(ret) {
-			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
+			jQuery(form).parent().find('.<?= ZBX_STYLE_MSG_BAD ?>, .<?= ZBX_STYLE_MSG_GOOD ?>').remove();
 
 			if (typeof ret.errors !== 'undefined') {
 				jQuery(ret.errors).insertBefore(jQuery(form));
@@ -167,4 +166,5 @@ function validateTriggerWizard(formname, dialogueid) {
 		type: 'post'
 	});
 }
-JAVASCRIPT;
+
+<?php return ob_get_clean(); ?>
