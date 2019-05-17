@@ -1763,7 +1763,7 @@ ZABBIX.apps.map = (function($) {
 						background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
 				})
 				.appendTo(this.sysmap.container)
-				.addClass('pointer sysmap_shape')
+				.addClass('cursor-pointer sysmap_shape')
 				.attr('data-id', this.id)
 				.attr('data-type', 'shapes');
 
@@ -1957,12 +1957,18 @@ ZABBIX.apps.map = (function($) {
 								return this.sysmap.dragGroupPlaceholder();
 							}, this),
 							start: $.proxy(function() {
+								this.domNode
+									.addClass(IE ? 'cursor-move' : 'cursor-dragging')
+									.removeClass('cursor-pointer');
 								this.sysmap.dragGroupInit(this);
 							}, this),
 							drag: $.proxy(function(event, data) {
 								this.sysmap.dragGroupDrag(data, this);
 							}, this),
 							stop: $.proxy(function() {
+								this.domNode
+									.addClass('cursor-pointer')
+									.removeClass(IE ? 'cursor-move' : 'cursor-dragging');
 								this.sysmap.dragGroupStop(this);
 							}, this)
 						});
@@ -2259,7 +2265,7 @@ ZABBIX.apps.map = (function($) {
 			// create dom
 			this.domNode = $('<div></div>', {style: 'position: absolute; z-index: 100'})
 				.appendTo(this.sysmap.container)
-				.addClass('pointer sysmap_element')
+				.addClass('cursor-pointer sysmap_element')
 				.attr('data-id', this.id)
 				.attr('data-type', 'selements');
 
@@ -3101,7 +3107,8 @@ ZABBIX.apps.map = (function($) {
 					disabled: (triggerContainer.find('tr.sortable').length < 2),
 					items: 'tbody tr.sortable',
 					axis: 'y',
-					cursor: 'move',
+					containment: 'parent',
+					cursor: IE ? 'move' : 'grabbing',
 					handle: 'div.drag-icon',
 					tolerance: 'pointer',
 					opacity: 0.6,
