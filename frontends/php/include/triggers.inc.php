@@ -702,7 +702,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 		$applications = API::Application()->get([
 			'output' => [],
 			'hostids' => $hostids,
-			'search' => ['name' => $application],
+			'filter' => ['name' => $application],
 			'preservekeys' => true
 		]);
 		$trigger_options['applicationids'] = array_keys($applications);
@@ -722,13 +722,15 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
  * @param int   $problem_options['show_suppressed']  Whether to show triggers with suppressed problems.
  * @param int   $problem_options['min_severity']     (optional) Minimal problem severity.
  * @param int   $problem_options['time_from']        (optional) The time starting from which the problems were created.
+ * @param bool  $problem_options['acknowledged']     (optional) Whether to show triggers with acknowledged problems.
  *
  * @return array
  */
 function getTriggersWithActualSeverity(array $trigger_options, array $problem_options) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-		'time_from' => null
+		'time_from' => null,
+		'acknowledged' => null
 	];
 
 	$triggers = API::Trigger()->get($trigger_options);
@@ -748,6 +750,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity'],
 			'objectids' => $problem_triggerids,
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
+			'acknowledged' => $problem_options['acknowledged'],
 			'time_from' => $problem_options['time_from']
 		]);
 
@@ -1242,26 +1245,28 @@ function make_trigger_details($trigger) {
  * Analyze an expression and returns expression html tree.
  *
  * @param string $expression  Trigger expression or recovery expression string.
- * @param int $type           Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
+ * @param int    $type        Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
  *
- * @return array
+ * @return array|bool
  */
 function analyzeExpression($expression, $type) {
-	if (empty($expression)) {
+	if ($expression === '') {
 		return ['', null];
 	}
 
-	$expressionData = new CTriggerExpression();
-	if (!$expressionData->parse($expression)) {
-		error($expressionData->error);
+	$expression_data = new CTriggerExpression();
+	if (!$expression_data->parse($expression)) {
+		error($expression_data->error);
+
 		return false;
 	}
 
-	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1);
+	$expression_tree[] = getExpressionTree($expression_data, 0, strlen($expression_data->expression) - 1);
 
 	$next = [];
-	$letterNum = 0;
-	return buildExpressionHtmlTree($expressionTree, $next, $letterNum, 0, null, $type);
+	$letter_num = 0;
+
+	return buildExpressionHtmlTree($expression_tree, $next, $letter_num, 0, null, $type);
 }
 
 /**
@@ -1503,9 +1508,10 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 					}
 					break;
 				case '{':
-					foreach ($expressionData->expressions as $exprPart) {
-						if ($exprPart['pos'] == $i) {
-							$i += strlen($exprPart['expression']) - 1;
+					// Skip any previously found tokens starting with brace.
+					foreach ($expressionData->result->getTokens() as $expression_token) {
+						if ($expression_token['pos'] == $i) {
+							$i += $expression_token['length'] - 1;
 							break;
 						}
 					}
@@ -1600,39 +1606,42 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
  * Recreate an expression depending on action.
  *
  * Supported action values:
- * - and	- add an expression using "and";
- * - or		- add an expression using "or";
- * - r 		- replace;
- * - R		- remove.
+ * - and - add an expression using "and";
+ * - or  - add an expression using "or";
+ * - r   - replace;
+ * - R   - remove.
  *
  * @param string $expression
- * @param string $expressionId  element identifier like "0_55"
- * @param string $action        action to perform
- * @param string $newExpression expression for AND, OR or replace actions
+ * @param string $expression_id   Element identifier like "0_55".
+ * @param string $action          Action to perform.
+ * @param string $new_expression  Expression for AND, OR or replace actions.
  *
- * @return bool                 returns new expression or false if expression is incorrect
+ * @return bool|string  Returns new expression or false if expression is incorrect.
  */
-function remakeExpression($expression, $expressionId, $action, $newExpression) {
-	if (empty($expression)) {
+function remakeExpression($expression, $expression_id, $action, $new_expression) {
+	if ($expression === '') {
 		return false;
 	}
 
-	$expressionData = new CTriggerExpression();
-	if ($action != 'R' && !$expressionData->parse($newExpression)) {
-		error($expressionData->error);
+	$expression_data = new CTriggerExpression();
+	if ($action !== 'R' && !$expression_data->parse($new_expression)) {
+		error($expression_data->error);
+
 		return false;
 	}
 
-	if (!$expressionData->parse($expression)) {
-		error($expressionData->error);
+	if (!$expression_data->parse($expression)) {
+		error($expression_data->error);
+
 		return false;
 	}
 
-	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1);
+	$expression_tree[] = getExpressionTree($expression_data, 0, strlen($expression_data->expression) - 1);
 
-	if (rebuildExpressionTree($expressionTree, $expressionId, $action, $newExpression)) {
-		$expression = makeExpression($expressionTree);
+	if (rebuildExpressionTree($expression_tree, $expression_id, $action, $new_expression)) {
+		$expression = makeExpression($expression_tree);
 	}
+
 	return $expression;
 }
 
@@ -2073,6 +2082,13 @@ function evalExpressionData($expression, $replaceFunctionMacros) {
 	return $result;
 }
 
+/**
+ * Converts a string representation of various time and byte measures into corresponding SI unit value.
+ *
+ * @param string $value  String value with byte or time suffix.
+ *
+ * @return string|int  Corresponding SI unit value.
+ */
 function convert($value) {
 	$value = trim($value);
 
@@ -2084,16 +2100,16 @@ function convert($value) {
 	$value = $arr['value'];
 	switch ($arr['mult']) {
 		case 'T':
-			$value *= 1024 * 1024 * 1024 * 1024;
+			$value = bcmul($value, bcmul(ZBX_KIBIBYTE, ZBX_GIBIBYTE));
 			break;
 		case 'G':
-			$value *= 1024 * 1024 * 1024;
+			$value = bcmul($value, ZBX_GIBIBYTE);
 			break;
 		case 'M':
-			$value *= 1024 * 1024;
+			$value = bcmul($value, ZBX_MEBIBYTE);
 			break;
 		case 'K':
-			$value *= 1024;
+			$value = bcmul($value, ZBX_KIBIBYTE);
 			break;
 		case 'm':
 			$value *= 60;
@@ -2288,13 +2304,19 @@ function makeTriggersHostsList(array $triggers_hosts) {
 			$host_name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 
-			// Add maintenance icon with hint if host is in maintenance.
-			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-					&& array_key_exists($host['maintenanceid'], $db_maintenances)) {
-				$maintenance = $db_maintenances[$host['maintenanceid']];
-				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
-					$maintenance['description']
-				);
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				if (array_key_exists($host['maintenanceid'], $db_maintenances)) {
+					$maintenance = $db_maintenances[$host['maintenanceid']];
+					$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+						$maintenance['description']
+					);
+				}
+				else {
+					$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], _('Inaccessible maintenance'),
+						''
+					);
+				}
+
 				$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 			}
 

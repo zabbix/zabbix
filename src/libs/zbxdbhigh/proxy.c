@@ -2551,7 +2551,7 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 	zbx_timespec_t	client_timediff;
 	int		sec, ns;
 
-	if (SUCCEED != zabbix_check_log_level(level))
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
@@ -4022,4 +4022,74 @@ void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int com
 		DBexecute("update hosts set auto_compress=%d where hostid=" ZBX_FS_UI64, diff.compress, diff.hostid);
 
 	zbx_db_flush_proxy_lastaccess();
+}
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_update_proxy_lasterror                                       *
+ *                                                                            *
+ * Purpose: flushes last_version_error_time changes runtime                   *
+ *          variable for proxies structures                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_update_proxy_lasterror(DC_PROXY *proxy)
+{
+	zbx_proxy_diff_t	diff;
+
+	diff.hostid = proxy->hostid;
+	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR;
+	diff.lastaccess = time(NULL);
+	diff.last_version_error_time = proxy->last_version_error_time;
+
+	zbx_dc_update_proxy(&diff);
+}
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_check_protocol_version                                       *
+ *                                                                            *
+ * Purpose: check server and proxy versions and compatibility rules           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     proxy        - [IN] the source proxy                                   *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - no compatibility issue                                       *
+ *     FAIL    - compatibility check fault                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_protocol_version(DC_PROXY *proxy)
+{
+	int	server_version;
+	int	ret = SUCCEED;
+	int	now;
+	int	print_log = 0;
+
+	/* warn if another proxy version is used and proceed with compatibility rules*/
+	if ((server_version = ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR)) != proxy->version)
+	{
+		now = (int)time(NULL);
+
+		if (proxy->last_version_error_time <= now)
+		{
+			print_log = 1;
+			proxy->last_version_error_time = now + 5 * SEC_PER_MIN;
+			zbx_update_proxy_lasterror(proxy);
+		}
+
+		if (1 == print_log)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" protocol version %d.%d differs from server version"
+					" %d.%d", proxy->host, ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
+					ZBX_COMPONENT_VERSION_MINOR(proxy->version),
+					ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR);
+		}
+
+		if (proxy->version > server_version)
+		{
+			if (1 == print_log)
+				zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
+			ret = FAIL;
+		}
+	}
+
+	return ret;
 }

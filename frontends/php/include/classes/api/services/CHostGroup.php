@@ -339,6 +339,7 @@ class CHostGroup extends CApiService {
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
 
@@ -348,8 +349,6 @@ class CHostGroup extends CApiService {
 	 * @param array  $groups
 	 * @param string $groups[]['groupid']
 	 * @param string $groups[]['name']
-	 *
-	 * @return array
 	 */
 	private function inheritRights(array $groups) {
 		$parent_names = [];
@@ -403,8 +402,6 @@ class CHostGroup extends CApiService {
 	 * @param array  $groups
 	 * @param string $groups[]['groupid']
 	 * @param string $groups[]['name']
-	 *
-	 * @return array
 	 */
 	private function inheritTagFilters(array $groups) {
 		$parent_names = [];
@@ -1349,12 +1346,9 @@ class CHostGroup extends CApiService {
 				]);
 				$hosts = zbx_toHash($hosts, 'groupid');
 				foreach ($result as $groupid => $group) {
-					if (isset($hosts[$groupid])) {
-						$result[$groupid]['hosts'] = $hosts[$groupid]['rowscount'];
-					}
-					else {
-						$result[$groupid]['hosts'] = 0;
-					}
+					$result[$groupid]['hosts'] = array_key_exists($groupid, $hosts)
+						? $hosts[$groupid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1381,12 +1375,9 @@ class CHostGroup extends CApiService {
 				]);
 				$hosts = zbx_toHash($hosts, 'groupid');
 				foreach ($result as $groupid => $group) {
-					if (isset($hosts[$groupid])) {
-						$result[$groupid]['templates'] = $hosts[$groupid]['rowscount'];
-					}
-					else {
-						$result[$groupid]['templates'] = 0;
-					}
+					$result[$groupid]['templates'] = array_key_exists($groupid, $hosts)
+						? $hosts[$groupid]['rowscount']
+						: '0';
 				}
 			}
 		}

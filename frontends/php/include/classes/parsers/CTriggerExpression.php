@@ -70,6 +70,13 @@ class CTriggerExpression {
 	public $expression;
 
 	/**
+	 * Object containing the results of parsing.
+	 *
+	 * @var CTriggerExpressionParserResult
+	 */
+	public $result;
+
+	/**
 	 * Current cursor position.
 	 *
 	 * @var
@@ -147,18 +154,11 @@ class CTriggerExpression {
 	protected $spaceChars = [' ' => true, "\r" => true, "\n" => true, "\t" => true];
 
 	/**
-	 * Object containing the results of parsing.
-	 *
-	 * @var CTriggerExpressionParserResult
-	 */
-	protected $result;
-
-	/**
 	 * @param array $options
-	 * @param bool $options['lldmacros']
+	 * @param bool  $options['lldmacros']
 	 */
-	public function __construct($options = []) {
-		if (isset($options['lldmacros'])) {
+	public function __construct(array $options = []) {
+		if (array_key_exists('lldmacros', $options)) {
 			$this->options['lldmacros'] = $options['lldmacros'];
 		}
 

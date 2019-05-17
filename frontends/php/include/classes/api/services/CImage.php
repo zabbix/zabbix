@@ -427,14 +427,18 @@ class CImage extends CApiService {
 	 * @throws APIException if wrong fields are passed.
 	 * @throws APIException if image with same name already exists.
 	 */
-	protected function validateCreate(array $images) {
+	protected function validateCreate(array &$images) {
 		// validate permissions
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		if (!$images) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		// check fields
-		foreach ($images as $image) {
+		foreach ($images as &$image) {
 			$imageDbFields = [
 				'name' => null,
 				'image' => null,
@@ -442,9 +446,10 @@ class CImage extends CApiService {
 			];
 
 			if (!check_db_fields($imageDbFields, $image)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for image "%1$s".', $image['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 		}
+		unset($image);
 
 		// check host name duplicates
 		$collectionValidator = new CCollectionValidator([
@@ -541,8 +546,13 @@ class CImage extends CApiService {
 	 */
 	protected function checkImage($image) {
 		// check size
-		if (strlen($image) > ZBX_MAX_IMAGE_SIZE) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Image size must be less than 1MB.'));
+		if (bccomp(strlen($image), ZBX_MAX_IMAGE_SIZE) == 1) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Image size must be less than %s.', convert_units([
+					'value' => ZBX_MAX_IMAGE_SIZE,
+					'units' => 'B'
+				]))
+			);
 		}
 
 		// check file format
@@ -552,16 +562,16 @@ class CImage extends CApiService {
 	}
 
 	/**
-	 * Unset "image" field from output.
+	 * Unset "image" field from the output.
 	 *
-	 * @param string $tableName
-	 * @param string $tableAlias
+	 * @param string $table_name
+	 * @param string $table_alias
 	 * @param array  $options
-	 * @param array  $sqlParts
+	 * @param array  $sql_parts
 	 *
-	 * @return array				The resulting SQL parts array
+	 * @return array The resulting SQL parts array.
 	 */
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
 		if (!$options['countOutput']) {
 			if ($options['output'] == API_OUTPUT_EXTEND) {
 				$options['output'] = ['imageid', 'imagetype', 'name'];
@@ -573,10 +583,8 @@ class CImage extends CApiService {
 					}
 				}
 			}
-
-			$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
 
-		return $sqlParts;
+		return parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 	}
 }

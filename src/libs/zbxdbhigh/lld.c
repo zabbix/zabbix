@@ -24,6 +24,7 @@
 #include "zbxalgo.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
+#include "proxy.h"
 
 /* lld rule filter condition (item_condition table record) */
 typedef struct

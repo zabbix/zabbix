@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="delayFlexRow">
 	<tr class="form_row">
 		<td>
-			<ul class="<?= ZBX_STYLE_RADIO_SEGMENTED ?>" id="delay_flex_#{rowNum}_type">
+			<ul class="<?= CRadioButtonList::ZBX_STYLE_CLASS ?>" id="delay_flex_#{rowNum}_type">
 				<li>
 					<input type="radio" id="delay_flex_#{rowNum}_type_0" name="delay_flex[#{rowNum}][type]" value="0" checked="checked">
 					<label for="delay_flex_#{rowNum}_type_0"><?= _('Flexible') ?></label>
@@ -79,14 +79,14 @@
 
 		<?php if (!$data['is_discovery_rule']) : ?>
 			var preproc_row_tpl = new Template($('#preprocessing_steps_row').html()),
-				preprocessing = $('#preprocessing');
+				$preprocessing = $('#preprocessing');
 
-			preprocessing.sortable({
-				disabled: (preprocessing.find('tr.sortable').length < 2),
+			$preprocessing.sortable({
+				disabled: $preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').hasClass('<?= ZBX_STYLE_DISABLED ?>'),
 				items: 'tr.sortable',
 				axis: 'y',
-				cursor: 'move',
 				containment: 'parent',
+				cursor: IE ? 'move' : 'grabbing',
 				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				tolerance: 'pointer',
 				opacity: 0.6,
@@ -104,21 +104,32 @@
 				}
 			});
 
-			preprocessing
+			$preprocessing
 				.on('click', '.element-table-add', function() {
 					var row = $(this).parent().parent();
-					row.before(preproc_row_tpl.evaluate({rowNum: preprocessing.find('tr.sortable').length}));
+					row.before(preproc_row_tpl.evaluate({rowNum: $preprocessing.find('tr.sortable').length}));
 
-					if (preprocessing.find('tr.sortable').length > 1) {
-						preprocessing.sortable('enable');
+					var sortable_count = $preprocessing.find('tr.sortable').length;
+
+					if (sortable_count == 1) {
+						$preprocessing
+							.sortable('disable')
+							.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
+					}
+					else if (sortable_count > 1) {
+						$preprocessing
+							.sortable('enable')
+							.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').removeClass('<?= ZBX_STYLE_DISABLED ?>');
 					}
 				})
 				.on('click', '.element-table-remove', function() {
 					var row = $(this).parent().parent();
 					row.remove();
 
-					if (preprocessing.find('tr.sortable').length < 2) {
-						preprocessing.sortable('disable');
+					if ($preprocessing.find('tr.sortable').length < 2) {
+						$preprocessing
+							.sortable('disable')
+							.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 					}
 				})
 				.on('change', 'select[name*="type"]', function() {
@@ -438,7 +449,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				items: 'tbody tr.sortable',
 				axis: 'y',
 				containment: 'parent',
-				cursor: 'move',
+				cursor: IE ? 'move' : 'grabbing',
 				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				tolerance: 'pointer',
 				opacity: 0.6,
@@ -602,10 +613,10 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				$(':radio', '#retrieve_mode')
 					.filter('[value=<?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>]').click()
 					.end()
-					.attr('disabled', 'disabled');
+					.prop('disabled', true);
 			}
 			else {
-				$(':radio', '#retrieve_mode').removeAttr('disabled');
+				$(':radio', '#retrieve_mode').prop('disabled', false);
 			}
 		});
 	});
