@@ -55,6 +55,10 @@ ob_start(); ?>
 		data.each(function (row_data) {
 			$expr_table.find('tbody').append(trigger_row_tmpl.evaluate(row_data));
 		});
+
+		if (data.length == 1) {
+			$expr_table.find('td.<?= ZBX_STYLE_TD_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
+		}
 	}
 
 	// Expression sortable table.
@@ -72,6 +76,7 @@ ob_start(); ?>
 
 		if (row.siblings().length == 1) {
 			$expr_table.sortable('disable');
+			$expr_table.find('td.<?= ZBX_STYLE_TD_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 		}
 
 		row.remove();
@@ -103,6 +108,9 @@ ob_start(); ?>
 				type_label: $('option:selected', $expt_type).text(),
 				type: $('option:selected', $expt_type).val()
 			}));
+
+			var $icons = $expr_table.find('tbody td.<?= ZBX_STYLE_TD_DRAG_ICON ?>');
+			$icons.toggleClass('<?= ZBX_STYLE_DISABLED ?>', $icons.length == 1);
 
 			$and_button.prop('disabled', false);
 			$or_button.prop('disabled', false);
