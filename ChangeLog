@@ -2426,6 +2426,7 @@ Changes for 3.0.28rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
 A.F....... [ZBX-15416] fixed locale validation in user create and update API methods (miks)
 
 --------------------------------------------------------------------------------
