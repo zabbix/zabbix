@@ -336,15 +336,14 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		{
 			zbx_ltrim(hostname, "[");
 			zbx_rtrim(hostname, "]");
-
-			if ('\0' == *hostname)
-			{
-				*error = zbx_dsprintf(*error, "Invalid or missing host in URL.");
-				ret = SYSINFO_RET_FAIL;
-				goto out;
-			}
-
 			ipv6_host_found = 1;
+		}
+
+		if ('\0' == *hostname)
+		{
+			*error = zbx_dsprintf(*error, "Invalid or missing host in URL.");
+			ret = SYSINFO_RET_FAIL;
+			goto out;
 		}
 
 		path_loc = zbx_strdup(path_loc, '\0' != p_host[authority_len] ? &p_host[authority_len] : "/");
