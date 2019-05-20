@@ -46,7 +46,7 @@ class CNavigationTree extends CDiv {
 					'severity_levels: '.CJs::encodeJson($this->data['severity_config']).','.
 					'navtree_items_opened: "'.implode(',', $this->data['navtree_items_opened']).'",'.
 					'navtree_item_selected: '.intval($this->data['navtree_item_selected']).','.
-					'maps_accessible: '.CJs::encodeJson($this->data['maps_accessible']).','.
+					'maps_accessible: '.CJs::encodeJson(array_map('strval', $this->data['maps_accessible'])).','.
 					'show_unavailable: '.$this->data['show_unavailable'].','.
 					'initial_load: '.$this->data['initial_load'].','.
 					'uniqueid: "'.$this->data['uniqueid'].'",'.

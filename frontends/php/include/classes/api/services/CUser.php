@@ -261,6 +261,7 @@ class CUser extends CApiService {
 		}
 
 		$valid_themes = THEME_DEFAULT.','.implode(',', array_keys(Z::getThemes()));
+		$supported_locales = array_keys(getLocales());
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['alias']], 'fields' => [
 			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'alias')],
@@ -270,7 +271,7 @@ class CUser extends CApiService {
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
-			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'lang')],
+			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => implode(',', $supported_locales)],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $valid_themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
@@ -302,6 +303,7 @@ class CUser extends CApiService {
 		unset($user);
 
 		$this->checkDuplicates(zbx_objectValues($users, 'alias'));
+		$this->checkLanguages(zbx_objectValues($users, 'lang'));
 		$this->checkUserGroups($users, []);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -365,6 +367,7 @@ class CUser extends CApiService {
 	 */
 	private function validateUpdate(array &$users, array &$db_users = null) {
 		$valid_themes = THEME_DEFAULT.','.implode(',', array_keys(Z::getThemes()));
+		$supported_locales = array_keys(getLocales());
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['alias']], 'fields' => [
 			'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -375,7 +378,7 @@ class CUser extends CApiService {
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
-			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'lang')],
+			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => implode(',', $supported_locales)],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $valid_themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
@@ -445,6 +448,7 @@ class CUser extends CApiService {
 		if ($aliases) {
 			$this->checkDuplicates($aliases);
 		}
+		$this->checkLanguages(zbx_objectValues($users, 'lang'));
 		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -532,6 +536,21 @@ class CUser extends CApiService {
 						_s('Incorrect value for field "%1$s": %2$s.', 'passwd', _('cannot be empty'))
 					);
 				}
+			}
+		}
+	}
+
+	/**
+	 * Check if specified language has dependent locale installed.
+	 *
+	 * @param array $languages
+	 *
+	 * @throws APIException if language locale is not installed.
+	 */
+	private function checkLanguages(array $languages) {
+		foreach ($languages as $lang) {
+			if ($lang !== 'en_GB' && !setlocale(LC_MONETARY , zbx_locale_variants($lang))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Language "%1$s" is not supported.', $lang));
 			}
 		}
 	}

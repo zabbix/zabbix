@@ -691,7 +691,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('description', 'New test description update');
 
 		$this->zbxTestTabSwitch('Operations');
-		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'removeOperation\')]');;
+		$this->zbxTestClickXpathWait('//button[contains(@onclick, \'removeOperation\')]');
 		$this->zbxTestDropdownSelect('new_operation_type', 'Close new event');
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_operation\')]');
 		$this->zbxTestClick('update');
