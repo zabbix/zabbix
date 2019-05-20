@@ -466,6 +466,13 @@ function str2mem($val) {
 	return $val;
 }
 
+/**
+ * Converts bytes into human-readable form.
+ *
+ * @param string|int $size
+ *
+ * @return string
+ */
 function mem2str($size) {
 	$prefix = 'B';
 	if ($size > ZBX_MEBIBYTE) {
@@ -477,7 +484,7 @@ function mem2str($size) {
 		$prefix = 'K';
 	}
 
-	return round($size, 6).$prefix;
+	return round($size, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT).$prefix;
 }
 
 function convertUnitsUptime($value) {
