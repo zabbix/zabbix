@@ -20,6 +20,7 @@
 #include "common.h"
 #include "zbxjson.h"
 #include "json_parser.h"
+#include "json.h"
 
 /******************************************************************************
  *                                                                            *
@@ -41,8 +42,7 @@ const char	*zbx_json_strerror(void)
 	return zbx_json_strerror_message;
 }
 
-__zbx_attr_format_printf(1, 2)
-static void	zbx_set_json_strerror(const char *fmt, ...)
+void	zbx_set_json_strerror(const char *fmt, ...)
 {
 	va_list	args;
 
