@@ -411,7 +411,7 @@ function check_fields(&$fields, $show_messages = true) {
 
 	$fields = null;
 
-	if ($err&ZBX_VALID_ERROR) {
+	if ($err & ZBX_VALID_ERROR) {
 		invalid_url();
 	}
 
