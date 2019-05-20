@@ -99,12 +99,6 @@ css_icons:
 
 css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
 
-## CUnit test support
-TESTDIR = src
-
-test:
-	cd $(TESTDIR) && $(MAKE) $(AM_MAKEFLAGS) test
-
 ## cmocka test support
 if ZBXCMOCKA
 WRAP_DB_FUNCS = \
@@ -126,14 +120,16 @@ WRAP_FS_FUNCS = \
 	-Wl,--wrap=opendir \
 	-Wl,--wrap=readdir \
 	-Wl,--wrap=stat \
-	-Wl,--wrap=__xstat
+	-Wl,--wrap=__xstat \
+	-Wl,--wrap=__fxstat
 
 WRAP_EXIT = \
 	-Wl,--wrap=exit
 
 WRAP_COMM_FUNCS = \
 	-Wl,--wrap=read \
-	-Wl,--wrap=connect
+	-Wl,--wrap=connect \
+	-Wl,--wrap=open
 
 WRAP_LOG = \
 	-Wl,--wrap=__zbx_zabbix_log

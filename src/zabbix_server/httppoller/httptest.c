@@ -507,58 +507,30 @@ out:
  *                                                                            *
  * Function: add_http_headers                                                 *
  *                                                                            *
- * Purpose: add http headers and cookies to CURL handle                       *
+ * Purpose: adds HTTP headers to curl_slist and prepares cookie header string *
  *                                                                            *
- * Parameters: easyhandle      - [IN] host to be used in macro expansion      *
- *             headers         - [IN] HTTP headers as string                  *
- *             headers_slist   - [IN/OUT] empty curl_slist to be freed after  *
- *                                        curl_easy_perform is called         *
- *             error           - [OUT] error string (if any)                  *
- *                                                                            *
- * Return value: SUCCEED if headers (and cookies) were set without errors.    *
- *               FAIL on error.                                               *
+ * Parameters: headers         - [IN] HTTP headers as string                  *
+ *             headers_slist   - [IN/OUT] curl_slist                          *
+ *             header_cookie   - [IN/OUT] cookie header as string             *
  *                                                                            *
  ******************************************************************************/
-static int	add_http_headers(CURL *easyhandle, char *headers, struct curl_slist **headers_slist, char **error)
+static void	add_http_headers(char *headers, struct curl_slist **headers_slist, char **header_cookie)
 {
 #define COOKIE_HEADER_STR	"Cookie:"
 #define COOKIE_HEADER_STR_LEN	ZBX_CONST_STRLEN(COOKIE_HEADER_STR)
-	CURLcode	err;
-	char		*line;
-	int		ret = SUCCEED;
+
+	char	*line;
 
 	while (NULL != (line = zbx_http_get_header(&headers)))
 	{
 		if (0 == strncmp(COOKIE_HEADER_STR, line, COOKIE_HEADER_STR_LEN))
-		{
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIE, (line +
-								COOKIE_HEADER_STR_LEN * sizeof(char)))))
-			{
-				ret = FAIL;
-
-				if (NULL != error)
-					*error = zbx_strdup(*error, curl_easy_strerror(err));
-
-				zbx_free(line);
-				goto out;
-			}
-		}
+			*header_cookie = zbx_strdup(*header_cookie, line + COOKIE_HEADER_STR_LEN);
 		else
 			*headers_slist = curl_slist_append(*headers_slist, line);
 
 		zbx_free(line);
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, *headers_slist)))
-	{
-		ret = FAIL;
-
-		if (NULL != error)
-			*error = zbx_strdup(*error, curl_easy_strerror(err));
-	}
-
-out:
-	return ret;
 #undef COOKIE_HEADER_STR
 #undef COOKIE_HEADER_STR_LEN
 }
@@ -746,6 +718,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	while (NULL != (row = DBfetch(result)))
 	{
 		struct curl_slist	*headers_slist = NULL;
+		char			*header_cookie = NULL;
 
 		/* NOTE: do not break or return from this block! */
 		/*       process_step_data() call is required! */
@@ -840,14 +813,23 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		/* headers defined in a step overwrite headers defined in scenario */
 		if (NULL != httpstep.headers && '\0' != *httpstep.headers)
-		{
-			if (FAIL == add_http_headers(easyhandle, httpstep.headers, &headers_slist, &err_str))
-				goto httpstep_error;
-		}
+			add_http_headers(httpstep.headers, &headers_slist, &header_cookie);
 		else if (NULL != httptest->headers && '\0' != *httptest->headers)
+			add_http_headers(httptest->headers, &headers_slist, &header_cookie);
+
+		err = curl_easy_setopt(easyhandle, CURLOPT_COOKIE, header_cookie);
+		zbx_free(header_cookie);
+
+		if (CURLE_OK != err)
 		{
-			if (FAIL == add_http_headers(easyhandle, httptest->headers, &headers_slist, &err_str))
-				goto httpstep_error;
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
+		}
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
 		}
 
 		/* enable/disable fetching the body */
