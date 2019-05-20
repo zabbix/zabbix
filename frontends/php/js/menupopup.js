@@ -1075,6 +1075,7 @@ jQuery(function($) {
 					.off('keydown', menuPopupKeyDownHandler);
 
 				removeFromOverlaysStack('contextmenu', return_focus);
+				menuPopup.remove();
 			}
 		}
 	};

@@ -3811,11 +3811,36 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   -moz-transform: translateY(-50%);
   -ms-transform: translateY(-50%);
   transform: translateY(-50%); }
+  .preloader-container.action-menu-preloader {
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+    transform: none;
+    background: #0e1012;
+    border: 1px solid #383838;
+    height: 120px;
+    width: 120px;
+    position: fixed;
+    right: auto;
+    bottom: auto;
+    display: flex;
+    align-items: center;
+    margin: 0; }
 
 .preloader {
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   border-radius: 50%;
+  -webkit-box-shadow: 0 0 0 7px rgba(43, 43, 43, 0.8);
+  -moz-box-shadow: 0 0 0 7px rgba(43, 43, 43, 0.8);
+  box-shadow: 0 0 0 7px rgba(43, 43, 43, 0.8);
+  background-color: rgba(43, 43, 43, 0.8);
   width: 20px;
   height: 20px;
   margin: 0 auto;

@@ -146,6 +146,27 @@ jQuery(function($) {
 		obj.menuPopup(data, event);
 	}
 
+	function showMenuPopupPreloader(event) {
+		var $preloader = $('.preloader-container.action-menu-preloader');
+
+		if (!$preloader.length) {
+			$preloader = $('<div>', {'class': 'preloader-container action-menu-preloader'})
+				.append($('<div>').addClass('preloader'))
+				.appendTo($('body'));
+		}
+
+		setTimeout(function(){
+			$preloader
+				.css({
+					top: Math.min(event.pageY - $(document).scrollTop(), $(window).height() - 140),
+					left: event.pageX - $(document).scrollLeft()
+				})
+				.fadeIn(200);
+		},500);
+
+		return $preloader.hide();
+	}
+
 	/**
 	 * Build menu popup for given elements.
 	 */
@@ -162,7 +183,8 @@ jQuery(function($) {
 			event.target = this;
 		}
 
-		var	url = new Curl('zabbix.php'),
+		var	$preloader = showMenuPopupPreloader(event),
+			url = new Curl('zabbix.php'),
 			ajax_data = {
 				data: data.data
 			};
@@ -170,17 +192,24 @@ jQuery(function($) {
 		url.setArgument('action', 'menu.popup');
 		url.setArgument('type', data.type);
 
-		$.ajax({
+		if ($(document).data('xhr-menu-popup')) {
+			$(document).data('xhr-menu-popup').abort();
+		}
+
+		$('.action-menu.action-menu-top').remove();
+
+		$(document).data('xhr-menu-popup', $.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			data: ajax_data,
 			dataType: 'json',
 			success: function(resp) {
+				$preloader.remove();
 				showMenuPopup(obj, resp.data, event);
 			},
 			error: function() {
 			}
-		});
+		}));
 
 		return false;
 	});
