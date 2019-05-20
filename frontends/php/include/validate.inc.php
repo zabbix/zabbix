@@ -386,6 +386,13 @@ function invalid_url($msg = null) {
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 
+/**
+ * Validate request fields and return result flags.
+ *
+ * @param array $fields field schema together with validation rules
+ *
+ * @return integer appropriate result flags ZBX_VALID_OK | ZBX_VALID_ERROR | ZBX_VALID_WARNING
+ */
 function check_fields_raw(&$fields) {
 	// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 	$system_fields = [
@@ -414,6 +421,14 @@ function check_fields_raw(&$fields) {
 	return $err;
 }
 
+/**
+ * Validate request fields and return true on succes, false on error.
+ *
+ * @param array $fields field schema together with validation rules
+ * @param bool $show_messages do show messages on error
+ *
+ * @return bool true un success, false on error.
+ */
 function check_fields(&$fields, $show_messages = true) {
 	$err = check_fields_raw($fields);
 
