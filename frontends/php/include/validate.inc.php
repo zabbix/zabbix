@@ -386,7 +386,7 @@ function invalid_url($msg = null) {
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 
-function check_fields(&$fields, $show_messages = true, $add_messages_to_message_stack = false) {
+function check_fields(&$fields, $show_messages = true) {
 	// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 	$system_fields = [
 		'sid' =>			[T_ZBX_STR, O_OPT, P_SYS, HEX(),		null],
@@ -417,9 +417,6 @@ function check_fields(&$fields, $show_messages = true, $add_messages_to_message_
 
 	if ($show_messages && $err != ZBX_VALID_OK) {
 		show_messages(($err == ZBX_VALID_OK), null, _('Page received incorrect data'));
-	}
-	elseif ($add_messages_to_message_stack && $err != ZBX_VALID_OK) {
-		error(_('Page received incorrect data'));
 	}
 
 	return ($err == ZBX_VALID_OK);
