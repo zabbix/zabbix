@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+..F....... [ZBX-15833] fixed scrollbar in overlay popups (ashubin)
 .......PS. [ZBX-16058] fixed error in IPMI poller causing growing queue (asitals)
 ..F....... [ZBX-16047] fixed division by zero error in SVG graph widget if selected time period is so small that calculated step between 2 milestones is 0s (miks)
 ..F....... [ZBX-15936] removed "change password" button when cloning media types (vasilijs)
