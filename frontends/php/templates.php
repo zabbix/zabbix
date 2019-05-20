@@ -26,23 +26,6 @@ require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 
-if (hasRequest('action') && getRequest('action') == 'template.export' && hasRequest('templates')) {
-	$exportData = true;
-
-	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-	$page['file'] = 'zbx_export_templates.xml';
-}
-else {
-	$exportData = false;
-
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['title'] = _('Configuration of templates');
-	$page['file'] = 'templates.php';
-	$page['scripts'] = ['multiselect.js'];
-}
-
-require_once dirname(__FILE__).'/include/page_header.php';
-
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields = [
 	'groups'			=> [T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
@@ -82,13 +65,41 @@ $fields = [
 	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null],
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-check_fields($fields);
+
+function prepare_html() {
+	global $page;
+
+	$page['title'] = _('Configuration of templates');
+	$page['file'] = 'templates.php';
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	$page['scripts'] = ['multiselect.js'];
+
+	require_once dirname(__FILE__) . '/include/page_header.php';
+}
+
+function prepare_xml() {
+	global $page;
+
+	$page['file'] = 'zbx_export_templates.xml';
+	$page['type'] = detect_page_type(PAGE_TYPE_XML);
+
+	require_once dirname(__FILE__) . '/include/page_header.php';
+}
+
+$fields_error = check_fields_raw($fields);
+if ($fields_error & ZBX_VALID_ERROR) {
+	// Halt on a HTML page with errors.
+
+	prepare_html();
+	invalid_url();
+}
 
 /*
  * Permissions
  */
+$access_deny = false;
 if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
-	access_deny();
+	$access_deny = true;
 }
 if (getRequest('templateid')) {
 	$templates = API::Template()->get([
@@ -98,27 +109,43 @@ if (getRequest('templateid')) {
 	]);
 
 	if (!$templates) {
-		access_deny();
+		$access_deny = true;
 	}
+}
+if ($access_deny) {
+	// Halt on a HTML page with errors.
+
+	prepare_html();
+	access_deny();
 }
 
 $templateIds = getRequest('templates', []);
 
-if ($exportData) {
+if (hasRequest('action') && getRequest('action') == 'template.export' && hasRequest('templates')) {
 	$export = new CConfigurationExport(['templates' => $templateIds]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
-	$exportData = $export->export();
 
-	if (hasErrorMesssages()) {
+	$export_data = $export->export();
+
+	if (false === $export_data) {
+		prepare_html();
+		access_deny();
+	}
+	elseif (hasErrorMesssages()) {
+		prepare_html();
 		show_messages();
 	}
 	else {
-		print($exportData);
+		prepare_xml();
+		print($export_data);
 	}
 
 	exit;
 }
+
+// Using HTML for the rest of functions.
+prepare_html();
 
 // remove inherited macros data (actions: 'add', 'update' and 'form')
 if (hasRequest('macros')) {

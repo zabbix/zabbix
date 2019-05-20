@@ -21,21 +21,6 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-if (hasRequest('action') && getRequest('action') === 'valuemap.export' && hasRequest('valuemapids')) {
-	$page['file'] = 'zbx_export_valuemaps.xml';
-	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-
-	$export = true;
-}
-else {
-	$page['title'] = _('Configuration of value mapping');
-	$page['file'] = 'adm.valuemapping.php';
-
-	$export = false;
-}
-
-require_once dirname(__FILE__).'/include/page_header.php';
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'valuemapids' =>	[T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		null],
@@ -52,7 +37,32 @@ $fields = [
 	'sort' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null],
 	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-check_fields($fields);
+
+function prepare_html() {
+	global $page;
+
+	$page['title'] = _('Configuration of value mapping');
+	$page['file'] = 'adm.valuemapping.php';
+
+	require_once dirname(__FILE__) . '/include/page_header.php';
+}
+
+function prepare_xml() {
+	global $page;
+
+	$page['file'] = 'zbx_export_valuemaps.xml';
+	$page['type'] = detect_page_type(PAGE_TYPE_XML);
+
+	require_once dirname(__FILE__) . '/include/page_header.php';
+}
+
+$fields_error = check_fields_raw($fields);
+if ($fields_error & ZBX_VALID_ERROR) {
+	// Halt on a HTML page with errors.
+
+	prepare_html();
+	invalid_url();
+}
 
 /*
  * Permissions
@@ -64,6 +74,9 @@ if (hasRequest('valuemapid')) {
 	]);
 
 	if (!$valuemaps) {
+		// Halt on a HTML page with errors.
+
+		prepare_html();
 		access_deny();
 	}
 }
@@ -71,22 +84,31 @@ if (hasRequest('valuemapid')) {
 /*
  * Export
  */
-if ($export) {
+if (hasRequest('action') && getRequest('action') === 'valuemap.export' && hasRequest('valuemapids')) {
 	$export = new CConfigurationExport(['valueMaps' => getRequest('valuemapids')]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 
 	$export_data = $export->export();
 
-	if (hasErrorMesssages()) {
+	if (false === $export_data) {
+		prepare_html();
+		access_deny();
+	}
+	elseif (hasErrorMesssages()) {
+		prepare_html();
 		show_messages();
 	}
 	else {
+		prepare_xml();
 		print($export_data);
 	}
 
 	exit;
 }
+
+// Using HTML for the rest of functions.
+prepare_html();
 
 /*
  * Actions

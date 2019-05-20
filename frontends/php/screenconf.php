@@ -25,23 +25,6 @@ require_once dirname(__FILE__).'/include/ident.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/maps.inc.php';
 
-if (hasRequest('action') && getRequest('action') == 'screen.export' && hasRequest('screens')) {
-	$isExportData = true;
-
-	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-	$page['file'] = 'zbx_export_screens.xml';
-}
-else {
-	$isExportData = false;
-
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['title'] = _('Configuration of screens');
-	$page['file'] = 'screenconf.php';
-	$page['scripts'] = ['multiselect.js'];
-}
-
-require_once dirname(__FILE__).'/include/page_header.php';
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'screens' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
@@ -76,7 +59,34 @@ $fields = [
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-check_fields($fields);
+
+function prepare_html() {
+	global $page;
+
+	$page['title'] = _('Configuration of screens');
+	$page['file'] = 'screenconf.php';
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	$page['scripts'] = ['multiselect.js'];
+
+	require_once dirname(__FILE__) . '/include/page_header.php';
+}
+
+function prepare_xml() {
+	global $page;
+
+	$page['file'] = 'zbx_export_screens.xml';
+	$page['type'] = detect_page_type(PAGE_TYPE_XML);
+
+	require_once dirname(__FILE__) . '/include/page_header.php';
+}
+
+$fields_error = check_fields_raw($fields);
+if ($fields_error & ZBX_VALID_ERROR) {
+	// Halt on a HTML page with errors.
+
+	prepare_html();
+	invalid_url();
+}
 
 CProfile::update('web.screenconf.config', getRequest('config', 0), PROFILE_TYPE_INT);
 
@@ -102,6 +112,9 @@ if (hasRequest('screenid')) {
 	}
 
 	if (!$screens) {
+		// Halt on a HTML page with errors.
+
+		prepare_html();
 		access_deny();
 	}
 
@@ -114,23 +127,33 @@ else {
 /*
  * Export
  */
-if ($isExportData) {
+if (hasRequest('action') && getRequest('action') == 'screen.export' && hasRequest('screens')) {
 	$screens = getRequest('screens', []);
 
 	$export = new CConfigurationExport(['screens' => $screens]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
-	$exportData = $export->export();
 
-	if (hasErrorMesssages()) {
+	$export_data = $export->export();
+
+	if (false === $export_data) {
+		prepare_html();
+		access_deny();
+	}
+	elseif (hasErrorMesssages()) {
+		prepare_html();
 		show_messages();
 	}
 	else {
-		print($exportData);
+		prepare_xml();
+		print($export_data);
 	}
 
 	exit;
 }
+
+// Using HTML for the rest of functions.
+prepare_html();
 
 /*
  * Actions
