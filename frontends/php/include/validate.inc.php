@@ -386,7 +386,7 @@ function invalid_url($msg = null) {
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 
-function check_fields(&$fields, $show_messages = true) {
+function check_fields_raw(&$fields) {
 	// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 	$system_fields = [
 		'sid' =>			[T_ZBX_STR, O_OPT, P_SYS, HEX(),		null],
@@ -410,6 +410,12 @@ function check_fields(&$fields, $show_messages = true) {
 	}
 
 	$fields = null;
+
+	return $err;
+}
+
+function check_fields(&$fields, $show_messages = true) {
+	$err = check_fields_raw($fields);
 
 	if ($err & ZBX_VALID_ERROR) {
 		invalid_url();
