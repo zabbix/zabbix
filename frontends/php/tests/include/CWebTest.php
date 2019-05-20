@@ -24,6 +24,10 @@ require_once dirname(__FILE__).'/CTest.php';
 require_once dirname(__FILE__).'/web/CPage.php';
 require_once dirname(__FILE__).'/helpers/CXPathHelper.php';
 
+define('TEST_GOOD', 0);
+define('TEST_BAD', 1);
+define('TEST_ERROR', 2);
+
 /**
  * Base class for Selenium tests.
  */
@@ -79,15 +83,15 @@ class CWebTest extends CTest {
 	 */
 	protected function tearDown() {
 		// Check for JS errors.
-		if (!$this->hasFailed()) {
-			if (!$this->supress_case_errors && self::$shared_page !== null) {
+		if (!$this->hasFailed() && $this->getStatus() !== null) {
+			if (self::$shared_page !== null) {
 				$errors = [];
 
 				foreach (self::$shared_page->getBrowserLog() as $log) {
 					$errors[] = $log['message'];
 				}
 
-				if ($errors) {
+				if (!$this->supress_case_errors && $errors) {
 					$this->captureScreenshot();
 					$this->fail("Severe browser errors:\n" . implode("\n", array_unique($errors)));
 				}

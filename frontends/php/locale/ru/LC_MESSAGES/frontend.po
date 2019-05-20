@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-14 01:44+0300\n"
+"POT-Creation-Date: 2019-04-16 17:24+0300\n"
 "PO-Revision-Date: 2019-03-13 13:33+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -314,7 +314,7 @@ msgstr "ДОБАВЛЕНИЕ ЗАМЕЩЕНИЯ"
 #: include/views/configuration.item.edit.php:571
 #: include/views/configuration.item.massupdate.php:248
 #: include/views/configuration.item.prototype.edit.php:516
-#: include/views/js/configuration.discovery.edit.js.php:113
+#: include/views/js/configuration.discovery.edit.js.php:110
 msgid "AES"
 msgstr "AES"
 
@@ -658,8 +658,8 @@ msgstr "Активно до"
 #: include/views/js/configuration.action.edit.js.php:268
 #: include/views/js/configuration.action.edit.js.php:654
 #: include/views/js/configuration.correlation.edit.js.php:47
-#: include/views/js/configuration.discovery.edit.js.php:126
-#: include/views/js/configuration.discovery.edit.js.php:707
+#: include/views/js/configuration.discovery.edit.js.php:123
+#: include/views/js/configuration.discovery.edit.js.php:704
 #: include/views/js/monitoring.screen.edit.js.php:83
 #: include/views/js/monitoring.slideconf.edit.js.php:99
 #: include/views/js/monitoring.sysmap.edit.js.php:101
@@ -981,7 +981,7 @@ msgstr "Любая строка символов включена"
 msgid "Application"
 msgstr "Группа элементов данных"
 
-#: httpconf.php:324 include/classes/api/services/CApplication.php:266
+#: httpconf.php:314 include/classes/api/services/CApplication.php:266
 #, c-format
 msgid "Application \"%1$s\" already exists."
 msgstr "Группа элементов данных \"%1$s\" уже существует."
@@ -1259,7 +1259,7 @@ msgstr "Метод аутентификации изменён"
 #: include/views/configuration.item.edit.php:553
 #: include/views/configuration.item.massupdate.php:234
 #: include/views/configuration.item.prototype.edit.php:508
-#: include/views/js/configuration.discovery.edit.js.php:103
+#: include/views/js/configuration.discovery.edit.js.php:100
 msgid "Authentication passphrase"
 msgstr "Пароль аутентификации"
 
@@ -1267,7 +1267,7 @@ msgstr "Пароль аутентификации"
 #: include/views/configuration.item.edit.php:547
 #: include/views/configuration.item.massupdate.php:221
 #: include/views/configuration.item.prototype.edit.php:501
-#: include/views/js/configuration.discovery.edit.js.php:95
+#: include/views/js/configuration.discovery.edit.js.php:92
 msgid "Authentication protocol"
 msgstr "Протокол аутентификации"
 
@@ -1547,10 +1547,10 @@ msgstr "Канада (136 символов)"
 #: include/views/js/administration.general.trigger.options.js.php:21
 #: include/views/js/administration.general.triggerSeverity.js.php:13
 #: include/views/js/configuration.action.edit.js.php:76
-#: include/views/js/configuration.discovery.edit.js.php:127
-#: include/views/js/configuration.discovery.edit.js.php:569
-#: include/views/js/configuration.discovery.edit.js.php:640
-#: include/views/js/configuration.discovery.edit.js.php:670
+#: include/views/js/configuration.discovery.edit.js.php:124
+#: include/views/js/configuration.discovery.edit.js.php:566
+#: include/views/js/configuration.discovery.edit.js.php:637
+#: include/views/js/configuration.discovery.edit.js.php:667
 #: include/views/js/conf.import.js.php:16
 #: include/views/monitoring.slideconf.edit.php:277 jsLoader.php:111
 #: jsLoader.php:122 jsLoader.php:286 jsLoader.php:298
@@ -1684,7 +1684,7 @@ msgstr "Невозможно добавить более одного элеме
 msgid "Cannot add network map"
 msgstr "Не удалось добавить карту сети"
 
-#: httpconf.php:339
+#: httpconf.php:329
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
 msgstr "Не удалось добавить новую группу элементов данных \"%1$s\"."
@@ -1727,7 +1727,7 @@ msgstr "Не удалось добавить шаблон"
 msgid "Cannot add trigger"
 msgstr "Не удалось добавить триггер"
 
-#: trigger_prototypes.php:239
+#: trigger_prototypes.php:229
 msgid "Cannot add trigger prototype"
 msgstr "Не удалось добавить прототипа триггеров"
 
@@ -1743,7 +1743,7 @@ msgstr "Невозможно добавить пользователя. Оба �
 msgid "Cannot add value map"
 msgstr "Не удалось добавить преобразование значения"
 
-#: httpconf.php:215
+#: httpconf.php:205
 msgid "Cannot add web scenario"
 msgstr "Не удалось добавить веб-сценарий"
 
@@ -1764,7 +1764,7 @@ msgstr "Не удалось привязать к LDAP серверу."
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
 msgstr "Не удалось вызвать метод \"%1$s.%2$s\" без параметров."
 
-#: httpconf.php:206 httpconf.php:515 items.php:912 items.php:1294
+#: httpconf.php:196 httpconf.php:505 items.php:912 items.php:1294
 msgid "Cannot clear history"
 msgstr "Не удалось очистить историю"
 
@@ -1859,7 +1859,7 @@ msgstr "Не удалось создать правило обнаружения
 msgid "Cannot create icon map"
 msgstr "Не удалось создать соответствие иконок"
 
-#: httpconf.php:224
+#: httpconf.php:214
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Не удалось создать новую группу элементов данных, веб-сценарий уже присоединен к группе элементов данных."
 
@@ -2112,11 +2112,11 @@ msgstr "Невозможно удалить веб-сценарий \"%1$s\" у�
 msgid "Cannot delete trigger"
 msgstr "Не удалось удалить триггер"
 
-#: trigger_prototypes.php:347
+#: trigger_prototypes.php:337
 msgid "Cannot delete trigger prototype"
 msgstr "Не удалось удалить прототип триггеров"
 
-#: trigger_prototypes.php:462
+#: trigger_prototypes.php:452
 msgid "Cannot delete trigger prototypes"
 msgstr "Не удалось удалить прототипы триггеров"
 
@@ -2135,7 +2135,7 @@ msgstr[0] "Не удалось удалить преобразование зн�
 msgstr[1] "Не удалось удалить преобразование значений"
 msgstr[2] "Не удалось удалить преобразование значений"
 
-#: httpconf.php:166 httpconf.php:524
+#: httpconf.php:156 httpconf.php:514
 msgid "Cannot delete web scenario"
 msgstr "Не удалось удалить веб-сценарий"
 
@@ -2196,7 +2196,7 @@ msgstr[0] "Не удалось деактивировать группу пол�
 msgstr[1] "Не удалось деактивировать группы пользователей"
 msgstr[2] "Не удалось деактивировать группы пользователей"
 
-#: httpconf.php:468
+#: httpconf.php:458
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Не удалось деактивировать веб-сценарий"
@@ -2268,7 +2268,7 @@ msgstr[0] "Не удалось активировать группу польз�
 msgstr[1] "Не удалось активировать группы пользователей"
 msgstr[2] "Не удалось активировать группы пользователей"
 
-#: httpconf.php:467
+#: httpconf.php:457
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Не удалось активировать веб-сценарий"
@@ -2930,7 +2930,7 @@ msgstr "Не удалось обновить триггер"
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "Не удалось обновить триггер \"%1$s\": %2$s."
 
-#: trigger_prototypes.php:332 trigger_prototypes.php:452
+#: trigger_prototypes.php:322 trigger_prototypes.php:442
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "Не удалось обновить прототип триггеров"
@@ -2942,7 +2942,7 @@ msgstr[2] "Не удалось обновить прототипы тригге�
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr "Не удалось обновить прототип триггера \"%1$s\": %2$s."
 
-#: trigger_prototypes.php:416
+#: trigger_prototypes.php:406
 msgid "Cannot update trigger prototypes"
 msgstr "Не удалось обновить прототипы триггеров"
 
@@ -2958,11 +2958,11 @@ msgstr "Не удалось обновить данные пользовател
 msgid "Cannot update value map"
 msgstr "Не удалось обновить преобразование значений"
 
-#: httpconf.php:211
+#: httpconf.php:201
 msgid "Cannot update web scenario"
 msgstr "Не удалось обновить веб-сценарий"
 
-#: include/views/js/configuration.discovery.edit.js.php:636
+#: include/views/js/configuration.discovery.edit.js.php:633
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
 msgstr "Не удалось проверить проверку обнаружения: ошибочный запрос или не удалось подключиться к Zabbix серверу."
 
@@ -3055,7 +3055,7 @@ msgstr "Шасси"
 msgid "Chassis information. Returns string"
 msgstr "Информация о шасси. Возвращает строку"
 
-#: include/views/js/configuration.discovery.edit.js.php:566
+#: include/views/js/configuration.discovery.edit.js.php:563
 msgid "Check already exists."
 msgstr "Проверка уже существует."
 
@@ -3082,7 +3082,7 @@ msgstr "Проверка предварительных условий"
 msgid "Check the key, please. Default example was passed."
 msgstr "Пожалуйста, проверьте ключ. Пример по умолчанию был показан."
 
-#: include/views/js/configuration.discovery.edit.js.php:36
+#: include/views/js/configuration.discovery.edit.js.php:37
 msgid "Check type"
 msgstr "Тип проверки"
 
@@ -3738,7 +3738,7 @@ msgstr "Меню содержимого"
 #: include/views/configuration.item.edit.php:494
 #: include/views/configuration.item.massupdate.php:193
 #: include/views/configuration.item.prototype.edit.php:477
-#: include/views/js/configuration.discovery.edit.js.php:72
+#: include/views/js/configuration.discovery.edit.js.php:70
 msgid "Context name"
 msgstr "Имя контекста"
 
@@ -4114,7 +4114,7 @@ msgstr "DD.MM.YY"
 #: include/views/configuration.item.edit.php:570
 #: include/views/configuration.item.massupdate.php:247
 #: include/views/configuration.item.prototype.edit.php:515
-#: include/views/js/configuration.discovery.edit.js.php:112
+#: include/views/js/configuration.discovery.edit.js.php:109
 msgid "DES"
 msgstr "DES"
 
@@ -4300,7 +4300,7 @@ msgstr "Дата покупки HW"
 msgid "Day"
 msgstr "День"
 
-#: include/func.inc.php:2694
+#: include/func.inc.php:2697
 msgid "Day before yesterday"
 msgstr "За день до вчера"
 
@@ -5013,9 +5013,9 @@ msgstr "Обнаружение через прокси"
 msgid "Discovery check"
 msgstr "Проверка обнаружения"
 
-#: include/views/js/configuration.discovery.edit.js.php:565
-#: include/views/js/configuration.discovery.edit.js.php:634
-#: include/views/js/configuration.discovery.edit.js.php:666
+#: include/views/js/configuration.discovery.edit.js.php:562
+#: include/views/js/configuration.discovery.edit.js.php:631
+#: include/views/js/configuration.discovery.edit.js.php:663
 msgid "Discovery check error"
 msgstr "Ошибка проверки обнаружения"
 
@@ -5970,7 +5970,7 @@ msgid "FALSE"
 msgstr "ЛОЖЬ"
 
 #: include/discovery.inc.php:50
-#: include/views/js/configuration.discovery.edit.js.php:183
+#: include/views/js/configuration.discovery.edit.js.php:180
 msgid "FTP"
 msgstr "FTP"
 
@@ -6744,7 +6744,7 @@ msgid "H:i:s"
 msgstr "H:i:s"
 
 #: include/discovery.inc.php:51
-#: include/views/js/configuration.discovery.edit.js.php:184
+#: include/views/js/configuration.discovery.edit.js.php:181
 msgid "HTTP"
 msgstr "HTTP"
 
@@ -6776,7 +6776,7 @@ msgid "HTTP settings"
 msgstr "Настройки HTTP"
 
 #: include/discovery.inc.php:62
-#: include/views/js/configuration.discovery.edit.js.php:185
+#: include/views/js/configuration.discovery.edit.js.php:182
 msgid "HTTPS"
 msgstr "HTTPS"
 
@@ -6886,7 +6886,7 @@ msgstr "Подсвечивать всю строку"
 msgid "History"
 msgstr "История"
 
-#: httpconf.php:199 httpconf.php:206 httpconf.php:503 httpconf.php:515
+#: httpconf.php:189 httpconf.php:196 httpconf.php:493 httpconf.php:505
 #: items.php:905 items.php:912 items.php:1282 items.php:1294
 msgid "History cleared"
 msgstr "История очищена"
@@ -6933,7 +6933,7 @@ msgstr "Выравнивание по горизонтали"
 #: app/views/monitoring.web.view.php:41
 #: app/views/monitoring.widget.problems.view.php:54
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
-#: app/views/popup.generic.php:137 httpconf.php:199 httpconf.php:503
+#: app/views/popup.generic.php:137 httpconf.php:189 httpconf.php:493
 #: include/actions.inc.php:48 include/audit.inc.php:27
 #: include/blocks.inc.php:547 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
@@ -7017,7 +7017,7 @@ msgstr "Доступ к узлам сети"
 msgid "Host added"
 msgstr "Узел сети добавлен"
 
-#: include/classes/api/services/CHostInterface.php:831
+#: include/classes/api/services/CHostInterface.php:819
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "У узла сети не может быть более одного интерфейса по умолчанию с одинаковым типом."
 
@@ -7333,7 +7333,7 @@ msgid "Hungarian (hu_HU)"
 msgstr "Венгерский (hu_HU)"
 
 #: include/discovery.inc.php:60
-#: include/views/js/configuration.discovery.edit.js.php:186
+#: include/views/js/configuration.discovery.edit.js.php:183
 msgid "ICMP ping"
 msgstr "ICMP ping"
 
@@ -7342,7 +7342,7 @@ msgid "ID"
 msgstr "ID"
 
 #: include/discovery.inc.php:54
-#: include/views/js/configuration.discovery.edit.js.php:187
+#: include/views/js/configuration.discovery.edit.js.php:184
 msgid "IMAP"
 msgstr "IMAP"
 
@@ -7730,12 +7730,12 @@ msgid "Incorrect API \"%1$s\"."
 msgstr "Некорректный API \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:543
-#: include/views/js/configuration.discovery.edit.js.php:603
+#: include/views/js/configuration.discovery.edit.js.php:600
 msgid "Incorrect SNMP OID."
 msgstr "Некорректный SNMP OID."
 
 #: include/classes/api/services/CDRule.php:537
-#: include/views/js/configuration.discovery.edit.js.php:599
+#: include/views/js/configuration.discovery.edit.js.php:596
 msgid "Incorrect SNMP community."
 msgstr "Некорректное SNMP community."
 
@@ -8783,7 +8783,7 @@ msgstr "Имя установщика"
 msgid "Interface"
 msgstr "Интерфейс"
 
-#: include/classes/api/services/CHostInterface.php:851
+#: include/classes/api/services/CHostInterface.php:839
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Интерфейс связан с элементом данных \"%1$s\" в \"%2$s\"."
@@ -9576,7 +9576,7 @@ msgstr "Период сохранения потерянных ресурсов"
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.prototype.edit.php:93
 #: include/views/configuration.item.prototype.list.php:53
-#: include/views/js/configuration.discovery.edit.js.php:56 items.php:48
+#: include/views/js/configuration.discovery.edit.js.php:55 items.php:48
 msgid "Key"
 msgstr "Ключ"
 
@@ -9606,7 +9606,7 @@ msgstr "Корейский (ko_KR)"
 
 #: app/views/administration.authentication.edit.php:30
 #: include/discovery.inc.php:48 include/users.inc.php:85
-#: include/views/js/configuration.discovery.edit.js.php:189
+#: include/views/js/configuration.discovery.edit.js.php:186
 msgid "LDAP"
 msgstr "LDAP"
 
@@ -9654,7 +9654,7 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Последняя"
 
-#: include/func.inc.php:2747
+#: include/func.inc.php:2750
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
@@ -9662,7 +9662,7 @@ msgstr[0] "Последний %1$d день"
 msgstr[1] "Последние %1$d дня"
 msgstr[2] "Последние %1$d дней"
 
-#: include/func.inc.php:2741
+#: include/func.inc.php:2744
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
@@ -9670,7 +9670,7 @@ msgstr[0] "Последний %1$d час"
 msgstr[1] "Последние %1$d часа"
 msgstr[2] "Последние %1$d часов"
 
-#: include/func.inc.php:2734
+#: include/func.inc.php:2737
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
@@ -9678,7 +9678,7 @@ msgstr[0] "Последняя %1$d минута"
 msgstr[1] "Последние %1$d минуты"
 msgstr[2] "Последние %1$d минут"
 
-#: include/func.inc.php:2750
+#: include/func.inc.php:2753
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
@@ -9686,7 +9686,7 @@ msgstr[0] "Последний %1$d месяц"
 msgstr[1] "Последние %1$d месяца"
 msgstr[2] "Последние %1$d месяцев"
 
-#: include/func.inc.php:2727
+#: include/func.inc.php:2730
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
@@ -9694,7 +9694,7 @@ msgstr[0] "Последняя %1$d секунда"
 msgstr[1] "Последние %1$d секунды"
 msgstr[2] "Последние %1$d секунд"
 
-#: include/func.inc.php:2753
+#: include/func.inc.php:2756
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -10053,7 +10053,7 @@ msgstr "MD2"
 #: include/views/configuration.item.edit.php:542
 #: include/views/configuration.item.massupdate.php:225
 #: include/views/configuration.item.prototype.edit.php:503
-#: include/views/js/configuration.discovery.edit.js.php:97
+#: include/views/js/configuration.discovery.edit.js.php:94
 msgid "MD5"
 msgstr "MD5"
 
@@ -10732,7 +10732,7 @@ msgid "Mute"
 msgstr "Отключить звук"
 
 #: include/discovery.inc.php:53
-#: include/views/js/configuration.discovery.edit.js.php:190
+#: include/views/js/configuration.discovery.edit.js.php:187
 msgid "NNTP"
 msgstr "NNTP"
 
@@ -11184,7 +11184,7 @@ msgstr "Данные не найдены."
 msgid "No data."
 msgstr "Данные отсутствуют."
 
-#: include/classes/api/services/CHostInterface.php:827
+#: include/classes/api/services/CHostInterface.php:815
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Нет интерфейса по умолчанию для \"%1$s\" типа у \"%2$s\"."
@@ -12427,7 +12427,7 @@ msgid "PHP xmlwriter extension missing."
 msgstr "Расширение PHP xmlwriter отсутствует."
 
 #: include/discovery.inc.php:52
-#: include/views/js/configuration.discovery.edit.js.php:191
+#: include/views/js/configuration.discovery.edit.js.php:188
 msgid "POP"
 msgstr "POP"
 
@@ -12768,7 +12768,7 @@ msgstr "Порт"
 msgid "Port cannot be empty for host interface."
 msgstr "Порт не может быть пустым у интерфейса узла сети."
 
-#: include/views/js/configuration.discovery.edit.js.php:40
+#: include/views/js/configuration.discovery.edit.js.php:41
 msgid "Port range"
 msgstr "Диапазон портов"
 
@@ -12815,15 +12815,15 @@ msgstr "Шаги предобработки"
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: include/func.inc.php:2697
+#: include/func.inc.php:2700
 msgid "Previous month"
 msgstr "Предыдущий месяц"
 
-#: include/func.inc.php:2696
+#: include/func.inc.php:2699
 msgid "Previous week"
 msgstr "Предыдущая неделя"
 
-#: include/func.inc.php:2698
+#: include/func.inc.php:2701
 msgid "Previous year"
 msgstr "Предыдущий год"
 
@@ -12859,7 +12859,7 @@ msgstr "Первичное ник-имя для контакта"
 #: include/views/configuration.item.edit.php:580
 #: include/views/configuration.item.massupdate.php:257
 #: include/views/configuration.item.prototype.edit.php:520
-#: include/views/js/configuration.discovery.edit.js.php:118
+#: include/views/js/configuration.discovery.edit.js.php:115
 msgid "Privacy passphrase"
 msgstr "Ключевая фраза безопасности"
 
@@ -12867,7 +12867,7 @@ msgstr "Ключевая фраза безопасности"
 #: include/views/configuration.item.edit.php:574
 #: include/views/configuration.item.massupdate.php:243
 #: include/views/configuration.item.prototype.edit.php:513
-#: include/views/js/configuration.discovery.edit.js.php:110
+#: include/views/js/configuration.discovery.edit.js.php:107
 msgid "Privacy protocol"
 msgstr "Протокол безопасности"
 
@@ -13832,7 +13832,7 @@ msgstr "Вс"
 #: include/views/configuration.item.edit.php:543
 #: include/views/configuration.item.massupdate.php:226
 #: include/views/configuration.item.prototype.edit.php:504
-#: include/views/js/configuration.discovery.edit.js.php:98
+#: include/views/js/configuration.discovery.edit.js.php:95
 msgid "SHA"
 msgstr "SHA"
 
@@ -13847,7 +13847,7 @@ msgid "SMS"
 msgstr "SMS"
 
 #: include/discovery.inc.php:49
-#: include/views/js/configuration.discovery.edit.js.php:195
+#: include/views/js/configuration.discovery.edit.js.php:192
 msgid "SMTP"
 msgstr "SMTP"
 
@@ -13878,7 +13878,7 @@ msgstr "SNMP"
 #: include/views/configuration.host.discovery.edit.php:391
 #: include/views/configuration.item.edit.php:487
 #: include/views/configuration.item.prototype.edit.php:470
-#: include/views/js/configuration.discovery.edit.js.php:64 items.php:96
+#: include/views/js/configuration.discovery.edit.js.php:62 items.php:96
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
@@ -13907,17 +13907,17 @@ msgid "SNMP trap key is invalid."
 msgstr "Ключ SNMP trap ошибочный."
 
 #: include/discovery.inc.php:57 include/items.inc.php:88
-#: include/views/js/configuration.discovery.edit.js.php:192
+#: include/views/js/configuration.discovery.edit.js.php:189
 msgid "SNMPv1 agent"
 msgstr "SNMPv1 агент"
 
 #: include/discovery.inc.php:58 include/items.inc.php:89
-#: include/views/js/configuration.discovery.edit.js.php:193
+#: include/views/js/configuration.discovery.edit.js.php:190
 msgid "SNMPv2 agent"
 msgstr "SNMPv2 агент"
 
 #: include/discovery.inc.php:59 include/items.inc.php:90
-#: include/views/js/configuration.discovery.edit.js.php:194
+#: include/views/js/configuration.discovery.edit.js.php:191
 msgid "SNMPv3 agent"
 msgstr "SNMPv3 агент"
 
@@ -13948,7 +13948,7 @@ msgstr "Ошибка при выполнении SQL запроса \"%1$s\"."
 #: include/views/configuration.action.edit.php:922
 #: include/views/configuration.action.edit.php:1682
 #: include/views/configuration.action.edit.php:2158
-#: include/views/js/configuration.discovery.edit.js.php:196
+#: include/views/js/configuration.discovery.edit.js.php:193
 msgid "SSH"
 msgstr "SSH"
 
@@ -14260,7 +14260,7 @@ msgstr "Секунд"
 #: include/views/configuration.item.edit.php:529
 #: include/views/configuration.item.massupdate.php:209
 #: include/views/configuration.item.prototype.edit.php:500
-#: include/views/js/configuration.discovery.edit.js.php:86
+#: include/views/js/configuration.discovery.edit.js.php:83
 msgid "Security level"
 msgstr "Уровень безопасности"
 
@@ -14269,7 +14269,7 @@ msgstr "Уровень безопасности"
 #: include/views/configuration.item.edit.php:506
 #: include/views/configuration.item.massupdate.php:201
 #: include/views/configuration.item.prototype.edit.php:488
-#: include/views/js/configuration.discovery.edit.js.php:79
+#: include/views/js/configuration.discovery.edit.js.php:76
 msgid "Security name"
 msgstr "Имя безопасности"
 
@@ -15333,7 +15333,7 @@ msgid "T"
 msgstr "Вт"
 
 #: include/discovery.inc.php:55
-#: include/views/js/configuration.discovery.edit.js.php:188
+#: include/views/js/configuration.discovery.edit.js.php:185
 msgid "TCP"
 msgstr "TCP"
 
@@ -15440,7 +15440,7 @@ msgstr "Тип цели"
 #: include/views/configuration.action.edit.php:923
 #: include/views/configuration.action.edit.php:1683
 #: include/views/configuration.action.edit.php:2159
-#: include/views/js/configuration.discovery.edit.js.php:197
+#: include/views/js/configuration.discovery.edit.js.php:194
 msgid "Telnet"
 msgstr "Telnet"
 
@@ -15712,7 +15712,7 @@ msgstr "Группа элементов данных веб-сценария п�
 msgid "Theme"
 msgstr "Тема"
 
-#: include/func.inc.php:2695
+#: include/func.inc.php:2698
 msgid "This day last week"
 msgstr "Этот день прошлой недели"
 
@@ -15721,11 +15721,11 @@ msgstr "Этот день прошлой недели"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Это поле автоматически заполняется элементом данных \"%s\"."
 
-#: include/func.inc.php:2703 srv_status.php:41
+#: include/func.inc.php:2706 srv_status.php:41
 msgid "This month"
 msgstr "Этот месяц"
 
-#: include/func.inc.php:2704
+#: include/func.inc.php:2707
 msgid "This month so far"
 msgstr "В этом месяце"
 
@@ -15737,19 +15737,19 @@ msgstr "Колонка комплексного экрана не пустая. 
 msgid "This screen row is not empty. Delete it?"
 msgstr "Строка комплексного экрана не пустая. Удалить её?"
 
-#: include/func.inc.php:2701 srv_status.php:40
+#: include/func.inc.php:2704 srv_status.php:40
 msgid "This week"
 msgstr "Эта неделя"
 
-#: include/func.inc.php:2702
+#: include/func.inc.php:2705
 msgid "This week so far"
 msgstr "На этой неделе"
 
-#: include/func.inc.php:2705 srv_status.php:42
+#: include/func.inc.php:2708 srv_status.php:42
 msgid "This year"
 msgstr "Этот год"
 
-#: include/func.inc.php:2706
+#: include/func.inc.php:2709
 msgid "This year so far"
 msgstr "В этом году"
 
@@ -15869,12 +15869,12 @@ msgstr "К"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Чтобы задать интерфейс узла сети выберите один тип элемента данных из всех элементов данных"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2699
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2702
 #: srv_status.php:39
 msgid "Today"
 msgstr "Сегодня"
 
-#: include/func.inc.php:2700
+#: include/func.inc.php:2703
 msgid "Today so far"
 msgstr "Сегодня до сих пор"
 
@@ -16129,7 +16129,7 @@ msgstr "Прототип триггеров \"%1$s\" зависит от три�
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr "Прототип триггеров \"%1$s\" должен содержать по крайней мере один прототип элементов данных."
 
-#: trigger_prototypes.php:239
+#: trigger_prototypes.php:229
 msgid "Trigger prototype added"
 msgstr "Прототип триггеров добавлен"
 
@@ -16137,11 +16137,11 @@ msgstr "Прототип триггеров добавлен"
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "Прототипа триггеров не может зависеть от триггера который унаследован от него."
 
-#: trigger_prototypes.php:347
+#: trigger_prototypes.php:337
 msgid "Trigger prototype deleted"
 msgstr "Прототип триггеров удален"
 
-#: trigger_prototypes.php:332 trigger_prototypes.php:451
+#: trigger_prototypes.php:322 trigger_prototypes.php:441
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] "Прототип триггеров обновлен"
@@ -16158,11 +16158,11 @@ msgstr[2] "Прототипы триггеров обновлены"
 msgid "Trigger prototypes"
 msgstr "Прототипы триггеров"
 
-#: trigger_prototypes.php:462
+#: trigger_prototypes.php:452
 msgid "Trigger prototypes deleted"
 msgstr "Прототипы триггеров удалены"
 
-#: trigger_prototypes.php:416
+#: trigger_prototypes.php:406
 msgid "Trigger prototypes updated"
 msgstr "Прототипы триггеров обновлены"
 
@@ -16496,7 +16496,7 @@ msgstr "Единица измерения"
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.triggers.list.php:43
-#: include/views/js/configuration.discovery.edit.js.php:206
+#: include/views/js/configuration.discovery.edit.js.php:203
 msgid "Unknown"
 msgstr "Неизвестно"
 
@@ -16689,7 +16689,7 @@ msgstr "Доступен"
 #: include/views/configuration.trigger.prototype.massupdate.php:188
 #: include/views/configuration.triggers.edit.php:643
 #: include/views/configuration.triggers.massupdate.php:171
-#: include/views/js/configuration.discovery.edit.js.php:384
+#: include/views/js/configuration.discovery.edit.js.php:381
 #: include/views/monitoring.screen.constructor.edit.php:934
 #: include/views/monitoring.screen.edit.php:220
 #: include/views/monitoring.slideconf.edit.php:273
@@ -17497,7 +17497,7 @@ msgstr "Веб"
 msgid "Web monitoring"
 msgstr "Веб-мониторинг"
 
-#: httpconf.php:198 httpconf.php:502 include/audit.inc.php:45
+#: httpconf.php:188 httpconf.php:492 include/audit.inc.php:45
 msgid "Web scenario"
 msgstr "Веб-сценарий"
 
@@ -17517,29 +17517,29 @@ msgstr "Веб-сценарий \"%1$s\" уже существует."
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Веб-сценарий \"%1$s\" на \"%2$s\": группа элементов данных \"%3$s\" не существует."
 
-#: httpconf.php:214
+#: httpconf.php:204
 msgid "Web scenario added"
 msgstr "Веб-сценарий добавлен"
 
-#: httpconf.php:166 httpconf.php:524
+#: httpconf.php:156 httpconf.php:514
 msgid "Web scenario deleted"
 msgstr "Веб-сценарий удален"
 
-#: httpconf.php:465
+#: httpconf.php:455
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Веб-сценарий деактивирован"
 msgstr[1] "Веб-сценарии деактивированы"
 msgstr[2] "Веб-сценарии деактивированы"
 
-#: httpconf.php:464
+#: httpconf.php:454
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] "Веб-сценарий активирован"
 msgstr[1] "Веб-сценарии активированы"
 msgstr[2] "Веб-сценарии активированы"
 
-#: httpconf.php:210
+#: httpconf.php:200
 msgid "Web scenario updated"
 msgstr "Веб-сценарий обновлен"
 
@@ -17848,7 +17848,7 @@ msgstr "Ежегодно"
 msgid "Yes"
 msgstr "Да"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2693
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2696
 msgid "Yesterday"
 msgstr "Вчера"
 
@@ -17963,7 +17963,7 @@ msgstr "Zabbix Пользователь"
 #: include/views/configuration.action.edit.php:938
 #: include/views/configuration.action.edit.php:1716
 #: include/views/configuration.action.edit.php:2184
-#: include/views/js/configuration.discovery.edit.js.php:198
+#: include/views/js/configuration.discovery.edit.js.php:195
 msgid "Zabbix agent"
 msgstr "Zabbix агент"
 

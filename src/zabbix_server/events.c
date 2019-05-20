@@ -1989,6 +1989,9 @@ static void	process_internal_ok_events(zbx_vector_ptr_t *ok_events)
 	{
 		event = (DB_EVENT *)ok_events->values[i];
 
+		if (ZBX_FLAGS_DB_EVENT_UNSET == event->flags)
+			continue;
+
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
@@ -2002,6 +2005,9 @@ static void	process_internal_ok_events(zbx_vector_ptr_t *ok_events)
 				break;
 		}
 	}
+
+	if (0 == triggerids.values_num && 0 == itemids.values_num && 0 == lldruleids.values_num)
+		goto out;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select eventid,object,objectid from problem"
@@ -2053,6 +2059,7 @@ static void	process_internal_ok_events(zbx_vector_ptr_t *ok_events)
 	DBfree_result(result);
 	zbx_free(sql);
 
+out:
 	zbx_vector_uint64_destroy(&lldruleids);
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_uint64_destroy(&triggerids);
@@ -2417,6 +2424,77 @@ static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_
 
 /******************************************************************************
  *                                                                            *
+ * Function: process_internal_events_dependency                               *
+ *                                                                            *
+ * Purpose: process internal trigger events                                   *
+ *          to avoid trigger dependency                                       *
+ *                                                                            *
+ * Parameters: internal_events - [IN] the internal events to process          *
+ *             trigger_events  - [IN] the trigger events used for dependency  *
+ *             trigger_diff   -  [IN] the trigger changeset                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	process_internal_events_dependency(zbx_vector_ptr_t *internal_events, zbx_vector_ptr_t *trigger_events,
+		zbx_vector_ptr_t *trigger_diff)
+{
+	int			i, index;
+	DB_EVENT		*event;
+	zbx_vector_uint64_t	triggerids;
+	zbx_vector_ptr_t	deps;
+	zbx_trigger_diff_t	*diff;
+
+	zbx_vector_uint64_create(&triggerids);
+	zbx_vector_uint64_reserve(&triggerids, internal_events->values_num + trigger_events->values_num);
+
+	zbx_vector_ptr_create(&deps);
+	zbx_vector_ptr_reserve(&deps, internal_events->values_num + trigger_events->values_num);
+
+	for (i = 0; i < internal_events->values_num; i++)
+	{
+		event = (DB_EVENT *)internal_events->values[i];
+		zbx_vector_uint64_append(&triggerids, event->objectid);
+	}
+
+	for (i = 0; i < trigger_events->values_num; i++)
+	{
+		event = (DB_EVENT *)trigger_events->values[i];
+		zbx_vector_uint64_append(&triggerids, event->objectid);
+	}
+
+	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_dc_get_trigger_dependencies(&triggerids, &deps);
+
+	for (i = 0; i < internal_events->values_num; i++)
+	{
+		event = (DB_EVENT *)internal_events->values[i];
+
+		if (FAIL == (index = zbx_vector_ptr_search(trigger_diff, &event->objectid,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
+
+		if (FAIL == (event_check_dependency(event, &deps, trigger_diff)))
+		{
+			/* reset event data/trigger changeset if dependency check failed */
+			event->flags = ZBX_FLAGS_DB_EVENT_UNSET;
+			diff->flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET;
+			continue;
+		}
+	}
+
+	zbx_vector_ptr_clear_ext(&deps, (zbx_clean_func_t)trigger_dep_free);
+	zbx_vector_ptr_destroy(&deps);
+
+	zbx_vector_uint64_destroy(&triggerids);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_process_events                                               *
  *                                                                            *
  * Purpose: processes cached events                                           *
@@ -2442,7 +2520,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 	const char		*__function_name = "zbx_process_events";
 	size_t			i, processed_num = 0;
 	zbx_uint64_t		eventid;
-	zbx_vector_ptr_t	internal_ok_events, trigger_events;
+	zbx_vector_ptr_t	internal_ok_events, trigger_events, internal_events;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
@@ -2456,6 +2534,9 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 		zbx_vector_ptr_create(&trigger_events);
 		zbx_vector_ptr_reserve(&trigger_events, events_num);
+
+		zbx_vector_ptr_create(&internal_events);
+		zbx_vector_ptr_reserve(&internal_events, events_num);
 
 		/* assign event identifiers - they are required to set correlation event ids */
 		eventid = DBget_maxid_num("events", events_num);
@@ -2478,6 +2559,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 					case EVENT_OBJECT_TRIGGER:
 						if (TRIGGER_STATE_NORMAL == event->value)
 							zbx_vector_ptr_append(&internal_ok_events, event);
+						zbx_vector_ptr_append(&internal_events, event);
 						break;
 					case EVENT_OBJECT_ITEM:
 						if (ITEM_STATE_NORMAL == event->value)
@@ -2490,6 +2572,9 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 				}
 			}
 		}
+
+		if (0 != internal_events.values_num)
+			process_internal_events_dependency(&internal_events, &trigger_events, trigger_diff);
 
 		if (0 != internal_ok_events.values_num)
 			process_internal_ok_events(&internal_ok_events);
@@ -2508,6 +2593,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 		zbx_vector_ptr_destroy(&trigger_events);
 		zbx_vector_ptr_destroy(&internal_ok_events);
+		zbx_vector_ptr_destroy(&internal_events);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, (int)processed_num);

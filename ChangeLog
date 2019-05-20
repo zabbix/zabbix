@@ -1,8 +1,52 @@
-Changes for 4.0.7rc1
+Changes for 4.0.8rc1
 
 New features:
+..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+....I..... [ZBX-16074] added file revision number generation for compilation on MS Windows (MVekslers)
+..F....... [ZBX-15833] fixed scrollbar in overlay popups (ashubin)
+.......PS. [ZBX-16058] fixed error in IPMI poller causing growing queue (asitals)
+..F....... [ZBX-16047] fixed division by zero error in SVG graph widget if selected time period is so small that calculated step between 2 milestones is 0s (miks)
+..F....... [ZBX-15936] removed "change password" button when cloning media types (vasilijs)
+A.F....... [ZBX-11272] changed sorting by type, fixed information disclosure and formatting of recipient name in action log screen item and dashboard widget; added new sortfields to alert API (miks)
+A.F....... [ZBX-15416] fixed locale validation in user create and update API methods (miks)
+..F....... [ZBX-15877] fixed Tab Key navigation for Safari and Edge browsers (vasilijs)
+........S. [ZBX-15891] fixed trigger dependencies are ignored when changing only trigger state (akozlovs)
+A......... [ZBX-13029] fixed api validation messages for linktrigger (vasilijs)
+...G...... [ZBX-15967] fixed buffer offset for reading hardware info from long DMI files (viktors)
+..F....... [ZBX-16018] fixed detection of logical functions (or / and) inside the context of user macros (averza)
+..F....... [ZBX-14782] deliver human friendly uptime in dashbord (talbergs)
+..F....... [ZBX-11325] fixed transparency of draggable interfaces; changed cursor type for all draggable and sortable elements (agriscenko)
+..F....... [ZBX-16048] fixed global search box loosing the search phrase after searching (averza)
+..F....... [ZBX-10729] fixed map element link coloring when linked problem is acknowledged (miks)
+..F....... [ZBX-15101] fixed several object IDs allowing them to be 64 bit integers, added asterisk for map navigation tree name field and changed the error message to more generic one (Ivo)
+.......PS. [ZBX-16050] fixed HTTP poller crashes (asestakovs)
+..F....... [ZBX-15871] fixed problem events to be filtered by "suppressed" instead of "related to maintenance" (talbergs)
+...G...PS. [ZBX-10550] added warnings when Zabbix components have different versions (akozlovs)
+..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
+..F....... [ZBX-11429] fixed macro not being retained in trigger expression editing wizard (agriscenko)
+..F....... [ZBX-15816] increased header value input field max length (talbergs)
+...G...PS. [ZBX-15677] fixed the process of compiling the dummy.c module (MVekslers)
+.......PS. [ZBX-15981] fixed invalid xpath for vmware "eventlog" key with "skip" option (MVekslers)
+...G...... [ZBX-15704] fixed sending log meta information without obvious needs (asestakovs)
+..F....... [ZBX-15905] added versioning of browser cached files (ashubin, gcalenko)
+........S. [ZBX-15956] reduced configuration cache fragmentation when reloading time based triggers (vso)
+........S. [ZBX-15998] improved performance of "Remove host", "Remove from host group", "Unlink from template" operations when processing network discovery events and using MySQL database (vso)
+........S. [ZBX-15935] fixed infinite loop and 100% CPU usage when using OpenIPMI 2.0.26 or newer (asitals)
+........S. [ZBX-16005] fixed "{{ITEM.VALUE}.regsub(<pattern>,<output>}" and "{{ITEM.LASTVALUE}.regsub(<pattern>,<output>}" being resolved to *UNKNOWN* during upgrade (vso)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.7
+
+4.0.7rc1 was released as 4.0.7 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.7rc1
+
+Bug fixes:
+........S. [ZBX-16019] fixed HOST.CONN, HOST.IP, IPADDRESS and HOST.DNS macros expansion in global scripts (akozlovs)
+........S. [ZBX-16020] fixed uncontrolled memory allocation in regex preprocessing steps (vjaceslavs)
 ..F....... [ZBX-15911] fixed guest sign in visibility for disabled guest user group in login page (gcalenko)
 A......... [ZBX-15977] fixed validation of host interface when multiple interfaces set as main interface (gcalenko, vmurzins)
 ...G...PS. [ZBX-15955] fixed security vulnerability - accepting connections from not allowed addresses (Andris, vso)
@@ -2382,9 +2426,25 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.28rc1
+
+New features:
+
+Bug fixes:
+....I..... [ZBX-16074] added file revision number generation for compilation on MS Windows (MVekslers)
+..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
+A.F....... [ZBX-15416] fixed locale validation in user create and update API methods (miks)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.27
+
+3.0.27rc1 was released as 3.0.27 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.27rc1
 
 Bug fixes:
+........S. [ZBX-16019] fixed HOST.CONN, HOST.IP, IPADDRESS and HOST.DNS macros expansion in global scripts (akozlovs)
 ..F....... [ZBX-15674] fixed map status to be displayed OK if there are no problem in submaps (talbergs)
 A.F....... [ZBX-2494] fixed sorting of items, item prototypes, lld rules and screens to avoid deadlocks in database between server and frontend (ashubin)
 ..F....... [ZBX-10404] fixed password being passed in plain text in media type edit form (gcalenko)
@@ -4524,6 +4584,7 @@ Changes for 2.2.24rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-16074] added file revision number generation for compilation on MS Windows (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.23
