@@ -157,7 +157,7 @@ class CFrontendSetup {
 	public function checkPhpUploadMaxFilesize() {
 		$current = ini_get('upload_max_filesize');
 
-		retu [
+		return [
 			'name' => _s('PHP option "%1$s"', 'upload_max_filesize'),
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE),
