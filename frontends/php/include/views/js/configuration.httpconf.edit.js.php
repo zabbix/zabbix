@@ -890,7 +890,9 @@
 		}.bind(this.pairs.query_fields), true);
 
 		// Appends remaining query parameters, if any.
-		url.pairs.forEach(this.pairs.query_fields.addRow.bind(this.pairs.query_fields));
+		url.pairs.forEach(function(new_pair) {
+			this.pairs.query_fields.addRow(new_pair);
+		}.bind(this));
 	};
 
 	/**
