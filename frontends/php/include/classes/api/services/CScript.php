@@ -93,7 +93,7 @@ class CScript extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + permission check
-		if (!$options['nopermissions'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if ($options['editable']) {
 				return $result;
 			}
