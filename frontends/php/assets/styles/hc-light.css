@@ -2015,6 +2015,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .icon-ackn::before {
     background: url(../img/icon-sprite.svg) no-repeat -45px -693px; }
 
+.icon-none {
+  margin-left: 18px; }
+
 .icon-help {
   background: transparent url(../img/icon-sprite.svg) no-repeat -6px -726px; }
 
