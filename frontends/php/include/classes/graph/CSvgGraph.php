@@ -371,6 +371,18 @@ class CSvgGraph extends CSvg {
 	public function getTimeGridWithPosition() {
 		$period = $this->time_till - $this->time_from;
 		$step = round(bcmul(bcdiv($period, $this->canvas_width), 100)); // Grid cell (100px) in seconds.
+
+		/*
+		 * In case if requested time period is so small that it is rounded to zero, we are displaying only two
+		 * milestones on X axis - the start and the end of period.
+		 */
+		if ($step == 0) {
+			return [
+				0 => date('H:i:s', $this->time_from),
+				$this->canvas_width => date('H:i:s', $this->time_till)
+			];
+		}
+
 		$start = $this->time_from + $step - $this->time_from % $step;
 		$time_formats = ['Y-n-d', 'n-d', 'n-d H:i','H:i', 'H:i:s'];
 
@@ -769,6 +781,10 @@ class CSvgGraph extends CSvg {
 	 * Calculate paths for metric elements.
 	 */
 	protected function calculatePaths() {
+		// Metric having very big values of y outside visible area will fail to render.
+		$y_max = pow(2, 16);
+		$y_min = $y_max * -1;
+
 		foreach ($this->metrics as $index => $metric) {
 			if (!array_key_exists($index, $this->points)) {
 				continue;
@@ -783,8 +799,8 @@ class CSvgGraph extends CSvg {
 				$max_value = $this->left_y_max;
 			}
 
-			$time_range = $this->time_till - $this->time_from ? : 1;
-			$value_diff = $max_value - $min_value ? : 1;
+			$time_range = ($this->time_till - $this->time_from) ? : 1;
+			$value_diff = ($max_value - $min_value) ? : 1;
 			$timeshift = $metric['options']['timeshift'];
 			$paths = [];
 
@@ -805,6 +821,11 @@ class CSvgGraph extends CSvg {
 					$x = $this->canvas_x + $this->canvas_width
 						- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 					$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
+
+					if (!$in_range) {
+						$y = ($point > $max_value) ? max($y_min, $y) : min($y_max, $y);
+					}
+
 					$paths[$path_num][] = [$x, ceil($y), convert_units([
 						'value' => $point,
 						'units' => $metric['units']

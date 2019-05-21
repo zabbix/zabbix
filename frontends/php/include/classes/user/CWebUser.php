@@ -237,7 +237,8 @@ class CWebUser {
 			'filter' => ['alias' => ZBX_GUEST_USER]
 		]);
 
-		return getUserGuiAccess($guest[0]['userid']) != GROUP_GUI_ACCESS_DISABLED;
+		return check_perm2system($guest[0]['userid'])
+			&& getUserGuiAccess($guest[0]['userid']) != GROUP_GUI_ACCESS_DISABLED;
 	}
 
 	/**

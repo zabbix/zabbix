@@ -45,7 +45,7 @@
 						(new CTag('label', false, _('Read-write')))
 							->setAttribute('for', 'user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE)
 					])
-				]))->addClass(ZBX_STYLE_RADIO_SEGMENTED)
+				]))->addClass(CRadioButtonList::ZBX_STYLE_CLASS)
 			),
 			(new CCol(
 				(new CButton('remove', _('Remove')))
@@ -78,7 +78,7 @@
 						(new CTag('label', false, _('Read-write')))
 							->setAttribute('for', 'user_#{id}_permission_'.PERM_READ_WRITE)
 					])
-				]))->addClass(ZBX_STYLE_RADIO_SEGMENTED)
+				]))->addClass(CRadioButtonList::ZBX_STYLE_CLASS)
 			),
 			(new CCol(
 				(new CButton('remove', _('Remove')))
@@ -271,7 +271,8 @@
 			disabled: (slideTable.find('tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
 			axis: 'y',
-			cursor: 'move',
+			containment: 'parent',
+			cursor: IE ? 'move' : 'grabbing',
 			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6,

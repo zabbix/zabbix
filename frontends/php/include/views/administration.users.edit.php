@@ -98,6 +98,7 @@ if (!$data['is_profile']) {
 
 // append password to form list
 if ($data['userid'] == 0 || $data['change_password']) {
+	$userForm->disablePasswordAutofill();
 	$password_box = new CPassBox('password1', $data['password1']);
 
 	if (!$form_autofocus) {
@@ -148,7 +149,7 @@ foreach (getLocales() as $localeId => $locale) {
 	if ($locale['display']) {
 		// checking if this locale exists in the system. The only way of doing it is to try and set one
 		// trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC
-		$localeExists = (setlocale(LC_MONETARY , zbx_locale_variants($localeId)) || $localeId == 'en_GB');
+		$localeExists = ($localeId === 'en_GB' || setlocale(LC_MONETARY , zbx_locale_variants($localeId)));
 
 		$languageComboBox->addItem(
 			$localeId,

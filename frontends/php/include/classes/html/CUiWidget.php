@@ -72,51 +72,29 @@ class CUiWidget extends CDiv {
 
 		parent::__construct();
 
-		$this->addClass('dashbrd-widget');
+		$this->addClass(ZBX_STYLE_DASHBRD_WIDGET);
 		$this->setId($this->id.'_widget');
 	}
 
 	/**
 	 * Set widget header.
 	 *
-	 * @param string	$caption
-	 * @param arrayi	$controls
+	 * @param string $caption
+	 * @param array  $controls
+	 *
+	 * @return $this
 	 */
-	public function setHeader($caption, array $controls = [], $cursor_move = false) {
+	public function setHeader($caption, array $controls = []) {
 		$this->header = (new CDiv())
-			->addClass('dashbrd-widget-head')
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
 			->addItem(
 				(new CTag('h4', true, $caption))->setId($this->id.'_header')
 			);
-
-		if ($cursor_move) {
-			$this->header->addClass(ZBX_STYLE_CURSOR_MOVE);
-		}
 
 		if ($controls) {
 			$this->header->addItem(new CList($controls));
 		}
 
-		return $this;
-	}
-
-	/**
-	 * Set widget header with left and right parts.
-	 *
-	 * @param string|array|CTag $leftColumn
-	 * @param string|array|CTag $rightColumn
-	 */
-	public function setDoubleHeader($leftColumn, $rightColumn) {
-		$leftColumn = (new CCol($leftColumn))->addStyle('text-align: left; border: 0;');
-		$rightColumn = (new CCol($rightColumn))->addStyle('text-align: right; border: 0;');
-
-		$table = new CTable();
-		$table->addStyle('width: 100%;');
-		$table->addRow([$leftColumn, $rightColumn]);
-
-		$this->header = (new CDiv($table))
-			->addClass(ZBX_STYLE_NOWRAP)
-			->addClass('ui-widget-header header');
 		return $this;
 	}
 

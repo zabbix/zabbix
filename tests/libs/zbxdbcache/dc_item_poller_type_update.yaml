@@ -1,0 +1,5555 @@
+# This file has been generated automatically by dc_gen_item_poller_update.pl
+
+---
+test case: Poller type update - direct
+in:
+  sets:
+  - ref: 1
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 2
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 3
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 4
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 5
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 6
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 7
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 8
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 9
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 10
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 11
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 12
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 13
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 14
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 15
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 16
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 17
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 18
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 19
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 20
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 21
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 22
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 23
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 24
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 25
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 26
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 27
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 28
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 29
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 30
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 31
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 32
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 33
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 34
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 35
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 36
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 37
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 38
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 39
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 40
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 41
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 42
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 43
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 44
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 45
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 46
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 47
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 48
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 49
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 50
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 51
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 52
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 53
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 54
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 55
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 56
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 57
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 58
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 59
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 60
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 61
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 62
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 63
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 64
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 65
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 66
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 67
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 68
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 69
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 70
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 71
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 72
+    access: DIRECT
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 73
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_PINGER
+  - ref: 74
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_PINGER
+  - ref: 75
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_PINGER
+  - ref: 76
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_PINGER
+  - ref: 77
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_PINGER
+  - ref: 78
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_PINGER
+  - ref: 79
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_PINGER
+  - ref: 80
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_PINGER
+  - ref: 81
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_PINGER
+  - ref: 82
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_PINGER
+  - ref: 83
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_PINGER
+  - ref: 84
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_PINGER
+  - ref: 85
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 86
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 87
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 88
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 89
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 90
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 91
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 92
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 93
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 94
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 95
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 96
+    access: DIRECT
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 97
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 98
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 99
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 100
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 101
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 102
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 103
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 104
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 105
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 106
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 107
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 108
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 109
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 110
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 111
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 112
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 113
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 114
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 115
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 116
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 117
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 118
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 119
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 120
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 121
+    access: DIRECT
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 122
+    access: DIRECT
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 123
+    access: DIRECT
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 124
+    access: DIRECT
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 125
+    access: DIRECT
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 126
+    access: DIRECT
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 127
+    access: DIRECT
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 128
+    access: DIRECT
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 129
+    access: DIRECT
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 130
+    access: DIRECT
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 131
+    access: DIRECT
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 132
+    access: DIRECT
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 133
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 134
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 135
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 136
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 137
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 138
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 139
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 140
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 141
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 142
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 143
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 144
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 145
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 146
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 147
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 148
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 149
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 150
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 151
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 152
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 153
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 154
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 155
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 156
+    access: DIRECT
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 157
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 158
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 159
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 160
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 161
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 162
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 163
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 164
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 165
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 166
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 167
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 168
+    access: DIRECT
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 169
+    access: DIRECT
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 170
+    access: DIRECT
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 171
+    access: DIRECT
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 172
+    access: DIRECT
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 173
+    access: DIRECT
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 174
+    access: DIRECT
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 175
+    access: DIRECT
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 176
+    access: DIRECT
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 177
+    access: DIRECT
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 178
+    access: DIRECT
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 179
+    access: DIRECT
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 180
+    access: DIRECT
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 181
+    access: DIRECT
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 182
+    access: DIRECT
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 183
+    access: DIRECT
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 184
+    access: DIRECT
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 185
+    access: DIRECT
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 186
+    access: DIRECT
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 187
+    access: DIRECT
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 188
+    access: DIRECT
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 189
+    access: DIRECT
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 190
+    access: DIRECT
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 191
+    access: DIRECT
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 192
+    access: DIRECT
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 193
+    access: DIRECT
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 194
+    access: DIRECT
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 195
+    access: DIRECT
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 196
+    access: DIRECT
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 197
+    access: DIRECT
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 198
+    access: DIRECT
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 199
+    access: DIRECT
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 200
+    access: DIRECT
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 201
+    access: DIRECT
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 202
+    access: DIRECT
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 203
+    access: DIRECT
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 204
+    access: DIRECT
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 205
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 206
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 207
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 208
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 209
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 210
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 211
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 212
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 213
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 214
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 215
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 216
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 217
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 218
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 219
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 220
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 221
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 222
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 223
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 224
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 225
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 226
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 227
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 228
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 229
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 230
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 231
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 232
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 233
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 234
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 235
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 236
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 237
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 238
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 239
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 240
+    access: DIRECT
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_IPMI
+  - ref: 241
+    access: DIRECT
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 242
+    access: DIRECT
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 243
+    access: DIRECT
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 244
+    access: DIRECT
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 245
+    access: DIRECT
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 246
+    access: DIRECT
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 247
+    access: DIRECT
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 248
+    access: DIRECT
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 249
+    access: DIRECT
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 250
+    access: DIRECT
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 251
+    access: DIRECT
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 252
+    access: DIRECT
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 253
+    access: DIRECT
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 254
+    access: DIRECT
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 255
+    access: DIRECT
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 256
+    access: DIRECT
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 257
+    access: DIRECT
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 258
+    access: DIRECT
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 259
+    access: DIRECT
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 260
+    access: DIRECT
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 261
+    access: DIRECT
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 262
+    access: DIRECT
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 263
+    access: DIRECT
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 264
+    access: DIRECT
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 265
+    access: DIRECT
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 266
+    access: DIRECT
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 267
+    access: DIRECT
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 268
+    access: DIRECT
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 269
+    access: DIRECT
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 270
+    access: DIRECT
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 271
+    access: DIRECT
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 272
+    access: DIRECT
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 273
+    access: DIRECT
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 274
+    access: DIRECT
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 275
+    access: DIRECT
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 276
+    access: DIRECT
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 277
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_JAVA
+  - ref: 278
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 279
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_JAVA
+  - ref: 280
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 281
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_JAVA
+  - ref: 282
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 283
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_JAVA
+  - ref: 284
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 285
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_JAVA
+  - ref: 286
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 287
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_JAVA
+  - ref: 288
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 289
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_JAVA
+  - ref: 290
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 291
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_JAVA
+  - ref: 292
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 293
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_JAVA
+  - ref: 294
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 295
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_JAVA
+  - ref: 296
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 297
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 298
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 299
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_JAVA
+  - ref: 300
+    access: DIRECT
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 301
+    access: DIRECT
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 302
+    access: DIRECT
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 303
+    access: DIRECT
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 304
+    access: DIRECT
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 305
+    access: DIRECT
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 306
+    access: DIRECT
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 307
+    access: DIRECT
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 308
+    access: DIRECT
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 309
+    access: DIRECT
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 310
+    access: DIRECT
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 311
+    access: DIRECT
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 312
+    access: DIRECT
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 313
+    access: DIRECT
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 314
+    access: DIRECT
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 315
+    access: DIRECT
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 316
+    access: DIRECT
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 317
+    access: DIRECT
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 318
+    access: DIRECT
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 319
+    access: DIRECT
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 320
+    access: DIRECT
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 321
+    access: DIRECT
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 322
+    access: DIRECT
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 323
+    access: DIRECT
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 324
+    access: DIRECT
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+---
+test case: Poller type update - by proxy
+in:
+  sets:
+  - ref: 1
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 2
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 3
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 4
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 5
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 6
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 7
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 8
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 9
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 10
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 11
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 12
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 13
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 14
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 15
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 16
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 17
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 18
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 19
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 20
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 21
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 22
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 23
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 24
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 25
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 26
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 27
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 28
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 29
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 30
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 31
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 32
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 33
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 34
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 35
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 36
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 37
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 38
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 39
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 40
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 41
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 42
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 43
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 44
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 45
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 46
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 47
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 48
+    access: PROXY
+    type: ITEM_TYPE_SNMPv1
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 49
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 50
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 51
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 52
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 53
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 54
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 55
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 56
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 57
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 58
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 59
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 60
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 61
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 62
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 63
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 64
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 65
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 66
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 67
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 68
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 69
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 70
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 71
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 72
+    access: PROXY
+    type: ITEM_TYPE_TRAPPER
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 73
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 74
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 75
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 76
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 77
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 78
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 79
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 80
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 81
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 82
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 83
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 84
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 85
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 86
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 87
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 88
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 89
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 90
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 91
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 92
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 93
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 94
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 95
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 96
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: icmpping
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 97
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 98
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 99
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 100
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 101
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 102
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 103
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 104
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 105
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 106
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 107
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 108
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 109
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 110
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 111
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 112
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 113
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 114
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 115
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 116
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 117
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 118
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 119
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 120
+    access: PROXY
+    type: ITEM_TYPE_SIMPLE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 121
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 122
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 123
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 124
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 125
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 126
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 127
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 128
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 129
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 130
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 131
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 132
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 133
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 134
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 135
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 136
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 137
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 138
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 139
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 140
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 141
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 142
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 143
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 144
+    access: PROXY
+    type: ITEM_TYPE_SNMPv2c
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 145
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: zabbix[host,,items]
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 146
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: zabbix[host,,items]
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 147
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: zabbix[host,,items]
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 148
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: zabbix[host,,items]
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 149
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: zabbix[host,,items]
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 150
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: zabbix[host,,items]
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 151
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: zabbix[host,,items]
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 152
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: zabbix[host,,items]
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 153
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: zabbix[host,,items]
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 154
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: zabbix[host,,items]
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 155
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: zabbix[host,,items]
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 156
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: zabbix[host,,items]
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 157
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 158
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 159
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 160
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 161
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 162
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 163
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 164
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 165
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 166
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 167
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 168
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 169
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 170
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 171
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 172
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 173
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 174
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 175
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 176
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 177
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 178
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 179
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 180
+    access: PROXY
+    type: ITEM_TYPE_INTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 181
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 182
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 183
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 184
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 185
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 186
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 187
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 188
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 189
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 190
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 191
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 192
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 193
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 194
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 195
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 196
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 197
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 198
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 199
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 200
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 201
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 202
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 203
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 204
+    access: PROXY
+    type: ITEM_TYPE_SNMPv3
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 205
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 206
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 207
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 208
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 209
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 210
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 211
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 212
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 213
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 214
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 215
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 216
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 217
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 218
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 219
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 220
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 221
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 222
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 223
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 224
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 225
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 226
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 227
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 228
+    access: PROXY
+    type: ITEM_TYPE_ZABBIX_ACTIVE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 229
+    access: PROXY
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 230
+    access: PROXY
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 231
+    access: PROXY
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 232
+    access: PROXY
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 233
+    access: PROXY
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 234
+    access: PROXY
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 235
+    access: PROXY
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 236
+    access: PROXY
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 237
+    access: PROXY
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 238
+    access: PROXY
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 239
+    access: PROXY
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 240
+    access: PROXY
+    type: ITEM_TYPE_AGGREGATE
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 241
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 242
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 243
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 244
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 245
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 246
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 247
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 248
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 249
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 250
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 251
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 252
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 253
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 254
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 255
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 256
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 257
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 258
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 259
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 260
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 261
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 262
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 263
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 264
+    access: PROXY
+    type: ITEM_TYPE_HTTPTEST
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 265
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 266
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 267
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 268
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 269
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 270
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 271
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 272
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 273
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 274
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 275
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 276
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 277
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 278
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 279
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 280
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 281
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 282
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 283
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 284
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 285
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 286
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 287
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 288
+    access: PROXY
+    type: ITEM_TYPE_EXTERNAL
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 289
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 290
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 291
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 292
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 293
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 294
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 295
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 296
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 297
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 298
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 299
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 300
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 301
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 302
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 303
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 304
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 305
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 306
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 307
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 308
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 309
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 310
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 311
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 312
+    access: PROXY
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 313
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 314
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 315
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 316
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 317
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 318
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 319
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 320
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 321
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 322
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 323
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 324
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 325
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 326
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 327
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 328
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 329
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 330
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 331
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 332
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 333
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 334
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 335
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 336
+    access: PROXY
+    type: ITEM_TYPE_IPMI
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 337
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 338
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 339
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 340
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 341
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 342
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 343
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 344
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 345
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 346
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 347
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 348
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 349
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 350
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 351
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 352
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 353
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 354
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 355
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 356
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 357
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 358
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 359
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 360
+    access: PROXY
+    type: ITEM_TYPE_SSH
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 361
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 362
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 363
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 364
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 365
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 366
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 367
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 368
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 369
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 370
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 371
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 372
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 373
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 374
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 375
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 376
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 377
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 378
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 379
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 380
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 381
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 382
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 383
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 384
+    access: PROXY
+    type: ITEM_TYPE_TELNET
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 385
+    access: PROXY
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 386
+    access: PROXY
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 387
+    access: PROXY
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 388
+    access: PROXY
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 389
+    access: PROXY
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 390
+    access: PROXY
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 391
+    access: PROXY
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 392
+    access: PROXY
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 393
+    access: PROXY
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 394
+    access: PROXY
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 395
+    access: PROXY
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 396
+    access: PROXY
+    type: ITEM_TYPE_CALCULATED
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_POLLER_TYPE_NORMAL
+  - ref: 397
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 398
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 399
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 400
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 401
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 402
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 403
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 404
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 405
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 406
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 407
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 408
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 409
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 410
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 411
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 412
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 413
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 414
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 415
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 416
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 417
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 418
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 419
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 420
+    access: PROXY
+    type: ITEM_TYPE_JMX
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 421
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 422
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 423
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 424
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 425
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 426
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 427
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 428
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 429
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 430
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 431
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 432
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 433
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 434
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 435
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 436
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 437
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 438
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 439
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 440
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 441
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 442
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 443
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 444
+    access: PROXY
+    type: ITEM_TYPE_SNMPTRAP
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 445
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 446
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 447
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 448
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 449
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 450
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 451
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 452
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 453
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 454
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 455
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 456
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 457
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 458
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 459
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 460
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 461
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 462
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 463
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 464
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 465
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    result: ZBX_NO_POLLER
+  - ref: 466
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_NO_POLLER
+  - ref: 467
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+  - ref: 468
+    access: PROXY
+    type: ITEM_TYPE_DEPENDENT
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    result: ZBX_NO_POLLER
+...

@@ -26,6 +26,11 @@ require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/helpers/CDBHelper.php';
 require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
 require_once dirname(__FILE__).'/helpers/CExceptionHelper.php';
+require_once dirname(__FILE__).'/helpers/CTestArrayHelper.php';
+
+define('USER_ACTION_ADD', 'add');
+define('USER_ACTION_UPDATE', 'update');
+define('USER_ACTION_REMOVE', 'remove');
 
 /**
  * Base class of php unit tests.
@@ -52,6 +57,15 @@ class CTest extends PHPUnit_Framework_TestCase {
 	protected static $warnings = [];
 	// Skip test suite execution.
 	protected static $skip_suite = false;
+	// Callbacks that should be executed at the test case level.
+	protected $case_callbacks = [];
+	// Callbacks that should be executed at the test suite level.
+	protected static $suite_callbacks = [
+		'after-once' => [],
+		'before-each' => [],
+		'after-each' => [],
+		'after' => []
+	];
 
 	/**
 	 * Overriden constructor for collecting data on data sets from dataProvider annotations.
@@ -112,6 +126,43 @@ class CTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Execute callbacks specified at some point of test execution.
+	 *
+	 * @param mixed $context      class instance or class name
+	 * @param array $callbacks    callbacks to be called
+	 *
+	 * @return boolean
+	 */
+	protected static function executeCallbacks($context, $callbacks) {
+		if (!$callbacks) {
+			return true;
+		}
+
+		$class = new ReflectionClass($context);
+		if (!is_object($context)) {
+			$context = null;
+		}
+
+		foreach ($callbacks as $callback) {
+			$method = $class->getMethod($callback);
+
+			if (!$method) {
+				self::addWarning('Callback "'.$callback.'" is not defined in requested context.');
+			}
+
+			try {
+				$method->invoke(!$method->isStatic() ? $context : null);
+			} catch (Exception $e) {
+				self::addWarning('Failed to execute callback "'.$callback.'": '.$e->getMessage());
+
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Callback executed before every test suite.
 	 */
 	protected function onBeforeTestSuite() {
@@ -127,6 +178,20 @@ class CTest extends PHPUnit_Framework_TestCase {
 		}
 
 		self::$skip_suite = false;
+
+		// Callbacks to be performed before test suite execution.
+		$callbacks = $this->getAnnotationTokensByName($class_annotations, 'on-before');
+		if (!self::executeCallbacks($this, $callbacks)) {
+			self::markTestSuiteSkipped();
+
+			return;
+		}
+
+		// Store callback to be executed later.
+		self::$suite_callbacks = ['after-once' => []];
+		foreach (['before-each', 'after-each', 'after'] as $key) {
+			self::$suite_callbacks[$key] = $this->getAnnotationTokensByName($class_annotations, 'on-'.$key);
+		}
 	}
 
 	/**
@@ -151,11 +216,25 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 		$this->annotations = $this->getAnnotations();
 
-		// Restore data from backup if test case changed
-		if (self::$case_backup_once !== null && self::$last_test_case !== $case_name) {
-			CDBHelper::restoreTables();
-			self::$case_backup_once = null;
+		if (self::$last_test_case !== $case_name) {
+			// Restore data from backup if test case changed.
+			if (self::$case_backup_once !== null) {
+				CDBHelper::restoreTables();
+				self::$case_backup_once = null;
+			}
+
+			self::executeCallbacks($this, self::$suite_callbacks['after-once']);
+			self::$suite_callbacks['after-once'] = [];
 		}
+
+		// Class name change is used to determine suite change.
+		if ($suite !== $class_name) {
+			$suite = $class_name;
+			$this->onBeforeTestSuite();
+		}
+
+		// Execute callbacks that should be executed before every test case.
+		self::executeCallbacks($this, self::$suite_callbacks['before-each']);
 
 		// Test case level annotations.
 		$method_annotations = $this->getAnnotationsByType($this->annotations, 'method');
@@ -189,13 +268,21 @@ class CTest extends PHPUnit_Framework_TestCase {
 					self::$case_backup_once = $case_backup_once;
 					CDBHelper::backupTables(self::$case_backup_once);
 				}
-			}
-		}
 
-		// Class name change is used to determine suite change.
-		if ($suite !== $class_name) {
-			$suite = $class_name;
-			$this->onBeforeTestSuite();
+				// Execute callbacks that should be executed once for multiple test cases.
+				self::executeCallbacks($this, $this->getAnnotationTokensByName($method_annotations, 'on-before-once'));
+
+				// Store callback to be executed after test case is executed for all data sets.
+				self::$suite_callbacks['after-once'] = $this->getAnnotationTokensByName($method_annotations,
+						'on-after-once'
+				);
+			}
+
+			// Execute callbacks that should be executed before specific test case.
+			self::executeCallbacks($this, $this->getAnnotationTokensByName($method_annotations, 'on-before'));
+
+			// Store callback to be executed after test case.
+			$this->case_callbacks = $this->getAnnotationTokensByName($method_annotations, 'on-after');
 		}
 
 		self::$last_test_case = $case_name;
@@ -221,6 +308,12 @@ class CTest extends PHPUnit_Framework_TestCase {
 			CDBHelper::restoreTables();
 		}
 
+		// Execute callbacks that should be executed after specific test case.
+		self::executeCallbacks($this, $this->case_callbacks);
+
+		// Execute callbacks that should be executed after every test case.
+		self::executeCallbacks($this, self::$suite_callbacks['after-each']);
+
 		DBclose();
 
 		if (self::$warnings) {
@@ -240,23 +333,32 @@ class CTest extends PHPUnit_Framework_TestCase {
 	public static function onAfterTestSuite() {
 		global $DB;
 
-		if (self::$suite_backup !== null || self::$case_backup_once !== null) {
-			DBconnect($error);
+		if (self::$suite_backup === null && self::$case_backup_once === null && !self::$suite_callbacks['after-once']
+				&& !self::$suite_callbacks['after']) {
 
-			// Restore case level backups.
-			if (self::$case_backup_once !== null) {
-				CDBHelper::restoreTables();
-				self::$case_backup_once = null;
-			}
-
-			// Restore suite level backups.
-			if (self::$suite_backup !== null) {
-				CDBHelper::restoreTables();
-				self::$suite_backup = null;
-			}
-
-			DBclose();
+			// Nothing to do after test suite.
+			return;
 		}
+
+		DBconnect($error);
+
+		// Restore case level backups.
+		if (self::$case_backup_once !== null) {
+			CDBHelper::restoreTables();
+			self::$case_backup_once = null;
+		}
+
+		// Restore suite level backups.
+		if (self::$suite_backup !== null) {
+			CDBHelper::restoreTables();
+			self::$suite_backup = null;
+		}
+
+		$context = get_called_class();
+		self::executeCallbacks($context, self::$suite_callbacks['after-once']);
+		self::executeCallbacks($context, self::$suite_callbacks['after']);
+
+		DBclose();
 	}
 
 	/**

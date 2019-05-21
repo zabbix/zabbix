@@ -185,7 +185,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	if (FAIL == zbx_ipc_async_socket_open(&ipmi_socket, ZBX_IPC_SERVICE_IPMI, 10, &error))
+	if (FAIL == zbx_ipc_async_socket_open(&ipmi_socket, ZBX_IPC_SERVICE_IPMI, SEC_PER_MIN, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to IPMI service: %s", error);
 		zbx_free(error);
@@ -221,18 +221,21 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-		while (NULL == message)
+		for (;;)
 		{
+			const int ipc_timeout = 2;
 			const int ipmi_timeout = 1;
-			const int ipc_timeout = 1;
-
-			zbx_perform_all_openipmi_ops(ipmi_timeout);
 
 			if (SUCCEED != zbx_ipc_async_socket_recv(&ipmi_socket, ipc_timeout, &message))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot read IPMI service request");
 				exit(EXIT_FAILURE);
 			}
+
+			if (NULL != message)
+				break;
+
+			zbx_perform_all_openipmi_ops(ipmi_timeout);
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
