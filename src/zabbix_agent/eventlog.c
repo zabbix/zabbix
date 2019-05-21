@@ -726,7 +726,7 @@ int	process_eventslog6(const char *server, unsigned short port, const char *even
 	const char	*str_severity, *__function_name = "process_eventslog6";
 	zbx_uint64_t	keywords, i, reading_startpoint = 0;
 	wchar_t		*eventlog_name_w = NULL;
-	int		s_count = 0, p_count = 0, send_err = SUCCEED, ret = FAIL;
+	int		s_count = 0, p_count = 0, send_err = SUCCEED, ret = FAIL, match = SUCCEED;
 	DWORD		required_buf_size = 0, error_code = ERROR_SUCCESS;
 
 	unsigned long	evt_timestamp, evt_eventid;
@@ -831,13 +831,65 @@ int	process_eventslog6(const char *server, unsigned short port, const char *even
 
 			zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", evt_eventid);
 
-			if (SUCCEED == regexp_match_ex(regexps, evt_message, pattern, ZBX_CASE_SENSITIVE) &&
-					SUCCEED == regexp_match_ex(regexps, str_severity, key_severity,
-							ZBX_IGNORE_CASE) &&
-					SUCCEED == regexp_match_ex(regexps, evt_provider, key_source,
-							ZBX_IGNORE_CASE) &&
-					SUCCEED == regexp_match_ex(regexps, str_logeventid, key_logeventid,
-							ZBX_CASE_SENSITIVE))
+			if (0 == p_count)
+			{
+				int	ret1, ret2, ret3, ret4;
+
+				if (FAIL == (ret1 = regexp_match_ex(&regexps, evt_message, pattern,
+						ZBX_CASE_SENSITIVE)))
+				{
+					*error = zbx_strdup(*error,
+							"Invalid regular expression in the second parameter.");
+					match = FAIL;
+				}
+				else if (FAIL == (ret2 = regexp_match_ex(&regexps, str_severity, key_severity,
+						ZBX_IGNORE_CASE)))
+				{
+					*error = zbx_strdup(*error,
+							"Invalid regular expression in the third parameter.");
+					match = FAIL;
+				}
+				else if (FAIL == (ret3 = regexp_match_ex(&regexps, evt_provider, key_source,
+						ZBX_IGNORE_CASE)))
+				{
+					*error = zbx_strdup(*error,
+							"Invalid regular expression in the fourth parameter.");
+					match = FAIL;
+				}
+				else if (FAIL == (ret4 = regexp_match_ex(&regexps, str_logeventid,
+						key_logeventid, ZBX_CASE_SENSITIVE)))
+				{
+					*error = zbx_strdup(*error,
+							"Invalid regular expression in the fifth parameter.");
+					match = FAIL;
+				}
+
+				if (FAIL == match)
+				{
+					zbx_free(evt_source);
+					zbx_free(evt_provider);
+					zbx_free(evt_message);
+
+					ret = FAIL;
+					break;
+				}
+
+				match = (ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
+						ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4);
+			}
+			else
+			{
+				match = (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, evt_message, pattern,
+							ZBX_CASE_SENSITIVE) &&
+						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_severity,
+							key_severity, ZBX_IGNORE_CASE) &&
+						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, evt_provider,
+							key_source, ZBX_IGNORE_CASE) &&
+						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_logeventid,
+							key_logeventid, ZBX_CASE_SENSITIVE));
+			}
+
+			if (1 == match)
 			{
 				send_err = process_value_cb(server, port, CONFIG_HOSTNAME, metric->key_orig,
 						evt_message, ITEM_STATE_NORMAL, &lastlogsize, NULL, &evt_timestamp,
@@ -1205,7 +1257,7 @@ int	process_eventslog(const char *server, unsigned short port, const char *event
 	int		buffer_size = 64 * ZBX_KIBIBYTE;
 	DWORD		num_bytes_read = 0, required_buf_size, ReadDirection, error_code;
 	BYTE		*pELRs = NULL;
-	int		s_count, p_count, send_err = SUCCEED;
+	int		s_count, p_count, send_err = SUCCEED, match = SUCCEED;
 	unsigned long	timestamp = 0;
 	char		*source;
 
@@ -1373,13 +1425,63 @@ int	process_eventslog(const char *server, unsigned short port, const char *event
 
 				zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-				if (SUCCEED == regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
-						SUCCEED == regexp_match_ex(regexps, str_severity, key_severity,
-								ZBX_IGNORE_CASE) &&
-						SUCCEED == regexp_match_ex(regexps, source, key_source,
-								ZBX_IGNORE_CASE) &&
-						SUCCEED == regexp_match_ex(regexps, str_logeventid, key_logeventid,
-								ZBX_CASE_SENSITIVE))
+				if (0 == p_count)
+				{
+					int	ret1, ret2, ret3, ret4;
+
+					if (FAIL == (ret1 = regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE)))
+					{
+						*error = zbx_strdup(*error,
+								"Invalid regular expression in the second parameter.");
+						match = FAIL;
+					}
+					else if (FAIL == (ret2 = regexp_match_ex(&regexps, str_severity, key_severity,
+							ZBX_IGNORE_CASE)))
+					{
+						*error = zbx_strdup(*error,
+								"Invalid regular expression in the third parameter.");
+						match = FAIL;
+					}
+					else if (FAIL == (ret3 = regexp_match_ex(&regexps, source, key_source,
+							ZBX_IGNORE_CASE)))
+					{
+						*error = zbx_strdup(*error,
+								"Invalid regular expression in the fourth parameter.");
+						match = FAIL;
+					}
+					else if (FAIL == (ret4 = regexp_match_ex(&regexps, str_logeventid, key_logeventid,
+							ZBX_CASE_SENSITIVE)))
+					{
+						*error = zbx_strdup(*error,
+								"Invalid regular expression in the fifth parameter.");
+						match = FAIL;
+					}
+
+					if (FAIL == match)
+					{
+						zbx_free(source);
+						zbx_free(value);
+
+						ret = FAIL;
+						break;
+					}
+
+					match = (ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
+							ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4);
+				}
+				else
+				{
+					match = (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, value, pattern,
+								ZBX_CASE_SENSITIVE) &&
+							ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_severity,
+								key_severity, ZBX_IGNORE_CASE) &&
+							ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, source,
+								key_source, ZBX_IGNORE_CASE) &&
+							ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_logeventid,
+								key_logeventid, ZBX_CASE_SENSITIVE));
+				}
+
+				if (1 == match)
 				{
 					send_err = process_value_cb(server, port, CONFIG_HOSTNAME, metric->key_orig,
 							value, ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp,
