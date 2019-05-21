@@ -178,7 +178,7 @@ class CConfigurationExport {
 
 			return $this->writer->write($this->builder->getExport());
 		}
-		catch (Exception $e) {
+		catch (CConfigurationExportException $e) {
 			return false;
 		}
 	}
@@ -1331,7 +1331,7 @@ class CConfigurationExport {
 
 		// Access denied for some objects?
 		if (count($groups) != count($groupIds)) {
-			throw new Exception();
+			throw new CConfigurationExportException();
 		}
 
 		foreach ($groups as &$group) {
@@ -1360,7 +1360,7 @@ class CConfigurationExport {
 
 		// Access denied for some objects?
 		if (count($hosts) != count($hostIds)) {
-			throw new Exception();
+			throw new CConfigurationExportException();
 		}
 
 		foreach ($hosts as $id => $host) {
@@ -1388,7 +1388,7 @@ class CConfigurationExport {
 
 		// Access denied for some objects?
 		if (count($screens) != count($screenIds)) {
-			throw new Exception();
+			throw new CConfigurationExportException();
 		}
 
 		foreach ($screens as $id => $screen) {
@@ -1416,7 +1416,7 @@ class CConfigurationExport {
 
 		// Access denied for some objects?
 		if (count($maps) != count($mapIds)) {
-			throw new Exception();
+			throw new CConfigurationExportException();
 		}
 
 		foreach ($maps as $id => $map) {
@@ -1446,7 +1446,7 @@ class CConfigurationExport {
 
 		// Access denied for some objects?
 		if (count($graphs) != count($graphIds)) {
-			throw new Exception();
+			throw new CConfigurationExportException();
 		}
 
 		foreach ($graphs as $id => $graph) {
@@ -1482,7 +1482,7 @@ class CConfigurationExport {
 
 		// Access denied for some objects?
 		if (count($items) != count($itemIds)) {
-			throw new Exception();
+			throw new CConfigurationExportException();
 		}
 
 		foreach ($items as $id => $item) {
@@ -1515,7 +1515,7 @@ class CConfigurationExport {
 
 		// Access denied for some objects?
 		if (count($triggers) != count($triggerIds)) {
-			throw new Exception();
+			throw new CConfigurationExportException();
 		}
 
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
@@ -1551,7 +1551,7 @@ class CConfigurationExport {
 
 		// Access denied for some objects?
 		if (count($images) != count($imageIds)) {
-			throw new Exception();
+			throw new CConfigurationExportException();
 		}
 
 		foreach ($images as $id => $image) {
