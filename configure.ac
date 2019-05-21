@@ -966,6 +966,7 @@ AC_CHECK_FUNCS(hstrerror)
 AC_CHECK_FUNCS(getenv)
 AC_CHECK_FUNCS(putenv)
 AC_CHECK_FUNCS(sigqueue)
+AC_CHECK_FUNCS(round)
 
 dnl *****************************************************************
 dnl *                                                               *
