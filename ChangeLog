@@ -4,6 +4,16 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+...G...... [ZBX-15915] fixed linking error if round() is undefined (akozlovs)
+....I..... [ZBX-16074] added file revision number generation for compilation on MS Windows (MVekslers)
+..F....... [ZBX-15833] fixed scrollbar in overlay popups (ashubin)
+.......PS. [ZBX-16058] fixed error in IPMI poller causing growing queue (asitals)
+..F....... [ZBX-16047] fixed division by zero error in SVG graph widget if selected time period is so small that calculated step between 2 milestones is 0s (miks)
+..F....... [ZBX-15936] removed "change password" button when cloning media types (vasilijs)
+A.F....... [ZBX-11272] changed sorting by type, fixed information disclosure and formatting of recipient name in action log screen item and dashboard widget; added new sortfields to alert API (miks)
+A.F....... [ZBX-15416] fixed locale validation in user create and update API methods (miks)
+..F....... [ZBX-15877] fixed Tab Key navigation for Safari and Edge browsers (vasilijs)
+........S. [ZBX-15891] fixed trigger dependencies are ignored when changing only trigger state (akozlovs)
 A......... [ZBX-13029] fixed api validation messages for linktrigger (vasilijs)
 ...G...... [ZBX-15967] fixed buffer offset for reading hardware info from long DMI files (viktors)
 ..F....... [ZBX-16018] fixed detection of logical functions (or / and) inside the context of user macros (averza)
@@ -2422,6 +2432,10 @@ Changes for 3.0.28rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-15915] fixed linking error if round() is undefined (akozlovs)
+....I..... [ZBX-16074] added file revision number generation for compilation on MS Windows (MVekslers)
+..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
+A.F....... [ZBX-15416] fixed locale validation in user create and update API methods (miks)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.27
@@ -4572,6 +4586,7 @@ Changes for 2.2.24rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-16074] added file revision number generation for compilation on MS Windows (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.23
