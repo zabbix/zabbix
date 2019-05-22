@@ -965,7 +965,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 	int				i, ret = FAIL;
 	size_t				sz;
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		if (NULL != lastlogsize)
 		{
