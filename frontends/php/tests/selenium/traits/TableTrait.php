@@ -61,16 +61,13 @@ trait TableTrait {
 			throw new Exception('Failed to find key as "text" in: "'.$value.'".');
 		}
 
+		$column = $row->getColumn($name);
 		if (array_key_exists('selector', $value)) {
-			$text = (!is_array($value['text']))
-					? $row->getColumn($name)->query($value['selector'])->one()->getText()
-					: $row->getColumn($name)->query($value['selector'])->all()->asText();
+			$query = $column->query($value['selector']);
+			$text = (!is_array($value['text'])) ? $query->one()->getText() : $query->all()->asText();
 		}
 		else {
-			$text = $row->getColumn($name)->getText();
-			if (is_array($value['text'])) {
-				$text = [$text];
-			}
+			$text = (is_array($value['text'])) ? [$column->getText()] : $column->getText();
 		}
 
 		return $text;
@@ -80,6 +77,7 @@ trait TableTrait {
 	 * Check if values in table rows match data from data provider.
 	 *
 	 * @param array   $data     data array to be match with result in table
+	 * @param string $selector	table selector
 	 */
 	public function assertTableData($data = [], $selector = 'class:list-table') {
 		$rows = $this->query($selector)->asTable()->one()->getRows();
@@ -128,13 +126,14 @@ trait TableTrait {
 	 * Select table rows.
 	 *
 	 * @param mixed $data		rows to be selected
+	 * @param string $selector	table selector
 	 */
-	public function selectTableRows($data = []) {
-		$table = $this->query('class:list-table')->asTable()->one();
+	public function selectTableRows($data = [], $selector = 'class:list-table') {
+		$table = $this->query($selector)->asTable()->one();
 
 		if (!$data) {
 			// Select all rows in table.
-			$table->query('id:all_media_types')->asCheckbox()->one()->check();
+			$table->query('xpath:./thead/tr/th/input[@type="checkbox"]')->asCheckbox()->one()->check();
 
 			return;
 		}
