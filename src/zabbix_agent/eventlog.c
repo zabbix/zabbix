@@ -835,28 +835,28 @@ int	process_eventslog6(const char *server, unsigned short port, const char *even
 			{
 				int	ret1, ret2, ret3, ret4;
 
-				if (FAIL == (ret1 = regexp_match_ex(&regexps, evt_message, pattern,
+				if (FAIL == (ret1 = regexp_match_ex(regexps, evt_message, pattern,
 						ZBX_CASE_SENSITIVE)))
 				{
 					*error = zbx_strdup(*error,
 							"Invalid regular expression in the second parameter.");
 					match = FAIL;
 				}
-				else if (FAIL == (ret2 = regexp_match_ex(&regexps, str_severity, key_severity,
+				else if (FAIL == (ret2 = regexp_match_ex(regexps, str_severity, key_severity,
 						ZBX_IGNORE_CASE)))
 				{
 					*error = zbx_strdup(*error,
 							"Invalid regular expression in the third parameter.");
 					match = FAIL;
 				}
-				else if (FAIL == (ret3 = regexp_match_ex(&regexps, evt_provider, key_source,
+				else if (FAIL == (ret3 = regexp_match_ex(regexps, evt_provider, key_source,
 						ZBX_IGNORE_CASE)))
 				{
 					*error = zbx_strdup(*error,
 							"Invalid regular expression in the fourth parameter.");
 					match = FAIL;
 				}
-				else if (FAIL == (ret4 = regexp_match_ex(&regexps, str_logeventid,
+				else if (FAIL == (ret4 = regexp_match_ex(regexps, str_logeventid,
 						key_logeventid, ZBX_CASE_SENSITIVE)))
 				{
 					*error = zbx_strdup(*error,
@@ -879,13 +879,13 @@ int	process_eventslog6(const char *server, unsigned short port, const char *even
 			}
 			else
 			{
-				match = (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, evt_message, pattern,
+				match = (ZBX_REGEXP_MATCH == regexp_match_ex(regexps, evt_message, pattern,
 							ZBX_CASE_SENSITIVE) &&
-						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_severity,
+						ZBX_REGEXP_MATCH == regexp_match_ex(regexps, str_severity,
 							key_severity, ZBX_IGNORE_CASE) &&
-						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, evt_provider,
+						ZBX_REGEXP_MATCH == regexp_match_ex(regexps, evt_provider,
 							key_source, ZBX_IGNORE_CASE) &&
-						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_logeventid,
+						ZBX_REGEXP_MATCH == regexp_match_ex(regexps, str_logeventid,
 							key_logeventid, ZBX_CASE_SENSITIVE));
 			}
 
@@ -1429,27 +1429,27 @@ int	process_eventslog(const char *server, unsigned short port, const char *event
 				{
 					int	ret1, ret2, ret3, ret4;
 
-					if (FAIL == (ret1 = regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE)))
+					if (FAIL == (ret1 = regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE)))
 					{
 						*error = zbx_strdup(*error,
 								"Invalid regular expression in the second parameter.");
 						match = FAIL;
 					}
-					else if (FAIL == (ret2 = regexp_match_ex(&regexps, str_severity, key_severity,
+					else if (FAIL == (ret2 = regexp_match_ex(regexps, str_severity, key_severity,
 							ZBX_IGNORE_CASE)))
 					{
 						*error = zbx_strdup(*error,
 								"Invalid regular expression in the third parameter.");
 						match = FAIL;
 					}
-					else if (FAIL == (ret3 = regexp_match_ex(&regexps, source, key_source,
+					else if (FAIL == (ret3 = regexp_match_ex(regexps, source, key_source,
 							ZBX_IGNORE_CASE)))
 					{
 						*error = zbx_strdup(*error,
 								"Invalid regular expression in the fourth parameter.");
 						match = FAIL;
 					}
-					else if (FAIL == (ret4 = regexp_match_ex(&regexps, str_logeventid, key_logeventid,
+					else if (FAIL == (ret4 = regexp_match_ex(regexps, str_logeventid, key_logeventid,
 							ZBX_CASE_SENSITIVE)))
 					{
 						*error = zbx_strdup(*error,
@@ -1471,13 +1471,13 @@ int	process_eventslog(const char *server, unsigned short port, const char *event
 				}
 				else
 				{
-					match = (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, value, pattern,
+					match = (ZBX_REGEXP_MATCH == regexp_match_ex(regexps, value, pattern,
 								ZBX_CASE_SENSITIVE) &&
-							ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_severity,
+							ZBX_REGEXP_MATCH == regexp_match_ex(regexps, str_severity,
 								key_severity, ZBX_IGNORE_CASE) &&
-							ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, source,
+							ZBX_REGEXP_MATCH == regexp_match_ex(regexps, source,
 								key_source, ZBX_IGNORE_CASE) &&
-							ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_logeventid,
+							ZBX_REGEXP_MATCH == regexp_match_ex(regexps, str_logeventid,
 								key_logeventid, ZBX_CASE_SENSITIVE));
 				}
 
