@@ -284,7 +284,7 @@ static void	lookup_jabber(const char *server, int port, char *real_server, size_
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	disconnect_jabber()
+static int	disconnect_jabber(void)
 {
 	const char	*__function_name = "disconnect_jabber";
 

@@ -2675,7 +2675,14 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       width: 100%;
       max-height: calc(100vh - 190px);
       max-width: inherit;
-      margin: 0 0 10px 0; }
+      margin: 0 -10px 10px -10px;
+      padding: 0 10px; }
+      .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
+        padding-right: 8px; }
+      .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper {
+        flex-wrap: nowrap; }
+        .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
+          margin-left: 10px; }
     .overlay-dialogue.modal .overlay-dialogue-controls {
       text-align: right;
       padding: 0px 0px 10px 0px; }
@@ -3846,6 +3853,20 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
 .overflow-table::-webkit-scrollbar {
   height: 9px; }
 
+.drag-icon,
+.ui-draggable .dashbrd-widget-head,
+.ui-draggable .dashbrd-grid-widget-head {
+  cursor: move;
+  /* fallback if grab cursor is unsupported */
+  cursor: grab; }
+
+.ui-draggable-dragging .drag-icon,
+.ui-draggable-dragging .dashbrd-widget-head,
+.ui-draggable-dragging .dashbrd-grid-widget-head, .cursor-dragging {
+  cursor: move;
+  /* fallback if grabbing cursor is unsupported */
+  cursor: grabbing; }
+
 .cursor-move {
   cursor: move; }
 
@@ -4281,8 +4302,7 @@ svg {
         .navtree .tree .tree-item > .tree-row > .content > .arrow > .treeview {
           display: none; }
       .navtree .tree .tree-item > .tree-row > .content > .drag-icon {
-        min-width: 24px;
-        cursor: move; }
+        min-width: 24px; }
       .navtree .tree .tree-item > .tree-row > .content > .item-name {
         flex: 0 1 auto;
         white-space: nowrap;

@@ -372,7 +372,7 @@ class CSvgGraph extends CSvg {
 		$period = $this->time_till - $this->time_from;
 		$step = round(bcmul(bcdiv($period, $this->canvas_width), 100)); // Grid cell (100px) in seconds.
 
-		/**
+		/*
 		 * In case if requested time period is so small that it is rounded to zero, we are displaying only two
 		 * milestones on X axis - the start and the end of period.
 		 */

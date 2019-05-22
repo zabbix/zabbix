@@ -61,10 +61,11 @@ class CControllerWidgetNavTreeItemEdit extends CController {
 
 		$formList = new CFormList();
 		$formList->addRow(
-			_('Name'),
+			(new CLabel(_('Name'), 'map.name.'.$map_id))->setAsteriskMark(),
 			(new CTextBox('map.name.'.$map_id, $map_item_name))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
+				->setAriaRequired()
 		);
 
 		$sysmap_id = 0;

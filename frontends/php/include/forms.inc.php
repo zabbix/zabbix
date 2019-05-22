@@ -354,7 +354,7 @@ function getItemFilterForm(&$items) {
 			ITEM_VALUE_TYPE_LOG => _('Log'),
 			ITEM_VALUE_TYPE_TEXT => _('Text')
 		])
-	);;
+	);
 	$filterColumn4->addRow(_('State'),
 		new CComboBox('filter_state', $filter_state, null, [
 			-1 => _('all'),
@@ -1612,27 +1612,33 @@ function getTriggerFormData(array $data) {
 	// Trigger expression constructor.
 	if ($data['expression_constructor'] == IM_TREE) {
 		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
+
 		if ($analyze !== false) {
 			list($data['expression_formula'], $data['expression_tree']) = $analyze;
+
 			if ($data['expression_action'] !== '' && $data['expression_tree'] !== null) {
 				$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
 					$data['expression_action'], $data['expr_temp']
 				);
+
 				if ($new_expr !== false) {
 					$data['expression'] = $new_expr;
 					$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
+
 					if ($analyze !== false) {
 						list($data['expression_formula'], $data['expression_tree']) = $analyze;
 					}
 					else {
 						show_messages(false, '', _('Expression syntax error.'));
 					}
+
 					$data['expr_temp'] = '';
 				}
 				else {
 					show_messages(false, '', _('Expression syntax error.'));
 				}
 			}
+
 			$data['expression_field_name'] = 'expr_temp';
 			$data['expression_field_value'] = $data['expr_temp'];
 			$data['expression_field_readonly'] = true;
@@ -1654,8 +1660,10 @@ function getTriggerFormData(array $data) {
 	// Trigger recovery expression constructor.
 	if ($data['recovery_expression_constructor'] == IM_TREE) {
 		$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
+
 		if ($analyze !== false) {
 			list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
+
 			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] !== null) {
 				$new_expr = remakeExpression($data['recovery_expression'], $_REQUEST['recovery_expr_target_single'],
 					$data['recovery_expression_action'], $data['recovery_expr_temp']
@@ -1664,18 +1672,21 @@ function getTriggerFormData(array $data) {
 				if ($new_expr !== false) {
 					$data['recovery_expression'] = $new_expr;
 					$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
+
 					if ($analyze !== false) {
 						list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
 					}
 					else {
 						show_messages(false, '', _('Recovery expression syntax error.'));
 					}
+
 					$data['recovery_expr_temp'] = '';
 				}
 				else {
 					show_messages(false, '', _('Recovery expression syntax error.'));
 				}
 			}
+
 			$data['recovery_expression_field_name'] = 'recovery_expr_temp';
 			$data['recovery_expression_field_value'] = $data['recovery_expr_temp'];
 			$data['recovery_expression_field_readonly'] = true;

@@ -966,6 +966,7 @@ AC_CHECK_FUNCS(hstrerror)
 AC_CHECK_FUNCS(getenv)
 AC_CHECK_FUNCS(putenv)
 AC_CHECK_FUNCS(sigqueue)
+AC_CHECK_FUNCS(round)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1286,8 +1287,6 @@ esac],
 AM_CONDITIONAL(IPV6, test "x$ipv6" = "xyes")
 
 AM_CONDITIONAL([DBSCHEMA], [test -d create])
-
-AM_CONDITIONAL([ZBXCUNIT], [test -f src/libs/zbxcunit/zbxcunit.c])
 
 AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || test "x$agent" = "xyes")])
 

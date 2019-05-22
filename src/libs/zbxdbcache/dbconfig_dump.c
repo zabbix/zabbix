@@ -1151,7 +1151,7 @@ static void	DCdump_maintenances(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-void	DCdump_configuration()
+void	DCdump_configuration(void)
 {
 	DCdump_config();
 	DCdump_hosts();
