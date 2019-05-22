@@ -192,8 +192,10 @@ jQuery(function($) {
 		url.setArgument('action', 'menu.popup');
 		url.setArgument('type', data.type);
 
-		if ($(document).data('xhr-menu-popup')) {
-			$(document).data('xhr-menu-popup').abort();
+		var xhr_menu_popup = $(document).data('xhr-menu-popup');
+
+		if (xhr_menu_popup) {
+			xhr_menu_popup.abort();
 		}
 
 		$('.action-menu.action-menu-top').remove();
