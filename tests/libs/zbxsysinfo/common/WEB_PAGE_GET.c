@@ -86,7 +86,6 @@ void	zbx_mock_test_entry(void **state)
 		rvalue = (NULL != GET_TEXT_RESULT(&param_result)) ? *GET_TEXT_RESULT(&param_result) : NULL;
 	}
 
-
 	if (NULL == rvalue)
 		fail_msg("Got 'NULL' response.");
 
