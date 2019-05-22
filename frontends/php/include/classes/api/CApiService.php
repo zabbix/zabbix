@@ -576,7 +576,7 @@ class CApiService {
 	 */
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
 		// add sort field to select if distinct is used
-		if (count($sqlParts['from']) > 1
+		if ((count($sqlParts['from']) > 1 || (isset($sqlParts['left_join']) && count($sqlParts['left_join'])))
 				&& !str_in_array($alias.'.'.$sortfield, $sqlParts['select'])
 				&& !str_in_array($alias.'.*', $sqlParts['select'])) {
 
