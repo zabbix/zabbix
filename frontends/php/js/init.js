@@ -162,7 +162,7 @@ jQuery(function($) {
 					left: event.pageX - $(document).scrollLeft()
 				})
 				.fadeIn(200);
-		},500);
+		}, 500);
 
 		return $preloader.hide();
 	}
