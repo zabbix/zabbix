@@ -25,6 +25,7 @@
 
 #include "common.h"
 #include "zbxjson.h"
+#include "../../../src/libs/zbxjson/json.h"
 
 static void	check_definite_path_result(zbx_mock_handle_t handle, const char *returned_output)
 {
@@ -60,6 +61,9 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
+	/* reset json error to check if compilation will set it */
+	zbx_set_json_strerror("%s", "");
+
 	data = zbx_mock_get_parameter_string("in.data");
 	if (FAIL == zbx_json_open(data, &jp))
 		fail_msg("Invalid json data: %s", zbx_json_strerror());
@@ -83,6 +87,8 @@ void	zbx_mock_test_entry(void **state)
 		else
 			zbx_mock_assert_ptr_eq("Query result", NULL, output);
 	}
+	else
+		zbx_mock_assert_str_ne("tzbx_jsonpath_query() error", "", zbx_json_strerror());
 
 	zbx_free(output);
 }

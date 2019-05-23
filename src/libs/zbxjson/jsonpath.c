@@ -2314,7 +2314,7 @@ int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath)
 	zbx_jsonpath_segment_type_t	segment_type, last_segment_type = ZBX_JSONPATH_SEGMENT_UNKNOWN;
 	char				prefix;
 
-	if ('$' != *ptr)
+	if ('$' != *ptr || '\0' == ptr[1])
 		return zbx_jsonpath_error(ptr);
 
 	memset(jsonpath, 0, sizeof(zbx_jsonpath_t));

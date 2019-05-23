@@ -26,6 +26,7 @@
 #include "zbxjson.h"
 
 #include "../../../src/libs/zbxjson/jsonpath.h"
+#include "../../../src/libs/zbxjson/json.h"
 
 static int	mock_str_to_segment_type(const char *segment_type)
 {
@@ -215,6 +216,9 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
+	/* reset json error to check if compilation will set it */
+	zbx_set_json_strerror("%s", "");
+
 	returned_ret = zbx_jsonpath_compile(zbx_mock_get_parameter_string("in.path"), &jsonpath);
 
 	if (FAIL == returned_ret)
@@ -252,6 +256,8 @@ void	zbx_mock_test_entry(void **state)
 
 		zbx_jsonpath_clear(&jsonpath);
 	}
+	else
+		zbx_mock_assert_str_ne("zbx_jsonpath_compile() error", "", zbx_json_strerror());
 }
 
 
