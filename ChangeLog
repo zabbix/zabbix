@@ -2823,8 +2823,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.28rc1
 
-New features:
-
 Bug fixes:
 ...G...... [ZBX-15915] fixed linking error if round() is undefined (akozlovs)
 ....I..... [ZBX-16074] added file revision number generation for compilation on MS Windows (MVekslers)
