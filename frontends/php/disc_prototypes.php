@@ -734,7 +734,7 @@ if (isset($_REQUEST['form'])) {
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
 	$history_in_seconds = timeUnitToSeconds($data['history']);
-	if ($history_in_seconds !== null && $history_in_seconds == ITEM_NO_STORAGE_VALUE) {
+	if (!getRequest('form_refresh') && $history_in_seconds !== null && $history_in_seconds == ITEM_NO_STORAGE_VALUE) {
 		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_OFF);
 		$data['history'] = DB::getDefault('items', 'history');
 	}
@@ -743,9 +743,8 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	$trends_in_seconds = timeUnitToSeconds($data['trends']);
-	if ($trends_in_seconds !== null && $trends_in_seconds == ITEM_NO_STORAGE_VALUE) {
-		$trends_mode_default = timeUnitToSeconds($data['trends_default']) ? ITEM_STORAGE_CUSTOM : ITEM_STORAGE_OFF;
-		$data['trends_mode'] = getRequest('trends_mode', $trends_mode_default);
+	if (!getRequest('form_refresh') && $trends_in_seconds !== null && $trends_in_seconds == ITEM_NO_STORAGE_VALUE) {
+		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_OFF);
 		$data['trends'] = $data['trends_default'];
 	}
 	else {
