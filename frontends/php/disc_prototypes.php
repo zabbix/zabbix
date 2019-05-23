@@ -744,8 +744,9 @@ if (isset($_REQUEST['form'])) {
 
 	$trends_in_seconds = timeUnitToSeconds($data['trends']);
 	if ($trends_in_seconds !== null && $trends_in_seconds == ITEM_NO_STORAGE_VALUE) {
-		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_OFF);
-		$data['trends'] = DB::getDefault('items', 'trends');
+		$trends_mode_default = timeUnitToSeconds($data['trends_default']) ? ITEM_STORAGE_CUSTOM : ITEM_STORAGE_OFF;
+		$data['trends_mode'] = getRequest('trends_mode', $trends_mode_default);
+		$data['trends'] = $data['trends_default'];
 	}
 	else {
 		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
