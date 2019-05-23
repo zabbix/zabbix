@@ -100,6 +100,7 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'r
 					trends.val('<?= $this->data['trends_default'] ?>');
 				}
 				$('#trends_mode_1').prop('checked', true);
+				$('#trends_mode_hint').show();
 			}
 		});
 
