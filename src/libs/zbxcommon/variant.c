@@ -418,6 +418,9 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 		case ZBX_VARIANT_UI64:
 			value1_dbl = value1->data.ui64;
 			break;
+		case ZBX_VARIANT_STR:
+			value1_dbl = atof(value1->data.str);
+			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -431,6 +434,9 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 		case ZBX_VARIANT_UI64:
 			value2_dbl = value2->data.ui64;
 			break;
+		case ZBX_VARIANT_STR:
+			value2_dbl = atof(value2->data.str);
+			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -440,6 +446,7 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 		return 0;
 
 	ZBX_RETURN_IF_NOT_EQUAL(value1_dbl, value2_dbl);
+
 	THIS_SHOULD_NEVER_HAPPEN;
 	exit(EXIT_FAILURE);
 }
@@ -473,13 +480,15 @@ static int	variant_compare_ui64(const zbx_variant_t *value1, const zbx_variant_t
  * Comments: The following priority is applied:                               *
  *           1) value of none type is always less than other types, two       *
  *              none types are equal                                          *
- *           1) value of binary type is always greater than other types, two  *
+ *           2) value of binary type is always greater than other types, two  *
  *              binary types are compared by length and then by contents      *
+ *           3) if both values have uint64 types, they are compared           *
+ *           4) convert both values to floating type, compare if succeeded    *
  *           2) if any of value is of string type, the other is converted to  *
  *              string and both are compared                                  *
  *           3) if any of value is of floating type, the other is converted   *
  *              to floating value and both are compared                       *
- *           4) only uin64 types are left, compare as uin64                   *
+ *           4) only uint64 types are left, compare as uint64                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2)
@@ -490,17 +499,17 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 	if (ZBX_VARIANT_BIN == value1->type || ZBX_VARIANT_BIN == value2->type)
 		return variant_compare_bin(value1, value2);
 
-	if (ZBX_VARIANT_STR == value1->type || ZBX_VARIANT_STR == value2->type)
-		return variant_compare_str(value1, value2);
-
-	if (ZBX_VARIANT_DBL == value1->type || ZBX_VARIANT_DBL == value2->type)
-		return variant_compare_dbl(value1, value2);
-
 	if (ZBX_VARIANT_UI64 == value1->type && ZBX_VARIANT_UI64 == value2->type)
-		return variant_compare_ui64(value1, value2);
+		return  variant_compare_ui64(value1, value2);
 
-	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+	if ((ZBX_VARIANT_STR != value1->type || SUCCEED == is_double(value1->data.str)) &&
+			(ZBX_VARIANT_STR != value2->type || SUCCEED == is_double(value2->data.str)))
+	{
+		return variant_compare_dbl(value1, value2);
+	}
+
+	/* at this point at least one of the values is string data, other can be uint64, floating or string */
+	return variant_compare_str(value1, value2);
 }
 
 

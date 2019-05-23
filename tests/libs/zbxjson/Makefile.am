@@ -3,7 +3,8 @@ noinst_PROGRAMS = \
 	zbx_json_path_open \
 	zbx_json_decodevalue \
 	zbx_json_decodevalue_dyn \
-	zbx_jsonpath_compile
+	zbx_jsonpath_compile \
+	zbx_jsonpath_query
 
 JSON_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
@@ -97,3 +98,18 @@ zbx_jsonpath_compile_LDFLAGS = @SERVER_LDFLAGS@
 endif
 
 zbx_jsonpath_compile_CFLAGS = -I@top_srcdir@/tests
+
+# zbx_jsonpath_query
+
+zbx_jsonpath_query_SOURCES = \
+	zbx_jsonpath_query.c \
+	../../zbxmocktest.h
+
+zbx_jsonpath_query_LDADD = $(JSON_LIBS)
+
+if SERVER
+zbx_jsonpath_query_LDADD += @SERVER_LIBS@
+zbx_jsonpath_query_LDFLAGS = @SERVER_LDFLAGS@
+endif
+
+zbx_jsonpath_query_CFLAGS = -I@top_srcdir@/tests

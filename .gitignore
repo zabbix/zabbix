@@ -131,6 +131,7 @@ tests/libs/zbxjson/jsonpath_next
 tests/libs/zbxjson/zbx_json_decodevalue
 tests/libs/zbxjson/zbx_json_decodevalue_dyn
 tests/libs/zbxjson/zbx_jsonpath_compile
+tests/libs/zbxjson/zbx_jsonpath_query
 tests/libs/zbxprometheus/prometheus_filter_init
 tests/libs/zbxprometheus/prometheus_parse_row
 tests/libs/zbxprometheus/zbx_prometheus_pattern
@@ -147,6 +148,7 @@ tests/libs/zbxsysinfo/linux/NET_IF_TOTAL
 tests/libs/zbxsysinfo/linux/SYSTEM_BOOTTIME
 tests/libs/zbxsysinfo/linux/SYSTEM_CPU_INTR
 tests/libs/zbxsysinfo/linux/SYSTEM_CPU_SWITCHES
+tests/libs/zbxsysinfo/linux/SYSTEM_HW_CHASSIS
 tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY
 tests/libs/zbxsysinfo/linux/SYSTEM_HW_CHASSIS
 tests/libs/zbxsysinfo/parse_item_key

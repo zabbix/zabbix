@@ -657,7 +657,7 @@ in:
   path: $.min()
 out:
   result: SUCCEED 
-  definite: 0
+  definite: 1
   segments:
     - type: ZBX_JSONPATH_SEGMENT_FUNCTION
       data: "min()"
@@ -667,7 +667,7 @@ in:
   path: $.max()
 out:
   result: SUCCEED 
-  definite: 0
+  definite: 1
   segments:
     - type: ZBX_JSONPATH_SEGMENT_FUNCTION
       data: "max()"
@@ -677,7 +677,7 @@ in:
   path: $.avg()
 out:
   result: SUCCEED 
-  definite: 0
+  definite: 1
   segments:
     - type: ZBX_JSONPATH_SEGMENT_FUNCTION
       data: "avg()"
@@ -687,7 +687,7 @@ in:
   path: $.length()
 out:
   result: SUCCEED 
-  definite: 0
+  definite: 1
   segments:
     - type: ZBX_JSONPATH_SEGMENT_FUNCTION
       data: "length()"
@@ -697,7 +697,7 @@ in:
   path: $.avg( )
 out:
   result: SUCCEED 
-  definite: 0
+  definite: 1
   segments:
     - type: ZBX_JSONPATH_SEGMENT_FUNCTION
       data: "avg()"
@@ -707,7 +707,7 @@ in:
   path: $.first().max()
 out:
   result: SUCCEED 
-  definite: 0
+  definite: 1
   segments:
     - type: ZBX_JSONPATH_SEGMENT_FUNCTION
       data: "first()"
@@ -1009,4 +1009,21 @@ out:
   segments:
     - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
       data: "1 , 2 , == , 3 , =="
+---
+test case: Compile fail $[?(1 == 2 == 3]
+in:
+  path: $[?(1 == 2 == 3]
+out:
+  result: FAIL 
+---
+test case: Compile success $..[?(@.id)]
+in:
+  path: $..[?(@.id)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "@.id"
+      detached: 1
 ...

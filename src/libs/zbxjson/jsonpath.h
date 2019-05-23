@@ -71,7 +71,7 @@ typedef struct
 	int		end;
 	unsigned int	flags;
 }
-zbx_jsonpath_slice_t;
+zbx_jsonpath_range_t;
 
 /* expression tokens in posfix notation */
 typedef struct
@@ -89,7 +89,7 @@ zbx_jsonpath_function_t;
 typedef union
 {
 	zbx_jsonpath_list_t		list;
-	zbx_jsonpath_slice_t		range;
+	zbx_jsonpath_range_t		range;
 	zbx_jsonpath_expression_t	expression;
 	zbx_jsonpath_function_t		function;
 }

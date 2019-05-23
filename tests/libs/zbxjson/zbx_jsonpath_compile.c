@@ -159,11 +159,11 @@ static char	*segment_data_to_str(zbx_jsonpath_segment_t *segment)
 			zbx_vector_ptr_destroy(&nodes);
 			break;
 		case ZBX_JSONPATH_SEGMENT_MATCH_RANGE:
-			if (0 != (segment->data.slice.flags & 0x01))
-				zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "%d", segment->data.slice.start);
+			if (0 != (segment->data.range.flags & 0x01))
+				zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "%d", segment->data.range.start);
 			zbx_chrcpy_alloc(&data, &data_alloc, &data_offset, ':');
-			if (0 != (segment->data.slice.flags & 0x02))
-				zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "%d", segment->data.slice.end);
+			if (0 != (segment->data.range.flags & 0x02))
+				zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "%d", segment->data.range.end);
 			break;
 		case ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION:
 			for (i = 0; i < segment->data.expression.tokens.values_num; i++)
@@ -250,6 +250,7 @@ void	zbx_mock_test_entry(void **state)
 
 		zbx_mock_assert_int_eq("Not enough path segments parsed", index, jsonpath.segments_num);
 
+		zbx_jsonpath_clear(&jsonpath);
 	}
 }
 
