@@ -94,10 +94,12 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'r
 
 			if ((old_value == <?= ITEM_VALUE_TYPE_STR ?> || old_value == <?= ITEM_VALUE_TYPE_LOG ?>
 					|| old_value == <?= ITEM_VALUE_TYPE_TEXT ?>)
-					&& ((new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
-					|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)
-					&& trends.val() == 0)) {
-				trends.val('<?= $this->data['trends_default'] ?>');
+					&& (new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
+					|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)) {
+				if (trends.val() == 0) {
+					trends.val('<?= $this->data['trends_default'] ?>');
+				}
+				$('#trends_mode_1').prop('checked', true);
 			}
 		});
 
