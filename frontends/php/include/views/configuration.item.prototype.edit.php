@@ -681,7 +681,7 @@ $itemFormList->addRow((new CLabel(_('History storage period'), 'history'))->setA
 		(new CTextBox('history', $data['history']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
-	]))->addStyle('display: flex;')
+	]))->addClass('wrap-multiple-controls')
 );
 
 $itemFormList->addRow((new CLabel(_('Trend storage period'), 'trends'))->setAsteriskMark(),
@@ -694,7 +694,7 @@ $itemFormList->addRow((new CLabel(_('Trend storage period'), 'trends'))->setAste
 		(new CTextBox('trends', $data['trends']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
-	]))->addStyle('display: flex;'),
+	]))->addClass('wrap-multiple-controls'),
 	'row_trends'
 );
 

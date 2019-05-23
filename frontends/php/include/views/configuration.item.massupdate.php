@@ -527,7 +527,7 @@ $itemFormList
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired()
 		]))
-			->addStyle('display: flex;')
+			->addClass('wrap-multiple-controls')
 			->setId('history_div')
 	)
 	->addRow(
@@ -544,7 +544,7 @@ $itemFormList
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired()
 		]))
-			->addStyle('display: flex;')
+			->addClass('wrap-multiple-controls')
 			->setId('trends_div')
 	);
 

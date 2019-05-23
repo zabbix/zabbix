@@ -787,7 +787,7 @@ $itemFormList->addRow((new CLabel(_('History storage period'), 'history'))->setA
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired(),
 		$keep_history_hint
-	]))->addStyle('display: flex;')
+	]))->addClass('wrap-multiple-controls')
 );
 
 // Append trend storage to form list.
@@ -821,7 +821,7 @@ $itemFormList->addRow((new CLabel(_('Trend storage period'), 'trends'))->setAste
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired(),
 		$keep_trend_hint
-	]))->addStyle('display: flex;'),
+	]))->addClass('wrap-multiple-controls'),
 	'row_trends'
 );
 
