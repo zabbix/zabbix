@@ -866,7 +866,7 @@ function getLastProblems(array $options) {
 			'resolved' => $resolved,
 			'triggerid' => $problem['objectid'],
 			'objectid' => $problem['objectid'],
-			'eventid' => $resolved ? $problem['r_eventid'] : $problem['eventid'],
+			'eventid' => $problem['eventid'],
 			'description' => $problem['name'],
 			'host' => reset($trigger['hosts']),
 			'severity' => $problem['severity'],

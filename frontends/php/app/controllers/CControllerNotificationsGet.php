@@ -125,6 +125,7 @@ class CControllerNotificationsGet extends CController {
 		return [
 			'id' => $problem['eventid'],
 			'time' => $problem['clock'],
+			'resolved' => (int) $problem['resolved'],
 			'uid' => sprintf('%d_%d', $problem['eventid'], $problem['resolved']),
 			'priority' => $severity,
 			'file' => $fileid,

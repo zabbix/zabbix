@@ -152,7 +152,11 @@ ZBX_Notifications.prototype.onPollerReceiveUpdates = function(resp) {
 	resp.notifications.forEach(function(notif) {
 		recv_ids.push(notif.uid);
 		if (!current_timeouts[notif.uid]) {
-			current_timeouts[notif.uid] = {recv_time: time_local, msg_timeout: resp.settings.msg_timeout}
+			current_timeouts[notif.uid] = {
+				recv_time: time_local,
+				msg_timeout: resp.settings.msg_timeout,
+				flip_uid: notif.id + '_' + (1 - notif.resolved)
+			};
 		}
 		else {
 			current_timeouts[notif.uid].msg_timeout = resp.settings.msg_timeout;
@@ -161,7 +165,10 @@ ZBX_Notifications.prototype.onPollerReceiveUpdates = function(resp) {
 
 	// Filter timedout.
 	for (var id in current_timeouts) {
-		if (current_timeouts[id].recv_time + current_timeouts[id].msg_timeout < time_local) {
+		var timedout = (current_timeouts[id].recv_time + current_timeouts[id].msg_timeout < time_local),
+			state_changed = (recv_ids.indexOf(current_timeouts[id].flip_uid) !== -1);
+
+		if (timedout || state_changed) {
 			delete current_timeouts[id];
 		}
 	}
