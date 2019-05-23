@@ -74,7 +74,13 @@ $availableJScripts = [
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
-	'class.cmessages.js' => '',
+	'class.promise.js' => '',
+	'class.localstorage.js' => '',
+	'class.notifications.js' => '',
+	'class.notification.js' => '',
+	'class.notification.collection.js' => '',
+	'class.notifications.audio.js' => '',
+	'class.browsertab.js' => '',
 	'class.cnavtree.js' => '',
 	'class.cookie.js' => '',
 	'class.coverride.js' => '',
@@ -190,7 +196,7 @@ $tranStrings = [
 		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
 		'S_COLOR_IS_NOT_CORRECT' => _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).')
 	],
-	'class.cmessages.js' => [
+	'class.notifications.js' => [
 		'S_MUTE' => _('Mute'),
 		'S_UNMUTE' => _('Unmute'),
 		'S_CLEAR' => _('Clear'),
@@ -300,6 +306,7 @@ $tranStrings = [
 ];
 
 if (empty($_GET['files'])) {
+	header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']));
 	$files = [
 		'prototype.js',
 		'jquery.js',
@@ -321,18 +328,24 @@ if (empty($_GET['files'])) {
 
 	// load frontend messaging only for some pages
 	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
-		$files[] = 'class.cmessages.js';
+		$files[] = 'class.promise.js';
+		$files[] = 'class.localstorage.js';
+		$files[] = 'class.browsertab.js';
+		$files[] = 'class.notification.collection.js';
+		$files[] = 'class.notifications.audio.js';
+		$files[] = 'class.notification.js';
+		$files[] = 'class.notifications.js';
 	}
 }
 else {
 	$files = $_GET['files'];
 }
 
-$js = 'if (typeof(locale) == "undefined") { var locale = {}; }'."\n";
+$js = 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
 foreach ($files as $file) {
 	if (isset($tranStrings[$file])) {
 		foreach ($tranStrings[$file] as $origStr => $str) {
-			$js .= "locale['".$origStr."'] = ".zbx_jsvalue($str).";";
+			$js .= 'locale[\'' . $origStr . '\'] = ' . zbx_jsvalue($str) . ';';
 		}
 	}
 }
