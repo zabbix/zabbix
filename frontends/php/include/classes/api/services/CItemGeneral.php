@@ -268,7 +268,7 @@ abstract class CItemGeneral extends CApiService {
 
 				$this->checkNoParameters(
 					$item,
-					['templateid', 'state'],
+					['templateid', 'state', 'lastlogsize', 'mtime', 'error'],
 					_('Cannot update "%1$s" for item "%2$s".'),
 					$item['name']
 				);
@@ -640,9 +640,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @return bool
 	 */
-	protected function checkSpecificFields(array $item, $method) {
-		return true;
-	}
+	abstract protected function checkSpecificFields(array $item, $method);
 
 	protected function clearValues(array $item) {
 		if (isset($item['port']) && $item['port'] != '') {

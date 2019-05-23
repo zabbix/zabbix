@@ -40,6 +40,27 @@ class CDiscoveryRule extends CItemGeneral {
 		ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON
 	];
 
+	/**
+	 * Fields name of item_rtdata
+	 *
+	 * @var array
+	 */
+	protected $secondaryTableFields = ['state', 'error', 'mtime', 'lastlogsize'];
+
+	/**
+	 * Secondaary table name
+	 *
+	 * @var string
+	 */
+	protected $secondaryTableName = 'item_rtdata';
+
+	/**
+	 * Secondary table alias
+	 *
+	 * @var string
+	 */
+	protected $secondaryTableAlias = 'ir';
+
 	public function __construct() {
 		parent::__construct();
 
@@ -120,6 +141,20 @@ class CDiscoveryRule extends CItemGeneral {
 				' HAVING MIN(r.permission)>'.PERM_DENY.
 					' AND MAX(r.permission)>='.zbx_dbstr($permission).
 				')';
+		}
+
+		if (
+			(
+				(!$options['countOutput'] || ($options['countOutput'] && $options['groupCount'])) &&
+				($this->outputIsRequested('state', $options['output']) || $this->outputIsRequested('error', $options['output']) ||
+				$this->outputIsRequested('mtime', $options['output']) || $this->outputIsRequested('lastlogsize', $options['output']))
+			) ||
+			(is_array($options['search']) && (isset($options['search']['state']) || isset($options['search']['error']))) ||
+			(is_array($options['filter']) && (isset($options['filter']['state']) || isset($options['filter']['error'])))
+		) {
+			$sqlParts = $this->addQuerySelect($this->fieldId('*', $this->getSecondaryTableAlias()), $sqlParts);
+			$sqlParts['left_join'][$this->getSecondaryTableName()] = ['from' => $this->tableId($this->getSecondaryTableName(), $this->getSecondaryTableAlias()), 'on' => $this->fieldId('itemid', $this->getSecondaryTableAlias()) . ' = ' . $this->fieldId('itemid')];
+			$sqlParts['left_table'] = $this->tableName();
 		}
 
 		// templateids
@@ -203,7 +238,20 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search('items i', $options, $sqlParts);
+			$itemDataSearch = ['search' => [], 'startSearch' => $options['startSearch'], 'excludeSearch' => $options['excludeSearch'], 'searchByAny' => $options['searchByAny'], 'searchWildcardsEnabled' => $options['searchWildcardsEnabled']];
+
+			if (array_key_exists('state', $options['search']) && $options['search']['state'] !== null) {
+				$itemDataSearch['search']['state'] = $options['search']['state'];
+				unset($options['search']['state']);
+			}
+
+			if (array_key_exists('error', $options['search']) && $options['search']['error'] !== null) {
+				$itemDataSearch['search']['error'] = $options['search']['error'];
+				unset($options['search']['error']);
+			}
+
+			zbx_db_search($this->tableId(), $options, $sqlParts);
+			zbx_db_search($this->tableId($this->getSecondaryTableName(), $this->getSecondaryTableAlias()), $itemDataSearch, $sqlParts);
 		}
 
 		// filter
@@ -217,7 +265,20 @@ class CDiscoveryRule extends CItemGeneral {
 				$options['filter']['lifetime'] = getTimeUnitFilters($options['filter']['lifetime']);
 			}
 
-			$this->dbFilter('items i', $options, $sqlParts);
+			$itemDataFilter = ['filter' => [], 'searchByAny' => $options['searchByAny']];
+
+			if (array_key_exists('state', $options['filter']) && $options['filter']['state'] !== null) {
+				$itemDataFilter['filter']['state'] = $options['filter']['state'];
+				unset($options['filter']['state']);
+			}
+
+			if (array_key_exists('error', $options['filter']) && $options['filter']['error'] !== null) {
+				$itemDataFilter['filter']['error'] = $options['filter']['error'];
+				unset($options['filter']['error']);
+			}
+
+			$this->dbFilter($this->tableId(), $options, $sqlParts);
+			$this->dbFilter($this->tableId($this->getSecondaryTableName(), $this->getSecondaryTableAlias()), $itemDataFilter, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
@@ -257,6 +318,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['lastlogsize', 'mtime'], []); // Fields lastlogsize, mtime should be removed from API response even for extend output requests.
 
 			foreach ($result as &$rule) {
 				// unset the fields that are returned in the filter
@@ -889,16 +951,44 @@ class CDiscoveryRule extends CItemGeneral {
 
 	protected function createReal(&$items) {
 		// create items without formulas, they will be updated when items and conditions are saved
+		$itemData = [];
 		$createItems = [];
-		foreach ($items as $item) {
+		foreach ($items as $key => $item) {
 			if (isset($item['filter'])) {
 				$item['evaltype'] = $item['filter']['evaltype'];
 				unset($item['filter']);
 			}
 
+			$itemData[$key] = DB::getDefaults($this->getSecondaryTableName());
+			foreach ($this->secondaryTableFields as $field) {
+				if (isset($item[$field])) {
+					$itemData[$key][$field] = $item[$field];
+					unset($item[$field]);
+				}
+			}
+
 			$createItems[] = $item;
 		}
-		$createItems = DB::save('items', $createItems);
+		$createItems = DB::save($this->tableName(), $createItems);
+
+		$hosts = API::Host()->get([
+			'output' => ['hostid'],
+			'filter' => ['hostid' => zbx_objectValues($createItems, 'hostid')],
+		]);
+		$hostids = zbx_objectValues($hosts, 'hostid');
+		if ($hostids) {
+			foreach ($createItems as $key => $item) {
+				if (in_array($item['hostid'], $hostids)) {
+					$itemData[$key]['itemid'] = $item['itemid'];
+					continue;
+				}
+				unset($itemData[$key]);
+			}
+
+			if (count($itemData)) {
+				DB::insert($this->getSecondaryTableName(), $itemData, false);
+			}
+		}
 
 		$conditions = [];
 		foreach ($items as $key => &$item) {
@@ -1965,6 +2055,14 @@ class CDiscoveryRule extends CItemGeneral {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (!$options['countOutput']) {
+			if (isset($sqlParts['left_join'][$this->getSecondaryTableName()]) && is_array($options['output'])) {
+				foreach ($this->secondaryTableFields as $field) {
+					if ($this->outputIsRequested($field, $options['output'])) {
+						$sqlParts = $this->addQuerySelect($this->fieldId($field, $this->getSecondaryTableAlias()), $sqlParts);
+					}
+				}
+			}
+
 			// add filter fields
 			if ($this->outputIsRequested('formula', $options['selectFilter'])
 					|| $this->outputIsRequested('eval_formula', $options['selectFilter'])
@@ -2234,5 +2332,15 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		return $result;
+	}
+
+	public function getSecondaryTableName()
+	{
+		return $this->secondaryTableName;
+	}
+
+	public function getSecondaryTableAlias()
+	{
+		return $this->secondaryTableAlias;
 	}
 }
