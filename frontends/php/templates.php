@@ -66,31 +66,28 @@ $fields = [
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
-function prepare_html() {
+function prepare_page_header(string $type) {
 	global $page;
 
-	$page['title'] = _('Configuration of templates');
-	$page['file'] = 'templates.php';
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['scripts'] = ['multiselect.js'];
-
-	require_once dirname(__FILE__) . '/include/page_header.php';
-}
-
-function prepare_xml() {
-	global $page;
-
-	$page['file'] = 'zbx_export_templates.xml';
-	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-
-	require_once dirname(__FILE__) . '/include/page_header.php';
+	if ($type == 'html') {
+		$page['title'] = _('Configuration of templates');
+		$page['file'] = 'templates.php';
+		$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+		$page['scripts'] = ['multiselect.js'];
+	}
+	elseif ($type == 'xml') {
+		$page['file'] = 'zbx_export_templates.xml';
+		$page['type'] = detect_page_type(PAGE_TYPE_XML);
+	}
 }
 
 $fields_error = check_fields_raw($fields);
 if ($fields_error & ZBX_VALID_ERROR) {
 	// Halt on a HTML page with errors.
 
-	prepare_html();
+	prepare_page_header('html');
+	require_once dirname(__FILE__) . '/include/page_header.php';
+
 	invalid_url();
 }
 
@@ -115,7 +112,9 @@ if (getRequest('templateid')) {
 if ($access_deny) {
 	// Halt on a HTML page with errors.
 
-	prepare_html();
+	prepare_page_header('html');
+	require_once dirname(__FILE__) . '/include/page_header.php';
+
 	access_deny();
 }
 
@@ -129,15 +128,21 @@ if (hasRequest('action') && getRequest('action') == 'template.export' && hasRequ
 	$export_data = $export->export();
 
 	if (false === $export_data) {
-		prepare_html();
+		prepare_page_header('html');
+		require_once dirname(__FILE__) . '/include/page_header.php';
+
 		access_deny();
 	}
 	elseif (hasErrorMesssages()) {
-		prepare_html();
+		prepare_page_header('html');
+		require_once dirname(__FILE__) . '/include/page_header.php';
+
 		show_messages();
 	}
 	else {
-		prepare_xml();
+		prepare_page_header('xml');
+		require_once dirname(__FILE__) . '/include/page_header.php';
+
 		print($export_data);
 	}
 
@@ -145,7 +150,8 @@ if (hasRequest('action') && getRequest('action') == 'template.export' && hasRequ
 }
 
 // Using HTML for the rest of functions.
-prepare_html();
+prepare_page_header('html');
+require_once dirname(__FILE__) . '/include/page_header.php';
 
 // remove inherited macros data (actions: 'add', 'update' and 'form')
 if (hasRequest('macros')) {
