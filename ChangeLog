@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+..F....... [ZBX-15974] improved trigger expression list in trigger modal form (gcalenko)
 ....I..... [ZBX-16074] added file revision number generation for compilation on MS Windows (MVekslers)
 ..F....... [ZBX-15833] fixed scrollbar in overlay popups (ashubin)
 .......PS. [ZBX-16058] fixed error in IPMI poller causing growing queue (asitals)
