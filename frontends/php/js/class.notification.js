@@ -88,7 +88,7 @@ ZBX_Notification.prototype.makeNode = function(obj) {
 	indicator.className = 'notif-indic ' + obj.severity_style;
 	node.appendChild(indicator);
 
-	title_node.innerHTML = BBCode.Parse(obj.title) + "X";
+	title_node.innerHTML = BBCode.Parse(obj.title);
 	node.appendChild(title_node);
 
 	obj.body.forEach(function(line) {
