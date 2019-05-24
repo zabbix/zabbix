@@ -33,13 +33,14 @@ class CControllerNotificationsGet extends CController {
 		$msg_settings = getMessageSettings();
 		$trigger_limit = 15;
 
+		$timeout = (int) timeUnitToSeconds($msg_settings['timeout']);
 		$result = [
 			'notifications' => [],
 			'listid' => '',
 			'settings' => [
 				'enabled' => (bool) $msg_settings['enabled'],
-				'alarm_timeout' => intval($msg_settings['sounds.repeat']),
-				'msg_timeout' => intval($msg_settings['timeout']),
+				'alarm_timeout' => (int) $msg_settings['sounds.repeat'],
+				'msg_timeout' => $timeout,
 				'muted' => (bool) $msg_settings['sounds.mute'],
 				'files' => [
 					'-1' => $msg_settings['sounds.recovery'],
@@ -57,22 +58,19 @@ class CControllerNotificationsGet extends CController {
 			return $this->setResponse(new CControllerResponseData(['main_block' => json_encode($result)]));
 		}
 
-		$timeout = timeUnitToSeconds($msg_settings['timeout']);
-		$problems = getLastProblems([
-			'time_from'       => max([$msg_settings['last.clock'], time() - $timeout]),
+		$time_from = max([$msg_settings['last.clock'], time() - $timeout]);
+		$problems = $this->getLastProblems([
+			'time_from'       => $time_from,
 			'show_recovered'  => $msg_settings['triggers.recovery'],
 			'show_suppressed' => $msg_settings['show_suppressed'],
 			'severities'      => array_keys($msg_settings['triggers.severities']),
 			'limit'           => 15
 		]);
 
-		$used_triggers = [];
 		foreach ($problems as $problem) {
-			if (array_key_exists($problem['triggerid'], $used_triggers)) {
+			if ($problem['clock'] < $time_from) {
 				continue;
 			}
-
-			$used_triggers[$problem['triggerid']] = true;
 
 			$notification = $this->problemToNotification($problem, $msg_settings);
 
@@ -139,5 +137,75 @@ class CControllerNotificationsGet extends CController {
 			],
 			'timeout' => $msg_settings['timeout']
 		];
+	}
+
+	/**
+	 * Selects recent problems.
+	 *
+	 * @param array  $options  Variate selection set using options. All fields are mandatory.
+	 * @param string $options['time_from']
+	 * @param bool   $options['show_recovered']
+	 * @param bool   $options['show_suppressed']
+	 * @param array  $options['severities']
+	 * @param int    $options['limit']
+	 *
+	 * @return array
+	 */
+	protected function getLastProblems(array $options) {
+		$problem_options = [
+			'output' => ['eventid', 'r_eventid', 'objectid', 'severity', 'clock', 'r_clock', 'name'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'severities' => $options['severities'],
+			'sortorder' => ZBX_SORT_DOWN,
+			'sortfield' => ['eventid'],
+			'limit' => $options['limit']
+		];
+
+		if ($options['show_recovered']) {
+			$problem_options['recent'] = true;
+		}
+		else {
+			$problem_options['time_from'] = $options['time_from'];
+		}
+
+		if (!$options['show_suppressed']) {
+			$problem_options['suppressed'] = false;
+		}
+
+		$db_problems = API::Problem()->get($problem_options);
+		$triggers = $db_problems
+			? API::Trigger()->get([
+				'output' => [],
+				'selectHosts' => ['hostid', 'name'],
+				'triggerid' => zbx_objectValues($db_problems, 'objectid'),
+				'lastChangeSince' => $options['time_from'],
+				'preservekeys' => true
+			])
+			: [];
+
+		$problems = [];
+
+		foreach ($db_problems as $problem) {
+			$resolved = ($problem['r_eventid'] != 0);
+
+			if (!array_key_exists($problem['objectid'], $triggers)) {
+				continue;
+			}
+
+			$trigger = $triggers[$problem['objectid']];
+			$problems[] = [
+				'resolved' => $resolved,
+				'triggerid' => $problem['objectid'],
+				'objectid' => $problem['objectid'],
+				'eventid' => $problem['eventid'],
+				'description' => $problem['name'],
+				'host' => reset($trigger['hosts']),
+				'severity' => $problem['severity'],
+				'clock' => $resolved ? $problem['r_clock'] : $problem['clock']
+			];
+		}
+
+		return $problems;
 	}
 }
