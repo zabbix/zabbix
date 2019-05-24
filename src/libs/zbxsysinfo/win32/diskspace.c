@@ -106,70 +106,75 @@ static const char	*get_drive_type_string(UINT type)
 
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	wchar_t		fsName[MAX_PATH + 1];
-	wchar_t 	*buffer = NULL, *p;
-	char		*utf8;
-	DWORD		dwSize;
-	size_t		sz;
 	struct zbx_json	j;
+	wchar_t		name[MAX_PATH + 1], paths[MAX_PATH], *p, *path;
+	HANDLE		volume;
+	DWORD		buf_size;
+	size_t		sz, sz_last;
+	int		ret = SYSINFO_RET_OK;
 
-	/* Make an initial call to GetLogicalDriveStrings to
-	   get the necessary size into the dwSize variable */
-	if (0 == (dwSize = GetLogicalDriveStrings(0, buffer)))
+	if (INVALID_HANDLE_VALUE == (volume = FindFirstVolume(name, ARRSIZE(name))))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain necessary buffer size from system."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	buffer = (wchar_t *)zbx_malloc(buffer, (dwSize + 1) * sizeof(wchar_t));
-
-	/* Make a second call to GetLogicalDriveStrings to get
-	   the actual data we require */
-	if (0 == (dwSize = GetLogicalDriveStrings(dwSize, buffer)))
-	{
-		zbx_free(buffer);
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain a list of filesystems."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find any volume."));
 		return SYSINFO_RET_FAIL;
 	}
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	for (p = buffer, sz = wcslen(p); sz > 0; p += sz + 1, sz = wcslen(p))
+	do
 	{
-		zbx_json_addobject(&j, NULL);
-
-		utf8 = zbx_unicode_to_utf8(p);
-
-		/* remove trailing backslash */
-		if ('A' <= utf8[0] && utf8[0] <= 'Z' && ':' == utf8[1] && '\\' == utf8[2] && '\0' == utf8[3])
-			utf8[2] = '\0';
-
-		zbx_json_addstring(&j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
-		zbx_free(utf8);
-
-		if (TRUE == GetVolumeInformation(p, NULL, 0, NULL, NULL, NULL, fsName, ARRSIZE(fsName)))
+		if (TRUE != GetVolumePathNamesForVolumeName(name, paths, ARRSIZE(paths), &buf_size))
 		{
-			utf8 = zbx_unicode_to_utf8(fsName);
-			zbx_json_addstring(&j, "{#FSTYPE}", utf8, ZBX_JSON_TYPE_STRING);
-			zbx_free(utf8);
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain a list of filesystems."));
+			ret = SYSINFO_RET_FAIL;
+			goto out;
 		}
-		else
-			zbx_json_addstring(&j, "{#FSTYPE}", "UNKNOWN", ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addstring(&j, "{#FSDRIVETYPE}", get_drive_type_string(GetDriveType(p)), ZBX_JSON_TYPE_STRING);
+		/* get only one path per volume */
+		for (p = paths, sz = wcslen(p), path = NULL; sz > 0; p += sz + 1, sz = wcslen(p))
+		{
+			path = p;
+			sz_last = --sz;
 
-		zbx_json_close(&j);
-	}
+			/* use assigned drive letter if found */
+			if (':' == path[sz_last - 1])
+				break;
+		}
 
-	zbx_free(buffer);
+		if (NULL != path)
+		{
+			char	*utf8;
+
+			zbx_json_addobject(&j, NULL);
+			utf8 = zbx_unicode_to_utf8(path);
+
+			if ('\\' == utf8[sz_last])
+				utf8[sz_last] = '\0';
+
+			zbx_json_addstring(&j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_free(utf8);
+
+			if (TRUE == GetVolumeInformation(path, NULL, 0, NULL, NULL, NULL, name, ARRSIZE(name)))
+			{
+				utf8 = zbx_unicode_to_utf8(name);
+				zbx_json_addstring(&j, "{#FSTYPE}", utf8, ZBX_JSON_TYPE_STRING);
+				zbx_free(utf8);
+			}
+			else
+				zbx_json_addstring(&j, "{#FSTYPE}", "UNKNOWN", ZBX_JSON_TYPE_STRING);
+
+			zbx_json_addstring(&j, "{#FSDRIVETYPE}", get_drive_type_string(GetDriveType(path)),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&j);
+		}
+	} while (TRUE == FindNextVolume(volume, name, ARRSIZE(name)));
 
 	zbx_json_close(&j);
-
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
-
+out:
+	FindVolumeClose(volume);
 	zbx_json_free(&j);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
