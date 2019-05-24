@@ -82,13 +82,13 @@ $fields = [
 function prepare_page_header(string $type) {
 	global $page;
 
-	if ($type == 'html') {
+	if ($type === 'html') {
 		$page['title'] = _('Configuration of network maps');
 		$page['file'] = 'sysmaps.php';
 		$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 		$page['scripts'] = ['multiselect.js'];
 	}
-	elseif ($type == 'xml') {
+	elseif ($type === 'xml') {
 		$page['file'] = 'zbx_export_maps.xml';
 		$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	}
@@ -135,14 +135,14 @@ else {
 /*
  * Export
  */
-if (hasRequest('action') && getRequest('action') == 'map.export' && hasRequest('maps')) {
+if (hasRequest('action') && getRequest('action') === 'map.export' && hasRequest('maps')) {
 	$export = new CConfigurationExport(['maps' => getRequest('maps', [])]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 
 	$export_data = $export->export();
 
-	if (false === $export_data) {
+	if ($export_data === false) {
 		prepare_page_header('html');
 		require_once dirname(__FILE__) . '/include/page_header.php';
 

@@ -127,13 +127,13 @@ $fields = [
 function prepare_page_header(string $type) {
 	global $page;
 
-	if ($type == 'html') {
+	if ($type === 'html') {
 		$page['title'] = _('Configuration of hosts');
 		$page['file'] = 'hosts.php';
 		$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 		$page['scripts'] = ['multiselect.js'];
 	}
-	elseif ($type == 'xml') {
+	elseif ($type === 'xml') {
 		$page['file'] = 'zbx_export_hosts.xml';
 		$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	}
@@ -182,14 +182,14 @@ $hostIds = getRequest('hosts', []);
 /*
  * Export
  */
-if (hasRequest('action') && getRequest('action') == 'host.export' && hasRequest('hosts')) {
+if (hasRequest('action') && getRequest('action') === 'host.export' && hasRequest('hosts')) {
 	$export = new CConfigurationExport(['hosts' => $hostIds]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 
 	$export_data = $export->export();
 
-	if (false === $export_data) {
+	if ($export_data === false) {
 		prepare_page_header('html');
 		require_once dirname(__FILE__) . '/include/page_header.php';
 

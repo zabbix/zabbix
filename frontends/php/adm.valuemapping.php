@@ -41,11 +41,11 @@ $fields = [
 function prepare_page_header(string $type) {
 	global $page;
 
-	if ($type == 'html') {
+	if ($type === 'html') {
 		$page['title'] = _('Configuration of value mapping');
 		$page['file'] = 'adm.valuemapping.php';
 	}
-	elseif ($type == 'xml') {
+	elseif ($type === 'xml') {
 		$page['file'] = 'zbx_export_valuemaps.xml';
 		$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	}
@@ -90,7 +90,7 @@ if (hasRequest('action') && getRequest('action') === 'valuemap.export' && hasReq
 
 	$export_data = $export->export();
 
-	if (false === $export_data) {
+	if ($export_data === false) {
 		prepare_page_header('html');
 		require_once dirname(__FILE__) . '/include/page_header.php';
 

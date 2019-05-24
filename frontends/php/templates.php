@@ -69,13 +69,13 @@ $fields = [
 function prepare_page_header(string $type) {
 	global $page;
 
-	if ($type == 'html') {
+	if ($type === 'html') {
 		$page['title'] = _('Configuration of templates');
 		$page['file'] = 'templates.php';
 		$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 		$page['scripts'] = ['multiselect.js'];
 	}
-	elseif ($type == 'xml') {
+	elseif ($type === 'xml') {
 		$page['file'] = 'zbx_export_templates.xml';
 		$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	}
@@ -120,14 +120,14 @@ if ($access_deny) {
 
 $templateIds = getRequest('templates', []);
 
-if (hasRequest('action') && getRequest('action') == 'template.export' && hasRequest('templates')) {
+if (hasRequest('action') && getRequest('action') === 'template.export' && hasRequest('templates')) {
 	$export = new CConfigurationExport(['templates' => $templateIds]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 
 	$export_data = $export->export();
 
-	if (false === $export_data) {
+	if ($export_data === false) {
 		prepare_page_header('html');
 		require_once dirname(__FILE__) . '/include/page_header.php';
 

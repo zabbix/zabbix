@@ -63,13 +63,13 @@ $fields = [
 function prepare_page_header(string $type) {
 	global $page;
 
-	if ($type == 'html') {
+	if ($type === 'html') {
 		$page['title'] = _('Configuration of screens');
 		$page['file'] = 'screenconf.php';
 		$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 		$page['scripts'] = ['multiselect.js'];
 	}
-	elseif ($type == 'xml') {
+	elseif ($type === 'xml') {
 		$page['file'] = 'zbx_export_screens.xml';
 		$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	}
@@ -126,7 +126,7 @@ else {
 /*
  * Export
  */
-if (hasRequest('action') && getRequest('action') == 'screen.export' && hasRequest('screens')) {
+if (hasRequest('action') && getRequest('action') === 'screen.export' && hasRequest('screens')) {
 	$screens = getRequest('screens', []);
 
 	$export = new CConfigurationExport(['screens' => $screens]);
@@ -135,7 +135,7 @@ if (hasRequest('action') && getRequest('action') == 'screen.export' && hasReques
 
 	$export_data = $export->export();
 
-	if (false === $export_data) {
+	if ($export_data === false) {
 		prepare_page_header('html');
 		require_once dirname(__FILE__) . '/include/page_header.php';
 
