@@ -21,6 +21,7 @@
 #include "zbxjson.h"
 #include "json_parser.h"
 #include "json.h"
+#include "jsonpath.h"
 
 /******************************************************************************
  *                                                                            *
@@ -1223,120 +1224,6 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_jsonpath_error                                               *
- *                                                                            *
- * Purpose: sets json error message and returns FAIL                          *
- *                                                                            *
- * Comments: This function is used to return from json path parsing functions *
- *           in the case of failure.                                          *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_jsonpath_error(const char *path)
-{
-	zbx_set_json_strerror("unsupported character in json path starting with: \"%s\"", path);
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: jsonpath_next                                                    *
- *                                                                            *
- * Purpose: returns next component of json path                               *
- *                                                                            *
- * Parameters: path  - [IN] the json path                                     *
- *             pnext - [IN/OUT] the reference to the next path component      *
- *             loc   - [OUT] the location of the path component               *
- *             type  - [OUT] json path component type, see ZBX_JSONPATH_      *
- *                     defines                                                *
- *                                                                            *
- * Return value: SUCCEED - the json path component was parsed successfully    *
- *               FAIL    - json path parsing error                            *
- *                                                                            *
- ******************************************************************************/
-static int	jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type)
-{
-	const char	*next = *pnext;
-	size_t		pos;
-	char		quotes;
-
-	if (NULL == next)
-	{
-		if ('$' != *path)
-			return zbx_jsonpath_error(path);
-
-		next = path + 1;
-		*pnext = next;
-	}
-
-	/* process dot notation component */
-	if (*next == '.')
-	{
-		if ('\0' == *(++next))
-			return zbx_jsonpath_error(*pnext);
-
-		loc->l = next - path;
-
-		while (0 != isalnum(*next) || '_' == *next)
-			next++;
-
-		if ((pos = next - path) == loc->l)
-			return zbx_jsonpath_error(*pnext);
-
-		loc->r = pos - 1;
-		*pnext = next;
-		*type = ZBX_JSONPATH_COMPONENT_DOT;
-
-		return SUCCEED;
-	}
-
-	if ('[' != *next)
-		return zbx_jsonpath_error(*pnext);
-
-	SKIP_WHITESPACE_NEXT(next);
-
-	/* process array index component */
-	if (0 != isdigit(*next))
-	{
-		for (pos = 1; 0 != isdigit(next[pos]); pos++)
-			;
-
-		loc->l = next - path;
-		loc->r = loc->l + pos - 1;
-
-		next += pos;
-		*type = ZBX_JSONPATH_ARRAY_INDEX;
-
-		SKIP_WHITESPACE(next);
-	}
-	else
-	{
-		loc->l = next - path + 1;
-
-		for (quotes = *next++; quotes != *next; next++)
-		{
-			if ('\0' == *next)
-				return zbx_jsonpath_error(*pnext);
-		}
-
-		if ((pos = next - path) == loc->l)
-			return zbx_jsonpath_error(*pnext);
-
-		loc->r = pos - 1;
-		*type = ZBX_JSONPATH_COMPONENT_BRACKET;
-
-		SKIP_WHITESPACE_NEXT(next);
-	}
-
-	if (']' != *next++)
-		return zbx_jsonpath_error(*pnext);
-
-	*pnext = next;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_json_path_open                                               *
  *                                                                            *
  * Purpose: opens an object by json path                                      *
@@ -1350,48 +1237,49 @@ static int	jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc
  ******************************************************************************/
 int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out)
 {
-	const char		*p, *next = 0;
-	char			buffer[MAX_STRING_LEN];
-	zbx_strloc_t		loc;
-	int			type, index;
+	const char		*p;
+	int			index, i, ret = FAIL;
 	struct zbx_json_parse	object;
+	zbx_jsonpath_t		jsonpath;
+	zbx_jsonpath_segment_t	*segment;
 
 	object = *jp;
 
-	do
-	{
-		if (FAIL == jsonpath_next(path, &next, &loc, &type))
-			return FAIL;
+	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
+		return FAIL;
 
-		if (ZBX_JSONPATH_ARRAY_INDEX == type)
+	for (i = 0; i < jsonpath.segments_num; i++)
+	{
+		segment = &jsonpath.segments[i];
+
+		if (ZBX_JSONPATH_SEGMENT_MATCH_LIST != segment->type)
+		{
+			zbx_set_json_strerror("Only name or index based paths can be used to locate single object");
+			goto out;
+		}
+
+		if (ZBX_JSONPATH_LIST_INDEX == segment->data.list.type)
 		{
 			if ('[' != *object.start)
-				return FAIL;
+				goto out;
 
-			if (FAIL == is_uint_n_range(path + loc.l, loc.r - loc.l + 1, &index, sizeof(index), 0,
-					0xFFFFFFFF))
-			{
-				return FAIL;
-			}
+			memcpy(&index, segment->data.list.values->data, sizeof(int));
 
 			for (p = NULL; NULL != (p = zbx_json_next(&object, p)) && 0 != index; index--)
 				;
 
 			if (0 != index || NULL == p)
 			{
-				zbx_set_json_strerror("array index out of bounds starting with json path: \"%s\"",
-						path + loc.l);
-				return FAIL;
+				zbx_set_json_strerror("array index out of bounds in jsonpath segment %d", i + 1);
+				goto out;
 			}
 		}
 		else
 		{
-			zbx_strlcpy(buffer, path + loc.l, loc.r - loc.l + 2);
-
-			if (NULL == (p = zbx_json_pair_by_name(&object, buffer)))
+			if (NULL == (p = zbx_json_pair_by_name(&object, (char *)&segment->data.list.values->data)))
 			{
-				zbx_set_json_strerror("object not found starting with json path: \"%s\"", path + loc.l);
-				return FAIL;
+				zbx_set_json_strerror("object not found in jsonpath segment %d", i + 1);
+				goto out;
 			}
 		}
 
@@ -1400,11 +1288,12 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
 		if (NULL == (object.end = __zbx_json_rbracket(p)))
 			object.end = p + json_parse_value(p, NULL) - 1;
 	}
-	while ('\0' != *next);
 
 	*out = object;
-
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	zbx_jsonpath_clear(&jsonpath);
+	return ret;
 }
 
 /******************************************************************************
@@ -1426,39 +1315,3 @@ void	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *
 		zbx_strlcpy(*string, jp->start, len);
 	}
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_json_path_check                                              *
- *                                                                            *
- * Purpose: validate json path string                                         *
- *                                                                            *
- * Parameters: path   - [IN] the json path                                    *
- *             error  - [OUT] the error message buffer                        *
- *             errlen - [IN] the size of error message buffer                 *
- *                                                                            *
- * Return value: SUCCEED - the json path component was parsed successfully    *
- *               FAIL    - json path parsing error                            *
- *                                                                            *
- ******************************************************************************/
-int	zbx_json_path_check(const char *path, char * error, size_t errlen)
-{
-	const char	*next = NULL;
-	zbx_strloc_t	loc;
-	int		type;
-
-	do
-	{
-		if (SUCCEED != jsonpath_next(path, &next, &loc, &type))
-		{
-			zbx_snprintf(error, errlen, "json path not valid: %s", zbx_json_strerror());
-			return FAIL;
-		}
-	}
-	while ('\0' != *next);
-
-	return SUCCEED;
-}
-#ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxjson/jsonpath_next_test.c"
-#endif

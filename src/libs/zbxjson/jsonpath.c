@@ -897,7 +897,7 @@ static int	jsonpath_parse_names(const char *list, zbx_jsonpath_t *jsonpath, cons
 					}
 
 					node = jsonpath_list_create_node(end - start + 1);
-					jsonpath_unquote((char *)&node->data, start, end - start + 1);
+					jsonpath_unquote(node->data, start, end - start + 1);
 					node->next = head;
 					head = node;
 					parsed_name = 1;
@@ -979,7 +979,7 @@ static int	jsonpath_parse_indexes(const char *list, zbx_jsonpath_t *jsonpath, co
 {
 	zbx_jsonpath_segment_t		*segment;
 	const char			*end, *start = NULL;
-	int				ret = FAIL, type = ZBX_JSONPATH_SEGMENT_UNKNOWN, parsed_index = 0;
+	int				ret = FAIL, type = ZBX_JSONPATH_SEGMENT_UNKNOWN, parsed_index = 0, value;
 	unsigned int			flags = 0;
 	zbx_jsonpath_list_node_t	*head = NULL, *node;
 
@@ -1014,7 +1014,8 @@ static int	jsonpath_parse_indexes(const char *list, zbx_jsonpath_t *jsonpath, co
 			node = jsonpath_list_create_node(sizeof(int));
 			node->next = head;
 			head = node;
-			*(int *)(&node->data) = atoi(start);
+			value = atoi(start);
+			memcpy(node->data, &value, sizeof(int));
 			start = NULL;
 			parsed_index = 1;
 		}
@@ -1072,13 +1073,17 @@ static int	jsonpath_parse_indexes(const char *list, zbx_jsonpath_t *jsonpath, co
 		segment->data.range.flags = flags;
 		if (0 != (flags & 0x02))
 		{
-			segment->data.range.end = *(int *)&node->data;
+			memcpy(&segment->data.range.end, node->data, sizeof(int));
 			node = node->next;
 		}
 		else
 			segment->data.range.end = 0;
 
-		segment->data.range.start = (0 != (flags & 0x01) ? *(int *)&node->data : 0);
+		if (0 != (flags & 0x01))
+			memcpy(&segment->data.range.start, node->data, sizeof(int));
+		else
+			segment->data.range.start = 0;
+
 		jsonpath->definite = 0;
 	}
 	else
@@ -1229,7 +1234,7 @@ static int	jsonpath_parse_dot_segment(const char *start, zbx_jsonpath_t *jsonpat
 		segment->type = ZBX_JSONPATH_SEGMENT_MATCH_LIST;
 		segment->data.list.type = ZBX_JSONPATH_LIST_NAME;
 		segment->data.list.values = jsonpath_list_create_node(len + 1);
-		zbx_strlcpy((char *)&segment->data.list.values->data, start, len + 1);
+		zbx_strlcpy(segment->data.list.values->data, start, len + 1);
 		segment->data.list.values->next = NULL;
 		*next = start + len;
 		return SUCCEED;
@@ -1370,7 +1375,7 @@ static int	jsonpath_match_name(struct zbx_json_parse *jp_root, const char *pnext
 
 	for (node = segment->data.list.values; NULL != node; node = node->next)
 	{
-		if (0 == strcmp(name, (char *)&node->data))
+		if (0 == strcmp(name, node->data))
 		{
 			if (FAIL == jsonpath_query_next_segment(jp_root, pnext, jsonpath, path_depth, objects))
 				return FAIL;
@@ -1878,7 +1883,7 @@ static int	jsonpath_match_index(struct zbx_json_parse *jp_root, const char *pnex
 
 	for (node = segment->data.list.values; NULL != node; node = node->next)
 	{
-		query_index = *(int *)&node->data;
+		memcpy(&query_index, node->data, 4);
 
 		if ((query_index >= 0 && index == query_index) || index == elements_num + query_index)
 		{

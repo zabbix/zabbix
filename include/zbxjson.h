@@ -203,7 +203,6 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc, zbx_json_type_t *type);
 void		zbx_json_escape(char **string);
 
-int	zbx_json_path_check(const char *path, char * error, size_t errlen);
 int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
 void	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *string_alloc);
 

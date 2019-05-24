@@ -127,7 +127,6 @@ tests/libs/zbxdbcache/zbx_vc_get_values
 tests/libs/zbxdbhigh/DBselect_uint64
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxjson/zbx_json_path_open
-tests/libs/zbxjson/jsonpath_next
 tests/libs/zbxjson/zbx_json_decodevalue
 tests/libs/zbxjson/zbx_json_decodevalue_dyn
 tests/libs/zbxjson/zbx_jsonpath_compile
