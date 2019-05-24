@@ -22,6 +22,7 @@
 #include "zbxjson.h"
 #include "log.h"
 
+#include <sys/ioctl.h>
 #include <sys/sockio.h>
 
 #if OpenBSD >= 201405			/* if OpenBSD 5.5 or newer */
