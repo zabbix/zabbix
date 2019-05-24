@@ -83,7 +83,7 @@ class CWebTest extends CTest {
 	 */
 	protected function tearDown() {
 		// Check for JS errors.
-		if (!$this->hasFailed()) {
+		if (!$this->hasFailed() && $this->getStatus() !== null) {
 			if (self::$shared_page !== null) {
 				$errors = [];
 

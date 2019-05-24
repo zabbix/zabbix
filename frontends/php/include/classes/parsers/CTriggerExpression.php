@@ -70,6 +70,13 @@ class CTriggerExpression {
 	public $expression;
 
 	/**
+	 * Object containing the results of parsing.
+	 *
+	 * @var CTriggerExpressionParserResult
+	 */
+	public $result;
+
+	/**
 	 * Current cursor position.
 	 *
 	 * @var
@@ -145,13 +152,6 @@ class CTriggerExpression {
 	 * @var array
 	 */
 	protected $spaceChars = [' ' => true, "\r" => true, "\n" => true, "\t" => true];
-
-	/**
-	 * Object containing the results of parsing.
-	 *
-	 * @var CTriggerExpressionParserResult
-	 */
-	protected $result;
 
 	/**
 	 * @param array $options

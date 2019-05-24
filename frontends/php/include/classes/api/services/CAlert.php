@@ -26,7 +26,7 @@ class CAlert extends CApiService {
 
 	protected $tableName = 'alerts';
 	protected $tableAlias = 'a';
-	protected $sortColumns = ['alertid', 'clock', 'eventid', 'status'];
+	protected $sortColumns = ['alertid', 'clock', 'eventid', 'status', 'sendto', 'mediatypeid'];
 
 	/**
 	 * Get alerts data.

@@ -18,8 +18,30 @@ EXTRA_DIST = \
 
 ## "dist-hook" run after the distribution directory is filled, but before the actual tar (or shar) file is created.
 dist-hook:
-	@zabbix_revision=`git -C $(top_srcdir) rev-parse --short HEAD`; \
-	cat $(top_distdir)/include/version.h|sed "s/{ZABBIX_REVISION}/$$zabbix_revision/g" > $(top_distdir)/include/version.h.new; \
+# File revision number must be numeric (Git commit hash cannot be used).
+# Therefore to make it numeric and meaningful it is artificially composed from:
+#    - branch (development or release),
+#    - type (alpha, beta, rc or release),
+#    - number of alpha, beta or rc.
+# 'branch' expression tries to find out is it a development branch or release branch.
+#      Result is encoded as: 1 - dev branch, release branch or error occurred, 2 - tag.
+# 'type_name' expression tries to find out what type of release it is.
+#      Expected result is: "alpha", "beta", "rc" or "" (empty string).
+# 'type_num' expression encodes 'type_name' as numeric value:
+#      1 - alpha, 2 - beta, 3 - rc, 4 - release, 0 - unknown.
+# 'type_count' expression tries to find out number of "alpha", "beta" or "rc" (e.g. 1 from "rc1").
+	@branch=`(git symbolic-ref -q HEAD > /dev/null && echo 1) || (git tag -l --points-at HEAD| grep "."| grep -q -v "-" && echo 2) || echo 1`; \
+	type_name=`cat $(top_distdir)/include/version.h| sed -n -e '/ZABBIX_VERSION_RC/s/.*"\([a-z]*\)[0-9]*"/\1/p'`; \
+	type_num=`(test "x$$type_name" = "xalpha" && echo "1") || echo ""`; \
+	type_num=`(test -z $$type_num && test "x$$type_name" = "xbeta" && echo "2") || echo "$$type_num"`; \
+	type_num=`(test -z $$type_num && test "x$$type_name" = "xrc" && echo "3") || echo "$$type_num"`; \
+	type_num=`(test -z $$type_num && test -z $$type_name && echo "4") || echo "$$type_num"`; \
+	type_num=`(test -z $$type_num && echo "0") || echo "$$type_num"`; \
+	type_count=`cat $(top_distdir)/include/version.h|sed -n -e '/ZABBIX_VERSION_RC/s/.*"[a-z]*\([0-9]*\)"/\1/p'`; \
+	type_count=`printf '%02d' $$type_count`; \
+	zabbix_revision=`git rev-parse --short HEAD`; \
+	cat $(top_distdir)/include/version.h|sed "s/{ZABBIX_RC_NUM}/$$branch$$type_num$$type_count/g"| \
+	sed "s/{ZABBIX_REVISION}/$$zabbix_revision/g" > $(top_distdir)/include/version.h.new; \
 	mv $(top_distdir)/include/version.h.new $(top_distdir)/include/version.h; \
 	cat $(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java|sed "s/{ZABBIX_REVISION}/$$zabbix_revision/g" > \
 		$(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java.new; \
@@ -120,14 +142,16 @@ WRAP_FS_FUNCS = \
 	-Wl,--wrap=opendir \
 	-Wl,--wrap=readdir \
 	-Wl,--wrap=stat \
-	-Wl,--wrap=__xstat
+	-Wl,--wrap=__xstat \
+	-Wl,--wrap=__fxstat
 
 WRAP_EXIT = \
 	-Wl,--wrap=exit
 
 WRAP_COMM_FUNCS = \
 	-Wl,--wrap=read \
-	-Wl,--wrap=connect
+	-Wl,--wrap=connect \
+	-Wl,--wrap=open
 
 WRAP_LOG = \
 	-Wl,--wrap=__zbx_zabbix_log

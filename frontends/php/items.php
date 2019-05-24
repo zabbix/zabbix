@@ -1692,7 +1692,13 @@ else {
 		$data['filter_hostid'] = $_REQUEST['filter_hostid'];
 	}
 	if (isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application'])) {
-		$options['application'] = $_REQUEST['filter_application'];
+		$options['applicationids'] = array_keys(API::Application()->get([
+			'output' => [],
+			'groupids' => array_key_exists('groupids', $options) ? $options['groupids'] : null,
+			'hostids' => array_key_exists('filter_hostid', $data) ? $data['filter_hostid'] : null,
+			'search' => ['name' => getRequest('filter_application')],
+			'preservekeys' => true
+		]));
 	}
 	if (isset($_REQUEST['filter_name']) && !zbx_empty($_REQUEST['filter_name'])) {
 		$options['search']['name'] = $_REQUEST['filter_name'];
