@@ -150,40 +150,29 @@ if ($fields_error & ZBX_VALID_ERROR) {
 }
 
 /*
- * Permissions
- */
-$access_deny = false;
-if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
-	$access_deny = true;
-}
-if (getRequest('hostid')) {
-	$hosts = API::Host()->get([
-		'output' => [],
-		'hostids' => getRequest('hostid'),
-		'editable' => true
-	]);
-
-	if (!$hosts) {
-		$access_deny = true;
-	}
-}
-
-if ($access_deny) {
-	// Halt on a HTML page with errors.
-
-	prepare_page_header('html');
-	require_once dirname(__FILE__) . '/include/page_header.php';
-
-	access_deny();
-}
-
-$hostIds = getRequest('hosts', []);
-
-/*
  * Export
  */
 if (hasRequest('action') && getRequest('action') === 'host.export' && hasRequest('hosts')) {
-	$export = new CConfigurationExport(['hosts' => $hostIds]);
+	// Check accessibility of selected objects.
+
+	$hosts = zbx_toArray(getRequest('hosts'));
+	$hosts_accessible = API::Host()->get([
+		'output' => [],
+		'hostids' => $hosts,
+	]);
+	if (count($hosts_accessible) != count($hosts)) {
+		// Uncheck inaccessible rows.
+		uncheckTableRows(null, zbx_objectValues($hosts_accessible, 'hostid'));
+
+		// Halt on a HTML page with errors.
+
+		prepare_page_header('html');
+		require_once dirname(__FILE__) . '/include/page_header.php';
+
+		access_deny();
+	}
+
+	$export = new CConfigurationExport(['hosts' => $hosts]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 
@@ -214,6 +203,23 @@ if (hasRequest('action') && getRequest('action') === 'host.export' && hasRequest
 // Using HTML for the rest of functions.
 prepare_page_header('html');
 require_once dirname(__FILE__) . '/include/page_header.php';
+
+/*
+ * Permissions
+ */
+if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
+	access_deny();
+}
+if (getRequest('hostid')) {
+	$hosts = API::Host()->get([
+		'output' => [],
+		'hostids' => getRequest('hostid'),
+		'editable' => true
+	]);
+	if (!$hosts) {
+		access_deny();
+	}
+}
 
 /*
  * Filter

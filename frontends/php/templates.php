@@ -92,36 +92,29 @@ if ($fields_error & ZBX_VALID_ERROR) {
 }
 
 /*
- * Permissions
+ * Export
  */
-$access_deny = false;
-if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
-	$access_deny = true;
-}
-if (getRequest('templateid')) {
-	$templates = API::Template()->get([
-		'output' => [],
-		'templateids' => getRequest('templateid'),
-		'editable' => true
-	]);
-
-	if (!$templates) {
-		$access_deny = true;
-	}
-}
-if ($access_deny) {
-	// Halt on a HTML page with errors.
-
-	prepare_page_header('html');
-	require_once dirname(__FILE__) . '/include/page_header.php';
-
-	access_deny();
-}
-
-$templateIds = getRequest('templates', []);
-
 if (hasRequest('action') && getRequest('action') === 'template.export' && hasRequest('templates')) {
-	$export = new CConfigurationExport(['templates' => $templateIds]);
+	// Check accessibility of selected objects.
+
+	$templates = zbx_toArray(getRequest('templates'));
+	$templates_accessible = API::Template()->get([
+		'output' => [],
+		'templateids' => $templates,
+	]);
+	if (count($templates_accessible) != count($templates)) {
+		// Uncheck inaccessible rows.
+		uncheckTableRows(null, zbx_objectValues($templates_accessible, 'templateid'));
+
+		// Halt on a HTML page with errors.
+
+		prepare_page_header('html');
+		require_once dirname(__FILE__) . '/include/page_header.php';
+
+		access_deny();
+	}
+
+	$export = new CConfigurationExport(['templates' => $templates]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 
@@ -152,6 +145,26 @@ if (hasRequest('action') && getRequest('action') === 'template.export' && hasReq
 // Using HTML for the rest of functions.
 prepare_page_header('html');
 require_once dirname(__FILE__) . '/include/page_header.php';
+
+/*
+ * Permissions
+ */
+if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
+	access_deny();
+}
+if (getRequest('templateid')) {
+	$templates = API::Template()->get([
+		'output' => [],
+		'templateids' => getRequest('templateid'),
+		'editable' => true
+	]);
+
+	if (!$templates) {
+		access_deny();
+	}
+}
+
+$templateIds = getRequest('templates', []);
 
 // remove inherited macros data (actions: 'add', 'update' and 'form')
 if (hasRequest('macros')) {

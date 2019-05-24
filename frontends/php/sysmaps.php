@@ -105,18 +105,20 @@ if ($fields_error & ZBX_VALID_ERROR) {
 }
 
 /*
- * Permissions
+ * Export
  */
-if (hasRequest('sysmapid')) {
-	$sysmap = API::Map()->get([
-		'sysmapids' => getRequest('sysmapid'),
-		'editable' => true,
-		'output' => API_OUTPUT_EXTEND,
-		'selectUrls' => API_OUTPUT_EXTEND,
-		'selectUsers' => ['userid', 'permission'],
-		'selectUserGroups' => ['usrgrpid', 'permission']
+if (hasRequest('action') && getRequest('action') === 'map.export' && hasRequest('maps')) {
+	// Check accessibility of selected objects.
+
+	$maps = zbx_toArray(getRequest('maps'));
+	$maps_accessible = API::Map()->get([
+		'output' => [],
+		'sysmapids' => $maps,
 	]);
-	if (empty($sysmap)) {
+	if (count($maps_accessible) != count($maps)) {
+		// Uncheck inaccessible rows.
+		uncheckTableRows(null, zbx_objectValues($maps_accessible, 'sysmapid'));
+
 		// Halt on a HTML page with errors.
 
 		prepare_page_header('html');
@@ -124,19 +126,8 @@ if (hasRequest('sysmapid')) {
 
 		access_deny();
 	}
-	else {
-		$sysmap = reset($sysmap);
-	}
-}
-else {
-	$sysmap = [];
-}
 
-/*
- * Export
- */
-if (hasRequest('action') && getRequest('action') === 'map.export' && hasRequest('maps')) {
-	$export = new CConfigurationExport(['maps' => getRequest('maps', [])]);
+	$export = new CConfigurationExport(['maps' => $maps]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 
@@ -167,6 +158,29 @@ if (hasRequest('action') && getRequest('action') === 'map.export' && hasRequest(
 // Using HTML for the rest of functions.
 prepare_page_header('html');
 require_once dirname(__FILE__) . '/include/page_header.php';
+
+/*
+ * Permissions
+ */
+if (hasRequest('sysmapid')) {
+	$sysmap = API::Map()->get([
+		'sysmapids' => getRequest('sysmapid'),
+		'editable' => true,
+		'output' => API_OUTPUT_EXTEND,
+		'selectUrls' => API_OUTPUT_EXTEND,
+		'selectUsers' => ['userid', 'permission'],
+		'selectUserGroups' => ['usrgrpid', 'permission']
+	]);
+	if (empty($sysmap)) {
+		access_deny();
+	}
+	else {
+		$sysmap = reset($sysmap);
+	}
+}
+else {
+	$sysmap = [];
+}
 
 /*
  * Actions
