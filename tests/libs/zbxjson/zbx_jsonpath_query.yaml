@@ -564,4 +564,13 @@ in:
 out:
   return: SUCCEED
   value: 14.99
+---
+test case: Query $.books[?(@.category == $.filters.xyz)].title
+include: &include zbx_jsonpath_query.inc.yaml
+in:
+  data: *include
+  path: $.books[?(@.category == $.filters.xyz)].title
+out:
+  return: SUCCEED
+  value: '[]'
 ...
