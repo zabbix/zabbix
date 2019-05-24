@@ -182,13 +182,13 @@ ZBX_Notifications.prototype.onPollerReceiveUpdates = function(resp) {
 
 	// Object from modified response array.
 	resp.notifications.forEach(function(raw_notif) {
-		var timeout = current_timeouts[id];
+		var timeout = current_timeouts[raw_notif.uid];
 
 		list_obj[raw_notif.uid] = raw_notif;
 		list_obj[raw_notif.uid].ttl = time_local - timeout.recv_time + timeout.msg_timeout;
 	});
 
-	all_snoozed = this.applySnoozeProp(resp.notifications),
+	all_snoozed = this.applySnoozeProp(resp.notifications);
 	notifid = ZBX_Notifications.findNotificationToPlay(resp.notifications);
 
 	this.writeAlarm(list_obj[notifid], resp.settings);
