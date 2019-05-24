@@ -146,25 +146,27 @@ jQuery(function($) {
 		obj.menuPopup(data, event);
 	}
 
-	function showMenuPopupPreloader(event) {
-		var $preloader = $('.preloader-container.action-menu-preloader');
+	/**
+	 * Create preloader elements for the menu popup.
+	 */
+	function createMenuPopupPreloader() {
+		return $('<div>', {
+			'id': 'menu-popup-preloader',
+			'class': 'preloader-container menu-popup-preloader'
+		})
+			.append($('<div>').addClass('preloader'))
+			.appendTo($('body'))
+			.on('click', function(e) {
+				e.stopPropagation();
+			})
+			.hide();
+	}
 
-		if (!$preloader.length) {
-			$preloader = $('<div>', {'class': 'preloader-container action-menu-preloader'})
-				.append($('<div>').addClass('preloader'))
-				.appendTo($('body'));
-		}
-
-		setTimeout(function(){
-			$preloader
-				.css({
-					top: Math.min(event.pageY - $(document).scrollTop(), $(window).height() - 140),
-					left: event.pageX - $(document).scrollLeft()
-				})
-				.fadeIn(200);
-		}, 500);
-
-		return $preloader.hide();
+	/**
+	 * Event handler for the preloader elements destroy.
+	 */
+	function menuPopupPreloaderCloseHandler(event) {
+		overlayPreloaderDestroy(event.data.id, event.data.xhr);
 	}
 
 	/**
@@ -183,35 +185,46 @@ jQuery(function($) {
 			event.target = this;
 		}
 
-		var	$preloader = showMenuPopupPreloader(event),
-			url = new Curl('zabbix.php'),
-			ajax_data = {
-				data: data.data
-			};
+		// Manually trigger event for menuPopupPreloaderCloseHandler call for the previous preloader.
+		if ($('#menu-popup-preloader').length) {
+			$(document).trigger('click');
+		}
+
+		var	$preloader = createMenuPopupPreloader(),
+			url = new Curl('zabbix.php');
 
 		url.setArgument('action', 'menu.popup');
 		url.setArgument('type', data.type);
 
-		var xhr_menu_popup = $(document).data('xhr-menu-popup');
-
-		if (xhr_menu_popup) {
-			xhr_menu_popup.abort();
-		}
-
-		$('.action-menu.action-menu-top').remove();
-
-		$(document).data('xhr-menu-popup', $.ajax({
+		var xhr = $.ajax({
 			url: url.getUrl(),
 			method: 'POST',
-			data: ajax_data,
+			data: {
+				data: data.data
+			},
 			dataType: 'json',
+			beforeSend: function() {
+				$('.menu-popup-top').menuPopup('close');
+				setTimeout(function(){
+					$preloader
+						.css({
+							top: Math.min(event.pageY - $(document).scrollTop(), $(window).height() - 140),
+							left: event.pageX - $(document).scrollLeft()
+						})
+						.fadeIn(200);
+				}, 500);
+			},
 			success: function(resp) {
-				$preloader.remove();
+				overlayPreloaderDestroy($preloader.prop('id'));
 				showMenuPopup(obj, resp.data, event);
 			},
 			error: function() {
 			}
-		}));
+		});
+
+		addToOverlaysStack($preloader.prop('id'), event.target, 'preloader', xhr);
+		$(document).off('click', menuPopupPreloaderCloseHandler);
+		$(document).on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
 
 		return false;
 	});

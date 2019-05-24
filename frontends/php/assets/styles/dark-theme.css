@@ -2602,7 +2602,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .dashbrd-widget-graph-link:link {
     border: none; }
 
-.action-menu {
+.menu-popup {
   position: absolute;
   z-index: 1000;
   padding: 5px 15px 5px 25px;
@@ -2614,14 +2614,14 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
-  .action-menu:focus {
+  .menu-popup:focus {
     outline: none; }
-  .action-menu li {
+  .menu-popup li {
     display: block; }
-    .action-menu li div {
+    .menu-popup li div {
       border-top: 1px solid #383838;
       margin: 5px -15px 5px -25px; }
-  .action-menu .action-menu-item {
+  .menu-popup .menu-popup-item {
     display: block;
     height: 24px;
     line-height: 24px;
@@ -2636,9 +2636,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     -webkit-transition: background-color 0.2s ease-out;
     -moz-transition: background-color 0.2s ease-out;
     transition: background-color 0.2s ease-out; }
-    .action-menu .action-menu-item:hover, .action-menu .action-menu-item:focus, .action-menu .action-menu-item:active, .action-menu .action-menu-item.highlighted {
+    .menu-popup .menu-popup-item:hover, .menu-popup .menu-popup-item:focus, .menu-popup .menu-popup-item:active, .menu-popup .menu-popup-item.highlighted {
       background-color: #454545; }
-    .action-menu .action-menu-item.selected::before {
+    .menu-popup .menu-popup-item.selected::before {
       display: block;
       width: 24px;
       height: 24px;
@@ -2646,7 +2646,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       left: 0;
       content: '';
       background: url(../img/icon-sprite.svg) no-repeat -5px -835px; }
-    .action-menu .action-menu-item .arrow-right {
+    .menu-popup .menu-popup-item .arrow-right {
       position: absolute;
       right: 10px;
       top: 8px;
@@ -2655,14 +2655,14 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       padding: 0;
       margin: 0;
       border-left-color: #737373; }
-  .action-menu .action-menu-item-disabled {
+  .menu-popup .menu-popup-item-disabled {
     display: block;
     height: 24px;
     line-height: 24px;
     color: #737373;
     border: none;
     cursor: default; }
-  .action-menu h3 {
+  .menu-popup h3 {
     height: 24px;
     line-height: 24px; }
 
@@ -3811,7 +3811,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   -moz-transform: translateY(-50%);
   -ms-transform: translateY(-50%);
   transform: translateY(-50%); }
-  .preloader-container.action-menu-preloader {
+  .preloader-container.menu-popup-preloader {
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
     border-radius: 0;
@@ -3931,7 +3931,7 @@ tr.cursor-move td * {
 .cursor-pointer {
   cursor: pointer; }
 
-.dashbrd-grid-widget-head h4, .action-menu .action-menu-item, .action-menu h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.dashbrd-grid-widget-head h4, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }

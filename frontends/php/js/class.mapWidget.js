@@ -92,7 +92,7 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 			jQuery('.dashbrd-grid-container').dashboardGrid('refreshWidget', uniqueid);
 			jQuery('.dashbrd-grid-container').dashboardGrid('widgetDataShare', widget[0], 'current_sysmapid',
 				{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0});
-			jQuery('.action-menu').menuPopup('close', null);
+			jQuery('.menu-popup').menuPopup('close', null);
 		}
 	}
 }
