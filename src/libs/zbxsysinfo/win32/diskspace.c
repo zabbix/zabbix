@@ -107,9 +107,9 @@ static const char	*get_drive_type_string(UINT type)
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct zbx_json	j;
-	wchar_t		name[MAX_PATH + 1], paths[MAX_PATH], *p, *path;
+	wchar_t		name[MAX_PATH + 1], *paths, *p, *path;
 	HANDLE		volume;
-	DWORD		buf_size;
+	DWORD		buf_size, buf_size_rec;
 	size_t		sz, sz_last;
 	int		ret = SYSINFO_RET_OK;
 
@@ -124,8 +124,18 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	do
 	{
-		if (TRUE != GetVolumePathNamesForVolumeName(name, paths, ARRSIZE(paths), &buf_size))
+		if (FALSE != GetVolumePathNamesForVolumeName(name, paths, 0, &buf_size))
 		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain necessary buffer size from system."));
+			ret = SYSINFO_RET_FAIL;
+			goto out;
+		}
+
+		paths = (wchar_t *)zbx_malloc(paths, buf_size * sizeof(wchar_t));
+
+		if (TRUE != GetVolumePathNamesForVolumeName(name, paths, buf_size, &buf_size_rec))
+		{
+			zbx_free(paths);
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain a list of filesystems."));
 			ret = SYSINFO_RET_FAIL;
 			goto out;
@@ -168,6 +178,9 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
+
+		zbx_free(paths);
+
 	} while (TRUE == FindNextVolume(volume, name, ARRSIZE(name)));
 
 	zbx_json_close(&j);
