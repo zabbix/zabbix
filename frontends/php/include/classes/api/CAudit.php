@@ -184,7 +184,10 @@ class CAudit {
 			if ($action == AUDIT_ACTION_UPDATE) {
 				$object_old = $objects_old[$resourceid];
 
-				$object_diff = array_diff_assoc(array_intersect_key($object_old, $object), $object);
+				$resourcename = $object_old[$field_name_resourcename];
+
+				$object_old = self::sanitizeObject($object, $object_old);
+				$object_diff = self::objectsDiffRecursivly($object_old, $object);
 
 				if (!$object_diff) {
 					continue;
@@ -198,15 +201,13 @@ class CAudit {
 					}
 
 					$values = [
-						'old' => $object_old[$field_name],
-						'new' => $object[$field_name]
+						'old' => json_encode($object_old[$field_name]),
+						'new' => json_encode($object[$field_name])
 					];
 				}
 				unset($values);
 
 				$objects_diff[] = $object_diff;
-
-				$resourcename = $object_old[$field_name_resourcename];
 			}
 			else {
 				$resourcename = $object[$field_name_resourcename];
@@ -248,5 +249,67 @@ class CAudit {
 				DB::insertBatch('auditlog_details', $auditlog_details);
 			}
 		}
+	}
+
+	/**
+	 * Remove from array2 all keys from array1 that not exists
+	 * Add keys and value to array2 that represent only in array1
+	 *
+	 * @param array $array1
+	 * @param array $array2
+	 *
+	 * @return array
+	 */
+	protected static function sanitizeObject(array $array1, array $array2)
+	{
+		foreach (array_keys($array2) as $key) {
+			if (!is_int($key) && !array_key_exists($key, $array1)) {
+				unset($array2[$key]);
+				continue;
+			}
+
+			if (is_array($array1[$key])) {
+				$array2[$key] = self::sanitizeObject($array1[$key], $array2[$key]);
+			}
+		}
+
+		foreach (array_keys($array1) as $key) {
+			if (!is_int($key) && !array_key_exists($key, $array2)) {
+				$array2[$key] = $array1[$key];
+			}
+		}
+
+		return $array2;
+	}
+
+	/**
+	 * Diff two arrays
+	 *
+	 * @param array $array1
+	 * @param array $array2
+	 *
+	 * @return array
+	 */
+	protected static function objectsDiffRecursivly(array $array1, array $array2)
+	{
+		$result = [];
+
+		foreach ($array1 as $key => $val) {
+			if (array_key_exists($key, $array2) && (string)$val == (string)$array2[$key]) {
+				if (is_array($val) || is_array($array2[$key])) {
+					if (false === is_array($val) || false === is_array($array2[$key])) {
+						$result[$key] = $val;
+					} else {
+						$result[$key] = self::objectsDiffRecursivly($val, $array2[$key]);
+						if (sizeof($result[$key]) === 0) {
+							unset($result[$key]);
+						}
+					}
+				}
+			} else {
+				$result[$key] = $val;
+			}
+		}
+		return $result;
 	}
 }

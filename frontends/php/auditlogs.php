@@ -121,7 +121,7 @@ $sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resource
 		' WHERE a.userid=u.userid'.
 			implode('', $sqlWhere).
 			' AND a.clock BETWEEN '.zbx_dbstr($data['timeline']['from_ts']).' AND '.zbx_dbstr($data['timeline']['to_ts']).
-		' ORDER BY a.clock DESC';
+		' ORDER BY a.clock DESC, a.auditid DESC';
 $dbAudit = DBselect($sql, $config['search_limit'] + 1);
 while ($audit = DBfetch($dbAudit)) {
 	switch ($audit['action']) {

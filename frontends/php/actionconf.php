@@ -155,11 +155,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'ack_shortdata' => getRequest('ack_shortdata', ''),
 		'ack_longdata' => getRequest('ack_longdata', ''),
 		'operations' => getRequest('operations', []),
-		'recovery_operations' => getRequest('recovery_operations', []),
-		'acknowledge_operations' => getRequest('ack_operations', [])
+		'recoveryOperations' => getRequest('recovery_operations', []),
+		'acknowledgeOperations' => getRequest('ack_operations', [])
 	];
 
-	foreach (['operations', 'recovery_operations', 'acknowledge_operations'] as $operation_key) {
+	foreach (['operations', 'recoveryOperations', 'acknowledgeOperations'] as $operation_key) {
 		foreach ($action[$operation_key] as &$operation) {
 			if (array_key_exists('opmessage', $operation)
 					&& !array_key_exists('default_msg', $operation['opmessage'])) {
@@ -498,9 +498,6 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['action.mass
 			? _n('Action enabled', 'Actions enabled', $actions_count)
 			: _n('Action disabled', 'Actions disabled', $actions_count);
 
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $result['actionids']).'] '.
-			($status == ACTION_STATUS_ENABLED ? 'enabled' : 'disabled')
-		);
 		show_messages(true, $message);
 		uncheckTableRows();
 	}
