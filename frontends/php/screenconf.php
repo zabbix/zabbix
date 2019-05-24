@@ -85,8 +85,6 @@ if ($fields_error & ZBX_VALID_ERROR) {
 	invalid_url();
 }
 
-CProfile::update('web.screenconf.config', getRequest('config', 0), PROFILE_TYPE_INT);
-
 /*
  * Export
  */
