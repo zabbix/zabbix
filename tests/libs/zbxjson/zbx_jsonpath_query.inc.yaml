@@ -1,5 +1,5 @@
 ---
-| 
+|
   {
     "books": [
       {
@@ -65,7 +65,8 @@
     },
     "filters": {
       "price": 10,
-      "category": "fiction"
+      "category": "fiction",
+      "no filters": "no \"filters\""
     },
     "closed message": "Store is closed",
     "tags": ["a", "b", "c", "d", "e" ]

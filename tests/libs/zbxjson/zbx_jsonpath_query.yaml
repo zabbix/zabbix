@@ -93,7 +93,8 @@ out:
   value: |
     {
       "price": 10,
-      "category": "fiction"
+      "category": "fiction",
+      "no filters": "no \"filters\""
     }
 ---
 test case: Query $.books.length()
@@ -573,4 +574,13 @@ in:
 out:
   return: SUCCEED
   value: '[]'
+---
+test case: Query $.filters['no filters']
+include: &include zbx_jsonpath_query.inc.yaml
+in:
+  data: *include
+  path: $.filters['no filters']
+out:
+  return: SUCCEED
+  value: no "filters"
 ...
