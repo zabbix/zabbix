@@ -444,7 +444,10 @@ elseif (isset($_REQUEST['form'])) {
 		];
 
 		if ($data['parent_discoveryid'] === null) {
-			$options['selectDiscoveryRule'] = ['itemid', 'name'];
+			$options += [
+				'selectDiscoveryRule'	=> ['itemid', 'name'],
+				'selectGraphDiscovery'	=> ['parent_graphid']
+			];
 			$graph = API::Graph()->get($options);
 		}
 		else {
@@ -475,6 +478,7 @@ elseif (isset($_REQUEST['form'])) {
 		if ($data['parent_discoveryid'] === null) {
 			$data['flags'] = $graph['flags'];
 			$data['discoveryRule'] = $graph['discoveryRule'];
+			$data['graphDiscovery'] = $graph['graphDiscovery'];
 		}
 
 		// if no host has been selected for the navigation panel, use the first graph host

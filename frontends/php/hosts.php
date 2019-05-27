@@ -1050,6 +1050,7 @@ elseif (hasRequest('form')) {
 				'selectParentTemplates' => ['templateid'],
 				'selectMacros' => ['hostmacroid', 'macro', 'value'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
+				'selectHostDiscovery' => ['parent_hostid'],
 				'selectInventory' => true,
 				'selectTags' => ['tag', 'value'],
 				'hostids' => [$data['hostid']]
@@ -1059,6 +1060,7 @@ elseif (hasRequest('form')) {
 			$data['flags'] = $dbHost['flags'];
 			if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 				$data['discoveryRule'] = $dbHost['discoveryRule'];
+				$data['hostDiscovery'] = $dbHost['hostDiscovery'];
 			}
 
 			// Host
