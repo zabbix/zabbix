@@ -1104,11 +1104,11 @@ output {
   .multiselect .disabled {
     opacity: 1;
     filter: alpha(opacity=100);
-    background-color: #ebebeb; }
+    background-color: #2b2b2b; }
     .multiselect .disabled .subfilter-enabled,
     .multiselect .disabled .subfilter-disable-btn {
-      background-color: #ccd5d9;
-      color: #768d99; }
+      background-color: #383838;
+      color: #808080; }
   .multiselect div[aria-live] {
     overflow: hidden;
     position: absolute;
