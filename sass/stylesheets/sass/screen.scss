@@ -213,13 +213,13 @@ pre {
 }
 
 .disabled {
-    @include opacity(0.35);
-    cursor: default !important;
+	@include opacity(0.35);
+	cursor: default !important;
 
-    .disabled,
+	.disabled,
 	[disabled] {
-        opacity: 1 !important;
-    }
+		opacity: 1 !important;
+	}
 }
 
 %space-pre-wrap {
