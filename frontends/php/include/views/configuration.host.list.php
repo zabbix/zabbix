@@ -210,7 +210,7 @@ foreach ($data['hosts'] as $host) {
 		->addSID();
 
 	if ($maintenance_icon) {
-		$status = (new CSpan([$maintenance_icon, $status]));
+		$status = [$maintenance_icon, $status];
 	}
 	elseif (count($data['maintenances'])) {
 		$status->addClass(ZBX_STYLE_ICON_NONE);
