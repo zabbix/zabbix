@@ -104,7 +104,7 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
  *             error                       - [IN] error for internal events   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
@@ -192,6 +192,8 @@ void	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t obje
 		event->name = zbx_strdup(NULL, error);
 
 	zbx_vector_ptr_append(&events, event);
+
+	return event;
 }
 
 /******************************************************************************
@@ -214,14 +216,15 @@ void	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t obje
  *             trigger_type                - [IN] TRIGGER_TYPE_* defines      *
  *                                                                            *
  ******************************************************************************/
-static void	close_trigger_event(zbx_uint64_t eventid, zbx_uint64_t objectid, const zbx_timespec_t *ts,
+static DB_EVENT	*close_trigger_event(zbx_uint64_t eventid, zbx_uint64_t objectid, const zbx_timespec_t *ts,
 		zbx_uint64_t userid, zbx_uint64_t correlationid, zbx_uint64_t c_eventid,
 		const char *trigger_description, const char *trigger_expression,
 		const char *trigger_recovery_expression, unsigned char trigger_priority, unsigned char trigger_type)
 {
 	zbx_event_recovery_t	recovery_local;
+	DB_EVENT		*r_event;
 
-	zbx_add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, objectid, ts, TRIGGER_VALUE_OK,
+	r_event = zbx_add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, objectid, ts, TRIGGER_VALUE_OK,
 			trigger_description, trigger_expression, trigger_recovery_expression, trigger_priority,
 			trigger_type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "", TRIGGER_VALUE_PROBLEM,
 			NULL);
@@ -230,10 +233,12 @@ static void	close_trigger_event(zbx_uint64_t eventid, zbx_uint64_t objectid, con
 	recovery_local.objectid = objectid;
 	recovery_local.correlationid = correlationid;
 	recovery_local.c_eventid = c_eventid;
-	recovery_local.r_event = events.values[events.values_num - 1];
+	recovery_local.r_event = r_event;
 	recovery_local.userid = userid;
 
 	zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
+
+	return r_event;
 }
 
 /******************************************************************************
@@ -1030,14 +1035,12 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, DB_EV
 				ts.sec = event->clock;
 				ts.ns = event->ns;
 
-
-				close_trigger_event(event->eventid, event->objectid, &ts, 0,
+				r_event = close_trigger_event(event->eventid, event->objectid, &ts, 0,
 						correlation->correlationid, event->eventid, event->trigger.description,
 						event->trigger.expression, event->trigger.recovery_expression,
 						event->trigger.priority, event->trigger.type);
 
 				event->flags |= ZBX_FLAGS_DB_EVENT_NO_ACTION;
-				r_event = events.values[events.values_num - 1];
 				r_event->flags |= ZBX_FLAGS_DB_EVENT_NO_ACTION;
 
 				break;
@@ -2639,10 +2642,10 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 
 		DBbegin();
 
-		close_trigger_event(eventid, triggerid, &ts, userid, 0, 0, trigger.description,
+		r_event = close_trigger_event(eventid, triggerid, &ts, userid, 0, 0, trigger.description,
 				trigger.expression_orig, trigger.recovery_expression_orig, trigger.priority,
 				trigger.type);
-		r_event = (DB_EVENT *)events.values[events.values_num - 1];
+
 		r_event->eventid = DBget_maxid_num("events", 1);
 
 		processed_num = flush_events();
