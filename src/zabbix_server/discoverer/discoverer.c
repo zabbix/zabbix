@@ -713,32 +713,27 @@ static int	process_discovery(void)
 	char		*delay_str = NULL;
 
 	result = DBselect(
-			"select distinct r.druleid,r.iprange,r.name,c.dcheckid,r.proxy_hostid,r.delay,r.status"
+			"select distinct r.druleid,r.iprange,r.name,c.dcheckid,r.proxy_hostid,r.delay"
 			" from drules r"
 				" left join dchecks c"
 					" on c.druleid=r.druleid"
 						" and c.uniq=1"
-			" where r.nextcheck<=%d"
+			" where r.status=%d"
+				" and r.nextcheck<=%d"
 				" and " ZBX_SQL_MOD(r.druleid,%d) "=%d",
+			DRULE_STATUS_MONITORED,
 			(int)time(NULL),
 			CONFIG_DISCOVERER_FORKS,
 			process_num - 1);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		int		status;
 		int		now, delay;
 		zbx_uint64_t	druleid;
 
-		status = atoi(row[6]);
-		ZBX_STR2UINT64(druleid, row[0]);
-
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-			discovery_clean_services(druleid);
-
-		if (DRULE_STATUS_MONITORED != status) continue;
-
 		rule_count++;
+
+		ZBX_STR2UINT64(druleid, row[0]);
 
 		delay_str = zbx_strdup(delay_str, row[5]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &delay_str,
@@ -776,6 +771,9 @@ static int	process_discovery(void)
 
 			process_rule(&drule);
 		}
+
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			discovery_clean_services(druleid);
 
 		now = (int)time(NULL);
 		if (0 > now + delay)
