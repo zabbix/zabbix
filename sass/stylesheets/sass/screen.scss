@@ -2983,7 +2983,9 @@ $var-icons: (
 	}
 }
 
-.icon-none {margin-left: 18px;}
+.icon-none {
+	margin-left: 18px;
+}
 
 $form-icon-btn: (
 	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
