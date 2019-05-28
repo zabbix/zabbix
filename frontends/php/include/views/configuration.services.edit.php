@@ -202,7 +202,8 @@ foreach ($data['times'] as $service_time) {
 		],
 		$from.' - '.$till,
 		(new CCol($service_time['note']))
-			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;word-break: break-word;'),
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 		(new CCol(
 			(new CButton('remove', _('Remove')))
 				->onClick('javascript: removeTime(\''.$i.'\');')
