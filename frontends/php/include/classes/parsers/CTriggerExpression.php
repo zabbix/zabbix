@@ -163,13 +163,7 @@ class CTriggerExpression {
 	 * @param bool  $options['allow_func_only']
 	 */
 	public function __construct(array $options = []) {
-		if (array_key_exists('lldmacros', $options)) {
-			$this->options['lldmacros'] = $options['lldmacros'];
-		}
-
-		if (array_key_exists('allow_func_only', $options)) {
-			$this->options['allow_func_only'] = $options['allow_func_only'];
-		}
+		$this->options = array_merge($this->options, $options);
 
 		$this->binaryOperatorParser = new CSetParser(['<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>']);
 		$this->logicalOperatorParser = new CSetParser(['and', 'or']);

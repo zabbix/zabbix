@@ -348,6 +348,7 @@ class CImportDataAdapter {
 								);
 								$simple_triggers[] = $this->renameTriggerFields($simple_trigger);
 							}
+							unset($item['triggers']);
 						}
 					}
 				}
@@ -365,6 +366,7 @@ class CImportDataAdapter {
 								);
 								$simple_triggers[] = $this->renameTriggerFields($simple_trigger);
 							}
+							unset($item['triggers']);
 						}
 					}
 				}
@@ -514,6 +516,7 @@ class CImportDataAdapter {
 						$item_prototype['key'], $trigger_prototype, ['allow_func_only' => true]
 					);
 				}
+				unset($item_prototype['trigger_prototypes']);
 			}
 
 			$item_prototype = $this->renameItemFields($item_prototype);
@@ -534,6 +537,17 @@ class CImportDataAdapter {
 	}
 
 	/**
+	 * Rename items, discovery rules, item prototypes fields.
+	 *
+	 * @param array $item
+	 *
+	 * @return array
+	 */
+	protected function renameItemFields(array $item) {
+		return CArrayHelper::renameKeys($item, ['key' => 'key_', 'allowed_hosts' => 'trapper_hosts']);
+	}
+
+	/**
 	 * Format web scenario.
 	 *
 	 * @param array $httptest
@@ -550,17 +564,6 @@ class CImportDataAdapter {
 		unset($step);
 
 		return $httptest;
-	}
-
-	/**
-	 * Rename items, discovery rules, item prototypes fields.
-	 *
-	 * @param array $item
-	 *
-	 * @return array
-	 */
-	protected function renameItemFields(array $item) {
-		return CArrayHelper::renameKeys($item, ['key' => 'key_', 'allowed_hosts' => 'trapper_hosts']);
 	}
 
 	/**

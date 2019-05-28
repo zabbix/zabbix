@@ -147,7 +147,7 @@ class CConfigurationExport {
 
 		if ($this->data['triggers']) {
 			foreach ($this->data['triggers'] as $triggerid => $trigger) {
-				if (count($trigger['items']) === 1) {
+				if (count($trigger['items']) == 1) {
 					$simple_triggers[] = $trigger;
 					unset($this->data['triggers'][$triggerid]);
 				}
