@@ -522,18 +522,23 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
  *                                                                            *
  * Purpose: save (insert or update) template item                             *
  *                                                                            *
- * Parameters: hostid     - [IN] parent host id                               *
- *             itemid     - [IN/OUT] item id used for insert operations       *
- *             item       - [IN] item to be saved                             *
- *             db_insert  - [IN] prepared item bulk insert                    *
- *             sql        - [IN/OUT] sql buffer pointer used for update       *
- *                                   operations                               *
- *             sql_alloc  - [IN/OUT] sql buffer already allocated memory      *
- *             sql_offset - [IN/OUT] offset for writing within sql buffer     *
+ * Parameters: hostid            - [IN] parent host id                        *
+ *             itemid            - [IN/OUT] item id used for insert           *
+ *                                          operations                        *
+ *             item              - [IN] item to be saved                      *
+ *             db_insert_items   - [IN] prepared item bulk insert             *
+ *             db_insert_irtdata - [IN] prepared item discovery bulk insert   *
+ *             sql               - [IN/OUT] sql buffer pointer used for       *
+ *                                          update operations                 *
+ *             sql_alloc         - [IN/OUT] sql buffer already allocated      *
+ *                                          memory                            *
+ *             sql_offset        - [IN/OUT] offset for writing within sql     *
+ *                                          buffer                            *
  *                                                                            *
  ******************************************************************************/
 static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_template_item_t *item,
-		zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc, size_t *sql_offset)
+		zbx_db_insert_t *db_insert_items, zbx_db_insert_t *db_insert_irtdata, char **sql, size_t *sql_alloc,
+		size_t *sql_offset)
 {
 	int			i;
 	zbx_template_item_t	*dependent;
@@ -695,7 +700,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 	}
 	else
 	{
-		zbx_db_insert_add_values(db_insert, *itemid, item->name, item->key, hostid, (int)item->type,
+		zbx_db_insert_add_values(db_insert_items, *itemid, item->name, item->key, hostid, (int)item->type,
 				(int)item->value_type, item->delay, item->history, item->trends,
 				(int)item->status, item->trapper_hosts, item->units, item->formula, item->logtimefmt,
 				item->valuemapid, item->params, item->ipmi_sensor, item->snmp_community, item->snmp_oid,
@@ -711,6 +716,8 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->output_format, item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password,
 				item->verify_peer, item->verify_host, item->allow_traps);
 
+		zbx_db_insert_add_values(db_insert_irtdata, *itemid, 0, 0, 0, "");
+
 		item->itemid = (*itemid)++;
 	}
 
@@ -718,7 +725,8 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 	{
 		dependent = (zbx_template_item_t *)item->dependent_items.values[i];
 		dependent->master_itemid = item->itemid;
-		save_template_item(hostid, itemid, dependent, db_insert, sql, sql_alloc, sql_offset);
+		save_template_item(hostid, itemid, dependent, db_insert_items, db_insert_irtdata, sql, sql_alloc,
+				sql_offset);
 	}
 }
 
@@ -730,7 +738,6 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
  *                                                                            *
  * Parameters:  hostid - [IN] the target host                                 *
  *              items  - [IN] the template items                              *
- *              rules  - [IN] the ldd rule mapping                            *
  *                                                                            *
  ******************************************************************************/
 static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
@@ -739,7 +746,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 	int			new_items = 0, upd_items = 0, i;
 	zbx_uint64_t		itemid = 0;
-	zbx_db_insert_t		db_insert;
+	zbx_db_insert_t		db_insert_items, db_insert_irtdata;
 	zbx_template_item_t	*item;
 
 	if (0 == items->values_num)
@@ -759,7 +766,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 	{
 		itemid = DBget_maxid_num("items", new_items);
 
-		zbx_db_insert_prepare(&db_insert, "items", "itemid", "name", "key_", "hostid", "type", "value_type",
+		zbx_db_insert_prepare(&db_insert_items, "items", "itemid", "name", "key_", "hostid", "type", "value_type",
 				"delay", "history", "trends", "status", "trapper_hosts", "units",
 				"formula", "logtimefmt", "valuemapid", "params", "ipmi_sensor",
 				"snmp_community", "snmp_oid", "snmpv3_securityname", "snmpv3_securitylevel",
@@ -771,6 +778,9 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 				"post_type", "http_proxy", "headers", "retrieve_mode", "request_method",
 				"output_format", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "verify_peer",
 				"verify_host", "allow_traps", NULL);
+
+		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", "lastlogsize", "state", "mtime",
+				"error", NULL);
 	}
 
 	if (0 != upd_items)
@@ -785,13 +795,19 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 
 		/* dependent items are saved within recursive save_template_item calls while saving master */
 		if (0 == item->master_itemid)
-			save_template_item(hostid, &itemid, item, &db_insert, &sql, &sql_alloc, &sql_offset);
+		{
+			save_template_item(hostid, &itemid, item, &db_insert_items, &db_insert_irtdata,
+					&sql, &sql_alloc, &sql_offset);
+		}
 	}
 
 	if (0 != new_items)
 	{
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
+		zbx_db_insert_execute(&db_insert_items);
+		zbx_db_insert_clean(&db_insert_items);
+
+		zbx_db_insert_execute(&db_insert_irtdata);
+		zbx_db_insert_clean(&db_insert_irtdata);
 	}
 
 	if (0 != upd_items)
