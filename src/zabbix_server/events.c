@@ -103,6 +103,8 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
  *             trigger_value               - [IN] trigger value               *
  *             error                       - [IN] error for internal events   *
  *                                                                            *
+ * Return value: The added event.                                             *
+ *                                                                            *
  ******************************************************************************/
 DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
@@ -214,6 +216,8 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
  *             trigger_recovery_expression - [IN] trigger recovery expression *
  *             trigger_priority            - [IN] trigger priority            *
  *             trigger_type                - [IN] TRIGGER_TYPE_* defines      *
+ *                                                                            *
+ * Return value: Recovery event, created to close the specified event.        *
  *                                                                            *
  ******************************************************************************/
 static DB_EVENT	*close_trigger_event(zbx_uint64_t eventid, zbx_uint64_t objectid, const zbx_timespec_t *ts,
