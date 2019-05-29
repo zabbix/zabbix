@@ -178,6 +178,13 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	} while (TRUE == FindNextVolume(volume, name, ARRSIZE(name)));
 
+	if (ERROR_NO_MORE_FILES != GetLastError())
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot proceed to the next volume."));
+		ret = SYSINFO_RET_FAIL;
+		goto out;
+	}
+
 	zbx_json_close(&j);
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 out:
