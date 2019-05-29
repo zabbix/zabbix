@@ -17,6 +17,7 @@ New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
+........S. [ZBX-16150] fixed inactive, unmounted, unaccessible VMware datastore causes unknown column nan insertion in field list (akozlovs)
 ..F....... [ZBX-16032] changed application filtering to partial name search (vmurzins)
 ...G...... [ZBX-15915] fixed linking error if round() is undefined (akozlovs)
 ....I..... [ZBX-16074] added file revision number generation for compilation on MS Windows (MVekslers)
