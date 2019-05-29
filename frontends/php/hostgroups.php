@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 
 $page['title'] = _('Configuration of host groups');
 $page['file'] = 'hostgroups.php';
