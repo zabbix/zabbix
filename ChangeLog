@@ -1,3 +1,18 @@
+Changes for 4.0.9rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-15585] fixed web scenarios pair manager issue when fields are duplicating on post type toggle (talbergs)
+........S. [ZBX-16150] fixed inactive, unmounted, unaccessible VMware datastore causes unknown column nan insertion in field list (akozlovs)
+A......... [ZBX-16122] fixed api validation of trigger dependency (averza)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.8
+
+4.0.8rc1 was released as 4.0.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.8rc1
 
 New features:
@@ -2428,9 +2443,19 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 3.0.28rc1
+Changes for 3.0.29rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 3.0.28
+
+3.0.28rc1 was released as 3.0.28 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.0.28rc1
 
 Bug fixes:
 ...G...... [ZBX-15915] fixed linking error if round() is undefined (akozlovs)
