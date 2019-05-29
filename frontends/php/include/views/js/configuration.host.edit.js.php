@@ -140,6 +140,7 @@
 		function addDraggableIcon(domElement) {
 			domElement.draggable({
 				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				opacity: 0.6,
 				revert: 'invalid',
 				helper: function(event) {
 					var hostInterfaceId = jQuery(this).data('interfaceid');
@@ -318,8 +319,8 @@
 				jQuery('.interfaceRow').find('input')
 					.removeAttr('id')
 					.removeAttr('name');
-				jQuery('.interfaceRow').find('input[type="text"]').attr('readonly', true);
-				jQuery('.interfaceRow').find('input[type="radio"], input[type="checkbox"]').attr('disabled', true);
+				jQuery('.interfaceRow').find('input[type="text"]').prop('readonly', true);
+				jQuery('.interfaceRow').find('input[type="radio"], input[type="checkbox"]').prop('disabled', true);
 			}
 		}
 	}());

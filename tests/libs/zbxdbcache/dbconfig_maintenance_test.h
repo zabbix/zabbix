@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -18,12 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef DBCONFIG_MAINTENANCE_TEST_H
+#define DBCONFIG_MAINTENANCE_TEST_H
 
-require_once dirname(__FILE__).'/../include/CTest.php';
+int	dc_maintenance_match_tags_test(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags);
 
-class function_DBend extends CTest {
-	public function test_DBend() {
-		// TODO
-		$this->markTestIncomplete();
-	}
-}
+#endif

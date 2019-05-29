@@ -79,7 +79,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 					}
 				})
 				.ready(function() {
-					$('#conditionRow').toggle($('.form_row', $('#conditions')).size() > 1);
+					$('#conditionRow').toggle($('.form_row', $('#conditions')).length > 1);
 				});
 
 			$('#evaltype').change(function() {

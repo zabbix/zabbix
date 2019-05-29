@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -10,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -18,12 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+#include "zbxmockassert.h"
 
-require_once dirname(__FILE__).'/../include/CTest.php';
+#include "common.h"
+#include "zbxjson.h"
 
-class function_DBexecute extends CTest {
-	public function test_DBexecute() {
-		// TODO
-		$this->markTestIncomplete();
-	}
+const char	*zbx_mock_json_type_to_str(int type)
+{
+	static const char *json_types[] = {
+			"ZBX_JSON_TYPE_UNKNOWN", "ZBX_JSON_TYPE_STRING", "ZBX_JSON_TYPE_INT",
+			"ZBX_JSON_TYPE_ARRAY", "ZBX_JSON_TYPE_OBJECT", "ZBX_JSON_TYPE_NULL",
+			"ZBX_JSON_TYPE_TRUE", "ZBX_JSON_TYPE_FALSE"};
+
+	if (0 > type || ZBX_JSON_TYPE_FALSE < type)
+		fail_msg("Unknown json type: %d", type);
+
+	return json_types[type];
 }

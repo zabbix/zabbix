@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -18,12 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_MOCK_JSON_H
+#define ZABBIX_MOCK_JSON_H
 
-require_once dirname(__FILE__).'/../include/CTest.php';
+const char	*zbx_mock_json_type_to_str(int type);
 
-class function_DBrollback extends CTest {
-	public function test_DBrollback() {
-		// TODO
-		$this->markTestIncomplete();
-	}
-}
+#endif

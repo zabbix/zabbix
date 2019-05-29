@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "zbxalgo.h"
+#include "../zabbix_server/events.h"
 
 void	zbx_initialize_events(void)
 {
