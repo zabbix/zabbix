@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-29 08:52+0300\n"
+"POT-Creation-Date: 2019-05-29 09:40+0300\n"
 "PO-Revision-Date: 2018-12-04 06:36+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -379,7 +379,7 @@ msgstr "대응 완료된 해결 이벤트"
 #: include/views/configuration.host.discovery.edit.php:615
 #: include/views/configuration.host.edit.php:546
 #: include/views/configuration.host.prototype.edit.php:255
-#: include/views/configuration.httpconf.edit.php:198
+#: include/views/configuration.httpconf.edit.php:202
 #: include/views/configuration.item.edit.php:699
 #: include/views/configuration.item.edit.php:936
 #: include/views/configuration.item.massupdate.php:344
@@ -514,10 +514,11 @@ msgstr "종료시간"
 #: app/views/dashboard.sharing.edit.php:28
 #: app/views/dashboard.sharing.edit.php:49
 #: app/views/monitoring.problem.view.php:210
-#: app/views/monitoring.problem.view.php:257 app/views/popup.httpstep.php:112
-#: app/views/popup.httpstep.php:157 app/views/popup.media.php:48
-#: app/views/popup.media.php:112 app/views/popup.triggerwizard.php:169
-#: app/views/popup.triggerwizard.php:195
+#: app/views/monitoring.problem.view.php:257 app/views/popup.httpstep.php:68
+#: app/views/popup.httpstep.php:94 app/views/popup.httpstep.php:118
+#: app/views/popup.httpstep.php:137 app/views/popup.httpstep.php:170
+#: app/views/popup.media.php:48 app/views/popup.media.php:112
+#: app/views/popup.triggerwizard.php:169 app/views/popup.triggerwizard.php:195
 #: include/classes/widgets/CWidgetHelper.php:421
 #: include/views/administration.auditlogs.list.php:46
 #: include/views/administration.general.iconmap.edit.php:101
@@ -568,9 +569,10 @@ msgstr "종료시간"
 #: include/views/configuration.host.prototype.edit.php:209
 #: include/views/configuration.host.prototype.edit.php:308
 #: include/views/configuration.host.prototype.edit.php:444
-#: include/views/configuration.httpconf.edit.php:128
-#: include/views/configuration.httpconf.edit.php:264
-#: include/views/configuration.httpconf.edit.php:306
+#: include/views/configuration.httpconf.edit.php:122
+#: include/views/configuration.httpconf.edit.php:140
+#: include/views/configuration.httpconf.edit.php:208
+#: include/views/configuration.httpconf.edit.php:257
 #: include/views/configuration.item.edit.php:146
 #: include/views/configuration.item.edit.php:241
 #: include/views/configuration.item.edit.php:748
@@ -748,7 +750,7 @@ msgid "Age less than %s"
 msgstr "표시시간 %s"
 
 #: app/views/administration.script.list.php:78 app/views/popup.generic.php:602
-#: include/items.inc.php:349 include/views/configuration.httpconf.edit.php:101
+#: include/items.inc.php:349 include/views/configuration.httpconf.edit.php:100
 msgid "Agent"
 msgstr "에이전트"
 
@@ -930,8 +932,8 @@ msgstr "어떤 문자열이 포함됨"
 #: include/forms.inc.php:407 include/views/common.filter.trigger.php:85
 #: include/views/configuration.application.edit.php:37
 #: include/views/configuration.application.list.php:63
-#: include/views/configuration.httpconf.edit.php:65
-#: include/views/configuration.httpconf.edit.php:70
+#: include/views/configuration.httpconf.edit.php:64
+#: include/views/configuration.httpconf.edit.php:69
 #: include/views/configuration.httpconf.list.php:94
 #: include/views/inventory.host.view.php:164
 #: include/views/js/monitoring.sysmaps.js.php:204
@@ -1152,7 +1154,7 @@ msgid "Attempt interval"
 msgstr "시도 간격"
 
 #: app/views/administration.mediatype.edit.php:210 httpconf.php:45
-#: include/views/configuration.httpconf.edit.php:86
+#: include/views/configuration.httpconf.edit.php:85
 #: include/views/configuration.httpconf.list.php:91
 msgid "Attempts"
 msgstr "시도횟수"
@@ -1187,7 +1189,7 @@ msgstr "8월"
 #: app/views/administration.authentication.edit.php:137
 #: app/views/administration.authentication.edit.php:146
 #: app/views/administration.mediatype.edit.php:88 include/menu.inc.php:263
-#: include/views/configuration.httpconf.edit.php:279
+#: include/views/configuration.httpconf.edit.php:230
 #: include/views/configuration.httpconf.list.php:92
 msgid "Authentication"
 msgstr "인증"
@@ -1725,7 +1727,7 @@ msgstr "LDAP서버에 바인드 할 수 없습니다."
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
 msgstr "파라미터 없이는 메소드 \"%1$s.%2$s\"를 불러올 수 없습니다."
 
-#: httpconf.php:196 httpconf.php:505 items.php:912 items.php:1294
+#: httpconf.php:196 httpconf.php:512 items.php:912 items.php:1294
 msgid "Cannot clear history"
 msgstr "히스토리를 정리할 수 없습니다"
 
@@ -1760,9 +1762,9 @@ msgstr "LDAP서버에 접속할 수 없습니다."
 msgid "Cannot connect to the database."
 msgstr "데이터베이스에 접속할 수 없습니다."
 
-#: include/views/js/configuration.httpconf.edit.js.php:582
-msgid "Cannot convert POST data from raw data format to form field data format."
-msgstr "POST데이터의 raw 데이터 포맷에서 폼 필드의 데이터 포맷으로 변환할 수 없습니다."
+#: include/views/js/configuration.httpconf.edit.js.php:79
+msgid "Cannot convert POST data:"
+msgstr ""
 
 #: graphs.php:388
 msgid "Cannot copy graph"
@@ -2070,7 +2072,7 @@ msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "값 매핑을 삭제할 수 없습니다"
 
-#: httpconf.php:156 httpconf.php:514
+#: httpconf.php:156 httpconf.php:521
 msgid "Cannot delete web scenario"
 msgstr "Web시나리오를 삭제할 수 없습니다"
 
@@ -2115,7 +2117,7 @@ msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
 msgstr[0] "유저 그룹을 비활성화 할 수 없습니다"
 
-#: httpconf.php:458
+#: httpconf.php:465
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Web 시나리오를 비활성화 할 수 없습니다"
@@ -2169,7 +2171,7 @@ msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
 msgstr[0] "유저 그룹을 활성화 할 수 없습니다."
 
-#: httpconf.php:457
+#: httpconf.php:464
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Web 시나리오를 활성화 할 수 없습니다."
@@ -3067,7 +3069,7 @@ msgstr "클리어"
 msgid "Clear history"
 msgstr "히스토리를 삭제"
 
-#: include/views/configuration.httpconf.edit.php:293
+#: include/views/configuration.httpconf.edit.php:244
 #: include/views/configuration.item.edit.php:1073
 msgid "Clear history and trends"
 msgstr "히스토리와 트렌드를 삭제"
@@ -3099,7 +3101,7 @@ msgstr "시각"
 #: include/views/configuration.host.edit.php:812
 #: include/views/configuration.hostgroups.edit.php:58
 #: include/views/configuration.host.prototype.edit.php:436
-#: include/views/configuration.httpconf.edit.php:286
+#: include/views/configuration.httpconf.edit.php:237
 #: include/views/configuration.item.edit.php:1060
 #: include/views/configuration.item.prototype.edit.php:894
 #: include/views/configuration.maintenance.edit.php:287
@@ -4095,7 +4097,7 @@ msgstr "데이터캐쉬 통계. cache - values (mode: all, float, uint, str, log
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Data from %1$s. Generated in %2$s sec."
 
-#: include/views/js/configuration.httpconf.edit.js.php:560
+#: include/views/js/configuration.httpconf.edit.js.php:72
 msgid "Data is not properly encoded."
 msgstr "데이터가 올바르게 인코딩되어 있지 않습니다."
 
@@ -4609,7 +4611,7 @@ msgstr "트리거 프로토타입을 삭제하시겠습니까?"
 msgid "Delete trigger?"
 msgstr "트리거를 삭제하시겠습니까?"
 
-#: include/views/configuration.httpconf.edit.php:298
+#: include/views/configuration.httpconf.edit.php:249
 msgid "Delete web scenario?"
 msgstr "Web시나리오를 삭제하시겠습니까?"
 
@@ -5563,7 +5565,7 @@ msgstr "트래핑의 활성화"
 #: include/views/configuration.host.edit.php:280
 #: include/views/configuration.host.list.php:186
 #: include/views/configuration.host.massupdate.php:185
-#: include/views/configuration.httpconf.edit.php:143
+#: include/views/configuration.httpconf.edit.php:150
 #: include/views/configuration.item.edit.php:927
 #: include/views/configuration.triggers.edit.php:575
 msgid "Enabled"
@@ -5598,8 +5600,7 @@ msgid "Equals"
 msgstr "같음"
 
 #: include/items.inc.php:35 include/views/js/common.item.edit.js.php:595
-#: include/views/js/configuration.httpconf.edit.js.php:579
-#: include/views/js/configuration.httpconf.edit.js.php:654
+#: include/views/js/configuration.httpconf.edit.js.php:77
 msgid "Error"
 msgstr "에러"
 
@@ -5866,7 +5867,7 @@ msgid "Failed to create dashboard"
 msgstr "대시보드의 작성에 실패하였습니다."
 
 #: include/views/js/common.item.edit.js.php:597
-#: include/views/js/configuration.httpconf.edit.js.php:656
+#: include/views/js/configuration.httpconf.edit.js.php:75
 msgid "Failed to parse URL."
 msgstr "URL을 해석할 수 없었습니다."
 
@@ -6119,7 +6120,7 @@ msgstr "고정"
 msgid "Flexible"
 msgstr "예외 설정"
 
-#: app/views/popup.httpstep.php:135
+#: app/views/popup.httpstep.php:148
 #: include/views/configuration.host.discovery.edit.php:250
 #: include/views/configuration.item.edit.php:282
 #: include/views/configuration.item.prototype.edit.php:270
@@ -6144,7 +6145,7 @@ msgstr "폰트 사이즈"
 msgid "For guest, password must be empty"
 msgstr "게스트의 패스워드는 비어있어야 합니다"
 
-#: app/views/popup.httpstep.php:74
+#: app/views/popup.httpstep.php:80
 msgid "Form data"
 msgstr "폼 데이터"
 
@@ -6625,7 +6626,7 @@ msgid "HTTP agent"
 msgstr "HTTP 에이전트"
 
 #: include/views/configuration.host.discovery.edit.php:280
-#: include/views/configuration.httpconf.edit.php:154
+#: include/views/configuration.httpconf.edit.php:158
 #: include/views/configuration.item.edit.php:321
 #: include/views/configuration.item.prototype.edit.php:309
 msgid "HTTP authentication"
@@ -6636,7 +6637,7 @@ msgid "HTTP login form"
 msgstr "HTTP의 로그인 화면"
 
 #: include/views/configuration.host.discovery.edit.php:271
-#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.httpconf.edit.php:109
 #: include/views/configuration.httpconf.list.php:93
 #: include/views/configuration.item.edit.php:312
 #: include/views/configuration.item.prototype.edit.php:300
@@ -6669,10 +6670,10 @@ msgstr "하드웨어 (전체설명)"
 msgid "Hardware sensor reading. Returns float"
 msgstr "하드웨어 센서 읽기. float를 리턴."
 
-#: app/views/popup.httpstep.php:95
+#: app/views/popup.httpstep.php:128
 #: include/views/configuration.host.discovery.edit.php:201
 #: include/views/configuration.host.discovery.edit.php:262
-#: include/views/configuration.httpconf.edit.php:117
+#: include/views/configuration.httpconf.edit.php:132
 #: include/views/configuration.item.edit.php:233
 #: include/views/configuration.item.edit.php:294
 #: include/views/configuration.item.massupdate.php:149
@@ -6758,12 +6759,12 @@ msgstr "행을 강조표시"
 msgid "History"
 msgstr "이력"
 
-#: httpconf.php:189 httpconf.php:196 httpconf.php:493 httpconf.php:505
+#: httpconf.php:189 httpconf.php:196 httpconf.php:500 httpconf.php:512
 #: items.php:905 items.php:912 items.php:1282 items.php:1294
 msgid "History cleared"
 msgstr "이력이 삭제되었습니다"
 
-#: include/views/configuration.httpconf.edit.php:294
+#: include/views/configuration.httpconf.edit.php:245
 #: include/views/configuration.item.edit.php:1074
 msgid "History clearing can take a long time. Continue?"
 msgstr "이력 삭제에 시간이 걸릴 수도 있습니다. 계속하시겠습니까?"
@@ -6805,7 +6806,7 @@ msgstr "가로 위치"
 #: app/views/monitoring.web.view.php:41
 #: app/views/monitoring.widget.problems.view.php:54
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
-#: app/views/popup.generic.php:137 httpconf.php:189 httpconf.php:493
+#: app/views/popup.generic.php:137 httpconf.php:189 httpconf.php:500
 #: include/actions.inc.php:48 include/audit.inc.php:27
 #: include/blocks.inc.php:547 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
@@ -8394,8 +8395,8 @@ msgid "Incorrect value for \"%1$s\" field."
 msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:95
-#: app/controllers/CControllerPopupHttpStep.php:103
-#: app/controllers/CControllerPopupHttpStep.php:109
+#: app/controllers/CControllerPopupHttpStep.php:92
+#: app/controllers/CControllerPopupHttpStep.php:98
 #: app/controllers/CControllerPopupMedia.php:94
 #: app/controllers/CControllerPopupMedia.php:105 correlation.php:227
 #: correlation.php:237 correlation.php:243 correlation.php:263
@@ -10624,9 +10625,11 @@ msgstr "NTLM"
 #: app/views/dashboard.properties.edit.php:50
 #: app/views/monitoring.dashboard.list.php:53
 #: app/views/monitoring.widget.plaintext.view.php:44
-#: app/views/popup.httpstep.php:43 app/views/popup.httpstep.php:109
-#: app/views/popup.triggerwizard.php:121 correlation.php:35
-#: disc_prototypes.php:41 graphs.php:45 host_discovery.php:48 httpconf.php:42
+#: app/views/popup.httpstep.php:40 app/views/popup.httpstep.php:65
+#: app/views/popup.httpstep.php:91 app/views/popup.httpstep.php:115
+#: app/views/popup.httpstep.php:134 app/views/popup.triggerwizard.php:121
+#: correlation.php:35 disc_prototypes.php:41 graphs.php:45
+#: host_discovery.php:48 httpconf.php:42
 #: include/classes/screens/CScreenHttpTest.php:116
 #: include/classes/widgets/CWidgetHelper.php:51 include/forms.inc.php:450
 #: include/hosts.inc.php:109
@@ -10670,9 +10673,10 @@ msgstr "NTLM"
 #: include/views/configuration.host.prototype.edit.php:227
 #: include/views/configuration.host.prototype.edit.php:255
 #: include/views/configuration.host.prototype.list.php:53
-#: include/views/configuration.httpconf.edit.php:60
-#: include/views/configuration.httpconf.edit.php:125
-#: include/views/configuration.httpconf.edit.php:191
+#: include/views/configuration.httpconf.edit.php:59
+#: include/views/configuration.httpconf.edit.php:119
+#: include/views/configuration.httpconf.edit.php:137
+#: include/views/configuration.httpconf.edit.php:195
 #: include/views/configuration.httpconf.list.php:88
 #: include/views/configuration.item.edit.php:63
 #: include/views/configuration.item.edit.php:142
@@ -10729,7 +10733,7 @@ msgctxt "user first name"
 msgid "Name"
 msgstr "이름"
 
-#: include/views/js/configuration.httpconf.edit.js.php:568
+#: include/views/js/configuration.httpconf.edit.js.php:73
 msgid "Name of the form field should not exceed 255 characters."
 msgstr "폼 필드 이름의 길이는 255 문자까지 가능합니다."
 
@@ -10785,7 +10789,7 @@ msgstr "없음"
 msgid "New"
 msgstr "새로 만들기"
 
-#: include/views/configuration.httpconf.edit.php:75
+#: include/views/configuration.httpconf.edit.php:74
 #: include/views/configuration.item.edit.php:875
 #: include/views/configuration.item.prototype.edit.php:723
 msgid "New application"
@@ -10975,7 +10979,7 @@ msgstr "스크린의 요소에 URL이 설정되어 있지 않습니다"
 msgid "No agent interfaces found."
 msgstr "에이전트 인터페이스가 설정되어 있지 않습니다"
 
-#: include/views/configuration.httpconf.edit.php:70
+#: include/views/configuration.httpconf.edit.php:69
 msgid "No applications found."
 msgstr "어플리케이션이 없습니다."
 
@@ -11776,8 +11780,7 @@ msgstr "OFF"
 #: include/views/administration.users.list.php:124
 #: include/views/configuration.triggers.list.php:58
 #: include/views/js/common.item.edit.js.php:601
-#: include/views/js/configuration.httpconf.edit.js.php:586
-#: include/views/js/configuration.httpconf.edit.js.php:660
+#: include/views/js/configuration.httpconf.edit.js.php:76
 #: include/views/js/conf.import.js.php:24 report2.php:431
 msgid "Ok"
 msgstr "OK"
@@ -12074,7 +12077,7 @@ msgid "Other parameters"
 msgstr "기타 파라미터"
 
 #: include/httptest.inc.php:431
-#: include/views/configuration.httpconf.edit.php:95
+#: include/views/configuration.httpconf.edit.php:94
 msgid "Others"
 msgstr "기타"
 
@@ -12368,11 +12371,11 @@ msgstr "상위 서비스"
 msgid "Parent triggers"
 msgstr "상위 트리거"
 
-#: include/views/configuration.httpconf.edit.php:50
+#: include/views/configuration.httpconf.edit.php:49
 msgid "Parent web scenarios"
 msgstr "상위 Web시나리오"
 
-#: app/views/popup.httpstep.php:56
+#: app/views/popup.httpstep.php:53
 #: include/views/configuration.host.discovery.edit.php:82
 #: include/views/configuration.item.edit.php:114
 #: include/views/configuration.item.prototype.edit.php:103
@@ -12410,7 +12413,7 @@ msgstr "패시브"
 #: include/views/configuration.host.discovery.edit.php:487
 #: include/views/configuration.host.edit.php:670
 #: include/views/configuration.host.prototype.edit.php:338
-#: include/views/configuration.httpconf.edit.php:162
+#: include/views/configuration.httpconf.edit.php:166
 #: include/views/configuration.item.edit.php:343
 #: include/views/configuration.item.edit.php:599
 #: include/views/configuration.item.edit.php:635
@@ -12625,11 +12628,11 @@ msgstr "포르투갈어 (pt_PT)"
 msgid "Position"
 msgstr "포지션"
 
-#: app/views/popup.httpstep.php:70
+#: app/views/popup.httpstep.php:85
 msgid "Post fields"
 msgstr "포스트 필드"
 
-#: app/views/popup.httpstep.php:72
+#: app/views/popup.httpstep.php:79
 msgid "Post type"
 msgstr "포스트 형식"
 
@@ -12938,7 +12941,7 @@ msgstr "공개키"
 msgid "Public key file"
 msgstr "공개키 파일"
 
-#: app/views/popup.httpstep.php:65
+#: app/views/popup.httpstep.php:59
 #: include/views/configuration.host.discovery.edit.php:106
 #: include/views/configuration.item.edit.php:138
 #: include/views/configuration.item.prototype.edit.php:126
@@ -12966,7 +12969,7 @@ msgstr "해결됨"
 msgid "RMCP+"
 msgstr "RMCP+"
 
-#: app/views/popup.httpstep.php:76
+#: app/views/popup.httpstep.php:81
 #: include/views/configuration.host.discovery.edit.php:171
 #: include/views/configuration.item.edit.php:203
 #: include/views/configuration.item.massupdate.php:118
@@ -12974,7 +12977,7 @@ msgstr "RMCP+"
 msgid "Raw data"
 msgstr "로우 데이터"
 
-#: app/views/popup.httpstep.php:82
+#: app/views/popup.httpstep.php:105
 msgid "Raw post"
 msgstr "로우 포스트"
 
@@ -13198,7 +13201,6 @@ msgstr "원격 명령"
 #: include/views/configuration.host.discovery.edit.php:226
 #: include/views/configuration.host.discovery.edit.php:545
 #: include/views/configuration.host.discovery.edit.php:658
-#: include/views/configuration.httpconf.edit.php:239
 #: include/views/configuration.item.edit.php:163
 #: include/views/configuration.item.edit.php:258
 #: include/views/configuration.item.edit.php:740
@@ -13246,7 +13248,8 @@ msgstr "원격 명령"
 #: include/views/js/configuration.host.discovery.edit.js.php:31
 #: include/views/js/configuration.host.edit.js.php:47
 #: include/views/js/configuration.host.prototype.edit.js.php:7
-#: include/views/js/configuration.httpconf.edit.js.php:21
+#: include/views/js/configuration.httpconf.edit.js.php:27
+#: include/views/js/configuration.httpconf.edit.js.php:50
 #: include/views/js/configuration.item.massupdate.js.php:22
 #: include/views/js/configuration.item.massupdate.js.php:47
 #: include/views/js/configuration.maintenance.edit.js.php:14
@@ -13372,7 +13375,7 @@ msgid "Request type"
 msgstr "리퀘스트 타입"
 
 #: include/classes/setup/CSetupWizard.php:165
-#: include/views/configuration.httpconf.edit.php:194
+#: include/views/configuration.httpconf.edit.php:198
 msgid "Required"
 msgstr "요구 문자열"
 
@@ -13392,14 +13395,14 @@ msgstr "Zabbix서버의 요구 퍼포먼스를 1초간격으로 기대되는 값
 msgid "Required server performance, new values per second"
 msgstr "1초간의 감시항목수(Zabbix서버의 요구 퍼포먼스)"
 
-#: app/views/popup.httpstep.php:151
+#: app/views/popup.httpstep.php:164
 #: include/views/configuration.host.discovery.edit.php:242
 #: include/views/configuration.item.edit.php:274
 #: include/views/configuration.item.prototype.edit.php:262
 msgid "Required status codes"
 msgstr "요구 스테이터스 코드"
 
-#: app/views/popup.httpstep.php:148
+#: app/views/popup.httpstep.php:161
 msgid "Required string"
 msgstr "요구문자열"
 
@@ -13504,7 +13507,7 @@ msgstr "결과 타입"
 msgid "Retrieve mode"
 msgstr "재습득 모드"
 
-#: app/views/popup.httpstep.php:139
+#: app/views/popup.httpstep.php:152
 msgid "Retrieve only headers"
 msgstr "헤더만 취득"
 
@@ -13794,21 +13797,21 @@ msgid "SSH agent"
 msgstr "SSH 에이전트"
 
 #: include/views/configuration.host.discovery.edit.php:328
-#: include/views/configuration.httpconf.edit.php:171
+#: include/views/configuration.httpconf.edit.php:175
 #: include/views/configuration.item.edit.php:369
 #: include/views/configuration.item.prototype.edit.php:357
 msgid "SSL certificate file"
 msgstr "SSL 인증서 파일"
 
 #: include/views/configuration.host.discovery.edit.php:337
-#: include/views/configuration.httpconf.edit.php:174
+#: include/views/configuration.httpconf.edit.php:178
 #: include/views/configuration.item.edit.php:377
 #: include/views/configuration.item.prototype.edit.php:365
 msgid "SSL key file"
 msgstr "SSL 키 파일"
 
 #: include/views/configuration.host.discovery.edit.php:345
-#: include/views/configuration.httpconf.edit.php:177
+#: include/views/configuration.httpconf.edit.php:181
 #: include/views/configuration.item.edit.php:385
 #: include/views/configuration.item.prototype.edit.php:373
 msgid "SSL key password"
@@ -13816,7 +13819,7 @@ msgstr "SSL 키 패스워드"
 
 #: app/views/administration.mediatype.edit.php:87
 #: include/views/configuration.host.discovery.edit.php:319
-#: include/views/configuration.httpconf.edit.php:168
+#: include/views/configuration.httpconf.edit.php:172
 #: include/views/configuration.item.edit.php:360
 #: include/views/configuration.item.prototype.edit.php:348
 msgid "SSL verify host"
@@ -13824,7 +13827,7 @@ msgstr "SSL호스트 검증"
 
 #: app/views/administration.mediatype.edit.php:86
 #: include/views/configuration.host.discovery.edit.php:310
-#: include/views/configuration.httpconf.edit.php:165
+#: include/views/configuration.httpconf.edit.php:169
 #: include/views/configuration.item.edit.php:351
 #: include/views/configuration.item.prototype.edit.php:339
 msgid "SSL verify peer"
@@ -13864,7 +13867,7 @@ msgstr "변경을 저장"
 msgid "Save it as \"%1$s\""
 msgstr "\"%1$s\"로 저장하였습니다"
 
-#: include/views/configuration.httpconf.edit.php:277
+#: include/views/configuration.httpconf.edit.php:228
 msgid "Scenario"
 msgstr "시나리오"
 
@@ -14945,7 +14948,7 @@ msgstr "상태 계산"
 msgid "Status calculation algorithm"
 msgstr "상태 계산 알고리즘"
 
-#: include/views/configuration.httpconf.edit.php:195
+#: include/views/configuration.httpconf.edit.php:199
 msgid "Status codes"
 msgstr "상태 코드"
 
@@ -14989,19 +14992,19 @@ msgstr "스텝\"%1$s\" [%3$s의 %2$s] 실패: %4$s"
 msgid "Step duration"
 msgstr "스텝 지속기간"
 
-#: app/controllers/CControllerPopupHttpStep.php:159
+#: app/controllers/CControllerPopupHttpStep.php:142
 msgid "Step of web scenario"
 msgstr "Web시나리오 스텝"
 
-#: app/controllers/CControllerPopupHttpStep.php:118
+#: app/controllers/CControllerPopupHttpStep.php:106
 #, c-format
 msgid "Step with name \"%1$s\" already exists."
 msgstr "\"%1$s\"의 이름를 지닌 스텝이 이미 존재합니다."
 
 #: httpconf.php:53 include/views/configuration.action.edit.php:435
 #: include/views/configuration.action.edit.php:593
-#: include/views/configuration.httpconf.edit.php:269
-#: include/views/configuration.httpconf.edit.php:278
+#: include/views/configuration.httpconf.edit.php:220
+#: include/views/configuration.httpconf.edit.php:229
 msgid "Steps"
 msgstr "스텝"
 
@@ -15671,9 +15674,9 @@ msgstr "사용할 시간"
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
 msgstr "PHP의 타임존이 설정되어 있지 않습니다 (\"date.timezone\"설정파라미터)."
 
-#: app/views/popup.httpstep.php:143
+#: app/views/popup.httpstep.php:156
 #: include/views/configuration.host.discovery.edit.php:162
-#: include/views/configuration.httpconf.edit.php:192
+#: include/views/configuration.httpconf.edit.php:196
 #: include/views/configuration.item.edit.php:194
 #: include/views/configuration.item.prototype.edit.php:182
 msgid "Timeout"
@@ -16176,13 +16179,13 @@ msgstr "타입"
 msgid "UNKNOWN"
 msgstr "알 수 없음"
 
-#: app/views/popup.httpstep.php:50 app/views/popup.triggerwizard.php:183
+#: app/views/popup.httpstep.php:47 app/views/popup.triggerwizard.php:183
 #: disc_prototypes.php:168 host_discovery.php:152
 #: include/classes/widgets/CWidgetConfig.php:50
 #: include/classes/widgets/forms/CWidgetFormUrl.php:31
 #: include/screens.inc.php:44
 #: include/views/configuration.host.discovery.edit.php:76
-#: include/views/configuration.httpconf.edit.php:193
+#: include/views/configuration.httpconf.edit.php:197
 #: include/views/configuration.item.edit.php:108
 #: include/views/configuration.item.massupdate.php:105
 #: include/views/configuration.item.prototype.edit.php:97
@@ -16211,7 +16214,7 @@ msgid "URL C"
 msgstr "URL C"
 
 #: include/views/js/common.item.edit.js.php:597
-#: include/views/js/configuration.httpconf.edit.js.php:656
+#: include/views/js/configuration.httpconf.edit.js.php:78
 msgid "URL is not properly encoded."
 msgstr "URL이 올바르게 인코딩되지 않았습니다."
 
@@ -16470,7 +16473,7 @@ msgstr "Up"
 #: app/views/administration.script.edit.php:127
 #: app/views/dashboard.sharing.edit.php:100
 #: app/views/monitoring.acknowledge.edit.php:87
-#: app/views/popup.httpstep.php:157 app/views/popup.media.php:112
+#: app/views/popup.httpstep.php:170 app/views/popup.media.php:112
 #: app/views/popup.trigdesc.view.php:46 app/views/popup.triggerwizard.php:195
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.general.gui.edit.php:68
@@ -16499,7 +16502,7 @@ msgstr "Up"
 #: include/views/configuration.hostgroups.edit.php:57
 #: include/views/configuration.host.massupdate.php:371
 #: include/views/configuration.host.prototype.edit.php:434
-#: include/views/configuration.httpconf.edit.php:302
+#: include/views/configuration.httpconf.edit.php:253
 #: include/views/configuration.item.edit.php:1082
 #: include/views/configuration.item.massupdate.php:721
 #: include/views/configuration.item.prototype.edit.php:893
@@ -16527,7 +16530,7 @@ msgstr "기존설정을 덮어씌움"
 #: discoveryconf.php:39 disc_prototypes.php:53 host_discovery.php:54
 #: include/forms.inc.php:394 include/views/configuration.discovery.edit.php:59
 #: include/views/configuration.host.discovery.edit.php:506
-#: include/views/configuration.httpconf.edit.php:80
+#: include/views/configuration.httpconf.edit.php:79
 #: include/views/configuration.item.edit.php:689
 #: include/views/configuration.item.massupdate.php:510
 #: include/views/configuration.item.prototype.edit.php:617 items.php:54
@@ -16622,7 +16625,7 @@ msgstr "아이템으로 사용"
 #: include/views/configuration.action.edit.php:698
 #: include/views/configuration.action.edit.php:1446
 #: include/views/configuration.action.edit.php:1991
-#: include/views/configuration.httpconf.edit.php:159
+#: include/views/configuration.httpconf.edit.php:163
 msgid "User"
 msgstr "유저"
 
@@ -16664,7 +16667,7 @@ msgstr "유저 액션"
 msgid "User added"
 msgstr "사용자를 추가하였습니다"
 
-#: include/views/configuration.httpconf.edit.php:103
+#: include/views/configuration.httpconf.edit.php:102
 msgid "User agent string"
 msgstr "유저 에이전트 문자열"
 
@@ -17074,8 +17077,10 @@ msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMwar
 msgstr "VMware가상머신 가동시간, <url> - VMware서비스 URL, <uuid> - VMware 가상머신 호스트명"
 
 #: app/views/monitoring.widget.plaintext.view.php:46
-#: app/views/popup.httpstep.php:109 app/views/popup.testtriggerexpr.php:30
-#: include/blocks.inc.php:427 include/classes/graphdraw/CPieGraphDraw.php:343
+#: app/views/popup.httpstep.php:65 app/views/popup.httpstep.php:91
+#: app/views/popup.httpstep.php:115 app/views/popup.httpstep.php:134
+#: app/views/popup.testtriggerexpr.php:30 include/blocks.inc.php:427
+#: include/classes/graphdraw/CPieGraphDraw.php:343
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHistory.php:264
 #: include/classes/screens/CScreenHistory.php:361
@@ -17084,7 +17089,8 @@ msgstr "VMware가상머신 가동시간, <url> - VMware서비스 URL, <uuid> - V
 #: include/views/administration.general.valuemapping.edit.php:55
 #: include/views/configuration.host.discovery.edit.php:110
 #: include/views/configuration.host.discovery.edit.php:205
-#: include/views/configuration.httpconf.edit.php:125
+#: include/views/configuration.httpconf.edit.php:119
+#: include/views/configuration.httpconf.edit.php:137
 #: include/views/configuration.item.edit.php:142
 #: include/views/configuration.item.edit.php:237
 #: include/views/configuration.item.massupdate.php:154
@@ -17206,12 +17212,12 @@ msgstr "값: 데이터 없음"
 msgid "Values"
 msgstr "값"
 
-#: include/views/js/configuration.httpconf.edit.js.php:564
+#: include/views/js/configuration.httpconf.edit.js.php:74
 msgid "Values without names are not allowed in form fields."
 msgstr "폼 필드에서는 이름을 반드시 입력해주십시오."
 
-#: app/views/popup.httpstep.php:90
-#: include/views/configuration.httpconf.edit.php:116
+#: app/views/popup.httpstep.php:109
+#: include/views/configuration.httpconf.edit.php:114
 msgid "Variables"
 msgstr "변수"
 
@@ -17313,7 +17319,7 @@ msgstr "웹"
 msgid "Web monitoring"
 msgstr "웹 감시"
 
-#: httpconf.php:188 httpconf.php:492 include/audit.inc.php:45
+#: httpconf.php:188 httpconf.php:499 include/audit.inc.php:45
 msgid "Web scenario"
 msgstr "Web시나리오"
 
@@ -17337,16 +17343,16 @@ msgstr "\"%2$s\"상의 Web시나리오 \"%1$s\": 어플리케이션 \"%3$s\"이 
 msgid "Web scenario added"
 msgstr "Web시나리오를 추가했습니다."
 
-#: httpconf.php:156 httpconf.php:514
+#: httpconf.php:156 httpconf.php:521
 msgid "Web scenario deleted"
 msgstr "Web시나리오를 삭제했습니다."
 
-#: httpconf.php:455
+#: httpconf.php:462
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Web시나리오를 비활성화 하였습니다"
 
-#: httpconf.php:454
+#: httpconf.php:461
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] "Web시나리오를 활성화 하였습니다"
@@ -17884,7 +17890,7 @@ msgstr "16진수의 색상코드(6자)를 입력해주십시오."
 msgid "a number is expected"
 msgstr "숫자로 지정해주세요"
 
-#: app/controllers/CControllerPopupHttpStep.php:109
+#: app/controllers/CControllerPopupHttpStep.php:98
 #: include/classes/validators/CApiInputValidator.php:422
 #: include/classes/validators/CApiInputValidator.php:564
 #: include/classes/validators/CApiInputValidator.php:959
@@ -17913,7 +17919,7 @@ msgstr "기간을 지정해주세요"
 msgid "a time range is expected"
 msgstr "시간범위를 지정해주세요"
 
-#: app/controllers/CControllerPopupHttpStep.php:103
+#: app/controllers/CControllerPopupHttpStep.php:92
 #: include/classes/validators/CApiInputValidator.php:1174
 #: include/validate.inc.php:227 include/validate.inc.php:572
 msgid "a time unit is expected"
@@ -18597,7 +18603,7 @@ msgstr "적어도 하나 이상의 LLD 매크로를 포함할 필요가 있습�
 #: include/views/configuration.item.edit.php:252
 #: include/views/configuration.item.prototype.edit.php:145
 #: include/views/configuration.item.prototype.edit.php:240
-#: include/views/js/configuration.httpconf.edit.js.php:13
+#: include/views/js/configuration.httpconf.edit.js.php:41
 msgid "name"
 msgstr "이름"
 
@@ -18711,7 +18717,7 @@ msgstr "오래된 이벤트 태그"
 msgid "on"
 msgstr "on"
 
-#: include/views/configuration.httpconf.edit.php:95
+#: include/views/configuration.httpconf.edit.php:94
 msgid "other"
 msgstr "그 외"
 
@@ -19038,7 +19044,7 @@ msgstr "지원되지 않는 버전의 번호입니다."
 #: include/views/configuration.triggers.massupdate.php:129
 #: include/views/hostmacros.php:85
 #: include/views/js/administration.general.macros.edit.js.php:11
-#: include/views/js/configuration.httpconf.edit.js.php:18
+#: include/views/js/configuration.httpconf.edit.js.php:46
 #: include/views/js/configuration.maintenance.edit.js.php:11
 #: include/views/js/configuration.maintenance.edit.js.php:35
 #: include/views/js/configuration.triggers.edit.js.php:9
