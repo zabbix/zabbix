@@ -62,7 +62,7 @@ static void	json_flatten_value(const char *ptr, const char *path, zbx_vector_ptr
 	struct zbx_json_parse	jp_value;
 	char			*value = NULL;
 	size_t			value_alloc = 0;
-	int			type;
+	zbx_json_type_t		type;
 
 	if (FAIL == zbx_json_brackets_open(ptr, &jp_value))
 	{

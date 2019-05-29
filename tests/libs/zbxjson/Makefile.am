@@ -23,26 +23,6 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
-<<<<<<< HEAD
-# jsonpath_next
-
-jsonpath_next_SOURCES = \
-	jsonpath_next.c \
-	../../zbxmocktest.h
-
-jsonpath_next_LDADD = $(JSON_LIBS)
-
-if SERVER
-jsonpath_next_LDADD += @SERVER_LIBS@
-jsonpath_next_LDFLAGS = @SERVER_LDFLAGS@
-endif
-
-jsonpath_next_CFLAGS = -I@top_srcdir@/tests
-
-# zbx_json_path_open
-
-=======
->>>>>>> .......PS. [ZBXNEXT-4502] replaced old json path usage with jsonpath compile/query
 zbx_json_path_open_SOURCES = \
 	zbx_json_path_open.c \
 	../../zbxmocktest.h
