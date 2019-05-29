@@ -418,6 +418,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+.......PST [ZBX-16138] fixed return value type and added preprocessing steps for items in remote internal checks tamplates; fixed unsigned write cache value for remote internal checks (viktors)
 .......PS. [ZBX-15963] fixed HTTP agent support of non-HTTP scheme in URL field (asestakovs)
 .......PS. [ZBX-16151] fixed theoretical possibility of large numbers in json data being truncated, added boolean value support to json parser (wiper)
 ..F....... [ZBX-15778] fixed wrong filtering by "Age less than" and "Show suppressed problems" in trigger overview (vasilijs)
