@@ -702,7 +702,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 		$applications = API::Application()->get([
 			'output' => [],
 			'hostids' => $hostids,
-			'filter' => ['name' => $application],
+			'search' => ['name' => $application],
 			'preservekeys' => true
 		]);
 		$trigger_options['applicationids'] = array_keys($applications);
@@ -722,13 +722,15 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
  * @param int   $problem_options['show_suppressed']  Whether to show triggers with suppressed problems.
  * @param int   $problem_options['min_severity']     (optional) Minimal problem severity.
  * @param int   $problem_options['time_from']        (optional) The time starting from which the problems were created.
+ * @param bool  $problem_options['acknowledged']     (optional) Whether to show triggers with acknowledged problems.
  *
  * @return array
  */
 function getTriggersWithActualSeverity(array $trigger_options, array $problem_options) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-		'time_from' => null
+		'time_from' => null,
+		'acknowledged' => null
 	];
 
 	$triggers = API::Trigger()->get($trigger_options);
@@ -736,7 +738,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 	$problem_triggerids = [];
 
 	foreach ($triggers as $triggerid => &$trigger) {
-		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
+		if ($trigger['value'] == TRIGGER_VALUE_TRUE
+				|| (array_key_exists('only_true', $trigger_options) && $trigger_options['only_true'])) {
 			$problem_triggerids[] = $triggerid;
 			$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
@@ -748,6 +751,10 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity'],
 			'objectids' => $problem_triggerids,
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
+			'recent' => array_key_exists('show_recent', $problem_options) ? $problem_options['show_recent'] : null,
+			'acknowledged' => (array_key_exists('acknowledged', $problem_options) && $problem_options['acknowledged'])
+				? false
+				: null,
 			'time_from' => $problem_options['time_from']
 		]);
 
@@ -763,10 +770,16 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 		}
 
 		foreach ($triggers as $triggerid => $trigger) {
-			if (!array_key_exists($triggerid, $objectids)) {
+			if (array_key_exists($triggerid, $objectids) && $trigger['priority'] >= $problem_options['min_severity']) {
+				continue;
+			}
+
+			if (!array_key_exists('only_true', $trigger_options)
+					|| ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null)) {
+				// Overview type = 'Data', Maps, Dasboard or Overview 'show any' mode.
 				$triggers[$triggerid]['value'] = TRIGGER_VALUE_FALSE;
 			}
-			elseif ($trigger['priority'] < $problem_options['min_severity']) {
+			else {
 				unset($triggers[$triggerid]);
 			}
 		}
@@ -1505,9 +1518,10 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 					}
 					break;
 				case '{':
-					foreach ($expressionData->expressions as $exprPart) {
-						if ($exprPart['pos'] == $i) {
-							$i += strlen($exprPart['expression']) - 1;
+					// Skip any previously found tokens starting with brace.
+					foreach ($expressionData->result->getTokens() as $expression_token) {
+						if ($expression_token['pos'] == $i) {
+							$i += $expression_token['length'] - 1;
 							break;
 						}
 					}

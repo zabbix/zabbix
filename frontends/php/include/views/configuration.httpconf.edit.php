@@ -27,51 +27,50 @@ if (!empty($this->data['hostid'])) {
 }
 
 // create form
-$httpForm = (new CForm())
+$http_form = (new CForm())
 	->setName('httpForm')
 	->setId('httpForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
-	->addVar('steps', $this->data['steps'])
 	->addVar('templated', $this->data['templated']);
 
 if (!empty($this->data['httptestid'])) {
-	$httpForm->addVar('httptestid', $this->data['httptestid']);
+	$http_form->addVar('httptestid', $this->data['httptestid']);
 }
 
 /*
  * Scenario tab
  */
-$httpFormList = new CFormList();
+$http_form_list = new CFormList();
 
 // Parent http tests
 if (!empty($this->data['templates'])) {
-	$httpFormList->addRow(_('Parent web scenarios'), $this->data['templates']);
+	$http_form_list->addRow(_('Parent web scenarios'), $this->data['templates']);
 }
 
 // Name
-$nameTextBox = (new CTextBox('name', $this->data['name'], $this->data['templated'], 64))
+$name_text_box = (new CTextBox('name', $this->data['name'], $this->data['templated'], 64))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAriaRequired();
 if (!$this->data['templated']) {
-	$nameTextBox->setAttribute('autofocus', 'autofocus');
+	$name_text_box->setAttribute('autofocus', 'autofocus');
 }
-$httpFormList->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(), $nameTextBox);
+$http_form_list->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(), $name_text_box);
 
 // Application
 if ($this->data['application_list']) {
 	$applications = zbx_array_merge([''], $this->data['application_list']);
-	$httpFormList->addRow(_('Application'),
+	$http_form_list->addRow(_('Application'),
 		new CComboBox('applicationid', $this->data['applicationid'], null, $applications)
 	);
 }
 else {
-	$httpFormList->addRow(_('Application'), new CSpan(_('No applications found.')));
+	$http_form_list->addRow(_('Application'), new CSpan(_('No applications found.')));
 }
 
 // New application
-$httpFormList
+$http_form_list
 	->addRow(new CLabel(_('New application'), 'new_application'),
 		(new CSpan(
 			(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -89,78 +88,83 @@ $httpFormList
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 
-$agentComboBox = new CComboBox('agent', $this->data['agent']);
+$agent_combo_box = new CComboBox('agent', $this->data['agent']);
 
-$userAgentsAll = userAgents();
-$userAgentsAll[_('Others')][ZBX_AGENT_OTHER] = _('other').' ...';
+$user_agents_all = userAgents();
+$user_agents_all[_('Others')][ZBX_AGENT_OTHER] = _('other').' ...';
 
-foreach ($userAgentsAll as $userAgentGroup => $userAgents) {
-	$agentComboBox->addItemsInGroup($userAgentGroup, $userAgents);
+foreach ($user_agents_all as $user_agent_group => $user_agents) {
+	$agent_combo_box->addItemsInGroup($user_agent_group, $user_agents);
 }
 
-$httpFormList->addRow(_('Agent'), $agentComboBox);
+$http_form_list->addRow(_('Agent'), $agent_combo_box);
 
-$httpFormList->addRow(_('User agent string'),
+$http_form_list->addRow(_('User agent string'),
 	(new CTextBox('agent_other', $this->data['agent_other']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'row_agent_other'
 );
 
 // append HTTP proxy to form list
-$httpFormList
+$http_form_list
 	->addRow(_('HTTP proxy'),
 		(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'));
 
-$pair_tables = [
-	['id' => 'variables', 'label' => _('Variables'), 'class' => 'pair-container'],
-	['id' => 'headers', 'label' => _('Headers'), 'class' => 'pair-container pair-container-sortable']
-];
-
-foreach ($pair_tables as $pair_table){
-	$pair_tab = (new CTable())
-		->setId($pair_table['id'])
-		->addClass($pair_table['class'])
+$http_form_list->addRow(_('Variables'), (new CDiv(
+	(new CTable())
+		->addClass('httpconf-dynamic-row')
+		->setAttribute('data-type', 'variables')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader(['', _('Name'), '', _('Value'), ''])
 		->addRow((new CRow([
 			(new CCol(
 				(new CButton(null, _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('pairs-control-add')
-					->setAttribute('data-type', $pair_table['id'])
+					->addClass('element-table-add')
 			))->setColSpan(5)
-		]))->setId($pair_table['id'].'_footer'));
+		])))
+))
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+);
 
-	$httpFormList->addRow($pair_table['label'],
-		(new CDiv($pair_tab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', $pair_table['id'])
-			->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
-	);
-}
+$http_form_list->addRow(_('Headers'), (new CDiv(
+	(new CTable())
+		->addClass('httpconf-dynamic-row')
+		->setAttribute('data-type', 'headers')
+		->setAttribute('style', 'width: 100%;')
+		->setHeader(['', _('Name'), '', _('Value'), ''])
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton(null, _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-add')
+			))->setColSpan(5)
+		])))
+))
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+);
 
-$httpFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
-
-zbx_add_post_js('pairManager.add("'.$httpForm->getId().'",'.CJs::encodeJson($this->data['pairs']).');');
-zbx_add_post_js('pairManager.initControls("'.$httpForm->getId().'");');
+$http_form_list->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
 
 /*
  * Authentication tab
  */
-$httpAuthenticationFormList = new CFormList('httpAuthenticationFormList');
+$http_authentication_form_list = new CFormList();
 
 // Authentication type
-$httpAuthenticationFormList->addRow(_('HTTP authentication'),
+$http_authentication_form_list->addRow(_('HTTP authentication'),
 	new CComboBox('authentication', $this->data['authentication'], null, httptest_authentications())
 );
 
-$httpAuthenticationFormList
+$http_authentication_form_list
 	->addRow(new CLabel(_('User'), 'http_user'),
-		(new CTextBox('http_user', $this->data['http_user'], false, 64)) ->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('http_user', $this->data['http_user'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('Password'), 'http_password'),
-		(new CTextBox('http_password', $this->data['http_password'], false, 64)) ->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('http_password', $this->data['http_password'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('SSL verify peer'),
 		(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
@@ -182,9 +186,9 @@ $httpAuthenticationFormList
 /*
  * Step tab
  */
-$httpStepFormList = new CFormList('httpFormList');
+$http_step_form_list = new CFormList();
 $steps_table = (new CTable())
-	->setId('httpStepTable')
+	->addClass('httpconf-steps-dynamic-row')
 	->setHeader([
 		(new CColHeader())->setWidth('15'),
 		(new CColHeader())->setWidth('15'),
@@ -198,87 +202,34 @@ $steps_table = (new CTable())
 		(new CColHeader(_('Action')))->setWidth('50')
 	]);
 
-$i = 1;
-foreach ($this->data['steps'] as $stepid => $step) {
-	if (!isset($step['name'])) {
-		$step['name'] = '';
-	}
-	if (!isset($step['timeout'])) {
-		$step['timeout'] = DB::getDefault('httpstep', 'timeout');
-	}
-	if (!isset($step['url'])) {
-		$step['url'] = '';
-	}
-
-	$numSpan = (new CSpan($i++.':'))
-		->addClass('rowNum')
-		->setId('current_step_'.$stepid);
-
-	$name = (new CLink($step['name'], 'javascript:void(0);'))
-		->setId('name_'.$stepid)
-		->setAttribute('name_step', $stepid);
-
-	if (mb_strlen($step['url']) > 70) {
-		$start = mb_substr($step['url'], 0, 35);
-		$end = mb_substr($step['url'], mb_strlen($step['url']) - 25, 25);
-		$url = (new CSpan($start.SPACE.'...'.SPACE.$end))
-			->setHint($step['url']);
-	}
-	else {
-		$url = $step['url'];
-	}
-
-	if ($this->data['templated']) {
-		$dragHandler = '';
-		$removeButton = '';
-	}
-	else {
-		$dragHandler = (new CCol(
-			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-		))->addClass(ZBX_STYLE_TD_DRAG_ICON);
-		$removeButton = (new CButton('remove_'.$stepid, _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->onClick('javascript: removeStep(this);')
-			->setAttribute('remove_step', $stepid);
-	}
-
-	$steps_table->addRow(
-		(new CRow([
-			$dragHandler,
-			$numSpan,
-			$name,
-			$step['timeout'],
-			$url,
-			htmlspecialchars($step['required']),
-			$step['status_codes'],
-			(new CCol($removeButton))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('sortable')
-			->setId('steps_'.$stepid)
-	);
-}
-
 if (!$this->data['templated']) {
 	$steps_table->addRow(
 		(new CCol(
-			(new CButton('add_step', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+			(new CButton(null, _('Add')))
+				->addClass('element-table-add')
+				->addClass(ZBX_STYLE_BTN_LINK)
 		))->setColSpan(8)
 	);
 }
+else {
+	$steps_table->addRow(
+		(new CCol(null))->setColSpan(8)->addClass('element-table-add')
+	);
+}
 
-$httpStepFormList->addRow((new CLabel(_('Steps'), $steps_table->getId()))->setAsteriskMark(),
+$http_step_form_list->addRow((new CLabel(_('Steps'), $steps_table->getId()))->setAsteriskMark(),
 	(new CDiv($steps_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAriaRequired()
 );
 
 // append tabs to form
-$httpTab = (new CTabView())
-	->addTab('scenarioTab', _('Scenario'), $httpFormList)
-	->addTab('stepTab', _('Steps'), $httpStepFormList)
-	->addTab('authenticationTab', _('Authentication'), $httpAuthenticationFormList);
+$http_tab = (new CTabView())
+	->addTab('scenarioTab', _('Scenario'), $http_form_list)
+	->addTab('stepTab', _('Steps'), $http_step_form_list)
+	->addTab('authenticationTab', _('Authentication'), $http_authentication_form_list);
 if (!$this->data['form_refresh']) {
-	$httpTab->setSelected(0);
+	$http_tab->setSelected(0);
 }
 
 // append buttons to form
@@ -299,21 +250,32 @@ if (!empty($this->data['httptestid'])) {
 		->setEnabled(!$data['templated']);
 	$buttons[] = new CButtonCancel();
 
-	$httpTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$http_tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
-	$httpTab->setFooter(makeFormFooter(
+	$http_tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel()]
 	));
 }
 
-$httpForm->addItem($httpTab);
-$widget->addItem($httpForm);
+$http_form->addItem($http_tab);
+$widget->addItem($http_form);
 
-$this->data['agentVisibility'] = [];
-zbx_subarray_push($this->data['agentVisibility'], ZBX_AGENT_OTHER, 'agent_other');
-zbx_subarray_push($this->data['agentVisibility'], ZBX_AGENT_OTHER, 'row_agent_other');
+$this->data['scenario_tab_data'] = [
+	'agent_visibility' => [],
+	'pairs' => [
+		'variables' => [],
+		'headers' => []
+	]
+];
+
+foreach ($data['pairs'] as $field) {
+	zbx_subarray_push($this->data['scenario_tab_data']['pairs'], $field['type'], $field);
+}
+
+zbx_subarray_push($this->data['scenario_tab_data']['agent_visibility'], ZBX_AGENT_OTHER, 'agent_other');
+zbx_subarray_push($this->data['scenario_tab_data']['agent_visibility'], ZBX_AGENT_OTHER, 'row_agent_other');
 
 require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 

@@ -3039,6 +3039,21 @@ $form-icon-btn: (
 	@extend %button-icon-size;
 }
 
+.drag-icon,
+.ui-draggable .dashbrd-widget-head,
+.ui-draggable .dashbrd-grid-widget-head {
+	@extend %cursor-drag;
+}
+
+.ui-draggable-dragging {
+
+	.drag-icon,
+	.dashbrd-widget-head,
+	.dashbrd-grid-widget-head {
+		@extend %cursor-dragging;
+	}
+}
+
 .icon-info {
 	position: relative;
 	width: 8px;
@@ -3877,8 +3892,21 @@ $form-icon-btn: (
 			width: 100%;
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
-			margin: 0 0 10px 0;
+			margin: 0 -10px 10px -10px;
+			padding: 0 10px;
 			@extend %webkit-scrollbar;
+
+			.table-forms .table-forms-td-right {
+				padding-right: 8px;
+			}
+
+			.columns-wrapper {
+				flex-wrap: nowrap;
+
+				.column-50:last-of-type {
+					margin-left: 10px;
+				}
+			}
 		}
 		.overlay-dialogue-controls {
 			text-align: right;
@@ -5546,6 +5574,20 @@ $browser-logos: (
 	@extend %webkit-scrollbar;
 }
 
+%cursor-drag {
+	cursor: move; /* fallback if grab cursor is unsupported */
+	cursor: grab;
+}
+
+%cursor-dragging {
+	cursor: move; /* fallback if grabbing cursor is unsupported */
+	cursor: grabbing;
+}
+
+.cursor-dragging {
+	@extend %cursor-dragging;
+}
+
 .cursor-move {
 	cursor: move;
 }
@@ -6053,7 +6095,6 @@ svg {
 
 					> .drag-icon {
 						min-width: 24px;
-						cursor: move;
 					}
 
 					> .item-name {

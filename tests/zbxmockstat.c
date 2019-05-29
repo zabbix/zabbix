@@ -19,11 +19,14 @@
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
+#include "zbxmockutil.h"
 
 #include "common.h"
 
 int	__wrap_stat(const char *pathname, struct stat *buf);
 int	__wrap___xstat(int ver, const char *pathname, struct stat *buf);
+int	__wrap_fstat(struct stat *stat_buf);
+int	__wrap___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
 
 int	__wrap_stat(const char *pathname, struct stat *buf)
 {
@@ -57,4 +60,19 @@ int	__wrap___xstat(int ver, const char *pathname, struct stat *buf)
 	ZBX_UNUSED(ver);
 
 	return __wrap_stat(pathname, buf);
+}
+
+int	__wrap_fstat(struct stat *stat_buf)
+{
+	stat_buf->st_size = zbx_mock_get_parameter_uint64("in.file_len");
+
+	return 0;
+}
+
+int	__wrap___fxstat(int __ver, int __fildes, struct stat *__stat_buf)
+{
+	ZBX_UNUSED(__ver);
+	ZBX_UNUSED(__fildes);
+
+	return __wrap_fstat(__stat_buf);
 }

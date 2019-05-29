@@ -2228,8 +2228,9 @@ function makeActionTableInfo(array $action, array $mediatypes) {
 		if ($action['alerttype'] == ALERT_TYPE_MESSAGE
 				&& ($action['status'] == ALERT_STATUS_NEW || $action['status'] == ALERT_STATUS_NOT_SENT)) {
 			$info_icons[] = makeWarningIcon(array_key_exists($action['mediatypeid'], $mediatypes)
-				? _n(_('%1$s retry left'), _('%1$s retries left'),
-						$mediatypes[$action['mediatypeid']]['maxattempts'] - $action['retries'])
+				? _n('%1$s retry left', '%1$s retries left',
+						$mediatypes[$action['mediatypeid']]['maxattempts'] - $action['retries']
+				)
 				: ''
 			);
 		}
