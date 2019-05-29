@@ -3,6 +3,7 @@ Changes for 4.0.9rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15963] fixed HTTP agent support of non-HTTP scheme in URL field (asestakovs)
 .......PS. [ZBX-16151] fixed theoretical possibility of large numbers in json data being truncated, added boolean value support to json parser (wiper)
 ..F....... [ZBX-15778] fixed wrong filtering by "Age less than" and "Show suppressed problems" in trigger overview (vasilijs)
 ..F....... [ZBX-15585] fixed web scenarios pair manager issue when fields are duplicating on post type toggle (talbergs)
