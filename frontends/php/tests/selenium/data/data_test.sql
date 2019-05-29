@@ -2081,3 +2081,6 @@ INSERT INTO triggers (triggerid, expression, description, comments) VALUES (1602
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16028, 40067, 16027,'last','0');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16029, 40068, 16028,'last','0');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16030, 40069, 16029,'last','0');
+
+-- testFormAdministrationMediaTypes
+INSERT INTO media_type (mediatypeid, type, description, exec_path, exec_params, status) VALUES (100, 1, 'Script', 'Selenium test script', 'one parameter', 1);
