@@ -3,6 +3,7 @@ Changes for 4.0.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-15778] fixed wrong filtering by "Age less than" and "Show suppressed problems" in trigger overview (vasilijs)
 ..F....... [ZBX-15585] fixed web scenarios pair manager issue when fields are duplicating on post type toggle (talbergs)
 ........S. [ZBX-16150] fixed inactive, unmounted, unaccessible VMware datastore causes unknown column nan insertion in field list (akozlovs)
 A......... [ZBX-16122] fixed api validation of trigger dependency (averza)
