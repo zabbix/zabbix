@@ -936,9 +936,7 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 	size_t		len;
 	zbx_json_type_t	type_local;
 
-	type_local = __zbx_json_type(p);
-
-	switch (type_local)
+	switch (type_local = __zbx_json_type(p))
 	{
 		case ZBX_JSON_TYPE_ARRAY:
 		case ZBX_JSON_TYPE_OBJECT:
@@ -946,11 +944,9 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 			/* only primitive values are decoded */
 			return NULL;
 		default:
-			len = json_parse_value(p, NULL);
+			if (0 == (len = json_parse_value(p, NULL)))
+				return NULL;
 	}
-
-	if (0 == len)
-		return NULL;
 
 	if (NULL != type)
 		*type = type_local;
@@ -974,9 +970,7 @@ const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *strin
 	size_t		len;
 	zbx_json_type_t	type_local;
 
-	type_local = __zbx_json_type(p);
-
-	switch (type_local)
+	switch (type_local = __zbx_json_type(p))
 	{
 		case ZBX_JSON_TYPE_ARRAY:
 		case ZBX_JSON_TYPE_OBJECT:
@@ -984,11 +978,9 @@ const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *strin
 			/* only primitive values are decoded */
 			return NULL;
 		default:
-			len = json_parse_value(p, NULL);
+			if (0 == (len = json_parse_value(p, NULL)))
+				return NULL;
 	}
-
-	if (0 == len)
-		return NULL;
 
 	if (*string_alloc <= len)
 	{
