@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.0.8rc1])
+AC_INIT([Zabbix],[4.0.9rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -966,6 +966,7 @@ AC_CHECK_FUNCS(hstrerror)
 AC_CHECK_FUNCS(getenv)
 AC_CHECK_FUNCS(putenv)
 AC_CHECK_FUNCS(sigqueue)
+AC_CHECK_FUNCS(round)
 
 dnl *****************************************************************
 dnl *                                                               *

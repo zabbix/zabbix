@@ -92,17 +92,6 @@
 		</for>
 	</target>
 
-	<target name="init">
-		<!-- Create database schema -->
-		<exec executable="./bootstrap.sh" failonerror="on"/>
-		<exec executable="./configure" failonerror="on"/>
-		<exec executable="make" failonerror="on">
-			<arg line="-s"/>
-			<arg line="-j5"/>
-			<arg line="dbschema"/>
-		</exec>
-	</target>
-
 	<macrodef name="make">
 		<!-- Build Zabbix with the specified command line arguments -->
 		<attribute name="args"/>
@@ -355,24 +344,28 @@
 
 	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
 
-	<target name="make-dist" depends="init">
+	<target name="make-dist">
 		<!-- Create & build Zabbix distribution -->
-		<sequential>
-			<delete includeemptydirs="true">
-				<fileset dir="." includes="zabbix-*/**"/>
-				<dirset dir="." includes="zabbix-*"/>
-				<fileset dir="." includes="zabbix-*"/>
-			</delete>
-			<make args="" target="dist"/>
-			<apply executable="tar">
-				<arg line="-zxvf"/>
-				<fileset dir="." includes="*.tar.gz"/>
-			</apply>
-			<dirset dir="." includes="zabbix-*" id="dist.dir"/>
-			<property name="prop.dist.dir" refid="dist.dir"/>
-			<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dist" inheritAll="true" inheritRefs="true" />
-		</sequential>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on"/>
+		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="-j5"/>
+			<arg line="dbschema"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="-j5"/>
+			<arg line="dist"/>
+		</exec>
+		<apply executable="tar">
+			<arg line="-zxf"/>
+			<fileset dir="." includes="zabbix-*.tar.gz"/>
+		</apply>
+		<dirset dir="." includes="zabbix-*" id="dist.dir"/>
+		<property name="prop.dist.dir" refid="dist.dir"/>
+		<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dist" inheritAll="true" inheritRefs="true"/>
 	</target>
 
-	<target name="build" depends="init,make-dist"/>
+	<target name="build" depends="make-dist"/>
 </project>

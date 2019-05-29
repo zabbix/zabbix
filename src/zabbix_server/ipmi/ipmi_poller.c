@@ -221,18 +221,21 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-		while (NULL == message)
+		for (;;)
 		{
+			const int ipc_timeout = 2;
 			const int ipmi_timeout = 1;
-			const int ipc_timeout = 1;
-
-			zbx_perform_all_openipmi_ops(ipmi_timeout);
 
 			if (SUCCEED != zbx_ipc_async_socket_recv(&ipmi_socket, ipc_timeout, &message))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot read IPMI service request");
 				exit(EXIT_FAILURE);
 			}
+
+			if (NULL != message)
+				break;
+
+			zbx_perform_all_openipmi_ops(ipmi_timeout);
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
