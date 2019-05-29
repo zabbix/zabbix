@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 
 $page['title'] = _('Availability report');
@@ -243,7 +242,7 @@ elseif (hasRequest('filter_hostid')) {
 			'with_triggers' => true,
 			'preservekeys' => true
 		]);
-		$groups = CPageFilter::enrichParentGroups($groups);
+		$groups = enrichParentGroups($groups);
 
 		order_result($groups, 'name');
 
@@ -327,7 +326,7 @@ elseif (hasRequest('filter_hostid')) {
 			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
-		$groups = CPageFilter::enrichParentGroups($groups);
+		$groups = enrichParentGroups($groups);
 
 		order_result($groups, 'name');
 
@@ -369,7 +368,7 @@ elseif (hasRequest('filter_hostid')) {
 			'with_triggers' => true,
 			'preservekeys' => true
 		]);
-		$groups = CPageFilter::enrichParentGroups($groups);
+		$groups = enrichParentGroups($groups);
 
 		order_result($groups, 'name');
 

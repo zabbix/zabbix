@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
-require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 
 class CControllerWidgetProblemHostsView extends CControllerWidget {
 

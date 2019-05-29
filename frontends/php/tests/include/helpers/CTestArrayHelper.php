@@ -47,4 +47,15 @@ class CTestArrayHelper {
 
 		return $default;
 	}
+
+	/**
+	 * Check if array is associative.
+	 *
+	 * @param array $array
+	 *
+	 * @return boolean
+	 */
+	public static function isAssociative($array) {
+		return array_keys($array) !== range(0, count($array) - 1);
+	}
 }
