@@ -92,14 +92,14 @@ jQuery(function($) {
 		});
 	});
 
-	function showMenuPopup(obj, data, event) {
+	function showMenuPopup($obj, data, event) {
 		switch (data.type) {
 			case 'history':
 				data = getMenuPopupHistory(data);
 				break;
 
 			case 'host':
-				data = getMenuPopupHost(data, obj);
+				data = getMenuPopupHost(data, $obj);
 				break;
 
 			case 'map_element_submap':
@@ -119,11 +119,11 @@ jQuery(function($) {
 				break;
 
 			case 'refresh':
-				data = getMenuPopupRefresh(data, obj);
+				data = getMenuPopupRefresh(data, $obj);
 				break;
 
 			case 'trigger':
-				data = getMenuPopupTrigger(data, obj);
+				data = getMenuPopupTrigger(data, $obj);
 				break;
 
 			case 'trigger_macro':
@@ -131,11 +131,11 @@ jQuery(function($) {
 				break;
 
 			case 'dashboard':
-				data = getMenuPopupDashboard(data, obj);
+				data = getMenuPopupDashboard(data, $obj);
 				break;
 
 			case 'item':
-				data = getMenuPopupItem(data, obj);
+				data = getMenuPopupItem(data, $obj);
 				break;
 
 			case 'item_prototype':
@@ -143,15 +143,15 @@ jQuery(function($) {
 				break;
 		}
 
-		obj.menuPopup(data, event);
+		$obj.menuPopup(data, event);
 	}
 
 	/**
 	 * Build menu popup for given elements.
 	 */
 	$(document).on('keydown click', '[data-menu-popup]', function(event) {
-		var obj = $(this),
-			data = obj.data('menu-popup');
+		var $obj = $(this),
+			data = $obj.data('menu-popup');
 
 		if (event.type === 'keydown') {
 			if (event.which != 13) {
@@ -176,7 +176,7 @@ jQuery(function($) {
 			data: ajax_data,
 			dataType: 'json',
 			success: function(resp) {
-				showMenuPopup(obj, resp.data, event);
+				showMenuPopup($obj, resp.data, event);
 			},
 			error: function() {
 			}

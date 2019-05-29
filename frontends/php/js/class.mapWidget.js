@@ -119,7 +119,6 @@ jQuery(function($) {
 							var url = new Curl(widget_data['map_instance'].options.refresh);
 							url.setArgument('curtime', new CDate().getTime());
 							url.setArgument('uniqueid', widget['uniqueid']);
-							url.setArgument('used_in_widget', 1);
 
 							$.ajax({
 								'url': url.getUrl()
