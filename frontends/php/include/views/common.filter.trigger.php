@@ -30,7 +30,11 @@ $filterForm = (new CFilter((new CUrl('overview.php'))->setArgument('type', 0)))
 	->addVar('groupid', $filter['groupId'])
 	->addVar('hostid', $filter['hostId']);
 
-// show
+$severityNames = [];
+for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+	$severityNames[] = getSeverityName($severity, $config);
+}
+
 $column1 = (new CFormList())
 	->addRow(_('Show'),
 		(new CRadioButtonList('show_triggers', (int) $filter['showTriggers']))
@@ -38,50 +42,30 @@ $column1 = (new CFormList())
 			->addValue(_('Problems'), TRIGGERS_OPTION_IN_PROBLEM)
 			->addValue(_('Any'), TRIGGERS_OPTION_ALL)
 			->setModern(true)
+	)
+	->addRow(_('Minimum severity'),
+		new CComboBox('show_severity', $filter['showSeverity'], null, $severityNames)
 	);
 
-// ack status
-$column1->addRow(_('Acknowledge status'),
-	new CComboBox('ack_status', $filter['ackStatus'], null, [
-		ZBX_ACK_STS_ANY => _('Any'),
-		ZBX_ACK_STS_WITH_UNACK => _('With unacknowledged events'),
-		ZBX_ACK_STS_WITH_LAST_UNACK => _('With last event unacknowledged')
-	])
-);
-
-// min severity
-$severityNames = [];
-for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$severityNames[] = getSeverityName($severity, $config);
-}
-$column1->addRow(_('Minimum severity'),
-	new CComboBox('show_severity', $filter['showSeverity'], null, $severityNames)
-);
-
-// age less than
 $statusChangeDays = (new CNumericBox('status_change_days', $filter['statusChangeDays'], 3, false, false, false))
 	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 if (!$filter['statusChange']) {
 	$statusChangeDays->setAttribute('disabled', 'disabled');
 }
 
-$column1->addRow(_('Age less than'), [
-	(new CCheckBox('status_change'))
-		->setChecked($filter['statusChange'] == 1)
-		->onClick('javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()'),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	$statusChangeDays,
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	_('days')
-]);
-
-// name
-$column1->addRow(_('Name'),
-	(new CTextBox('txt_select', $filter['txtSelect']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-);
-
-// application
-$column2 = (new CFormList())
+$column1
+	->addRow(_('Age less than'), [
+		(new CCheckBox('status_change'))
+			->setChecked($filter['statusChange'] == 1)
+			->onClick('javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$statusChangeDays,
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		_('days')
+	])
+	->addRow(_('Name'),
+		(new CTextBox('txt_select', $filter['txtSelect']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
 	->addRow(_('Application'), [
 		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -134,12 +118,17 @@ $inventoryFilterTable->addRow(
 			->addClass('element-table-add')
 	))->setColSpan(2)
 );
-$column2->addRow(_('Host inventory'), $inventoryFilterTable);
 
-// suppressed problem filter
-$column2->addRow(_('Show suppressed problems'),
-	(new CCheckBox('show_suppressed'))->setChecked($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
-);
+$column2 = (new CFormList())
+	->addRow(_('Host inventory'), $inventoryFilterTable)
+	->addRow(_('Show unacknowledged only'),
+		(new CCheckBox('ack_status'))
+			->setChecked($filter['ackStatus'] == 1)
+			->setUncheckedValue(0)
+	)
+	->addRow(_('Show suppressed problems'),
+		(new CCheckBox('show_suppressed'))->setChecked($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+	);
 
 $filterForm->addFilterTab(_('Filter'), [$column1, $column2]);
 
