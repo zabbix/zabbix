@@ -1,6 +1,7 @@
 Changes for 4.0.9rc1
 
 New features:
+...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
 .......PS. [ZBX-15963] fixed HTTP agent support of non-HTTP scheme in URL field (asestakovs)
