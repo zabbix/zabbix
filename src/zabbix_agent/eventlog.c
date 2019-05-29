@@ -874,19 +874,19 @@ int	process_eventslog6(const char *server, unsigned short port, const char *even
 					break;
 				}
 
-				match = (ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
-						ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4);
+				match = ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
+						ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4;
 			}
 			else
 			{
-				match = (ZBX_REGEXP_MATCH == regexp_match_ex(regexps, evt_message, pattern,
+				match = ZBX_REGEXP_MATCH == regexp_match_ex(regexps, evt_message, pattern,
 							ZBX_CASE_SENSITIVE) &&
 						ZBX_REGEXP_MATCH == regexp_match_ex(regexps, str_severity,
 							key_severity, ZBX_IGNORE_CASE) &&
 						ZBX_REGEXP_MATCH == regexp_match_ex(regexps, evt_provider,
 							key_source, ZBX_IGNORE_CASE) &&
 						ZBX_REGEXP_MATCH == regexp_match_ex(regexps, str_logeventid,
-							key_logeventid, ZBX_CASE_SENSITIVE));
+							key_logeventid, ZBX_CASE_SENSITIVE);
 			}
 
 			if (1 == match)
@@ -1429,7 +1429,8 @@ int	process_eventslog(const char *server, unsigned short port, const char *event
 				{
 					int	ret1, ret2, ret3, ret4;
 
-					if (FAIL == (ret1 = regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE)))
+					if (FAIL == (ret1 = regexp_match_ex(regexps, value, pattern,
+							ZBX_CASE_SENSITIVE)))
 					{
 						*error = zbx_strdup(*error,
 								"Invalid regular expression in the second parameter.");
@@ -1449,8 +1450,8 @@ int	process_eventslog(const char *server, unsigned short port, const char *event
 								"Invalid regular expression in the fourth parameter.");
 						match = FAIL;
 					}
-					else if (FAIL == (ret4 = regexp_match_ex(regexps, str_logeventid, key_logeventid,
-							ZBX_CASE_SENSITIVE)))
+					else if (FAIL == (ret4 = regexp_match_ex(regexps, str_logeventid,
+							key_logeventid, ZBX_CASE_SENSITIVE)))
 					{
 						*error = zbx_strdup(*error,
 								"Invalid regular expression in the fifth parameter.");
@@ -1466,19 +1467,19 @@ int	process_eventslog(const char *server, unsigned short port, const char *event
 						break;
 					}
 
-					match = (ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
-							ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4);
+					match = ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
+							ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4;
 				}
 				else
 				{
-					match = (ZBX_REGEXP_MATCH == regexp_match_ex(regexps, value, pattern,
+					match = ZBX_REGEXP_MATCH == regexp_match_ex(regexps, value, pattern,
 								ZBX_CASE_SENSITIVE) &&
 							ZBX_REGEXP_MATCH == regexp_match_ex(regexps, str_severity,
 								key_severity, ZBX_IGNORE_CASE) &&
 							ZBX_REGEXP_MATCH == regexp_match_ex(regexps, source,
 								key_source, ZBX_IGNORE_CASE) &&
 							ZBX_REGEXP_MATCH == regexp_match_ex(regexps, str_logeventid,
-								key_logeventid, ZBX_CASE_SENSITIVE));
+								key_logeventid, ZBX_CASE_SENSITIVE);
 				}
 
 				if (1 == match)
