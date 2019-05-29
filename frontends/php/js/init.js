@@ -173,16 +173,16 @@ jQuery(function($) {
 	 * Build menu popup for given elements.
 	 */
 	$(document).on('keydown click', '[data-menu-popup]', function(event) {
-		var obj = $(this),
-			data = obj.data('menu-popup');
+		var $obj = $(this),
+			data = $obj.data('menu-popup'),
+			target = event.target;
 
-		if (event.type === 'keydown') {
-			if (event.which != 13) {
-				return;
-			}
-
-			event.preventDefault();
-			event.target = this;
+		if (event.type === 'keydown' && event.which != 13) {
+			return;
+		}
+		else if (event.type === 'contextmenu' || (IE && $obj.closest('svg').length > 0)
+			|| event.originalEvent.detail !== 0) {
+			target = event;
 		}
 
 		// Manually trigger event for menuPopupPreloaderCloseHandler call for the previous preloader.
@@ -207,24 +207,27 @@ jQuery(function($) {
 				$('.menu-popup-top').menuPopup('close');
 				setTimeout(function(){
 					$preloader
-						.css({
-							top: Math.min(event.pageY - $(document).scrollTop(), $(window).height() - 140),
-							left: event.pageX - $(document).scrollLeft()
-						})
-						.fadeIn(200);
+						.fadeIn(200)
+						.position({
+							of: target,
+							my: 'left top',
+							at: 'left bottom'
+						});
 				}, 500);
 			},
 			success: function(resp) {
 				overlayPreloaderDestroy($preloader.prop('id'));
-				showMenuPopup(obj, resp.data, event);
+				showMenuPopup($obj, resp.data, event);
 			},
 			error: function() {
 			}
 		});
 
 		addToOverlaysStack($preloader.prop('id'), event.target, 'preloader', xhr);
-		$(document).off('click', menuPopupPreloaderCloseHandler);
-		$(document).on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
+
+		$(document)
+			.off('click', menuPopupPreloaderCloseHandler)
+			.on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
 
 		return false;
 	});
