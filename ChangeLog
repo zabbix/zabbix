@@ -17,6 +17,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-16080] fixed setup page to not to use bclib (talbergs)
 ..F....... [ZBX-15797] fixed dashboard map widget sub-map link behaviour (miks, talbergs)
 A.F....... [ZBX-15049] fixed to host group limited global scripts to be usable in sub group (talbergs)
 .......PST [ZBX-16138] fixed return value type and added preprocessing steps for items in remote internal checks tamplates; fixed unsigned write cache value for remote internal checks (viktors)
@@ -421,6 +422,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-16080] fixed setup page to not to use bclib (talbergs)
 ..F....... [ZBX-15797] fixed dashboard map widget sub-map link behaviour (miks, talbergs)
 A.F....... [ZBX-15049] fixed to host group limited global scripts to be usable in sub group (talbergs)
 .......PST [ZBX-16138] fixed return value type and added preprocessing steps for items in remote internal checks tamplates; fixed unsigned write cache value for remote internal checks (viktors)
