@@ -867,6 +867,9 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 {
 	char	*start = out;
 
+	if (0 == size)
+		return NULL;
+
 	p++;
 
 	while ('\0' != *p)
