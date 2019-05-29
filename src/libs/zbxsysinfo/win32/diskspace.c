@@ -107,7 +107,7 @@ static const char	*get_drive_type_string(UINT type)
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct zbx_json	j;
-	wchar_t		name[MAX_PATH + 1], *paths, *p, *path;
+	wchar_t		name[MAX_PATH + 1], *paths = NULL, *p, *path;
 	HANDLE		volume;
 	DWORD		buf_size = MAX_PATH + 1;
 	size_t		sz, sz_last;
