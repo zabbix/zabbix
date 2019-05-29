@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-29 08:53+0300\n"
+"POT-Creation-Date: 2019-05-29 15:44+0300\n"
 "PO-Revision-Date: 2019-03-28 07:26+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -39,8 +39,8 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:353
 #: include/classes/api/services/CMaintenance.php:358
 #: include/classes/api/services/CMaintenance.php:569
-#: include/classes/api/services/CMaintenance.php:583 maintenance.php:140
-#: maintenance.php:146 services.php:182 services.php:191
+#: include/classes/api/services/CMaintenance.php:583 maintenance.php:139
+#: maintenance.php:145 services.php:182 services.php:191
 #, c-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" må være mellom 01.01.1970 og 01.18.2038"
@@ -63,7 +63,7 @@ msgstr ""
 msgid "%1$d characters exceeds maximum length of %2$d characters"
 msgstr "%1$d tegn overskrider grensen for %2$d tegn"
 
-#: include/func.inc.php:513
+#: include/func.inc.php:509
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
@@ -76,7 +76,7 @@ msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr ""
 
-#: app/controllers/CControllerWidgetProblemsView.php:58
+#: app/controllers/CControllerWidgetProblemsView.php:56
 #: include/classes/screens/CScreenHostTriggers.php:204
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
@@ -89,7 +89,7 @@ msgstr[1] "%1$d of %3$d%2$s problemer vises"
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (år %2$s)"
 
-#: latest.php:633 latest.php:776
+#: latest.php:632 latest.php:775
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -263,7 +263,7 @@ msgstr "(ingen proxy)"
 msgid "0 - use default port"
 msgstr "0 - bruk standard port"
 
-#: include/triggers.inc.php:1835
+#: include/triggers.inc.php:1845
 msgid "0 or 1"
 msgstr "0 eller 1"
 
@@ -275,7 +275,7 @@ msgstr "1 minutt"
 msgid "10 seconds"
 msgstr "10 sekunder"
 
-#: include/views/reports.toptriggers.php:112 toptriggers.php:26
+#: include/views/reports.toptriggers.php:112 toptriggers.php:25
 msgid "100 busiest triggers"
 msgstr "100 mest aktive utløsere"
 
@@ -346,7 +346,7 @@ msgstr "AND"
 msgid "Acceptable SLA"
 msgstr "Akseptabel SLA"
 
-#: include/func.inc.php:1792
+#: include/func.inc.php:1788
 msgid "Access denied"
 msgstr "Tilgang nektet"
 
@@ -376,10 +376,6 @@ msgstr "Ack"
 #: app/views/monitoring.acknowledge.edit.php:72 jsLoader.php:240
 msgid "Acknowledge"
 msgstr "Bekrefte"
-
-#: include/views/common.filter.trigger.php:44
-msgid "Acknowledge status"
-msgstr "Bekreftelse status"
 
 #: include/actions.inc.php:2144 include/events.inc.php:175
 msgid "Acknowledged"
@@ -553,16 +549,16 @@ msgstr "Aktiv"
 #: include/classes/api/services/CMaintenance.php:353
 #: include/classes/api/services/CMaintenance.php:569
 #: include/views/configuration.maintenance.edit.php:54
-#: include/views/configuration.maintenance.list.php:72 maintenance.php:46
-#: maintenance.php:140
+#: include/views/configuration.maintenance.list.php:72 maintenance.php:45
+#: maintenance.php:139
 msgid "Active since"
 msgstr "Aktiv siden"
 
 #: include/classes/api/services/CMaintenance.php:358
 #: include/classes/api/services/CMaintenance.php:583
 #: include/views/configuration.maintenance.edit.php:60
-#: include/views/configuration.maintenance.list.php:73 maintenance.php:49
-#: maintenance.php:146
+#: include/views/configuration.maintenance.list.php:73 maintenance.php:48
+#: maintenance.php:145
 msgid "Active till"
 msgstr "Aktiv til"
 
@@ -595,7 +591,7 @@ msgstr "Aktiv til"
 #: include/views/administration.usergroups.edit.php:287
 #: include/views/administration.users.edit.php:325
 #: include/views/administration.users.edit.php:532
-#: include/views/common.filter.trigger.php:132
+#: include/views/common.filter.trigger.php:116
 #: include/views/configuration.action.edit.php:393
 #: include/views/configuration.action.edit.php:678
 #: include/views/configuration.action.edit.php:700
@@ -800,7 +796,7 @@ msgid "Age"
 msgstr "Alder"
 
 #: app/views/monitoring.problem.view.php:177
-#: include/views/common.filter.trigger.php:68
+#: include/views/common.filter.trigger.php:57
 msgid "Age less than"
 msgstr "Alder mindre enn"
 
@@ -835,7 +831,7 @@ msgstr "Agent vertsnavn. Returnerer streng"
 msgid "Agent interfaces"
 msgstr "Agent grensesnitt"
 
-#: hosts.php:69
+#: hosts.php:68
 msgid "Agent or SNMP or JMX or IPMI interface"
 msgstr "Agent eller SNMP eller JMX eller IPMI grensesnitt"
 
@@ -847,7 +843,7 @@ msgstr "Samlet kontroller krever ikke at noen agenter kjører på en vert som ov
 msgid "Alert message"
 msgstr ""
 
-#: app/controllers/CControllerPopupGeneric.php:196 include/hosts.inc.php:114
+#: app/controllers/CControllerPopupGeneric.php:195 include/hosts.inc.php:114
 #: include/views/administration.users.edit.php:51
 #: include/views/administration.users.list.php:52
 #: include/views/administration.users.list.php:83 users.php:44
@@ -923,7 +919,7 @@ msgstr ""
 msgid "All templates"
 msgstr "Alle maler"
 
-#: include/triggers.inc.php:1231
+#: include/triggers.inc.php:1241
 #: include/views/configuration.trigger.prototype.edit.php:489
 #: include/views/configuration.trigger.prototype.massupdate.php:58
 #: include/views/configuration.triggers.edit.php:519
@@ -943,7 +939,7 @@ msgstr "Tillatte verter"
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativt kan du installere det manuelt:"
 
-#: include/triggers.inc.php:1299
+#: include/triggers.inc.php:1309
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:1146
 #: include/views/configuration.correlation.edit.php:94
@@ -974,8 +970,7 @@ msgstr "Og/Eller"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:34
 #: include/views/administration.usergroups.list.php:42
 #: include/views/administration.users.list.php:65
-#: include/views/common.filter.trigger.php:39
-#: include/views/common.filter.trigger.php:46
+#: include/views/common.filter.trigger.php:43
 #: include/views/configuration.action.list.php:54
 #: include/views/configuration.correlation.list.php:44
 #: include/views/configuration.discovery.list.php:43
@@ -992,7 +987,7 @@ msgstr "En hvilken som helst tegnstreng er inkludert"
 #: include/actions.inc.php:62 include/audit.inc.php:34
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:39
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:55
-#: include/forms.inc.php:407 include/views/common.filter.trigger.php:85
+#: include/forms.inc.php:407 include/views/common.filter.trigger.php:69
 #: include/views/configuration.application.edit.php:37
 #: include/views/configuration.application.list.php:63
 #: include/views/configuration.httpconf.edit.php:65
@@ -1001,7 +996,7 @@ msgstr "En hvilken som helst tegnstreng er inkludert"
 #: include/views/inventory.host.view.php:173
 #: include/views/js/monitoring.sysmaps.js.php:203
 #: include/views/monitoring.overview.items.php:83
-#: include/views/monitoring.screen.constructor.edit.php:647 latest.php:355
+#: include/views/monitoring.screen.constructor.edit.php:647 latest.php:354
 msgid "Application"
 msgstr "Applikasjon"
 
@@ -1010,11 +1005,11 @@ msgstr "Applikasjon"
 msgid "Application \"%1$s\" already exists."
 msgstr "Applikasjon \"%1$s\" eksisterer allerede."
 
-#: applications.php:114
+#: applications.php:113
 msgid "Application added"
 msgstr "Applikasjon lagt til"
 
-#: applications.php:133 applications.php:144
+#: applications.php:132 applications.php:143
 msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "Applikasjon slettet"
@@ -1024,13 +1019,13 @@ msgstr[1] "Applikasjoner slettet"
 msgid "Application error."
 msgstr "Programfeil."
 
-#: app/controllers/CControllerPopupGeneric.php:136
+#: app/controllers/CControllerPopupGeneric.php:135
 #: include/views/configuration.item.prototype.edit.php:739
 #: include/views/configuration.item.prototype.massupdate.php:541
 msgid "Application prototypes"
 msgstr "Applikasjonsprototyper"
 
-#: applications.php:106
+#: applications.php:105
 msgid "Application updated"
 msgstr "Applikasjon oppdatert"
 
@@ -1044,7 +1039,7 @@ msgstr "Applikasjon med ID \"%1$s\" er ikke tilgjengelig på \"%2$s\"."
 msgid "Application with applicationid \"%1$s\" does not exist."
 msgstr "Applikasjon med applikasjonsid \"%1$s\" eksisterer ikke."
 
-#: app/controllers/CControllerPopupGeneric.php:124 app/views/search.php:34
+#: app/controllers/CControllerPopupGeneric.php:123 app/views/search.php:34
 #: app/views/search.php:56 app/views/search.php:57 app/views/search.php:185
 #: app/views/search.php:204 app/views/search.php:205 include/forms.inc.php:832
 #: include/html.inc.php:368
@@ -1141,7 +1136,7 @@ msgstr "Asset tagg"
 msgid "Assets cache directory is not writable."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:697
+#: include/classes/setup/CFrontendSetup.php:690
 msgid "Assets cache directory permissions"
 msgstr ""
 
@@ -1188,7 +1183,7 @@ msgstr ""
 msgid "At least one maintenance period must be created."
 msgstr "Minst en vedlikeholdsperiode må opprettes."
 
-#: include/classes/setup/CFrontendSetup.php:264
+#: include/classes/setup/CFrontendSetup.php:257
 msgid "At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported."
 msgstr "Minst en av MySQL, PostgreSQL, Oracle eller IBM DB2 skal støttes."
 
@@ -1369,7 +1364,7 @@ msgstr "Automatisk ikonvalg"
 msgid "Availability"
 msgstr "Tilgjengelighet"
 
-#: include/menu.inc.php:152 report2.php:26 report2.php:160
+#: include/menu.inc.php:152 report2.php:25 report2.php:159
 msgid "Availability report"
 msgstr "Tilgjengelighetsrapport"
 
@@ -1438,7 +1433,7 @@ msgstr "blinker"
 msgid "Blocked"
 msgstr "Blokkert"
 
-#: include/classes/core/ZBase.php:284
+#: include/classes/core/ZBase.php:285
 msgid "Blue"
 msgstr "Blå"
 
@@ -1501,11 +1496,11 @@ msgstr "Ta med til fronten"
 msgid "Bulgarian (bg_BG)"
 msgstr "Bulgarsk (bg_BG)"
 
-#: report2.php:192
+#: report2.php:191
 msgid "By host"
 msgstr "Av verten"
 
-#: report2.php:193
+#: report2.php:192
 msgid "By trigger template"
 msgstr "Ved utløsermalen"
 
@@ -1625,7 +1620,7 @@ msgstr "Kan ikke legge til handling"
 msgid "Cannot add action condition"
 msgstr "Kan ikke legge til tilstandsbetingelser"
 
-#: applications.php:114
+#: applications.php:113
 msgid "Cannot add application"
 msgstr "Kan ikke legge til program"
 
@@ -1653,15 +1648,15 @@ msgstr "Kan ikke legge til avhengighet fra utløseren \"%1$s:%2$s\" til ikke eks
 msgid "Cannot add discovery rule"
 msgstr "Kan ikke legge til oppdagelsesregel"
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Cannot add graph"
 msgstr "Kan ikke legge til graf"
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Cannot add graph prototype"
 msgstr "Kan ikke legge til graf prototype"
 
-#: hostgroups.php:114 usergrps.php:144
+#: hostgroups.php:113 usergrps.php:143
 msgid "Cannot add group"
 msgstr "Kan ikke legge til gruppe"
 
@@ -1669,7 +1664,7 @@ msgstr "Kan ikke legge til gruppe"
 msgid "Cannot add group."
 msgstr "Kan ikke legge til gruppe."
 
-#: hosts.php:619
+#: hosts.php:618
 msgid "Cannot add host"
 msgstr "Kan ikke legge til vert"
 
@@ -1681,7 +1676,7 @@ msgstr "Kan ikke legge til vertsprototype"
 msgid "Cannot add image"
 msgstr "Kan ikke legge til bilde"
 
-#: items.php:931
+#: items.php:930
 msgid "Cannot add item"
 msgstr "Kan ikke legge til element"
 
@@ -1698,7 +1693,7 @@ msgstr "Kan ikke legge til prototype for element"
 msgid "Cannot add items."
 msgstr "Kan ikke legge til elementer."
 
-#: maintenance.php:126
+#: maintenance.php:125
 msgid "Cannot add maintenance"
 msgstr "Kan ikke legge til vedlikehold"
 
@@ -1761,11 +1756,11 @@ msgstr "Kan ikke legge til lysbildefremvisning"
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Kan ikke legge til underkart. Maks dybde nådd."
 
-#: templates.php:415
+#: templates.php:414
 msgid "Cannot add template"
 msgstr "Kan ikke legge til mal"
 
-#: app/controllers/CControllerPopupTriggerWizard.php:197 triggers.php:296
+#: app/controllers/CControllerPopupTriggerWizard.php:197 triggers.php:295
 msgid "Cannot add trigger"
 msgstr "Kan ikke legge til utløser"
 
@@ -1806,7 +1801,7 @@ msgstr ""
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
 msgstr "Kan ikke hente metode \"%1$s.%2$s\" uten parametere."
 
-#: httpconf.php:196 httpconf.php:502 items.php:980 items.php:1389
+#: httpconf.php:196 httpconf.php:502 items.php:979 items.php:1388
 msgid "Cannot clear history"
 msgstr "Kan ikke fjerne historie"
 
@@ -1845,19 +1840,19 @@ msgstr "Kan ikke koble til databasen."
 msgid "Cannot convert POST data from raw data format to form field data format."
 msgstr "Kan ikke konvertere POST data fra rådataformat til å danne feltdataformat."
 
-#: graphs.php:388
+#: graphs.php:387
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
 msgstr[0] "Kan ikke kopiere graf"
 msgstr[1] "Kan ikke kopiere grafer"
 
-#: items.php:1345
+#: items.php:1344
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
 msgstr[0] "Kan ikke kopiere element"
 msgstr[1] "Kan ikke kopiere elementer"
 
-#: triggers.php:594
+#: triggers.php:593
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
 msgstr[0] "Kan ikke kopiere utløser"
@@ -1924,7 +1919,7 @@ msgstr "Kan ikke slette Zabbix intern bruker \"%1$s\", prøv å deaktivere bruke
 msgid "Cannot delete action"
 msgstr "Kan ikke slette handling"
 
-#: applications.php:133 applications.php:145
+#: applications.php:132 applications.php:144
 msgid "Cannot delete application"
 msgid_plural "Cannot delete applications"
 msgstr[0] "Kan ikke slette programmet"
@@ -1958,29 +1953,29 @@ msgstr "Kan ikke slette gjenkjenningsregel"
 msgid "Cannot delete discovery rules"
 msgstr "Kan ikke slette gjenkjenningsregler"
 
-#: graphs.php:287
+#: graphs.php:286
 msgid "Cannot delete graph"
 msgstr "Kan ikke slette grafen"
 
-#: graphs.php:279
+#: graphs.php:278
 msgid "Cannot delete graph prototype"
 msgstr "Kan ikke slette graf prototype"
 
-#: graphs.php:312
+#: graphs.php:311
 msgid "Cannot delete graph prototypes"
 msgstr "Kan ikke slette graf prototyper"
 
-#: graphs.php:329
+#: graphs.php:328
 msgid "Cannot delete graphs"
 msgstr "Kan ikke slette grafer"
 
-#: hostgroups.php:134 hostgroups.php:156 usergrps.php:159 usergrps.php:174
+#: hostgroups.php:133 hostgroups.php:155 usergrps.php:158 usergrps.php:173
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "Kan ikke slette gruppen"
 msgstr[1] "Kan ikke slette gruppene"
 
-#: hosts.php:863 hosts.php:884
+#: hosts.php:862 hosts.php:883
 msgid "Cannot delete host"
 msgstr "Kan ikke slette verten"
 
@@ -2018,7 +2013,7 @@ msgstr "Kan ikke slette bilde"
 msgid "Cannot delete inventory."
 msgstr "Kan ikke slette beholdning."
 
-#: items.php:532
+#: items.php:531
 msgid "Cannot delete item"
 msgstr "Kan ikke slette element"
 
@@ -2030,11 +2025,11 @@ msgstr "Kan ikke slette vareprototype"
 msgid "Cannot delete item prototypes"
 msgstr "Kan ikke slette vareprototyper"
 
-#: items.php:1399
+#: items.php:1398
 msgid "Cannot delete items"
 msgstr "Kan ikke slette elementer"
 
-#: maintenance.php:225
+#: maintenance.php:224
 msgid "Cannot delete maintenance"
 msgstr "Kan ikke slette vedlikehold"
 
@@ -2070,7 +2065,7 @@ msgid_plural "Cannot delete scripts"
 msgstr[0] "Kan ikke slette skript"
 msgstr[1] "Kan ikke slette skriptene"
 
-#: include/classes/api/services/CScript.php:564
+#: include/classes/api/services/CScript.php:589
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "Kan ikke slette skript. Skriptet \"%1$s\" brukes i handlingsoperasjon \"%2$s\"."
@@ -2091,7 +2086,7 @@ msgstr "Kan ikke slette tjenesten"
 msgid "Cannot delete slide show"
 msgstr "Kan ikke slette lysbildefremvisning"
 
-#: templates.php:606 templates.php:620 templates.php:653
+#: templates.php:605 templates.php:619 templates.php:652
 msgid "Cannot delete template"
 msgstr "Kan ikke slette mal"
 
@@ -2138,7 +2133,7 @@ msgstr ""
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Kan ikke slette templert webscenario \"%1$s\"."
 
-#: triggers.php:409
+#: triggers.php:408
 msgid "Cannot delete trigger"
 msgstr "Kan ikke slette utløseren"
 
@@ -2150,7 +2145,7 @@ msgstr "Kan ikke slette utløserprototype"
 msgid "Cannot delete trigger prototypes"
 msgstr "Kan ikke slette utløserprototyper"
 
-#: triggers.php:608
+#: triggers.php:607
 msgid "Cannot delete triggers"
 msgstr "Kan ikke slette utløsere"
 
@@ -2186,14 +2181,14 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Kan ikke deaktivere oppdagelsesregel"
 msgstr[1] "Kan ikke deaktivere oppdagelsesregler"
 
-#: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:206
-#: hosts.php:915
+#: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:205
+#: hosts.php:914
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Kan ikke deaktivere verten"
 msgstr[1] "Kan ikke deaktivere verter"
 
-#: applications.php:175 items.php:1305
+#: applications.php:174 items.php:1304
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "Kan ikke deaktivere elementet"
@@ -2205,13 +2200,13 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "Kan ikke deaktivere medietype"
 msgstr[1] "Kan ikke deaktivere medietyper"
 
-#: triggers.php:546
+#: triggers.php:545
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] "Kan ikke deaktivere utløseren"
 msgstr[1] "Kan ikke deaktivere utløsere"
 
-#: usergrps.php:228
+#: usergrps.php:227
 msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
 msgstr[0] "Kan ikke deaktivere brukergruppen"
@@ -2249,14 +2244,14 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Kan ikke aktivere oppdagelsesregel"
 msgstr[1] "Kan ikke aktivere oppdagelsesregler"
 
-#: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:205
-#: hosts.php:914
+#: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:204
+#: hosts.php:913
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Kan ikke aktivere vert"
 msgstr[1] "Kan ikke aktivere verter"
 
-#: applications.php:174 items.php:1304
+#: applications.php:173 items.php:1303
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "Kan ikke aktivere elementet"
@@ -2268,13 +2263,13 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Kan ikke aktivere medietype"
 msgstr[1] "Kan ikke aktivere medietyper"
 
-#: triggers.php:545
+#: triggers.php:544
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] "Kan ikke aktivere utløseren"
 msgstr[1] "Kan ikke aktivere utløsere"
 
-#: usergrps.php:227
+#: usergrps.php:226
 msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
 msgstr[0] "Kan ikke aktivere brukergruppe"
@@ -2553,7 +2548,7 @@ msgstr "Kan ikke lagre widget \"%1$s\"."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Kan ikke sende kommando, sjekk tilkobling med Zabbix server \"%1$s\"."
 
-#: host_discovery.php:305 host_discovery.php:634 items.php:948 items.php:1411
+#: host_discovery.php:305 host_discovery.php:634 items.php:947 items.php:1410
 msgid "Cannot send request"
 msgstr ""
 
@@ -2752,7 +2747,7 @@ msgstr "Kan ikke oppdatere et templert webscenario \"%1$s\":%2$s."
 msgid "Cannot update action"
 msgstr "Kan ikke oppdatere handling"
 
-#: applications.php:106
+#: applications.php:105
 msgid "Cannot update application"
 msgstr "Kan ikke oppdatere programmet"
 
@@ -2770,7 +2765,7 @@ msgstr "Kan ikke oppdatere konfigurasjonen"
 msgid "Cannot update correlation"
 msgstr "Kan ikke oppdatere korrelasjon"
 
-#: usergrps.php:206
+#: usergrps.php:205
 msgid "Cannot update debug mode"
 msgstr "Kan ikke oppdatere feilsøkingsmodus"
 
@@ -2794,19 +2789,19 @@ msgid_plural "Cannot update events"
 msgstr[0] ""
 msgstr[1] ""
 
-#: usergrps.php:189
+#: usergrps.php:188
 msgid "Cannot update frontend access"
 msgstr "Kan ikke oppdatere frontend tilgang"
 
-#: graphs.php:238
+#: graphs.php:237
 msgid "Cannot update graph"
 msgstr "Kan ikke oppdatere grafen"
 
-#: graphs.php:220
+#: graphs.php:219
 msgid "Cannot update graph prototype"
 msgstr "Kan ikke oppdatere graf prototype"
 
-#: hostgroups.php:76 usergrps.php:149
+#: hostgroups.php:75 usergrps.php:148
 msgid "Cannot update group"
 msgstr "Kan ikke oppdatere gruppe"
 
@@ -2817,7 +2812,7 @@ msgstr "Kan ikke oppdatere gruppe"
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Kan ikke oppdatere grupper for oppdaget vert \"%1$s\"."
 
-#: hosts.php:603
+#: hosts.php:602
 msgid "Cannot update host"
 msgstr "Kan ikke oppdatere verten"
 
@@ -2831,7 +2826,7 @@ msgid_plural "Cannot update host prototypes"
 msgstr[0] "Kan ikke oppdatere vertsprototype"
 msgstr[1] "Kan ikke oppdatere vertsprototyper"
 
-#: hosts.php:590
+#: hosts.php:589
 msgid "Cannot update hosts"
 msgstr "Kan ikke oppdatere verter"
 
@@ -2848,7 +2843,7 @@ msgstr "Kan ikke oppdatere bildet"
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Kan ikke oppdatere grensesnitt for oppdaget vert \"%1$s\"."
 
-#: items.php:934
+#: items.php:933
 msgid "Cannot update item"
 msgstr "Kan ikke oppdatere element"
 
@@ -2862,7 +2857,7 @@ msgstr[1] "Kan ikke oppdatere element prototyper"
 msgid "Cannot update item prototypes"
 msgstr ""
 
-#: items.php:1281
+#: items.php:1280
 msgid "Cannot update items"
 msgstr "Kan ikke oppdatere elementer"
 
@@ -2870,7 +2865,7 @@ msgstr "Kan ikke oppdatere elementer"
 msgid "Cannot update macros"
 msgstr "Kan ikke oppdatere makroer"
 
-#: maintenance.php:122
+#: maintenance.php:121
 msgid "Cannot update maintenance"
 msgstr "Kan ikke oppdatere vedlikehold"
 
@@ -2921,7 +2916,7 @@ msgstr "Kan ikke oppdatere lysbildefremvisning"
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
 msgstr "Kan ikke oppdatere trinn for et templert webscenario \"%1$s\":%2$s."
 
-#: templates.php:420
+#: templates.php:419
 msgid "Cannot update template"
 msgstr "Kan ikke oppdatere mal"
 
@@ -2929,7 +2924,7 @@ msgstr "Kan ikke oppdatere mal"
 msgid "Cannot update templated applications."
 msgstr "Kan ikke oppdatere templiserte applikasjoner."
 
-#: templates.php:398
+#: templates.php:397
 msgid "Cannot update templates"
 msgstr ""
 
@@ -2939,8 +2934,8 @@ msgstr ""
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Kan ikke oppdatere maler på oppdaget vert \"%1$s\"."
 
-#: app/controllers/CControllerPopupTriggerWizard.php:181 triggers.php:394
-#: triggers.php:512
+#: app/controllers/CControllerPopupTriggerWizard.php:181 triggers.php:393
+#: triggers.php:511
 msgid "Cannot update trigger"
 msgstr "Kan ikke oppdatere utløseren"
 
@@ -3021,8 +3016,8 @@ msgstr ""
 msgid "Certificate"
 msgstr "Sertifikat"
 
-#: include/items.inc.php:1733 include/items.inc.php:1737 latest.php:413
-#: latest.php:426
+#: include/items.inc.php:1733 include/items.inc.php:1737 latest.php:412
+#: latest.php:425
 msgctxt "noun"
 msgid "Change"
 msgstr "Endring"
@@ -3263,7 +3258,7 @@ msgstr "Klokke"
 msgid "Clone"
 msgstr "Klon"
 
-#: include/func.inc.php:1906 include/views/js/monitoring.sysmaps.js.php:273
+#: include/func.inc.php:1902 include/views/js/monitoring.sysmaps.js.php:273
 #: include/views/js/monitoring.sysmaps.js.php:421
 #: include/views/js/monitoring.sysmaps.js.php:541
 #: include/views/js/monitoring.sysmaps.js.php:636
@@ -3340,7 +3335,7 @@ msgstr "Kombinert resultat"
 msgid "Command"
 msgstr "Kommando"
 
-#: app/controllers/CControllerPopupGeneric.php:331
+#: app/controllers/CControllerPopupGeneric.php:330
 #: app/views/administration.script.edit.php:55
 #: app/views/administration.script.list.php:59
 #: include/views/configuration.action.edit.php:997
@@ -3449,7 +3444,7 @@ msgstr "Konfigurasjon av Zabbix"
 msgid "Configuration of actions"
 msgstr "Konfigurasjon av handlinger"
 
-#: applications.php:27
+#: applications.php:26
 msgid "Configuration of applications"
 msgstr "Konfigurasjon av applikasjoner"
 
@@ -3461,15 +3456,15 @@ msgstr ""
 msgid "Configuration of discovery rules"
 msgstr "Konfigurasjon av oppdagelsesregler"
 
-#: graphs.php:28
+#: graphs.php:27
 msgid "Configuration of graph prototypes"
 msgstr "Konfigurasjon av grafprototyper"
 
-#: graphs.php:28
+#: graphs.php:27
 msgid "Configuration of graphs"
 msgstr "Konfigurasjon av grafer"
 
-#: hostgroups.php:26
+#: hostgroups.php:25
 msgid "Configuration of host groups"
 msgstr "Konfigurasjon av vertsgrupper"
 
@@ -3477,7 +3472,7 @@ msgstr "Konfigurasjon av vertsgrupper"
 msgid "Configuration of host prototypes"
 msgstr "Konfigurasjon av vertsprototyper"
 
-#: hosts.php:33
+#: hosts.php:32
 msgid "Configuration of hosts"
 msgstr "Konfigurasjon av verter"
 
@@ -3497,7 +3492,7 @@ msgstr "Konfigurasjon av bilder"
 msgid "Configuration of item prototypes"
 msgstr "Konfigurasjon av element prototyper"
 
-#: items.php:28
+#: items.php:27
 msgid "Configuration of items"
 msgstr "Konfigurasjon av elementer"
 
@@ -3505,7 +3500,7 @@ msgstr "Konfigurasjon av elementer"
 msgid "Configuration of macros"
 msgstr "Konfigurasjon av makroer"
 
-#: maintenance.php:28
+#: maintenance.php:27
 msgid "Configuration of maintenance periods"
 msgstr "Konfigurasjon av vedlikeholdsperioder"
 
@@ -3544,7 +3539,7 @@ msgstr "Konfigurering av tjenester"
 msgid "Configuration of slide shows"
 msgstr "Konfigurasjon av lysbildefremvisninger"
 
-#: templates.php:39
+#: templates.php:38
 msgid "Configuration of templates"
 msgstr "Konfigurasjon av maler"
 
@@ -3560,11 +3555,11 @@ msgstr "Konfigurasjon av trigger-prototyper"
 msgid "Configuration of trigger severities"
 msgstr "Konfigurasjon av utløser-alvorlighetsgrader"
 
-#: triggers.php:28
+#: triggers.php:27
 msgid "Configuration of triggers"
 msgstr "Konfigurasjon av utløsere"
 
-#: usergrps.php:30
+#: usergrps.php:29
 msgid "Configuration of user groups"
 msgstr "Konfigurering av brukergrupper"
 
@@ -3767,8 +3762,8 @@ msgstr ""
 #: include/views/monitoring.screen.php:103
 #: include/views/monitoring.slideconf.list.php:37
 #: include/views/monitoring.slides.php:96
-#: include/views/monitoring.sysmap.list.php:34 latest.php:313 queue.php:80
-#: report2.php:174 srv_status.php:175 tr_events.php:164
+#: include/views/monitoring.sysmap.list.php:34 latest.php:312 queue.php:80
+#: report2.php:173 srv_status.php:175 tr_events.php:164
 msgid "Content controls"
 msgstr ""
 
@@ -4097,7 +4092,7 @@ msgstr "Tilpasset"
 msgid "Custom expression"
 msgstr "Egendefinert uttrykk"
 
-#: charts.php:27
+#: charts.php:26
 msgid "Custom graphs"
 msgstr "Egendefinerte grafer"
 
@@ -4128,7 +4123,7 @@ msgstr "Tilpasset multiplikator"
 msgid "Custom on fail"
 msgstr ""
 
-#: screens.php:28
+#: screens.php:27
 msgid "Custom screens"
 msgstr "Tilpassede skjermer"
 
@@ -4150,7 +4145,7 @@ msgstr "Egendefinerte alvorlighetsnavn påvirker alle lokaliteter og krever manu
 msgid "Custom size"
 msgstr "Tilpasset størrelse"
 
-#: slides.php:28
+#: slides.php:27
 msgid "Custom slides"
 msgstr "Tilpassede lysbilder"
 
@@ -4199,7 +4194,7 @@ msgstr "DNS-navn"
 msgid "Daily"
 msgstr "Daglig"
 
-#: include/classes/core/ZBase.php:285
+#: include/classes/core/ZBase.php:286
 msgid "Dark"
 msgstr "Mørk"
 
@@ -4332,7 +4327,7 @@ msgstr "Databasetype"
 msgid "Database user"
 msgstr "Databasebruker"
 
-#: include/forms.inc.php:2344 include/forms.inc.php:2429 maintenance.php:51
+#: include/forms.inc.php:2344 include/forms.inc.php:2429 maintenance.php:50
 msgid "Date"
 msgstr "Dato"
 
@@ -4356,7 +4351,7 @@ msgstr "Dato HW kjøpt"
 msgid "Day"
 msgstr "Dag"
 
-#: include/func.inc.php:2671
+#: include/func.inc.php:2667
 msgid "Day before yesterday"
 msgstr ""
 
@@ -4383,7 +4378,7 @@ msgstr "Debug"
 msgid "Debug mode"
 msgstr "Debug modus"
 
-#: usergrps.php:206
+#: usergrps.php:205
 msgid "Debug mode updated"
 msgstr "Debug modus oppdater"
 
@@ -4829,7 +4824,7 @@ msgstr "Benekte"
 msgid "Dependencies"
 msgstr "avhengig"
 
-#: include/triggers.inc.php:2713
+#: include/triggers.inc.php:2723
 msgid "Dependent"
 msgstr "Avhengig"
 
@@ -4837,7 +4832,7 @@ msgstr "Avhengig"
 msgid "Dependent item"
 msgstr "Avhengige gjenstand"
 
-#: app/views/popup.generic.php:289 include/triggers.inc.php:2713
+#: app/views/popup.generic.php:289 include/triggers.inc.php:2723
 #: include/views/configuration.services.edit.php:152
 #: include/views/configuration.trigger.prototype.list.php:81
 #: include/views/configuration.triggers.list.php:238
@@ -4877,7 +4872,7 @@ msgid "Description updated"
 msgstr "Beskrivelse oppdatert"
 
 #: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:427
-#: include/func.inc.php:1861
+#: include/func.inc.php:1857
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:435
 #: include/views/configuration.action.edit.php:439
@@ -4909,7 +4904,7 @@ msgstr "Enhetens unikhetskriterier"
 msgid "Dimension (cols x rows)"
 msgstr "Dimensjon (kolonner x rader)"
 
-#: include/classes/setup/CFrontendSetup.php:701
+#: include/classes/setup/CFrontendSetup.php:694
 #, c-format
 msgid "Directory \"%1$s\" must be writable."
 msgstr ""
@@ -5009,7 +5004,7 @@ msgstr "Deaktiver valgte webscenarier?"
 #: include/discovery.inc.php:108 include/hosts.inc.php:1299
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:140 include/items.inc.php:143
-#: include/items.inc.php:187 include/triggers.inc.php:2163
+#: include/items.inc.php:187 include/triggers.inc.php:2173
 #: include/users.inc.php:86
 #: include/views/administration.general.other.edit.php:57
 #: include/views/administration.usergroups.list.php:44
@@ -5098,7 +5093,7 @@ msgstr "Discovery sjekk"
 msgid "Discovery check error"
 msgstr "Feilsøkingsfeil"
 
-#: app/controllers/CControllerPopupGeneric.php:313
+#: app/controllers/CControllerPopupGeneric.php:312
 msgid "Discovery checks"
 msgstr "Discovery sjekker"
 
@@ -5171,7 +5166,7 @@ msgstr[1] "Discoveryregler aktivert"
 msgid "Discovery rule updated"
 msgstr "Oppdagelsesregel oppdatert"
 
-#: app/controllers/CControllerPopupGeneric.php:301 include/html.inc.php:428
+#: app/controllers/CControllerPopupGeneric.php:300 include/html.inc.php:428
 #: include/views/configuration.discovery.edit.php:24
 #: include/views/configuration.discovery.list.php:22
 #: include/views/configuration.host.discovery.edit.php:23
@@ -5210,7 +5205,7 @@ msgstr "Disk skrive statistikk. Returnerer heltall med type i sektorer, operasjo
 msgid "Display OK triggers for"
 msgstr "Vis OK utløsere for"
 
-#: latest.php:791
+#: latest.php:790
 msgid "Display graph"
 msgstr "Vis grafen"
 
@@ -5218,19 +5213,19 @@ msgstr "Vis grafen"
 msgid "Display problems"
 msgstr "Vis problemer"
 
-#: latest.php:790
+#: latest.php:789
 msgid "Display stacked graph"
 msgstr "Vis stablet graf"
 
 #: app/views/search.php:124 app/views/search.php:180 app/views/search.php:254
 #: include/actions.inc.php:1798 include/actions.inc.php:1870
-#: include/actions.inc.php:1961 include/func.inc.php:1670 jsLoader.php:302
+#: include/actions.inc.php:1961 include/func.inc.php:1666 jsLoader.php:302
 #: queue.php:298
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Viser %1$s av %2$s funnet"
 
-#: include/func.inc.php:1673
+#: include/func.inc.php:1669
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
 msgstr "Viser %1$s til %2$s av %3$s funnet"
@@ -5748,7 +5743,7 @@ msgstr ""
 #: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
 #: include/httptest.inc.php:45 include/items.inc.php:140
 #: include/items.inc.php:143 include/items.inc.php:184
-#: include/triggers.inc.php:1236 include/triggers.inc.php:2160
+#: include/triggers.inc.php:1246 include/triggers.inc.php:2170
 #: include/views/administration.usergroups.edit.php:73
 #: include/views/administration.usergroups.edit.php:88
 #: include/views/administration.usergroups.edit.php:89
@@ -5824,7 +5819,7 @@ msgstr "Feil"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Feil i søkeforespørsel for tabell \"%1$s\"."
 
-#: include/func.inc.php:1900
+#: include/func.inc.php:1896
 msgid "Error message"
 msgstr ""
 
@@ -5860,7 +5855,7 @@ msgstr "Hendelse korrelasjonsregler"
 msgid "Event details"
 msgstr "Event detaljer"
 
-#: include/triggers.inc.php:1226
+#: include/triggers.inc.php:1236
 msgid "Event generation"
 msgstr "Eventgenerering"
 
@@ -5927,7 +5922,7 @@ msgstr "Utfør SQL-feil [%1$s] i [%2$s]."
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "Utfør WMI-spørring og returner det første valgte objektet. Returnerer heltall, flyt, streng eller tekst (avhengig av forespørselen)"
 
-#: app/controllers/CControllerPopupGeneric.php:330
+#: app/controllers/CControllerPopupGeneric.php:329
 #: app/views/administration.script.edit.php:48
 #: app/views/administration.script.list.php:58
 #: include/views/configuration.action.edit.php:934
@@ -6010,8 +6005,8 @@ msgstr "Eksporter til CSV"
 #: include/views/configuration.triggers.edit.php:394
 #: include/views/configuration.triggers.list.php:198
 #: include/views/js/configuration.triggers.edit.js.php:21
-#: trigger_prototypes.php:38 trigger_prototypes.php:49 triggers.php:47
-#: triggers.php:58
+#: trigger_prototypes.php:38 trigger_prototypes.php:49 triggers.php:46
+#: triggers.php:57
 msgid "Expression"
 msgstr "Uttrykk"
 
@@ -6125,7 +6120,7 @@ msgstr "Feb"
 msgid "February"
 msgstr "Februar"
 
-#: hostinventoriesoverview.php:108 include/views/inventory.host.list.php:49
+#: hostinventoriesoverview.php:107 include/views/inventory.host.list.php:49
 msgid "Field"
 msgstr "Felt"
 
@@ -6260,7 +6255,7 @@ msgstr "Fylt område"
 #: include/views/administration.auditlogs.list.php:61
 #: include/views/administration.usergroups.list.php:34
 #: include/views/administration.users.list.php:51
-#: include/views/common.filter.trigger.php:144
+#: include/views/common.filter.trigger.php:133
 #: include/views/configuration.action.list.php:46
 #: include/views/configuration.correlation.list.php:36
 #: include/views/configuration.discovery.list.php:35
@@ -6276,7 +6271,7 @@ msgstr "Fylt område"
 #: include/views/monitoring.screen.list.php:58
 #: include/views/monitoring.slideconf.list.php:45
 #: include/views/monitoring.sysmap.list.php:40
-#: include/views/reports.toptriggers.php:76 latest.php:321 report2.php:425
+#: include/views/reports.toptriggers.php:76 latest.php:320 report2.php:424
 msgid "Filter"
 msgstr "Filtrer"
 
@@ -6308,7 +6303,7 @@ msgstr "Bli ferdig"
 msgid "Finnish (fi_FI)"
 msgstr "Finsk (fi_FI)"
 
-#: include/func.inc.php:1630
+#: include/func.inc.php:1626
 msgctxt "page navigation"
 msgid "First"
 msgstr "Første"
@@ -6401,7 +6396,7 @@ msgstr "Fra"
 msgid "Frontend access"
 msgstr "Frontend tilgang"
 
-#: usergrps.php:189
+#: usergrps.php:188
 msgid "Frontend access updated"
 msgstr "Frontend tilgang oppdatert"
 
@@ -6476,7 +6471,7 @@ msgid "Get content of web page. Returns web page source as text"
 msgstr "Få innhold på nettsiden. Returnerer nettsiden kilde som tekst"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
-#: include/triggers.inc.php:1382
+#: include/triggers.inc.php:1392
 msgid "Given expression is not a macro"
 msgstr "Gitt uttrykk er ikke en makro"
 
@@ -6491,7 +6486,7 @@ msgstr "Globalt vanlig uttrykk \"%1$s\" eksisterer ikke."
 msgid "Global script"
 msgstr "Globalt skript"
 
-#: app/controllers/CControllerPopupGeneric.php:321
+#: app/controllers/CControllerPopupGeneric.php:320
 msgid "Global scripts"
 msgstr "Globale skript"
 
@@ -6508,7 +6503,7 @@ msgstr "Gå tilbake til %1$s"
 msgid "Go to"
 msgstr "Gå til"
 
-#: app/views/system.warning.php:26 include/func.inc.php:1805
+#: app/views/system.warning.php:26 include/func.inc.php:1801
 msgid "Go to dashboard"
 msgstr "Gå til Dashboard"
 
@@ -6520,7 +6515,7 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "Gradient linje"
 
-#: charts.php:100 include/audit.inc.php:30
+#: charts.php:99 include/audit.inc.php:30
 #: include/classes/screens/CScreenProblem.php:1229
 #: include/classes/widgets/CWidgetConfig.php:46
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
@@ -6528,8 +6523,8 @@ msgstr "Gradient linje"
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:438
 #: include/views/monitoring.charts.php:38
 #: include/views/monitoring.history.php:66
-#: include/views/monitoring.screen.constructor.edit.php:156 latest.php:540
-#: latest.php:692 report2.php:431
+#: include/views/monitoring.screen.constructor.edit.php:156 latest.php:539
+#: latest.php:691 report2.php:430
 msgid "Graph"
 msgstr "Graf"
 
@@ -6586,17 +6581,17 @@ msgstr "Graf \"%1$s\" med templerte elementer kan ikke inneholde elementer fra a
 msgid "Graph (classic)"
 msgstr ""
 
-#: graphs.php:243
+#: graphs.php:242
 msgid "Graph added"
 msgstr "Graf lagt til"
 
-#: graphs.php:387
+#: graphs.php:386
 msgid "Graph copied"
 msgid_plural "Graphs copied"
 msgstr[0] "Graf kopiert"
 msgstr[1] "Grafer kopiert"
 
-#: graphs.php:287
+#: graphs.php:286
 msgid "Graph deleted"
 msgstr "Graf slettet"
 
@@ -6625,11 +6620,11 @@ msgstr "Grafprototypen \"%1$s\" må ha minst én gjenstands prototype."
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "Graf prototype \"%1$s\" med templerte elementer kan ikke inneholde elementer fra andre verter."
 
-#: graphs.php:225
+#: graphs.php:224
 msgid "Graph prototype added"
 msgstr "Graf prototype lagt til"
 
-#: graphs.php:279
+#: graphs.php:278
 msgid "Graph prototype deleted"
 msgstr "Graf prototype slettet"
 
@@ -6637,7 +6632,7 @@ msgstr "Graf prototype slettet"
 msgid "Graph prototype not found."
 msgstr "Graf prototype ikke funnet."
 
-#: graphs.php:219
+#: graphs.php:218
 msgid "Graph prototype updated"
 msgstr "Graf prototype oppdatert"
 
@@ -6646,7 +6641,7 @@ msgstr "Graf prototype oppdatert"
 msgid "Graph prototype with ID \"%1$s\" is not available."
 msgstr "Graf prototype med ID \"%1$s\" er ikke tilgjengelig."
 
-#: app/controllers/CControllerPopupGeneric.php:252 include/html.inc.php:490
+#: app/controllers/CControllerPopupGeneric.php:251 include/html.inc.php:490
 #: include/views/configuration.graph.edit.php:31
 #: include/views/configuration.graph.list.php:24
 #: include/views/configuration.host.discovery.list.php:149
@@ -6655,7 +6650,7 @@ msgstr "Graf prototype med ID \"%1$s\" er ikke tilgjengelig."
 msgid "Graph prototypes"
 msgstr "Graf prototyper"
 
-#: graphs.php:312
+#: graphs.php:311
 msgid "Graph prototypes deleted"
 msgstr "Graf prototyper slettet"
 
@@ -6663,15 +6658,15 @@ msgstr "Graf prototyper slettet"
 msgid "Graph sum"
 msgstr "Graf sum"
 
-#: app/controllers/CControllerPopupGeneric.php:248
-#: app/controllers/CControllerPopupGeneric.php:261
+#: app/controllers/CControllerPopupGeneric.php:247
+#: app/controllers/CControllerPopupGeneric.php:260
 #: include/views/configuration.graph.edit.php:97
 #: include/views/configuration.graph.list.php:90
 #: include/views/monitoring.history.php:222
 msgid "Graph type"
 msgstr "Graftype"
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Graph updated"
 msgstr "Graf oppdatert"
 
@@ -6692,11 +6687,11 @@ msgstr "Graf med navn \"%1$s\" finnes allerede i diagrammer eller grafprototyper
 msgid "Graph with same name but other type exist."
 msgstr "Graf med samme navn, men det finnes annen type."
 
-#: app/controllers/CControllerPopupGeneric.php:239 app/views/search.php:31
+#: app/controllers/CControllerPopupGeneric.php:238 app/views/search.php:31
 #: app/views/search.php:37 app/views/search.php:74 app/views/search.php:75
 #: app/views/search.php:107 app/views/search.php:132 app/views/search.php:168
 #: app/views/search.php:185 app/views/search.php:222 app/views/search.php:223
-#: graphs.php:419 include/html.inc.php:406 include/menu.inc.php:73
+#: graphs.php:418 include/html.inc.php:406 include/menu.inc.php:73
 #: include/views/configuration.graph.edit.php:26
 #: include/views/configuration.graph.list.php:39
 #: include/views/configuration.host.discovery.list.php:54
@@ -6713,7 +6708,7 @@ msgstr "Graf med samme navn, men det finnes annen type."
 msgid "Graphs"
 msgstr "Grafer"
 
-#: graphs.php:329
+#: graphs.php:328
 msgid "Graphs deleted"
 msgstr "Grafer slettet"
 
@@ -6728,7 +6723,7 @@ msgstr "Rutenett"
 
 #: app/views/monitoring.dashboard.view.php:57
 #: app/views/monitoring.web.view.php:36 app/views/popup.generic.php:72
-#: hostinventoriesoverview.php:93
+#: hostinventoriesoverview.php:92
 #: include/classes/screens/CScreenDataOverview.php:40
 #: include/classes/screens/CScreenHostgroupTriggers.php:67
 #: include/classes/screens/CScreenHostgroupTriggers.php:133
@@ -6775,11 +6770,11 @@ msgstr "Gruppe \"%1$s\" eksisterer ikke."
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Gruppe \"%1$s\" for verten \"%2$s\" eksisterer ikke."
 
-#: hostgroups.php:113 usergrps.php:144
+#: hostgroups.php:112 usergrps.php:143
 msgid "Group added"
 msgstr "Gruppe lagt til"
 
-#: hostgroups.php:134 hostgroups.php:155 usergrps.php:159 usergrps.php:174
+#: hostgroups.php:133 hostgroups.php:154 usergrps.php:158 usergrps.php:173
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "Gruppe slettet"
@@ -6794,8 +6789,8 @@ msgstr "Gruppe for oppdagede verter"
 msgid "Group for discovered hosts \"%1$s\"."
 msgstr "Gruppe for oppdagede verter \"%1$s\"."
 
-#: hostgroups.php:37 include/views/administration.usergroups.edit.php:36
-#: include/views/configuration.hostgroups.edit.php:32 usergrps.php:43
+#: hostgroups.php:36 include/views/administration.usergroups.edit.php:36
+#: include/views/configuration.hostgroups.edit.php:32 usergrps.php:42
 msgid "Group name"
 msgstr "Gruppe navn"
 
@@ -6808,11 +6803,11 @@ msgstr "Gruppeprototype kan ikke baseres på en oppdaget vertsgruppe \"%1$s\"."
 msgid "Group prototypes"
 msgstr "Gruppeprototyper"
 
-#: hostgroups.php:75 usergrps.php:149
+#: hostgroups.php:74 usergrps.php:148
 msgid "Group updated"
 msgstr "Gruppe oppdatert"
 
-#: hostinventoriesoverview.php:98
+#: hostinventoriesoverview.php:97
 msgid "Grouping by"
 msgstr "Gruppering av"
 
@@ -6911,7 +6906,7 @@ msgstr "Overskrifter"
 msgid "Hebrew (he_IL)"
 msgstr "Hebraisk (he_IL)"
 
-#: graphs.php:47 include/views/configuration.graph.edit.php:92
+#: graphs.php:46 include/views/configuration.graph.edit.php:92
 #: include/views/configuration.graph.list.php:89
 #: include/views/js/monitoring.sysmaps.js.php:98
 #: include/views/js/monitoring.sysmaps.js.php:403
@@ -6959,11 +6954,11 @@ msgstr ""
 msgid "High"
 msgstr "Høy"
 
-#: include/classes/core/ZBase.php:287
+#: include/classes/core/ZBase.php:288
 msgid "High-contrast dark"
 msgstr ""
 
-#: include/classes/core/ZBase.php:286
+#: include/classes/core/ZBase.php:287
 msgid "High-contrast light"
 msgstr ""
 
@@ -6979,13 +6974,13 @@ msgstr ""
 #: include/forms.inc.php:438 include/forms.inc.php:872
 #: include/views/administration.general.housekeeper.edit.php:117
 #: include/views/configuration.item.list.php:65
-#: include/views/configuration.item.prototype.list.php:55 items.php:305
-#: jsLoader.php:258 latest.php:408 latest.php:545 latest.php:697
+#: include/views/configuration.item.prototype.list.php:55 items.php:304
+#: jsLoader.php:258 latest.php:407 latest.php:544 latest.php:696
 msgid "History"
 msgstr "Historikk"
 
 #: httpconf.php:189 httpconf.php:196 httpconf.php:490 httpconf.php:502
-#: items.php:973 items.php:980 items.php:1377 items.php:1389
+#: items.php:972 items.php:979 items.php:1376 items.php:1388
 msgid "History cleared"
 msgstr "Historikk ryddet"
 
@@ -7014,7 +7009,7 @@ msgstr "Historie av hendelser"
 #: disc_prototypes.php:193 include/views/configuration.item.edit.php:772
 #: include/views/configuration.item.massupdate.php:403
 #: include/views/configuration.item.prototype.edit.php:665
-#: include/views/configuration.item.prototype.massupdate.php:400 items.php:64
+#: include/views/configuration.item.prototype.massupdate.php:400 items.php:63
 msgid "History storage period"
 msgstr "Historikk lagringsperiode"
 
@@ -7048,7 +7043,7 @@ msgstr "Horisontal justering"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
-#: include/triggers.inc.php:1194
+#: include/triggers.inc.php:1204
 #: include/views/configuration.application.list.php:35
 #: include/views/configuration.application.list.php:62
 #: include/views/configuration.graph.list.php:51
@@ -7070,9 +7065,9 @@ msgstr "Horisontal justering"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
-#: include/views/reports.toptriggers.php:79 items.php:973 items.php:1376
-#: jsLoader.php:168 latest.php:405 latest.php:422 queue.php:263
-#: report2.php:409 report2.php:431
+#: include/views/reports.toptriggers.php:79 items.php:972 items.php:1375
+#: jsLoader.php:168 latest.php:404 latest.php:421 queue.php:263
+#: report2.php:408 report2.php:430
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Vert"
@@ -7110,7 +7105,7 @@ msgstr "Vert IP"
 msgid "Host access"
 msgstr "Vertsadgang"
 
-#: hosts.php:618
+#: hosts.php:617
 msgid "Host added"
 msgstr "Vert lagt til"
 
@@ -7118,23 +7113,23 @@ msgstr "Vert lagt til"
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "Verten kan ikke ha mer enn ett standardgrensesnitt av samme type."
 
-#: app/views/administration.proxy.list.php:69 hostinventoriesoverview.php:111
+#: app/views/administration.proxy.list.php:69 hostinventoriesoverview.php:110
 msgid "Host count"
 msgstr "Vert antall"
 
-#: hosts.php:863 hosts.php:884
+#: hosts.php:862 hosts.php:883
 msgid "Host deleted"
 msgstr "Verten slettet"
 
-#: app/controllers/CControllerProxyHostDisable.php:73 hostgroups.php:203
-#: hosts.php:912
+#: app/controllers/CControllerProxyHostDisable.php:73 hostgroups.php:202
+#: hosts.php:911
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Vert deaktivert"
 msgstr[1] "Verter deaktivert"
 
-#: app/controllers/CControllerProxyHostEnable.php:73 hostgroups.php:202
-#: hosts.php:911
+#: app/controllers/CControllerProxyHostEnable.php:73 hostgroups.php:201
+#: hosts.php:910
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Verten aktivert"
@@ -7155,7 +7150,7 @@ msgstr[1] "Verter aktivert"
 #: include/views/js/monitoring.sysmaps.js.php:71
 #: include/views/js/monitoring.sysmaps.js.php:77
 #: include/views/js/monitoring.sysmaps.js.php:125 jsLoader.php:171
-#: report2.php:357 report2.php:379
+#: report2.php:356 report2.php:378
 msgid "Host group"
 msgstr "Vertsgruppe"
 
@@ -7189,13 +7184,13 @@ msgid "Host group label type"
 msgstr "Vertsgruppe etikett type"
 
 #: include/classes/api/services/CDashboard.php:694
-#: include/classes/api/services/CScript.php:429
+#: include/classes/api/services/CScript.php:454
 #: include/classes/api/services/CUserGroup.php:445
 #, c-format
 msgid "Host group with ID \"%1$s\" is not available."
 msgstr "Vertsgruppe med ID \"%1$s\" er ikke tilgjengelig."
 
-#: app/controllers/CControllerPopupGeneric.php:100
+#: app/controllers/CControllerPopupGeneric.php:99
 #: app/views/monitoring.problem.view.php:96 app/views/search.php:178
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:31
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:31
@@ -7212,8 +7207,8 @@ msgstr "Vertsgruppe med ID \"%1$s\" er ikke tilgjengelig."
 #: include/views/configuration.maintenance.edit.php:235
 #: include/views/configuration.template.massupdate.php:53
 #: include/views/configuration.triggers.list.php:25
-#: include/views/reports.toptriggers.php:34 latest.php:323 usergrps.php:319
-#: usergrps.php:359
+#: include/views/reports.toptriggers.php:34 latest.php:322 usergrps.php:318
+#: usergrps.php:358
 msgid "Host groups"
 msgstr "Vert grupper"
 
@@ -7230,14 +7225,14 @@ msgstr "Vert info"
 msgid "Host interface"
 msgstr "Vertsgrensesnitt"
 
-#: app/views/monitoring.problem.view.php:282 hostinventories.php:27
-#: include/views/common.filter.trigger.php:137
+#: app/views/monitoring.problem.view.php:282 hostinventories.php:26
+#: include/views/common.filter.trigger.php:123
 #: include/views/inventory.host.list.php:23
 #: include/views/inventory.host.view.php:223 jsLoader.php:259
 msgid "Host inventory"
 msgstr "Vert inventar"
 
-#: hostinventoriesoverview.php:27 hostinventoriesoverview.php:71
+#: hostinventoriesoverview.php:26 hostinventoriesoverview.php:70
 msgid "Host inventory overview"
 msgstr "Vert oversikt over verten"
 
@@ -7259,7 +7254,7 @@ msgstr "Vertsmakroer"
 msgid "Host metadata"
 msgstr "Vert metadata"
 
-#: host_prototypes.php:37 hosts.php:60 include/actions.inc.php:47
+#: host_prototypes.php:37 hosts.php:59 include/actions.inc.php:47
 #: include/views/configuration.discovery.edit.php:95
 #: include/views/configuration.discovery.edit.php:111
 #: include/views/configuration.host.edit.php:67
@@ -7343,7 +7338,7 @@ msgstr "Vert tid"
 msgid "Host update failed."
 msgstr "Vertsoppdatering mislyktes."
 
-#: hosts.php:602
+#: hosts.php:601
 msgid "Host updated"
 msgstr "Vert oppdatert"
 
@@ -7375,8 +7370,8 @@ msgstr "Vert med samme synlige navn \"%1$s\" eksisterer allerede."
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Vert med samme synlige navn \"%s\" eksisterer allerede."
 
-#: app/controllers/CControllerPopupGeneric.php:64
-#: app/controllers/CControllerPopupGeneric.php:88
+#: app/controllers/CControllerPopupGeneric.php:63
+#: app/controllers/CControllerPopupGeneric.php:87
 #: app/views/administration.proxy.list.php:72
 #: app/views/monitoring.problem.view.php:113 app/views/search.php:122
 #: app/views/search.php:134 app/views/search.php:147 app/views/search.php:148
@@ -7387,7 +7382,7 @@ msgstr "Vert med samme synlige navn \"%s\" eksisterer allerede."
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:376 include/forms.inc.php:827
 #: include/items.inc.php:1179 include/menu.inc.php:134
-#: include/menu.inc.php:198 include/triggers.inc.php:891
+#: include/menu.inc.php:198 include/triggers.inc.php:901
 #: include/views/configuration.copy.elements.php:58
 #: include/views/configuration.graph.list.php:86
 #: include/views/configuration.host.discovery.list.php:55
@@ -7399,7 +7394,7 @@ msgstr "Vert med samme synlige navn \"%s\" eksisterer allerede."
 #: include/views/configuration.maintenance.edit.php:251
 #: include/views/configuration.triggers.list.php:41
 #: include/views/conf.import.php:29 include/views/reports.toptriggers.php:51
-#: latest.php:340
+#: latest.php:339
 msgid "Hosts"
 msgstr "verter"
 
@@ -7415,7 +7410,7 @@ msgstr ""
 msgid "Hosts location"
 msgstr "Verter plassering"
 
-#: hosts.php:584
+#: hosts.php:583
 msgid "Hosts updated"
 msgstr "Verter oppdatert"
 
@@ -7503,14 +7498,14 @@ msgstr "IPMI-agent"
 msgid "IPMI interfaces"
 msgstr "IPMI-grensesnitt"
 
-#: include/classes/api/services/CScript.php:353
+#: include/classes/api/services/CScript.php:378
 msgid "IPMI scripts can be executed only by server."
 msgstr "IPMI-skript kan bare utføres av serveren."
 
 #: disc_prototypes.php:162 host_discovery.php:142
 #: include/views/configuration.host.discovery.edit.php:473
 #: include/views/configuration.item.edit.php:579
-#: include/views/configuration.item.prototype.edit.php:515 items.php:175
+#: include/views/configuration.item.prototype.edit.php:515 items.php:174
 msgid "IPMI sensor"
 msgstr "IPMI-sensor"
 
@@ -7587,7 +7582,7 @@ msgstr "ikoner"
 msgid "Identification of the system. Returns string"
 msgstr "Identifikasjon av systemet. Returnerer streng"
 
-#: include/func.inc.php:1795 include/func.inc.php:1814
+#: include/func.inc.php:1791 include/func.inc.php:1810
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Hvis du mener at denne meldingen er feil, vennligst kontakt administratorer om å få de nødvendige tillatelsene."
 
@@ -7672,7 +7667,7 @@ msgstr "Importer fil"
 msgid "Imported successfully"
 msgstr "Importert med hell"
 
-#: hostinventories.php:192
+#: hostinventories.php:191
 #, c-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "Umulig å filtrere etter lagerfelt \"%s\", som ikke eksisterer."
@@ -7712,7 +7707,7 @@ msgid "Inaccessible item"
 msgstr "Utilgjengelig gjenstand"
 
 #: include/classes/screens/CScreenProblem.php:414
-#: include/hostgroups.inc.php:288 include/triggers.inc.php:2315
+#: include/hostgroups.inc.php:288 include/triggers.inc.php:2325
 #: include/views/inventory.host.view.php:36
 msgid "Inaccessible maintenance"
 msgstr ""
@@ -7724,11 +7719,11 @@ msgstr "Utilgjengelig kart"
 
 #: include/graphs.inc.php:271 include/hosts.inc.php:658
 #: include/hosts.inc.php:827 include/httptest.inc.php:209
-#: include/items.inc.php:896 include/triggers.inc.php:2454
+#: include/items.inc.php:896 include/triggers.inc.php:2464
 msgid "Inaccessible template"
 msgstr ""
 
-#: include/triggers.inc.php:2683 include/triggers.inc.php:2691
+#: include/triggers.inc.php:2693 include/triggers.inc.php:2701
 msgid "Inaccessible trigger"
 msgstr ""
 
@@ -8168,7 +8163,7 @@ msgstr "Feil filtertilstandstype for handling \"%1$s\"."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1383
+#: include/triggers.inc.php:1393
 msgid "Incorrect function is used"
 msgstr "Feil funksjon brukes"
 
@@ -8259,7 +8254,7 @@ msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "Feil vare prototype ID \"%1$s\" gitt for skjermelement."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:51
-#: include/triggers.inc.php:1384
+#: include/triggers.inc.php:1394
 msgid "Incorrect item value type"
 msgstr "Feil element verdi type"
 
@@ -8272,35 +8267,35 @@ msgstr "Feil elementverdietype \"%1$s\" gitt for utløsingsfunksjonen \"%2$s\"."
 msgid "Incorrect list of items."
 msgstr "Feil liste over varer."
 
-#: maintenance.php:298
+#: maintenance.php:297
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
 msgstr "Feil vedlikeholdsdato må være mellom 1970.01.01 og 2038.01.18"
 
-#: maintenance.php:326
+#: maintenance.php:325
 msgid "Incorrect maintenance date"
 msgstr "Feil vedlikeholdsdato"
 
-#: maintenance.php:303
+#: maintenance.php:302
 msgid "Incorrect maintenance day period"
 msgstr "Feil vedlikeholdsperiode"
 
-#: maintenance.php:312 maintenance.php:322
+#: maintenance.php:311 maintenance.php:321
 msgid "Incorrect maintenance days of week"
 msgstr "Feil vedlikeholdsdager i uken"
 
-#: maintenance.php:318
+#: maintenance.php:317
 msgid "Incorrect maintenance month period"
 msgstr "Feil vedlikeholdsmåned periode"
 
-#: maintenance.php:288
+#: maintenance.php:287
 msgid "Incorrect maintenance period"
 msgstr "Feil vedlikeholdsperiode"
 
-#: maintenance.php:284
+#: maintenance.php:283
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Feil vedlikeholdsperiode (minimum 5 minutter)"
 
-#: maintenance.php:308
+#: maintenance.php:307
 msgid "Incorrect maintenance week period"
 msgstr "Feil vedlikeholdsuke"
 
@@ -8532,7 +8527,7 @@ msgstr "Feil brukergruppen ID angitt for skjermbildet \"%1$s\"."
 msgid "Incorrect user group."
 msgstr "Feil brukergruppe."
 
-#: app/controllers/CControllerPopupGeneric.php:403
+#: app/controllers/CControllerPopupGeneric.php:402
 #: include/classes/api/services/CAction.php:822
 #: include/classes/api/services/CAction.php:865
 #: include/classes/api/services/CAction.php:939
@@ -8812,8 +8807,8 @@ msgstr ""
 #: include/classes/validators/CNewValidator.php:278
 #: include/screens.inc.php:321 include/screens.inc.php:335
 #: include/screens.inc.php:450 include/screens.inc.php:464
-#: include/sounds.inc.php:108 usergrps.php:319 usergrps.php:359
-#: usergrps.php:362
+#: include/sounds.inc.php:108 usergrps.php:318 usergrps.php:358
+#: usergrps.php:361
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "Feil verdi for felt \"%1$s\": %2$s."
@@ -8858,7 +8853,7 @@ msgstr "Indonesisk (id_ID)"
 #: include/views/configuration.trigger.prototype.edit.php:369
 #: include/views/configuration.triggers.edit.php:199
 #: include/views/configuration.triggers.edit.php:396
-#: include/views/configuration.triggers.list.php:200 latest.php:415
+#: include/views/configuration.triggers.list.php:200 latest.php:414
 msgid "Info"
 msgstr "info"
 
@@ -8921,7 +8916,7 @@ msgstr ""
 
 #: app/views/administration.proxy.edit.php:70 disc_prototypes.php:40
 #: host_discovery.php:47 include/views/configuration.host.list.php:179
-#: items.php:39
+#: items.php:38
 msgid "Interface"
 msgstr "Grensesnitt"
 
@@ -9012,7 +9007,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.prototype.edit.php:614
 #: include/views/configuration.item.prototype.list.php:54
 #: include/views/configuration.item.prototype.massupdate.php:338
-#: include/views/configuration.services.edit.php:170 latest.php:407
+#: include/views/configuration.services.edit.php:170 latest.php:406
 msgid "Interval"
 msgstr "Intervall"
 
@@ -9103,8 +9098,8 @@ msgstr "Ugyldig intern datalagringsperiode: %1$s."
 #: disc_prototypes.php:404 disc_prototypes.php:409 disc_prototypes.php:422
 #: disc_prototypes.php:754 disc_prototypes.php:759 disc_prototypes.php:772
 #: host_discovery.php:332 host_discovery.php:337 host_discovery.php:350
-#: items.php:584 items.php:589 items.php:602 items.php:1006 items.php:1011
-#: items.php:1024
+#: items.php:583 items.php:588 items.php:601 items.php:1005 items.php:1010
+#: items.php:1023
 #, c-format
 msgid "Invalid interval \"%1$s\"."
 msgstr "Ugyldig intervall \"%1$s\"."
@@ -9370,8 +9365,8 @@ msgstr "Italiensk (it_IT)"
 #: include/views/configuration.item.massupdate.php:576
 #: include/views/monitoring.screen.constructor.edit.php:258
 #: include/views/monitoring.screen.constructor.edit.php:427
-#: include/views/monitoring.screen.constructor.edit.php:787 items.php:972
-#: items.php:1376
+#: include/views/monitoring.screen.constructor.edit.php:787 items.php:971
+#: items.php:1375
 msgid "Item"
 msgstr "artikkel"
 
@@ -9417,11 +9412,11 @@ msgstr "Element \"%1$s\" på \"%2$s\": Programmet \"%3$s\" eksisterer ikke."
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Elementet \"%1$s : %2$s\" har ugyldig port: \"%3$s\"."
 
-#: items.php:931
+#: items.php:930
 msgid "Item added"
 msgstr "Element lagt til"
 
-#: items.php:1344
+#: items.php:1343
 msgid "Item copied"
 msgid_plural "Items copied"
 msgstr[0] "Element kopiert"
@@ -9431,17 +9426,17 @@ msgstr[1] "Elementer kopiert"
 msgid "Item count"
 msgstr "Varenummer"
 
-#: items.php:532
+#: items.php:531
 msgid "Item deleted"
 msgstr "Elementet slettet"
 
-#: applications.php:172 items.php:1302
+#: applications.php:171 items.php:1301
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "Elementet er deaktivert"
 msgstr[1] "Elementer er deaktivert"
 
-#: applications.php:171 items.php:1301
+#: applications.php:170 items.php:1300
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "Element aktivert"
@@ -9500,7 +9495,7 @@ msgstr[1] "Element prototyper oppdatert"
 msgid "Item prototype with ID \"%1$s\" is not available."
 msgstr "Element prototype med ID \"%1$s\" er ikke tilgjengelig."
 
-#: app/controllers/CControllerPopupGeneric.php:265 include/html.inc.php:468
+#: app/controllers/CControllerPopupGeneric.php:264 include/html.inc.php:468
 #: include/views/configuration.host.discovery.list.php:135
 #: include/views/configuration.host.edit.php:440
 #: include/views/configuration.item.prototype.edit.php:22
@@ -9518,7 +9513,7 @@ msgstr "Vare prototyper slettet"
 msgid "Item prototypes updated"
 msgstr ""
 
-#: items.php:934
+#: items.php:933
 msgid "Item updated"
 msgstr "Varen er oppdatert"
 
@@ -9581,7 +9576,7 @@ msgstr "Element med nøkkel \"%1$s\" eksisterer allerede på \"%2$s\" som ukjent
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Element med nøkkel \"%1$s\" eksisterer allerede på \"%2$s\"."
 
-#: app/controllers/CControllerPopupGeneric.php:202 app/views/search.php:35
+#: app/controllers/CControllerPopupGeneric.php:201 app/views/search.php:35
 #: app/views/search.php:60 app/views/search.php:64 app/views/search.php:185
 #: app/views/search.php:208 app/views/search.php:212
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
@@ -9600,11 +9595,11 @@ msgstr "Element med nøkkel \"%1$s\" eksisterer allerede på \"%2$s\"."
 #: include/views/configuration.template.list.php:137
 #: include/views/configuration.template.list.php:239
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:155
-#: include/views/inventory.host.view.php:174 items.php:1729 queue.php:109
+#: include/views/inventory.host.view.php:174 items.php:1728 queue.php:109
 msgid "Items"
 msgstr "elementer"
 
-#: items.php:1399
+#: items.php:1398
 msgid "Items deleted"
 msgstr "Elementer slettet"
 
@@ -9616,7 +9611,7 @@ msgstr "Elementer liste"
 msgid "Items location"
 msgstr ""
 
-#: items.php:1281
+#: items.php:1280
 msgid "Items updated"
 msgstr "Elementer oppdatert"
 
@@ -9726,9 +9721,9 @@ msgstr "juni"
 msgid "Keep lost resources period"
 msgstr "Hold tapt ressursperiode"
 
-#: app/controllers/CControllerPopupGeneric.php:211
-#: app/controllers/CControllerPopupGeneric.php:222
-#: app/controllers/CControllerPopupGeneric.php:274 disc_prototypes.php:46
+#: app/controllers/CControllerPopupGeneric.php:210
+#: app/controllers/CControllerPopupGeneric.php:221
+#: app/controllers/CControllerPopupGeneric.php:273 disc_prototypes.php:46
 #: host_discovery.php:50 include/forms.inc.php:469
 #: include/views/configuration.host.discovery.edit.php:67
 #: include/views/configuration.host.discovery.list.php:56
@@ -9736,7 +9731,7 @@ msgstr "Hold tapt ressursperiode"
 #: include/views/configuration.item.list.php:63
 #: include/views/configuration.item.prototype.edit.php:92
 #: include/views/configuration.item.prototype.list.php:53
-#: include/views/js/configuration.discovery.edit.js.php:79 items.php:50
+#: include/views/js/configuration.discovery.edit.js.php:79 items.php:49
 msgid "Key"
 msgstr "Tast"
 
@@ -9828,47 +9823,47 @@ msgstr "Spr"
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
 
-#: include/func.inc.php:1657
+#: include/func.inc.php:1653
 msgctxt "page navigation"
 msgid "Last"
 msgstr "Siste"
 
-#: include/func.inc.php:2724
+#: include/func.inc.php:2720
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2718
+#: include/func.inc.php:2714
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2711
+#: include/func.inc.php:2707
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2727
+#: include/func.inc.php:2723
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2704
+#: include/func.inc.php:2700
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2730
+#: include/func.inc.php:2726
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -9899,8 +9894,8 @@ msgstr "Siste endring"
 msgid "Last change (descending)"
 msgstr "Siste endring (synkende)"
 
-#: include/classes/screens/CScreenHttpTest.php:118 latest.php:411
-#: latest.php:424
+#: include/classes/screens/CScreenHttpTest.php:118 latest.php:410
+#: latest.php:423
 msgid "Last check"
 msgstr "Siste sjekk"
 
@@ -9927,7 +9922,7 @@ msgstr "Siste av"
 msgid "Last seen (age)"
 msgstr "Sist sett (alder)"
 
-#: latest.php:412 latest.php:425
+#: latest.php:411 latest.php:424
 msgid "Last value"
 msgstr "Siste verdi"
 
@@ -9937,8 +9932,8 @@ msgstr "Forrige uke graf"
 
 #: app/views/search.php:29 app/views/search.php:100 app/views/search.php:130
 #: app/views/search.php:162 include/menu.inc.php:68
-#: include/views/inventory.host.view.php:127 jsLoader.php:261 latest.php:27
-#: latest.php:307
+#: include/views/inventory.host.view.php:127 jsLoader.php:261 latest.php:26
+#: latest.php:306
 msgid "Latest data"
 msgstr "Siste data"
 
@@ -10172,7 +10167,7 @@ msgid "Log unmatched SNMP traps"
 msgstr "Logg på uovertruffen SNMP-feller"
 
 #: app/views/administration.authentication.edit.php:123 auditlogs.php:138
-#: include/func.inc.php:1802 include/func.inc.php:1817
+#: include/func.inc.php:1798 include/func.inc.php:1813
 #: include/menu.inc.php:294 include/views/administration.auditlogs.list.php:44
 #: include/views/administration.users.list.php:89 index_http.php:91
 #, fuzzy
@@ -10284,7 +10279,7 @@ msgstr "Makroer oppdatert"
 
 #: app/views/monitoring.dashboard.view.php:53
 #: app/views/monitoring.map.view.php:36 app/views/monitoring.web.view.php:32
-#: app/views/report.services.php:59 hostinventoriesoverview.php:90
+#: app/views/report.services.php:59 hostinventoriesoverview.php:89
 #: include/views/administration.general.image.edit.php:25
 #: include/views/administration.users.list.php:33
 #: include/views/configuration.application.list.php:27
@@ -10298,7 +10293,7 @@ msgstr "Makroer oppdatert"
 #: include/views/monitoring.hostscreen.php:57
 #: include/views/monitoring.overview.items.php:45
 #: include/views/monitoring.overview.triggers.php:82
-#: include/views/monitoring.slides.php:83 report2.php:186 report4.php:128
+#: include/views/monitoring.slides.php:83 report2.php:185 report4.php:128
 #: srv_status.php:167
 msgid "Main filter"
 msgstr ""
@@ -10327,11 +10322,11 @@ msgstr "Vedlikehold \"%1$s\" eksisterer allerede."
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
 msgstr "Vedlikeholdsverdien \"Aktiv siden\" kan ikke være større enn \"Aktiv til\"."
 
-#: maintenance.php:125
+#: maintenance.php:124
 msgid "Maintenance added"
 msgstr "Vedlikehold lagt til"
 
-#: maintenance.php:225
+#: maintenance.php:224
 msgid "Maintenance deleted"
 msgstr "Vedlikehold slettet"
 
@@ -10352,7 +10347,7 @@ msgstr "Vedlikeholdsperioder"
 msgid "Maintenance type"
 msgstr "Vedlikeholdstype"
 
-#: maintenance.php:121
+#: maintenance.php:120
 msgid "Maintenance updated"
 msgstr "Vedlikehold oppdatert"
 
@@ -10475,7 +10470,7 @@ msgstr "Mappet til"
 msgid "Mappings"
 msgstr "kartlegginger"
 
-#: app/controllers/CControllerPopupGeneric.php:281
+#: app/controllers/CControllerPopupGeneric.php:280
 #: app/views/monitoring.map.view.php:29 include/menu.inc.php:91
 #: include/views/conf.import.php:40
 #: include/views/monitoring.sysmap.list.php:23
@@ -10530,7 +10525,7 @@ msgstr "Masse oppdateringsformer"
 #: include/views/configuration.item.edit.php:382
 #: include/views/configuration.item.massupdate.php:561
 #: include/views/configuration.item.prototype.edit.php:409
-#: include/views/configuration.item.prototype.massupdate.php:573 items.php:54
+#: include/views/configuration.item.prototype.massupdate.php:573 items.php:53
 msgid "Master item"
 msgstr "Master element"
 
@@ -10748,7 +10743,7 @@ msgstr ""
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")."
 msgstr "Minimumskrav for PHP-minne er %s (konfigurasjonsalternativ \"memory_limit\")."
 
-#: include/classes/setup/CFrontendSetup.php:172
+#: include/classes/setup/CFrontendSetup.php:166
 #, c-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")."
 msgstr "Minimumskrav for PHP opplasting filstørrelse er %s (konfigurasjonsalternativ \"upload_max_filesize\")."
@@ -10758,24 +10753,24 @@ msgstr "Minimumskrav for PHP opplasting filstørrelse er %s (konfigurasjonsalter
 msgid "Minimum required PHP version is %s."
 msgstr "Minimum nødvendig PHP-versjon er %s."
 
-#: include/classes/setup/CFrontendSetup.php:203
+#: include/classes/setup/CFrontendSetup.php:196
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")."
 msgstr "Minimumskrav for eksekveringstid for PHP-skript er %s (konfigurasjonsalternativ \"max_execution_time\")."
 
-#: include/classes/setup/CFrontendSetup.php:224
+#: include/classes/setup/CFrontendSetup.php:217
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")."
 msgstr "Minimum krevende grense for innsparingstid for PHP-skript er %s (konfigurasjonsalternativ \"max_input_time\")."
 
-#: include/classes/setup/CFrontendSetup.php:151
+#: include/classes/setup/CFrontendSetup.php:148
 #, c-format
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")."
 msgstr "Minimumskrav på PHP-innlegget er %s (konfigurasjonsalternativet \"post_max_size\")."
 
 #: app/views/monitoring.map.view.php:39
 #: app/views/monitoring.problem.view.php:166
-#: include/views/common.filter.trigger.php:57
+#: include/views/common.filter.trigger.php:46
 #: include/views/monitoring.sysmap.edit.php:219
 msgid "Minimum severity"
 msgstr "Minste alvorlighetsgrad"
@@ -10841,7 +10836,7 @@ msgstr "Manglende nøkkel \"%1$s\" for verten \"%2$s\"."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:184
 #: app/views/administration.proxy.list.php:43
-#: app/views/administration.proxy.list.php:65 report2.php:189
+#: app/views/administration.proxy.list.php:65 report2.php:188
 msgid "Mode"
 msgstr "Modus"
 
@@ -10917,7 +10912,7 @@ msgstr "Mozilla Firefox"
 msgid "Multiple"
 msgstr "Flere"
 
-#: include/triggers.inc.php:1227
+#: include/triggers.inc.php:1237
 msgid "Multiple PROBLEM events"
 msgstr "Flere PROBLEM-hendelser"
 
@@ -10938,31 +10933,31 @@ msgid "NTLM"
 msgstr "NTLM"
 
 #: actionconf.php:36 actionconf.php:239 adm.regexps.php:36 adm.regexps.php:158
-#: adm.regexps.php:189 app/controllers/CControllerPopupGeneric.php:72
-#: app/controllers/CControllerPopupGeneric.php:84
-#: app/controllers/CControllerPopupGeneric.php:96
-#: app/controllers/CControllerPopupGeneric.php:108
-#: app/controllers/CControllerPopupGeneric.php:120
-#: app/controllers/CControllerPopupGeneric.php:132
-#: app/controllers/CControllerPopupGeneric.php:144
-#: app/controllers/CControllerPopupGeneric.php:156
-#: app/controllers/CControllerPopupGeneric.php:170
-#: app/controllers/CControllerPopupGeneric.php:184
-#: app/controllers/CControllerPopupGeneric.php:210
-#: app/controllers/CControllerPopupGeneric.php:223
-#: app/controllers/CControllerPopupGeneric.php:235
-#: app/controllers/CControllerPopupGeneric.php:247
-#: app/controllers/CControllerPopupGeneric.php:260
-#: app/controllers/CControllerPopupGeneric.php:273
-#: app/controllers/CControllerPopupGeneric.php:289
-#: app/controllers/CControllerPopupGeneric.php:297
-#: app/controllers/CControllerPopupGeneric.php:309
-#: app/controllers/CControllerPopupGeneric.php:317
-#: app/controllers/CControllerPopupGeneric.php:329
+#: adm.regexps.php:189 app/controllers/CControllerPopupGeneric.php:71
+#: app/controllers/CControllerPopupGeneric.php:83
+#: app/controllers/CControllerPopupGeneric.php:95
+#: app/controllers/CControllerPopupGeneric.php:107
+#: app/controllers/CControllerPopupGeneric.php:119
+#: app/controllers/CControllerPopupGeneric.php:131
+#: app/controllers/CControllerPopupGeneric.php:143
+#: app/controllers/CControllerPopupGeneric.php:155
+#: app/controllers/CControllerPopupGeneric.php:169
+#: app/controllers/CControllerPopupGeneric.php:183
+#: app/controllers/CControllerPopupGeneric.php:209
+#: app/controllers/CControllerPopupGeneric.php:222
+#: app/controllers/CControllerPopupGeneric.php:234
+#: app/controllers/CControllerPopupGeneric.php:246
+#: app/controllers/CControllerPopupGeneric.php:259
+#: app/controllers/CControllerPopupGeneric.php:272
+#: app/controllers/CControllerPopupGeneric.php:288
+#: app/controllers/CControllerPopupGeneric.php:296
+#: app/controllers/CControllerPopupGeneric.php:308
+#: app/controllers/CControllerPopupGeneric.php:316
+#: app/controllers/CControllerPopupGeneric.php:328
 #: app/controllers/CControllerPopupTriggerWizard.php:125
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:64
 #: app/controllers/CControllerWidgetNavTreeItemUpdate.php:41
-#: applications.php:38 app/views/administration.mediatype.edit.php:43
+#: applications.php:37 app/views/administration.mediatype.edit.php:43
 #: app/views/administration.mediatype.list.php:38
 #: app/views/administration.mediatype.list.php:64
 #: app/views/administration.proxy.list.php:38
@@ -10976,7 +10971,7 @@ msgstr "NTLM"
 #: app/views/popup.httpstep.php:43 app/views/popup.httpstep.php:109
 #: app/views/popup.preproctestedit.view.php:52
 #: app/views/popup.triggerwizard.php:121 correlation.php:35
-#: disc_prototypes.php:42 graphs.php:45 host_discovery.php:48 httpconf.php:42
+#: disc_prototypes.php:42 graphs.php:44 host_discovery.php:48 httpconf.php:42
 #: include/classes/screens/CScreenHttpTest.php:116
 #: include/classes/widgets/CWidgetHelper.php:51 include/forms.inc.php:450
 #: include/forms.inc.php:1400 include/hosts.inc.php:109
@@ -10990,7 +10985,7 @@ msgstr "NTLM"
 #: include/views/administration.usergroups.list.php:35
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.users.list.php:57
-#: include/views/common.filter.trigger.php:79
+#: include/views/common.filter.trigger.php:66
 #: include/views/configuration.action.edit.php:40
 #: include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:1096
@@ -11069,14 +11064,14 @@ msgstr "NTLM"
 #: include/views/monitoring.sysmap.edit.php:88
 #: include/views/monitoring.sysmap.edit.php:230
 #: include/views/monitoring.sysmap.list.php:41
-#: include/views/monitoring.sysmap.list.php:58 items.php:47 latest.php:372
-#: latest.php:406 latest.php:423 maintenance.php:42 queue.php:264
-#: report2.php:431 screenconf.php:52 services.php:36 slideconf.php:36
-#: sysmaps.php:50 trigger_prototypes.php:37 triggers.php:46
+#: include/views/monitoring.sysmap.list.php:58 items.php:46 latest.php:371
+#: latest.php:405 latest.php:422 maintenance.php:41 queue.php:264
+#: report2.php:430 screenconf.php:52 services.php:36 slideconf.php:36
+#: sysmaps.php:50 trigger_prototypes.php:37 triggers.php:45
 msgid "Name"
 msgstr "Navn"
 
-#: app/controllers/CControllerPopupGeneric.php:197
+#: app/controllers/CControllerPopupGeneric.php:196
 #: include/views/administration.users.edit.php:59
 #: include/views/administration.users.list.php:84 users.php:45
 msgctxt "user first name"
@@ -11204,7 +11199,7 @@ msgstr "Neste steg"
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
-#: include/triggers.inc.php:1233 include/triggers.inc.php:1238
+#: include/triggers.inc.php:1243 include/triggers.inc.php:1248
 #: include/views/administration.users.list.php:111
 #: include/views/administration.users.list.php:115
 #: include/views/configuration.host.prototype.list.php:126
@@ -11557,8 +11552,8 @@ msgstr "Ingen tillatelser for systemtilgang."
 #: app/controllers/CControllerMenuPopup.php:190
 #: app/controllers/CControllerMenuPopup.php:252
 #: app/controllers/CControllerMenuPopup.php:283
-#: app/controllers/CControllerMenuPopup.php:452
-#: app/controllers/CControllerMenuPopup.php:600
+#: app/controllers/CControllerMenuPopup.php:456
+#: app/controllers/CControllerMenuPopup.php:604
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:56
 #: app/controllers/CControllerPopupMediatypeTestSend.php:65
 #: app/controllers/CControllerPopupScriptExec.php:99
@@ -11665,10 +11660,10 @@ msgstr "Ingen tillatelser for systemtilgang."
 #: include/classes/api/services/CScreenItem.php:443
 #: include/classes/api/services/CScreen.php:770
 #: include/classes/api/services/CScreen.php:1238
-#: include/classes/api/services/CScript.php:320
-#: include/classes/api/services/CScript.php:547
-#: include/classes/api/services/CScript.php:592
-#: include/classes/api/services/CScript.php:601
+#: include/classes/api/services/CScript.php:345
+#: include/classes/api/services/CScript.php:572
+#: include/classes/api/services/CScript.php:617
+#: include/classes/api/services/CScript.php:626
 #: include/classes/api/services/CService.php:989
 #: include/classes/api/services/CService.php:1013
 #: include/classes/api/services/CTask.php:136
@@ -11698,7 +11693,7 @@ msgstr "Ingen tillatelser for systemtilgang."
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1770 items.php:1505 items.php:1702 services.php:84
+#: include/func.inc.php:1766 items.php:1504 items.php:1701 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Ingen tillatelser til henvist objekt eller det eksisterer ikke!"
 
@@ -11744,11 +11739,11 @@ msgstr "Ingen skjermer lagt til."
 msgid "No script specified for action operation command."
 msgstr "Ingen skript angitt for handlingsoperasjonskommando."
 
-#: triggers.php:598
+#: triggers.php:597
 msgid "No target selected"
 msgstr "Ingen mål valgt"
 
-#: graphs.php:392 items.php:1349
+#: graphs.php:391 items.php:1348
 msgid "No target selected."
 msgstr "Ingen mål valgt."
 
@@ -11804,7 +11799,7 @@ msgid "None"
 msgstr "Ingen"
 
 #: app/views/popup.generic.php:534 include/graphs.inc.php:24
-#: include/items.inc.php:158 include/triggers.inc.php:1226
+#: include/items.inc.php:158 include/triggers.inc.php:1236
 #: include/views/configuration.triggers.list.php:70
 #: include/views/monitoring.history.php:224
 msgid "Normal"
@@ -12044,14 +12039,14 @@ msgid "Numeral systems"
 msgstr "Numerale systemer"
 
 #: include/forms.inc.php:352 include/items.inc.php:127
-#: include/triggers.inc.php:1833 include/views/configuration.item.edit.php:666
+#: include/triggers.inc.php:1843 include/views/configuration.item.edit.php:666
 #: include/views/configuration.item.massupdate.php:267
 #: include/views/configuration.item.prototype.edit.php:591
 #: include/views/configuration.item.prototype.massupdate.php:262
 msgid "Numeric (float)"
 msgstr "Numerisk (flyt)"
 
-#: include/triggers.inc.php:1834
+#: include/triggers.inc.php:1844
 msgid "Numeric (integer)"
 msgstr "Numerisk (heltall)"
 
@@ -12144,7 +12139,7 @@ msgstr "Av"
 #: include/views/js/common.item.edit.js.php:327
 #: include/views/js/configuration.httpconf.edit.js.php:590
 #: include/views/js/configuration.httpconf.edit.js.php:664
-#: include/views/js/conf.import.js.php:24 report2.php:431
+#: include/views/js/conf.import.js.php:24 report2.php:430
 msgid "Ok"
 msgstr "Ok"
 
@@ -12362,7 +12357,7 @@ msgstr "Alternativer"
 #: app/views/monitoring.problem.view.php:228
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:379
-#: include/triggers.inc.php:1299
+#: include/triggers.inc.php:1309
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:1147
 #: include/views/configuration.correlation.edit.php:95
@@ -12522,7 +12517,7 @@ msgstr ""
 #: include/menu.inc.php:57 include/menu.inc.php:130
 #: include/views/inventory.host.view.php:195
 #: include/views/monitoring.overview.items.php:40
-#: include/views/monitoring.overview.triggers.php:77 overview.php:28
+#: include/views/monitoring.overview.triggers.php:77 overview.php:27
 #: queue.php:73
 msgid "Overview"
 msgstr "Oversikt"
@@ -12538,140 +12533,140 @@ msgstr "Oversikt over proxy"
 msgid "Owner"
 msgstr "Eier"
 
-#: include/classes/setup/CFrontendSetup.php:582
+#: include/classes/setup/CFrontendSetup.php:575
 msgid "PHP LDAP"
 msgstr "PHP LDAP"
 
-#: include/classes/setup/CFrontendSetup.php:586
+#: include/classes/setup/CFrontendSetup.php:579
 #: include/classes/validators/CLdapAuthValidator.php:69
 msgid "PHP LDAP extension missing."
 msgstr "PHP LDAP-utvidelse mangler."
 
-#: include/classes/setup/CFrontendSetup.php:319
+#: include/classes/setup/CFrontendSetup.php:312
 msgid "PHP bcmath"
 msgstr "PHP bcmath"
 
-#: include/classes/setup/CFrontendSetup.php:323
+#: include/classes/setup/CFrontendSetup.php:316
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
 msgstr "PHP bcmath forlengelse mangler (PHP konfigurasjons parameter --enable-bcmath)."
 
-#: include/classes/setup/CFrontendSetup.php:609
+#: include/classes/setup/CFrontendSetup.php:602
 msgid "PHP ctype"
 msgstr "PHP ctype"
 
-#: include/classes/setup/CFrontendSetup.php:613
+#: include/classes/setup/CFrontendSetup.php:606
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "PHP ctype forlengelse mangler (PHP konfigurasjons parameter --enable-ctype)."
 
-#: include/classes/setup/CFrontendSetup.php:260
+#: include/classes/setup/CFrontendSetup.php:253
 msgid "PHP databases support"
 msgstr "PHP databaser støtter"
 
-#: include/classes/setup/CFrontendSetup.php:420
+#: include/classes/setup/CFrontendSetup.php:413
 msgid "PHP gd"
 msgstr "PHP gd"
 
-#: include/classes/setup/CFrontendSetup.php:508
+#: include/classes/setup/CFrontendSetup.php:501
 msgid "PHP gd FreeType support"
 msgstr "PHP gd FreeType-støtte"
 
-#: include/classes/setup/CFrontendSetup.php:512
+#: include/classes/setup/CFrontendSetup.php:505
 msgid "PHP gd FreeType support missing."
 msgstr "PHP gd FreeType-støtte mangler."
 
-#: include/classes/setup/CFrontendSetup.php:489
+#: include/classes/setup/CFrontendSetup.php:482
 msgid "PHP gd GIF image support missing."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:485
+#: include/classes/setup/CFrontendSetup.php:478
 msgid "PHP gd GIF support"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:472
+#: include/classes/setup/CFrontendSetup.php:465
 msgid "PHP gd JPEG image support missing."
 msgstr "PHP gd JPEG bildestøtte mangler."
 
-#: include/classes/setup/CFrontendSetup.php:468
+#: include/classes/setup/CFrontendSetup.php:461
 msgid "PHP gd JPEG support"
 msgstr "PHP gd JPEG-støtte"
 
-#: include/classes/setup/CFrontendSetup.php:447
+#: include/classes/setup/CFrontendSetup.php:440
 msgid "PHP gd PNG image support missing."
 msgstr "PHP gd PNG-bildestøtte mangler."
 
-#: include/classes/setup/CFrontendSetup.php:443
+#: include/classes/setup/CFrontendSetup.php:436
 msgid "PHP gd PNG support"
 msgstr "PHP Gd PNG-støtte"
 
-#: include/classes/setup/CFrontendSetup.php:424
+#: include/classes/setup/CFrontendSetup.php:417
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)."
 msgstr "PHP gd forlengelse mangler (PHP konfigurasjonsparameter - med-gd)."
 
-#: include/classes/setup/CFrontendSetup.php:660
+#: include/classes/setup/CFrontendSetup.php:653
 msgid "PHP gettext"
 msgstr "PHP gettext"
 
-#: include/classes/setup/CFrontendSetup.php:664
+#: include/classes/setup/CFrontendSetup.php:657
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available."
 msgstr "PHP gettext-utvidelse mangler (PHP-konfigurasjonsparameter - med-gettekst). Oversettelser vil ikke være tilgjengelige."
 
-#: include/classes/setup/CFrontendSetup.php:531
+#: include/classes/setup/CFrontendSetup.php:524
 msgid "PHP libxml"
 msgstr "PHP libxml"
 
-#: include/classes/setup/CFrontendSetup.php:535
+#: include/classes/setup/CFrontendSetup.php:528
 msgid "PHP libxml extension missing."
 msgstr "PHP libxml forlengelse mangler."
 
-#: include/classes/setup/CFrontendSetup.php:336
+#: include/classes/setup/CFrontendSetup.php:329
 msgid "PHP mbstring"
 msgstr "PHP mbstring"
 
-#: include/classes/setup/CFrontendSetup.php:340
+#: include/classes/setup/CFrontendSetup.php:333
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)."
 msgstr "PHP mbstring-utvidelse mangler (PHP-konfigurasjonsparameter --enbar-mbstring)."
 
 #: include/classes/setup/CFrontendSetup.php:126
-#: include/classes/setup/CFrontendSetup.php:145
-#: include/classes/setup/CFrontendSetup.php:166
-#: include/classes/setup/CFrontendSetup.php:199
-#: include/classes/setup/CFrontendSetup.php:220
-#: include/classes/setup/CFrontendSetup.php:237
-#: include/classes/setup/CFrontendSetup.php:357
-#: include/classes/setup/CFrontendSetup.php:378
-#: include/classes/setup/CFrontendSetup.php:643
-#: include/classes/setup/CFrontendSetup.php:677
+#: include/classes/setup/CFrontendSetup.php:144
+#: include/classes/setup/CFrontendSetup.php:162
+#: include/classes/setup/CFrontendSetup.php:192
+#: include/classes/setup/CFrontendSetup.php:213
+#: include/classes/setup/CFrontendSetup.php:230
+#: include/classes/setup/CFrontendSetup.php:350
+#: include/classes/setup/CFrontendSetup.php:371
+#: include/classes/setup/CFrontendSetup.php:636
+#: include/classes/setup/CFrontendSetup.php:670
 #, c-format
 msgid "PHP option \"%1$s\""
 msgstr "PHP-alternativet \"%1$s\""
 
-#: include/classes/setup/CFrontendSetup.php:382
-#: include/classes/setup/CFrontendSetup.php:681
+#: include/classes/setup/CFrontendSetup.php:375
+#: include/classes/setup/CFrontendSetup.php:674
 #, c-format
 msgid "PHP option \"%1$s\" must be set to \"%2$s\""
 msgstr "PHP-alternativet \"%1$s\" må settes til \"%2$s\""
 
-#: include/classes/setup/CFrontendSetup.php:626
+#: include/classes/setup/CFrontendSetup.php:619
 msgid "PHP session"
 msgstr "PHP-økt"
 
-#: include/classes/setup/CFrontendSetup.php:647
+#: include/classes/setup/CFrontendSetup.php:640
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")."
 msgstr "PHP-økt automatisk start må være deaktivert (PHP-direktivet \"session.auto_start\")."
 
-#: include/classes/setup/CFrontendSetup.php:630
+#: include/classes/setup/CFrontendSetup.php:623
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)."
 msgstr "PHP-øktutvidelse mangler (PHP-konfigurasjonsparameter - opptaks-økt)."
 
-#: include/classes/setup/CFrontendSetup.php:395
+#: include/classes/setup/CFrontendSetup.php:388
 msgid "PHP sockets"
 msgstr "PHP-stikkontakter"
 
-#: include/classes/setup/CFrontendSetup.php:399
+#: include/classes/setup/CFrontendSetup.php:392
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)."
 msgstr "PHP-stikkontakter mangler (PHP-konfigurasjonsparameter - stikkontakter)."
 
-#: include/classes/setup/CFrontendSetup.php:361
+#: include/classes/setup/CFrontendSetup.php:354
 msgid "PHP string function overloading must be disabled."
 msgstr "Overføring av PHP-strengfunksjon må være deaktivert."
 
@@ -12679,19 +12674,19 @@ msgstr "Overføring av PHP-strengfunksjon må være deaktivert."
 msgid "PHP version"
 msgstr "PHP versjon"
 
-#: include/classes/setup/CFrontendSetup.php:565
+#: include/classes/setup/CFrontendSetup.php:558
 msgid "PHP xmlreader"
 msgstr "PHP xmlreader"
 
-#: include/classes/setup/CFrontendSetup.php:569
+#: include/classes/setup/CFrontendSetup.php:562
 msgid "PHP xmlreader extension missing."
 msgstr "PHP xmlreader-utvidelsen mangler."
 
-#: include/classes/setup/CFrontendSetup.php:548
+#: include/classes/setup/CFrontendSetup.php:541
 msgid "PHP xmlwriter"
 msgstr "PHP xmlwriter"
 
-#: include/classes/setup/CFrontendSetup.php:552
+#: include/classes/setup/CFrontendSetup.php:545
 msgid "PHP xmlwriter extension missing."
 msgstr "PHP xmlwriter-utvidelsen mangler."
 
@@ -12848,7 +12843,7 @@ msgstr "Passiv"
 #: include/views/configuration.item.prototype.massupdate.php:281
 #: include/views/configuration.item.prototype.massupdate.php:309
 #: include/views/general.login.php:64
-#: include/views/js/common.item.edit.js.php:251 items.php:261
+#: include/views/js/common.item.edit.js.php:251 items.php:260
 msgid "Password"
 msgstr "Passord"
 
@@ -12885,11 +12880,11 @@ msgstr "Maksimal minnebruk: %1$s"
 msgid "Percentage"
 msgstr "Prosentdel"
 
-#: graphs.php:57 include/views/configuration.graph.edit.php:136
+#: graphs.php:56 include/views/configuration.graph.edit.php:136
 msgid "Percentile line (left)"
 msgstr "Percentil linje (venstre)"
 
-#: graphs.php:58 include/views/configuration.graph.edit.php:154
+#: graphs.php:57 include/views/configuration.graph.edit.php:154
 msgid "Percentile line (right)"
 msgstr "Percentil linje (høyre)"
 
@@ -13031,7 +13026,7 @@ msgstr "Fyller vertsinvesteringsfelt"
 #: include/views/configuration.item.massupdate.php:256
 #: include/views/configuration.item.prototype.edit.php:511
 #: include/views/configuration.item.prototype.massupdate.php:251
-#: include/views/inventory.host.view.php:75 items.php:134 items.php:302
+#: include/views/inventory.host.view.php:75 items.php:133 items.php:301
 #: setup.php:50
 msgid "Port"
 msgstr "Havn"
@@ -13102,7 +13097,7 @@ msgstr ""
 msgid "Preview"
 msgstr "Forh"
 
-#: include/func.inc.php:2674
+#: include/func.inc.php:2670
 msgid "Previous month"
 msgstr ""
 
@@ -13110,11 +13105,11 @@ msgstr ""
 msgid "Previous value"
 msgstr ""
 
-#: include/func.inc.php:2673
+#: include/func.inc.php:2669
 msgid "Previous week"
 msgstr ""
 
-#: include/func.inc.php:2675
+#: include/func.inc.php:2671
 msgid "Previous year"
 msgstr ""
 
@@ -13218,7 +13213,7 @@ msgstr ""
 msgid "Problem display"
 msgstr "Problemvisning"
 
-#: include/triggers.inc.php:1219
+#: include/triggers.inc.php:1229
 #: include/views/js/configuration.triggers.edit.js.php:20
 msgid "Problem expression"
 msgstr "Problemuttrykk"
@@ -13256,7 +13251,7 @@ msgstr "Problem, hvis alle barn har problemer"
 msgid "Problem, if at least one child has a problem"
 msgstr "Problem, hvis minst ett barn har et problem"
 
-#: app/controllers/CControllerProblemView.php:354
+#: app/controllers/CControllerProblemView.php:352
 #: app/views/monitoring.problem.view.php:92
 #: app/views/monitoring.problem.view.php:344 app/views/report.services.php:66
 #: app/views/report.services.php:67 app/views/report.services.php:68
@@ -13269,8 +13264,8 @@ msgstr "Problem, hvis minst ett barn har et problem"
 #: include/maps.inc.php:293 include/maps.inc.php:305 include/maps.inc.php:377
 #: include/maps.inc.php:389 include/maps.inc.php:470 include/maps.inc.php:482
 #: include/maps.inc.php:558 include/maps.inc.php:570 include/menu.inc.php:52
-#: include/views/common.filter.trigger.php:38
-#: include/views/inventory.host.view.php:135 jsLoader.php:266 report2.php:431
+#: include/views/common.filter.trigger.php:42
+#: include/views/inventory.host.view.php:135 jsLoader.php:266 report2.php:430
 msgid "Problems"
 msgstr "problemer"
 
@@ -13303,7 +13298,7 @@ msgid "Properties"
 msgstr "Egenskaper"
 
 #: app/controllers/CControllerMenuPopup.php:319
-#: app/controllers/CControllerMenuPopup.php:593
+#: app/controllers/CControllerMenuPopup.php:597
 #: app/controllers/CControllerWidgetUrlView.php:56
 #: include/classes/screens/CScreenUrl.php:38
 #: include/classes/screens/CScreenUrl.php:62 include/events.inc.php:431
@@ -13311,7 +13306,7 @@ msgstr "Egenskaper"
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr ""
 
-#: app/controllers/CControllerPopupGeneric.php:112
+#: app/controllers/CControllerPopupGeneric.php:111
 #: app/views/administration.proxy.edit.php:24
 #: app/views/administration.proxy.list.php:27 include/menu.inc.php:259
 msgid "Proxies"
@@ -13496,7 +13491,7 @@ msgstr "Mottatt verdi"
 #: app/views/monitoring.problem.view.php:91
 #: include/classes/widgets/forms/CWidgetFormProblems.php:34
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:32
-#: include/views/common.filter.trigger.php:37
+#: include/views/common.filter.trigger.php:41
 msgid "Recent problems"
 msgstr "Nylige problemer"
 
@@ -13525,12 +13520,12 @@ msgstr "Mottaker (synkende)"
 msgid "Recovery"
 msgstr "Gjenoppretting"
 
-#: include/triggers.inc.php:1223
+#: include/triggers.inc.php:1233
 #: include/views/configuration.trigger.prototype.edit.php:273
 #: include/views/configuration.trigger.prototype.edit.php:355
 #: include/views/configuration.triggers.edit.php:300
 #: include/views/configuration.triggers.edit.php:382 trigger_prototypes.php:39
-#: trigger_prototypes.php:51 triggers.php:48 triggers.php:60
+#: trigger_prototypes.php:51 triggers.php:47 triggers.php:59
 msgid "Recovery expression"
 msgstr "Recovery uttrykk"
 
@@ -13658,7 +13653,7 @@ msgstr "Fjernkommando"
 #: include/views/administration.general.valuemapping.edit.php:65
 #: include/views/administration.usergroups.edit.php:189
 #: include/views/administration.users.edit.php:313
-#: include/views/common.filter.trigger.php:122
+#: include/views/common.filter.trigger.php:106
 #: include/views/configuration.action.edit.php:89
 #: include/views/configuration.action.edit.php:512
 #: include/views/configuration.action.edit.php:533
@@ -13839,7 +13834,7 @@ msgstr ""
 msgid "Request body type"
 msgstr ""
 
-#: host_discovery.php:305 host_discovery.php:634 items.php:948 items.php:1411
+#: host_discovery.php:305 host_discovery.php:634 items.php:947 items.php:1410
 msgid "Request sent successfully"
 msgstr ""
 
@@ -14192,7 +14187,7 @@ msgstr "SNMP"
 #: include/views/configuration.host.discovery.edit.php:411
 #: include/views/configuration.item.edit.php:476
 #: include/views/configuration.item.prototype.edit.php:455
-#: include/views/js/configuration.discovery.edit.js.php:86 items.php:127
+#: include/views/js/configuration.discovery.edit.js.php:86 items.php:126
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
@@ -14202,7 +14197,7 @@ msgstr "SNMP OID"
 #: include/views/configuration.item.massupdate.php:183
 #: include/views/configuration.item.prototype.edit.php:467
 #: include/views/configuration.item.prototype.massupdate.php:179
-#: include/views/js/configuration.discovery.edit.js.php:72 items.php:120
+#: include/views/js/configuration.discovery.edit.js.php:72 items.php:119
 msgid "SNMP community"
 msgstr "SNMP fellesskapet"
 
@@ -14442,8 +14437,8 @@ msgstr "Skjerm eieren kan ikke være tom."
 msgid "Screen updated"
 msgstr "Skjerm oppdatert"
 
-#: app/controllers/CControllerPopupGeneric.php:227
-#: app/controllers/CControllerPopupGeneric.php:293 app/views/search.php:32
+#: app/controllers/CControllerPopupGeneric.php:226
+#: app/controllers/CControllerPopupGeneric.php:292 app/views/search.php:32
 #: app/views/search.php:108 app/views/search.php:185 app/views/search.php:226
 #: app/views/search.php:227 include/html.inc.php:417 include/menu.inc.php:78
 #: include/views/configuration.template.edit.php:306
@@ -14470,7 +14465,7 @@ msgstr "Screens"
 msgid "Script"
 msgstr "Skript"
 
-#: include/classes/api/services/CScript.php:487
+#: include/classes/api/services/CScript.php:512
 #, c-format
 msgid "Script \"%1$s\" already exists."
 msgstr "Skriptet \"%1$s\" eksisterer allerede."
@@ -14485,7 +14480,7 @@ msgid_plural "Scripts deleted"
 msgstr[0] "Skript slettet"
 msgstr[1] "Skripts slettet"
 
-#: include/classes/api/services/CScript.php:447
+#: include/classes/api/services/CScript.php:472
 #, c-format
 msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
 msgstr "Skriptmenybanen \"%1$s\" er allerede brukt i skriptnavnet \"%2$s\"."
@@ -14498,7 +14493,7 @@ msgstr "Skriptmenybanen \"%1$s\" er allerede brukt i skriptnavnet \"%2$s\"."
 msgid "Script name"
 msgstr "Skriptnavn"
 
-#: include/classes/api/services/CScript.php:453
+#: include/classes/api/services/CScript.php:478
 #, c-format
 msgid "Script name \"%1$s\" already used in menu path for script \"%2$s\"."
 msgstr "Skriptnavn \"%1$s\" allerede brukt i menyen for skript \"%2$s\"."
@@ -14606,7 +14601,7 @@ msgstr "Sikkerhetsnavn"
 #: include/classes/widgets/CWidgetHelper.php:923 include/forms.inc.php:411
 #: include/views/administration.auditacts.list.php:30
 #: include/views/administration.auditlogs.list.php:31
-#: include/views/common.filter.trigger.php:88
+#: include/views/common.filter.trigger.php:72
 #: include/views/configuration.action.edit.php:269
 #: include/views/configuration.action.edit.php:910
 #: include/views/configuration.action.edit.php:1698
@@ -14630,7 +14625,7 @@ msgstr "Sikkerhetsnavn"
 #: include/views/monitoring.screen.constructor.edit.php:390
 #: include/views/monitoring.screen.constructor.edit.php:651
 #: include/views/monitoring.screen.constructor.edit.php:699 jsLoader.php:227
-#: latest.php:358
+#: latest.php:357
 msgid "Select"
 msgstr "Valgt"
 
@@ -14906,8 +14901,8 @@ msgstr ""
 msgid "Setting LDAP referrals to \"Off\" failed."
 msgstr ""
 
-#: app/controllers/CControllerPopupGeneric.php:157
-#: app/controllers/CControllerPopupGeneric.php:171
+#: app/controllers/CControllerPopupGeneric.php:156
+#: app/controllers/CControllerPopupGeneric.php:170
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.triggerwizard.php:144
 #: include/classes/screens/CScreenEvents.php:33
@@ -14921,7 +14916,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblems.php:196
 #: include/classes/widgets/forms/CWidgetFormProblems.php:197
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
-#: include/events.inc.php:167 include/triggers.inc.php:1204
+#: include/events.inc.php:167 include/triggers.inc.php:1214
 #: include/views/configuration.item.list.php:139
 #: include/views/configuration.trigger.prototype.edit.php:65
 #: include/views/configuration.trigger.prototype.list.php:50
@@ -14996,12 +14991,12 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:188
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:261
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:31
-#: include/views/common.filter.trigger.php:35
-#: include/views/js/monitoring.sysmaps.js.php:75 report2.php:463
+#: include/views/common.filter.trigger.php:39
+#: include/views/js/monitoring.sysmaps.js.php:75 report2.php:462
 msgid "Show"
 msgstr "Vis"
 
-#: app/views/monitoring.problem.view.php:310 latest.php:376
+#: app/views/monitoring.problem.view.php:310 latest.php:375
 msgid "Show details"
 msgstr "Vis detaljer"
 
@@ -15009,7 +15004,7 @@ msgstr "Vis detaljer"
 msgid "Show hosts in maintenance"
 msgstr "Vis verter under vedlikehold"
 
-#: latest.php:373
+#: latest.php:372
 msgid "Show items without data"
 msgstr "Vis elementer uten data"
 
@@ -15050,7 +15045,7 @@ msgstr "Vis valgt"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:158
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:64
 #: include/views/administration.users.edit.php:438
-#: include/views/common.filter.trigger.php:140
+#: include/views/common.filter.trigger.php:129
 #: include/views/monitoring.overview.items.php:101
 #: include/views/monitoring.sysmap.edit.php:223
 msgid "Show suppressed problems"
@@ -15078,6 +15073,7 @@ msgstr "Vis utløsere"
 
 #: app/views/monitoring.problem.view.php:295
 #: include/classes/widgets/forms/CWidgetFormProblems.php:168
+#: include/views/common.filter.trigger.php:124
 msgid "Show unacknowledged only"
 msgstr "Vis kun ubekreftet"
 
@@ -15332,7 +15328,7 @@ msgstr "Spansk (es_ES)"
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "Spesifisert skript eksisterer ikke, eller du har ikke rettigheter på det for handlingsoperasjonskommando."
 
-#: include/views/monitoring.history.php:264 latest.php:387
+#: include/views/monitoring.history.php:264 latest.php:386
 msgid "Specify some filter condition to see the values."
 msgstr "Angi noen filtertilstand for å se verdiene."
 
@@ -15351,7 +15347,7 @@ msgstr "Stablet"
 msgid "Staircase"
 msgstr ""
 
-#: app/controllers/CControllerPopupGeneric.php:218
+#: app/controllers/CControllerPopupGeneric.php:217
 msgid "Standard items"
 msgstr "Standardelementer"
 
@@ -15380,10 +15376,10 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr ""
 
-#: app/controllers/CControllerPopupGeneric.php:158
-#: app/controllers/CControllerPopupGeneric.php:172
-#: app/controllers/CControllerPopupGeneric.php:214
-#: app/controllers/CControllerPopupGeneric.php:277
+#: app/controllers/CControllerPopupGeneric.php:157
+#: app/controllers/CControllerPopupGeneric.php:171
+#: app/controllers/CControllerPopupGeneric.php:213
+#: app/controllers/CControllerPopupGeneric.php:276
 #: app/views/administration.mediatype.list.php:43
 #: app/views/administration.mediatype.list.php:66
 #: app/views/monitoring.widget.actionlog.view.php:34
@@ -15549,7 +15545,7 @@ msgstr "Submap"
 msgid "Success Audit"
 msgstr "Suksess revisjon"
 
-#: include/func.inc.php:1900
+#: include/func.inc.php:1896
 msgid "Success message"
 msgstr ""
 
@@ -15576,7 +15572,7 @@ msgstr "Support"
 msgid "Suppressed till: %1$s"
 msgstr ""
 
-#: app/controllers/CControllerPopupGeneric.php:198
+#: app/controllers/CControllerPopupGeneric.php:197
 #: include/views/administration.users.edit.php:64
 #: include/views/administration.users.list.php:60
 #: include/views/administration.users.list.php:85 users.php:46
@@ -15615,7 +15611,7 @@ msgstr "Systemstarttid. Returnerer heltall (Unix tidsstempel)"
 msgid "System default"
 msgstr "System standard"
 
-#: include/func.inc.php:1927
+#: include/func.inc.php:1923
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr ""
 
@@ -15691,7 +15687,7 @@ msgstr "Tabellen \"%1$s\" har ikke et felt som heter \"%2$s\"."
 
 #: include/actions.inc.php:66 include/actions.inc.php:356
 #: include/hosts.inc.php:144 include/views/inventory.host.list.php:70
-#: usergrps.php:362
+#: usergrps.php:361
 msgid "Tag"
 msgstr "Tagg"
 
@@ -15764,8 +15760,8 @@ msgstr "Tagger"
 #: include/views/configuration.triggers.edit.php:196
 #: include/views/configuration.triggers.edit.php:393
 #: include/views/js/configuration.action.edit.js.php:62
-#: trigger_prototypes.php:50 trigger_prototypes.php:52 triggers.php:59
-#: triggers.php:61
+#: trigger_prototypes.php:50 trigger_prototypes.php:52 triggers.php:58
+#: triggers.php:60
 msgid "Target"
 msgstr "Mål"
 
@@ -15791,7 +15787,7 @@ msgstr "Telnet"
 #: include/audit.inc.php:53 include/forms.inc.php:460
 #: include/forms.inc.php:857 include/views/configuration.template.edit.php:40
 #: include/views/configuration.template.edit.php:334
-#: include/views/configuration.template.massupdate.php:155 report2.php:285
+#: include/views/configuration.template.massupdate.php:155 report2.php:284
 msgid "Template"
 msgstr "Mal"
 
@@ -15814,7 +15810,7 @@ msgstr "Mal \"%1$s\" kan ikke være uten vertsgruppe."
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Mal \"%1$s\" for verten \"%2$s\" eksisterer ikke."
 
-#: templates.php:414
+#: templates.php:413
 msgid "Template added"
 msgstr "Mal lagt til"
 
@@ -15822,11 +15818,11 @@ msgstr "Mal lagt til"
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Mal kan ikke kobles til en annen mal mer enn en gang, selv gjennom andre maler."
 
-#: templates.php:606 templates.php:620 templates.php:653
+#: templates.php:605 templates.php:619 templates.php:652
 msgid "Template deleted"
 msgstr "Mal slettet"
 
-#: report2.php:253
+#: report2.php:252
 msgid "Template group"
 msgstr "Mal gruppen"
 
@@ -15838,7 +15834,7 @@ msgstr "Malkobling"
 msgid "Template macros"
 msgstr "Malmekroner"
 
-#: include/views/configuration.template.edit.php:80 templates.php:58
+#: include/views/configuration.template.edit.php:80 templates.php:57
 msgid "Template name"
 msgstr "Malnavn"
 
@@ -15852,11 +15848,11 @@ msgstr "Malskjermbildet \"%1$s\" eksisterer allerede."
 msgid "Template screens"
 msgstr "Maleskjermer"
 
-#: report2.php:318
+#: report2.php:317
 msgid "Template trigger"
 msgstr "Template utløser"
 
-#: templates.php:419
+#: templates.php:418
 msgid "Template updated"
 msgstr "Mal oppdatert"
 
@@ -15887,7 +15883,7 @@ msgstr "Mal med det samme synlige navnet \"%1$s\" eksisterer allerede."
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Mal med det samme synlige navnet \"%s\" eksisterer allerede."
 
-#: app/controllers/CControllerPopupGeneric.php:76 app/views/search.php:135
+#: app/controllers/CControllerPopupGeneric.php:75 app/views/search.php:135
 #: app/views/search.php:153 app/views/search.php:156 app/views/search.php:157
 #: app/views/search.php:252 include/menu.inc.php:190
 #: include/views/configuration.action.edit.php:1047
@@ -15912,7 +15908,7 @@ msgstr "maler"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Maler \"%1$s\" koblet fra verter \"%2$s\"."
 
-#: templates.php:392
+#: templates.php:391
 msgid "Templates updated"
 msgstr ""
 
@@ -16078,7 +16074,7 @@ msgstr "Webscenario-applikasjonen tilhører en annen vert enn webscenarverten."
 msgid "Theme"
 msgstr "Tema"
 
-#: include/func.inc.php:2672
+#: include/func.inc.php:2668
 msgid "This day last week"
 msgstr ""
 
@@ -16091,11 +16087,11 @@ msgstr "Dette feltet er automatisk befolket av elementet \"%s\"."
 msgid "This is the test message from Zabbix"
 msgstr ""
 
-#: include/func.inc.php:2680 srv_status.php:41
+#: include/func.inc.php:2676 srv_status.php:41
 msgid "This month"
 msgstr "Denne måneden"
 
-#: include/func.inc.php:2681
+#: include/func.inc.php:2677
 msgid "This month so far"
 msgstr ""
 
@@ -16107,19 +16103,19 @@ msgstr "Denne skjermkolonnen er ikke tom. Slett det?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "Denne skjermraden er ikke tom. Slett det?"
 
-#: include/func.inc.php:2678 srv_status.php:40
+#: include/func.inc.php:2674 srv_status.php:40
 msgid "This week"
 msgstr "Denne uken"
 
-#: include/func.inc.php:2679
+#: include/func.inc.php:2675
 msgid "This week so far"
 msgstr ""
 
-#: include/func.inc.php:2682 srv_status.php:42
+#: include/func.inc.php:2678 srv_status.php:42
 msgid "This year"
 msgstr "Dette året"
 
-#: include/func.inc.php:2683
+#: include/func.inc.php:2679
 msgid "This year so far"
 msgstr ""
 
@@ -16212,7 +16208,7 @@ msgstr "Time shift"
 msgid "Time type"
 msgstr "Tidstype"
 
-#: include/classes/setup/CFrontendSetup.php:241
+#: include/classes/setup/CFrontendSetup.php:234
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
 msgstr "Tidssone for PHP er ikke angitt (konfigurasjonsparameter \"date.timezone\")."
 
@@ -16244,12 +16240,12 @@ msgstr "Til"
 msgid "To set a host interface select a single item type for all items"
 msgstr "For å angi et vertsgrensesnitt, velg en enkelt gjenstandstype for alle elementer"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2676
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2672
 #: srv_status.php:39
 msgid "Today"
 msgstr "I dag"
 
-#: include/func.inc.php:2677
+#: include/func.inc.php:2673
 msgid "Today so far"
 msgstr ""
 
@@ -16334,7 +16330,7 @@ msgstr "Trend datalagringsperiode \"%1$s\"."
 #: disc_prototypes.php:198 include/views/configuration.item.edit.php:799
 #: include/views/configuration.item.massupdate.php:410
 #: include/views/configuration.item.prototype.edit.php:674
-#: include/views/configuration.item.prototype.massupdate.php:407 items.php:80
+#: include/views/configuration.item.prototype.massupdate.php:407 items.php:79
 msgid "Trend storage period"
 msgstr "Trend lagringsperiode"
 
@@ -16342,8 +16338,8 @@ msgstr "Trend lagringsperiode"
 #: include/forms.inc.php:457 include/forms.inc.php:877
 #: include/views/administration.general.housekeeper.edit.php:135
 #: include/views/configuration.item.list.php:66
-#: include/views/configuration.item.prototype.list.php:56 items.php:306
-#: latest.php:409
+#: include/views/configuration.item.prototype.list.php:56 items.php:305
+#: latest.php:408
 msgid "Trends"
 msgstr "Trender"
 
@@ -16352,7 +16348,7 @@ msgstr "Trender"
 #: app/views/popup.services.php:44 include/actions.inc.php:46
 #: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:481
 #: include/events.inc.php:229 include/maps.inc.php:26
-#: include/triggers.inc.php:1198
+#: include/triggers.inc.php:1208
 #: include/views/configuration.services.edit.php:87
 #: include/views/configuration.services.edit.php:117
 #: include/views/configuration.services.parent.list.php:35
@@ -16380,7 +16376,7 @@ msgstr "Trigger \"%1$s\" tilhører maler med forskjellige koblinger."
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Trigger \"%1$s\" avhenger av utløseren \"%2$s\", som ikke eksisterer."
 
-#: triggers.php:296
+#: triggers.php:295
 msgid "Trigger added"
 msgstr "Utløser lagt til"
 
@@ -16388,7 +16384,7 @@ msgstr "Utløser lagt til"
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Trigger kan ikke være avhengig av en trigger som er arvet fra den."
 
-#: triggers.php:593
+#: triggers.php:592
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
 msgstr[0] "Utløser kopiert"
@@ -16398,7 +16394,7 @@ msgstr[1] "Utløsere kopiert"
 msgid "Trigger data storage period"
 msgstr "Utløser data lagringsperiode"
 
-#: triggers.php:409
+#: triggers.php:408
 msgid "Trigger deleted"
 msgstr "Utløser slettet"
 
@@ -16410,7 +16406,7 @@ msgstr "Utløser beskrivelse"
 msgid "Trigger details"
 msgstr ""
 
-#: triggers.php:543
+#: triggers.php:542
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] "Utløser deaktivert"
@@ -16422,7 +16418,7 @@ msgstr[1] "Utløsere deaktivert"
 msgid "Trigger displaying options"
 msgstr "Trigger viser alternativer"
 
-#: triggers.php:542
+#: triggers.php:541
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] "Utløser aktivert"
@@ -16522,7 +16518,7 @@ msgid_plural "Trigger prototypes updated"
 msgstr[0] "Utløser prototype oppdatert"
 msgstr[1] "Utløser prototyper oppdatert"
 
-#: app/controllers/CControllerPopupGeneric.php:162 include/html.inc.php:478
+#: app/controllers/CControllerPopupGeneric.php:161 include/html.inc.php:478
 #: include/views/configuration.host.discovery.list.php:142
 #: include/views/configuration.host.edit.php:468
 #: include/views/configuration.template.edit.php:264
@@ -16566,15 +16562,15 @@ msgstr "Trigger status \"Problem\""
 msgid "Trigger tags"
 msgstr ""
 
-#: triggers.php:394 triggers.php:512
+#: triggers.php:393 triggers.php:511
 msgid "Trigger updated"
 msgstr "Utløser oppdatert"
 
-#: app/controllers/CControllerPopupGeneric.php:148
+#: app/controllers/CControllerPopupGeneric.php:147
 #: app/views/monitoring.problem.view.php:145 app/views/search.php:36
 #: app/views/search.php:67 app/views/search.php:71 app/views/search.php:185
 #: app/views/search.php:215 app/views/search.php:219 include/forms.inc.php:441
-#: include/html.inc.php:392 include/triggers.inc.php:865
+#: include/html.inc.php:392 include/triggers.inc.php:875
 #: include/views/configuration.action.list.php:32
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:359
@@ -16592,11 +16588,11 @@ msgstr "Utløser oppdatert"
 #: include/views/inventory.host.view.php:175
 #: include/views/js/monitoring.sysmaps.js.php:143
 #: include/views/monitoring.overview.items.php:56
-#: include/views/monitoring.overview.triggers.php:93 triggers.php:663
+#: include/views/monitoring.overview.triggers.php:93 triggers.php:662
 msgid "Triggers"
 msgstr "Utløsere"
 
-#: triggers.php:608
+#: triggers.php:607
 msgid "Triggers deleted"
 msgstr "Utløsere slettet"
 
@@ -16635,8 +16631,8 @@ msgstr "To elementer (\"%1$s\" og \"%2$s\") kan ikke fylle ut et vertsinventarfe
 msgid "Two map elements should be selected"
 msgstr ""
 
-#: app/controllers/CControllerPopupGeneric.php:212
-#: app/controllers/CControllerPopupGeneric.php:275
+#: app/controllers/CControllerPopupGeneric.php:211
+#: app/controllers/CControllerPopupGeneric.php:274
 #: app/views/administration.mediatype.edit.php:49
 #: app/views/administration.mediatype.list.php:65
 #: app/views/administration.script.edit.php:42
@@ -16684,7 +16680,7 @@ msgstr ""
 #: include/views/monitoring.overview.triggers.php:90
 #: include/views/monitoring.screen.edit.php:197
 #: include/views/monitoring.slideconf.edit.php:250
-#: include/views/monitoring.sysmap.edit.php:364 latest.php:410
+#: include/views/monitoring.sysmap.edit.php:364 latest.php:409
 msgid "Type"
 msgstr "Type"
 
@@ -16711,8 +16707,8 @@ msgstr "Type (synkende)"
 msgid "Type of calculation"
 msgstr "Type beregning"
 
-#: app/controllers/CControllerPopupGeneric.php:213
-#: app/controllers/CControllerPopupGeneric.php:276 include/forms.inc.php:348
+#: app/controllers/CControllerPopupGeneric.php:212
+#: app/controllers/CControllerPopupGeneric.php:275 include/forms.inc.php:348
 #: include/forms.inc.php:842 include/views/configuration.item.edit.php:657
 #: include/views/configuration.item.edit.php:663
 #: include/views/configuration.item.massupdate.php:263
@@ -16750,7 +16746,7 @@ msgstr "UKJENT"
 #: include/views/configuration.triggers.edit.php:534
 #: include/views/js/monitoring.sysmaps.js.php:253
 #: include/views/monitoring.screen.constructor.edit.php:843
-#: include/views/monitoring.sysmap.edit.php:230 items.php:207 jsLoader.php:272
+#: include/views/monitoring.sysmap.edit.php:230 items.php:206 jsLoader.php:272
 msgid "URL"
 msgstr "URL"
 
@@ -16875,7 +16871,7 @@ msgstr "Enheter"
 #: include/items.inc.php:169 include/maintenances.inc.php:39
 #: include/maps.inc.php:39 include/regexp.inc.php:236
 #: include/screens.inc.php:57 include/triggers.inc.php:120
-#: include/triggers.inc.php:242 include/triggers.inc.php:2160
+#: include/triggers.inc.php:242 include/triggers.inc.php:2170
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.triggers.list.php:71
@@ -16901,12 +16897,12 @@ msgstr "Ukjent funksjon."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: app/controllers/CControllerPopupTriggerExpr.php:535
-#: include/triggers.inc.php:1381
+#: include/triggers.inc.php:1391
 msgid "Unknown host item, no such item in selected host"
 msgstr "Ukjent vertsobjekt, ikke noe element i valgt vert"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: include/triggers.inc.php:1380
+#: include/triggers.inc.php:1390
 msgid "Unknown host, no such host present in system"
 msgstr "Ukjent vert, ingen slik vert i systemet"
 
@@ -17094,8 +17090,8 @@ msgstr "Oppdater eksisterende"
 #: include/views/configuration.item.edit.php:679
 #: include/views/configuration.item.massupdate.php:396
 #: include/views/configuration.item.prototype.edit.php:604
-#: include/views/configuration.item.prototype.massupdate.php:393 items.php:60
-#: items.php:304
+#: include/views/configuration.item.prototype.massupdate.php:393 items.php:59
+#: items.php:303
 msgid "Update interval"
 msgstr "Oppdateringsintervall"
 
@@ -17118,7 +17114,7 @@ msgid "Updated status of host \"%1$s\"."
 msgstr "Oppdatert status for verten \"%1$s\"."
 
 #: include/classes/screens/CScreenActions.php:165
-#: include/classes/screens/CScreenDataOverview.php:46
+#: include/classes/screens/CScreenDataOverview.php:48
 #: include/classes/screens/CScreenEvents.php:144
 #: include/classes/screens/CScreenHostgroupTriggers.php:148
 #: include/classes/screens/CScreenHostsInfo.php:118
@@ -17279,13 +17275,13 @@ msgstr "Brukergruppe \"%1$s\" brukes i konfigurasjon for nedlastingsmeldinger."
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "Brukergruppe \"%1$s\" brukes i skriptet \"%2$s\"."
 
-#: usergrps.php:225
+#: usergrps.php:224
 msgid "User group disabled"
 msgid_plural "User groups disabled"
 msgstr[0] "Brukergruppe deaktivert"
 msgstr[1] "Brukergrupper deaktivert"
 
-#: usergrps.php:224
+#: usergrps.php:223
 msgid "User group enabled"
 msgid_plural "User groups enabled"
 msgstr[0] "Brukergruppe aktivert"
@@ -17313,13 +17309,13 @@ msgid "User group sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr "Brukergruppedeling mangler parametere:%1$s for skjermbildet \"%2$s\"."
 
 #: include/classes/api/services/CDashboard.php:528
-#: include/classes/api/services/CScript.php:393
+#: include/classes/api/services/CScript.php:418
 #: include/classes/api/services/CUser.php:515
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr "Brukergruppe med ID \"%1$s\" er ikke tilgjengelig."
 
-#: app/controllers/CControllerPopupGeneric.php:176
+#: app/controllers/CControllerPopupGeneric.php:175
 #: app/views/dashboard.sharing.edit.php:24 include/menu.inc.php:269
 #: include/views/administration.usergroups.edit.php:22
 #: include/views/administration.usergroups.list.php:22
@@ -17354,7 +17350,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:293
 #: include/views/configuration.item.prototype.edit.php:312
 #: include/views/configuration.item.prototype.edit.php:535
-#: include/views/configuration.item.prototype.massupdate.php:288 items.php:93
+#: include/views/configuration.item.prototype.massupdate.php:288 items.php:92
 msgid "User name"
 msgstr "Bruker navn"
 
@@ -17425,7 +17421,7 @@ msgstr ""
 #: host_discovery.php:208 include/views/configuration.host.edit.php:679
 #: include/views/configuration.host.massupdate.php:173
 #: include/views/configuration.host.prototype.edit.php:335
-#: include/views/general.login.php:60 index.php:33 items.php:255
+#: include/views/general.login.php:60 index.php:33 items.php:254
 msgid "Username"
 msgstr "Brukernavn"
 
@@ -17433,7 +17429,7 @@ msgstr "Brukernavn"
 msgid "Username and password"
 msgstr "Brukernavn og passord"
 
-#: app/controllers/CControllerPopupGeneric.php:188
+#: app/controllers/CControllerPopupGeneric.php:187
 #: app/views/dashboard.sharing.edit.php:45 include/menu.inc.php:273
 #: include/views/administration.usergroups.edit.php:44
 #: include/views/administration.usergroups.list.php:155
@@ -17785,7 +17781,7 @@ msgstr "Verdi av en hvilken som helst Windows-ytelsesteller. Returnerer heltall,
 msgid "Value: no data"
 msgstr "Verdi: ingen data"
 
-#: charts.php:101 include/views/monitoring.history.php:67
+#: charts.php:100 include/views/monitoring.history.php:67
 msgid "Values"
 msgstr "Verdier"
 
@@ -17976,7 +17972,7 @@ msgstr "Velkommen til"
 msgid "When active"
 msgstr "Når aktiv"
 
-#: graphs.php:46 include/classes/widgets/CWidgetHelper.php:658
+#: graphs.php:45 include/classes/widgets/CWidgetHelper.php:658
 #: include/classes/widgets/CWidgetHelper.php:690
 #: include/classes/widgets/CWidgetHelper.php:691
 #: include/classes/widgets/CWidgetHelper.php:692
@@ -18010,10 +18006,6 @@ msgstr "Med datainnsamling"
 msgid "With dependencies"
 msgstr ""
 
-#: include/views/common.filter.trigger.php:48
-msgid "With last event unacknowledged"
-msgstr "Med siste hendelse unacknowledged"
-
 #: app/views/monitoring.widget.problemhosts.view.php:29
 msgid "With problems"
 msgstr "Med problemer"
@@ -18022,10 +18014,6 @@ msgstr "Med problemer"
 #: include/forms.inc.php:862
 msgid "With triggers"
 msgstr "Med utløsere"
-
-#: include/views/common.filter.trigger.php:47
-msgid "With unacknowledged events"
-msgstr "Med ubekreftet hendelser"
 
 #: app/views/monitoring.widget.problemhosts.view.php:28
 msgid "Without problems"
@@ -18234,7 +18222,7 @@ msgstr "Årlig"
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
-#: include/triggers.inc.php:1232 include/triggers.inc.php:1237
+#: include/triggers.inc.php:1242 include/triggers.inc.php:1247
 #: include/views/administration.general.valuemapping.list.php:65
 #: include/views/administration.users.list.php:109
 #: include/views/configuration.host.prototype.list.php:126
@@ -18249,11 +18237,11 @@ msgstr "Årlig"
 msgid "Yes"
 msgstr "Ja"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2670
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2666
 msgid "Yesterday"
 msgstr "I går"
 
-#: include/func.inc.php:1794
+#: include/func.inc.php:1790
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr "Du er innlogget som \"%1$s\"."
@@ -18262,7 +18250,7 @@ msgstr "Du er innlogget som \"%1$s\"."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Du kan ikke velge noen av språkene, fordi lokalene for dem ikke er installert på webserveren."
 
-#: include/func.inc.php:1811 index_http.php:88
+#: include/func.inc.php:1807 index_http.php:88
 msgid "You are not logged in"
 msgstr "Du er ikke innlogget"
 
@@ -18296,9 +18284,9 @@ msgstr "Du angav ikke mål for handlingsoperasjon globalt skript \"%s\"."
 #: include/classes/api/services/CMaintenance.php:505
 #: include/classes/api/services/CMaintenance.php:919
 #: include/classes/api/services/CMaintenance.php:931
-#: include/classes/api/services/CScript.php:211
-#: include/classes/api/services/CScript.php:288
-#: include/classes/api/services/CScript.php:530
+#: include/classes/api/services/CScript.php:236
+#: include/classes/api/services/CScript.php:313
+#: include/classes/api/services/CScript.php:555
 #: include/classes/api/services/CTask.php:104
 #: include/classes/api/services/CTemplate.php:411
 #: include/classes/api/services/CTemplate.php:561
@@ -18315,7 +18303,7 @@ msgstr "Du har ikke tillatelse til å utføre denne operasjonen."
 msgid "You do not have permissions to create users."
 msgstr "Du har ikke tilgang til å opprette brukere."
 
-#: include/func.inc.php:1794
+#: include/func.inc.php:1790
 msgid "You have no permissions to access this page."
 msgstr "Du har ikke tilgang til denne siden."
 
@@ -18323,7 +18311,7 @@ msgstr "Du har ikke tilgang til denne siden."
 msgid "You have unsaved changes."
 msgstr "Du har ikke lagrede endringer."
 
-#: include/func.inc.php:1813
+#: include/func.inc.php:1809
 msgid "You must login to view this page."
 msgstr "Du må være innlogget for å se denne siden."
 
@@ -18549,7 +18537,7 @@ msgstr "agent"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1871
 #: include/classes/html/CSeverity.php:80
-#: include/classes/pagefilter/CPageFilter.php:812
+#: include/classes/pagefilter/CPageFilter.php:767
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -18565,9 +18553,9 @@ msgstr "agent"
 #: include/views/configuration.triggers.list.php:138
 #: include/views/configuration.triggers.list.php:145
 #: include/views/configuration.triggers.list.php:152
-#: include/views/js/configuration.graph.edit.js.php:55 report2.php:238
-#: report2.php:257 report2.php:289 report2.php:322 report2.php:364
-#: report2.php:383 report4.php:87 report4.php:289
+#: include/views/js/configuration.graph.edit.js.php:55 report2.php:237
+#: report2.php:256 report2.php:288 report2.php:321 report2.php:363
+#: report2.php:382 report4.php:87 report4.php:289
 msgid "all"
 msgstr "alle"
 
@@ -18736,8 +18724,8 @@ msgstr "kan ikke endres"
 #: include/classes/validators/CApiInputValidator.php:765
 #: include/classes/validators/CApiInputValidator.php:807
 #: include/classes/validators/CNewValidator.php:91
-#: include/classes/widgets/forms/CWidgetFormMap.php:101 usergrps.php:319
-#: usergrps.php:359 usergrps.php:362
+#: include/classes/widgets/forms/CWidgetFormMap.php:101 usergrps.php:318
+#: usergrps.php:358 usergrps.php:361
 msgid "cannot be empty"
 msgstr "kan ikke være tomt"
 
@@ -18789,7 +18777,7 @@ msgstr ""
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr ""
 
-#: include/func.inc.php:625 jsLoader.php:129
+#: include/func.inc.php:621 jsLoader.php:129
 msgctxt "day short"
 msgid "d"
 msgstr "d"
@@ -18811,11 +18799,11 @@ msgid "dayofweek() - Day of week"
 msgstr ""
 
 #: app/views/monitoring.problem.view.php:184
-#: include/views/common.filter.trigger.php:75
+#: include/views/common.filter.trigger.php:64
 msgid "days"
 msgstr "dager"
 
-#: include/classes/pagefilter/CPageFilter.php:699
+#: include/classes/pagefilter/CPageFilter.php:654
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/widgets/CWidgetHelper.php:53
 #: include/views/js/monitoring.slideconf.edit.js.php:14
@@ -18926,7 +18914,7 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "globale housekeeping innstillinger"
 
-#: include/func.inc.php:626 jsLoader.php:130
+#: include/func.inc.php:622 jsLoader.php:130
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -19115,12 +19103,12 @@ msgstr ""
 msgid "low-level discovery rule"
 msgstr "lavnivå oppdagelsesregel"
 
-#: include/func.inc.php:627 jsLoader.php:104 jsLoader.php:131 jsLoader.php:303
+#: include/func.inc.php:623 jsLoader.php:104 jsLoader.php:131 jsLoader.php:303
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:624 jsLoader.php:128
+#: include/func.inc.php:620 jsLoader.php:128
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -19204,7 +19192,7 @@ msgstr "Minste lengde er %1$s tegn"
 msgid "mm"
 msgstr "mm"
 
-#: include/func.inc.php:629
+#: include/func.inc.php:625
 msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
@@ -19246,8 +19234,8 @@ msgstr "navn"
 msgid "new"
 msgstr "ny"
 
-#: disc_prototypes.php:1330 disc_prototypes.php:1354 hosts.php:1270
-#: include/views/configuration.item.massupdate.php:476 templates.php:813
+#: disc_prototypes.php:1330 disc_prototypes.php:1354 hosts.php:1269
+#: include/views/configuration.item.massupdate.php:476 templates.php:812
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "ny"
@@ -19280,10 +19268,10 @@ msgid "not in"
 msgstr "ikke i"
 
 #: app/controllers/CControllerDashboardView.php:134
-#: hostinventoriesoverview.php:76
-#: include/classes/pagefilter/CPageFilter.php:758
-#: include/classes/pagefilter/CPageFilter.php:812 include/forms.inc.php:1134
-#: include/views/monitoring.screen.php:63 slides.php:187
+#: hostinventoriesoverview.php:75
+#: include/classes/pagefilter/CPageFilter.php:713
+#: include/classes/pagefilter/CPageFilter.php:767 include/forms.inc.php:1134
+#: include/views/monitoring.screen.php:63 slides.php:186
 msgid "not selected"
 msgstr "ikke valgt"
 
@@ -19300,26 +19288,26 @@ msgstr "nummer"
 msgid "of"
 msgstr "av"
 
-#: include/classes/setup/CFrontendSetup.php:261
-#: include/classes/setup/CFrontendSetup.php:320
-#: include/classes/setup/CFrontendSetup.php:337
-#: include/classes/setup/CFrontendSetup.php:358
-#: include/classes/setup/CFrontendSetup.php:359
-#: include/classes/setup/CFrontendSetup.php:379
-#: include/classes/setup/CFrontendSetup.php:380
-#: include/classes/setup/CFrontendSetup.php:396
-#: include/classes/setup/CFrontendSetup.php:444
-#: include/classes/setup/CFrontendSetup.php:469
-#: include/classes/setup/CFrontendSetup.php:486
-#: include/classes/setup/CFrontendSetup.php:509
-#: include/classes/setup/CFrontendSetup.php:549
-#: include/classes/setup/CFrontendSetup.php:566
-#: include/classes/setup/CFrontendSetup.php:583
-#: include/classes/setup/CFrontendSetup.php:610
-#: include/classes/setup/CFrontendSetup.php:627
-#: include/classes/setup/CFrontendSetup.php:644
-#: include/classes/setup/CFrontendSetup.php:645
-#: include/classes/setup/CFrontendSetup.php:661
+#: include/classes/setup/CFrontendSetup.php:254
+#: include/classes/setup/CFrontendSetup.php:313
+#: include/classes/setup/CFrontendSetup.php:330
+#: include/classes/setup/CFrontendSetup.php:351
+#: include/classes/setup/CFrontendSetup.php:352
+#: include/classes/setup/CFrontendSetup.php:372
+#: include/classes/setup/CFrontendSetup.php:373
+#: include/classes/setup/CFrontendSetup.php:389
+#: include/classes/setup/CFrontendSetup.php:437
+#: include/classes/setup/CFrontendSetup.php:462
+#: include/classes/setup/CFrontendSetup.php:479
+#: include/classes/setup/CFrontendSetup.php:502
+#: include/classes/setup/CFrontendSetup.php:542
+#: include/classes/setup/CFrontendSetup.php:559
+#: include/classes/setup/CFrontendSetup.php:576
+#: include/classes/setup/CFrontendSetup.php:603
+#: include/classes/setup/CFrontendSetup.php:620
+#: include/classes/setup/CFrontendSetup.php:637
+#: include/classes/setup/CFrontendSetup.php:638
+#: include/classes/setup/CFrontendSetup.php:654
 #: include/views/administration.users.edit.php:287
 msgid "off"
 msgstr "av"
@@ -19328,22 +19316,22 @@ msgstr "av"
 msgid "old event tag"
 msgstr "gammel hendelse tagg"
 
-#: include/classes/setup/CFrontendSetup.php:320
-#: include/classes/setup/CFrontendSetup.php:337
-#: include/classes/setup/CFrontendSetup.php:358
-#: include/classes/setup/CFrontendSetup.php:379
-#: include/classes/setup/CFrontendSetup.php:396
-#: include/classes/setup/CFrontendSetup.php:444
-#: include/classes/setup/CFrontendSetup.php:469
-#: include/classes/setup/CFrontendSetup.php:486
-#: include/classes/setup/CFrontendSetup.php:509
-#: include/classes/setup/CFrontendSetup.php:549
-#: include/classes/setup/CFrontendSetup.php:566
-#: include/classes/setup/CFrontendSetup.php:583
-#: include/classes/setup/CFrontendSetup.php:610
-#: include/classes/setup/CFrontendSetup.php:627
-#: include/classes/setup/CFrontendSetup.php:644
-#: include/classes/setup/CFrontendSetup.php:661
+#: include/classes/setup/CFrontendSetup.php:313
+#: include/classes/setup/CFrontendSetup.php:330
+#: include/classes/setup/CFrontendSetup.php:351
+#: include/classes/setup/CFrontendSetup.php:372
+#: include/classes/setup/CFrontendSetup.php:389
+#: include/classes/setup/CFrontendSetup.php:437
+#: include/classes/setup/CFrontendSetup.php:462
+#: include/classes/setup/CFrontendSetup.php:479
+#: include/classes/setup/CFrontendSetup.php:502
+#: include/classes/setup/CFrontendSetup.php:542
+#: include/classes/setup/CFrontendSetup.php:559
+#: include/classes/setup/CFrontendSetup.php:576
+#: include/classes/setup/CFrontendSetup.php:603
+#: include/classes/setup/CFrontendSetup.php:620
+#: include/classes/setup/CFrontendSetup.php:637
+#: include/classes/setup/CFrontendSetup.php:654
 #: include/views/administration.users.edit.php:287
 #: include/views/monitoring.hostscreen.php:33
 msgid "on"
@@ -19416,7 +19404,7 @@ msgstr "root"
 msgid "ruleid of dependent item and master item should match"
 msgstr ""
 
-#: include/func.inc.php:628
+#: include/func.inc.php:624
 msgctxt "second short"
 msgid "s"
 msgstr "s"
@@ -19650,9 +19638,9 @@ msgstr "uventet tekst \"%1$s\""
 msgid "unexpected value \"%1$s\""
 msgstr "uventet verdi \"%1$s\""
 
-#: include/classes/setup/CFrontendSetup.php:238
-#: include/classes/setup/CFrontendSetup.php:415
-#: include/classes/setup/CFrontendSetup.php:526
+#: include/classes/setup/CFrontendSetup.php:231
+#: include/classes/setup/CFrontendSetup.php:408
+#: include/classes/setup/CFrontendSetup.php:519
 msgid "unknown"
 msgstr "ukjent"
 
@@ -19765,7 +19753,7 @@ msgstr ""
 msgid "wrong item type"
 msgstr ""
 
-#: include/func.inc.php:623 jsLoader.php:127
+#: include/func.inc.php:619 jsLoader.php:127
 msgctxt "year short"
 msgid "y"
 msgstr "å"
