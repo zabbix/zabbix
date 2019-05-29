@@ -222,12 +222,12 @@
 		$el.on('dynamic_rows.updated', function(e, dynamic_rows) {
 			if (dynamic_rows.length < 2) {
 				dynamic_rows.$element.sortable('option', 'disabled', true);
-				dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
+				dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_DRAG_ICON)
 					.addClass(httpconf.ZBX_STYLE_DISABLED);
 			}
 			else {
 				dynamic_rows.$element.sortable('option', 'disabled', false);
-				dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON)
+				dynamic_rows.$element.find('.' + httpconf.ZBX_STYLE_DRAG_ICON)
 					.removeClass(httpconf.ZBX_STYLE_DISABLED);
 			}
 		});
