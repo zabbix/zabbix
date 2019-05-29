@@ -948,7 +948,7 @@ static int	compare_nth_field(const ZBX_FIELD **fields, const char *rec_data, int
 static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_parse *jp_obj,
 		zbx_vector_uint64_t *del, char **error)
 {
-	int			f, fields_count, insert, is_null, i, ret = FAIL, id_field_nr = 0, move_out = 0,
+	int			f, fields_count, insert, i, ret = FAIL, id_field_nr = 0, move_out = 0,
 				move_field_nr = 0;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
@@ -1176,8 +1176,9 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 			if (1 == move_out)
 			{
-				int	last_n = 0;
-				size_t	last_pos = 0;
+				int		last_n = 0;
+				size_t		last_pos = 0;
+				zbx_json_type_t	type;
 
 				/* locate a copy of this record as found in database */
 				id_offset.id = recid;
@@ -1189,7 +1190,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 				/* find the field requiring special preprocessing in JSON record */
 				f = 1;
-				while (NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &is_null)))
+				while (NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &type)))
 				{
 					/* parse values for the entry (lines 10-12 in T1) */
 
@@ -1206,7 +1207,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				}
 
 				if (0 != compare_nth_field(fields, recs + p_id_offset->offset, move_field_nr, buf,
-						is_null, &last_n, &last_pos))
+						(ZBX_JSON_TYPE_NULL == type), &last_n, &last_pos))
 				{
 					zbx_vector_uint64_append(&moves, recid);
 				}
@@ -1296,9 +1297,10 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	/* iterate the entries (lines 9, 14 and 19 in T1) */
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
-		int	rec_differ = 0;	/* how many fields differ */
-		int	last_n = 0;
-		size_t	tmp_offset = sql_offset, last_pos = 0;
+		int		rec_differ = 0;	/* how many fields differ */
+		int		last_n = 0;
+		size_t		tmp_offset = sql_offset, last_pos = 0;
+		zbx_json_type_t	type;
 
 		zbx_json_brackets_open(p, &jp_row);
 		pf = zbx_json_next_value_dyn(&jp_row, NULL, &buf, &buf_alloc, NULL);
@@ -1319,7 +1321,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			zbx_vector_ptr_append(&values, value);
 
 			/* add the rest of fields */
-			for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &is_null));
+			for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &type));
 					f++)
 			{
 				if (f == fields_count)
@@ -1329,7 +1331,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					goto clean;
 				}
 
-				if (0 != is_null && 0 != (fields[f]->flags & ZBX_NOTNULL))
+				if (ZBX_JSON_TYPE_NULL == type && 0 != (fields[f]->flags & ZBX_NOTNULL))
 				{
 					*error = zbx_dsprintf(*error, "column \"%s.%s\" cannot be null",
 							table->table, fields[f]->name);
@@ -1347,7 +1349,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 						ZBX_STR2UINT64(value->ui64, buf);
 						break;
 					case ZBX_TYPE_ID:
-						if (0 == is_null)
+						if (ZBX_JSON_TYPE_NULL != type)
 							ZBX_STR2UINT64(value->ui64, buf);
 						else
 							value->ui64 = 0;
@@ -1413,7 +1415,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table->table);
 
-			for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &is_null));
+			for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &type));
 					f++)
 			{
 				int	field_differ = 1;
@@ -1427,7 +1429,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					goto clean;
 				}
 
-				if (0 != is_null && 0 != (fields[f]->flags & ZBX_NOTNULL))
+				if (ZBX_JSON_TYPE_NULL == type && 0 != (fields[f]->flags & ZBX_NOTNULL))
 				{
 					*error = zbx_dsprintf(*error, "column \"%s.%s\" cannot be null",
 							table->table, fields[f]->name);
@@ -1442,7 +1444,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				}
 
 				if (0 == (field_differ = compare_nth_field(fields, recs + p_id_offset->offset, f, buf,
-						is_null, &last_n, &last_pos)))
+						(ZBX_JSON_TYPE_NULL == type), &last_n, &last_pos)))
 				{
 					continue;
 				}
@@ -1459,7 +1461,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=", fields[f]->name);
 				rec_differ++;
 
-				if (0 != is_null)
+				if (ZBX_JSON_TYPE_NULL == type)
 				{
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "null,");
 					continue;
