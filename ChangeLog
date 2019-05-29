@@ -17,6 +17,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+A.F....... [ZBX-15049] fixed to host group limited global scripts to be usable in sub group (talbergs)
 .......PST [ZBX-16138] fixed return value type and added preprocessing steps for items in remote internal checks tamplates; fixed unsigned write cache value for remote internal checks (viktors)
 .......PS. [ZBX-15942] changed proxy to send timestamps of empty historical values to server, so throttled items are not listed in administration/queue (wiper)
 .......PS. [ZBX-15963] fixed HTTP agent support of non-HTTP scheme in URL field (asestakovs)
