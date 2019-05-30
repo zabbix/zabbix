@@ -1,6 +1,7 @@
 Changes for 4.4.0alpha1
 
 New features:
+...G...... [ZBXNEXT-287] added SSL support for agent HTTP checks (asestakovs)
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 ....I..PS. [ZBXNEXT-5211] increased the maximum Hosts name character length from 64 to 128 for autoregistration and LLD (akozlovs)
 ...G...... [ZBXNEXT-1302] added low-level discovery of block devices (asestakovs)
@@ -14,6 +15,7 @@ Bug fixes:
 Changes for 4.2.3rc1
 
 New features:
+...G...... [ZBXNEXT-287] added SSL support for agent HTTP checks (asestakovs)
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
@@ -420,6 +422,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.9rc1
 
 New features:
+...G...... [ZBXNEXT-287] added SSL support for agent HTTP checks (asestakovs)
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
