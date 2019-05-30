@@ -33,15 +33,26 @@
 static const char	*http_req;
 static size_t		http_len;
 
+int	__wrap_zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port,
+		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
+int	__wrap_zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned char flags, int timeout);
+ssize_t	__wrap_zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
+void	__wrap_zbx_tcp_close(zbx_socket_t *s);
+
 #else
 
 #define STR_TEST_TYPE	"libcurl"
 #define STR_FIELD_OUT	"out.url"
 
-static void		*page_data = NULL;
-static size_t		(*cb_ptr)(void *ptr, size_t size, size_t nmemb, void *userdata);
-static char		*req_url = NULL;
-static int		dummy;
+static void	*page_data = NULL;
+static size_t	(*cb_ptr)(void *ptr, size_t size, size_t nmemb, void *userdata);
+static char	*req_url = NULL;
+static int	dummy;
+
+CURL		*__wrap_curl_easy_init(void);
+CURLcode	__wrap_curl_easy_setopt(CURL *easyhandle, int opt, void *val);
+CURLcode	__wrap_curl_easy_perform(CURL *easyhandle);
+void		__wrap_curl_easy_cleanup(CURL *easyhandle);
 
 #endif
 
@@ -69,7 +80,7 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != parse_item_key(init_param, &request))
 		fail_msg("Cannot parse item key: %s", init_param);
 
-	if (expected_result != (actual_result = WEB_PAGE_GET(&request,&param_result)))
+	if (expected_result != (actual_result = WEB_PAGE_GET(&request, &param_result)))
 	{
 		fail_msg("Got %s instead of %s as a result.", zbx_sysinfo_ret_string(actual_result),
 			zbx_sysinfo_ret_string(expected_result));
