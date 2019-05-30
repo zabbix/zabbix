@@ -2087,3 +2087,4 @@ INSERT INTO media_type (mediatypeid, type, description, exec_path, exec_params, 
 
 -- testFormUser
 INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status,debug_mode) VALUES (16,'LDAP user group',2,0,0);
+
