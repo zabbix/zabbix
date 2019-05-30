@@ -129,7 +129,7 @@
 					self.refreshImg(id, function() {
 						$('a', '#flickerfreescreen_' + id).each(function() {
 								var obj = $(this),
-								url = new Curl(obj.attr('href'));
+								url = new Curl(obj.attr('href'), false);
 
 								url.setArgument('from', screen.timeline.from);
 								url.setArgument('to', screen.timeline.to);
@@ -310,10 +310,10 @@
 				var url = new Curl(screen.data.options.refresh);
 				url.setArgument('curtime', new CDate().getTime());
 
-				jQuery.ajax( {
+				jQuery.ajax({
 					'url': url.getUrl()
 				})
-				.error(function() {
+				.fail(function() {
 					screen.error++;
 					window.flickerfreeScreen.calculateReRefresh(id);
 				})
@@ -368,7 +368,7 @@
 							usemap: domImg.attr('usemap'),
 							alt: domImg.attr('alt')
 						})
-						.error(function() {
+						.on('error', function() {
 							screen.error++;
 							window.flickerfreeScreen.calculateReRefresh(id);
 						})
@@ -437,7 +437,7 @@
 				url.setArgument('_', (new Date).getTime().toString(34));
 
 				return $.get(url.getUrl(), {'onlyHeight': 1}, 'json')
-					.success(function(response, status, xhr) {
+					.done(function(response, status, xhr) {
 						cb(xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'))
 					});
 			}

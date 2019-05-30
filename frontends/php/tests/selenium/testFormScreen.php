@@ -221,23 +221,46 @@ class testFormScreen extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount("SELECT screenid FROM screens WHERE name='$this->testscreen_history'"));
 	}
 
+	/*
+	 * Test "Dynamic item"checkbox state changes after screen element update.
+	 */
 	public function testFormScreen_ZBX6030() {
-		$this->zbxTestLogin('screenconf.php');
-		$this->zbxTestClickLinkTextWait($this->testscreen_);
-		$this->zbxTestClickWait('edit');
-		$this->zbxTestClickLinkTextWait('Change');
-		$this->assertFalse($this->zbxTestCheckboxSelected('dynamic'));
-		$this->zbxTestCheckboxSelect('dynamic');
-		$this->zbxTestInputTypeOverwrite('colspan', '1');
-		$this->zbxTestInputTypeOverwrite('rowspan', '1');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Screen updated');
-		$this->zbxTestClickLinkTextWait('Change');
-		$this->assertTrue($this->zbxTestCheckboxSelected('dynamic'));
-		$this->zbxTestCheckboxSelect('dynamic', false);
-		$this->zbxTestClickWait('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Screen updated');
-		$this->zbxTestClickLinkTextWait('Change');
-		$this->assertFalse($this->zbxTestCheckboxSelected('dynamic'));
+		$this->page->login()->open('screenconf.php');
+
+		// Open screens page and edit screen.
+		$this->query('link',$this->testscreen_)->waitUntilClickable()->one()->click();
+		$this->query('button:Edit screen')->waitUntilClickable()->one()->click();
+		// Edit screen element.
+		$this->query('class:in-progress')->waitUntilNotPresent();
+		$this->query('link:Change')->waitUntilClickable()->one()->click();
+
+		$form = $this->query('name:screen_item_form')->asForm()->waitUntilPresent()->one();
+
+		// Check "Dynamic item" checkbox state and fill fields.
+		$this->assertTrue($form->getField('Dynamic item')->isChecked(false));
+		$set_options = [
+			'Dynamic item' => true,
+			'Column span' => 1,
+			'Row span' => 1
+		];
+		$form->fill($set_options);
+		$form->submit();
+		// Check successful message on frontend.
+		$message = CMessageElement::find()->one();
+		$this->assertTrue($message->isGood());
+		$this->assertEquals('Screen updated', $message->getTitle());
+
+		// Edit screen element and uncheck "Dynamic item" checkbox.
+		$this->query('link:Change')->waitUntilClickable()->one()->click();
+		$this->assertTrue($form->getField('Dynamic item', true)->isChecked(true));
+		$form->getField('Dynamic item')->fill(false);
+		$form->submit();
+		// Check message on frontend.
+		$this->assertTrue($message->isGood());
+		$this->assertEquals('Screen updated', $message->getTitle());
+
+		$this->query('link:Change')->waitUntilClickable()->one()->click();
+		// Check that "Dynamic item" checkbox is unselected.
+		$this->assertTrue($form->getField('Dynamic item', true)->isChecked(false));
 	}
 }

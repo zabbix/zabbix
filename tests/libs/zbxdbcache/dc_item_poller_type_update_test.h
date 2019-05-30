@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -18,12 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef DC_ITEM_POLLER_TYPE_UPDATE_TEST_H
+#define DC_ITEM_POLLER_TYPE_UPDATE_TEST_H
 
-require_once dirname(__FILE__).'/../include/CTest.php';
+void	DCitem_poller_type_update_test(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags);
 
-class function_DBfetch extends CTest {
-	public function test_DBfetch() {
-		// TODO
-		$this->markTestIncomplete();
-	}
-}
+#endif /* DC_ITEM_POLLER_TYPE_UPDATE_TEST_H */

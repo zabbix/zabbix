@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -18,12 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef JSONPATH_NEXT_TEST_H
+#define JSONPATH_NEXT_TEST_H
 
-require_once dirname(__FILE__).'/../include/CTest.php';
+int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type);
 
-class function_DBend extends CTest {
-	public function test_DBend() {
-		// TODO
-		$this->markTestIncomplete();
-	}
-}
+#endif

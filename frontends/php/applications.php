@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
@@ -82,7 +81,7 @@ if (hasRequest('action')) {
 			'applicationids' => getRequest('applications')
 		]);
 		if (count($applications) != count(getRequest('applications'))) {
-			uncheckTableRows($pageFilter->hostid, array_column($applications, 'applicationid', 'applicationid'));
+			uncheckTableRows($pageFilter->hostid, zbx_objectValues($applications, 'applicationid'));
 		}
 	}
 }

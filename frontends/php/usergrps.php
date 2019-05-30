@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/media.inc.php';
 require_once dirname(__FILE__).'/include/users.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 
@@ -109,7 +108,7 @@ elseif (hasRequest('action')) {
 		]);
 
 		if (count($group_users) != count(getRequest('group_groupid'))) {
-			uncheckTableRows(null, array_column($group_users, 'usrgrpid', 'usrgrpid'));
+			uncheckTableRows(null, zbx_objectValues($group_users, 'usrgrpid'));
 		}
 	}
 }

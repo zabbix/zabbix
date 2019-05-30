@@ -34,7 +34,7 @@ static	SERVICE_STATUS_HANDLE	serviceHandle;
 int	application_status = ZBX_APP_RUNNING;
 
 /* free resources allocated by MAIN_ZABBIX_ENTRY() */
-void	zbx_free_service_resources();
+void	zbx_free_service_resources(void);
 
 static void	parent_signal_handler(int sig)
 {

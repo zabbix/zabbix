@@ -19,11 +19,25 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CTest.php';
+require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
+CWebUser::disableSessionCookie();
 
-class function_DBexecute extends CTest {
-	public function test_DBexecute() {
-		// TODO
-		$this->markTestIncomplete();
-	}
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
+
+$page['title'] = _('ZABBIX');
+$page['file'] = 'cachewarning.php';
+
+if ((new CAssetsFileCache(ZBase::getRootDir()))->build()) {
+	redirect('index.php');
+
+	exit;
 }
+
+(new CView('general.warning', [
+	'header' => _('Insufficient file system permissions.'),
+	'messages' => [
+		_('Assets cache directory is not writable.')
+	],
+	'theme' => ZBX_DEFAULT_THEME
+]))->render();

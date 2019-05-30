@@ -4,7 +4,8 @@ SERVER_tests = \
 	zbx_vc_add_values \
 	zbx_vc_get_value \
 	dc_maintenance_match_tags \
-	is_item_processed_by_server
+	is_item_processed_by_server \
+	dc_item_poller_type_update
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -132,4 +133,9 @@ is_item_processed_by_server_SOURCES = is_item_processed_by_server.c
 is_item_processed_by_server_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
 is_item_processed_by_server_LDFLAGS = @SERVER_LDFLAGS@
 is_item_processed_by_server_CFLAGS = -I@top_srcdir@/tests
+
+dc_item_poller_type_update_SOURCES = dc_item_poller_type_update.c
+dc_item_poller_type_update_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
+dc_item_poller_type_update_LDFLAGS = @SERVER_LDFLAGS@
+dc_item_poller_type_update_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src/libs/zbxdbcache
 endif

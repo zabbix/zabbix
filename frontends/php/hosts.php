@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
 if (hasRequest('action') && getRequest('action') == 'host.export' && hasRequest('hosts')) {
@@ -814,7 +813,7 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massdelete' && has
 			'hostids' => getRequest('hosts'),
 			'editable' => true
 		]);
-		uncheckTableRows(getRequest('hostid'), array_column($hostids, 'hostid', 'hostid'));
+		uncheckTableRows(getRequest('hostid'), zbx_objectValues($hostids, 'hostid'));
 	}
 	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }

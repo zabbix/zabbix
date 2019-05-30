@@ -121,7 +121,7 @@ class CElement extends CBaseElement implements IWaitable {
 			$query->setContext($this->parent);
 		}
 
-		$this->setElement($query->one());
+		$this->setElement($query->waitUntilPresent()->one());
 		if (!$this->normalized) {
 			$this->normalize();
 		}
@@ -248,12 +248,37 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Get element value.
+	 *
+	 * @return type
+	 */
+	public function getValue() {
+		return CElementQuery::getDriver()->executeScript('return arguments[0].value;', [$this]);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function sendKeys($value) {
+		if (is_string($value) && strpos($value, '"') === false) {
+			parent::sendKeys($value);
+		}
+		else {
+			CElementQuery::getDriver()->executeScript('arguments[0].value=arguments[1];arguments[0].focus();',
+					[$this, $value]
+			);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Highlight the value in the field.
 	 *
 	 * @return $this
 	 */
 	public function selectValue() {
-		$this->click()->sendKeys([WebDriverKeys::CONTROL, 'a', WebDriverKeys::CONTROL]);
+		CElementQuery::getDriver()->executeScript('arguments[0].focus();arguments[0].select();', [$this]);
 
 		return $this;
 	}
@@ -266,6 +291,10 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return $this
 	 */
 	public function overwrite($text) {
+		if ($text === '' || $text === null) {
+			$text = WebDriverKeys::DELETE;
+		}
+
 		return $this->selectValue()->type($text);
 	}
 
@@ -440,5 +469,72 @@ class CElement extends CBaseElement implements IWaitable {
 		CElementQuery::wait()->until(WebDriverExpectedCondition::elementToBeSelected($this));
 
 		return $this;
+	}
+
+	/**
+	 * Detect element by its tag or class.
+	 *
+	 * @param type $options
+	 */
+	public function detect($options = []) {
+
+		$tag = $this->getTagName();
+		if ($tag === 'textarea' ) {
+			return $this->asElement($options);
+		}
+
+		if ($tag === 'select') {
+			return $this->asDropdown($options);
+		}
+
+		if ($tag === 'table') {
+			return $this->asTable($options);
+		}
+
+		if ($tag === 'input') {
+			$type = $this->getAttribute('type');
+			if ($type === 'checkbox' || $type === 'radio') {
+				return $this->asCheckbox($options);
+			}
+			else {
+				return $this->asElement($options);
+			}
+		}
+
+		$class = explode(' ', $this->getAttribute('class'));
+		if (in_array('multiselect-control', $class)) {
+			return $this->asMultiselect($options);
+		}
+
+		if (in_array('radio-list-control', $class)) {
+			return $this->asSegmentedRadio($options);
+		}
+
+		if (in_array('checkbox-list', $class)) {
+			return $this->asCheckboxList($options);
+		}
+
+		if (in_array('range-control', $class)) {
+			return $this->asRangeControl($options);
+		}
+
+		if (in_array('multilineinput-control', $class)) {
+			return $this->asMultiline($options);
+		}
+
+		self::addWarning('No specific element was detected');
+
+		return $this;
+	}
+
+	/**
+	 * Throw error for not supported method invocation.
+	 *
+	 * @param string $method    method name
+	 *
+	 * @throws Exception
+	 */
+	public static function onNotSupportedMethod($method) {
+		throw new Exception('Method "'.$method.'" is not supported by "'.static::class.'" class elements.');
 	}
 }

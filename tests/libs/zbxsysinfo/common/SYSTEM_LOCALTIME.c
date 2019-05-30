@@ -29,6 +29,9 @@
 
 static zbx_timespec_t	timespec;
 
+time_t	__wrap_time(time_t *seconds);
+int	__wrap_gettimeofday(struct timeval *__restrict tv, __timezone_ptr_t tz);
+
 static void	zbx_mock_time(void)
 {
 	static int		time_parsed = 0;

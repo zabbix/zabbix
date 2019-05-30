@@ -514,17 +514,6 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 		];
 		$hasStatus = true;
 	}
-	elseif ($i['disabled']) {
-		if (!$hasProblem) {
-			$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
-			$info['iconid'] = $selement['iconid_disabled'];
-		}
-		$info['info']['disabled'] = [
-			'msg' => _('DISABLED'),
-			'color' => '960000'
-		];
-		$hasStatus = true;
-	}
 
 	if (!$hasStatus && !$hasProblem) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
@@ -611,17 +600,6 @@ function getMapsInfo($selement, $i, $show_unack) {
 		$info['info']['maintenance'] = [
 			'msg' => $i['maintenance'].' '._('Maintenance'),
 			'color' => 'EE9600'
-		];
-		$hasStatus = true;
-	}
-	elseif ($i['disabled']) {
-		if (!$hasProblem) {
-			$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
-			$info['iconid'] = $selement['iconid_disabled'];
-		}
-		$info['info']['disabled'] = [
-			'msg' => _('DISABLED'),
-			'color' => '960000'
 		];
 		$hasStatus = true;
 	}
@@ -2025,6 +2003,8 @@ function getMapHighligts(array $map, array $map_info) {
  *
  * @param array $sysmap
  * @param array $sysmap['show_suppressed']  Whether to show suppressed problems.
+ * @param array $sysmap['show_unack']       Property specified in sysmap's 'Problem display' field. Used to determine
+ *                                          whether to show unacknowledged problems only.
  * @param array $options                    Options used to retrieve actions.
  * @param int   $options['severity_min']    Minimal severity used.
  *
@@ -2039,18 +2019,23 @@ function getMapLinktriggerInfo($sysmap, $options) {
 
 	foreach ($sysmap['links'] as $link) {
 		foreach ($link['linktriggers'] as $linktrigger) {
-			$triggerids[$linktrigger['triggerid']] = $linktrigger['triggerid'];
+			$triggerids[$linktrigger['triggerid']] = true;
 		}
 	}
 
 	$trigger_options = [
 		'output' => ['status', 'value', 'priority'],
-		'triggerids' => $triggerids,
+		'triggerids' => array_keys($triggerids),
 		'monitored' => true,
 		'preservekeys' => true
 	];
 
-	return getTriggersWithActualSeverity($trigger_options, ['show_suppressed' => $sysmap['show_suppressed']]);
+	$problem_options = [
+		'show_suppressed' => $sysmap['show_suppressed'],
+		'acknowledged' => ($sysmap['show_unack'] == EXTACK_OPTION_UNACK) ? false : null
+	];
+
+	return getTriggersWithActualSeverity($trigger_options, $problem_options);
 }
 
 /**

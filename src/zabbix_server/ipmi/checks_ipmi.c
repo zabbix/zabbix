@@ -771,28 +771,33 @@ static int	zbx_perform_openipmi_ops(zbx_ipmi_host_t *h, const char *func_name)
  *****************************************************************************/
 void	zbx_perform_all_openipmi_ops(int timeout)
 {
-	struct timeval	tv;
-
-	tv.tv_sec = timeout;
-	tv.tv_usec = 0;
+	/* Before OpenIPMI v2.0.26, perform_one_op() did not modify timeout argument.   */
+	/* Starting with OpenIPMI v2.0.26, perform_one_op() updates timeout argument.   */
+	/* To make sure that the loop works consistently with all versions of OpenIPMI, */
+	/* initialize timeout argument for perform_one_op() inside the loop.            */
 
 	for (;;)
 	{
-		double	start_time;
-		int	res;
+		struct timeval	tv;
+		double		start_time;
+		int		res;
+
+		tv.tv_sec = timeout;
+		tv.tv_usec = 0;
 
 		start_time = zbx_time();
 
-		res = os_hnd->perform_one_op(os_hnd, &tv);
-
 		/* perform_one_op() returns 0 on success, errno on failure (timeout means success) */
-		if (0 != res)
+		if (0 != (res = os_hnd->perform_one_op(os_hnd, &tv)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "IPMI error: %s", zbx_strerror(res));
 			break;
 		}
 
-		/* if duration is less than timeout, there may be more operations to be processed */
+		/* If execution of perform_one_op() took more time than specified in timeout argument, assume that  */
+		/* perform_one_op() timed out and break the loop.                                                   */
+		/* If it took less than specified in timeout argument, assume that some operation was performed and */
+		/* there may be more operations to be performed.                                                    */
 		if (zbx_time() - start_time >= timeout)
 		{
 			break;
