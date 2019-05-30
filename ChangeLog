@@ -5,6 +5,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+...G...... [ZBX-14441] fixed windows agent "eventlog" key for reading big event log files of windows 2003 (MVekslers)
 ..F....... [ZBX-16109] fixed hidden error in graphs for PHP 7.3.5 (rlataria)
 ....I...S. [ZBX-16093] fixed regular expression File systems for discovery does not contain apfs (akozlovs)
 ..F....... [ZBX-16080] fixed setup page to not to use bclib (talbergs)
