@@ -716,7 +716,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->output_format, item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password,
 				item->verify_peer, item->verify_host, item->allow_traps);
 
-		zbx_db_insert_add_values(db_insert_irtdata, *itemid, 0, 0, 0, "");
+		zbx_db_insert_add_values(db_insert_irtdata, item->itemid);
 
 		item->itemid = (*itemid)++;
 	}
@@ -779,8 +779,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 				"output_format", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "verify_peer",
 				"verify_host", "allow_traps", NULL);
 
-		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", "lastlogsize", "state", "mtime",
-				"error", NULL);
+		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", NULL);
 	}
 
 	if (0 != upd_items)
