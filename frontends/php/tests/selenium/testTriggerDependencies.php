@@ -48,7 +48,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 
 	public function testTriggerDependenciesFromHost_SimpleTestProvider() {
 		return [
-			['10001', 'Not all templates are linked to "Test host".'],
+			['10001', 'Not all templates are linked to'],
 			['10081', 'Trigger updated']
 		];
 	}
