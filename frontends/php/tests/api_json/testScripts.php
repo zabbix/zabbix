@@ -142,6 +142,242 @@ class testScripts extends CAPITest {
 		];
 	}
 
+	public static function script_get() {
+		return [
+			// 90020 is top group, nothing to inherit from
+			[
+				'params' => [
+					'output' => ['scriptid'],
+					'groupids' => ['90020']
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['90020']
+				]
+			],
+			// group 90021 is child group of 90020 and script from parent group is inherited
+			[
+				'params' => [
+					'output' => ['scriptid'],
+					'groupids' => ['90021']
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['90021', '90020']
+				]
+			],
+			// host 90021 is in group 90021 that is child a group of 90020 and script from parent group is inherited
+			[
+				'params' => [
+					'output' => ['scriptid'],
+					'hostids' => ['90021']
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['90021', '90020']
+				]
+			],
+			// child host has 2 inherited scripts but only one of them may not be invoked on parent group
+			[
+				'params' => [
+					'output' => ['scriptid'],
+					'hostids' => ['90021'],
+					'groupids' => ['90020']
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['90020'],
+					'!has.scriptid' => ['90021']
+				]
+			],
+			// child group has 2 inherited scripts but only one of them may not be invoked on parent group host
+			[
+				'params' => [
+					'output' => ['scriptid'],
+					'hostids' => ['90020'],
+					'groupids' => ['90021']
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['90020'],
+					'!has.scriptid' => ['90021']
+				]
+			],
+			// returns empty intersection of both selections
+			[
+				'params' => [
+					'output' => ['scriptid'],
+					'hostids' => ['90020'],
+					'groupids' => ['no such id']
+				],
+				'expect' => [
+					'error' => null,
+					'!has.scriptid' => ['90020', '90021', '90022', '90023']
+				]
+			],
+			// selectHosts test
+			[
+				'params' => [
+					'output' => ['scriptid'],
+					'hostids' => ['90021'],
+					'preservekeys' => true,
+					'selectHosts' => ['hostid']
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid:hostid' => [
+						'90020' => ['90020', '90021', '90022', '90023'],
+						'90021' => ['90021', '90022', '90023']
+					]
+				]
+			],
+			// selectHosts test
+			// user has no write permission for group 90021 AND script 90021 requires that permission
+			[
+				'params' => [
+					'__auth' => ['90000', 'zabbix'],
+					'output' => ['scriptid'],
+					'hostids' => ['90021'],
+					'preservekeys' => true,
+					'selectHosts' => ['hostid']
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid:hostid' => [
+						'90020' => ['90020', '90021', '90022', '90023'],
+						'90021' => ['90022', '90023']
+					],
+					'!has.scriptid:hostid' => [
+						'90020' => [],
+						'90021' => ['90021']
+					]
+				]
+			],
+			// selectGroups test
+			[
+				'params' => [
+					'output' => ['scriptid'],
+					'hostids' => ['90021'],
+					'preservekeys' => true,
+					'selectGroups' => ['groupid']
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid:groupid' => [
+						'90020' => ['90020', '90021', '90022', '90023'],
+						'90021' => ['90021', '90022', '90023']
+					]
+				]
+			],
+			// selectGroups test
+			// user has no write permission for group 90021, that group is not shown
+			[
+				'params' => [
+					'__auth' => ['90000', 'zabbix'],
+					'output' => ['scriptid'],
+					'hostids' => ['90021'],
+					'preservekeys' => true,
+					'selectGroups' => ['groupid']
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid:groupid' => [
+						'90020' => ['90020', '90021', '90022', '90023'],
+						'90021' => ['90022', '90023']
+					],
+					'!has.scriptid:groupid' => [
+						'90020' => [],
+						'90021' => ['90021']
+					]
+				]
+			],
+			// selectGroups test
+			// no extra output is present
+			[
+				'params' => [
+					'__auth' => ['90000', 'zabbix'],
+					'output' => ['scriptid'],
+					'hostids' => ['90021'],
+					'preservekeys' => true,
+					'selectGroups' => ['flags']
+				],
+				'expect' => [
+					'error' => null,
+					'groupsObjectProperties' => ['flags']
+				]
+			]
+		];
+	}
+
+	/**
+	* @dataProvider script_get
+	*/
+	public function testScripts_Get($params, $expect) {
+		if (array_key_exists('__auth', $params)) {
+			$this->authorize($params['__auth'][0], $params['__auth'][1]);
+			unset($params['__auth']);
+		}
+
+		$response = $this->call('script.get', $params, $expect['error']);
+		$this->enableAuthorization();
+
+		if ($expect['error'] !== null) {
+			return;
+		}
+
+		if (array_key_exists('has.scriptid', $expect)) {
+			$ids = array_column($response['result'], 'scriptid');
+			$this->assertEmpty(array_diff($expect['has.scriptid'], $ids));
+		}
+
+		if (array_key_exists('!has.scriptid', $expect)) {
+			$ids = array_column($response['result'], 'scriptid');
+			$this->assertEquals($expect['!has.scriptid'], array_diff($expect['!has.scriptid'], $ids));
+		}
+
+		if (array_key_exists('has.scriptid:hostid', $expect)) {
+			foreach ($expect['has.scriptid:hostid'] as $scriptid => $hostids) {
+				$this->assertTrue(array_key_exists($scriptid, $response['result']), 'expected script id '.$scriptid);
+				$ids = array_column($response['result'][$scriptid]['hosts'], 'hostid');
+				$this->assertEmpty(array_diff($hostids, $ids), 'Expected ids: '.implode(',', $hostids));
+			}
+		}
+
+		if (array_key_exists('!has.scriptid:hostid', $expect)) {
+			foreach ($expect['!has.scriptid:hostid'] as $scriptid => $hostids) {
+				$this->assertTrue(array_key_exists($scriptid, $response['result']), 'expected script id '.$scriptid);
+				$ids = array_column($response['result'][$scriptid]['hosts'], 'hostid');
+				$this->assertEquals($hostids, array_diff($hostids, $ids));
+			}
+		}
+
+		if (array_key_exists('has.scriptid:groupid', $expect)) {
+			foreach ($expect['has.scriptid:groupid'] as $scriptid => $groupids) {
+				$this->assertTrue(array_key_exists($scriptid, $response['result']), 'expected script id '.$scriptid);
+				$ids = array_column($response['result'][$scriptid]['groups'], 'groupid');
+				$this->assertEmpty(array_diff($groupids, $ids), 'Expected ids: '.implode(',', $groupids));
+			}
+		}
+
+		if (array_key_exists('!has.scriptid:groupid', $expect)) {
+			foreach ($expect['!has.scriptid:groupid'] as $scriptid => $groupids) {
+				$this->assertTrue(array_key_exists($scriptid, $response['result']), 'expected script id '.$scriptid);
+				$ids = array_column($response['result'][$scriptid]['groups'], 'groupid');
+				$this->assertEquals($groupids, array_diff($groupids, $ids));
+			}
+		}
+
+		if (array_key_exists('groupsObjectProperties', $expect)) {
+			sort($expect['groupsObjectProperties']);
+			foreach ($response['result'] as $script) {
+				foreach ($script['groups'] as $group) {
+					ksort($group);
+					$this->assertEquals($expect['groupsObjectProperties'], array_keys($group));
+				}
+			}
+		}
+	}
+
 	/**
 	* @dataProvider script_create
 	*/
