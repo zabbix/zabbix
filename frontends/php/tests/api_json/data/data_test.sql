@@ -153,7 +153,7 @@ INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, 
 
 -- scripts / inherited hostgroups
 INSERT INTO usrgrp (usrgrpid,name) VALUES (90000,'90000 Eur group write except one');
-INSERT INTO users (userid,alias,passwd,`type`) VALUES (90000,'90000','5fce1b3e34b520afeffb37ce08c7cd66',2);
+INSERT INTO users (userid,alias,passwd,type) VALUES (90000,'90000','5fce1b3e34b520afeffb37ce08c7cd66',2);
 INSERT INTO users_groups (id,usrgrpid,userid) VALUES (90000,90000,90000);
 INSERT INTO hosts (hostid,host,name,status,description) VALUES (90020,'90020','90020',0,'');
 INSERT INTO hosts (hostid,host,name,status,description) VALUES (90021,'90021','90021',0,'');
@@ -176,8 +176,8 @@ INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,descript
 -- INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90022,90022,2,'90022-acc-read','date',NULL,'');
 INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90023,90023,2,'90023-acc-read','date',NULL,'');
 -- for dev
-INSERT INTO `sysmaps` VALUES (90000,'90000',800,600,NULL,0,0,0,1,0,0,50,1,1,0,2,2,2,2,2,'','','','','',NULL,0,0,90000,1,0);
-INSERT INTO `sysmaps_elements` VALUES (90020,90000,90020,0,151,NULL,'90020',-1,189,127,NULL,NULL,0,0,200,200,0,0,''),(90021,90000,90021,0,151,NULL,'90021',-1,239,127,NULL,NULL,0,0,200,200,0,0,''),(90022,90000,90022,0,151,NULL,'90022',-1,289,127,NULL,NULL,0,0,200,200,0,0,''),(90023,90000,90023,0,151,NULL,'90023',-1,339,127,NULL,NULL,0,0,200,200,0,0,'');
+INSERT INTO sysmaps VALUES (90000,'90000',800,600,NULL,0,0,0,1,0,0,50,1,1,0,2,2,2,2,2,'','','','','',NULL,0,0,90000,1,0);
+INSERT INTO sysmaps_elements VALUES (90020,90000,90020,0,151,NULL,'90020',-1,189,127,NULL,NULL,0,0,200,200,0,0,''),(90021,90000,90021,0,151,NULL,'90021',-1,239,127,NULL,NULL,0,0,200,200,0,0,''),(90022,90000,90022,0,151,NULL,'90022',-1,289,127,NULL,NULL,0,0,200,200,0,0,''),(90023,90000,90023,0,151,NULL,'90023',-1,339,127,NULL,NULL,0,0,200,200,0,0,'');
 
 -- global macro
 INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (13,'{$API_MACRO_FOR_UPDATE1}','update');
