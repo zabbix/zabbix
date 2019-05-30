@@ -235,7 +235,10 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 	ZBX_HISTORY_WRITE_CBS	(*func_history_write_cbs)(void);
 	zbx_module_t		*module, module_tmp;
 
-	zbx_snprintf(full_name, sizeof(full_name), "%s/%s", path, name);
+	if ('/' != *name)
+		zbx_snprintf(full_name, sizeof(full_name), "%s/%s", path, name);
+	else
+		zbx_snprintf(full_name, sizeof(full_name), "%s", name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "loading module \"%s\"", full_name);
 

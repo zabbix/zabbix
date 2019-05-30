@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -1441,6 +1440,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 			],
 			'selectHosts' => ['status', 'name'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectItemDiscovery' => ['parent_itemid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'itemids' => getRequest('itemid')
 		]);
@@ -1782,7 +1782,13 @@ else {
 	}
 
 	if (isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application'])) {
-		$options['application'] = $_REQUEST['filter_application'];
+		$options['applicationids'] = array_keys(API::Application()->get([
+			'output' => [],
+			'groupids' => array_key_exists('groupids', $options) ? $options['groupids'] : null,
+			'hostids' => array_key_exists('hostids', $options) ? $options['hostids'] : null,
+			'search' => ['name' => getRequest('filter_application')],
+			'preservekeys' => true
+		]));
 	}
 	if (isset($_REQUEST['filter_name']) && !zbx_empty($_REQUEST['filter_name'])) {
 		$options['search']['name'] = $_REQUEST['filter_name'];

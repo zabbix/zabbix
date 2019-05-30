@@ -69,7 +69,10 @@ if (!empty($data['templates'])) {
 
 if ($discovered_trigger) {
 	$triggersFormList->addRow(_('Discovered by'), new CLink($data['discoveryRule']['name'],
-		'trigger_prototypes.php?parent_discoveryid='.$data['discoveryRule']['itemid']
+		(new CUrl('trigger_prototypes.php'))
+			->setArgument('form', 'update')
+			->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+			->setArgument('triggerid', $data['triggerDiscovery']['parent_triggerid'])
 	));
 }
 

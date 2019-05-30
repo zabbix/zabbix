@@ -107,10 +107,6 @@ define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
 define('TRIGGERS_OPTION_ALL',				2);
 define('TRIGGERS_OPTION_IN_PROBLEM',		3);
 
-define('ZBX_ACK_STS_ANY',				1);
-define('ZBX_ACK_STS_WITH_UNACK',		2);
-define('ZBX_ACK_STS_WITH_LAST_UNACK',	3);
-
 define('ZBX_FONT_NAME', 'DejaVuSans');
 
 define('ZBX_AUTH_INTERNAL',	0);

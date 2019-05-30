@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
@@ -185,7 +184,7 @@ if ($hosts) {
 		$applications = API::Application()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'hostids' => $hostIds,
-			'filter' => ['name' => $filter['application']],
+			'search' => ['name' => $filter['application']],
 			'preservekeys' => true
 		]);
 	}

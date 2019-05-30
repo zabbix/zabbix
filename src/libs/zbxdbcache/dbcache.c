@@ -2161,10 +2161,11 @@ static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		i;
+	unsigned int	flags;
 	char		buffer[64], *pvalue;
 	zbx_db_insert_t	db_insert;
 
-	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "value", NULL);
+	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "value", "flags", NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -2179,23 +2180,33 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
 			continue;
 
-		switch (h->value_type)
+		if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
 		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL, h->value.dbl);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
-				break;
-			case ITEM_VALUE_TYPE_STR:
-			case ITEM_VALUE_TYPE_TEXT:
-				pvalue = h->value.str;
-				break;
-			default:
-				continue;
+			switch (h->value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+					zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL, h->value.dbl);
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
+					break;
+				case ITEM_VALUE_TYPE_STR:
+				case ITEM_VALUE_TYPE_TEXT:
+					pvalue = h->value.str;
+					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+			}
+			flags = 0;
+		}
+		else
+		{
+			flags = PROXY_HISTORY_FLAG_NOVALUE;
+			pvalue = (char *)"";
 		}
 
-		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, pvalue);
+		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, pvalue, flags);
 	}
 
 	zbx_db_insert_execute(&db_insert);
@@ -2410,6 +2421,9 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 					h_meta_num++;
 				else
 					h_num++;
+				break;
+			case ITEM_VALUE_TYPE_NONE:
+				h_num++;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -3362,6 +3376,21 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, const zbx_timespec_t *
 	string_values_offset += item_value->value.value_str.len;
 }
 
+static void	dc_local_add_history_empty(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
+		unsigned char flags)
+{
+	dc_item_value_t	*item_value;
+
+	item_value = dc_local_get_history_slot();
+
+	item_value->itemid = itemid;
+	item_value->ts = *ts;
+	item_value->item_value_type = item_value_type;
+	item_value->value_type = ITEM_VALUE_TYPE_NONE;
+	item_value->state = ITEM_STATE_NORMAL;
+	item_value->flags = flags;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: dc_add_history                                                   *
@@ -3417,7 +3446,8 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		return;
 	}
 
-	if (!ISSET_VALUE(result) && !ISSET_META(result))
+	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
+	if (!ISSET_VALUE(result) && !ISSET_META(result) && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return;
 
 	value_flags = 0;
@@ -3428,9 +3458,9 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 	if (ISSET_META(result))
 		value_flags |= ZBX_DC_FLAG_META;
 
-	/* Add data to the local history cache if:                            */
-	/*   1) the NOVALUE flag is set (data contains only meta information) */
-	/*   2) the NOVALUE flag is not set and value conversion succeeded    */
+	/* Add data to the local history cache if:                                           */
+	/*   1) the NOVALUE flag is set (data contains either meta information or timestamp) */
+	/*   2) the NOVALUE flag is not set and value conversion succeeded                   */
 
 	if (0 == (value_flags & ZBX_DC_FLAG_NOVALUE))
 	{
@@ -3472,8 +3502,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 					value_flags);
 		}
 		else
-			THIS_SHOULD_NEVER_HAPPEN;
-
+			dc_local_add_history_empty(itemid, item_value_type, ts, value_flags);
 	}
 }
 

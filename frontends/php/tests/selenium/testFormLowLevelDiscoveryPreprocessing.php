@@ -31,13 +31,13 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 
 	use PreprocessingTrait;
 
-	public static function getCreateData() {
+	public static function getCreateAllStepsData() {
 		return [
 			[
 				// Validation. Regular expression.
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD empty regular expression',
 						'Key' => 'lld-empty-both-parameters',
 					],
@@ -50,7 +50,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD empty pattern of regular expression',
 						'Key' => 'lld-empty-first-parameter',
 					],
@@ -63,7 +63,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD empty output of regular expression',
 						'Key' => 'lld-empty-second-parameter',
 					],
@@ -77,7 +77,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD JSONPath empty',
 						'Key' => 'lld-empty-jsonpath'
 					],
@@ -87,11 +87,25 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'error_details' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
+			// Custom scripts. JavaScript.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item empty JavaScript',
+						'Key' => 'item-empty-javascript',
+					],
+					'preprocessing' => [
+						['type' => 'JavaScript']
+					],
+					'error_details' => 'Incorrect value for field "params": cannot be empty.'
+				]
+			],
 			// Validation. Regular expressions matching.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD Does not match regular expression empty',
 						'Key' => 'lld-does-not-match-regular-expression-empty',
 					],
@@ -105,7 +119,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD error JSON empty',
 						'Key' => 'lld-error-json-empty'
 					],
@@ -119,7 +133,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD two equal discard unchanged with heartbeat',
 						'Key' => 'lld-two-equal-discard-uncahnged-with-heartbeat'
 					],
@@ -133,7 +147,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD two different discard unchanged with heartbeat',
 						'Key' => 'lld-two-different-discard-uncahnged-with-heartbeat'
 					],
@@ -147,7 +161,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD Discard unchanged with heartbeat empty',
 						'Key' => 'lld-discard-uncahnged-with-heartbeat-empty'
 					],
@@ -160,7 +174,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD Discard unchanged with heartbeat symbols',
 						'Key' => 'lld-discard-uncahnged-with-heartbeat-symbols'
 					],
@@ -173,7 +187,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD Discardunchanged with heartbeat letters string',
 						'Key' => 'lld-discard-uncahnged-with-heartbeat-letters-string'
 					],
@@ -186,7 +200,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD Discard unchanged with heartbeat comma',
 						'Key' => 'lld-discard-uncahnged-with-heartbeat-comma',
 					],
@@ -199,7 +213,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD Discard unchanged with heartbeat dot',
 						'Key' => 'lld-discard-uncahnged-with-heartbeat-dot',
 					],
@@ -212,7 +226,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD Discard unchanged with heartbeat negative',
 						'Key' => 'lld-discard-uncahnged-with-heartbeat-negative',
 					],
@@ -225,7 +239,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD Discard unchanged with heartbeat zero',
 						'Key' => 'lld-discard-uncahnged-with-heartbeat-zero'
 					],
@@ -238,7 +252,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD Discard unchanged with heartbeat maximum',
 						'Key' => 'lld-uncahnged-with-heartbeat-max'
 					],
@@ -252,13 +266,26 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'fields' =>[
+					'fields' => [
+						'Name' => 'Add JavaScript multiline preprocessing',
+						'Key' => 'item.javascript.multiline.preprocessing'
+					],
+					'preprocessing' => [
+						['type' => 'JavaScript', 'parameter_1' => "Test line 1\nTest line 2\nTest line 3"]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
 						'Name' => 'LLD all preprocessing steps',
 						'Key' => 'lld-all-preprocessing-steps'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => '\1'],
 						['type' => 'JSONPath', 'parameter_1' => '$.data.test'],
+						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
 						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern'],
 						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '30']
@@ -268,7 +295,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD double preprocessing steps',
 						'Key' => 'lld-double-preprocessing-steps'
 					],
@@ -279,6 +306,8 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 						['type' => 'JSONPath', 'parameter_1' => '$.data.test2'],
 						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern1'],
 						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern2'],
+						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
+						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
 						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path1'],
 						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path2']
 					]
@@ -287,7 +316,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'fields' =>[
+					'fields' => [
 						'Name' => 'LLD symbols preprocessing steps',
 						'Key' => 'lld-symbols-preprocessing-steps'
 					],
@@ -295,6 +324,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 						['type' => 'Regular expression', 'parameter_1' => '1a!@#$%^&*()-=', 'parameter_2' => '2b!@#$%^&*()-='],
 						['type' => 'JSONPath', 'parameter_1' => '3c!@#$%^&*()-='],
 						['type' => 'Does not match regular expression', 'parameter_1' => '4d!@#$%^&*()-='],
+						['type' => 'JavaScript', 'parameter_1' => '5d!@#$%^&*()-='],
 						['type' => 'Check for error in JSON', 'parameter_1' => '5e!@#$%^&*()-=']
 					]
 				]
@@ -302,14 +332,15 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'fields' =>[
-						'Name' => 'LLD user macrospreprocessing steps',
+					'fields' => [
+						'Name' => 'LLD user macros preprocessing steps',
 						'Key' => 'lld-macros-preprocessing-steps'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '{$PATTERN}', 'parameter_2' => '{$OUTPUT}'],
 						['type' => 'JSONPath', 'parameter_1' => '{$PATH}'],
 						['type' => 'Does not match regular expression', 'parameter_1' => '{$PATTERN2}'],
+						['type' => 'JavaScript', 'parameter_1' => '{$JAVASCRIPT}'],
 						['type' => 'Check for error in JSON', 'parameter_1' => '{$PATH2}'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '{$HEARTBEAT}']
 					]
@@ -321,9 +352,461 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 	/**
 	 *  Test creation of a discovery rule with Preprocessing steps.
 	 *
-	 * @dataProvider getCreateData
+	 * @dataProvider getCreateAllStepsData
 	 */
-	public function testFormLowLevelDiscoveryPreprocessing_Create($data) {
+	public function testFormLowLevelDiscoveryPreprocessing_CreateAllSteps($data) {
+		$this->executeCreate($data);
+	}
+
+	public static function getCreatePrometheusData() {
+		return [
+			// Prometheus to JSON validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON first parameter starts with digits',
+						'Key' => 'json-prometeus-digits-first-parameter',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '1name_of_metric']
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON wrong equals operator',
+						'Key' => 'json-prometeus-wrong-equals-operator',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}=1']
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON unsupported operator >',
+						'Key' => 'json-prometeus-unsupported-operator-1',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}>1'],
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON unsupported operator <',
+						'Key' => 'json-prometeus-unsupported-operator-2',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}<1'],
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON unsupported operator !==',
+						'Key' => 'json-prometeus-unsupported-operator-3',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}!==1'],
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON unsupported operator >=',
+						'Key' => 'json-prometeus-unsupported-operator-4',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}>=1'],
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON unsupported operator =<',
+						'Key' => 'json-prometeus-unsupported-operator-5',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}=<1'],
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON unsupported label operator !=',
+						'Key' => 'json-prometeus-unsupported-label-operator-1',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name!="regex_pattern"}'],
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON unsupported label operator !~',
+						'Key' => 'json-prometeus-unsupported-label-operator-2',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name!~"<regex>"}'],
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON duplicate metric condition',
+						'Key' => 'json-duplicate-metric-condition',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu_system{__name__="metric_name"}'],
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON wrong parameter - space',
+						'Key' => 'json-wrong-parameter-space',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON',  'parameter_1' => 'cpu usage_system']
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON wrong parameter - slash',
+						'Key' => 'json-wrong-parameter-slash',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON',  'parameter_1' => 'cpu\\']
+
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometheus to JSON wrong parameter - digits',
+						'Key' => 'json-wrong-parameter-digits',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON',  'parameter_1' => '123']
+
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometheus to JSON wrong first parameter - pipe',
+						'Key' => 'json-wrong-parameter-pipe',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => 'metric==1e|5']
+
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometheus to JSON wrong first parameter - slash',
+						'Key' => 'json-wrong-parameter-slash',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{label="value\"}']
+
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometheus to JSON wrong first parameter - LLD macro',
+						'Key' => 'json-wrong-first-parameter-macro',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{#METRICNAME}==1']
+
+					],
+					'error_details' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item duplicate Prometeus to JSON steps',
+						'Key' => 'duplicate-prometheus-to-json-steps',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu_usage_system_1'],
+						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu_usage_system_1']
+					],
+					'error_details' => 'Only one Prometheus step is allowed.'
+				]
+			],
+			// Successful Prometheus to JSON creation.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON empty first parameter',
+						'Key' => 'json-prometeus-empty-first-parameter',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '']
+					],
+					'error_details' => 'Incorrect value for field "params": first parameter is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON first parameter +inf',
+						'Key' => 'json-prometeus-plus-inf',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu_usage_system==+inf']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON first parameter inf',
+						'Key' => 'json-prometeus-inf',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__="metric_name"}==inf']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON first parameter -inf',
+						'Key' => 'json-prometeus-negative-inf',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}==-inf']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON first parameter nan',
+						'Key' => 'json-prometeus-nan',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__="metric_name"}==nan']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON first parameter exp',
+						'Key' => 'json-prometeus-exp',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu_usage_system==3.5180e+11']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON first parameter ==1',
+						'Key' => 'json-prometeus-neutral-digit',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__="metric_name"}==1']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON first parameters ==+1',
+						'Key' => 'json-prometeus-positive-digit',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__="metric_name"}==+1']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON first parameters ==-1',
+						'Key' => 'json-prometeus-negative-digit',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__="metric_name"}==-1']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON label operator =',
+						'Key' => 'json-prometeus-label-operator-equal-strong',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name="name"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON label operator =~',
+						'Key' => 'json-prometeus-label-operator-contains',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name=~"name"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Trailing spaces',
+						'Key' => 'json-prometeus-space-in-parameter',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '  metric  ']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON slashes in pattern',
+						'Key' => 'json-prometeus-slashes-pattern',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{label="value\\\\"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON user macros in parameter',
+						'Key' => 'json-prometeus-macros-1',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{$METRIC_NAME}==1']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON user macros in parameter',
+						'Key' => 'json-prometeus-macros-2',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__="{$METRIC_NAME}"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON user macros in parameters',
+						'Key' => 'json-prometeus-macros-3',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{{$LABEL_NAME}="<label value>"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON user macros in parameters',
+						'Key' => 'json-prometeus-macros-4',
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name="{$LABEL_VALUE}"}']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 *  Test creation of a discovery rule with Prometheus Preprocessing steps.
+	 *
+	 * @dataProvider getCreatePrometheusData
+	 */
+	public function testFormLowLevelDiscoveryPreprocessing_CreatePrometheus($data) {
+		$this->executeCreate($data);
+	}
+
+	private function executeCreate($data) {
 		if ($data['expected'] === TEST_BAD) {
 			$sql_items = 'SELECT * FROM items ORDER BY itemid';
 			$old_hash = CDBHelper::getHash($sql_items);
@@ -353,7 +836,13 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 				$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
 				$this->page->open('host_discovery.php?form=update&itemid='.$id);
 				$form->selectTab('Preprocessing');
-
+				// Check for Trailing spaces case.
+				if ($data['fields']['Name'] === 'Trailing spaces'){
+					$data['preprocessing'][0]['parameter_1'] = trim($data['preprocessing'][0]['parameter_1']);
+					if (array_key_exists('parameter_2', $data['preprocessing'][0])){
+						$data['preprocessing'][0]['parameter_2'] = trim($data['preprocessing'][0]['parameter_2']);
+					}
+				}
 				$this->assertPreprocessingSteps($data['preprocessing']);
 				break;
 
@@ -515,7 +1004,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			// 'Set value to' validation.
 			[
 				'expected' => TEST_GOOD,
-				'fields' =>[
+				'fields' => [
 					'Name' => 'Set value empty',
 					'Key' => 'set-value-empty'
 				],
@@ -526,7 +1015,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			],
 			[
 				'expected' => TEST_GOOD,
-				'fields' =>[
+				'fields' => [
 					'Name' => 'Set value number',
 					'Key' => 'set-value-number'
 				],
@@ -537,7 +1026,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			],
 			[
 				'expected' => TEST_GOOD,
-				'fields' =>[
+				'fields' => [
 					'Name' => 'Set value string',
 					'Key' => 'set-value-string'
 				],
@@ -548,7 +1037,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			],
 			[
 				'expected' => TEST_GOOD,
-				'fields' =>[
+				'fields' => [
 					'Name' => 'Set value special-symbols',
 					'Key' => 'set-value-special-symbols'
 				],
@@ -560,7 +1049,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			// 'Set error to' validation.
 			[
 				'expected' => TEST_BAD,
-				'fields' =>[
+				'fields' => [
 					'Name' => 'Set error empty',
 					'Key' => 'set-error-empty'
 				],
@@ -572,7 +1061,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			],
 			[
 				'expected' => TEST_GOOD,
-				'fields' =>[
+				'fields' => [
 					'Name' => 'Set error string',
 					'Key' => 'set-error-string'
 				],
@@ -583,7 +1072,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			],
 			[
 				'expected' => TEST_GOOD,
-				'fields' =>[
+				'fields' => [
 					'Name' => 'Set error number',
 					'Key' => 'set-error-number'
 				],
@@ -594,7 +1083,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			],
 			[
 				'expected' => TEST_GOOD,
-				'fields' =>[
+				'fields' => [
 					'Name' => 'Set error special symbols',
 					'Key' => 'set-error-special-symbols'
 				],

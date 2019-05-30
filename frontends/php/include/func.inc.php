@@ -445,20 +445,21 @@ function zbx_num2bitstr($num, $rev = false) {
  *
  * @param string $val
  *
- * @return string
+ * @return int
  */
 function str2mem($val) {
 	$unit = strtolower(substr($val, -1));
+	$val = (int) substr($val, 0, -1);
 
 	switch ($unit) {
 		case 'g':
-			$val = bcmul(substr($val, 0, -1), ZBX_GIBIBYTE, 0);
+			$val *= ZBX_GIBIBYTE;
 			break;
 		case 'm':
-			$val = bcmul(substr($val, 0, -1), ZBX_MEBIBYTE, 0);
+			$val *= ZBX_MEBIBYTE;
 			break;
 		case 'k':
-			$val = bcmul(substr($val, 0, -1), ZBX_KIBIBYTE, 0);
+			$val *= ZBX_KIBIBYTE;
 			break;
 	}
 
@@ -474,21 +475,16 @@ function str2mem($val) {
  */
 function mem2str($size) {
 	$prefix = 'B';
-	if (bccomp($size, ZBX_MEBIBYTE) == 1) {
-		$size = bcdiv($size, ZBX_MEBIBYTE, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+	if ($size > ZBX_MEBIBYTE) {
+		$size = $size / ZBX_MEBIBYTE;
 		$prefix = 'M';
 	}
-	elseif (bccomp($size, ZBX_KIBIBYTE) == 1) {
-		$size = bcdiv($size, ZBX_KIBIBYTE, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+	elseif ($size > ZBX_KIBIBYTE) {
+		$size = $size / ZBX_KIBIBYTE;
 		$prefix = 'K';
 	}
 
-	if (strpos($size, '.') !== false) {
-		$size = rtrim($size, '0');
-		$size = rtrim($size, '.');
-	}
-
-	return $size.$prefix;
+	return round($size, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT).$prefix;
 }
 
 function convertUnitsUptime($value) {
