@@ -49,21 +49,21 @@ class CItem extends CItemGeneral {
 	 *
 	 * @var array
 	 */
-	protected $secondaryTableFields = ['state', 'error', 'mtime', 'lastlogsize'];
+	protected $secondary_table_fields = ['state', 'error', 'mtime', 'lastlogsize'];
 
 	/**
 	 * Secondaary table name
 	 *
 	 * @var string
 	 */
-	protected $secondaryTableName = 'item_rtdata';
+	protected $secondary_table_name = 'item_rtdata';
 
 	/**
 	 * Secondary table alias
 	 *
 	 * @var string
 	 */
-	protected $secondaryTableAlias = 'ir';
+	protected $secondary_table_alias = 'ir';
 
 	public function __construct() {
 		parent::__construct();
@@ -159,8 +159,8 @@ class CItem extends CItemGeneral {
 				($this->outputIsRequested('state', $options['output']) || $this->outputIsRequested('error', $options['output']) ||
 				$this->outputIsRequested('mtime', $options['output']) || $this->outputIsRequested('lastlogsize', $options['output']))
 			) ||
-			(is_array($options['search']) && (isset($options['search']['state']) || isset($options['search']['error']))) ||
-			(is_array($options['filter']) && (isset($options['filter']['state']) || isset($options['filter']['error'])))
+			(is_array($options['search']) && array_key_exists('error', $options['search'])) ||
+			(is_array($options['filter']) && array_key_exists('state', $options['filter']))
 		) {
 			$sqlParts = $this->addQuerySelect($this->fieldId('*', $this->getSecondaryTableAlias()), $sqlParts);
 			$sqlParts['left_join'][$this->getSecondaryTableName()] = ['from' => $this->tableId($this->getSecondaryTableName(), $this->getSecondaryTableAlias()), 'on' => $this->fieldId('itemid', $this->getSecondaryTableAlias()) . ' = ' . $this->fieldId('itemid')];
@@ -324,20 +324,15 @@ class CItem extends CItemGeneral {
 
 		// search
 		if (is_array($options['search'])) {
-			$itemDataSearch = ['search' => [], 'startSearch' => $options['startSearch'], 'excludeSearch' => $options['excludeSearch'], 'searchByAny' => $options['searchByAny'], 'searchWildcardsEnabled' => $options['searchWildcardsEnabled']];
-
-			if (array_key_exists('state', $options['search']) && $options['search']['state'] !== null) {
-				$itemDataSearch['search']['state'] = $options['search']['state'];
-				unset($options['search']['state']);
-			}
+			$item_data_search = ['search' => [], 'startSearch' => $options['startSearch'], 'excludeSearch' => $options['excludeSearch'], 'searchByAny' => $options['searchByAny'], 'searchWildcardsEnabled' => $options['searchWildcardsEnabled']];
 
 			if (array_key_exists('error', $options['search']) && $options['search']['error'] !== null) {
-				$itemDataSearch['search']['error'] = $options['search']['error'];
+				$item_data_search['search']['error'] = $options['search']['error'];
 				unset($options['search']['error']);
 			}
 
 			zbx_db_search($this->tableId(), $options, $sqlParts);
-			zbx_db_search($this->tableId($this->getSecondaryTableName(), $this->getSecondaryTableAlias()), $itemDataSearch, $sqlParts);
+			zbx_db_search($this->tableId($this->getSecondaryTableName(), $this->getSecondaryTableAlias()), $item_data_search, $sqlParts);
 		}
 
 		// filter
@@ -355,20 +350,15 @@ class CItem extends CItemGeneral {
 				$options['filter']['trends'] = getTimeUnitFilters($options['filter']['trends']);
 			}
 
-			$itemDataFilter = ['filter' => [], 'searchByAny' => $options['searchByAny']];
+			$item_data_filter = ['filter' => [], 'searchByAny' => $options['searchByAny']];
 
 			if (array_key_exists('state', $options['filter']) && $options['filter']['state'] !== null) {
-				$itemDataFilter['filter']['state'] = $options['filter']['state'];
+				$item_data_filter['filter']['state'] = $options['filter']['state'];
 				unset($options['filter']['state']);
 			}
 
-			if (array_key_exists('error', $options['filter']) && $options['filter']['error'] !== null) {
-				$itemDataFilter['filter']['error'] = $options['filter']['error'];
-				unset($options['filter']['error']);
-			}
-
 			$this->dbFilter($this->tableId(), $options, $sqlParts);
-			$this->dbFilter($this->tableId($this->getSecondaryTableName(), $this->getSecondaryTableAlias()), $itemDataFilter, $sqlParts);
+			$this->dbFilter($this->tableId($this->getSecondaryTableName(), $this->getSecondaryTableAlias()), $item_data_filter, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
@@ -439,7 +429,7 @@ class CItem extends CItemGeneral {
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-		while ($item = DBfetch($res)) {
+		while ($item = DBfetch($res, false)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
 					$result[] = $item;
@@ -461,7 +451,8 @@ class CItem extends CItemGeneral {
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid', 'interfaceid', 'value_type'], $options['output']);
-			$result = $this->unsetExtraFields($result, ['lastlogsize', 'mtime'], []); // Fields lastlogsize, mtime should be removed from API response even for extend output requests.
+			// Fields lastlogsize, mtime should be removed from API response even for extend output requests.
+			$result = $this->unsetExtraFields($result, ['lastlogsize', 'mtime'], []);
 		}
 
 		// removing keys (hash -> array)
@@ -473,6 +464,14 @@ class CItem extends CItemGeneral {
 		$json = new CJson();
 
 		foreach ($result as &$item) {
+			foreach (array_keys($item) as $key) {
+				if (is_null($item[$key])) {
+					$table_name = in_array($key, $this->secondary_table_fields) ? $this->getSecondaryTableName() : $this->tableName();
+					$field_default = DB::getDefault($table_name, $key);
+					$item[$key] = is_null($field_default) ? '0' : $field_default;
+				}
+			}
+
 			if (array_key_exists('query_fields', $item)) {
 				$query_fields = ($item['query_fields'] !== '') ? $json->decode($item['query_fields'], true) : [];
 				$item['query_fields'] = $json->hasError() ? [] : $query_fields;
@@ -531,6 +530,26 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
+		$hosts = API::Host()->get([
+			'output' => ['hostid'],
+			'filter' => ['hostid' => zbx_objectValues($items, 'hostid')],
+		]);
+		$hostids = zbx_objectValues($hosts, 'hostid');
+		if ($hostids) {
+			foreach ($items as &$item) {
+				if (in_array($item['hostid'], $hostids)) {
+					$item['rtdata'] = DB::getDefaults($this->getSecondaryTableName());
+					foreach ($this->secondary_table_fields as $field) {
+						if (array_key_exists($field, $item)) {
+							$item['rtdata'][$field] = $item[$field];
+							unset($item[$field]);
+						}
+					}
+				}
+			}
+			unset($item, $hostids, $hosts);
+		}
+
 		$this->createReal($items);
 		$this->inherit($items);
 
@@ -543,45 +562,34 @@ class CItem extends CItemGeneral {
 	 * @param array $items
 	 */
 	protected function createReal(array &$items) {
-		$itemData = [];
+		$item_data = [];
 		foreach ($items as $key => &$item) {
 			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
 				$item['master_itemid'] = null;
 			}
 
-			$itemData[$key] = DB::getDefaults($this->getSecondaryTableName());
-			foreach ($this->secondaryTableFields as $field) {
-				if (isset($item[$field])) {
-					$itemData[$key][$field] = $item[$field];
-					unset($item[$field]);
-				}
+			if (array_key_exists('rtdata', $item)) {
+				$item_data[$key] = $item['rtdata'];
+				unset($item['rtdata']);
 			}
 		}
 		unset($item);
 
 		$itemids = DB::insert($this->tableName(), $items);
 
-		$hosts = API::Host()->get([
-			'output' => ['hostid'],
-			'filter' => ['hostid' => zbx_objectValues($items, 'hostid')],
-		]);
-
-		$hostids = zbx_objectValues($hosts, 'hostid');
-		if ($hostids) {
-			foreach ($itemids as $key => $val) {
-				if (in_array($items[$key]['hostid'], $hostids)) {
-					$itemData[$key]['itemid'] = $val;
-					continue;
-				}
-				unset($itemData[$key]);
+		foreach ($itemids as $key => $val) {
+			if (array_key_exists($key, $item_data)) {
+				$item_data[$key]['itemid'] = $val;
+				continue;
 			}
-
-			if (count($itemData)) {
-				DB::insert($this->getSecondaryTableName(), $itemData, false);
-			}
+			unset($item_data[$key]);
 		}
 
-		$itemApplications = [];
+		if (count($item_data)) {
+			DB::insert($this->getSecondaryTableName(), $item_data, false);
+		}
+
+		$item_applications = [];
 		foreach ($items as $key => $item) {
 			$items[$key]['itemid'] = $itemids[$key];
 
@@ -594,15 +602,15 @@ class CItem extends CItemGeneral {
 					continue;
 				}
 
-				$itemApplications[] = [
+				$item_applications[] = [
 					'applicationid' => $appid,
 					'itemid' => $items[$key]['itemid']
 				];
 			}
 		}
 
-		if ($itemApplications) {
-			DB::insertBatch('items_applications', $itemApplications);
+		if ($item_applications) {
+			DB::insertBatch('items_applications', $item_applications);
 		}
 
 		$this->createItemPreprocessing($items);
@@ -1252,10 +1260,12 @@ class CItem extends CItemGeneral {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (!$options['countOutput']) {
-			if (isset($sqlParts['left_join'][$this->getSecondaryTableName()]) && is_array($options['output'])) {
-				foreach ($this->secondaryTableFields as $field) {
-					if ($this->outputIsRequested($field, $options['output'])) {
-						$sqlParts = $this->addQuerySelect($this->fieldId($field, $this->getSecondaryTableAlias()), $sqlParts);
+			if (array_key_exists('left_join', $sqlParts)) {
+				if (array_key_exists($this->getSecondaryTableName(), $sqlParts['left_join']) && is_array($options['output'])) {
+					foreach ($this->secondary_table_fields as $field) {
+						if ($this->outputIsRequested($field, $options['output'])) {
+							$sqlParts = $this->addQuerySelect($this->fieldId($field, $this->getSecondaryTableAlias()), $sqlParts);
+						}
 					}
 				}
 			}
@@ -1282,11 +1292,11 @@ class CItem extends CItemGeneral {
 
 	public function getSecondaryTableName()
 	{
-		return $this->secondaryTableName;
+		return $this->secondary_table_name;
 	}
 
 	public function getSecondaryTableAlias()
 	{
-		return $this->secondaryTableAlias;
+		return $this->secondary_table_alias;
 	}
 }
