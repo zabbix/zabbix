@@ -4,6 +4,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+....I...S. [ZBX-16093] fixed regular expression File systems for discovery does not contain apfs (akozlovs)
 ..F....... [ZBX-16080] fixed setup page to not to use bclib (talbergs)
 ..F....... [ZBX-15797] fixed dashboard map widget sub-map link behaviour (miks, talbergs)
 A.F....... [ZBX-15049] fixed to host group limited global scripts to be usable in sub group (talbergs)
