@@ -583,4 +583,23 @@ in:
 out:
   return: SUCCEED
   value: no "filters"
+---
+test case: Query $.services[?(@.active=="true")].servicegroup
+include: &include zbx_jsonpath_query.inc.yaml
+in:
+  data: *include
+  path: $.services[?(@.active=="true")].servicegroup
+out:
+  return: SUCCEED
+  value: '[1000,1001]'
+---
+test case: Query $.services[?(@.active=="false")].servicegroup
+include: &include zbx_jsonpath_query.inc.yaml
+in:
+  data: *include
+  path: $.services[?(@.active=="false")].servicegroup
+out:
+  return: SUCCEED
+  value: '[1002]'
 ...
+

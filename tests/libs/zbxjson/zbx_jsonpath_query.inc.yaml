@@ -37,16 +37,19 @@
       "delivery": {
         "servicegroup": 1000,
         "description": "Next day delivery in local town",
+        "active": true,
         "price": 5
       },
       "bookbinding": {
         "servicegroup": 1001,
         "description": "Printing and assembling book in A5 format",
+        "active": true,
         "price": 154.99
       },
       "restoration": {
         "servicegroup": 1002,
         "description": "Various restoration methods",
+        "active": false,
         "methods": [
           {
             "description": "Checmical cleaning",
