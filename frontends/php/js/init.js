@@ -175,14 +175,14 @@ jQuery(function($) {
 	$(document).on('keydown click', '[data-menu-popup]', function(event) {
 		var $obj = $(this),
 			data = $obj.data('menu-popup'),
-			target = event.target;
+			position_target = event.target;
 
 		if (event.type === 'keydown' && event.which != 13) {
 			return;
 		}
 		else if (event.type === 'contextmenu' || (IE && $obj.closest('svg').length > 0)
 			|| event.originalEvent.detail !== 0) {
-			target = event;
+			position_target = event;
 		}
 
 		// Manually trigger event for menuPopupPreloaderCloseHandler call for the previous preloader.
@@ -209,7 +209,7 @@ jQuery(function($) {
 					$preloader
 						.fadeIn(200)
 						.position({
-							of: target,
+							of: position_target,
 							my: 'left top',
 							at: 'left bottom'
 						});
