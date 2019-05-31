@@ -1440,12 +1440,13 @@ function expressionLevelDraw(array $next, $level) {
 	$expr = [];
 	for ($i = 1; $i <= $level; $i++) {
 		if ($i == $level) {
-			$image = $next[$i] ? 'top_right_bottom' : 'top_right';
+			$class_name = $next[$i] ? 'icon-tree-top-bottom-right' : 'icon-tree-top-right';
 		}
 		else {
-			$image = $next[$i] ? 'top_bottom' : 'space';
+			$class_name = $next[$i] ? 'icon-tree-top-bottom' : 'icon-tree-empty';
 		}
-		$expr[] = new CImg('images/general/tr_'.$image.'.gif', 'tr', 12, 12);
+
+		$expr[] = (new CSpan(''))->addClass($class_name);
 	}
 	return $expr;
 }
