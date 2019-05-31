@@ -1302,7 +1302,12 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		size_t		tmp_offset = sql_offset, last_pos = 0;
 		zbx_json_type_t	type;
 
-		zbx_json_brackets_open(p, &jp_row);
+		if (FAIL == zbx_json_brackets_open(p, &jp_row))
+		{
+			*error = zbx_dsprintf(*error, "invalid data format: %s", zbx_json_strerror());
+			goto clean;
+		}
+
 		pf = zbx_json_next_value_dyn(&jp_row, NULL, &buf, &buf_alloc, NULL);
 
 		/* check whether we need to insert a new entry or update an existing one */
