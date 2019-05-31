@@ -2083,4 +2083,4 @@ INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (1
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16030, 40069, 16029,'last','0');
 
 -- testFormAdministrationMediaTypes
-INSERT INTO media_type (mediatypeid, type, description, exec_path, exec_params, status) VALUES (100, 1, 'Script', 'Selenium test script', 'one parameter\n', 1);
+INSERT INTO media_type (mediatypeid, type, description, exec_path, status) VALUES (100, 1, 'Test script', 'Selenium test script', 1);
