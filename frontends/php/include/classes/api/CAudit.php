@@ -186,8 +186,8 @@ class CAudit {
 
 				$resourcename = $object_old[$field_name_resourcename];
 
-				$object_old = self::sanitizeObject($object, $object_old);
-				$object_diff = self::objectsDiffRecursivly($object_old, $object);
+				$object_old = self::sanitizeObjectRecursivly($object, $object_old);
+				$object_diff = self::diffObjectRecursivly($object_old, $object);
 
 				if (!$object_diff) {
 					continue;
@@ -254,13 +254,14 @@ class CAudit {
 	/**
 	 * Remove from array2 all keys from array1 that not exists
 	 * Add keys and value to array2 that represent only in array1
+	 * Recursivly.
 	 *
 	 * @param array $array1
 	 * @param array $array2
 	 *
 	 * @return array
 	 */
-	protected static function sanitizeObject(array $array1, array $array2)
+	protected static function sanitizeObjectRecursivly(array $array1, array $array2)
 	{
 		foreach (array_keys($array2) as $key) {
 			if (!is_int($key) && !array_key_exists($key, $array1)) {
@@ -268,8 +269,8 @@ class CAudit {
 				continue;
 			}
 
-			if (is_array($array1[$key])) {
-				$array2[$key] = self::sanitizeObject($array1[$key], $array2[$key]);
+			if (array_key_exists($key, $array1) && is_array($array1[$key])) {
+				$array2[$key] = self::sanitizeObjectRecursivly($array1[$key], $array2[$key]);
 			}
 		}
 
@@ -284,23 +285,24 @@ class CAudit {
 
 	/**
 	 * Diff two arrays
+	 * Recursivly.
 	 *
 	 * @param array $array1
 	 * @param array $array2
 	 *
 	 * @return array
 	 */
-	protected static function objectsDiffRecursivly(array $array1, array $array2)
+	protected static function diffObjectRecursivly(array $array1, array $array2)
 	{
 		$result = [];
 
 		foreach ($array1 as $key => $val) {
-			if (array_key_exists($key, $array2) && (string)$val == (string)$array2[$key]) {
+			if (array_key_exists($key, $array2) && $val == $array2[$key]) {
 				if (is_array($val) || is_array($array2[$key])) {
 					if (false === is_array($val) || false === is_array($array2[$key])) {
 						$result[$key] = $val;
 					} else {
-						$result[$key] = self::objectsDiffRecursivly($val, $array2[$key]);
+						$result[$key] = self::diffObjectRecursivly($val, $array2[$key]);
 						if (sizeof($result[$key]) === 0) {
 							unset($result[$key]);
 						}

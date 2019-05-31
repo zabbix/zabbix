@@ -155,11 +155,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'ack_shortdata' => getRequest('ack_shortdata', ''),
 		'ack_longdata' => getRequest('ack_longdata', ''),
 		'operations' => getRequest('operations', []),
-		'recoveryOperations' => getRequest('recovery_operations', []),
-		'acknowledgeOperations' => getRequest('ack_operations', [])
+		'recovery_operations' => getRequest('recovery_operations', []),
+		'acknowledge_operations' => getRequest('ack_operations', [])
 	];
 
-	foreach (['operations', 'recoveryOperations', 'acknowledgeOperations'] as $operation_key) {
+	foreach (['operations', 'recovery_operations', 'acknowledge_operations'] as $operation_key) {
 		foreach ($action[$operation_key] as &$operation) {
 			if (array_key_exists('opmessage', $operation)
 					&& !array_key_exists('default_msg', $operation['opmessage'])) {
