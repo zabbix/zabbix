@@ -3013,6 +3013,28 @@ $var-icons: (
 	}
 }
 
+$trigger-expression-tree-icons: (
+	top-bottom: url(../img/icon-sprite.svg) no-repeat -84px -300px,
+	top-bottom-right: url(../img/icon-sprite.svg) no-repeat -84px -334px,
+	top-right: url(../img/icon-sprite.svg) no-repeat -84px -372px,
+	empty: url(../img/icon-sprite.svg) no-repeat -84px -350px
+);
+
+@each $var-icon, $bgimage in $trigger-expression-tree-icons {
+	.icon-tree-#{$var-icon} {
+		margin: 0 12px 0 0;
+
+		&::before {
+			background: $bgimage;
+			display: inline-block;
+			width: 12px;
+			height: 12px;
+			position: absolute;
+			content: '';
+		}
+	}
+}
+
 $form-icon-btn: (
 	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
@@ -6588,6 +6610,10 @@ ul.checkbox-list {
 	&::before {
 		background-position: -524px -245px;
 	}
+}
+
+#expressions_list .ui-sortable-helper {
+	display: table;
 }
 
 // RANGE CONTROL

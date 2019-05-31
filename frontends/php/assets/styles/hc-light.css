@@ -2032,6 +2032,46 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .icon-ackn::before {
     background: url(../img/icon-sprite.svg) no-repeat -45px -693px; }
 
+.icon-tree-top-bottom {
+  margin: 0 12px 0 0; }
+  .icon-tree-top-bottom::before {
+    background: url(../img/icon-sprite.svg) no-repeat -84px -300px;
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    content: ''; }
+
+.icon-tree-top-bottom-right {
+  margin: 0 12px 0 0; }
+  .icon-tree-top-bottom-right::before {
+    background: url(../img/icon-sprite.svg) no-repeat -84px -334px;
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    content: ''; }
+
+.icon-tree-top-right {
+  margin: 0 12px 0 0; }
+  .icon-tree-top-right::before {
+    background: url(../img/icon-sprite.svg) no-repeat -84px -372px;
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    content: ''; }
+
+.icon-tree-empty {
+  margin: 0 12px 0 0; }
+  .icon-tree-empty::before {
+    background: url(../img/icon-sprite.svg) no-repeat -84px -350px;
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    content: ''; }
+
 .icon-help {
   background: transparent url(../img/icon-sprite.svg) no-repeat -6px -726px; }
 
@@ -4704,6 +4744,9 @@ ul.checkbox-list.col-3 > li {
   color: #000; }
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
+
+#expressions_list .ui-sortable-helper {
+  display: table; }
 
 .range-control {
   position: relative;
