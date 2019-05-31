@@ -96,7 +96,7 @@ class testGeneric extends CLegacyWebTest {
 			['zabbix.php?action=proxy.list',						'Configuration of proxies'],
 			['zabbix.php?action=authentication.edit',				'Configuration of authentication'],
 			['usergrps.php',					'Configuration of user groups'],
-			['users.php',						'Configuration of users'],
+			['zabbix.php?action=user.edit',		'Configuration of users'],
 			['zabbix.php?action=mediatype.list',					'Configuration of media types'],
 			['zabbix.php?action=script.list',						'Configuration of scripts'],
 			['auditlogs.php',					'Audit log'],
@@ -115,7 +115,7 @@ class testGeneric extends CLegacyWebTest {
 
 			// Misc
 			['zabbix.php?action=search&search=server',		'Search'],
-			['profile.php',					'User profile']
+			['zabbix.php?action=profile.edit',				'User profile']
 		];
 	}
 

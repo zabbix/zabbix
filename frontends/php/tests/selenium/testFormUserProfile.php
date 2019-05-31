@@ -27,7 +27,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				. ' from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
-		$this->zbxTestLogin('profile.php');
+		$this->zbxTestLogin('zabbix.php?action=profile.edit');
 
 		$this->zbxTestCheckTitle('User profile');
 
@@ -42,7 +42,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				. ' from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
-		$this->zbxTestLogin('profile.php');
+		$this->zbxTestLogin('zabbix.php?action=profile.edit');
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
 		$this->zbxTestInputTypeOverwrite('refresh', '60');
 
@@ -58,7 +58,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_BAD,
 				'password1' => '',
 				'password2' => '',
-				'error_msg' => 'Password should not be empty'
+				'error_msg' => 'Incorrect value for field "passwd": cannot be empty.'
 			]],
 			[[
 				'expected' => TEST_BAD,
@@ -92,7 +92,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$sqlHashUsers = 'select * from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
-		$this->zbxTestLogin('profile.php');
+		$this->zbxTestLogin('zabbix.php?action=profile.edit');
 
 		$this->zbxTestClickXpathWait("//ul[@id='userFormList']//button[contains(@onclick, 'change_password')]");
 		$this->zbxTestInputTypeWait('password1', $data['password1']);
@@ -118,7 +118,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$sqlHashUsers = "select * from users where alias<>'".PHPUNIT_LOGIN_NAME."' order by userid";
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
-		$this->zbxTestLogin('profile.php');
+		$this->zbxTestLogin('zabbix.php?action=profile.edit');
 
 		$this->zbxTestDropdownSelect('theme', 'Blue');
 		$this->zbxTestClickWait('update');
@@ -205,7 +205,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$sqlHashUsers = 'select * from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
-		$this->zbxTestLogin('profile.php');
+		$this->zbxTestLogin('zabbix.php?action=profile.edit');
 
 		$this->zbxTestInputTypeOverwrite('refresh', $data['refresh']);
 		$this->zbxTestClickWait('update');
@@ -312,7 +312,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$sqlHashUsers = 'select * from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
-		$this->zbxTestLogin('profile.php');
+		$this->zbxTestLogin('zabbix.php?action=profile.edit');
 
 		$this->zbxTestCheckboxSelect('autologout_visible', true);
 		$this->zbxTestInputTypeOverwrite('autologout', $data['autologout']);
@@ -426,7 +426,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	 * @dataProvider messaging
 	 */
 	public function testFormProfile_MessagesTimeout($data) {
-		$this->zbxTestLogin('profile.php');
+		$this->zbxTestLogin('zabbix.php?action=profile.edit');
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
 		$this->zbxTestTabSwitch('Messaging');
 
@@ -540,7 +540,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	 * @dataProvider media
 	 */
 	public function testFormProfile_Media($data) {
-		$this->zbxTestLogin('profile.php');
+		$this->zbxTestLogin('zabbix.php?action=profile.edit');
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
 		$this->zbxTestTabSwitch('Media');
 		$this->zbxTestClickButtonText('Add');

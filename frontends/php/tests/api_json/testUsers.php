@@ -1469,7 +1469,7 @@ class testUsers extends CAPITest {
 					'type' => 3,
 					'theme' => 'dark-theme',
 					'rows_per_page' => 25,
-					'url' => 'profile.php'
+					'url' => 'zabbix.php?action=profile.edit'
 				],
 				'expected_error' => null
 			],

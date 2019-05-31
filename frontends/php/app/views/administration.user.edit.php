@@ -19,35 +19,38 @@
 **/
 
 
-include('include/views/js/administration.users.edit.js.php');
+$this->includeJSfile('app/views/administration.user.edit.js.php');
+$this->addJsFile('multiselect.js');
 
 if ($data['is_profile']) {
-	$userWidget = ($data['name'] !== '' || $data['surname'] !== '')
+	$widget = ($data['name'] !== '' || $data['surname'] !== '')
 		? (new CWidget())->setTitle(_('User profile').NAME_DELIMITER.$data['name'].' '.$data['surname'])
 		: (new CWidget())->setTitle(_('User profile').NAME_DELIMITER.$data['alias']);
 }
 else {
-	$userWidget = (new CWidget())->setTitle(_('Users'));
+	$widget = (new CWidget())->setTitle(_('Users'));
 }
 
-// create form
-$userForm = (new CForm())
-	->setName('userForm')
+$tabs = new CTabView();
+
+if ($data['form_refresh'] == 0) {
+	$tabs->setSelected(0);
+}
+
+// Create form.
+$user_form = (new CForm())
+	->setName('user_form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('form', $data['form']);
+	->addVar('action', $data['action'])
+	->addVar('userid', $data['userid']);
 
-if ($data['userid'] != 0) {
-	$userForm->addVar('userid', $data['userid']);
-}
 
-/*
- * User tab
- */
-$userFormList = new CFormList('userFormList');
+// Create form list and user tab.
+$user_form_list = new CFormList('user_form_list');
 $form_autofocus = false;
 
 if (!$data['is_profile']) {
-	$userFormList->addRow(
+	$user_form_list->addRow(
 		(new CLabel(_('Alias'), 'alias'))->setAsteriskMark(),
 		(new CTextBox('alias', $data['alias']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -56,27 +59,24 @@ if (!$data['is_profile']) {
 			->setAttribute('maxlength', DB::getFieldLength('users', 'alias'))
 	);
 	$form_autofocus = true;
-	$userFormList->addRow(_x('Name', 'user first name'),
+	$user_form_list->addRow(_x('Name', 'user first name'),
 		(new CTextBox('name', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('maxlength', DB::getFieldLength('users', 'name'))
 	);
-	$userFormList->addRow(_('Surname'),
+	$user_form_list->addRow(_('Surname'),
 		(new CTextBox('surname', $data['surname']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('maxlength', DB::getFieldLength('users', 'surname'))
 	);
-}
 
-// append user groups to form list
-if (!$data['is_profile']) {
 	$user_groups = [];
 
 	foreach ($data['groups'] as $group) {
 		$user_groups[] = CArrayHelper::renameKeys($group, ['usrgrpid' => 'id']);
 	}
 
-	$userFormList->addRow(
+	$user_form_list->addRow(
 		(new CLabel(_('Groups'), 'user_groups__ms'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'user_groups[]',
@@ -86,7 +86,7 @@ if (!$data['is_profile']) {
 				'parameters' => [
 					'srctbl' => 'usrgrp',
 					'srcfld1' => 'usrgrpid',
-					'dstfrm' => $userForm->getName(),
+					'dstfrm' => $user_form->getName(),
 					'dstfld1' => 'user_groups_'
 				]
 			]
@@ -96,9 +96,9 @@ if (!$data['is_profile']) {
 	);
 }
 
-// append password to form list
+// Append password to form list.
 if ($data['userid'] == 0 || $data['change_password']) {
-	$userForm->disablePasswordAutofill();
+	$user_form->disablePasswordAutofill();
 	$password_box = new CPassBox('password1', $data['password1']);
 
 	if (!$form_autofocus) {
@@ -106,13 +106,13 @@ if ($data['userid'] == 0 || $data['change_password']) {
 		$password_box->setAttribute('autofocus', 'autofocus');
 	}
 
-	$userFormList->addRow(
+	$user_form_list->addRow(
 		(new CLabel(_('Password'), 'password1'))->setAsteriskMark(),
 		$password_box
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 	);
-	$userFormList->addRow(
+	$user_form_list->addRow(
 		(new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
 		(new CPassBox('password2', $data['password2']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -120,73 +120,78 @@ if ($data['userid'] == 0 || $data['change_password']) {
 	);
 
 	if ($data['change_password']) {
-		$userForm->addVar('change_password', $data['change_password']);
+		$user_form->addVar('change_password', $data['change_password']);
 	}
 
-	$userFormList->addRow('', _('Password is not mandatory for non internal authentication type.'));
+	$user_form_list->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
 else {
-	$passwdButton = (new CSimpleButton(_('Change password')))
-		->onClick('javascript: submitFormWithParam("'.$userForm->getName().'", "change_password", "1");')
+	$passwd_btn = (new CSimpleButton(_('Change password')))
+		->onClick('javascript: submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
 		->addClass(ZBX_STYLE_BTN_GREY);
 	if ($data['alias'] == ZBX_GUEST_USER) {
-		$passwdButton->setAttribute('disabled', 'disabled');
+		$passwd_btn->setAttribute('disabled', 'disabled');
 	}
 
 	if (!$form_autofocus) {
 		$form_autofocus = true;
-		$passwdButton->setAttribute('autofocus', 'autofocus');
+		$passwd_btn->setAttribute('autofocus', 'autofocus');
 	}
 
-	$userFormList->addRow(_('Password'), $passwdButton);
+	$user_form_list->addRow(_('Password'), $passwd_btn);
 }
 
-// append languages to form list
-$languageComboBox = new CComboBox('lang', $data['lang']);
+// Append languages to form list.
+$lang_combobox = new CComboBox('lang', $data['lang']);
 
-$allLocalesAvailable = true;
-foreach (getLocales() as $localeId => $locale) {
+$all_locales_available = true;
+foreach (getLocales() as $localeid => $locale) {
 	if ($locale['display']) {
-		// checking if this locale exists in the system. The only way of doing it is to try and set one
-		// trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC
-		$localeExists = ($localeId === 'en_GB' || setlocale(LC_MONETARY , zbx_locale_variants($localeId)));
+		/*
+		 * Checking if this locale exists in the system. The only way of doing it is to try and set one
+		 * trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC.
+		 */
+		$locale_exists = ($localeid === 'en_GB' || setlocale(LC_MONETARY , zbx_locale_variants($localeid)));
 
-		$languageComboBox->addItem(
-			$localeId,
+		$lang_combobox->addItem(
+			$localeid,
 			$locale['name'],
-			($localeId == $data['lang']) ? true : null,
-			$localeExists
+			($localeid == $data['lang']) ? true : null,
+			$locale_exists
 		);
 
-		$allLocalesAvailable &= $localeExists;
+		$all_locales_available &= $locale_exists;
 	}
 }
 
-// restoring original locale
+// Restoring original locale.
 setlocale(LC_MONETARY, zbx_locale_variants(CWebUser::$data['lang']));
 
-$languageError = '';
+$language_error = '';
 if (!function_exists('bindtextdomain')) {
-	$languageError = 'Translations are unavailable because the PHP gettext module is missing.';
-	$languageComboBox->setAttribute('disabled', 'disabled');
+	$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
+	$lang_combobox->setAttribute('disabled', 'disabled');
 }
-elseif (!$allLocalesAvailable) {
-	$languageError = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
+elseif (!$all_locales_available) {
+	$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 }
 
-if (!$form_autofocus && $languageComboBox->getAttribute('disabled') === null) {
-	$languageComboBox->setAttribute('autofocus', 'autofocus');
+if (!$form_autofocus && $lang_combobox->getAttribute('disabled') === null) {
+	$lang_combobox->setAttribute('autofocus', 'autofocus');
 	$form_autofocus = true;
 }
 
-$userFormList->addRow(
+$user_form_list->addRow(
 	_('Language'),
-	$languageError
-		? [$languageComboBox, SPACE, (new CSpan($languageError))->addClass('red')->addClass('wrap')]
-		: $languageComboBox
+	$language_error
+		? [$lang_combobox, SPACE,
+			(new CSpan($language_error))
+				->addClass('red')
+				->addClass('wrap')]
+		: $lang_combobox
 );
 
-// append themes to form list
+// Append themes to form list.
 $themes = array_merge([THEME_DEFAULT => _('System default')], Z::getThemes());
 $themes_combobox = new CComboBox('theme', $data['theme'], null, $themes);
 
@@ -195,29 +200,29 @@ if (!$form_autofocus) {
 	$form_autofocus = true;
 }
 
-$userFormList->addRow(_('Theme'), $themes_combobox);
+$user_form_list->addRow(_('Theme'), $themes_combobox);
 
-// append auto-login & auto-logout to form list
-$autologoutCheckBox = (new CCheckBox('autologout_visible'))->setChecked($data['autologout_visible']);
+// Append auto-login & auto-logout to form list.
+$autologout_checkbox = (new CCheckBox('autologout_visible'))->setChecked($data['autologout_visible']);
 if ($data['autologout_visible']) {
-	$autologoutTextBox = (new CTextBox('autologout', $data['autologout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
+	$autologout_textbox = (new CTextBox('autologout', $data['autologout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 }
 else {
-	$autologoutTextBox = (new CTextBox('autologout', DB::getDefault('users', 'autologout')))
+	$autologout_textbox = (new CTextBox('autologout', DB::getDefault('users', 'autologout')))
 		->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 		->setAttribute('disabled', 'disabled');
 }
 
 if ($data['alias'] != ZBX_GUEST_USER) {
-	$userFormList->addRow(_('Auto-login'), (new CCheckBox('autologin'))->setChecked($data['autologin']));
-	$userFormList->addRow(_('Auto-logout'), [
-		$autologoutCheckBox,
+	$user_form_list->addRow(_('Auto-login'), (new CCheckBox('autologin'))->setChecked($data['autologin']));
+	$user_form_list->addRow(_('Auto-logout'), [
+		$autologout_checkbox,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$autologoutTextBox
+		$autologout_textbox
 	]);
 }
 
-$userFormList
+$user_form_list
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
 		(new CTextBox('refresh', $data['refresh']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -232,14 +237,12 @@ $userFormList
 		(new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-/*
- * Media tab
- */
-if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])) {
-	$userMediaFormList = new CFormList('userMediaFormList');
-	$userForm->addVar('user_medias', $data['user_medias']);
+// Media tab.
+if (!$data['is_profile'] || ($data['is_profile'] && CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER)) {
+	$user_media_form_list = new CFormList('userMediaFormList');
+	$user_form->addVar('user_medias', $data['user_medias']);
 
-	$mediaTableInfo = (new CTable())
+	$media_table_info = (new CTable())
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), ('Status'), _('Action')]);
 
@@ -248,17 +251,17 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			$status = (new CLink(_('Enabled'), '#'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
-				->onClick('return create_var("'.$userForm->getName().'","disable_media",'.$id.', true);');
+				->onClick('return create_var("'.$user_form->getName().'","disable_media",'.$id.', true);');
 		}
 		else {
 			$status = (new CLink(_('Disabled'), '#'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
-				->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);');
+				->onClick('return create_var("'.$user_form->getName().'","enable_media",'.$id.', true);');
 		}
 
 		$popup_options = [
-			'dstfrm' => $userForm->getName(),
+			'dstfrm' => $user_form->getName(),
 			'media' => $id,
 			'mediatypeid' => $media['mediatypeid'],
 			'period' => $media['period'],
@@ -275,17 +278,17 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			$popup_options['sendto'] = $media['sendto'];
 		}
 
-		$mediaSeverity = [];
+		$media_severity = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severityName = getSeverityName($severity, $data['config']);
+			$severity_name = getSeverityName($severity, $data['config']);
 			$severity_status_style = getSeverityStatusStyle($severity);
 
-			$mediaActive = ($media['severity'] & (1 << $severity));
+			$media_active = ($media['severity'] & (1 << $severity));
 
-			$mediaSeverity[$severity] = (new CSpan(mb_substr($severityName, 0, 1)))
-				->setHint($severityName.' ('.($mediaActive ? _('on') : _('off')).')', '', false)
-				->addClass($mediaActive ? $severity_status_style : ZBX_STYLE_STATUS_DISABLED_BG);
+			$media_severity[$severity] = (new CSpan(mb_substr($severity_name, 0, 1)))
+				->setHint($severity_name.' ('.($media_active ? _('on') : _('off')).')', '', false)
+				->addClass($media_active ? $severity_status_style : ZBX_STYLE_STATUS_DISABLED_BG);
 		}
 
 		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
@@ -296,14 +299,14 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			$media['sendto'] = (new CSpan(mb_substr($media['sendto'], 0, 50).'...'))->setHint($media['sendto']);
 		}
 
-		$mediaTableInfo->addRow(
+		$media_table_info->addRow(
 			(new CRow([
 				$media['description'],
 				$media['sendto'],
 				(new CDiv($media['period']))
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
-				(new CDiv($mediaSeverity))->addClass(ZBX_STYLE_STATUS_CONTAINER),
+				(new CDiv($media_severity))->addClass(ZBX_STYLE_STATUS_CONTAINER),
 				$status,
 				(new CCol(
 					new CHorList([
@@ -319,13 +322,13 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 		);
 	}
 
-	$userMediaFormList->addRow(_('Media'),
+	$user_media_form_list->addRow(_('Media'),
 		(new CDiv([
-			$mediaTableInfo,
+			$media_table_info,
 			(new CButton(null, _('Add')))
 				->onClick('return PopUp("popup.media",'.
 					CJs::encodeJson([
-						'dstfrm' => $userForm->getName()
+						'dstfrm' => $user_form->getName()
 					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),
@@ -334,25 +337,27 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 }
-else {
-	$userMediaFormList = null;
+
+// Append form lists to tab.
+$tabs->addTab('userTab', _('User'), $user_form_list);
+
+if (!$data['is_profile'] || ($data['is_profile'] && CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER)) {
+	$tabs->addTab('mediaTab', _('Media'), $user_media_form_list);
 }
 
-/*
- * Profile fields
- */
 if ($data['is_profile']) {
-	$zbxSounds = getSounds();
+	// Messaging tab.
 
-	$userMessagingFormList = new CFormList();
-	$userMessagingFormList->addRow(_('Frontend messaging'),
+	$zbx_sounds = getSounds();
+
+	$user_messaging_form_list = new CFormList();
+	$user_messaging_form_list->addRow(_('Frontend messaging'),
 		(new CCheckBox('messages[enabled]'))
 			->setChecked($data['messages']['enabled'] == 1)
 			->setUncheckedValue(0)
 	);
-	$userMessagingFormList->addRow(_('Message timeout'),
-		(new CTextBox('messages[timeout]', $data['messages']['timeout']))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH),
+	$user_messaging_form_list->addRow(_('Message timeout'),
+		(new CTextBox('messages[timeout]', $data['messages']['timeout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH),
 		'timeout_row'
 	);
 
@@ -364,21 +369,21 @@ if ($data['is_profile']) {
 			-1 => _('Message timeout')
 		]
 	);
-	$userMessagingFormList->addRow(_('Play sound'), $repeatSound, 'repeat_row');
+	$user_messaging_form_list->addRow(_('Play sound'), $repeatSound, 'repeat_row');
 
-	$soundList = new CComboBox('messages[sounds.recovery]', $data['messages']['sounds.recovery']);
-	foreach ($zbxSounds as $filename => $file) {
-		$soundList->addItem($file, $filename);
+	$sound_list = new CComboBox('messages[sounds.recovery]', $data['messages']['sounds.recovery']);
+	foreach ($zbx_sounds as $filename => $file) {
+		$sound_list->addItem($file, $filename);
 	}
 
-	$triggersTable = (new CTable())
+	$triggers_table = (new CTable())
 		->addRow([
 			(new CCheckBox('messages[triggers.recovery]'))
 				->setLabel(_('Recovery'))
 				->setChecked($data['messages']['triggers.recovery'] == 1)
 				->setUncheckedValue(0),
 			[
-				$soundList,
+				$sound_list,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)
@@ -392,7 +397,7 @@ if ($data['is_profile']) {
 			]
 		]);
 
-	$msgVisibility = ['1' => [
+	$msg_visibility = ['1' => [
 		'messages[timeout]',
 		'messages[sounds.repeat]',
 		'messages[sounds.recovery]',
@@ -404,18 +409,18 @@ if ($data['is_profile']) {
 
 	// trigger sounds
 	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-		$soundList = new CComboBox('messages[sounds.'.$severity.']', $data['messages']['sounds.'.$severity]);
-		foreach ($zbxSounds as $filename => $file) {
-			$soundList->addItem($file, $filename);
+		$sound_list = new CComboBox('messages[sounds.'.$severity.']', $data['messages']['sounds.'.$severity]);
+		foreach ($zbx_sounds as $filename => $file) {
+			$sound_list->addItem($file, $filename);
 		}
 
-		$triggersTable->addRow([
+		$triggers_table->addRow([
 			(new CCheckBox('messages[triggers.severities]['.$severity.']'))
 				->setLabel(getSeverityName($severity, $data['config']))
 				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
 				->setUncheckedValue(0),
 			[
-				$soundList,
+				$sound_list,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)
@@ -429,49 +434,40 @@ if ($data['is_profile']) {
 			]
 		]);
 
-		zbx_subarray_push($msgVisibility, 1, 'messages[triggers.severities]['.$severity.']');
-		zbx_subarray_push($msgVisibility, 1, 'messages[sounds.'.$severity.']');
+		zbx_subarray_push($msg_visibility, 1, 'messages[triggers.severities]['.$severity.']');
+		zbx_subarray_push($msg_visibility, 1, 'messages[sounds.'.$severity.']');
 	}
 
-	$userMessagingFormList
-		->addRow(_('Trigger severity'), $triggersTable, 'triggers_row')
+	$user_messaging_form_list
+		->addRow(_('Trigger severity'), $triggers_table, 'triggers_row')
 		->addRow(_('Show suppressed problems'),
 			(new CCheckBox('messages[show_suppressed]'))
 				->setChecked($data['messages']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
 		);
+
+	$tabs->addTab('messagingTab', _('Messaging'), $user_messaging_form_list);
 }
 else {
-	$userMessagingFormList = null;
-}
+	// Permissions tab.
 
-// append form lists to tab
-$userTab = new CTabView();
-if (!$data['form_refresh']) {
-	$userTab->setSelected(0);
-}
-$userTab->addTab('userTab', _('User'), $userFormList);
-if ($userMediaFormList) {
-	$userTab->addTab('mediaTab', _('Media'), $userMediaFormList);
-}
+	$permissions_form_list = new CFormList('permissionsFormList');
 
-// Permissions tab.
-if (!$data['is_profile']) {
-	$permissionsFormList = new CFormList('permissionsFormList');
-
-	$userTypeComboBox = new CComboBox('user_type', $data['user_type'], 'submit();', [
+	$user_type_combobox = new CComboBox('user_type', $data['user_type'], 'submit()', [
 		USER_TYPE_ZABBIX_USER => user_type2str(USER_TYPE_ZABBIX_USER),
 		USER_TYPE_ZABBIX_ADMIN => user_type2str(USER_TYPE_ZABBIX_ADMIN),
 		USER_TYPE_SUPER_ADMIN => user_type2str(USER_TYPE_SUPER_ADMIN)
 	]);
 
 	if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
-		$userTypeComboBox->setEnabled(false);
-		$permissionsFormList->addRow(_('User type'), [$userTypeComboBox, SPACE, new CSpan(_('User can\'t change type for himself'))]);
-		$userForm->addItem((new CVar('user_type', $data['user_type']))->removeId());
+		$user_type_combobox->setEnabled(false);
+		$permissions_form_list->addRow(_('User type'),
+			[$user_type_combobox, SPACE, new CSpan(_('User can\'t change type for himself'))]
+		);
+		$user_form->addItem((new CVar('user_type', $data['user_type']))->removeId());
 	}
 	else {
-		$permissionsFormList->addRow(_('User type'), $userTypeComboBox);
+		$permissions_form_list->addRow(_('User type'), $user_type_combobox);
 	}
 
 	$permissions_table = (new CTable())
@@ -495,7 +491,7 @@ if (!$data['is_profile']) {
 		}
 	}
 
-	$permissionsFormList
+	$permissions_form_list
 		->addRow(_('Permissions'),
 			(new CDiv($permissions_table))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -503,41 +499,44 @@ if (!$data['is_profile']) {
 		)
 		->addInfo(_('Permissions can be assigned for user groups only.'));
 
-	$userTab->addTab('permissionsTab', _('Permissions'), $permissionsFormList);
+	$tabs->addTab('permissionsTab', _('Permissions'), $permissions_form_list);
 }
 
-if ($userMessagingFormList) {
-	$userTab->addTab('messagingTab', _('Messaging'), $userMessagingFormList);
-}
-
-// append buttons to form
+// Append buttons to form.
 if ($data['userid'] != 0) {
 	$buttons = [
-		new CButtonCancel()
+		(new CRedirectButton(_('Cancel'),
+			$data['is_profile'] ? ZBX_DEFAULT_URL : 'zabbix.php?action=user.list')
+		)->setId('cancel')
 	];
 
 	if (!$data['is_profile']) {
-		$deleteButton = new CButtonDelete(_('Delete selected user?'), url_param('form').url_param('userid'));
+		$delete_btn = (new CRedirectButton(_('Delete'),
+			'zabbix.php?action=user.delete&sid='.$data['sid'].'&group_userid[]='.$data['userid'],
+			_('Delete selected user?')
+		))->setId('delete');
+
 		if (bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
-			$deleteButton->setAttribute('disabled', 'disabled');
+			$delete_btn->setAttribute('disabled', 'disabled');
 		}
 
-		array_unshift($buttons, $deleteButton);
+		array_unshift($buttons, $delete_btn);
 	}
 
-	$userTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$tabs->setFooter(makeFormFooter(
+		(new CSubmitButton(_('Update'), 'action', $data['is_profile'] ? 'profile.update' : 'user.update'))
+			->setId('update'),
+		$buttons
+	));
 }
 else {
-	$userTab->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
-		[new CButtonCancel()]
+	$tabs->setFooter(makeFormFooter(
+		(new CSubmitButton(_('Add'), 'action', 'user.create'))->setId('add'),
+		[(new CRedirectButton(_('Cancel'), 'zabbix.php?action=user.list'))->setId('cancel')]
 	));
 }
 
-// append tab to form
-$userForm->addItem($userTab);
+// Append tab to form.
+$user_form->addItem($tabs);
 
-// append form to widget
-$userWidget->addItem($userForm);
-
-return $userWidget;
+$widget->addItem($user_form)->show();

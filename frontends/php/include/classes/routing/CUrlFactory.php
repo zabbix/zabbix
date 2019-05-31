@@ -93,9 +93,6 @@ class CUrlFactory {
 		'usergrps.php' => [
 			'remove' => ['usrgrpid']
 		],
-		'users.php' => [
-			'remove' => ['userid']
-		],
 		'__default' => [
 			'remove' => ['cancel', 'form', 'delete']
 		]
