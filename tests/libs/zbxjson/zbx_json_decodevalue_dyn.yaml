@@ -1,0 +1,383 @@
+---
+test case: Decode fail ''
+in:
+  data: ''
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail 'a b'
+in:
+  data: 'a b'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail ' 1'
+in:
+  data: ' 1'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail '+1'
+in:
+  data: '+1'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail '--1'
+in:
+  data: '--1'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail '.5'
+in:
+  data: '.5'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail '01'
+in:
+  data: '01'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail '"a\X"'
+in:
+  data: '"a\X"'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail '"a\'
+in:
+  data: '"a\'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail '"a'
+in:
+  data: '"a'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail '"'
+in:
+  data: '"'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail '[1, 2]'
+in:
+  data: '[1, 2]'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail '{"a":1}'
+in:
+  data: '{"a":1}'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail 'NULL'
+in:
+  data: 'NULL'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail 'TRUE'
+in:
+  data: 'TRUE'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode fail 'FALSE'
+in:
+  data: 'FALSE'
+  size: 1024
+out:
+  offset: 0
+---
+test case: Decode success '"longer value"' with small output buffer
+in:
+  data: '"longer value"'
+  size: 10
+out:
+  offset: 14
+  type: ZBX_JSON_TYPE_STRING
+  value: longer value
+---
+test case: Decode success '12345678901234567890' with small output buffer
+in:
+  data: '12345678901234567890'
+  size: 10
+out:
+  offset: 20
+  type: ZBX_JSON_TYPE_INT
+  value: 12345678901234567890
+---
+test case: Decode fail 'true' with small output buffer
+in:
+  data: 'true'
+  size: 2
+out:
+  offset: 4
+  type: ZBX_JSON_TYPE_TRUE
+  value: true
+---
+test case: Decode fail 'false' with small output buffer
+in:
+  data: 'false'
+  size: 2
+out:
+  offset: 5
+  type: ZBX_JSON_TYPE_FALSE
+  value: false
+---
+test case: Decode fail 'null' with small output buffer
+in:
+  data: 'null'
+  size: 0
+out:
+  offset: 4
+  type: ZBX_JSON_TYPE_NULL
+  value: ''
+---
+test case: Decode fail '"text"' with 0 output buffer
+in:
+  data: '"text"'
+  size: 0
+out:
+  offset: 6
+  type: ZBX_JSON_TYPE_STRING
+  value: text
+---
+test case: Decode fail 'true' with 0 output buffer
+in:
+  data: 'true'
+  size: 0
+out:
+  offset: 4
+  type: ZBX_JSON_TYPE_TRUE
+  value: true
+---
+test case: Decode fail 'false' with 0 output buffer
+in:
+  data: 'false'
+  size: 0
+out:
+  offset: 5
+  type: ZBX_JSON_TYPE_FALSE
+  value: false
+---
+test case: Decode fail 'null' with 0 output buffer
+in:
+  data: 'null'
+  size: 0
+out:
+  offset: 4
+  type: ZBX_JSON_TYPE_NULL
+  value: ''
+---
+test case: Decode fail '12345' with 0 output buffer
+in:
+  data: '12345'
+  size: 0
+out:
+  offset: 5
+  type: ZBX_JSON_TYPE_INT
+  value: 12345
+---
+test case: Decode success '1'
+in:
+  data: '1'
+  size: 1024
+out:
+  offset: 1
+  type: ZBX_JSON_TYPE_INT
+  value: '1'
+---
+test case: Decode success '1.5'
+in:
+  data: '1.5'
+  size: 1024
+out:
+  offset: 3
+  type: ZBX_JSON_TYPE_INT
+  value: '1.5'
+---
+test case: Decode success '-1'
+in:
+  data: '-1'
+  size: 1024
+out:
+  offset: 2
+  type: ZBX_JSON_TYPE_INT
+  value: '-1'
+---
+test case: Decode success '0'
+in:
+  data: '0'
+  size: 1024
+out:
+  offset: 1
+  type: ZBX_JSON_TYPE_INT
+  value: '0'
+---
+test case: Decode success '1e5'
+in:
+  data: '1e5'
+  size: 1024
+out:
+  offset: 3
+  type: ZBX_JSON_TYPE_INT
+  value: '1e5'
+---
+test case: Decode success '1e-2'
+in:
+  data: '1e-2'
+  size: 1024
+out:
+  offset: 4
+  type: ZBX_JSON_TYPE_INT
+  value: '1e-2'
+---
+test case: Decode success '-0.5E10'
+in:
+  data: '-0.5E10'
+  size: 1024
+out:
+  offset: 7
+  type: ZBX_JSON_TYPE_INT
+  value: '-0.5E10'
+---
+test case: Decode success '-0.5E+10'
+in:
+  data: '-0.5E+10'
+  size: 1024
+out:
+  offset: 8
+  type: ZBX_JSON_TYPE_INT
+  value: '-0.5E+10'
+---
+test case: Decode success '1e03'
+in:
+  data: '1e03'
+  size: 1024
+out:
+  offset: 4
+  type: ZBX_JSON_TYPE_INT
+  value: '1e03'
+---
+test case: Decode success 'true'
+in:
+  data: 'true'
+  size: 5
+out:
+  offset: 4
+  type: ZBX_JSON_TYPE_TRUE
+  value: 'true'
+---
+test case: Decode fail 'true' with output buffer 1 byte less than needed
+in:
+  data: 'true'
+  size: 4
+out:
+  offset: 4
+  type: ZBX_JSON_TYPE_TRUE
+  value: 'true'
+---
+test case: Decode success 'false'
+in:
+  data: 'false'
+  size: 6
+out:
+  offset: 5
+  type: ZBX_JSON_TYPE_FALSE
+  value: 'false'
+---
+test case: Decode fail 'false' with output buffer 1 byte less than needed
+in:
+  data: 'false'
+  size: 5
+out:
+  offset: 5
+  type: ZBX_JSON_TYPE_FALSE
+  value: 'false'
+---
+test case: Decode success 'null'
+in:
+  data: 'null'
+  size: 1
+out:
+  offset: 4
+  type: ZBX_JSON_TYPE_NULL
+  value: ''
+---
+test case: Decode success '"a"'
+in:
+  data: '"a"'
+  size: 1024
+out:
+  offset: 3
+  type: ZBX_JSON_TYPE_STRING
+  value: 'a'
+---
+test case: Decode success '"\\/"'
+in:
+  data: '"\\/"'
+  size: 1024
+out:
+  offset: 5
+  type: ZBX_JSON_TYPE_STRING
+  value: '\/'
+---
+test case: Decode success '"value \"1\""'
+in:
+  data: '"value \"1\""'
+  size: 1024
+out:
+  offset: 13
+  type: ZBX_JSON_TYPE_STRING
+  value: 'value "1"'
+---
+test case: Decode success '"value \"1\""'with output buffer having the required size
+in:
+  data: '"value \"1\""'
+  size: 10
+out:
+  offset: 13
+  type: ZBX_JSON_TYPE_STRING
+  value: 'value "1"'
+---
+test case: Decode fail '"value \"1\""' with output buffer 1 byte less than needed
+in:
+  data: '"value \"1\""'
+  size: 9
+out:
+  offset: 13
+  type: ZBX_JSON_TYPE_STRING
+  value: 'value "1"'
+---
+test case: Decode success '"\u0420\u0435\u0433\u0438\u043e\u043d"'
+in:
+  data: '"\u0420\u0435\u0433\u0438\u043e\u043d"'
+  size: 1024
+out:
+  offset: 38
+  type: ZBX_JSON_TYPE_STRING
+  value: 'Регион'
+...
