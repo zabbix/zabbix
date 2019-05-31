@@ -8,6 +8,7 @@ A.F....PS. [ZBXNEXT-1856,ZBXNEXT-5223] added web scenario and HTTP agent with Ke
 ..F....... [ZBX-10574] automated documentation link update upon release of new major version (vasilijs)
 
 Bug fixes:
+..F....... [ZBX-16152] fixed not data loss on saving host prototypes by user with insufficient permissions (averza)
 ..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
 ..F....... [ZBX-15804] fixed links for discovered hosts, items, triggers and graphs (gcalenko)
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
@@ -22,6 +23,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-16152] fixed not data loss on saving host prototypes by user with insufficient permissions (averza)
 ..F....... [ZBX-16126] fixed checkbox selection on navigate to inherited template in triggers and items (talbergs)
 ..F....... [ZBX-15952] fixed errors when trying to create a graph widget for key system.cpu.util[,iowait] with Y axis placed on the left side of the graph (vasilijs)
 ...G...PS. [ZBX-15899] added output sanitization to prevent invalid UTF-8 sequences in regexp-based text replacement (Andris)
@@ -454,6 +456,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-16152] fixed not data loss on saving host prototypes by user with insufficient permissions (averza)
 ..F....... [ZBX-15952] fixed errors when trying to create a graph widget for key system.cpu.util[,iowait] with Y axis placed on the left side of the graph (vasilijs)
 ...G...PS. [ZBX-15899] added output sanitization to prevent invalid UTF-8 sequences in regexp-based text replacement (Andris)
 ..F....... [ZBX-16073] fixed horizontal scrolling in map (vasilijs)
