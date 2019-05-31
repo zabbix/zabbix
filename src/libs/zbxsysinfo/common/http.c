@@ -183,7 +183,10 @@ static int	curl_page_get(char *url, char **buffer, char **error)
 		ret = SYSINFO_RET_OK;
 	}
 	else
+	{
+		zbx_free(page.data);
 		*error = zbx_dsprintf(*error, "Cannot perform cURL request: %s.", curl_easy_strerror(err));
+	}
 
 out:
 	curl_easy_cleanup(easyhandle);
@@ -441,7 +444,7 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, &buffer, &error)))
 	{
 		zbx_rtrim(buffer, "\r\n");
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
+		SET_TEXT_RESULT(result, buffer);
 	}
 	else
 		SET_MSG_RESULT(result, error);
