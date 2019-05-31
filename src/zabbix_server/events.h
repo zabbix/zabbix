@@ -22,7 +22,7 @@
 
 void	zbx_initialize_events(void);
 void	zbx_uninitialize_events(void);
-int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
