@@ -691,7 +691,6 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 		'selectHosts' => ['hostid', 'name'],
 		'hostids' => $hostids,
 		'monitored' => true,
-		'skipDependent' => true,
 		'sortfield' => 'description',
 		'selectDependencies' => ['triggerid'],
 		'preservekeys' => true
@@ -733,6 +732,21 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 		'acknowledged' => null
 	];
 
+	$nondepended_triggers = [];
+
+	if (array_key_exists('skipDependent', $trigger_options) && $trigger_options['skipDependent'] === false) {
+		$nondepended_options = [
+			'output' => [],
+			'selectHosts' => null,
+			'sortfield' => [],
+			'selectDependencies' => null,
+			'skipDependent' => true
+		] + $trigger_options;
+
+		$nondepended_triggers = API::Trigger()->get($nondepended_options);
+		$trigger_options['skipDependent'] = null;
+	}
+
 	$triggers = API::Trigger()->get($trigger_options);
 
 	$problem_triggerids = [];
@@ -742,6 +756,11 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 				|| (array_key_exists('only_true', $trigger_options) && $trigger_options['only_true'])) {
 			$problem_triggerids[] = $triggerid;
 			$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+		}
+
+		if ($trigger['value'] == TRIGGER_VALUE_TRUE && $nondepended_triggers
+				&& !array_key_exists($triggerid, $nondepended_triggers)) {
+			$trigger['value'] = TRIGGER_VALUE_FALSE;
 		}
 	}
 	unset($trigger);

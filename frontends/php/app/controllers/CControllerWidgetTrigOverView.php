@@ -45,6 +45,7 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 		];
 
 		$trigger_options = [
+			'skipDependent' => ($fields['show'] == TRIGGERS_OPTION_ALL) ? false : true,
 			'only_true' => ($fields['show'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
 			'filter' => ['value' => ($fields['show'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null]
 		];
