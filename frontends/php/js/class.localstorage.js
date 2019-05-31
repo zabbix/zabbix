@@ -80,7 +80,9 @@ function ZBX_LocalStorage(version, prefix) {
 		// Disabled setting tells notifier objects to stop audio, hide notifications and to stop following active tab.
 		'notifications.disabled': false,
 		// An object of timeout setting and client time at first render, keyed by notification id.
-		'notifications.localtimeouts': {}
+		'notifications.localtimeouts': {},
+		// Severity styles are rendered and determined clients side.
+		'notifications.severity_settings': {}
 	};
 
 	/*
@@ -93,7 +95,8 @@ function ZBX_LocalStorage(version, prefix) {
 		'notifications.snoozedids': true,
 		'notifications.list': true,
 		'notifications.disabled': true,
-		'notifications.localtimeouts': true
+		'notifications.localtimeouts': true,
+		'notifications.severity_settings': true
 	};
 
 	if (this.readKey('version') != this.keys.version) {

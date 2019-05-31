@@ -135,68 +135,67 @@ ZBX_Notifications.prototype.onStoreUpdate = function(key, value) {
 };
 
 /**
- * Handles server response. Local timedouts object is maintained. If notificaion is not in server response,
- * it might be recovered if it should still be visible.
+ * Handles server response. Local timedouts object is maintained.
  *
  * @param {object} resp  Server response object.
  */
 ZBX_Notifications.prototype.onPollerReceiveUpdates = function(resp) {
 	var time_local = (+new Date / 1000),
+		severity_settings = this.store.readKey('notifications.severity_settings'),
 		stored_list = this.store.readKey('notifications.list'),
-		current_timeouts = this.store.readKey('notifications.localtimeouts'),
-		recv_ids = [],
-		list_obj = {},
+		stored_timeouts = this.store.readKey('notifications.localtimeouts'),
+		snoozedids = this.store.readKey('notifications.snoozedids'),
+		new_list = {},
+		new_timeouts = {},
+		alarm_severity = -1,
 		all_snoozed = false,
-		notifid;
+		alarm_notif = null;
 
 	resp.notifications.forEach(function(notif) {
-		recv_ids.push(notif.uid);
-		if (!current_timeouts[notif.uid]) {
-			current_timeouts[notif.uid] = {
-				recv_time: time_local,
-				msg_timeout: resp.settings.msg_timeout,
-				flip_uid: notif.id + '_' + (1 - notif.resolved)
-			};
+		if (stored_timeouts[notif.uid]) {
+			if (time_local >= (stored_timeouts[notif.uid].recv_time + stored_timeouts[notif.uid].msg_timeout)) {
+				return;
+			}
+			new_timeouts[notif.uid] = stored_timeouts[notif.uid];
 		}
 		else {
-			current_timeouts[notif.uid].msg_timeout = resp.settings.msg_timeout;
+			new_timeouts[notif.uid] = {
+				eventid: notif.eventid,
+				recv_time: time_local,
+				msg_timeout: notif.resolved
+					? resp.settings.msg_recovery_timeout
+					: resp.settings.msg_timeout
+			};
+		}
+
+		if (notif.body) {
+			new_list[notif.eventid] = notif;
+		}
+		else if (stored_list[notif.eventid]) {
+			new_list[notif.eventid] = stored_list[notif.eventid];
+			new_list[notif.eventid].resolved = notif.resolved;
+			new_list[notif.eventid].uid = notif.uid;
+		}
+		else {
+			return;
+		}
+
+		new_list[notif.eventid].snoozed = snoozedids[new_list[notif.eventid]];
+
+		all_snoozed |= new_list[notif.eventid].snoozed;
+
+		if (!new_list[notif.eventid].snoozed && alarm_severity < new_list[notif.eventid].severity) {
+			alarm_severity = new_list[notif.eventid].severity;
+			alarm_notif = new_list[notif.eventid];
 		}
 	});
 
-	// Filter timedout.
-	for (var id in current_timeouts) {
-		var timedout = (current_timeouts[id].recv_time + current_timeouts[id].msg_timeout < time_local),
-			state_changed = (recv_ids.indexOf(current_timeouts[id].flip_uid) !== -1);
+	this.writeAlarm(alarm_notif, resp.settings, new_timeouts);
 
-		if (timedout || state_changed) {
-			delete current_timeouts[id];
-		}
-	}
+	this.store.writeKey('notifications.list', new_list);
+	this.onNotificationsList(new_list, new_timeouts, severity_settings);
 
-	// Unreceived notifs.
-	Object.keys(current_timeouts).forEach(function(id) {
-		if (recv_ids.indexOf(id) === -1) {
-			resp.notifications.push(stored_list[id]);
-		}
-	});
-
-	// Object from modified response array.
-	resp.notifications.forEach(function(raw_notif) {
-		var timeout = current_timeouts[raw_notif.uid];
-
-		list_obj[raw_notif.uid] = raw_notif;
-		list_obj[raw_notif.uid].ttl = time_local - timeout.recv_time + timeout.msg_timeout;
-	});
-
-	all_snoozed = this.applySnoozeProp(resp.notifications);
-	notifid = ZBX_Notifications.findNotificationToPlay(resp.notifications);
-
-	this.writeAlarm(list_obj[notifid], resp.settings);
-
-	this.store.writeKey('notifications.list', list_obj);
-	this.onNotificationsList(list_obj, current_timeouts);
-
-	this.store.writeKey('notifications.localtimeouts', current_timeouts);
+	this.store.writeKey('notifications.localtimeouts', new_timeouts);
 	this.store.writeKey('notifications.alarm.snoozed', all_snoozed);
 
 	this.onSnoozeChange(all_snoozed);
@@ -248,17 +247,17 @@ ZBX_Notifications.prototype.onNotifTimeout = function(notif) {
 			this.dom.hide();
 		}
 
-		if (this.store.readKey('notifications.alarm.start') == notif.uid) {
-			this.store.writeKey('notifications.alarm.end', notif.uid);
+		if (this.store.readKey('notifications.alarm.start') == notif.eventid) {
+			this.store.writeKey('notifications.alarm.end', notif.eventid);
 			this.player.stop();
 		}
 
 		this.store.mutateObject('notifications.localtimeouts', function(list_obj) {
-			delete list_obj[notif.uid];
+			delete list_obj[notif.eventid];
 		});
 
 		this.store.mutateObject('notifications.list', function(list_obj) {
-			delete list_obj[notif.uid];
+			delete list_obj[notif.eventid];
 		});
 
 	}.bind(this));
@@ -280,9 +279,10 @@ ZBX_Notifications.prototype.onPlayerTimeout = function() {
  * @param {object} list_obj  Notification ID keyed hash-map of storable notification objects.
  * @param {object} timeouts_obj  Optional reference, if it is possible to read store less often.
  */
-ZBX_Notifications.prototype.onNotificationsList = function(list_obj, timeouts_obj) {
+ZBX_Notifications.prototype.onNotificationsList = function(list_obj, timeouts_obj, severity_settings) {
 	var timeouts_obj = timeouts_obj || this.store.readKey('notifications.localtimeouts'),
-		length = this.dom.renderFromStorable(list_obj, timeouts_obj);
+		severity_settings = severity_settings || this.store.readKey('notifications.severity_settings'),
+		length = this.dom.renderFromStorable(list_obj, timeouts_obj, severity_settings);
 
 	if (length) {
 		this.dom.node.hidden && this.dom.show();
@@ -305,11 +305,11 @@ ZBX_Notifications.prototype.onSnoozeChange = function(bool) {
 
 	var list_obj = this.store.readKey('notifications.list'),
 		snoozedids = {},
-		id;
+		eventid;
 
-	for (id  in list_obj) {
-		snoozedids[id] = bool;
-		list_obj[id].snoozed = bool;
+	for (eventid  in list_obj) {
+		snoozedids[eventid] = bool;
+		list_obj[eventid].snoozed = bool;
 	}
 
 	this.player.stop();
@@ -378,10 +378,11 @@ ZBX_Notifications.prototype.onTabFocus = function(tab) {
 /**
  * Adjust alarm settings and update local storage to play a notification.
  *
- * @param {object|null} notif  Notification object in the format it was received from server.
- * @param {object}      opts   Notification settings object.
+ * @param {object|null} notif     Notification object in the format it was received from server.
+ * @param {object}      opts      Notification settings object.
+ * @param {object}      timeouts
  */
-ZBX_Notifications.prototype.writeAlarm = function(notif, opts) {
+ZBX_Notifications.prototype.writeAlarm = function(notif, opts, timeouts_obj) {
 	if (!notif) {
 		this.store.resetKey('notifications.alarm.start');
 		this.store.resetKey('notifications.alarm.end');
@@ -398,7 +399,9 @@ ZBX_Notifications.prototype.writeAlarm = function(notif, opts) {
 
 	// Play in loop till end of notification timeout.
 	if (opts.alarm_timeout == -1) {
-		this.store.writeKey('notifications.alarm.timeout', notif.ttl);
+		var timeout = timeouts_obj[notif.uid],
+			time_local = (+new Date / 1000);
+		this.store.writeKey('notifications.alarm.timeout', timeout.recv_time - time_local + timeout.msg_timeout);
 	}
 	// Play once till end of audio file.
 	else if (opts.alarm_timeout == 1) {
@@ -409,7 +412,7 @@ ZBX_Notifications.prototype.writeAlarm = function(notif, opts) {
 		this.store.writeKey('notifications.alarm.timeout', opts.alarm_timeout);
 	}
 
-	this.store.writeKey('notifications.alarm.wave', opts.files[notif.file]);
+	this.store.writeKey('notifications.alarm.wave', opts.files[notif.resolved ? -1 : notif.severity]);
 
 	// This write event is an trigger to play action.
 	this.store.writeKey('notifications.alarm.start', notif.uid);
@@ -425,6 +428,11 @@ ZBX_Notifications.prototype.writeAlarm = function(notif, opts) {
  * @param {object} settings  Settings object received from server.
  */
 ZBX_Notifications.prototype.writeSettings = function(settings) {
+	this.store.writeKey('notifications.severity_settings', {
+		styles: settings.severity_styles,
+		files: settings.files,
+	});
+
 	this.store.writeKey('notifications.disabled', !settings.enabled);
 	this.store.writeKey('notifications.alarm.muted', settings.muted);
 
@@ -447,46 +455,10 @@ ZBX_Notifications.prototype.writeSettings = function(settings) {
 };
 
 /**
- * Mutates list objects by setting an additional 'snoozed' property.
- *
- * @param {array} list  List of notifications received from server.
- *
- * @return {bool}  True in every notification in list matched with snoozed notifications.
- */
-ZBX_Notifications.prototype.applySnoozeProp = function(list) {
-	if (!(list instanceof Array)) {
-		throw 'Expected array';
-	}
-
-	var snoozes = this.store.readKey('notifications.snoozedids'),
-		is_all_snoozed = true;
-
-	list.forEach(function(raw_notif) {
-		if (snoozes[raw_notif.uid]) {
-			raw_notif.snoozed = true;
-		}
-		else {
-			raw_notif.snoozed = false;
-			is_all_snoozed = false;
-		}
-	});
-
-	return is_all_snoozed;
-};
-
-/**
  * On close click, send a request to server that marks current notifications as read.
  */
 ZBX_Notifications.prototype.btnCloseClicked = function() {
-	var params = {ids: []},
-		list = this.store.readKey('notifications.list'),
-		uid;
-
-	for (uid in list) {
-		params.ids.push(list[uid].id);
-	}
-
-	this.fetch('notifications.read', params)
+	this.fetch('notifications.read', {ids: Object.keys(this.store.readKey('notifications.list'))})
 		.catch(console.error)
 		.then(function(resp) {
 			this.store.resetKey('notifications.list');
@@ -588,44 +560,12 @@ ZBX_Notifications.prototype.mainLoop = function() {
 		return;
 	}
 
-	this.fetch('notifications.get')
+	this.fetch('notifications.get', {
+		validate_eventids: Object.keys(this.store.readKey('notifications.list'))
+	})
 		.catch(console.error)
 		.then(this.onPollerReceive.bind(this));
 };
-
-/**
- * Finds most severe, most recent, not-snoozed notification.
- *
- * List received from server reflects current notifications within timeout. To find a notification to play, filter
- * out any snoozed notifications. First sort by severity, then by timeout.
- *
- * @param list array  Notification objects in server provided format.
- *
- * @return string|null  Notification ID if it is found.
- */
-ZBX_Notifications.findNotificationToPlay = function(list) {
-	if (!list.length) {
-		return null;
-	}
-
-	return list.reduce(function(acc, cur) {
-		if (cur.snoozed) {
-			return acc;
-		}
-		if (cur.priority > acc.priority) {
-			return cur;
-		}
-		if (cur.priority == acc.priority && cur.ttl > acc.ttl) {
-			return cur;
-		}
-		return acc;
-	}, {
-		uid: '',
-		snoozed: true,
-		priority: -1,
-		ttl: -1
-	}).uid;
-}
 
 /**
  * Registering instance.

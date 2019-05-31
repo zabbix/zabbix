@@ -22,7 +22,7 @@
  * Represents DOM node for notification list. Stores the list of notification objects.
  */
 function ZBX_NotificationCollection() {
-	this.list = {};
+	this.list = [];
 	this.makeNodes();
 	this.onTimeout = function() {};
 
@@ -132,22 +132,43 @@ ZBX_NotificationCollection.prototype.hide = function() {
  * Creates list node contents and replaces current list node children.
  *
  * @param {object} list_obj  Notifications list object in format it is stored in local storage.
+ * @param {object} timeouts_obj
+ * @param {object} severity_settings
  */
-ZBX_NotificationCollection.prototype.renderFromStorable = function(list_obj, timeouts_obj) {
+ZBX_NotificationCollection.prototype.renderFromStorable = function(list_obj, timeouts_obj, severity_settings) {
 	var time_local = (+new Date / 1000),
 		frag = document.createDocumentFragment();
 
-	this.list = {};
+	this.list = [];
 
-	Object.keys(list_obj).forEach(function(id) {
-		var timeout = timeouts_obj[id];
+	Object.keys(list_obj).reverse().forEach(function(eventid) {
+		var timeout = timeouts_obj[list_obj[eventid].uid],
+			notif = list_obj[eventid],
+			severity_style = notif.resolved ? severity_settings.styles[-1] : severity_settings.styles[notif.severity],
+			title = (notif.resolved ? locale.S_RESOLVED : locale.S_PROBLEM_ON) + ' ' + notif.title
 
-		this.list[id] = new ZBX_Notification(list_obj[id]);
-		this.list[id].setTimeout(timeout.recv_time - time_local + timeout.msg_timeout);
-		this.list[id].renderSnoozed(list_obj[id].snoozed);
-		this.list[id].onTimeout = this.onTimeout;
-		frag.appendChild(this.list[id].node);
+		var notif = new ZBX_Notification({
+			uid: list_obj[eventid].uid,
+			title: title,
+			body: list_obj[eventid].body,
+			severity_style: severity_style
+		});
+
+		notif.clock = list_obj[eventid].clock;
+		notif.onTimeout = this.onTimeout;
+		notif.setTimeout(timeout.recv_time - time_local + timeout.msg_timeout);
+		notif.renderSnoozed(list_obj[eventid].snoozed);
+
+		this.list.push(notif);
 	}.bind(this));
+
+	this.list.sort(function(a, b) {
+		return a.clock > b.clock;
+	});
+
+	this.list.forEach(function(notif) {
+		frag.appendChild(notif.node);
+	});
 
 	this.list_node.innerHTML = '';
 

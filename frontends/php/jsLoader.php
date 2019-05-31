@@ -197,6 +197,8 @@ $tranStrings = [
 		'S_COLOR_IS_NOT_CORRECT' => _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).')
 	],
 	'class.notifications.js' => [
+		'S_PROBLEM_ON' => _('Problem on'),
+		'S_RESOLVED' => _('Resolved'),
 		'S_MUTE' => _('Mute'),
 		'S_UNMUTE' => _('Unmute'),
 		'S_CLEAR' => _('Clear'),
