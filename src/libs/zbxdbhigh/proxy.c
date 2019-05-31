@@ -1273,7 +1273,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 		{
-			*error = zbx_dsprintf(*error, "invalid data format, expected \"[\" while got \"%c\"", *p);
+			*error = zbx_dsprintf(*error, "invalid data format: %s", zbx_json_strerror());
 			goto clean;
 		}
 
