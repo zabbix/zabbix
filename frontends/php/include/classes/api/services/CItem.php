@@ -562,14 +562,15 @@ class CItem extends CItemGeneral {
 	 * @param array $items
 	 */
 	protected function createReal(array &$items) {
-		$item_data = [];
+		$items_rtdata = [];
+
 		foreach ($items as $key => &$item) {
 			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
 				$item['master_itemid'] = null;
 			}
 
 			if (array_key_exists('rtdata', $item)) {
-				$item_data[$key] = $item['rtdata'];
+				$items_rtdata[$key] = $item['rtdata'];
 				unset($item['rtdata']);
 			}
 		}
@@ -577,16 +578,13 @@ class CItem extends CItemGeneral {
 
 		$itemids = DB::insert($this->tableName(), $items);
 
-		foreach ($itemids as $key => $val) {
-			if (array_key_exists($key, $item_data)) {
-				$item_data[$key]['itemid'] = $val;
-				continue;
+		if ($items_rtdata) {
+			foreach ($items_rtdata as $key => &$rtdata) {
+				$rtdata['itemid'] = $itemids[$key];
 			}
-			unset($item_data[$key]);
-		}
+			unset($rtdata);
 
-		if (count($item_data)) {
-			DB::insert($this->getSecondaryTableName(), $item_data, false);
+			DB::insert($this->getSecondaryTableName(), $items_rtdata, false);
 		}
 
 		$item_applications = [];

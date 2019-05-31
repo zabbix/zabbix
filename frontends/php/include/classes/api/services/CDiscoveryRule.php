@@ -969,9 +969,10 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	protected function createReal(array &$items) {
-		// create items without formulas, they will be updated when items and conditions are saved
-		$item_data = [];
+		$items_rtdata = [];
 		$create_items = [];
+
+		// create items without formulas, they will be updated when items and conditions are saved
 		foreach ($items as $key => $item) {
 			if (array_key_exists('filter', $item)) {
 				$item['evaltype'] = $item['filter']['evaltype'];
@@ -979,7 +980,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 
 			if (array_key_exists('rtdata', $item)) {
-				$item_data[$key] = $item['rtdata'];
+				$items_rtdata[$key] = $item['rtdata'];
 				unset($item['rtdata']);
 			}
 
@@ -987,16 +988,13 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		$create_items = DB::save($this->tableName(), $create_items);
 
-		foreach ($create_items as $key => $item) {
-			if (array_key_exists($key, $item_data)) {
-				$item_data[$key]['itemid'] = $item['itemid'];
-				continue;
+		if ($items_rtdata) {
+			foreach ($items_rtdata as $key => &$rtdata) {
+				$rtdata['itemid'] = $create_items[$key]['itemid'];
 			}
-			unset($item_data[$key]);
-		}
+			unset($rtdata);
 
-		if (count($item_data)) {
-			DB::insert($this->getSecondaryTableName(), $item_data, false);
+			DB::insert($this->getSecondaryTableName(), $items_rtdata, false);
 		}
 
 		$conditions = [];
