@@ -5,6 +5,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+...G...... [ZBX-16096] fixed "system.cpu.util" reporting incorrect CPU utilisation due to guest time sometimes not being fully included in user time by "/proc/stat" (vso)
 ..F....... [ZBX-15882] fixed widgets flickering on refresh (ashubin)
 ..F....... [ZBX-15974] improved trigger expression list in trigger modal form (gcalenko)
 ...G...... [ZBX-14441] fixed windows agent "eventlog" key for reading big event log files of windows 2003 (MVekslers)
