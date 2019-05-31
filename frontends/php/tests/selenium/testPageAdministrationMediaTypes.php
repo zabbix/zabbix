@@ -80,7 +80,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Status' => 'Disabled'
 					],
-					'result' => ['Script']
+					'result' => ['Test script']
 				]
 			],
 			// Filter by name and status.

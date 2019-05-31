@@ -2196,4 +2196,4 @@ INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (184, 10011
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (185, 100112, 'tag', 'trigger');
 
 -- testFormAdministrationMediaTypes
-INSERT INTO media_type (mediatypeid, type, description, exec_path, exec_params, status) VALUES (100, 1, 'Script', 'Selenium test script', 'one parameter\n', 1);
+INSERT INTO media_type (mediatypeid, type, description, exec_path, status) VALUES (100, 1, 'Test script', 'Selenium test script', 1);
