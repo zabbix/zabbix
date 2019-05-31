@@ -836,7 +836,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$depTemplateIds = array_keys($triggerDepTemplates);
 
 			// run the check only if a templated trigger has dependencies on other templates
-			$triggerTemplateIds = zbx_toHash(zbx_objectValues($triggerTemplates, 'hostid'));
+			$triggerTemplateIds = zbx_toHash(zbx_objectValues($triggerTemplates, 'templateid'));
 			$tdiff = array_diff($depTemplateIds, $triggerTemplateIds);
 
 			if (!empty($triggerTemplateIds) && !empty($depTemplateIds) && !empty($tdiff)) {

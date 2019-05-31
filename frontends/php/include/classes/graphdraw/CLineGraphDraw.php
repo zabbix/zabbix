@@ -177,7 +177,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 	protected function selectData() {
 		$this->data = [];
-		$now = time(null);
+		$now = time();
 
 		if (!isset($this->stime)) {
 			$this->stime = $now - $this->period;
