@@ -936,10 +936,17 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 	size_t		len;
 	zbx_json_type_t	type_local;
 
-	if (0 == (len = json_parse_value(p, NULL)))
-		return NULL;
-
-	type_local = __zbx_json_type(p);
+	switch (type_local = __zbx_json_type(p))
+	{
+		case ZBX_JSON_TYPE_ARRAY:
+		case ZBX_JSON_TYPE_OBJECT:
+		case ZBX_JSON_TYPE_UNKNOWN:
+			/* only primitive values are decoded */
+			return NULL;
+		default:
+			if (0 == (len = json_parse_value(p, NULL)))
+				return NULL;
+	}
 
 	if (NULL != type)
 		*type = type_local;
@@ -953,12 +960,8 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 				return NULL;
 			*string = '\0';
 			return p + len;
-		case ZBX_JSON_TYPE_TRUE:
-		case ZBX_JSON_TYPE_INT:
-		case ZBX_JSON_TYPE_FALSE:
+		default: /* ZBX_JSON_TYPE_INT, ZBX_JSON_TYPE_TRUE, ZBX_JSON_TYPE_FALSE */
 			return zbx_json_copy_unquoted_value(p, len, string, size);
-		default:
-			return NULL;
 	}
 }
 
@@ -967,16 +970,23 @@ const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *strin
 	size_t		len;
 	zbx_json_type_t	type_local;
 
-	if (0 == (len = json_parse_value(p, NULL)))
-		return NULL;
+	switch (type_local = __zbx_json_type(p))
+	{
+		case ZBX_JSON_TYPE_ARRAY:
+		case ZBX_JSON_TYPE_OBJECT:
+		case ZBX_JSON_TYPE_UNKNOWN:
+			/* only primitive values are decoded */
+			return NULL;
+		default:
+			if (0 == (len = json_parse_value(p, NULL)))
+				return NULL;
+	}
 
 	if (*string_alloc <= len)
 	{
 		*string_alloc = len + 1;
 		*string = (char *)zbx_realloc(*string, *string_alloc);
 	}
-
-	type_local = __zbx_json_type(p);
 
 	if (NULL != type)
 		*type = type_local;
@@ -988,12 +998,8 @@ const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *strin
 		case ZBX_JSON_TYPE_NULL:
 			**string = '\0';
 			return p + len;
-		case ZBX_JSON_TYPE_INT:
-		case ZBX_JSON_TYPE_TRUE:
-		case ZBX_JSON_TYPE_FALSE:
+		default: /* ZBX_JSON_TYPE_INT, ZBX_JSON_TYPE_TRUE, ZBX_JSON_TYPE_FALSE */
 			return zbx_json_copy_unquoted_value(p, len, *string, *string_alloc);
-		default:
-			return NULL;
 	}
 }
 
