@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-29 15:42+0300\n"
+"POT-Creation-Date: 2019-06-02 01:43+0300\n"
 "PO-Revision-Date: 2019-03-13 13:33+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -256,7 +256,7 @@ msgstr "(без прокси)"
 msgid "0 - use default port"
 msgstr "0 - использовать порт по умолчанию"
 
-#: include/triggers.inc.php:1845
+#: include/triggers.inc.php:1846
 msgid "0 or 1"
 msgstr "0 или 1"
 
@@ -313,7 +313,7 @@ msgstr "ДОБАВЛЕНИЕ ЗАМЕЩЕНИЯ"
 msgid "AES"
 msgstr "AES"
 
-#: app/views/popup.triggerwizard.php:156
+#: app/views/popup.triggerwizard.php:103
 msgid "AND"
 msgstr "И"
 
@@ -373,7 +373,7 @@ msgstr "Подтвержденные РЕШЁННЫЕ события"
 #: app/views/dashboard.sharing.edit.php:24
 #: app/views/dashboard.sharing.edit.php:45
 #: app/views/monitoring.widget.actionlog.view.php:30
-#: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:80
+#: app/views/popup.triggerwizard.php:49 app/views/popup.triggerwizard.php:121
 #: include/actions.inc.php:1904 include/actions.inc.php:1988
 #: include/audit.inc.php:29 include/classes/screens/CScreenActions.php:112
 #: include/views/administration.auditacts.list.php:57
@@ -550,7 +550,7 @@ msgstr "Активно до"
 #: app/views/popup.httpstep.php:94 app/views/popup.httpstep.php:118
 #: app/views/popup.httpstep.php:137 app/views/popup.httpstep.php:170
 #: app/views/popup.media.php:48 app/views/popup.media.php:112
-#: app/views/popup.triggerwizard.php:169 app/views/popup.triggerwizard.php:195
+#: app/views/popup.triggerwizard.php:112 app/views/popup.triggerwizard.php:144
 #: include/classes/widgets/CWidgetHelper.php:421
 #: include/views/administration.auditlogs.list.php:46
 #: include/views/administration.general.iconmap.edit.php:101
@@ -1723,7 +1723,7 @@ msgstr "Не удалось добавить подкарты. Достигну�
 msgid "Cannot add template"
 msgstr "Не удалось добавить шаблон"
 
-#: app/controllers/CControllerPopupTriggerWizard.php:197 triggers.php:278
+#: app/controllers/CControllerPopupTriggerWizard.php:204 triggers.php:278
 msgid "Cannot add trigger"
 msgstr "Не удалось добавить триггер"
 
@@ -2920,7 +2920,7 @@ msgstr "Не удалось обновить шаблонные группы э�
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Не удалось обновить шаблоны для обнаруженного узла сети \"%1$s\"."
 
-#: app/controllers/CControllerPopupTriggerWizard.php:181 triggers.php:373
+#: app/controllers/CControllerPopupTriggerWizard.php:188 triggers.php:373
 #: triggers.php:458
 msgid "Cannot update trigger"
 msgstr "Не удалось обновить триггер"
@@ -4771,7 +4771,7 @@ msgstr "Запрещено"
 msgid "Dependencies"
 msgstr "Зависимости"
 
-#: include/triggers.inc.php:2723
+#: include/triggers.inc.php:2724
 msgid "Dependent"
 msgstr "Зависимость"
 
@@ -4779,7 +4779,7 @@ msgstr "Зависимость"
 msgid "Dependent item"
 msgstr "Зависимый элемент данных"
 
-#: app/views/popup.generic.php:288 include/triggers.inc.php:2723
+#: app/views/popup.generic.php:288 include/triggers.inc.php:2724
 #: include/views/configuration.services.edit.php:152
 #: include/views/configuration.trigger.prototype.list.php:81
 #: include/views/configuration.triggers.list.php:207
@@ -4793,7 +4793,7 @@ msgstr "Состояние развертывания"
 #: app/views/administration.proxy.edit.php:78
 #: app/views/administration.script.edit.php:66
 #: app/views/popup.trigdesc.view.php:28 app/views/popup.trigdesc.view.php:29
-#: app/views/popup.triggerwizard.php:184
+#: app/views/popup.triggerwizard.php:133
 #: include/classes/screens/CScreenEvents.php:32
 #: include/views/administration.auditlogs.list.php:76
 #: include/views/configuration.correlation.edit.php:205
@@ -4949,7 +4949,7 @@ msgstr "Деактивировать выбранные веб-сценарии?
 #: include/discovery.inc.php:108 include/hosts.inc.php:1299
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:142 include/items.inc.php:145
-#: include/items.inc.php:189 include/triggers.inc.php:2173
+#: include/items.inc.php:189 include/triggers.inc.php:2174
 #: include/users.inc.php:86
 #: include/views/administration.general.other.edit.php:57
 #: include/views/administration.usergroups.list.php:44
@@ -5660,11 +5660,11 @@ msgstr "Активировать трапы"
 #: app/views/administration.mediatype.edit.php:171
 #: app/views/administration.mediatype.list.php:46
 #: app/views/administration.mediatype.list.php:124
-#: app/views/popup.media.php:74 app/views/popup.triggerwizard.php:187
+#: app/views/popup.media.php:74 app/views/popup.triggerwizard.php:136
 #: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
 #: include/httptest.inc.php:45 include/items.inc.php:142
 #: include/items.inc.php:145 include/items.inc.php:186
-#: include/triggers.inc.php:1246 include/triggers.inc.php:2170
+#: include/triggers.inc.php:1246 include/triggers.inc.php:2171
 #: include/views/administration.usergroups.edit.php:73
 #: include/views/administration.usergroups.edit.php:88
 #: include/views/administration.usergroups.edit.php:89
@@ -5809,7 +5809,7 @@ msgstr "Каждый день(и)"
 msgid "Every week(s)"
 msgstr "Каждую неделю(и)"
 
-#: app/views/popup.triggerwizard.php:98 app/views/popup.triggerwizard.php:166
+#: app/views/popup.triggerwizard.php:57 app/views/popup.triggerwizard.php:109
 msgid "Exclude"
 msgstr "Исключено"
 
@@ -5900,8 +5900,8 @@ msgstr "Экспорт"
 msgid "Export to CSV"
 msgstr "Экспорт в CSV"
 
-#: app/views/popup.testtriggerexpr.php:47 app/views/popup.triggerwizard.php:77
-#: app/views/popup.triggerwizard.php:148
+#: app/views/popup.testtriggerexpr.php:47 app/views/popup.triggerwizard.php:47
+#: app/views/popup.triggerwizard.php:95
 #: include/views/administration.general.iconmap.edit.php:55
 #: include/views/administration.general.regularexpressions.edit.php:50
 #: include/views/administration.general.regularexpressions.edit.php:128
@@ -6041,7 +6041,7 @@ msgstr "Поле"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Поле \"%1$s\" не может быть NULL."
 
-#: app/controllers/CControllerPopupTriggerWizard.php:219
+#: app/controllers/CControllerPopupTriggerWizard.php:226
 #: include/classes/api/services/CAction.php:1705
 #: include/classes/api/services/CDRule.php:196
 #: include/classes/api/services/CDRule.php:318
@@ -7617,7 +7617,7 @@ msgid "Inaccessible item"
 msgstr "Недоступный элемент данных"
 
 #: include/classes/screens/CScreenProblem.php:414
-#: include/hostgroups.inc.php:291 include/triggers.inc.php:2325
+#: include/hostgroups.inc.php:291 include/triggers.inc.php:2326
 #: include/views/inventory.host.view.php:36
 msgid "Inaccessible maintenance"
 msgstr "Недоступное обслуживание"
@@ -7629,11 +7629,11 @@ msgstr "Недоступная карта сети"
 
 #: include/graphs.inc.php:271 include/hosts.inc.php:658
 #: include/hosts.inc.php:827 include/httptest.inc.php:209
-#: include/items.inc.php:898 include/triggers.inc.php:2464
+#: include/items.inc.php:898 include/triggers.inc.php:2465
 msgid "Inaccessible template"
 msgstr "Недоступный шаблон"
 
-#: include/triggers.inc.php:2693 include/triggers.inc.php:2701
+#: include/triggers.inc.php:2694 include/triggers.inc.php:2702
 msgid "Inaccessible trigger"
 msgstr "Недоступный триггер"
 
@@ -7645,7 +7645,7 @@ msgstr "Недоступный триггер"
 msgid "Inaccessible user"
 msgstr "Недоступный пользователь"
 
-#: app/views/popup.triggerwizard.php:98 app/views/popup.triggerwizard.php:165
+#: app/views/popup.triggerwizard.php:57 app/views/popup.triggerwizard.php:108
 msgid "Include"
 msgstr "Включено"
 
@@ -8697,7 +8697,7 @@ msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "Некорректное значение для поля \"%1$s\": %2$s."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:126
-#: app/controllers/CControllerPopupTriggerWizard.php:125
+#: app/controllers/CControllerPopupTriggerWizard.php:132
 #: app/controllers/CControllerWidgetNavTreeItemUpdate.php:41
 #: include/validate.inc.php:346
 #, c-format
@@ -9215,7 +9215,7 @@ msgstr "Невозможно выполнить поиск по паролям �
 msgid "Italian (it_IT)"
 msgstr "Итальянский (it_IT)"
 
-#: app/views/popup.triggerexpr.php:88 app/views/popup.triggerwizard.php:126
+#: app/views/popup.triggerexpr.php:88 app/views/popup.triggerwizard.php:73
 #: include/audit.inc.php:38 include/classes/screens/CScreenHistory.php:253
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormClock.php:48
@@ -9600,7 +9600,7 @@ msgstr "Ключ \"%1$s\" не совпадает с <grpmax|grpmin|grpsum|grpav
 msgid "Key passphrase"
 msgstr "Фраза-пароль ключа"
 
-#: app/views/popup.triggerwizard.php:45
+#: app/views/popup.triggerwizard.php:119
 msgid "Keyword"
 msgstr "Ключевое слово"
 
@@ -10777,7 +10777,7 @@ msgstr "NTLM"
 #: app/controllers/CControllerPopupGeneric.php:296
 #: app/controllers/CControllerPopupGeneric.php:304
 #: app/controllers/CControllerPopupGeneric.php:316
-#: app/controllers/CControllerPopupTriggerWizard.php:125
+#: app/controllers/CControllerPopupTriggerWizard.php:132
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:64
 #: app/controllers/CControllerWidgetNavTreeItemUpdate.php:41
 #: applications.php:37 app/views/administration.mediatype.edit.php:43
@@ -10793,7 +10793,7 @@ msgstr "NTLM"
 #: app/views/monitoring.widget.plaintext.view.php:44
 #: app/views/popup.httpstep.php:40 app/views/popup.httpstep.php:65
 #: app/views/popup.httpstep.php:91 app/views/popup.httpstep.php:115
-#: app/views/popup.httpstep.php:134 app/views/popup.triggerwizard.php:121
+#: app/views/popup.httpstep.php:134 app/views/popup.triggerwizard.php:68
 #: correlation.php:35 disc_prototypes.php:41 graphs.php:44
 #: host_discovery.php:48 httpconf.php:42
 #: include/classes/screens/CScreenHttpTest.php:116
@@ -11850,13 +11850,13 @@ msgid "Numeral systems"
 msgstr "Системы счисления"
 
 #: include/forms.inc.php:352 include/items.inc.php:129
-#: include/triggers.inc.php:1843 include/views/configuration.item.edit.php:676
+#: include/triggers.inc.php:1844 include/views/configuration.item.edit.php:676
 #: include/views/configuration.item.massupdate.php:278
 #: include/views/configuration.item.prototype.edit.php:604
 msgid "Numeric (float)"
 msgstr "Числовой (с плавающей точкой)"
 
-#: include/triggers.inc.php:1844
+#: include/triggers.inc.php:1845
 msgid "Numeric (integer)"
 msgstr "Числовой (целочисленный)"
 
@@ -11904,7 +11904,7 @@ msgstr "OOB роутер"
 msgid "OOB subnet mask"
 msgstr "OOB маска подсети"
 
-#: app/views/popup.triggerwizard.php:160
+#: app/views/popup.triggerwizard.php:105
 msgid "OR"
 msgstr "ИЛИ"
 
@@ -12792,10 +12792,6 @@ msgstr "Португальский (pt_BR)"
 msgid "Portuguese (pt_PT)"
 msgstr "Португальский (pt_PT)"
 
-#: app/views/popup.triggerwizard.php:79
-msgid "Position"
-msgstr "Позиция"
-
 #: app/views/popup.httpstep.php:85
 msgid "Post fields"
 msgstr "Post поля"
@@ -13349,10 +13345,7 @@ msgstr "Удаленная команда"
 #: app/views/monitoring.problem.view.js.php:28
 #: app/views/monitoring.problem.view.php:200
 #: app/views/monitoring.problem.view.php:247 app/views/popup.media.php:41
-#: app/views/popup.media.php:96 app/views/popup.triggerwizard.js.php:150
-#: app/views/popup.triggerwizard.js.php:335
-#: app/views/popup.triggerwizard.php:57 app/views/popup.triggerwizard.php:101
-#: include/classes/widgets/CWidgetHelper.php:409
+#: app/views/popup.media.php:96 include/classes/widgets/CWidgetHelper.php:409
 #: include/classes/widgets/CWidgetHelper.php:453
 #: include/views/administration.general.iconmap.edit.php:84
 #: include/views/administration.general.macros.edit.php:56
@@ -13422,6 +13415,8 @@ msgstr "Удаленная команда"
 #: include/views/js/configuration.host.prototype.edit.js.php:7
 #: include/views/js/configuration.httpconf.edit.js.php:27
 #: include/views/js/configuration.httpconf.edit.js.php:50
+#: include/views/js/configuration.item.list.js.php:42
+#: include/views/js/configuration.item.list.js.php:57
 #: include/views/js/configuration.item.massupdate.js.php:22
 #: include/views/js/configuration.item.massupdate.js.php:47
 #: include/views/js/configuration.maintenance.edit.js.php:14
@@ -14288,7 +14283,7 @@ msgstr "Имя безопасности"
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:97
 #: app/views/monitoring.problem.view.php:132 app/views/popup.generic.php:630
 #: app/views/popup.services.php:128 app/views/popup.triggerexpr.php:65
-#: app/views/popup.triggerwizard.php:131
+#: app/views/popup.triggerwizard.php:78
 #: include/classes/html/CMultiSelect.php:74
 #: include/classes/widgets/CWidgetHelper.php:156
 #: include/classes/widgets/CWidgetHelper.php:286
@@ -14589,7 +14584,7 @@ msgstr "Не удалось установить значение \"Выкл\" �
 #: app/controllers/CControllerPopupGeneric.php:144
 #: app/controllers/CControllerPopupGeneric.php:158
 #: app/views/monitoring.widget.problems.view.php:58
-#: app/views/popup.triggerwizard.php:144
+#: app/views/popup.triggerwizard.php:91
 #: include/classes/screens/CScreenEvents.php:33
 #: include/classes/screens/CScreenHistory.php:259
 #: include/classes/screens/CScreenProblem.php:882
@@ -15983,8 +15978,8 @@ msgstr "Период хранения динамики изменений"
 msgid "Trends"
 msgstr "Динамика изменений"
 
-#: app/controllers/CControllerPopupTriggerWizard.php:208
-#: app/controllers/CControllerPopupTriggerWizard.php:279
+#: app/controllers/CControllerPopupTriggerWizard.php:215
+#: app/controllers/CControllerPopupTriggerWizard.php:286
 #: app/views/popup.services.php:44 include/actions.inc.php:44
 #: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:481
 #: include/events.inc.php:229 include/maps.inc.php:26
@@ -16278,7 +16273,7 @@ msgstr "Необходимо выбрать два элемента карты"
 #: app/views/dashboard.sharing.edit.php:73
 #: app/views/monitoring.widget.actionlog.view.php:31
 #: app/views/popup.generic.php:87 app/views/popup.media.php:55
-#: app/views/popup.triggerwizard.php:46 app/views/popup.triggerwizard.php:78
+#: app/views/popup.triggerwizard.php:48 app/views/popup.triggerwizard.php:120
 #: include/classes/screens/CScreenActions.php:113
 #: include/classes/widgets/CWidgetHelper.php:48
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
@@ -16366,7 +16361,7 @@ msgstr "Типы"
 msgid "UNKNOWN"
 msgstr "НЕИЗВЕСТНО"
 
-#: app/views/popup.httpstep.php:47 app/views/popup.triggerwizard.php:183
+#: app/views/popup.httpstep.php:47 app/views/popup.triggerwizard.php:132
 #: disc_prototypes.php:168 host_discovery.php:152
 #: include/classes/widgets/CWidgetConfig.php:50
 #: include/classes/widgets/forms/CWidgetFormUrl.php:31
@@ -16504,7 +16499,7 @@ msgstr "Единица измерения"
 #: include/items.inc.php:171 include/maintenances.inc.php:39
 #: include/maps.inc.php:39 include/regexp.inc.php:236
 #: include/screens.inc.php:57 include/triggers.inc.php:120
-#: include/triggers.inc.php:242 include/triggers.inc.php:2170
+#: include/triggers.inc.php:242 include/triggers.inc.php:2171
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.triggers.list.php:43
@@ -16661,7 +16656,7 @@ msgstr "Доступен"
 #: app/views/dashboard.sharing.edit.php:100
 #: app/views/monitoring.acknowledge.edit.php:87
 #: app/views/popup.httpstep.php:170 app/views/popup.media.php:112
-#: app/views/popup.trigdesc.view.php:46 app/views/popup.triggerwizard.php:195
+#: app/views/popup.trigdesc.view.php:46 app/views/popup.triggerwizard.php:144
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.general.gui.edit.php:68
 #: include/views/administration.general.housekeeper.edit.php:156
