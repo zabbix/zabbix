@@ -54,13 +54,13 @@ $fields = [
 	'authentication'  => [T_ZBX_INT, O_OPT, null,  IN('0,1,2,3'),             'isset({add}) || isset({update})'],
 	'http_user'       => [T_ZBX_STR, O_OPT, null,  null,
 		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
-			' || {authentication}=='.HTTPTEST_AUTH_NTLM.
+			' || {authentication}=='.HTTPTEST_AUTH_NTLM.' || {authentication}=='.HTTPTEST_AUTH_KERBEROS.
 		')',
 		_('User')
 	],
 	'http_password'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM, null,
 		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
-			' || {authentication}=='.HTTPTEST_AUTH_NTLM.
+			' || {authentication}=='.HTTPTEST_AUTH_NTLM.' || {authentication}=='.HTTPTEST_AUTH_KERBEROS.
 		')',
 		_('Password')
 	],
