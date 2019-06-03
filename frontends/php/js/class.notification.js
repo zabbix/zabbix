@@ -35,6 +35,7 @@ ZBX_Notification.max_timeout = Math.pow(2, 30);
  * @param {object} options
  */
 function ZBX_Notification(options) {
+	this.eventid   = options.eventid;
 	this.uid       = options.uid;
 	this.node      = this.makeNode(options);
 	this.timeoutid = 0;

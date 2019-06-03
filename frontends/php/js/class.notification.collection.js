@@ -141,13 +141,14 @@ ZBX_NotificationCollection.prototype.renderFromStorable = function(list_obj, tim
 
 	this.list = [];
 
-	Object.keys(list_obj).reverse().forEach(function(eventid) {
+	for (var eventid in list_obj) {
 		var timeout = timeouts_obj[list_obj[eventid].uid],
 			notif = list_obj[eventid],
 			severity_style = notif.resolved ? severity_settings.styles[-1] : severity_settings.styles[notif.severity],
 			title = (notif.resolved ? locale.S_RESOLVED : locale.S_PROBLEM_ON) + ' ' + notif.title
 
 		var notif = new ZBX_Notification({
+			eventid: eventid,
 			uid: list_obj[eventid].uid,
 			title: title,
 			body: list_obj[eventid].body,
@@ -160,7 +161,7 @@ ZBX_NotificationCollection.prototype.renderFromStorable = function(list_obj, tim
 		notif.renderSnoozed(list_obj[eventid].snoozed);
 
 		this.list.push(notif);
-	}.bind(this));
+	};
 
 	this.list.sort(function(a, b) {
 		return a.clock > b.clock ? -1 : 1;
