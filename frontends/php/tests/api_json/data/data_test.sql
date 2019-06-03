@@ -173,11 +173,7 @@ INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90022,90022,90022)
 INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90023,90023,90023);
 INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90020,90020,2,'90020-acc-read','date',NULL,'');
 INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90021,90021,3,'90021-acc-write','date',NULL,'');
--- INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90022,90022,2,'90022-acc-read','date',NULL,'');
 INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90023,90023,2,'90023-acc-read','date',NULL,'');
--- for dev
-INSERT INTO sysmaps VALUES (90000,'90000',800,600,NULL,0,0,0,1,0,0,50,1,1,0,2,2,2,2,2,'','','','','',NULL,0,0,90000,1,0);
-INSERT INTO sysmaps_elements VALUES (90020,90000,90020,0,151,NULL,'90020',-1,189,127,NULL,NULL,0,0,200,200,0,0,''),(90021,90000,90021,0,151,NULL,'90021',-1,239,127,NULL,NULL,0,0,200,200,0,0,''),(90022,90000,90022,0,151,NULL,'90022',-1,289,127,NULL,NULL,0,0,200,200,0,0,''),(90023,90000,90023,0,151,NULL,'90023',-1,339,127,NULL,NULL,0,0,200,200,0,0,'');
 
 -- global macro
 INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (13,'{$API_MACRO_FOR_UPDATE1}','update');
