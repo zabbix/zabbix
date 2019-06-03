@@ -148,7 +148,7 @@ ZBX_Notifications.prototype.onPollerReceiveUpdates = function(resp) {
 		new_list = {},
 		new_timeouts = {},
 		alarm_severity = -1,
-		all_snoozed = false,
+		ctn_snoozed = 0,
 		alarm_notif = null;
 
 	resp.notifications.forEach(function(notif) {
@@ -180,9 +180,9 @@ ZBX_Notifications.prototype.onPollerReceiveUpdates = function(resp) {
 			return;
 		}
 
-		new_list[notif.eventid].snoozed = snoozedids[new_list[notif.eventid]];
+		new_list[notif.eventid].snoozed = !! snoozedids[notif.eventid];
 
-		all_snoozed |= new_list[notif.eventid].snoozed;
+		ctn_snoozed += new_list[notif.eventid].snoozed;
 
 		if (!new_list[notif.eventid].snoozed && alarm_severity < new_list[notif.eventid].severity) {
 			alarm_severity = new_list[notif.eventid].severity;
@@ -196,9 +196,9 @@ ZBX_Notifications.prototype.onPollerReceiveUpdates = function(resp) {
 	this.onNotificationsList(new_list, new_timeouts, severity_settings);
 
 	this.store.writeKey('notifications.localtimeouts', new_timeouts);
-	this.store.writeKey('notifications.alarm.snoozed', all_snoozed);
+	this.store.writeKey('notifications.alarm.snoozed', ctn_snoozed == resp.notifications.length);
 
-	this.onSnoozeChange(all_snoozed);
+	this.onSnoozeChange(ctn_snoozed == resp.notifications.length);
 }
 
 /**
