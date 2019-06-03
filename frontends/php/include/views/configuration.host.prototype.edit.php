@@ -176,7 +176,8 @@ $groups = [];
 foreach ($data['groups'] as $group) {
 	$groups[] = [
 		'id' => $group['groupid'],
-		'name' => $group['name']
+		'name' => $group['name'],
+		'inaccessible' => isset($group['inaccessible']) && $group['inaccessible']
 	];
 }
 $groupList->addRow(
