@@ -346,11 +346,15 @@ if (hasRequest('form')) {
 				'preservekeys' => true
 			]);
 
+			$inaccessible_group = _('Inaccessible group');
+			$n = 0;
 			foreach ($groupids as $groupid) {
 				if (!array_key_exists($groupid, $data['groups'])) {
+					$postfix = (++$n > 1) ? ' (' . $n . ')' : '';
 					$data['groups'][$groupid] = [
 						'groupid' => $groupid,
-						'name' => _('Inaccessible group')
+						'name' => $inaccessible_group . $postfix,
+						'inaccessible' => true
 					];
 				}
 			}
