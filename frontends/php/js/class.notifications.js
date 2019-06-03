@@ -147,7 +147,7 @@ ZBX_Notifications.prototype.onPollerReceiveUpdates = function(resp) {
 		snoozedids = this.store.readKey('notifications.snoozedids'),
 		new_list = {},
 		new_timeouts = {},
-		alarm_severity = -1,
+		alarm_severity = -2,
 		ctn_snoozed = 0,
 		alarm_notif = null;
 
@@ -184,8 +184,9 @@ ZBX_Notifications.prototype.onPollerReceiveUpdates = function(resp) {
 
 		ctn_snoozed += new_list[notif.eventid].snoozed;
 
-		if (!new_list[notif.eventid].snoozed && alarm_severity < new_list[notif.eventid].severity) {
-			alarm_severity = new_list[notif.eventid].severity;
+		var notif_alarm_severity = new_list[notif.eventid].resolved ? -1 : new_list[notif.eventid].severity;
+		if (!new_list[notif.eventid].snoozed && alarm_severity < notif_alarm_severity) {
+			alarm_severity = notif_alarm_severity;
 			alarm_notif = new_list[notif.eventid];
 		}
 	});

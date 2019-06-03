@@ -131,7 +131,10 @@ class CControllerNotificationsGet extends CController {
 			];
 		}
 
-		CArrayHelper::sort($result['notifications'], ['clock', 'priority']);
+		CArrayHelper::sort($result['notifications'], [
+			'field' => ['clock', 'priority'],
+			'order' => ZBX_SORT_DOWN
+		]);
 
 		$result['listid'] = sprintf('%u:%u:%u',
 			crc32($result['listid']), $result['settings']['alarm_timeout'], $result['settings']['msg_timeout']
