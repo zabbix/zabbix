@@ -464,9 +464,12 @@ class CImportDataAdapter {
 	 * @param string $host
 	 * @param string $item_key
 	 * @param array  $simple_trigger
-	 * @param array  $simple_trigger['expression]
-	 * @param array  $simple_trigger['recovery_mode]
-	 * @param array  $simple_trigger['recovery_expression]
+	 * @param string $simple_trigger['expression]
+	 * @param int    $simple_trigger['recovery_mode]
+	 * @param string $simple_trigger['recovery_expression]
+	 * @param array  $options
+	 * @param bool   $options['lldmacros']                  (optional)
+	 * @param bool   $options['allow_func_only']            (optional)
 	 *
 	 * @return array
 	 */
