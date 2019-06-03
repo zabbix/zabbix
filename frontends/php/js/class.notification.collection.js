@@ -163,7 +163,7 @@ ZBX_NotificationCollection.prototype.renderFromStorable = function(list_obj, tim
 	}.bind(this));
 
 	this.list.sort(function(a, b) {
-		return a.clock > b.clock;
+		return a.clock > b.clock ? -1 : 1;
 	});
 
 	this.list.forEach(function(notif) {
