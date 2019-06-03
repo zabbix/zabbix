@@ -342,7 +342,6 @@ if (hasRequest('form')) {
 			$data['groups'] = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $groupids,
-				'editable' => true,
 				'preservekeys' => true
 			]);
 
