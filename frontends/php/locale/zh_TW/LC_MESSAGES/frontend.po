@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-29 15:44+0300\n"
+"POT-Creation-Date: 2019-06-02 01:44+0300\n"
 "PO-Revision-Date: 2012-11-06 09:39+0300\n"
 "Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -247,7 +247,7 @@ msgstr "(無系統代理程式)"
 msgid "0 - use default port"
 msgstr ""
 
-#: include/triggers.inc.php:1845
+#: include/triggers.inc.php:1846
 msgid "0 or 1"
 msgstr "0 或 1"
 
@@ -320,7 +320,7 @@ msgstr ""
 msgid "AES"
 msgstr "AES"
 
-#: app/views/popup.triggerwizard.php:156
+#: app/views/popup.triggerwizard.php:103
 msgid "AND"
 msgstr "且"
 
@@ -379,7 +379,7 @@ msgstr ""
 #: app/views/dashboard.sharing.edit.php:24
 #: app/views/dashboard.sharing.edit.php:45
 #: app/views/monitoring.widget.actionlog.view.php:30
-#: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:80
+#: app/views/popup.triggerwizard.php:49 app/views/popup.triggerwizard.php:121
 #: include/actions.inc.php:1910 include/actions.inc.php:1994
 #: include/audit.inc.php:29 include/classes/screens/CScreenActions.php:112
 #: include/views/administration.auditacts.list.php:57
@@ -554,8 +554,8 @@ msgstr "作用中直到"
 #: app/views/monitoring.problem.view.php:210
 #: app/views/monitoring.problem.view.php:257 app/views/popup.httpstep.php:112
 #: app/views/popup.httpstep.php:163 app/views/popup.media.php:48
-#: app/views/popup.media.php:112 app/views/popup.triggerwizard.php:169
-#: app/views/popup.triggerwizard.php:195
+#: app/views/popup.media.php:112 app/views/popup.triggerwizard.php:112
+#: app/views/popup.triggerwizard.php:144
 #: include/classes/widgets/CWidgetHelper.php:421 include/forms.inc.php:1622
 #: include/forms.inc.php:2512
 #: include/views/administration.auditlogs.list.php:46
@@ -1741,7 +1741,7 @@ msgstr ""
 msgid "Cannot add template"
 msgstr "無法新增模板"
 
-#: app/controllers/CControllerPopupTriggerWizard.php:197 triggers.php:295
+#: app/controllers/CControllerPopupTriggerWizard.php:204 triggers.php:295
 msgid "Cannot add trigger"
 msgstr "無法新增觸發器"
 
@@ -2883,7 +2883,7 @@ msgstr ""
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerWizard.php:181 triggers.php:393
+#: app/controllers/CControllerPopupTriggerWizard.php:188 triggers.php:393
 #: triggers.php:511
 msgid "Cannot update trigger"
 msgstr "無法更新觸發器"
@@ -4767,7 +4767,7 @@ msgstr "禁止"
 msgid "Dependencies"
 msgstr "相依關係"
 
-#: include/triggers.inc.php:2723
+#: include/triggers.inc.php:2724
 msgid "Dependent"
 msgstr "相依"
 
@@ -4775,7 +4775,7 @@ msgstr "相依"
 msgid "Dependent item"
 msgstr ""
 
-#: app/views/popup.generic.php:289 include/triggers.inc.php:2723
+#: app/views/popup.generic.php:289 include/triggers.inc.php:2724
 #: include/views/configuration.services.edit.php:152
 #: include/views/configuration.trigger.prototype.list.php:81
 #: include/views/configuration.triggers.list.php:238
@@ -4789,7 +4789,7 @@ msgstr "佈署狀態"
 #: app/views/administration.proxy.edit.php:78
 #: app/views/administration.script.edit.php:66
 #: app/views/popup.trigdesc.view.php:28 app/views/popup.trigdesc.view.php:29
-#: app/views/popup.triggerwizard.php:184
+#: app/views/popup.triggerwizard.php:133
 #: include/classes/screens/CScreenEvents.php:32
 #: include/views/administration.auditlogs.list.php:76
 #: include/views/configuration.correlation.edit.php:205
@@ -4947,7 +4947,7 @@ msgstr "停用選取的網頁檢測？"
 #: include/discovery.inc.php:108 include/hosts.inc.php:1299
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:140 include/items.inc.php:143
-#: include/items.inc.php:187 include/triggers.inc.php:2173
+#: include/items.inc.php:187 include/triggers.inc.php:2174
 #: include/users.inc.php:86
 #: include/views/administration.general.other.edit.php:57
 #: include/views/administration.usergroups.list.php:44
@@ -5680,11 +5680,11 @@ msgstr ""
 #: app/views/administration.mediatype.edit.php:179
 #: app/views/administration.mediatype.list.php:46
 #: app/views/administration.mediatype.list.php:125
-#: app/views/popup.media.php:74 app/views/popup.triggerwizard.php:187
+#: app/views/popup.media.php:74 app/views/popup.triggerwizard.php:136
 #: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
 #: include/httptest.inc.php:45 include/items.inc.php:140
 #: include/items.inc.php:143 include/items.inc.php:184
-#: include/triggers.inc.php:1246 include/triggers.inc.php:2170
+#: include/triggers.inc.php:1246 include/triggers.inc.php:2171
 #: include/views/administration.usergroups.edit.php:73
 #: include/views/administration.usergroups.edit.php:88
 #: include/views/administration.usergroups.edit.php:89
@@ -5836,7 +5836,7 @@ msgstr "每日"
 msgid "Every week(s)"
 msgstr "每週"
 
-#: app/views/popup.triggerwizard.php:98 app/views/popup.triggerwizard.php:166
+#: app/views/popup.triggerwizard.php:57 app/views/popup.triggerwizard.php:109
 msgid "Exclude"
 msgstr "除外"
 
@@ -5927,8 +5927,8 @@ msgstr ""
 msgid "Export to CSV"
 msgstr "匯出到CSV"
 
-#: app/views/popup.testtriggerexpr.php:47 app/views/popup.triggerwizard.php:77
-#: app/views/popup.triggerwizard.php:148
+#: app/views/popup.testtriggerexpr.php:47 app/views/popup.triggerwizard.php:47
+#: app/views/popup.triggerwizard.php:95
 #: include/views/administration.general.iconmap.edit.php:55
 #: include/views/administration.general.regularexpressions.edit.php:50
 #: include/views/administration.general.regularexpressions.edit.php:128
@@ -6068,7 +6068,7 @@ msgstr "欄位"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerWizard.php:219
+#: app/controllers/CControllerPopupTriggerWizard.php:226
 #: include/classes/api/services/CAction.php:1709
 #: include/classes/api/services/CDRule.php:196
 #: include/classes/api/services/CDRule.php:318
@@ -7642,7 +7642,7 @@ msgid "Inaccessible item"
 msgstr ""
 
 #: include/classes/screens/CScreenProblem.php:414
-#: include/hostgroups.inc.php:288 include/triggers.inc.php:2325
+#: include/hostgroups.inc.php:288 include/triggers.inc.php:2326
 #: include/views/inventory.host.view.php:36
 msgid "Inaccessible maintenance"
 msgstr ""
@@ -7654,11 +7654,11 @@ msgstr ""
 
 #: include/graphs.inc.php:271 include/hosts.inc.php:658
 #: include/hosts.inc.php:827 include/httptest.inc.php:209
-#: include/items.inc.php:896 include/triggers.inc.php:2464
+#: include/items.inc.php:896 include/triggers.inc.php:2465
 msgid "Inaccessible template"
 msgstr ""
 
-#: include/triggers.inc.php:2693 include/triggers.inc.php:2701
+#: include/triggers.inc.php:2694 include/triggers.inc.php:2702
 msgid "Inaccessible trigger"
 msgstr ""
 
@@ -7670,7 +7670,7 @@ msgstr ""
 msgid "Inaccessible user"
 msgstr ""
 
-#: app/views/popup.triggerwizard.php:98 app/views/popup.triggerwizard.php:165
+#: app/views/popup.triggerwizard.php:57 app/views/popup.triggerwizard.php:108
 msgid "Include"
 msgstr "包含"
 
@@ -8749,7 +8749,7 @@ msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:126
-#: app/controllers/CControllerPopupTriggerWizard.php:125
+#: app/controllers/CControllerPopupTriggerWizard.php:132
 #: app/controllers/CControllerWidgetNavTreeItemUpdate.php:41
 #: include/validate.inc.php:346
 #, c-format
@@ -9290,7 +9290,7 @@ msgstr "以用戶密碼尋找是不可能的."
 msgid "Italian (it_IT)"
 msgstr "意大利語 (it_IT)"
 
-#: app/views/popup.triggerexpr.php:88 app/views/popup.triggerwizard.php:126
+#: app/views/popup.triggerexpr.php:88 app/views/popup.triggerwizard.php:73
 #: include/audit.inc.php:38 include/classes/screens/CScreenHistory.php:253
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormClock.php:48
@@ -9678,7 +9678,7 @@ msgstr "鍵值\"%1$s\"不符 <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"
 msgid "Key passphrase"
 msgstr "鍵值通行短語"
 
-#: app/views/popup.triggerwizard.php:45
+#: app/views/popup.triggerwizard.php:119
 msgid "Keyword"
 msgstr "關鍵字"
 
@@ -10874,7 +10874,7 @@ msgstr ""
 #: app/controllers/CControllerPopupGeneric.php:308
 #: app/controllers/CControllerPopupGeneric.php:316
 #: app/controllers/CControllerPopupGeneric.php:328
-#: app/controllers/CControllerPopupTriggerWizard.php:125
+#: app/controllers/CControllerPopupTriggerWizard.php:132
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:64
 #: app/controllers/CControllerWidgetNavTreeItemUpdate.php:41
 #: applications.php:37 app/views/administration.mediatype.edit.php:43
@@ -10890,7 +10890,7 @@ msgstr ""
 #: app/views/monitoring.widget.plaintext.view.php:44
 #: app/views/popup.httpstep.php:43 app/views/popup.httpstep.php:109
 #: app/views/popup.preproctestedit.view.php:52
-#: app/views/popup.triggerwizard.php:121 correlation.php:35
+#: app/views/popup.triggerwizard.php:68 correlation.php:35
 #: disc_prototypes.php:42 graphs.php:44 host_discovery.php:48 httpconf.php:42
 #: include/classes/screens/CScreenHttpTest.php:116
 #: include/classes/widgets/CWidgetHelper.php:51 include/forms.inc.php:450
@@ -11959,14 +11959,14 @@ msgid "Numeral systems"
 msgstr ""
 
 #: include/forms.inc.php:352 include/items.inc.php:127
-#: include/triggers.inc.php:1843 include/views/configuration.item.edit.php:666
+#: include/triggers.inc.php:1844 include/views/configuration.item.edit.php:666
 #: include/views/configuration.item.massupdate.php:267
 #: include/views/configuration.item.prototype.edit.php:591
 #: include/views/configuration.item.prototype.massupdate.php:262
 msgid "Numeric (float)"
 msgstr "數字的 (浮點)"
 
-#: include/triggers.inc.php:1844
+#: include/triggers.inc.php:1845
 msgid "Numeric (integer)"
 msgstr ""
 
@@ -12015,7 +12015,7 @@ msgstr "OOP路由器"
 msgid "OOB subnet mask"
 msgstr "OOB子網遮罩"
 
-#: app/views/popup.triggerwizard.php:160
+#: app/views/popup.triggerwizard.php:105
 msgid "OR"
 msgstr "OR"
 
@@ -12966,10 +12966,6 @@ msgstr "波蘭語 (pt_BR)"
 msgid "Portuguese (pt_PT)"
 msgstr ""
 
-#: app/views/popup.triggerwizard.php:79
-msgid "Position"
-msgstr "位置"
-
 #: app/views/popup.httpstep.php:70
 msgid "Post fields"
 msgstr ""
@@ -13558,10 +13554,7 @@ msgstr "遠端命令"
 #: app/views/monitoring.problem.view.js.php:29
 #: app/views/monitoring.problem.view.php:200
 #: app/views/monitoring.problem.view.php:247 app/views/popup.media.php:41
-#: app/views/popup.media.php:96 app/views/popup.triggerwizard.js.php:150
-#: app/views/popup.triggerwizard.js.php:335
-#: app/views/popup.triggerwizard.php:57 app/views/popup.triggerwizard.php:101
-#: include/classes/widgets/CWidgetHelper.php:409
+#: app/views/popup.media.php:96 include/classes/widgets/CWidgetHelper.php:409
 #: include/classes/widgets/CWidgetHelper.php:453 include/forms.inc.php:1602
 #: include/forms.inc.php:2486
 #: include/views/administration.general.iconmap.edit.php:84
@@ -13642,6 +13635,8 @@ msgstr "遠端命令"
 #: include/views/js/configuration.host.list.js.php:14
 #: include/views/js/configuration.host.prototype.edit.js.php:7
 #: include/views/js/configuration.httpconf.edit.js.php:21
+#: include/views/js/configuration.item.list.js.php:42
+#: include/views/js/configuration.item.list.js.php:57
 #: include/views/js/configuration.item.massupdate.js.php:26
 #: include/views/js/configuration.maintenance.edit.js.php:14
 #: include/views/js/configuration.services.edit.js.php:81
@@ -14506,7 +14501,7 @@ msgstr ""
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:97
 #: app/views/monitoring.problem.view.php:132 app/views/popup.generic.php:631
 #: app/views/popup.services.php:128 app/views/popup.triggerexpr.php:65
-#: app/views/popup.triggerwizard.php:131
+#: app/views/popup.triggerwizard.php:78
 #: include/classes/html/CMultiSelect.php:74
 #: include/classes/widgets/CWidgetHelper.php:156
 #: include/classes/widgets/CWidgetHelper.php:286
@@ -14820,7 +14815,7 @@ msgstr ""
 #: app/controllers/CControllerPopupGeneric.php:156
 #: app/controllers/CControllerPopupGeneric.php:170
 #: app/views/monitoring.widget.problems.view.php:58
-#: app/views/popup.triggerwizard.php:144
+#: app/views/popup.triggerwizard.php:91
 #: include/classes/screens/CScreenEvents.php:33
 #: include/classes/screens/CScreenHistory.php:259
 #: include/classes/screens/CScreenProblem.php:882
@@ -16257,8 +16252,8 @@ msgstr ""
 msgid "Trends"
 msgstr "趨勢"
 
-#: app/controllers/CControllerPopupTriggerWizard.php:208
-#: app/controllers/CControllerPopupTriggerWizard.php:279
+#: app/controllers/CControllerPopupTriggerWizard.php:215
+#: app/controllers/CControllerPopupTriggerWizard.php:286
 #: app/views/popup.services.php:44 include/actions.inc.php:46
 #: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:481
 #: include/events.inc.php:229 include/maps.inc.php:26
@@ -16550,7 +16545,7 @@ msgstr ""
 #: app/views/dashboard.sharing.edit.php:73
 #: app/views/monitoring.widget.actionlog.view.php:31
 #: app/views/popup.generic.php:87 app/views/popup.media.php:55
-#: app/views/popup.triggerwizard.php:46 app/views/popup.triggerwizard.php:78
+#: app/views/popup.triggerwizard.php:48 app/views/popup.triggerwizard.php:120
 #: include/classes/screens/CScreenActions.php:113
 #: include/classes/widgets/CWidgetHelper.php:48
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
@@ -16641,7 +16636,7 @@ msgstr "類型 "
 msgid "UNKNOWN"
 msgstr "未知的"
 
-#: app/views/popup.httpstep.php:50 app/views/popup.triggerwizard.php:183
+#: app/views/popup.httpstep.php:50 app/views/popup.triggerwizard.php:132
 #: disc_prototypes.php:207 host_discovery.php:159
 #: include/classes/widgets/CWidgetConfig.php:50
 #: include/classes/widgets/forms/CWidgetFormUrl.php:31
@@ -16781,7 +16776,7 @@ msgstr "單位"
 #: include/items.inc.php:169 include/maintenances.inc.php:39
 #: include/maps.inc.php:39 include/regexp.inc.php:236
 #: include/screens.inc.php:57 include/triggers.inc.php:120
-#: include/triggers.inc.php:242 include/triggers.inc.php:2170
+#: include/triggers.inc.php:242 include/triggers.inc.php:2171
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.triggers.list.php:71
@@ -16938,7 +16933,7 @@ msgstr "上"
 #: app/views/dashboard.sharing.edit.php:100
 #: app/views/monitoring.acknowledge.edit.php:87
 #: app/views/popup.httpstep.php:163 app/views/popup.media.php:112
-#: app/views/popup.trigdesc.view.php:46 app/views/popup.triggerwizard.php:195
+#: app/views/popup.trigdesc.view.php:46 app/views/popup.triggerwizard.php:144
 #: include/views/administration.auditlogs.list.php:47
 #: include/views/administration.general.gui.edit.php:68
 #: include/views/administration.general.housekeeper.edit.php:156

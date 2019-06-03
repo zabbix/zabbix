@@ -43,13 +43,13 @@ class testPageOverview extends CLegacyWebTest {
 						'view_style' => 'Left'
 					],
 					'result_hosts' => [
-						'1_Host_to_check_Monitoring_Overview',
-						'3_Host_to_check_Monitoring_Overview', '4_Host_to_check_Monitoring_Overview'
+						'1_Host_to_check_Monitoring_Overview', '3_Host_to_check_Monitoring_Overview',
+						'4_Host_to_check_Monitoring_Overview', 'Host for triggers filtering'
 					],
 					'result_triggers' => [
 						'1_trigger_Average', '1_trigger_Disaster', '1_trigger_High',
 						'1_trigger_Not_classified', '1_trigger_Warning', '2_trigger_Information',
-						'3_trigger_Average', '4_trigger_Average'
+						'3_trigger_Average', '4_trigger_Average', 'Inheritance trigger with tags'
 					]
 				]
 			],
@@ -657,10 +657,10 @@ class testPageOverview extends CLegacyWebTest {
 		}
 
 		// Count rows and columns to compare with expected number of results.
-		$rows = $this->webDriver->findElements(WebDriverBy::xpath('//th//div[@class="vertical_rotation_inner"]'));
-		$columns = $this->webDriver->findElements(WebDriverBy::xpath('//table[@class="list-table"]//tbody//th[1]'));
-		$this->assertEquals(count($thead), count($rows));
-		$this->assertEquals(count($tbody), count($columns));
+		$columns = $this->webDriver->findElements(WebDriverBy::xpath('//th//div[@class="vertical_rotation_inner"]'));
+		$rows = $this->webDriver->findElements(WebDriverBy::xpath('//table[@class="list-table"]//tbody//th[@class="nowrap"]'));
+		$this->assertEquals(count($thead), count($columns));
+		$this->assertEquals(count($tbody), count($rows));
 	}
 
 	public function getContextMenu() {
