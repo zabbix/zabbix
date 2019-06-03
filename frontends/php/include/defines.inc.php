@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.8rc1');
-define('ZABBIX_API_VERSION',	'4.0.8');
+define('ZABBIX_VERSION',		'4.0.9rc1');
+define('ZABBIX_API_VERSION',	'4.0.9');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -106,10 +106,6 @@ define('EXTACK_OPTION_BOTH',	2);
 define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
 define('TRIGGERS_OPTION_ALL',				2);
 define('TRIGGERS_OPTION_IN_PROBLEM',		3);
-
-define('ZBX_ACK_STS_ANY',				1);
-define('ZBX_ACK_STS_WITH_UNACK',		2);
-define('ZBX_ACK_STS_WITH_LAST_UNACK',	3);
 
 define('ZBX_FONT_NAME', 'DejaVuSans');
 

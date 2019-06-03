@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
 if (hasRequest('action') && getRequest('action') == 'host.export' && hasRequest('hosts')) {

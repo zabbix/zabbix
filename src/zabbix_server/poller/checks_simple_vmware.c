@@ -1857,7 +1857,8 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 			SET_UI64_RESULT(result, disk_provisioned - disk_used);
 			break;
 		case ZBX_VMWARE_DATASTORE_SIZE_PFREE:
-			SET_DBL_RESULT(result, (double) (disk_capacity - disk_used) / disk_capacity * 100);
+			SET_DBL_RESULT(result, 0 != disk_capacity ?
+					(double) (disk_capacity - disk_used) / disk_capacity * 100 : 0);
 			break;
 	}
 

@@ -248,7 +248,7 @@ switch ($data['method']) {
 
 				if ($hostGroups) {
 					if (array_key_exists('enrich_parent_groups', $data)) {
-						$hostGroups = CPageFilter::enrichParentGroups($hostGroups, [
+						$hostGroups = enrichParentGroups($hostGroups, [
 							'real_hosts' => null
 						] + $options);
 					}
