@@ -358,7 +358,7 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
  *             offset    - [IN/OUT] offset for writing                        *
  *             src       - [IN] copied string                                 *
  *             n         - [IN] maximum number of bytes to copy               *
- *             l         - [IN] maximum number of bytes to be allocated       *
+ *             limit     - [IN] maximum number of bytes to be allocated       *
  *                                                                            *
  ******************************************************************************/
 static void	strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n, size_t limit)
