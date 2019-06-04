@@ -825,7 +825,7 @@ class CConfigurationExportBuilder {
 							foreach (array_reverse($expression_data->expressions) as $expression) {
 								if ($expression['host'] === $item['host'] && $expression['item'] === $item['key_']) {
 									$simple_trigger['expression'] = substr_replace($simple_trigger['expression'], '',
-										$expression['pos'] + 1 , $prefix_length
+										$expression['pos'] + 1, $prefix_length
 									);
 								}
 							}
