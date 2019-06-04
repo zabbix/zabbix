@@ -178,19 +178,19 @@ foreach ($data['hosts'] as $host) {
 	$hostInterface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 	$hostInterface .= empty($interface['port']) ? '' : NAME_DELIMITER.$interface['port'];
 
-	if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-		if (array_key_exists($host['maintenanceid'], $data['maintenances'])) {
-			$maintenance = $data['maintenances'][$host['maintenanceid']];
-			$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
-				$maintenance['description']
-			);
-		}
-		else {
-			$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], _('Inaccessible maintenance'), '');
-		}
-	}
-
 	if ($host['status'] == HOST_STATUS_MONITORED) {
+		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+			if (array_key_exists($host['maintenanceid'], $data['maintenances'])) {
+				$maintenance = $data['maintenances'][$host['maintenanceid']];
+				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+					$maintenance['description']
+				);
+			}
+			else {
+				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], _('Inaccessible maintenance'), '');
+			}
+		}
+
 		$statusCaption = _('Enabled');
 		$statusClass = ZBX_STYLE_GREEN;
 		$confirm_message = _('Disable host?');

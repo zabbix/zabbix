@@ -1338,7 +1338,7 @@ else {
 			$proxyHostIds[$host['proxy_hostid']] = $host['proxy_hostid'];
 		}
 
-		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+		if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 			$maintenanceids[$host['maintenanceid']] = true;
 		}
 	}
