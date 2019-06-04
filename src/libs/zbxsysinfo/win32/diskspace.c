@@ -180,7 +180,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (ERROR_NO_MORE_FILES != GetLastError())
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot proceed to the next volume."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain complete list of filesystems."));
 		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
