@@ -20,73 +20,416 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
+#include "zbxhttp.h"
 
 #include "comms.h"
 #include "cfg.h"
 
 #include "http.h"
 
-#define ZBX_MAX_WEBPAGE_SIZE	(1 * 1024 * 1024)
-static const char URI_PROHIBIT_CHARS[] = {0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xA,0xB,0xC,0xD,0xE,0xF,0x10,0x11,0x12,\
-	0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x7F,0};
+#define HTTP_SCHEME_STR		"http://"
 
-static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer,
-		size_t max_buffer_len, char **error)
+#ifndef HAVE_LIBCURL
+
+#define ZBX_MAX_WEBPAGE_SIZE	(1 * 1024 * 1024)
+
+#else
+
+#define HTTPS_SCHEME_STR	"https://"
+
+typedef struct
 {
-	int		ret;
-	char		*wrong_chr;
-	char		request[MAX_STRING_LEN];
-	zbx_socket_t	s;
+	char	*data;
+	size_t	allocated;
+	size_t	offset;
+}
+zbx_http_response_t;
+
+#endif
+
+static int	detect_url(const char *host)
+{
+	char	*p;
+	int	ret = FAIL;
+
+	if (NULL != strpbrk(host, "/@#?[]"))
+		return SUCCEED;
+
+	if (NULL != (p = strchr(host, ':')) && NULL == strchr(++p, ':'))
+		ret = SUCCEED;
+
+	return ret;
+}
+
+static int	process_url(const char *host, const char *port, const char *path, char **url, char **error)
+{
+	char	*p, *delim;
+	int	scheme_found = 0;
+
+	/* port and path parameters must be empty */
+	if ((NULL != port && '\0' != *port) || (NULL != path && '\0' != *path))
+	{
+		*error = zbx_strdup(*error,
+				"Parameters \"path\" and \"port\" must be empty if URL is specified in \"host\".");
+		return FAIL;
+	}
+
+	/* allow HTTP(S) scheme only */
+#ifdef HAVE_LIBCURL
+	if (0 == zbx_strncasecmp(host, HTTP_SCHEME_STR, ZBX_CONST_STRLEN(HTTP_SCHEME_STR)) ||
+			0 == zbx_strncasecmp(host, HTTPS_SCHEME_STR, ZBX_CONST_STRLEN(HTTPS_SCHEME_STR)))
+#else
+	if (0 == zbx_strncasecmp(host, HTTP_SCHEME_STR, ZBX_CONST_STRLEN(HTTP_SCHEME_STR)))
+#endif
+	{
+		scheme_found = 1;
+	}
+	else if (NULL != (p = strstr(host, "://")) && (NULL == (delim = strpbrk(host, "/?#")) || delim > p))
+	{
+		*error = zbx_dsprintf(*error, "Unsupported scheme: %.*s.", (int)(p - host), host);
+		return FAIL;
+	}
+
+	if (NULL != (p = strchr(host, '#')))
+		*url = zbx_dsprintf(*url, "%s%.*s", (0 == scheme_found ? HTTP_SCHEME_STR : ""), (int)(p - host), host);
+	else
+		*url = zbx_dsprintf(*url, "%s%s", (0 == scheme_found ? HTTP_SCHEME_STR : ""), host);
+
+	return SUCCEED;
+}
+
+static int	check_common_params(const char *host, const char *path, char **error)
+{
+	const char	*wrong_chr, URI_PROHIBIT_CHARS[] = {0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xA,0xB,0xC,0xD,0xE,\
+			0xF,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x7F,0};
+
+	if (NULL == host || '\0' == *host)
+	{
+		*error = zbx_strdup(*error, "Invalid first parameter.");
+		return FAIL;
+	}
 
 	if (NULL != (wrong_chr = strpbrk(host, URI_PROHIBIT_CHARS)))
 	{
 		*error = zbx_dsprintf(NULL, "Incorrect hostname expression. Check hostname part after: %.*s.",
 				(int)(wrong_chr - host), host);
-		return SYSINFO_RET_FAIL;
+		return FAIL;
 	}
 
-	if (NULL != (wrong_chr = strpbrk(path, URI_PROHIBIT_CHARS)))
+	if (NULL != path && NULL != (wrong_chr = strpbrk(path, URI_PROHIBIT_CHARS)))
 	{
 		*error = zbx_dsprintf(NULL, "Incorrect path expression. Check path part after: %.*s.",
 				(int)(wrong_chr - path), path);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+#ifdef HAVE_LIBCURL
+static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
+{
+	size_t			r_size = size * nmemb;
+	zbx_http_response_t	*response;
+
+	response = (zbx_http_response_t*)userdata;
+	zbx_str_memcpy_alloc(&response->data, &response->allocated, &response->offset, (const char *)ptr, r_size);
+
+	return r_size;
+}
+
+static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
+{
+	ZBX_UNUSED(ptr);
+	ZBX_UNUSED(userdata);
+
+	return size * nmemb;
+}
+
+static int	curl_page_get(char *url, char **buffer, char **error)
+{
+	CURLcode		err;
+	zbx_http_response_t	page = {0};
+	CURL			*easyhandle;
+	int			ret = SYSINFO_RET_FAIL;
+
+	if (NULL == (easyhandle = curl_easy_init()))
+	{
+		*error = zbx_strdup(*error, "Cannot initialize cURL library.");
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT,
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION,
+			NULL != buffer ? curl_write_cb : curl_ignore_cb)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &page)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADER, 1L)) ||
+			(NULL != CONFIG_SOURCE_IP &&
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP))))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option: %s.", curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
+	{
+		if (NULL != buffer)
+			*buffer = page.data;
+
+		ret = SYSINFO_RET_OK;
+	}
+	else
+	{
+		zbx_free(page.data);
+		*error = zbx_dsprintf(*error, "Cannot perform cURL request: %s.", curl_easy_strerror(err));
+	}
+
+out:
+	curl_easy_cleanup(easyhandle);
+
+	return ret;
+}
+
+static int	get_http_page(const char *host, const char *path, const char *port, char **buffer, char **error)
+{
+	char	*url = NULL;
+	int	ret;
+
+	if (SUCCEED != check_common_params(host, path, error))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED == detect_url(host))
+	{
+		/* URL detected */
+		if (SUCCEED != process_url(host, port, path, &url, error))
+			return SYSINFO_RET_FAIL;
+	}
+	else
+	{
+		/* URL is not detected - compose URL using host, port and path */
+
+		unsigned short	port_n = ZBX_DEFAULT_HTTP_PORT;
+
+		if (NULL != port && '\0' != *port)
+		{
+			if (SUCCEED != is_ushort(port, &port_n))
+			{
+				*error = zbx_strdup(*error, "Invalid third parameter.");
+				return SYSINFO_RET_FAIL;
+			}
+		}
+
+		if (NULL != strchr(host, ':'))
+			url = zbx_dsprintf(url, HTTP_SCHEME_STR "[%s]:%u/", host, port_n);
+		else
+			url = zbx_dsprintf(url, HTTP_SCHEME_STR "%s:%u/", host, port_n);
+
+		if (NULL != path)
+			url = zbx_strdcat(url, path + ('/' == *path ? 1 : 0));
+	}
+
+	if (SUCCEED != zbx_http_punycode_encode_url(&url))
+	{
+		*error = zbx_strdup(*error, "Cannot encode domain name into punycode.");
+		ret = SYSINFO_RET_FAIL;
+		goto out;
+	}
+
+	ret = curl_page_get(url, buffer, error);
+out:
+	zbx_free(url);
+
+	return ret;
+}
+#else
+static char	*find_port_sep(char *host, size_t len)
+{
+	int	in_ipv6 = 0;
+
+	for (; 0 < len--; host++)
+	{
+		if (0 == in_ipv6)
+		{
+			if (':' == *host)
+				return host;
+			else if ('[' == *host)
+				in_ipv6 = 1;
+		}
+		else if (']' == *host)
+			in_ipv6 = 0;
+	}
+
+	return NULL;
+}
+
+static int	get_http_page(const char *host, const char *path, const char *port, char **buffer, char **error)
+{
+	char		*url = NULL, *hostname = NULL, *path_loc = NULL;
+	int		ret = SYSINFO_RET_OK, ipv6_host_found = 0;
+	unsigned short	port_num;
+	zbx_socket_t	s;
+
+	if (SUCCEED != check_common_params(host, path, error))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED == detect_url(host))
+	{
+		/* URL detected */
+
+		char	*p, *p_host, *au_end;
+		size_t	authority_len;
+
+		if (SUCCEED != process_url(host, port, path, &url, error))
+			return SYSINFO_RET_FAIL;
+
+		p_host = url + ZBX_CONST_STRLEN(HTTP_SCHEME_STR);
+
+		if (0 == (authority_len = strcspn(p_host, "/?")))
+		{
+			*error = zbx_dsprintf(*error, "Invalid or missing host in URL.");
+			ret = SYSINFO_RET_FAIL;
+			goto out;
+		}
+
+		if (NULL != memchr(p_host, '@', authority_len))
+		{
+			*error = zbx_strdup(*error, "Unsupported URL format.");
+			ret = SYSINFO_RET_FAIL;
+			goto out;
+		}
+
+		au_end = &p_host[authority_len - 1];
+
+		if (NULL != (p = find_port_sep(p_host, authority_len)))
+		{
+			char	*port_str;
+			int	port_len = (int)(au_end - p);
+
+			if (0 < port_len)
+			{
+				port_str = zbx_dsprintf(NULL, "%.*s", port_len, p + 1);
+
+				if (SUCCEED != is_ushort(port_str, &port_num))
+					ret = SYSINFO_RET_FAIL;
+				else
+					hostname = zbx_dsprintf(hostname, "%.*s", (int)(p - p_host), p_host);
+
+				zbx_free(port_str);
+			}
+			else
+				ret = SYSINFO_RET_FAIL;
+		}
+		else
+		{
+			port_num = ZBX_DEFAULT_HTTP_PORT;
+			hostname = zbx_dsprintf(hostname, "%.*s", (int)(au_end - p_host + 1), p_host);
+		}
+
+		if (SYSINFO_RET_OK != ret)
+		{
+			*error = zbx_dsprintf(*error, "URL using bad/illegal format.");
+			goto out;
+		}
+
+		if ('[' == *hostname)
+		{
+			zbx_ltrim(hostname, "[");
+			zbx_rtrim(hostname, "]");
+			ipv6_host_found = 1;
+		}
+
+		if ('\0' == *hostname)
+		{
+			*error = zbx_dsprintf(*error, "Invalid or missing host in URL.");
+			ret = SYSINFO_RET_FAIL;
+			goto out;
+		}
+
+		path_loc = zbx_strdup(path_loc, '\0' != p_host[authority_len] ? &p_host[authority_len] : "/");
+	}
+	else
+	{
+		/* URL is not detected */
+
+		if (NULL == port || '\0' == *port)
+		{
+			port_num = ZBX_DEFAULT_HTTP_PORT;
+		}
+		else if (FAIL == is_ushort(port, &port_num))
+		{
+			*error = zbx_strdup(*error, "Invalid third parameter.");
+			ret = SYSINFO_RET_FAIL;
+			goto out;
+		}
+
+		path_loc = zbx_strdup(path_loc, (NULL != path ? path : "/"));
+		hostname = zbx_strdup(hostname, host);
+
+		if (NULL != strchr(hostname, ':'))
+			ipv6_host_found = 1;
+	}
+
+	if (SUCCEED != zbx_http_punycode_encode_url(&hostname))
+	{
+		*error = zbx_strdup(*error, "Cannot encode domain name into punycode.");
+		ret = SYSINFO_RET_FAIL;
+		goto out;
+	}
+
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, hostname, port_num, CONFIG_TIMEOUT,
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
-		zbx_snprintf(request, sizeof(request),
+		char	*request = NULL;
+
+		request = zbx_dsprintf(request,
 				"GET %s%s HTTP/1.1\r\n"
-				"Host: %s\r\n"
+				"Host: %s%s%s\r\n"
 				"Connection: close\r\n"
 				"\r\n",
-				'/' != *path ? "/" : "", path, host);
+				('/' != *path_loc ? "/" : ""), path_loc, (1 == ipv6_host_found ? "[" : ""), hostname,
+				(1 == ipv6_host_found ? "]" : ""));
 
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{
 			if (SUCCEED == (ret = zbx_tcp_recv_raw(&s)))
 			{
 				if (NULL != buffer)
-					zbx_strlcpy(buffer, s.buffer, max_buffer_len);
+				{
+					*buffer = (char*)zbx_malloc(*buffer, ZBX_MAX_WEBPAGE_SIZE);
+					zbx_strlcpy(*buffer, s.buffer, ZBX_MAX_WEBPAGE_SIZE);
+				}
 			}
 		}
 
+		zbx_free(request);
 		zbx_tcp_close(&s);
 	}
 
-	if (FAIL == ret)
+	if (SUCCEED != ret)
 	{
 		*error = zbx_dsprintf(NULL, "HTTP get error: %s", zbx_socket_strerror());
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
 	}
+	else
+		ret = SYSINFO_RET_OK;
 
-	return SYSINFO_RET_OK;
+out:
+	zbx_free(url);
+	zbx_free(path_loc);
+	zbx_free(hostname);
+
+	return ret;
 }
+#endif
 
 int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*hostname, *path_str, *port_str, buffer[MAX_BUFFER_LEN], path[MAX_STRING_LEN], *error;
-	unsigned short	port_number;
+	char	*hostname, *path_str, *port_str, *buffer = NULL, *error = NULL;
+	int	ret;
 
 	if (3 < request->nparam)
 	{
@@ -98,44 +441,22 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	path_str = get_rparam(request, 1);
 	port_str = get_rparam(request, 2);
 
-	if (NULL == hostname || '\0' == *hostname)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (NULL == path_str)
-		*path = '\0';
-	else
-		strscpy(path, path_str);
-
-	if (NULL == port_str || '\0' == *port_str)
-		port_number = ZBX_DEFAULT_HTTP_PORT;
-	else if (FAIL == is_ushort(port_str, &port_number))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, sizeof(buffer), &error))
+	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, &buffer, &error)))
 	{
 		zbx_rtrim(buffer, "\r\n");
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
+		SET_TEXT_RESULT(result, buffer);
 	}
 	else
-	{
 		SET_MSG_RESULT(result, error);
-		return SYSINFO_RET_FAIL;
-	}
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*hostname, path[MAX_STRING_LEN], *port_str, *path_str, *error;
-	double		start_time;
-	unsigned short	port_number;
+	char	*hostname, *path_str, *port_str, *error = NULL;
+	double	start_time;
+	int	ret;
 
 	if (3 < request->nparam)
 	{
@@ -147,48 +468,22 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 	path_str = get_rparam(request, 1);
 	port_str = get_rparam(request, 2);
 
-	if (NULL == hostname || '\0' == *hostname)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (NULL == path_str || '\0' == *path_str)
-		*path = '\0';
-	else
-		strscpy(path, path_str);
-
-	if (NULL == port_str || '\0' == *port_str)
-		port_number = ZBX_DEFAULT_HTTP_PORT;
-	else if (FAIL == is_ushort(port_str, &port_number))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
 	start_time = zbx_time();
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, NULL, 0, &error))
-	{
+	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, NULL, &error)))
 		SET_DBL_RESULT(result, zbx_time() - start_time);
-
-	}
 	else
-	{
 		SET_MSG_RESULT(result, error);
-		return SYSINFO_RET_FAIL;
-	}
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*hostname, *path_str, *port_str, *regexp, *length_str, path[MAX_STRING_LEN],
-			*buffer = NULL, *ptr = NULL, *str, *newline, *error;
-	int		length;
+	char		*hostname, *path_str, *port_str, *buffer = NULL, *error = NULL,
+			*ptr = NULL, *str, *newline, *regexp, *length_str;
 	const char	*output;
-	unsigned short	port_number;
+	int		length, ret;
 
 	if (6 < request->nparam)
 	{
@@ -209,25 +504,6 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	length_str = get_rparam(request, 4);
 	output = get_rparam(request, 5);
 
-	if ('\0' == *hostname)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if ('\0' == *path_str)
-		*path = '\0';
-	else
-		strscpy(path, path_str);
-
-	if ('\0' == *port_str)
-		port_number = ZBX_DEFAULT_HTTP_PORT;
-	else if (FAIL == is_ushort(port_str, &port_number))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
 	if (NULL == length_str || '\0' == *length_str)
 		length = MAX_BUFFER_LEN - 1;
 	else if (FAIL == is_uint31_1(length_str, &length))
@@ -240,9 +516,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == output || '\0' == *output)
 		output = "\\0";
 
-	buffer = (char *)zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
-
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, ZBX_MAX_WEBPAGE_SIZE, &error))
+	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, &buffer, &error)))
 	{
 		for (str = buffer; ;)
 		{
@@ -262,20 +536,16 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 			else
 				break;
 		}
-	}
-	else
-	{
+
+		if (NULL != ptr)
+			SET_STR_RESULT(result, ptr);
+		else
+			SET_STR_RESULT(result, zbx_strdup(NULL, ""));
+
 		zbx_free(buffer);
-		SET_MSG_RESULT(result, error);
-		return SYSINFO_RET_FAIL;
 	}
-
-	if (NULL != ptr)
-		SET_STR_RESULT(result, ptr);
 	else
-		SET_STR_RESULT(result, zbx_strdup(NULL, ""));
+		SET_MSG_RESULT(result, error);
 
-	zbx_free(buffer);
-
-	return SYSINFO_RET_OK;
+	return ret;
 }
