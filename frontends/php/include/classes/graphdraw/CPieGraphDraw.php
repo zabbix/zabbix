@@ -139,7 +139,7 @@ class CPieGraphDraw extends CGraphDraw {
 
 	protected function selectData() {
 		$this->data = [];
-		$now = time(null);
+		$now = time();
 
 		if (isset($this->stime)) {
 			$this->from_time = $this->stime;
