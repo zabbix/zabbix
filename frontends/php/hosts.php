@@ -1215,7 +1215,7 @@ elseif (hasRequest('form')) {
 		$data['groups_ms'][] = [
 			'id' => $group,
 			'name' => $inaccessible_group . $postfix,
-			'disabled' => true,
+			'disabled' => true
 		];
 	}
 
