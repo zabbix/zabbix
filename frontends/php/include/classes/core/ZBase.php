@@ -158,9 +158,6 @@ class ZBase {
 				exit;
 			}
 		}
-		elseif ($mode == self::EXEC_MODE_DEFAULT && basename($_SERVER['SCRIPT_NAME']) !== 'cachewarning.php'
-				&& basename($_SERVER['SCRIPT_NAME']) !== 'jsrpc.php') {
-		}
 	}
 
 	/**
