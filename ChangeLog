@@ -5,6 +5,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+...G...... [ZBX-16142] fixed missing sys/ioctl.h from src/libs/zbxsysinfo/openbsd/net.c (akozlovs)
 .......PS. [ZBX-16166] fixed Zabbix fping feature detection does not work with fping builds since 10 Feb 2017 (akozlovs)
 ....I..... [ZBX-16178] fixed distributive can contain untracked backup file include/config.h.in~ (akozlovs)
 ........S. [ZBX-16170] fixed crash in global event correlation (vso)
