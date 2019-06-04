@@ -978,7 +978,6 @@ elseif (hasRequest('form')) {
 					'ipmi_username', 'ipmi_password', 'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
 					'tls_subject', 'tls_psk_identity', 'tls_psk'
 				],
-				'selectGroups' => ['groupid'],
 				'selectParentTemplates' => ['templateid'],
 				'selectMacros' => ['hostmacroid', 'macro', 'value'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
@@ -1059,7 +1058,15 @@ elseif (hasRequest('form')) {
 				$data['visiblename'] = '';
 			}
 
-			$groups = zbx_objectValues($dbHost['groups'], 'groupid');
+			// Fetch all groups, including inaccessible ones.
+			$res = DBselect(
+				'SELECT hg.groupid' .
+				' FROM hosts_groups hg' .
+				' WHERE ' . dbConditionInt('hg.hostid', [$dbHost['hostid']])
+			);
+			while ($row = DBfetch($res)) {
+				$groups[] = $row['groupid'];
+			}
 		}
 		else {
 			if (getRequest('groupid', 0) != 0) {
@@ -1159,13 +1166,14 @@ elseif (hasRequest('form')) {
 	}
 
 	// Groups with R and RW permissions.
-	$groups_all = $groupids
+	$groups_r = $groupids
 		? API::HostGroup()->get([
 			'output' => ['name'],
 			'groupids' => $groupids,
 			'preservekeys' => true
 		])
-		: [];
+		: []
+	;
 
 	// Groups with RW permissions.
 	$groups_rw = $groupids && (CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
@@ -1175,7 +1183,8 @@ elseif (hasRequest('form')) {
 			'editable' => true,
 			'preservekeys' => true
 		])
-		: [];
+		: []
+	;
 
 	$data['groups_ms'] = [];
 
@@ -1184,19 +1193,31 @@ elseif (hasRequest('form')) {
 		if (is_array($group) && array_key_exists('new', $group)) {
 			$data['groups_ms'][] = [
 				'id' => $group['new'],
-				'name' => $group['new'].' ('._x('new', 'new element in multiselect').')',
+				'name' => $group['new'] . ' (' . _x('new', 'new element in multiselect') . ')',
 				'isNew' => true
 			];
 		}
-		elseif (array_key_exists($group, $groups_all)) {
+		elseif (array_key_exists($group, $groups_r)) {
 			$data['groups_ms'][] = [
 				'id' => $group,
-				'name' => $groups_all[$group]['name'],
+				'name' => $groups_r[$group]['name'],
 				'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) && !array_key_exists($group, $groups_rw)
 			];
 		}
 	}
 	CArrayHelper::sort($data['groups_ms'], ['name']);
+
+	// Append inaccessible groups to the end of the sorted list.
+	$inaccessible_group = _('Inaccessible group');
+	foreach (array_values(array_diff($groupids, array_keys($groups_r))) as $n => $group) {
+		$postfix = ($n > 0) ? ' (' . ($n + 1) . ')' : '';
+
+		$data['groups_ms'][] = [
+			'id' => $group,
+			'name' => $inaccessible_group . $postfix,
+			'disabled' => true,
+		];
+	}
 
 	if ($data['templates']) {
 		$data['linked_templates'] = API::Template()->get([
