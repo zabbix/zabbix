@@ -162,7 +162,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addstring(&j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
 			zbx_free(utf8);
 
-			if (TRUE == GetVolumeInformation(path, NULL, 0, NULL, NULL, NULL, name, ARRSIZE(name)))
+			if (FALSE != GetVolumeInformation(path, NULL, 0, NULL, NULL, NULL, name, ARRSIZE(name)))
 			{
 				utf8 = zbx_unicode_to_utf8(name);
 				zbx_json_addstring(&j, "{#FSTYPE}", utf8, ZBX_JSON_TYPE_STRING);
@@ -176,7 +176,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_close(&j);
 		}
 
-	} while (TRUE == FindNextVolume(volume, name, ARRSIZE(name)));
+	} while (FALSE != FindNextVolume(volume, name, ARRSIZE(name)));
 
 	if (ERROR_NO_MORE_FILES != GetLastError())
 	{
