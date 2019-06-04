@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__) . '/../../include/items.inc.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
  * @backup httptest
@@ -195,7 +195,7 @@ class testFormWeb extends CLegacyWebTest {
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestTextPresent('Parent web scenarios');
 			if (isset($data['hostTemplate'])) {
-				$this->zbxTestAssertElementPresentXpath("//a[text()='" . $data['hostTemplate'] . "']");
+				$this->zbxTestAssertElementPresentXpath("//a[text()='".$data['hostTemplate']."']");
 			}
 		}
 		else {
@@ -1495,7 +1495,7 @@ class testFormWeb extends CLegacyWebTest {
 				$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 				$step = $item['step'].' step';
 				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="step_name"]', $step, false);
-				$url = $step .'url';
+				$url = $step.' url';
 				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $url);
 				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 				$this->zbxTestWaitForPageToLoad();
