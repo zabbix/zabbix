@@ -1166,7 +1166,7 @@ elseif (hasRequest('form')) {
 	}
 
 	// Groups with R and RW permissions.
-	$groups_r = $groupids
+	$groups_r_rw = $groupids
 		? API::HostGroup()->get([
 			'output' => ['name'],
 			'groupids' => $groupids,
@@ -1197,10 +1197,10 @@ elseif (hasRequest('form')) {
 				'isNew' => true
 			];
 		}
-		elseif (array_key_exists($group, $groups_r)) {
+		elseif (array_key_exists($group, $groups_r_rw)) {
 			$data['groups_ms'][] = [
 				'id' => $group,
-				'name' => $groups_r[$group]['name'],
+				'name' => $groups_r_rw[$group]['name'],
 				'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) && !array_key_exists($group, $groups_rw)
 			];
 		}
@@ -1209,7 +1209,7 @@ elseif (hasRequest('form')) {
 
 	// Append inaccessible groups to the end of the sorted list.
 	$inaccessible_group = _('Inaccessible group');
-	foreach (array_values(array_diff($groupids, array_keys($groups_r))) as $n => $group) {
+	foreach (array_values(array_diff($groupids, array_keys($groups_r_rw))) as $n => $group) {
 		$postfix = ($n > 0) ? ' (' . ($n + 1) . ')' : '';
 
 		$data['groups_ms'][] = [
