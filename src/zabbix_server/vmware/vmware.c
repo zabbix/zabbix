@@ -108,6 +108,7 @@ static zbx_vmware_t	*vmware = NULL;
 #define ZBX_MAXQUERYMETRICS_UNLIMITED	1000
 
 ZBX_VECTOR_IMPL(str_uint64_pair, zbx_str_uint64_pair_t)
+ZBX_PTR_VECTOR_IMPL(vmware_datastore, zbx_vmware_datastore_t *)
 
 /* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
@@ -116,14 +117,15 @@ typedef struct
 	const char	*session_manager;
 	const char	*event_manager;
 	const char	*property_collector;
+	const char	*root_folder;
 }
 zbx_vmware_service_objects_t;
 
 static zbx_vmware_service_objects_t	vmware_service_objects[3] =
 {
-	{NULL, NULL, NULL, NULL},
-	{"ha-perfmgr", "ha-sessionmgr", "ha-eventmgr", "ha-property-collector"},
-	{"PerfMgr", "SessionManager", "EventManager", "propertyCollector"}
+	{NULL, NULL, NULL, NULL, NULL},
+	{"ha-perfmgr", "ha-sessionmgr", "ha-eventmgr", "ha-property-collector", "ha-folder-root"},
+	{"PerfMgr", "SessionManager", "EventManager", "propertyCollector", "group-d1"}
 };
 
 /* mapping of performance counter group/key[rollup type] to its id (net/transmitted[average] -> <id>) */
@@ -790,6 +792,9 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 	if (NULL != datastore->uuid)
 		vmware_shared_strfree(datastore->uuid);
 
+	zbx_vector_str_clear_ext(&datastore->hv_uuids, vmware_shared_strfree);
+	zbx_vector_str_destroy(&datastore->hv_uuids);
+
 	__vm_mem_free_func(datastore);
 }
 
@@ -895,8 +900,8 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
  ******************************************************************************/
 static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_ptr_clear_ext(&hv->datastores, (zbx_clean_func_t)vmware_datastore_shared_free);
-	zbx_vector_ptr_destroy(&hv->datastores);
+	zbx_vector_str_clear_ext(&hv->ds_ids, vmware_shared_strfree);
+	zbx_vector_str_destroy(&hv->ds_ids);
 
 	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_shared_free);
 	zbx_vector_ptr_destroy(&hv->vms);
@@ -990,6 +995,9 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 
 		zbx_vector_ptr_clear_ext(&data->events, (zbx_clean_func_t)vmware_event_shared_free);
 		zbx_vector_ptr_destroy(&data->events);
+
+		zbx_vector_vmware_datastore_clear_ext(&data->datastores, vmware_datastore_shared_free);
+		zbx_vector_vmware_datastore_destroy(&data->datastores);
 
 		if (NULL != data->error)
 			vmware_shared_strfree(data->error);
@@ -1140,16 +1148,22 @@ static zbx_vmware_event_t	*vmware_event_shared_dup(const zbx_vmware_event_t *src
  ******************************************************************************/
 static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_datastore_t *src)
 {
+	int			i;
 	zbx_vmware_datastore_t	*datastore;
 
 	datastore = (zbx_vmware_datastore_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_datastore_t));
 	datastore->uuid = vmware_shared_strdup(src->uuid);
 	datastore->name = vmware_shared_strdup(src->name);
 	datastore->id = vmware_shared_strdup(src->id);
+	VMWARE_VECTOR_CREATE(&datastore->hv_uuids, str);
+	zbx_vector_str_reserve(&datastore->hv_uuids, src->hv_uuids.values_num);
 
 	datastore->capacity = src->capacity;
 	datastore->free_space = src->free_space;
 	datastore->uncommitted = src->uncommitted;
+
+	for (i = 0; i < src->hv_uuids.values_num; i++)
+		zbx_vector_str_append(&datastore->hv_uuids, vmware_shared_strdup(src->hv_uuids.values[i]));
 
 	return datastore;
 }
@@ -1277,9 +1291,9 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 {
 	int	i;
 
-	VMWARE_VECTOR_CREATE(&dst->datastores, ptr);
+	VMWARE_VECTOR_CREATE(&dst->ds_ids, str);
 	VMWARE_VECTOR_CREATE(&dst->vms, ptr);
-	zbx_vector_ptr_reserve(&dst->datastores, src->datastores.values_num);
+	zbx_vector_str_reserve(&dst->ds_ids, src->ds_ids.values_num);
 	zbx_vector_ptr_reserve(&dst->vms, src->vms.values_num);
 
 	dst->uuid = vmware_shared_strdup(src->uuid);
@@ -1291,8 +1305,8 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 	dst->parent_name = vmware_shared_strdup(src->parent_name);
 	dst->parent_type= vmware_shared_strdup(src->parent_type);
 
-	for (i = 0; i < src->datastores.values_num; i++)
-		zbx_vector_ptr_append(&dst->datastores, vmware_datastore_shared_dup((zbx_vmware_datastore_t *)src->datastores.values[i]));
+	for (i = 0; i < src->ds_ids.values_num; i++)
+		zbx_vector_str_append(&dst->ds_ids, vmware_shared_strdup(src->ds_ids.values[i]));
 
 	for (i = 0; i < src->vms.values_num; i++)
 		zbx_vector_ptr_append(&dst->vms, vmware_vm_shared_dup((zbx_vmware_vm_t *)src->vms.values[i]));
@@ -1322,8 +1336,10 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 			__vm_mem_realloc_func, __vm_mem_free_func);
 	VMWARE_VECTOR_CREATE(&data->clusters, ptr);
 	VMWARE_VECTOR_CREATE(&data->events, ptr);
+	VMWARE_VECTOR_CREATE(&data->datastores, vmware_datastore);
 	zbx_vector_ptr_reserve(&data->clusters, src->clusters.values_num);
 	zbx_vector_ptr_reserve(&data->events, src->events.values_num);
+	zbx_vector_vmware_datastore_reserve(&data->datastores, src->datastores.values_num);
 
 	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_mem_malloc_func,
 			__vm_mem_realloc_func, __vm_mem_free_func);
@@ -1335,6 +1351,9 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 
 	for (i = 0; i < src->events.values_num; i++)
 		zbx_vector_ptr_append(&data->events, vmware_event_shared_dup((zbx_vmware_event_t *)src->events.values[i]));
+
+	for (i = 0; i < src->datastores.values_num; i++)
+		zbx_vector_vmware_datastore_append(&data->datastores, vmware_datastore_shared_dup(src->datastores.values[i]));
 
 	zbx_hashset_iter_reset(&src->hvs, &iter);
 	while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
@@ -1467,8 +1486,8 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
  ******************************************************************************/
 static void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_ptr_clear_ext(&hv->datastores, (zbx_clean_func_t)vmware_datastore_free);
-	zbx_vector_ptr_destroy(&hv->datastores);
+	zbx_vector_str_clear_ext(&hv->ds_ids, zbx_str_free);
+	zbx_vector_str_destroy(&hv->ds_ids);
 
 	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_free);
 	zbx_vector_ptr_destroy(&hv->vms);
@@ -1539,6 +1558,9 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 
 	zbx_vector_ptr_clear_ext(&data->events, (zbx_clean_func_t)vmware_event_free);
 	zbx_vector_ptr_destroy(&data->events);
+
+	zbx_vector_vmware_datastore_clear_ext(&data->datastores, vmware_datastore_free);
+	zbx_vector_vmware_datastore_destroy(&data->datastores);
 
 	zbx_free(data->error);
 	zbx_free(data);
@@ -2561,6 +2583,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 	datastore->capacity = capacity;
 	datastore->free_space = free_space;
 	datastore->uncommitted = uncommitted;
+	zbx_vector_str_create(&datastore->hv_uuids);
 out:
 	zbx_xml_free_doc(doc);
 
@@ -2789,6 +2812,21 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_ds_compare                                                *
+ *                                                                            *
+ * Purpose: sorting function to sort Datastore vector by id                   *
+ *                                                                            *
+ ******************************************************************************/
+int	vmware_ds_compare(const void *d1, const void *d2)
+{
+	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t **)d1;
+	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t **)d2;
+
+	return strcmp(ds1->id, ds2->id);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_service_init_hv                                           *
  *                                                                            *
  * Purpose: initialize vmware hypervisor object                               *
@@ -2796,6 +2834,7 @@ out:
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
  *             id           - [IN] the vmware hypervisor id                   *
+ *             dss          - [IN/OUT] the vector with all Datastores         *
  *             hv           - [OUT] the hypervisor object (must be allocated) *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
@@ -2804,19 +2843,19 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, const char *id,
-		zbx_vmware_hv_t *hv, char **error)
+		zbx_vector_vmware_datastore_t *dss, zbx_vmware_hv_t *hv, char **error)
 {
 	const char		*__function_name = "vmware_service_init_hv";
 	char			*value;
 	xmlDoc			*details = NULL;
 	zbx_vector_str_t	datastores, vms;
-	int			i, ret = FAIL;
+	int			i, j, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __function_name, id);
 
 	memset(hv, 0, sizeof(zbx_vmware_hv_t));
 
-	zbx_vector_ptr_create(&hv->datastores);
+	zbx_vector_str_create(&hv->ds_ids);
 	zbx_vector_ptr_create(&hv->vms);
 
 	zbx_vector_str_create(&datastores);
@@ -2844,14 +2883,24 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		goto out;
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
-	zbx_vector_ptr_reserve(&hv->datastores, datastores.values_num + hv->datastores.values_alloc);
+	zbx_vector_str_reserve(&hv->ds_ids, datastores.values_num + hv->ds_ids.values_alloc);
 
 	for (i = 0; i < datastores.values_num; i++)
 	{
-		zbx_vmware_datastore_t	*datastore;
+		zbx_vmware_datastore_t ds_cmp;
 
-		if (NULL != (datastore = vmware_service_create_datastore(service, easyhandle, datastores.values[i])))
-			zbx_vector_ptr_append(&hv->datastores, datastore);
+		ds_cmp.id = datastores.values[i];
+
+		if (FAIL == (j = zbx_vector_vmware_datastore_bsearch(dss, &ds_cmp, vmware_ds_compare)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): for HV %s DS %s not found", __func__, hv->id,
+					datastores.values[i]);
+			continue;
+		}
+
+		zbx_vmware_datastore_t *ds = dss->values[j];
+		zbx_vector_str_append(&ds->hv_uuids, zbx_strdup(NULL, hv->uuid));
+		zbx_vector_str_append(&hv->ds_ids, zbx_strdup(NULL, ds->id));
 	}
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_VMS(), &vms);
@@ -2885,32 +2934,36 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_hv_list                                       *
+ * Function: vmware_service_get_hv_ds_list                                    *
  *                                                                            *
  * Purpose: retrieves a list of all vmware service hypervisor ids             *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
  *             hvs          - [OUT] list of vmware hypervisor ids             *
+ *             dss          - [OUT] list of vmware datastore ids              *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_str_t *hvs, char **error)
+static int	vmware_service_get_hv_ds_list(const zbx_vmware_service_t *service, CURL *easyhandle,
+		zbx_vector_str_t *hvs, zbx_vector_str_t *dss, char **error)
 {
-#	define ZBX_POST_VCENTER_HV_LIST								\
+#	define ZBX_POST_VCENTER_HV_DS_LIST							\
 		ZBX_POST_VSPHERE_HEADER								\
 		"<ns0:RetrievePropertiesEx xsi:type=\"ns0:RetrievePropertiesExRequestType\">"	\
-			"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"	\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
 			"<ns0:specSet>"								\
 				"<ns0:propSet>"							\
 					"<ns0:type>HostSystem</ns0:type>"			\
 				"</ns0:propSet>"						\
+				"<ns0:propSet>"							\
+					"<ns0:type>Datastore</ns0:type>"			\
+				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
-					"<ns0:obj type=\"Folder\">group-d1</ns0:obj>"		\
+					"<ns0:obj type=\"Folder\">%s</ns0:obj>"			\
 					"<ns0:skip>false</ns0:skip>"				\
 					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
 						"<ns0:name>visitFolders</ns0:name>"		\
@@ -3022,41 +3075,49 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 
 	const char	*__function_name = "vmware_service_get_hv_list";
 
+	char				tmp[MAX_STRING_LEN];
 	int				ret = FAIL;
 	xmlDoc				*doc = NULL;
 	zbx_property_collection_iter	*iter = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (ZBX_VMWARE_TYPE_VCENTER == service->type)
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_HV_DS_LIST,
+			vmware_service_objects[service->type].property_collector,
+			vmware_service_objects[service->type].root_folder);
+
+	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, "propertyCollector", &iter, &doc, error))
 	{
-		if (SUCCEED != zbx_property_collection_init(easyhandle, ZBX_POST_VCENTER_HV_LIST, "propertyCollector",
-				&iter, &doc, error))
-		{
-			goto out;
-		}
-
-		zbx_xml_read_values(doc, "//*[@type='HostSystem']", hvs);
-
-		while (NULL != iter->token)
-		{
-			zbx_xml_free_doc(doc);
-			doc = NULL;
-
-			if (SUCCEED != zbx_property_collection_next(iter, &doc, error))
-				goto out;
-
-			zbx_xml_read_values(doc, "//*[@type='HostSystem']", hvs);
-		}
+		goto out;
 	}
+
+	if (ZBX_VMWARE_TYPE_VCENTER == service->type)
+		zbx_xml_read_values(doc, "//*[@type='HostSystem']", hvs);
 	else
 		zbx_vector_str_append(hvs, zbx_strdup(NULL, "ha-host"));
+
+	zbx_xml_read_values(doc, "//*[@type='Datastore']", dss);
+
+	while (NULL != iter->token)
+	{
+		zbx_xml_free_doc(doc);
+		doc = NULL;
+
+		if (SUCCEED != zbx_property_collection_next(iter, &doc, error))
+			goto out;
+
+		if (ZBX_VMWARE_TYPE_VCENTER == service->type)
+			zbx_xml_read_values(doc, "//*[@type='HostSystem']", hvs);
+
+		zbx_xml_read_values(doc, "//*[@type='Datastore']", dss);
+	}
 
 	ret = SUCCEED;
 out:
 	zbx_property_collection_free(iter);
 	zbx_xml_free_doc(doc);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d", __function_name, zbx_result_string(ret), hvs->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found hv:%d ds:%d", __function_name, zbx_result_string(ret),
+			hvs->values_num, dss->values_num);
 
 	return ret;
 }
@@ -4163,13 +4224,13 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 			zabbix_log(LOG_LEVEL_TRACE, "%s() for type: VirtualMachine hv id: %s hv uuid: %s linked vm id:"
 					" %s vm uuid: %s", __function_name, hv->id, hv->uuid, vm->id, vm->uuid);
 		}
+	}
 
-		if (ZBX_VMWARE_TYPE_VSPHERE == service->type)
-			continue;
-
-		for (i = 0; i < hv->datastores.values_num; i++)
+	if (ZBX_VMWARE_TYPE_VCENTER == service->type)
+	{
+		for (i = 0; i < service->data->datastores.values_num; i++)
 		{
-			zbx_vmware_datastore_t	*ds = hv->datastores.values[i];
+			zbx_vmware_datastore_t	*ds = service->data->datastores.values[i];
 			vmware_service_add_perf_entity(service, "Datastore", ds->id, ds_perfcounters, "",
 					service->lastcheck);
 			zabbix_log(LOG_LEVEL_TRACE, "%s() for type: Datastore hv id: %s hv uuid: %s linked ds id:"
@@ -4199,7 +4260,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	CURLcode		err;
 	struct curl_slist	*headers = NULL;
 	zbx_vmware_data_t	*data;
-	zbx_vector_str_t	hvs;
+	zbx_vector_str_t	hvs, dss;
 	zbx_vector_ptr_t	events;
 	int			i, ret = FAIL;
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
@@ -4214,8 +4275,10 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	zbx_hashset_create(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare);
 	zbx_vector_ptr_create(&data->clusters);
 	zbx_vector_ptr_create(&data->events);
+	zbx_vector_vmware_datastore_create(&data->datastores);
 
 	zbx_vector_str_create(&hvs);
+	zbx_vector_str_create(&dss);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -4244,8 +4307,20 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
-	if (SUCCEED != vmware_service_get_hv_list(service, easyhandle, &hvs, &data->error))
+	if (SUCCEED != vmware_service_get_hv_ds_list(service, easyhandle, &hvs, &dss, &data->error))
 		goto clean;
+
+	zbx_vector_vmware_datastore_reserve(&data->datastores, dss.values_num + data->datastores.values_alloc);
+
+	for (i = 0; i < dss.values_num; i++)
+	{
+		zbx_vmware_datastore_t	*datastore;
+
+		if (NULL != (datastore = vmware_service_create_datastore(service, easyhandle, dss.values[i])))
+			zbx_vector_vmware_datastore_append(&data->datastores, datastore);
+	}
+
+	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_compare);
 
 	if (SUCCEED != zbx_hashset_reserve(&data->hvs, hvs.values_num))
 	{
@@ -4257,8 +4332,11 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	{
 		zbx_vmware_hv_t	hv_local;
 
-		if (SUCCEED == vmware_service_init_hv(service, easyhandle, hvs.values[i], &hv_local, &data->error))
+		if (SUCCEED == vmware_service_init_hv(service, easyhandle, hvs.values[i], &data->datastores, &hv_local,
+				&data->error))
+		{
 			zbx_hashset_insert(&data->hvs, &hv_local, sizeof(hv_local));
+		}
 	}
 
 	/* skip collection of event data if we don't know where we stopped last time or item can't accept values */
@@ -4307,6 +4385,8 @@ clean:
 
 	zbx_vector_str_clear_ext(&hvs, zbx_str_free);
 	zbx_vector_str_destroy(&hvs);
+	zbx_vector_str_clear_ext(&dss, zbx_str_free);
+	zbx_vector_str_destroy(&dss);
 out:
 	zbx_vector_ptr_create(&events);
 	zbx_vmware_lock();

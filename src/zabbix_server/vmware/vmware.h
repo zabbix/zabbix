@@ -96,15 +96,18 @@ zbx_vmware_perf_entity_t;
 
 typedef struct
 {
-	char		*name;
-	char		*uuid;
-	char		*id;
-	zbx_uint64_t	capacity;
-	zbx_uint64_t	free_space;
-	zbx_uint64_t	uncommitted;
-
+	char			*name;
+	char			*uuid;
+	char			*id;
+	zbx_uint64_t		capacity;
+	zbx_uint64_t		free_space;
+	zbx_uint64_t		uncommitted;
+	zbx_vector_str_t	hv_uuids;
 }
 zbx_vmware_datastore_t;
+
+int	vmware_ds_compare(const void *d1, const void *d2);
+ZBX_PTR_VECTOR_DECL(vmware_datastore, zbx_vmware_datastore_t *)
 
 #define ZBX_VMWARE_DEV_TYPE_NIC		1
 #define ZBX_VMWARE_DEV_TYPE_DISK	2
@@ -146,7 +149,7 @@ typedef struct
 	char			*parent_name;
 	char			*parent_type;
 	char			**props;
-	zbx_vector_ptr_t	datastores;
+	zbx_vector_str_t	ds_ids;
 	zbx_vector_ptr_t	vms;
 }
 zbx_vmware_hv_t;
@@ -191,11 +194,12 @@ typedef struct
 {
 	char	*error;
 
-	zbx_hashset_t		hvs;
-	zbx_hashset_t		vms_index;
-	zbx_vector_ptr_t	clusters;
-	zbx_vector_ptr_t	events;			/* vector of pointers to zbx_vmware_event_t structures */
-	int			max_query_metrics;	/* max count of Datastore perfCounters in one request */
+	zbx_hashset_t			hvs;
+	zbx_hashset_t			vms_index;
+	zbx_vector_ptr_t		clusters;
+	zbx_vector_ptr_t		events;			/* vector of pointers to zbx_vmware_event_t structures */
+	int				max_query_metrics;	/* max count of Datastore perfCounters in one request */
+	zbx_vector_vmware_datastore_t	datastores;
 }
 zbx_vmware_data_t;
 
