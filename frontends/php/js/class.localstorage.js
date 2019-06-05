@@ -90,6 +90,7 @@ function ZBX_LocalStorage(version, prefix) {
 	 * This way we survive data across page reloads in case of single tab.
 	 */
 	this.keys_to_backup = {
+		'tabs.lastfocused': true,
 		'notifications.alarm.end': true,
 		'notifications.alarm.snoozed': true,
 		'notifications.snoozedids': true,

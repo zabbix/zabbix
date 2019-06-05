@@ -74,7 +74,7 @@ ZBX_BrowserTab.prototype.checkAlive = function() {
 };
 
 /**
- * A focus event on current tab will be spoofed, if it tab just removed a crashed tab reference, that previously was the
+ * A focus event onto current tab will be spoofed, if it just removed a crashed tab reference, that previously was the
  * focused one.
  *
  * @param {string} tabid  The crashed tab ID.
