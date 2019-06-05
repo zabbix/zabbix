@@ -3806,7 +3806,7 @@ $form-icon-btn: (
 }
 
 // Action Menus, Pop-up Menus
-.action-menu {
+.menu-popup {
 	position: absolute;
 	z-index: 1000;
 	padding: 5px 15px 5px 25px;
@@ -3830,7 +3830,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.action-menu-item {
+	.menu-popup-item {
 		display: block;
 		height: 24px;
 		line-height: 24px;
@@ -3877,7 +3877,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.action-menu-item-disabled {
+	.menu-popup-item-disabled {
 		display: block;
 		height: 24px;
 		line-height: 24px;
@@ -5615,10 +5615,29 @@ a.overlay-close-btn {
 	background-color: rgba($ui-bg-color, .8);
 	@include border-radius(50%);
 	@include transform(translateY(-50%));
+
+	&.menu-popup-preloader {
+		@include border-radius(0);
+		@include box-shadow(0 4px 20px 0 $action-shadow-color);
+		@include transform(none);
+		background: $action-preloader-bg-color;
+		border: 1px solid $action-border-color;
+		height: 120px;
+		width: 120px;
+		position: fixed;
+		right: auto;
+		bottom: auto;
+		display: flex;
+		align-items: center;
+		margin: 0;
+		z-index: 1010;
+	}
 }
 
 .preloader {
 	@include border-radius(50%);
+	@include box-shadow (0 0 0 7px rgba($ui-bg-color, .8));
+	background-color: rgba($ui-bg-color, .8);
 	width: 20px;
 	height: 20px;
 	margin: 0 auto;
@@ -7328,27 +7347,27 @@ In exceptional cases dialogs may contain additional information inside a scrolla
 Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch.
 
 ```html_example
-<ul class="action-menu">
+<ul class="menu-popup">
    <li>
       <h3>Favourite screens</h3>
    </li>
-   <li><span class="action-menu-item">Add</span></li>
+   <li><span class="menu-popup-item">Add</span></li>
    <li>
-      <span class="action-menu-item">Remove<span class="arrow-right"></span></span>
-      <ul class="action-menu" style="top: 47px; left: 203px;">
-         <li><span class="action-menu-item">Zabbix server</span></li>
+      <span class="menu-popup-item">Remove<span class="arrow-right"></span></span>
+      <ul class="menu-popup" style="top: 47px; left: 203px;">
+         <li><span class="menu-popup-item">Zabbix server</span></li>
       </ul>
    </li>
-   <li><span class="action-menu-item">Remove all</span></li>
+   <li><span class="menu-popup-item">Remove all</span></li>
    <li>
       <div></div>
    </li>
    <li>
       <h3>Favourite slide shows</h3>
    </li>
-   <li><span class="action-menu-item selected">Add</span></li>
-   <li><span class="action-menu-item-disabled">Remove</span></li>
-   <li><span class="action-menu-item-disabled">Remove all</span></li>
+   <li><span class="menu-popup-item selected">Add</span></li>
+   <li><span class="menu-popup-item-disabled">Remove</span></li>
+   <li><span class="menu-popup-item-disabled">Remove all</span></li>
 </ul>
 ```
 */
