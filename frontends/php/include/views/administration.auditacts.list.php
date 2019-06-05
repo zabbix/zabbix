@@ -104,7 +104,7 @@ foreach ($this->data['alerts'] as $alert) {
 	}
 
 	$recipient = (isset($alert['userid']) && $alert['userid'])
-		? [bold(getUserFullname($this->data['users'][$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
+		? makeEventDetailsTableUser($alert + ['action_type' => ZBX_EVENT_HISTORY_ALERT], $data['users'])
 		: zbx_nl2br($alert['sendto']);
 
 	$auditTable->addRow([

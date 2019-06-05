@@ -9,7 +9,8 @@ AGENT_tests = \
 	SYSTEM_BOOTTIME \
 	NET_IF_TOTAL \
 	NET_IF_IN \
-	NET_IF_OUT
+	NET_IF_OUT \
+	SYSTEM_HW_CHASSIS
 endif
 
 noinst_PROGRAMS = $(AGENT_tests)
@@ -36,6 +37,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/zabbix_agent/libzbxagent.a \
@@ -162,5 +164,14 @@ NET_IF_OUT_SOURCES = \
 NET_IF_OUT_LDADD = $(COMMON_LIB_FILES) @AGENT_LIBS@
 
 NET_IF_OUT_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+#SYSTEM_HW_CHASSIS
+SYSTEM_HW_CHASSIS_SOURCES = \
+	SYSTEM_HW_CHASSIS.c \
+	$(COMMON_SRC_FILES)
+
+SYSTEM_HW_CHASSIS_LDADD = $(COMMON_LIB_FILES) @AGENT_LIBS@
+
+SYSTEM_HW_CHASSIS_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

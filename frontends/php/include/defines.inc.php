@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.8rc1');
-define('ZABBIX_API_VERSION',	'4.0.8');
+define('ZABBIX_VERSION',		'4.0.9rc1');
+define('ZABBIX_API_VERSION',	'4.0.9');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -65,7 +65,7 @@ define('ELASTICSEARCH_RESPONSE_DOCUMENTS',		2);
 
 define('ZBX_WIDGET_ROWS', 20);
 
-define('ZBX_FONTPATH',				realpath('fonts')); // where to search for font (GD > 2.0.18)
+define('ZBX_FONTPATH',				realpath('assets/fonts')); // where to search for font (GD > 2.0.18)
 define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
 define('ZBX_GRAPH_LEGEND_HEIGHT',	120); // when graph height is less then this value, some legend will not show up
 
@@ -106,10 +106,6 @@ define('EXTACK_OPTION_BOTH',	2);
 define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
 define('TRIGGERS_OPTION_ALL',				2);
 define('TRIGGERS_OPTION_IN_PROBLEM',		3);
-
-define('ZBX_ACK_STS_ANY',				1);
-define('ZBX_ACK_STS_WITH_UNACK',		2);
-define('ZBX_ACK_STS_WITH_LAST_UNACK',	3);
 
 define('ZBX_FONT_NAME', 'DejaVuSans');
 
@@ -1474,7 +1470,6 @@ define('ZBX_STYLE_COLUMN_TAGS_1', 'column-tags-1');
 define('ZBX_STYLE_COLUMN_TAGS_2', 'column-tags-2');
 define('ZBX_STYLE_COLUMN_TAGS_3', 'column-tags-3');
 define('ZBX_STYLE_COMPACT_VIEW', 'compact-view');
-define('ZBX_STYLE_CURSOR_MOVE', 'cursor-move');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
 define('ZBX_STYLE_DASHBRD_GRID_CONTAINER', 'dashbrd-grid-container');
 define('ZBX_STYLE_DASHBRD_WIDGET', 'dashbrd-widget');

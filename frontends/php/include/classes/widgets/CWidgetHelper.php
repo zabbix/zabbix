@@ -846,7 +846,7 @@ class CWidgetHelper {
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
 				'scroll: false,'.
-				'cursor: "move",'.
+				'cursor: IE ? "move" : "grabbing",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disabled: function() {'.
@@ -1113,17 +1113,17 @@ class CWidgetHelper {
 					'jQuery("#ds_" + row_num + "_width").rangeControl("disable");'.
 					'jQuery("#ds_" + row_num + "_fill").rangeControl("disable");'.
 					'jQuery("#ds_" + row_num + "_pointsize").rangeControl("enable");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_0").attr("disabled", "disabled");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_1").attr("disabled", "disabled");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_2").attr("disabled", "disabled");'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);'.
 				'}'.
 				'else {'.
 					'jQuery("#ds_" + row_num + "_width").rangeControl("enable");'.
 					'jQuery("#ds_" + row_num + "_fill").rangeControl("enable");'.
 					'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_0").removeAttr("disabled");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_1").removeAttr("disabled");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_2").removeAttr("disabled");'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", false);'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);'.
 				'}'.
 			'};',
 
@@ -1224,7 +1224,7 @@ class CWidgetHelper {
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
 				'scroll: false,'.
-				'cursor: "move",'.
+				'cursor: IE ? "move" : "grabbing",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disabled: function() {'.
