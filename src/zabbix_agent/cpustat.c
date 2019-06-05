@@ -140,43 +140,23 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	cpe.dwInstanceIndex = -1;
 	cpe.szCounterName = get_counter_name(PCI_PROCESSOR_TIME);
 
-	cpus_per_group = pcpus->count / pcpus->group_count;
+	/* 64 logical CPUs (threads) is a hard limit for 32-bit Windows systems and some old 64-bit versions,  */
+	/* such as Windows Vista. Systems with <= 64 threads will always have one processor group, which means */
+	/* it's ok to use old performance counter "\Processor(n)\% Processor Time". However, for systems with  */
+	/* more than 64 threads Windows distributes them evenly across multiple processor groups with maximum  */
+	/* 64 threads per single group. Given that "\Processor(n)" doesn't report values for n >= 64 we need   */
+	/* to use "\Processor Information(g, n)" where g is a group number and n is a thread number within     */
+	/* group. So, for 72-thread system there will be two groups with 36 threads each and Windows will      */
+	/* support counters "\Processor Information(0,n)" with 0 <= n <= 31 and "\Processor Information(1,n)". */
 
-	for (gidx = 0; gidx < pcpus->group_count; gidx++)
-	{
-		for (idx = 0; idx <= cpus_per_group; idx++)
-		{
-			if (0 == idx)
-			{
-				if (gidx == 0)
-				{
-					StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("_Total"));
-					zabbix_log(LOG_LEVEL_DEBUG, ":: _Total");
-				}
-				else
-					continue;
-			}
-			else
-			{
-				StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("%d,%d"), gidx, idx - 1);
-				zabbix_log(LOG_LEVEL_DEBUG, ":: %d,%d",gidx, idx - 1);
-			}
+	/* We might use "\Processor Information" for all systems (even with less than 64 threads) and  to      */
+	/* fall back to "\Processor" only when "\Processor Information" is not available (it's the case        */
+	/* for very old OSes like Windows 2003) but the corresponding index may be occupied by a third-party   */
+	/* object. In this case we would need to either rely on the fact that this third party object          */
+	/* is not likely to have counter of the same name ("Processor Time") or to resolve counters by names   */
+	/* and deal with potential localization issues. */
 
-			if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
-				goto clean;
-
-			if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
-					&error)))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, 
-						"counter \"Processor Information\" failed, fallback to \"Processor\"");
-				goto retry_old_counter;
-			}
-		}
-	}
-
-retry_old_counter:
-	if (idx <= cpus_per_group)
+	if (pcpus->count <= 64)
 	{
 		cpe.szObjectName = get_counter_name(PCI_PROCESSOR);
 		for (idx = 0; idx <= pcpus->count; idx++)
@@ -195,6 +175,45 @@ retry_old_counter:
 				goto clean;
 			}
 		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "system with more than 64 CPUs, using \"Processor Information\" counter");
+
+		cpus_per_group = pcpus->count / pcpus->group_count;
+
+		zabbix_log(LOG_LEVEL_DEBUG, ":: groups = %d, cpus_per_group = %d, cpus = %d", pcpus->group_count,
+				cpus_per_group, pcpus->count);
+
+		for (gidx = 0; gidx < pcpus->group_count; gidx++)
+		{
+			for (idx = 0; idx <= cpus_per_group; idx++)
+			{
+				if (0 == idx)
+				{
+					if (gidx == 0)
+					{
+						StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("_Total"));
+						zabbix_log(LOG_LEVEL_DEBUG, ":: _Total");
+					}
+					else
+						continue;
+				}
+				else
+				{
+					StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("%d,%d"), gidx, idx - 1);
+					zabbix_log(LOG_LEVEL_DEBUG, ":: %d,%d", gidx, idx - 1);
+				}
+
+				if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
+					goto clean;
+
+				if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+						&error)))
+					goto clean;
+			}
+		}
+
 	}
 
 	cpe.szObjectName = get_counter_name(PCI_SYSTEM);

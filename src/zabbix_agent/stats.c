@@ -63,17 +63,62 @@ zbx_mutex_t		diskstats_lock = ZBX_MUTEX_NULL;
 static int	zbx_get_cpu_num(void)
 {
 #if defined(_WINDOWS)
-	/* Define a function pointer type for the GetActiveProcessorCount API */
-	typedef DWORD (WINAPI *GETACTIVEPC) (WORD);
+	/* shortcut just to avoid extra verbosity */
+	typedef PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX PSYS_LPI_EX;
+	/* define function pointer types for the GetActiveProcessorCount() and GetLogicalProcessorInformationEx() API */
+	typedef DWORD (WINAPI *GETACTIVEPC)(WORD);
+	typedef BOOL (WINAPI *GETLPIEX)(LOGICAL_PROCESSOR_RELATIONSHIP, PSYS_LPI_EX, PDWORD);
 
 	GETACTIVEPC	get_act;
+	GETLPIEX	get_lpiex;
 	SYSTEM_INFO	sysInfo;
+	DWORD		buffer_length;
+	PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX buffer;
+	int		cpu_count = 0;
 
-	/* The rationale for checking dynamically if the GetActiveProcessorCount is implemented */
-	/* in kernel32.lib, is because the function is implemented only on 64 bit versions of Windows */
-	/* from Windows 7 onward. Windows Vista 64 bit doesn't have it and also Windows XP does */
-	/* not. We can't resolve this using conditional compilation unless we release multiple agents */
+	/* The rationale for checking dynamically if specific functions are implemented */
+	/* in kernel32.lib because these may not be available in certain Windows versions. */
+	/* E.g. GetActiveProcessorCount() available from Windows 7 onward (and not in Windows Vista or XP) */
+	/* We can't resolve this using conditional compilation unless we release multiple agents */
 	/* targeting different sets of Windows APIs. */
+
+	/* First, lets try GetLogicalProcessorInformationEx() method. It's the most reliable way */
+	/* because it counts logical CPUs (aka threads) regardless of whether the application is */
+	/* 32 or 64-bit. GetActiveProcessorCount() may return incorrect value (e.g. 64 CPUs for systems */
+	/* with 128 CPUs) if executed under under WoW64. */
+
+	get_lpiex = (GETLPIEX)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetLogicalProcessorInformationEx");
+
+	if (NULL != get_lpiex)
+	{
+		/* first run with empty arguments to figure the buffer length */
+		if (get_lpiex(RelationAll, NULL, &buffer_length) || ERROR_INSUFFICIENT_BUFFER != GetLastError())
+			goto fallback;
+
+		buffer = (PSYS_LPI_EX)malloc((size_t)buffer_length);
+		if (get_lpiex(RelationProcessorCore, buffer, &buffer_length))
+		{
+			for (unsigned i = 0; i < buffer_length;)
+			{
+				PSYS_LPI_EX ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
+				for (WORD group = 0; group < ptr->Processor.GroupCount; group++)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "\tgroup %d", group);
+					for (KAFFINITY mask = ptr->Processor.GroupMask[group].Mask; mask != 0; mask >>= 1)
+					{
+						zabbix_log(LOG_LEVEL_DEBUG, "\t\tgroup: %d, mask: %x",
+								ptr->Processor.GroupMask[group].Group, mask);
+						cpu_count += mask & 1;
+					}
+				}
+				i += (unsigned)ptr->Size;
+			}
+			zabbix_log(LOG_LEVEL_DEBUG,"found thread count %d\n", cpu_count);
+			return cpu_count;
+		}
+	}
+
+fallback:
 	get_act = (GETACTIVEPC)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetActiveProcessorCount");
 
 	if (NULL != get_act)
@@ -159,7 +204,7 @@ static int	zbx_get_cpu_group_num(void)
 {
 #if defined(_WINDOWS)
 	/* Define a function pointer type for the GetActiveProcessorGroupCount API */
-	typedef DWORD (WINAPI *GETACTIVEPGC) ();
+	typedef WORD (WINAPI *GETACTIVEPGC) ();
 
 	GETACTIVEPGC	get_act;
 
@@ -202,8 +247,9 @@ int	init_collector_data(char **error)
 	collector = zbx_malloc(collector, sz + sz_cpu);
 	memset(collector, 0, sz + sz_cpu);
 
-	collector->cpus.cpu_counter = (zbx_perf_counter_data_t **)((char *)collector + sz);
-	collector->cpus.count = cpu_count;
+	collector->cpus.cpu_counter	= (zbx_perf_counter_data_t **)((char *)collector + sz);
+	collector->cpus.count		= cpu_count;
+	collector->cpus.group_count	= zbx_get_cpu_group_num();
 #else
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 
