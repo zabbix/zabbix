@@ -4205,7 +4205,8 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 
 	const char			*ds_perfcounters[] = {
 						"disk/used[latest]", "disk/provisioned[latest]",
-						"disk/capacity[latest]", NULL
+						"disk/capacity[latest]", "disk/totalReadLatency[average]",
+						"disk/totalWriteLatency[average]", NULL
 					};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
