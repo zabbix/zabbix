@@ -125,7 +125,8 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	char				*error = NULL;
 	int				idx, ret = FAIL;
 #ifdef _WINDOWS
-	wchar_t				cpu[8];
+	TCHAR				cpu[16];
+	int				gidx, cpus_per_group;
 	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 #endif
@@ -133,26 +134,66 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 #ifdef _WINDOWS
 	cpe.szMachineName = NULL;
-	cpe.szObjectName = get_counter_name(PCI_PROCESSOR);
+	cpe.szObjectName = get_counter_name(PCI_PROCESSOR_INFORMATION);
 	cpe.szInstanceName = cpu;
 	cpe.szParentInstance = NULL;
 	cpe.dwInstanceIndex = -1;
 	cpe.szCounterName = get_counter_name(PCI_PROCESSOR_TIME);
 
-	for (idx = 0; idx <= pcpus->count; idx++)
+	cpus_per_group = pcpus->count / pcpus->group_count;
+
+	for (gidx = 0; gidx < pcpus->group_count; gidx++)
 	{
-		if (0 == idx)
-			StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("_Total"));
-		else
-			_itow_s(idx - 1, cpu, ARRSIZE(cpu), 10);
-
-		if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
-			goto clean;
-
-		if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
-				&error)))
+		for (idx = 0; idx <= cpus_per_group; idx++)
 		{
-			goto clean;
+			if (0 == idx)
+			{
+				if (gidx == 0)
+				{
+					StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("_Total"));
+					zabbix_log(LOG_LEVEL_DEBUG, ":: _Total");
+				}
+				else
+					continue;
+			}
+			else
+			{
+				StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("%d,%d"), gidx, idx - 1);
+				zabbix_log(LOG_LEVEL_DEBUG, ":: %d,%d",gidx, idx - 1);
+			}
+
+			if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
+				goto clean;
+
+			if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+					&error)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, 
+						"counter \"Processor Information\" failed, fallback to \"Processor\"");
+				goto retry_old_counter;
+			}
+		}
+	}
+
+retry_old_counter:
+	if (idx <= cpus_per_group)
+	{
+		cpe.szObjectName = get_counter_name(PCI_PROCESSOR);
+		for (idx = 0; idx <= pcpus->count; idx++)
+		{
+			if (0 == idx)
+				StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("_Total"));
+			else
+				_itow_s(idx - 1, cpu, ARRSIZE(cpu), 10);
+
+			if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
+				goto clean;
+
+			if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+					&error)))
+			{
+				goto clean;
+			}
 		}
 	}
 

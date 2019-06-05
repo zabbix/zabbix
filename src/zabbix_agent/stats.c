@@ -148,6 +148,34 @@ return_one:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_get_cpu_group_num                                            *
+ *                                                                            *
+ * Purpose: returns the number of active processor groups on Windows          *
+ *                                                                            *
+ * Return value: number of groups, 1 if groups are not supported              *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_get_cpu_group_num(void)
+{
+#if defined(_WINDOWS)
+	/* Define a function pointer type for the GetActiveProcessorGroupCount API */
+	typedef DWORD (WINAPI *GETACTIVEPGC) ();
+
+	GETACTIVEPGC	get_act;
+
+	/* please see comments in zbx_get_cpu_num() */
+	get_act = (GETACTIVEPGC)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetActiveProcessorGroupCount");
+
+	if (NULL != get_act)
+		return (int)get_act();
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "GetActiveProcessorGroupCount() is not supported");
+#endif
+	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: init_collector_data                                              *
  *                                                                            *
  * Purpose: Allocate memory for collector                                     *
