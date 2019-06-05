@@ -155,6 +155,14 @@ pre {
   font-family: "Courier New", Courier, monospace;
   font-size: 1em; }
 
+.disabled {
+  opacity: 0.35;
+  filter: alpha(opacity=35);
+  cursor: default !important; }
+  .disabled .disabled,
+  .disabled [disabled] {
+    opacity: 1 !important; }
+
 pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
@@ -1003,6 +1011,17 @@ output {
   .subfilter-enabled sup {
     color: #bfcacf; }
 
+.disabled {
+  background-color: transparent; }
+  .disabled .subfilter-enabled {
+    color: #273035; }
+  .disabled .subfilter-disable-btn {
+    cursor: default;
+    color: #3d4b52;
+    background-color: #768d99; }
+    .disabled .subfilter-disable-btn:hover, .disabled .subfilter-disable-btn:focus, .disabled .subfilter-disable-btn:active {
+      color: #3d4b52; }
+
 .filter-forms {
   margin: 0 auto;
   text-align: center;
@@ -1063,16 +1082,14 @@ output {
       .multiselect .multiselect-list li .subfilter-enabled {
         padding: 0 9px 0 4px;
         line-height: 18px; }
-      .multiselect .multiselect-list li.selected .subfilter-enabled {
-        background-color: #93a5af; }
-      .multiselect .multiselect-list li.selected .subfilter-disable-btn {
-        background-color: #93a5af;
-        opacity: 1;
-        filter: alpha(opacity=100); }
-        .multiselect .multiselect-list li.selected .subfilter-disable-btn:active {
-          background-color: #93a5af;
-          opacity: 1;
-          filter: alpha(opacity=100); }
+  .multiselect .disabled {
+    opacity: 1;
+    filter: alpha(opacity=100);
+    background-color: #ebebeb; }
+    .multiselect .disabled .subfilter-enabled,
+    .multiselect .disabled .subfilter-disable-btn {
+      background-color: #ccd5d9;
+      color: #768d99; }
   .multiselect div[aria-live] {
     overflow: hidden;
     position: absolute;
@@ -1950,24 +1967,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   color: #acbbc2;
   background-color: #ebebeb !important;
   border-color: #ccd5d9; }
-
-.disabled {
-  cursor: default !important;
-  background-color: transparent !important;
-  opacity: 0.35;
-  filter: alpha(opacity=35); }
-  .disabled .subfilter-enabled {
-    color: #273035; }
-  .disabled .subfilter-disable-btn {
-    cursor: default;
-    color: #3d4b52;
-    background-color: #768d99; }
-    .disabled .subfilter-disable-btn:hover {
-      color: #273035; }
-    .disabled .subfilter-disable-btn:focus {
-      color: #273035; }
-    .disabled .subfilter-disable-btn:active {
-      color: #273035; }
 
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }

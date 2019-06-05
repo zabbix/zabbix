@@ -213,6 +213,16 @@ pre {
 	}
 }
 
+.disabled {
+	@include opacity(0.35);
+	cursor: default !important;
+
+	.disabled,
+	[disabled] {
+		opacity: 1 !important;
+	}
+}
+
 %space-pre-wrap {
 	white-space: pre-wrap;
 	word-wrap: break-word;
@@ -1500,6 +1510,26 @@ output {
 	}
 }
 
+.disabled {
+	background-color: transparent;
+
+	.subfilter-enabled {
+		color: darken($ui-bg-selected-color, 35%);
+	}
+
+	.subfilter-disable-btn {
+		cursor: default;
+		color: darken($ui-bg-selected-color, 25%);
+		background-color: $ui-bg-selected-color;
+
+		&:hover,
+		&:focus,
+		&:active {
+			color: darken($ui-bg-selected-color, 25%);
+		}
+	}
+}
+
 .filter-forms {
 	margin: 0 auto;
 	text-align: center;
@@ -1597,23 +1627,17 @@ output {
 				padding: 0 9px 0 4px;
 				line-height: 18px;
 			}
+		}
+	}
 
-			&.selected {
+	.disabled {
+		@include opacity(1);
+		background-color: $multiselect-disabled-bg-color;
 
-				.subfilter-enabled {
-					background-color: lighten($ui-bg-selected-color, 10%);
-				}
-
-				.subfilter-disable-btn {
-					background-color: lighten($ui-bg-selected-color, 10%);
-					@include opacity(1);
-
-					&:active {
-						background-color: lighten($ui-bg-selected-color, 10%);
-						@include opacity(1);
-					}
-				}
-			}
+		.subfilter-enabled,
+		.subfilter-disable-btn {
+			background-color: $multiselect-item-disabled-bg-color;
+			color: $multiselect-item-disabled-color;
 		}
 	}
 
@@ -2067,7 +2091,7 @@ input {
 	}
 
 	&[readonly] {
-		color: $font-color!important;
+		color: $font-color !important;
 		@extend %form-disabled;
 	}
 }
@@ -2870,34 +2894,6 @@ $icon-widget-btn: (
 	color: $form-disabled-font-color;
 	background-color: $form-disabled-bg-color !important;
 	border-color: $form-disabled-border-color;
-}
-
-.disabled {
-	cursor: default !important;
-	background-color: transparent !important;
-	@include opacity(0.35);
-
-	.subfilter-enabled {
-		color: darken($ui-bg-selected-color, 35%);
-	}
-
-	.subfilter-disable-btn {
-		cursor: default;
-		color: darken($ui-bg-selected-color, 25%);
-		background-color: $ui-bg-selected-color;
-
-		&:hover {
-			color: darken($ui-bg-selected-color, 35%);
-		}
-
-		&:focus {
-			color: darken($ui-bg-selected-color, 35%);
-		}
-
-		&:active {
-			color: darken($ui-bg-selected-color, 35%);
-		}
-	}
 }
 
 .inaccessible {

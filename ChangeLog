@@ -17,6 +17,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-15875] fixed colors for the multiselect disabled elements (ashubin)
 ..F....... [ZBX-10948] 'IT Services --> Service Time --> Note' infinite stretching (rlataria)
 ..F....... [ZBX-15585] fixed web scenarios pair manager issue when fields are duplicating on post type toggle (talbergs)
 ...G...... [ZBX-16142] fixed missing sys/ioctl.h from src/libs/zbxsysinfo/openbsd/net.c; thanks to Andrea Biscuola for the patch (akozlovs)
@@ -435,6 +436,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-15875] fixed colors for the multiselect disabled elements (ashubin)
 ..F....... [ZBX-10948] 'IT Services --> Service Time --> Note' infinite stretching (rlataria)
 ...G...... [ZBX-16142] fixed missing sys/ioctl.h from src/libs/zbxsysinfo/openbsd/net.c; thanks to Andrea Biscuola for the patch (akozlovs)
 .......PS. [ZBX-16166] fixed Zabbix fping feature detection does not work with fping builds since 10 Feb 2017 (akozlovs)

@@ -160,6 +160,14 @@ pre {
   font-family: "Courier New", Courier, monospace;
   font-size: 1em; }
 
+.disabled {
+  opacity: 0.35;
+  filter: alpha(opacity=35);
+  cursor: default !important; }
+  .disabled .disabled,
+  .disabled [disabled] {
+    opacity: 1 !important; }
+
 pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
@@ -990,6 +998,17 @@ output {
   .subfilter-enabled sup {
     color: #737373; }
 
+.disabled {
+  background-color: transparent; }
+  .disabled .subfilter-enabled {
+    color: black; }
+  .disabled .subfilter-disable-btn {
+    cursor: default;
+    color: black;
+    background-color: #333; }
+    .disabled .subfilter-disable-btn:hover, .disabled .subfilter-disable-btn:focus, .disabled .subfilter-disable-btn:active {
+      color: black; }
+
 .filter-forms {
   margin: 0 auto;
   text-align: center;
@@ -1050,16 +1069,14 @@ output {
       .multiselect .multiselect-list li .subfilter-enabled {
         padding: 0 9px 0 4px;
         line-height: 18px; }
-      .multiselect .multiselect-list li.selected .subfilter-enabled {
-        background-color: #4d4d4d; }
-      .multiselect .multiselect-list li.selected .subfilter-disable-btn {
-        background-color: #4d4d4d;
-        opacity: 1;
-        filter: alpha(opacity=100); }
-        .multiselect .multiselect-list li.selected .subfilter-disable-btn:active {
-          background-color: #4d4d4d;
-          opacity: 1;
-          filter: alpha(opacity=100); }
+  .multiselect .disabled {
+    opacity: 1;
+    filter: alpha(opacity=100);
+    background-color: #f0f0f0; }
+    .multiselect .disabled .subfilter-enabled,
+    .multiselect .disabled .subfilter-disable-btn {
+      background-color: #9f9f9f;
+      color: #fff; }
   .multiselect div[aria-live] {
     overflow: hidden;
     position: absolute;
@@ -1937,24 +1954,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   color: #9f9f9f;
   background-color: #f0f0f0 !important;
   border-color: #9f9f9f; }
-
-.disabled {
-  cursor: default !important;
-  background-color: transparent !important;
-  opacity: 0.35;
-  filter: alpha(opacity=35); }
-  .disabled .subfilter-enabled {
-    color: black; }
-  .disabled .subfilter-disable-btn {
-    cursor: default;
-    color: black;
-    background-color: #333; }
-    .disabled .subfilter-disable-btn:hover {
-      color: black; }
-    .disabled .subfilter-disable-btn:focus {
-      color: black; }
-    .disabled .subfilter-disable-btn:active {
-      color: black; }
 
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }
@@ -5147,19 +5146,12 @@ ul.top-nav-icons a:focus {
   opacity: 0.5;
   filter: alpha(opacity=50); }
 
-.multiselect .multiselect-list {
-  padding-left: 2px;
-  padding-bottom: 2px; }
-  .multiselect .multiselect-list li.selected .subfilter-enabled {
-    background-color: #777 !important;
-    -webkit-box-shadow: 0 0 0 1px #111111;
-    -moz-box-shadow: 0 0 0 1px #111111;
-    box-shadow: 0 0 0 1px #111111; }
-  .multiselect .multiselect-list li.selected .subfilter-disable-btn {
-    background-color: #777 !important;
-    -webkit-box-shadow: 0 0 0 1px #111111;
-    -moz-box-shadow: 0 0 0 1px #111111;
-    box-shadow: 0 0 0 1px #111111; }
+.multiselect .multiselect-list li.selected .subfilter-enabled,
+.multiselect .multiselect-list li.selected .subfilter-disable-btn {
+  background-color: #777;
+  -webkit-box-shadow: 0 0 0 1px #111111;
+  -moz-box-shadow: 0 0 0 1px #111111;
+  box-shadow: 0 0 0 1px #111111; }
 
 .header-logo:focus {
   -webkit-box-shadow: 0 0 0 2px #111;

@@ -20,6 +20,10 @@ $blue: white;
 
 $white: #000 !important;
 
+$disabled-bg-color: #000;
+$disabled-item-color: #b5b5b5;
+$disabled-item-bg-color: #383838;
+
 // MAIN
 $main-nav-bg-color: #000;
 $main-subnav-bg-color: #e0e0e0;
@@ -560,17 +564,9 @@ ul.top-nav-icons {
 	}
 }
 
-.subfilter-enabled {
-	background-color: #000;
-}
-
-
+.subfilter-enabled,
 .subfilter-disable-btn {
-	background-color: $ui-bg-color !important;
-
-	&:active {
-		background-color: $ui-bg-color !important;
-	}
+	background-color: $ui-bg-color;
 }
 
 .tag {
@@ -582,21 +578,16 @@ ul.top-nav-icons {
 }
 
 .multiselect {
+
 	.multiselect-list {
-		padding-left: 2px;
-		padding-bottom: 2px;
 
 		li {
 
 			&.selected {
 
-				.subfilter-enabled {
-					background-color: $ui-hover-color !important;
-					@include box-shadow(0 0 0 1px rgba($blue, 1));
-				}
-
+				.subfilter-enabled,
 				.subfilter-disable-btn {
-					background-color: $ui-hover-color !important;
+					background-color: $ui-hover-color;
 					@include box-shadow(0 0 0 1px rgba($blue, 1));
 				}
 			}

@@ -160,6 +160,14 @@ pre {
   font-family: "Courier New", Courier, monospace;
   font-size: 1em; }
 
+.disabled {
+  opacity: 0.35;
+  filter: alpha(opacity=35);
+  cursor: default !important; }
+  .disabled .disabled,
+  .disabled [disabled] {
+    opacity: 1 !important; }
+
 pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
@@ -990,6 +998,17 @@ output {
   .subfilter-enabled sup {
     color: white; }
 
+.disabled {
+  background-color: transparent; }
+  .disabled .subfilter-enabled {
+    color: #848484; }
+  .disabled .subfilter-disable-btn {
+    cursor: default;
+    color: #9d9d9d;
+    background-color: #ddd; }
+    .disabled .subfilter-disable-btn:hover, .disabled .subfilter-disable-btn:focus, .disabled .subfilter-disable-btn:active {
+      color: #9d9d9d; }
+
 .filter-forms {
   margin: 0 auto;
   text-align: center;
@@ -1050,16 +1069,14 @@ output {
       .multiselect .multiselect-list li .subfilter-enabled {
         padding: 0 9px 0 4px;
         line-height: 18px; }
-      .multiselect .multiselect-list li.selected .subfilter-enabled {
-        background-color: #f7f7f7; }
-      .multiselect .multiselect-list li.selected .subfilter-disable-btn {
-        background-color: #f7f7f7;
-        opacity: 1;
-        filter: alpha(opacity=100); }
-        .multiselect .multiselect-list li.selected .subfilter-disable-btn:active {
-          background-color: #f7f7f7;
-          opacity: 1;
-          filter: alpha(opacity=100); }
+  .multiselect .disabled {
+    opacity: 1;
+    filter: alpha(opacity=100);
+    background-color: #000; }
+    .multiselect .disabled .subfilter-enabled,
+    .multiselect .disabled .subfilter-disable-btn {
+      background-color: #383838;
+      color: #b5b5b5; }
   .multiselect div[aria-live] {
     overflow: hidden;
     position: absolute;
@@ -1937,24 +1954,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   color: #7d7d7d;
   background-color: #000 !important;
   border-color: #5a5a5a; }
-
-.disabled {
-  cursor: default !important;
-  background-color: transparent !important;
-  opacity: 0.35;
-  filter: alpha(opacity=35); }
-  .disabled .subfilter-enabled {
-    color: #848484; }
-  .disabled .subfilter-disable-btn {
-    cursor: default;
-    color: #9d9d9d;
-    background-color: #ddd; }
-    .disabled .subfilter-disable-btn:hover {
-      color: #848484; }
-    .disabled .subfilter-disable-btn:focus {
-      color: #848484; }
-    .disabled .subfilter-disable-btn:active {
-      color: #848484; }
 
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }
@@ -5172,13 +5171,9 @@ ul.top-nav-icons a:focus {
 .filter-trigger .arrow-down {
   border-top-color: #000 !important; }
 
-.subfilter-enabled {
-  background-color: #000; }
-
+.subfilter-enabled,
 .subfilter-disable-btn {
-  background-color: #000 !important; }
-  .subfilter-disable-btn:active {
-    background-color: #000 !important; }
+  background-color: #000; }
 
 .tag {
   color: #000; }
@@ -5187,19 +5182,12 @@ ul.top-nav-icons a:focus {
   opacity: 0.6;
   filter: alpha(opacity=60); }
 
-.multiselect .multiselect-list {
-  padding-left: 2px;
-  padding-bottom: 2px; }
-  .multiselect .multiselect-list li.selected .subfilter-enabled {
-    background-color: #222 !important;
-    -webkit-box-shadow: 0 0 0 1px white;
-    -moz-box-shadow: 0 0 0 1px white;
-    box-shadow: 0 0 0 1px white; }
-  .multiselect .multiselect-list li.selected .subfilter-disable-btn {
-    background-color: #222 !important;
-    -webkit-box-shadow: 0 0 0 1px white;
-    -moz-box-shadow: 0 0 0 1px white;
-    box-shadow: 0 0 0 1px white; }
+.multiselect .multiselect-list li.selected .subfilter-enabled,
+.multiselect .multiselect-list li.selected .subfilter-disable-btn {
+  background-color: #222;
+  -webkit-box-shadow: 0 0 0 1px white;
+  -moz-box-shadow: 0 0 0 1px white;
+  box-shadow: 0 0 0 1px white; }
 
 .header-logo:focus {
   -webkit-box-shadow: 0 0 0 2px white;
