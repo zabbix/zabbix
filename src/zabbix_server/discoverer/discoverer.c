@@ -641,6 +641,8 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 	char			*iprange = NULL;
 	zbx_vector_uint64_t	keep_dhostids, del_dhostids, del_dserviceids;
 	zbx_uint64_t		dhostid, dserviceid;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -658,17 +660,23 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 	zbx_vector_uint64_create(&del_dhostids);
 	zbx_vector_uint64_create(&del_dserviceids);
 
-	result = DBselect("select dh.dhostid,ds.dserviceid,ds.ip"
-			" from dhosts dh,dservices ds"
-			" where dh.dhostid=ds.dhostid"
-				" and dh.druleid=" ZBX_FS_UI64,
+	result = DBselect(
+			"select dh.dhostid,ds.dserviceid,ds.ip"
+			" from dhosts dh"
+				" left join dservices ds"
+					" on dh.dhostid=ds.dhostid"
+			" where dh.druleid=" ZBX_FS_UI64,
 			druleid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(dhostid, row[0]);
 
-		if (SUCCEED != ip_in_list(iprange, row[2]))
+		if (SUCCEED == DBis_null(row[1]))
+		{
+			zbx_vector_uint64_append(&del_dhostids, dhostid);
+		}
+		else if (SUCCEED != ip_in_list(iprange, row[2]))
 		{
 			ZBX_STR2UINT64(dserviceid, row[1]);
 
@@ -685,8 +693,6 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 	if (0 != del_dserviceids.values_num)
 	{
 		int	i;
-		char	*sql = NULL;
-		size_t	sql_alloc = 0, sql_offset;
 
 		/* remove dservices */
 
@@ -714,21 +720,21 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 			if (FAIL != zbx_vector_uint64_bsearch(&keep_dhostids, dhostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 				zbx_vector_uint64_remove_noorder(&del_dhostids, i--);
 		}
-
-		if (0 != del_dhostids.values_num)
-		{
-			zbx_vector_uint64_sort(&del_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-			sql_offset = 0;
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dhosts where");
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
-					del_dhostids.values, del_dhostids.values_num);
-
-			DBexecute("%s", sql);
-		}
-
-		zbx_free(sql);
 	}
+
+	if (0 != del_dhostids.values_num)
+	{
+		zbx_vector_uint64_sort(&del_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dhosts where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
+				del_dhostids.values, del_dhostids.values_num);
+
+		DBexecute("%s", sql);
+	}
+
+	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&del_dserviceids);
 	zbx_vector_uint64_destroy(&del_dhostids);
