@@ -14,6 +14,7 @@ Bug fixes:
 Changes for 4.2.4rc1
 
 New features:
+..F....... [ZBXNEXT-5163] added display of maintenance information in Configuration section for hosts in maitenance (vasilijs)
 ..F....... [ZBXNEXT-5036] added preloader for popup menus (ashubin)
 ...G...... [ZBXNEXT-287] added SSL support for agent HTTP checks (asestakovs)
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
@@ -441,6 +442,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.10rc1
 
 New features:
+..F....... [ZBXNEXT-5163] added display of maintenance information in Configuration section for hosts in maitenance (vasilijs)
 ..F....... [ZBXNEXT-5036] added preloader for popup menus (ashubin)
 ...G...... [ZBXNEXT-287] added SSL support for agent HTTP checks (asestakovs)
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
