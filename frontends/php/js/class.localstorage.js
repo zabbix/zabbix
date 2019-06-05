@@ -103,6 +103,20 @@ function ZBX_LocalStorage(version, prefix) {
 		this.truncate();
 	}
 
+	/*
+	 * We first copy everything from session storage into local storage, an then we copy everything from local storage
+	 * into session storage. This way session is transfered onto next tab, meanwhile allowing us to truncate local
+	 * storage at single tab reload or close. Else in case when user opens second tab, then closes first, second tab
+	 * would not be able to restore backup keys session storage, because it has new session storage.
+	 */
+	this.iteratorSession().forEach(function(key_variant) {
+		localStorage.setItem(key_variant.abs_key, sessionStorage.getItem(key_variant.abs_key));
+	});
+
+	this.iteratorLocal().forEach(function(key_variant) {
+		sessionStorage.setItem(key_variant.abs_key, localStorage.getItem(key_variant.abs_key));
+	});
+
 	this.keepAlive();
 	setInterval(this.keepAlive, ZBX_LocalStorage.defines.KEEP_ALIVE_INTERVAL * 1000);
 }
@@ -354,7 +368,7 @@ ZBX_LocalStorage.prototype.truncateBackup = function() {
  * @param {callable} filter_cb  Optional callback which return true if key should be removed.
  */
 ZBX_LocalStorage.prototype.truncate = function(filter_cb) {
-	var iter = this.iterator();
+	var iter = this.iteratorLocal();
 
 	if (filter_cb && filter_cb.constructor === Function) {
 		iter = iter.filter(filter_cb);
@@ -406,7 +420,7 @@ ZBX_LocalStorage.prototype.onUpdate = function(callback) {
  * @param {callable} callback
  */
 ZBX_LocalStorage.prototype.mapCallback = function(callback) {
-	this.iterator().forEach(function(key_variants) {
+	this.iteratorLocal().forEach(function(key_variants) {
 		if (this.hasKey(key_variants.key)) {
 			callback(key_variants.key, this.readKey(key_variants.key), ZBX_LocalStorage.defines.EVT_MAP);
 		}
@@ -414,11 +428,41 @@ ZBX_LocalStorage.prototype.mapCallback = function(callback) {
 };
 
 /**
+ * Returns list of keys found in sessionStorage relevant for current session.
+ *
+ * @return {array}
+ */
+ZBX_LocalStorage.prototype.iteratorSession = function() {
+	var length = sessionStorage.length,
+		list = [],
+		abs_key,
+		key,
+		i;
+
+	for (i = 0; i < length; i++) {
+		abs_key = sessionStorage.key(i);
+		key = this.fromAbsKey(abs_key);
+
+		if (!key) {
+			continue;
+		}
+
+		list.push({
+			abs_key: abs_key,
+			key: key
+		});
+	}
+
+
+	return list;
+};
+
+/**
  * Returns list of keys found in localStorage relevant for current session.
  *
  * @return {array}
  */
-ZBX_LocalStorage.prototype.iterator = function() {
+ZBX_LocalStorage.prototype.iteratorLocal = function() {
 	var length = localStorage.length,
 		list = [],
 		abs_key,
