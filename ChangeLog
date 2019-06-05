@@ -1,3 +1,9 @@
+Changes for 4.0.9
+
+Bug fixes:
+..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.8
 
 4.0.8rc1 was released as 4.0.8 without any changes
