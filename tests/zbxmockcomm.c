@@ -27,7 +27,10 @@ static zbx_mock_handle_t	fragments;
 
 int	__wrap_connect(int fd, __CONST_SOCKADDR_ARG addr, socklen_t len);
 ssize_t	__wrap_read(int fd, void *buf, size_t nbytes);
-int	__wrap_open(int fd, int flags);
+int	__wrap_open(const char *path, int flags, ...);
+
+ssize_t	__real_read(int fd, void *buf, size_t nbytes);
+int	__real_open(const char *path, int flags, ...);
 
 int	__wrap_connect(int fd, __CONST_SOCKADDR_ARG addr, socklen_t len)
 {
@@ -43,14 +46,22 @@ int	__wrap_connect(int fd, __CONST_SOCKADDR_ARG addr, socklen_t len)
 	return 0;
 }
 
-int	__wrap_open(int fd, int flags)
+int	__wrap_open(const char *path, int flags, ...)
 {
-	ZBX_UNUSED(fd);
-	ZBX_UNUSED(flags);
+	if (NULL != strstr(path, ".gcda"))
+	{
+		va_list	args;
+		int	fd;
+
+		va_start(args, flags);
+		fd = __real_open(path, flags, va_arg(args, int));
+		va_end(args);
+		return fd;
+	}
 
 	fragments = zbx_mock_get_parameter_handle("in.fragments");
 
-	return 0;
+	return INT_MAX;
 }
 
 ssize_t	__wrap_read(int fd, void *buf, size_t nbytes)

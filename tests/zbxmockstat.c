@@ -25,13 +25,18 @@
 
 int	__wrap_stat(const char *pathname, struct stat *buf);
 int	__wrap___xstat(int ver, const char *pathname, struct stat *buf);
-int	__wrap_fstat(struct stat *stat_buf);
 int	__wrap___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
+
+int	__real_stat(const char *pathname, struct stat *buf);
+int	__real___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
 
 int	__wrap_stat(const char *pathname, struct stat *buf)
 {
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	handle;
+
+	if (NULL != strstr(pathname, ".gcda"))
+		return __real_stat(pathname, buf);
 
 	if (ZBX_MOCK_SUCCESS == (error = zbx_mock_file(pathname, &handle)))
 	{
@@ -59,20 +64,18 @@ int	__wrap___xstat(int ver, const char *pathname, struct stat *buf)
 {
 	ZBX_UNUSED(ver);
 
+	if (NULL != strstr(pathname, ".gcda"))
+		return __real_stat(pathname, buf);
+
 	return __wrap_stat(pathname, buf);
-}
-
-int	__wrap_fstat(struct stat *stat_buf)
-{
-	stat_buf->st_size = zbx_mock_get_parameter_uint64("in.file_len");
-
-	return 0;
 }
 
 int	__wrap___fxstat(int __ver, int __fildes, struct stat *__stat_buf)
 {
-	ZBX_UNUSED(__ver);
-	ZBX_UNUSED(__fildes);
+	if (__fildes != INT_MAX)
+		return __real___fxstat(__ver, __fildes, __stat_buf);
 
-	return __wrap_fstat(__stat_buf);
+	__stat_buf->st_size = zbx_mock_get_parameter_uint64("in.file_len");
+
+	return 0;
 }
