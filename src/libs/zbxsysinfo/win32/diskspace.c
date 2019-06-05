@@ -110,7 +110,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	wchar_t		name[MAX_PATH + 1], *paths = NULL, *p, *path;
 	HANDLE		volume;
 	DWORD		buf_size = MAX_PATH + 1;
-	size_t		sz, sz_last;
+	size_t		sz;
 	int		ret = SYSINFO_RET_OK;
 
 	if (INVALID_HANDLE_VALUE == (volume = FindFirstVolume(name, ARRSIZE(name))))
@@ -142,10 +142,9 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		for (p = paths, sz = wcslen(p), path = NULL; sz > 0; p += sz + 1, sz = wcslen(p))
 		{
 			path = p;
-			sz_last = --sz;
 
 			/* use assigned drive letter if found */
-			if (':' == path[sz_last - 1])
+			if (3 >= sz)
 				break;
 		}
 
@@ -155,9 +154,10 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			zbx_json_addobject(&j, NULL);
 			utf8 = zbx_unicode_to_utf8(path);
+			sz = strlen(utf8);
 
-			if ('\\' == utf8[sz_last])
-				utf8[sz_last] = '\0';
+			if (0 < sz && '\\' == utf8[--sz])
+				utf8[sz] = '\0';
 
 			zbx_json_addstring(&j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
 			zbx_free(utf8);
