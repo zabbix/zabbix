@@ -4175,6 +4175,8 @@ svg {
   margin: 4px 0; }
   .sysmap-scroll-container .map-container {
     display: table; }
+  .sysmap-scroll-container .flickerfreescreen {
+    display: inline-block; }
   .sysmap-scroll-container .table-forms-container, .sysmap-scroll-container .browser-warning-container {
     display: table;
     margin: 0;
