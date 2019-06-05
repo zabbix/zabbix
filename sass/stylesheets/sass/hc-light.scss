@@ -274,13 +274,13 @@ $icon-widget-btn: (
 	}
 }
 
-.action-menu {
+.menu-popup {
 
-	.action-menu-item-disabled {
+	.menu-popup-item-disabled {
 		color: $form-disabled-font-color;
 	}
 
-	.action-menu-item {
+	.menu-popup-item {
 		&:hover,
 		&:focus,
 		&:active,
