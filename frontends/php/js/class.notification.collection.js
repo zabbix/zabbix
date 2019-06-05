@@ -96,7 +96,7 @@ ZBX_NotificationCollection.prototype.makeToggleBtn = function(attrs_inactive, at
  */
 ZBX_NotificationCollection.prototype.show = function() {
 	this.node.style.opacity = 0;
-	this.node.style.display = 'initial';
+	this.node.style.display = 'inherit';
 	this.node.hidden = false;
 
 	var op = 0;
