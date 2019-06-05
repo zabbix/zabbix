@@ -48,6 +48,12 @@ if (!check_fields($fields)) {
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 $items = getRequest('items', []);
+
+if (count($items) === 0) {
+	show_error_message(_('No items defined.'));
+	exit();
+}
+
 CArrayHelper::sort($items, ['sortorder']);
 
 /*
