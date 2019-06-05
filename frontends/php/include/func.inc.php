@@ -448,10 +448,11 @@ function zbx_num2bitstr($num, $rev = false) {
  * @return int
  */
 function str2mem($val) {
-	$unit = strtolower(substr($val, -1));
-	$val = (int) substr($val, 0, -1);
+	$val = trim($val);
+	$last = strtolower(substr($val, -1));
+	$val = (int) $val;
 
-	switch ($unit) {
+	switch ($last) {
 		case 'g':
 			$val *= ZBX_GIBIBYTE;
 			break;
