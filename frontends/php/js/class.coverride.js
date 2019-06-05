@@ -124,7 +124,7 @@ jQuery(function ($) {
 							item.data = data.data;
 
 							item.clickCallback = function(e) {
-								$(this).closest('.action-menu-top').menuPopup('close', null, true);
+								$(this).closest('.menu-popup-top').menuPopup('close', null, true);
 
 								var args = [$obj];
 								$(this).data('args').each(function(a) {args.push(a)});

@@ -38,82 +38,29 @@ if (array_key_exists('triggerid', $options)) {
 	$form->addVar('triggerid', $options['triggerid']);
 }
 
-$key_table = (new CTable())
-	->setId('key_list')
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([
-		_('Keyword'),
-		_('Type'),
-		_('Action')
-	]);
-
-$max_id = 0;
-foreach ($data['keys'] as $id => $val) {
-	$key_table->addRow(
-		(new CRow([
-			htmlspecialchars($val['value']),
-			$val['type'],
-			(new CCol(
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick('remove_keyword("keytr'.$id.'");')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))->setId('keytr'.$id)
-	);
-
-	$form
-		->addVar('keys['.$id.'][value]', $val['value'])
-		->addVar('keys['.$id.'][type]', $val['type']);
-
-	$max_id = max($max_id, $id);
-}
-
-$output['script_inline'] .= 'key_count='.($max_id + 1).';'."\n";
-
 $expression_table = (new CTable())
-	->setId('exp_list')
+	->addClass('ui-sortable')
+	->setId('expressions_list')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([
+		'',
 		_('Expression'),
 		_('Type'),
-		_('Position'),
 		_('Action')
 	]);
 
-$max_id = 0;
-foreach ($data['expressions'] as $id => $expr) {
-	$imgup = (new CImg('images/general/arrow_up.png', 'up', 12, 14))
-		->onClick('element_up("logtr'.$id.'");')
-		->onMouseover('this.style.cursor = "pointer";')
-		->addClass('updown');
+$expressions = [];
 
-	$imgdn = (new CImg('images/general/arrow_down.png', 'down', 12, 14))
-		->onClick('element_down("logtr'.$id.'");')
-		->onMouseover('this.style.cursor = "pointer";')
-		->addClass('updown');
-
-	$expression_table->addRow(
-		(new CRow([
-			htmlspecialchars($expr['value']),
-			($expr['type'] == CTextTriggerConstructor::EXPRESSION_TYPE_MATCH) ? _('Include') : _('Exclude'),
-			[$imgup, ' ', $imgdn],
-			(new CCol(
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick('remove_expression("logtr'.$id.'");')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))->setId('logtr'.$id)
-	);
-
-	$form
-		->addVar('expressions['.$id.'][value]', $expr['value'])
-		->addVar('expressions['.$id.'][type]', $expr['type']);
-
-	$max_id = max($max_id, $id);
+foreach ($data['expressions'] as $expr) {
+	$expressions[] = [
+		'expression' => $expr['value'],
+		'type_label' => $expr['type'] == CTextTriggerConstructor::EXPRESSION_TYPE_MATCH ? _('Include') : _('Exclude'),
+		'type' => $expr['type']
+	];
 }
 
-$output['script_inline'] .= 'logexpr_count='.($max_id + 1).';'."\n";
-$output['script_inline'] .= 'jQuery(document).ready(function(){processExpressionList();});'."\n";
+$output['script_inline'] = 'jQuery("#'.$expression_table->getId().'").data("rows", '.CJs::encodeJson($expressions).');'
+	.$output['script_inline'];
 
 $form->addItem(
 	(new CFormList())
@@ -153,25 +100,27 @@ $form->addItem(
 		->addRow(null, [
 			(new CCheckBox('iregexp'))->setLabel('iregexp'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('add_key_and', _('AND')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('add_keyword_and();'),
+			(new CButton('add_key_and', _('AND')))->addClass(ZBX_STYLE_BTN_GREY),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('add_key_or', _('OR')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('add_keyword_or();'),
+			(new CButton('add_key_or', _('OR')))->addClass(ZBX_STYLE_BTN_GREY),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CComboBox('expr_type', null, null, [
 				CTextTriggerConstructor::EXPRESSION_TYPE_MATCH => _('Include'),
 				CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH => _('Exclude')
 			]))->setId('expr_type'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('add_exp', _('Add')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('add_logexpr();')
+			(new CButton('add_exp', _('Add')))->addClass(ZBX_STYLE_BTN_GREY)
 		])
 		->addRow(null,
-			(new CDiv($key_table))
+			(new CDiv((new CTable())
+				->setId('key_list')
+				->setAttribute('style', 'width: 100%;')
+				->setHeader([
+					_('Keyword'),
+					_('Type'),
+					_('Action')
+				])
+			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)

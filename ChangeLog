@@ -1,10 +1,59 @@
+Changes for 4.0.9rc1
+
+New features:
+..F....... [ZBXNEXT-5163] added display of maintenance information in Configuration section for hosts in maitenance (vasilijs)
+..F....... [ZBXNEXT-5036] added preloader for popup menus (ashubin)
+...G...... [ZBXNEXT-287] added SSL support for agent HTTP checks (asestakovs)
+...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
+
+Bug fixes:
+..F....... [ZBX-16073] fixed horizontal scrolling in map (vasilijs)
+........S. [ZBX-15943] fixed discovered hosts are not removed from table 'dhosts' after removing and adding the corresponding discovery check (akozlovs)
+..F....... [ZBX-15875] fixed colors for the multiselect disabled elements (ashubin)
+..F....... [ZBX-10948] 'IT Services --> Service Time --> Note' infinite stretching (rlataria)
+...G...... [ZBX-16142] fixed missing sys/ioctl.h from src/libs/zbxsysinfo/openbsd/net.c; thanks to Andrea Biscuola for the patch (akozlovs)
+.......PS. [ZBX-16166] fixed Zabbix fping feature detection does not work with fping builds since 10 Feb 2017 (akozlovs)
+....I..... [ZBX-16178] fixed distributive can contain untracked backup file include/config.h.in~ (akozlovs)
+........S. [ZBX-16170] fixed crash in global event correlation (vso)
+...G...... [ZBX-16096] fixed "system.cpu.util" reporting incorrect CPU utilisation due to guest time sometimes not being fully included in user time by "/proc/stat" (vso)
+..F....... [ZBX-15882] fixed widgets flickering on refresh (ashubin)
+..F....... [ZBX-15974] improved trigger expression list in trigger modal form (gcalenko)
+...G...... [ZBX-14441] fixed windows agent "eventlog" key for reading big event log files of windows 2003 (MVekslers)
+..F....... [ZBX-16109] fixed hidden error in graphs for PHP 7.3.5 (rlataria)
+....I...S. [ZBX-16093] fixed regular expression File systems for discovery does not contain apfs (akozlovs)
+..F....... [ZBX-16080] fixed setup page to not to use bclib (talbergs)
+..F....... [ZBX-15797] fixed dashboard map widget sub-map link behaviour (miks, talbergs)
+A.F....... [ZBX-15049] fixed to host group limited global scripts to be usable in sub group (talbergs)
+.......PST [ZBX-16138] fixed return value type and added preprocessing steps for items in remote internal checks tamplates; fixed unsigned write cache value for remote internal checks (viktors)
+.......PS. [ZBX-15963] fixed HTTP agent support of non-HTTP scheme in URL field (asestakovs)
+.......PS. [ZBX-16151] fixed theoretical possibility of large numbers in json data being truncated, added boolean value support to json parser (wiper)
+..F....... [ZBX-15778] fixed wrong filtering by "Age less than" and "Show suppressed problems" in trigger overview (vasilijs)
+..F....... [ZBX-15585] fixed web scenarios pair manager issue when fields are duplicating on post type toggle (talbergs)
+........S. [ZBX-16150] fixed inactive, unmounted, unaccessible VMware datastore causes unknown column nan insertion in field list (akozlovs)
+A......... [ZBX-16122] fixed api validation of trigger dependency (averza)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.8
+
+4.0.8rc1 was released as 4.0.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.8rc1
 
 New features:
 ..F....... [ZBX-16069] upgraded jQuery version v1.10.2 -> v3.3.1 and jQueryUI v1.10.3 -> v1.12.1 (talbergs)
 
 Bug fixes:
-..F....... [ZBX-16073] fixed horizontal scrolling in map (vasilijs)
+..F....... [ZBX-16032] changed application filtering to partial name search (vmurzins)
+...G...... [ZBX-15915] fixed linking error if round() is undefined (akozlovs)
+....I..... [ZBX-16074] added file revision number generation for compilation on MS Windows (MVekslers)
+..F....... [ZBX-15833] fixed scrollbar in overlay popups (ashubin)
+.......PS. [ZBX-16058] fixed error in IPMI poller causing growing queue (asitals)
+..F....... [ZBX-16047] fixed division by zero error in SVG graph widget if selected time period is so small that calculated step between 2 milestones is 0s (miks)
+..F....... [ZBX-15936] removed "change password" button when cloning media types (vasilijs)
+A.F....... [ZBX-11272] changed sorting by type, fixed information disclosure and formatting of recipient name in action log screen item and dashboard widget; added new sortfields to alert API (miks)
+A.F....... [ZBX-15416] fixed locale validation in user create and update API methods (miks)
+..F....... [ZBX-15877] fixed Tab Key navigation for Safari and Edge browsers (vasilijs)
 ........S. [ZBX-15891] fixed trigger dependencies are ignored when changing only trigger state (akozlovs)
 A......... [ZBX-13029] fixed api validation messages for linktrigger (vasilijs)
 ...G...... [ZBX-15967] fixed buffer offset for reading hardware info from long DMI files (viktors)
@@ -2419,11 +2468,26 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 3.0.28rc1
+Changes for 3.0.29rc1
 
 New features:
 
 Bug fixes:
+....I..... [ZBX-16178] fixed distributive can contain untracked backup file include/config.h.in~ (akozlovs)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.28
+
+3.0.28rc1 was released as 3.0.28 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.0.28rc1
+
+Bug fixes:
+...G...... [ZBX-15915] fixed linking error if round() is undefined (akozlovs)
+....I..... [ZBX-16074] added file revision number generation for compilation on MS Windows (MVekslers)
+..F....... [ZBX-11284] removed sid URL argument for form cancel buttons (gcalenko, miks)
+A.F....... [ZBX-15416] fixed locale validation in user create and update API methods (miks)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.27
@@ -4574,6 +4638,7 @@ Changes for 2.2.24rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-16074] added file revision number generation for compilation on MS Windows (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.23

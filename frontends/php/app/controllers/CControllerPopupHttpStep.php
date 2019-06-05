@@ -26,15 +26,13 @@ class CControllerPopupHttpStep extends CController {
 	}
 
 	protected function checkInput() {
+
 		$fields = [
-			'dstfrm' =>				'required|string|not_empty',
-			'stepid' =>				'int32',
-			'list_name' =>			'string',
+			'httpstepid' =>			'int32',
 			'name' =>				'string|not_empty',
 			'url' =>				'string|not_empty',
 			'post_type' =>			'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_FORM]),
 			'posts' =>				'string',
-			'pairs' =>				'array',
 			'retrieve_mode' =>		'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS]),
 			'follow_redirects' =>	'in '.implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_ON, HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF]),
 			'timeout' =>			'string|not_empty',
@@ -68,8 +66,6 @@ class CControllerPopupHttpStep extends CController {
 
 	protected function doAction() {
 		$page_options = [
-			'dstfrm' => $this->getInput('dstfrm'),
-			'list_name' => $this->getInput('list_name', ''),
 			'name' => $this->getInput('name', ''),
 			'templated' => $this->getInput('templated', 0),
 			'post_type' => $this->getInput('post_type', ZBX_POSTTYPE_FORM),
@@ -79,19 +75,12 @@ class CControllerPopupHttpStep extends CController {
 			'required' => $this->getInput('required', ''),
 			'status_codes' => $this->getInput('status_codes', ''),
 			'old_name' => $this->getInput('old_name', ''),
-			'pairs' => $this->getInput('pairs', []),
-			'stepid' => $this->getInput('stepid', -1),
+			'httpstepid' => $this->getInput('httpstepid', -1),
 			'steps_names' => $this->getInput('steps_names', [])
 		];
 
-		if ($page_options['stepid'] >= 0 || $this->hasInput('validate')) {
-			$page_options['follow_redirects'] = $this->getInput('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF);
-			$page_options['retrieve_mode'] = $this->getInput('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
-		}
-		else {
-			$page_options['follow_redirects'] = HTTPTEST_STEP_FOLLOW_REDIRECTS_ON;
-			$page_options['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
-		}
+		$page_options['follow_redirects'] = $this->getInput('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF);
+		$page_options['retrieve_mode'] = $this->getInput('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
 
 		if ($this->hasInput('validate')) {
 			$output = [];
@@ -111,8 +100,7 @@ class CControllerPopupHttpStep extends CController {
 			}
 
 			// Validate if step names are unique.
-			if (($page_options['stepid'] >= 0 && $page_options['name'] !== $page_options['old_name'])
-					|| $page_options['stepid'] < 0) {
+			if ($page_options['name'] !== $page_options['old_name']) {
 				foreach ($page_options['steps_names'] as $name) {
 					if ($name === $page_options['name']) {
 						error(_s('Step with name "%1$s" already exists.', $name));
@@ -132,20 +120,15 @@ class CControllerPopupHttpStep extends CController {
 					'url' => $page_options['url'],
 					'post_type' => $page_options['post_type'],
 					'posts' => $page_options['posts'],
-					'pairs' => $page_options['pairs'],
 					'required' => $page_options['required'],
 					'status_codes' => $page_options['status_codes'],
 					'follow_redirects' => $page_options['follow_redirects'],
 					'retrieve_mode' => $page_options['retrieve_mode']
 				];
 
-				if ($page_options['stepid'] >= 0) {
-					$params['stepid'] = $page_options['stepid'];
-				}
+				$params['httpstepid'] = $page_options['httpstepid'];
 
 				$output = [
-					'dstfrm' => $page_options['dstfrm'],
-					'list_name' => $page_options['list_name'],
 					'params' => $params
 				];
 			}
