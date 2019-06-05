@@ -162,6 +162,8 @@ class CWidgetConfig {
 	/**
 	 * Detect if widget uses time selector.
 	 *
+	 * @static
+	 *
 	 * @param array $widget
 	 * @param array $widget[type]
 	 * @param array $widget[fields]
@@ -178,6 +180,26 @@ class CWidgetConfig {
 
 			default:
 				return false;
+		}
+	}
+
+	/**
+	 * Is it allowed for the widget to have scrollable content.
+	 *
+	 * @static
+	 *
+	 * @param string $type  Widget type - 'WIDGET_' constant.
+	 *
+	 * @return bool
+	 */
+	public static function isScrollable($type) {
+		switch ($type) {
+			case WIDGET_GRAPH:
+			case WIDGET_SVG_GRAPH:
+				return false;
+
+			default:
+				return true;
 		}
 	}
 

@@ -138,7 +138,9 @@ typedef enum
 	ZBX_JSON_TYPE_INT,
 	ZBX_JSON_TYPE_ARRAY,
 	ZBX_JSON_TYPE_OBJECT,
-	ZBX_JSON_TYPE_NULL
+	ZBX_JSON_TYPE_NULL,
+	ZBX_JSON_TYPE_TRUE,
+	ZBX_JSON_TYPE_FALSE
 }
 zbx_json_type_t;
 
@@ -185,9 +187,10 @@ int	zbx_json_close(struct zbx_json *j);
 
 int		zbx_json_open(const char *buffer, struct zbx_json_parse *jp);
 const char	*zbx_json_next(const struct zbx_json_parse *jp, const char *p);
-const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, char *string, size_t len, int *is_null);
+const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, char *string, size_t len,
+		zbx_json_type_t *type);
 const char	*zbx_json_next_value_dyn(const struct zbx_json_parse *jp, const char *p, char **string,
-		size_t *string_alloc, int *is_null);
+		size_t *string_alloc, zbx_json_type_t *type);
 const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, char *name, size_t len);
 const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *name);
 int		zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, char *string, size_t len);
@@ -196,7 +199,8 @@ int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *out);
 int		zbx_json_brackets_by_name(const struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out);
 int		zbx_json_object_is_empty(const struct zbx_json_parse *jp);
 int		zbx_json_count(const struct zbx_json_parse *jp);
-const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, int *is_null);
+const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_json_type_t *type);
+const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc, zbx_json_type_t *type);
 void		zbx_json_escape(char **string);
 
 int	zbx_json_path_check(const char *path, char * error, size_t errlen);

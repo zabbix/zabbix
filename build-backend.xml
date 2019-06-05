@@ -92,17 +92,6 @@
 		</for>
 	</target>
 
-	<target name="init">
-		<!-- Create database schema -->
-		<exec executable="./bootstrap.sh" failonerror="on"/>
-		<exec executable="./configure" failonerror="on"/>
-		<exec executable="make" failonerror="on">
-			<arg line="-s"/>
-			<arg line="-j5"/>
-			<arg line="dbschema"/>
-		</exec>
-	</target>
-
 	<macrodef name="make">
 		<!-- Build Zabbix with the specified command line arguments -->
 		<attribute name="args"/>
@@ -116,7 +105,7 @@
 			<property name="common.cflags" value="-O2 -g"/>
 			<switch value="@{cc}">
 				<case value="gcc">
-					<property name="cc.cflags" value="-Wall -Wextra -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat"/>
+					<property name="cc.cflags" value="-Wall -Wextra -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes"/>
 				</case>
 				<case value="clang">
 					<property name="cc.cflags" value=""/>
@@ -294,7 +283,7 @@
 		<!-- Zabbix various configuration parameters for cmocka tests -->
 		<!-- Configuration option name must consist of prefix 'cmocka-', configuration order number
 			and configuration title: cmocka-<number>-<title> -->
-		<property name="cmocka-1-default" value="-q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+		<property name="cmocka-1-default" value="-q CFLAGS='-Wall -Wextra -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes' --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
 		<property name="cmocka-2-agent-only" value="-q --enable-agent"/>
 		<property name="cmocka-3-server-only" value="-q --enable-server --with-mysql"/>
 		<property name="cmocka-4-sanitizer" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
@@ -355,24 +344,28 @@
 
 	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
 
-	<target name="make-dist" depends="init">
+	<target name="make-dist">
 		<!-- Create & build Zabbix distribution -->
-		<sequential>
-			<delete includeemptydirs="true">
-				<fileset dir="." includes="zabbix-*/**"/>
-				<dirset dir="." includes="zabbix-*"/>
-				<fileset dir="." includes="zabbix-*"/>
-			</delete>
-			<make args="" target="dist"/>
-			<apply executable="tar">
-				<arg line="-zxvf"/>
-				<fileset dir="." includes="*.tar.gz"/>
-			</apply>
-			<dirset dir="." includes="zabbix-*" id="dist.dir"/>
-			<property name="prop.dist.dir" refid="dist.dir"/>
-			<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dist" inheritAll="true" inheritRefs="true" />
-		</sequential>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on"/>
+		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="-j5"/>
+			<arg line="dbschema"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="-j5"/>
+			<arg line="dist"/>
+		</exec>
+		<apply executable="tar">
+			<arg line="-zxf"/>
+			<fileset dir="." includes="zabbix-*.tar.gz"/>
+		</apply>
+		<dirset dir="." includes="zabbix-*" id="dist.dir"/>
+		<property name="prop.dist.dir" refid="dist.dir"/>
+		<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dist" inheritAll="true" inheritRefs="true"/>
 	</target>
 
-	<target name="build" depends="init,make-dist"/>
+	<target name="build" depends="make-dist"/>
 </project>
