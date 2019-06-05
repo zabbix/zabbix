@@ -6,11 +6,12 @@ New features:
 ..F....... [ZBX-10574] automated documentation link update upon release of new major version (vasilijs)
 
 Bug fixes:
+..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
 ..F....... [ZBX-15804] fixed links for discovered hosts, items, triggers and graphs (gcalenko)
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
 
 --------------------------------------------------------------------------------
-Changes for 4.2.3rc1
+Changes for 4.2.4rc1
 
 New features:
 ..F....... [ZBXNEXT-5036] added preloader for popup menus (ashubin)
@@ -42,6 +43,12 @@ A.F....... [ZBX-15049] fixed to host group limited global scripts to be usable i
 ..F....... [ZBX-15778] fixed wrong filtering by "Age less than" and "Show suppressed problems" in trigger overview (vasilijs)
 ........S. [ZBX-16150] fixed inactive, unmounted, unaccessible VMware datastore causes unknown column nan insertion in field list (akozlovs)
 A......... [ZBX-16122] fixed api validation of trigger dependency (averza)
+
+--------------------------------------------------------------------------------
+Changes for 4.2.3
+
+Bug fixes:
+..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.2
@@ -431,7 +438,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.9rc1
+Changes for 4.0.10rc1
 
 New features:
 ..F....... [ZBXNEXT-5036] added preloader for popup menus (ashubin)
@@ -462,6 +469,12 @@ A.F....... [ZBX-15049] fixed to host group limited global scripts to be usable i
 ..F....... [ZBX-15585] fixed web scenarios pair manager issue when fields are duplicating on post type toggle (talbergs)
 ........S. [ZBX-16150] fixed inactive, unmounted, unaccessible VMware datastore causes unknown column nan insertion in field list (akozlovs)
 A......... [ZBX-16122] fixed api validation of trigger dependency (averza)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.9
+
+Bug fixes:
+..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.8
