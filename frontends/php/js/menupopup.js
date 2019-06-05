@@ -208,6 +208,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
  *
  * @param {array}  options['sysmapid']
  * @param {int}    options['severity_min']     (optional)
+ * @param {int}    options['widget_uniqueid']  (optional)
  * @param {array}  options['urls']             (optional)
  * @param {string} options['url'][]['label']
  * @param {string} options['url'][]['url']
@@ -216,12 +217,19 @@ function getMenuPopupHost(options, trigger_elmnt) {
  */
 function getMenuPopupMapElementSubmap(options) {
 	var sections = [],
-		submap_url = new Curl('zabbix.php', false);
+		submap_url;
 
-	submap_url.setArgument('action', 'map.view');
-	submap_url.setArgument('sysmapid', options.sysmapid);
-	if (typeof options.severity_min !== 'undefined') {
-		submap_url.setArgument('severity_min', options.severity_min);
+	if (typeof options.widget_uniqueid !== 'undefined') {
+		submap_url = new Curl('javascript: navigateToSubmap(' + options.sysmapid +
+			', "' + options.widget_uniqueid + '");', false);
+	}
+	else {
+		submap_url = new Curl('zabbix.php', false);
+		submap_url.setArgument('action', 'map.view');
+		submap_url.setArgument('sysmapid', options.sysmapid);
+		if (typeof options.severity_min !== 'undefined') {
+			submap_url.setArgument('severity_min', options.severity_min);
+		}
 	}
 
 	sections.push({

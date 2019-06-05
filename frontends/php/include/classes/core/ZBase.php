@@ -98,6 +98,7 @@ class ZBase {
 		require_once $this->getRootDir().'/include/draw.inc.php';
 		require_once $this->getRootDir().'/include/events.inc.php';
 		require_once $this->getRootDir().'/include/graphs.inc.php';
+		require_once $this->getRootDir().'/include/hostgroups.inc.php';
 		require_once $this->getRootDir().'/include/hosts.inc.php';
 		require_once $this->getRootDir().'/include/httptest.inc.php';
 		require_once $this->getRootDir().'/include/ident.inc.php';
@@ -126,14 +127,14 @@ class ZBase {
 				$this->loadConfigFile();
 				$this->initDB();
 				$this->authenticateUser();
-				$this->initLocales();
+				$this->initLocales(CWebUser::$data);
 				$this->setLayoutModeByUrl();
 				break;
 
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
-				$this->initLocales();
+				$this->initLocales(['lang' => 'en_gb']);
 				break;
 
 			case self::EXEC_MODE_SETUP:
@@ -142,7 +143,7 @@ class ZBase {
 					$this->loadConfigFile();
 					$this->initDB();
 					$this->authenticateUser();
-					$this->initLocales();
+					$this->initLocales(CWebUser::$data);
 				}
 				catch (ConfigFileException $e) {}
 				break;
@@ -327,8 +328,11 @@ class ZBase {
 
 	/**
 	 * Initialize translations.
+	 *
+	 * @param array  $user_data          Array of user data.
+	 * @param string $user_data['lang']  Language.
 	 */
-	protected function initLocales() {
+	protected function initLocales(array $user_data) {
 		init_mbstrings();
 
 		$defaultLocales = [
@@ -337,7 +341,7 @@ class ZBase {
 
 		if (function_exists('bindtextdomain')) {
 			// initializing gettext translations depending on language selected by user
-			$locales = zbx_locale_variants(CWebUser::$data['lang']);
+			$locales = zbx_locale_variants($user_data['lang']);
 			$locale_found = false;
 			foreach ($locales as $locale) {
 				// since LC_MESSAGES may be unavailable on some systems, try to set all of the locales
@@ -349,7 +353,6 @@ class ZBase {
 
 				if (setlocale(LC_ALL, $locale)) {
 					$locale_found = true;
-					CWebUser::$data['locale'] = $locale;
 					break;
 				}
 			}
@@ -360,8 +363,8 @@ class ZBase {
 			// this will be unnecessary in PHP 5.5
 			setlocale(LC_CTYPE, $defaultLocales);
 
-			if (!$locale_found && CWebUser::$data['lang'] != 'en_GB' && CWebUser::$data['lang'] != 'en_gb') {
-				error('Locale for language "'.CWebUser::$data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
+			if (!$locale_found && $user_data['lang'] != 'en_GB' && $user_data['lang'] != 'en_gb') {
+				error('Locale for language "'.$user_data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
 			}
 			bindtextdomain('frontend', 'locale');
 			bind_textdomain_codeset('frontend', 'UTF-8');
