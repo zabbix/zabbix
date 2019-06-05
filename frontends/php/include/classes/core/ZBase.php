@@ -152,30 +152,11 @@ class ZBase {
 		if (hasRequest('action')) {
 			$router = new CRouter(getRequest('action'));
 
-			if ($router->getLayout() === 'layout.htmlpage') {
-				$this->checkAssetsCache();
-			}
-
 			if ($router->getController() !== null) {
 				CProfiler::getInstance()->start();
 				$this->processRequest($router);
 				exit;
 			}
-		}
-		elseif ($mode == self::EXEC_MODE_DEFAULT && basename($_SERVER['SCRIPT_NAME']) !== 'cachewarning.php'
-				&& basename($_SERVER['SCRIPT_NAME']) !== 'jsrpc.php') {
-			$this->checkAssetsCache();
-		}
-	}
-
-	/**
-	 * Redirect user to cachewarning.php page if assets cache is not ready.
-	 */
-	public function checkAssetsCache() {
-		if ((new CAssetsFileCache(ZBase::getRootDir()))->build() === false) {
-			redirect('cachewarning.php');
-
-			exit;
 		}
 	}
 
