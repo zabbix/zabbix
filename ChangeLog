@@ -7,17 +7,29 @@ A......... [ZBXNEXT-5183] implemented support of simple triggers under items in 
 ..F....... [ZBX-10574] automated documentation link update upon release of new major version (vasilijs)
 
 Bug fixes:
+..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
 ..F....... [ZBX-15804] fixed links for discovered hosts, items, triggers and graphs (gcalenko)
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
 
 --------------------------------------------------------------------------------
-Changes for 4.2.3rc1
+Changes for 4.2.4rc1
 
 New features:
+..F....... [ZBXNEXT-5163] added display of maintenance information in Configuration section for hosts in maitenance (vasilijs)
+..F....... [ZBXNEXT-5036] added preloader for popup menus (ashubin)
 ...G...... [ZBXNEXT-287] added SSL support for agent HTTP checks (asestakovs)
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+...G...PS. [ZBX-15899] added output sanitization to prevent invalid UTF-8 sequences in regexp-based text replacement (Andris)
+..F....... [ZBX-16073] fixed horizontal scrolling in map (vasilijs)
+........S. [ZBX-15943] fixed discovered hosts are not removed from table 'dhosts' after removing and adding the corresponding discovery check (akozlovs)
+..F....... [ZBX-15875] fixed colors for the multiselect disabled elements (ashubin)
+..F....... [ZBX-10948] 'IT Services --> Service Time --> Note' infinite stretching (rlataria)
+..F....... [ZBX-15585] fixed web scenarios pair manager issue when fields are duplicating on post type toggle (talbergs)
+...G...... [ZBX-16142] fixed missing sys/ioctl.h from src/libs/zbxsysinfo/openbsd/net.c; thanks to Andrea Biscuola for the patch (akozlovs)
+.......PS. [ZBX-16166] fixed Zabbix fping feature detection does not work with fping builds since 10 Feb 2017 (akozlovs)
+....I..... [ZBX-16178] fixed distributive can contain untracked backup file include/config.h.in~ (akozlovs)
 ........S. [ZBX-16170] fixed crash in global event correlation (vso)
 ...G...... [ZBX-16096] fixed "system.cpu.util" reporting incorrect CPU utilisation due to guest time sometimes not being fully included in user time by "/proc/stat" (vso)
 ..F....... [ZBX-15882] fixed widgets flickering on refresh (ashubin)
@@ -35,6 +47,12 @@ A.F....... [ZBX-15049] fixed to host group limited global scripts to be usable i
 ..F....... [ZBX-15778] fixed wrong filtering by "Age less than" and "Show suppressed problems" in trigger overview (vasilijs)
 ........S. [ZBX-16150] fixed inactive, unmounted, unaccessible VMware datastore causes unknown column nan insertion in field list (akozlovs)
 A......... [ZBX-16122] fixed api validation of trigger dependency (averza)
+
+--------------------------------------------------------------------------------
+Changes for 4.2.3
+
+Bug fixes:
+..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.2
@@ -424,13 +442,23 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.9rc1
+Changes for 4.0.10rc1
 
 New features:
+..F....... [ZBXNEXT-5163] added display of maintenance information in Configuration section for hosts in maitenance (vasilijs)
+..F....... [ZBXNEXT-5036] added preloader for popup menus (ashubin)
 ...G...... [ZBXNEXT-287] added SSL support for agent HTTP checks (asestakovs)
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+...G...PS. [ZBX-15899] added output sanitization to prevent invalid UTF-8 sequences in regexp-based text replacement (Andris)
+..F....... [ZBX-16073] fixed horizontal scrolling in map (vasilijs)
+........S. [ZBX-15943] fixed discovered hosts are not removed from table 'dhosts' after removing and adding the corresponding discovery check (akozlovs)
+..F....... [ZBX-15875] fixed colors for the multiselect disabled elements (ashubin)
+..F....... [ZBX-10948] 'IT Services --> Service Time --> Note' infinite stretching (rlataria)
+...G...... [ZBX-16142] fixed missing sys/ioctl.h from src/libs/zbxsysinfo/openbsd/net.c; thanks to Andrea Biscuola for the patch (akozlovs)
+.......PS. [ZBX-16166] fixed Zabbix fping feature detection does not work with fping builds since 10 Feb 2017 (akozlovs)
+....I..... [ZBX-16178] fixed distributive can contain untracked backup file include/config.h.in~ (akozlovs)
 ........S. [ZBX-16170] fixed crash in global event correlation (vso)
 ...G...... [ZBX-16096] fixed "system.cpu.util" reporting incorrect CPU utilisation due to guest time sometimes not being fully included in user time by "/proc/stat" (vso)
 ..F....... [ZBX-15882] fixed widgets flickering on refresh (ashubin)
@@ -448,6 +476,12 @@ A.F....... [ZBX-15049] fixed to host group limited global scripts to be usable i
 ..F....... [ZBX-15585] fixed web scenarios pair manager issue when fields are duplicating on post type toggle (talbergs)
 ........S. [ZBX-16150] fixed inactive, unmounted, unaccessible VMware datastore causes unknown column nan insertion in field list (akozlovs)
 A......... [ZBX-16122] fixed api validation of trigger dependency (averza)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.9
+
+Bug fixes:
+..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.8
@@ -2890,6 +2924,7 @@ Changes for 3.0.29rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-16178] fixed distributive can contain untracked backup file include/config.h.in~ (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.28
