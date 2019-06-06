@@ -773,7 +773,7 @@ class CAction extends CApiService {
 		$operations_to_update = [];
 		$operationids_to_delete = [];
 
-		$actionsUpdateData = [];
+		$actions_update_data = [];
 
 		$newActionConditions = null;
 		foreach ($actions as $actionId => $action) {
@@ -946,14 +946,14 @@ class CAction extends CApiService {
 			}
 
 			if ($actionUpdateValues) {
-				$actionsUpdateData[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
+				$actions_update_data[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
 			}
 		}
 
-		if ($actionsUpdateData) {
-			DB::update('actions', $actionsUpdateData);
-			$auditAction = CArrayHelper::renameObjectsKeys($actions, ['recovery_operations' => 'recoveryOperations', 'acknowledge_operations' => 'acknowledgeOperations']);
-			$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, $auditAction, $db_actions);
+		if ($actions_update_data) {
+			DB::update('actions', $actions_update_data);
+			$audit_actions = CArrayHelper::renameObjectsKeys($actions, ['recovery_operations' => 'recoveryOperations', 'acknowledge_operations' => 'acknowledgeOperations']);
+			$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, $audit_actions, $db_actions);
 		}
 
 		// add, update and delete operations
