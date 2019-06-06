@@ -200,6 +200,15 @@ int	__wrap_open(const char *path, int oflag, ...)
 	return INT_MAX;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Comments: Note that simply wrapping read function will break any compiled  *
+ *           in tool, that would attempt to use read() function. In this case *
+ *           some safeguards must be added to implement pass-through          *
+ *           functionality like it's done with open/fxstat etc functions for  *
+ *           coverage builds.                                                 *
+ *                                                                            *
+ ******************************************************************************/
 ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte)
 {
 	static int		remaining_length;
