@@ -153,6 +153,11 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 
 		// Process problems.
 		foreach ($problems as $problem) {
+			// Exclude problems that dependening from excluded hosts
+			if (!array_key_exists($triggers[$problem['objectid']]['hosts'][0]['hostid'], $hosts)) {
+				continue;
+			}
+
 			$host = $hosts[$triggers[$problem['objectid']]['hosts'][0]['hostid']];
 
 			// Prepare hosts data for tables displayed in hintboxes.
