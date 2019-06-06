@@ -952,7 +952,7 @@ class CAction extends CApiService {
 
 		if ($actionsUpdateData) {
 			DB::update('actions', $actionsUpdateData);
-			$auditAction = $this->convertKeys($actions);
+			$auditAction = CArrayHelper::renameObjectsKeys($actions, ['recovery_operations' => 'recoveryOperations', 'acknowledge_operations' => 'acknowledgeOperations']);
 			$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, $auditAction, $db_actions);
 		}
 
@@ -1008,27 +1008,6 @@ class CAction extends CApiService {
 		}
 
 		return ['actionids' => $actionIds];
-	}
-
-	/**
-	 * For audit log. Convert some keys in actions from underscore to camelCase
-	 *
-	 * @param array $actions
-	 *
-	 * @return array
-	 */
-	protected function convertKeys(array $actions)
-	{
-		foreach ($actions as &$action) {
-			foreach (['recovery_operations' => 'recoveryOperations', 'acknowledge_operations' => 'acknowledgeOperations'] as $key => $val) {
-				if (array_key_exists($key, $action)) {
-					$action[$val] = $action[$key];
-					unset($action[$key]);
-				}
-			}
-		}
-
-		return $actions;
 	}
 
 	/**
