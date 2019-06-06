@@ -22,6 +22,8 @@
 #include "cpustat.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
+/* defined in sysinfo lib */
+extern int get_cpu_group_num_win32();
 #endif
 #include "mutexs.h"
 #include "log.h"
@@ -126,7 +128,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	int				idx, ret = FAIL;
 #ifdef _WINDOWS
 	TCHAR				cpu[16];
-	int				gidx, cpus_per_group;
+	int				gidx, cpu_groups, cpus_per_group;
 	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 #endif
@@ -180,12 +182,13 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "system with more than 64 CPUs, using \"Processor Information\" counter");
 
-		cpus_per_group = pcpus->count / pcpus->group_count;
+		cpu_groups = get_cpu_group_num_win32();
+		cpus_per_group = pcpus->count / cpu_groups;
 
-		zabbix_log(LOG_LEVEL_DEBUG, ":: groups = %d, cpus_per_group = %d, cpus = %d", pcpus->group_count,
+		zabbix_log(LOG_LEVEL_DEBUG, ":: groups = %d, cpus_per_group = %d, cpus = %d", get_cpu_group_num_win32(),
 				cpus_per_group, pcpus->count);
 
-		for (gidx = 0; gidx < pcpus->group_count; gidx++)
+		for (gidx = 0; gidx < cpu_groups; gidx++)
 		{
 			for (idx = 0; idx <= cpus_per_group; idx++)
 			{
@@ -208,12 +211,11 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 				if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
 					goto clean;
 
-				if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+				if (NULL == (pcpus->cpu_counter[gidx * cpus_per_group + idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
 						&error)))
 					goto clean;
 			}
 		}
-
 	}
 
 	cpe.szObjectName = get_counter_name(PCI_SYSTEM);

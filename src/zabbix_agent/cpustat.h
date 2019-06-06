@@ -31,7 +31,6 @@ typedef struct
 	zbx_perf_counter_data_t	**cpu_counter;
 	zbx_perf_counter_data_t	*queue_counter;
 	int			count;
-	int			group_count;
 }
 ZBX_CPUS_STAT_DATA;
 
