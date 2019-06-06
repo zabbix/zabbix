@@ -356,6 +356,12 @@ ZBX_Notifications.prototype.onTabFocusChanged = function(tabid) {
 		return;
 	}
 
+	var is_single_tab = this.tab.isSingleSession();
+
+	if (is_single_tab) {
+		this.do_poll_server = true;
+	}
+
 	var active_blured = (this.do_poll_server && this.tab.uid != tabid);
 
 	if (active_blured) {
@@ -364,7 +370,7 @@ ZBX_Notifications.prototype.onTabFocusChanged = function(tabid) {
 		this.player.stop();
 	}
 
-	this.do_poll_server = (this.tab.uid === tabid);
+	this.do_poll_server = (is_single_tab || this.tab.uid === tabid);
 };
 
 /**
