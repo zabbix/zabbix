@@ -719,6 +719,7 @@ class CConfigurationExportBuilder {
 	 */
 	protected function formatItems(array $items, array $simple_triggers) {
 		$result = [];
+		$expression_data = $simple_triggers ? new CTriggerExpression() : null;
 
 		CArrayHelper::sort($items, ['key_']);
 
@@ -815,8 +816,6 @@ class CConfigurationExportBuilder {
 
 			if ($simple_triggers) {
 				$triggers = [];
-
-				$expression_data = new CTriggerExpression();
 				$prefix_length = strlen($item['host'].':'.$item['key_'].'.');
 
 				foreach ($simple_triggers as $simple_trigger) {
