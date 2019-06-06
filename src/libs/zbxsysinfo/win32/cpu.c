@@ -44,7 +44,7 @@ int	get_cpu_num_win32(void)
 	GETLPIEX	get_lpiex;
 	SYSTEM_INFO	sysInfo;
 	DWORD		buffer_length;
-	PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX buffer;
+	PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX buffer = NULL;
 	int		cpu_count = 0;
 
 	/* The rationale for checking dynamically if specific functions are implemented */
@@ -66,12 +66,14 @@ int	get_cpu_num_win32(void)
 		if (get_lpiex(RelationAll, NULL, &buffer_length) || ERROR_INSUFFICIENT_BUFFER != GetLastError())
 			goto fallback;
 
-		buffer = (PSYS_LPI_EX)malloc((size_t)buffer_length);
+		buffer = (PSYS_LPI_EX)zbx_malloc(buffer, (size_t)buffer_length);
+
 		if (NULL != buffer && get_lpiex(RelationProcessorCore, buffer, &buffer_length))
 		{
 			for (unsigned i = 0; i < buffer_length;)
 			{
 				PSYS_LPI_EX ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
+
 				for (WORD group = 0; group < ptr->Processor.GroupCount; group++)
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "\tgroup %d, mask %X", group,
@@ -81,7 +83,9 @@ int	get_cpu_num_win32(void)
 				}
 				i += (unsigned)ptr->Size;
 			}
-			zabbix_log(LOG_LEVEL_DEBUG,"found thread count %d\n", cpu_count);
+
+			zbx_free(buffer);
+			zabbix_log(LOG_LEVEL_DEBUG, "found thread count %d", cpu_count);
 			return cpu_count;
 		}
 	}

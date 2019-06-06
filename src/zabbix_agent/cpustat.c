@@ -136,7 +136,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 #ifdef _WINDOWS
 	cpe.szMachineName = NULL;
-	cpe.szObjectName = get_counter_name(PCI_PROCESSOR_INFORMATION);
+	cpe.szObjectName = get_counter_name(PCI_PROCESSOR);
 	cpe.szInstanceName = cpu;
 	cpe.szParentInstance = NULL;
 	cpe.dwInstanceIndex = -1;
@@ -160,7 +160,6 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	if (pcpus->count <= 64)
 	{
-		cpe.szObjectName = get_counter_name(PCI_PROCESSOR);
 		for (idx = 0; idx <= pcpus->count; idx++)
 		{
 			if (0 == idx)
@@ -182,6 +181,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "system with more than 64 CPUs, using \"Processor Information\" counter");
 
+		cpe.szObjectName = get_counter_name(PCI_PROCESSOR_INFORMATION);
 		cpu_groups = get_cpu_group_num_win32();
 		cpus_per_group = pcpus->count / cpu_groups;
 
