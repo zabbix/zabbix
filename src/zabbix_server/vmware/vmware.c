@@ -3048,7 +3048,7 @@ static int	vmware_service_get_hv_ds_list(const zbx_vmware_service_t *service, CU
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char				tmp[MAX_STRING_LEN];
+	char				tmp[MAX_STRING_LEN * 2];
 	int				ret = FAIL;
 	xmlDoc				*doc = NULL;
 	zbx_property_collection_iter	*iter = NULL;

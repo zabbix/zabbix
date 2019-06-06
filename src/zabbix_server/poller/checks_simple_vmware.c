@@ -1833,7 +1833,7 @@ static int	check_vcenter_hv_datastore_size_vsphere(int mode, const zbx_vmware_da
 	return SYSINFO_RET_OK;
 }
 
-static int	check_vcenter_ds_size(const char *url, const char *param, const char *hv_uuid, const char *name,
+static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const char *name, const char *param,
 		const char *username, const char *password, AGENT_RESULT *result)
 {
 
@@ -1873,7 +1873,8 @@ static int	check_vcenter_ds_size(const char *url, const char *param, const char 
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, NULL != hv_uuid? "Invalid fourth parameter." :
+				"Invalid third parameter."));
 		goto out;
 	}
 
