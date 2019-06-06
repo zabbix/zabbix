@@ -1390,6 +1390,9 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
  ******************************************************************************/
 static void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 {
+	zbx_vector_str_clear_ext(&datastore->hv_uuids, zbx_str_free);
+	zbx_vector_str_destroy(&datastore->hv_uuids);
+
 	zbx_free(datastore->name);
 	zbx_free(datastore->uuid);
 	zbx_free(datastore->id);
