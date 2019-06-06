@@ -95,6 +95,7 @@ function ZBX_LocalStorage(version, prefix) {
 		'notifications.alarm.snoozed': true,
 		'notifications.snoozedids': true,
 		'notifications.list': true,
+		'notifications.listid': true,
 		'notifications.disabled': true,
 		'notifications.localtimeouts': true,
 		'notifications.severity_settings': true
