@@ -2084,7 +2084,7 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 
 	for (i=0; i < datastore->hv_uuids.values_num; i++)
 	{
-		hv_list = zbx_dsprintf(hv_list, "%s\n", datastore->hv_uuids.values[i]);
+		hv_list = zbx_strdcatf(hv_list, "%s\n", datastore->hv_uuids.values[i]);
 	}
 
 	if (NULL == hv_list)
@@ -2144,7 +2144,7 @@ int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username
 			continue;
 		}
 
-		ds_list = zbx_dsprintf(ds_list, "%s\n", datastore->name);
+		ds_list = zbx_strdcatf(ds_list, "%s\n", datastore->name);
 	}
 
 	if (NULL == ds_list)
