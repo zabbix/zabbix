@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -736,7 +735,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['snmpv3_securityname'] !== getRequest('snmpv3_securityname', '')) {
 					$item['snmpv3_securityname'] = getRequest('snmpv3_securityname', '');
 				}
-				$snmpv3_securitylevel = getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);;
+				$snmpv3_securitylevel = getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
 				if ($db_item['snmpv3_securitylevel'] != $snmpv3_securitylevel) {
 					$item['snmpv3_securitylevel'] = $snmpv3_securitylevel;
 				}
@@ -1693,7 +1692,13 @@ else {
 		$data['filter_hostid'] = $_REQUEST['filter_hostid'];
 	}
 	if (isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application'])) {
-		$options['application'] = $_REQUEST['filter_application'];
+		$options['applicationids'] = array_keys(API::Application()->get([
+			'output' => [],
+			'groupids' => array_key_exists('groupids', $options) ? $options['groupids'] : null,
+			'hostids' => array_key_exists('filter_hostid', $data) ? $data['filter_hostid'] : null,
+			'search' => ['name' => getRequest('filter_application')],
+			'preservekeys' => true
+		]));
 	}
 	if (isset($_REQUEST['filter_name']) && !zbx_empty($_REQUEST['filter_name'])) {
 		$options['search']['name'] = $_REQUEST['filter_name'];

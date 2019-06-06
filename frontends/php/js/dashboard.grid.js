@@ -911,10 +911,8 @@
 	}
 
 	function makeDraggable($obj, data, widget) {
-		widget['content_header']
-			.addClass('cursor-move');
-
 		widget['div'].draggable({
+			cursor: IE ? 'move' : 'grabbing',
 			handle: widget['content_header'],
 			scroll: true,
 			scrollSensitivity: data.options['widget-height'],
@@ -1158,6 +1156,10 @@
 			return;
 		}
 
+		if (widget['scrollable'] == false) {
+			widget['content_body'].css('overflow', 'hidden');
+		}
+
 		var url = new Curl('zabbix.php'),
 			ajax_data;
 
@@ -1169,7 +1171,7 @@
 			'initial_load': widget['initial_load'] ? 1 : 0,
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
 			'storage': widget['storage'],
-			'content_width': Math.floor(widget['content_body'].css('overflow', 'hidden').width()),
+			'content_width': Math.floor(widget['content_body'].width()),
 			'content_height': Math.floor(widget['content_body'].height())
 		};
 

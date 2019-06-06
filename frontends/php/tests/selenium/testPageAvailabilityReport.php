@@ -108,6 +108,7 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 	}
 
 	/**
+	 * @depends testInitializeTestData
 	 * @dataProvider dataProviderSLA
 	 */
 	public function testPageAvailabilityReportSLA($start_time, $end_time, $sla_item_values) {

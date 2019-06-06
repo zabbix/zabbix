@@ -371,6 +371,18 @@ class CSvgGraph extends CSvg {
 	public function getTimeGridWithPosition() {
 		$period = $this->time_till - $this->time_from;
 		$step = round(bcmul(bcdiv($period, $this->canvas_width), 100)); // Grid cell (100px) in seconds.
+
+		/*
+		 * In case if requested time period is so small that it is rounded to zero, we are displaying only two
+		 * milestones on X axis - the start and the end of period.
+		 */
+		if ($step == 0) {
+			return [
+				0 => date('H:i:s', $this->time_from),
+				$this->canvas_width => date('H:i:s', $this->time_till)
+			];
+		}
+
 		$start = $this->time_from + $step - $this->time_from % $step;
 		$time_formats = ['Y-n-d', 'n-d', 'n-d H:i','H:i', 'H:i:s'];
 

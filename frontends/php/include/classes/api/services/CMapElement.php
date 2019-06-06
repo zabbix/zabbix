@@ -757,7 +757,7 @@ abstract class CMapElement extends CApiService {
 
 		foreach ($linkTriggers as $linkTrigger) {
 			if (!check_db_fields($linkTriggerDbFields, $linkTrigger)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			if (isset($linkTrigger['color']) && !$colorValidator->validate($linkTrigger['color'])) {
@@ -792,7 +792,7 @@ abstract class CMapElement extends CApiService {
 
 		foreach ($linkTriggers as $linkTrigger) {
 			if (!check_db_fields($linkTriggerDbFields, $linkTrigger)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger update.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			if (isset($linkTrigger['color']) && !$colorValidator->validate($linkTrigger['color'])) {
@@ -817,7 +817,7 @@ abstract class CMapElement extends CApiService {
 
 		foreach ($linkTriggers as $linkTrigger) {
 			if (!check_db_fields($linktriggerDbFields, $linkTrigger)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger delete.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 		}
 	}

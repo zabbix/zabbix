@@ -549,9 +549,14 @@ function closeDialogHandler(event) {
 					hintBox.hideHint(dialog.element, true);
 					break;
 
-				// Close context menu overlays.
-				case 'contextmenu':
-					jQuery('.action-menu.action-menu-top:visible').menuPopup('close', dialog.element);
+				// Close popup menu overlays.
+				case 'menu-popup':
+					jQuery('.menu-popup.menu-popup-top:visible').menuPopup('close', dialog.element);
+					break;
+
+				// Close context menu preloader.
+				case 'preloader':
+					overlayPreloaderDestroy(dialog.dialogueid, dialog.xhr);
 					break;
 
 				// Close overlay time picker.
@@ -810,13 +815,12 @@ function validate_trigger_expression(formname, dialogueid) {
 }
 
 function redirect(uri, method, needle, invert_needle, add_sid) {
-	if (typeof add_sid === 'undefined') {
-		add_sid = true;
-	}
-	method = method || 'get';
+	method = (method || 'get').toLowerCase();
+	add_sid = (method !== 'get' && (typeof add_sid === 'undefined' || add_sid));
+
 	var url = new Curl(uri, add_sid);
 
-	if (method.toLowerCase() == 'get') {
+	if (method == 'get') {
 		window.location = url.getUrl();
 	}
 	else {
