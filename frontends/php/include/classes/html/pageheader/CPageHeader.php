@@ -144,9 +144,7 @@ class CPageHeader {
 HTML;
 
 		foreach ($this->cssFiles as $path) {
-			$prefix = (substr($path, -4) === '.css' ? 'assets/' : '');
-
-			echo '<link rel="stylesheet" type="text/css" href="'.$prefix.$path.'" />'."\n";
+			echo '<link rel="stylesheet" type="text/css" href="'.$path.'" />'."\n";
 		}
 
 		if ($this->styles) {
