@@ -481,7 +481,7 @@ class CImportDataAdapter {
 			foreach (array_reverse($expression_data->expressions) as $expression) {
 				if ($expression['host'] === '' && $expression['item'] === '') {
 					$simple_trigger['expression'] = substr_replace($simple_trigger['expression'], $prefix,
-						$expression['pos'] + 1 , 0
+						$expression['pos'] + 1, 0
 					);
 				}
 			}
