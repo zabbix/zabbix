@@ -40,8 +40,8 @@ int	get_cpu_num_win32(void)
 	typedef DWORD (WINAPI *GETACTIVEPC)(WORD);
 	typedef BOOL (WINAPI *GETLPIEX)(LOGICAL_PROCESSOR_RELATIONSHIP, PSYS_LPI_EX, PDWORD);
 
-	GETACTIVEPC	get_act;
-	GETLPIEX	get_lpiex;
+	static GETACTIVEPC	get_act;
+	static GETLPIEX		get_lpiex;
 	SYSTEM_INFO	sysInfo;
 	DWORD		buffer_length;
 	PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX buffer = NULL;
@@ -58,7 +58,11 @@ int	get_cpu_num_win32(void)
 	/* 32 or 64-bit. GetActiveProcessorCount() may return incorrect value (e.g. 64 CPUs for systems */
 	/* with 128 CPUs) if executed under under WoW64. */
 
-	get_lpiex = (GETLPIEX)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetLogicalProcessorInformationEx");
+	if (NULL == get_lpiex)
+	{
+		get_lpiex = (GETLPIEX)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+				"GetLogicalProcessorInformationEx");
+	}
 
 	if (NULL != get_lpiex)
 	{
@@ -85,18 +89,19 @@ int	get_cpu_num_win32(void)
 			}
 
 			zbx_free(buffer);
-			zabbix_log(LOG_LEVEL_DEBUG, "found thread count %d", cpu_count);
+			zabbix_log(LOG_LEVEL_DEBUG, "logical CPU count %d", cpu_count);
 			return cpu_count;
 		}
 	}
 
 fallback:
-	get_act = (GETACTIVEPC)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetActiveProcessorCount");
+	if (NULL == get_act)
+		get_act = (GETACTIVEPC)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetActiveProcessorCount");
 
 	if (NULL != get_act)
 		return (int)get_act(ALL_PROCESSOR_GROUPS);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Cannot find address of GetActiveProcessorCount function");
+	zabbix_log(LOG_LEVEL_DEBUG, "Cannot find address of GetActiveProcessorCount()");
 
 	GetNativeSystemInfo(&sysInfo);
 
@@ -117,15 +122,20 @@ int	get_cpu_group_num_win32(void)
 	/* Define a function pointer type for the GetActiveProcessorGroupCount API */
 	typedef WORD (WINAPI *GETACTIVEPGC)();
 
-	GETACTIVEPGC	get_act;
+	static GETACTIVEPGC	get_act;
 
 	/* please see comments in get_cpu_num_win32() */
-	get_act = (GETACTIVEPGC)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetActiveProcessorGroupCount");
+
+	if (NULL == get_act)
+	{
+		get_act = (GETACTIVEPGC)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+				"GetActiveProcessorGroupCount");
+	}
 
 	if (NULL != get_act)
 		return (int)get_act();
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "GetActiveProcessorGroupCount() not supported, assuming 1");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "GetActiveProcessorGroupCount() not supported, assuming 1");
 
 	return 1;
 }

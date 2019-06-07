@@ -139,7 +139,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	cpe.szObjectName = get_counter_name(PCI_PROCESSOR);
 	cpe.szInstanceName = cpu;
 	cpe.szParentInstance = NULL;
-	cpe.dwInstanceIndex = -1;
+	cpe.dwInstanceIndex = (DWORD)-1;
 	cpe.szCounterName = get_counter_name(PCI_PROCESSOR_TIME);
 
 	/* 64 logical CPUs (threads) is a hard limit for 32-bit Windows systems and some old 64-bit versions,  */
