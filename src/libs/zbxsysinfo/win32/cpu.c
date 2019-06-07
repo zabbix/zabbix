@@ -91,6 +91,8 @@ int	get_cpu_num_win32(void)
 			zabbix_log(LOG_LEVEL_DEBUG, "logical CPU count %d", cpu_count);
 			return cpu_count;
 		}
+
+		zbx_free(buffer);
 	}
 
 fallback:
