@@ -53,7 +53,7 @@ int	__wrap___xstat(int ver, const char *pathname, struct stat *buf);
 int	__wrap___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
 
 int	__real_open(const char *path, int oflag, ...);
-int	__real_stat(const char *restrict path, struct stat *restrict buf);
+int	__real_stat(const char *path, struct stat *buf);
 int	__real___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
 
 static int	is_profiler_path(const char *path)
