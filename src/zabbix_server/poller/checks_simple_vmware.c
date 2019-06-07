@@ -1554,7 +1554,7 @@ int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, c
 	name = get_rparam(request, 1);
 	mode = get_rparam(request, 2);
 
-	if (NULL != mode && '\0' != *mode && (0 != strcmp(mode, "latency") || 0 != strcmp(mode, "maxlatency")))
+	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency") && 0 != strcmp(mode, "maxlatency"))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		goto out;
@@ -1724,7 +1724,7 @@ int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, 
 	name = get_rparam(request, 1);
 	mode = get_rparam(request, 2);
 
-	if (NULL != mode && '\0' != *mode && (0 != strcmp(mode, "latency") || 0 != strcmp(mode, "maxlatency")))
+	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency") && 0 != strcmp(mode, "maxlatency"))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		goto out;
