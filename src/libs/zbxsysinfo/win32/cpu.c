@@ -34,7 +34,7 @@
  ******************************************************************************/
 int	get_cpu_num_win32(void)
 {
-	/* shortcut just to avoid extra verbosity */
+	/* shortcut to avoid extra verbosity */
 	typedef PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX PSYS_LPI_EX;
 	/* define function pointer types for the GetActiveProcessorCount() and GetLogicalProcessorInformationEx() API */
 	typedef DWORD (WINAPI *GETACTIVEPC)(WORD);
@@ -66,6 +66,8 @@ int	get_cpu_num_win32(void)
 
 	if (NULL != get_lpiex)
 	{
+		buffer_length = 0;
+
 		/* first run with empty arguments to figure the buffer length */
 		if (get_lpiex(RelationAll, NULL, &buffer_length) || ERROR_INSUFFICIENT_BUFFER != GetLastError())
 			goto fallback;
@@ -79,12 +81,9 @@ int	get_cpu_num_win32(void)
 				PSYS_LPI_EX ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
 
 				for (WORD group = 0; group < ptr->Processor.GroupCount; group++)
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "\tgroup %d, mask %X", group,
-							ptr->Processor.GroupMask[group].Mask);
 					for (KAFFINITY mask = ptr->Processor.GroupMask[group].Mask; mask != 0; mask >>= 1)
 						cpu_count += mask & 1;
-				}
+
 				i += (unsigned)ptr->Size;
 			}
 
