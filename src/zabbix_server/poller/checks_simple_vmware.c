@@ -66,12 +66,12 @@ static zbx_vmware_hv_t	*hv_get(zbx_hashset_t *hvs, const char *uuid)
 	return hv;
 }
 
-static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_t *dss, char * ds_id)
+static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_t *dss, char *id)
 {
 	int			i;
 	zbx_vmware_datastore_t	ds_cmp;
 
-	ds_cmp.id = ds_id;
+	ds_cmp.id = id;
 
 	if (FAIL == (i = zbx_vector_vmware_datastore_bsearch(dss, &ds_cmp, vmware_ds_compare)))
 		return NULL;
