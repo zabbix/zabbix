@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-02 01:43+0300\n"
+"POT-Creation-Date: 2019-06-09 01:43+0300\n"
 "PO-Revision-Date: 2019-03-12 09:36+0300\n"
 "Last-Translator: Quang <quangnh@tnmt.vn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -46,7 +46,7 @@ msgstr "Cặp \"host:key\" được dự đoán"
 msgid "%1$d characters exceeds maximum length of %2$d characters"
 msgstr "Kí tự %1$d vượt quá độ dài tối đa của kí tự %2$d"
 
-#: include/func.inc.php:509
+#: include/func.inc.php:510
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
@@ -293,7 +293,7 @@ msgstr "VÀ"
 msgid "Acceptable SLA"
 msgstr "SLA chấp nhận được"
 
-#: include/func.inc.php:1824
+#: include/func.inc.php:1825
 msgid "Access denied"
 msgstr "Truy cập bị từ chối"
 
@@ -586,8 +586,8 @@ msgstr "Kích hoạt"
 #: include/views/configuration.maintenance.edit.php:224
 #: include/views/configuration.maintenance.edit.php:295
 #: include/views/configuration.services.edit.php:155
-#: include/views/configuration.services.edit.php:322
-#: include/views/configuration.services.edit.php:359
+#: include/views/configuration.services.edit.php:324
+#: include/views/configuration.services.edit.php:361
 #: include/views/configuration.template.edit.php:408
 #: include/views/configuration.template.edit.php:460
 #: include/views/configuration.trigger.prototype.edit.php:87
@@ -979,7 +979,7 @@ msgstr "Ứng dụng với id \"%1$s\" không tồn tại."
 #: include/views/configuration.application.list.php:23
 #: include/views/configuration.host.edit.php:304
 #: include/views/configuration.host.list.php:129
-#: include/views/configuration.host.list.php:320
+#: include/views/configuration.host.list.php:333
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.list.php:70
 #: include/views/configuration.item.prototype.edit.php:734
@@ -1063,14 +1063,6 @@ msgstr "dạng text"
 msgid "Asset tag"
 msgstr "Asset tag"
 
-#: cachewarning.php:40
-msgid "Assets cache directory is not writable."
-msgstr ""
-
-#: include/classes/setup/CFrontendSetup.php:672
-msgid "Assets cache directory permissions"
-msgstr ""
-
 #: include/maintenances.inc.php:76
 #, c-format
 msgid "At %1$s:%2$s %3$s of every week"
@@ -1118,7 +1110,7 @@ msgstr "Ít nhất 1 interface phải tồn tại."
 msgid "At least one maintenance period must be created."
 msgstr "Ít nhất một chu kỳ bảo trì phải được thiết lập."
 
-#: include/classes/setup/CFrontendSetup.php:256
+#: include/classes/setup/CFrontendSetup.php:255
 msgid "At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported."
 msgstr "Ít nhất một MySQL, PostgreSQL, Oracle  hoặc IBM DB2 cần được hỗ trợ."
 
@@ -1364,7 +1356,7 @@ msgstr "Chớp nháy"
 msgid "Blocked"
 msgstr "Bị khóa"
 
-#: include/classes/core/ZBase.php:284
+#: include/classes/core/ZBase.php:265
 msgid "Blue"
 msgstr "Xanh da trời"
 
@@ -1435,9 +1427,9 @@ msgstr "By trigger template"
 
 #: app/views/administration.proxy.list.php:119
 #: app/views/administration.proxy.list.php:132
-#: include/views/configuration.host.list.php:287
-#: include/views/configuration.host.list.php:307
-#: include/views/configuration.host.list.php:310
+#: include/views/configuration.host.list.php:300
+#: include/views/configuration.host.list.php:320
+#: include/views/configuration.host.list.php:323
 msgid "CERT"
 msgstr "CERT"
 
@@ -3117,7 +3109,7 @@ msgstr "Đồng hồ"
 msgid "Clone"
 msgstr "Tạo bản sao"
 
-#: include/func.inc.php:1938 include/views/js/monitoring.sysmaps.js.php:274
+#: include/func.inc.php:1939 include/views/js/monitoring.sysmaps.js.php:274
 #: include/views/js/monitoring.sysmaps.js.php:422
 #: include/views/js/monitoring.sysmaps.js.php:542
 #: include/views/js/monitoring.sysmaps.js.php:637
@@ -4030,7 +4022,7 @@ msgstr "TÊN DNS"
 msgid "Daily"
 msgstr "Hàng ngày"
 
-#: include/classes/core/ZBase.php:285
+#: include/classes/core/ZBase.php:266
 msgid "Dark"
 msgstr "Tối"
 
@@ -4186,7 +4178,7 @@ msgstr "Ngày HW đã mua"
 msgid "Day"
 msgstr "Ngày"
 
-#: include/func.inc.php:2693
+#: include/func.inc.php:2694
 msgid "Day before yesterday"
 msgstr "Ngày trước hôm qua"
 
@@ -4320,7 +4312,7 @@ msgstr "Trễ bởi"
 #: include/views/configuration.graph.list.php:152
 #: include/views/configuration.host.discovery.list.php:156
 #: include/views/configuration.hostgroups.list.php:156
-#: include/views/configuration.host.list.php:361
+#: include/views/configuration.host.list.php:374
 #: include/views/configuration.host.prototype.list.php:158
 #: include/views/configuration.httpconf.list.php:170
 #: include/views/configuration.item.list.php:252
@@ -4499,7 +4491,7 @@ msgstr "Xóa các kiểu host được chọn?"
 msgid "Delete selected host?"
 msgstr "Xóa host được chọn?"
 
-#: include/views/configuration.host.list.php:361
+#: include/views/configuration.host.list.php:374
 msgid "Delete selected hosts?"
 msgstr "Xóa các host được chọn ?"
 
@@ -4647,7 +4639,7 @@ msgstr "Bộ giới hạn"
 msgid "Deny"
 msgstr "Từ chối"
 
-#: include/views/configuration.services.edit.php:339
+#: include/views/configuration.services.edit.php:341
 #: include/views/configuration.trigger.prototype.edit.php:587
 #: include/views/configuration.trigger.prototype.edit.php:622
 #: include/views/configuration.triggers.edit.php:615
@@ -4701,7 +4693,7 @@ msgid "Description updated"
 msgstr "Mô tả được cập nhật"
 
 #: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:427
-#: include/func.inc.php:1893
+#: include/func.inc.php:1894
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:435
 #: include/views/configuration.action.edit.php:439
@@ -4733,11 +4725,6 @@ msgstr "Thiết bị tiêu chuẩn tuyệt đối."
 msgid "Dimension (cols x rows)"
 msgstr "Kích thước (cột x hàng)"
 
-#: include/classes/setup/CFrontendSetup.php:676
-#, c-format
-msgid "Directory \"%1$s\" must be writable."
-msgstr ""
-
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:587
 msgid "Directory size (in bytes). Returns integer"
@@ -4751,7 +4738,7 @@ msgstr "Kích thước thư mục (byte). Trả về integer"
 #: include/views/configuration.correlation.list.php:127
 #: include/views/configuration.discovery.list.php:97
 #: include/views/configuration.host.discovery.list.php:152
-#: include/views/configuration.host.list.php:358
+#: include/views/configuration.host.list.php:371
 #: include/views/configuration.httpconf.list.php:166
 #: include/views/configuration.item.list.php:245
 #: include/views/configuration.triggers.list.php:300
@@ -4770,7 +4757,7 @@ msgstr "Tắt chế độ debug trong nhóm được lựa chọn?"
 msgid "Disable host"
 msgstr "Vô hiệu hóa host"
 
-#: include/views/configuration.host.list.php:190
+#: include/views/configuration.host.list.php:196
 msgid "Disable host?"
 msgstr "Vô hiệu hóa host?"
 
@@ -4808,7 +4795,7 @@ msgstr "Vô hiệu hóa các quy tắc phát hiện đã chọn?"
 msgid "Disable selected groups?"
 msgstr "Vô hiệu hóa các nhóm đã chọn?"
 
-#: include/views/configuration.host.list.php:358
+#: include/views/configuration.host.list.php:371
 msgid "Disable selected hosts?"
 msgstr "Vô hiệu hóa các host đã chọn?"
 
@@ -4849,7 +4836,7 @@ msgstr "Vô hiệu hóa web scenario đã chọn?"
 #: include/views/configuration.correlation.list.php:96
 #: include/views/configuration.discovery.list.php:45
 #: include/views/configuration.host.edit.php:691
-#: include/views/configuration.host.list.php:194
+#: include/views/configuration.host.list.php:200
 #: include/views/configuration.host.massupdate.php:186
 #: include/views/configuration.host.massupdate.php:273
 #: include/views/configuration.host.prototype.edit.php:365
@@ -4884,7 +4871,7 @@ msgstr "Item được khám phá"
 #: include/forms.inc.php:476 include/forms.inc.php:867 include/menu.inc.php:98
 #: include/menu.inc.php:224 include/views/configuration.action.list.php:33
 #: include/views/configuration.host.list.php:133
-#: include/views/configuration.host.list.php:336
+#: include/views/configuration.host.list.php:349
 #: include/views/configuration.template.list.php:91
 #: include/views/configuration.template.list.php:204
 #: include/views/inventory.host.view.php:157
@@ -5025,13 +5012,13 @@ msgid "Display stacked graph"
 msgstr "Hiển thị sơ đồ xếp chồng"
 
 #: include/actions.inc.php:1792 include/actions.inc.php:1864
-#: include/actions.inc.php:1955 include/func.inc.php:1702 jsLoader.php:294
+#: include/actions.inc.php:1955 include/func.inc.php:1703 jsLoader.php:294
 #: queue.php:298 search.php:256 search.php:356 search.php:498
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Hiển thị %1$s của %2$s đã tìm được"
 
-#: include/func.inc.php:1705
+#: include/func.inc.php:1706
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
 msgstr "Hiển thị %1$s đến %2$s của %3$s được tìm thấy"
@@ -5071,7 +5058,7 @@ msgstr "Tải xuống tệp tin cấu hình"
 #: app/views/report.services.php:68 app/views/report.services.php:69
 #: include/classes/screens/CScreenDiscovery.php:120
 #: include/views/configuration.services.edit.php:183
-#: include/views/configuration.services.edit.php:229
+#: include/views/configuration.services.edit.php:231
 msgid "Downtime"
 msgstr "Thời gian down"
 
@@ -5433,7 +5420,7 @@ msgstr "ID screen trống."
 #: include/views/configuration.correlation.list.php:126
 #: include/views/configuration.discovery.list.php:96
 #: include/views/configuration.host.discovery.list.php:149
-#: include/views/configuration.host.list.php:357
+#: include/views/configuration.host.list.php:370
 #: include/views/configuration.httpconf.list.php:165
 #: include/views/configuration.item.list.php:244
 #: include/views/configuration.triggers.list.php:299
@@ -5464,7 +5451,7 @@ msgstr "Kích hoạt chế độ debug trong các nhóm được lựa ch
 msgid "Enable host"
 msgstr "Kích hoạt host"
 
-#: include/views/configuration.host.list.php:196
+#: include/views/configuration.host.list.php:202
 msgid "Enable host?"
 msgstr "Kích hoạt host?"
 
@@ -5510,7 +5497,7 @@ msgid "Enable selected groups?"
 msgstr "Kích hoạt các nhóm được chọn?"
 
 #: include/views/configuration.hostgroups.list.php:152
-#: include/views/configuration.host.list.php:357
+#: include/views/configuration.host.list.php:370
 msgid "Enable selected hosts?"
 msgstr "Kích hoạt các host được chọn?"
 
@@ -5565,7 +5552,7 @@ msgstr "Kích hoạt trap"
 #: include/views/configuration.discovery.list.php:44
 #: include/views/configuration.host.discovery.edit.php:584
 #: include/views/configuration.host.edit.php:280
-#: include/views/configuration.host.list.php:186
+#: include/views/configuration.host.list.php:194
 #: include/views/configuration.host.massupdate.php:185
 #: include/views/configuration.httpconf.edit.php:150
 #: include/views/configuration.item.edit.php:927
@@ -5611,7 +5598,7 @@ msgstr "Lỗi"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Lỗi trong yêu cầu tìm kiếm cho bảng \"%1$s\"."
 
-#: include/func.inc.php:1932
+#: include/func.inc.php:1933
 msgid "Error message"
 msgstr "Tin nhắn lỗi"
 
@@ -5767,7 +5754,7 @@ msgid "Exploded"
 msgstr "Exploded"
 
 #: include/views/administration.general.valuemapping.list.php:73
-#: include/views/configuration.host.list.php:359
+#: include/views/configuration.host.list.php:372
 #: include/views/configuration.template.list.php:221
 #: include/views/monitoring.screen.list.php:116
 #: include/views/monitoring.sysmap.list.php:91
@@ -6093,7 +6080,7 @@ msgstr "Hoàn thành"
 msgid "Finnish (fi_FI)"
 msgstr "Hoàn thành(fi_FI)"
 
-#: include/func.inc.php:1662
+#: include/func.inc.php:1663
 msgctxt "page navigation"
 msgid "First"
 msgstr "Đầu tiên"
@@ -6171,8 +6158,8 @@ msgstr "Thứ sáu"
 
 #: app/views/report.services.php:68 include/classes/html/CFilter.php:282
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:86
-#: include/views/configuration.services.edit.php:243
-#: include/views/configuration.services.edit.php:289
+#: include/views/configuration.services.edit.php:245
+#: include/views/configuration.services.edit.php:291
 #: include/views/js/monitoring.sysmaps.js.php:669 report4.php:195
 #: services.php:47 services.php:182
 msgid "From"
@@ -6292,7 +6279,7 @@ msgstr "Quay trở về %1$s"
 msgid "Go to"
 msgstr "Đi tới"
 
-#: app/views/system.warning.php:26 include/func.inc.php:1837
+#: app/views/system.warning.php:26 include/func.inc.php:1838
 msgid "Go to dashboard"
 msgstr "Đi tới bảng điều khiển"
 
@@ -6482,7 +6469,7 @@ msgstr "Đồ thị với tên giống nhau nhưng kiểu khác nhau tồn
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:387
 #: include/views/configuration.host.list.php:132
-#: include/views/configuration.host.list.php:332
+#: include/views/configuration.host.list.php:345
 #: include/views/configuration.template.edit.php:196
 #: include/views/configuration.template.list.php:89
 #: include/views/configuration.template.list.php:196
@@ -6736,11 +6723,11 @@ msgstr "Thứ bậc"
 msgid "High"
 msgstr "Cao"
 
-#: include/classes/core/ZBase.php:287
+#: include/classes/core/ZBase.php:268
 msgid "High-contrast dark"
 msgstr "Độ tương phản tối"
 
-#: include/classes/core/ZBase.php:286
+#: include/classes/core/ZBase.php:267
 msgid "High-contrast light"
 msgstr "Độ tương phản sáng"
 
@@ -7367,7 +7354,7 @@ msgstr "Các biểu tượng"
 msgid "Identification of the system. Returns string"
 msgstr "Nhận dạng hệ thống. Trả về kiểu string"
 
-#: include/func.inc.php:1827 include/func.inc.php:1846
+#: include/func.inc.php:1828 include/func.inc.php:1847
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Nếu bạn nghĩ rằng tin nhắn này là sai, xin vui lòng tham khảo ý kiên các quản trị viên của bạn về việc nhận các điều khoản cần thiết."
 
@@ -7457,7 +7444,7 @@ msgstr "Đã Import thành công"
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "Không thể lọc theo trường các thành phần còn lại \"%s\", cái đó không tồn tại."
 
-#: include/html.inc.php:324 include/views/configuration.host.list.php:182
+#: include/html.inc.php:324
 msgid "In maintenance"
 msgstr "Đang bảo trì"
 
@@ -7484,6 +7471,7 @@ msgstr "Item không thể tiếp cận"
 
 #: include/classes/screens/CScreenProblem.php:414
 #: include/hostgroups.inc.php:291 include/triggers.inc.php:2326
+#: include/views/configuration.host.list.php:190
 #: include/views/inventory.host.view.php:36
 msgid "Inaccessible maintenance"
 msgstr "Bảo trì không thể tiếp cận"
@@ -8647,10 +8635,6 @@ msgstr "Cài đặt"
 msgid "Installer name"
 msgstr "Tên người cài đặt"
 
-#: cachewarning.php:38
-msgid "Insufficient file system permissions."
-msgstr ""
-
 #: app/views/administration.proxy.edit.php:70 disc_prototypes.php:39
 #: host_discovery.php:47 include/views/configuration.host.list.php:135
 #: items.php:38
@@ -9304,7 +9288,7 @@ msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\"."
 #: include/views/configuration.host.discovery.list.php:52
 #: include/views/configuration.host.edit.php:327
 #: include/views/configuration.host.list.php:130
-#: include/views/configuration.host.list.php:324
+#: include/views/configuration.host.list.php:337
 #: include/views/configuration.item.edit.php:22
 #: include/views/configuration.item.list.php:25
 #: include/views/configuration.item.massupdate.php:22
@@ -9520,42 +9504,42 @@ msgstr "Ngôn ngữ"
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
 
-#: include/func.inc.php:1689
+#: include/func.inc.php:1690
 msgctxt "page navigation"
 msgid "Last"
 msgstr "Giá trị cuối cùng"
 
-#: include/func.inc.php:2746
+#: include/func.inc.php:2747
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "%1$d ngày cuối cùng"
 
-#: include/func.inc.php:2740
+#: include/func.inc.php:2741
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] "%1$d giờ cuối cùng"
 
-#: include/func.inc.php:2733
+#: include/func.inc.php:2734
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] "%1$d phút cuối cùng"
 
-#: include/func.inc.php:2749
+#: include/func.inc.php:2750
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] "%1$d tháng cuối cùng"
 
-#: include/func.inc.php:2726
+#: include/func.inc.php:2727
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] "%1$d giây cuối cùng"
 
-#: include/func.inc.php:2752
+#: include/func.inc.php:2753
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -9853,7 +9837,7 @@ msgid "Log unmatched SNMP traps"
 msgstr "Log không khớp với SNMP traps"
 
 #: app/views/administration.authentication.edit.php:123 auditlogs.php:138
-#: include/func.inc.php:1834 include/func.inc.php:1849
+#: include/func.inc.php:1835 include/func.inc.php:1850
 #: include/menu.inc.php:292 include/views/administration.auditlogs.list.php:44
 #: include/views/administration.users.list.php:89 index_http.php:91
 msgid "Login"
@@ -10188,7 +10172,7 @@ msgid "Mask"
 msgstr "Mặt nạ"
 
 #: include/classes/screens/CScreenProblem.php:1111
-#: include/views/configuration.host.list.php:360
+#: include/views/configuration.host.list.php:373
 #: include/views/configuration.item.list.php:251
 #: include/views/configuration.item.massupdate.php:717
 #: include/views/configuration.trigger.prototype.list.php:162
@@ -10399,32 +10383,32 @@ msgstr "Giữa"
 msgid "Min"
 msgstr "Tối thiểu"
 
-#: include/classes/setup/CFrontendSetup.php:129
+#: include/classes/setup/CFrontendSetup.php:128
 #, c-format
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")."
 msgstr "Giới hạn bộ nhớ PHP được yêu cầu tối thiểu là %s (tùy chọn cấu hình \"memory_linit\")."
 
-#: include/classes/setup/CFrontendSetup.php:165
+#: include/classes/setup/CFrontendSetup.php:164
 #, c-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")."
 msgstr "Kích thước tải lên tập tin PHP được yêu cầu tối thiểu là %s (tùy chọn cấu hình \"upload_max_filesize\")."
 
-#: include/classes/setup/CFrontendSetup.php:111
+#: include/classes/setup/CFrontendSetup.php:110
 #, c-format
 msgid "Minimum required PHP version is %s."
 msgstr "Phiên bản PHP được yêu cầu tối thiểu là %s."
 
-#: include/classes/setup/CFrontendSetup.php:195
+#: include/classes/setup/CFrontendSetup.php:194
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")."
 msgstr "Giới hạn được yêu cầu tối thiểu về thời gian thực hiện các tập lệnh PHP là %s (tùy chọn cấu hình \"max_execution_time\")."
 
-#: include/classes/setup/CFrontendSetup.php:216
+#: include/classes/setup/CFrontendSetup.php:215
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")."
 msgstr "Giới hạn được yêu cầu tối thiểu về thời gian phân tích đầu vào cho các tập lệnh PHP là %s (tùy chọn cấu hình \"max_input_time\")."
 
-#: include/classes/setup/CFrontendSetup.php:147
+#: include/classes/setup/CFrontendSetup.php:146
 #, c-format
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")."
 msgstr "Kích thước được yêu cầu tối thiểu để PHP gửi đi là %s (tùy chọn cấu hình \"post_max_size\")."
@@ -10839,7 +10823,7 @@ msgstr "Thao tác mới"
 msgid "New regular expression"
 msgstr "Biểu thức chính quy mới"
 
-#: include/views/configuration.services.edit.php:319
+#: include/views/configuration.services.edit.php:321
 msgid "New service time"
 msgstr "Thời gian dịch vụ mới"
 
@@ -11345,7 +11329,7 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1802 items.php:1403 items.php:1586 services.php:84
+#: include/func.inc.php:1803 items.php:1403 items.php:1586 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Không có quyền truy cập vào đối tượng được gọi hoặc nó không tồn tại!"
 
@@ -11430,10 +11414,10 @@ msgstr "Không có cờ boolean bị phản đối."
 #: include/views/administration.usergroups.edit.php:127
 #: include/views/administration.usergroups.edit.php:159
 #: include/views/configuration.host.discovery.edit.php:284
-#: include/views/configuration.host.list.php:275
-#: include/views/configuration.host.list.php:281
-#: include/views/configuration.host.list.php:293
-#: include/views/configuration.host.list.php:296
+#: include/views/configuration.host.list.php:288
+#: include/views/configuration.host.list.php:294
+#: include/views/configuration.host.list.php:306
+#: include/views/configuration.host.list.php:309
 #: include/views/configuration.item.edit.php:325
 #: include/views/configuration.item.edit.php:880
 #: include/views/configuration.item.edit.php:894
@@ -11499,7 +11483,7 @@ msgstr "Không được hỗ trợ"
 
 #: app/views/popup.services.php:67
 #: include/views/configuration.services.edit.php:170
-#: include/views/configuration.services.edit.php:237
+#: include/views/configuration.services.edit.php:239
 #: include/views/configuration.services.parent.list.php:57
 msgid "Note"
 msgstr "Ghi chú"
@@ -11824,7 +11808,7 @@ msgid "One time only"
 msgstr "Một lần duy nhất"
 
 #: include/views/configuration.services.edit.php:189
-#: include/views/configuration.services.edit.php:230
+#: include/views/configuration.services.edit.php:232
 msgid "One-time downtime"
 msgstr "Một lần downtime"
 
@@ -12127,152 +12111,152 @@ msgstr "Tổng quan bằng proxy"
 msgid "Owner"
 msgstr "Chủ sở hữu"
 
-#: include/classes/setup/CFrontendSetup.php:557
+#: include/classes/setup/CFrontendSetup.php:556
 msgid "PHP LDAP"
 msgstr "PHP LDAP"
 
-#: include/classes/setup/CFrontendSetup.php:561
+#: include/classes/setup/CFrontendSetup.php:560
 #: include/classes/validators/CLdapAuthValidator.php:69
 msgid "PHP LDAP extension missing."
 msgstr "Thiếu phần mở rộng PHP LDAP"
 
-#: include/classes/setup/CFrontendSetup.php:311
+#: include/classes/setup/CFrontendSetup.php:310
 msgid "PHP bcmath"
 msgstr "PHP bcmath"
 
-#: include/classes/setup/CFrontendSetup.php:315
+#: include/classes/setup/CFrontendSetup.php:314
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
 msgstr "Phần mở rộng PHP bcmath đang lỗi (cấu hình tham số PHP --kích hoạt-bcmath)."
 
-#: include/classes/setup/CFrontendSetup.php:584
+#: include/classes/setup/CFrontendSetup.php:583
 msgid "PHP ctype"
 msgstr "PHP ctype"
 
-#: include/classes/setup/CFrontendSetup.php:588
+#: include/classes/setup/CFrontendSetup.php:587
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "Phần mở rộng PHP ctype lỗi (cấu hình tham số PHP --kích hoạt-ctype)."
 
-#: include/classes/setup/CFrontendSetup.php:252
+#: include/classes/setup/CFrontendSetup.php:251
 msgid "PHP databases support"
 msgstr "Hỗ trợ cơ sở dữ liệu PHP"
 
-#: include/classes/setup/CFrontendSetup.php:412
+#: include/classes/setup/CFrontendSetup.php:411
 msgid "PHP gd"
 msgstr "PHP gd"
 
-#: include/classes/setup/CFrontendSetup.php:483
+#: include/classes/setup/CFrontendSetup.php:482
 msgid "PHP gd FreeType support"
 msgstr "Hỗ trợ PHP gd FreeType"
 
-#: include/classes/setup/CFrontendSetup.php:487
+#: include/classes/setup/CFrontendSetup.php:486
 msgid "PHP gd FreeType support missing."
 msgstr "Hỗ trợ lỗi PHP gd FreeType."
 
-#: include/classes/setup/CFrontendSetup.php:464
+#: include/classes/setup/CFrontendSetup.php:463
 msgid "PHP gd JPEG image support missing."
 msgstr "Hỗ trợ hình ảnh PHP gd JPEG bị lỗi."
 
-#: include/classes/setup/CFrontendSetup.php:460
+#: include/classes/setup/CFrontendSetup.php:459
 msgid "PHP gd JPEG support"
 msgstr "Hỗ trợ PHP gd JPEG"
 
-#: include/classes/setup/CFrontendSetup.php:439
+#: include/classes/setup/CFrontendSetup.php:438
 msgid "PHP gd PNG image support missing."
 msgstr "Hỗ trợ hình ảnh PHP gd PNG bị lỗi."
 
-#: include/classes/setup/CFrontendSetup.php:435
+#: include/classes/setup/CFrontendSetup.php:434
 msgid "PHP gd PNG support"
 msgstr "Hỗ trợ PHP gd PNG"
 
-#: include/classes/setup/CFrontendSetup.php:416
+#: include/classes/setup/CFrontendSetup.php:415
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)."
 msgstr "Phần mở rộng PHP gd lỗi (cấu hình tham số PHP --with-gd)."
 
-#: include/classes/setup/CFrontendSetup.php:635
+#: include/classes/setup/CFrontendSetup.php:634
 msgid "PHP gettext"
 msgstr "PHP gettext"
 
-#: include/classes/setup/CFrontendSetup.php:639
+#: include/classes/setup/CFrontendSetup.php:638
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available."
 msgstr "Phần mở rộng PHP gettext lỗi (cấu hình tham số PHP --with-gettext)."
 
-#: include/classes/setup/CFrontendSetup.php:506
+#: include/classes/setup/CFrontendSetup.php:505
 msgid "PHP libxml"
 msgstr "PHP libxml"
 
-#: include/classes/setup/CFrontendSetup.php:510
+#: include/classes/setup/CFrontendSetup.php:509
 msgid "PHP libxml extension missing."
 msgstr "Phần mở rộng PHP libxml lỗi."
 
-#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:327
 msgid "PHP mbstring"
 msgstr "PHP mbstring"
 
-#: include/classes/setup/CFrontendSetup.php:332
+#: include/classes/setup/CFrontendSetup.php:331
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)."
 msgstr "Phần mở rộng PHP mbstring lỗi (cấu hình tham số PHP --kích hoạt-mbstring)."
 
-#: include/classes/setup/CFrontendSetup.php:125
-#: include/classes/setup/CFrontendSetup.php:143
-#: include/classes/setup/CFrontendSetup.php:161
-#: include/classes/setup/CFrontendSetup.php:191
-#: include/classes/setup/CFrontendSetup.php:212
-#: include/classes/setup/CFrontendSetup.php:229
-#: include/classes/setup/CFrontendSetup.php:349
-#: include/classes/setup/CFrontendSetup.php:370
-#: include/classes/setup/CFrontendSetup.php:618
-#: include/classes/setup/CFrontendSetup.php:652
+#: include/classes/setup/CFrontendSetup.php:124
+#: include/classes/setup/CFrontendSetup.php:142
+#: include/classes/setup/CFrontendSetup.php:160
+#: include/classes/setup/CFrontendSetup.php:190
+#: include/classes/setup/CFrontendSetup.php:211
+#: include/classes/setup/CFrontendSetup.php:228
+#: include/classes/setup/CFrontendSetup.php:348
+#: include/classes/setup/CFrontendSetup.php:369
+#: include/classes/setup/CFrontendSetup.php:617
+#: include/classes/setup/CFrontendSetup.php:651
 #, c-format
 msgid "PHP option \"%1$s\""
 msgstr "Tùy chọn PHP \"%1$s\""
 
-#: include/classes/setup/CFrontendSetup.php:374
-#: include/classes/setup/CFrontendSetup.php:656
+#: include/classes/setup/CFrontendSetup.php:373
+#: include/classes/setup/CFrontendSetup.php:655
 #, c-format
 msgid "PHP option \"%1$s\" must be set to \"%2$s\""
 msgstr "Tùy chọn PHP \"%1$s\" phải được gửi \"%2$s\""
 
-#: include/classes/setup/CFrontendSetup.php:601
+#: include/classes/setup/CFrontendSetup.php:600
 msgid "PHP session"
 msgstr "PHP session"
 
-#: include/classes/setup/CFrontendSetup.php:622
+#: include/classes/setup/CFrontendSetup.php:621
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")."
 msgstr "PHP session tự khởi động phải vô hiệu hóa (PHP chỉ thị \"session.auto_start\")."
 
-#: include/classes/setup/CFrontendSetup.php:605
+#: include/classes/setup/CFrontendSetup.php:604
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)."
 msgstr "Phần mở rộng PHP session lỗi (cấu hình tham số --kích hoạt-session)."
 
-#: include/classes/setup/CFrontendSetup.php:387
+#: include/classes/setup/CFrontendSetup.php:386
 msgid "PHP sockets"
 msgstr "PHP sockets"
 
-#: include/classes/setup/CFrontendSetup.php:391
+#: include/classes/setup/CFrontendSetup.php:390
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)."
 msgstr "Phần mở rộng PHP sockets lỗi (cấu hình tham số PHP --kích hoạt-sockets)."
 
-#: include/classes/setup/CFrontendSetup.php:353
+#: include/classes/setup/CFrontendSetup.php:352
 msgid "PHP string function overloading must be disabled."
 msgstr "Quá tải chức năng chuỗi PHP phải bị vô hiệu hóa."
 
-#: include/classes/setup/CFrontendSetup.php:107
+#: include/classes/setup/CFrontendSetup.php:106
 msgid "PHP version"
 msgstr "Phiên bản PHP"
 
-#: include/classes/setup/CFrontendSetup.php:540
+#: include/classes/setup/CFrontendSetup.php:539
 msgid "PHP xmlreader"
 msgstr "PHP xmlreader"
 
-#: include/classes/setup/CFrontendSetup.php:544
+#: include/classes/setup/CFrontendSetup.php:543
 msgid "PHP xmlreader extension missing."
 msgstr "Phần mở rộng PHP xmlreader lỗi."
 
-#: include/classes/setup/CFrontendSetup.php:523
+#: include/classes/setup/CFrontendSetup.php:522
 msgid "PHP xmlwriter"
 msgstr "PHP xmlwriter"
 
-#: include/classes/setup/CFrontendSetup.php:527
+#: include/classes/setup/CFrontendSetup.php:526
 msgid "PHP xmlwriter extension missing."
 msgstr "Phần mở rộng PHP xmlwriter lỗi."
 
@@ -12306,9 +12290,9 @@ msgstr "Chế độ tạo sự kiện PROBLEM"
 #: include/views/configuration.host.edit.php:760
 #: include/views/configuration.host.edit.php:773
 #: include/views/configuration.host.edit.php:788
-#: include/views/configuration.host.list.php:284
-#: include/views/configuration.host.list.php:300
-#: include/views/configuration.host.list.php:303
+#: include/views/configuration.host.list.php:297
+#: include/views/configuration.host.list.php:313
+#: include/views/configuration.host.list.php:316
 #: include/views/configuration.host.massupdate.php:323
 #: include/views/configuration.host.massupdate.php:331
 #: include/views/configuration.host.massupdate.php:337
@@ -12487,7 +12471,7 @@ msgstr "Chu kỳ"
 
 #: include/forms.inc.php:1864
 #: include/views/configuration.maintenance.edit.php:77
-#: include/views/configuration.services.edit.php:226
+#: include/views/configuration.services.edit.php:228
 msgid "Period type"
 msgstr "Loại chu kỳ"
 
@@ -12657,15 +12641,15 @@ msgstr "Bước tiền xử lý"
 msgid "Preview"
 msgstr "Xem trước"
 
-#: include/func.inc.php:2696
+#: include/func.inc.php:2697
 msgid "Previous month"
 msgstr "quay lại tháng trước"
 
-#: include/func.inc.php:2695
+#: include/func.inc.php:2696
 msgid "Previous week"
 msgstr "Quay lại tuần trước"
 
-#: include/func.inc.php:2697
+#: include/func.inc.php:2698
 msgid "Previous year"
 msgstr "Quay lại năm trước"
 
@@ -13211,7 +13195,7 @@ msgstr "Lệnh từ xa"
 #: include/views/configuration.maintenance.edit.php:193
 #: include/views/configuration.maintenance.edit.php:213
 #: include/views/configuration.services.edit.php:134
-#: include/views/configuration.services.edit.php:206
+#: include/views/configuration.services.edit.php:208
 #: include/views/configuration.trigger.prototype.edit.php:219
 #: include/views/configuration.trigger.prototype.edit.php:414
 #: include/views/configuration.trigger.prototype.edit.php:502
@@ -14289,7 +14273,7 @@ msgid "Server time"
 msgstr "thời gian máy chủ"
 
 #: app/views/popup.services.php:42 include/actions.inc.php:74
-#: include/audit.inc.php:42 include/views/configuration.services.edit.php:338
+#: include/audit.inc.php:42 include/views/configuration.services.edit.php:340
 #: include/views/configuration.services.parent.list.php:35 services.php:354
 #: srv_status.php:145
 msgid "Service"
@@ -14358,7 +14342,7 @@ msgstr "Cổng dịch vụ"
 msgid "Service start time must be less than end time."
 msgstr "Thời gian bắt đầu dịch vụ phải ít hơn so với thời gian kết thúc."
 
-#: include/views/configuration.services.edit.php:217
+#: include/views/configuration.services.edit.php:219
 msgid "Service times"
 msgstr "Thời gian dịch vụ"
 
@@ -15055,7 +15039,7 @@ msgstr "Submap"
 msgid "Success Audit"
 msgstr "Kiểm nghiệm thành công"
 
-#: include/func.inc.php:1932
+#: include/func.inc.php:1933
 msgid "Success message"
 msgstr "Tin chắn thành công"
 
@@ -15121,7 +15105,7 @@ msgstr "Thời gian khởi động hệ thống. Trả về kiểu integer (đơ
 msgid "System default"
 msgstr "Mặc định hệ thống"
 
-#: include/func.inc.php:1959
+#: include/func.inc.php:1960
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "Xảy ra lỗi hệ thống. Vui lòng liên hệ với quản trị viên Zabbix."
 
@@ -15543,7 +15527,7 @@ msgstr "Ứng dụng web scenario thuộc về một host khác hơn so vơ
 msgid "Theme"
 msgstr "Giao diện"
 
-#: include/func.inc.php:2694
+#: include/func.inc.php:2695
 msgid "This day last week"
 msgstr "Ngày cuối tuần"
 
@@ -15552,11 +15536,11 @@ msgstr "Ngày cuối tuần"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Trường này được tự động gắn vào bởi item \"%s\"."
 
-#: include/func.inc.php:2702 srv_status.php:41
+#: include/func.inc.php:2703 srv_status.php:41
 msgid "This month"
 msgstr "Tháng này"
 
-#: include/func.inc.php:2703
+#: include/func.inc.php:2704
 msgid "This month so far"
 msgstr "Tháng này đến nay"
 
@@ -15568,19 +15552,19 @@ msgstr "Cột screen này không được để trống. Xóa nó?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "Hàng screen này không được để trống. Xóa chúng?"
 
-#: include/func.inc.php:2700 srv_status.php:40
+#: include/func.inc.php:2701 srv_status.php:40
 msgid "This week"
 msgstr "Tuần này"
 
-#: include/func.inc.php:2701
+#: include/func.inc.php:2702
 msgid "This week so far"
 msgstr "Tuần này cho đến nay"
 
-#: include/func.inc.php:2704 srv_status.php:42
+#: include/func.inc.php:2705 srv_status.php:42
 msgid "This year"
 msgstr "Năm này"
 
-#: include/func.inc.php:2705
+#: include/func.inc.php:2706
 msgid "This year so far"
 msgstr "Năm này cho đến nay"
 
@@ -15598,8 +15582,8 @@ msgid "Thursday"
 msgstr "Thứ năm"
 
 #: app/views/report.services.php:68
-#: include/views/configuration.services.edit.php:250
-#: include/views/configuration.services.edit.php:303 report4.php:195
+#: include/views/configuration.services.edit.php:252
+#: include/views/configuration.services.edit.php:305 report4.php:195
 #: services.php:48 services.php:191
 msgid "Till"
 msgstr "Cho tới"
@@ -15624,9 +15608,9 @@ msgstr "Cho tới"
 #: include/events.inc.php:447 include/events.inc.php:453
 #: include/views/administration.auditacts.list.php:56
 #: include/views/administration.auditlogs.list.php:70
-#: include/views/configuration.services.edit.php:293
-#: include/views/configuration.services.edit.php:307
-#: include/views/configuration.services.edit.php:340
+#: include/views/configuration.services.edit.php:295
+#: include/views/configuration.services.edit.php:309
+#: include/views/configuration.services.edit.php:342
 msgid "Time"
 msgstr "Thời gian"
 
@@ -15668,7 +15652,7 @@ msgstr "Di chuyển mốc thời gian"
 msgid "Time type"
 msgstr "Kiểu thời gian"
 
-#: include/classes/setup/CFrontendSetup.php:233
+#: include/classes/setup/CFrontendSetup.php:232
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
 msgstr "Múi giờ cho PHP không được thiết lập (cấu hình tham số \"date.timezone\")."
 
@@ -15700,12 +15684,12 @@ msgstr "To"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Để thiết lập một host interface chọn một kiểu item duy nhất cho tất cả các item"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2698
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2699
 #: srv_status.php:39
 msgid "Today"
 msgstr "Hôm nay"
 
-#: include/func.inc.php:2699
+#: include/func.inc.php:2700
 msgid "Today so far"
 msgstr "Hôm nay"
 
@@ -16022,7 +16006,7 @@ msgstr "Trigger được cập nhật"
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:355
 #: include/views/configuration.host.list.php:131
-#: include/views/configuration.host.list.php:328
+#: include/views/configuration.host.list.php:341
 #: include/views/configuration.item.list.php:64
 #: include/views/configuration.item.list.php:192
 #: include/views/configuration.template.edit.php:175
@@ -16506,7 +16490,7 @@ msgstr "Up"
 #: include/views/configuration.item.prototype.edit.php:893
 #: include/views/configuration.maintenance.edit.php:134
 #: include/views/configuration.maintenance.edit.php:285
-#: include/views/configuration.services.edit.php:353
+#: include/views/configuration.services.edit.php:355
 #: include/views/configuration.template.edit.php:443
 #: include/views/configuration.trigger.prototype.edit.php:635
 #: include/views/configuration.trigger.prototype.massupdate.php:188
@@ -16579,7 +16563,7 @@ msgstr "Các bản đồ ở mức cao hơn"
 
 #: include/classes/screens/CScreenDiscovery.php:120
 #: include/views/configuration.services.edit.php:177
-#: include/views/configuration.services.edit.php:228
+#: include/views/configuration.services.edit.php:230
 msgid "Uptime"
 msgstr "Thời gian chạy"
 
@@ -17298,7 +17282,7 @@ msgid "We are sorry, the maximum possible number of elements to remember has bee
 msgstr "Chúng tôi xin lỗi, số lượng tối đa có thể của các phần tử để ghi nhớ đã đạt tới giới hạn."
 
 #: include/menu.inc.php:63 include/views/configuration.host.list.php:134
-#: include/views/configuration.host.list.php:340
+#: include/views/configuration.host.list.php:353
 #: include/views/configuration.template.list.php:92
 #: include/views/configuration.template.list.php:208
 #: include/views/inventory.host.view.php:124
@@ -17602,8 +17586,8 @@ msgstr "Y2"
 #: include/forms.inc.php:2084
 #: include/views/configuration.maintenance.edit.php:57
 #: include/views/configuration.maintenance.edit.php:63
-#: include/views/configuration.services.edit.php:246
-#: include/views/configuration.services.edit.php:253
+#: include/views/configuration.services.edit.php:248
+#: include/views/configuration.services.edit.php:255
 msgid "YYYY-MM-DD hh:mm"
 msgstr "YYYY-MM-DD hh:mm"
 
@@ -17644,11 +17628,11 @@ msgstr "Hàng năm"
 msgid "Yes"
 msgstr "Yes"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2692
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2693
 msgid "Yesterday"
 msgstr "hôm qua"
 
-#: include/func.inc.php:1826
+#: include/func.inc.php:1827
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr "Bạn vừa đăng nhập vào \"%1$s\"."
@@ -17657,7 +17641,7 @@ msgstr "Bạn vừa đăng nhập vào \"%1$s\"."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Bạn không thể chọn một số trong các ngôn ngữ, bởi vì địa chỉ của chúng không được cài đặt trên web máy chủ."
 
-#: include/func.inc.php:1843 index_http.php:88
+#: include/func.inc.php:1844 index_http.php:88
 msgid "You are not logged in"
 msgstr "Bạn không đăng nhập"
 
@@ -17710,7 +17694,7 @@ msgstr "Bạn không có quyền để thực hiện các thao tác này
 msgid "You do not have permissions to create users."
 msgstr "Bạn không có quyền để tạo các người dùng."
 
-#: include/func.inc.php:1826
+#: include/func.inc.php:1827
 msgid "You have no permissions to access this page."
 msgstr "Bạn không có quyền truy cập trang này."
 
@@ -17718,7 +17702,7 @@ msgstr "Bạn không có quyền truy cập trang này."
 msgid "You have unsaved changes."
 msgstr "Bạn có các thay đổi chưa lưu."
 
-#: include/func.inc.php:1845
+#: include/func.inc.php:1846
 msgid "You must login to view this page."
 msgstr "Bạn phải đăng nhập để xem trang này."
 
@@ -17726,7 +17710,7 @@ msgstr "Bạn phải đăng nhập để xem trang này."
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 msgstr "Cơ sở dữ liệu của bạn không hoạt động đúng. Vui lòng đợi vài phút và cố gắng lặp lại hành động này. Nếu sự cố vẫn còn, vui lòng liên hệ với quản trị viên hệ thống. Vấn đề có thể do giao dịch chạy dài hoặc khóa cấp hàng được thực hiện bởi hệ thống quản lý cơ sở dữ liệu của bạn."
 
-#: cachewarning.php:28 index.php:28
+#: index.php:28
 msgid "ZABBIX"
 msgstr "ZABBIX"
 
@@ -18162,7 +18146,7 @@ msgstr "bao gồm"
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr "Count () - Số lượng giá trị được truy xuất thành công V (đáp ứng toán tử O) cho giai đoạn T"
 
-#: include/func.inc.php:621 jsLoader.php:128
+#: include/func.inc.php:622 jsLoader.php:128
 msgctxt "day short"
 msgid "d"
 msgstr "d"
@@ -18293,13 +18277,13 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "Cài đặt global housekeeping"
 
-#: include/func.inc.php:622 jsLoader.php:129
+#: include/func.inc.php:623 jsLoader.php:129
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
 
-#: include/views/configuration.services.edit.php:270
-#: include/views/configuration.services.edit.php:280
+#: include/views/configuration.services.edit.php:272
+#: include/views/configuration.services.edit.php:282
 msgid "hh"
 msgstr "hh"
 
@@ -18476,12 +18460,12 @@ msgstr "logource() - Nguồn log của tham số khớp bản log cuối cùng T
 msgid "low-level discovery rule"
 msgstr "Quy tắc phát hiện low-level"
 
-#: include/func.inc.php:623 jsLoader.php:103 jsLoader.php:130 jsLoader.php:295
+#: include/func.inc.php:624 jsLoader.php:103 jsLoader.php:130 jsLoader.php:295
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:620 jsLoader.php:127
+#: include/func.inc.php:621 jsLoader.php:127
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -18553,12 +18537,12 @@ msgstr "min () - Giá trị tối thiểu cho giai đoạn T"
 msgid "minimum length is %1$s characters"
 msgstr "độ dài tối thiểu là ký tự %1$s"
 
-#: include/views/configuration.services.edit.php:275
-#: include/views/configuration.services.edit.php:285
+#: include/views/configuration.services.edit.php:277
+#: include/views/configuration.services.edit.php:287
 msgid "mm"
 msgstr "mm"
 
-#: include/func.inc.php:625
+#: include/func.inc.php:626
 msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
@@ -18659,25 +18643,25 @@ msgstr "số"
 msgid "of"
 msgstr "of"
 
-#: include/classes/setup/CFrontendSetup.php:253
-#: include/classes/setup/CFrontendSetup.php:312
-#: include/classes/setup/CFrontendSetup.php:329
+#: include/classes/setup/CFrontendSetup.php:252
+#: include/classes/setup/CFrontendSetup.php:311
+#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:349
 #: include/classes/setup/CFrontendSetup.php:350
-#: include/classes/setup/CFrontendSetup.php:351
+#: include/classes/setup/CFrontendSetup.php:370
 #: include/classes/setup/CFrontendSetup.php:371
-#: include/classes/setup/CFrontendSetup.php:372
-#: include/classes/setup/CFrontendSetup.php:388
-#: include/classes/setup/CFrontendSetup.php:436
-#: include/classes/setup/CFrontendSetup.php:461
-#: include/classes/setup/CFrontendSetup.php:484
-#: include/classes/setup/CFrontendSetup.php:524
-#: include/classes/setup/CFrontendSetup.php:541
-#: include/classes/setup/CFrontendSetup.php:558
-#: include/classes/setup/CFrontendSetup.php:585
-#: include/classes/setup/CFrontendSetup.php:602
+#: include/classes/setup/CFrontendSetup.php:387
+#: include/classes/setup/CFrontendSetup.php:435
+#: include/classes/setup/CFrontendSetup.php:460
+#: include/classes/setup/CFrontendSetup.php:483
+#: include/classes/setup/CFrontendSetup.php:523
+#: include/classes/setup/CFrontendSetup.php:540
+#: include/classes/setup/CFrontendSetup.php:557
+#: include/classes/setup/CFrontendSetup.php:584
+#: include/classes/setup/CFrontendSetup.php:601
+#: include/classes/setup/CFrontendSetup.php:618
 #: include/classes/setup/CFrontendSetup.php:619
-#: include/classes/setup/CFrontendSetup.php:620
-#: include/classes/setup/CFrontendSetup.php:636
+#: include/classes/setup/CFrontendSetup.php:635
 #: include/views/administration.users.edit.php:287
 msgid "off"
 msgstr "off"
@@ -18686,21 +18670,21 @@ msgstr "off"
 msgid "old event tag"
 msgstr "thẻ sự kiện cũ"
 
-#: include/classes/setup/CFrontendSetup.php:312
-#: include/classes/setup/CFrontendSetup.php:329
-#: include/classes/setup/CFrontendSetup.php:350
-#: include/classes/setup/CFrontendSetup.php:371
-#: include/classes/setup/CFrontendSetup.php:388
-#: include/classes/setup/CFrontendSetup.php:436
-#: include/classes/setup/CFrontendSetup.php:461
-#: include/classes/setup/CFrontendSetup.php:484
-#: include/classes/setup/CFrontendSetup.php:524
-#: include/classes/setup/CFrontendSetup.php:541
-#: include/classes/setup/CFrontendSetup.php:558
-#: include/classes/setup/CFrontendSetup.php:585
-#: include/classes/setup/CFrontendSetup.php:602
-#: include/classes/setup/CFrontendSetup.php:619
-#: include/classes/setup/CFrontendSetup.php:636
+#: include/classes/setup/CFrontendSetup.php:311
+#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:349
+#: include/classes/setup/CFrontendSetup.php:370
+#: include/classes/setup/CFrontendSetup.php:387
+#: include/classes/setup/CFrontendSetup.php:435
+#: include/classes/setup/CFrontendSetup.php:460
+#: include/classes/setup/CFrontendSetup.php:483
+#: include/classes/setup/CFrontendSetup.php:523
+#: include/classes/setup/CFrontendSetup.php:540
+#: include/classes/setup/CFrontendSetup.php:557
+#: include/classes/setup/CFrontendSetup.php:584
+#: include/classes/setup/CFrontendSetup.php:601
+#: include/classes/setup/CFrontendSetup.php:618
+#: include/classes/setup/CFrontendSetup.php:635
 #: include/views/administration.users.edit.php:287
 #: include/views/monitoring.hostscreen.php:33
 msgid "on"
@@ -18784,7 +18768,7 @@ msgstr "root"
 msgid "ruleid of dependent item and master item should match"
 msgstr "quy tắc của item phụ thuộc và item chủ phải phù hợp"
 
-#: include/func.inc.php:624
+#: include/func.inc.php:625
 msgctxt "second short"
 msgid "s"
 msgstr "s"
@@ -18802,7 +18786,7 @@ msgstr "tham số thứ hai được kì vọng"
 msgid "selected"
 msgstr "Chọn"
 
-#: include/views/configuration.services.edit.php:240
+#: include/views/configuration.services.edit.php:242
 msgid "short description"
 msgstr "Mô tả ngắn"
 
@@ -18999,9 +18983,9 @@ msgstr "Văn bản bất ngờ \"%1$s\""
 msgid "unexpected value \"%1$s\""
 msgstr "Giá trị bất ngờ \"%1$s\""
 
-#: include/classes/setup/CFrontendSetup.php:230
-#: include/classes/setup/CFrontendSetup.php:407
-#: include/classes/setup/CFrontendSetup.php:501
+#: include/classes/setup/CFrontendSetup.php:229
+#: include/classes/setup/CFrontendSetup.php:406
+#: include/classes/setup/CFrontendSetup.php:500
 msgid "unknown"
 msgstr "Không rõ"
 
@@ -19099,7 +19083,7 @@ msgstr "phát hiện sai loại quy tắc"
 msgid "wrong item type"
 msgstr "Loại item sai"
 
-#: include/func.inc.php:619 jsLoader.php:126
+#: include/func.inc.php:620 jsLoader.php:126
 msgctxt "year short"
 msgid "y"
 msgstr "y"
