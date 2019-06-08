@@ -38,12 +38,6 @@
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
 		<replace file="frontends/php/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
-
-		<!-- Set RW acces to the assets -->
-		<exec executable="chmod">
-			<arg line="g+w"/>
-			<arg line="frontends/php/assets"/>
-		</exec>
 	</target>
 
 	<target name="make-dbschema">
