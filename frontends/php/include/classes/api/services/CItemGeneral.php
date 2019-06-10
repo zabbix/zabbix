@@ -2144,14 +2144,17 @@ abstract class CItemGeneral extends CApiService {
 			],
 			'authtype' => [
 				'type' => API_INT32,
-				'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM])
+				'in' => implode(',', [
+					HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS
+				])
 			]
 		];
 
 		$data = $item + $db_item;
 
 		if (array_key_exists('authtype', $data)
-				&& ($data['authtype'] == HTTPTEST_AUTH_BASIC || $data['authtype'] == HTTPTEST_AUTH_NTLM)) {
+				&& ($data['authtype'] == HTTPTEST_AUTH_BASIC || $data['authtype'] == HTTPTEST_AUTH_NTLM
+					|| $data['authtype'] == HTTPTEST_AUTH_KERBEROS)) {
 			$rules += [
 				'username' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 				'password' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')]

@@ -94,6 +94,13 @@ class testFormWeb extends CLegacyWebTest {
 			],
 			[
 				[
+					'agent' => 'other ...',
+					'authentication' => 'Kerberos',
+					'host' => 'Simple form test host'
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'None',
@@ -341,7 +348,7 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('authentication'));
 
 		$this->zbxTestTextPresent('Authentication');
-		$this->zbxTestDropdownHasOptions('authentication', ['None',	'Basic', 'NTLM']);
+		$this->zbxTestDropdownHasOptions('authentication', ['None',	'Basic', 'NTLM', 'Kerberos']);
 
 		if (isset($data['authentication'])) {
 			$this->zbxTestDropdownSelect('authentication', $data['authentication']);
@@ -1389,6 +1396,28 @@ class testFormWeb extends CLegacyWebTest {
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Kerberos empty fields',
+					'authentication' => 'Kerberos',
+					'add_step' => [
+						['step' => 'Kerberos1']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Kerberos user-password',
+					'authentication' => 'Kerberos',
+					'http_user' => 'k_user',
+					'http_password' => 'zabbix_k2',
+					'add_step' => [
+						['step' => 'Kerberos2']
+					]
 				]
 			]
 		];
