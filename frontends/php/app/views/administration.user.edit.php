@@ -524,7 +524,7 @@ if ($data['userid'] != 0) {
 	}
 
 	$tabs->setFooter(makeFormFooter(
-		(new CSubmitButton(_('Update'), 'action', $data['is_profile'] ? 'profile.update' : 'user.update'))
+		(new CSubmitButton(_('Update'), 'action', $data['is_profile'] ? 'userprofile.update' : 'user.update'))
 			->setId('update'),
 		$buttons
 	));

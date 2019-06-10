@@ -707,7 +707,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'zabbix.php?action=profile.edit',
+				'url' => 'zabbix.php?action=userprofile.edit',
 				'title' =>	'User profile',
 				'header' => 'User profile: ',
 				'users' => [
@@ -744,7 +744,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			if ($user && !array_key_exists('no_permissions_to_object', $data)) {
 				$this->zbxTestOpen($data['url']);
 				$this->zbxTestCheckTitle($data['title']);
-				if ($data['url'] === 'zabbix.php?action=profile.edit') {
+				if ($data['url'] === 'zabbix.php?action=userprofile.edit') {
 					$this->zbxTestCheckHeader($data['header'].$alias);
 				}
 				else {

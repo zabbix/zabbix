@@ -29,7 +29,7 @@ class CControllerUserUpdate extends CController {
 
 		$supported_locales = array_keys(getLocales());
 
-		$this->is_profile = ($this->getAction() === 'profile.update') ? true : false;
+		$this->is_profile = ($this->getAction() === 'userprofile.update') ? true : false;
 
 		$fields = [
 			'userid' =>				'fatal|required|db users.userid',
@@ -94,7 +94,7 @@ class CControllerUserUpdate extends CController {
 				case self::VALIDATION_ERROR:
 				case self::VALIDATION_OK:
 					$response = new CControllerResponseRedirect('zabbix.php?action='.
-						($this->is_profile ? 'profile.edit' : 'user.edit')
+						($this->is_profile ? 'userprofile.edit' : 'user.edit')
 					);
 					$response->setFormData($this->getInputAll());
 					$response->setMessageError(_('Cannot update user'));
@@ -182,7 +182,7 @@ class CControllerUserUpdate extends CController {
 		}
 		else {
 			$response = new CControllerResponseRedirect('zabbix.php?action='.
-				($this->is_profile ? 'profile.edit' : 'user.edit')
+				($this->is_profile ? 'userprofile.edit' : 'user.edit')
 			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update user'));

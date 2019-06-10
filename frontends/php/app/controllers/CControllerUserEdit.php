@@ -34,7 +34,7 @@ class CControllerUserEdit extends CController {
 
 		$supported_locales = array_keys(getLocales());
 
-		$this->is_profile = ($this->getAction() === 'profile.edit') ? true : false;
+		$this->is_profile = ($this->getAction() === 'userprofile.edit') ? true : false;
 
 		$fields = [
 			'userid' =>				'db users.userid',

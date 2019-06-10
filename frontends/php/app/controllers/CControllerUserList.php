@@ -63,13 +63,13 @@ class CControllerUserList extends CController {
 		CProfile::update('web.users.php.sort', $sortfield, PROFILE_TYPE_STR);
 		CProfile::update('web.users.php.sortorder', $sortorder, PROFILE_TYPE_STR);
 
-		if (hasRequest('filter_set')) {
+		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.user.filter_alias', $this->getInput('filter_alias', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.user.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.user.filter_surname', $this->getInput('filter_surname', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.user.filter_type', $this->getInput('filter_type', -1), PROFILE_TYPE_INT);
 		}
-		elseif (hasRequest('filter_rst')) {
+		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.user.filter_alias');
 			CProfile::delete('web.user.filter_name');
 			CProfile::delete('web.user.filter_surname');
