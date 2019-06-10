@@ -152,7 +152,7 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 	$userGroupTable->addRow([
 		new CCheckBox('group_groupid['.$userGroupId.']', $userGroupId),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		[new CLink(_('Users'), 'zabbix.php?action=user.list?filter_usrgrpid='.$userGroupId),
+		[new CLink(_('Users'), 'zabbix.php?action=user.list&filter_usrgrpid='.$userGroupId),
 			CViewHelper::showNum(count($usrgrp['users']))
 		],
 		$users,
