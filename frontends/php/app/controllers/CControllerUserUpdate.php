@@ -186,7 +186,7 @@ class CControllerUserUpdate extends CController {
 				($this->is_profile ? 'profile.edit' : 'user.edit')
 			);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot updated user'));
+			$response->setMessageError(_('Cannot update user'));
 		}
 		$this->setResponse($response);
 	}
