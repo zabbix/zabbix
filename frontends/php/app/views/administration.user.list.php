@@ -23,8 +23,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('user');
 }
 
-$user_group_combobox = (new CComboBox('filter_usrgrpid', getRequest('filter_usrgrpid', 0), 'submit()'))
-	->addItem(0, _('All'));
+$user_group_combobox = (new CComboBox('filter_usrgrpid', $data['filter_usrgrpid'], 'submit()'))->addItem(0, _('All'));
 
 foreach ($data['userGroups'] as $user_group) {
 	$user_group_combobox->addItem($user_group['usrgrpid'], $user_group['name']);

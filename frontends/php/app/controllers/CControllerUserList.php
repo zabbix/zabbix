@@ -95,7 +95,8 @@ class CControllerUserList extends CController {
 			'active_tab' => CProfile::get('web.user.filter.active', 1),
 			'userGroups' => API::UserGroup()->get([
 				'output' => ['name']
-			])
+			]),
+			'filter_usrgrpid' => $filter_usrgrpid
 		];
 
 		order_result($data['userGroups'], 'name');
