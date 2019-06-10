@@ -20,6 +20,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-15952] fixed errors when trying to create a graph widget for key system.cpu.util[,iowait] with Y axis placed on the left side of the graph (vasilijs)
 ...G...PS. [ZBX-15899] added output sanitization to prevent invalid UTF-8 sequences in regexp-based text replacement (Andris)
 ..F....... [ZBX-16073] fixed horizontal scrolling in map (vasilijs)
 ........S. [ZBX-15943] fixed discovered hosts are not removed from table "dhosts" after removing and adding the corresponding discovery check (akozlovs)
@@ -450,6 +451,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-15952] fixed errors when trying to create a graph widget for key system.cpu.util[,iowait] with Y axis placed on the left side of the graph (vasilijs)
 ...G...PS. [ZBX-15899] added output sanitization to prevent invalid UTF-8 sequences in regexp-based text replacement (Andris)
 ..F....... [ZBX-16073] fixed horizontal scrolling in map (vasilijs)
 ........S. [ZBX-15943] fixed discovered hosts are not removed from table "dhosts" after removing and adding the corresponding discovery check (akozlovs)
