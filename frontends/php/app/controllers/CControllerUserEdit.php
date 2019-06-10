@@ -274,8 +274,9 @@ class CControllerUserEdit extends CController {
 						dbConditionInt('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
 				);
 				while ($db_media_type = DBfetch($db_media_types)) {
-					$media_type_descriptions[$db_media_type['mediatypeid']]['description'] = $db_media_type['description'];
-					$media_type_descriptions[$db_media_type['mediatypeid']]['mediatype'] = $db_media_type['type'];
+					$mediatypeid = $db_media_type['mediatypeid'];
+					$media_type_descriptions[$mediatypeid]['description'] = $db_media_type['description'];
+					$media_type_descriptions[$mediatypeid]['mediatype'] = $db_media_type['type'];
 				}
 
 				foreach ($data['user_medias'] as &$media) {
