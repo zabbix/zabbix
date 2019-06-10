@@ -266,3 +266,4 @@ class CImageHelper {
 		return $result;
 	}
 }
+
