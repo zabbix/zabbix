@@ -31,7 +31,6 @@ class CControllerUserUpdate extends CController {
 
 		$this->is_profile = ($this->getAction() === 'profile.update') ? true : false;
 
-		// shite
 		$fields = [
 			'userid' =>				'fatal|required|db users.userid',
 			'password1' =>			'db users.passwd',
