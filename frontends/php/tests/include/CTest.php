@@ -224,7 +224,6 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 		// Clear contents of error log.
 		@file_put_contents(PHPUNIT_ERROR_LOG, '');
-		chmod(PHPUNIT_ERROR_LOG, 0666);
 
 		if (!isset($DB['DB'])) {
 			DBconnect($error);
