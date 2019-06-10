@@ -298,22 +298,7 @@ class CControllerUserEdit extends CController {
 		}
 
 		if ($this->is_profile) {
-			// set messages
-			$data['messages'] = $this->getInput('messages', []);
-			if (!array_key_exists('enabled', $data['messages'])) {
-				$data['messages']['enabled'] = 0;
-			}
-			if (!array_key_exists('sounds.recovery', $data['messages'])) {
-				$data['messages']['sounds.recovery'] = 'alarm_ok.wav';
-			}
-			if (!array_key_exists('triggers.recovery', $data['messages'])) {
-				$data['messages']['triggers.recovery'] = 0;
-			}
-			if (!array_key_exists('triggers.severities', $data['messages'])) {
-				$data['messages']['triggers.severities'] = [];
-			}
-
-			$data['messages'] = array_merge($messages, $data['messages']);
+			$data['messages'] = array_merge($messages, $this->getInput('messages', []));
 		}
 		else {
 			$data['groups'] = API::UserGroup()->get([
