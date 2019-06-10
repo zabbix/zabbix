@@ -70,8 +70,18 @@ class testPageMaps extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickLinkText($name);
 
+		$element = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
+				->waitUntilPresent()->one();
+		$this->assertScreenshotExcept($element, [
+			'query'	=> 'class:map-timestamp',
+			'color'	=> '#ffffff'
+		], 'view_'.$sysmapid);
+
 		$this->zbxTestContentControlButtonClickTextWait('Edit map');
 		$this->zbxTestCheckHeader('Network maps');
+
+		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$sysmapid);
+
 		$this->zbxTestClickWait('sysmap_update');
 		$this->zbxTestAcceptAlert();
 
