@@ -2161,7 +2161,6 @@ int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, c
 	zbx_vmware_datastore_t	*datastore = NULL;
 	int			i, ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t		latency = 0, counterid;
-
 	unsigned char		is_maxlatency = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
