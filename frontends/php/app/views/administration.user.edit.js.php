@@ -34,7 +34,7 @@
 			$autologout_txt.prop('disabled', !this.checked);
 		});
 
-		$('#user_form').submit(function() {
+		$('form[name="user_form"]').submit(function() {
 			var fields_to_trim = ['#password1', '#password2', '#url', '#refresh'];
 
 			if (!is_profile) {

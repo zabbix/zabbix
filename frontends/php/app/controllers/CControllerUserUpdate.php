@@ -83,7 +83,9 @@ class CControllerUserUpdate extends CController {
 				error(_('Cannot update user. Both passwords must be equal.'));
 				$ret = false;
 			}
-			elseif ($password1 !== null && CWebUser::$data['alias'] != ZBX_GUEST_USER && zbx_empty($password1)) {
+
+			if ($this->is_profile && $password1 !== null && CWebUser::$data['alias'] != ZBX_GUEST_USER
+					&& $password1 === '') {
 				error(_s('Incorrect value for field "%1$s": cannot be empty.', 'passwd'));
 				$ret = false;
 			}
@@ -140,10 +142,13 @@ class CControllerUserUpdate extends CController {
 
 		if (!$this->is_profile) {
 			$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
-			$user['type'] = $this->getInput('user_type');
+
+			if (bccomp(CWebUser::$data['userid'], $this->getInput('userid')) != 0) {
+				$user['type'] = $this->getInput('user_type');
+			}
 		}
 
-		if ($this->getInput('password1', '') !== '') {
+		if (trim($this->getInput('password1', '')) !== '') {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
