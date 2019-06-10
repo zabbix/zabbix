@@ -17,7 +17,8 @@
 	jQuery(function($) {
 		var $autologin_cbx = $('#autologin'),
 			$autologout_cbx = $('#autologout_visible'),
-			$autologout_txt = $('#autologout');
+			$autologout_txt = $('#autologout'),
+			is_profile = <?= $this->data['is_profile'] ?>;
 
 		$autologin_cbx.on('click', function() {
 			if (this.checked) {
@@ -34,24 +35,21 @@
 		});
 
 		$('#user_form').submit(function() {
-			var fields_to_trim = [
-				'#password1', '#password2', '#url', '#refresh'
-			];
-			<?php if (!$this->data['is_profile']): ?>
+			var fields_to_trim = ['#password1', '#password2', '#url', '#refresh'];
+
+			if (!is_profile) {
 				fields_to_trim.push('#alias', '#name', '#surname');
-			<?php endif ?>
+			}
 
 			$(this).trimValues(fields_to_trim);
 		});
 
-		<?php if ($this->data['is_profile']): ?>
+		if (is_profile) {
 			$('#messages_enabled').on('change', function() {
-				console.log($('input, button, select', $('#messagingTab')));
-
 				$('input, button, select', $('#messagingTab'))
 					.not('[name="messages[enabled]"]')
 					.prop('disabled', !this.checked);
 			}).trigger('change');
-		<?php endif ?>
+		}
 	});
 </script>
