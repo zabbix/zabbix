@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -444,7 +443,10 @@ elseif (isset($_REQUEST['form'])) {
 		];
 
 		if ($data['parent_discoveryid'] === null) {
-			$options['selectDiscoveryRule'] = ['itemid', 'name'];
+			$options += [
+				'selectDiscoveryRule'	=> ['itemid', 'name'],
+				'selectGraphDiscovery'	=> ['parent_graphid']
+			];
 			$graph = API::Graph()->get($options);
 		}
 		else {
@@ -475,6 +477,7 @@ elseif (isset($_REQUEST['form'])) {
 		if ($data['parent_discoveryid'] === null) {
 			$data['flags'] = $graph['flags'];
 			$data['discoveryRule'] = $graph['discoveryRule'];
+			$data['graphDiscovery'] = $graph['graphDiscovery'];
 		}
 
 		// if no host has been selected for the navigation panel, use the first graph host

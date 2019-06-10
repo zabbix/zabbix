@@ -233,7 +233,7 @@ public static function getFilterByTagsData() {
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Check filtered result.
-		$this->checkTableDataColumn(CTestArrayHelper::get($data, 'expected_templates', []));
+		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected_templates', []));
 
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();

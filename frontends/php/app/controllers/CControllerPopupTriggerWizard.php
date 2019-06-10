@@ -100,7 +100,14 @@ class CControllerPopupTriggerWizard extends CController {
 			'item_name' => ''
 		];
 
-		$exprs = $this->getInput('expressions', []);
+		$input = $this->getInput('expressions', []);
+		$exprs = [];
+
+		while ($input) {
+			// Merge array with 'value' and array with 'type' into single array with both attributes.
+			$exprs[] = array_shift($input) + array_shift($input);
+		}
+
 		$constructor = new CTextTriggerConstructor(new CTriggerExpression());
 
 		if ($this->hasInput('triggerid')) {

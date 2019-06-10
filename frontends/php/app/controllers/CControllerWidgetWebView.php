@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
-
 class CControllerWidgetWebView extends CControllerWidget {
 
 	public function __construct() {

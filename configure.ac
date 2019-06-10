@@ -1721,7 +1721,7 @@ AC_SUBST(LDAP_CPPFLAGS)
 
 found_curl="no"
 dnl Checking for libCurl [by default - skip]
-LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
+LIBCURL_CHECK_CONFIG(, [7.20.0], [],[])
 if test "x$want_curl" = "xyes"; then
 	if test "x$found_curl" != "xyes"; then
 		AC_MSG_ERROR([Curl library not found])
@@ -1737,6 +1737,8 @@ SERVER_LIBS="$SERVER_LIBS $LIBCURL_LIBS"
 
 PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBCURL_LDFLAGS"
 PROXY_LIBS="$PROXY_LIBS $LIBCURL_LIBS"
+
+AM_CONDITIONAL(HAVE_LIBCURL, test "x$found_curl" = "xyes")
 
 dnl Starting from 2.0 agent can do web monitoring
 AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"

@@ -214,24 +214,35 @@ foreach ($data['hosts'] as $host) {
 			->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER;
 	}
+	elseif ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		// Discovered host which does not contain info about parent discovery rule is inaccessible for current user.
+		$description[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
+		$description[] = NAME_DELIMITER;
+	}
 
 	$description[] = new CLink(CHtml::encode($host['name']),
 		'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid')
 	);
 
+	$maintenance_icon = false;
 	$hostInterface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 	$hostInterface .= empty($interface['port']) ? '' : NAME_DELIMITER.$interface['port'];
 
 	if ($host['status'] == HOST_STATUS_MONITORED) {
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-			$statusCaption = _('In maintenance');
-			$statusClass = ZBX_STYLE_ORANGE;
-		}
-		else {
-			$statusCaption = _('Enabled');
-			$statusClass = ZBX_STYLE_GREEN;
+			if (array_key_exists($host['maintenanceid'], $data['maintenances'])) {
+				$maintenance = $data['maintenances'][$host['maintenanceid']];
+				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+					$maintenance['description']
+				);
+			}
+			else {
+				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], _('Inaccessible maintenance'), '');
+			}
 		}
 
+		$statusCaption = _('Enabled');
+		$statusClass = ZBX_STYLE_GREEN;
 		$confirm_message = _('Disable host?');
 		$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massdisable'.url_param('groupid');
 	}
@@ -247,6 +258,13 @@ foreach ($data['hosts'] as $host) {
 		->addClass($statusClass)
 		->addConfirmation($confirm_message)
 		->addSID();
+
+	if ($maintenance_icon) {
+		$status = [$maintenance_icon, $status];
+	}
+	elseif (count($data['maintenances'])) {
+		$status->addClass(ZBX_STYLE_ICON_NONE);
+	}
 
 	order_result($host['parentTemplates'], 'name');
 

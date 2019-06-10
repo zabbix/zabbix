@@ -104,13 +104,13 @@ class testInheritanceWeb extends CLegacyWebTest {
 
 		$this->zbxTestClick('tab_stepTab');
 		foreach ($data['addStep'] as $step) {
-			$this->zbxTestClick('add_step');
+			$this->zbxTestClickXpathWait('//td[@colspan="8"]/button[contains(@class, "element-table-add")]');
 			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="step_name"]', $step['name']);
 			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $step['url']);
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 			$this->zbxTestTextNotPresent('Page received incorrect data');
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name_0'));
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//a[contains(@href,"javascript:httpconf.steps.open")]'));
 			$this->zbxTestTextPresent($step['name']);
 		}
 
