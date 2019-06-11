@@ -6795,22 +6795,22 @@ table.preprocessing-test-results {
 .hosts-avail {
 	&-true {
 		color: darken($font-color, 100%);
-		background: $host-available-true-bg-color;
+		background: $hosts-avail-true-bg-color;
 	}
 
 	&-false {
 		color: darken($font-color, 100%);
-		background: $host-available-false-bg-color;
+		background: $hosts-avail-false-bg-color;
 	}
 
 	&-unknown {
 		color: darken($font-color, 100%);
-		background: $host-available-unknown-bg-color;
+		background: $hosts-avail-unknown-bg-color;
 	}
 
 	&-total {
 		color: $font-color;
-		background: $host-available-total-bg-color;
+		background: $hosts-avail-total-bg-color;
 	}
 }
 

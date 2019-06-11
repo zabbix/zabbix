@@ -132,7 +132,7 @@ $ok-unack-fg-color: #009900 !default;
 $ok-ack-fg-color: #009900 !default;
 
 // HOST STATUS
-$host-available-true-bg-color: $alt-light-green !default;
-$host-available-false-bg-color: $alt-red !default;
-$host-available-unknown-bg-color: $alt-blue-grey !default;
-$host-available-total-bg-color: $transparent !default;
+$hosts-avail-true-bg-color: $alt-light-green !default;
+$hosts-avail-false-bg-color: $alt-red !default;
+$hosts-avail-unknown-bg-color: $alt-blue-grey !default;
+$hosts-avail-total-bg-color: $transparent !default;
