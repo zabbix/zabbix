@@ -146,22 +146,32 @@ class CHistoryManager {
 
 		if ($limit == 1) {
 			foreach ($items as $item) {
-				$values = DBfetchArray(DBselect(
-					'SELECT *'.
-					' FROM '.self::getTableName($item['value_type']).' h'.
-					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-						' AND h.clock=('.
-							'SELECT MAX(h2.clock)'.
-							' FROM '.self::getTableName($item['value_type']).' h2'.
-							' WHERE h2.itemid='.zbx_dbstr($item['itemid']).
-								($period ? ' AND h2.clock>'.$period : '').
-						')'.
-					' ORDER BY h.ns DESC',
-					$limit
-				));
+				// Executing two subsequent queries individually for the sake of performance.
 
-				if ($values) {
-					$results[$item['itemid']] = $values;
+				$clock_max = DBfetch(DBselect(
+					'SELECT MAX(h.clock)' .
+					' FROM ' . self::getTableName($item['value_type']) . ' h' .
+					' WHERE h.itemid=' . zbx_dbstr($item['itemid']) .
+						($period ? ' AND h.clock>' . $period : '')
+				), false);
+
+				if ($clock_max) {
+					$clock_max = reset($clock_max);
+
+					if ($clock_max !== null) {
+						$values = DBfetchArray(DBselect(
+							'SELECT *'.
+							' FROM ' . self::getTableName($item['value_type']) . ' h' .
+							' WHERE h.itemid=' . zbx_dbstr($item['itemid']) .
+								' AND h.clock=' . zbx_dbstr($clock_max) .
+							' ORDER BY h.ns DESC',
+							$limit
+						));
+
+						if ($values) {
+							$results[$item['itemid']] = $values;
+						}
+					}
 				}
 			}
 		}
