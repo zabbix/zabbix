@@ -32,6 +32,11 @@
 #define ZBX_VMWARE_DATASTORE_SIZE_PFREE		2
 #define ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED	3
 
+#define ZBX_DATASTORE_TOTAL			""
+#define ZBX_DATASTORE_COUNTER_CAPACITY		0x01
+#define ZBX_DATASTORE_COUNTER_USED		0x02
+#define ZBX_DATASTORE_COUNTER_PROVISIONED	0x04
+
 static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_OK;
@@ -1699,50 +1704,45 @@ static int	check_vcenter_hv_datastore_size_vsphere(int mode, const zbx_vmware_da
 	return SYSINFO_RET_OK;
 }
 
-static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const char *name, const char *param,
-		const char *username, const char *password, AGENT_RESULT *result)
+static int	check_vcenter_ds_param(const char *param, int *mode, unsigned int *flags)
 {
-
-#define		ZBX_DATASTORE_TOTAL			""
-#define		ZBX_DATASTORE_COUNTER_CAPACITY		0x01
-#define		ZBX_DATASTORE_COUNTER_USED		0x02
-#define		ZBX_DATASTORE_COUNTER_PROVISIONED	0x04
-
-	zbx_vmware_service_t	*service;
-	zbx_vmware_hv_t		*hv;
-	int			i, ret = SYSINFO_RET_FAIL, mode;
-	zbx_vmware_datastore_t	*datastore = NULL;
-	zbx_uint64_t		disk_used, disk_provisioned, disk_capacity;
-	unsigned int		flags;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == param || '\0' == *param || 0 == strcmp(param, "total"))
 	{
-		mode = ZBX_VMWARE_DATASTORE_SIZE_TOTAL;
-		flags = ZBX_DATASTORE_COUNTER_CAPACITY;
+		*mode = ZBX_VMWARE_DATASTORE_SIZE_TOTAL;
+		*flags = ZBX_DATASTORE_COUNTER_CAPACITY;
 	}
 	else if (0 == strcmp(param, "free"))
 	{
-		mode = ZBX_VMWARE_DATASTORE_SIZE_FREE;
-		flags = ZBX_DATASTORE_COUNTER_CAPACITY | ZBX_DATASTORE_COUNTER_USED;
+		*mode = ZBX_VMWARE_DATASTORE_SIZE_FREE;
+		*flags = ZBX_DATASTORE_COUNTER_CAPACITY | ZBX_DATASTORE_COUNTER_USED;
 	}
 	else if (0 == strcmp(param, "pfree"))
 	{
-		mode = ZBX_VMWARE_DATASTORE_SIZE_PFREE;
-		flags = ZBX_DATASTORE_COUNTER_CAPACITY | ZBX_DATASTORE_COUNTER_USED;
+		*mode = ZBX_VMWARE_DATASTORE_SIZE_PFREE;
+		*flags = ZBX_DATASTORE_COUNTER_CAPACITY | ZBX_DATASTORE_COUNTER_USED;
 	}
 	else if (0 == strcmp(param, "uncommitted"))
 	{
-		mode = ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED;
-		flags = ZBX_DATASTORE_COUNTER_PROVISIONED | ZBX_DATASTORE_COUNTER_USED;
+		*mode = ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED;
+		*flags = ZBX_DATASTORE_COUNTER_PROVISIONED | ZBX_DATASTORE_COUNTER_USED;
 	}
 	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, NULL != hv_uuid? "Invalid fourth parameter." :
-				"Invalid third parameter."));
-		goto out;
-	}
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const char *name, const int mode,
+		const unsigned int flags, const char *username, const char *password, AGENT_RESULT *result)
+{
+	zbx_vmware_service_t	*service;
+	zbx_vmware_hv_t		*hv;
+	int			i, ret = SYSINFO_RET_FAIL;
+	zbx_vmware_datastore_t	*datastore = NULL;
+	zbx_uint64_t		disk_used, disk_provisioned, disk_capacity;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vmware_lock();
 
@@ -1852,22 +1852,18 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
-
-#undef	ZBX_DATASTORE_COUNTER_PROVISIONED
-#undef	ZBX_DATASTORE_COUNTER_USED
-#undef	ZBX_DATASTORE_COUNTER_CAPACITY
-#undef	ZBX_DATASTORE_TOTAL
 }
 
 int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char	*url, *uuid, *name, *param;
-	int	ret = SYSINFO_RET_FAIL;
+	char		*url, *uuid, *name, *param;
+	int		ret = SYSINFO_RET_FAIL, mode;
+	unsigned int	flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1881,7 +1877,11 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 	uuid = get_rparam(request, 1);
 	name = get_rparam(request, 2);
 	param = get_rparam(request, 3);
-	ret = check_vcenter_ds_size(url, uuid, name, param, username, password, result);
+
+	if (SUCCEED == check_vcenter_ds_param(param, &mode, &flags))
+		ret = check_vcenter_ds_size(url, uuid, name, mode, flags, username, password, result);
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
@@ -2082,8 +2082,9 @@ out:
 int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char	*url, *name, *param;
-	int	ret = SYSINFO_RET_FAIL;
+	char		*url, *name, *param;
+	int		ret = SYSINFO_RET_FAIL, mode;
+	unsigned int	flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2096,7 +2097,11 @@ int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, c
 	url = get_rparam(request, 0);
 	name = get_rparam(request, 1);
 	param = get_rparam(request, 2);
-	ret = check_vcenter_ds_size(url, NULL, name, param, username, password, result);
+
+	if (SUCCEED == check_vcenter_ds_param(param, &mode, &flags))
+		ret = check_vcenter_ds_size(url, NULL, name, mode, flags, username, password, result);
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
