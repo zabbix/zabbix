@@ -123,6 +123,7 @@ class CRouter {
 		'widget.trigover.view'			=> ['CControllerWidgetTrigOverView',		'layout.widget',		'monitoring.widget.trigover.view'],
 		'widget.url.view'				=> ['CControllerWidgetUrlView',				'layout.widget',		'monitoring.widget.url.view'],
 		'widget.plaintext.view'			=> ['CControllerWidgetPlainTextView',		'layout.widget',		'monitoring.widget.plaintext.view'],
+		'widget.hostsavail.view'		=> ['CControllerWidgetHostsAvailView',		'layout.widget',		'monitoring.widget.hostsavail.view'],
 		'popup.generic'					=> ['CControllerPopupGeneric',				'layout.json',			'popup.generic'],
 		'popup.httpstep'				=> ['CControllerPopupHttpStep',				'layout.json',			'popup.httpstep'],
 		'popup.media'					=> ['CControllerPopupMedia',				'layout.json',			'popup.media'],

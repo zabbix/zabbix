@@ -6792,6 +6792,28 @@ table.preprocessing-test-results {
 	}
 }
 
+.hosts-avail {
+	&-true {
+		color: darken($font-color, 100%);
+		background: $host-available-true-bg-color;
+	}
+
+	&-false {
+		color: darken($font-color, 100%);
+		background: $host-available-false-bg-color;
+	}
+
+	&-unknown {
+		color: darken($font-color, 100%);
+		background: $host-available-unknown-bg-color;
+	}
+
+	&-total {
+		color: $font-color;
+		background: $host-available-total-bg-color;
+	}
+}
+
 @if $theme_name == 'dev' {
 
 /*doc
