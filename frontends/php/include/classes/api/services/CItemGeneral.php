@@ -1982,11 +1982,10 @@ abstract class CItemGeneral extends CApiService {
 				}
 				else {
 					$error = reset($errors);
-					self::exception(ZBX_API_ERROR_PARAMETERS, str_replace('"', "'",
-						_s('Invalid parameter "%1$s": %2$s.', 'posts',
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'posts',
 						_s('%1$s [Line: %2$s | Column: %3$s]', '('.$error->code.') '.trim($error->message),
 						$error->line, $error->column
-					))));
+					)));
 				}
 			}
 
