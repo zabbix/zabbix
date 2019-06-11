@@ -2865,6 +2865,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	for (i = 0; i < datastores.values_num; i++)
 	{
+		zbx_vmware_datastore_t *ds;
 		zbx_vmware_datastore_t ds_cmp;
 
 		ds_cmp.id = datastores.values[i];
@@ -2876,7 +2877,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 			continue;
 		}
 
-		zbx_vmware_datastore_t *ds = dss->values[j];
+		ds = dss->values[j];
 		zbx_vector_str_append(&ds->hv_uuids, zbx_strdup(NULL, hv->uuid));
 		zbx_vector_str_append(&hv->ds_ids, zbx_strdup(NULL, ds->id));
 	}
