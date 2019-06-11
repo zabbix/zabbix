@@ -21,48 +21,77 @@
 (function($) {
 	"use strict"
 
-	function makeWidgetDiv(data, widget) {
-		widget['content_header'] = $('<div>')
-			.addClass('dashbrd-grid-widget-head')
-			.append($('<h4>').text(
+	function makeWidgetDiv($obj, data, widget) {
+		widget['content_header'] = $('<div>', {'class': 'dashbrd-grid-widget-head'}).append(
+			$('<h4>').text(
 				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
-			));
-		widget['content_body'] = $('<div>').addClass('dashbrd-grid-widget-content');
+			))
+			.append(
+				$('<ul>', {'class': 'dashbrd-grid-widget-actions'}).append(
+					$('<li>').append(
+						$('<button>', {
+							'type': 'button',
+							'class': 'btn-widget-edit',
+							'title': t('Edit')
+						}).on('click', function() {
+							if (!methods.isEditMode.call($obj)) {
+								showEditMode();
+							}
+							doAction('beforeConfigLoad', $obj, data, widget);
+							methods.editWidget.call($obj, widget, this);
+						})
+					))
+				.append(
+					$('<li>').append(
+						$('<button>', {
+							'type': 'button',
+							'class': 'btn-widget-action',
+							'title': t('Adjust widget refresh interval'),
+							'data-menu-popup': JSON.stringify({
+								'type': 'refresh',
+								'data': {
+									'widgetName': widget['widgetid'],
+									'currentRate': widget['rf_rate'],
+									'multiplier': '0'
+								}
+							}),
+							'attr': {
+								'aria-haspopup': true
+							}
+						})
+					))
+				.append(
+					$('<li>').hide().append(
+						$('<button>', {
+							'type': 'button',
+							'class': 'btn-widget-delete',
+							'title': t('Delete')
+						}).on('click', function(){
+							methods.deleteWidget.call($obj, widget);
+						})
+					))
+			);
+		widget['content_body'] = $('<div>', {'class': 'dashbrd-grid-widget-content'});
 		widget['content_script'] = $('<div>');
-		widget['content_header'].append($('<ul>')
-			.append($('<li>')
-				.append($('<button>', {
-					'type': 'button',
-					'class': 'btn-widget-action',
-					'title': t('Adjust widget refresh interval'),
-					'data-menu-popup': JSON.stringify({
-						'type': 'refresh',
-						'data': {
-							'widgetName': widget['widgetid'],
-							'currentRate': widget['rf_rate'],
-							'multiplier': '0'
-						}
-					}),
-					'attr': {
-						'aria-haspopup': true
-					}
-				}))
-			)
-		);
+
 		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container'})
 			.append(widget['content_header'])
 			.append(widget['content_body'])
 			.append(widget['content_script']);
 
 		return $('<div>', {
-			'class': 'dashbrd-grid-widget' + (!widget['widgetid'].length ? ' new-widget' : ''),
+			'class': 'dashbrd-grid-widget',
 			'css': {
 				'min-height': '' + data['options']['widget-height'] + 'px',
 				'min-width': '' + data['options']['widget-width'] + '%'
 			}
 		})
+			.toggleClass('new-widget', !widget['widgetid'].length)
 			.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
-			.append(widget['container']);
+			.append(widget['container'])
+			.on('focusin focusout', function(event) {
+				$(this).toggleClass('dashbrd-grid-widget-focus', event.type === 'focusin')
+			});
 	}
 
 	function makeWidgetInfoBtns(btns) {
@@ -1757,30 +1786,8 @@
 	}
 
 	function setWidgetModeEdit($obj, data, widget) {
-		var	btn_edit = $('<button>')
-			.attr('type', 'button')
-			.addClass('btn-widget-edit')
-			.attr('title', t('Edit'))
-			.click(function() {
-				doAction('beforeConfigLoad', $obj, data, widget);
-				methods.editWidget.call($obj, widget, this);
-			});
-
-		var	btn_delete = $('<button>')
-			.attr('type', 'button')
-			.addClass('btn-widget-delete')
-			.attr('title', t('Delete'))
-			.click(function(){
-				methods.deleteWidget.call($obj, widget);
-			});
-
-		$('ul', widget['content_header']).hide();
-		widget['content_header'].append($('<ul>')
-			.addClass('dashbrd-widg-edit')
-			.append($('<li>').append(btn_edit))
-			.append($('<li>').append(btn_delete))
-		);
-
+		$('.btn-widget-action', widget['content_header']).parent('li').hide();
+		$('.btn-widget-delete', widget['content_header']).parent('li').show();
 		stopWidgetRefreshTimer(widget);
 		makeDraggable($obj, data, widget);
 		makeResizable($obj, data, widget);
@@ -2135,7 +2142,7 @@
 					data = $this.data('dashboardGrid');
 
 				widget['uniqueid'] = generateUniqueId($this, data);
-				widget['div'] = makeWidgetDiv(data, widget).data('widget-index', data['widgets'].length);
+				widget['div'] = makeWidgetDiv($this, data, widget).data('widget-index', data['widgets'].length);
 				updateWidgetDynamic($this, data, widget);
 
 				data['widgets'].push(widget);
