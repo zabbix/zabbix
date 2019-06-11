@@ -177,6 +177,7 @@ class CHistoryManager {
 		}
 		else {
 			foreach ($items as $item) {
+				// Cannot order by h.ns directly here due to performance issues.
 				$values = DBfetchArray(DBselect(
 					'SELECT *'.
 					' FROM '.self::getTableName($item['value_type']).' h'.
@@ -191,6 +192,10 @@ class CHistoryManager {
 					$clock = $values[$count - 1]['clock'];
 
 					if ($count == $limit + 1 && $values[$count - 2]['clock'] == $clock) {
+						/* The last selected entries having the same clock means the selection (not just the order)
+						 * of the last entries is possibly wrong due to unordered by nanoseconds.
+						 */
+
 						do {
 							unset($values[--$count]);
 						} while ($values && $values[$count - 1]['clock'] == $clock);
