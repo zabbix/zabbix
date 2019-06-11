@@ -1490,7 +1490,7 @@ void	zbx_variant_set_str(zbx_variant_t *value, char *text);
 void	zbx_variant_set_dbl(zbx_variant_t *value, double dbl);
 void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t ui64);
 void	zbx_variant_set_bin(zbx_variant_t *value, void *value_bin);
-void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source);
+void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source);
 int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text);
 
 int	zbx_variant_convert(zbx_variant_t *value, int type);

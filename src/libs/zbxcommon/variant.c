@@ -68,6 +68,18 @@ void	zbx_variant_clear(zbx_variant_t *value)
 	value->type = ZBX_VARIANT_NONE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Setter functions that assigns passed data and sets corresponding variant   *
+ * type. Note that for complex data it means the pointer is simply copied     *
+ * instead of making a copy of the specified data.                            *
+ *                                                                            *
+ * The contents of the destination value are not freed. When setting already  *
+ * initialized variant it's safer to clear it beforehand, even if the variant *
+ * contains primitive value (numeric).                                        *
+ *                                                                            *
+ ******************************************************************************/
+
 void	zbx_variant_set_str(zbx_variant_t *value, char *text)
 {
 	value->data.str = text;
@@ -97,7 +109,20 @@ void	zbx_variant_set_bin(zbx_variant_t *value, void *value_bin)
 	value->type = ZBX_VARIANT_BIN;
 }
 
-void	zbx_variant_set_variant(zbx_variant_t *value, const zbx_variant_t *source)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_variant_copy                                                 *
+ *                                                                            *
+ * Purpose: copies variant contents from source to value                      *
+ *                                                                            *
+ * Comments: String and binary data are cloned, which is different from       *
+ *           setters where only the pointers are copied.                      *
+ *           The contents of the destination value are not freed. If copied   *
+ *           over already initialized variant it's safer to clear it          *
+ *           beforehand.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 {
 	switch (source->type)
 	{

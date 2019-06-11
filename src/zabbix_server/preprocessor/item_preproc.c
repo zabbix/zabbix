@@ -104,7 +104,7 @@ int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zb
 	{
 		case ZBX_VARIANT_DBL:
 		case ZBX_VARIANT_UI64:
-			zbx_variant_set_variant(value_num, value);
+			zbx_variant_copy(value_num, value);
 			ret = SUCCEED;
 			break;
 		case ZBX_VARIANT_STR:
@@ -318,7 +318,7 @@ static int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, co
 		return FAIL;
 
 	zbx_variant_clear(value);
-	zbx_variant_set_variant(value, &value_num);
+	zbx_variant_copy(value, &value_num);
 
 	if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == history_value->value.type)
 	{
@@ -334,7 +334,7 @@ static int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, co
 	}
 
 	history_value->timestamp = *ts;
-	zbx_variant_set_variant(&history_value->value, &value_num);
+	zbx_variant_copy(&history_value->value, &value_num);
 	zbx_variant_clear(&value_num);
 
 	if (SUCCEED != ret)
