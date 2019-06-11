@@ -535,5 +535,3 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 	/* at this point at least one of the values is string data, other can be uint64, floating or string */
 	return variant_compare_str(value1, value2);
 }
-
-
