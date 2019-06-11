@@ -289,9 +289,8 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 
 const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 {
-	static char	buffer[ZBX_MAX_UINT64_LEN + 1];
-	int		i, len;
-	zbx_uint32_t	size;
+	ZBX_THREAD_LOCAL static char	buffer[ZBX_MAX_UINT64_LEN + 1];
+	zbx_uint32_t			size, i, len;
 
 	switch (value->type)
 	{
@@ -367,7 +366,8 @@ int	zbx_validate_value_dbl(double value)
  *                                                                            *
  * Function: variant_compare_empty                                            *
  *                                                                            *
- * Purpose: compares two variant values when at least one is empty            *
+ * Purpose: compares two variant values when at least one is empty (having    *
+ *          type of ZBX_VARIANT_NONE)                                         *
  *                                                                            *
  ******************************************************************************/
 static int	variant_compare_empty(const zbx_variant_t *value1, const zbx_variant_t *value2)
@@ -428,7 +428,8 @@ static int	variant_compare_str(const zbx_variant_t *value1, const zbx_variant_t 
  * Function: variant_compare_dbl                                              *
  *                                                                            *
  * Purpose: compares two variant values when at least one is double and the   *
- *          other is double or uint64                                         *
+ *          other is double, uint64 or a string representing a valid double   *
+ *          value                                                             *
  *                                                                            *
  ******************************************************************************/
 static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t *value2)
@@ -498,22 +499,20 @@ static int	variant_compare_ui64(const zbx_variant_t *value1, const zbx_variant_t
  * Parameters: value1 - [IN] the first value                                  *
  *             value2 - [IN] the second value                                 *
  *                                                                            *
- * Return value: <0 - the first value is less than second                     *
- *               >0 - the first value is greater than second                  *
+ * Return value: <0 - the first value is less than the second                 *
+ *               >0 - the first value is greater than the second              *
  *               0  - the values are equal                                    *
  *                                                                            *
- * Comments: The following priority is applied:                               *
- *           1) value of none type is always less than other types, two       *
- *              none types are equal                                          *
+ * Comments: The following comparison logic is applied:                       *
+ *           1) value of 'none' type is always less than other types, two     *
+ *              'none' types are equal                                        *
  *           2) value of binary type is always greater than other types, two  *
  *              binary types are compared by length and then by contents      *
- *           3) if both values have uint64 types, they are compared           *
- *           4) convert both values to floating type, compare if succeeded    *
- *           2) if any of value is of string type, the other is converted to  *
+ *           3) if both values have uint64 types, they are compared as is     *
+ *           4) if both values can be converted to floating point values the  *
+ *              conversion is done and the result is compared                 *
+ *           5) if any of value is of string type, the other is converted to  *
  *              string and both are compared                                  *
- *           3) if any of value is of floating type, the other is converted   *
- *              to floating value and both are compared                       *
- *           4) only uint64 types are left, compare as uint64                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2)
