@@ -20,10 +20,10 @@
 #include "common.h"
 #include "zbxalgo.h"
 
-zbx_variant_data_bin_t	*zbx_variant_data_bin_copy(const zbx_variant_data_bin_t *bin)
+void	*zbx_variant_data_bin_copy(const void *bin)
 {
 	zbx_uint32_t		size;
-	zbx_variant_data_bin_t	*value_bin;
+	void	*value_bin;
 
 	memcpy(&size, bin, sizeof(size));
 	value_bin = zbx_malloc(NULL, size + sizeof(size));
@@ -32,9 +32,9 @@ zbx_variant_data_bin_t	*zbx_variant_data_bin_copy(const zbx_variant_data_bin_t *
 	return value_bin;
 }
 
-zbx_variant_data_bin_t	*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size)
+void	*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size)
 {
-	zbx_variant_data_bin_t	*value_bin;
+	void	*value_bin;
 
 	value_bin = zbx_malloc(NULL, size + sizeof(size));
 	memcpy(value_bin, &size, sizeof(size));
@@ -43,13 +43,13 @@ zbx_variant_data_bin_t	*zbx_variant_data_bin_create(const void *data, zbx_uint32
 	return value_bin;
 }
 
-zbx_uint32_t	zbx_variant_data_bin_get(const zbx_variant_data_bin_t *bin, void **data)
+zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data)
 {
 	zbx_uint32_t	size;
 
 	memcpy(&size, bin, sizeof(zbx_uint32_t));
 	if (NULL != data)
-		*data = ((char *)bin) + sizeof(size);
+		*data = ((unsigned char *)bin) + sizeof(size);
 	return size;
 }
 
@@ -91,7 +91,7 @@ void	zbx_variant_set_none(zbx_variant_t *value)
 	value->type = ZBX_VARIANT_NONE;
 }
 
-void	zbx_variant_set_bin(zbx_variant_t *value, zbx_variant_data_bin_t *value_bin)
+void	zbx_variant_set_bin(zbx_variant_t *value, void *value_bin)
 {
 	value->data.bin = value_bin;
 	value->type = ZBX_VARIANT_BIN;
