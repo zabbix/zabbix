@@ -192,7 +192,8 @@ class CHistoryManager {
 					$clock = $values[$count - 1]['clock'];
 
 					if ($count == $limit + 1 && $values[$count - 2]['clock'] == $clock) {
-						/* The last selected entries having the same clock means the selection (not just the order)
+						/*
+						 * The last selected entries having the same clock means the selection (not just the order)
 						 * of the last entries is possibly wrong due to unordered by nanoseconds.
 						 */
 
