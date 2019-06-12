@@ -39,7 +39,7 @@ $fields = [
 	'graphtype' =>		[T_ZBX_INT,			O_OPT, null,	IN('2,3'),			null],
 	'graph3d' =>		[T_ZBX_INT,			O_OPT, P_NZERO,	IN('0,1'),			null],
 	'legend' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null],
-	'items' =>			[T_ZBX_STR,			O_MAND, null,	null,				null],
+	'items' =>			[T_ZBX_STR,			O_OPT, null,	null,				null],
 	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {
