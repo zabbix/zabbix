@@ -106,7 +106,7 @@ typedef struct
 }
 zbx_vmware_datastore_t;
 
-int	vmware_ds_compare(const void *d1, const void *d2);
+int	vmware_ds_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datastore, zbx_vmware_datastore_t *)
 
 #define ZBX_VMWARE_DEV_TYPE_NIC		1
@@ -149,7 +149,7 @@ typedef struct
 	char			*parent_name;
 	char			*parent_type;
 	char			**props;
-	zbx_vector_str_t	ds_ids;
+	zbx_vector_str_t	ds_names;
 	zbx_vector_ptr_t	vms;
 }
 zbx_vmware_hv_t;

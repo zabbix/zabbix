@@ -900,8 +900,8 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
  ******************************************************************************/
 static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_str_clear_ext(&hv->ds_ids, vmware_shared_strfree);
-	zbx_vector_str_destroy(&hv->ds_ids);
+	zbx_vector_str_clear_ext(&hv->ds_names, vmware_shared_strfree);
+	zbx_vector_str_destroy(&hv->ds_names);
 
 	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_shared_free);
 	zbx_vector_ptr_destroy(&hv->vms);
@@ -1289,9 +1289,9 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 {
 	int	i;
 
-	VMWARE_VECTOR_CREATE(&dst->ds_ids, str);
+	VMWARE_VECTOR_CREATE(&dst->ds_names, str);
 	VMWARE_VECTOR_CREATE(&dst->vms, ptr);
-	zbx_vector_str_reserve(&dst->ds_ids, src->ds_ids.values_num);
+	zbx_vector_str_reserve(&dst->ds_names, src->ds_names.values_num);
 	zbx_vector_ptr_reserve(&dst->vms, src->vms.values_num);
 
 	dst->uuid = vmware_shared_strdup(src->uuid);
@@ -1303,8 +1303,8 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 	dst->parent_name = vmware_shared_strdup(src->parent_name);
 	dst->parent_type= vmware_shared_strdup(src->parent_type);
 
-	for (i = 0; i < src->ds_ids.values_num; i++)
-		zbx_vector_str_append(&dst->ds_ids, vmware_shared_strdup(src->ds_ids.values[i]));
+	for (i = 0; i < src->ds_names.values_num; i++)
+		zbx_vector_str_append(&dst->ds_names, vmware_shared_strdup(src->ds_names.values[i]));
 
 	for (i = 0; i < src->vms.values_num; i++)
 		zbx_vector_ptr_append(&dst->vms, vmware_vm_shared_dup((zbx_vmware_vm_t *)src->vms.values[i]));
@@ -1487,8 +1487,8 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
  ******************************************************************************/
 static void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_str_clear_ext(&hv->ds_ids, zbx_str_free);
-	zbx_vector_str_destroy(&hv->ds_ids);
+	zbx_vector_str_clear_ext(&hv->ds_names, zbx_str_free);
+	zbx_vector_str_destroy(&hv->ds_names);
 
 	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_free);
 	zbx_vector_ptr_destroy(&hv->vms);
@@ -2791,12 +2791,27 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_ds_compare                                                *
+ * Function: vmware_ds_name_compare                                           *
+ *                                                                            *
+ * Purpose: sorting function to sort Datastore vector by name                 *
+ *                                                                            *
+ ******************************************************************************/
+int	vmware_ds_name_compare(const void *d1, const void *d2)
+{
+	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t **)d1;
+	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t **)d2;
+
+	return strcmp(ds1->name, ds2->name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_ds_id_compare                                             *
  *                                                                            *
  * Purpose: sorting function to sort Datastore vector by id                   *
  *                                                                            *
  ******************************************************************************/
-int	vmware_ds_compare(const void *d1, const void *d2)
+static int	vmware_ds_id_compare(const void *d1, const void *d2)
 {
 	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t **)d1;
 	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t **)d2;
@@ -2833,7 +2848,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	memset(hv, 0, sizeof(zbx_vmware_hv_t));
 
-	zbx_vector_str_create(&hv->ds_ids);
+	zbx_vector_str_create(&hv->ds_names);
 	zbx_vector_ptr_create(&hv->vms);
 
 	zbx_vector_str_create(&datastores);
@@ -2861,7 +2876,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		goto out;
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
-	zbx_vector_str_reserve(&hv->ds_ids, datastores.values_num + hv->ds_ids.values_alloc);
+	zbx_vector_str_reserve(&hv->ds_names, datastores.values_num + hv->ds_names.values_alloc);
 
 	for (i = 0; i < datastores.values_num; i++)
 	{
@@ -2870,7 +2885,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 		ds_cmp.id = datastores.values[i];
 
-		if (FAIL == (j = zbx_vector_vmware_datastore_bsearch(dss, &ds_cmp, vmware_ds_compare)))
+		if (FAIL == (j = zbx_vector_vmware_datastore_bsearch(dss, &ds_cmp, vmware_ds_id_compare)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): for HV %s DS %s not found", __func__, hv->id,
 					datastores.values[i]);
@@ -2879,9 +2894,10 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 		ds = dss->values[j];
 		zbx_vector_str_append(&ds->hv_uuids, zbx_strdup(NULL, hv->uuid));
-		zbx_vector_str_append(&hv->ds_ids, zbx_strdup(NULL, ds->id));
+		zbx_vector_str_append(&hv->ds_names, zbx_strdup(NULL, ds->name));
 	}
 
+	zbx_vector_str_sort(&hv->ds_names, ZBX_DEFAULT_STR_COMPARE_FUNC);
 	zbx_xml_read_values(details, ZBX_XPATH_HV_VMS(), &vms);
 	zbx_vector_ptr_reserve(&hv->vms, vms.values_num + hv->vms.values_alloc);
 
@@ -4273,7 +4289,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 			zbx_vector_vmware_datastore_append(&data->datastores, datastore);
 	}
 
-	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_compare);
+	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_id_compare);
 
 	if (SUCCEED != zbx_hashset_reserve(&data->hvs, hvs.values_num))
 	{
@@ -4291,6 +4307,13 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 			zbx_hashset_insert(&data->hvs, &hv_local, sizeof(hv_local));
 		}
 	}
+
+	for (i = 0; i < data->datastores.values_num; i++)
+	{
+		zbx_vector_str_sort(&data->datastores.values[i]->hv_uuids, ZBX_DEFAULT_STR_COMPARE_FUNC);
+	}
+
+	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_name_compare);
 
 	/* skip collection of event data if we don't know where we stopped last time or item can't accept values */
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != service->eventlog.last_key && 0 == service->eventlog.skip_old &&
