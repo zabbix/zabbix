@@ -62,20 +62,15 @@ if ($fields_error & ZBX_VALID_ERROR) {
 }
 
 /*
- * Export
+ * Permissions
  */
-if (hasRequest('action') && getRequest('action') === 'valuemap.export' && hasRequest('valuemapids')) {
-	// Check accessibility of selected objects.
-
-	$valuemapids = zbx_toArray(getRequest('valuemapids'));
-	$valuemapids_accessible = API::ValueMap()->get([
-		'output' => [],
-		'valuemapids' => $valuemapids,
+if (hasRequest('valuemapid')) {
+	$valuemaps = API::ValueMap()->get([
+		'output' => ['valuemapid'],
+		'valuemapids' => [getRequest('valuemapid')]
 	]);
-	if (count($valuemapids_accessible) != count($valuemapids)) {
-		// Uncheck inaccessible rows.
-		uncheckTableRows(null, zbx_objectValues($valuemapids_accessible, 'valuemapid'));
 
+	if (!$valuemaps) {
 		// Halt on a HTML page with errors.
 
 		prepare_page_header('html');
@@ -83,8 +78,13 @@ if (hasRequest('action') && getRequest('action') === 'valuemap.export' && hasReq
 
 		access_deny();
 	}
+}
 
-	$export = new CConfigurationExport(['valueMaps' => $valuemapids]);
+/*
+ * Export
+ */
+if (hasRequest('action') && getRequest('action') === 'valuemap.export' && hasRequest('valuemapids')) {
+	$export = new CConfigurationExport(['valueMaps' => getRequest('valuemapids')]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 
@@ -115,20 +115,6 @@ if (hasRequest('action') && getRequest('action') === 'valuemap.export' && hasReq
 // Using HTML for the rest of functions.
 prepare_page_header('html');
 require_once dirname(__FILE__) . '/include/page_header.php';
-
-/*
- * Permissions
- */
-if (hasRequest('valuemapid')) {
-	$valuemaps = API::ValueMap()->get([
-		'output' => ['valuemapid'],
-		'valuemapids' => [getRequest('valuemapid')]
-	]);
-
-	if (!$valuemaps) {
-		access_deny();
-	}
-}
 
 /*
  * Actions

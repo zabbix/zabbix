@@ -86,20 +86,27 @@ if ($fields_error & ZBX_VALID_ERROR) {
 }
 
 /*
- * Export
+ * Permissions
  */
-if (hasRequest('action') && getRequest('action') === 'screen.export' && hasRequest('screens')) {
-	// Check accessibility of selected objects.
+if (hasRequest('screenid')) {
+	if (hasRequest('templateid')) {
+		$screens = API::TemplateScreen()->get([
+			'output' => ['screenid', 'name', 'hsize', 'vsize', 'templateid'],
+			'screenids' => getRequest('screenid'),
+			'editable' => true
+		]);
+	}
+	else {
+		$screens = API::Screen()->get([
+			'output' => ['screenid', 'name', 'hsize', 'vsize', 'templateid', 'userid', 'private'],
+			'selectUsers' => ['userid', 'permission'],
+			'selectUserGroups' => ['usrgrpid', 'permission'],
+			'screenids' => getRequest('screenid'),
+			'editable' => true
+		]);
+	}
 
-	$screens = zbx_toArray(getRequest('screens'));
-	$screens_accessible = API::Screen()->get([
-		'output' => [],
-		'screenids' => $screens,
-	]);
-	if (count($screens_accessible) != count($screens)) {
-		// Uncheck inaccessible rows.
-		uncheckTableRows(null, zbx_objectValues($screens_accessible, 'screenid'));
-
+	if (!$screens) {
 		// Halt on a HTML page with errors.
 
 		prepare_page_header('html');
@@ -107,6 +114,18 @@ if (hasRequest('action') && getRequest('action') === 'screen.export' && hasReque
 
 		access_deny();
 	}
+
+	$screen = reset($screens);
+}
+else {
+	$screen = [];
+}
+
+/*
+ * Export
+ */
+if (hasRequest('action') && getRequest('action') === 'screen.export' && hasRequest('screens')) {
+	$screens = getRequest('screens', []);
 
 	$export = new CConfigurationExport(['screens' => $screens]);
 	$export->setBuilder(new CConfigurationExportBuilder());
@@ -139,37 +158,6 @@ if (hasRequest('action') && getRequest('action') === 'screen.export' && hasReque
 // Using HTML for the rest of functions.
 prepare_page_header('html');
 require_once dirname(__FILE__) . '/include/page_header.php';
-
-/*
- * Permissions
- */
-if (hasRequest('screenid')) {
-	if (hasRequest('templateid')) {
-		$screens = API::TemplateScreen()->get([
-			'output' => ['screenid', 'name', 'hsize', 'vsize', 'templateid'],
-			'screenids' => getRequest('screenid'),
-			'editable' => true
-		]);
-	}
-	else {
-		$screens = API::Screen()->get([
-			'output' => ['screenid', 'name', 'hsize', 'vsize', 'templateid', 'userid', 'private'],
-			'selectUsers' => ['userid', 'permission'],
-			'selectUserGroups' => ['usrgrpid', 'permission'],
-			'screenids' => getRequest('screenid'),
-			'editable' => true
-		]);
-	}
-
-	if (!$screens) {
-		access_deny();
-	}
-
-	$screen = reset($screens);
-}
-else {
-	$screen = [];
-}
 
 /*
  * Actions
