@@ -49,7 +49,7 @@ class CWidgetConfig {
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
 			WIDGET_URL					=> _('URL'),
 			WIDGET_WEB					=> _('Web monitoring'),
-			WIDGET_HOSTS_AVAIL			=> _('Hosts availability')
+			WIDGET_HOSTS_AVAIL			=> _('Host availability')
 		];
 	}
 
