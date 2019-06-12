@@ -2698,14 +2698,16 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
  *                                             operations                     *
  *             itemdiscoveryid      - [IN/OUT] item discovery id used for     *
  *                                             insert operations              *
- *             db_insert            - [IN] prepared item bulk insert          *
+ *             db_insert_items      - [IN] prepared item bulk insert          *
  *             db_insert_idiscovery - [IN] prepared item discovery bulk       *
+ *                                         insert                             *
+ *             db_insert_irtdata    - [IN] prepared item real-time data bulk  *
  *                                         insert                             *
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prototypes, zbx_lld_item_t *item,
-		zbx_uint64_t *itemid, zbx_uint64_t *itemdiscoveryid, zbx_db_insert_t *db_insert,
-		zbx_db_insert_t *db_insert_idiscovery)
+		zbx_uint64_t *itemid, zbx_uint64_t *itemdiscoveryid, zbx_db_insert_t *db_insert_items,
+		zbx_db_insert_t *db_insert_idiscovery, zbx_db_insert_t *db_insert_irtdata)
 {
 	int	index;
 
@@ -2726,7 +2728,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
 		item->itemid = (*itemid)++;
 
-		zbx_db_insert_add_values(db_insert, item->itemid, item->name, item->key, hostid,
+		zbx_db_insert_add_values(db_insert_items, item->itemid, item->name, item->key, hostid,
 				(int)item_prototype->type, (int)item_prototype->value_type,
 				item->delay, item->history, item->trends,
 				(int)item_prototype->status, item_prototype->trapper_hosts, item->units,
@@ -2749,6 +2751,8 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, item->itemid,
 				item->parent_itemid, item_prototype->key);
+
+		zbx_db_insert_add_values(db_insert_irtdata, item->itemid);
 	}
 
 	for (index = 0; index < item->dependent_items.values_num; index++)
@@ -2757,8 +2761,8 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 		dependent = (zbx_lld_item_t *)item->dependent_items.values[index];
 		dependent->master_itemid = item->itemid;
-		lld_item_save(hostid, item_prototypes, dependent, itemid, itemdiscoveryid, db_insert,
-				db_insert_idiscovery);
+		lld_item_save(hostid, item_prototypes, dependent, itemid, itemdiscoveryid, db_insert_items,
+				db_insert_idiscovery, db_insert_irtdata);
 	}
 }
 
@@ -3181,7 +3185,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 	int			ret = SUCCEED, i, new_items = 0, upd_items = 0;
 	zbx_lld_item_t		*item;
 	zbx_uint64_t		itemid, itemdiscoveryid;
-	zbx_db_insert_t		db_insert, db_insert_idiscovery;
+	zbx_db_insert_t		db_insert_items, db_insert_idiscovery, db_insert_irtdata;
 	zbx_lld_item_index_t	item_index_local;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3222,8 +3226,8 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		itemid = DBget_maxid_num("items", new_items);
 		itemdiscoveryid = DBget_maxid_num("item_discovery", new_items);
 
-		zbx_db_insert_prepare(&db_insert, "items", "itemid", "name", "key_", "hostid", "type", "value_type",
-				"delay", "history", "trends", "status", "trapper_hosts",
+		zbx_db_insert_prepare(&db_insert_items, "items", "itemid", "name", "key_", "hostid", "type",
+				"value_type", "delay", "history", "trends", "status", "trapper_hosts",
 				"units", "formula", "logtimefmt", "valuemapid", "params",
 				"ipmi_sensor", "snmp_community", "snmp_oid", "port", "snmpv3_securityname",
 				"snmpv3_securitylevel", "snmpv3_authprotocol", "snmpv3_authpassphrase",
@@ -3236,6 +3240,8 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", NULL);
+
+		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", NULL);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -3246,8 +3252,8 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		/* saving master item */
 		if (0 == item->master_itemid)
 		{
-			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert,
-					&db_insert_idiscovery);
+			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert_items,
+					&db_insert_idiscovery, &db_insert_irtdata);
 		}
 		else
 		{
@@ -3257,8 +3263,8 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 			/* dependent item based on host item should be saved */
 			if (NULL == zbx_hashset_search(items_index, &item_index_local))
 			{
-				lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert,
-						&db_insert_idiscovery);
+				lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid,
+						&db_insert_items, &db_insert_idiscovery, &db_insert_irtdata);
 			}
 		}
 
@@ -3266,11 +3272,14 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 	if (0 != new_items)
 	{
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
+		zbx_db_insert_execute(&db_insert_items);
+		zbx_db_insert_clean(&db_insert_items);
 
 		zbx_db_insert_execute(&db_insert_idiscovery);
 		zbx_db_insert_clean(&db_insert_idiscovery);
+
+		zbx_db_insert_execute(&db_insert_irtdata);
+		zbx_db_insert_clean(&db_insert_irtdata);
 
 		zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
