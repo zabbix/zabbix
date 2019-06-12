@@ -274,7 +274,8 @@ $form_list
 			(new CComboBox($data['limited'] ? '' : 'http_authtype', $data['http_authtype'], null, [
 				HTTPTEST_AUTH_NONE => _('None'),
 				HTTPTEST_AUTH_BASIC => _('Basic'),
-				HTTPTEST_AUTH_NTLM => _('NTLM')
+				HTTPTEST_AUTH_NTLM => _('NTLM'),
+				HTTPTEST_AUTH_KERBEROS => _('Kerberos')
 			]))->setEnabled(!$data['limited'])
 		],
 		'http_authtype_row'

@@ -593,6 +593,7 @@ typedef struct
 zbx_wcache_info_t;
 
 int	is_item_processed_by_server(unsigned char type, const char *key);
+int	zbx_is_counted_in_item_queue(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
 void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,

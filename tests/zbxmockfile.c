@@ -27,6 +27,7 @@
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
+#include "zbxmockutil.h"
 
 #include "common.h"
 
@@ -34,14 +35,26 @@
 
 void	*mock_streams[ZBX_MOCK_MAX_FILES];
 
+static zbx_mock_handle_t	fragments;
+
 struct zbx_mock_IO_FILE
 {
 	const char	*contents;
 };
 
 FILE	*__wrap_fopen(const char *path, const char *mode);
-int	__wrap_fclose(FILE *stream);
+int	__wrap_fclose(FILE *fp);
 char	*__wrap_fgets(char *s, int size, FILE *stream);
+int	__wrap_connect(int socket, __CONST_SOCKADDR_ARG addr, socklen_t address_len);
+ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte);
+int	__wrap_open(const char *path, int oflag, ...);
+int	__wrap_stat(const char *path, struct stat *buf);
+int	__wrap___xstat(int ver, const char *pathname, struct stat *buf);
+int	__wrap___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
+
+int	__real_open(const char *path, int oflag, ...);
+int	__real_stat(const char *path, struct stat *buf);
+int	__real___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
 
 static int	is_profiler_path(const char *path)
 {
@@ -120,12 +133,12 @@ FILE	*__wrap_fopen(const char *path, const char *mode)
 	return (FILE *)file;
 }
 
-int	__wrap_fclose(FILE *stream)
+int	__wrap_fclose(FILE *fp)
 {
-	if (SUCCEED != is_mock_stream(stream))
-		return __real_fclose(stream);
+	if (SUCCEED != is_mock_stream(fp))
+		return __real_fclose(fp);
 
-	zbx_free(stream);
+	zbx_free(fp);
 	return 0;
 }
 
@@ -153,4 +166,129 @@ char	*__wrap_fgets(char *s, int size, FILE *stream)
 	assert_int_equal(length, zbx_snprintf(s, size, "%.*s", length, file->contents));
 	file->contents += length;
 	return s;
+}
+
+int	__wrap_connect(int socket, __CONST_SOCKADDR_ARG addr, socklen_t address_len)
+{
+	zbx_mock_error_t	error;
+
+	ZBX_UNUSED(socket);
+	ZBX_UNUSED(addr);
+	ZBX_UNUSED(address_len);
+
+	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("fragments", &fragments)))
+		fail_msg("Cannot get fragments handle: %s", zbx_mock_error_string(error));
+
+	return 0;
+}
+
+int	__wrap_open(const char *path, int oflag, ...)
+{
+	if (SUCCEED == is_profiler_path(path))
+	{
+		va_list	args;
+		int	fd;
+
+		va_start(args, oflag);
+		fd = __real_open(path, oflag, va_arg(args, int));
+		va_end(args);
+		return fd;
+	}
+
+	fragments = zbx_mock_get_parameter_handle("in.fragments");
+
+	return INT_MAX;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Comments: Note that simply wrapping read function will break any compiled  *
+ *           in tool, that would attempt to use read() function. In this case *
+ *           some safeguards must be added to implement pass-through          *
+ *           functionality like it's done with open/fxstat etc functions for  *
+ *           coverage builds.                                                 *
+ *                                                                            *
+ ******************************************************************************/
+ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte)
+{
+	static int		remaining_length;
+	static const char	*data;
+	zbx_mock_error_t	error;
+	zbx_mock_handle_t	fragment;
+	size_t			length;
+
+	ZBX_UNUSED(fildes);
+
+	if (0 == remaining_length)
+	{
+		if (ZBX_MOCK_SUCCESS != zbx_mock_vector_element(fragments, &fragment))
+			return 0;	/* no more data */
+
+		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_binary(fragment, &data, &length)))
+			fail_msg("Cannot read data '%s'", zbx_mock_error_string(error));
+	}
+	else
+		length = remaining_length;
+
+	if (nbyte < length)
+	{
+		remaining_length = length - nbyte;
+		length = nbyte;
+	}
+	else
+		remaining_length = 0;
+
+	memcpy(buf, data, length);
+
+	if (0 != remaining_length)
+		data += length;
+
+	return length;
+}
+
+int	__wrap_stat(const char *path, struct stat *buf)
+{
+	zbx_mock_error_t	error;
+	zbx_mock_handle_t	handle;
+
+	if (SUCCEED == is_profiler_path(path))
+		return __real_stat(path, buf);
+
+	if (ZBX_MOCK_SUCCESS == (error = zbx_mock_file(path, &handle)))
+	{
+		buf->st_mode = S_IFMT & S_IFREG;
+		return 0;
+	}
+
+	if (ZBX_MOCK_NO_PARAMETER != error)
+		fail_msg("Error during path \"%s\" lookup among files: %s", path, zbx_mock_error_string(error));
+
+	if (0)	/* directory lookup is not implemented */
+	{
+		buf->st_mode = S_IFMT & S_IFDIR;
+		return 0;
+	}
+
+	errno = ENOENT;	/* No such file or directory */
+	return -1;
+}
+
+int	__wrap___xstat(int ver, const char *pathname, struct stat *buf)
+{
+	ZBX_UNUSED(ver);
+
+	if (SUCCEED == is_profiler_path(pathname))
+		return __real_stat(pathname, buf);
+
+	return __wrap_stat(pathname, buf);
+}
+
+int	__wrap___fxstat(int __ver, int __fildes, struct stat *__stat_buf)
+{
+	if (__fildes != INT_MAX)
+		return __real___fxstat(__ver, __fildes, __stat_buf);
+
+	__stat_buf->st_size = zbx_mock_get_parameter_uint64("in.file_len");
+
+	return 0;
 }

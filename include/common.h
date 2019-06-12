@@ -242,7 +242,8 @@ typedef enum
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT,
 	/* the number of defined value types */
-	ITEM_VALUE_TYPE_MAX
+	ITEM_VALUE_TYPE_MAX,
+	ITEM_VALUE_TYPE_NONE,
 }
 zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
@@ -711,6 +712,8 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define PROXY_HISTORY_FLAG_META		0x01
 #define PROXY_HISTORY_FLAG_NOVALUE	0x02
 
+#define PROXY_HISTORY_MASK_NOVALUE	(PROXY_HISTORY_FLAG_META | PROXY_HISTORY_FLAG_NOVALUE)
+
 /* global correlation constants */
 #define ZBX_CORRELATION_ENABLED				0
 #define ZBX_CORRELATION_DISABLED			1
@@ -896,7 +899,8 @@ typedef enum
 {
 	HTTPTEST_AUTH_NONE = 0,
 	HTTPTEST_AUTH_BASIC,
-	HTTPTEST_AUTH_NTLM
+	HTTPTEST_AUTH_NTLM,
+	HTTPTEST_AUTH_NEGOTIATE
 }
 zbx_httptest_auth_t;
 

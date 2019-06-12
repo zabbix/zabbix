@@ -44,7 +44,7 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		if (0 == (ZBX_FLAGS_ITEM_DIFF_UPDATE_DB & diff->flags))
 			continue;
 
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update items set");
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update item_rtdata set");
 
 		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE & diff->flags))
 		{
@@ -67,7 +67,7 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 
 		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & diff->flags))
 		{
-			value_esc = DBdyn_escape_field("items", "error", diff->error);
+			value_esc = DBdyn_escape_field("item_rtdata", "error", diff->error);
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cerror='%s'", delim, value_esc);
 			zbx_free(value_esc);
 		}

@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -139,6 +138,7 @@ $fields = [
 	'cancel' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>							[T_ZBX_INT, O_OPT, null,	null,		null],
+	'checkbox_hash' =>							[T_ZBX_STR, O_OPT, null,	null,		null],
 	// Sort and sortorder.
 	'sort' =>									[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null],
 	'sortorder' =>								[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -177,7 +177,7 @@ if ($triggerIds) {
 	]);
 
 	if (count($triggers) != count($triggerIds)) {
-		uncheckTableRows(null, zbx_objectValues($triggers, 'triggerid'));
+		uncheckTableRows(getRequest('checkbox_hash'), zbx_objectValues($triggers, 'triggerid'));
 	}
 }
 
@@ -396,7 +396,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if ($result) {
 		unset($_REQUEST['form']);
-		uncheckTableRows();
+		uncheckTableRows(getRequest('checkbox_hash'));
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
@@ -404,7 +404,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
-		uncheckTableRows();
+		uncheckTableRows(getRequest('checkbox_hash'));
 	}
 	show_messages($result, _('Trigger deleted'), _('Cannot delete trigger'));
 }
@@ -507,7 +507,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['g_triggerid']);
-		uncheckTableRows();
+		uncheckTableRows(getRequest('checkbox_hash'));
 	}
 	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 }
@@ -546,7 +546,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 		: _n('Cannot disable trigger', 'Cannot disable triggers', $updated);
 
 	if ($result) {
-		uncheckTableRows();
+		uncheckTableRows(getRequest('checkbox_hash'));
 		unset($_REQUEST['g_triggerid']);
 	}
 
@@ -585,7 +585,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' &&
 		$triggers_count = count(getRequest('g_triggerid'));
 
 		if ($result) {
-			uncheckTableRows();
+			uncheckTableRows(getRequest('checkbox_hash'));
 			unset($_REQUEST['g_triggerid']);
 		}
 
@@ -602,7 +602,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' &&
 	$result = API::Trigger()->delete(getRequest('g_triggerid'));
 
 	if ($result) {
-		uncheckTableRows();
+		uncheckTableRows(getRequest('checkbox_hash'));
 	}
 
 	show_messages($result, _('Triggers deleted'), _('Cannot delete triggers'));
@@ -965,6 +965,9 @@ else {
 		$single_selected_hostid = reset($filter_hostids);
 	}
 
+	sort($filter_hostids);
+	$checkbox_hash = crc32(implode('', $filter_hostids));
+
 	$data = [
 		'config' => $config,
 		'config_priorities' => $config_priorities,
@@ -985,6 +988,7 @@ else {
 		'filter_inherited' => $filter_inherited,
 		'filter_discovered' => $filter_discovered,
 		'filter_dependent' => $filter_dependent,
+		'checkbox_hash' => $checkbox_hash,
 		'show_info_column' => $show_info_column,
 		'show_value_column' => $show_value_column,
 		'single_selected_hostid' => $single_selected_hostid,

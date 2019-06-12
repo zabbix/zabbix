@@ -51,10 +51,14 @@ $hostList = new CFormList('hostlist');
 
 // LLD rule link
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-	$hostList->addRow(_('Discovered by'),
-		new CLink($data['discoveryRule']['name'],
-			(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+	$hostList->addRow(_('Discovered by'), $data['discoveryRule']
+		? new CLink($data['discoveryRule']['name'],
+			(new CUrl('host_prototypes.php'))
+				->setArgument('form', 'update')
+				->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+				->setArgument('hostid', $data['hostDiscovery']['parent_hostid'])
 		)
+		: (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY)
 	);
 }
 
