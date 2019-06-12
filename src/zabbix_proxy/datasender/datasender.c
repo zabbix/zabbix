@@ -255,9 +255,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 		if (ZBX_PROXY_DATA_MORE != more)
 			zbx_sleep_loop(ZBX_TASK_UPDATE_FREQUENCY);
 	}
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_free();
-#endif
-	DBclose();
-	exit(EXIT_SUCCESS);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

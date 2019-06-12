@@ -173,9 +173,6 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		zbx_sleep_loop(CONFIG_PROXYCONFIG_FREQUENCY);
 	}
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_free();
-#endif
-	DBclose();
-	exit(EXIT_SUCCESS);
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

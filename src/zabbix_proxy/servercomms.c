@@ -96,7 +96,8 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 				sleep(retry_interval);
 			}
 
-			zabbix_log(LOG_LEVEL_WARNING, "Connection restored.");
+			if (FAIL != res)
+				zabbix_log(LOG_LEVEL_WARNING, "Connection restored.");
 		}
 	}
 

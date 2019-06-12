@@ -1040,7 +1040,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-	while (ZBX_IS_RUNNING())
+	for (;;)
 	{
 		time_now = zbx_time();
 
@@ -1102,7 +1102,5 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 
 	zbx_ipc_service_close(&service);
 	preprocessor_destroy_manager(&manager);
-
-	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

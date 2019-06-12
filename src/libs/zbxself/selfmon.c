@@ -24,7 +24,6 @@
 #	include "mutexs.h"
 #	include "ipc.h"
 #	include "log.h"
-#	include "daemon.h"
 
 #	define MAX_HISTORY	60
 
@@ -659,9 +658,6 @@ void	zbx_sleep_loop(int sleeptime)
 
 	do
 	{
-		if (!ZBX_IS_RUNNING())
-			break;
-
 		sleep(1);
 	}
 	while (0 < --sleep_remains);
@@ -677,9 +673,6 @@ void	zbx_sleep_forever(void)
 
 	do
 	{
-		if (!ZBX_IS_RUNNING())
-			break;
-
 		sleep(1);
 	}
 	while (0 != sleep_remains);

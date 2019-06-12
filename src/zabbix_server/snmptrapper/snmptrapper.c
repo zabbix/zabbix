@@ -647,7 +647,7 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-		while (SUCCEED == get_latest_data())
+		while (ZBX_IS_RUNNING() && SUCCEED == get_latest_data())
 			read_traps();
 		sec = zbx_time() - sec;
 
@@ -661,6 +661,7 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 	if (-1 != trap_fd)
 		close(trap_fd);
-	DBclose();
-	exit(EXIT_SUCCESS);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

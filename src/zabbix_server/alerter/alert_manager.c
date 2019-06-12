@@ -2068,10 +2068,11 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 			zbx_ipc_client_release(client);
 	}
 
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
+
 	zbx_ipc_service_close(&alerter_service);
-	/* am_destroy(&manager); */
+	am_destroy(&manager);
 
 	DBclose();
-
-	exit(EXIT_SUCCESS);
 }

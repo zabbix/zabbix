@@ -5341,7 +5341,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 		zbx_sleep_loop(sleeptime);
 	}
 
-	exit(EXIT_SUCCESS);
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 #undef STAT_INTERVAL
 #else
 	ZBX_UNUSED(args);

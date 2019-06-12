@@ -154,8 +154,7 @@ ZBX_THREAD_ENTRY(httppoller_thread, args)
 		zbx_sleep_loop(sleeptime);
 	}
 
-	DBclose();
-	exit(EXIT_SUCCESS);
-
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 #undef STAT_INTERVAL
 }

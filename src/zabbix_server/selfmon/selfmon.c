@@ -53,5 +53,6 @@ ZBX_THREAD_ENTRY(selfmon_thread, args)
 		zbx_sleep_loop(ZBX_SELFMON_DELAY);
 	}
 
-	exit(EXIT_SUCCESS);
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

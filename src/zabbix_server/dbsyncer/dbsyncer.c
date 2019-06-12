@@ -76,7 +76,6 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		zbx_problems_export_init("history-syncer", process_num);
 	}
 
-
 	for (;;)
 	{
 		sec = zbx_time();
@@ -128,6 +127,5 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	zbx_free(stats);
 	DBclose();
 	exit(EXIT_SUCCESS);
-
 #undef STAT_INTERVAL
 }

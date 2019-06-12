@@ -1124,7 +1124,6 @@ void	zbx_free_service_resources(int ret)
 		zbx_free(threads);
 		zbx_free(threads_flags);
 	}
-
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();
 #endif

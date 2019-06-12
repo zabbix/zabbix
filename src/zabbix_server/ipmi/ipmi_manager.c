@@ -1062,11 +1062,11 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 		}
 	}
 
-	zbx_ipc_service_close(&ipmi_service);
-	/* ipmi_manager_destroy(&ipmi_manager); */
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 
-	DBclose();
-	exit(EXIT_SUCCESS);
+	zbx_ipc_service_close(&ipmi_service);
+	ipmi_manager_destroy(&ipmi_manager);
 #undef STAT_INTERVAL
 }
 

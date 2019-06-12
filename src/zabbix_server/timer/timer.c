@@ -769,6 +769,6 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		idle = 1;
 	}
 
-	DBclose();
-	exit(EXIT_SUCCESS);
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

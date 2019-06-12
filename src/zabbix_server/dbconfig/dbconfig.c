@@ -100,6 +100,6 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
 	}
 
-	DBclose();
-	exit(EXIT_SUCCESS);
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

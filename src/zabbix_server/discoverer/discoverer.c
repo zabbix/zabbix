@@ -521,8 +521,6 @@ static void	process_rule(DB_DRULE *drule)
 
 		do
 		{
-			if (!ZBX_IS_RUNNING())
-				goto out;
 #ifdef HAVE_IPV6
 			if (ZBX_IPRANGE_V6 == iprange.type)
 			{
@@ -895,10 +893,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_free();
-#endif
-	DBclose();
-	exit(EXIT_SUCCESS);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 #undef STAT_INTERVAL
 }

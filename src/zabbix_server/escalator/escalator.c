@@ -2547,7 +2547,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 				now + CONFIG_ESCALATOR_FREQUENCY);
 	zbx_free(filter);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())
 	{
 		int	esc_nextcheck;
 
@@ -2692,9 +2692,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_free();
-#endif
-	DBclose();
-	exit(EXIT_SUCCESS);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

@@ -656,6 +656,6 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
 	}
 
-	DBclose();
-	exit(EXIT_SUCCESS);
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

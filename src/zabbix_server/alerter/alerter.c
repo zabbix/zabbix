@@ -331,9 +331,6 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 		if (SUCCEED != zbx_ipc_socket_read(&alerter_socket, &message))
 		{
-			if (!ZBX_IS_RUNNING())
-				break;
-
 			zabbix_log(LOG_LEVEL_CRIT, "cannot read alert manager service request");
 			exit(EXIT_FAILURE);
 		}
@@ -366,7 +363,8 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 		zbx_ipc_message_clean(&message);
 	}
 
-	zbx_ipc_socket_close(&alerter_socket);
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 
-	exit(EXIT_SUCCESS);
+	zbx_ipc_socket_close(&alerter_socket);
 }

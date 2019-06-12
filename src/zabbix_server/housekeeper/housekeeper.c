@@ -1119,5 +1119,6 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
 	}
 
-	exit(EXIT_SUCCESS);
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }
