@@ -54,14 +54,14 @@ class CControllerUserList extends CController {
 	}
 
 	protected function doAction() {
-		$filter_usrgrpid = $this->getInput('filter_usrgrpid', CProfile::get('web.users.filter.usrgrpid', 0));
-		CProfile::update('web.users.filter.usrgrpid', $filter_usrgrpid, PROFILE_TYPE_ID);
+		$filter_usrgrpid = $this->getInput('filter_usrgrpid', CProfile::get('web.user.filter.usrgrpid', 0));
+		CProfile::update('web.user.filter.usrgrpid', $filter_usrgrpid, PROFILE_TYPE_ID);
 
-		$sortfield = $this->getInput('sort', CProfile::get('web.users.php.sort', 'name'));
-		$sortorder = $this->getInput('sortorder', CProfile::get('web.users.php.sortorder', ZBX_SORT_UP));
+		$sortfield = $this->getInput('sort', CProfile::get('web.user.sort', 'name'));
+		$sortorder = $this->getInput('sortorder', CProfile::get('web.user.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.users.php.sort', $sortfield, PROFILE_TYPE_STR);
-		CProfile::update('web.users.php.sortorder', $sortorder, PROFILE_TYPE_STR);
+		CProfile::update('web.user.sort', $sortfield, PROFILE_TYPE_STR);
+		CProfile::update('web.user.sortorder', $sortorder, PROFILE_TYPE_STR);
 
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.user.filter_alias', $this->getInput('filter_alias', ''), PROFILE_TYPE_STR);
