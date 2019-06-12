@@ -4884,3 +4884,16 @@ table.preprocessing-test-results .rel-container {
 
 #preprocessing-test-form .table-forms-separator {
   margin-top: -2px; }
+
+.host-avail-true {
+  color: black;
+  background: #86cc89; }
+.host-avail-false {
+  color: black;
+  background: #e45959; }
+.host-avail-unknown {
+  color: black;
+  background: #97aab3; }
+.host-avail-total {
+  color: #1f2c33;
+  background: transparent; }
