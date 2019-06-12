@@ -19,12 +19,12 @@
 **/
 
 
-class CControllerWidgetHostsAvailView extends CControllerWidget {
+class CControllerWidgetHostAvailView extends CControllerWidget {
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_HOSTS_AVAIL);
+		$this->setType(WIDGET_HOST_AVAIL);
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'json',

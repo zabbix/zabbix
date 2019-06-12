@@ -49,7 +49,7 @@ class CWidgetConfig {
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
 			WIDGET_URL					=> _('URL'),
 			WIDGET_WEB					=> _('Web monitoring'),
-			WIDGET_HOSTS_AVAIL			=> _('Host availability')
+			WIDGET_HOST_AVAIL			=> _('Host availability')
 		];
 	}
 
@@ -81,7 +81,7 @@ class CWidgetConfig {
 			WIDGET_TRIG_OVER			=> ['width' => 6, 'height' => 5],
 			WIDGET_URL					=> ['width' => 6, 'height' => 5],
 			WIDGET_WEB					=> ['width' => 3, 'height' => 3],
-			WIDGET_HOSTS_AVAIL			=> ['width' => 3, 'height' => 2]
+			WIDGET_HOST_AVAIL			=> ['width' => 3, 'height' => 2]
 		];
 	}
 
@@ -137,7 +137,7 @@ class CWidgetConfig {
 			case WIDGET_MAP:
 			case WIDGET_NAV_TREE:
 			case WIDGET_SYSTEM_INFO:
-			case WIDGET_HOSTS_AVAIL:
+			case WIDGET_HOST_AVAIL:
 				return 15 * SEC_PER_MIN;
 
 			case WIDGET_URL:
@@ -260,8 +260,8 @@ class CWidgetConfig {
 			case WIDGET_WEB:
 				return new CWidgetFormWeb($data);
 
-			case WIDGET_HOSTS_AVAIL:
-				return new CWidgetFormHostsAvail($data);
+			case WIDGET_HOST_AVAIL:
+				return new CWidgetFormHostAvail($data);
 
 			default:
 				return new CWidgetForm($data, $type);

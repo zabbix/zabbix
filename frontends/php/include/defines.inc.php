@@ -1353,7 +1353,7 @@ define('WIDGET_SYSTEM_INFO',	'systeminfo');
 define('WIDGET_TRIG_OVER',		'trigover');
 define('WIDGET_URL',			'url');
 define('WIDGET_WEB',			'web');
-define('WIDGET_HOSTS_AVAIL',	'hostsavail');
+define('WIDGET_HOST_AVAIL',		'hostavail');
 
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
@@ -1737,10 +1737,10 @@ define('ZBX_STYLE_COLUMN_95', 'column-95');
 define('ZBX_STYLE_COLUMN_CENTER', 'column-center');
 define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');
 
-define('ZBX_STYLE_HOSTS_AVAIL_TRUE', 'hosts-avail-true');
-define('ZBX_STYLE_HOSTS_AVAIL_FALSE', 'hosts-avail-false');
-define('ZBX_STYLE_HOSTS_AVAIL_UNKNOWN', 'hosts-avail-unknown');
-define('ZBX_STYLE_HOSTS_AVAIL_TOTAL', 'hosts-avail-total');
+define('ZBX_STYLE_HOST_AVAIL_TRUE', 'host-avail-true');
+define('ZBX_STYLE_HOST_AVAIL_FALSE', 'host-avail-false');
+define('ZBX_STYLE_HOST_AVAIL_UNKNOWN', 'host-avail-unknown');
+define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

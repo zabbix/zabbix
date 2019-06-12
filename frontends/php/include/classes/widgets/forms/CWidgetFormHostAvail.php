@@ -22,10 +22,10 @@
 /**
  * Host info widget form
  */
-class CWidgetFormHostsAvail extends CWidgetForm {
+class CWidgetFormHostAvail extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data, WIDGET_HOSTS_AVAIL);
+		parent::__construct($data, WIDGET_HOST_AVAIL);
 
 		// Host groups
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));

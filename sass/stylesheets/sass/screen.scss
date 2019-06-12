@@ -6792,25 +6792,25 @@ table.preprocessing-test-results {
 	}
 }
 
-.hosts-avail {
+.host-avail {
 	&-true {
 		color: darken($font-color, 100%);
-		background: $hosts-avail-true-bg-color;
+		background: $host-avail-true-bg-color;
 	}
 
 	&-false {
 		color: darken($font-color, 100%);
-		background: $hosts-avail-false-bg-color;
+		background: $host-avail-false-bg-color;
 	}
 
 	&-unknown {
 		color: darken($font-color, 100%);
-		background: $hosts-avail-unknown-bg-color;
+		background: $host-avail-unknown-bg-color;
 	}
 
 	&-total {
 		color: $font-color;
-		background: $hosts-avail-total-bg-color;
+		background: $host-avail-total-bg-color;
 	}
 }
 
