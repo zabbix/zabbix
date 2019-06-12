@@ -640,7 +640,7 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 	buffer = (char *)zbx_malloc(buffer, MAX_BUFFER_LEN);
 	*buffer = '\0';
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -661,4 +661,6 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 	if (-1 != trap_fd)
 		close(trap_fd);
+	DBclose();
+	exit(EXIT_SUCCESS);
 }

@@ -311,7 +311,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
 
@@ -331,6 +331,9 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 		if (SUCCEED != zbx_ipc_socket_read(&alerter_socket, &message))
 		{
+			if (!ZBX_IS_RUNNING())
+				break;
+
 			zabbix_log(LOG_LEVEL_CRIT, "cannot read alert manager service request");
 			exit(EXIT_FAILURE);
 		}
@@ -364,4 +367,6 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 	}
 
 	zbx_ipc_socket_close(&alerter_socket);
+
+	exit(EXIT_SUCCESS);
 }

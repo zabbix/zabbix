@@ -10,6 +10,7 @@
 #include "zbxalgo.h"
 #include "log.h"
 #include "zbxipcservice.h"
+#include "daemon.h"
 
 #define ZBX_IPC_PATH_MAX	sizeof(((struct sockaddr_un *)0)->sun_path)
 
@@ -1166,7 +1167,7 @@ int	zbx_ipc_socket_open(zbx_ipc_socket_t *csocket, const char *service_name, int
 
 	while (0 != connect(csocket->fd, (struct sockaddr*)&addr, sizeof(addr)))
 	{
-		if (time(NULL) - start > timeout)
+		if (time(NULL) - start > timeout || !ZBX_IS_RUNNING())
 		{
 			*error = zbx_dsprintf(*error, "Cannot connect to service \"%s\": %s.", service_name,
 					zbx_strerror(errno));

@@ -939,7 +939,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -980,5 +980,11 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_free();
+#endif
+	DBclose();
+	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

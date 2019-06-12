@@ -111,7 +111,7 @@ ZBX_THREAD_ENTRY(httppoller_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -153,6 +153,9 @@ ZBX_THREAD_ENTRY(httppoller_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
+
+	DBclose();
+	exit(EXIT_SUCCESS);
 
 #undef STAT_INTERVAL
 }

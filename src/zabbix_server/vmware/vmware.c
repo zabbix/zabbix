@@ -5220,7 +5220,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 
 	last_stat_time = time(NULL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -5308,7 +5308,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 					break;
 			}
 		}
-		while (ZBX_VMWARE_TASK_IDLE != task);
+		while (ZBX_VMWARE_TASK_IDLE != task && ZBX_IS_RUNNING());
 
 		total_sec += zbx_time() - sec;
 		now = time(NULL);
@@ -5340,6 +5340,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
+
+	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 #else
 	ZBX_UNUSED(args);

@@ -3206,16 +3206,26 @@ static void	sync_history_cache_full(void)
 void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more)
 {
 	const char		*__function_name = "zbx_sync_history_cache";
+	sigset_t		orig_mask, mask;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
 
 	*values_num = 0;
 	*triggers_num = 0;
 
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+
+	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the user signal");
+
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		sync_server_history(values_num, triggers_num, more);
 	else
 		sync_proxy_history(values_num, more);
+
+	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+		zabbix_log(LOG_LEVEL_WARNING,"cannot restore sigprocmask");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

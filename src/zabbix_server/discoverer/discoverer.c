@@ -521,6 +521,8 @@ static void	process_rule(DB_DRULE *drule)
 
 		do
 		{
+			if (!ZBX_IS_RUNNING())
+				goto out;
 #ifdef HAVE_IPV6
 			if (ZBX_IPRANGE_V6 == iprange.type)
 			{
@@ -726,7 +728,7 @@ static int	process_discovery(void)
 			CONFIG_DISCOVERER_FORKS,
 			process_num - 1);
 
-	while (NULL != (row = DBfetch(result)))
+	while (ZBX_IS_RUNNING() && NULL != (row = DBfetch(result)))
 	{
 		int		now, delay;
 		zbx_uint64_t	druleid;
@@ -852,7 +854,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -893,6 +895,10 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
-
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_free();
+#endif
+	DBclose();
+	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

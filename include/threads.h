@@ -44,7 +44,7 @@
 	#define zbx_sleep(sec) SleepEx(((DWORD)(sec)) * ((DWORD)1000), TRUE)
 
 	#define zbx_thread_kill(h) QueueUserAPC(ZBXEndThread, h, 0);
-
+	#define zbx_thread_kill_fatal(h) QueueUserAPC(ZBXEndThread, h, 0);
 #else	/* not _WINDOWS */
 
 	int	zbx_fork(void);
@@ -69,7 +69,7 @@
 	#define zbx_sleep(sec) sleep((sec))
 
 	#define zbx_thread_kill(h) kill(h, SIGTERM);
-
+	#define zbx_thread_kill_fatal(h) kill(h, SIGQUIT)
 #endif	/* _WINDOWS */
 
 typedef struct
@@ -86,7 +86,7 @@ zbx_thread_args_t;
 
 void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args, ZBX_THREAD_HANDLE *thread);
 int	zbx_thread_wait(ZBX_THREAD_HANDLE thread);
-void			zbx_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num);
+void			zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret);
 /* zbx_thread_exit(status) -- declared as define !!! */
 long int		zbx_get_thread_id(void);
 

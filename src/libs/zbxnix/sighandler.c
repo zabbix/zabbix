@@ -25,8 +25,8 @@
 #include "sigcommon.h"
 #include "../../libs/zbxcrypto/tls.h"
 
-int	sig_parent_pid = -1;
-int	sig_exiting = 0;
+int			sig_parent_pid = -1;
+volatile sig_atomic_t	sig_exiting;
 
 static void	log_fatal_signal(int sig, siginfo_t *siginfo, void *context)
 {
@@ -119,7 +119,10 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		if (SIGINT == sig)
 			return;
 
-		exit_with_failure();
+		if (SIGQUIT == sig)
+			exit_with_failure();
+
+		sig_exiting = 1;
 	}
 	else
 	{
@@ -138,7 +141,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			zbx_tls_free_on_signal();
 #endif
-			zbx_on_exit();
+			zbx_on_exit(SUCCEED);
 		}
 	}
 }
@@ -166,7 +169,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_free_on_signal();
 #endif
-		zbx_on_exit();
+		zbx_on_exit(FAIL);
 	}
 }
 

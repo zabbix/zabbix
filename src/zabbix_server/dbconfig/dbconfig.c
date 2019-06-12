@@ -82,7 +82,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, syncing configuration]",
 				get_process_type_string(process_type), sec);
@@ -99,4 +99,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 		zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
 	}
+
+	DBclose();
+	exit(EXIT_SUCCESS);
 }
