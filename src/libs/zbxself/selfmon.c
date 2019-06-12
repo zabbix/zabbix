@@ -20,7 +20,6 @@
 #include "zbxself.h"
 #include "common.h"
 
-
 #ifndef _WINDOWS
 #	include "mutexs.h"
 #	include "ipc.h"

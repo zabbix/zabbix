@@ -21,8 +21,6 @@
 #include "log.h"
 #include "threads.h"
 
-#define ZBX_THREAD_WAIT_TIMEOUT	5
-
 #if !defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
