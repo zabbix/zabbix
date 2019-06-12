@@ -933,7 +933,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Name' => 'Empty Basic User/Password',
 						'Key' => 'basic.empty.user.pass',
 						'URL' => 'zabbix.com',
-						'HTTP authentication' => 'Basic',
+						'HTTP authentication' => 'Basic'
 					],
 					'check_form' => true
 				]
@@ -945,7 +945,33 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Name' => 'Empty NTLM User/Password',
 						'Key' => 'ntlm.empty.user.pass',
 						'URL' => 'zabbix.com',
-						'HTTP authentication' => 'NTLM',
+						'HTTP authentication' => 'NTLM'
+					],
+					'check_form' => true
+				]
+			],
+			// Empty Kerberos authentication user/password.
+			[
+				[
+					'fields' => [
+						'Name' => 'Empty Kerberos',
+						'Key' => 'kerberos.empty',
+						'URL' => 'zabbix.com',
+						'HTTP authentication' => 'Kerberos'
+					],
+					'check_form' => true
+				]
+			],
+			// Kerberos authentication with user/password.
+			[
+				[
+					'fields' => [
+						'Name' => 'Empty Kerberos User/Password',
+						'Key' => 'kerberos.empty.user.pass',
+						'URL' => 'zabbix.com',
+						'HTTP authentication' => 'Kerberos',
+						'User name' => 'admin',
+						'Password' => 'zabbix',
 					],
 					'check_form' => true
 				]
@@ -1093,6 +1119,26 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'fields' => [
 						'HTTP authentication' => 'NTLM',
+					],
+					'check_form' => true
+				]
+			],
+			// Empty Kerberos authentication user/password.
+			[
+				[
+					'fields' => [
+						'HTTP authentication' => 'Kerberos',
+					],
+					'check_form' => true
+				]
+			],
+			// Kerberos authentication with user/password.
+			[
+				[
+					'fields' => [
+						'HTTP authentication' => 'Kerberos',
+						'User name' => 'k_admin',
+						'Password' => 'zabbix_k',
 					],
 					'check_form' => true
 				]

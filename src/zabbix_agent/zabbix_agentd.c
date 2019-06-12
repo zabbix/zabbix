@@ -57,6 +57,11 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
 
 char	*CONFIG_USER			= NULL;
 
+/* SSL parameters */
+char	*CONFIG_SSL_CA_LOCATION;
+char	*CONFIG_SSL_CERT_LOCATION;
+char	*CONFIG_SSL_KEY_LOCATION;
+
 /* TLS parameters */
 unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
 unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;

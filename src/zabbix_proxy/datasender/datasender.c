@@ -84,13 +84,16 @@ static int	proxy_data_sender(int *more, int now)
 		if (SUCCEED == get_host_availability_data(&j, &availability_ts))
 			flags |= ZBX_DATASENDER_AVAILABILITY;
 
-		if  (0 != (history_records = proxy_get_hist_data(&j, &history_lastid, &more_history)))
+		history_records = proxy_get_hist_data(&j, &history_lastid, &more_history);
+		if (0 != history_lastid)
 			flags |= ZBX_DATASENDER_HISTORY;
 
-		if  (0 != (discovery_records = proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery)))
+		discovery_records = proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
+		if (0 != discovery_records)
 			flags |= ZBX_DATASENDER_DISCOVERY;
 
-		if  (0 != (areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg)))
+		areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg);
+		if (0 != areg_records)
 			flags |= ZBX_DATASENDER_AUTOREGISTRATION;
 
 		if (ZBX_PROXY_DATA_MORE != more_history && ZBX_PROXY_DATA_MORE != more_discovery &&

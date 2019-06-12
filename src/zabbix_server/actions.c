@@ -1719,20 +1719,19 @@ static int	check_event_conditions(const DB_EVENT *event, zbx_hashset_t *uniq_con
  * Purpose: process all actions of each event in a list                       *
  *                                                                            *
  * Parameters: events        - [IN] events to apply actions for               *
- *             events_num    - [IN] number of events                          *
  *             closed_events - [IN] a vector of closed event data -           *
  *                                  (PROBLEM eventid, OK eventid) pairs.      *
  *                                                                            *
  ******************************************************************************/
-void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint64_pair_t *closed_events)
+void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pair_t *closed_events)
 {
-	size_t				i;
+	int				i;
 	zbx_vector_ptr_t		actions;
 	zbx_vector_ptr_t 		new_escalations;
 	zbx_vector_uint64_pair_t	rec_escalations;
 	zbx_hashset_t			uniq_conditions[EVENT_SOURCE_COUNT];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events->values_num);
 
 	zbx_vector_ptr_create(&new_escalations);
 	zbx_vector_uint64_pair_create(&rec_escalations);
@@ -1746,12 +1745,12 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 	/* 1. All event sources: match PROBLEM events to action conditions, add them to 'new_escalations' list.      */
 	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION: execute operations (except command and message */
 	/*    operations) for events that match action conditions.                                                   */
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < events->values_num; i++)
 	{
 		int		j;
-		const DB_EVENT 	*event;
+		const DB_EVENT	*event;
 
-		event = &events[i];
+		event = (const DB_EVENT *)events->values[i];
 
 		/* OK events can't start escalations - skip them */
 		if (SUCCEED == is_recovery_event(event))
