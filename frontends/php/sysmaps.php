@@ -79,7 +79,7 @@ $fields = [
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
-function prepare_page_header(string $type) {
+function prepare_page_header($type) {
 	global $page;
 
 	if ($type === 'html') {
