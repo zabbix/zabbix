@@ -56,7 +56,7 @@ if ($fields_error & ZBX_VALID_ERROR) {
 	// Halt on a HTML page with errors.
 
 	prepare_page_header('html');
-	require_once dirname(__FILE__) . '/include/page_header.php';
+	require_once dirname(__FILE__).'/include/page_header.php';
 
 	invalid_url();
 }
@@ -74,7 +74,7 @@ if (hasRequest('valuemapid')) {
 		// Halt on a HTML page with errors.
 
 		prepare_page_header('html');
-		require_once dirname(__FILE__) . '/include/page_header.php';
+		require_once dirname(__FILE__).'/include/page_header.php';
 
 		access_deny();
 	}
@@ -92,19 +92,19 @@ if (hasRequest('action') && getRequest('action') === 'valuemap.export' && hasReq
 
 	if ($export_data === false) {
 		prepare_page_header('html');
-		require_once dirname(__FILE__) . '/include/page_header.php';
+		require_once dirname(__FILE__).'/include/page_header.php';
 
 		access_deny();
 	}
 	elseif (hasErrorMesssages()) {
 		prepare_page_header('html');
-		require_once dirname(__FILE__) . '/include/page_header.php';
+		require_once dirname(__FILE__).'/include/page_header.php';
 
 		show_messages();
 	}
 	else {
 		prepare_page_header('xml');
-		require_once dirname(__FILE__) . '/include/page_header.php';
+		require_once dirname(__FILE__).'/include/page_header.php';
 
 		print($export_data);
 	}
@@ -114,7 +114,7 @@ if (hasRequest('action') && getRequest('action') === 'valuemap.export' && hasReq
 
 // Using HTML for the rest of functions.
 prepare_page_header('html');
-require_once dirname(__FILE__) . '/include/page_header.php';
+require_once dirname(__FILE__).'/include/page_header.php';
 
 /*
  * Actions
