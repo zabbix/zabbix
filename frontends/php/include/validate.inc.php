@@ -422,12 +422,12 @@ function check_fields_raw(&$fields) {
 }
 
 /**
- * Validate request fields and return true on succes, false on error.
+ * Validate request fields and return true on success, false on error.
  *
  * @param array $fields field schema together with validation rules
  * @param bool $show_messages do show messages on error
  *
- * @return bool true un success, false on error.
+ * @return bool true on success, false on error.
  */
 function check_fields(&$fields, $show_messages = true) {
 	$err = check_fields_raw($fields);
