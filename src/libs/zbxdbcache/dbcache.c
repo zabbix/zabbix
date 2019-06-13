@@ -3215,6 +3215,7 @@ void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more)
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGINT);
 
 	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the user signal");
