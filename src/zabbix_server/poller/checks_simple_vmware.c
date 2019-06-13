@@ -1548,7 +1548,8 @@ int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username
 
 		if (NULL == datastore)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): for HV %s DS %p not found", __func__, hv->id, name);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): for hypervisor %s datastore %p not found", __func__, hv->id,
+					name);
 		}
 		else
 		{
@@ -1617,7 +1618,8 @@ int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *usernam
 
 		if (NULL == datastore)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): for HV %s DS %p not found", __func__, hv->id, name);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): for hypervisor %s datastore %p not found", __func__, hv->id,
+					name);
 		}
 		else
 		{
