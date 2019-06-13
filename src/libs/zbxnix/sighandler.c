@@ -43,7 +43,7 @@ static void	exit_with_failure(void)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free_on_signal();
 #endif
-	exit(EXIT_FAILURE);
+	_exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -104,20 +104,17 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 	if (!SIG_PARENT_PROCESS)
 	{
-		zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) || SIGINT == sig ?
+		/* don't log warning on interrupt and termination signal in children - the parent */
+		/* process will send terminate signals instead                                    */
+
+		zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) || SIGINT == sig || SIGTERM == sig ?
 				LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
 				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
-				"reason:%d]. %s ...",
+				"reason:%d]. Exiting ...",
 				sig, get_signal_name(sig),
 				SIG_CHECKED_FIELD(siginfo, si_pid),
 				SIG_CHECKED_FIELD(siginfo, si_uid),
-				SIG_CHECKED_FIELD(siginfo, si_code),
-				SIGINT == sig ? "Ignoring" : "Exiting");
-
-		/* ignore interrupt signal in children - the parent */
-		/* process will send terminate signals instead      */
-		if (SIGINT == sig)
-			return;
+				SIG_CHECKED_FIELD(siginfo, si_code));
 
 		if (SIGQUIT == sig)
 			exit_with_failure();
