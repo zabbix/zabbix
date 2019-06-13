@@ -84,6 +84,10 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		if (0 != sleeptime)
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
 
+		/* clear timer trigger queue to avoid processing time triggers at exit */
+		if (!ZBX_IS_RUNNING())
+			zbx_dc_clear_timer_queue();
+
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
 		total_values_num += values_num;
 		total_triggers_num += triggers_num;
