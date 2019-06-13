@@ -1959,14 +1959,14 @@ int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username
 		ds_list = zbx_strdcatf(ds_list, "%s\n", hv->ds_names.values[i]);
 	}
 
-	if (NULL == ds_list)
+	if (NULL != ds_list)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Empty Hypervisor list."));
-		goto unlock;
+		ds_list[strlen(ds_list)-1] = '\0';
+		SET_TEXT_RESULT(result, ds_list);
 	}
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, ""));
 
-	ds_list[strlen(ds_list)-1] = 0;
-	SET_TEXT_RESULT(result, ds_list);
 	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
@@ -2030,14 +2030,14 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 		hv_list = zbx_strdcatf(hv_list, "%s\n", hv_name);
 	}
 
-	if (NULL == hv_list)
+	if (NULL != hv_list)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Empty Hypervisor list."));
-		goto unlock;
+		hv_list[strlen(hv_list)-1] = '\0';
+		SET_TEXT_RESULT(result, hv_list);
 	}
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, ""));
 
-	hv_list[strlen(hv_list)-1] = 0;
-	SET_TEXT_RESULT(result, hv_list);
 	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
