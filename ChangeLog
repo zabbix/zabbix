@@ -1,6 +1,7 @@
 Changes for 4.4.0alpha1
 
 New features:
+A......... [ZBXNEXT-5183] implemented support of simple triggers under items in export files (agriscenko)
 A.F.I..PS. [ZBXNEXT-5040,ZBXNEXT-5219] moved item real-time data to a new, seperate table in database (rlataria, viktors)
 A.F....PS. [ZBXNEXT-1856,ZBXNEXT-5223] added web scenario and HTTP agent with Kerberos authentication delegation (akozlovs, vasilijs)
 ....I..PS. [ZBXNEXT-5211] increased the maximum Hosts name character length from 64 to 128 for autoregistration and LLD (akozlovs)
