@@ -240,7 +240,7 @@ void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int 
 
 	for (i = 0; i < threads_num; i++)
 	{
-		if (!threads[i] || 0 == threads_flags[i])
+		if (!threads[i] || ZBX_THREAD_WAIT_EXIT != threads_flags[i])
 			continue;
 
 		zbx_thread_wait(threads[i]);

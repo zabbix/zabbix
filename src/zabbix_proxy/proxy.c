@@ -1126,6 +1126,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
+				threads_flags[i] = ZBX_THREAD_WAIT_EXIT;
 				zbx_thread_start(dbsyncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:

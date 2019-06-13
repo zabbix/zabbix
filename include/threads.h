@@ -31,6 +31,8 @@
 	#define ZBX_THREAD_HANDLE	HANDLE
 	#define ZBX_THREAD_HANDLE_NULL	NULL
 
+	#define ZBX_THREAD_WAIT_EXIT	1
+
 	#define ZBX_THREAD_ENTRY_POINTER(pointer_name) \
 		unsigned (__stdcall *pointer_name)(void *)
 
@@ -54,6 +56,8 @@
 
 	#define ZBX_THREAD_HANDLE	pid_t
 	#define ZBX_THREAD_HANDLE_NULL	0
+
+	#define ZBX_THREAD_WAIT_EXIT	1
 
 	#define ZBX_THREAD_ENTRY_POINTER(pointer_name) \
 		unsigned (* pointer_name)(void *)
