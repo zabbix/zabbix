@@ -1960,12 +1960,11 @@ int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username
 	}
 
 	if (NULL != ds_list)
-	{
 		ds_list[strlen(ds_list)-1] = '\0';
-		SET_TEXT_RESULT(result, ds_list);
-	}
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, ""));
+		ds_list = zbx_strdup(NULL, "");
+
+	SET_TEXT_RESULT(result, ds_list);
 
 	ret = SYSINFO_RET_OK;
 unlock:
@@ -2031,12 +2030,11 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 	}
 
 	if (NULL != hv_list)
-	{
 		hv_list[strlen(hv_list)-1] = '\0';
-		SET_TEXT_RESULT(result, hv_list);
-	}
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, ""));
+		hv_list = zbx_strdup(NULL, "");
+
+	SET_TEXT_RESULT(result, hv_list);
 
 	ret = SYSINFO_RET_OK;
 unlock:
