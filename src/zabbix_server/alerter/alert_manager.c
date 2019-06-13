@@ -2068,6 +2068,8 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 			zbx_ipc_client_release(client);
 	}
 
+	zbx_setproctitle("%s #%d [idle]", get_process_type_string(process_type), process_num);
+
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 

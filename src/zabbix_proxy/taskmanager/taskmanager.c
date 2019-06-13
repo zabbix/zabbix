@@ -322,6 +322,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
 	}
 
+	zbx_setproctitle("%s #%d [idle]", get_process_type_string(process_type), process_num);
+
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 }
