@@ -348,10 +348,10 @@ if (hasRequest('form')) {
 			$n = 0;
 			foreach ($groupids as $groupid) {
 				if (!array_key_exists($groupid, $data['groups'])) {
-					$postfix = (++$n > 1) ? ' (' . $n . ')' : '';
+					$postfix = (++$n > 1) ? ' ('.$n.')' : '';
 					$data['groups'][$groupid] = [
 						'groupid' => $groupid,
-						'name' => _('Inaccessible group') . $postfix,
+						'name' => _('Inaccessible group').$postfix,
 						'inaccessible' => true
 					];
 				}
