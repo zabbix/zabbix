@@ -535,7 +535,7 @@ static int	get_vcenter_hvprop(AGENT_REQUEST *request, const char *username, cons
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
@@ -635,7 +635,7 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 
 	if (NULL == (cluster = cluster_get_by_name(&service->data->clusters, name)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No cluster name found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown cluster name."));
 		goto unlock;
 	}
 
@@ -868,7 +868,7 @@ int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, 
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
@@ -1131,7 +1131,7 @@ int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
@@ -1299,7 +1299,7 @@ int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const 
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
@@ -1346,7 +1346,7 @@ int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, co
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
@@ -1393,7 +1393,7 @@ int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, c
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
@@ -1433,7 +1433,7 @@ int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *usernam
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
@@ -1475,7 +1475,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
@@ -1539,7 +1539,7 @@ int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
@@ -1547,19 +1547,19 @@ int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username
 
 	if (NULL == datastore)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore name found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 		goto unlock;
 	}
 
 	if (FAIL != zbx_vector_str_bsearch(&hv->ds_names, datastore->name, ZBX_DEFAULT_STR_COMPARE_FUNC))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore name found for current hypervisor."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name for current hypervisor."));
 		goto unlock;
 	}
 
 	if (NULL == datastore->uuid)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
 		goto unlock;
 	}
 
@@ -1608,7 +1608,7 @@ int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *usernam
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
@@ -1616,19 +1616,19 @@ int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *usernam
 
 	if (NULL == datastore)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore name found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 		goto unlock;
 	}
 
 	if (FAIL != zbx_vector_str_bsearch(&hv->ds_names, datastore->name, ZBX_DEFAULT_STR_COMPARE_FUNC))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore name found for current hypervisor."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name for current hypervisor."));
 		goto unlock;
 	}
 
 	if (NULL == datastore->uuid)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
 		goto unlock;
 	}
 
@@ -1742,14 +1742,14 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 
 	if (NULL == datastore)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore name found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 		goto unlock;
 	}
 
 	if (NULL != hv_uuid &&
 			FAIL == zbx_vector_str_bsearch(&datastore->hv_uuids, hv_uuid, ZBX_DEFAULT_STR_COMPARE_FUNC))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore name found for current hypervisor."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name for current hypervisor."));
 		goto unlock;
 	}
 
@@ -1884,7 +1884,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
@@ -1936,7 +1936,7 @@ int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username
 
 	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
@@ -1998,7 +1998,7 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 
 	if (NULL == datastore)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore name found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 		goto unlock;
 	}
 
@@ -2006,7 +2006,7 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 	{
 		if (NULL == (hv = hv_get(&service->data->hvs, datastore->hv_uuids.values[i])))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 			goto unlock;
 		}
 
@@ -2152,13 +2152,13 @@ int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, c
 
 	if (NULL == datastore)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore name found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 		goto unlock;
 	}
 
 	if (NULL == datastore->uuid)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
 		goto unlock;
 	}
 
@@ -2172,7 +2172,7 @@ int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, c
 	{
 		if (NULL == (hv = hv_get(&service->data->hvs, datastore->hv_uuids.values[i])))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 			goto unlock;
 		}
 
@@ -2243,13 +2243,13 @@ int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, 
 
 	if (NULL == datastore)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore name found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 		goto unlock;
 	}
 
 	if (NULL == datastore->uuid)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastore uuid found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
 		goto unlock;
 	}
 
@@ -2263,7 +2263,7 @@ int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, 
 	{
 		if (NULL == (hv = hv_get(&service->data->hvs, datastore->hv_uuids.values[i])))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "No hypervisor uuid found."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 			goto unlock;
 		}
 
