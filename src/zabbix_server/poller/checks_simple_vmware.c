@@ -1551,9 +1551,9 @@ int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username
 		goto unlock;
 	}
 
-	if (FAIL != zbx_vector_str_bsearch(&hv->ds_names, datastore->name, ZBX_DEFAULT_STR_COMPARE_FUNC))
+	if (FAIL == zbx_vector_str_bsearch(&hv->ds_names, datastore->name, ZBX_DEFAULT_STR_COMPARE_FUNC))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore '%s' not found on this hypervisor.",
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 				datastore->name));
 		goto unlock;
 	}
@@ -1621,9 +1621,9 @@ int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *usernam
 		goto unlock;
 	}
 
-	if (FAIL != zbx_vector_str_bsearch(&hv->ds_names, datastore->name, ZBX_DEFAULT_STR_COMPARE_FUNC))
+	if (FAIL == zbx_vector_str_bsearch(&hv->ds_names, datastore->name, ZBX_DEFAULT_STR_COMPARE_FUNC))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore '%s' not found on this hypervisor.",
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 				datastore->name));
 		goto unlock;
 	}
