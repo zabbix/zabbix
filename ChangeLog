@@ -2,6 +2,8 @@ Changes for 4.4.0alpha1
 
 New features:
 A......... [ZBXNEXT-5183] implemented support of simple triggers under items in export files (agriscenko)
+A.F.I..PS. [ZBXNEXT-5040,ZBXNEXT-5219] moved item real-time data to a new, seperate table in database (rlataria, viktors)
+A.F....PS. [ZBXNEXT-1856,ZBXNEXT-5223] added web scenario and HTTP agent with Kerberos authentication delegation (akozlovs, vasilijs)
 ....I..PS. [ZBXNEXT-5211] increased the maximum Hosts name character length from 64 to 128 for autoregistration and LLD (akozlovs)
 ...G...... [ZBXNEXT-1302] added low-level discovery of block devices (asestakovs)
 ..F....... [ZBX-10574] automated documentation link update upon release of new major version (vasilijs)
@@ -21,9 +23,12 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-16152] fixed not data loss on saving host prototypes by user with insufficient permissions (averza)
+..F....... [ZBX-16126] fixed checkbox selection on navigate to inherited template in triggers and items (talbergs)
+..F....... [ZBX-15952] fixed errors when trying to create a graph widget for key system.cpu.util[,iowait] with Y axis placed on the left side of the graph (vasilijs)
 ...G...PS. [ZBX-15899] added output sanitization to prevent invalid UTF-8 sequences in regexp-based text replacement (Andris)
 ..F....... [ZBX-16073] fixed horizontal scrolling in map (vasilijs)
-........S. [ZBX-15943] fixed discovered hosts are not removed from table 'dhosts' after removing and adding the corresponding discovery check (akozlovs)
+........S. [ZBX-15943] fixed discovered hosts are not removed from table "dhosts" after removing and adding the corresponding discovery check (akozlovs)
 ..F....... [ZBX-15875] fixed colors for the multiselect disabled elements (ashubin)
 ..F....... [ZBX-10948] 'IT Services --> Service Time --> Note' infinite stretching (rlataria)
 ..F....... [ZBX-15585] fixed web scenarios pair manager issue when fields are duplicating on post type toggle (talbergs)
@@ -451,9 +456,11 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-16152] fixed not data loss on saving host prototypes by user with insufficient permissions (averza)
+..F....... [ZBX-15952] fixed errors when trying to create a graph widget for key system.cpu.util[,iowait] with Y axis placed on the left side of the graph (vasilijs)
 ...G...PS. [ZBX-15899] added output sanitization to prevent invalid UTF-8 sequences in regexp-based text replacement (Andris)
 ..F....... [ZBX-16073] fixed horizontal scrolling in map (vasilijs)
-........S. [ZBX-15943] fixed discovered hosts are not removed from table 'dhosts' after removing and adding the corresponding discovery check (akozlovs)
+........S. [ZBX-15943] fixed discovered hosts are not removed from table "dhosts" after removing and adding the corresponding discovery check (akozlovs)
 ..F....... [ZBX-15875] fixed colors for the multiselect disabled elements (ashubin)
 ..F....... [ZBX-10948] 'IT Services --> Service Time --> Note' infinite stretching (rlataria)
 ...G...... [ZBX-16142] fixed missing sys/ioctl.h from src/libs/zbxsysinfo/openbsd/net.c; thanks to Andrea Biscuola for the patch (akozlovs)

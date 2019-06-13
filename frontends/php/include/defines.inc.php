@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.4.0alpha1');
 define('ZABBIX_API_VERSION',	'4.4.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',	4030002);
+define('ZABBIX_DB_VERSION',	4030009);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -870,9 +870,10 @@ define('PARAM_TYPE_COUNTS',		1);
 define('ZBX_DEFAULT_AGENT', 'Zabbix');
 define('ZBX_AGENT_OTHER', -1);
 
-define('HTTPTEST_AUTH_NONE',	0);
-define('HTTPTEST_AUTH_BASIC',	1);
-define('HTTPTEST_AUTH_NTLM',	2);
+define('HTTPTEST_AUTH_NONE',		0);
+define('HTTPTEST_AUTH_BASIC',		1);
+define('HTTPTEST_AUTH_NTLM',		2);
+define('HTTPTEST_AUTH_KERBEROS',	3);
 
 define('HTTPTEST_STATUS_ACTIVE',	0);
 define('HTTPTEST_STATUS_DISABLED',	1);

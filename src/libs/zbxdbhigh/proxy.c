@@ -502,7 +502,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL,
 				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_DEPENDENT);
 	}
-	else if (0 == strcmp(table->table, "item_preproc"))
+	else if (SUCCEED == str_in_list("item_rtdata,item_preproc", table->table, ','))
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				",items i,hosts r"
@@ -722,6 +722,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		"hosts_templates",
 		"hostmacro",
 		"items",
+		"item_rtdata",
 		"item_preproc",
 		"drules",
 		"dchecks",

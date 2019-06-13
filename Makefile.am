@@ -138,7 +138,8 @@ WRAP_DB_FUNCS = \
 WRAP_IO_FUNCS = \
 	-Wl,--wrap=fopen \
 	-Wl,--wrap=fclose \
-	-Wl,--wrap=fgets
+	-Wl,--wrap=fgets \
+	-Wl,--wrap=open
 
 WRAP_FS_FUNCS = \
 	-Wl,--wrap=opendir \
@@ -152,8 +153,7 @@ WRAP_EXIT = \
 
 WRAP_COMM_FUNCS = \
 	-Wl,--wrap=read \
-	-Wl,--wrap=connect \
-	-Wl,--wrap=open
+	-Wl,--wrap=connect
 
 WRAP_LOG = \
 	-Wl,--wrap=__zbx_zabbix_log
