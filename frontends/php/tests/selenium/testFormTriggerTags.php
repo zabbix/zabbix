@@ -191,9 +191,6 @@ class testFormTriggerTags extends CWebTest {
 
 		$form->fill($data['fields']);
 
-//		$form->getLabel('Name')->fill($data['trigger_name']);
-//		$form->getLabel('Expression')->fill($data['expression']);
-
 		$form->selectTab('Tags');
 		$this->fillTags($data['tags']);
 		$form->submit();
