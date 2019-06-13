@@ -1553,7 +1553,8 @@ int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username
 
 	if (FAIL != zbx_vector_str_bsearch(&hv->ds_names, datastore->name, ZBX_DEFAULT_STR_COMPARE_FUNC))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name for current hypervisor."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore '%s' not found on this hypervisor.",
+				datastore->name));
 		goto unlock;
 	}
 
@@ -1622,7 +1623,8 @@ int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *usernam
 
 	if (FAIL != zbx_vector_str_bsearch(&hv->ds_names, datastore->name, ZBX_DEFAULT_STR_COMPARE_FUNC))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name for current hypervisor."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore '%s' not found on this hypervisor.",
+				datastore->name));
 		goto unlock;
 	}
 
@@ -1746,7 +1748,7 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 	if (NULL != hv_uuid &&
 			FAIL == zbx_vector_str_bsearch(&datastore->hv_uuids, hv_uuid, ZBX_DEFAULT_STR_COMPARE_FUNC))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name for current hypervisor."));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Hypervisor '%s' not found on this datastore.", hv_uuid));
 		goto unlock;
 	}
 
