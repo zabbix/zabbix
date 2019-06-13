@@ -104,9 +104,6 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 	if (!SIG_PARENT_PROCESS)
 	{
-		/* don't log warning on interrupt and termination signal in children - the parent */
-		/* process will send terminate signals instead                                    */
-
 		zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) || SIGINT == sig || SIGTERM == sig ?
 				LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
 				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
@@ -115,6 +112,11 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				SIG_CHECKED_FIELD(siginfo, si_pid),
 				SIG_CHECKED_FIELD(siginfo, si_uid),
 				SIG_CHECKED_FIELD(siginfo, si_code));
+
+		/* ignore terminate signal in children - the parent */
+		/* process will send terminate signals instead      */
+		if (sig_parent_pid != SIG_CHECKED_FIELD(siginfo, si_pid))
+			return;
 
 		if (SIGQUIT == sig)
 			exit_with_failure();
