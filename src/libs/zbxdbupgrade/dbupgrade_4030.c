@@ -78,7 +78,7 @@ static int	DBpatch_4030005(void)
 	if (ZBX_DB_OK <= DBexecute("insert into item_rtdata (itemid,lastlogsize,state,mtime,error)"
 			" select i.itemid,i.lastlogsize,i.state,i.mtime,i.error"
 			" from items i"
-			" inner join hosts h on i.hostid=h.hostid"
+			" join hosts h on i.hostid=h.hostid"
 			" where h.status in (%d,%d) and i.flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{

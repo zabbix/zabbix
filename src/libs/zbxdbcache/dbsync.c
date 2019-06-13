@@ -1738,7 +1738,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 			" from items i"
 			" inner join hosts h on i.hostid=h.hostid"
 			" left join item_discovery id on i.itemid=id.itemid"
-			" inner join item_rtdata ir on i.itemid=ir.itemid"
+			" join item_rtdata ir on i.itemid=ir.itemid"
 			" where h.status in (%d,%d) and i.flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 
