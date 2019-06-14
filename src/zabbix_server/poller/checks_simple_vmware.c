@@ -2073,7 +2073,7 @@ int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *username
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_datastore_t	*datastore;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			i, ret = SYSINFO_RET_FAIL, count = 0;
 	zbx_uint64_t		latency = 0, counterid;
 	unsigned char		is_maxlatency = 0;
 
@@ -2137,16 +2137,22 @@ int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *username
 			goto unlock;
 		}
 
+		if (0 == ISSET_VALUE(result))
+			continue;
+
 		if (0 == is_maxlatency)
+		{
 			latency += *GET_UI64_RESULT(result);
+			count++;
+		}
 		else if (latency < *GET_UI64_RESULT(result))
 			latency = *GET_UI64_RESULT(result);
 
 		UNSET_UI64_RESULT(result);
 	}
 
-	if (0 == is_maxlatency && 0 != datastore->hv_uuids.values_num)
-		latency = latency / datastore->hv_uuids.values_num;
+	if (0 == is_maxlatency && 0 != count)
+		latency = latency / count;
 
 	SET_UI64_RESULT(result, latency);
 unlock:
