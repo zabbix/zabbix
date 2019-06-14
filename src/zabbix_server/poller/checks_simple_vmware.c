@@ -666,7 +666,7 @@ out:
 static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t eventlog_last_key, const DC_ITEM *item,
 		zbx_vector_ptr_t *add_results)
 {
-	int		i;
+	int	i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventlog_last_key:" ZBX_FS_UI64, __func__, eventlog_last_key);
 
@@ -889,7 +889,7 @@ out:
 int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -972,7 +972,7 @@ out:
 int	check_vcenter_hv_fullname(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -986,7 +986,7 @@ int	check_vcenter_hv_fullname(AGENT_REQUEST *request, const char *username, cons
 int	check_vcenter_hv_hw_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1000,7 +1000,7 @@ int	check_vcenter_hv_hw_cpu_num(AGENT_REQUEST *request, const char *username, co
 int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1017,7 +1017,7 @@ int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, const char *username, c
 int	check_vcenter_hv_hw_cpu_model(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1031,7 +1031,7 @@ int	check_vcenter_hv_hw_cpu_model(AGENT_REQUEST *request, const char *username, 
 int	check_vcenter_hv_hw_cpu_threads(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1045,7 +1045,7 @@ int	check_vcenter_hv_hw_cpu_threads(AGENT_REQUEST *request, const char *username
 int	check_vcenter_hv_hw_memory(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1059,7 +1059,7 @@ int	check_vcenter_hv_hw_memory(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1073,7 +1073,7 @@ int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, const char *username, cons
 int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1087,7 +1087,7 @@ int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, const char *username, const
 int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1165,7 +1165,7 @@ out:
 int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1182,7 +1182,7 @@ int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, c
 int	check_vcenter_hv_sensor_health_state(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1212,7 +1212,7 @@ int	check_vcenter_hv_sensor_health_state(AGENT_REQUEST *request, const char *use
 int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1242,7 +1242,7 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const 
 int	check_vcenter_hv_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1256,7 +1256,7 @@ int	check_vcenter_hv_uptime(AGENT_REQUEST *request, const char *username, const 
 int	check_vcenter_hv_version(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1783,8 +1783,8 @@ unlock:
 int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char		*url, *uuid, *name, *param;
-	int		ret = SYSINFO_RET_FAIL, mode;
+	char	*url, *uuid, *name, *param;
+	int	ret = SYSINFO_RET_FAIL, mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1992,8 +1992,8 @@ out:
 int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char		*url, *name, *param;
-	int		ret = SYSINFO_RET_FAIL, mode;
+	char	*url, *name, *param;
+	int	ret = SYSINFO_RET_FAIL, mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2180,7 +2180,7 @@ int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, 
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2282,7 +2282,7 @@ out:
 int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2472,7 +2472,7 @@ out:
 int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2489,7 +2489,7 @@ int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, const char *username, c
 int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2506,7 +2506,7 @@ int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2523,7 +2523,7 @@ int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, const char *
 int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2540,7 +2540,7 @@ int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, const char *use
 int	check_vcenter_vm_memory_size_usage_guest(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2557,7 +2557,7 @@ int	check_vcenter_vm_memory_size_usage_guest(AGENT_REQUEST *request, const char 
 int	check_vcenter_vm_memory_size_usage_host(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2574,7 +2574,7 @@ int	check_vcenter_vm_memory_size_usage_host(AGENT_REQUEST *request, const char *
 int	check_vcenter_vm_memory_size_private(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2591,7 +2591,7 @@ int	check_vcenter_vm_memory_size_private(AGENT_REQUEST *request, const char *use
 int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2608,7 +2608,7 @@ int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *user
 int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2822,7 +2822,7 @@ out:
 int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2836,7 +2836,7 @@ int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *usern
 int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2850,7 +2850,7 @@ int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, const char *userna
 int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2864,7 +2864,7 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *use
 int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

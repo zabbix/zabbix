@@ -1724,7 +1724,7 @@ static int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle
 		"</ns0:Logout>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char		tmp[MAX_STRING_LEN];
+	char	tmp[MAX_STRING_LEN];
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_LOGOUT, vmware_service_objects[service->type].session_manager);
 	return zbx_soap_post(__func__, easyhandle, tmp, NULL, error);
@@ -1774,7 +1774,7 @@ static int	zbx_property_collection_next(zbx_property_collection_iter *iter, xmlD
 		"/*[local-name()='ContinueRetrievePropertiesExResponse']"	\
 		"/*[local-name()='returnval']/*[local-name()='token']"
 
-	char		*token_esc, post[MAX_STRING_LEN];
+	char	*token_esc, post[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() continue retrieving properties with token: '%s'", __func__,
 			iter->token);
@@ -1825,7 +1825,7 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 		"</ns0:RetrieveServiceContent>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	xmlDoc		*doc = NULL;
+	xmlDoc	*doc = NULL;
 
 	if (SUCCEED != zbx_soap_post(__func__, easyhandle, ZBX_POST_VMWARE_CONTENTS, &doc, error))
 	{
@@ -1872,9 +1872,9 @@ static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *ser
 		"</ns0:QueryPerfProviderSummary>"				\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char		tmp[MAX_STRING_LEN], *value = NULL, *id_esc;
-	int		ret = FAIL;
-	xmlDoc		*doc = NULL;
+	char	tmp[MAX_STRING_LEN], *value = NULL, *id_esc;
+	int	ret = FAIL;
+	xmlDoc	*doc = NULL;
 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type: %s id: %s", __func__, type, id);
@@ -2323,8 +2323,8 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 		"</ns0:RetrievePropertiesEx>"						\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char		tmp[MAX_STRING_LEN], props[MAX_STRING_LEN], *vmid_esc;
-	int		i, ret = FAIL;
+	char	tmp[MAX_STRING_LEN], props[MAX_STRING_LEN], *vmid_esc;
+	int	i, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __func__, vmid);
 	props[0] = '\0';
@@ -2622,8 +2622,8 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char		tmp[MAX_STRING_LEN], props[MAX_STRING_LEN], *hvid_esc;
-	int		i, ret = FAIL;
+	char	tmp[MAX_STRING_LEN], props[MAX_STRING_LEN], *hvid_esc;
+	int	i, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __func__, hvid);
 	props[0] = '\0';
@@ -2741,9 +2741,9 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 			"<ns0:pathSet>name</ns0:pathSet>"							\
 		"</ns0:propSet>"
 
-	char		tmp[MAX_STRING_LEN];
-	int		ret = FAIL;
-	xmlDoc		*doc = NULL;
+	char	tmp[MAX_STRING_LEN];
+	int	ret = FAIL;
+	xmlDoc	*doc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() id:'%s'", __func__, hv->id);
 
@@ -3141,9 +3141,9 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 		"</ns0:CreateCollectorForEvents>"				\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char		tmp[MAX_STRING_LEN];
-	int		ret = FAIL;
-	xmlDoc		*doc = NULL;
+	char	tmp[MAX_STRING_LEN];
+	int	ret = FAIL;
+	xmlDoc	*doc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3243,8 +3243,8 @@ static int	vmware_service_read_previous_events(CURL *easyhandle, const char *eve
 		"</ns0:ReadPreviousEvents>"						\
 		ZBX_POST_VSPHERE_FOOTER
 
-	int		ret = FAIL;
-	char		tmp[MAX_STRING_LEN], *event_session_esc;
+	int	ret = FAIL;
+	char	tmp[MAX_STRING_LEN], *event_session_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() soap_count: %d", __func__, soap_count);
 
@@ -3288,8 +3288,8 @@ static int	vmware_service_destroy_event_session(CURL *easyhandle, const char *ev
 		"</ns0:DestroyCollector>"						\
 		ZBX_POST_VSPHERE_FOOTER
 
-	int		ret = FAIL;
-	char		tmp[MAX_STRING_LEN], *event_session_esc;
+	int	ret = FAIL;
+	char	tmp[MAX_STRING_LEN], *event_session_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3788,7 +3788,7 @@ static int	vmware_service_get_clusters(CURL *easyhandle, xmlDoc **clusters, char
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	int		ret = FAIL;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3839,9 +3839,9 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 		"</ns0:RetrievePropertiesEx>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char		tmp[MAX_STRING_LEN], *clusterid_esc;
-	int		ret = FAIL;
-	xmlDoc		*doc = NULL;
+	char	tmp[MAX_STRING_LEN], *clusterid_esc;
+	int	ret = FAIL;
+	xmlDoc	*doc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clusterid:'%s'", __func__, clusterid);
 
@@ -3959,9 +3959,9 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, cha
 		"</ns0:QueryOptions>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-	int		ret = FAIL;
-	char		*val;
-	xmlDoc		*doc = NULL;
+	int	ret = FAIL;
+	char	*val;
+	xmlDoc	*doc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4154,10 +4154,10 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
  ******************************************************************************/
 static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 {
-	int				i;
-	zbx_vmware_hv_t			*hv;
-	zbx_vmware_vm_t			*vm;
-	zbx_hashset_iter_t		iter;
+	int			i;
+	zbx_vmware_hv_t		*hv;
+	zbx_vmware_vm_t		*vm;
+	zbx_hashset_iter_t	iter;
 
 	const char			*hv_perfcounters[] = {
 						"net/packetsRx[summation]", "net/packetsTx[summation]",
@@ -4417,12 +4417,12 @@ out:
  ******************************************************************************/
 static int	vmware_service_process_perf_entity_data(zbx_vector_ptr_t *pervalues, xmlDoc *xdoc, xmlNode *node)
 {
-	xmlXPathContext			*xpathCtx;
-	xmlXPathObject			*xpathObj;
-	xmlNodeSetPtr			nodeset;
-	char				*instance, *counter, *value;
-	int				i, values = 0, ret = FAIL;
-	zbx_vmware_perf_value_t		*perfvalue;
+	xmlXPathContext		*xpathCtx;
+	xmlXPathObject		*xpathObj;
+	xmlNodeSetPtr		nodeset;
+	char			*instance, *counter, *value;
+	int			i, values = 0, ret = FAIL;
+	zbx_vmware_perf_value_t	*perfvalue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4492,10 +4492,10 @@ out:
  ******************************************************************************/
 static void	vmware_service_parse_perf_data(zbx_vector_ptr_t *perfdata, xmlDoc *xdoc)
 {
-	xmlXPathContext		*xpathCtx;
-	xmlXPathObject		*xpathObj;
-	xmlNodeSetPtr		nodeset;
-	int			i;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4937,7 +4937,7 @@ out:
  ******************************************************************************/
 static void	vmware_service_remove(zbx_vmware_service_t *service)
 {
-	int		index;
+	int	index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
 
