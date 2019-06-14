@@ -2122,8 +2122,8 @@ out:
 	return ret;
 }
 
-int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result)
+int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
+		const char *perfcounter, AGENT_RESULT *result)
 {
 	char			*url, *mode, *name;
 	zbx_vmware_service_t	*service;
@@ -2133,7 +2133,7 @@ int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, c
 	zbx_uint64_t		latency = 0, counterid;
 	unsigned char		is_maxlatency = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() perfcounter:%s", __func__, perfcounter);
 
 	if (2 > request->nparam || request->nparam > 3)
 	{
@@ -2173,7 +2173,7 @@ int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	if (FAIL == zbx_vmware_service_get_counterid(service, "datastore/totalReadLatency[average]", &counterid))
+	if (FAIL == zbx_vmware_service_get_counterid(service, perfcounter, &counterid))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
 		goto unlock;
@@ -2213,95 +2213,18 @@ out:
 	return ret;
 }
 
+int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return check_vcenter_datastore_latency(request, username, password, "datastore/totalReadLatency[average]",
+			result);
+}
+
 int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *mode, *name;
-	zbx_vmware_service_t	*service;
-	zbx_vmware_hv_t		*hv;
-	zbx_vmware_datastore_t	*datastore;
-	int			i, ret = SYSINFO_RET_FAIL;
-	zbx_uint64_t		latency = 0, counterid;
-	unsigned char		is_maxlatency = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (2 > request->nparam || request->nparam > 3)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	name = get_rparam(request, 1);
-	mode = get_rparam(request, 2);
-
-	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency") && 0 != strcmp(mode, "maxlatency"))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto out;
-	}
-
-	if (0 == strcmp(mode, "maxlatency"))
-		is_maxlatency = 1;
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	datastore = ds_get(&service->data->datastores, name);
-
-	if (NULL == datastore)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
-		goto unlock;
-	}
-
-	if (NULL == datastore->uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
-		goto unlock;
-	}
-
-	if (FAIL == zbx_vmware_service_get_counterid(service, "datastore/totalWriteLatency[average]", &counterid))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
-		goto unlock;
-	}
-
-	for (i = 0; i < datastore->hv_uuids.values_num; i++)
-	{
-		if (NULL == (hv = hv_get(&service->data->hvs, datastore->hv_uuids.values[i])))
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
-			goto unlock;
-		}
-
-		if (SYSINFO_RET_OK != (ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
-				counterid, datastore->uuid, 1, result)))
-		{
-			goto unlock;
-		}
-
-		if (0 == is_maxlatency)
-			latency += *GET_UI64_RESULT(result);
-		else if (latency < *GET_UI64_RESULT(result))
-			latency = *GET_UI64_RESULT(result);
-
-		UNSET_UI64_RESULT(result);
-	}
-
-	if (0 == is_maxlatency && 0 != datastore->hv_uuids.values_num)
-		latency = latency / datastore->hv_uuids.values_num;
-
-	SET_UI64_RESULT(result, latency);
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return check_vcenter_datastore_latency(request, username, password, "datastore/totalWriteLatency[average]",
+			result);
 }
 
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
