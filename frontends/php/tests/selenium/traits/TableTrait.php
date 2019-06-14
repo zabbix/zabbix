@@ -47,33 +47,6 @@ trait TableTrait {
 	}
 
 	/**
-	 * Get value from table column.
-	 *
-	 * @param CElement $row		row element
-	 * @param string $name		table column name
-	 * @param string $value		value from data provider
-	 *
-	 * @return string
-	 */
-	protected function getColumnData($row, $name, $value) {
-		if (!array_key_exists('text', $value)) {
-			// There is only support for text (currently).
-			throw new Exception('Failed to find key as "text" in: "'.$value.'".');
-		}
-
-		$column = $row->getColumn($name);
-		if (array_key_exists('selector', $value)) {
-			$query = $column->query($value['selector']);
-			$text = (!is_array($value['text'])) ? $query->one()->getText() : $query->all()->asText();
-		}
-		else {
-			$text = (is_array($value['text'])) ? [$column->getText()] : $column->getText();
-		}
-
-		return $text;
-	}
-
-	/**
 	 * Check if values in table rows match data from data provider.
 	 *
 	 * @param array   $data     data array to be match with result in table
@@ -97,8 +70,7 @@ trait TableTrait {
 			$row = $rows->get($i);
 
 			foreach ($values as $name => $value) {
-				$text = $this->getColumnData($row, $name, $value);
-				if ($text === null) {
+				if (($text = $row->getColumnData($name, $value)) === null) {
 					continue;
 				}
 
@@ -138,28 +110,6 @@ trait TableTrait {
 			return;
 		}
 
-		if (CTestArrayHelper::isAssociative($data)) {
-			$data = [$data];
-		}
-
-		$data = $this->normalizeData($data);
-
-		foreach ($table->getRows() as $row) {
-			foreach ($data as $values) {
-				$match = true;
-
-				foreach ($values as $name => $value) {
-					if ($value['text'] !== $this->getColumnData($row, $name, $value)) {
-						$match = false;
-						break;
-					}
-				}
-
-				if ($match) {
-					$row->select();
-					break;
-				}
-			}
-		}
+		$table->findRows($data)->select();
 	}
 }
