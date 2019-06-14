@@ -34,49 +34,34 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
-		$filter_groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
-		$filter_maintenance = ($fields['maintenance'] == HOST_MAINTENANCE_STATUS_OFF) ? HOST_MAINTENANCE_STATUS_OFF : null;
+		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 
-		$hostsids = $this->getHostIds($filter_groupids, $filter_maintenance);
+		$db_hosts = API::Host()->get([
+			'output' => ['available'],
+			'groupids' => $groupids,
+			'filter' => ($fields['maintenance'] == HOST_MAINTENANCE_STATUS_OFF)
+				? ['maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
+				: null
+		]);
 
-		$hosts_count = $this->getHostStatusCount($hostsids);
+		$hosts_count = [
+			HOST_AVAILABLE_UNKNOWN => 0,
+			HOST_AVAILABLE_TRUE => 0,
+			HOST_AVAILABLE_FALSE => 0
+		];
+
+		foreach ($db_hosts as $host) {
+			$hosts_count[$host['available']]++;
+		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'layout' => $fields['layout'],
 			'hosts' => $hosts_count,
+			'total' => array_sum($hosts_count),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		]));
-	}
-
-	protected function getHostIds($groups, $maintenance) {
-		$hosts = API::Host()->get([
-			'output' => ['hostid'],
-			'groupids' => $groups,
-			'filter' => ['maintenance_status' => $maintenance],
-			'preservekeys' => true
-		]);
-
-		return array_keys($hosts);
-	}
-
-	protected function getHostStatusCount(array $ids) {
-		$arr = [];
-
-		$query = DBselect(
-			'SELECT COUNT(DISTINCT h.hostid) AS cnt, h.available'.
-			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.available', [HOST_AVAILABLE_TRUE, HOST_AVAILABLE_FALSE, HOST_AVAILABLE_UNKNOWN]).
-				' AND '.dbConditionInt('h.status', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]).
-				' AND '.dbConditionInt('h.hostid', $ids).
-			' GROUP BY h.available'
-		);
-		while ($row = DBfetch($query)) {
-			$arr[$row['available']] = $row['cnt'];
-		}
-
-		return $arr;
 	}
 }
