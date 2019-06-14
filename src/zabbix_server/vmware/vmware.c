@@ -2887,8 +2887,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 		if (FAIL == (j = zbx_vector_vmware_datastore_bsearch(dss, &ds_cmp, vmware_ds_id_compare)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): for HV %s DS %s not found", __func__, hv->id,
-					datastores.values[i]);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Datastore \"%s\" not found on hypervisor \"%s\".", __func__,
+					datastores.values[i], hv->id);
 			continue;
 		}
 
