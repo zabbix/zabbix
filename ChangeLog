@@ -23,6 +23,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+...G...... [ZBX-16218] fixed zabbix_sender does not clean up its semaphores (akozlovs)
 ..F....... [ZBX-16152] fixed not data loss on saving host prototypes by user with insufficient permissions (averza)
 ..F....... [ZBX-16126] fixed checkbox selection on navigate to inherited template in triggers and items (talbergs)
 ..F....... [ZBX-15952] fixed errors when trying to create a graph widget for key system.cpu.util[,iowait] with Y axis placed on the left side of the graph (vasilijs)
