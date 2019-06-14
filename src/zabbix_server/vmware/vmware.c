@@ -2876,7 +2876,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		goto out;
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
-	zbx_vector_str_reserve(&hv->ds_names, datastores.values_num + hv->ds_names.values_alloc);
+	zbx_vector_str_reserve(&hv->ds_names, datastores.values_num);
 
 	for (i = 0; i < datastores.values_num; i++)
 	{
