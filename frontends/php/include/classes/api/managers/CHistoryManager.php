@@ -149,10 +149,10 @@ class CHistoryManager {
 				// Executing two subsequent queries individually for the sake of performance.
 
 				$clock_max = DBfetch(DBselect(
-					'SELECT MAX(h.clock)' .
-					' FROM ' . self::getTableName($item['value_type']) . ' h' .
-					' WHERE h.itemid=' . zbx_dbstr($item['itemid']) .
-						($period ? ' AND h.clock>' . $period : '')
+					'SELECT MAX(h.clock)'.
+					' FROM '.self::getTableName($item['value_type']).' h'.
+					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+						($period ? ' AND h.clock>'.$period : '')
 				), false);
 
 				if ($clock_max) {
@@ -161,9 +161,9 @@ class CHistoryManager {
 					if ($clock_max !== null) {
 						$values = DBfetchArray(DBselect(
 							'SELECT *'.
-							' FROM ' . self::getTableName($item['value_type']) . ' h' .
-							' WHERE h.itemid=' . zbx_dbstr($item['itemid']) .
-								' AND h.clock=' . zbx_dbstr($clock_max) .
+							' FROM '.self::getTableName($item['value_type']).' h'.
+							' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+								' AND h.clock='.zbx_dbstr($clock_max).
 							' ORDER BY h.ns DESC',
 							$limit
 						));
