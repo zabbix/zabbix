@@ -1517,14 +1517,16 @@ static int	prometheus_extract_value(zbx_vector_ptr_t *rows, const char *output, 
 	if ('\0' != *output)
 	{
 		int			i;
-		zbx_prometheus_label_t	*label;
 
 		for (i = 0; i < row->labels.values_num; i++)
 		{
-			label = (zbx_prometheus_label_t *)row->labels.values[i];
+			const zbx_prometheus_label_t	*label = (const zbx_prometheus_label_t *)row->labels.values[i];
 
 			if (0 == strcmp(label->name, output))
+			{
+				*value = zbx_strdup(NULL, label->value);
 				break;
+			}
 		}
 
 		if (i == row->labels.values_num)
@@ -1532,7 +1534,6 @@ static int	prometheus_extract_value(zbx_vector_ptr_t *rows, const char *output, 
 			*error = zbx_strdup(*error, "no label matches the specified output");
 			return FAIL;
 		}
-		*value = zbx_strdup(NULL, label->value);
 	}
 	else
 		*value = zbx_strdup(NULL, row->value);
