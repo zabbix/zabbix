@@ -1504,8 +1504,8 @@ out:
 	return ret;
 }
 
-int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result)
+int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
+		const char *perfcounter, AGENT_RESULT *result)
 {
 	char			*url, *mode, *uuid, *name;
 	zbx_vmware_service_t	*service;
@@ -1513,7 +1513,7 @@ int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username
 	zbx_vmware_datastore_t	*datastore;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() perfcounter:%s", __func__, perfcounter);
 
 	if (3 > request->nparam || request->nparam > 4)
 	{
@@ -1564,8 +1564,8 @@ int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username
 		goto unlock;
 	}
 
-	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id,
-			"datastore/totalReadLatency[average]", datastore->uuid, 1, result);
+	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, perfcounter, datastore->uuid, 1,
+			result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -1574,74 +1574,18 @@ out:
 	return ret;
 }
 
+int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return check_vcenter_hv_datastore_latency(request, username, password, "datastore/totalReadLatency[average]",
+			result);
+}
+
 int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *mode, *uuid, *name;
-	zbx_vmware_service_t	*service;
-	zbx_vmware_hv_t		*hv;
-	zbx_vmware_datastore_t	*datastore;
-	int			ret = SYSINFO_RET_FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (3 > request->nparam || request->nparam > 4)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	name = get_rparam(request, 2);
-	mode = get_rparam(request, 3);
-
-	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency"))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
-		goto unlock;
-	}
-
-	datastore = ds_get(&service->data->datastores, name);
-
-	if (NULL == datastore)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
-		goto unlock;
-	}
-
-	if (FAIL == zbx_vector_str_bsearch(&hv->ds_names, datastore->name, ZBX_DEFAULT_STR_COMPARE_FUNC))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
-				datastore->name));
-		goto unlock;
-	}
-
-	if (NULL == datastore->uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
-		goto unlock;
-	}
-
-	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id,
-			"datastore/totalWriteLatency[average]", datastore->uuid, 1, result);
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return check_vcenter_hv_datastore_latency(request, username, password, "datastore/totalWriteLatency[average]",
+			result);
 }
 
 static int	check_vcenter_hv_datastore_size_vsphere(int mode, const zbx_vmware_datastore_t *datastore,
