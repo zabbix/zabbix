@@ -147,7 +147,8 @@ class CConfigurationExport {
 
 		if ($this->data['triggers']) {
 			foreach ($this->data['triggers'] as $triggerid => $trigger) {
-				if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST) {
+				if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST
+						&& $trigger['items'][0]['templateid'] == 0) {
 					$simple_triggers[] = $trigger;
 					unset($this->data['triggers'][$triggerid]);
 				}
@@ -977,7 +978,7 @@ class CConfigurationExport {
 				'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
 			],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
-			'selectItems' => ['itemid', 'flags', 'type'],
+			'selectItems' => ['itemid', 'flags', 'type', 'templateid'],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $hostIds,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
