@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-09 01:44+0300\n"
+"POT-Creation-Date: 2019-06-16 01:44+0300\n"
 "PO-Revision-Date: 2017-03-19 02:15+0300\n"
 "Last-Translator: Silviu <silviubv@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -22,12 +22,13 @@ msgstr ""
 #: include/classes/import/validators/C32XmlValidator.php:1007
 #: include/classes/import/validators/C34XmlValidator.php:1111
 #: include/classes/import/validators/C40XmlValidator.php:1290
-#: include/classes/import/validators/C42XmlValidator.php:1352
+#: include/classes/import/validators/C42XmlValidator.php:1350
+#: include/classes/import/validators/C44XmlValidator.php:1466
 #, c-format
 msgid "\"%1$s\" is expected"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1422
+#: include/classes/api/services/CItemGeneral.php:1430
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
 msgstr ""
@@ -48,7 +49,7 @@ msgid "\"host:key\" pair is expected"
 msgstr ""
 
 #: include/forms.inc.php:1467
-#: include/views/configuration.host.discovery.edit.php:747
+#: include/views/configuration.host.discovery.edit.php:748
 #: include/views/js/configuration.host.discovery.edit.js.php:52
 #: include/views/js/item.preprocessing.js.php:162
 msgid "$.path.to.node"
@@ -95,7 +96,7 @@ msgstr[0] "%1$s Element"
 msgstr[1] "%1$s Elemente"
 msgstr[2] "%1$s Elemente"
 
-#: include/classes/api/services/CItemGeneral.php:2266
+#: include/classes/api/services/CItemGeneral.php:2277
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
@@ -337,11 +338,11 @@ msgstr ""
 msgid "ADD OVERRIDE"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:460
-#: include/views/configuration.item.edit.php:553
-#: include/views/configuration.item.edit.php:560
+#: include/views/configuration.host.discovery.edit.php:461
+#: include/views/configuration.item.edit.php:554
+#: include/views/configuration.item.edit.php:561
 #: include/views/configuration.item.massupdate.php:240
-#: include/views/configuration.item.prototype.edit.php:502
+#: include/views/configuration.item.prototype.edit.php:503
 #: include/views/configuration.item.prototype.massupdate.php:236
 #: include/views/js/configuration.discovery.edit.js.php:134
 msgid "AES"
@@ -438,15 +439,15 @@ msgstr ""
 #: include/views/configuration.correlation.edit.php:48
 #: include/views/configuration.correlation.edit.php:218
 #: include/views/configuration.graph.edit.php:351
-#: include/views/configuration.host.discovery.edit.php:539
-#: include/views/configuration.host.discovery.edit.php:638
+#: include/views/configuration.host.discovery.edit.php:540
+#: include/views/configuration.host.discovery.edit.php:639
 #: include/views/configuration.host.edit.php:550
 #: include/views/configuration.host.massupdate.php:216
-#: include/views/configuration.host.prototype.edit.php:255
+#: include/views/configuration.host.prototype.edit.php:256
 #: include/views/configuration.httpconf.edit.php:202
-#: include/views/configuration.item.edit.php:689
+#: include/views/configuration.item.edit.php:690
 #: include/views/configuration.item.massupdate.php:343
-#: include/views/configuration.item.prototype.edit.php:614
+#: include/views/configuration.item.prototype.edit.php:615
 #: include/views/configuration.item.prototype.massupdate.php:340
 #: include/views/configuration.maintenance.edit.php:77
 #: include/views/configuration.services.edit.php:117
@@ -628,10 +629,10 @@ msgstr "Activ până la"
 #: include/views/configuration.graph.edit.php:478
 #: include/views/configuration.host.discovery.edit.php:113
 #: include/views/configuration.host.discovery.edit.php:205
-#: include/views/configuration.host.discovery.edit.php:575
-#: include/views/configuration.host.discovery.edit.php:695
-#: include/views/configuration.host.discovery.edit.php:760
-#: include/views/configuration.host.discovery.edit.php:808
+#: include/views/configuration.host.discovery.edit.php:576
+#: include/views/configuration.host.discovery.edit.php:696
+#: include/views/configuration.host.discovery.edit.php:761
+#: include/views/configuration.host.discovery.edit.php:809
 #: include/views/configuration.host.edit.php:120
 #: include/views/configuration.host.edit.php:136
 #: include/views/configuration.host.edit.php:152
@@ -642,24 +643,24 @@ msgstr "Activ până la"
 #: include/views/configuration.host.list.php:89
 #: include/views/configuration.host.massupdate.php:56
 #: include/views/configuration.host.massupdate.php:210
-#: include/views/configuration.host.prototype.edit.php:209
-#: include/views/configuration.host.prototype.edit.php:308
-#: include/views/configuration.host.prototype.edit.php:444
+#: include/views/configuration.host.prototype.edit.php:210
+#: include/views/configuration.host.prototype.edit.php:309
+#: include/views/configuration.host.prototype.edit.php:445
 #: include/views/configuration.httpconf.edit.php:122
 #: include/views/configuration.httpconf.edit.php:140
 #: include/views/configuration.httpconf.edit.php:208
 #: include/views/configuration.httpconf.edit.php:257
 #: include/views/configuration.item.edit.php:151
 #: include/views/configuration.item.edit.php:243
-#: include/views/configuration.item.edit.php:738
-#: include/views/configuration.item.edit.php:959
+#: include/views/configuration.item.edit.php:739
+#: include/views/configuration.item.edit.php:960
 #: include/views/configuration.item.massupdate.php:156
 #: include/views/configuration.item.massupdate.php:381
 #: include/views/configuration.item.massupdate.php:495
 #: include/views/configuration.item.prototype.edit.php:133
 #: include/views/configuration.item.prototype.edit.php:225
-#: include/views/configuration.item.prototype.edit.php:650
-#: include/views/configuration.item.prototype.edit.php:777
+#: include/views/configuration.item.prototype.edit.php:651
+#: include/views/configuration.item.prototype.edit.php:778
 #: include/views/configuration.item.prototype.massupdate.php:152
 #: include/views/configuration.item.prototype.massupdate.php:378
 #: include/views/configuration.item.prototype.massupdate.php:470
@@ -943,10 +944,10 @@ msgstr ""
 msgid "Allow manual close"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:598
-#: include/views/configuration.item.edit.php:839
+#: include/views/configuration.host.discovery.edit.php:599
+#: include/views/configuration.item.edit.php:840
 #: include/views/configuration.item.massupdate.php:460
-#: include/views/configuration.item.prototype.edit.php:708
+#: include/views/configuration.item.prototype.edit.php:709
 #: include/views/configuration.item.prototype.massupdate.php:460
 msgid "Allowed hosts"
 msgstr "Servere permise"
@@ -959,7 +960,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:1146
 #: include/views/configuration.correlation.edit.php:94
-#: include/views/configuration.host.discovery.edit.php:619
+#: include/views/configuration.host.discovery.edit.php:620
 #: include/views/configuration.trigger.prototype.edit.php:130
 #: include/views/configuration.trigger.prototype.edit.php:322
 #: include/views/configuration.triggers.edit.php:154
@@ -973,7 +974,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:1145
 #: include/views/configuration.correlation.edit.php:93
-#: include/views/configuration.host.discovery.edit.php:618
+#: include/views/configuration.host.discovery.edit.php:619
 #: include/views/configuration.host.list.php:59
 #: include/views/configuration.maintenance.edit.php:170
 #: include/views/configuration.template.list.php:33
@@ -1038,7 +1039,7 @@ msgid "Application error."
 msgstr "Eroare aplicație."
 
 #: app/controllers/CControllerPopupGeneric.php:135
-#: include/views/configuration.item.prototype.edit.php:739
+#: include/views/configuration.item.prototype.edit.php:740
 #: include/views/configuration.item.prototype.massupdate.php:541
 msgid "Application prototypes"
 msgstr ""
@@ -1066,10 +1067,10 @@ msgstr ""
 #: include/views/configuration.host.edit.php:308
 #: include/views/configuration.host.list.php:173
 #: include/views/configuration.host.list.php:387
-#: include/views/configuration.item.edit.php:874
-#: include/views/configuration.item.list.php:68
+#: include/views/configuration.item.edit.php:875
+#: include/views/configuration.item.list.php:69
 #: include/views/configuration.item.massupdate.php:521
-#: include/views/configuration.item.prototype.edit.php:724
+#: include/views/configuration.item.prototype.edit.php:725
 #: include/views/configuration.item.prototype.list.php:58
 #: include/views/configuration.item.prototype.massupdate.php:466
 #: include/views/configuration.template.edit.php:130
@@ -1133,11 +1134,11 @@ msgstr "Tipul suprafeței"
 msgid "Arithmetic"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:809
-#: include/views/configuration.item.edit.php:815
+#: include/views/configuration.item.edit.php:810
+#: include/views/configuration.item.edit.php:816
 #: include/views/configuration.item.massupdate.php:437
-#: include/views/configuration.item.prototype.edit.php:686
-#: include/views/configuration.item.prototype.edit.php:692
+#: include/views/configuration.item.prototype.edit.php:687
+#: include/views/configuration.item.prototype.edit.php:693
 #: include/views/configuration.item.prototype.massupdate.php:436
 msgid "As is"
 msgstr "Ca și"
@@ -1270,7 +1271,7 @@ msgstr "Autentificare"
 
 #: include/views/configuration.host.edit.php:677
 #: include/views/configuration.host.massupdate.php:159
-#: include/views/configuration.host.prototype.edit.php:327
+#: include/views/configuration.host.prototype.edit.php:328
 msgid "Authentication algorithm"
 msgstr "Algoritm de autentificare"
 
@@ -1282,10 +1283,10 @@ msgstr ""
 #: include/views/configuration.action.edit.php:944
 #: include/views/configuration.action.edit.php:1731
 #: include/views/configuration.action.edit.php:2189
-#: include/views/configuration.host.discovery.edit.php:480
-#: include/views/configuration.item.edit.php:600
+#: include/views/configuration.host.discovery.edit.php:481
+#: include/views/configuration.item.edit.php:601
 #: include/views/configuration.item.massupdate.php:283
-#: include/views/configuration.item.prototype.edit.php:522
+#: include/views/configuration.item.prototype.edit.php:523
 #: include/views/configuration.item.prototype.massupdate.php:278
 msgid "Authentication method"
 msgstr "Metodă de autentificare"
@@ -1294,19 +1295,19 @@ msgstr "Metodă de autentificare"
 msgid "Authentication method changed"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:452
-#: include/views/configuration.item.edit.php:542
+#: include/views/configuration.host.discovery.edit.php:453
+#: include/views/configuration.item.edit.php:543
 #: include/views/configuration.item.massupdate.php:227
-#: include/views/configuration.item.prototype.edit.php:494
+#: include/views/configuration.item.prototype.edit.php:495
 #: include/views/configuration.item.prototype.massupdate.php:223
 #: include/views/js/configuration.discovery.edit.js.php:124
 msgid "Authentication passphrase"
 msgstr "Frază de acces pentru autentificare"
 
-#: include/views/configuration.host.discovery.edit.php:445
-#: include/views/configuration.item.edit.php:537
+#: include/views/configuration.host.discovery.edit.php:446
+#: include/views/configuration.item.edit.php:538
 #: include/views/configuration.item.massupdate.php:215
-#: include/views/configuration.item.prototype.edit.php:487
+#: include/views/configuration.item.prototype.edit.php:488
 #: include/views/configuration.item.prototype.massupdate.php:211
 #: include/views/js/configuration.discovery.edit.js.php:116
 msgid "Authentication protocol"
@@ -1357,7 +1358,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:1075
 #: include/views/configuration.host.edit.php:718
 #: include/views/configuration.host.massupdate.php:196
-#: include/views/configuration.host.prototype.edit.php:367
+#: include/views/configuration.host.prototype.edit.php:368
 msgid "Automatic"
 msgstr "Automată"
 
@@ -1523,7 +1524,7 @@ msgid "CERT"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:1002
+#: include/classes/graph/CSvgGraph.php:977
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:991
 #: include/classes/screens/CScreenProblem.php:1150 include/events.inc.php:340
@@ -1648,13 +1649,13 @@ msgstr ""
 msgid "Cannot add dependency from a host to a template."
 msgstr "Nu se poate adăuga dependința server - șablon."
 
-#: include/classes/api/services/CDiscoveryRule.php:867
+#: include/classes/api/services/CDiscoveryRule.php:948
 #: include/triggers.inc.php:527
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 msgstr "Nu se poate adăuga dependința trigger \"%1$s:%2$s\" la trigger nonexistent \"%3$s:%4$s\"."
 
-#: host_discovery.php:579
+#: host_discovery.php:583
 msgid "Cannot add discovery rule"
 msgstr "Nu se poate adăuga regula de detecție"
 
@@ -1686,7 +1687,7 @@ msgstr "Nu se poate adăuga prototipul serverului"
 msgid "Cannot add image"
 msgstr "Nu se poate adăuga imaginea"
 
-#: items.php:930
+#: items.php:935
 msgid "Cannot add item"
 msgstr "Nu se poate adăuga elementul"
 
@@ -1695,7 +1696,7 @@ msgstr "Nu se poate adăuga elementul"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "Nu se poate adăuga elementul \"%1$s\" de la \"%2$s\" la aplicația \"%3$s\" de la \"%4$s\"."
 
-#: disc_prototypes.php:681
+#: disc_prototypes.php:685
 msgid "Cannot add item prototype"
 msgstr "Nu se poate adăuga prototip item"
 
@@ -1770,7 +1771,7 @@ msgstr ""
 msgid "Cannot add template"
 msgstr "Nu se poate adăuga șablonul"
 
-#: app/controllers/CControllerPopupTriggerWizard.php:204 triggers.php:295
+#: app/controllers/CControllerPopupTriggerWizard.php:204 triggers.php:296
 msgid "Cannot add trigger"
 msgstr "Nu se poate adăuga trigger-ul"
 
@@ -1811,25 +1812,25 @@ msgstr ""
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
 msgstr ""
 
-#: httpconf.php:196 httpconf.php:509 items.php:979 items.php:1388
+#: httpconf.php:196 httpconf.php:509 items.php:984 items.php:1393
 msgid "Cannot clear history"
 msgstr "Nu se poate șterge istoricul"
 
-#: include/classes/api/services/CDiscoveryRule.php:1910
+#: include/classes/api/services/CDiscoveryRule.php:2007
 msgid "Cannot clone graph prototypes."
 msgstr "Nu se pot clona prototipurile de grafic."
 
-#: include/classes/api/services/CDiscoveryRule.php:1958
+#: include/classes/api/services/CDiscoveryRule.php:2055
 msgid "Cannot clone host prototypes."
 msgstr "Nu se pot clona prototipurile de server."
 
-#: include/classes/api/services/CDiscoveryRule.php:1715
-#: include/classes/api/services/CDiscoveryRule.php:1771
-#: include/classes/api/services/CDiscoveryRule.php:1789
+#: include/classes/api/services/CDiscoveryRule.php:1812
+#: include/classes/api/services/CDiscoveryRule.php:1868
+#: include/classes/api/services/CDiscoveryRule.php:1886
 msgid "Cannot clone item prototypes."
 msgstr "Nu se pot clona prototipurile de element."
 
-#: include/classes/api/services/CDiscoveryRule.php:780
+#: include/classes/api/services/CDiscoveryRule.php:861
 msgid "Cannot clone trigger prototypes."
 msgstr "Nu se pot clona prototipurile de trigger."
 
@@ -1857,14 +1858,14 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: items.php:1344
+#: items.php:1349
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: triggers.php:593
+#: triggers.php:594
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
 msgstr[0] ""
@@ -1961,11 +1962,11 @@ msgstr "Nu se poate șterge dependința"
 msgid "Cannot delete discovered application \"%1$s\"."
 msgstr ""
 
-#: discoveryconf.php:188 host_discovery.php:295
+#: discoveryconf.php:188 host_discovery.php:299
 msgid "Cannot delete discovery rule"
 msgstr "Nu se poate șterge regula de detecție"
 
-#: discoveryconf.php:230 host_discovery.php:622
+#: discoveryconf.php:230 host_discovery.php:626
 msgid "Cannot delete discovery rules"
 msgstr "Nu se pot șterge regulile de detecție"
 
@@ -2013,7 +2014,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/classes/api/services/CDiscoveryRule.php:551
+#: include/classes/api/services/CDiscoveryRule.php:632
 msgid "Cannot delete host prototype."
 msgstr "Nu se poate șterge prototipul de server."
 
@@ -2033,19 +2034,19 @@ msgstr "Nu se poate șterge imaginea"
 msgid "Cannot delete inventory."
 msgstr "Nu se poate șterge inventarul."
 
-#: items.php:531
+#: items.php:536
 msgid "Cannot delete item"
 msgstr "Nu se poate șterge elementul"
 
-#: disc_prototypes.php:342
+#: disc_prototypes.php:346
 msgid "Cannot delete item prototype"
 msgstr "Nu se poate șterge prototipul itemului"
 
-#: disc_prototypes.php:724
+#: disc_prototypes.php:728
 msgid "Cannot delete item prototypes"
 msgstr "Nu se pot şterge prototipurile de element"
 
-#: items.php:1398
+#: items.php:1403
 msgid "Cannot delete items"
 msgstr "Nu se pot șterge elementele"
 
@@ -2137,11 +2138,11 @@ msgstr "Nu se poate șterge prototipul de server bazat pe un șablon."
 msgid "Cannot delete templated item prototype."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:718
+#: include/classes/api/services/CItem.php:815
 msgid "Cannot delete templated item."
 msgstr "Nu se pote șterge un element bazat pe un șablon."
 
-#: include/classes/api/services/CDiscoveryRule.php:502
+#: include/classes/api/services/CDiscoveryRule.php:583
 msgid "Cannot delete templated items."
 msgstr "Nu se pot șterge elementele bazate pe șabloane."
 
@@ -2160,7 +2161,7 @@ msgstr ""
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Nu se poate șterge scenariul web \"%1$s\" bazat pe un șablon."
 
-#: triggers.php:408
+#: triggers.php:409
 msgid "Cannot delete trigger"
 msgstr "Nu se poate șterge trigger-ul"
 
@@ -2172,7 +2173,7 @@ msgstr "Nu se poate șterge prototipul trigger-ului"
 msgid "Cannot delete trigger prototypes"
 msgstr "Nu se pot şterge prototipurile triggerilor"
 
-#: triggers.php:607
+#: triggers.php:608
 msgid "Cannot delete triggers"
 msgstr "Nu se pot șterge triggerii"
 
@@ -2206,7 +2207,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: discoveryconf.php:215 host_discovery.php:612
+#: discoveryconf.php:215 host_discovery.php:616
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Nu se poate dezactiva regula de detecție"
@@ -2221,7 +2222,7 @@ msgstr[0] "Nu se poate dezactiva serverul"
 msgstr[1] "Nu se pot dezactiva servererele"
 msgstr[2] "Nu se pot dezactiva servererele"
 
-#: applications.php:174 items.php:1304
+#: applications.php:174 items.php:1309
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "Nu se poate dezactiva elementul"
@@ -2235,7 +2236,7 @@ msgstr[0] "Nu se poate dezactiva tipul media"
 msgstr[1] "Nu se poate dezactiva tipul media"
 msgstr[2] "Nu se poate dezactiva tipul media"
 
-#: triggers.php:545
+#: triggers.php:546
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] "Nu se poate dezactiva triggerul"
@@ -2278,7 +2279,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: discoveryconf.php:214 host_discovery.php:611
+#: discoveryconf.php:214 host_discovery.php:615
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Nu se poate activa regula de detecție"
@@ -2293,7 +2294,7 @@ msgstr[0] "Nu se poate activa srverul"
 msgstr[1] "Nu se pot activa serverele"
 msgstr[2] "Nu se pot activa serverele"
 
-#: applications.php:173 items.php:1303
+#: applications.php:173 items.php:1308
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "Nu se poate activa elementul"
@@ -2307,7 +2308,7 @@ msgstr[0] "Nu se poate activa tipul media"
 msgstr[1] "Nu se poate activa tipurile media"
 msgstr[2] "Nu se poate activa tipul media"
 
-#: triggers.php:544
+#: triggers.php:545
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] "Nu se poate activa trigger-ul"
@@ -2371,8 +2372,8 @@ msgstr "Nu se poate găsi serverul \"%1$s\" folosit în ecranul \"%2$s\"."
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nu se poate gasi grupul server \"%1$s\" pentru serverul prototip \"%2$s\" a regulii de detecție \"%3$s\" pe \"%4$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1559
-#: include/classes/api/services/CDiscoveryRule.php:1742
+#: include/classes/api/services/CDiscoveryRule.php:1656
+#: include/classes/api/services/CDiscoveryRule.php:1839
 #: include/classes/api/services/CItemGeneral.php:115 include/items.inc.php:504
 #: include/items.inc.php:651
 #, c-format
@@ -2555,8 +2556,8 @@ msgstr "Nu se poate efectua instrucțiunea de actualizare în tabela \"%1$s\" f�
 msgid "Cannot process applications from different hosts or templates."
 msgstr "Nu se pot procesa aplicațiile de la diferite servere sau șabloane."
 
-#: include/classes/api/services/CItemGeneral.php:2274
-#: include/classes/api/services/CItemGeneral.php:2301
+#: include/classes/api/services/CItemGeneral.php:2285
+#: include/classes/api/services/CItemGeneral.php:2312
 msgid "Cannot read JSON."
 msgstr ""
 
@@ -2565,8 +2566,8 @@ msgstr ""
 msgid "Cannot read JSON: %1$s."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2261
-#: include/classes/api/services/CItemGeneral.php:2265
+#: include/classes/api/services/CItemGeneral.php:2272
+#: include/classes/api/services/CItemGeneral.php:2276
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
@@ -2597,7 +2598,7 @@ msgstr ""
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Nu se poate trimite comanda, verificați conexiunea cu serverul Zabbix \"%1$s\"."
 
-#: host_discovery.php:305 host_discovery.php:634 items.php:947 items.php:1410
+#: host_discovery.php:309 host_discovery.php:638 items.php:952 items.php:1415
 msgid "Cannot send request"
 msgstr ""
 
@@ -2827,7 +2828,7 @@ msgstr ""
 msgid "Cannot update discovered application \"%1$s\"."
 msgstr ""
 
-#: discoveryconf.php:157 host_discovery.php:582
+#: discoveryconf.php:157 host_discovery.php:586
 msgid "Cannot update discovery rule"
 msgstr "Nu se poate actualiza regula de detecție"
 
@@ -2895,11 +2896,11 @@ msgstr "Nu se poate actualiza imaginea"
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Nu se poate actualiza interfața pentru serverul detectat \"%1$s\"."
 
-#: items.php:933
+#: items.php:938
 msgid "Cannot update item"
 msgstr "Nu se poate actualiza elementul"
 
-#: disc_prototypes.php:684 disc_prototypes.php:711
+#: disc_prototypes.php:688 disc_prototypes.php:715
 #, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
@@ -2907,11 +2908,11 @@ msgstr[0] "Nu se poate actualiza prototipul item"
 msgstr[1] "Nu se poate actualiza prototipul item"
 msgstr[2] "Nu se poate actualiza prototipul item"
 
-#: disc_prototypes.php:1153
+#: disc_prototypes.php:1157
 msgid "Cannot update item prototypes"
 msgstr ""
 
-#: items.php:1280
+#: items.php:1285
 msgid "Cannot update items"
 msgstr "Nu se pot actualiza elementele"
 
@@ -2988,8 +2989,8 @@ msgstr ""
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Nu se poate actualiza șablonul pentru serverul detectat \"%1$s\"."
 
-#: app/controllers/CControllerPopupTriggerWizard.php:188 triggers.php:393
-#: triggers.php:511
+#: app/controllers/CControllerPopupTriggerWizard.php:188 triggers.php:394
+#: triggers.php:512
 msgid "Cannot update trigger"
 msgstr "Nu se poate actualiza trigger-ul"
 
@@ -3067,8 +3068,8 @@ msgstr ""
 #: include/views/configuration.host.edit.php:800
 #: include/views/configuration.host.massupdate.php:253
 #: include/views/configuration.host.massupdate.php:261
-#: include/views/configuration.host.prototype.edit.php:380
-#: include/views/configuration.host.prototype.edit.php:396
+#: include/views/configuration.host.prototype.edit.php:381
+#: include/views/configuration.host.prototype.edit.php:397
 msgid "Certificate"
 msgstr ""
 
@@ -3102,9 +3103,9 @@ msgid "Change severity"
 msgstr ""
 
 #: include/forms.inc.php:353 include/items.inc.php:129
-#: include/views/configuration.item.edit.php:667
+#: include/views/configuration.item.edit.php:668
 #: include/views/configuration.item.massupdate.php:268
-#: include/views/configuration.item.prototype.edit.php:592
+#: include/views/configuration.item.prototype.edit.php:593
 #: include/views/configuration.item.prototype.massupdate.php:263
 msgid "Character"
 msgstr "Caracter"
@@ -3130,7 +3131,7 @@ msgstr ""
 msgid "Check already exists."
 msgstr "Verificarea există deja."
 
-#: include/classes/parsers/CTriggerExpression.php:460
+#: include/classes/parsers/CTriggerExpression.php:463
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Verifică partea din expresie care începe de la \"%1$s\"."
@@ -3147,10 +3148,10 @@ msgstr ""
 msgid "Check for error using regular expression"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:793
+#: include/views/configuration.host.discovery.edit.php:794
 #: include/views/configuration.host.discovery.list.php:175
-#: include/views/configuration.item.edit.php:936
-#: include/views/configuration.item.list.php:243
+#: include/views/configuration.item.edit.php:937
+#: include/views/configuration.item.list.php:244
 msgid "Check now"
 msgstr ""
 
@@ -3259,12 +3260,12 @@ msgid "Clear"
 msgstr "Șterge"
 
 #: include/views/configuration.httpconf.list.php:167
-#: include/views/configuration.item.list.php:244
+#: include/views/configuration.item.list.php:245
 msgid "Clear history"
 msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:244
-#: include/views/configuration.item.edit.php:946
+#: include/views/configuration.item.edit.php:947
 msgid "Clear history and trends"
 msgstr "Șterge istoric și tendințe"
 
@@ -3296,13 +3297,13 @@ msgstr "Ceas"
 #: include/views/configuration.correlation.edit.php:277
 #: include/views/configuration.discovery.edit.php:135
 #: include/views/configuration.graph.edit.php:470
-#: include/views/configuration.host.discovery.edit.php:790
+#: include/views/configuration.host.discovery.edit.php:791
 #: include/views/configuration.host.edit.php:835
 #: include/views/configuration.hostgroups.edit.php:58
-#: include/views/configuration.host.prototype.edit.php:436
+#: include/views/configuration.host.prototype.edit.php:437
 #: include/views/configuration.httpconf.edit.php:237
-#: include/views/configuration.item.edit.php:933
-#: include/views/configuration.item.prototype.edit.php:767
+#: include/views/configuration.item.edit.php:934
+#: include/views/configuration.item.prototype.edit.php:768
 #: include/views/configuration.maintenance.edit.php:287
 #: include/views/configuration.template.edit.php:452
 #: include/views/configuration.trigger.prototype.edit.php:616
@@ -3436,7 +3437,7 @@ msgstr ""
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for correlation \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1242
+#: include/classes/api/services/CDiscoveryRule.php:1339
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
 msgstr ""
@@ -3451,7 +3452,7 @@ msgstr ""
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for correlation \"%1$s\" is not defined."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1241
+#: include/classes/api/services/CDiscoveryRule.php:1338
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
 msgstr ""
@@ -3721,7 +3722,7 @@ msgstr ""
 
 #: include/views/configuration.host.edit.php:788
 #: include/views/configuration.host.massupdate.php:256
-#: include/views/configuration.host.prototype.edit.php:384
+#: include/views/configuration.host.prototype.edit.php:385
 msgid "Connections from host"
 msgstr ""
 
@@ -3731,7 +3732,7 @@ msgstr ""
 
 #: include/views/configuration.host.edit.php:780
 #: include/views/configuration.host.massupdate.php:249
-#: include/views/configuration.host.prototype.edit.php:376
+#: include/views/configuration.host.prototype.edit.php:377
 msgid "Connections to host"
 msgstr ""
 
@@ -3826,10 +3827,10 @@ msgstr ""
 msgid "Content menu"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:418
-#: include/views/configuration.item.edit.php:483
+#: include/views/configuration.host.discovery.edit.php:419
+#: include/views/configuration.item.edit.php:484
 #: include/views/configuration.item.massupdate.php:190
-#: include/views/configuration.item.prototype.edit.php:462
+#: include/views/configuration.item.prototype.edit.php:463
 #: include/views/configuration.item.prototype.massupdate.php:186
 #: include/views/js/configuration.discovery.edit.js.php:94
 msgid "Context name"
@@ -3851,8 +3852,8 @@ msgstr "Coordonate"
 
 #: include/views/configuration.copy.elements.php:73
 #: include/views/configuration.graph.list.php:150
-#: include/views/configuration.item.list.php:247
-#: include/views/configuration.triggers.list.php:331 jsLoader.php:184
+#: include/views/configuration.item.list.php:248
+#: include/views/configuration.triggers.list.php:332 jsLoader.php:184
 msgid "Copy"
 msgstr "Copiază"
 
@@ -3979,7 +3980,7 @@ msgstr "Creează regula de detecție"
 #: include/views/configuration.host.prototype.edit.php:164
 #: include/views/configuration.host.prototype.list.php:55
 #: include/views/configuration.host.prototype.list.php:152
-#: include/views/configuration.item.prototype.edit.php:745
+#: include/views/configuration.item.prototype.edit.php:746
 #: include/views/configuration.item.prototype.list.php:59
 #: include/views/configuration.item.prototype.list.php:168
 #: include/views/configuration.item.prototype.massupdate.php:422
@@ -4145,7 +4146,7 @@ msgstr ""
 
 #: include/views/configuration.action.edit.php:114
 #: include/views/configuration.correlation.edit.php:96
-#: include/views/configuration.host.discovery.edit.php:621
+#: include/views/configuration.host.discovery.edit.php:622
 msgid "Custom expression"
 msgstr ""
 
@@ -4153,10 +4154,10 @@ msgstr ""
 msgid "Custom graphs"
 msgstr "Grafice personalizate"
 
-#: include/views/configuration.host.discovery.edit.php:581
-#: include/views/configuration.item.edit.php:743
+#: include/views/configuration.host.discovery.edit.php:582
+#: include/views/configuration.item.edit.php:744
 #: include/views/configuration.item.massupdate.php:387
-#: include/views/configuration.item.prototype.edit.php:654
+#: include/views/configuration.item.prototype.edit.php:655
 #: include/views/configuration.item.prototype.massupdate.php:384
 msgid "Custom intervals"
 msgstr ""
@@ -4215,11 +4216,11 @@ msgctxt "XML date format"
 msgid "DD.MM.YY"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:459
-#: include/views/configuration.item.edit.php:552
-#: include/views/configuration.item.edit.php:559
+#: include/views/configuration.host.discovery.edit.php:460
+#: include/views/configuration.item.edit.php:553
+#: include/views/configuration.item.edit.php:560
 #: include/views/configuration.item.massupdate.php:239
-#: include/views/configuration.item.prototype.edit.php:501
+#: include/views/configuration.item.prototype.edit.php:502
 #: include/views/configuration.item.prototype.massupdate.php:235
 #: include/views/js/configuration.discovery.edit.js.php:133
 msgid "DES"
@@ -4547,12 +4548,12 @@ msgstr "Întârziat de către"
 #: include/views/configuration.host.list.php:437
 #: include/views/configuration.host.prototype.list.php:158
 #: include/views/configuration.httpconf.list.php:170
-#: include/views/configuration.item.list.php:249
+#: include/views/configuration.item.list.php:250
 #: include/views/configuration.item.prototype.list.php:175
 #: include/views/configuration.maintenance.list.php:109
 #: include/views/configuration.template.list.php:283
 #: include/views/configuration.trigger.prototype.list.php:163
-#: include/views/configuration.triggers.list.php:333
+#: include/views/configuration.triggers.list.php:334
 #: include/views/monitoring.screen.list.php:119
 #: include/views/monitoring.slideconf.list.php:97
 #: include/views/monitoring.sysmap.list.php:92 jsLoader.php:113
@@ -4594,7 +4595,7 @@ msgid "Delete dashboard?"
 msgstr ""
 
 #: include/views/configuration.discovery.edit.php:136
-#: include/views/configuration.host.discovery.edit.php:800
+#: include/views/configuration.host.discovery.edit.php:801
 msgid "Delete discovery rule?"
 msgstr "Ștergere regulă de detecție?"
 
@@ -4613,7 +4614,7 @@ msgstr "Ștergere prototip de grafic?"
 msgid "Delete graph?"
 msgstr "Ștergere element grafic?"
 
-#: include/views/configuration.item.list.php:245
+#: include/views/configuration.item.list.php:246
 msgid "Delete history of selected items?"
 msgstr "Ștergere istoric pentru itemi selectați?"
 
@@ -4625,11 +4626,11 @@ msgstr ""
 msgid "Delete icon map?"
 msgstr "Ștergere harta icoanei?"
 
-#: include/views/configuration.item.prototype.edit.php:768
+#: include/views/configuration.item.prototype.edit.php:769
 msgid "Delete item prototype?"
 msgstr "Ștergere prototip de element?"
 
-#: include/views/configuration.item.edit.php:951
+#: include/views/configuration.item.edit.php:952
 msgid "Delete item?"
 msgstr "Ștergere element?"
 
@@ -4711,7 +4712,7 @@ msgstr "Ștergere grupuri selectate?"
 msgid "Delete selected host groups?"
 msgstr "Ștergere grupuri de servere selectate?"
 
-#: include/views/configuration.host.prototype.edit.php:428
+#: include/views/configuration.host.prototype.edit.php:429
 msgid "Delete selected host prototype?"
 msgstr "Ștergere prototipuri de servere selectați?"
 
@@ -4735,7 +4736,7 @@ msgstr "Ștergere imagine selectată?"
 msgid "Delete selected item prototypes?"
 msgstr "Ștergere elemente prototip selectațe?"
 
-#: include/views/configuration.item.list.php:249
+#: include/views/configuration.item.list.php:250
 msgid "Delete selected items?"
 msgstr "Ștergere elementele selectate?"
 
@@ -4787,7 +4788,7 @@ msgstr "Ștergere șabloane selectate?"
 msgid "Delete selected trigger prototypes?"
 msgstr "Ștergere prototipuri de trigger selectați?"
 
-#: include/views/configuration.triggers.list.php:333
+#: include/views/configuration.triggers.list.php:334
 msgid "Delete selected triggers?"
 msgstr "Ștergere triggeri selectați?"
 
@@ -4894,7 +4895,7 @@ msgstr ""
 #: app/views/popup.generic.php:289 include/triggers.inc.php:2724
 #: include/views/configuration.services.edit.php:152
 #: include/views/configuration.trigger.prototype.list.php:81
-#: include/views/configuration.triggers.list.php:238
+#: include/views/configuration.triggers.list.php:239
 msgid "Depends on"
 msgstr "Depinde de"
 
@@ -4909,12 +4910,12 @@ msgstr "Stare de implementare"
 #: include/classes/screens/CScreenEvents.php:32
 #: include/views/administration.auditlogs.list.php:76
 #: include/views/configuration.correlation.edit.php:205
-#: include/views/configuration.host.discovery.edit.php:602
+#: include/views/configuration.host.discovery.edit.php:603
 #: include/views/configuration.host.edit.php:268
 #: include/views/configuration.host.massupdate.php:82
-#: include/views/configuration.item.edit.php:907
+#: include/views/configuration.item.edit.php:908
 #: include/views/configuration.item.massupdate.php:570
-#: include/views/configuration.item.prototype.edit.php:741
+#: include/views/configuration.item.prototype.edit.php:742
 #: include/views/configuration.item.prototype.massupdate.php:583
 #: include/views/configuration.maintenance.edit.php:67
 #: include/views/configuration.maintenance.list.php:75
@@ -4978,8 +4979,8 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:172
 #: include/views/configuration.host.list.php:434
 #: include/views/configuration.httpconf.list.php:166
-#: include/views/configuration.item.list.php:242
-#: include/views/configuration.triggers.list.php:330
+#: include/views/configuration.item.list.php:243
+#: include/views/configuration.triggers.list.php:331
 msgid "Disable"
 msgstr "Dezactivare"
 
@@ -5037,7 +5038,7 @@ msgstr "Dezactivare grupuri selectate?"
 msgid "Disable selected hosts?"
 msgstr "Dezactivare servere selectate?"
 
-#: include/views/configuration.item.list.php:242
+#: include/views/configuration.item.list.php:243
 msgid "Disable selected items?"
 msgstr "Dezactivare itemi selectaţi?"
 
@@ -5045,7 +5046,7 @@ msgstr "Dezactivare itemi selectaţi?"
 msgid "Disable selected media types?"
 msgstr "Dezactivare elemente media selectate?"
 
-#: include/views/configuration.triggers.list.php:330
+#: include/views/configuration.triggers.list.php:331
 msgid "Disable selected triggers?"
 msgstr "Dezactivare triggeri selectați?"
 
@@ -5056,7 +5057,7 @@ msgstr ""
 #: app/views/administration.mediatype.list.php:47
 #: app/views/administration.mediatype.list.php:129 auditlogs.php:147
 #: include/discovery.inc.php:108 include/hosts.inc.php:1299
-#: include/html.inc.php:331 include/httptest.inc.php:46
+#: include/html.inc.php:331 include/httptest.inc.php:47
 #: include/items.inc.php:140 include/items.inc.php:143
 #: include/items.inc.php:187 include/triggers.inc.php:2174
 #: include/users.inc.php:86
@@ -5077,7 +5078,7 @@ msgstr ""
 #: include/views/configuration.host.list.php:250
 #: include/views/configuration.host.massupdate.php:107
 #: include/views/configuration.host.massupdate.php:194
-#: include/views/configuration.host.prototype.edit.php:365
+#: include/views/configuration.host.prototype.edit.php:366
 #: include/views/js/monitoring.sysmaps.js.php:232
 msgid "Disabled"
 msgstr "Dezactivat"
@@ -5167,12 +5168,12 @@ msgstr "Obiect detectat"
 msgid "Discovery rule"
 msgstr "Regulă de detecție"
 
-#: include/classes/api/services/CDiscoveryRule.php:47
+#: include/classes/api/services/CDiscoveryRule.php:68
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Regula de detecție \"%1$s\" există deja pe \"%2$s\", moștenită de la alt șablon."
 
-#: include/classes/api/services/CDiscoveryRule.php:48
+#: include/classes/api/services/CDiscoveryRule.php:69
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
 msgstr "Regula de detecție \"%1$s\" există deja pe \"%2$s\"."
@@ -5185,7 +5186,7 @@ msgstr "Regula de detecție \"%1$s\" există deja pe \"%2$s\"."
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1578
+#: include/classes/api/services/CDiscoveryRule.php:1675
 #, c-format
 msgid "Discovery rule \"%1$s\" cannot be copied without its master item."
 msgstr ""
@@ -5196,29 +5197,29 @@ msgstr ""
 msgid "Discovery rule \"%1$s\" is used in \"%2$s\" action."
 msgstr ""
 
-#: discoveryconf.php:163 host_discovery.php:579
+#: discoveryconf.php:163 host_discovery.php:583
 msgid "Discovery rule created"
 msgstr "Regulă de detecție creată"
 
-#: discoveryconf.php:188 host_discovery.php:295
+#: discoveryconf.php:188 host_discovery.php:299
 msgid "Discovery rule deleted"
 msgstr "Regulă de detecție ștearsă"
 
-#: discoveryconf.php:212 host_discovery.php:609
+#: discoveryconf.php:212 host_discovery.php:613
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Regulă de detecție dezactivată"
 msgstr[1] "Reguli de detecție dezactivate"
 msgstr[2] "Reguli de detecție dezactivate"
 
-#: discoveryconf.php:211 host_discovery.php:608
+#: discoveryconf.php:211 host_discovery.php:612
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Regulă de detecție activată"
 msgstr[1] "Reguli de detecție activate"
 msgstr[2] "Reguli de detecție activate"
 
-#: discoveryconf.php:156 host_discovery.php:582
+#: discoveryconf.php:156 host_discovery.php:586
 msgid "Discovery rule updated"
 msgstr "Regulă de detecție actualizată"
 
@@ -5233,7 +5234,7 @@ msgstr "Regulă de detecție actualizată"
 msgid "Discovery rules"
 msgstr "Reguli de detecție"
 
-#: discoveryconf.php:230 host_discovery.php:622
+#: discoveryconf.php:230 host_discovery.php:626
 msgid "Discovery rules deleted"
 msgstr "Reguli de detecție șterse"
 
@@ -5598,12 +5599,12 @@ msgstr ""
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1269
+#: include/classes/api/services/CDiscoveryRule.php:1366
 #, c-format
 msgid "Empty filter condition formula ID for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1261
+#: include/classes/api/services/CDiscoveryRule.php:1358
 #, c-format
 msgid "Empty filter condition macro for discovery rule \"%1$s\"."
 msgstr ""
@@ -5620,7 +5621,7 @@ msgstr ""
 
 #: include/classes/api/services/CCorrelation.php:516
 #: include/classes/api/services/CCorrelation.php:693
-#: include/classes/api/services/CDiscoveryRule.php:483
+#: include/classes/api/services/CDiscoveryRule.php:564
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
 #: include/classes/api/services/CHostInterface.php:383
@@ -5689,8 +5690,8 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:169
 #: include/views/configuration.host.list.php:433
 #: include/views/configuration.httpconf.list.php:165
-#: include/views/configuration.item.list.php:241
-#: include/views/configuration.triggers.list.php:329
+#: include/views/configuration.item.list.php:242
+#: include/views/configuration.triggers.list.php:330
 msgid "Enable"
 msgstr "Activare"
 
@@ -5768,7 +5769,7 @@ msgstr "Activare grupuri selectate?"
 msgid "Enable selected hosts?"
 msgstr "Activare servere selectate?"
 
-#: include/views/configuration.item.list.php:241
+#: include/views/configuration.item.list.php:242
 msgid "Enable selected items?"
 msgstr "Activare itemi selectați?"
 
@@ -5776,7 +5777,7 @@ msgstr "Activare itemi selectați?"
 msgid "Enable selected media types?"
 msgstr "Activare elemente de tip media selectate?"
 
-#: include/views/configuration.triggers.list.php:329
+#: include/views/configuration.triggers.list.php:330
 msgid "Enable selected triggers?"
 msgstr "Activare triggeri selectați?"
 
@@ -5784,10 +5785,10 @@ msgstr "Activare triggeri selectați?"
 msgid "Enable selected web scenarios?"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:593
-#: include/views/configuration.item.edit.php:830
+#: include/views/configuration.host.discovery.edit.php:594
+#: include/views/configuration.item.edit.php:831
 #: include/views/configuration.item.massupdate.php:453
-#: include/views/configuration.item.prototype.edit.php:703
+#: include/views/configuration.item.prototype.edit.php:704
 #: include/views/configuration.item.prototype.massupdate.php:453
 msgid "Enable trapping"
 msgstr ""
@@ -5797,7 +5798,7 @@ msgstr ""
 #: app/views/administration.mediatype.list.php:125
 #: app/views/popup.media.php:74 app/views/popup.triggerwizard.php:136
 #: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
-#: include/httptest.inc.php:45 include/items.inc.php:140
+#: include/httptest.inc.php:46 include/items.inc.php:140
 #: include/items.inc.php:143 include/items.inc.php:184
 #: include/triggers.inc.php:1246 include/triggers.inc.php:2171
 #: include/views/administration.usergroups.edit.php:73
@@ -5818,12 +5819,12 @@ msgstr ""
 #: include/views/configuration.correlation.list.php:104
 #: include/views/configuration.discovery.edit.php:124
 #: include/views/configuration.discovery.list.php:44
-#: include/views/configuration.host.discovery.edit.php:605
+#: include/views/configuration.host.discovery.edit.php:606
 #: include/views/configuration.host.edit.php:284
 #: include/views/configuration.host.list.php:244
 #: include/views/configuration.host.massupdate.php:106
 #: include/views/configuration.httpconf.edit.php:150
-#: include/views/configuration.item.edit.php:913
+#: include/views/configuration.item.edit.php:914
 #: include/views/configuration.triggers.edit.php:540
 msgid "Enabled"
 msgstr "Activat"
@@ -5832,7 +5833,7 @@ msgstr "Activat"
 #: app/views/administration.proxy.list.php:66
 #: include/views/configuration.host.edit.php:825
 #: include/views/configuration.host.massupdate.php:299
-#: include/views/configuration.host.prototype.edit.php:421
+#: include/views/configuration.host.prototype.edit.php:422
 msgid "Encryption"
 msgstr ""
 
@@ -5864,7 +5865,7 @@ msgstr "Engleză (en_US)"
 msgid "Equals"
 msgstr ""
 
-#: include/items.inc.php:35 include/views/js/common.item.edit.js.php:321
+#: include/items.inc.php:35 include/views/js/common.item.edit.js.php:322
 #: include/views/js/configuration.httpconf.edit.js.php:77
 msgid "Error"
 msgstr "Eroare"
@@ -5993,9 +5994,9 @@ msgid "Executed"
 msgstr ""
 
 #: include/items.inc.php:1671
-#: include/views/configuration.host.discovery.edit.php:516
-#: include/views/configuration.item.edit.php:630
-#: include/views/configuration.item.prototype.edit.php:558
+#: include/views/configuration.host.discovery.edit.php:517
+#: include/views/configuration.item.edit.php:631
+#: include/views/configuration.item.prototype.edit.php:559
 msgid "Executed script"
 msgstr "Script executat"
 
@@ -6049,7 +6050,7 @@ msgstr "Export în CSV"
 #: include/views/administration.general.iconmap.edit.php:55
 #: include/views/administration.general.regularexpressions.edit.php:50
 #: include/views/administration.general.regularexpressions.edit.php:128
-#: include/views/configuration.item.list.php:139
+#: include/views/configuration.item.list.php:140
 #: include/views/configuration.trigger.prototype.edit.php:162
 #: include/views/configuration.trigger.prototype.edit.php:173
 #: include/views/configuration.trigger.prototype.edit.php:272
@@ -6059,7 +6060,7 @@ msgstr "Export în CSV"
 #: include/views/configuration.triggers.edit.php:197
 #: include/views/configuration.triggers.edit.php:299
 #: include/views/configuration.triggers.edit.php:394
-#: include/views/configuration.triggers.list.php:198
+#: include/views/configuration.triggers.list.php:199
 #: include/views/js/configuration.triggers.edit.js.php:21
 #: trigger_prototypes.php:38 trigger_prototypes.php:49 triggers.php:46
 #: triggers.php:57
@@ -6134,7 +6135,7 @@ msgstr "Eșec"
 msgid "Failed to create dashboard"
 msgstr ""
 
-#: include/views/js/common.item.edit.js.php:323
+#: include/views/js/common.item.edit.js.php:324
 #: include/views/js/configuration.httpconf.edit.js.php:75
 msgid "Failed to parse URL."
 msgstr ""
@@ -6331,8 +6332,8 @@ msgstr "Zone pline"
 msgid "Filter"
 msgstr "Filtru"
 
-#: include/views/configuration.host.discovery.edit.php:700
-#: include/views/configuration.host.discovery.edit.php:782
+#: include/views/configuration.host.discovery.edit.php:701
+#: include/views/configuration.host.discovery.edit.php:783
 msgid "Filters"
 msgstr ""
 
@@ -6378,11 +6379,11 @@ msgstr "Încadrează în hartă"
 msgid "Fixed"
 msgstr "Remediat"
 
-#: include/views/configuration.host.discovery.edit.php:544
-#: include/views/configuration.item.edit.php:696
-#: include/views/configuration.item.edit.php:703
+#: include/views/configuration.host.discovery.edit.php:545
+#: include/views/configuration.item.edit.php:697
+#: include/views/configuration.item.edit.php:704
 #: include/views/configuration.item.massupdate.php:350
-#: include/views/configuration.item.prototype.edit.php:619
+#: include/views/configuration.item.prototype.edit.php:620
 #: include/views/configuration.item.prototype.massupdate.php:347
 #: include/views/js/common.item.edit.js.php:7
 #: include/views/js/configuration.item.massupdate.js.php:11
@@ -6418,8 +6419,8 @@ msgstr "Pentru invitat, parola trebuie să fie nulă"
 msgid "Form data"
 msgstr ""
 
-#: include/items.inc.php:1675 include/views/configuration.item.edit.php:646
-#: include/views/configuration.item.prototype.edit.php:572
+#: include/items.inc.php:1675 include/views/configuration.item.edit.php:647
+#: include/views/configuration.item.prototype.edit.php:573
 msgid "Formula"
 msgstr "Formulă"
 
@@ -6563,7 +6564,7 @@ msgstr "Mergi la"
 msgid "Go to dashboard"
 msgstr "Mergi la tabloul de bord"
 
-#: include/httptest.inc.php:412
+#: include/httptest.inc.php:413
 msgid "Google Chrome"
 msgstr "Google Chrome"
 
@@ -6858,7 +6859,7 @@ msgstr "Nume grup"
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Grupul prototip nu se poate baza pe un grup server detectat \"%1$s\"."
 
-#: include/views/configuration.host.prototype.edit.php:217
+#: include/views/configuration.host.prototype.edit.php:218
 msgid "Group prototypes"
 msgstr "Prototipuri grup"
 
@@ -6873,8 +6874,8 @@ msgstr "Grupare după"
 #: include/views/administration.users.edit.php:80
 #: include/views/administration.users.list.php:87
 #: include/views/configuration.host.edit.php:77
-#: include/views/configuration.host.prototype.edit.php:183
-#: include/views/configuration.host.prototype.edit.php:219
+#: include/views/configuration.host.prototype.edit.php:184
+#: include/views/configuration.host.prototype.edit.php:220
 #: include/views/configuration.template.edit.php:89
 #: include/views/conf.import.php:28
 msgid "Groups"
@@ -7032,19 +7033,19 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:438 include/forms.inc.php:872
 #: include/views/administration.general.housekeeper.edit.php:117
-#: include/views/configuration.item.list.php:65
-#: include/views/configuration.item.prototype.list.php:55 items.php:304
+#: include/views/configuration.item.list.php:66
+#: include/views/configuration.item.prototype.list.php:55 items.php:308
 #: jsLoader.php:258 latest.php:407 latest.php:544 latest.php:696
 msgid "History"
 msgstr "Istoric"
 
 #: httpconf.php:189 httpconf.php:196 httpconf.php:497 httpconf.php:509
-#: items.php:972 items.php:979 items.php:1376 items.php:1388
+#: items.php:977 items.php:984 items.php:1381 items.php:1393
 msgid "History cleared"
 msgstr "Istoric șters"
 
 #: include/views/configuration.httpconf.edit.php:245
-#: include/views/configuration.item.edit.php:947
+#: include/views/configuration.item.edit.php:948
 msgid "History clearing can take a long time. Continue?"
 msgstr "Golirea istoricului poate lua o perioadă lungă de timp. Continuare?"
 
@@ -7065,9 +7066,9 @@ msgstr ""
 msgid "History of events"
 msgstr "Istoric al evenimentelor"
 
-#: disc_prototypes.php:193 include/views/configuration.item.edit.php:772
+#: disc_prototypes.php:193 include/views/configuration.item.edit.php:773
 #: include/views/configuration.item.massupdate.php:403
-#: include/views/configuration.item.prototype.edit.php:665
+#: include/views/configuration.item.prototype.edit.php:666
 #: include/views/configuration.item.prototype.massupdate.php:400 items.php:63
 msgid "History storage period"
 msgstr "Perioadă de istoric a stocării"
@@ -7111,8 +7112,8 @@ msgstr "Aliniere orizontală"
 #: include/views/configuration.host.prototype.edit.php:169
 #: include/views/configuration.httpconf.list.php:49
 #: include/views/configuration.httpconf.list.php:86
-#: include/views/configuration.item.list.php:60
-#: include/views/configuration.triggers.list.php:196
+#: include/views/configuration.item.list.php:61
+#: include/views/configuration.triggers.list.php:197
 #: include/views/inventory.host.list.php:64
 #: include/views/inventory.host.view.php:150
 #: include/views/inventory.host.view.php:172
@@ -7124,7 +7125,7 @@ msgstr "Aliniere orizontală"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
-#: include/views/reports.toptriggers.php:79 items.php:972 items.php:1375
+#: include/views/reports.toptriggers.php:79 items.php:977 items.php:1380
 #: jsLoader.php:168 latest.php:404 latest.php:421 queue.php:263
 #: report2.php:408 report2.php:430
 #, fuzzy
@@ -7279,11 +7280,11 @@ msgstr "Grupuri de servere"
 msgid "Host info"
 msgstr "Informații servere"
 
-#: include/views/configuration.host.discovery.edit.php:399
-#: include/views/configuration.item.edit.php:422
-#: include/views/configuration.item.edit.php:466
+#: include/views/configuration.host.discovery.edit.php:400
+#: include/views/configuration.item.edit.php:423
+#: include/views/configuration.item.edit.php:467
 #: include/views/configuration.item.massupdate.php:84
-#: include/views/configuration.item.prototype.edit.php:447
+#: include/views/configuration.item.prototype.edit.php:448
 #: include/views/configuration.item.prototype.massupdate.php:80
 msgid "Host interface"
 msgstr "Interfață server"
@@ -7548,7 +7549,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:2156
 #: include/views/configuration.host.edit.php:675
 #: include/views/configuration.host.massupdate.php:296
-#: include/views/configuration.host.prototype.edit.php:342
+#: include/views/configuration.host.prototype.edit.php:343
 msgid "IPMI"
 msgstr "IPMI"
 
@@ -7568,9 +7569,9 @@ msgid "IPMI scripts can be executed only by server."
 msgstr ""
 
 #: disc_prototypes.php:162 host_discovery.php:142
-#: include/views/configuration.host.discovery.edit.php:473
-#: include/views/configuration.item.edit.php:579
-#: include/views/configuration.item.prototype.edit.php:515 items.php:174
+#: include/views/configuration.host.discovery.edit.php:474
+#: include/views/configuration.item.edit.php:580
+#: include/views/configuration.item.prototype.edit.php:516 items.php:174
 msgid "IPMI sensor"
 msgstr "Senzor IPMI"
 
@@ -7760,6 +7761,7 @@ msgid "Inaccessible graph"
 msgstr ""
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:239
+#: host_prototypes.php:354
 msgid "Inaccessible group"
 msgstr ""
 
@@ -7784,7 +7786,7 @@ msgid "Inaccessible map"
 msgstr ""
 
 #: include/graphs.inc.php:271 include/hosts.inc.php:658
-#: include/hosts.inc.php:827 include/httptest.inc.php:209
+#: include/hosts.inc.php:827 include/httptest.inc.php:210
 #: include/items.inc.php:896 include/triggers.inc.php:2465
 msgid "Inaccessible template"
 msgstr ""
@@ -8051,19 +8053,19 @@ msgstr "Argumente incorecte trimise funcției"
 #: include/classes/api/services/CHostPrototype.php:392
 #: include/classes/api/services/CHostPrototype.php:413
 #: include/classes/api/services/CItemGeneral.php:257
-#: include/classes/api/services/CItemGeneral.php:1258
-#: include/classes/api/services/CItemGeneral.php:1291
-#: include/classes/api/services/CItemGeneral.php:1316
-#: include/classes/api/services/CItemGeneral.php:1347
-#: include/classes/api/services/CItemGeneral.php:1361
-#: include/classes/api/services/CItemGeneral.php:1387
-#: include/classes/api/services/CItemGeneral.php:1433
-#: include/classes/api/services/CItemGeneral.php:1456
-#: include/classes/api/services/CItemGeneral.php:1505
-#: include/classes/api/services/CItemGeneral.php:1559
-#: include/classes/api/services/CItemGeneral.php:1570
-#: include/classes/api/services/CItemGeneral.php:1585
-#: include/classes/api/services/CItemGeneral.php:1596
+#: include/classes/api/services/CItemGeneral.php:1266
+#: include/classes/api/services/CItemGeneral.php:1299
+#: include/classes/api/services/CItemGeneral.php:1324
+#: include/classes/api/services/CItemGeneral.php:1355
+#: include/classes/api/services/CItemGeneral.php:1369
+#: include/classes/api/services/CItemGeneral.php:1395
+#: include/classes/api/services/CItemGeneral.php:1441
+#: include/classes/api/services/CItemGeneral.php:1464
+#: include/classes/api/services/CItemGeneral.php:1513
+#: include/classes/api/services/CItemGeneral.php:1567
+#: include/classes/api/services/CItemGeneral.php:1578
+#: include/classes/api/services/CItemGeneral.php:1593
+#: include/classes/api/services/CItemGeneral.php:1604
 #: include/classes/api/services/CMapElement.php:46
 #: include/classes/api/services/CMapElement.php:101
 #: include/classes/api/services/CMapElement.php:120
@@ -8131,7 +8133,7 @@ msgstr "Caractere incorecte folosite pentru șablonul nume \"%1$s\"."
 msgid "Incorrect conditions for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1235
+#: include/classes/api/services/CDiscoveryRule.php:1332
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr ""
@@ -8150,7 +8152,7 @@ msgstr ""
 msgid "Incorrect custom expression \"%2$s\" for correlation \"%1$s\": %3$s."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1240
+#: include/classes/api/services/CDiscoveryRule.php:1337
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
 msgstr ""
@@ -8195,7 +8197,7 @@ msgstr "Încărcare fișier incorectă. "
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1270
+#: include/classes/api/services/CDiscoveryRule.php:1367
 #, c-format
 msgid "Incorrect filter condition formula ID for discovery rule \"%1$s\"."
 msgstr ""
@@ -8205,7 +8207,7 @@ msgstr ""
 msgid "Incorrect filter condition formula ID given for correlation \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1262
+#: include/classes/api/services/CDiscoveryRule.php:1359
 #, c-format
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr ""
@@ -8216,7 +8218,7 @@ msgstr ""
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1274
+#: include/classes/api/services/CDiscoveryRule.php:1371
 #, c-format
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr ""
@@ -8518,8 +8520,8 @@ msgstr "ID trigger incorect pentru serviciul \"%1$s\"."
 msgid "Incorrect trigger expression"
 msgstr "Expresie trigger incorectă"
 
-#: include/classes/parsers/CTriggerExpression.php:453
-#: include/classes/parsers/CTriggerExpression.php:460
+#: include/classes/parsers/CTriggerExpression.php:456
+#: include/classes/parsers/CTriggerExpression.php:463
 msgid "Incorrect trigger expression."
 msgstr "Expresii trigger incorecte."
 
@@ -8560,7 +8562,7 @@ msgstr ""
 msgid "Incorrect type of calculation for correlation \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1228
+#: include/classes/api/services/CDiscoveryRule.php:1325
 #, c-format
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr ""
@@ -8610,7 +8612,7 @@ msgstr "Grup utilizator incorect."
 #: include/classes/api/services/CDRule.php:586
 #: include/classes/api/services/CDRule.php:599
 #: include/classes/api/services/CItemGeneral.php:528
-#: include/classes/api/services/CItemGeneral.php:2245
+#: include/classes/api/services/CItemGeneral.php:2256
 #: include/classes/validators/CNewValidator.php:116
 #: include/classes/validators/CNewValidator.php:129
 #: include/classes/validators/CNewValidator.php:142
@@ -8713,8 +8715,8 @@ msgstr ""
 #: include/classes/api/services/CCorrelation.php:1101
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
-#: include/classes/api/services/CDiscoveryRule.php:1296
-#: include/classes/api/services/CDiscoveryRule.php:1681
+#: include/classes/api/services/CDiscoveryRule.php:1393
+#: include/classes/api/services/CDiscoveryRule.php:1778
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:214
@@ -8761,39 +8763,39 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:516
 #: include/classes/api/services/CItemGeneral.php:522
 #: include/classes/api/services/CItemGeneral.php:535
-#: include/classes/api/services/CItemGeneral.php:1296
-#: include/classes/api/services/CItemGeneral.php:1302
-#: include/classes/api/services/CItemGeneral.php:1320
-#: include/classes/api/services/CItemGeneral.php:1329
-#: include/classes/api/services/CItemGeneral.php:1352
-#: include/classes/api/services/CItemGeneral.php:1366
-#: include/classes/api/services/CItemGeneral.php:1373
-#: include/classes/api/services/CItemGeneral.php:1379
-#: include/classes/api/services/CItemGeneral.php:1392
-#: include/classes/api/services/CItemGeneral.php:1403
-#: include/classes/api/services/CItemGeneral.php:1413
-#: include/classes/api/services/CItemGeneral.php:1420
-#: include/classes/api/services/CItemGeneral.php:1438
-#: include/classes/api/services/CItemGeneral.php:1461
-#: include/classes/api/services/CItemGeneral.php:1512
-#: include/classes/api/services/CItemGeneral.php:1519
-#: include/classes/api/services/CItemGeneral.php:1525
-#: include/classes/api/services/CItemGeneral.php:1532
+#: include/classes/api/services/CItemGeneral.php:1304
+#: include/classes/api/services/CItemGeneral.php:1310
+#: include/classes/api/services/CItemGeneral.php:1328
+#: include/classes/api/services/CItemGeneral.php:1337
+#: include/classes/api/services/CItemGeneral.php:1360
+#: include/classes/api/services/CItemGeneral.php:1374
+#: include/classes/api/services/CItemGeneral.php:1381
+#: include/classes/api/services/CItemGeneral.php:1387
+#: include/classes/api/services/CItemGeneral.php:1400
+#: include/classes/api/services/CItemGeneral.php:1411
+#: include/classes/api/services/CItemGeneral.php:1421
+#: include/classes/api/services/CItemGeneral.php:1428
+#: include/classes/api/services/CItemGeneral.php:1446
+#: include/classes/api/services/CItemGeneral.php:1469
+#: include/classes/api/services/CItemGeneral.php:1520
+#: include/classes/api/services/CItemGeneral.php:1527
+#: include/classes/api/services/CItemGeneral.php:1533
 #: include/classes/api/services/CItemGeneral.php:1540
-#: include/classes/api/services/CItemGeneral.php:1563
-#: include/classes/api/services/CItemGeneral.php:1576
-#: include/classes/api/services/CItemGeneral.php:1589
-#: include/classes/api/services/CItemGeneral.php:1604
-#: include/classes/api/services/CItemGeneral.php:1614
-#: include/classes/api/services/CItemGeneral.php:1892
-#: include/classes/api/services/CItemGeneral.php:1912
-#: include/classes/api/services/CItemGeneral.php:1919
-#: include/classes/api/services/CItemGeneral.php:1929
-#: include/classes/api/services/CItemGeneral.php:2009
-#: include/classes/api/services/CItemGeneral.php:2023
-#: include/classes/api/services/CItemGeneral.php:2184
-#: include/classes/api/services/CItem.php:786
-#: include/classes/api/services/CItem.php:794
+#: include/classes/api/services/CItemGeneral.php:1548
+#: include/classes/api/services/CItemGeneral.php:1571
+#: include/classes/api/services/CItemGeneral.php:1584
+#: include/classes/api/services/CItemGeneral.php:1597
+#: include/classes/api/services/CItemGeneral.php:1612
+#: include/classes/api/services/CItemGeneral.php:1622
+#: include/classes/api/services/CItemGeneral.php:1900
+#: include/classes/api/services/CItemGeneral.php:1920
+#: include/classes/api/services/CItemGeneral.php:1927
+#: include/classes/api/services/CItemGeneral.php:1937
+#: include/classes/api/services/CItemGeneral.php:2017
+#: include/classes/api/services/CItemGeneral.php:2031
+#: include/classes/api/services/CItemGeneral.php:2195
+#: include/classes/api/services/CItem.php:883
+#: include/classes/api/services/CItem.php:891
 #: include/classes/api/services/CItemPrototype.php:960
 #: include/classes/api/services/CItemPrototype.php:968
 #: include/classes/api/services/CMaintenance.php:472
@@ -8914,12 +8916,12 @@ msgstr "Indoneză (id_ID)"
 #: include/views/configuration.hostgroups.list.php:61
 #: include/views/configuration.host.list.php:184
 #: include/views/configuration.httpconf.list.php:96
-#: include/views/configuration.item.list.php:70
+#: include/views/configuration.item.list.php:71
 #: include/views/configuration.trigger.prototype.edit.php:175
 #: include/views/configuration.trigger.prototype.edit.php:369
 #: include/views/configuration.triggers.edit.php:199
 #: include/views/configuration.triggers.edit.php:396
-#: include/views/configuration.triggers.list.php:200 latest.php:414
+#: include/views/configuration.triggers.list.php:201 latest.php:414
 msgid "Info"
 msgstr "Info"
 
@@ -9041,7 +9043,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:1185
 #: include/classes/api/services/CTriggerGeneral.php:1547
 #: include/classes/core/CJsonRpc.php:205
-#: include/classes/import/validators/CXmlValidatorGeneral.php:155
+#: include/classes/import/validators/CXmlValidatorGeneral.php:153
 #: include/classes/widgets/fields/CWidgetField.php:100
 msgid "Internal error."
 msgstr "Eroare internă."
@@ -9055,18 +9057,18 @@ msgstr "Eveniment intern și avertizare perioadă de stocare a datelor"
 msgid "Internal event and alert data storage period \"%1$s\"."
 msgstr ""
 
-#: include/httptest.inc.php:399
+#: include/httptest.inc.php:400
 msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
 #: include/forms.inc.php:882 include/views/configuration.discovery.list.php:62
-#: include/views/configuration.host.discovery.edit.php:539
+#: include/views/configuration.host.discovery.edit.php:540
 #: include/views/configuration.host.discovery.list.php:57
 #: include/views/configuration.httpconf.list.php:90
-#: include/views/configuration.item.edit.php:689
-#: include/views/configuration.item.list.php:64
+#: include/views/configuration.item.edit.php:690
+#: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.massupdate.php:341
-#: include/views/configuration.item.prototype.edit.php:614
+#: include/views/configuration.item.prototype.edit.php:615
 #: include/views/configuration.item.prototype.list.php:54
 #: include/views/configuration.item.prototype.massupdate.php:338
 #: include/views/configuration.services.edit.php:170 latest.php:406
@@ -9157,21 +9159,21 @@ msgstr "Hostid invalid pentru macroul \"%1$s\"."
 msgid "Invalid internal data storage period: %1$s."
 msgstr ""
 
-#: disc_prototypes.php:404 disc_prototypes.php:409 disc_prototypes.php:422
-#: disc_prototypes.php:754 disc_prototypes.php:759 disc_prototypes.php:772
-#: host_discovery.php:332 host_discovery.php:337 host_discovery.php:350
-#: items.php:583 items.php:588 items.php:601 items.php:1005 items.php:1010
-#: items.php:1023
+#: disc_prototypes.php:408 disc_prototypes.php:413 disc_prototypes.php:426
+#: disc_prototypes.php:758 disc_prototypes.php:763 disc_prototypes.php:776
+#: host_discovery.php:336 host_discovery.php:341 host_discovery.php:354
+#: items.php:588 items.php:593 items.php:606 items.php:1010 items.php:1015
+#: items.php:1028
 #, c-format
 msgid "Invalid interval \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:49
+#: include/classes/api/services/CDiscoveryRule.php:70
 #, c-format
 msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Cheie invalidă \"%1$s\" pentru regula de detecție \"%2$s\" pe \"%3$s\": %4$s."
 
-#: include/classes/api/services/CItem.php:53
+#: include/classes/api/services/CItem.php:74
 #, c-format
 msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Cheie invalidă \"%1$s\" pentru itemul \"%2$s\" pe \"%3$s\": %4$s."
@@ -9219,16 +9221,16 @@ msgstr "Număr invalid de parametri."
 #: app/controllers/CControllerDashboardUpdate.php:125
 #: app/controllers/CControllerDashboardUpdate.php:134
 #: app/controllers/CControllerDashboardUpdate.php:142
-#: include/classes/api/services/CDiscoveryRule.php:1316
-#: include/classes/api/services/CDiscoveryRule.php:1402
-#: include/classes/api/services/CDiscoveryRule.php:1419
-#: include/classes/api/services/CDiscoveryRule.php:1437
-#: include/classes/api/services/CDiscoveryRule.php:1445
-#: include/classes/api/services/CItemGeneral.php:2200
-#: include/classes/api/services/CItemGeneral.php:2207
-#: include/classes/api/services/CItemGeneral.php:2215
-#: include/classes/api/services/CItemGeneral.php:2224
-#: include/classes/api/services/CItemGeneral.php:2231
+#: include/classes/api/services/CDiscoveryRule.php:1413
+#: include/classes/api/services/CDiscoveryRule.php:1499
+#: include/classes/api/services/CDiscoveryRule.php:1516
+#: include/classes/api/services/CDiscoveryRule.php:1534
+#: include/classes/api/services/CDiscoveryRule.php:1542
+#: include/classes/api/services/CItemGeneral.php:2211
+#: include/classes/api/services/CItemGeneral.php:2218
+#: include/classes/api/services/CItemGeneral.php:2226
+#: include/classes/api/services/CItemGeneral.php:2235
+#: include/classes/api/services/CItemGeneral.php:2242
 #: include/classes/api/services/CUser.php:668
 #: include/classes/api/services/CUser.php:679
 #: include/classes/validators/CApiInputValidator.php:234
@@ -9330,14 +9332,15 @@ msgstr "Al doilea parametru invalid."
 #: include/classes/import/validators/C32XmlValidator.php:1007
 #: include/classes/import/validators/C34XmlValidator.php:1111
 #: include/classes/import/validators/C40XmlValidator.php:1290
-#: include/classes/import/validators/C42XmlValidator.php:1352
-#: include/classes/import/validators/CXmlValidatorGeneral.php:98
-#: include/classes/import/validators/CXmlValidatorGeneral.php:113
-#: include/classes/import/validators/CXmlValidatorGeneral.php:132
-#: include/classes/import/validators/CXmlValidatorGeneral.php:159
-#: include/classes/import/validators/CXmlValidatorGeneral.php:201
-#: include/classes/import/validators/CXmlValidatorGeneral.php:215
-#: include/classes/import/validators/CXmlValidator.php:67
+#: include/classes/import/validators/C42XmlValidator.php:1350
+#: include/classes/import/validators/C44XmlValidator.php:1466
+#: include/classes/import/validators/CXmlValidatorGeneral.php:96
+#: include/classes/import/validators/CXmlValidatorGeneral.php:111
+#: include/classes/import/validators/CXmlValidatorGeneral.php:130
+#: include/classes/import/validators/CXmlValidatorGeneral.php:157
+#: include/classes/import/validators/CXmlValidatorGeneral.php:199
+#: include/classes/import/validators/CXmlValidatorGeneral.php:213
+#: include/classes/import/validators/CXmlValidator.php:70
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr ""
@@ -9372,7 +9375,7 @@ msgstr "Numele \"%s\" este invalid. Caracterele permise: \"a-z\" și \".\"."
 
 #: include/menu.inc.php:124 include/views/configuration.host.edit.php:776
 #: include/views/configuration.host.massupdate.php:298
-#: include/views/configuration.host.prototype.edit.php:372
+#: include/views/configuration.host.prototype.edit.php:373
 msgid "Inventory"
 msgstr "Inventar"
 
@@ -9401,7 +9404,7 @@ msgstr "Problemă"
 #: app/views/administration.proxy.edit.php:111
 #: include/views/configuration.host.edit.php:816
 #: include/views/configuration.host.massupdate.php:275
-#: include/views/configuration.host.prototype.edit.php:410
+#: include/views/configuration.host.prototype.edit.php:411
 msgid "Issuer"
 msgstr ""
 
@@ -9427,18 +9430,18 @@ msgstr "Italiană (it)"
 #: include/views/configuration.item.massupdate.php:576
 #: include/views/monitoring.screen.constructor.edit.php:258
 #: include/views/monitoring.screen.constructor.edit.php:427
-#: include/views/monitoring.screen.constructor.edit.php:787 items.php:971
-#: items.php:1375
+#: include/views/monitoring.screen.constructor.edit.php:787 items.php:976
+#: items.php:1380
 msgid "Item"
 msgstr "Item"
 
 #: include/classes/api/services/CHostPrototype.php:973
-#: include/classes/api/services/CItem.php:51
+#: include/classes/api/services/CItem.php:72
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Itemul \"%1$s\" există deja pe \"%2$s\" moștenit de la alt șablon."
 
-#: include/classes/api/services/CItem.php:52
+#: include/classes/api/services/CItem.php:73
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
 msgstr "Itemul \"%1$s\" există deja pe \"%2$s\"."
@@ -9448,7 +9451,7 @@ msgstr "Itemul \"%1$s\" există deja pe \"%2$s\"."
 msgid "Item \"%1$s\" cannot be copied without its master item."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:903
+#: include/classes/api/services/CItem.php:1000
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Itemul \"%1$s\" nu poate popula un server lipsă cu număr câmp inventar \"%2$d\". Opțiunile suntȘ de la 0 (nu popula) la %3$d."
@@ -9458,8 +9461,8 @@ msgstr "Itemul \"%1$s\" nu poate popula un server lipsă cu număr câmp inventa
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Itemul \"%1$s\" nu există pe șablonul \"%2$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1682
-#: include/classes/api/services/CItemGeneral.php:1893
+#: include/classes/api/services/CDiscoveryRule.php:1779
+#: include/classes/api/services/CItemGeneral.php:1901
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr ""
@@ -9474,11 +9477,11 @@ msgstr "Itemul \"%1$s\" pe \"%2$s\": aplicația \"%3$s\" nu există."
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Itemul \"%1$s:%2$s\" are un port invalid: \"%3$s\"."
 
-#: items.php:930
+#: items.php:935
 msgid "Item added"
 msgstr "Item adăugat"
 
-#: items.php:1343
+#: items.php:1348
 msgid "Item copied"
 msgid_plural "Items copied"
 msgstr[0] ""
@@ -9489,18 +9492,18 @@ msgstr[2] ""
 msgid "Item count"
 msgstr "Numărătoare item"
 
-#: items.php:531
+#: items.php:536
 msgid "Item deleted"
 msgstr "Item șters"
 
-#: applications.php:171 items.php:1301
+#: applications.php:171 items.php:1306
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "Element dezactivat"
 msgstr[1] "Elemente dezactivate"
 msgstr[2] "Elemente dezactivate"
 
-#: applications.php:170 items.php:1300
+#: applications.php:170 items.php:1305
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "Item activat"
@@ -9515,7 +9518,7 @@ msgstr "Item în stare \"nesuportată\""
 msgid "Item not selected"
 msgstr "Item neselectat"
 
-#: include/classes/api/services/CItemGeneral.php:1286
+#: include/classes/api/services/CItemGeneral.php:1294
 #, c-format
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr ""
@@ -9531,7 +9534,7 @@ msgstr "Prototip item"
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Prototip item \"%1$s\" există deja pe \"%2$s\", moștenit de la alt șablon."
 
-#: include/classes/api/services/CItemGeneral.php:1040
+#: include/classes/api/services/CItemGeneral.php:1036
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", linked to another rule."
 msgstr ""
@@ -9541,15 +9544,15 @@ msgstr ""
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Prototip item \"%1$s\" există deja pe \"%2$s\"."
 
-#: disc_prototypes.php:681
+#: disc_prototypes.php:685
 msgid "Item prototype added"
 msgstr "Prototip item adăugat"
 
-#: disc_prototypes.php:342
+#: disc_prototypes.php:346
 msgid "Item prototype deleted"
 msgstr "Prototip item șters"
 
-#: disc_prototypes.php:684 disc_prototypes.php:710
+#: disc_prototypes.php:688 disc_prototypes.php:714
 #, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
@@ -9572,15 +9575,15 @@ msgstr ""
 msgid "Item prototypes"
 msgstr "Prototipuri item"
 
-#: disc_prototypes.php:724
+#: disc_prototypes.php:728
 msgid "Item prototypes deleted"
 msgstr "Prototipuri item șterse"
 
-#: disc_prototypes.php:1153
+#: disc_prototypes.php:1157
 msgid "Item prototypes updated"
 msgstr ""
 
-#: items.php:933
+#: items.php:938
 msgid "Item updated"
 msgstr "Item actualizat"
 
@@ -9613,32 +9616,32 @@ msgstr ""
 msgid "Item with ID \"%1$s\" is not available."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:669
+#: include/classes/api/services/CItemGeneral.php:667
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\" ca o regulă de detecție."
 
-#: include/classes/api/services/CItemGeneral.php:675
+#: include/classes/api/services/CItemGeneral.php:673
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\" ca și un item creat dintr-un prototip item. "
 
-#: include/classes/api/services/CItemGeneral.php:672
+#: include/classes/api/services/CItemGeneral.php:670
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\" ca și un prototip item."
 
-#: include/classes/api/services/CItemGeneral.php:666
+#: include/classes/api/services/CItemGeneral.php:664
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\" ca și un item."
 
-#: include/classes/api/services/CItemGeneral.php:678
+#: include/classes/api/services/CItemGeneral.php:676
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\" ca și un element item necunoscut."
 
-#: include/classes/api/services/CItemGeneral.php:1750
+#: include/classes/api/services/CItemGeneral.php:1758
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\"."
@@ -9662,11 +9665,11 @@ msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\"."
 #: include/views/configuration.template.list.php:137
 #: include/views/configuration.template.list.php:239
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:155
-#: include/views/inventory.host.view.php:174 items.php:1728 queue.php:109
+#: include/views/inventory.host.view.php:174 items.php:1733 queue.php:109
 msgid "Items"
 msgstr "Itemi"
 
-#: items.php:1398
+#: items.php:1403
 msgid "Items deleted"
 msgstr "Itemi ștersi"
 
@@ -9678,7 +9681,7 @@ msgstr "Lista itemi"
 msgid "Items location"
 msgstr ""
 
-#: items.php:1280
+#: items.php:1285
 msgid "Items updated"
 msgstr "Itemi actualizați"
 
@@ -9690,10 +9693,10 @@ msgstr "JMX"
 msgid "JMX agent"
 msgstr "Agent JMX"
 
-#: include/views/configuration.host.discovery.edit.php:487
-#: include/views/configuration.item.edit.php:601
+#: include/views/configuration.host.discovery.edit.php:488
+#: include/views/configuration.item.edit.php:602
 #: include/views/configuration.item.massupdate.php:97
-#: include/views/configuration.item.prototype.edit.php:529
+#: include/views/configuration.item.prototype.edit.php:530
 #: include/views/configuration.item.prototype.massupdate.php:93
 msgid "JMX endpoint"
 msgstr ""
@@ -9735,7 +9738,7 @@ msgid "JSON-rpc version is not specified."
 msgstr "Verisunea JSON-rpc nu este specificată."
 
 #: include/items.inc.php:1726
-#: include/views/configuration.host.discovery.edit.php:714
+#: include/views/configuration.host.discovery.edit.php:715
 msgid "JSONPath"
 msgstr ""
 
@@ -9784,8 +9787,15 @@ msgstr "Iun"
 msgid "June"
 msgstr "Iunie"
 
-#: include/views/configuration.host.discovery.edit.php:587
+#: include/views/configuration.host.discovery.edit.php:588
 msgid "Keep lost resources period"
+msgstr ""
+
+#: include/httptest.inc.php:30
+#: include/views/configuration.host.discovery.edit.php:278
+#: include/views/configuration.item.edit.php:324
+#: include/views/configuration.item.prototype.edit.php:306
+msgid "Kerberos"
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:210
@@ -9795,7 +9805,7 @@ msgstr ""
 #: include/views/configuration.host.discovery.edit.php:67
 #: include/views/configuration.host.discovery.list.php:56
 #: include/views/configuration.item.edit.php:109
-#: include/views/configuration.item.list.php:63
+#: include/views/configuration.item.list.php:64
 #: include/views/configuration.item.prototype.edit.php:92
 #: include/views/configuration.item.prototype.list.php:53
 #: include/views/js/configuration.discovery.edit.js.php:79 items.php:49
@@ -9856,19 +9866,19 @@ msgstr ""
 msgid "LF"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:714
+#: include/views/configuration.host.discovery.edit.php:715
 msgid "LLD macro"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:766
-#: include/views/configuration.host.discovery.edit.php:781
+#: include/views/configuration.host.discovery.edit.php:767
+#: include/views/configuration.host.discovery.edit.php:782
 msgid "LLD macros"
 msgstr ""
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:1096
 #: include/views/configuration.correlation.edit.php:48
-#: include/views/configuration.host.discovery.edit.php:638
+#: include/views/configuration.host.discovery.edit.php:639
 #: include/views/js/monitoring.sysmaps.js.php:110
 #: include/views/js/monitoring.sysmaps.js.php:577
 #: include/views/js/monitoring.sysmaps.js.php:685
@@ -10085,7 +10095,7 @@ msgid "Link indicators"
 msgstr "Indicatori de legătură"
 
 #: include/views/configuration.host.edit.php:617
-#: include/views/configuration.host.prototype.edit.php:313
+#: include/views/configuration.host.prototype.edit.php:314
 #: include/views/configuration.template.edit.php:413
 msgid "Link new templates"
 msgstr "Leagă noi șabloane"
@@ -10121,8 +10131,8 @@ msgstr ""
 
 #: include/views/configuration.host.edit.php:587
 #: include/views/configuration.host.edit.php:646
-#: include/views/configuration.host.prototype.edit.php:244
-#: include/views/configuration.host.prototype.edit.php:283
+#: include/views/configuration.host.prototype.edit.php:245
+#: include/views/configuration.host.prototype.edit.php:284
 #: include/views/configuration.template.edit.php:382
 #: include/views/configuration.template.edit.php:419
 #: include/views/configuration.template.list.php:81
@@ -10212,9 +10222,9 @@ msgid "Location longitude"
 msgstr "Longitudine locație"
 
 #: include/forms.inc.php:354 include/items.inc.php:131
-#: include/views/configuration.item.edit.php:668
+#: include/views/configuration.item.edit.php:669
 #: include/views/configuration.item.massupdate.php:269
-#: include/views/configuration.item.prototype.edit.php:593
+#: include/views/configuration.item.prototype.edit.php:594
 #: include/views/configuration.item.prototype.massupdate.php:264
 msgid "Log"
 msgstr "Înregistrare"
@@ -10227,9 +10237,9 @@ msgstr ""
 msgid "Log file monitoring. Returns log"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:800
+#: include/views/configuration.item.edit.php:801
 #: include/views/configuration.item.massupdate.php:430
-#: include/views/configuration.item.prototype.edit.php:677
+#: include/views/configuration.item.prototype.edit.php:678
 #: include/views/configuration.item.prototype.massupdate.php:429
 msgid "Log time format"
 msgstr "Format timp autentificare"
@@ -10293,11 +10303,11 @@ msgid "MD2"
 msgstr "MD2"
 
 #: include/hosts.inc.php:34
-#: include/views/configuration.host.discovery.edit.php:447
-#: include/views/configuration.item.edit.php:524
-#: include/views/configuration.item.edit.php:531
+#: include/views/configuration.host.discovery.edit.php:448
+#: include/views/configuration.item.edit.php:525
+#: include/views/configuration.item.edit.php:532
 #: include/views/configuration.item.massupdate.php:219
-#: include/views/configuration.item.prototype.edit.php:489
+#: include/views/configuration.item.prototype.edit.php:490
 #: include/views/configuration.item.prototype.massupdate.php:215
 #: include/views/js/configuration.discovery.edit.js.php:118
 msgid "MD5"
@@ -10310,7 +10320,7 @@ msgstr ""
 
 #: include/audit.inc.php:52
 #: include/views/administration.general.macros.edit.php:38
-#: include/views/configuration.host.discovery.edit.php:638
+#: include/views/configuration.host.discovery.edit.php:639
 #: include/views/hostmacros.php:46 include/views/hostmacros.php:50
 msgid "Macro"
 msgstr "Macro"
@@ -10339,7 +10349,7 @@ msgstr "Nu există macro cu hostmacroid \"%1$s\"."
 #: include/views/administration.general.macros.edit.php:25
 #: include/views/administration.general.macros.edit.php:80
 #: include/views/configuration.host.edit.php:710
-#: include/views/configuration.host.prototype.edit.php:359
+#: include/views/configuration.host.prototype.edit.php:360
 #: include/views/configuration.template.edit.php:445
 msgid "Macros"
 msgstr "Macro-uri"
@@ -10444,7 +10454,7 @@ msgstr "Lipsește parametrul obligatoriu."
 #: include/views/configuration.action.edit.php:1074
 #: include/views/configuration.host.edit.php:717
 #: include/views/configuration.host.massupdate.php:195
-#: include/views/configuration.host.prototype.edit.php:366
+#: include/views/configuration.host.prototype.edit.php:367
 msgid "Manual"
 msgstr "Manual"
 
@@ -10575,11 +10585,11 @@ msgstr "Mască"
 
 #: include/classes/screens/CScreenProblem.php:1111
 #: include/views/configuration.host.list.php:436
-#: include/views/configuration.item.list.php:248
+#: include/views/configuration.item.list.php:249
 #: include/views/configuration.item.prototype.list.php:174
 #: include/views/configuration.template.list.php:282
 #: include/views/configuration.trigger.prototype.list.php:162
-#: include/views/configuration.triggers.list.php:332
+#: include/views/configuration.triggers.list.php:333
 msgid "Mass update"
 msgstr "Masă zctualizată"
 
@@ -10592,10 +10602,10 @@ msgid "Mass update shapes"
 msgstr ""
 
 #: disc_prototypes.php:51 host_discovery.php:54
-#: include/views/configuration.host.discovery.edit.php:339
-#: include/views/configuration.item.edit.php:382
+#: include/views/configuration.host.discovery.edit.php:340
+#: include/views/configuration.item.edit.php:383
 #: include/views/configuration.item.massupdate.php:561
-#: include/views/configuration.item.prototype.edit.php:409
+#: include/views/configuration.item.prototype.edit.php:410
 #: include/views/configuration.item.prototype.massupdate.php:573 items.php:53
 msgid "Master item"
 msgstr ""
@@ -10980,7 +10990,7 @@ msgstr "Mai mult de 10 minute"
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "Mai mult de un grafic cu numele \"%1$s\" fără server."
 
-#: include/httptest.inc.php:407
+#: include/httptest.inc.php:408
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
@@ -11092,8 +11102,8 @@ msgstr ""
 #: include/views/configuration.host.list.php:102
 #: include/views/configuration.host.list.php:172
 #: include/views/configuration.host.massupdate.php:216
-#: include/views/configuration.host.prototype.edit.php:227
-#: include/views/configuration.host.prototype.edit.php:255
+#: include/views/configuration.host.prototype.edit.php:228
+#: include/views/configuration.host.prototype.edit.php:256
 #: include/views/configuration.host.prototype.list.php:53
 #: include/views/configuration.httpconf.edit.php:59
 #: include/views/configuration.httpconf.edit.php:119
@@ -11103,8 +11113,8 @@ msgstr ""
 #: include/views/configuration.item.edit.php:66
 #: include/views/configuration.item.edit.php:147
 #: include/views/configuration.item.edit.php:239
-#: include/views/configuration.item.list.php:61
-#: include/views/configuration.item.list.php:139
+#: include/views/configuration.item.list.php:62
+#: include/views/configuration.item.list.php:140
 #: include/views/configuration.item.massupdate.php:152
 #: include/views/configuration.item.prototype.edit.php:49
 #: include/views/configuration.item.prototype.edit.php:129
@@ -11128,7 +11138,7 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:80
 #: include/views/configuration.triggers.edit.php:566
 #: include/views/configuration.triggers.list.php:58
-#: include/views/configuration.triggers.list.php:197
+#: include/views/configuration.triggers.list.php:198
 #: include/views/configuration.triggers.massupdate.php:86
 #: include/views/configuration.triggers.massupdate.php:98
 #: include/views/inventory.host.list.php:66
@@ -11215,12 +11225,12 @@ msgid "New"
 msgstr "Nou"
 
 #: include/views/configuration.httpconf.edit.php:74
-#: include/views/configuration.item.edit.php:863
-#: include/views/configuration.item.prototype.edit.php:712
+#: include/views/configuration.item.edit.php:864
+#: include/views/configuration.item.prototype.edit.php:713
 msgid "New application"
 msgstr "Aplicație nouă"
 
-#: include/views/configuration.item.prototype.edit.php:726
+#: include/views/configuration.item.prototype.edit.php:727
 msgid "New application prototype"
 msgstr ""
 
@@ -11356,7 +11366,7 @@ msgstr "Niciun \"%1$s\" dat pentru șablon ecran."
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1278
+#: include/classes/api/services/CDiscoveryRule.php:1375
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of discovery rule \"%1$s\"."
 msgstr ""
@@ -11366,7 +11376,7 @@ msgstr ""
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1246
+#: include/classes/api/services/CDiscoveryRule.php:1343
 #, c-format
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr ""
@@ -11469,7 +11479,7 @@ msgstr "Nicio interfață implicită pentru tipul \"%1$s\" pe \"%2$s\"."
 msgid "No details"
 msgstr "Niciun detaliu"
 
-#: include/classes/api/services/CDiscoveryRule.php:621
+#: include/classes/api/services/CDiscoveryRule.php:702
 msgid "No discovery rule IDs given."
 msgstr "Nicio regulă de detecție IDs dată."
 
@@ -11479,8 +11489,8 @@ msgstr "Nicio regulă de detecție IDs dată."
 #: include/views/configuration.host.edit.php:792
 #: include/views/configuration.host.massupdate.php:251
 #: include/views/configuration.host.massupdate.php:259
-#: include/views/configuration.host.prototype.edit.php:378
-#: include/views/configuration.host.prototype.edit.php:388
+#: include/views/configuration.host.prototype.edit.php:379
+#: include/views/configuration.host.prototype.edit.php:389
 msgid "No encryption"
 msgstr ""
 
@@ -11510,7 +11520,7 @@ msgstr ""
 msgid "No graphs added."
 msgstr "Niciun grafic adăugat."
 
-#: include/classes/api/services/CDiscoveryRule.php:624
+#: include/classes/api/services/CDiscoveryRule.php:705
 msgid "No host IDs given."
 msgstr "Niciun IDs server dat."
 
@@ -11547,10 +11557,10 @@ msgstr "Nicio iconiță pentru elementul hartă \"%s\"."
 msgid "No image"
 msgstr "Nicio imagine"
 
-#: include/views/configuration.host.discovery.edit.php:401
-#: include/views/configuration.item.edit.php:461
+#: include/views/configuration.host.discovery.edit.php:402
+#: include/views/configuration.item.edit.php:462
 #: include/views/configuration.item.massupdate.php:77
-#: include/views/configuration.item.prototype.edit.php:442
+#: include/views/configuration.item.prototype.edit.php:443
 #: include/views/configuration.item.prototype.massupdate.php:74
 #: jsLoader.php:285
 msgid "No interface found"
@@ -11641,8 +11651,8 @@ msgstr "Nicio permisiune de acces la sistem."
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
 #: app/controllers/CControllerWidgetMapView.php:68
 #: app/controllers/CControllerWidgetPlainTextView.php:78
-#: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:1237
-#: disc_prototypes.php:1464 host_discovery.php:664
+#: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:1241
+#: disc_prototypes.php:1468 host_discovery.php:668
 #: include/classes/api/services/CAction.php:1615
 #: include/classes/api/services/CAction.php:1992
 #: include/classes/api/services/CAction.php:2969
@@ -11658,10 +11668,10 @@ msgstr "Nicio permisiune de acces la sistem."
 #: include/classes/api/services/CDashboard.php:369
 #: include/classes/api/services/CDashboard.php:394
 #: include/classes/api/services/CDashboard.php:1234
-#: include/classes/api/services/CDiscoveryRule.php:499
-#: include/classes/api/services/CDiscoveryRule.php:600
-#: include/classes/api/services/CDiscoveryRule.php:636
-#: include/classes/api/services/CDiscoveryRule.php:1471
+#: include/classes/api/services/CDiscoveryRule.php:580
+#: include/classes/api/services/CDiscoveryRule.php:681
+#: include/classes/api/services/CDiscoveryRule.php:717
+#: include/classes/api/services/CDiscoveryRule.php:1568
 #: include/classes/api/services/CDRule.php:183
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CDRule.php:336
@@ -11712,7 +11722,7 @@ msgstr "Nicio permisiune de acces la sistem."
 #: include/classes/api/services/CItemGeneral.php:208
 #: include/classes/api/services/CItemGeneral.php:310
 #: include/classes/api/services/CItemGeneral.php:325
-#: include/classes/api/services/CItem.php:711
+#: include/classes/api/services/CItem.php:808
 #: include/classes/api/services/CItemPrototype.php:885
 #: include/classes/api/services/CMaintenance.php:263
 #: include/classes/api/services/CMaintenance.php:292
@@ -11773,7 +11783,7 @@ msgstr "Nicio permisiune de acces la sistem."
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1767 items.php:1504 items.php:1701 services.php:84
+#: include/func.inc.php:1767 items.php:1509 items.php:1706 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Nicio permisiune la obiectul menționat sau acesta nu există!"
 
@@ -11819,11 +11829,11 @@ msgstr "Niciun ecran adăugat."
 msgid "No script specified for action operation command."
 msgstr "Nu a fost specificat niciun script pentru comanda de acțiune a operațiunii."
 
-#: triggers.php:597
+#: triggers.php:598
 msgid "No target selected"
 msgstr "Nu a fost selectată nicio țintă"
 
-#: graphs.php:391 items.php:1348
+#: graphs.php:391 items.php:1353
 msgid "No target selected."
 msgstr "Nu a fost selectată nicio țintă."
 
@@ -11867,11 +11877,11 @@ msgstr ""
 #: include/views/configuration.host.list.php:360
 #: include/views/configuration.host.list.php:363
 #: include/views/configuration.item.edit.php:321
-#: include/views/configuration.item.edit.php:868
-#: include/views/configuration.item.edit.php:882
+#: include/views/configuration.item.edit.php:869
+#: include/views/configuration.item.edit.php:883
 #: include/views/configuration.item.prototype.edit.php:303
-#: include/views/configuration.item.prototype.edit.php:719
-#: include/views/configuration.item.prototype.edit.php:734
+#: include/views/configuration.item.prototype.edit.php:720
+#: include/views/configuration.item.prototype.edit.php:735
 #: include/views/configuration.trigger.prototype.edit.php:274
 #: include/views/configuration.triggers.edit.php:301
 #: include/views/js/monitoring.sysmaps.js.php:3
@@ -12119,9 +12129,9 @@ msgid "Numeral systems"
 msgstr ""
 
 #: include/forms.inc.php:352 include/items.inc.php:127
-#: include/triggers.inc.php:1844 include/views/configuration.item.edit.php:666
+#: include/triggers.inc.php:1844 include/views/configuration.item.edit.php:667
 #: include/views/configuration.item.massupdate.php:267
-#: include/views/configuration.item.prototype.edit.php:591
+#: include/views/configuration.item.prototype.edit.php:592
 #: include/views/configuration.item.prototype.massupdate.php:262
 msgid "Numeric (float)"
 msgstr "Numeric (float)"
@@ -12131,9 +12141,9 @@ msgid "Numeric (integer)"
 msgstr ""
 
 #: include/forms.inc.php:351 include/items.inc.php:125
-#: include/views/configuration.item.edit.php:665
+#: include/views/configuration.item.edit.php:666
 #: include/views/configuration.item.massupdate.php:266
-#: include/views/configuration.item.prototype.edit.php:590
+#: include/views/configuration.item.prototype.edit.php:591
 #: include/views/configuration.item.prototype.massupdate.php:261
 msgid "Numeric (unsigned)"
 msgstr "Numeric (nesemnat)"
@@ -12216,7 +12226,7 @@ msgstr "Oprit"
 #: include/classes/html/CTriggersInfo.php:76
 #: include/views/administration.users.list.php:124
 #: include/views/configuration.triggers.list.php:84
-#: include/views/js/common.item.edit.js.php:327
+#: include/views/js/common.item.edit.js.php:328
 #: include/views/js/configuration.httpconf.edit.js.php:76
 #: include/views/js/conf.import.js.php:24 report2.php:430
 msgid "Ok"
@@ -12313,11 +12323,11 @@ msgstr ""
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Numai itemii desemnați să activeze servere sunt numărați"
 
-#: include/classes/api/services/CItemGeneral.php:1499
+#: include/classes/api/services/CItemGeneral.php:1507
 msgid "Only one Prometheus step is allowed."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1467
+#: include/classes/api/services/CItemGeneral.php:1475
 msgid "Only one change step is allowed."
 msgstr ""
 
@@ -12325,8 +12335,8 @@ msgstr ""
 msgid "Only one check can be unique."
 msgstr "Numai o verificare poate fi unică."
 
-#: include/classes/api/services/CItemGeneral.php:1444
-#: include/classes/api/services/CItemGeneral.php:1489
+#: include/classes/api/services/CItemGeneral.php:1452
+#: include/classes/api/services/CItemGeneral.php:1497
 msgid "Only one throttling step is allowed."
 msgstr ""
 
@@ -12370,7 +12380,7 @@ msgstr "Numai ultimii 20%% din indicatori sunt afișați."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Numai triggerii atribuiți să activeze servere și care depind de itemi activați sunt contorizați"
 
-#: include/httptest.inc.php:418
+#: include/httptest.inc.php:419
 msgid "Opera"
 msgstr "Opera"
 
@@ -12441,7 +12451,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:1147
 #: include/views/configuration.correlation.edit.php:95
-#: include/views/configuration.host.discovery.edit.php:620
+#: include/views/configuration.host.discovery.edit.php:621
 #: include/views/configuration.host.list.php:60
 #: include/views/configuration.maintenance.edit.php:171
 #: include/views/configuration.template.list.php:34
@@ -12564,7 +12574,7 @@ msgstr "Alți parametri de configurare"
 msgid "Other parameters"
 msgstr "Alți parametri"
 
-#: include/httptest.inc.php:431
+#: include/httptest.inc.php:432
 #: include/views/configuration.httpconf.edit.php:94
 msgid "Others"
 msgstr "Alții"
@@ -12574,8 +12584,8 @@ msgstr "Alții"
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:758
-#: include/views/configuration.item.edit.php:784
+#: include/views/configuration.item.edit.php:759
+#: include/views/configuration.item.edit.php:785
 msgctxt "item_form"
 msgid "Overridden by"
 msgstr "Suprascrisă de "
@@ -12776,7 +12786,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:997
+#: include/classes/graph/CSvgGraph.php:972
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:991
 #: include/classes/screens/CScreenProblem.php:1150 include/events.inc.php:340
@@ -12806,16 +12816,16 @@ msgstr ""
 #: include/views/configuration.host.massupdate.php:252
 #: include/views/configuration.host.massupdate.php:260
 #: include/views/configuration.host.massupdate.php:270
-#: include/views/configuration.host.prototype.edit.php:379
-#: include/views/configuration.host.prototype.edit.php:392
-#: include/views/configuration.host.prototype.edit.php:405
+#: include/views/configuration.host.prototype.edit.php:380
+#: include/views/configuration.host.prototype.edit.php:393
+#: include/views/configuration.host.prototype.edit.php:406
 msgid "PSK"
 msgstr ""
 
 #: app/views/administration.proxy.edit.php:101
 #: include/views/configuration.host.edit.php:805
 #: include/views/configuration.host.massupdate.php:264
-#: include/views/configuration.host.prototype.edit.php:400
+#: include/views/configuration.host.prototype.edit.php:401
 msgid "PSK identity"
 msgstr ""
 
@@ -12894,8 +12904,8 @@ msgstr "Eroare de analizare"
 msgid "Passive"
 msgstr "Pasiv"
 
-#: app/views/administration.mediatype.edit.php:165 disc_prototypes.php:266
-#: host_discovery.php:214 httpconf.php:65
+#: app/views/administration.mediatype.edit.php:165 disc_prototypes.php:270
+#: host_discovery.php:218 httpconf.php:65
 #: include/classes/setup/CSetupWizard.php:248
 #: include/views/administration.users.edit.php:110
 #: include/views/administration.users.edit.php:141
@@ -12905,25 +12915,25 @@ msgstr "Pasiv"
 #: include/views/configuration.action.edit.php:1758
 #: include/views/configuration.action.edit.php:2193
 #: include/views/configuration.action.edit.php:2220
-#: include/views/configuration.host.discovery.edit.php:292
-#: include/views/configuration.host.discovery.edit.php:482
-#: include/views/configuration.host.discovery.edit.php:511
+#: include/views/configuration.host.discovery.edit.php:293
+#: include/views/configuration.host.discovery.edit.php:483
+#: include/views/configuration.host.discovery.edit.php:512
 #: include/views/configuration.host.edit.php:683
 #: include/views/configuration.host.massupdate.php:180
-#: include/views/configuration.host.prototype.edit.php:338
+#: include/views/configuration.host.prototype.edit.php:339
 #: include/views/configuration.httpconf.edit.php:166
-#: include/views/configuration.item.edit.php:337
-#: include/views/configuration.item.edit.php:588
-#: include/views/configuration.item.edit.php:625
+#: include/views/configuration.item.edit.php:338
+#: include/views/configuration.item.edit.php:589
+#: include/views/configuration.item.edit.php:626
 #: include/views/configuration.item.massupdate.php:286
 #: include/views/configuration.item.massupdate.php:314
-#: include/views/configuration.item.prototype.edit.php:319
-#: include/views/configuration.item.prototype.edit.php:524
-#: include/views/configuration.item.prototype.edit.php:553
+#: include/views/configuration.item.prototype.edit.php:320
+#: include/views/configuration.item.prototype.edit.php:525
+#: include/views/configuration.item.prototype.edit.php:554
 #: include/views/configuration.item.prototype.massupdate.php:281
 #: include/views/configuration.item.prototype.massupdate.php:309
 #: include/views/general.login.php:64
-#: include/views/js/common.item.edit.js.php:251 items.php:260
+#: include/views/js/common.item.edit.js.php:251 items.php:264
 msgid "Password"
 msgstr "Parolă"
 
@@ -12974,10 +12984,10 @@ msgid "Performs a DNS query. Returns character string with the required type of 
 msgstr ""
 
 #: app/views/report.services.php:31
-#: include/views/configuration.host.discovery.edit.php:539
-#: include/views/configuration.item.edit.php:689
+#: include/views/configuration.host.discovery.edit.php:540
+#: include/views/configuration.item.edit.php:690
 #: include/views/configuration.item.massupdate.php:342
-#: include/views/configuration.item.prototype.edit.php:614
+#: include/views/configuration.item.prototype.edit.php:615
 #: include/views/configuration.item.prototype.massupdate.php:339
 #: include/views/configuration.maintenance.edit.php:77 report4.php:104
 #: srv_status.php:170
@@ -13087,7 +13097,7 @@ msgstr ""
 msgid "Polish (pl_PL)"
 msgstr "Poloneză (pl_PL)"
 
-#: include/views/configuration.item.edit.php:902
+#: include/views/configuration.item.edit.php:903
 msgid "Populates host inventory field"
 msgstr "Populare câmp server inventar"
 
@@ -13097,16 +13107,16 @@ msgstr "Populare câmp server inventar"
 #: include/forms.inc.php:472 include/views/configuration.action.edit.php:991
 #: include/views/configuration.action.edit.php:1773
 #: include/views/configuration.action.edit.php:2232
-#: include/views/configuration.host.discovery.edit.php:469
+#: include/views/configuration.host.discovery.edit.php:470
 #: include/views/configuration.host.edit.php:115
 #: include/views/configuration.host.edit.php:198
 #: include/views/configuration.host.list.php:130
 #: include/views/configuration.host.prototype.edit.php:86
-#: include/views/configuration.item.edit.php:574
+#: include/views/configuration.item.edit.php:575
 #: include/views/configuration.item.massupdate.php:256
-#: include/views/configuration.item.prototype.edit.php:511
+#: include/views/configuration.item.prototype.edit.php:512
 #: include/views/configuration.item.prototype.massupdate.php:251
-#: include/views/inventory.host.view.php:75 items.php:133 items.php:301
+#: include/views/inventory.host.view.php:75 items.php:133 items.php:305
 #: setup.php:50
 msgid "Port"
 msgstr "Port"
@@ -13140,19 +13150,19 @@ msgstr ""
 msgid "Pre-installation summary"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:775
-#: include/views/configuration.item.edit.php:920
+#: include/views/configuration.host.discovery.edit.php:776
+#: include/views/configuration.item.edit.php:921
 #: include/views/configuration.item.massupdate.php:577
-#: include/views/configuration.item.prototype.edit.php:752
+#: include/views/configuration.item.prototype.edit.php:753
 #: include/views/configuration.item.prototype.massupdate.php:590
 msgid "Preprocessing"
 msgstr ""
 
 #: app/views/popup.preproctestedit.view.php:114
-#: include/views/configuration.host.discovery.edit.php:777
-#: include/views/configuration.item.edit.php:922
+#: include/views/configuration.host.discovery.edit.php:778
+#: include/views/configuration.item.edit.php:923
 #: include/views/configuration.item.massupdate.php:324
-#: include/views/configuration.item.prototype.edit.php:754
+#: include/views/configuration.item.prototype.edit.php:755
 #: include/views/configuration.item.prototype.massupdate.php:319
 msgid "Preprocessing steps"
 msgstr ""
@@ -13217,19 +13227,19 @@ msgstr "Telefon B inițial POC"
 msgid "Primary POC screen name"
 msgstr "Nume ecran inițial POC"
 
-#: include/views/configuration.host.discovery.edit.php:464
-#: include/views/configuration.item.edit.php:569
+#: include/views/configuration.host.discovery.edit.php:465
+#: include/views/configuration.item.edit.php:570
 #: include/views/configuration.item.massupdate.php:248
-#: include/views/configuration.item.prototype.edit.php:506
+#: include/views/configuration.item.prototype.edit.php:507
 #: include/views/configuration.item.prototype.massupdate.php:243
 #: include/views/js/configuration.discovery.edit.js.php:139
 msgid "Privacy passphrase"
 msgstr "Frază de acces de confidențialitate"
 
-#: include/views/configuration.host.discovery.edit.php:457
-#: include/views/configuration.item.edit.php:564
+#: include/views/configuration.host.discovery.edit.php:458
+#: include/views/configuration.item.edit.php:565
 #: include/views/configuration.item.massupdate.php:235
-#: include/views/configuration.item.prototype.edit.php:499
+#: include/views/configuration.item.prototype.edit.php:500
 #: include/views/configuration.item.prototype.massupdate.php:231
 #: include/views/js/configuration.discovery.edit.js.php:131
 msgid "Privacy protocol"
@@ -13245,17 +13255,17 @@ msgstr ""
 #: include/views/configuration.action.edit.php:970
 #: include/views/configuration.action.edit.php:1750
 #: include/views/configuration.action.edit.php:2213
-#: include/views/configuration.host.discovery.edit.php:505
-#: include/views/configuration.item.edit.php:619
+#: include/views/configuration.host.discovery.edit.php:506
+#: include/views/configuration.item.edit.php:620
 #: include/views/configuration.item.massupdate.php:307
-#: include/views/configuration.item.prototype.edit.php:547
+#: include/views/configuration.item.prototype.edit.php:548
 #: include/views/configuration.item.prototype.massupdate.php:302
 msgid "Private key file"
 msgstr "Fișier cheie privată"
 
 #: include/views/configuration.host.edit.php:678
 #: include/views/configuration.host.massupdate.php:166
-#: include/views/configuration.host.prototype.edit.php:331
+#: include/views/configuration.host.prototype.edit.php:332
 msgid "Privilege level"
 msgstr "Nivel privilegiat"
 
@@ -13271,10 +13281,10 @@ msgstr "Nivel privilegiat"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:198
 #: include/classes/widgets/forms/CWidgetFormProblems.php:199
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
-#: include/views/configuration.item.list.php:167
+#: include/views/configuration.item.list.php:168
 #: include/views/configuration.trigger.prototype.list.php:129
 #: include/views/configuration.triggers.list.php:85
-#: include/views/configuration.triggers.list.php:295
+#: include/views/configuration.triggers.list.php:296
 #: include/views/js/monitoring.sysmaps.js.php:221
 msgid "Problem"
 msgstr "Problemă"
@@ -13462,10 +13472,10 @@ msgstr ""
 #: include/views/configuration.action.edit.php:949
 #: include/views/configuration.action.edit.php:1727
 #: include/views/configuration.action.edit.php:2194
-#: include/views/configuration.host.discovery.edit.php:483
-#: include/views/configuration.item.edit.php:589
+#: include/views/configuration.host.discovery.edit.php:484
+#: include/views/configuration.item.edit.php:590
 #: include/views/configuration.item.massupdate.php:287
-#: include/views/configuration.item.prototype.edit.php:525
+#: include/views/configuration.item.prototype.edit.php:526
 #: include/views/configuration.item.prototype.massupdate.php:282
 msgid "Public key"
 msgstr "Cheie publică"
@@ -13473,10 +13483,10 @@ msgstr "Cheie publică"
 #: include/views/configuration.action.edit.php:962
 #: include/views/configuration.action.edit.php:1741
 #: include/views/configuration.action.edit.php:2205
-#: include/views/configuration.host.discovery.edit.php:498
-#: include/views/configuration.item.edit.php:612
+#: include/views/configuration.host.discovery.edit.php:499
+#: include/views/configuration.item.edit.php:613
 #: include/views/configuration.item.massupdate.php:300
-#: include/views/configuration.item.prototype.edit.php:540
+#: include/views/configuration.item.prototype.edit.php:541
 #: include/views/configuration.item.prototype.massupdate.php:295
 msgid "Public key file"
 msgstr "Fișier cheie publică"
@@ -13497,7 +13507,7 @@ msgid "Queue of items to be updated"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:993
+#: include/classes/graph/CSvgGraph.php:968
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:977
 #: include/classes/screens/CScreenProblem.php:1138 include/events.inc.php:345
@@ -13592,9 +13602,9 @@ msgstr "Destinatar (descrescător)"
 
 #: include/classes/screens/CScreenProblem.php:1048
 #: include/views/administration.users.edit.php:377
-#: include/views/configuration.item.list.php:168
+#: include/views/configuration.item.list.php:169
 #: include/views/configuration.trigger.prototype.list.php:130
-#: include/views/configuration.triggers.list.php:296
+#: include/views/configuration.triggers.list.php:297
 msgid "Recovery"
 msgstr "Recuperare"
 
@@ -13657,7 +13667,7 @@ msgid "Regular"
 msgstr ""
 
 #: include/audit.inc.php:49 include/items.inc.php:1706
-#: include/views/configuration.host.discovery.edit.php:638
+#: include/views/configuration.host.discovery.edit.php:639
 msgid "Regular expression"
 msgstr "Expresie uzuală"
 
@@ -13740,21 +13750,21 @@ msgstr "Comandă de la distanță"
 #: include/views/configuration.correlation.edit.php:230
 #: include/views/configuration.host.discovery.edit.php:130
 #: include/views/configuration.host.discovery.edit.php:222
-#: include/views/configuration.host.discovery.edit.php:568
-#: include/views/configuration.host.discovery.edit.php:681
-#: include/views/configuration.host.discovery.edit.php:750
+#: include/views/configuration.host.discovery.edit.php:569
+#: include/views/configuration.host.discovery.edit.php:682
+#: include/views/configuration.host.discovery.edit.php:751
 #: include/views/configuration.host.list.php:79
 #: include/views/configuration.host.massupdate.php:58
 #: include/views/configuration.host.massupdate.php:212
 #: include/views/configuration.item.edit.php:168
 #: include/views/configuration.item.edit.php:260
-#: include/views/configuration.item.edit.php:730
+#: include/views/configuration.item.edit.php:731
 #: include/views/configuration.item.massupdate.php:169
 #: include/views/configuration.item.massupdate.php:374
 #: include/views/configuration.item.massupdate.php:497
 #: include/views/configuration.item.prototype.edit.php:150
 #: include/views/configuration.item.prototype.edit.php:242
-#: include/views/configuration.item.prototype.edit.php:643
+#: include/views/configuration.item.prototype.edit.php:644
 #: include/views/configuration.item.prototype.massupdate.php:165
 #: include/views/configuration.item.prototype.massupdate.php:371
 #: include/views/configuration.item.prototype.massupdate.php:472
@@ -13912,7 +13922,7 @@ msgstr ""
 msgid "Request body type"
 msgstr ""
 
-#: host_discovery.php:305 host_discovery.php:634 items.php:947 items.php:1410
+#: host_discovery.php:309 host_discovery.php:638 items.php:952 items.php:1415
 msgid "Request sent successfully"
 msgstr ""
 
@@ -14213,11 +14223,11 @@ msgctxt "Sunday short"
 msgid "S"
 msgstr "S"
 
-#: include/views/configuration.host.discovery.edit.php:448
-#: include/views/configuration.item.edit.php:525
-#: include/views/configuration.item.edit.php:532
+#: include/views/configuration.host.discovery.edit.php:449
+#: include/views/configuration.item.edit.php:526
+#: include/views/configuration.item.edit.php:533
 #: include/views/configuration.item.massupdate.php:220
-#: include/views/configuration.item.prototype.edit.php:490
+#: include/views/configuration.item.prototype.edit.php:491
 #: include/views/configuration.item.prototype.massupdate.php:216
 #: include/views/js/configuration.discovery.edit.js.php:119
 msgid "SHA"
@@ -14262,18 +14272,18 @@ msgid "SNMP"
 msgstr "SNMP"
 
 #: disc_prototypes.php:114 host_discovery.php:106 include/forms.inc.php:453
-#: include/views/configuration.host.discovery.edit.php:411
-#: include/views/configuration.item.edit.php:476
-#: include/views/configuration.item.prototype.edit.php:455
+#: include/views/configuration.host.discovery.edit.php:412
+#: include/views/configuration.item.edit.php:477
+#: include/views/configuration.item.prototype.edit.php:456
 #: include/views/js/configuration.discovery.edit.js.php:86 items.php:126
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
 #: disc_prototypes.php:107 host_discovery.php:101 include/forms.inc.php:428
-#: include/views/configuration.host.discovery.edit.php:423
-#: include/views/configuration.item.edit.php:489
+#: include/views/configuration.host.discovery.edit.php:424
+#: include/views/configuration.item.edit.php:490
 #: include/views/configuration.item.massupdate.php:183
-#: include/views/configuration.item.prototype.edit.php:467
+#: include/views/configuration.item.prototype.edit.php:468
 #: include/views/configuration.item.prototype.massupdate.php:179
 #: include/views/js/configuration.discovery.edit.js.php:72 items.php:119
 msgid "SNMP community"
@@ -14315,9 +14325,9 @@ msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 msgstr ""
 
 #: include/items.inc.php:1673
-#: include/views/configuration.host.discovery.edit.php:523
-#: include/views/configuration.item.edit.php:638
-#: include/views/configuration.item.prototype.edit.php:565
+#: include/views/configuration.host.discovery.edit.php:524
+#: include/views/configuration.item.edit.php:639
+#: include/views/configuration.item.prototype.edit.php:566
 msgid "SQL query"
 msgstr "Cerere SQL"
 
@@ -14344,40 +14354,40 @@ msgstr "SSH"
 msgid "SSH agent"
 msgstr "agent SSH"
 
-#: include/views/configuration.host.discovery.edit.php:316
+#: include/views/configuration.host.discovery.edit.php:317
 #: include/views/configuration.httpconf.edit.php:175
-#: include/views/configuration.item.edit.php:360
-#: include/views/configuration.item.prototype.edit.php:342
+#: include/views/configuration.item.edit.php:361
+#: include/views/configuration.item.prototype.edit.php:343
 msgid "SSL certificate file"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:324
+#: include/views/configuration.host.discovery.edit.php:325
 #: include/views/configuration.httpconf.edit.php:178
-#: include/views/configuration.item.edit.php:367
-#: include/views/configuration.item.prototype.edit.php:349
+#: include/views/configuration.item.edit.php:368
+#: include/views/configuration.item.prototype.edit.php:350
 msgid "SSL key file"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:331
+#: include/views/configuration.host.discovery.edit.php:332
 #: include/views/configuration.httpconf.edit.php:181
-#: include/views/configuration.item.edit.php:374
-#: include/views/configuration.item.prototype.edit.php:356
+#: include/views/configuration.item.edit.php:375
+#: include/views/configuration.item.prototype.edit.php:357
 msgid "SSL key password"
 msgstr ""
 
 #: app/views/administration.mediatype.edit.php:89
-#: include/views/configuration.host.discovery.edit.php:308
+#: include/views/configuration.host.discovery.edit.php:309
 #: include/views/configuration.httpconf.edit.php:172
-#: include/views/configuration.item.edit.php:352
-#: include/views/configuration.item.prototype.edit.php:334
+#: include/views/configuration.item.edit.php:353
+#: include/views/configuration.item.prototype.edit.php:335
 msgid "SSL verify host"
 msgstr ""
 
 #: app/views/administration.mediatype.edit.php:88
-#: include/views/configuration.host.discovery.edit.php:300
+#: include/views/configuration.host.discovery.edit.php:301
 #: include/views/configuration.httpconf.edit.php:169
-#: include/views/configuration.item.edit.php:344
-#: include/views/configuration.item.prototype.edit.php:326
+#: include/views/configuration.item.edit.php:345
+#: include/views/configuration.item.prototype.edit.php:327
 msgid "SSL verify peer"
 msgstr ""
 
@@ -14389,7 +14399,7 @@ msgstr ""
 msgid "STARTTLS"
 msgstr ""
 
-#: include/httptest.inc.php:425
+#: include/httptest.inc.php:426
 msgid "Safari"
 msgstr "Safari"
 
@@ -14427,11 +14437,11 @@ msgstr "Programare"
 msgid "Scheduled check"
 msgstr "Verificare programare"
 
-#: include/views/configuration.host.discovery.edit.php:545
-#: include/views/configuration.item.edit.php:697
-#: include/views/configuration.item.edit.php:704
+#: include/views/configuration.host.discovery.edit.php:546
+#: include/views/configuration.item.edit.php:698
+#: include/views/configuration.item.edit.php:705
 #: include/views/configuration.item.massupdate.php:351
-#: include/views/configuration.item.prototype.edit.php:620
+#: include/views/configuration.item.prototype.edit.php:621
 #: include/views/configuration.item.prototype.massupdate.php:348
 #: include/views/js/common.item.edit.js.php:10
 #: include/views/js/configuration.item.massupdate.js.php:14
@@ -14648,20 +14658,20 @@ msgstr "Nume ecran POC secundar"
 msgid "Seconds"
 msgstr "Secunde"
 
-#: include/views/configuration.host.discovery.edit.php:437
-#: include/views/configuration.item.edit.php:518
+#: include/views/configuration.host.discovery.edit.php:438
+#: include/views/configuration.item.edit.php:519
 #: include/views/configuration.item.massupdate.php:204
-#: include/views/configuration.item.prototype.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:480
 #: include/views/configuration.item.prototype.massupdate.php:200
 #: include/views/js/configuration.discovery.edit.js.php:107
 msgid "Security level"
 msgstr "Nivel de securitate"
 
 #: include/forms.inc.php:432
-#: include/views/configuration.host.discovery.edit.php:429
-#: include/views/configuration.item.edit.php:495
+#: include/views/configuration.host.discovery.edit.php:430
+#: include/views/configuration.item.edit.php:496
 #: include/views/configuration.item.massupdate.php:197
-#: include/views/configuration.item.prototype.edit.php:473
+#: include/views/configuration.item.prototype.edit.php:474
 #: include/views/configuration.item.prototype.massupdate.php:193
 #: include/views/js/configuration.discovery.edit.js.php:100
 msgid "Security name"
@@ -14690,7 +14700,7 @@ msgstr "Nume securitate"
 #: include/views/configuration.graph.edit.php:270
 #: include/views/configuration.item.edit.php:94
 #: include/views/configuration.item.prototype.edit.php:77
-#: include/views/configuration.item.prototype.edit.php:375
+#: include/views/configuration.item.prototype.edit.php:376
 #: include/views/configuration.item.prototype.massupdate.php:508
 #: include/views/configuration.services.edit.php:90
 #: include/views/js/monitoring.sysmaps.js.php:189
@@ -14712,7 +14722,7 @@ msgstr "Selectează"
 #: app/views/popup.triggerexpr.php:72
 #: include/views/configuration.graph.edit.php:209
 #: include/views/configuration.graph.edit.php:291
-#: include/views/configuration.item.prototype.edit.php:392
+#: include/views/configuration.item.prototype.edit.php:393
 #: include/views/configuration.item.prototype.massupdate.php:524
 msgid "Select prototype"
 msgstr "Selectează prototip"
@@ -14997,13 +15007,13 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblems.php:197
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
 #: include/events.inc.php:167 include/triggers.inc.php:1214
-#: include/views/configuration.item.list.php:139
+#: include/views/configuration.item.list.php:140
 #: include/views/configuration.trigger.prototype.edit.php:65
 #: include/views/configuration.trigger.prototype.list.php:50
 #: include/views/configuration.trigger.prototype.massupdate.php:46
 #: include/views/configuration.triggers.edit.php:95
 #: include/views/configuration.triggers.list.php:61
-#: include/views/configuration.triggers.list.php:194
+#: include/views/configuration.triggers.list.php:195
 #: include/views/configuration.triggers.massupdate.php:48
 #: include/views/reports.toptriggers.php:66
 #: include/views/reports.toptriggers.php:79
@@ -15161,9 +15171,9 @@ msgstr ""
 msgid "Show unavailable maps"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:828
+#: include/views/configuration.item.edit.php:829
 #: include/views/configuration.item.massupdate.php:445
-#: include/views/configuration.item.prototype.edit.php:699
+#: include/views/configuration.item.prototype.edit.php:700
 #: include/views/configuration.item.prototype.massupdate.php:445
 msgid "Show value"
 msgstr "Arată valoare"
@@ -15490,11 +15500,11 @@ msgstr ""
 #: include/views/configuration.host.massupdate.php:103
 #: include/views/configuration.httpconf.list.php:27
 #: include/views/configuration.httpconf.list.php:95
-#: include/views/configuration.item.list.php:69
-#: include/views/configuration.item.list.php:139
+#: include/views/configuration.item.list.php:70
+#: include/views/configuration.item.list.php:140
 #: include/views/configuration.item.massupdate.php:423
 #: include/views/configuration.triggers.list.php:74
-#: include/views/configuration.triggers.list.php:199 srv_status.php:146
+#: include/views/configuration.triggers.list.php:200 srv_status.php:146
 msgid "Status"
 msgstr "Stare"
 
@@ -15612,7 +15622,7 @@ msgstr "Subiect"
 #: app/views/administration.proxy.edit.php:114
 #: include/views/configuration.host.edit.php:820
 #: include/views/configuration.host.massupdate.php:278
-#: include/views/configuration.host.prototype.edit.php:415
+#: include/views/configuration.host.prototype.edit.php:416
 msgctxt "encryption certificate"
 msgid "Subject"
 msgstr ""
@@ -15825,7 +15835,7 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.massupdate.php:180
 #: include/views/configuration.triggers.edit.php:558
 #: include/views/configuration.triggers.list.php:135
-#: include/views/configuration.triggers.list.php:201
+#: include/views/configuration.triggers.list.php:202
 #: include/views/configuration.triggers.massupdate.php:76
 #: include/views/configuration.triggers.massupdate.php:160
 msgid "Tags"
@@ -15974,7 +15984,7 @@ msgstr "Șablon cu același nume vizibil \"%s\" există deja."
 #: include/views/configuration.host.list.php:108
 #: include/views/configuration.host.list.php:180
 #: include/views/configuration.host.massupdate.php:295
-#: include/views/configuration.host.prototype.edit.php:320
+#: include/views/configuration.host.prototype.edit.php:321
 #: include/views/configuration.host.prototype.list.php:54
 #: include/views/configuration.template.edit.php:22
 #: include/views/configuration.template.list.php:101
@@ -16047,9 +16057,9 @@ msgstr ""
 #: include/forms.inc.php:355 include/items.inc.php:133
 #: include/items.inc.php:1705 include/items.inc.php:1709
 #: include/items.inc.php:1713 include/items.inc.php:1717
-#: include/views/configuration.item.edit.php:669
+#: include/views/configuration.item.edit.php:670
 #: include/views/configuration.item.massupdate.php:270
-#: include/views/configuration.item.prototype.edit.php:594
+#: include/views/configuration.item.prototype.edit.php:595
 #: include/views/configuration.item.prototype.massupdate.php:265
 #: include/views/js/monitoring.sysmaps.js.php:305
 #: include/views/js/monitoring.sysmaps.js.php:455
@@ -16409,9 +16419,9 @@ msgstr "Perioadă trend a stocării datelor"
 msgid "Trend data storage period \"%1$s\"."
 msgstr ""
 
-#: disc_prototypes.php:198 include/views/configuration.item.edit.php:799
+#: disc_prototypes.php:198 include/views/configuration.item.edit.php:800
 #: include/views/configuration.item.massupdate.php:410
-#: include/views/configuration.item.prototype.edit.php:674
+#: include/views/configuration.item.prototype.edit.php:675
 #: include/views/configuration.item.prototype.massupdate.php:407 items.php:79
 msgid "Trend storage period"
 msgstr "Perioadă trend a stocării"
@@ -16419,8 +16429,8 @@ msgstr "Perioadă trend a stocării"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:457 include/forms.inc.php:877
 #: include/views/administration.general.housekeeper.edit.php:135
-#: include/views/configuration.item.list.php:66
-#: include/views/configuration.item.prototype.list.php:56 items.php:305
+#: include/views/configuration.item.list.php:67
+#: include/views/configuration.item.prototype.list.php:56 items.php:309
 #: latest.php:408
 msgid "Trends"
 msgstr "Tendințe"
@@ -16458,7 +16468,7 @@ msgstr ""
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Triggerul \"%1$s\" depinde de trigger \"%2$s\", care nu există."
 
-#: triggers.php:295
+#: triggers.php:296
 msgid "Trigger added"
 msgstr "Trigger adăugat"
 
@@ -16466,7 +16476,7 @@ msgstr "Trigger adăugat"
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Triggerul nu poate depinde de un trigger care este moștenit de la el."
 
-#: triggers.php:592
+#: triggers.php:593
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
 msgstr[0] ""
@@ -16477,7 +16487,7 @@ msgstr[2] ""
 msgid "Trigger data storage period"
 msgstr ""
 
-#: triggers.php:408
+#: triggers.php:409
 msgid "Trigger deleted"
 msgstr "Trigger șters"
 
@@ -16489,7 +16499,7 @@ msgstr ""
 msgid "Trigger details"
 msgstr ""
 
-#: triggers.php:542
+#: triggers.php:543
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] "Trigger dezactivat"
@@ -16502,7 +16512,7 @@ msgstr[2] "Triggeri dezactivați"
 msgid "Trigger displaying options"
 msgstr "Opțiuni de afișare trigger"
 
-#: triggers.php:541
+#: triggers.php:542
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] "Trigger activat"
@@ -16649,7 +16659,7 @@ msgstr ""
 msgid "Trigger tags"
 msgstr ""
 
-#: triggers.php:393 triggers.php:511
+#: triggers.php:394 triggers.php:512
 msgid "Trigger updated"
 msgstr "Trigger actualizat"
 
@@ -16663,8 +16673,8 @@ msgstr "Trigger actualizat"
 #: include/views/configuration.host.edit.php:359
 #: include/views/configuration.host.list.php:175
 #: include/views/configuration.host.list.php:399
-#: include/views/configuration.item.list.php:62
-#: include/views/configuration.item.list.php:186
+#: include/views/configuration.item.list.php:63
+#: include/views/configuration.item.list.php:187
 #: include/views/configuration.template.edit.php:175
 #: include/views/configuration.template.list.php:138
 #: include/views/configuration.template.list.php:247
@@ -16675,11 +16685,11 @@ msgstr "Trigger actualizat"
 #: include/views/inventory.host.view.php:175
 #: include/views/js/monitoring.sysmaps.js.php:143
 #: include/views/monitoring.overview.items.php:56
-#: include/views/monitoring.overview.triggers.php:93 triggers.php:662
+#: include/views/monitoring.overview.triggers.php:93 triggers.php:663
 msgid "Triggers"
 msgstr "Triggeri"
 
-#: triggers.php:607
+#: triggers.php:608
 msgid "Triggers deleted"
 msgstr "Triggeri șterși"
 
@@ -16709,7 +16719,7 @@ msgstr "Marți"
 msgid "Turkish (tr_TR)"
 msgstr "Turcă (tr_TR)"
 
-#: include/classes/api/services/CItem.php:964
+#: include/classes/api/services/CItem.php:1061
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Doi itemi (\"%1$s\" și \"%2$s\") nu pot popula un câmp inventar al unui server \"%3$s\", aceasta ar duce la un conflict. "
@@ -16742,17 +16752,17 @@ msgstr ""
 #: include/views/configuration.graph.edit.php:337
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.discovery.edit.php:59
-#: include/views/configuration.host.discovery.edit.php:539
+#: include/views/configuration.host.discovery.edit.php:540
 #: include/views/configuration.host.discovery.list.php:58
 #: include/views/configuration.item.edit.php:76
 #: include/views/configuration.item.edit.php:81
-#: include/views/configuration.item.edit.php:689
-#: include/views/configuration.item.list.php:67
+#: include/views/configuration.item.edit.php:690
+#: include/views/configuration.item.list.php:68
 #: include/views/configuration.item.massupdate.php:41
 #: include/views/configuration.item.massupdate.php:340
 #: include/views/configuration.item.prototype.edit.php:59
 #: include/views/configuration.item.prototype.edit.php:64
-#: include/views/configuration.item.prototype.edit.php:614
+#: include/views/configuration.item.prototype.edit.php:615
 #: include/views/configuration.item.prototype.list.php:57
 #: include/views/configuration.item.prototype.massupdate.php:37
 #: include/views/configuration.item.prototype.massupdate.php:337
@@ -16790,17 +16800,17 @@ msgstr "Tip (descendent)"
 #: include/views/configuration.action.edit.php:118
 #: include/views/configuration.action.edit.php:1151
 #: include/views/configuration.correlation.edit.php:91
-#: include/views/configuration.host.discovery.edit.php:615
+#: include/views/configuration.host.discovery.edit.php:616
 msgid "Type of calculation"
 msgstr "Tip de calcul"
 
 #: app/controllers/CControllerPopupGeneric.php:212
 #: app/controllers/CControllerPopupGeneric.php:275 include/forms.inc.php:348
-#: include/forms.inc.php:842 include/views/configuration.item.edit.php:657
-#: include/views/configuration.item.edit.php:663
+#: include/forms.inc.php:842 include/views/configuration.item.edit.php:658
+#: include/views/configuration.item.edit.php:664
 #: include/views/configuration.item.massupdate.php:263
-#: include/views/configuration.item.prototype.edit.php:582
-#: include/views/configuration.item.prototype.edit.php:588
+#: include/views/configuration.item.prototype.edit.php:583
+#: include/views/configuration.item.prototype.edit.php:589
 #: include/views/configuration.item.prototype.massupdate.php:258
 msgid "Type of information"
 msgstr "Tip de informație"
@@ -16853,7 +16863,7 @@ msgstr "URL B"
 msgid "URL C"
 msgstr "URL C"
 
-#: include/views/js/common.item.edit.js.php:323
+#: include/views/js/common.item.edit.js.php:324
 #: include/views/js/configuration.httpconf.edit.js.php:78
 msgid "URL is not properly encoded."
 msgstr ""
@@ -16937,9 +16947,9 @@ msgstr "Deblocare utilizatori selectați?"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:154
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
-#: include/views/configuration.item.edit.php:675
+#: include/views/configuration.item.edit.php:676
 #: include/views/configuration.item.massupdate.php:276
-#: include/views/configuration.item.prototype.edit.php:600
+#: include/views/configuration.item.prototype.edit.php:601
 #: include/views/configuration.item.prototype.massupdate.php:271
 msgid "Units"
 msgstr "Unități"
@@ -16952,8 +16962,8 @@ msgstr "Unități"
 #: include/discovery.inc.php:151 include/events.inc.php:47
 #: include/events.inc.php:78 include/graphs.inc.php:37
 #: include/graphs.inc.php:67 include/hosts.inc.php:47 include/hosts.inc.php:74
-#: include/html.inc.php:334 include/httptest.inc.php:39
-#: include/httptest.inc.php:56 include/items.inc.php:45
+#: include/html.inc.php:334 include/httptest.inc.php:40
+#: include/httptest.inc.php:57 include/items.inc.php:45
 #: include/items.inc.php:112 include/items.inc.php:135
 #: include/items.inc.php:169 include/maintenances.inc.php:39
 #: include/maps.inc.php:39 include/regexp.inc.php:236
@@ -17016,7 +17026,7 @@ msgid "Unlimited"
 msgstr ""
 
 #: include/views/configuration.host.edit.php:568
-#: include/views/configuration.host.prototype.edit.php:272
+#: include/views/configuration.host.prototype.edit.php:273
 #: include/views/configuration.template.edit.php:363
 msgid "Unlink"
 msgstr "Dezleagă"
@@ -17083,7 +17093,7 @@ msgstr "Format nesuportat la import \"%1$s\"."
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1279
+#: include/classes/api/services/CDiscoveryRule.php:1376
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of discovery rule \"%1$s\"."
 msgstr ""
@@ -17093,7 +17103,7 @@ msgstr ""
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1247
+#: include/classes/api/services/CDiscoveryRule.php:1344
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr ""
@@ -17138,15 +17148,15 @@ msgstr "Sus"
 #: include/views/configuration.correlation.edit.php:276
 #: include/views/configuration.discovery.edit.php:133
 #: include/views/configuration.graph.edit.php:454
-#: include/views/configuration.host.discovery.edit.php:804
+#: include/views/configuration.host.discovery.edit.php:805
 #: include/views/configuration.host.edit.php:833
 #: include/views/configuration.hostgroups.edit.php:57
 #: include/views/configuration.host.massupdate.php:308
-#: include/views/configuration.host.prototype.edit.php:434
+#: include/views/configuration.host.prototype.edit.php:435
 #: include/views/configuration.httpconf.edit.php:253
-#: include/views/configuration.item.edit.php:955
+#: include/views/configuration.item.edit.php:956
 #: include/views/configuration.item.massupdate.php:579
-#: include/views/configuration.item.prototype.edit.php:766
+#: include/views/configuration.item.prototype.edit.php:767
 #: include/views/configuration.item.prototype.massupdate.php:593
 #: include/views/configuration.maintenance.edit.php:134
 #: include/views/configuration.maintenance.edit.php:285
@@ -17172,13 +17182,13 @@ msgstr "Actualizează existent"
 
 #: discoveryconf.php:39 disc_prototypes.php:58 host_discovery.php:60
 #: include/forms.inc.php:394 include/views/configuration.discovery.edit.php:59
-#: include/views/configuration.host.discovery.edit.php:529
+#: include/views/configuration.host.discovery.edit.php:530
 #: include/views/configuration.httpconf.edit.php:79
-#: include/views/configuration.item.edit.php:679
+#: include/views/configuration.item.edit.php:680
 #: include/views/configuration.item.massupdate.php:396
-#: include/views/configuration.item.prototype.edit.php:604
+#: include/views/configuration.item.prototype.edit.php:605
 #: include/views/configuration.item.prototype.massupdate.php:393 items.php:59
-#: items.php:303
+#: items.php:307
 msgid "Update interval"
 msgstr "Actualizare inventar"
 
@@ -17432,13 +17442,13 @@ msgstr ""
 #: include/views/configuration.action.edit.php:954
 #: include/views/configuration.action.edit.php:1733
 #: include/views/configuration.action.edit.php:2197
-#: include/views/configuration.host.discovery.edit.php:284
-#: include/views/configuration.host.discovery.edit.php:493
-#: include/views/configuration.item.edit.php:330
-#: include/views/configuration.item.edit.php:607
+#: include/views/configuration.host.discovery.edit.php:285
+#: include/views/configuration.host.discovery.edit.php:494
+#: include/views/configuration.item.edit.php:331
+#: include/views/configuration.item.edit.php:608
 #: include/views/configuration.item.massupdate.php:293
-#: include/views/configuration.item.prototype.edit.php:312
-#: include/views/configuration.item.prototype.edit.php:535
+#: include/views/configuration.item.prototype.edit.php:313
+#: include/views/configuration.item.prototype.edit.php:536
 #: include/views/configuration.item.prototype.massupdate.php:288 items.php:92
 msgid "User name"
 msgstr "Nume utilizator"
@@ -17506,11 +17516,11 @@ msgstr ""
 
 #: app/views/administration.mediatype.edit.php:96
 #: app/views/administration.mediatype.edit.php:160
-#: app/views/administration.mediatype.list.php:94 disc_prototypes.php:259
-#: host_discovery.php:208 include/views/configuration.host.edit.php:679
+#: app/views/administration.mediatype.list.php:94 disc_prototypes.php:262
+#: host_discovery.php:211 include/views/configuration.host.edit.php:679
 #: include/views/configuration.host.massupdate.php:173
-#: include/views/configuration.host.prototype.edit.php:335
-#: include/views/general.login.php:60 index.php:33 items.php:254
+#: include/views/configuration.host.prototype.edit.php:336
+#: include/views/general.login.php:60 index.php:33 items.php:257
 msgid "Username"
 msgstr "Nume utilizator"
 
@@ -17759,7 +17769,7 @@ msgstr ""
 #: include/views/configuration.template.massupdate.php:148
 #: include/views/configuration.trigger.prototype.massupdate.php:84
 #: include/views/configuration.triggers.list.php:81
-#: include/views/configuration.triggers.list.php:195
+#: include/views/configuration.triggers.list.php:196
 #: include/views/configuration.triggers.massupdate.php:86
 #: include/views/hostmacros.php:50 include/views/monitoring.history.php:145
 #: include/views/monitoring.history.php:262
@@ -18118,7 +18128,7 @@ msgstr "Fără probleme"
 msgid "Without triggers"
 msgstr "Fără triggeri"
 
-#: include/views/configuration.item.list.php:59
+#: include/views/configuration.item.list.php:60
 #: include/views/configuration.item.prototype.list.php:51
 msgid "Wizard"
 msgstr "Expert"
@@ -18220,7 +18230,7 @@ msgstr ""
 msgid "XML data"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2261
+#: include/classes/api/services/CItemGeneral.php:2272
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
 msgstr ""
@@ -18296,7 +18306,8 @@ msgstr ""
 #: include/classes/import/validators/C32XmlValidator.php:1007
 #: include/classes/import/validators/C34XmlValidator.php:1111
 #: include/classes/import/validators/C40XmlValidator.php:1290
-#: include/classes/import/validators/C42XmlValidator.php:1352
+#: include/classes/import/validators/C42XmlValidator.php:1350
+#: include/classes/import/validators/C44XmlValidator.php:1466
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr ""
@@ -18552,7 +18563,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:242
 #: include/classes/api/services/CTriggerGeneral.php:258
 #: include/classes/api/services/CUser.php:668
-#: include/classes/import/validators/CXmlValidatorGeneral.php:201
+#: include/classes/import/validators/CXmlValidatorGeneral.php:199
 #: include/classes/validators/CApiInputValidator.php:234
 #: include/classes/validators/CNewValidator.php:278
 msgid "a character string is expected"
@@ -18581,9 +18592,9 @@ msgid "a number is too large"
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:320
-#: include/classes/api/services/CItemGeneral.php:1330
-#: include/classes/api/services/CItemGeneral.php:1404
-#: include/classes/api/services/CItemGeneral.php:1414
+#: include/classes/api/services/CItemGeneral.php:1338
+#: include/classes/api/services/CItemGeneral.php:1412
+#: include/classes/api/services/CItemGeneral.php:1422
 #: include/classes/api/services/CScreen.php:422
 msgid "a numeric value is expected"
 msgstr ""
@@ -18660,9 +18671,9 @@ msgstr "toata media"
 
 #: include/classes/api/services/CDRule.php:467
 #: include/classes/api/services/CDRule.php:474
-#: include/classes/api/services/CItemGeneral.php:2200
-#: include/classes/api/services/CItemGeneral.php:2224
-#: include/classes/import/validators/CXmlValidatorGeneral.php:215
+#: include/classes/api/services/CItemGeneral.php:2211
+#: include/classes/api/services/CItemGeneral.php:2235
+#: include/classes/import/validators/CXmlValidatorGeneral.php:213
 #: include/classes/validators/CApiInputValidator.php:374
 #: include/classes/validators/CApiInputValidator.php:512
 #: include/classes/validators/CApiInputValidator.php:652
@@ -18771,7 +18782,7 @@ msgstr ""
 #: include/classes/api/services/CCorrelation.php:1101
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
-#: include/classes/api/services/CDiscoveryRule.php:1420
+#: include/classes/api/services/CDiscoveryRule.php:1517
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:319
@@ -18785,13 +18796,13 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:511
 #: include/classes/api/services/CItemGeneral.php:517
 #: include/classes/api/services/CItemGeneral.php:523
-#: include/classes/api/services/CItemGeneral.php:1296
-#: include/classes/api/services/CItemGeneral.php:1320
-#: include/classes/api/services/CItemGeneral.php:1352
-#: include/classes/api/services/CItemGeneral.php:1366
-#: include/classes/api/services/CItemGeneral.php:1392
-#: include/classes/api/services/CItemGeneral.php:1512
-#: include/classes/api/services/CItemGeneral.php:1615
+#: include/classes/api/services/CItemGeneral.php:1304
+#: include/classes/api/services/CItemGeneral.php:1328
+#: include/classes/api/services/CItemGeneral.php:1360
+#: include/classes/api/services/CItemGeneral.php:1374
+#: include/classes/api/services/CItemGeneral.php:1400
+#: include/classes/api/services/CItemGeneral.php:1520
+#: include/classes/api/services/CItemGeneral.php:1623
 #: include/classes/api/services/CMapElement.php:106
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
@@ -18824,7 +18835,7 @@ msgstr ""
 msgid "cannot be empty"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2216
+#: include/classes/api/services/CItemGeneral.php:2227
 msgid "cannot convert to JSON, result value too long"
 msgstr ""
 
@@ -18832,7 +18843,7 @@ msgstr ""
 msgid "cannot perform Scroll API request, data could be truncated"
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1403
+#: include/classes/api/services/CDiscoveryRule.php:1500
 msgid "cannot update property for templated discovery rule"
 msgstr ""
 
@@ -18845,7 +18856,7 @@ msgstr ""
 msgid "check expression starting from \"%1$s\""
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1930
+#: include/classes/api/services/CItemGeneral.php:1938
 #: include/classes/import/CConfigurationImport.php:2625
 msgid "circular item dependency is not allowed"
 msgstr ""
@@ -18954,7 +18965,7 @@ msgid "does not equal"
 msgstr ""
 
 #: include/actions.inc.php:35
-#: include/views/configuration.host.discovery.edit.php:655
+#: include/views/configuration.host.discovery.edit.php:656
 #: include/views/js/configuration.host.discovery.edit.js.php:27
 msgid "does not match"
 msgstr ""
@@ -18984,8 +18995,8 @@ msgstr ""
 msgid "first"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1374
-#: include/classes/api/services/CItemGeneral.php:1520
+#: include/classes/api/services/CItemGeneral.php:1382
+#: include/classes/api/services/CItemGeneral.php:1528
 msgid "first parameter is expected"
 msgstr ""
 
@@ -19001,10 +19012,10 @@ msgstr ""
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:761
-#: include/views/configuration.item.edit.php:766
-#: include/views/configuration.item.edit.php:787
-#: include/views/configuration.item.edit.php:792
+#: include/views/configuration.item.edit.php:762
+#: include/views/configuration.item.edit.php:767
+#: include/views/configuration.item.edit.php:788
+#: include/views/configuration.item.edit.php:793
 msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "setări interne globale"
@@ -19044,7 +19055,7 @@ msgstr ""
 msgid "host pattern"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1913
+#: include/classes/api/services/CItemGeneral.php:1921
 msgid "hostid of dependent item and master item should match"
 msgstr ""
 
@@ -19082,12 +19093,12 @@ msgctxt "event source"
 msgid "internal"
 msgstr "intern"
 
-#: include/classes/api/services/CItemGeneral.php:1533
+#: include/classes/api/services/CItemGeneral.php:1541
 msgid "invalid Prometheus output"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1526
-#: include/classes/api/services/CItemGeneral.php:1541
+#: include/classes/api/services/CItemGeneral.php:1534
+#: include/classes/api/services/CItemGeneral.php:1549
 msgid "invalid Prometheus pattern"
 msgstr ""
 
@@ -19231,12 +19242,12 @@ msgid "map"
 msgstr "hartă"
 
 #: include/actions.inc.php:34
-#: include/views/configuration.host.discovery.edit.php:654
+#: include/views/configuration.host.discovery.edit.php:655
 #: include/views/js/configuration.host.discovery.edit.js.php:26
 msgid "matches"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1422
+#: include/classes/api/services/CItemGeneral.php:1430
 #: include/classes/graphdraw/CLineGraphDraw.php:1854
 #: include/classes/graphdraw/CLineGraphDraw.php:1868
 #: include/classes/graphdraw/CPieGraphDraw.php:326 include/forms.inc.php:1481
@@ -19251,17 +19262,17 @@ msgstr "max"
 msgid "max() - Maximum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2024
+#: include/classes/api/services/CItemGeneral.php:2032
 msgid "maximum dependent items count reached"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2010
+#: include/classes/api/services/CItemGeneral.php:2018
 #: include/classes/import/CConfigurationImport.php:2579
 #: include/classes/import/CConfigurationImport.php:2640
 msgid "maximum number of dependency levels reached"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1422
+#: include/classes/api/services/CItemGeneral.php:1430
 #: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/graphdraw/CLineGraphDraw.php:1865
 #: include/classes/graphdraw/CPieGraphDraw.php:322 include/forms.inc.php:1480
@@ -19328,7 +19339,7 @@ msgstr ""
 msgid "new"
 msgstr "nou"
 
-#: disc_prototypes.php:1330 disc_prototypes.php:1354 hosts.php:1269
+#: disc_prototypes.php:1334 disc_prototypes.php:1358 hosts.php:1269
 #: include/views/configuration.item.massupdate.php:476 templates.php:812
 msgctxt "new element in multiselect"
 msgid "new"
@@ -19352,8 +19363,8 @@ msgstr ""
 msgid "none"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2207
-#: include/classes/api/services/CItemGeneral.php:2231
+#: include/classes/api/services/CItemGeneral.php:2218
+#: include/classes/api/services/CItemGeneral.php:2242
 msgid "nonempty key and value pair expected"
 msgstr ""
 
@@ -19470,7 +19481,7 @@ msgstr "actualizare la fiecare %1$s sec."
 msgid "regexp() - Regular expression V matching last value in period T (1 - match, 0 - no match)"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:677
+#: include/views/configuration.host.discovery.edit.php:678
 #: include/views/js/configuration.host.discovery.edit.js.php:31
 msgid "regular expression"
 msgstr ""
@@ -19494,7 +19505,7 @@ msgstr ""
 msgid "root"
 msgstr "rădăcină"
 
-#: include/classes/api/services/CItemGeneral.php:1920
+#: include/classes/api/services/CItemGeneral.php:1928
 msgid "ruleid of dependent item and master item should match"
 msgstr ""
 
@@ -19512,7 +19523,7 @@ msgctxt "adjective"
 msgid "second"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1380
+#: include/classes/api/services/CItemGeneral.php:1388
 msgid "second parameter is expected"
 msgstr ""
 
@@ -19536,11 +19547,11 @@ msgstr "descriere scurtă"
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:498
 #: include/classes/api/services/CItemGeneral.php:536
-#: include/classes/api/services/CItemGeneral.php:1438
-#: include/classes/api/services/CItemGeneral.php:1461
-#: include/classes/api/services/CItemGeneral.php:1577
-#: include/classes/api/services/CItemGeneral.php:1605
-#: include/classes/api/services/CItemGeneral.php:2184
+#: include/classes/api/services/CItemGeneral.php:1446
+#: include/classes/api/services/CItemGeneral.php:1469
+#: include/classes/api/services/CItemGeneral.php:1585
+#: include/classes/api/services/CItemGeneral.php:1613
+#: include/classes/api/services/CItemGeneral.php:2195
 #: include/classes/api/services/CMaintenance.php:472
 #: include/classes/api/services/CMaintenance.php:675
 #: include/classes/api/services/CProxy.php:661
@@ -19560,9 +19571,9 @@ msgstr ""
 msgid "show icon mappings"
 msgstr "arată mapări iconițe"
 
-#: include/views/configuration.item.edit.php:823
+#: include/views/configuration.item.edit.php:824
 #: include/views/configuration.item.massupdate.php:448
-#: include/views/configuration.item.prototype.edit.php:700
+#: include/views/configuration.item.prototype.edit.php:701
 #: include/views/configuration.item.prototype.massupdate.php:448
 msgid "show value mappings"
 msgstr "arată mapări valori"
@@ -19621,16 +19632,16 @@ msgstr "ID șablon \"%1$s\" este trecut %2$s ori"
 #: app/controllers/CControllerDashboardUpdate.php:135
 #: app/controllers/CControllerDashboardUpdate.php:143
 #: include/classes/api/services/CDashboard.php:386
-#: include/classes/api/services/CDiscoveryRule.php:1438
-#: include/classes/api/services/CDiscoveryRule.php:1446
+#: include/classes/api/services/CDiscoveryRule.php:1535
+#: include/classes/api/services/CDiscoveryRule.php:1543
 #: include/classes/api/services/CHttpTest.php:742
 #: include/classes/validators/CApiInputValidator.php:687
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
 msgstr ""
 
-#: include/classes/import/validators/CXmlValidatorGeneral.php:114
-#: include/classes/import/validators/CXmlValidatorGeneral.php:133
+#: include/classes/import/validators/CXmlValidatorGeneral.php:112
+#: include/classes/import/validators/CXmlValidatorGeneral.php:131
 #, c-format
 msgid "the tag \"%1$s\" is missing"
 msgstr ""
@@ -19700,8 +19711,8 @@ msgstr ""
 msgid "unexpected parameter \"%1$s\""
 msgstr ""
 
-#: include/classes/import/validators/CXmlValidatorGeneral.php:99
-#: include/classes/import/validators/CXmlValidatorGeneral.php:159
+#: include/classes/import/validators/CXmlValidatorGeneral.php:97
+#: include/classes/import/validators/CXmlValidatorGeneral.php:157
 #, c-format
 msgid "unexpected tag \"%1$s\""
 msgstr ""
@@ -19717,9 +19728,9 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:838
 #: include/classes/api/services/CHost.php:1586
 #: include/classes/api/services/CHost.php:1592
-#: include/classes/api/services/CItemGeneral.php:1303
-#: include/classes/api/services/CItemGeneral.php:1564
-#: include/classes/api/services/CItemGeneral.php:1590
+#: include/classes/api/services/CItemGeneral.php:1311
+#: include/classes/api/services/CItemGeneral.php:1572
+#: include/classes/api/services/CItemGeneral.php:1598
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
 #: include/classes/api/services/CTriggerGeneral.php:575
@@ -19742,7 +19753,7 @@ msgstr "necunoscut"
 msgid "unsupported time suffix"
 msgstr ""
 
-#: include/classes/import/validators/CXmlValidator.php:67
+#: include/classes/import/validators/CXmlValidator.php:70
 msgid "unsupported version number"
 msgstr ""
 
@@ -19784,7 +19795,7 @@ msgstr ""
 msgid "value"
 msgstr "valoare"
 
-#: include/classes/api/services/CDiscoveryRule.php:1317
+#: include/classes/api/services/CDiscoveryRule.php:1414
 #, c-format
 msgid "value \"%1$s\" already exists"
 msgstr ""
