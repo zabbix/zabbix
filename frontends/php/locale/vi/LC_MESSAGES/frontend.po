@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-09 01:43+0300\n"
+"POT-Creation-Date: 2019-06-16 01:43+0300\n"
 "PO-Revision-Date: 2019-03-12 09:36+0300\n"
 "Last-Translator: Quang <quangnh@tnmt.vn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -374,7 +374,7 @@ msgstr " Sự kiện được ghi nhận giải quyết"
 #: include/views/configuration.host.discovery.edit.php:516
 #: include/views/configuration.host.discovery.edit.php:615
 #: include/views/configuration.host.edit.php:546
-#: include/views/configuration.host.prototype.edit.php:255
+#: include/views/configuration.host.prototype.edit.php:256
 #: include/views/configuration.httpconf.edit.php:202
 #: include/views/configuration.item.edit.php:699
 #: include/views/configuration.item.edit.php:936
@@ -562,9 +562,9 @@ msgstr "Kích hoạt"
 #: include/views/configuration.host.edit.php:608
 #: include/views/configuration.host.edit.php:821
 #: include/views/configuration.hostgroups.edit.php:51
-#: include/views/configuration.host.prototype.edit.php:209
-#: include/views/configuration.host.prototype.edit.php:308
-#: include/views/configuration.host.prototype.edit.php:444
+#: include/views/configuration.host.prototype.edit.php:210
+#: include/views/configuration.host.prototype.edit.php:309
+#: include/views/configuration.host.prototype.edit.php:445
 #: include/views/configuration.httpconf.edit.php:122
 #: include/views/configuration.httpconf.edit.php:140
 #: include/views/configuration.httpconf.edit.php:208
@@ -1186,7 +1186,7 @@ msgid "Authentication"
 msgstr "Xác thực"
 
 #: include/views/configuration.host.edit.php:664
-#: include/views/configuration.host.prototype.edit.php:327
+#: include/views/configuration.host.prototype.edit.php:328
 msgid "Authentication algorithm"
 msgstr "Thuật toán xác thực"
 
@@ -1270,7 +1270,7 @@ msgstr "Sự  kiện đăng kí tự động hoặc cảnh báo chu kì lưu tr�
 #: include/views/configuration.action.edit.php:1075
 #: include/views/configuration.host.edit.php:693
 #: include/views/configuration.host.massupdate.php:275
-#: include/views/configuration.host.prototype.edit.php:367
+#: include/views/configuration.host.prototype.edit.php:368
 msgid "Automatic"
 msgstr "Tự động"
 
@@ -1434,7 +1434,7 @@ msgid "CERT"
 msgstr "CERT"
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:1002
+#: include/classes/graph/CSvgGraph.php:977
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:991
 #: include/classes/screens/CScreenProblem.php:1150 include/events.inc.php:340
@@ -2882,8 +2882,8 @@ msgstr "Trung tâm"
 #: include/views/configuration.host.edit.php:777
 #: include/views/configuration.host.massupdate.php:324
 #: include/views/configuration.host.massupdate.php:332
-#: include/views/configuration.host.prototype.edit.php:380
-#: include/views/configuration.host.prototype.edit.php:396
+#: include/views/configuration.host.prototype.edit.php:381
+#: include/views/configuration.host.prototype.edit.php:397
 msgid "Certificate"
 msgstr "Chứng nhận"
 
@@ -3095,7 +3095,7 @@ msgstr "Đồng hồ"
 #: include/views/configuration.host.discovery.edit.php:693
 #: include/views/configuration.host.edit.php:812
 #: include/views/configuration.hostgroups.edit.php:58
-#: include/views/configuration.host.prototype.edit.php:436
+#: include/views/configuration.host.prototype.edit.php:437
 #: include/views/configuration.httpconf.edit.php:237
 #: include/views/configuration.item.edit.php:1060
 #: include/views/configuration.item.prototype.edit.php:894
@@ -3517,7 +3517,7 @@ msgstr "Kết nối"
 
 #: include/views/configuration.host.edit.php:765
 #: include/views/configuration.host.massupdate.php:327
-#: include/views/configuration.host.prototype.edit.php:384
+#: include/views/configuration.host.prototype.edit.php:385
 msgid "Connections from host"
 msgstr "Kết nối từ máy chủ"
 
@@ -3527,7 +3527,7 @@ msgstr "Kết nối từ proxy"
 
 #: include/views/configuration.host.edit.php:757
 #: include/views/configuration.host.massupdate.php:320
-#: include/views/configuration.host.prototype.edit.php:376
+#: include/views/configuration.host.prototype.edit.php:377
 msgid "Connections to host"
 msgstr "Kết nối đến máy chủ"
 
@@ -4479,7 +4479,7 @@ msgstr "Xóa các nhóm được chọn?"
 msgid "Delete selected host groups?"
 msgstr "Xóa các nhóm host được chọn?"
 
-#: include/views/configuration.host.prototype.edit.php:428
+#: include/views/configuration.host.prototype.edit.php:429
 msgid "Delete selected host prototype?"
 msgstr "Xóa kiểu host được chọn?"
 
@@ -4839,7 +4839,7 @@ msgstr "Vô hiệu hóa web scenario đã chọn?"
 #: include/views/configuration.host.list.php:200
 #: include/views/configuration.host.massupdate.php:186
 #: include/views/configuration.host.massupdate.php:273
-#: include/views/configuration.host.prototype.edit.php:365
+#: include/views/configuration.host.prototype.edit.php:366
 #: include/views/js/monitoring.sysmaps.js.php:233
 msgid "Disabled"
 msgstr "Đã vô hiệu hóa"
@@ -5564,7 +5564,7 @@ msgstr "Đã kích hoạt"
 #: app/views/administration.proxy.list.php:66
 #: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.massupdate.php:367
-#: include/views/configuration.host.prototype.edit.php:421
+#: include/views/configuration.host.prototype.edit.php:422
 msgid "Encryption"
 msgstr "Mã hóa"
 
@@ -6573,7 +6573,7 @@ msgstr "Tên nhóm"
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Kiểu nhóm không thể dựa trên một nhóm host được phát hiện \"%1$s\"."
 
-#: include/views/configuration.host.prototype.edit.php:217
+#: include/views/configuration.host.prototype.edit.php:218
 msgid "Group prototypes"
 msgstr "Các kiểu nhóm"
 
@@ -6588,8 +6588,8 @@ msgstr "Gộp nhóm theo"
 #: include/views/administration.users.edit.php:80
 #: include/views/administration.users.list.php:87
 #: include/views/configuration.host.edit.php:73
-#: include/views/configuration.host.prototype.edit.php:183
-#: include/views/configuration.host.prototype.edit.php:219
+#: include/views/configuration.host.prototype.edit.php:184
+#: include/views/configuration.host.prototype.edit.php:220
 #: include/views/configuration.template.edit.php:89
 #: include/views/conf.import.php:28
 msgid "Groups"
@@ -6989,7 +6989,7 @@ msgstr "Giao diện host"
 #: app/views/monitoring.problem.view.php:282 hostinventories.php:26
 #: include/views/common.filter.trigger.php:123
 #: include/views/configuration.host.edit.php:753
-#: include/views/configuration.host.prototype.edit.php:372
+#: include/views/configuration.host.prototype.edit.php:373
 #: include/views/inventory.host.list.php:23
 #: include/views/inventory.host.view.php:214 jsLoader.php:251
 msgid "Host inventory"
@@ -7239,7 +7239,7 @@ msgstr "Dải IP \"%1$s\" vượt quá giới hạn địa chỉ \"%2$s\""
 #: include/views/configuration.action.edit.php:2156
 #: include/views/configuration.host.edit.php:662
 #: include/views/configuration.host.massupdate.php:361
-#: include/views/configuration.host.prototype.edit.php:342
+#: include/views/configuration.host.prototype.edit.php:343
 msgid "IPMI"
 msgstr "IPMI"
 
@@ -7458,6 +7458,7 @@ msgid "Inaccessible graph"
 msgstr "Đồ thị không thể tiếp cận"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:239
+#: host_prototypes.php:354
 msgid "Inaccessible group"
 msgstr "Nhóm không thể tiếp cận"
 
@@ -9049,7 +9050,7 @@ msgstr "Issue"
 #: app/views/administration.proxy.edit.php:111
 #: include/views/configuration.host.edit.php:793
 #: include/views/configuration.host.massupdate.php:340
-#: include/views/configuration.host.prototype.edit.php:410
+#: include/views/configuration.host.prototype.edit.php:411
 msgid "Issuer"
 msgstr "Tổ chức phát hành"
 
@@ -9687,7 +9688,7 @@ msgid "Link indicators"
 msgstr "Chỉ số liên kết"
 
 #: include/views/configuration.host.edit.php:613
-#: include/views/configuration.host.prototype.edit.php:313
+#: include/views/configuration.host.prototype.edit.php:314
 #: include/views/configuration.template.edit.php:413
 msgid "Link new templates"
 msgstr "Liên kết các template mới"
@@ -9722,8 +9723,8 @@ msgstr "Sơ đồ được kết nối"
 
 #: include/views/configuration.host.edit.php:583
 #: include/views/configuration.host.edit.php:633
-#: include/views/configuration.host.prototype.edit.php:244
-#: include/views/configuration.host.prototype.edit.php:283
+#: include/views/configuration.host.prototype.edit.php:245
+#: include/views/configuration.host.prototype.edit.php:284
 #: include/views/configuration.template.edit.php:382
 #: include/views/configuration.template.edit.php:419
 #: include/views/configuration.template.list.php:32
@@ -9936,7 +9937,7 @@ msgstr "Macro với hostmacroid \"%1$s\" không tồn tại."
 #: include/views/administration.general.macros.edit.php:25
 #: include/views/administration.general.macros.edit.php:80
 #: include/views/configuration.host.edit.php:685
-#: include/views/configuration.host.prototype.edit.php:359
+#: include/views/configuration.host.prototype.edit.php:360
 #: include/views/configuration.template.edit.php:437
 msgid "Macros"
 msgstr "Macros"
@@ -10042,7 +10043,7 @@ msgstr "Tham số bắt buộc bị lỗi."
 #: include/views/configuration.action.edit.php:1074
 #: include/views/configuration.host.edit.php:692
 #: include/views/configuration.host.massupdate.php:274
-#: include/views/configuration.host.prototype.edit.php:366
+#: include/views/configuration.host.prototype.edit.php:367
 msgid "Manual"
 msgstr "Hướng dẫn"
 
@@ -10656,8 +10657,8 @@ msgstr "NTLM"
 #: include/views/configuration.hostgroups.list.php:57
 #: include/views/configuration.host.list.php:59
 #: include/views/configuration.host.list.php:128
-#: include/views/configuration.host.prototype.edit.php:227
-#: include/views/configuration.host.prototype.edit.php:255
+#: include/views/configuration.host.prototype.edit.php:228
+#: include/views/configuration.host.prototype.edit.php:256
 #: include/views/configuration.host.prototype.list.php:53
 #: include/views/configuration.httpconf.edit.php:59
 #: include/views/configuration.httpconf.edit.php:119
@@ -11041,8 +11042,8 @@ msgstr "Không có quy tắc phát hiện các ID cho."
 #: include/views/configuration.host.edit.php:769
 #: include/views/configuration.host.massupdate.php:322
 #: include/views/configuration.host.massupdate.php:330
-#: include/views/configuration.host.prototype.edit.php:378
-#: include/views/configuration.host.prototype.edit.php:388
+#: include/views/configuration.host.prototype.edit.php:379
+#: include/views/configuration.host.prototype.edit.php:389
 msgid "No encryption"
 msgstr "Không mã hóa"
 
@@ -12266,7 +12267,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:997
+#: include/classes/graph/CSvgGraph.php:972
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:991
 #: include/classes/screens/CScreenProblem.php:1150 include/events.inc.php:340
@@ -12296,16 +12297,16 @@ msgstr "Chế độ tạo sự kiện PROBLEM"
 #: include/views/configuration.host.massupdate.php:323
 #: include/views/configuration.host.massupdate.php:331
 #: include/views/configuration.host.massupdate.php:337
-#: include/views/configuration.host.prototype.edit.php:379
-#: include/views/configuration.host.prototype.edit.php:392
-#: include/views/configuration.host.prototype.edit.php:405
+#: include/views/configuration.host.prototype.edit.php:380
+#: include/views/configuration.host.prototype.edit.php:393
+#: include/views/configuration.host.prototype.edit.php:406
 msgid "PSK"
 msgstr "PSK"
 
 #: app/views/administration.proxy.edit.php:101
 #: include/views/configuration.host.edit.php:782
 #: include/views/configuration.host.massupdate.php:334
-#: include/views/configuration.host.prototype.edit.php:400
+#: include/views/configuration.host.prototype.edit.php:401
 msgid "PSK identity"
 msgstr "Danh tính PSK"
 
@@ -12398,7 +12399,7 @@ msgstr "Thụ động"
 #: include/views/configuration.host.discovery.edit.php:459
 #: include/views/configuration.host.discovery.edit.php:487
 #: include/views/configuration.host.edit.php:670
-#: include/views/configuration.host.prototype.edit.php:338
+#: include/views/configuration.host.prototype.edit.php:339
 #: include/views/configuration.httpconf.edit.php:166
 #: include/views/configuration.item.edit.php:343
 #: include/views/configuration.item.edit.php:599
@@ -12715,7 +12716,7 @@ msgid "Private key file"
 msgstr "Key file riêng"
 
 #: include/views/configuration.host.edit.php:665
-#: include/views/configuration.host.prototype.edit.php:331
+#: include/views/configuration.host.prototype.edit.php:332
 msgid "Privilege level"
 msgstr "Cấp đặc quyền"
 
@@ -12939,7 +12940,7 @@ msgid "Queue of items to be updated"
 msgstr "Hàng đợi item được cập nhật"
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:993
+#: include/classes/graph/CSvgGraph.php:968
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:977
 #: include/classes/screens/CScreenProblem.php:1138 include/events.inc.php:345
@@ -15026,7 +15027,7 @@ msgstr "Đối tượng"
 #: app/views/administration.proxy.edit.php:114
 #: include/views/configuration.host.edit.php:797
 #: include/views/configuration.host.massupdate.php:343
-#: include/views/configuration.host.prototype.edit.php:415
+#: include/views/configuration.host.prototype.edit.php:416
 msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Chủ đề"
@@ -15376,7 +15377,7 @@ msgstr "Templated items"
 #: include/views/configuration.host.list.php:65
 #: include/views/configuration.host.list.php:136
 #: include/views/configuration.host.massupdate.php:360
-#: include/views/configuration.host.prototype.edit.php:320
+#: include/views/configuration.host.prototype.edit.php:321
 #: include/views/configuration.host.prototype.list.php:54
 #: include/views/configuration.template.edit.php:22
 #: include/views/configuration.template.list.php:51
@@ -16357,7 +16358,7 @@ msgid "Unlimited"
 msgstr "Không giới hạn"
 
 #: include/views/configuration.host.edit.php:564
-#: include/views/configuration.host.prototype.edit.php:272
+#: include/views/configuration.host.prototype.edit.php:273
 #: include/views/configuration.template.edit.php:363
 msgid "Unlink"
 msgstr "Hủy liên kết"
@@ -16483,7 +16484,7 @@ msgstr "Up"
 #: include/views/configuration.host.edit.php:810
 #: include/views/configuration.hostgroups.edit.php:57
 #: include/views/configuration.host.massupdate.php:371
-#: include/views/configuration.host.prototype.edit.php:434
+#: include/views/configuration.host.prototype.edit.php:435
 #: include/views/configuration.httpconf.edit.php:253
 #: include/views/configuration.item.edit.php:1082
 #: include/views/configuration.item.massupdate.php:721
@@ -16841,7 +16842,7 @@ msgstr "Người dùng/Người nhận"
 #: app/views/administration.mediatype.edit.php:158
 #: app/views/administration.mediatype.list.php:93 disc_prototypes.php:218
 #: host_discovery.php:201 include/views/configuration.host.edit.php:666
-#: include/views/configuration.host.prototype.edit.php:335
+#: include/views/configuration.host.prototype.edit.php:336
 #: include/views/general.login.php:60 index.php:33 items.php:185
 msgid "Username"
 msgstr "Tên người dùng"
