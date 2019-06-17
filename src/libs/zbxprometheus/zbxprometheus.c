@@ -1516,7 +1516,7 @@ static int	prometheus_extract_value(zbx_vector_ptr_t *rows, const char *output, 
 
 	if ('\0' != *output)
 	{
-		int			i;
+		int	i;
 
 		for (i = 0; i < row->labels.values_num; i++)
 		{
