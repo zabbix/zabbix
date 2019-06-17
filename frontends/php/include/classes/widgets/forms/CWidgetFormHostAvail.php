@@ -27,7 +27,7 @@ class CWidgetFormHostAvail extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_HOST_AVAIL);
 
-		// Host groups
+		// Host groups.
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
 		if (array_key_exists('groupids', $this->data)) {
@@ -35,7 +35,7 @@ class CWidgetFormHostAvail extends CWidgetForm {
 		}
 		$this->fields[$field_groups->getName()] = $field_groups;
 
-		// Layout
+		// Layout.
 		$field_style = (new CWidgetFieldRadioButtonList('layout', _('Layout'), [
 			STYLE_HORIZONTAL => _('Horizontal'),
 			STYLE_VERTICAL => _('Vertical')
@@ -49,7 +49,7 @@ class CWidgetFormHostAvail extends CWidgetForm {
 
 		$this->fields[$field_style->getName()] = $field_style;
 
-		// Show hosts in maintenance
+		// Show hosts in maintenance.
 		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))
 			->setDefault(HOST_MAINTENANCE_STATUS_OFF);
 
