@@ -152,10 +152,6 @@ tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
 tests/libs/zbxcommon/zbx_user_macro_parse
 tests/libs/zbxdbcache/is_item_processed_by_server
-<<<<<<< HEAD
-=======
-tests/libs/zbxjson/zbx_jsonpath_next
->>>>>>> ........S. [ZBX-15827] added tests for preprocessing testing
 tests/zabbix_server/preprocessor/item_preproc_xpath
 tests/zabbix_server/preprocessor/zbx_item_preproc
 tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
