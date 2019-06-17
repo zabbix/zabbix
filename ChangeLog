@@ -1,6 +1,7 @@
 Changes for 4.4.0alpha1
 
 New features:
+..F.....S. [ZBXNEXT-5124,ZBX-15827] extended preprocessing steps with final result row; improved input validation in preprocessing steps (miks, wiper)
 A......... [ZBXNEXT-5183] implemented support of simple triggers under items in export files (agriscenko)
 A.F.I..PS. [ZBXNEXT-5040,ZBXNEXT-5219] moved item real-time data to a new, seperate table in database (rlataria, viktors)
 A.F....PS. [ZBXNEXT-1856,ZBXNEXT-5223] added web scenario and HTTP agent with Kerberos authentication delegation (akozlovs, vasilijs)
