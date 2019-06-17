@@ -26,6 +26,7 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-16217] fixed value trim in multiline input (miks)
 ...G...... [ZBX-16218] fixed zabbix_sender does not clean up its semaphores (akozlovs)
 ..F....... [ZBX-16152] fixed not data loss on saving host prototypes by user with insufficient permissions (averza)
 ..F....... [ZBX-16126] fixed checkbox selection on navigate to inherited template in triggers and items (talbergs)
