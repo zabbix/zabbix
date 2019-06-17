@@ -981,7 +981,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 		zbx_sleep_loop(sleeptime);
 	}
 
-	zbx_setproctitle("%s #%d [idle]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);

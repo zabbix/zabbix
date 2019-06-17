@@ -1119,7 +1119,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
 	}
 
-	zbx_setproctitle("%s #%d [idle]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);

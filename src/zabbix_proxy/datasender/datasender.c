@@ -256,7 +256,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 			zbx_sleep_loop(ZBX_TASK_UPDATE_FREQUENCY);
 	}
 
-	zbx_setproctitle("%s #%d [idle]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);

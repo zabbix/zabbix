@@ -163,7 +163,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 		zbx_ipc_message_clean(&message);
 	}
 
-	zbx_setproctitle("%s #%d [idle]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
