@@ -30,7 +30,7 @@ $total_row = (new CCol(sprintf("%d %s", $data['total'], _('Total'))))
 
 $table = new CTableInfo();
 
-$table->addClass('list-table-without-hover');
+$table->addClass(ZBX_STYLE_TABLE_WITHOUT_HOVER);
 
 if ($data['layout'] == STYLE_HORIZONTAL) {
 	$table->addRow([$available_row, $not_available_row, $unknown_row, $total_row]);
