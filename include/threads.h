@@ -45,8 +45,8 @@
 
 	#define zbx_sleep(sec) SleepEx(((DWORD)(sec)) * ((DWORD)1000), TRUE)
 
-	#define zbx_thread_kill(h) QueueUserAPC(ZBXEndThread, h, 0);
-	#define zbx_thread_kill_fatal(h) QueueUserAPC(ZBXEndThread, h, 0);
+	#define zbx_thread_kill(h) QueueUserAPC(ZBXEndThread, h, 0)
+	#define zbx_thread_kill_fatal(h) QueueUserAPC(ZBXEndThread, h, 0)
 #else	/* not _WINDOWS */
 
 	int	zbx_fork(void);
@@ -72,7 +72,7 @@
 
 	#define zbx_sleep(sec) sleep((sec))
 
-	#define zbx_thread_kill(h) kill(h, SIGTERM);
+	#define zbx_thread_kill(h) kill(h, SIGTERM)
 	#define zbx_thread_kill_fatal(h) kill(h, SIGQUIT)
 #endif	/* _WINDOWS */
 
