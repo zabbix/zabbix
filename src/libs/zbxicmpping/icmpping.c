@@ -43,7 +43,7 @@ static const char	*source_ip6_option = NULL;
 
 /* starting with fping (4.x), the packets interval can be 0ms, otherwise minimum value is 10ms */
 #define UNINITIALIZED_INTERVAL	-1
-static int		packet_intrval = UNINITIALIZED_INTERVAL;
+static int		packet_interval = UNINITIALIZED_INTERVAL;
 
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
 {
@@ -174,18 +174,18 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	if (0 != timeout)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -t%d", timeout);
 
-	if (UNINITIALIZED_INTERVAL == packet_intrval)
-		packet_intrval = get_interval_option(CONFIG_FPING_LOCATION, "127.0.0.1");
+	if (UNINITIALIZED_INTERVAL == packet_interval)
+		packet_interval = get_interval_option(CONFIG_FPING_LOCATION, "127.0.0.1");
 
-	zbx_snprintf(params + offset, sizeof(params) - offset, " -i%d", packet_intrval);
+	zbx_snprintf(params + offset, sizeof(params) - offset, " -i%d", packet_interval);
 
 #ifdef HAVE_IPV6
 	strscpy(params6, params);
 
-	if (UNINITIALIZED_INTERVAL == packet_intrval)
-		packet_intrval = get_interval_option(CONFIG_FPING6_LOCATION, "::1");
+	if (UNINITIALIZED_INTERVAL == packet_interval)
+		packet_interval = get_interval_option(CONFIG_FPING6_LOCATION, "::1");
 
-	zbx_snprintf(params6 + offset, sizeof(params6) - offset, " -i%d", packet_intrval);
+	zbx_snprintf(params6 + offset, sizeof(params6) - offset, " -i%d", packet_interval);
 #endif	/* HAVE_IPV6 */
 
 	if (NULL != CONFIG_SOURCE_IP)
