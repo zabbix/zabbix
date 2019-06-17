@@ -218,7 +218,9 @@ class CScreenHistory extends CScreenBase {
 
 					if (in_array($items[$history_row['itemid']]['value_type'],
 							[ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
-						$value = rtrim($value, " \t\r\n");
+						// Preserve trailing spaces on the last line for quoted strings.
+						$value = preg_replace('/[\t\r\n]\s*$/s', '', $value);
+
 						$value = '"'.str_replace('"', '""', htmlspecialchars($value, ENT_NOQUOTES)).'"';
 					}
 					elseif ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
