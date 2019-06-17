@@ -20,7 +20,7 @@
 
 
 /**
- * Host info widget form
+ * Host availability widget form.
  */
 class CWidgetFormHostAvail extends CWidgetForm {
 
@@ -35,7 +35,7 @@ class CWidgetFormHostAvail extends CWidgetForm {
 		}
 		$this->fields[$field_groups->getName()] = $field_groups;
 
-		// Hosts info style
+		// Layout
 		$field_style = (new CWidgetFieldRadioButtonList('layout', _('Layout'), [
 			STYLE_HORIZONTAL => _('Horizontal'),
 			STYLE_VERTICAL => _('Vertical')
@@ -50,13 +50,13 @@ class CWidgetFormHostAvail extends CWidgetForm {
 		$this->fields[$field_style->getName()] = $field_style;
 
 		// Show hosts in maintenance
-		$field_style = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))
+		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))
 			->setDefault(HOST_MAINTENANCE_STATUS_OFF);
 
 		if (array_key_exists('maintenance', $this->data)) {
-			$field_style->setValue($this->data['maintenance']);
+			$field_maintenance->setValue($this->data['maintenance']);
 		}
 
-		$this->fields[$field_style->getName()] = $field_style;
+		$this->fields[$field_maintenance->getName()] = $field_maintenance;
 	}
 }

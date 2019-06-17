@@ -20,7 +20,7 @@
 
 
 /**
- * Host info widget form view.
+ * Host availability widget form view.
  */
 $fields = $data['dialogue']['fields'];
 
@@ -37,10 +37,10 @@ $field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
 $scripts = [$field_groupids->getPostJS()];
 
-// Layout
+// Layout.
 $form_list->addRow(CWidgetHelper::getLabel($fields['layout']), CWidgetHelper::getRadioButtonList($fields['layout']));
 
-// Show hosts in maintenance
+// Show hosts in maintenance.
 $form_list->addRow(CWidgetHelper::getLabel($fields['maintenance']), CWidgetHelper::getCheckBox($fields['maintenance']));
 
 $form->addItem($form_list);
