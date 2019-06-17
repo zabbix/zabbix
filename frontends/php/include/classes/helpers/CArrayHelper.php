@@ -215,6 +215,28 @@ class CArrayHelper {
 	}
 
 	/**
+	 * Function can be used to count up numeric values of 2 arrays, having equal keys.
+	 *
+	 * For example,
+	 *		self::sumArrayValues([1 => 0, 2 => 5, 3 => 10], [1 => 1, 2 => 2, 3 => 3])
+	 * will produce following output:
+	 *		[1 => 1, 2 => 7, 3 => 13].
+	 *
+	 * @param array $a1	    Array containing numeric values. It's expected that keys used in $a1 exists also in $a2.
+	 * @param array $a2	    Array containing numeric values.
+	 *
+	 * @return array        Array containing values from $a1 and $a2 summed.
+	 */
+	public static function sumArrayValues(array $a1, array $a2) {
+		foreach ($a1 as $key => &$value) {
+			$value += $a2[$key];
+		}
+		unset($value);
+
+		return $a1;
+	}
+
+	/**
 	 * Checks if array $arrays contains arrays with duplicate values under the $uniqueField key. If a duplicate exists,
 	 * returns the first duplicate, otherwise returns null.
 	 *
