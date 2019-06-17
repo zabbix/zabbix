@@ -375,7 +375,8 @@ class CScreenHistory extends CScreenBase {
 						sscanf($value, '%f', $value);
 					}
 					else {
-						$value = rtrim($value, " \t\r\n");
+						// Preserve trailing spaces on the last line before value mapping.
+						$value = preg_replace('/[\t\r\n]\s*$/s', '', $value);
 					}
 
 					if ($item['valuemapid']) {
@@ -458,11 +459,12 @@ class CScreenHistory extends CScreenBase {
 					foreach ($items as $item) {
 						$value = array_key_exists($item['itemid'], $values) ? $values[$item['itemid']] : '';
 
-						if ($value && $item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
+						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 							sscanf($value, '%f', $value);
 						}
 						else {
-							$value = rtrim($value, " \t\r\n");
+							// Preserve trailing spaces on the last line before value mapping.
+							$value = preg_replace('/[\t\r\n]\s*$/s', '', $value);
 						}
 
 						if ($item['valuemapid']) {
