@@ -19,10 +19,14 @@
 **/
 
 
-$available_row = (new CCol(sprintf("%d %s", $data['hosts'][HOST_AVAILABLE_TRUE], _('Available'))))->addClass(ZBX_STYLE_HOST_AVAIL_TRUE);
-$not_available_row = (new CCol(sprintf("%d %s", $data['hosts'][HOST_AVAILABLE_FALSE], _('Not available'))))->addClass(ZBX_STYLE_HOST_AVAIL_FALSE);
-$unknown_row = (new CCol(sprintf("%d %s", $data['hosts'][HOST_AVAILABLE_UNKNOWN], _('Unknown'))))->addClass(ZBX_STYLE_HOST_AVAIL_UNKNOWN);
-$total_row = (new CCol(sprintf("%d %s", $data['total'], _('Total'))))->addClass(ZBX_STYLE_HOST_AVAIL_TOTAL);
+$available_row = (new CCol(sprintf("%d %s", $data['hosts'][HOST_AVAILABLE_TRUE], _('Available'))))
+	->addClass(ZBX_STYLE_HOST_AVAIL_TRUE);
+$not_available_row = (new CCol(sprintf("%d %s", $data['hosts'][HOST_AVAILABLE_FALSE], _('Not available'))))
+	->addClass(ZBX_STYLE_HOST_AVAIL_FALSE);
+$unknown_row = (new CCol(sprintf("%d %s", $data['hosts'][HOST_AVAILABLE_UNKNOWN], _('Unknown'))))
+	->addClass(ZBX_STYLE_HOST_AVAIL_UNKNOWN);
+$total_row = (new CCol(sprintf("%d %s", $data['total'], _('Total'))))
+	->addClass(ZBX_STYLE_HOST_AVAIL_TOTAL);
 
 $table = new CTableInfo();
 
