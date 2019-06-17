@@ -27,7 +27,6 @@
 #include "dbcache.h"
 #include "dbsyncer.h"
 #include "export.h"
-#include "../../libs/zbxcrypto/tls.h"
 
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
 extern unsigned char	process_type, program_type;
