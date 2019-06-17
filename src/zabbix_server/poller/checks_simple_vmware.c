@@ -2095,7 +2095,7 @@ int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *username
 		goto out;
 	}
 
-	if (0 == strcmp(mode, "maxlatency"))
+	if (NULL != mode && 0 == strcmp(mode, "maxlatency"))
 		is_maxlatency = 1;
 
 	zbx_vmware_lock();
