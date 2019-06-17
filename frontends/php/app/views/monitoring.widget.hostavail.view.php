@@ -30,6 +30,8 @@ $total_row = (new CCol(sprintf("%d %s", $data['total'], _('Total'))))
 
 $table = new CTableInfo();
 
+$table->addClass('list-table-without-hover');
+
 if ($data['layout'] == STYLE_HORIZONTAL) {
 	$table->addRow([$available_row, $not_available_row, $unknown_row, $total_row]);
 }

@@ -6812,6 +6812,10 @@ table.preprocessing-test-results {
 	background: $host-avail-total-bg-color;
 }
 
+.list-table.list-table-without-hover tbody tr:hover {
+	background-color: unset;
+}
+
 @if $theme_name == 'dev' {
 
 /*doc

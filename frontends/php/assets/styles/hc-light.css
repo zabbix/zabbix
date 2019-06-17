@@ -4866,15 +4866,21 @@ table.preprocessing-test-results .rel-container {
 .host-avail-true {
   color: black;
   background: #86cc89; }
+
 .host-avail-false {
   color: black;
   background: #e45959; }
+
 .host-avail-unknown {
   color: black;
   background: #97aab3; }
+
 .host-avail-total {
   color: #000;
   background: transparent; }
+
+.list-table.list-table-without-hover tbody tr:hover {
+  background-color: unset; }
 
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position,
