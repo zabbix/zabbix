@@ -1,23 +1,22 @@
 if SERVER
-SERVER_tests = zbx_item_preproc 
-
-if HAVE_LIBXML2
-SERVER_tests +=	item_preproc_xpath
-endif
+SERVER_tests = zbx_trapper_preproc_test_run 
 
 noinst_PROGRAMS = $(SERVER_tests)
 
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-JSON_LIBS = \
+TRAPPER_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
+	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
@@ -32,25 +31,19 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
-zbx_item_preproc_SOURCES = \
-	zbx_item_preproc.c 
+zbx_trapper_preproc_test_run_SOURCES = \
+	zbx_trapper_preproc_test_run.c \
+	../../../src/zabbix_server/trapper/trapper_preproc.c  \
+	../../zbxmockjson.c
 
-zbx_item_preproc_LDADD = $(JSON_LIBS)
+zbx_trapper_preproc_test_run_LDADD = $(TRAPPER_LIBS)
+zbx_trapper_preproc_test_run_LDADD += @SERVER_LIBS@ 
+zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@
 
-zbx_item_preproc_LDADD += @SERVER_LIBS@
-zbx_item_preproc_LDFLAGS = @SERVER_LDFLAGS@
+zbx_trapper_preproc_test_run_CFLAGS = \
+	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ \
+	-Wl,--wrap=zbx_preprocessor_test \
+	-Wl,--wrap=DBget_user_by_active_session
 
-zbx_item_preproc_CFLAGS = -I@top_srcdir@/tests @LIBXML2_CFLAGS@
-
-item_preproc_xpath_SOURCES = \
-	../../../src/zabbix_server/preprocessor/item_preproc.c \
-	item_preproc_xpath.c \
-	$(COMMON_SRC_FILES) 
-
-item_preproc_xpath_LDADD = $(JSON_LIBS)
-
-item_preproc_xpath_LDADD += @SERVER_LIBS@
-item_preproc_xpath_LDFLAGS = @SERVER_LDFLAGS@
-
-item_preproc_xpath_CFLAGS = -I@top_srcdir@/tests @LIBXML2_CFLAGS@
 endif
+

@@ -1727,51 +1727,15 @@ static void	dc_history_set_error(ZBX_DC_HISTORY *hdata, char *errmsg)
  *             value_type - [IN] the item value type                          *
  *             value      - [IN] the value to set                             *
  *                                                                            *
- * Return value: SUCCEED - Value conversion was successful.                   *
- *               FAIL    - Otherwise                                          *
- *                                                                            *
  ******************************************************************************/
-static int	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type, zbx_variant_t *value)
+static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type, zbx_variant_t *value)
 {
-	int	ret;
 	char	*errmsg = NULL;
 
-	switch (value_type)
+	if (FAIL == zbx_variant_to_value_type(value, value_type, &errmsg))
 	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			if (SUCCEED == (ret = zbx_variant_convert(value, ZBX_VARIANT_DBL)))
-			{
-				if (FAIL == (ret = zbx_validate_value_dbl(value->data.dbl)))
-				{
-					errmsg = zbx_dsprintf(NULL, "Value " ZBX_FS_DBL " is too small or too large.",
-							value->data.dbl);
-				}
-			}
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			ret = zbx_variant_convert(value, ZBX_VARIANT_UI64);
-			break;
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-		case ITEM_VALUE_TYPE_LOG:
-			ret = zbx_variant_convert(value, ZBX_VARIANT_STR);
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-	}
-
-	if (FAIL == ret)
-	{
-		if (NULL == errmsg)
-		{
-			errmsg = zbx_dsprintf(NULL, "Value \"%s\" of type \"%s\" is not suitable for"
-				" value type \"%s\"", zbx_variant_value_desc(value),
-				zbx_variant_type_desc(value), zbx_item_value_type_string(value_type));
-		}
-
 		dc_history_set_error(hdata, errmsg);
-		return FAIL;
+		return;
 	}
 
 	switch (value_type)
@@ -1807,8 +1771,6 @@ static int	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type,
 
 	hdata->value_type = value_type;
 	zbx_variant_set_none(value);
-
-	return ret;
 }
 
 /******************************************************************************
@@ -1821,25 +1783,17 @@ static int	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type,
  * Parameters: item          - [IN] the item                                  *
  *             hdata         - [IN/OUT] the historical data to process        *
  *                                                                            *
- * Return value: SUCCEED - Normalization was successful.                      *
- *               FAIL    - Otherwise - ZBX_DC_FLAG_UNDEF will be set and item *
- *                         state changed to ZBX_NOTSUPPORTED.                 *
- *                                                                            *
  ******************************************************************************/
-static int	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
+static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 {
-	int		ret = FAIL;
 	char		*logvalue;
 	zbx_variant_t	value_var;
 
 	if (0 != (hdata->flags & ZBX_DC_FLAG_NOVALUE))
-	{
-		ret = SUCCEED;
-		goto out;
-	}
+		return;
 
 	if (ITEM_STATE_NOTSUPPORTED == hdata->state)
-		goto out;
+		return;
 
 	if (0 == (hdata->flags & ZBX_DC_FLAG_NOHISTORY))
 		hdata->ttl = item->history_sec;
@@ -1864,11 +1818,10 @@ static int	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 				{
 					dc_history_set_error(hdata, zbx_dsprintf(NULL, "Value " ZBX_FS_DBL
 							" is too small or too large.", hdata->value.dbl));
-					return FAIL;
 				}
 				break;
 		}
-		return SUCCEED;
+		return;
 	}
 
 	switch (hdata->value_type)
@@ -1890,10 +1843,8 @@ static int	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 			break;
 	}
 
-	ret = dc_history_set_value(hdata, item->value_type, &value_var);
+	dc_history_set_value(hdata, item->value_type, &value_var);
 	zbx_variant_clear(&value_var);
-out:
-	return ret;
 }
 
 /******************************************************************************

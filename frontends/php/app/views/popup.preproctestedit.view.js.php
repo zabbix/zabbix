@@ -22,6 +22,35 @@
 ob_start(); ?>
 
 /**
+ * Make step result UI element.
+ *
+ * @param array step  Step object returned from server.
+ *
+ * @return jQuery
+ */
+function makeStepResult(step) {
+	if (typeof step.error !== 'undefined') {
+		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
+			{error: step.error || <?= CJs::encodeJson(_('<empty string>')) ?>}
+		));
+	}
+	else if (typeof step.result === 'undefined' || step.result === null) {
+		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= CJs::encodeJson(_('No value')) ?>);
+	}
+	else if (step.result === '') {
+		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= CJs::encodeJson(_('<empty string>')) ?>);
+	}
+	else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
+		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(
+			jQuery.extend({result: step.result})
+		));
+	}
+	else {
+		return jQuery('<span>').text(step.result);
+	}
+}
+
+/**
  * Send item preprocessing test details and display results in table.
  *
  * @param string formid  Selector for form to send.
@@ -55,6 +84,10 @@ function itemPreprocessingTest(form) {
 			// Clean previous results.
 			jQuery('[id^="preproc-test-step-"][id$="-result"]').empty();
 			jQuery('[id^="preproc-test-step-"][id$="-name"] > div').remove();
+			jQuery('#final-result')
+				.hide()
+				.find('.table-forms-td-right')
+				.empty();
 		},
 		success: function(ret) {
 			jQuery(form).parent().find('.msg-bad, .msg-good').remove();
@@ -63,7 +96,19 @@ function itemPreprocessingTest(form) {
 
 			if (typeof ret.messages !== 'undefined') {
 				jQuery(ret.messages).insertBefore(jQuery(form));
-				jQuery(form).parent().find('.link-action').click();
+			}
+
+			if (typeof ret.final !== 'undefined') {
+				var result = makeStepResult(ret.final);
+				if (result !== null) {
+					$result = jQuery(result).css('float', 'right');
+				}
+
+				jQuery('#final-result')
+					.show()
+					.find('.table-forms-td-right')
+						.append(ret.final.action)
+						.append($result);
 			}
 
 			jQuery('#value, #time, [name^=macros]').prop('disabled', false);
@@ -87,10 +132,8 @@ function itemPreprocessingTest(form) {
  * @param array steps  Array of objects containing details about each preprocessing step test results.
  */
 function processItemPreprocessingTestResults(steps) {
-	var tmpl_err_icon = new Template(jQuery('#preprocessing-step-error-icon').html()),
-		tmpl_gray_label = new Template(jQuery('#preprocessing-gray-label').html()),
-		tmpl_act_done = new Template(jQuery('#preprocessing-step-action-done').html()),
-		tmpl_step_result = new Template(jQuery('#preprocessing-step-result').html());
+	var tmpl_gray_label = new Template(jQuery('#preprocessing-gray-label').html()),
+		tmpl_act_done = new Template(jQuery('#preprocessing-step-action-done').html());
 
 	steps.each(function(step, i) {
 		if (typeof step.action !== 'undefined') {
@@ -119,24 +162,7 @@ function processItemPreprocessingTestResults(steps) {
 			}
 		}
 
-		if (typeof step.error !== 'undefined') {
-			step.result = jQuery(
-				tmpl_err_icon.evaluate({error: step.error || <?= CJs::encodeJson(_('<empty string>')) ?>})
-			);
-		}
-		else if (typeof step.result === 'undefined' || step.result === null) {
-			step.result = jQuery('<span>',
-				{'class': '<?= ZBX_STYLE_GREY ?>'}
-			).text(<?= CJs::encodeJson(_('No value')) ?>);
-		}
-		else if (step.result === '') {
-			step.result = jQuery('<span>',
-				{'class': '<?= ZBX_STYLE_GREY ?>'}
-			).text(<?= CJs::encodeJson(_('<empty string>')) ?>);
-		}
-		else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
-			step.result = jQuery(tmpl_step_result.evaluate(jQuery.extend({result: step.result})));
-		}
+		step.result = makeStepResult(step);
 
 		if (typeof step.action !== 'undefined' && step.action !== null) {
 			jQuery('#preproc-test-step-'+i+'-name').append(jQuery(tmpl_gray_label.evaluate(<?= CJs::encodeJson([
@@ -177,6 +203,8 @@ function savePreprocessingTestInputs() {
 }
 
 jQuery(document).ready(function($) {
+	$('#final-result').hide();
+
 	$('#value').multilineInput({
 		placeholder: <?= CJs::encodeJson(_('value')) ?>,
 		value: <?= CJs::encodeJson($data['value']) ?>,

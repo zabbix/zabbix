@@ -17,6 +17,7 @@ Bug fixes:
 Changes for 4.2.4rc1
 
 New features:
+..F.....S. [ZBXNEXT-5124,ZBX-15827] extended preprocessing steps with final result row; improved input validation in preprocessing steps (miks, wiper)
 .......PS. [ZBXNEXT-2880] added access to vmware datastore at vmware vCenter level (MVekslers)
 ..F....... [ZBXNEXT-5163] added display of maintenance information in Configuration section for hosts in maitenance (vasilijs)
 ..F....... [ZBXNEXT-5036] added preloader for popup menus (ashubin)

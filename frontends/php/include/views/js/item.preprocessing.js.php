@@ -112,10 +112,11 @@
 		/**
 		 * Creates preprocessing test modal window.
 		 *
-		 * @param {array}  step_nums     List of step numbers to collect.
-		 * @param {object} trigger_elmnt UI element triggered function.
+		 * @param {array}  step_nums          List of step numbers to collect.
+		 * @param {bool}   show_final_result  Either the final result should be displayed.
+		 * @param {object} trigger_elmnt      UI element triggered function.
 		 */
-		function openPreprocessingTestDialog(step_nums, trigger_elmnt) {
+		function openPreprocessingTestDialog(step_nums, show_final_result, trigger_elmnt) {
 			var $step_obj = $(trigger_elmnt).closest('.preprocessing-list-item, .preprocessing-list-foot');
 
 			PopUp('popup.preproctest.edit', $.extend({
@@ -124,7 +125,8 @@
 				steps: getPreprocessingSteps(step_nums),
 				hostid: <?= $data['hostid'] ?>,
 				test_type: <?= $data['preprocessing_test_type'] ?>,
-				step_obj: $step_obj.attr('data-step') || -1
+				step_obj: $step_obj.attr('data-step') || -1,
+				show_final_result: show_final_result ? 1 : 0
 			}, {'data': $step_obj.data('test-data') || []}), 'preprocessing-test', trigger_elmnt);
 		}
 
@@ -252,12 +254,12 @@
 				var sortable_count = $preprocessing.find('li.sortable').length;
 
 				if (sortable_count == 1) {
+					$('#preproc_test_all').show();
 					$preprocessing
 						.sortable('disable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 				else if (sortable_count > 1) {
-					$('#preproc_test_all').show();
 					$preprocessing
 						.sortable('enable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').removeClass('<?= ZBX_STYLE_DISABLED ?>');
@@ -272,13 +274,13 @@
 					step_nums.push(str.substr(14, str.length - 21));
 				});
 
-				openPreprocessingTestDialog(step_nums, this);
+				openPreprocessingTestDialog(step_nums, true, this);
 			})
 			.on('click', '.preprocessing-step-test', function() {
 				var str = $(this).attr('name'),
 					num = str.substr(14, str.length - 21);
 
-				openPreprocessingTestDialog([num], this);
+				openPreprocessingTestDialog([num], false, this);
 			})
 			.on('click', '.element-table-remove', function() {
 				$(this).closest('li.sortable').remove();
@@ -286,10 +288,10 @@
 				var sortable_count = $preprocessing.find('li.sortable').length;
 
 				if (sortable_count == 0) {
+					$('#preproc_test_all').hide();
 					$('.preprocessing-list-head').hide();
 				}
 				else if (sortable_count == 1) {
-					$('#preproc_test_all').hide();
 					$preprocessing
 						.sortable('disable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');

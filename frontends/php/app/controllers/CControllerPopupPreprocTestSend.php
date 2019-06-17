@@ -27,6 +27,11 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 	/**
 	 * @var bool
 	 */
+	protected $show_final_result;
+
+	/**
+	 * @var bool
+	 */
 	protected $use_prev_value;
 
 	/**
@@ -46,7 +51,8 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 			'macros' => 'array',
 			'value' => 'string',
 			'prev_value' => 'string',
-			'prev_time' => 'string'
+			'prev_time' => 'string',
+			'show_final_result' => 'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -56,6 +62,7 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 			$prepr_types = zbx_objectValues($steps, 'type');
 			$this->preproc_item = self::getPreprocessingItemType($this->getInput('test_type'));
 			$this->use_prev_value = (count(array_intersect($prepr_types, self::$preproc_steps_using_prev_value)) > 0);
+			$this->show_final_result = ($this->getInput('show_final_result') == 1);
 
 			// Check preprocessing steps.
 			if (($error = $this->preproc_item->validateItemPreprocessingSteps($steps)) !== true) {
@@ -123,7 +130,8 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 		$data = [
 			'value' => $this->getInput('value', ''),
 			'value_type' => $this->getInput('value_type', ITEM_VALUE_TYPE_STR),
-			'steps' => $this->getInput('steps')
+			'steps' => $this->getInput('steps'),
+			'single' => !$this->show_final_result
 		];
 
 		// Resolve macros used in parameter fields.
@@ -178,14 +186,15 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 		}
 		elseif (is_array($result)) {
 			$test_failed = false;
+			$test_outcome = null;
 			foreach ($data['steps'] as $i => &$step) {
 				if ($test_failed) {
 					// If test is failed, proceesing steps are skipped from results.
 					unset($data['steps'][$i]);
 					continue;
 				}
-				elseif (array_key_exists($i, $result)) {
-					$step += $result[$i];
+				elseif (array_key_exists($i, $result['steps'])) {
+					$step += $result['steps'][$i];
 
 					if (array_key_exists('error', $step)) {
 						// If error happened and no value is set, frontend shows label 'No value'.
@@ -200,8 +209,37 @@ class CControllerPopupPreprocTestSend extends CControllerPopupPreprocTest {
 				unset($step['params']);
 				unset($step['error_handler']);
 				unset($step['error_handler_params']);
+
+				// Latest executed step due to the error or end of preprocessing.
+				$test_outcome = $step + ['action' => ZBX_PREPROC_FAIL_DEFAULT];
 			}
 			unset($step);
+
+			if (array_key_exists('previous', $result) && $result['previous'] === true) {
+				error(_s('Incorrect value for "%1$s" field.', _('Previous value')));
+			}
+			elseif ($this->show_final_result) {
+				if (array_key_exists('result', $result)) {
+					$output['final'] = [
+						'action' => _s('Result converted to %1$s', itemValueTypeString($data['value_type'])),
+						'result' => $result['result']
+					];
+				}
+				elseif (array_key_exists('error', $result)) {
+					$output['final'] = [
+						'action' => ($test_outcome['action'] == ZBX_PREPROC_FAIL_SET_ERROR)
+							? _('Set error to')
+							: '',
+						'error' => $result['error']
+					];
+				}
+
+				if ($output['final']['action'] !== '') {
+					$output['final']['action'] = (new CSpan($output['final']['action']))
+						->addClass(ZBX_STYLE_GREY)
+						->toString();
+				}
+			}
 
 			$output['steps'] = $data['steps'];
 		}

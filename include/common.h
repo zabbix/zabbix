@@ -1547,4 +1547,6 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
+int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg);
+
 #endif

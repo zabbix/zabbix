@@ -25,6 +25,7 @@ $form = (new CForm())
 	->addVar('hostid', $data['hostid'])
 	->addVar('value_type', $data['value_type'])
 	->addVar('test_type', $data['test_type'])
+	->addVar('show_final_result', $data['show_final_result'])
 	->setId('preprocessing-test-form');
 
 // Create macros table.
@@ -116,6 +117,14 @@ $form_list->addRow(
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('width: 100%;')
 );
+
+if ($data['show_final_result']) {
+	$form_list->addRow(
+		_('Result'),
+		new CDiv(),
+		'final-result'
+	);
+}
 
 $form
 	->addItem($form_list)
