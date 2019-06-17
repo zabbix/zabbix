@@ -4204,9 +4204,8 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 			zbx_vmware_datastore_t	*ds = service->data->datastores.values[i];
 			vmware_service_add_perf_entity(service, "Datastore", ds->id, ds_perfcounters, "",
 					service->lastcheck);
-			zabbix_log(LOG_LEVEL_TRACE, "%s() for type: Datastore hv id: %s hv uuid: %s linked ds id:"
-					" %s ds name: %s ds uuid: %s", __func__, hv->id, hv->uuid, ds->id,
-					ds->name, ds->uuid);
+			zabbix_log(LOG_LEVEL_TRACE, "%s() for type: Datastore id: %s name: %s uuid: %s", __func__,
+					ds->id, ds->name, ds->uuid);
 		}
 	}
 
