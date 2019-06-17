@@ -198,6 +198,18 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 	return status;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: threads_kill                                                     *
+ *                                                                            *
+ * Purpose: sends termination signal to "threads"                             *
+ *                                                                            *
+ * Parameters: threads     - [IN] handles to threads or processes             *
+ *             threads_num - [IN] number of handles                           *
+ *             ret         - [IN] terminate thread politely on SUCCEED or ask *
+ *                                threads to exit immediately on FAIL         *
+ *                                                                            *
+ ******************************************************************************/
 static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, int ret)
 {
 	int	i;
