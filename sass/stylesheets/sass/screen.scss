@@ -6792,26 +6792,24 @@ table.preprocessing-test-results {
 	}
 }
 
-.host-avail {
-	&-true {
-		color: darken($font-color, 100%);
-		background: $host-avail-true-bg-color;
-	}
+.host-avail-true {
+	color: darken($font-color, 100%);
+	background: $host-avail-true-bg-color;
+}
 
-	&-false {
-		color: darken($font-color, 100%);
-		background: $host-avail-false-bg-color;
-	}
+.host-avail-false {
+	color: darken($font-color, 100%);
+	background: $host-avail-false-bg-color;
+}
 
-	&-unknown {
-		color: darken($font-color, 100%);
-		background: $host-avail-unknown-bg-color;
-	}
+.host-avail-unknown {
+	color: darken($font-color, 100%);
+	background: $host-avail-unknown-bg-color;
+}
 
-	&-total {
-		color: $font-color;
-		background: $host-avail-total-bg-color;
-	}
+.host-avail-total {
+	color: $font-color;
+	background: $host-avail-total-bg-color;
 }
 
 @if $theme_name == 'dev' {
