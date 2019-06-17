@@ -65,6 +65,12 @@ $form_list->addRow(
 	CWidgetHelper::getSeverities($fields['severities'], $data['config'])
 );
 
+// Show type.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_type']), CWidgetHelper::getRadioButtonList($fields['show_type']));
+
+// Layout.
+$form_list->addRow(CWidgetHelper::getLabel($fields['layout']), CWidgetHelper::getRadioButtonList($fields['layout']));
+
 // Show suppressed problems.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
 	CWidgetHelper::getCheckBox($fields['show_suppressed'])

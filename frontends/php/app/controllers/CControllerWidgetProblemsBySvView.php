@@ -44,6 +44,8 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 			'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
 			'problem' => $fields['problem'],
 			'severities' => $fields['severities'],
+			'show_type' => $fields['show_type'],
+			'layout' => $fields['layout'],
 			'show_suppressed' => $fields['show_suppressed'],
 			'hide_empty_groups' => $fields['hide_empty_groups'],
 			'ext_ack' => $fields['ext_ack'],

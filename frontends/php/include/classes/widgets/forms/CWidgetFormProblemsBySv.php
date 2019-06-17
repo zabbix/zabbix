@@ -72,6 +72,39 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 
 		$this->fields[$field_severities->getName()] = $field_severities;
 
+		// Show type.
+		$field_show_type = (new CWidgetFieldRadioButtonList('show_type', _('Show'), [
+			WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS => _('Host groups'),
+			WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS => _('Totals')
+		]))
+			->setDefault(WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS)
+			->setModern(true)
+			->setAction('var disabled = jQuery(this).filter("[value=\''.WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS.
+				'\']").is(":checked");'.
+				'jQuery("#hide_empty_groups").prop("disabled", !disabled);'.
+				'jQuery("#layout input").prop("disabled", disabled)'
+			);
+
+		if (array_key_exists('show_type', $this->data)) {
+			$field_show_type->setValue($this->data['show_type']);
+		}
+
+		$this->fields[$field_show_type->getName()] = $field_show_type;
+
+		// Layout.
+		$field_layout = (new CWidgetFieldRadioButtonList('layout', _('Layout'), [
+			STYLE_HORIZONTAL => _('Horizontal'),
+			STYLE_VERTICAL => _('Vertical')
+		]))
+			->setDefault(STYLE_HORIZONTAL)
+			->setModern(true);
+
+		if (array_key_exists('layout', $this->data)) {
+			$field_layout->setValue($this->data['layout']);
+		}
+
+		$this->fields[$field_layout->getName()] = $field_layout;
+
 		// Show suppressed problems.
 		$field_show_suppressed = (new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems')))
 			->setDefault(ZBX_PROBLEM_SUPPRESSED_FALSE);
