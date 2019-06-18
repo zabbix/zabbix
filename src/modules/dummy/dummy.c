@@ -29,9 +29,15 @@ static int	item_timeout = 0;
 
 /* module SHOULD define internal functions as static and use a naming pattern different from Zabbix internal */
 /* symbols (zbx_*) and loadable module API functions (zbx_module_*) to avoid conflicts                       */
-static int	dummy_ping(AGENT_REQUEST *request, AGENT_RESULT *result);
-static int	dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result);
-static int	dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result);
+int			zbx_module_api_version(void);
+void			zbx_module_item_timeout(int timeout);
+ZBX_METRIC		*zbx_module_item_list(void);
+int			zbx_module_init(void);
+int			zbx_module_uninit(void);
+ZBX_HISTORY_WRITE_CBS	zbx_module_history_write_cbs(void);
+static int		dummy_ping(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int		dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int		dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 static ZBX_METRIC keys[] =
 /*	KEY			FLAG		FUNCTION	TEST PARAMETERS */
