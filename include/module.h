@@ -170,7 +170,7 @@ typedef struct
 	const char	*value;
 }
 ZBX_HISTORY_STRING;
-7
+
 typedef struct
 {
 	zbx_uint64_t	itemid;
