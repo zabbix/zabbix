@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Zabbix" default="build" basedir=".">
 	<target name="init-common">
+		<condition property="phpunit_filter" value=" --filter='${PHPUNIT_FILTER}'" else="">
+			<and>
+				<isset property="PHPUNIT_FILTER" />
+				<length string="${PHPUNIT_FILTER}" when="greater" length="0"/>
+			</and>
+		</condition>
+
 		<!-- Cleanup from the previous run -->
 		<delete dir="build/logs" failonerror="off"/>
 		<mkdir dir="build/logs"/>
@@ -17,13 +24,6 @@
 	 	<property name="phpunit_error_log" value="${PHPUNIT_ERROR_LOG}"/>
 	 	<property name="phpunit_port_prefix" value="${PHPUNIT_PORT_PREFIX}"/>
 		<property environment="env"/>
-
-		<condition property="phpunit_filter" value=" --filter='${PHPUNIT_FILTER}'" else="">
-			<and>
-				<isset property="PHPUNIT_FILTER" />
-				<length string="${PHPUNIT_FILTER}" when="greater" length="0"/>
-			</and>
-		</condition>
 
 		<!-- Create bootstrap.php -->
 		<copy overwrite="true" file="frontends/php/tests/bootstrap.php.template" tofile="frontends/php/tests/bootstrap.php"/>
