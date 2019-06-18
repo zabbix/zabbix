@@ -7612,8 +7612,9 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *                                                                            *
  * Purpose: Get array of items for selected poller                            *
  *                                                                            *
- * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
- *             items       - [OUT] array of items                             *
+ * Parameters: poller_type     - [IN] poller type (ZBX_POLLER_TYPE_...)       *
+ *             max_items_count - [IN] length of items array                   *
+ *             items           - [OUT] array of items                         *
  *                                                                            *
  * Return value: number of items in items array                               *
  *                                                                            *
@@ -7631,14 +7632,15 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *           function.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
+int	DCconfig_get_poller_items(unsigned char poller_type, int max_items_count, DC_ITEM *items)
 {
 	const char		*__function_name = "DCconfig_get_poller_items";
 
 	int			now, num = 0, max_items;
 	zbx_binary_heap_t	*queue;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d max_items_count:d", __function_name, (int)poller_type,
+			max_items_count);
 
 	now = time(NULL);
 
@@ -7647,10 +7649,10 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 	switch (poller_type)
 	{
 		case ZBX_POLLER_TYPE_JAVA:
-			max_items = MAX_JAVA_ITEMS;
+			max_items = MAX_JAVA_ITEMS < max_items_count ? MAX_JAVA_ITEMS : max_items_count;
 			break;
 		case ZBX_POLLER_TYPE_PINGER:
-			max_items = MAX_PINGER_ITEMS;
+			max_items = MAX_PINGER_ITEMS < max_items_count ? MAX_PINGER_ITEMS : max_items_count;
 			break;
 		default:
 			max_items = 1;

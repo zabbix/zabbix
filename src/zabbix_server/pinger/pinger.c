@@ -39,6 +39,7 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+extern int		CONFIG_PINGER_FORKS;
 
 /******************************************************************************
  *                                                                            *
@@ -408,7 +409,8 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int *icmp_items_count)
+static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int *icmp_items_count,
+		int *max_pinger_items)
 {
 	const char		*__function_name = "get_pinger_hosts";
 	DC_ITEM			items[MAX_PINGER_ITEMS];
@@ -419,7 +421,22 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, items);
+	if (0 == *max_pinger_items)
+	{
+		if (0 < CONFIG_PINGER_FORKS && 0 < zbx_get_fping_interval_value())
+		{
+			*max_pinger_items = config->queues[ZBX_POLLER_TYPE_PINGER]->elems_num / CONFIG_PINGER_FORKS;
+
+			if (MAX_PINGER_ITEMS < *max_pinger_items)
+				*max_pinger_items = MAX_PINGER_ITEMS;
+			else if ( 10 > *max_pinger_items)
+				*max_pinger_items = 10;
+		}
+		else
+			*max_pinger_items = MAX_PINGER_ITEMS;
+	}
+
+	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, max_pinger_items, items);
 
 	for (i = 0; i < num; i++)
 	{
@@ -575,7 +592,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(pinger_thread, args)
 {
-	int			nextcheck, sleeptime, items_count = 0, itc;
+	int			nextcheck, sleeptime, items_count = 0, itc, max_pinger_items = 0;
 	double			sec;
 	static icmpitem_t	*items = NULL;
 	static int		items_alloc = 4;
@@ -597,7 +614,7 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 
 		zbx_setproctitle("%s #%d [getting values]", get_process_type_string(process_type), process_num);
 
-		get_pinger_hosts(&items, &items_alloc, &items_count);
+		get_pinger_hosts(&items, &items_alloc, &items_count, &max_pinger_items);
 		process_pinger_hosts(items, items_count);
 		sec = zbx_time() - sec;
 		itc = items_count;
@@ -606,6 +623,9 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 
 		nextcheck = DCconfig_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
+
+		if (0 < sleeptime)
+			max_pinger_items = 0;
 
 		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), process_num, itc, sec, sleeptime);
