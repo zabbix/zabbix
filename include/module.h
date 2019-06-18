@@ -203,7 +203,6 @@ typedef struct
 }
 ZBX_HISTORY_WRITE_CBS;
 
-
 int	zbx_module_api_version(void);
 int	zbx_module_init(void);
 int	zbx_module_uninit(void);
