@@ -207,6 +207,26 @@ class CWidgetConfig {
 	}
 
 	/**
+	 * Detect if widget has bottom padding or not
+	 *
+	 * @static
+	 *
+	 * @param string $type Widget type
+	 *
+	 * @return bool
+	 */
+	public static function hasPadding($type)
+	{
+		switch ($type) {
+			case WIDGET_HOST_AVAIL:
+				return false;
+
+			default:
+				return true;
+		}
+	}
+
+	/**
 	 * Return Form object for widget with provided data.
 	 *
 	 * @static

@@ -19,28 +19,28 @@
 **/
 
 
-$available_row = (new CCol(sprintf("%d %s", $data['hosts'][HOST_AVAILABLE_TRUE], _('Available'))))
+$table = (new CTag('table', true))->addClass(ZBX_STYLE_HOST_AVAIL_WIDGET);
+
+$available_row = (new CCol([new CSpan($data['hosts'][HOST_AVAILABLE_TRUE]), _('Available')]))
 	->addClass(ZBX_STYLE_HOST_AVAIL_TRUE);
-$not_available_row = (new CCol(sprintf("%d %s", $data['hosts'][HOST_AVAILABLE_FALSE], _('Not available'))))
+$not_available_row = (new CCol([new CSpan($data['hosts'][HOST_AVAILABLE_FALSE]), _('Not available')]))
 	->addClass(ZBX_STYLE_HOST_AVAIL_FALSE);
-$unknown_row = (new CCol(sprintf("%d %s", $data['hosts'][HOST_AVAILABLE_UNKNOWN], _('Unknown'))))
+$unknown_row = (new CCol([new CSpan($data['hosts'][HOST_AVAILABLE_UNKNOWN]), _('Unknown')]))
 	->addClass(ZBX_STYLE_HOST_AVAIL_UNKNOWN);
-$total_row = (new CCol(sprintf("%d %s", $data['total'], _('Total'))))
+$total_row = (new CCol([new CSpan($data['total']), _('Total')]))
 	->addClass(ZBX_STYLE_HOST_AVAIL_TOTAL);
 
-$table = new CTableInfo();
-
-$table->addClass(ZBX_STYLE_TABLE_WITHOUT_HOVER);
-
 if ($data['layout'] == STYLE_HORIZONTAL) {
-	$table->addRow([$available_row, $not_available_row, $unknown_row, $total_row]);
+	$table
+		->addItem([$available_row, $not_available_row, $unknown_row, $total_row])
+		->addClass(ZBX_STYLE_HOST_AVAIL_LAYOUT_HORIZONTAL);
 }
 else {
-	$table
-		->addRow($available_row)
-		->addRow($not_available_row)
-		->addRow($unknown_row)
-		->addRow($total_row);
+	$table->addItem(new CRow($available_row))
+		->addItem(new CRow($not_available_row))
+		->addItem(new CRow($unknown_row))
+		->addItem(new CRow($total_row))
+		->addClass(ZBX_STYLE_HOST_AVAIL_LAYOUT_VERTICAL);
 }
 
 $output = [

@@ -21,8 +21,8 @@
 
 define('ZABBIX_VERSION',		'4.4.0alpha1');
 define('ZABBIX_API_VERSION',	'4.4.0');
-define('ZABBIX_EXPORT_VERSION',	'4.2');
-define('ZABBIX_DB_VERSION',	4030002);
+define('ZABBIX_EXPORT_VERSION',	'4.4');
+define('ZABBIX_DB_VERSION',	4030009);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -870,9 +870,10 @@ define('PARAM_TYPE_COUNTS',		1);
 define('ZBX_DEFAULT_AGENT', 'Zabbix');
 define('ZBX_AGENT_OTHER', -1);
 
-define('HTTPTEST_AUTH_NONE',	0);
-define('HTTPTEST_AUTH_BASIC',	1);
-define('HTTPTEST_AUTH_NTLM',	2);
+define('HTTPTEST_AUTH_NONE',		0);
+define('HTTPTEST_AUTH_BASIC',		1);
+define('HTTPTEST_AUTH_NTLM',		2);
+define('HTTPTEST_AUTH_KERBEROS',	3);
 
 define('HTTPTEST_STATUS_ACTIVE',	0);
 define('HTTPTEST_STATUS_DISABLED',	1);
@@ -1575,6 +1576,7 @@ define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
+define('ZBX_STYLE_ICON_NONE', 'icon-none');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
 define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
 define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');
@@ -1737,12 +1739,14 @@ define('ZBX_STYLE_COLUMN_95', 'column-95');
 define('ZBX_STYLE_COLUMN_CENTER', 'column-center');
 define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');
 
-define('ZBX_STYLE_HOST_AVAIL_TRUE', 'host-avail-true');
-define('ZBX_STYLE_HOST_AVAIL_FALSE', 'host-avail-false');
-define('ZBX_STYLE_HOST_AVAIL_UNKNOWN', 'host-avail-unknown');
-define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
-
-define('ZBX_STYLE_TABLE_WITHOUT_HOVER', 'list-table-without-hover');
+// Widget "Host availability" styles.
+define('ZBX_STYLE_HOST_AVAIL_WIDGET', 'host-avail-widget');
+define('ZBX_STYLE_HOST_AVAIL_LAYOUT_HORIZONTAL', 'host-avail-layout-horizontal');
+define('ZBX_STYLE_HOST_AVAIL_LAYOUT_VERTICAL', 'host-avail-layout-vertical');
+define('ZBX_STYLE_HOST_AVAIL_TRUE', 'host-avail-col-true');
+define('ZBX_STYLE_HOST_AVAIL_FALSE', 'host-avail-col-false');
+define('ZBX_STYLE_HOST_AVAIL_UNKNOWN', 'host-avail-col-unknown');
+define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-col-total');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
