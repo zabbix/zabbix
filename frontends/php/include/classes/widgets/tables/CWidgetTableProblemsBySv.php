@@ -145,7 +145,7 @@ class CWidgetTableProblemsBySv {
 			$url_group->setArgument('filter_groupids', [$group['groupid']]);
 			$row = [new CLink($group['name'], $url_group->getUrl())];
 
-            $row = $this->getGroupSeverity($row, $group, false);
+			$row = $this->getGroupSeverity($row, $group, false);
 			$table->addRow($row);
 		}
 
@@ -158,7 +158,7 @@ class CWidgetTableProblemsBySv {
 		$table = new CTableInfo();
 
 		foreach ($goups_info as $group) {
-            $row = $this->getGroupSeverity([], $group, true, $table);
+			$row = $this->getGroupSeverity([], $group, true, $table);
 
 			if ($this->filter['layout'] == STYLE_HORIZONTAL) {
 				$table->addRow($row);
