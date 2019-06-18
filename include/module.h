@@ -170,7 +170,7 @@ typedef struct
 	const char	*value;
 }
 ZBX_HISTORY_STRING;
-
+7
 typedef struct
 {
 	zbx_uint64_t	itemid;
@@ -202,6 +202,7 @@ typedef struct
 	void	(*history_log_cb)(const ZBX_HISTORY_LOG *history, int history_num);
 }
 ZBX_HISTORY_WRITE_CBS;
+
 
 int	zbx_module_api_version(void);
 int	zbx_module_init(void);
