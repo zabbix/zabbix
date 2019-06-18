@@ -269,6 +269,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/pagefilter',
 			$this->rootDir.'/include/classes/widgets/fields',
 			$this->rootDir.'/include/classes/widgets/forms',
+			$this->rootDir.'/include/classes/widgets/tables',
 			$this->rootDir.'/include/classes/widgets',
 			$this->rootDir.'/local/app/controllers',
 			$this->rootDir.'/app/controllers'

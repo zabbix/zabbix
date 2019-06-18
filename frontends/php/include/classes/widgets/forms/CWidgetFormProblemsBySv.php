@@ -103,6 +103,10 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 			$field_layout->setValue($this->data['layout']);
 		}
 
+		if ($field_show_type->getValue() == WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS) {
+			$field_layout->setFlags(CWidgetField::FLAG_DISABLED);
+		}
+
 		$this->fields[$field_layout->getName()] = $field_layout;
 
 		// Show suppressed problems.
@@ -120,6 +124,10 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 
 		if (array_key_exists('hide_empty_groups', $this->data)) {
 			$field_hide_empty_groups->setValue($this->data['hide_empty_groups']);
+		}
+
+		if ($field_show_type->getValue() == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {
+			$field_hide_empty_groups->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 
 		$this->fields[$field_hide_empty_groups->getName()] = $field_hide_empty_groups;

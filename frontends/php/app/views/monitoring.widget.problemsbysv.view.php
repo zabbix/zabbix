@@ -21,7 +21,8 @@
 
 $backurl = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view');
 
-$table = makeSystemStatus($data['filter'], $data['data'], $data['config'], $backurl->getUrl());
+$table = (new CWidgetTableProblemsBySv($data['filter'], $data['data'], $data['config'], $backurl->getUrl()))
+	->getTable();
 
 $output = [
 	'header' => $data['name'],

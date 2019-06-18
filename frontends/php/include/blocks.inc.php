@@ -329,25 +329,13 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
 	// indicator of sort field
 	$sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_UP);
 
-	$aggregate = $filter['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS;
+	// Set trigger severities as table header starting from highest severity.
+	$header = [[_('Host group'), $sort_div]];
 
-	if ($aggregate) {
-		$header = null;
-		$filter_hide_empty_groups = false;
-
-		$goups_info = aggregate_data($data['groups'], $config);
-	}
-	else {
-		// Set trigger severities as table header starting from highest severity.
-		$header = [[_('Host group'), $sort_div]];
-
-		for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity--) {
-			if (in_array($severity, $filter_severities)) {
-				$header[] = getSeverityName($severity, $config);
-			}
+	for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity--) {
+		if (in_array($severity, $filter_severities)) {
+			$header[] = getSeverityName($severity, $config);
 		}
-
-		$goups_info = $data['groups'];
 	}
 
 	$table = (new CTableInfo())
@@ -367,20 +355,19 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
 				: null
 		);
 
-	foreach ($goups_info as $group) {
+	foreach ($data['groups'] as $group) {
 		if ($filter_hide_empty_groups && !$group['has_problems']) {
 			continue;
 		}
 
 		$url_group->setArgument('filter_groupids', [$group['groupid']]);
-		$row = $aggregate ? [] : [new CLink($group['name'], $url_group->getUrl())];
+		$row = [new CLink($group['name'], $url_group->getUrl())];
 
 		foreach ($group['stats'] as $severity => $stat) {
 			if ($stat['count'] == 0 && $stat['count_unack'] == 0) {
 				$row[] = '';
 				continue;
 			}
-			$severity_name = $aggregate ? SPACE.getSeverityName($severity, $config) : '';
 
 			$allTriggersNum = $stat['count'];
 			if ($allTriggersNum) {
@@ -389,7 +376,6 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
 						$config, $filter
 					));
 			}
-			$allTriggersNum = [$allTriggersNum, $severity_name];
 
 			$unackTriggersNum = $stat['count_unack'];
 			if ($unackTriggersNum) {
@@ -419,52 +405,12 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
 					}
 					break;
 			}
-			if ($filter['layout'] == STYLE_VERTICAL) {
-				$table->addRow($row);
-				$row = [];
-			}
 		}
-		if ($filter['layout'] == STYLE_HORIZONTAL) {
-			$table->addRow($row);
-		}
+
+		$table->addRow($row);
 	}
 
 	return $table;
-}
-
-function aggregate_data(array $groups, array $config) {
-	$goups_info = [
-		0 => [
-			'groupid' => 0,
-			'name' => 'Totals',
-			'stats' => []
-		]
-	];
-
-	foreach (array_reverse($config) as $key => $value) {
-		$i = explode('_', $key)[2];
-		$goups_info[0]['stats'][$i] = [
-			'count' => 0,
-			'problems' => [],
-			'count_unack' => 0,
-			'problems_unack' => []
-		];
-	}
-
-	foreach ($groups as $group) {
-		foreach ($group['stats'] as $severity => $stat) {
-			$goups_info[0]['stats'][$severity]['count'] += $stat['count'];
-			foreach ($stat['problems'] as $problem) {
-				$goups_info[0]['stats'][$severity]['problems'][] = $problem;
-			}
-			$goups_info[0]['stats'][$severity]['count_unack'] += $stat['count_unack'];
-			foreach ($stat['problems_unack'] as $problem) {
-				$goups_info[0]['stats'][$severity]['problems_unack'][] = $problem;
-			}
-		}
-	}
-
-	return $goups_info;
 }
 
 function make_status_of_zbx() {
