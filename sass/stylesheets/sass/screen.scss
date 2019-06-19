@@ -212,6 +212,16 @@ pre {
 	}
 }
 
+.disabled {
+	@include opacity(0.35);
+	cursor: default !important;
+
+	.disabled,
+	[disabled] {
+		opacity: 1 !important;
+	}
+}
+
 %space-pre-wrap {
 	white-space: pre-wrap;
 	word-wrap: break-word;
@@ -1492,6 +1502,26 @@ output {
 	}
 }
 
+.disabled {
+	background-color: transparent;
+
+	.subfilter-enabled {
+		color: darken($ui-bg-selected-color, 35%);
+	}
+
+	.subfilter-disable-btn {
+		cursor: default;
+		color: darken($ui-bg-selected-color, 25%);
+		background-color: $ui-bg-selected-color;
+
+		&:hover,
+		&:focus,
+		&:active {
+			color: darken($ui-bg-selected-color, 25%);
+		}
+	}
+}
+
 .filter-forms {
 	margin: 0 auto;
 	text-align: center;
@@ -1589,23 +1619,17 @@ output {
 				padding: 0 9px 0 4px;
 				line-height: 18px;
 			}
+		}
+	}
 
-			&.selected {
+	.disabled {
+		@include opacity(1);
+		background-color: $multiselect-disabled-bg-color;
 
-				.subfilter-enabled {
-					background-color: lighten($ui-bg-selected-color, 10%);
-				}
-
-				.subfilter-disable-btn {
-					background-color: lighten($ui-bg-selected-color, 10%);
-					@include opacity(1);
-
-					&:active {
-						background-color: lighten($ui-bg-selected-color, 10%);
-						@include opacity(1);
-					}
-				}
-			}
+		.subfilter-enabled,
+		.subfilter-disable-btn {
+			background-color: $multiselect-item-disabled-bg-color;
+			color: $multiselect-item-disabled-color;
 		}
 	}
 
@@ -2038,7 +2062,7 @@ input {
 	}
 
 	&[readonly] {
-		color: $font-color!important;
+		color: $font-color !important;
 		@extend %form-disabled;
 	}
 }
@@ -2842,34 +2866,6 @@ $icon-widget-btn: (
 	border-color: $form-disabled-border-color;
 }
 
-.disabled {
-	cursor: default !important;
-	background-color: transparent !important;
-	@include opacity(0.35);
-
-	.subfilter-enabled {
-		color: darken($ui-bg-selected-color, 35%);
-	}
-
-	.subfilter-disable-btn {
-		cursor: default;
-		color: darken($ui-bg-selected-color, 25%);
-		background-color: $ui-bg-selected-color;
-
-		&:hover {
-			color: darken($ui-bg-selected-color, 35%);
-		}
-
-		&:focus {
-			color: darken($ui-bg-selected-color, 35%);
-		}
-
-		&:active {
-			color: darken($ui-bg-selected-color, 35%);
-		}
-	}
-}
-
 .inaccessible {
 	.subfilter-enabled {
 		color: darken($font-selected-color, 25%);
@@ -2979,6 +2975,32 @@ $var-icons: (
 		&::before {
 			background: $bgimage;
 			@extend %var-icons;
+		}
+	}
+}
+
+.icon-none {
+	margin-left: 18px;
+}
+
+$trigger-expression-tree-icons: (
+	top-bottom: url(../img/icon-sprite.svg) no-repeat -84px -300px,
+	top-bottom-right: url(../img/icon-sprite.svg) no-repeat -84px -334px,
+	top-right: url(../img/icon-sprite.svg) no-repeat -84px -372px,
+	empty: url(../img/icon-sprite.svg) no-repeat -84px -350px
+);
+
+@each $var-icon, $bgimage in $trigger-expression-tree-icons {
+	.icon-tree-#{$var-icon} {
+		margin: 0 12px 0 0;
+
+		&::before {
+			background: $bgimage;
+			display: inline-block;
+			width: 12px;
+			height: 12px;
+			position: absolute;
+			content: '';
 		}
 	}
 }
@@ -3758,7 +3780,7 @@ $form-icon-btn: (
 }
 
 // Action Menus, Pop-up Menus
-.action-menu {
+.menu-popup {
 	position: absolute;
 	z-index: 1000;
 	padding: 5px 15px 5px 25px;
@@ -3782,7 +3804,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.action-menu-item {
+	.menu-popup-item {
 		display: block;
 		height: 24px;
 		line-height: 24px;
@@ -3829,7 +3851,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.action-menu-item-disabled {
+	.menu-popup-item-disabled {
 		display: block;
 		height: 24px;
 		line-height: 24px;
@@ -5481,10 +5503,29 @@ a.overlay-close-btn {
 	background-color: rgba($ui-bg-color, .8);
 	@include border-radius(50%);
 	@include transform(translateY(-50%));
+
+	&.menu-popup-preloader {
+		@include border-radius(0);
+		@include box-shadow(0 4px 20px 0 $action-shadow-color);
+		@include transform(none);
+		background: $action-preloader-bg-color;
+		border: 1px solid $action-border-color;
+		height: 120px;
+		width: 120px;
+		position: fixed;
+		right: auto;
+		bottom: auto;
+		display: flex;
+		align-items: center;
+		margin: 0;
+		z-index: 1010;
+	}
 }
 
 .preloader {
 	@include border-radius(50%);
+	@include box-shadow (0 0 0 7px rgba($ui-bg-color, .8));
+	background-color: rgba($ui-bg-color, .8);
 	width: 20px;
 	height: 20px;
 	margin: 0 auto;
@@ -5733,6 +5774,11 @@ svg {
 	.map-container {
 		display: table;
 	}
+
+	.flickerfreescreen {
+		display: inline-block;
+	}
+
 	.table-forms-container {
 		display: table;
 		margin: 0;
@@ -6317,6 +6363,10 @@ svg {
 	&::before {
 		background-position: -524px -245px;
 	}
+}
+
+#expressions_list .ui-sortable-helper {
+	display: table;
 }
 
 // RANGE CONTROL
@@ -7008,27 +7058,27 @@ In exceptional cases dialogs may contain additional information inside a scrolla
 Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch.
 
 ```html_example
-<ul class="action-menu">
+<ul class="menu-popup">
    <li>
       <h3>Favourite screens</h3>
    </li>
-   <li><span class="action-menu-item">Add</span></li>
+   <li><span class="menu-popup-item">Add</span></li>
    <li>
-      <span class="action-menu-item">Remove<span class="arrow-right"></span></span>
-      <ul class="action-menu" style="top: 47px; left: 203px;">
-         <li><span class="action-menu-item">Zabbix server</span></li>
+      <span class="menu-popup-item">Remove<span class="arrow-right"></span></span>
+      <ul class="menu-popup" style="top: 47px; left: 203px;">
+         <li><span class="menu-popup-item">Zabbix server</span></li>
       </ul>
    </li>
-   <li><span class="action-menu-item">Remove all</span></li>
+   <li><span class="menu-popup-item">Remove all</span></li>
    <li>
       <div></div>
    </li>
    <li>
       <h3>Favourite slide shows</h3>
    </li>
-   <li><span class="action-menu-item selected">Add</span></li>
-   <li><span class="action-menu-item-disabled">Remove</span></li>
-   <li><span class="action-menu-item-disabled">Remove all</span></li>
+   <li><span class="menu-popup-item selected">Add</span></li>
+   <li><span class="menu-popup-item-disabled">Remove</span></li>
+   <li><span class="menu-popup-item-disabled">Remove all</span></li>
 </ul>
 ```
 */
